@@ -107,9 +107,9 @@ void SimControl::InitTimerAndIO() {
       false));
 }
 
-void SimControl::Init(double start_velocity,
+void SimControl::Init(bool set_start_point, double start_velocity,
                       double start_acceleration) {
-  if (!FLAGS_use_navigation_mode) {
+  if (set_start_point && !FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
@@ -252,7 +252,8 @@ void SimControl::Start() {
     // When localization is already available, we do not need to
     // reset/override the start point.
     localization_reader_->Observe();
-    Init(next_point_.has_v() ? next_point_.v() : 0.0,
+    Init(localization_reader_->Empty(),
+         next_point_.has_v() ? next_point_.v() : 0.0,
          next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();

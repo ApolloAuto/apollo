@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -98,6 +99,30 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+  /**
+   * @brief The function to construct a parking routing task from the given
+   * json,
+   * @param json that contains start, end, waypoint, parking info, lane width,
+   * @param parking_routing_task
+   * @return True if parking routing task is constructed successfully
+   */
+  bool ConstructParkingRoutingTask(
+      const nlohmann::json &json,
+      apollo::task_manager::ParkingRoutingTask *parking_routing_task);
+
+  /**
+   * @brief The function to construct a dead end junction routing task from the
+   * given json,
+   * @param json that contains start1, end1, start2, end2, inLaneIds,
+   * outLaneIds, junctionInfo
+   * @param dead_junction_routing_task
+   * @return True if dead junction routing task is constructed successfully
+   */
+  bool ConstructDeadJunctionRoutingTask(
+      const nlohmann::json &json,
+      apollo::task_manager::DeadEndRoutingTask
+          *dead_end_routing_task);
+
   bool ValidateCoordinate(const nlohmann::json &json);
 
   /**
@@ -106,6 +131,13 @@ class SimulationWorldUpdater {
    * @return True if the lane is CITY_DRIVING
    */
   nlohmann::json CheckRoutingPoint(const nlohmann::json &json);
+
+  /**
+   * @brief Check if routing point is located on a lane that included by arr
+   * @param json that contains point and ids array
+   * @return json contains error means check failed else means check succeed
+   */
+  nlohmann::json CheckDeadEndJunctionPoints(const nlohmann::json &json);
 
   /**
    * @brief Tries to load the points of interest from the file if it has

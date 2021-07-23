@@ -57,7 +57,7 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectPadMsgScenario(const Frame& frame);
 
-  ScenarioConfig::ScenarioType SelectIntersectionScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectInterceptionScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
@@ -66,6 +66,8 @@ class ScenarioManager final {
       const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap);
 
   ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
+
+  ScenarioConfig::ScenarioType SelectDeadEndScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectYieldSignScenario(
       const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
@@ -104,6 +106,9 @@ class ScenarioManager final {
   void UpdatePlanningContextYieldSignScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
+  bool JudgeReachTargetPoint(const common::VehicleState& car_position,
+                             const common::PointENU& target_point);
+
  private:
   std::shared_ptr<DependencyInjector> injector_;
   PlanningConfig planning_config_;
@@ -116,6 +121,9 @@ class ScenarioManager final {
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>
       first_encountered_overlap_map_;
+  bool routing_in_flag_ = true;
+  common::PointENU dead_end_point_;
+  bool reach_target_pose_ = false;
 };
 
 }  // namespace scenario

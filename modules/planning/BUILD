@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -88,6 +88,7 @@ cc_library(
     hdrs = ["on_lane_planning.h"],
     copts = [
         "-fopenmp",
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":planning_base",
@@ -127,37 +128,7 @@ install(
         ":libplanning_component.so",
     ],
     deps = [
-        ":pb_planning",
         "//cyber:install",
-    ],
-)
-
-install_files(
-    name = "pb_planning",
-    dest = "modules/planning",
-    files = [
-        "//modules/planning/proto:auto_tuning_raw_feature_py_pb2",
-        "//modules/planning/proto:decision_py_pb2",
-        "//modules/planning/proto:ipopt_return_status_py_pb2",
-        "//modules/planning/proto:lattice_structure_py_pb2",
-        "//modules/planning/proto:learning_data_py_pb2",
-        "//modules/planning/proto:open_space_task_config_py_pb2",
-        "//modules/planning/proto:pad_msg_py_pb2",
-        "//modules/planning/proto:planner_open_space_config_py_pb2",
-        "//modules/planning/proto:planning_config_py_pb2",
-        "//modules/planning/proto:planning_internal_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
-        "//modules/planning/proto:planning_semantic_map_config_py_pb2",
-        "//modules/planning/proto:planning_stats_py_pb2",
-        "//modules/planning/proto:planning_status_py_pb2",
-        "//modules/planning/proto:reference_line_smoother_config_py_pb2",
-        "//modules/planning/proto:sl_boundary_py_pb2",
-        "//modules/planning/proto:st_drivable_boundary_py_pb2",
-        "//modules/planning/proto:task_config_py_pb2",
-        "//modules/planning/proto:traffic_rule_config_py_pb2",
-        "//modules/planning/proto/math:cos_theta_smoother_config_py_pb2",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
-        "//modules/planning/proto/math:qp_problem_py_pb2",
     ],
 )
 

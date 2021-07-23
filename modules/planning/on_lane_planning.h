@@ -102,10 +102,21 @@ class OnLanePlanning : public PlanningBase {
   void AddFallbackTrajectory(const planning_internal::Debug& debug_info,
                              planning_internal::Debug* debug_chart);
 
+  bool DeadEndHandle(const common::PointENU& dead_end_point,
+                     const common::VehicleState& vehicle_state);
+
+  bool JudgeCarInDeadEndJunction(
+    std::vector<hdmap::JunctionInfoConstPtr>* junctions,
+    const common::math::Vec2d& dead_end_point,
+    hdmap::JunctionInfoConstPtr* target_junction);
+
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
   Smoother planning_smoother_;
+  bool wait_flag_ = false;
+  bool routing_in_flag_ = true;
+  common::PointENU dead_end_point_;
 };
 
 }  // namespace planning
