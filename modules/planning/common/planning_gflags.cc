@@ -83,6 +83,10 @@ DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
               "valet_parking scenario config file");
+DEFINE_string(scenario_deadend_turnaround_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/deadend_turnaround_config.pb.txt",
+              "deadend_turnaround scenario config file");
 DEFINE_string(scenario_yield_sign_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/yield_sign_config.pb.txt",
@@ -179,6 +183,13 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 
+DEFINE_double(threshold_distance_for_destination, 0.01,
+              "threshold distance for destination");
+
+DEFINE_double(buffer_in_routing, 0.0, "buffer for select in lane for boundary");
+
+DEFINE_double(buffer_out_routing, 2.0,
+              "buffer for select out lane for boundary");
 // planning trajectory output time density control
 DEFINE_double(
     trajectory_time_min_interval, 0.02,

@@ -29,6 +29,7 @@ message OpenSpacePreStopDeciderConfig {
     PARKING = 1;
     PULL_OVER = 2;
     NARROW_STREET_U_TURN = 3;
+    DEAD_END_PRE_STOP = 4;
   }
   optional StopType stop_type = 1;
   optional double rightaway_stop_distance = 2 [default = 2.0];  // meter
@@ -46,6 +47,7 @@ message OpenSpaceRoiDeciderConfig {
     PULL_OVER = 2;
     PARK_AND_GO = 3;
     NARROW_STREET_U_TURN = 4;
+    DEAD_END = 5;
   }
   optional RoiType roi_type = 1;
   // longitudinal range of parking roi start
@@ -74,6 +76,12 @@ message OpenSpaceRoiDeciderConfig {
   optional double curb_heading_tangent_change_upper_limit = 13 [default = 1.0];
   // end pose s distance to current vehicle
   optional double end_pose_s_distance = 14 [default = 10.0];
+  // end pose x to parallel parking
+  optional double parallel_park_end_x_buffer = 15 [default = 0.2];
+  // extend right spot width size 
+  optional double extend_right_x_buffer = 16 [default = 0.0];
+  // extend left spot width size
+  optional double extend_left_x_buffer = 17 [default = 0.0];
 }
 
 //////////////////////////////////

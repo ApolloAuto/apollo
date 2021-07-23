@@ -462,8 +462,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
 
 void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
   std::string start_command = absl::StrCat(
-      "nohup bash /apollo/modules/tools/sensor_calibration/extract_data.sh -t ",
-      task_type, " &");
+      "nohup bash /apollo/scripts/extract_data.sh -t ", task_type, " &");
   System(start_command);
 }
 

@@ -315,6 +315,9 @@ class Path {
   const std::vector<PathOverlap>& parking_space_overlaps() const {
     return parking_space_overlaps_;
   }
+  const std::vector<PathOverlap>& dead_end_overlaps() const {
+    return dead_end_overlaps_;
+  }
 
   double GetLaneLeftWidth(const double s) const;
   double GetLaneRightWidth(const double s) const;
@@ -374,6 +377,7 @@ class Path {
   std::vector<PathOverlap> stop_sign_overlaps_;
   std::vector<PathOverlap> crosswalk_overlaps_;
   std::vector<PathOverlap> parking_space_overlaps_;
+  std::vector<PathOverlap> dead_end_overlaps_;
   std::vector<PathOverlap> junction_overlaps_;
   std::vector<PathOverlap> pnc_junction_overlaps_;
   std::vector<PathOverlap> clear_area_overlaps_;

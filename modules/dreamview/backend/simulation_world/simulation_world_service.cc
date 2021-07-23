@@ -546,8 +546,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
 
-  auto_driving_car->set_battery_percentage(
-    chassis.battery_soc_percentage());
+  auto_driving_car->set_battery_percentage(chassis.battery_soc_percentage());
   auto_driving_car->set_gear_location(chassis.gear_location());
 }
 
