@@ -69,3 +69,5 @@ DECLARE_string(vehicle_calibration_mode);
 DECLARE_string(lidar_calibration_mode);
 
 DECLARE_string(camera_calibration_mode);
+
+DECLARE_double(parking_routing_distance_threshold);

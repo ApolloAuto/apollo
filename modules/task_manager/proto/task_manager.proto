@@ -4,9 +4,21 @@ package apollo.task_manager;
 
 import "modules/common/proto/header.proto";
 import "modules/routing/proto/routing.proto";
+import "modules/map/proto/map_parking_space.proto";
 
 enum TaskType {
   CYCLE_ROUTING = 0;
+  PARKING_ROUTING = 1;
+  DEAD_END_ROUTING = 3;
+}
+
+enum JunctionType {
+  UNKNOWN = 0;
+  IN_ROAD = 1;
+  CROSS_ROAD = 2;
+  FORK_ROAD = 3;
+  MAIN_SIDE = 4;
+  DEAD_END = 5;
 }
 
 message CycleRoutingTask {
@@ -14,9 +26,23 @@ message CycleRoutingTask {
   optional apollo.routing.RoutingRequest routing_request = 2;
 }
 
+message ParkingRoutingTask {
+  optional double lane_width = 1;
+  optional apollo.routing.RoutingRequest routing_request = 2;
+} 
+
+message DeadEndRoutingTask {
+  optional apollo.routing.RoutingRequest routing_request_in = 2;
+  optional apollo.routing.RoutingRequest routing_request_out = 3;
+}
+
 message Task {
   optional apollo.common.Header header = 1;
   optional string task_name = 2;
   optional TaskType task_type = 3;
-  optional CycleRoutingTask cycle_routing_task = 4;
+  oneof routing_task {
+    CycleRoutingTask cycle_routing_task = 4;
+    ParkingRoutingTask parking_routing_task = 5;
+    DeadEndRoutingTask dead_end_routing_task = 6;
+  }
 }

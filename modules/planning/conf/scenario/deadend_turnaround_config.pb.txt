@@ -1,0 +1,102 @@
+scenario_type: DEADEND_TURNAROUND
+deadend_turnaround_config: {
+  dead_end_start_range: 5.0
+  max_valid_stop_distance: 1.0
+}
+stage_type: DEADEND_TURNAROUND_APPROACHING_TURNING_POINT
+stage_type: DEADEND_TURNAROUND_TURNING
+
+stage_config: {
+  stage_type: DEADEND_TURNAROUND_APPROACHING_TURNING_POINT
+  enabled: true
+  task_type: OPEN_SPACE_PRE_STOP_DECIDER
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_config: {
+    task_type: OPEN_SPACE_PRE_STOP_DECIDER
+    open_space_pre_stop_decider_config {
+      stop_type: DEAD_END_PRE_STOP
+    }
+  }
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_HEURISTIC_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}
+
+stage_config: {
+  stage_type: DEADEND_TURNAROUND_TURNING
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: DEAD_END
+      perception_obstacle_buffer: 0.2
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+    open_space_trajectory_partition_config {
+      heading_offset_to_midpoint: 0.79
+      lateral_offset_to_midpoint: 0.5
+      longitudinal_offset_to_midpoint: 0.2
+      vehicle_box_iou_threshold_to_midpoint: 0.6
+      linear_velocity_threshold_on_ego: 0.1
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}

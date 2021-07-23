@@ -648,7 +648,6 @@ bool HybridAStar::Plan(
   close_set_.clear();
   open_pq_ = decltype(open_pq_)();
   final_node_ = nullptr;
-
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec;
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
@@ -662,7 +661,6 @@ bool HybridAStar::Plan(
     obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
   }
   obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
-
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
@@ -671,11 +669,11 @@ bool HybridAStar::Plan(
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   if (!ValidityCheck(start_node_)) {
-    ADEBUG << "start_node in collision with obstacles";
+    AERROR << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    ADEBUG << "end_node in collision with obstacles";
+    AERROR << "end_node in collision with obstacles";
     return false;
   }
   double map_time = Clock::NowInSeconds();
@@ -685,7 +683,6 @@ bool HybridAStar::Plan(
   // load open set, pq
   open_set_.emplace(start_node_->GetIndex(), start_node_);
   open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
-
   // Hybrid A* begins
   size_t explored_node_num = 0;
   double astar_start_time = Clock::NowInSeconds();
