@@ -1712,7 +1712,8 @@
                         "ULTRASONIC_RADAR": 17,
                         "MOBILEYE": 18,
                         "DELPHI_ESR": 19,
-                        "STORYTELLING": 20
+                        "STORYTELLING": 20,
+                        "TASK_MANAGER": 21
                       }
                     },
                     "LogLevel": {
@@ -4100,7 +4101,8 @@
                     "NOT_DEFINED": 0,
                     "PARKING": 1,
                     "PULL_OVER": 2,
-                    "NARROW_STREET_U_TURN": 3
+                    "NARROW_STREET_U_TURN": 3,
+                    "DEAD_END_PRE_STOP": 4
                   }
                 }
               }
@@ -4195,6 +4197,27 @@
                   "options": {
                     "default": 10
                   }
+                },
+                "parallelParkEndXBuffer": {
+                  "type": "double",
+                  "id": 15,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "extendRightXBuffer": {
+                  "type": "double",
+                  "id": 16,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "extendLeftXBuffer": {
+                  "type": "double",
+                  "id": 17,
+                  "options": {
+                    "default": 0
+                  }
                 }
               },
               "nested": {
@@ -4204,7 +4227,8 @@
                     "PARKING": 1,
                     "PULL_OVER": 2,
                     "PARK_AND_GO": 3,
-                    "NARROW_STREET_U_TURN": 4
+                    "NARROW_STREET_U_TURN": 4,
+                    "DEAD_END": 5
                   }
                 }
               }
@@ -5364,6 +5388,16 @@
                 }
               }
             },
+            "JucType": {
+              "values": {
+                "UNKNOWN": 0,
+                "IN_ROAD": 1,
+                "CROSS_ROAD": 2,
+                "FORK_ROAD": 3,
+                "MAIN_SIDE": 4,
+                "DEAD_END": 5
+              }
+            },
             "RSSInfo": {
               "fields": {
                 "isRssSafe": {
@@ -5418,19 +5452,13 @@
                   "type": "double",
                   "id": 3
                 },
-                "trajectoryPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.TrajectoryPoint",
-                  "id": 12
-                },
                 "estop": {
                   "type": "EStop",
                   "id": 6
                 },
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 13
+                "debug": {
+                  "type": "apollo.planning_internal.Debug",
+                  "id": 8
                 },
                 "isReplan": {
                   "type": "bool",
@@ -5439,13 +5467,19 @@
                     "default": false
                   }
                 },
-                "replanReason": {
-                  "type": "string",
-                  "id": 22
-                },
                 "gear": {
                   "type": "apollo.canbus.Chassis.GearPosition",
                   "id": 10
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 12
+                },
+                "pathPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PathPoint",
+                  "id": 13
                 },
                 "decision": {
                   "type": "apollo.planning.DecisionResult",
@@ -5458,10 +5492,6 @@
                 "routingHeader": {
                   "type": "apollo.common.Header",
                   "id": 16
-                },
-                "debug": {
-                  "type": "apollo.planning_internal.Debug",
-                  "id": 8
                 },
                 "rightOfWayStatus": {
                   "type": "RightOfWayStatus",
@@ -5487,10 +5517,18 @@
                     "default": "UNKNOWN"
                   }
                 },
+                "replanReason": {
+                  "type": "string",
+                  "id": 22
+                },
                 "targetLaneId": {
                   "rule": "repeated",
                   "type": "apollo.hdmap.Id",
                   "id": 23
+                },
+                "carInDeadEnd": {
+                  "type": "bool",
+                  "id": 24
                 },
                 "rssInfo": {
                   "type": "RSSInfo",
@@ -6095,6 +6133,24 @@
                 }
               }
             },
+            "ScenarioDeadEndTurnAroundConfig": {
+              "fields": {
+                "deadEndStartRange": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
             "ScenarioYieldSignConfig": {
               "fields": {
                 "startYieldSignScenarioDistance": {
@@ -6144,7 +6200,8 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "trafficLightUnprotectedRightTurnConfig",
                     "valetParkingConfig",
-                    "yieldSignConfig"
+                    "yieldSignConfig",
+                    "deadendTurnaroundConfig"
                   ]
                 }
               },
@@ -6209,6 +6266,10 @@
                   "type": "ScenarioYieldSignConfig",
                   "id": 15
                 },
+                "deadendTurnaroundConfig": {
+                  "type": "ScenarioDeadEndTurnAroundConfig",
+                  "id": 18
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
@@ -6240,7 +6301,8 @@
                     "EMERGENCY_STOP": 12,
                     "NARROW_STREET_U_TURN": 13,
                     "PARK_AND_GO": 14,
-                    "LEARNING_MODEL_SAMPLE": 15
+                    "LEARNING_MODEL_SAMPLE": 15,
+                    "DEADEND_TURNAROUND": 16
                   }
                 },
                 "StageType": {
@@ -6271,6 +6333,8 @@
                     "EMERGENCY_STOP_STANDBY": 611,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 700,
                     "VALET_PARKING_PARKING": 701,
+                    "DEADEND_TURNAROUND_APPROACHING_TURNING_POINT": 1100,
+                    "DEADEND_TURNAROUND_TURNING": 1101,
                     "PARK_AND_GO_CHECK": 800,
                     "PARK_AND_GO_CRUISE": 801,
                     "PARK_AND_GO_ADJUST": 802,
@@ -10478,6 +10542,18 @@
                 }
               }
             },
+            "ParkingSpaceType": {
+              "values": {
+                "VERTICAL_PLOT": 0,
+                "PARALLEL_PARKING": 1
+              }
+            },
+            "DeadEndRoutingType": {
+              "values": {
+                "ROUTING_IN": 0,
+                "ROUTING_OUT": 1
+              }
+            },
             "ParkingInfo": {
               "fields": {
                 "parkingSpaceId": {
@@ -10485,6 +10561,26 @@
                   "id": 1
                 },
                 "parkingPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 2
+                },
+                "parkingSpaceType": {
+                  "type": "ParkingSpaceType",
+                  "id": 3
+                },
+                "cornerPoint": {
+                  "type": "apollo.hdmap.Polygon",
+                  "id": 4
+                }
+              }
+            },
+            "DeadEndInfo": {
+              "fields": {
+                "deadEndRoutingType": {
+                  "type": "DeadEndRoutingType",
+                  "id": 1
+                },
+                "targetPoint": {
                   "type": "apollo.common.PointENU",
                   "id": 2
                 }
@@ -10528,6 +10624,10 @@
                 "parkingInfo": {
                   "type": "ParkingInfo",
                   "id": 7
+                },
+                "deadEndInfo": {
+                  "type": "DeadEndInfo",
+                  "id": 8
                 }
               }
             },
@@ -10859,6 +10959,22 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 4
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "IN_ROAD": 1,
+                    "CROSS_ROAD": 2,
+                    "FORK_ROAD": 3,
+                    "MAIN_SIDE": 4,
+                    "DEAD_END": 5
+                  }
                 }
               }
             },

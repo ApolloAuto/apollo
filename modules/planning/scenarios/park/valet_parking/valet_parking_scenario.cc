@@ -132,7 +132,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
     return false;
   }
 
-  if (!CheckDistanceToParkingSpot(vehicle_state, nearby_path,
+  if (!CheckDistanceToParkingSpot(frame, vehicle_state, nearby_path,
                                   parking_start_range, parking_space_overlap)) {
     ADEBUG << "target parking spot found, but too far, distance larger than "
               "pre-defined distance"
@@ -157,6 +157,7 @@ bool ValetParkingScenario::SearchTargetParkingSpotOnPath(
 }
 
 bool ValetParkingScenario::CheckDistanceToParkingSpot(
+    const Frame& frame,
     const VehicleState& vehicle_state, const Path& nearby_path,
     const double parking_start_range,
     const PathOverlap& parking_space_overlap) {
@@ -170,6 +171,14 @@ bool ValetParkingScenario::CheckDistanceToParkingSpot(
       hdmap->GetParkingSpaceById(id);
   Vec2d left_bottom_point = target_parking_spot_ptr->polygon().points().at(0);
   Vec2d right_bottom_point = target_parking_spot_ptr->polygon().points().at(1);
+  const auto &routing_request =
+      frame.local_view().routing->routing_request();
+  auto corner_point =
+      routing_request.parking_info().corner_point();
+  left_bottom_point.set_x(corner_point.point().at(0).x());
+  left_bottom_point.set_y(corner_point.point().at(0).y());
+  right_bottom_point.set_x(corner_point.point().at(1).x());
+  right_bottom_point.set_y(corner_point.point().at(1).y());
   double left_bottom_point_s = 0.0;
   double left_bottom_point_l = 0.0;
   double right_bottom_point_s = 0.0;
