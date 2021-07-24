@@ -106,7 +106,7 @@ bool ClassicContext::RemoveCRoutine(const std::shared_ptr<CRoutine>& cr) {
     if ((*it)->id() == crid) {
       auto cr = *it;
       cr->Stop();
-      while (!cr->Acquire()) {
+      while (cr.get() != CRoutine::GetCurrentRoutine() && !cr->Acquire()) {
         std::this_thread::sleep_for(std::chrono::microseconds(1));
         AINFO_EVERY(1000) << "waiting for task " << cr->name() << " completion";
       }
