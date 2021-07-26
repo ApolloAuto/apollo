@@ -1,14 +1,21 @@
 # How to add a new camera detector algorithm
 
 The processing flow of camera perception module is shown below:
-![camera overview](images/Camera_overview.png)
+    ![camera overview](images/Camera_overview.png)
 
 The 3 detector algorithms introduced by this document were traffic_light_detector, land_detector, obstacle_detector. These 3 detectors are located in their own component. The architecture of each component is showed below:
-![traffic light component](images/camera_traffic_light_detection.png)
-![lane component](images/camera_lane_detection.png)
-![obstacle component](images/camera_lane_detection.png)
+Traffic Light:
+    ![traffic light component](images/camera_traffic_light_detection.png)
+
+Lane:
+    ![lane component](images/camera_lane_detection.png)
+
+Obstacle:
+    ![obstacle component](images/camera_lane_detection.png)
+
 
 As we can see clearly from above structure,each component has its own abstract class member `base_XXX_detector`. Different derived detector algorithms inherit `base_XXX_detector` and implement their main flows to complete the deployment. Next, we will take `base_obstacle_detector` as an example to introduce how to add a new camera detector algorithm. You could also refer to this document if you want to add traffic light detector or lane detector.
+
 
 Apollo has provided three camera detector algorithms -- Smoke，Yolo, YoloV4. All of them could be easily changed or replaced by other algorithms. The input of algorithm should be preprocessed image data, while the output should be obastacle object data. This document will introduce how to add a new camera detector algorithm, the basic task sequence is listed below：
 

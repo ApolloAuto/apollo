@@ -1,14 +1,21 @@
 # 如何添加新的camera检测算法
 
 Perception中的camera数据流如下：
-![camera overview](images/Camera_overview.png)
+    ![camera overview](images/Camera_overview.png)
 
 本篇文档所介绍的camera检测算法分为三种，分别为针对交通信号灯的检测算法，针对车道线的检测算法和针对障碍物的检测算法。这三种检测算法分别位于图中的Traffic_light, Lane和Obstacle三大Component中。各Component的架构如下：
-![traffic light component](images/camera_traffic_light_detection.png)
-![lane component](images/camera_lane_detection.png)
-![obstacle component](images/camera_lane_detection.png)
+交通信号灯检测:
+    ![traffic light component](images/camera_traffic_light_detection.png)
+
+车道线检测:
+    ![lane component](images/camera_lane_detection.png)
+
+障碍物检测:
+    ![obstacle component](images/camera_lane_detection.png)
+
 
 从以上结构中可以清楚地看到,各个component都有自己的抽象类成员 `base_XXX_detector`。对应的检测算法作为 `base_XXX_detector` 的不同的派生类，继承各自的基类实现算法的部署。由于各detector基类在结构上非常相似，下面将以 ` base_obstacle_detector` 为例介绍如何基于当前结构添加新的camera障碍物检测算法。新增交通信号灯和车道线检测算法的步骤相同。
+
 
 Apollo默认提供了3种camera检测算法--Smoke，Yolo和YoloV4，它们可以被轻松更改或替换为不同的算法。每种算法的输入都是经过预处理的图像信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的Camera检测算法，添加新算法的步骤如下：
 
