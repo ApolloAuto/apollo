@@ -100,6 +100,12 @@ cyber_modules {
     dag_files: "/apollo/modules/drivers/microphone/dag/microphone.dag"
   }
 }
+cyber_modules {
+  key: "TaskManager"
+  value: {
+    dag_files: "/apollo/modules/task_manager/dag/task_manager.dag"
+  }
+}
 modules {
   key: "Recorder"
   value: {
