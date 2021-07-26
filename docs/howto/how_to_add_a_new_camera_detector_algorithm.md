@@ -11,13 +11,13 @@ Lane:
     ![lane component](images/camera_lane_detection.png)
 
 Obstacle:
-    ![obstacle component](images/camera_lane_detection.png)
+    ![obstacle component](images/camera_obstacle_detection.png)
 
 
-As we can see clearly from above structure,each component has its own abstract class member `base_XXX_detector`. Different derived detector algorithms inherit `base_XXX_detector` and implement their main flows to complete the deployment. Next, we will take `base_obstacle_detector` as an example to introduce how to add a new camera detector algorithm. You could also refer to this document if you want to add traffic light detector or lane detector.
+As we can see clearly from above structure, each component has its own abstract class member `base_XXX_detector`. Different derived detector algorithms inherit `base_XXX_detector` and implement their main flows to complete the deployment. Next, we will take `base_obstacle_detector` as an example to introduce how to add a new camera detector algorithm. You could also refer to this document if you want to add traffic light detector or lane detector.
 
 
-Apollo has provided three camera detector algorithms -- Smoke，Yolo, YoloV4. All of them could be easily changed or replaced by other algorithms. The input of algorithm should be preprocessed image data, while the output should be obastacle object data. This document will introduce how to add a new camera detector algorithm, the basic task sequence is listed below：
+Apollo has provided three camera detector algorithms in Obstacle Detection -- Smoke，Yolo, YoloV4. All of them could be easily changed or replaced by other algorithms. The input of algorithm should be preprocessed image data, while the output should be obastacle object data. This document will introduce how to add a new camera detector algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_obstacle_detector` 
 2. Implement the class `NewObstacleDetector`
@@ -151,7 +151,7 @@ Follow the steps below to add parameters for your new camera detector:
     // Your parameters
     ```
 
-2. Refer to `obstacle.pt` at `modules/perception/production/data/perception/camera/models/` and create your `newobstacledetector` folder and `*.pt` file：
+2. Refer to `yolo_obstacle_detector` at `modules/perception/production/data/perception/camera/models/` and create your `newobstacledetector` folder and `*.pt` file：
 
     ```
     Note：The "*.pt" file should have the format defined in step one
@@ -188,7 +188,7 @@ To use your new camera detector algorithm in Apollo， you have to config the fo
     }
     ```
 
-3. If you create a new `.pt` instead of using `obstacle.pt` given in step one， you have also to modify `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt`. The corresponding `proto` file is `modules/perception/onboard/proto/fusion_camera_detection_component.proto`：
+3. If you create a new `*.pt` instead of using `obstacle.pt` given in step one， you also have to modify `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt`. The corresponding `proto` file is `modules/perception/onboard/proto/fusion_camera_detection_component.proto`：
 
     ```protobuf
     camera_obstacle_perception_conf_dir : "/apollo/modules/perception/production/conf/perception/camera"
