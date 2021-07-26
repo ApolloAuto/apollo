@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/task_manager/task_manager_component.h"
-
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/task_manager/proto/task_manager_config.pb.h"
 
 #include "cyber/time/rate.h"
@@ -27,7 +27,8 @@ using apollo::cyber::Rate;
 using apollo::localization::LocalizationEstimate;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
-
+using apollo::canbus::Chassis;
+using apollo::hdmap::HDMapUtil;
 bool TaskManagerComponent::Init() {
   TaskManagerConfig task_manager_conf;
   ACHECK(cyber::ComponentBase::GetProtoConfig(&task_manager_conf))
@@ -36,7 +37,13 @@ bool TaskManagerComponent::Init() {
 
   AINFO << "Config file: " << cyber::ComponentBase::ConfigFilePath()
         << " is loaded.";
-
+  chassis_reader_= node_->CreateReader<Chassis>(
+      task_manager_conf.topic_config().chassis_topic(), 
+      [this](const std::shared_ptr<Chassis>& chassis) {
+        ADEBUG << "Received localization data: run localization callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        chassis_.CopyFrom(*chassis);
+      });
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       task_manager_conf.topic_config().localization_pose_topic(),
       [this](const std::shared_ptr<LocalizationEstimate>& localization) {
@@ -70,8 +77,8 @@ bool TaskManagerComponent::Init() {
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   task_name_ = task->task_name();
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING) {
-    AERROR << "Task type is not cycle_routing or parking_routing.";
+      task->task_type() != PARKING_ROUTING && task->task_type()!=PARK_GO) {
+    AERROR << "Task type is not cycle_routing or parking_routing or park go.";
     return false;
   }
 
@@ -136,6 +143,37 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       AERROR << "plot verification failed, please select suitable plot!";
       return false;
     }
+  } else if (task->task_type() == PARK_GO) {
+        AINFO<<"Enter park&go task";
+        if (park_go_manager_==nullptr) {
+                park_go_manager_ = std::make_shared<ParkGoManager>();
+                park_go_manager_->Init(task->park_go_task());
+        }
+        int wp_size=task->mutable_park_go_task()->mutable_routing_request()->waypoint_size();
+        int stage=0;
+        int stay_time=task->mutable_park_go_task()->stay_time()*1000;
+        auto basemap=HDMapUtil::BaseMapPtr();
+        apollo::hdmap::LaneInfoConstPtr lane;
+        apollo::common::PointENU point;
+        double s,l,heading;
+        while (stage<wp_size) {
+          if (park_go_manager_->near(localization_,stage)&&chassis_.speed_mps()<0.2) {
+                cyber::SleepFor(std::chrono::milliseconds(stay_time));
+                stage++;
+                if (stage==wp_size)
+                      break;
+                point.set_x(localization_.mutable_pose()->mutable_position()->x());
+                point.set_y(localization_.mutable_pose()->mutable_position()->y());
+                heading=localization_.mutable_pose()->heading();
+                basemap->GetNearestLaneWithHeading(point,5,heading,2,&lane,&s,&l);
+                routing_request_=park_go_manager_->generate(localization_,stage,lane->id().id(),s);
+                common::util::FillHeader(node_->Name(), &routing_request_  );
+                request_writer_->Write(routing_request_);
+          }
+        }
+  
+       
+        
   }
   return true;
 }

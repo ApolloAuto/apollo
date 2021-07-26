@@ -22,6 +22,21 @@ cc_library(
 )
 
 cc_library(
+    name = "park_go_manager_lib",
+    srcs = ["park_go_manager.cc"],
+    hdrs = ["park_go_manager.h"],
+    copts = TASK_MANAGER_COPTS,
+    deps = [
+        "//modules/common/monitor_log",
+        "//modules/common/status",
+        "//modules/dreamview/backend/map:map_service",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/task_manager/common:task_manager_gflags",
+        "//modules/task_manager/proto:task_manager_cc_proto",
+    ],
+)
+
+cc_library(
     name = "parking_routing_manager_lib",
     srcs = ["parking_routing_manager.cc"],
     hdrs = ["parking_routing_manager.h"],
@@ -45,8 +60,10 @@ cc_library(
     deps = [
         ":cycle_routing_manager_lib",
         ":parking_routing_manager_lib",
+        "park_go_manager_lib",
         "//cyber",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
+        "//modules/map/hdmap:hdmap_util",
     ],
 )
 

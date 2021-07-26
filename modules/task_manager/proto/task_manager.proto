@@ -16,7 +16,10 @@ message CycleRoutingTask {
   optional int32 cycle_num = 1;
   optional apollo.routing.RoutingRequest routing_request = 2;
 }
-
+message ParkGOTask {
+  optional double stay_time = 1;
+  optional apollo.routing.RoutingRequest routing_request = 2;
+}
 message ParkingRoutingTask {
   optional double lane_width = 1;
   optional apollo.routing.RoutingRequest routing_request = 2;

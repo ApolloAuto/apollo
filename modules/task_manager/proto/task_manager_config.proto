@@ -6,6 +6,7 @@ message TopicConfig {
   optional string routing_request_topic = 1;
   optional string routing_response_topic = 2;
   optional string localization_pose_topic = 3;
+  optional string chassis_topic = 4;
 }
 
 message TaskManagerConfig {

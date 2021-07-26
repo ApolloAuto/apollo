@@ -23,11 +23,12 @@
 #include "cyber/component/component.h"
 #include "modules/task_manager/cycle_routing_manager.h"
 #include "modules/task_manager/parking_routing_manager.h"
+#include "modules/task_manager/park_go_manager.h"
 namespace apollo {
 namespace task_manager {
 
 using apollo::localization::LocalizationEstimate;
-
+using apollo::canbus::Chassis;
 class TaskManagerComponent final : public cyber::Component<task_manager::Task> {
  public:
   TaskManagerComponent() = default;
@@ -43,9 +44,12 @@ class TaskManagerComponent final : public cyber::Component<task_manager::Task> {
   std::shared_ptr<cyber::Writer<routing::RoutingRequest>> request_writer_;
   std::shared_ptr<CycleRoutingManager> cycle_routing_manager_;
   std::shared_ptr<ParkingRoutingManager> parking_routing_manager_;
+  std::shared_ptr<ParkGoManager> park_go_manager_;
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   routing::RoutingRequest routing_request_;
   routing::RoutingResponse routing_response_;
   LocalizationEstimate localization_;
+  Chassis chassis_;
   std::mutex mutex_;
   std::string task_name_;
 };
