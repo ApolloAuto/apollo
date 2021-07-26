@@ -150,7 +150,7 @@ PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //注册新的lidar_detecto
     //你的param参数
     ```
 
-4. 参考如下内容更新 `modules/perception/production/conf/perception/lidar/config_manager`文件:
+4. 参考如下内容更新 `modules/perception/production/conf/perception/lidar/config_manager.config`文件:
 
     ```protobuf
     model_config_path: "./conf/perception/lidar/modules/newlidardetector_config.config"

@@ -4,20 +4,20 @@ Perception中的camera数据流如下：
     ![camera overview](images/Camera_overview.png)
 
 本篇文档所介绍的camera检测算法分为三种，分别为针对交通信号灯的检测算法，针对车道线的检测算法和针对障碍物的检测算法。这三种检测算法分别位于图中的Traffic_light, Lane和Obstacle三大Component中。各Component的架构如下：
-交通信号灯检测:
+交通信号灯感知:
     ![traffic light component](images/camera_traffic_light_detection.png)
 
-车道线检测:
+车道线感知:
     ![lane component](images/camera_lane_detection.png)
 
-障碍物检测:
-    ![obstacle component](images/camera_lane_detection.png)
+障碍物感知:
+    ![obstacle component](images/camera_obstacle_detection.png)
 
 
 从以上结构中可以清楚地看到,各个component都有自己的抽象类成员 `base_XXX_detector`。对应的检测算法作为 `base_XXX_detector` 的不同的派生类，继承各自的基类实现算法的部署。由于各detector基类在结构上非常相似，下面将以 ` base_obstacle_detector` 为例介绍如何基于当前结构添加新的camera障碍物检测算法。新增交通信号灯和车道线检测算法的步骤相同。
 
 
-Apollo默认提供了3种camera检测算法--Smoke，Yolo和YoloV4，它们可以被轻松更改或替换为不同的算法。每种算法的输入都是经过预处理的图像信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的Camera检测算法，添加新算法的步骤如下：
+Apollo在Obstacle Detection中默认提供了3种camera检测算法--Smoke，Yolo和YoloV4，它们可以被轻松更改或替换为不同的算法。每种算法的输入都是经过预处理的图像信息，输出都是目标级障碍物信息。本篇文档将介绍如何引入新的Camera检测算法，添加新算法的步骤如下：
 
 1. 定义一个继承基类 `base_obstacle_detector` 的类
 2. 实现新类 `NewObstacleDetector`
@@ -151,7 +151,7 @@ REGISTER_OBSTACLE_DETECTOR(NewObstacleDetector); //注册新的camera_obstacle_d
     //你的param参数
     ```
 
-2. 参考 `obstacle.pt` 在目录 `modules/perception/production/data/perception/camera/models/` 中创建 `newobstacledetector` 文件夹，并根据需求创建 `*.pt` 文件：
+2. 参考 `yolo_obstacle_detector` 在目录 `modules/perception/production/data/perception/camera/models/` 中创建 `newobstacledetector` 文件夹，并根据需求创建 `*.pt` 文件：
 
     ```
     注意：此处 "*.pt" 文件应对应步骤1中的proto文件格式.
@@ -188,7 +188,7 @@ REGISTER_OBSTACLE_DETECTOR(NewObstacleDetector); //注册新的camera_obstacle_d
     }
     ```
 
-3. 若步骤1中不直接使用 `obstacle.pt` 文件，而使用其他新建的 `.pt` 文件，则需要更改 `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt`. 其对应的 `proto` 文件为 `modules/perception/onboard/proto/fusion_camera_detection_component.proto`：
+3. 若步骤1中不直接使用 `obstacle.pt` 文件，而使用其他新建的 `*.pt` 文件，则需要更改 `modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt`. 其对应的 `proto` 文件为 `modules/perception/onboard/proto/fusion_camera_detection_component.proto`：
 
     ```protobuf
     camera_obstacle_perception_conf_dir : "/apollo/modules/perception/production/conf/perception/camera"
