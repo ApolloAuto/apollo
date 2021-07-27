@@ -4,6 +4,7 @@ The processing flow of camera perception module is shown below:
     ![camera overview](images/Camera_overview.png)
 
 The 3 detector algorithms introduced by this document were traffic_light_detector, land_detector, obstacle_detector. These 3 detectors are located in their own component. The architecture of each component is showed below:
+
 Traffic Light:
     ![traffic light component](images/camera_traffic_light_detection.png)
 

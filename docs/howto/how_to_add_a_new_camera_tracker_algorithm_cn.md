@@ -4,6 +4,7 @@ Perception中的camera数据流如下：
     ![camera overview](images/Camera_overview.png)
 
 本篇文档所介绍的camera匹配算法分为两种，分别为针对交通信号灯的匹配算法和针对障碍物的匹配算法（针对车道线的匹配算法虽然已预留接口类，但目前暂未部署）。这两种匹配算法分别位于图中的Traffic_light和Obstacle三两大Component中。各Component的架构如下：
+
 交通信号灯感知:
     ![traffic light component](images/camera_traffic_light_detection.png)
 
