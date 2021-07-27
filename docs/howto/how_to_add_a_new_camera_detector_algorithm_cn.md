@@ -4,6 +4,7 @@ Perception中的camera数据流如下：
     ![camera overview](images/Camera_overview.png)
 
 本篇文档所介绍的camera检测算法分为三种，分别为针对交通信号灯的检测算法，针对车道线的检测算法和针对障碍物的检测算法。这三种检测算法分别位于图中的Traffic_light, Lane和Obstacle三大Component中。各Component的架构如下：
+
 交通信号灯感知:
     ![traffic light component](images/camera_traffic_light_detection.png)
 

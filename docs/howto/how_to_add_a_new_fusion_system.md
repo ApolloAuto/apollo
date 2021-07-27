@@ -224,6 +224,6 @@ Follow the following steps to add config proto file for the new system:
 
 ## Update config file to put your system into effect
 
-To use your new fusion system in Apollo，you need to modify the value of `fusion_method` to your system's name in `fusion_component_conf.pb.txt` located in corresponding sensor folder in `modules/perception/production/data/perception/fusion/`
+To use your new fusion system in Apollo，you need to modify the value of `fusion_method` to your system's name in `fusion_component_conf.pb.txt` located in corresponding folder in `modules/perception/production/data/perception/fusion/`
 
 Once you finished the above modifications, you new fusion system should take effect in Apollo.

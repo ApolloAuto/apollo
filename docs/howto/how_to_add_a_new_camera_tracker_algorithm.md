@@ -4,6 +4,7 @@ The processing flow of camera perception module is shown below:
     ![camera overview](images/Camera_overview.png)
 
 The 2 tracker algorithms introduced by this document were traffic_light_tracker and obstacle_tracker (lane_tracker is reserved but not used so far). These 2 trackers are located in their own component. The architecture of each component is showed below:
+
 Traffic Light:
     ![traffic light component](images/camera_traffic_light_detection.png)
 
@@ -110,7 +111,8 @@ struct CameraFrame {
 To ensure the new tracker could function properly, `NewObstacleTracker` should at least override the interface Init(), Track(), Name() defined in `base_obstacle_tracker` Init() is resposible for config loading, class member initialization, etc. And Track() will implement the basic logic of algorithm. A concrete `NewObstacleTracker.cc` example is shown：
 
 ```
-Note：Currently, the algorithm pipeline has not been encapsulated into the Track() function of base_obstacle_tracker.h. Therefore, all the virtual interface should be re-writen.
+Note：Currently, the algorithm pipeline has not been encapsulated into the Track() function of base_obstacle_tracker.h. 
+Therefore, all the virtual interface should be re-writen.
 ```
 
 ```c++

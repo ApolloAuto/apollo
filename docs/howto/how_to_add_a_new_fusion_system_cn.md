@@ -139,7 +139,7 @@ using ObjectConstPtr = std::shared_ptr<const Object>;
 
 ## 实现新类 `NewFusionSystem`
 
-为了确保新的融合系统能顺利工作， `NewFusionSystem` 至少需要重写 `base_fusion_system` 中定义的接口Init(), Fuse()和Name()函数。其中Init()函数负责完成加载配置文件，初始化类成员等工作；而Fuse()函数则负责实系统的主体流程。一个具体的`NewFusionSystem.cc`实现示例如下：
+为了确保新的融合系统能顺利工作， `NewFusionSystem` 至少需要重写 `base_fusion_system` 中定义的接口Init(), Fuse()和Name()函数。其中Init()函数负责完成加载配置文件，初始化类成员等工作；而Fuse()函数则负责实现系统的主体流程。一个具体的`NewFusionSystem.cc`实现示例如下：
 
 ```c++
 namespace apollo {
@@ -180,7 +180,7 @@ FUSION_REGISTER_FUSIONSYSTEM(NewFusionSystem); //注册新的fusion_system
 
 1. 根据系统要求为新fusion融合系统配置config的`proto`文件。作为示例，可以参考以下位置的`probabilistic_fusion_config`的`proto`定义：`modules/perception/proto/probabilistic_fusion_config.proto`.
 
-2. 定义新的`proto`之后，例如`newfusionsystem_config.proto`，定义完成后在文件头部输入以下内容：
+2. 定义新的`proto`之后，例如`newfusionsystem_config.proto`，在文件头部输入以下内容：
 
     ```protobuf
     syntax = "proto2";
@@ -224,6 +224,6 @@ FUSION_REGISTER_FUSIONSYSTEM(NewFusionSystem); //注册新的fusion_system
 
 ## 更新config文件使新的系统生效
 
-要使用Apollo系统中的新fusion融合系统，需要将 `modules/perception/production/data/perception/fusion/fusion_component_conf.pb.txt` 中的 `fusion_method` 值字段改为 "NewFusionSystem"。
+要使用Apollo系统中的新fusion融合系统，需要将 `modules/perception/production/data/perception/fusion/fusion_component_conf.pb.txt` 中的 `fusion_method` 字段值改为 "NewFusionSystem"。
 
 在完成以上步骤后，您的新fusion融合系统便可在Apollo系统中生效。
