@@ -58,7 +58,7 @@ DEFINE_double(surrounding_lane_search_radius, 3.0,
 
 // Semantic Map
 DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
-DEFINE_bool(enable_draw_adc_trajectory, false,
+DEFINE_bool(enable_draw_adc_trajectory, true,
             "If draw adc trajectory in semantic map");
 DEFINE_bool(img_show_semantic_map, false, "If show the image of semantic map.");
 
