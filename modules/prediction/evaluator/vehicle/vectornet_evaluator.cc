@@ -69,32 +69,6 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
     return false;
   }
 
-  // Process target obs pos_history
-  torch::Tensor target_obstacle_pos = torch::zeros({20, 2});
-  torch::Tensor target_obstacle_pos_step = torch::zeros({20, 2});
-  for (int i = 0; i < 20; ++i) {
-    target_obstacle_pos[19 - i][0] = target_pos_history[i].first;
-    target_obstacle_pos[19 - i][1] = target_pos_history[i].second;
-    if (i == 19 || (i > 0 && target_pos_history[i].first == 0.0)) {
-      break;
-    }
-    target_obstacle_pos_step[19 - i][0] =
-        target_pos_history[i].first - target_pos_history[i + 1].first;
-    target_obstacle_pos_step[19 - i][1] =
-        target_pos_history[i].second - target_pos_history[i + 1].second;
-  }
-
-  // Process all obs pos_history
-  int obs_num =
-      obstacles_container->curr_frame_considered_obstacle_ids().size();
-  torch::Tensor all_obstacle_pos = torch::zeros({obs_num, 20, 2});
-  for (int i = 0; i < obs_num; ++i) {
-    for (int j = 0; j < 20; ++j) {
-      all_obstacle_pos[i][19 - j][0] = all_obs_pos_history[i][j].first;
-      all_obstacle_pos[i][19 - j][1] = all_obs_pos_history[i][j].second;
-    }
-  }
-
   // Query the map data vector
   FeatureVector map_feature;
   PidVector map_p_id;
@@ -114,41 +88,87 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   auto end_time_query = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_query = end_time_query - start_time_query;
   ADEBUG << "vectors query used time: " << diff_query.count() * 1000 << " ms.";
-
-  auto start_time_data_prep = std::chrono::system_clock::now();
-
-  // Process mask & p_id
-  // process v_mask for obs
-  int obs_his_size = obstacle_ptr->history_size();
-  torch::Tensor vector_mask = torch::zeros({450, 50});
+  
+  // Process all obs pos_history & obs pid
+  auto start_time_data_prep = std::chrono::system_clock::now(); 
+  int obs_num =
+      obstacles_container->curr_frame_considered_obstacle_ids().size();
+  torch::Tensor target_obstacle_pos = torch::zeros({20, 2});
+  torch::Tensor target_obstacle_pos_step = torch::zeros({20, 2});      
+  torch::Tensor all_obstacle_pos = torch::zeros({obs_num, 20, 2});
+  torch::Tensor all_obs_p_id = torch::zeros({obs_num, 2});
   for (int i = 0; i < obs_num; ++i) {
-    if (obs_his_size > 1 && obs_his_size <= 20) {
-      vector_mask.index_put_({i, torch::indexing::Slice(torch::indexing::None,
-                                                        -(obs_his_size - 1))},
-                             1);
-    } else if (obs_his_size > 20) {
-      vector_mask.index_put_(
-          {i, torch::indexing::Slice(torch::indexing::None, -19)}, 1);
-    } else {
-      vector_mask.index_put_(
-          {i, torch::indexing::Slice(torch::indexing::None, -1)}, 1);
+    std::vector<double> obs_p_id{std::numeric_limits<float>::max(),
+                              std::numeric_limits<float>::max()};
+    for (int j = 0; j < 20; ++j) {  
+      // Process obs pid
+      if (obs_p_id[0] > std::abs(all_obs_pos_history[i][j].first)) {
+        obs_p_id[0] = std::abs(all_obs_pos_history[i][j].first);
+        all_obs_p_id[i][0] = obs_p_id[0];
+      }
+      if (obs_p_id[1] > std::abs(all_obs_pos_history[i][j].second)) {
+        obs_p_id[1] = std::abs(all_obs_pos_history[i][j].second);
+        all_obs_p_id[i][1] = obs_p_id[1];
+      }
+      // Process obs pos history
+      target_obstacle_pos[19 - j][0] = target_pos_history[j].first;
+      target_obstacle_pos[19 - j][1] = target_pos_history[j].second;
+      all_obstacle_pos[i][19 - j][0] = all_obs_pos_history[i][j].first;
+      all_obstacle_pos[i][19 - j][1] = all_obs_pos_history[i][j].second;
+      if (j == 19 || (j > 0 && target_pos_history[j].first == 0.0)) {
+        break;
+      }
+      target_obstacle_pos_step[19 - j][0] =
+          target_pos_history[j].first - target_pos_history[j + 1].first;
+      target_obstacle_pos_step[19 - j][1] =
+          target_pos_history[j].second - target_pos_history[j + 1].second;     
     }
   }
 
-  // process map data & v_mask for map polyline
+  // Process mask
+  // process v_mask for obs
+  torch::Tensor vector_mask = torch::zeros({450, 50});
+  int obs_count = 0;
+  for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
+    Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    int obs_his_size =
+        (obstacle->history_size() <= 20) ? obstacle->history_size() : 20;
+    if (obs_his_size > 0) {
+      vector_mask.index_put_({obs_count, torch::indexing::Slice(torch::indexing::None,
+                                                        -(obs_his_size))}, 1);
+    } else {
+      vector_mask.index_put_({obs_count, torch::indexing::Slice()}, 1);
+    }
+    ++obs_count;
+  }
+
+  // process map data & map p id & v_mask for map polyline
   int map_polyline_num = map_feature.size();
-  for (int i = obs_num; i <= map_polyline_num; ++i) {
-    int one_polyline_vector_num = map_feature[i].size();
+  int data_length = 
+      ((obs_num + map_polyline_num) < 450) ? (obs_num + map_polyline_num) : 450;
+  for (int i = obs_num; i < data_length; ++i) {
+    int one_polyline_vector_size = map_feature[i].size();
+    int one_polyline_vector_num = std::abs(one_polyline_vector_size);
+    if (one_polyline_vector_size < 0) {
+      vector_mask.index_put_({i, torch::indexing::Slice()}, 1);
+      continue;
+    }
     if (one_polyline_vector_num < 50) {
       vector_mask.index_put_({i, torch::indexing::Slice(one_polyline_vector_num,
                                                         torch::indexing::None)},
                              1);
     }
   }
-
   torch::Tensor map_data = torch::zeros({map_polyline_num, 50, 9});
+  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
   for (int i = 0; i < map_polyline_num && i < 450; ++i) {
-    int one_polyline_vector_num = map_feature[i].size();
+    all_map_p_id[i][0] = map_p_id[i][0];
+    all_map_p_id[i][1] = map_p_id[i][1];
+    int one_polyline_vector_size = map_feature[i].size();
+    if (one_polyline_vector_size < 0) {
+      continue;
+    }
+    int one_polyline_vector_num = std::abs(one_polyline_vector_size);
     for (int j = 0; j < one_polyline_vector_num && j < 50; ++j) {
       map_data.index_put_({i, j},
                           torch::from_blob(map_feature[i][j].data(), {9}));
@@ -157,33 +177,9 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   // process p mask
   torch::Tensor polyline_mask = torch::zeros({450});
-  int data_length = obs_num + map_polyline_num;
   if (data_length < 450) {
     polyline_mask.index_put_(
         {torch::indexing::Slice(data_length, torch::indexing::None)}, 1);
-  }
-
-  // process p_id for obs and map p_id
-  torch::Tensor all_obs_p_id = torch::zeros({obs_num, 2});
-  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
-  for (int i = 0; i < obs_num; ++i) {
-    std::vector<double> obs_p_id{std::numeric_limits<float>::max(),
-                                 std::numeric_limits<float>::max()};
-    for (int j = 0; j < obs_his_size && j < 20; ++j) {
-      if (obs_p_id[0] > obstacle_ptr->latest_feature().position().x()) {
-        obs_p_id[0] = obstacle_ptr->latest_feature().position().x();
-        all_obs_p_id[i][0] = obs_p_id[0];
-      }
-      if (obs_p_id[1] > obstacle_ptr->latest_feature().position().y()) {
-        obs_p_id[1] = obstacle_ptr->latest_feature().position().y();
-        all_obs_p_id[i][1] = obs_p_id[1];
-      }
-    }
-  }
-
-  for (int i = 0; i < map_polyline_num; ++i) {
-    all_map_p_id[i][0] = map_p_id[i][0];
-    all_map_p_id[i][1] = map_p_id[i][1];
   }
 
   // Extend obs data to specific dimension
@@ -406,9 +402,11 @@ void VectornetEvaluator::LoadModel() {
        std::move(vector_data.to(device_)), std::move(vector_mask.to(device_)),
        std::move(polyline_mask.to(device_)), std::move(rand_mask.to(device_)),
        std::move(polyline_id.to(device_))}));
-  // Run one inference to avoid very slow first inference later
+  // Run inference twice to avoid very slow first inference later
   torch_default_output_tensor_ =
       torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  torch_default_output_tensor_ =
+      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);      
 }
 
 }  // namespace prediction
