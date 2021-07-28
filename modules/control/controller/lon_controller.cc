@@ -257,12 +257,11 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  if(chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL)
-  {
+  if (chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
   }
-  
+
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
@@ -278,12 +277,22 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
+  if ((trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::UNKNOWN) &&
+      std::abs(cmd->steering_target() - chassis->steering_percentage()) > 20) {
+    acceleration_cmd = 0;
+    ADEBUG << "Steering not reached";
+    debug->set_is_full_stop(true);
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
+  }
+
   // At near-stop stage, replace the brake control command with the standstill
   // acceleration if the former is even softer than the latter
   if (((trajectory_message_->trajectory_type() ==
-       apollo::planning::ADCTrajectory::NORMAL)||
+        apollo::planning::ADCTrajectory::NORMAL) ||
        (trajectory_message_->trajectory_type() ==
-       apollo::planning::ADCTrajectory::SPEED_FALLBACK)) &&
+        apollo::planning::ADCTrajectory::SPEED_FALLBACK)) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
             control_conf_->max_acceleration_when_stopped() &&
         std::fabs(debug->preview_speed_reference()) <=
