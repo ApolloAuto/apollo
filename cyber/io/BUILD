@@ -65,6 +65,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "timer",
+    srcs = ["timer.cc"],
+    hdrs = ["timer.h"],
+    deps = [
+        ":poll_handler",
+        "//cyber/common:log",
+    ],
+)
+
 cc_binary(
     name = "tcp_echo_client",
     srcs = ["example/tcp_echo_client.cc"],
@@ -93,6 +103,15 @@ cc_binary(
     name = "udp_echo_server",
     srcs = ["example/udp_echo_server.cc"],
     deps = [
+        "//cyber:cyber_core",
+    ],
+)
+
+cc_binary(
+    name = "timer_example",
+    srcs = ["example/timer_example.cc"],
+    deps = [
+        ":timer",
         "//cyber:cyber_core",
     ],
 )
