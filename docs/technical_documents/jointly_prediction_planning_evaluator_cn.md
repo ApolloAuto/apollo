@@ -12,12 +12,12 @@
 
 # Where is the code
 
-Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator/vehicle).
+可以参考 [jointly prediction planning evaluator代码](https://github.com/ApolloAuto/apollo/tree/master/modules/prediction/evaluator/vehicle).
 
 # Code Reading
 
 ## Interaction filter
-Please refer [interaction filter](https://github.com/ApolloAuto/apollo/modules/prediction/scenario).
+Please refer [interaction filter代码](https://github.com/ApolloAuto/apollo/tree/master/modules/prediction/scenario/interaction_filter).
 1. 交互障碍物的获取是通过交互障碍物过滤器得到的，交互障碍物过滤器基于一定的规则筛选出与主车可能发生交互关系的障碍物。
 
 2. 这些障碍物将被添加上交互标签，用于触发交互预测模型。
