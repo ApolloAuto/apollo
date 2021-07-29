@@ -277,7 +277,16 @@ Status LonController::ComputeControlCommand(
       FLAGS_enable_slope_offset * debug->slope_offset_compensation();
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
-
+  
+  if((trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::UNKNOWN) && 
+       std::abs(cmd->steering_target()-chassis->steering_percentage())>20){
+    acceleration_cmd =0;
+    ADEBUG << "Steering not reached";
+    debug->set_is_full_stop(true);
+    speed_pid_controller_.Reset_integral();
+    station_pid_controller_.Reset_integral();
+  }  
   // At near-stop stage, replace the brake control command with the standstill
   // acceleration if the former is even softer than the latter
   if (((trajectory_message_->trajectory_type() ==
