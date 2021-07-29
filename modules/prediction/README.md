@@ -68,6 +68,7 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 
 * **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
 
+* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_documents/jointly_prediction_planning_evaluator.md).
 
 ### Predictor
 

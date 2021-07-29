@@ -12,12 +12,12 @@ Jointly prediction planning evaluator is used in the new Interactive Obstacle(ve
 
 # Where is the code
 
-Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator/vehicle).
+Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/tree/master/modules/prediction/evaluator/vehicle).
 
 # Code Reading
 
 ## Interaction filter
-Please refer [interaction filter](https://github.com/ApolloAuto/apollo/modules/prediction/scenario).
+Please refer [interaction filter](https://github.com/ApolloAuto/apollo/tree/master/modules/prediction/scenario/interaction_filter).
 1. The interaction filter is a rule-based filter for selecting interactive obstacles.
 
 2. Such interactive obstacles will be labeled.

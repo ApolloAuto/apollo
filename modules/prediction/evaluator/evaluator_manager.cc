@@ -437,8 +437,7 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       break;
     }
     case ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR: {
-      evaluator_ptr.reset(new JointlyPredictionPlanningEvaluator(
-          semantic_map_.get()));
+      evaluator_ptr.reset(new JointlyPredictionPlanningEvaluator());
       break;
     }
     case ObstacleConf::VECTORNET_EVALUATOR: {
