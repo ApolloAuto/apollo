@@ -44,7 +44,7 @@ class Session {
   int Bind(const struct sockaddr *addr, socklen_t addrlen);
   SessionPtr Accept(struct sockaddr *addr, socklen_t *addrlen);
   int Connect(const struct sockaddr *addr, socklen_t addrlen);
-  int Close();
+  void Close();
 
   // timeout_ms < 0, keep trying until the operation is successfully
   // timeout_ms == 0, try once
