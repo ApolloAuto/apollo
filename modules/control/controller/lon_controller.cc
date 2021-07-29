@@ -278,7 +278,7 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
-  if (trajectory_message_->trajectory_type() ==
+  if((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::UNKNOWN) && 
        std::abs(cmd->steering_target()-chassis->steering_percentage())>20){
     acceleration_cmd =0;
