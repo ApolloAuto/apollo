@@ -50,7 +50,7 @@ The Evaluator predicts path and speed separately for any given obstacle.
 An evaluator evaluates a path by outputting a probability for it (lane
 sequence) using the given model stored in _prediction/data/_.
 
-There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cruise and Junction scenarios have been included, their corresponding evaluators (Cruise MLP and Junction MLP) were added as well. The list of available evaluators include:
+The list of available evaluators include:
 
 * **Cost evaluator**: probability is calculated by a set of cost functions
 
@@ -69,6 +69,8 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 * **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
 
 * **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_documents/jointly_prediction_planning_evaluator.md).
+
+* **Vectornet LSTM evaluator**: this evaluator is used for short-term trajectory prediction for "Caution" tagged obstacles. More detail is in [vectornet lstm evaluator readme](https://github.com/ApolloAuto/apollo/docs/technical_documents/vectornet_lstm_evaluator.md).
 
 ### Predictor
 
