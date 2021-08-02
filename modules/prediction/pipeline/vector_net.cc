@@ -116,6 +116,16 @@ bool VectorNet::query(const common::PointENU& center_point,
 
 bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
                               const double obstacle_phi) {
+  return offline_query(obstacle_x,
+                       obstacle_y,
+                       obstacle_phi,
+                       FLAGS_prediction_target_file);
+}
+
+bool VectorNet::offline_query(const double obstacle_x,
+                              const double obstacle_y,
+                              const double obstacle_phi,
+                              const std::string file_name) {
   FeatureVector offline_feature;
   PidVector p_id;
   common::PointENU center_point =
@@ -141,7 +151,7 @@ bool VectorNet::offline_query(const double obstacle_x, const double obstacle_y,
     }
   }
   cyber::common::SetProtoToASCIIFile(vector_net_pb_,
-                                     FLAGS_prediction_target_file);
+                                     file_name);
 
   return true;
 }

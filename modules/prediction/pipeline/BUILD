@@ -47,4 +47,15 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "vector_net_offline_data",
+    srcs = ["vector_net_offline_data.cc"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        ":vector_net",
+    ],
+)
+
 cpplint()
