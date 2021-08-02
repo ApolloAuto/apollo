@@ -20,11 +20,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "torch/extension.h"
 #include "torch/script.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/pipeline/vector_net.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,8 +36,7 @@ class JointlyPredictionPlanningEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  JointlyPredictionPlanningEvaluator() = delete;
-  explicit JointlyPredictionPlanningEvaluator(SemanticMap* semantic_map);
+  JointlyPredictionPlanningEvaluator();
 
   /**
    * @brief Destructor
@@ -69,13 +68,16 @@ class JointlyPredictionPlanningEvaluator : public Evaluator {
                 ObstaclesContainer* obstacles_container) override;
 
   /**
-   * @brief Extract obstacle history
-   * @param Obstacle pointer
+   * @brief Extract all obstacles history
+   * @param Obstacles container
    *        Feature container in a vector for receiving the obstacle history
    */
-  bool ExtractObstacleHistory(
-      Obstacle* obstacle_ptr,
-      std::vector<std::pair<double, double>>* pos_history);
+    bool ExtractObstaclesHistory(
+      Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+      std::vector<std::pair<double, double>>* curr_pos_history,
+      std::vector<std::pair<double, double>>* all_obs_length,
+      std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history,
+      torch::Tensor* vector_mask);
 
   /**
    * @brief Extract adc trajectory and convert world coord to obstacle coord
@@ -104,7 +106,7 @@ class JointlyPredictionPlanningEvaluator : public Evaluator {
   torch::jit::script::Module torch_vehicle_model_;
   at::Tensor torch_default_output_tensor_;
   torch::Device device_;
-  SemanticMap* semantic_map_;
+  VectorNet vector_net_;
 };
 
 }  // namespace prediction

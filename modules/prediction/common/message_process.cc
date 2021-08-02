@@ -157,9 +157,6 @@ void MessageProcess::ContainerProcess(
   // Ignore some obstacles
   obstacles_prioritizer.AssignIgnoreLevel();
 
-  // Add interactive tag
-  interaction_filter.AssignInteractiveTag();
-
   // Scenario analysis
   scenario_manager->Run(container_manager.get());
 
@@ -176,6 +173,9 @@ void MessageProcess::ContainerProcess(
 
   // Assign CautionLevel for obstacles
   obstacles_prioritizer.AssignCautionLevel();
+
+  // Add interactive tag
+  interaction_filter.AssignInteractiveTag();
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze(container_manager.get());

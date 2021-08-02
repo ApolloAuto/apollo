@@ -192,6 +192,7 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
+        "//modules/prediction/pipeline:vector_net",
         "//third_party:libtorch",
         "@eigen",
     ],
