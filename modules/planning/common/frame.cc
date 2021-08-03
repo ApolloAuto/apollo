@@ -449,7 +449,7 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   for (auto &obstacle : *prediction_obstacles->mutable_prediction_obstacle()) {
     for (auto &trajectory : *obstacle.mutable_trajectory()) {
       Trajectory fix_trajectory;
-      fix_trajectory.set_probability(trajectory->probability());
+      fix_trajectory.set_probability(trajectory.probability());
       for (auto &point : *trajectory.mutable_trajectory_point()) {
         if (!fix_trajectory.trajectory_point().empty()) {
           const auto &last_relative_time =
