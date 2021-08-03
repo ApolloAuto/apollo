@@ -112,6 +112,47 @@ bool VectornetEvaluator::VectornetProcessObstaclePosition(
   return true;
 }
 
+bool VectornetEvaluator::VectornetProcessMapData(
+                             FeatureVector* map_feature,
+                             PidVector* map_p_id,
+                             const int obs_num,
+                             torch::Tensor* ptr_map_data,
+                             torch::Tensor* ptr_all_map_p_id,
+                             torch::Tensor* ptr_vector_mask) {
+  int map_polyline_num = map_feature->size();
+
+  for (int i = 0; i < map_polyline_num && obs_num + i < 450; ++i) {
+    size_t one_polyline_vector_size = map_feature->at(i).size();
+    if (one_polyline_vector_size < 50) {
+      ptr_vector_mask->index_put_({obs_num + i,
+                                   torch::indexing::Slice(
+                                       one_polyline_vector_size,
+                                       torch::indexing::None)},
+                                  1);
+    }
+  }
+
+  auto opts = torch::TensorOptions().dtype(torch::kDouble);
+
+  for (int i = 0; i < map_polyline_num && i + obs_num < 450; ++i) {
+    ptr_all_map_p_id->index_put_({i}, torch::from_blob(map_p_id->at(i).data(),
+                                                       {2},
+                                                       opts));
+
+    int one_polyline_vector_size = map_feature->at(i).size();
+    for (int j = 0; j < one_polyline_vector_size && j < 50; ++j) {
+      ptr_map_data->index_put_({i, j},
+                               torch::from_blob(map_feature->at(i)[j].data(),
+                                                {9},
+                                                opts));
+    }
+  }
+  *ptr_map_data = ptr_map_data->toType(at::kFloat);
+  *ptr_all_map_p_id = ptr_all_map_p_id->toType(at::kFloat);
+
+  return true;
+}
+
 bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                   ObstaclesContainer* obstacles_container) {
   omp_set_num_threads(1);
@@ -138,7 +179,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   torch::Tensor all_obs_p_id = torch::zeros({obs_num, 2});
   torch::Tensor obs_length_tmp = torch::zeros({obs_num, 2});
 
-  if (VectornetProcessObstaclePosition(obstacle_ptr,
+  if (!VectornetProcessObstaclePosition(obstacle_ptr,
                                        obstacles_container,
                                        &target_obstacle_pos,
                                        &target_obstacle_pos_step,
@@ -152,7 +193,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   auto end_time_obs = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_obs = end_time_obs - start_time_obs;
-  ADEBUG << "obstacle vectors used time: " << diff_obs.count() * 1000 << " ms.";
+  AINFO << "obstacle vectors used time: " << diff_obs.count() * 1000 << " ms.";
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
@@ -163,7 +204,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   const double pos_x = latest_feature_ptr->position().x();
   const double pos_y = latest_feature_ptr->position().y();
   common::PointENU center_point
-      = common::util::PointFactory::ToPointENU(pos_x, pos_y);;
+     = common::util::PointFactory::ToPointENU(pos_x, pos_y);;
   const double heading = latest_feature_ptr->velocity_heading();
 
   auto start_time_query = std::chrono::system_clock::now();
@@ -174,42 +215,27 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   auto end_time_query = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_query = end_time_query - start_time_query;
-  ADEBUG << "vectors query used time: " << diff_query.count() * 1000 << " ms.";
-
-  // Process all obs pos_history & obs pid
-  auto start_time_data_prep = std::chrono::system_clock::now();
+  AINFO << "vectors query used time: " << diff_query.count() * 1000 << " ms.";
 
   // process map data & map p id & v_mask for map polyline
   int map_polyline_num = map_feature.size();
   int data_length =
       ((obs_num + map_polyline_num) < 450) ? (obs_num + map_polyline_num) : 450;
-  for (int i = 0; i < map_polyline_num && obs_num + i < 450; ++i) {
-    size_t one_polyline_vector_size = map_feature[i].size();
-    if (one_polyline_vector_size < 50) {
-      vector_mask.index_put_({obs_num + i,
-                              torch::indexing::Slice(one_polyline_vector_size,
-                                                     torch::indexing::None)},
-                             1);
-    }
-  }
 
+  // Process input tensor
+  auto start_time_data_prep = std::chrono::system_clock::now();
   torch::Tensor map_data = torch::zeros({map_polyline_num, 50, 9});
   torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
-  auto opts = torch::TensorOptions().dtype(torch::kDouble);
 
-  for (int i = 0; i < map_polyline_num && i + obs_num < 450; ++i) {
-    all_map_p_id[i][0] = map_p_id[i][0];
-    all_map_p_id[i][1] = map_p_id[i][1];
-
-    int one_polyline_vector_size = map_feature[i].size();
-    for (int j = 0; j < one_polyline_vector_size && j < 50; ++j) {
-      map_data.index_put_({i, j},
-                          torch::from_blob(map_feature[i][j].data(),
-                                           {9},
-                                           opts));
-    }
+  if (!VectornetProcessMapData(&map_feature,
+                               &map_p_id,
+                               obs_num,
+                               &map_data,
+                               &all_map_p_id,
+                               &vector_mask)) {
+    AERROR << "Obstacle [" << id << "] processing map data fails.";
+    return false;
   }
-  map_data = map_data.toType(at::kFloat);
 
   // process p mask
   torch::Tensor polyline_mask = torch::zeros({450});
@@ -285,7 +311,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   auto end_time_data_prep = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_data_prep =
       end_time_data_prep - start_time_data_prep;
-  ADEBUG << "vectornet input tensor prepration used time: "
+  AINFO << "vectornet input tensor preparation used time: "
          << diff_data_prep.count() * 1000 << " ms.";
 
   auto start_time_inference = std::chrono::system_clock::now();
@@ -297,7 +323,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   auto end_time_inference = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_inference =
       end_time_inference - start_time_inference;
-  ADEBUG << "vectornet inference used time: " << diff_inference.count() * 1000
+  AINFO << "vectornet inference used time: " << diff_inference.count() * 1000
          << " ms.";
 
   // Get the trajectory
@@ -352,7 +378,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
   auto end_time_output_process = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_output_process =
       end_time_output_process - start_time_output_process;
-  ADEBUG << "vectornet output process used time: "
+  AINFO << "vectornet output process used time: "
          << diff_output_process.count() * 1000 << " ms.";
   return true;
 }
@@ -434,7 +460,6 @@ void VectornetEvaluator::LoadModel() {
         torch::jit::load(FLAGS_torch_vehicle_vectornet_cpu_file, device_);
   }
   torch::set_num_threads(1);
-  AINFO << "CUDA is 11111";
 
   // Fake intput for the first frame
   torch::Tensor target_obstacle_pos = torch::randn({1, 20, 2});

@@ -66,6 +66,21 @@ class VectornetEvaluator : public Evaluator {
                                     torch::Tensor* ptr_obs_length);
 
   /**
+  * @brief Process map data to vector
+  * @param FeatureVector: map feature vector
+  * @param int: obstacle number
+  * @param PidVector: map p_id vector
+  * @param Tensor: map data
+  * @param Tensor: map data p_id
+  */
+  bool VectornetProcessMapData(FeatureVector *map_feature,
+                               PidVector *map_p_id,
+                               const int obs_num,
+                               torch::Tensor* ptr_map_data,
+                               torch::Tensor* ptr_all_map_p_id,
+                               torch::Tensor* ptr_vector_mask);
+
+  /**
    * @brief Override Evaluate
    * @param Obstacle pointer
    * @param Obstacles container
