@@ -1,30 +1,68 @@
+# Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/librobosense_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lidar_robosense/libsuteng_driver_component.so"
+    
+    ##################################################
+    #                   drivers                      #
+    ##################################################
     components {
-        class_name : "RobosenseComponent"
-        config {
-          name : "RS16_left_Driver"
-          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_left.pb.txt"
-        }
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_left_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_left.conf"
+      }
     }
-
     components {
-        class_name : "RobosenseComponent"
-        config {
-          name : "RS16_right_Driver"
-          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_right.pb.txt"
-        }
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_right_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_right.conf"
+      }
     }
-
     components {
-        class_name : "RobosenseComponent"
-        config {
-          name : "RS16_back_Driver"
-          config_file_path : "/apollo/modules/drivers/lidar/conf/rs16_back.pb.txt"
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_back_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+      }
+    }
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_left_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_left.conf"
+        readers {
+          #channel: "/sensor/lidar16/left/SutengScan"
+          channel: "/apollo/sensor/lidar16/left/Scan"
         }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_right_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_right.conf"
+        readers {
+          #channel: "/sensor/suteng16/right/SutengScan"
+          channel: "/apollo/sensor/lidar16/right/Scan"
+        }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+        readers {
+          #channel: "/sensor/suteng16/back/SutengScan"
+          channel: "/apollo/sensor/lidar16/back/Scan"
+        }
+      }
     }
 }
-
 ##################################################
 #                   fusion                      #
 ##################################################
@@ -34,24 +72,28 @@ module_config {
     components {
       class_name : "PriSecFusionComponent"
       config {
-        name : "velodyne_fusion"
+        name : "robosense_fusion"
         config_file_path : "/apollo/modules/drivers/lidar/conf/robo_fusion_conf.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
     }
   }
 }
 
+
 ##################################################
 #                compensation                    #
 ##################################################
+
 module_config {
     module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
+
     components {
       class_name : "CompensatorComponent"
       config {
-        name : "RS16_Compensator"
-        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_fusion_compensator.pb.txt"
+        name : "robosense16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar_robo_fusion_compensator.pb.txt"
         readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
       }
     }
 }
+
