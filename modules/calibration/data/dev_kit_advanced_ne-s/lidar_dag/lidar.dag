@@ -21,7 +21,7 @@ module_config {
         name : "robo_back_convert"
         config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
         readers {
-          channel: "/apollo/sensor/lidar16/back/Scan"
+          channel: "/apollo/sensor/lidar16/Scan"
         }
       }
     }
@@ -37,9 +37,9 @@ module_config {
     components {
       class_name : "CompensatorComponent"
       config {
-        name : "velodyne16_fusion_compensator"
+        name : "robosense16_fusion_compensator"
         config_file_path : "/apollo/modules/drivers/lidar/conf/back_compensator.pb.txt"
-        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
+        readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
       }
     }
 }
