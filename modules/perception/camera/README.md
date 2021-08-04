@@ -65,6 +65,6 @@ mainboard -d modules/perception/production/dag/dag_streaming_obstacle_detection.
 ``` 
 
 ## Reference
-Liu, Zechen, Zizhang Wu, and Roland Tóth. "Smoke: single-stage monocular 3d object detection via keypoint estimation." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops, pp. 996-997. 2020.
+- Liu, Zechen, Zizhang Wu, and Roland Tóth. "Smoke: single-stage monocular 3d object detection via keypoint estimation." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops, pp. 996-997. 2020.
 
-{MMDetection3D: OpenMMLab} next-generation platform for general {3D} object detection} https://github.com/open-mmlab/mmdetection3d
+- {MMDetection3D: OpenMMLab} next-generation platform for general 3D object detection} https://github.com/open-mmlab/mmdetection3d
