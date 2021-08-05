@@ -19,7 +19,7 @@ The steps are elaborated below for better understanding:
 
 ## Define a class that inherits `base_multi_target_tracker` 
 
-All the lidar tracker algorithms shall inherit `base_multi_target_tracker`，which defines a set of interfaces. Here is an example of a tracker implementation:
+All the lidar tracker algorithms shall inherit `base_multi_target_tracker`，which defines a set of interfaces. Here is an example of the tracker implementation:
 
 ```c++
 namespace apollo {
@@ -110,7 +110,7 @@ bool NewLidarTracker::Track(const MultiTargetTrackerOptions& options, LidarFrame
 
 std::string NewLidarTracker::Name() const {
     /*
-    return your tracker's name
+    Return your tracker's name
     */
 }
 

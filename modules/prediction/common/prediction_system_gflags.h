@@ -54,6 +54,8 @@ DECLARE_string(perception_obstacles_topic_name);
 
 // VectorNet
 DECLARE_string(prediction_target_file);
+DECLARE_string(world_coordinate_file);
+DECLARE_string(prediction_target_dir);
 DECLARE_double(obstacle_x);
 DECLARE_double(obstacle_y);
 DECLARE_double(obstacle_phi);

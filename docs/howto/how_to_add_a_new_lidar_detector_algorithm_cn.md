@@ -150,7 +150,7 @@ PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //注册新的lidar_detecto
     //你的param参数
     ```
 
-4. 参考如下内容更新 `modules/perception/production/conf/perception/lidar/config_manager`文件:
+4. 参考如下内容更新 `modules/perception/production/conf/perception/lidar/config_manager.config`文件:
 
     ```protobuf
     model_config_path: "./conf/perception/lidar/modules/newlidardetector_config.config"
@@ -177,6 +177,6 @@ PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //注册新的lidar_detecto
 
 ## 更新 lidar_obstacle_detection.conf
 
-要使用Apollo系统中的新lidar检测算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_detection.conf` 文件的 `detector` 值字段改为 "NewLidarDetector"
+要使用Apollo系统中的新lidar检测算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_detection.conf` 文件的 `detector` 字段值改为 "NewLidarDetector"
 
 在完成以上步骤后，您的新lidar检测算法便可在Apollo系统中生效。
