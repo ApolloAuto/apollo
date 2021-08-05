@@ -450,6 +450,11 @@ bool MapService::ConstructLaneWayPointWithLaneId(
     return false;
   }
 
+  if (s > lane->lane().length()) {
+    s = lane->lane().length();
+  }
+
+
   laneWayPoint->set_id(id);
   laneWayPoint->set_s(s);
   auto *pose = laneWayPoint->mutable_pose();

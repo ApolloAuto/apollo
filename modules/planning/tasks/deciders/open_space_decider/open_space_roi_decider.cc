@@ -849,32 +849,53 @@ void OpenSpaceRoiDecider::GetInLaneBoundaryPoints(LaneInfoConstPtr lane_info,
     lane_info->lane().left_boundary().curve().segment();
   const auto& right_boundary_segment =
     lane_info->lane().right_boundary().curve().segment();
-  size_t lane_points_num = left_boundary_segment[0].line_segment().point_size();
+  size_t lane_points_num =
+    left_boundary_segment[0].line_segment().point_size();
   int temp_record_left = 0;
   int temp_record_right = 0;
+  double left_point_s = 0.0;
+  double left_point_l = 0.0;
+  double right_point_s = 0.0;
+  double right_point_l = 0.0;
+  std::vector<double> left_s, right_s, left_l, right_l;
   std::vector<PointENU> left_points, right_points;
+  double car_s, car_l;
+  Vec2d car_position = {temp_state_.x(), temp_state_.y()};
+  lane_info->GetProjection(car_position, &car_s, &car_l);
   for (size_t i = 0; i < lane_points_num; ++i) {
-    left_points.push_back(left_boundary_segment[0].
-                          line_segment().point().at(i));
-    right_points.push_back(right_boundary_segment[0].
-                           line_segment().point().at(i));
-  }
-  // (to do): by s
-  for (size_t i = 0; i < lane_points_num; ++i) {
-    if (left_points[i].x() < temp_state_.x()) {
-      In_left_boundary_points->push_back(left_points[i]);
+    PointENU left_point = left_boundary_segment[0].
+                          line_segment().point().at(i);
+    PointENU right_point = right_boundary_segment[0].
+                           line_segment().point().at(i);
+    left_points.push_back(left_point);
+    right_points.push_back(right_point);
+    Vec2d left_point_v = {left_boundary_segment[0].
+                        line_segment().point().at(i).x(),
+                        left_boundary_segment[0].
+                        line_segment().point().at(i).y()};
+    Vec2d right_point_v = {right_boundary_segment[0].
+                         line_segment().point().at(i).x(),
+                         right_boundary_segment[0].
+                         line_segment().point().at(i).y()};
+    lane_info->GetProjection(left_point_v, &left_point_s, &left_point_l);
+    lane_info->GetProjection(right_point_v, &right_point_s, &right_point_l);
+    if (left_point_s > car_s) {
+      In_left_boundary_points->push_back(left_point);
       temp_record_left = i;
     }
-    if (right_points[i].x() < temp_state_.x()) {
-      In_right_boundary_points->push_back(right_points[i]);
+    if (right_point_s > car_s) {
+      In_right_boundary_points->push_back(right_point);
       temp_record_right = i;
     }
+    left_s.push_back(left_point_s);
+    left_l.push_back(left_point_l);
+    right_s.push_back(right_point_s);
+    right_l.push_back(right_point_l);
   }
-  // add one point, bigger than vehicle x
-  if (left_points[temp_record_left - 1].x() > temp_state_.x()) {
+  if (left_s[temp_record_left - 1] < car_s) {
     In_left_boundary_points->push_back(left_points[temp_record_left - 1]);
   }
-  if (right_points[temp_record_right - 1].x() > temp_state_.x()) {
+  if (right_s[temp_record_right - 1] < car_s) {
     In_right_boundary_points->push_back(right_points[temp_record_right - 1]);
   }
   std::reverse(In_right_boundary_points->begin(),
@@ -894,29 +915,50 @@ void OpenSpaceRoiDecider::GetOutLaneBoundaryPoints(
     left_boundary_segment[0].line_segment().point_size();
   int temp_record_left = 0;
   int temp_record_right = 0;
+  double left_point_s = 0.0;
+  double left_point_l = 0.0;
+  double right_point_s = 0.0;
+  double right_point_l = 0.0;
+  std::vector<double> left_s, right_s, left_l, right_l;
   std::vector<PointENU> left_points, right_points;
+  double target_point_s, target_point_l;
+  Vec2d target_position = {routing_target_point_.x(),
+                           routing_target_point_.y()};
+  lane_info->GetProjection(target_position, &target_point_s, &target_point_l);
   for (size_t i = 0; i < lane_points_num; ++i) {
-    left_points.push_back(left_boundary_segment[0].
-                          line_segment().point().at(i));
-    right_points.push_back(right_boundary_segment[0].
-                          line_segment().point().at(i));
-  }
-  // (to do): by s
-  for (size_t i = 0; i < lane_points_num; ++i) {
-    if (left_points[i].x() < routing_target_point_.x()) {
-      Out_left_boundary_points->push_back(left_points[i]);
+    PointENU left_point = left_boundary_segment[0].
+                          line_segment().point().at(i);
+    PointENU right_point = right_boundary_segment[0].
+                           line_segment().point().at(i);
+    left_points.push_back(left_point);
+    right_points.push_back(right_point);
+    Vec2d left_point_v = {left_boundary_segment[0].
+                          line_segment().point().at(i).x(),
+                          left_boundary_segment[0].
+                          line_segment().point().at(i).y()};
+    Vec2d right_point_v = {right_boundary_segment[0].
+                           line_segment().point().at(i).x(),
+                           right_boundary_segment[0].
+                           line_segment().point().at(i).y()};
+    lane_info->GetProjection(left_point_v, &left_point_s, &left_point_l);
+    lane_info->GetProjection(right_point_v, &right_point_s, &right_point_l);
+    if (left_point_s < target_point_s) {
+      Out_left_boundary_points->push_back(left_point);
       temp_record_left = i;
     }
-    if (right_points[i].x() < routing_target_point_.x()) {
-      Out_right_boundary_points->push_back(right_points[i]);
+    if (right_point_s < target_point_s) {
+      Out_right_boundary_points->push_back(right_point);
       temp_record_right = i;
     }
+    left_s.push_back(left_point_s);
+    left_l.push_back(left_point_l);
+    right_s.push_back(right_point_s);
+    right_l.push_back(right_point_l);
   }
-  // add one point, bigger than vehicle x
-  if (left_points[temp_record_left + 1].x() > routing_target_point_.x()) {
+  if (left_s[temp_record_left + 1] > target_point_s) {
     Out_left_boundary_points->push_back(left_points[temp_record_left + 1]);
   }
-  if (right_points[temp_record_right + 1].x() > routing_target_point_.x()) {
+  if (right_s[temp_record_right + 1] > target_point_s) {
     Out_right_boundary_points->push_back(right_points[temp_record_right + 1]);
   }
   std::reverse(Out_left_boundary_points->begin(),
@@ -1005,7 +1047,6 @@ bool OpenSpaceRoiDecider::GetDeadEndBoundary(
                             In_right_boundary_points[0].y()});
   const auto &origin_point = frame->open_space_info().origin_point();
   const auto &origin_heading = frame->open_space_info().origin_heading();
-
   for (size_t i = 0; i < point_boundary.size(); ++i) {
     point_boundary[i] -= origin_point;
     point_boundary[i].SelfRotate(-origin_heading);
