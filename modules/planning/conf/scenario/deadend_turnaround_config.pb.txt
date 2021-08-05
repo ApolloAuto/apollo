@@ -1,6 +1,6 @@
 scenario_type: DEADEND_TURNAROUND
 deadend_turnaround_config: {
-  dead_end_start_range: 5.0
+  dead_end_start_range: 5.7
   max_valid_stop_distance: 1.0
 }
 stage_type: DEADEND_TURNAROUND_APPROACHING_TURNING_POINT

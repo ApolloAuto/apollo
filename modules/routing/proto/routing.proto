@@ -26,8 +26,9 @@ enum ParkingSpaceType {
 }
 
 enum DeadEndRoutingType {
-  ROUTING_IN = 0;
-  ROUTING_OUT = 1;
+  ROUTING_OTHER = 0;
+  ROUTING_IN = 1;
+  ROUTING_OUT = 2;
 }
 
 message ParkingInfo {
