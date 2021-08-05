@@ -167,6 +167,6 @@ PERCEPTION_REGISTER_MULTITARGET_TRACKER(NewLidarTracker); //注册新的lidar_tr
 
 ## 更新 lidar_obstacle_tracking.conf
 
-要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 值字段改为 "NewLidarTracker"
+要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 字段值改为 "NewLidarTracker"
 
 在完成以上步骤后，您的新lidar匹配算法便可在Apollo系统中生效。

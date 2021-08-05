@@ -1,6 +1,6 @@
 # How to add a new lidar detector algorithm
 
-The processing flow of lidar perception module is shown below: ：
+The processing flow of lidar perception module is shown below:
 ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
 
 The detector algorithm introduced by this document is located at Detection Component listed below. Current architecture of Detection Component is shown：
@@ -20,7 +20,7 @@ The steps are elaborated below for better understanding:
 
 ## Define a class that inherits `base_lidar_detector`
 
-All the lidar detector algorithms shall inherit `base_lidar_detector`，which defines a set of interfaces. Here is an example of a detector implementation:
+All the lidar detector algorithms shall inherit `base_lidar_detector`，which defines a set of interfaces. Here is an example of the detector implementation:
 
 ```c++
 namespace apollo {
@@ -112,7 +112,7 @@ bool NewLidarDetector::Detect(const LidarDetectorOptions& options, LidarFrame* f
 
 std::string NewLidarDetector::Name() const {
     /*
-    return your detector's name
+    Return your detector's name
     */
 }
 
