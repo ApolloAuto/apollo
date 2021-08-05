@@ -78,7 +78,7 @@ message Trajectory {
   repeated apollo.common.TrajectoryPoint trajectory_point = 2;
 }
 
-// next id = 39
+// next id = 40
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -134,6 +134,7 @@ message Feature {
   // ADC trajectory at the same frame, and ADC trajectory timestamp
   repeated apollo.common.TrajectoryPoint adc_trajectory_point = 34;
   optional double adc_timestamp = 38;
+  optional apollo.perception.PerceptionObstacle adc_localization = 39;
 
   // Surrounding lanes
   repeated string surrounding_lane_id = 35;

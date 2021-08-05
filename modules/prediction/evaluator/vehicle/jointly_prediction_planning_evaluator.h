@@ -72,11 +72,12 @@ class JointlyPredictionPlanningEvaluator : public Evaluator {
    * @param Obstacles container
    *        Feature container in a vector for receiving the obstacle history
    */
-  bool ExtractObstaclesHistory(
+    bool ExtractObstaclesHistory(
       Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
       std::vector<std::pair<double, double>>* curr_pos_history,
       std::vector<std::pair<double, double>>* all_obs_length,
-      std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history);
+      std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history,
+      torch::Tensor* vector_mask);
 
   /**
    * @brief Extract adc trajectory and convert world coord to obstacle coord

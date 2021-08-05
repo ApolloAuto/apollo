@@ -109,7 +109,7 @@ export function pointOnVectorRight(p, p1, p2) {
 }
 
 export function directionVectorCrossProduct(p1, p2, abs = false) {
-  //p1 X p2
+  // p1 X p2
   let crossProduct = p1.x * p2.y - p1.y * p2.x;
   if (abs) {
     crossProduct = Math.abs(crossProduct);
@@ -151,14 +151,14 @@ export function getPointDistance(p1, p2) {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-export function directionSameWithVector(p0, p1,vector) {
+export function directionSameWithVector(p0, p1, vector) {
   return directionVectorDotProduct(vector, {
     x: p1.x - p0.x,
     y: p1.y - p0.y,
   }) > 0;
 }
 
-function getPointInFrontOf(points, p,vector) {
+function getPointInFrontOf(points, p, vector) {
   return _.findIndex(points, point =>
     directionVectorDotProduct({
       x: point.x - p.x,
@@ -167,7 +167,7 @@ function getPointInFrontOf(points, p,vector) {
 }
 
 function getPointBehind(points, p, vector) {
-  return  _.findLastIndex(points, point =>
+  return _.findLastIndex(points, point =>
     directionVectorDotProduct({
       x: p.x - point.x,
       y: p.y - point.y

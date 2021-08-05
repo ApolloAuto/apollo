@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools/platform:build_defs.bzl", "copts_if_teleop")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -42,7 +42,17 @@ install(
     ],
     targets = ["dreamview"],
     deps = [
+        ":pb_dreamview",
         "//cyber:install",
+    ],
+)
+
+install_files(
+    name = "pb_dreamview",
+    dest = "modules/dreamview",
+    files = [
+        "//modules/dreamview/proto:chart_py_pb2",
+        "//modules/dreamview/proto:preprocess_table_py_pb2",
     ],
 )
 
