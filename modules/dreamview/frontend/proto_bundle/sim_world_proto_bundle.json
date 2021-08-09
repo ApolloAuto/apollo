@@ -10550,8 +10550,9 @@
             },
             "DeadEndRoutingType": {
               "values": {
-                "ROUTING_IN": 0,
-                "ROUTING_OUT": 1
+                "ROUTING_OTHER": 0,
+                "ROUTING_IN": 1,
+                "ROUTING_OUT": 2
               }
             },
             "ParkingInfo": {
@@ -12114,6 +12115,10 @@
                 "adcTimestamp": {
                   "type": "double",
                   "id": 38
+                },
+                "adcLocalization": {
+                  "type": "apollo.perception.PerceptionObstacle",
+                  "id": 39
                 },
                 "surroundingLaneId": {
                   "rule": "repeated",
