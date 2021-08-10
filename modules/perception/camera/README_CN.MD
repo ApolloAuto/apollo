@@ -10,20 +10,31 @@
 - 我们增加了预测2D边框宽和高的head，再加上2D中心点就可以直接计算出障碍物的2D边框；
 - 利用2D边框和其他一些3D信息，我们使用了后处理几何约束去优化预测的位置信息。首先，我们利用模型预测的3D信息计算障碍物的3D边框，如公式1所示。公式中$\theta$表示偏转角度，$h,w,l$是障碍物的长宽高，$x,y,z$代表了障碍物的位置。
 
-$$
+<!-- $$
 B = \left[\begin{matrix} \cos(\theta) & 0 & \sin(\theta) \\ 0 & 1 & 0 \\ -\sin(\theta) & 0 & \cos(\theta) \end{matrix} \right]
 \left[\begin{matrix} \pm\frac{h}{2}  \\ \pm\frac{w}{2} \\ \pm\frac{l}{2} \end{matrix} \right] + 
 \left[\begin{matrix} x  \\ y \\ z \end{matrix} \right]
 \tag{1}
-$$
+$$ -->
+
+<div align=center>
+
+<img src="https://latex.codecogs.com/svg.latex?B&space;=&space;\left[\begin{matrix}&space;\cos(\theta)&space;&&space;0&space;&&space;\sin(\theta)&space;\\&space;0&space;&&space;1&space;&&space;0&space;\\&space;-\sin(\theta)&space;&&space;0&space;&&space;\cos(\theta)&space;\end{matrix}&space;\right]&space;\left[\begin{matrix}&space;\pm\frac{h}{2}&space;\\&space;\pm\frac{w}{2}&space;\\&space;\pm\frac{l}{2}&space;\end{matrix}&space;\right]&space;&plus;&space;\left[\begin{matrix}&space;x&space;\\&space;y&space;\\&space;z&space;\end{matrix}&space;\right]" />
+
+</div>
 
 然后根据障碍物的边框和图像中的边框对应关系作为约束条件，优化障碍物的位置信息，如公式2所示。
 
-$$
-x^*, y^*, z^* = \argmin_{\lbrace x,y,z \rbrace}{\sum{||B - B^*||^2_{\sum}}}
-
+<!-- $$
+x^*, y^*, z^* = arg\,\max_{\lbrace x,y,z \rbrace}{\sum{||B - B^*||^2_{\sum}}}
 \tag{2}
-$$
+$$ -->
+
+<div align=center>
+
+<img src="https://latex.codecogs.com/svg.latex?x^*,&space;y^*,&space;z^*&space;=&space;arg\,\max_{\lbrace&space;x,y,z&space;\rbrace}{\sum{||B&space;-&space;B^*||^2_{\sum}}}" />
+
+</div>
 
 最终网络结构图如下所示
 <div align=center>

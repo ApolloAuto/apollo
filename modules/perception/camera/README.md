@@ -14,20 +14,31 @@ Here we mainly focus on the modifications based on SMOKE,  more detail about SMO
 
 - Using 2D bounding box and other 3D information, we use post-processing geometric constraints to optimize the predicted position information. Firstly, we use the 3D information predicted by the model to calculate the 3D bounding box of the obstacle, as shown in Formula 1. $\theta$ represents the rotation of obstacle，$h,w,l$ is the dimensions and $x,y,z$ represent location。
 
-$$
+<!-- $$
 B = \left[\begin{matrix} \cos(\theta) & 0 & \sin(\theta) \\ 0 & 1 & 0 \\ -\sin(\theta) & 0 & \cos(\theta) \end{matrix} \right]
 \left[\begin{matrix} \pm\frac{h}{2}  \\ \pm\frac{w}{2} \\ \pm\frac{l}{2} \end{matrix} \right] + 
 \left[\begin{matrix} x  \\ y \\ z \end{matrix} \right]
 \tag{1}
-$$
+$$ -->
+
+<div align=center>
+
+<img src="https://latex.codecogs.com/svg.latex?B&space;=&space;\left[\begin{matrix}&space;\cos(\theta)&space;&&space;0&space;&&space;\sin(\theta)&space;\\&space;0&space;&&space;1&space;&&space;0&space;\\&space;-\sin(\theta)&space;&&space;0&space;&&space;\cos(\theta)&space;\end{matrix}&space;\right]&space;\left[\begin{matrix}&space;\pm\frac{h}{2}&space;\\&space;\pm\frac{w}{2}&space;\\&space;\pm\frac{l}{2}&space;\end{matrix}&space;\right]&space;&plus;&space;\left[\begin{matrix}&space;x&space;\\&space;y&space;\\&space;z&space;\end{matrix}&space;\right]" />
+
+</div>
 
 Then, according to the corresponding relationship between the bounding boxes as the constraint condition, we optimized the position information of the obstacle as shown in formula 2.
 
-$$
-x^*, y^*, z^* = \argmin_{\lbrace x,y,z \rbrace}{\sum{||B - B^*||^2_{\sum}}}
-
+<!-- $$
+x^*, y^*, z^* = arg\,\max_{\lbrace x,y,z \rbrace}{\sum{||B - B^*||^2_{\sum}}}
 \tag{2}
-$$
+$$ -->
+
+<div align=center>
+
+<img src="https://latex.codecogs.com/svg.latex?x^*,&space;y^*,&space;z^*&space;=&space;arg\,\max_{\lbrace&space;x,y,z&space;\rbrace}{\sum{||B&space;-&space;B^*||^2_{\sum}}}" />
+
+</div>
 
 The final network structure is shown below
 <div align=center>
