@@ -24,18 +24,19 @@ The network structure of the final FPN is shown in the figure below
 
 ## Results
 We use the mmdetction3d framework for training. On the KITTI validation set, the results are as follows. The results of PointPillars comes from [mmdetction3d](https://github.com/open-mmlab/mmdetection3d/blob/master/configs/pointpillars/README.md)
+
 <div align=center>
 
-
 |    Method           |   3DmAP <br> Mod.|  Car <br> Easy Mod. Hard| Pedestrian <br> Easy Mod. Hard | Cyclist <br> Easy Mod. Hard|              
-|---------------------|:---------:|:-----:|:----------:|:-------:|:-------------------------------------------------------------------------------------------:|
+|---------------------|:---------:|:-----:|:----------:|:-------:|
 | PointPillars        | 60.11           | 85.41     73.98	 67.76 |  52.02	      46.40        42.48| 78.72	   59.95	57.25|
 | Ours                | 62.07           | 86.13     76.74	 74.14 |  50.79	      45.59	       41.50| 83.91	   63.87	61.05|
 
 |     Method          |  BEVmAP <br> Mod.|  Car <br> Easy Mod. Hard| Pedestrian <br> Easy Mod. Hard | Cyclist <br> Easy Mod. Hard|              
-|---------------------|:---------:|:-----:|:----------:|:-------:|:-------------------------------------------------------------------------------------------:|
+|---------------------|:---------:|:-----:|:----------:|:-------:|
 | PointPillars        | 67.76           | 89.93     86.57	 85.20 |  59.08	      53.36	       48.42| 80.93	   63.34	60.06|
 | Ours                | 69.49          | 89.85     87.15	 85.55 |  58.29	      53.87	       49.98| 85.13	   67.43	63.85|
+
 </div>
 
 
