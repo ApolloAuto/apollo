@@ -9,6 +9,7 @@ import "modules/map/proto/map_parking_space.proto";
 enum TaskType {
   CYCLE_ROUTING = 0;
   PARKING_ROUTING = 1;
+  PARK_GO_ROUTING = 2;
 }
 
 message CycleRoutingTask {
@@ -19,7 +20,12 @@ message CycleRoutingTask {
 message ParkingRoutingTask {
   optional double lane_width = 1;
   optional apollo.routing.RoutingRequest routing_request = 2;
-} 
+}
+
+message ParkGoRoutingTask {
+  optional int32 park_time = 1; // sec
+  repeated apollo.routing.RoutingRequest routing_requests = 2;
+}
 
 message Task {
   optional apollo.common.Header header = 1;
@@ -27,4 +33,5 @@ message Task {
   optional TaskType task_type = 3;
   optional CycleRoutingTask cycle_routing_task = 4;
   optional ParkingRoutingTask parking_routing_task = 5;
+  optional ParkGoRoutingTask park_go_routing_task = 6;
 }
