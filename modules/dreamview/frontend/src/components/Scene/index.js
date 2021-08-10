@@ -7,6 +7,7 @@ import RENDERER from 'renderer';
 import STORE from 'store';
 import DefaultRoutingInput from '../RouteEditingBar/DefaultRoutingInput';
 import CycleNumberInput from '../DefaultRouting/CycleNumberInput';
+import ParkTimeInput from '../DefaultRouting/ParkTimeInput';
 
 @inject('store') @observer
 export default class Scene extends React.Component {
@@ -52,7 +53,12 @@ export default class Scene extends React.Component {
                         && <CycleNumberInput
                             routeEditingManager={routeEditingManager}
                             options={options}
-                      />}
+                        />}
+                    {!options.showRouteEditingBar && options.showParkTimeInput
+                        && <ParkTimeInput
+                            routeEditingManager={routeEditingManager}
+                            options={options}
+                        />}
                     {options.showGeo && <Geolocation />}
                 </div>
             </React.Fragment>

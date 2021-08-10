@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 
 import POI from './POI';
 import DefaultRoutingPoint from './DefaultRoutingPoint';
+import ParkAndGo from './ParkAndGo';
 
 
 @observer
@@ -27,6 +28,7 @@ export default class DefaultRouting extends React.Component {
             <TabList>
               <Tab>Point of Interest</Tab>
               <Tab>Default Routings</Tab>
+              <Tab>Park And Go</Tab>
             </TabList>
             <TabPanel>
               <POI
@@ -37,6 +39,12 @@ export default class DefaultRouting extends React.Component {
             </TabPanel>
             <TabPanel>
               <DefaultRoutingPoint
+                routeEditingManager={routeEditingManager}
+                options={options}
+              />
+            </TabPanel>
+            <TabPanel>
+              <ParkAndGo
                 routeEditingManager={routeEditingManager}
                 options={options}
               />

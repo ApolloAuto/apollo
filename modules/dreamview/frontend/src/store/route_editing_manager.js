@@ -12,6 +12,8 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
+    @observable parkAndGoRoutings = {};
+
     @observable defaultRoutingDistanceThreshold = 10.0;
 
     @observable currentPOI = 'none';
@@ -68,19 +70,19 @@ export default class RouteEditingManager {
       }
     }
 
-    @action addDefaultRoutingPoint(defaultRoutingName) {
-      if (_.isEmpty(this.defaultRoutings)) {
-        alert("Failed to get default routing, make sure there's "
-                + 'a default routing file under the map data directory.');
+    @action addDefaultRoutingPoint(defaultRoutingName, isDefaultRouting = true) {
+      const routings = isDefaultRouting ? this.defaultRoutings : this.parkAndGoRoutings;
+      if (_.isEmpty(routings)) {
+        alert('Failed to get routing, make sure the '
+                + 'routing file under the map data directory.');
         return;
       }
-      if (defaultRoutingName === undefined || defaultRoutingName === ''
-            || !(defaultRoutingName in this.defaultRoutings)) {
+      if (!defaultRoutingName || !(defaultRoutingName in routings)) {
         alert('Please select a valid default routing.');
         return;
       }
 
-      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName]);
+      RENDERER.addDefaultEndPoint(routings[defaultRoutingName]);
     }
 
     @action updateDefaultRoutingPoints(data) {
@@ -97,16 +99,32 @@ export default class RouteEditingManager {
       }
     }
 
+    @action updateParkAndGoRoutings(data) {
+      if (data.parkAndGoRoutings === undefined) {
+        return;
+      }
+      this.parkAndGoRoutings = {};
+      for (let i = 0; i < data.parkAndGoRoutings.length; ++i) {
+        const parkGoRouting = data.parkAndGoRoutings[i];
+        this.parkAndGoRoutings[parkGoRouting.name] = parkGoRouting.point;
+      }
+    }
+
     addDefaultRoutingPath(message) {
       if (message.data === undefined) {
         return;
       }
       const drouting = message.data;
-      this.defaultRoutings[drouting.name] = drouting.waypoint;
+      const routingType = message.routingType;
+      if (routingType === 'defaultRouting') {
+        this.defaultRoutings[drouting.name] = drouting.waypoint;
+      } else {
+        this.parkAndGoRoutings[drouting.name] = drouting.waypoint;
+      }
     }
 
-    addDefaultRouting(routingName) {
-      return RENDERER.addDefaultRouting(routingName);
+    addDefaultRouting(routingName, type = 'defaultRouting') {
+      return RENDERER.addDefaultRouting(routingName, type);
     }
 
     toggleDefaultRoutingMode() {
@@ -146,6 +164,18 @@ export default class RouteEditingManager {
       if (!isNaN(cycleNumber) || !points) {
         const success = RENDERER.sendCycleRoutingRequest
         (this.currentDefaultRouting, points, cycleNumber);
+        if (success) {
+          this.disableRouteEditing();
+        }
+        return success;
+      }
+      return false;
+    }
+
+    sendParkGoRoutingRequest(parkTime) {
+      const points = this.parkAndGoRoutings[this.currentDefaultRouting];
+      if (!isNaN(parkTime) || !points) {
+        const success = RENDERER.sendParkGoRoutingRequest(points, parkTime);
         if (success) {
           this.disableRouteEditing();
         }

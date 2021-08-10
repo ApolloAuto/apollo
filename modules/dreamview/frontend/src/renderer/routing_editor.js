@@ -7,7 +7,11 @@ import WS from 'store/websocket';
 import { IsPointInRectangle } from 'utils/misc';
 import { drawImage, drawRoutingPointArrow, disposeMesh } from 'utils/draw';
 
-const minDefaultRoutingPointsNum = 1;
+// define the min routing points num for different routing type
+const minRoutingPointsNum = {
+  defaultRouting: 1,
+  parkGoRouting: 2,
+};
 
 export default class RoutingEditor {
   constructor() {
@@ -260,9 +264,28 @@ export default class RoutingEditor {
     return true;
   }
 
-  addDefaultRouting(routingName, coordinates) {
-    if (this.routePoints.length < minDefaultRoutingPointsNum) {
-      alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
+  sendParkGoRoutingRequest(routingPoints, parkTime,
+    carOffsetPosition, carHeading, coordinates) {
+    const points = routingPoints.map((point) => {
+      point.z = 0;
+      const offsetPoint = coordinates.applyOffset(point, true);
+      if (_.isNumber(point.heading)) {
+        offsetPoint.heading = point.heading;
+      }
+      return offsetPoint;
+    });
+    // always use car position as start position
+    const start = coordinates.applyOffset(carOffsetPosition, true);
+    const start_heading = carHeading;
+    const end = points[points.length - 1];
+    const waypoint = points.slice(0, -1);
+    WS.requestParkGoRouting(start, start_heading, waypoint, end, parkTime);
+    return true;
+  }
+
+  addDefaultRouting(routingName, coordinates, type = 'defaultRouting') {
+    if (this.routePoints.length < minRoutingPointsNum[type]) {
+      alert(`Please provide at least ${minRoutingPointsNum[type]} end point.`);
       return false;
     }
 
@@ -275,7 +298,7 @@ export default class RoutingEditor {
       }
       return point;
     });
-    WS.saveDefaultRouting(routingName, points);
+    WS.saveDefaultRouting(routingName, points, type);
   }
 
   checkCycleRoutingAvailable(cycleRoutingPoints, carPosition, threshold) {

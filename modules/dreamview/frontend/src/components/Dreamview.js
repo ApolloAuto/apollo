@@ -38,7 +38,8 @@ export default class Dreamview extends React.Component {
     const optionName = HOTKEYS_CONFIG[event.key];
     if (!optionName || options.showDataRecorder
       || options.showDefaultRoutingInput || options.showCycleNumberInput
-    || options.showFuelClient) {
+      || options.showFuelClient || options.showParkTimeInput
+    ) {
       return;
     }
 
