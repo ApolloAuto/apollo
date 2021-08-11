@@ -42,7 +42,7 @@ double Select::Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2,
 void Select::SelectTrafficLights(
     const std::vector<base::TrafficLightPtr> &refined_bboxes,
     std::vector<base::TrafficLightPtr> *hdmap_bboxes) {
-  std::vector<std::pair<size_t, size_t> > assignments;
+  std::vector<std::pair<size_t, size_t>> assignments;
   munkres_.costs()->Resize(hdmap_bboxes->size(), refined_bboxes.size());
 
   for (size_t row = 0; row < hdmap_bboxes->size(); ++row) {

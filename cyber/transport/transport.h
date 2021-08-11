@@ -21,8 +21,9 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/macros.h"
 #include "cyber/proto/transport_conf.pb.h"
+
+#include "cyber/common/macros.h"
 #include "cyber/transport/dispatcher/intra_dispatcher.h"
 #include "cyber/transport/dispatcher/rtps_dispatcher.h"
 #include "cyber/transport/dispatcher/shm_dispatcher.h"
@@ -68,12 +69,12 @@ class Transport {
  private:
   void CreateParticipant();
 
-  std::atomic<bool> is_shutdown_;
-  ParticipantPtr participant_;
-  NotifierPtr notifier_;
-  IntraDispatcherPtr intra_dispatcher_;
-  ShmDispatcherPtr shm_dispatcher_;
-  RtpsDispatcherPtr rtps_dispatcher_;
+  std::atomic<bool> is_shutdown_ = {false};
+  ParticipantPtr participant_ = nullptr;
+  NotifierPtr notifier_ = nullptr;
+  IntraDispatcherPtr intra_dispatcher_ = nullptr;
+  ShmDispatcherPtr shm_dispatcher_ = nullptr;
+  RtpsDispatcherPtr rtps_dispatcher_ = nullptr;
 
   DECLARE_SINGLETON(Transport)
 };

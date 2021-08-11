@@ -1,6 +1,6 @@
 ## Installation Guide of Racobit B01HC Radar
 
-Racobit developed one Radar product with **60 degree FOV** and **150 m** detection range for autonomous driving needs. 
+Racobit developed one Radar product with **60 degree FOV** and **150 m** detection range for autonomous driving needs.
 
 ![radar_image](images/b01hc.png)
 
@@ -11,12 +11,11 @@ Racobit developed one Radar product with **60 degree FOV** and **150 m** detecti
 3. Connect the power cable to **12VDC** power supply.
 4. Connect the CAN output to the CAN interface of the IPC.
 5. You should be able to receive the CAN messages through the CAN port once the Radar is powered.
-6. Please discuss with the vendor for additional support if needed while integrating it with your vehicle. 
+6. Please discuss with the vendor for additional support if needed while integrating it with your vehicle.
 
 ## Disclaimer
 
 This device is `Apollo Hardware Development Platform Supported`
 
-  
 
-  
+

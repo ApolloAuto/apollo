@@ -24,16 +24,14 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
-using apollo::common::PathPoint;
-using apollo::common::util::MakePathPoint;
+using apollo::common::util::PointFactory;
 using apollo::perception::PerceptionObstacle;
 using apollo::prediction::ObstaclePriority;
 
@@ -56,12 +54,8 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   perception_obstacle.mutable_position()->set_y(1.0);
   Obstacle b1("1", perception_obstacle, ObstaclePriority::NORMAL, false);
 
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(3.0);
-  vec_points.emplace_back(p1);
-  vec_points.emplace_back(p2);
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 0.0));
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 3.0, 0.0, 3.0));
   vec_obstacle.emplace_back(&b1);
   obstacle_boundary.set_start_l(1.5);
 
@@ -100,12 +94,8 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   b1.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b1);
 
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(3.0);
-  vec_points.emplace_back(p1);
-  vec_points.emplace_back(p2);
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 0.0));
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 3.0, 0.0, 3.0));
   vec_obstacle.emplace_back(&b1);
   vehicle_state.set_linear_velocity(5.556);
 
@@ -152,21 +142,16 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   b2.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b2);
 
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(p1.s() + std::sqrt(1.0 + 1.0));
-  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p3.set_s(p2.s() + std::sqrt(1.0 + 1.0));
-  PathPoint p4 = MakePathPoint(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p4.set_s(p3.s() + std::sqrt(1.0 + 1.0));
-  PathPoint p5 = MakePathPoint(4.0, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p5.set_s(p4.s() + std::sqrt(1.0 + 1.0));
-  vec_points.emplace_back(p1);
-  vec_points.emplace_back(p2);
-  vec_points.emplace_back(p3);
-  vec_points.emplace_back(p4);
-  vec_points.emplace_back(p5);
+  const double s1 = 0;
+  const double s2 = s1 + std::sqrt(1.0 + 1.0);
+  const double s3 = s2 + std::sqrt(1.0 + 1.0);
+  const double s4 = s3 + std::sqrt(1.0 + 1.0);
+  const double s5 = s4 + std::sqrt(1.0 + 1.0);
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1));
+  vec_points.push_back(PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2));
+  vec_points.push_back(PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3));
+  vec_points.push_back(PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4));
+  vec_points.push_back(PointFactory::ToPathPoint(4.0, 4.0, 0.0, s5));
   vec_obstacle.emplace_back(&b1);
   vec_obstacle.emplace_back(&b2);
   vehicle_state.set_linear_velocity(5.556);
@@ -203,12 +188,8 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
   b1.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b1);
 
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(3.0);
-  vec_points.emplace_back(p1);
-  vec_points.emplace_back(p2);
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 0.0));
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 3.0, 0.0, 3.0));
   vec_obstacle.emplace_back(&b1);
   vehicle_state.set_linear_velocity(20);
 
@@ -248,21 +229,16 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   perception_obstacle.mutable_velocity()->set_y(0.0);
   Obstacle b2("6", perception_obstacle, ObstaclePriority::NORMAL, false);
 
-  PathPoint p1 = MakePathPoint(0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(p1.s() + 1.0);
-  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p3.set_s(p2.s() + 1.0);
-  PathPoint p4 = MakePathPoint(3.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p4.set_s(p3.s() + 1.0);
-  PathPoint p5 = MakePathPoint(4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p5.set_s(p4.s() + 1.0);
-  vec_points.emplace_back(p1);
-  vec_points.emplace_back(p2);
-  vec_points.emplace_back(p3);
-  vec_points.emplace_back(p4);
-  vec_points.emplace_back(p5);
+  const double s1 = 0.0;
+  const double s2 = s1 + 1.0;
+  const double s3 = s2 + 1.0;
+  const double s4 = s3 + 1.0;
+  const double s5 = s4 + 1.0;
+  vec_points.push_back(PointFactory::ToPathPoint(0.0, 2.0, 0.0, s1));
+  vec_points.push_back(PointFactory::ToPathPoint(1.0, 2.0, 0.0, s2));
+  vec_points.push_back(PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3));
+  vec_points.push_back(PointFactory::ToPathPoint(3.0, 2.0, 0.0, s4));
+  vec_points.push_back(PointFactory::ToPathPoint(4.0, 2.0, 0.0, s5));
   vec_obstacle.emplace_back(&b1);
   vec_obstacle.emplace_back(&b2);
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QSpinBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpinBox>
 
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
 #include "modules/tools/visualizer/grid.h"
@@ -1195,8 +1195,9 @@ void MainWindow::AddNewWriter(
 void MainWindow::PlayPause(void) {
   QObject* obj = QObject::sender();
   bool b = true;
-  if (obj == ui_->actionPause) b = false;
-
+  if (obj == ui_->actionPause) {
+    b = false;
+  }
   if (pointcloud_top_item_) {
     pointcloud_button_->setChecked(b);
     PlayRenderableObject(b);

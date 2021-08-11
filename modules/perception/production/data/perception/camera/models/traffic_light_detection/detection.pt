@@ -9,7 +9,7 @@ input_blob_name : "img"
 im_param_blob_name : "im_info"
 output_blob_name : "bboxes"
 model_name: "./"
-model_type: "CaffeNet"
+model_type: "RTNet"
 proto_file:"deploy.prototxt"
 weight_file: "baidu_iter_140000.caffemodel"
-max_batch_size: 4
+max_batch_size: 1  # only support 1 so far

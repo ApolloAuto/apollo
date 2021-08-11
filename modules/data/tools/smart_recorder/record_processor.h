@@ -29,9 +29,6 @@
 namespace apollo {
 namespace data {
 
-using cyber::record::RecordMessage;
-using cyber::record::RecordWriter;
-
 /**
  * @class RecordProcessor
  * @brief Process messages and apply the rules based on configured triggers
@@ -47,12 +44,12 @@ class RecordProcessor {
 
  protected:
   bool InitTriggers(const SmartRecordTrigger& trigger_conf);
-  bool ShouldRestore(const RecordMessage& msg) const;
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const;
 
   const std::string source_record_dir_;
   const std::string restored_output_dir_;
   std::vector<std::unique_ptr<TriggerBase>> triggers_;
-  std::unique_ptr<RecordWriter> writer_ = nullptr;
+  std::unique_ptr<cyber::record::RecordWriter> writer_ = nullptr;
 };
 
 }  // namespace data

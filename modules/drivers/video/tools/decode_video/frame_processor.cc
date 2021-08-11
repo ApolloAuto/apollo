@@ -20,15 +20,13 @@
 #include <memory>
 #include <sstream>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/drivers/video/tools/decode_video/h265_decoder.h"
 
 namespace apollo {
 namespace drivers {
 namespace video {
-
-using apollo::common::util::StrCat;
 
 FrameProcessor::FrameProcessor(const std::string& input_video_file,
                                const std::string& output_jpg_dir)
@@ -101,12 +99,12 @@ bool FrameProcessor::ProcessStream() const {
 }
 
 std::string FrameProcessor::GetOutputFile(const int frame_num) const {
-  constexpr int kSuffixLen = 5;
+  static constexpr int kSuffixLen = 5;
   std::stringstream jpg_suffix;
   jpg_suffix.fill('0');
   jpg_suffix.width(kSuffixLen);
-  jpg_suffix << std::to_string(frame_num);
-  return StrCat(output_jpg_dir_, "/", jpg_suffix.str(), ".jpg");
+  jpg_suffix << frame_num;
+  return absl::StrCat(output_jpg_dir_, "/", jpg_suffix.str(), ".jpg");
 }
 
 void FrameProcessor::WriteOutputJpgFile(

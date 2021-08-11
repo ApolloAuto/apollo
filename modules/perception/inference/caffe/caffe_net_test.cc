@@ -66,16 +66,16 @@ TEST(CaffeNetTest, init_test) {
   // std::vector<std::string> inputs{"data", "bad"};
   // auto rt_net = apollo::perception::inference::CreateInferenceByName(
   //     "CaffeNet", proto_file, weight_file, outputs, inputs);
-  // CHECK(rt_net);
+  // ACHECK(rt_net);
   // int height = 576;
   // int width = 1440;
   // int offset_y = 312;
   // int batchsize = 1;
   // std::vector<int> shape = {batchsize, height, width, 3};
   // std::map<std::string, std::vector<int>> shape_map{{"bad", shape}};
-  // CHECK(rt_net->Init(shape_map));
+  // ACHECK(rt_net->Init(shape_map));
   // rt_net->Infer();
-  // CHECK(!rt_net->get_blob("bad"));
+  // ACHECK(!rt_net->get_blob("bad"));
 }
 
 TEST(CaffeNetTest, cpu_test) {
@@ -108,7 +108,7 @@ TEST(CaffeNetTest, cpu_test) {
 
   // rt_net = apollo::perception::inference::CreateInferenceByName(
   //     "CaffeNet", proto_file, weight_file, outputs, inputs);
-  // CHECK(rt_net);
+  // ACHECK(rt_net);
   // int height = 576;
   // int width = 1440;
   // int offset_y = 312;
@@ -117,7 +117,7 @@ TEST(CaffeNetTest, cpu_test) {
   // rt_net->set_gpu_id(-1);
   // std::map<std::string, std::vector<int>> shape_map{{input_blob_name,
   // shape}}; rt_net->set_max_batch_size(batchsize);
-  // CHECK(rt_net->Init(shape_map));
+  // ACHECK(rt_net->Init(shape_map));
   // rt_net->Infer();
   // if (rt_net != nullptr) {
   //   delete rt_net;
@@ -156,7 +156,7 @@ TEST(CaffeNetTest, reshape_test) {
   // int batchsize = 2;
   // caffenet.Init(std::map<std::string, std::vector<int>>{});
   // std::vector<int> shape = {batchsize, height, width, 3};
-  // CHECK(!caffenet.shape("bad", &shape));
+  // ACHECK(!caffenet.shape("bad", &shape));
   // auto datablob = caffenet.get_blob("data");
   // {
   //   datablob->Reshape(1, height, width, 3);

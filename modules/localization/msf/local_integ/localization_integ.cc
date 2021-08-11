@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
 
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/time_util.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
@@ -26,7 +26,7 @@ namespace localization {
 namespace msf {
 
 using common::Status;
-using common::time::TimeUtil;
+using common::util::TimeUtil;
 
 LocalizationInteg::LocalizationInteg()
     : localization_integ_impl_(new LocalizationIntegImpl()) {}
@@ -45,45 +45,38 @@ void LocalizationInteg::PcdProcess(const drivers::PointCloud &message) {
   LidarMsgTransfer transfer;
   transfer.Transfer(message, &lidar_frame);
   localization_integ_impl_->PcdProcess(lidar_frame);
-  return;
 }
 
 void LocalizationInteg::RawImuProcessFlu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuFlu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
-  return;
 }
 
 void LocalizationInteg::RawImuProcessRfu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuRfu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
-  return;
 }
 
 void LocalizationInteg::RawObservationProcess(
     const drivers::gnss::EpochObservation &raw_obs_msg) {
   localization_integ_impl_->RawObservationProcess(raw_obs_msg);
-  return;
 }
 
 void LocalizationInteg::RawEphemerisProcess(
     const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
   localization_integ_impl_->RawEphemerisProcess(gnss_orbit_msg);
-  return;
 }
 
 void LocalizationInteg::GnssBestPoseProcess(
     const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
   localization_integ_impl_->GnssBestPoseProcess(bestgnsspos_msg);
-  return;
 }
 
 void LocalizationInteg::GnssHeadingProcess(
     const drivers::gnss::Heading &gnssheading_msg) {
   localization_integ_impl_->GnssHeadingProcess(gnssheading_msg);
-  return;
 }
 
 const LocalizationResult &LocalizationInteg::GetLastestLidarLocalization()
@@ -105,7 +98,7 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
   CHECK_NOTNULL(imu_rfu);
 
-  double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
+  double measurement_time = TimeUtil::Gps2Unix(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
   imu_rfu->fb[0] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
   imu_rfu->fb[1] = imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
@@ -114,14 +107,13 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
   imu_rfu->wibb[0] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
   imu_rfu->wibb[1] = imu_msg.angular_velocity().y() * FLAGS_imu_rate;
   imu_rfu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
-  return;
 }
 
 void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
   CHECK_NOTNULL(imu_flu);
 
-  double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
+  double measurement_time = TimeUtil::Gps2Unix(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;
   imu_flu->fb[0] = -imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
   imu_flu->fb[1] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
@@ -130,7 +122,6 @@ void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
   imu_flu->wibb[0] = -imu_msg.angular_velocity().y() * FLAGS_imu_rate;
   imu_flu->wibb[1] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
   imu_flu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
-  return;
 }
 
 }  // namespace msf

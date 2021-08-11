@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -21,8 +21,8 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
-import debug_topo
+import modules.tools.common.proto_utils as proto_utils
+import modules.tools.routing.debug_topo as debug_topo
 from modules.routing.proto.routing_pb2 import RoutingResponse
 from modules.routing.proto.topo_graph_pb2 import Graph
 
@@ -46,8 +46,8 @@ def plot_region(region, color):
             g_central_curve_dict[seg.id], seg.start_s, seg.end_s, color=color)
         debug_topo.draw_id(center_pt, seg.id, 'r')
         g_center_point_dict[seg.id] = center_pt
-        print 'Plot lane id: %s, start s: %f, end s: %f' % (seg.id, seg.start_s,
-                                                            seg.end_s)
+        print('Plot lane id: %s, start s: %f, end s: %f' % (seg.id, seg.start_s,
+                                                            seg.end_s))
 
 
 def plot_lane_change(lane_change, passage_regions):
@@ -104,8 +104,8 @@ def print_help():
     Args:
 
     """
-    print 'usage:'
-    print '     python debug_topo.py file_path, then',
+    print('usage:')
+    print('     python debug_topo.py file_path, then', end=' ')
     print_help_command()
 
 
@@ -117,16 +117,16 @@ def print_help_command():
     Args:
 
     """
-    print 'type in command: [q] [r]'
-    print '         q               exit'
-    print '         p               plot passage region'
+    print('type in command: [q] [r]')
+    print('         q               exit')
+    print('         p               plot passage region')
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print_help()
         sys.exit(0)
-    print 'Please wait for loading data...'
+    print('Please wait for loading data...')
 
     topo_graph_file = sys.argv[1]
     graph = proto_utils.get_pb_from_bin_file(topo_graph_file, Graph())
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     plt.ion()
     while 1:
         print_help_command()
-        print 'cmd>',
+        print('cmd>', end=' ')
         instruction = raw_input()
         argv = instruction.strip(' ').split(' ')
         if len(argv) == 1:
@@ -147,9 +147,9 @@ if __name__ == '__main__':
                                                           RoutingResponse())
                 plot_result(result, g_central_curve_dict)
             else:
-                print '[ERROR] wrong command'
+                print('[ERROR] wrong command')
             continue
 
         else:
-            print '[ERROR] wrong arguments'
+            print('[ERROR] wrong arguments')
             continue

@@ -25,7 +25,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::StringPrintf;
+using apollo::common::util::StrFormat;
 
 STPoint::STPoint(const double s, const double t) : Vec2d(t, s) {}
 
@@ -40,7 +40,7 @@ void STPoint::set_s(const double s) { y_ = s; }
 void STPoint::set_t(const double t) { x_ = t; }
 
 std::string STPoint::DebugString() const {
-  return StringPrintf("{ \"s\" : %.6f, \"t\" : %.6f }", s(), t());
+  return StrFormat("{ \"s\" : %.6f, \"t\" : %.6f }", s(), t());
 }
 
 }  // namespace planning

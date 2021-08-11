@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>control_lateral_longitudinal</name>
+        <dag_conf>/apollo/modules/control/dag/lateral_longitudinal_module.dag</dag_conf>
+        <process_name>control_lateral_longitudinal</process_name>
+    </module>
+</cyber>

@@ -17,7 +17,7 @@
 #ifndef CYBER_RECORD_RECORD_BASE_H_
 #define CYBER_RECORD_RECORD_BASE_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <set>
 #include <string>
 
@@ -26,6 +26,8 @@
 namespace apollo {
 namespace cyber {
 namespace record {
+
+static const std::string& kEmptyString = "";
 
 /**
  * @brief Base class for record reader and writer.
@@ -89,7 +91,6 @@ class RecordBase {
 
  protected:
   std::string file_;
-  std::string null_type_;
   proto::Header header_;
   bool is_opened_ = false;
 };

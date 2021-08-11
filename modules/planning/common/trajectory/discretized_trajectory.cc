@@ -34,7 +34,7 @@ using apollo::common::TrajectoryPoint;
 DiscretizedTrajectory::DiscretizedTrajectory(
     const std::vector<TrajectoryPoint>& trajectory_points)
     : std::vector<TrajectoryPoint>(trajectory_points) {
-  CHECK(!trajectory_points.empty())
+  ACHECK(!trajectory_points.empty())
       << "trajectory_points should NOT be empty()";
 }
 
@@ -64,7 +64,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
 
 size_t DiscretizedTrajectory::QueryLowerBoundPoint(const double relative_time,
                                                    const double epsilon) const {
-  CHECK(!empty());
+  ACHECK(!empty());
 
   if (relative_time >= back().relative_time()) {
     return size() - 1;
@@ -126,7 +126,7 @@ const TrajectoryPoint& DiscretizedTrajectory::TrajectoryPointAt(
 }
 
 TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
-  CHECK(!empty());
+  ACHECK(!empty());
   return front();
 }
 

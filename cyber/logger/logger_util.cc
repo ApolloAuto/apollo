@@ -14,27 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/logger/logger_util.h"
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
-#include <time.h>
 #include <unistd.h>
+
 #include <cstdint>
 #include <cstdlib>
+#include <ctime>
 #include <string>
 #include <vector>
 
-#include "cyber/common/global_data.h"
-#include "cyber/logger/logger_util.h"
 #include "glog/logging.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-namespace {
 static int32_t g_main_thread_pid = getpid();
-}
 
 int32_t GetMainThreadPid() { return g_main_thread_pid; }
 
@@ -45,18 +44,6 @@ bool PidHasChanged() {
   }
   g_main_thread_pid = pid;
   return true;
-}
-
-const std::vector<std::string>& GetLoggingDirectories() {
-  static std::vector<std::string> logging_directories_list;
-  if (logging_directories_list.empty()) {
-    if (!FLAGS_log_dir.empty()) {
-      logging_directories_list.emplace_back(FLAGS_log_dir.c_str());
-    } else {
-      logging_directories_list.emplace_back("./");
-    }
-  }
-  return logging_directories_list;
 }
 
 }  // namespace logger

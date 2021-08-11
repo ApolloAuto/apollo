@@ -1,7 +1,0 @@
-syntax = "proto2";
-
-package apollo.planning;
-
-message LaneChangeDeciderConfig {
-  optional bool enable_lane_change_urgency_check = 1;
-}

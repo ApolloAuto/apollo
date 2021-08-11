@@ -16,10 +16,10 @@
 
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
 
-#include <QContextMenuEvent>
-#include <QMenu>
-#include <QPainter>
-#include <QStyleOption>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QPainter>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QStyleOption>
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)
     : QWidget(parent), index_(index), refresh_timer_(this), viewer_() {

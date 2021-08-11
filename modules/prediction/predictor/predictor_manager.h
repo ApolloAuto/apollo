@@ -38,6 +38,11 @@ namespace prediction {
 class PredictorManager {
  public:
   /**
+   * @brief Constructor
+   */
+  PredictorManager();
+
+  /**
    * @brief Destructor
    */
   virtual ~PredictorManager() = default;
@@ -56,18 +61,24 @@ class PredictorManager {
 
   /**
    * @brief Execute the predictor generation
+   * @param Adc trajectory container
+   * @param Obstacles container
    */
-  void Run();
+  void Run(const apollo::perception::PerceptionObstacles& perception_obstacles,
+           const ADCTrajectoryContainer* adc_trajectory_container,
+           ObstaclesContainer* obstacles_container);
 
   /**
    * @brief Predict a single obstacle
-   * @param A pointer to the specific obstacle
-   * @param A pointer to prediction_obstacle
    * @param A pointer to adc_trajectory_container
+   * @param A pointer to the specific obstacle
+   * @param A pointer to the obstacles container
+   * @param A pointer to prediction_obstacle
    */
-  void PredictObstacle(Obstacle* obstacle,
-                       PredictionObstacle* const prediction_obstacle,
-                       ADCTrajectoryContainer* adc_trajectory_container);
+  void PredictObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
+                       Obstacle* obstacle,
+                       ObstaclesContainer* obstacles_container,
+                       PredictionObstacle* const prediction_obstacle);
 
   /**
    * @brief Get prediction obstacles
@@ -95,12 +106,41 @@ class PredictorManager {
    */
   void RegisterPredictors();
 
-  void PredictObstacles(ObstaclesContainer* obstacles_container,
-                        ADCTrajectoryContainer* adc_trajectory_container);
+  void PredictObstacles(
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      ObstaclesContainer* obstacles_container);
 
   void PredictObstaclesInParallel(
-      ObstaclesContainer* obstacles_container,
-      ADCTrajectoryContainer* adc_trajectory_container);
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      ObstaclesContainer* obstacles_container);
+
+  void InitVehiclePredictors(const ObstacleConf& conf);
+
+  void InitCyclistPredictors(const ObstacleConf& conf);
+
+  void InitDefaultPredictors(const ObstacleConf& conf);
+
+  void RunVehiclePredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunPedestrianPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunCyclistPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunDefaultPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunEmptyPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                         Obstacle* obstacle,
+                         ObstaclesContainer* obstacles_container);
 
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
@@ -121,7 +161,7 @@ class PredictorManager {
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType pedestrian_predictor_ =
-      ObstacleConf::REGIONAL_PREDICTOR;
+      ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType default_on_lane_predictor_ =
       ObstacleConf::LANE_SEQUENCE_PREDICTOR;
@@ -129,9 +169,19 @@ class PredictorManager {
   ObstacleConf::PredictorType default_off_lane_predictor_ =
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
-  PredictionObstacles prediction_obstacles_;
+  ObstacleConf::PredictorType vehicle_on_lane_caution_predictor_ =
+      ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
 
-  DECLARE_SINGLETON(PredictorManager)
+  ObstacleConf::PredictorType vehicle_in_junction_caution_predictor_ =
+      ObstacleConf::INTERACTION_PREDICTOR;
+
+  ObstacleConf::PredictorType vehicle_default_caution_predictor_ =
+      ObstacleConf::EXTRAPOLATION_PREDICTOR;
+
+  ObstacleConf::PredictorType vehicle_interactive_predictor_ =
+      ObstacleConf::EMPTY_PREDICTOR;
+
+  PredictionObstacles prediction_obstacles_;
 };
 
 }  // namespace prediction

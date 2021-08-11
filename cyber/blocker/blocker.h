@@ -17,7 +17,7 @@
 #ifndef CYBER_BLOCKER_BLOCKER_H_
 #define CYBER_BLOCKER_BLOCKER_H_
 
-#include <stddef.h>
+#include <cstddef>
 #include <functional>
 #include <list>
 #include <memory>

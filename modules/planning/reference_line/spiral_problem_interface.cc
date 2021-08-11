@@ -234,9 +234,9 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
                                                 bool init_lambda,
                                                 double* lambda) {
   CHECK_EQ(n, num_of_variables_);
-  CHECK(init_x);
-  CHECK(!init_z);
-  CHECK(!init_lambda);
+  ACHECK(init_x);
+  ACHECK(!init_z);
+  ACHECK(!init_lambda);
 
   for (int i = 0; i < num_of_points_; ++i) {
     int index = i * 5;
@@ -655,7 +655,7 @@ bool SpiralProblemInterface::eval_h(int n, const double* x, bool new_x,
                                     const double* lambda, bool new_lambda,
                                     int nele_hess, int* iRow, int* jCol,
                                     double* values) {
-  CHECK(false);
+  ACHECK(false);
   return true;
 }
 

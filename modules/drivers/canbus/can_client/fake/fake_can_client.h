@@ -44,9 +44,6 @@ namespace can {
  */
 class FakeCanClient : public CanClient {
  public:
-  /// Interval of sleeping
-  static const int32_t USLEEP_INTERVAL = 10000;
-
   /**
    * @brief Initialize the fake CAN client by specified CAN card parameters.
    * @param parameter CAN card parameters to initialize the CAN client.

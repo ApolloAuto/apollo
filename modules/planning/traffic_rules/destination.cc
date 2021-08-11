@@ -17,10 +17,10 @@
 /**
  * @file
  **/
-#include <algorithm>
-#include <vector>
-
 #include "modules/planning/traffic_rules/destination.h"
+
+#include <memory>
+#include <vector>
 
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
@@ -32,10 +32,10 @@ namespace planning {
 
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using apollo::hdmap::HDMapUtil;
 
-Destination::Destination(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
+Destination::Destination(const TrafficRuleConfig& config,
+                         const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status Destination::ApplyRule(Frame* frame,
                               ReferenceLineInfo* const reference_line_info) {
@@ -68,11 +68,10 @@ int Destination::MakeDecisions(Frame* frame,
   common::SLPoint dest_sl;
   const auto& reference_line = reference_line_info->reference_line();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &dest_sl);
+  reference_line.XYToSL(routing_end.pose(), &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
   const auto& dest =
-      PlanningContext::Instance()->mutable_planning_status()->destination();
+      injector_->planning_context()->mutable_planning_status()->destination();
   if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
     ADEBUG << "Destination at back, but we have not reached destination yet";
     return 0;
@@ -83,16 +82,14 @@ int Destination::MakeDecisions(Frame* frame,
 
   if (FLAGS_enable_scenario_pull_over) {
     const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
-    if (pull_over_status.is_feasible() && pull_over_status.has_position() &&
+        injector_->planning_context()->planning_status().pull_over();
+    if (pull_over_status.has_position() &&
         pull_over_status.position().has_x() &&
         pull_over_status.position().has_y()) {
       // build stop decision based on pull-over position
       ADEBUG << "BuildStopDecision: pull-over position";
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.position().x(), pull_over_status.position().y()},
-          &pull_over_sl);
+      reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
       const double stop_line_s = pull_over_sl.s() +
                                  VehicleConfigHelper::GetConfig()

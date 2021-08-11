@@ -1,15 +1,12 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "speed_bounds_decider",
-    srcs = [
-        "speed_bounds_decider.cc",
-    ],
-    hdrs = [
-        "speed_bounds_decider.h",
-    ],
+    srcs = ["speed_bounds_decider.cc"],
+    hdrs = ["speed_bounds_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":st_boundary_mapper",
@@ -37,11 +34,11 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
-        "//modules/map/proto:map_proto",
+        "//modules/planning/common:dependency_injector",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
@@ -52,46 +49,24 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/proto:planning_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line",
-    ],
-)
-
-cc_test(
-    name = "speed_limit_decider_test",
-    size = "small",
-    srcs = [
-        "speed_limit_decider_test.cc",
-    ],
-    data = [
-        "//modules/planning:planning_testdata",
-    ],
-    deps = [
-        ":st_boundary_mapper",
-        "//cyber/common:log",
-        "//modules/common/time",
-        "//modules/common/util",
-        "@gtest//:main",
     ],
 )
 
 cc_test(
     name = "st_boundary_mapper_test",
     size = "small",
-    srcs = [
-        "st_boundary_mapper_test.cc",
-    ],
+    srcs = ["st_boundary_mapper_test.cc"],
     data = [
         "//modules/planning:planning_testdata",
     ],
     deps = [
         ":st_boundary_mapper",
         "//cyber/common:log",
-        "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

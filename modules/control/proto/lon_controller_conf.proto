@@ -33,4 +33,7 @@ message LonControllerConf {
   optional calibrationtable.ControlCalibrationTable calibration_table = 17;
 
   optional bool enable_reverse_leadlag_compensation = 18 [default = false];
+
+  // low/high speed switch transition-window
+  optional double switch_speed_window = 19 [default = 0.0];
 }

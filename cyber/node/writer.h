@@ -21,9 +21,10 @@
 #include <string>
 #include <vector>
 
+#include "cyber/proto/topology_change.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/node/writer_base.h"
-#include "cyber/proto/topology_change.pb.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/transport/transport.h"
 

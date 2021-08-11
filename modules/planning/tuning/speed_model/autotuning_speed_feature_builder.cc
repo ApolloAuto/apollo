@@ -19,6 +19,7 @@
 #include <cmath>
 #include <string>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 
@@ -40,9 +41,9 @@ Status AutotuningSpeedFeatureBuilder::BuildFeature(
   // number of input trajectory point
   int n = input_feature->point_feature_size();
   if (n != raw_feature.point_feature_size()) {
-    std::ostringstream oss("raw and input feature size mismatch");
-    oss << "raw : " << raw_feature.point_feature_size() << "input : " << n;
-    const std::string msg = oss.str();
+    const std::string msg = absl::StrCat(
+        "raw and input feature size mismatch. raw: ",
+        raw_feature.point_feature_size(), "; input: ", n);
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

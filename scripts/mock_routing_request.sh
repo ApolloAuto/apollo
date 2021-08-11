@@ -16,11 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-python modules/tools/mock_routing/mock_routing_request.py
+${TOP_DIR}/bazel-bin/modules/tools/mock_routing/mock_routing_request

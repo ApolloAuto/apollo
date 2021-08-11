@@ -19,11 +19,20 @@
 # Fail on first error.
 set -e
 
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-apt-get update -y
-apt-get install -y yarn
+cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
+# Ref https://classic.yarnpkg.com/en/docs/install/#debian-stable
+# Don't use tee here. It complains
+# "Warning: apt-key output should not be parsed (stdout is not a terminal)"
+# otherwise.
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+apt_get_update_and_install yarn
+
+info "Successfully installed yarn"
+
+apt-get clean
 rm -fr /etc/apt/sources.list.d/yarn.list

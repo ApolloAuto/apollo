@@ -15,9 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <vector>
 
+#include <limits>
+
+#include "Eigen/Core"
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point.h"
@@ -109,8 +111,7 @@ bool PolyEval(const Dtype& x, int order,
 template <typename Dtype>
 bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
                    std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
-                   Eigen::Matrix<Dtype, 4, 1>* coeff,
-                   const int max_iters = 100,
+                   Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
                    const int N = 5,
                    const Dtype inlier_thres = static_cast<Dtype>(0.1)) {
   if (coeff == nullptr) {
@@ -132,7 +133,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   std::vector<int> index(3, 0);
   int max_inliers = 0;
-  Dtype min_residual = FLT_MAX;
+  Dtype min_residual = std::numeric_limits<float>::max();
   Dtype early_stop_ratio = 0.95f;
   Dtype good_lane_ratio = 0.666f;
   for (int j = 0; j < max_iters; ++j) {
@@ -141,24 +142,28 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     index[2] = q3 + std::rand() % q1;
 
     Eigen::Matrix<Dtype, 3, 3> matA;
-    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0),
-        pos_vec[index[0]](0), 1,
-        pos_vec[index[1]](0) * pos_vec[index[1]](0),
-        pos_vec[index[1]](0), 1,
-        pos_vec[index[2]](0) * pos_vec[index[2]](0),
-        pos_vec[index[2]](0), 1;
+    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0), pos_vec[index[0]](0),
+        1, pos_vec[index[1]](0) * pos_vec[index[1]](0), pos_vec[index[1]](0), 1,
+        pos_vec[index[2]](0) * pos_vec[index[2]](0), pos_vec[index[2]](0), 1;
 
     Eigen::FullPivLU<Eigen::Matrix<Dtype, 3, 3>> mat(matA);
     mat.setThreshold(1e-5f);
     if (mat.rank() < 3) {
-      ADEBUG << "matA: "<< matA;
+      ADEBUG << "matA: " << matA;
       ADEBUG << "Matrix is not full rank (3). The rank is: " << mat.rank();
       continue;
     }
 
+    // Since Eigen::solver was crashing, simple inverse of 3x3 matrix is used
+    // Note that Eigen::inverse of 3x3 and 4x4 is a closed form solution
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
-    Eigen::Matrix<Dtype, 3, 1> c = matA.colPivHouseholderQr().solve(matB);
+    Eigen::Vector3f c =
+        static_cast<Eigen::Matrix<Dtype, 3, 1>>(matA.inverse() * matB);
+    if (!(matA * c).isApprox(matB)) {
+      ADEBUG << "No solution.";
+      continue;
+    }
 
     int num_inliers = 0;
     Dtype residual = 0;

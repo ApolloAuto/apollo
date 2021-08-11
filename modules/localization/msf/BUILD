@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,67 +15,75 @@ cc_library(
         "msf_localization_component.h",
     ],
     copts = [
-        "-O2",
         "-DMODULE_NAME=\\\"localization\\\"",
-        "-DENABLE_DEBUG_LIB",
-        "-DENABLE_OPENCV",
     ],
     deps = [
         "//cyber",
-        "//modules/common",
+        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
-        "//modules/drivers/gnss/proto:config_proto",
-        "//modules/drivers/gnss/proto:gnss_best_pose_proto",
-        "//modules/drivers/gnss/proto:gnss_proto",
-        "//modules/drivers/gnss/proto:imu_proto",
+        "//modules/drivers/gnss/proto:config_cc_proto",
+        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
+        "//modules/drivers/gnss/proto:gnss_cc_proto",
+        "//modules/drivers/gnss/proto:heading_cc_proto",
+        "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_integ:localization_msf_local_integ",
-        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
-        "//modules/localization/proto:gnss_pnt_result_proto",
-        "//modules/localization/proto:localization_config_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/localization/proto:localization_status_proto",
-        "//modules/localization/proto:measure_proto",
-        "//modules/localization/proto:sins_pva_proto",
-        "//modules/transform:transform_broadcaster_lib",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/local_integ",
+        "//modules/localization/msf/local_pyramid_map/base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map",
+        "//modules/localization/proto:gnss_pnt_result_cc_proto",
+        "//modules/localization/proto:gps_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "//modules/localization/proto:localization_config_cc_proto",
+        "//modules/localization/proto:localization_status_cc_proto",
+        "//modules/localization/proto:measure_cc_proto",
+        "//modules/localization/proto:sins_pva_cc_proto",
+        "//modules/transform:transform_broadcaster",
         "@boost",
-        "@glog",
-        "@gtest",
-        "@yaml_cpp//:yaml",
+        "@com_github_google_glog//:glog",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest",
     ],
 )
 
 cc_binary(
     name = "libmsf_localization_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
     linkstatic = False,
     deps = [":msf_localization_component_lib"],
 )
 
 cc_test(
     name = "msf_localization_test",
-    size = "small",
-    timeout = "short",
-    srcs = [
-        "msf_localization_test.cc",
-    ],
+    size = "enormous",
+    srcs = ["msf_localization_test.cc"],
     copts = [
-        "-Dprivate=public",
+        "-fno-access-control",
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//cyber",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":libmsf_localization_component.so",
+    ],
+    deps = [
+        "//modules/localization/msf/local_tool/data_extraction:install",
+        "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
+        "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+        "//modules/localization/msf/params:install",
     ],
 )
 

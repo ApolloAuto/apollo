@@ -16,18 +16,18 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/quaternion.h"
-
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 using apollo::canbus::Chassis;
 using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
-using apollo::common::util::StrCat;
 using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
@@ -107,11 +107,11 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
 
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
     auto* notification = sim_world_service_->world_.add_notification();
-    notification->mutable_item()->set_msg(StrCat("I am message ", i));
+    notification->mutable_item()->set_msg(absl::StrCat("I am message ", i));
     notification->set_timestamp_sec(1990);
   }
   int last = SimulationWorldService::kMaxMonitorItems - 1;
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last).item().msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
@@ -122,7 +122,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
             sim_world_service_->world_.notification(last).item().msg());
   EXPECT_EQ("I am message -1",
             sim_world_service_->world_.notification(last - 1).item().msg());
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last - 2).item().msg());
   EXPECT_DOUBLE_EQ(
       2000, sim_world_service_->world_.notification(last).timestamp_sec());
@@ -136,11 +136,11 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   MonitorMessage monitor;
   int large_size = SimulationWorldService::kMaxMonitorItems + 10;
   for (int i = 0; i < large_size; ++i) {
-    monitor.add_item()->set_msg(StrCat("I am message ", i));
+    monitor.add_item()->set_msg(absl::StrCat("I am message ", i));
   }
   monitor.mutable_header()->set_timestamp_sec(2000);
   EXPECT_EQ(large_size, monitor.item_size());
-  EXPECT_EQ(StrCat("I am message ", large_size - 1),
+  EXPECT_EQ(absl::StrCat("I am message ", large_size - 1),
             monitor.item(large_size - 1).msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
@@ -150,7 +150,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
             sim_world_service_->world_.notification_size());
   EXPECT_EQ("I am message 0",
             sim_world_service_->world_.notification(0).item().msg());
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last).item().msg());
   EXPECT_DOUBLE_EQ(2000,
                    sim_world_service_->world_.notification(0).timestamp_sec());
@@ -166,6 +166,8 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   chassis.set_throttle_percentage(50);
   chassis.set_brake_percentage(10);
   chassis.set_steering_percentage(25);
+  chassis.set_battery_soc_percentage(80);
+  chassis.set_gear_location(Chassis::GEAR_DRIVE);
   chassis.mutable_signal()->set_turn_signal(
       apollo::common::VehicleSignal::TURN_RIGHT);
 
@@ -181,6 +183,8 @@ TEST_F(SimulationWorldServiceTest, UpdateChassisInfo) {
   EXPECT_DOUBLE_EQ(50.0, car.throttle_percentage());
   EXPECT_DOUBLE_EQ(10.0, car.brake_percentage());
   EXPECT_DOUBLE_EQ(25.0, car.steering_percentage());
+  EXPECT_EQ(80, car.battery_percentage());
+  EXPECT_EQ(Chassis::GEAR_DRIVE, car.gear_location());
   EXPECT_EQ("RIGHT", car.current_signal());
 }
 
@@ -416,6 +420,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
   // Update with prediction obstacles
   PredictionObstacles prediction_obstacles;
+  std::set<std::pair<int, double>> original_probabilities;
   for (int i = 0; i < 3; ++i) {
     auto* obstacle = prediction_obstacles.add_prediction_obstacle();
     auto* perception_obstacle = obstacle->mutable_perception_obstacle();
@@ -423,6 +428,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
     for (int j = 0; j < 5; ++j) {
       auto* traj = obstacle->add_trajectory();
       traj->set_probability(i * 0.1 + j);
+      original_probabilities.emplace(perception_obstacle->id(),
+                                     traj->probability());
       for (int k = 0; k < 8; ++k) {
         auto* traj_pt = traj->add_trajectory_point()->mutable_path_point();
         int pt = j * 10 + k;
@@ -448,12 +455,18 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 
     for (int j = 0; j < obj.prediction_size(); ++j) {
       const Prediction& prediction = obj.prediction(j);
-      EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
-                  prediction.probability(), kEpsilon);
+      const std::pair<int, double> item_to_find(std::stoi(obj.id()),
+                                                prediction.probability());
+      const auto id_prob_it = original_probabilities.find(item_to_find);
+      EXPECT_NE(id_prob_it, original_probabilities.end());
+      if (id_prob_it != original_probabilities.end()) {
+        original_probabilities.erase(id_prob_it);
+      }
       EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
+  EXPECT_TRUE(original_probabilities.empty());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {

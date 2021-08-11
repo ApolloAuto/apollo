@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -21,8 +21,9 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
-import util
+import modules.tools.common.proto_utils as proto_utils
+import modules.tools.routing.util as util
+
 
 g_color = [
     'navy', 'c', 'cornflowerblue', 'gold', 'darkorange', 'darkviolet',
@@ -103,13 +104,13 @@ def get_road_index_of_lane(lane_id, road_lane_set):
 
 def draw_map(drivemap):
     """ draw map from mapfile"""
-    print 'Map info:'
-    print '\tVersion:\t',
-    print drivemap.header.version
-    print '\tDate:\t',
-    print drivemap.header.date
-    print '\tDistrict:\t',
-    print drivemap.header.district
+    print('Map info:')
+    print('\tVersion:\t', end=' ')
+    print(drivemap.header.version)
+    print('\tDate:\t', end=' ')
+    print(drivemap.header.date)
+    print('\tDistrict:\t', end=' ')
+    print(drivemap.header.district)
 
     road_lane_set = []
     for road in drivemap.road:
@@ -123,13 +124,13 @@ def draw_map(drivemap):
             if curve.HasField('line_segment'):
                 road_idx = get_road_index_of_lane(lane.id.id, road_lane_set)
                 if road_idx == -1:
-                    print 'Failed to get road index of lane'
+                    print('Failed to get road index of lane')
                     sys.exit(-1)
                 center_x, center_y = draw_line(curve.line_segment,
                                                g_color[road_idx % len(g_color)])
                 draw_id(center_x, center_y, str(road_idx))
-                #break
-            #if curve.HasField('arc'):
+                # break
+            # if curve.HasField('arc'):
             #    draw_arc(curve.arc)
 
         for curve in lane.left_boundary.curve.segment:
@@ -139,16 +140,16 @@ def draw_map(drivemap):
         for curve in lane.right_boundary.curve.segment:
             if curve.HasField('line_segment'):
                 draw_boundary(curve.line_segment)
-                #break
+                # break
 
     return drivemap
 
 
 if __name__ == "__main__":
-    print "Reading map data"
+    print("Reading map data")
     map_dir = util.get_map_dir(sys.argv)
     base_map = util.get_mapdata(map_dir)
-    print "Done reading map data"
+    print("Done reading map data")
     plt.subplots()
     draw_map(base_map)
     plt.axis('equal')

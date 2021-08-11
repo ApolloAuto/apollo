@@ -48,7 +48,6 @@ void GnssMagTransfer::Transfer(const apollo::drivers::gnss::BandObservation& in,
   if (in.has_snr()) {
     out->set_snr(in.snr());
   }
-  return;
 }
 
 void GnssMagTransfer::Transfer(
@@ -69,8 +68,6 @@ void GnssMagTransfer::Transfer(
     auto tmp = out->add_band_obs();
     Transfer(in.band_obs(idx), tmp);
   }
-
-  return;
 }
 
 void GnssMagTransfer::Transfer(
@@ -109,7 +106,6 @@ void GnssMagTransfer::Transfer(
     auto tmp = out->add_sat_obs();
     Transfer(in.sat_obs(idx), tmp);
   }
-  return;
 }
 
 void GnssMagTransfer::Transfer(const apollo::drivers::gnss::KepplerOrbit& in,
@@ -229,8 +225,6 @@ void GnssMagTransfer::Transfer(const apollo::drivers::gnss::KepplerOrbit& in,
   if (in.has_iodc()) {
     out->set_iodc(in.iodc());
   }
-
-  return;
 }
 
 void GnssMagTransfer::Transfer(const apollo::drivers::gnss::GlonassOrbit& in,
@@ -317,8 +311,6 @@ void GnssMagTransfer::Transfer(const apollo::drivers::gnss::GlonassOrbit& in,
   if (in.has_infor_age()) {
     out->set_infor_age(in.infor_age());
   }
-
-  return;
 }
 
 void GnssMagTransfer::Transfer(const apollo::drivers::gnss::GnssEphemeris& in,
@@ -335,8 +327,6 @@ void GnssMagTransfer::Transfer(const apollo::drivers::gnss::GnssEphemeris& in,
     auto tmp = out->mutable_glonass_orbit();
     Transfer(in.glonass_orbit(), tmp);
   }
-
-  return;
 }
 
 }  // namespace msf

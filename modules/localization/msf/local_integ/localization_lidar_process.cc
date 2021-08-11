@@ -20,15 +20,15 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/time/timer.h"
+#include "cyber/time/clock.h"
+#include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
 using apollo::common::Status;
-using apollo::common::time::Timer;
+using apollo::common::util::Timer;
 
 LocalizationLidarProcess::LocalizationLidarProcess()
     : locator_(new LocalizationLidar()),
@@ -215,7 +215,6 @@ void LocalizationLidarProcess::GetResult(int* lidar_status,
   *lidar_status = static_cast<int>(lidar_status_);
   *location = location_;
   *covariance = location_covariance_;
-  return;
 }
 
 int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
@@ -250,7 +249,7 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
   position_std_dev->set_y(location_covariance_(1, 1));
   position_std_dev->set_z(0.0);
 
-  constexpr double yaw_covariance = 0.15 * 0.15 * DEG_TO_RAD2;
+  static constexpr double yaw_covariance = 0.15 * 0.15 * DEG_TO_RAD2;
   apollo::common::Point3D* orientation_std_dev =
       uncertainty->mutable_orientation_std_dev();
   orientation_std_dev->set_x(0.0);
@@ -266,12 +265,10 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
 
 void LocalizationLidarProcess::IntegPvaProcess(const InsPva& sins_pva_msg) {
   pose_forecastor_->PushInspvaData(sins_pva_msg);
-  return;
 }
 
 void LocalizationLidarProcess::RawImuProcess(const ImuData& imu_msg) {
   pose_forecastor_->PushImuData(imu_msg);
-  return;
 }
 
 bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,

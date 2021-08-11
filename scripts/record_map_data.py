@@ -37,6 +37,7 @@ import sys
 
 import psutil
 
+
 MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/monitor/system_status',
     '/apollo/sensor/gnss/best_pose',
@@ -58,6 +59,7 @@ MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/velodyne64/VelodyneScan',
 ]
+
 
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
@@ -92,7 +94,7 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
 
 
@@ -159,7 +161,7 @@ class Recorder(object):
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh
-            source /apollo/framework/install/setup.bash
+            source /apollo/cyber/setup.bash
             nohup cyber_recorder record -c {} >{} 2>&1 &
         '''.format(task_dir, topics_str, log_file)
         shell_cmd(cmd)
@@ -167,7 +169,7 @@ class Recorder(object):
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -c -f "cyber_recorder record"', False)
+        _, stdout, _ = shell_cmd('pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 
@@ -181,6 +183,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

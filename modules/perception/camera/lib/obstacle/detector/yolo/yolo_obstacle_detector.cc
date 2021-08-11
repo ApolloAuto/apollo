@@ -18,11 +18,11 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -254,7 +254,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ = options.base_camera_model;
-  CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+  ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       GetAbsolutePath(options.root_dir, options.conf_file);
   if (!cyber::common::GetProtoFromFile(config_path, &yolo_param_)) {
@@ -283,7 +283,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   if (!LoadExpand(expand_file, &expands_)) {
     return false;
   }
-  CHECK(expands_.size() == types_.size());
+  ACHECK(expands_.size() == types_.size());
   if (!InitNet(yolo_param_, model_root)) {
     return false;
   }
@@ -341,7 +341,7 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";
-  get_objects_gpu(yolo_blobs_, stream_, types_, nms_, yolo_param_.model_param(),
+  get_objects_cpu(yolo_blobs_, stream_, types_, nms_, yolo_param_.model_param(),
                   light_vis_conf_threshold_, light_swt_conf_threshold_,
                   overlapped_.get(), idx_sm_.get(), &(frame->detected_objects));
 

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "include/gnss_struct.h"
+#include "localization_msf/gnss_struct.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 /**

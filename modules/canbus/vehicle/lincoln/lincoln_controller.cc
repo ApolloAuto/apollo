@@ -19,6 +19,7 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
@@ -27,7 +28,6 @@
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -64,6 +64,7 @@ ErrorCode LincolnController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Canbus sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
@@ -456,7 +457,7 @@ ErrorCode LincolnController::EnableSpeedOnlyMode() {
 
   can_sender_->Update();
   if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    AERROR << "Failed to switch to AUTO_SPEED_ONLY mode.";
     CheckChassisError();
     Emergency();
     return ErrorCode::CANBUS_ERROR;
@@ -777,8 +778,7 @@ void LincolnController::SecurityDogThreadFunc() {
   }
 
   std::chrono::duration<double, std::micro> default_period{50000};
-  int64_t start =
-      common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+  int64_t start = cyber::Time::Now().ToMicrosecond();
 
   int32_t speed_ctrl_fail = 0;
   int32_t steer_ctrl_fail = 0;
@@ -819,13 +819,11 @@ void LincolnController::SecurityDogThreadFunc() {
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       Emergency();
     }
-    int64_t end =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+    int64_t end = cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
-      start = common::time::AsInt64<common::time::micros>(
-          common::time::Clock::Now());
+      start = cyber::Time::Now().ToMicrosecond();
     } else {
       AERROR_EVERY(100)
           << "Too much time consumption in LincolnController looping process:"

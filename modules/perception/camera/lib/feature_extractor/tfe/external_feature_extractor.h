@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feature.pb.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/proto/tracking_feature.pb.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/inference.h"
 

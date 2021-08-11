@@ -16,9 +16,16 @@
 
 #include "cyber/tools/cyber_recorder/info.h"
 
+#include "cyber/record/record_message.h"
+
 namespace apollo {
 namespace cyber {
 namespace record {
+
+using apollo::cyber::proto::ChannelCache;
+using apollo::cyber::record::kGB;
+using apollo::cyber::record::kKB;
+using apollo::cyber::record::kMB;
 
 Info::Info() {}
 
@@ -30,7 +37,7 @@ bool Info::Display(const std::string& file) {
     AERROR << "open record file error. file: " << file;
     return false;
   }
-  Header hdr = file_reader.GetHeader();
+  proto::Header hdr = file_reader.GetHeader();
 
   std::cout << setiosflags(std::ios::left);
   std::cout << setiosflags(std::ios::fixed);
@@ -56,14 +63,12 @@ bool Info::Display(const std::string& file) {
 
   // size
   std::cout << std::setw(w) << "size: " << hdr.size() << " Bytes";
-  if (hdr.size() >= (1024 * 1024 * 1024)) {
-    std::cout << " (" << static_cast<double>(hdr.size()) / (1024 * 1024 * 1024)
-              << " GB)";
-  } else if (hdr.size() >= (1024 * 1024)) {
-    std::cout << " (" << static_cast<double>(hdr.size()) / (1024 * 1024)
-              << " MB)";
-  } else if (hdr.size() >= 1024) {
-    std::cout << " (" << static_cast<double>(hdr.size()) / 1024 << " KB)";
+  if (hdr.size() >= kGB) {
+    std::cout << " (" << static_cast<float>(hdr.size()) / kGB << " GB)";
+  } else if (hdr.size() >= kMB) {
+    std::cout << " (" << static_cast<float>(hdr.size()) / kMB << " MB)";
+  } else if (hdr.size() >= kKB) {
+    std::cout << " (" << static_cast<float>(hdr.size()) / kKB << " KB)";
   }
   std::cout << std::endl;
 
@@ -92,10 +97,10 @@ bool Info::Display(const std::string& file) {
 
   // channel info
   std::cout << std::setw(w) << "channel_info: " << std::endl;
-  Index idx = file_reader.GetIndex();
+  proto::Index idx = file_reader.GetIndex();
   for (int i = 0; i < idx.indexes_size(); ++i) {
     ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
-    if (idx.mutable_indexes(i)->type() == SectionType::SECTION_CHANNEL) {
+    if (idx.mutable_indexes(i)->type() == proto::SectionType::SECTION_CHANNEL) {
       std::cout << std::setw(w) << "";
       std::cout << resetiosflags(std::ios::right);
       std::cout << std::setw(50) << cache->name();
@@ -106,6 +111,7 @@ bool Info::Display(const std::string& file) {
       std::cout << std::endl;
     }
   }
+  file_reader.Close();
   return true;
 }
 

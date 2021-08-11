@@ -30,15 +30,15 @@ using cyber::common::GetAbsolutePath;
 bool MapManager::Init(const MapManagerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "map_manager.conf");
   MapManagerConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   update_pose_ = config.update_pose();
   roi_search_distance_ = config.roi_search_distance();
   hdmap_input_ = map::HDMapInput::Instance();

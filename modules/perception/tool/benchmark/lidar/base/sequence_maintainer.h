@@ -71,7 +71,7 @@ bool SequenceMaintainer<ObjectKey>::add_data(
   }
   auto iter = _sequence.begin();
   while (iter != _sequence.end()) {
-    if (iter->second.size() == 0 ||
+    if (iter->second.empty() ||
         static_cast<double>(key - iter->second.rbegin()->first) >
             _s_max_lift_time) {
       _sequence.erase(iter++);

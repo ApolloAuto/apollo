@@ -20,8 +20,8 @@
 #include <cmath>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -50,6 +50,12 @@ LineSegment2d::LineSegment2d(const Vec2d &start, const Vec2d &end)
       (length_ <= kMathEpsilon ? Vec2d(0, 0)
                                : Vec2d(dx / length_, dy / length_));
   heading_ = unit_direction_.Angle();
+}
+
+Vec2d LineSegment2d::rotate(const double angle) {
+  Vec2d diff_vec = end_ - start_;
+  diff_vec.SelfRotate(angle);
+  return start_ + diff_vec;
 }
 
 double LineSegment2d::length() const { return length_; }
@@ -214,7 +220,7 @@ double LineSegment2d::GetPerpendicularFoot(const Vec2d &point,
 }
 
 std::string LineSegment2d::DebugString() const {
-  return util::StrCat("segment2d ( start = ", start_.DebugString(),
+  return absl::StrCat("segment2d ( start = ", start_.DebugString(),
                       "  end = ", end_.DebugString(), " )");
 }
 

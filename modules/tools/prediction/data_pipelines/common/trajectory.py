@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -19,16 +19,17 @@
 import abc
 import logging
 import math
+
 import numpy as np
 
-from configure import parameters
-from common.bounding_rectangle import BoundingRectangle
+from modules.tools.prediction.data_pipelines.common.bounding_rectangle import BoundingRectangle
+from modules.tools.prediction.data_pipelines.common.configure import parameters
+
+
 param_fea = parameters['feature']
 
 
-class TrajectoryToSample(object):
-
-    __metaclass__ = abc.ABCMeta
+class TrajectoryToSample(object, metaclass=abc.ABCMeta):
 
     def __call__(self, trajectory):
         self.clean(trajectory)
@@ -55,7 +56,7 @@ class TrajectoryToSample(object):
             if lane_seq_sz == 0:
                 continue
             elif lane_seq_sz > 10:
-                print "Too many lane sequences:", lane_seq_sz
+                print("Too many lane sequences:", lane_seq_sz)
 
             fea_prev = trajectory[i - 1]
             fea_curr = trajectory[i]
@@ -139,7 +140,7 @@ class TrajectoryToSample(object):
         for i, fea in enumerate(trajectory):
             if not fea.HasField('lane') or \
                not fea.lane.HasField('lane_feature'):
-                print "No lane feature, cancel labeling"
+                print("No lane feature, cancel labeling")
                 continue
 
             future_lane_ids = []
@@ -159,7 +160,7 @@ class TrajectoryToSample(object):
                     future_lane_ids.append(lane_id_j)
 
             if len(future_lane_ids) < 1:
-                print "No lane id"
+                print("No lane id")
                 continue
 
             seq_size = len(fea.lane.lane_graph.lane_sequence)
@@ -186,7 +187,7 @@ class TrajectoryToSample(object):
             # Sanity check.
             if not fea.HasField('lane') or \
                not fea.lane.HasField('lane_feature'):
-                print "No lane feature, cancel labeling"
+                print("No lane feature, cancel labeling")
                 continue
 
             # Find the lane_sequence at which the obstacle is located,
@@ -197,7 +198,7 @@ class TrajectoryToSample(object):
                     for lane_segment in lane_sequence.lane_segment:
                         curr_lane_seq.add(lane_segment.lane_id)
             if len(curr_lane_seq) == 0:
-                print "Obstacle is not on any lane."
+                print("Obstacle is not on any lane.")
                 continue
 
             new_lane_id = None
@@ -262,7 +263,7 @@ class TrajectoryToSample(object):
                             lane_change_finish_time = time_span
 
             if len(obs_actual_lane_ids) < 1:
-                print "No lane id"
+                print("No lane id")
                 continue
 
             '''
@@ -393,11 +394,11 @@ class TrajectoryToSample(object):
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
                     exit_dict[junction_exit.exit_lane_id] = \
-                    BoundingRectangle(junction_exit.exit_position.x,
-                                      junction_exit.exit_position.y,
-                                      junction_exit.exit_heading,
-                                      0.01,
-                                      junction_exit.exit_width)
+                        BoundingRectangle(junction_exit.exit_position.x,
+                                          junction_exit.exit_position.y,
+                                          junction_exit.exit_heading,
+                                          0.01,
+                                          junction_exit.exit_width)
                     exit_pos_dict[junction_exit.exit_lane_id] = np.array(
                         [junction_exit.exit_position.x, junction_exit.exit_position.y])
             # Searching for up to 100 frames (10 seconds)
@@ -418,7 +419,7 @@ class TrajectoryToSample(object):
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)
-                        break # actually break two level
+                        break  # actually break two level
                 else:
                     continue
                 break

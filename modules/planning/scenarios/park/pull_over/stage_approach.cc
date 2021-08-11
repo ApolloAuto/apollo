@@ -20,11 +20,11 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "cyber/common/log.h"
-
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -39,8 +39,9 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageApproach::PullOverStageApproach(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -55,8 +56,9 @@ Stage::StageStatus PullOverStageApproach::Process(
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
-  scenario::util::PullOverStatus status =
-      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
+  scenario::util::PullOverStatus status = scenario::util::CheckADCPullOver(
+      injector_->vehicle_state(), reference_line_info, scenario_config_,
+      injector_->planning_context());
 
   if (status == scenario::util::PASS_DESTINATION ||
       status == scenario::util::PARK_COMPLETE) {
@@ -74,9 +76,9 @@ Stage::StageStatus PullOverStageApproach::Process(
         break;
       }
 
-      for (size_t i = path_data.discretized_path().size() - 1; i >= 0; --i) {
+      for (size_t i = path_data.discretized_path().size(); i >= 1; --i) {
         if (path_data.frenet_frame_path().back().s() -
-                path_data.frenet_frame_path()[i].s() <
+                path_data.frenet_frame_path()[i - 1].s() <
             kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
           continue;
         }
@@ -84,7 +86,8 @@ Stage::StageStatus PullOverStageApproach::Process(
         const auto& path_point = path_data.discretized_path()[i];
         scenario::util::PullOverStatus status =
             scenario::util::CheckADCPullOverPathPoint(
-                reference_line_info, scenario_config_, path_point);
+                reference_line_info, scenario_config_, path_point,
+                injector_->planning_context());
         if (status == scenario::util::PARK_FAIL) {
           path_fail = true;
         }
@@ -96,15 +99,13 @@ Stage::StageStatus PullOverStageApproach::Process(
   // add a stop fence for adc to pause at a better position
   if (path_fail) {
     const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
+        injector_->planning_context()->planning_status().pull_over();
     if (pull_over_status.has_position() &&
         pull_over_status.position().has_x() &&
         pull_over_status.position().has_y()) {
       const auto& reference_line = reference_line_info.reference_line();
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.position().x(), pull_over_status.position().y()},
-          &pull_over_sl);
+      reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
       const double stop_line_s =
           pull_over_sl.s() -
@@ -123,8 +124,8 @@ Stage::StageStatus PullOverStageApproach::Process(
       const double adc_front_edge_s =
           reference_line_info.AdcSlBoundary().end_s();
       double distance = stop_line_s - adc_front_edge_s;
-      constexpr double kPreparkingStopDistance = 1.0;
-      constexpr double kPreparkingAngleDiff = 0.2;
+      static constexpr double kPreparkingStopDistance = 1.0;
+      static constexpr double kPreparkingAngleDiff = 0.2;
       auto ref_point = reference_line.GetReferencePoint(adc_front_edge_s);
       double angle = common::math::AngleDiff(pull_over_status.theta(),
                                              ref_point.heading());

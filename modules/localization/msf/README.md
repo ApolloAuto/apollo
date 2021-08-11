@@ -36,12 +36,19 @@
   You can set `gnss_mode` in `apollo/localization/conf/localization.conf` to decide which mode you want to use. The default mode is gnss best pose.
 
 ### LiDAR Localization Setting
-  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost. Futhermore, we provide three yaw optimization methods in LiDAR localization algorithm. You can set the parameter `lidar_yaw_align_mode` in file localization.conf to choose the mode.
+  We provide three modes of LiDAR localization: intensity, altitude, and fusion. You can set the parameter `lidar_localization_mode` in file localization.conf to choose the mode. Considering computing ability of different platforms, we provide `lidar_filter_size`, `lidar_thread_num` and `point_cloud_step` to adjust the computation cost. Furthermore, we provide three yaw optimization methods in LiDAR localization algorithm. You can set the parameter `lidar_yaw_align_mode` in file localization.conf to choose the mode.
 
 ## Generate Localization Map
   Localization map is used for LiDAR-based localization, which is a grid-cell representation of the environment. Each cell stores the statistics of laser reflection intensity and altitude. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map`.
 
-  We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.
+  We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. Usage: `bash msf_local_map_creator.sh [pcd_folder] [pose_file] [zone_id] [map_folder]`.   
+  `pcd_folder`: contains all pcd files(as .pcd file) which are used to create map.  
+  `pose_file`: a file which contains all poses of pcd files. Each line corresponds to a pcd file, and the format of each line is "pcd_number timestamp x y z qx qy qz qw". Thereinto, "pcd_number" corresponds to the pcd file name.   
+  `zone_id`: UTM zone id.  
+  `map_folder`: destination folder for map.
+
+  After running this script, you will get a localization map in map_folder, which contains a "config.xml" and "map" folder。
+Actually, in this script, we first create lossless map and then convert lossless map to lossy map which losses some not essential message and has smaller size. The lossless map is also avaliable.
 
 ## Visualization Tool
   We provide a simple online visualization tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localization.conf is used to enable the online visualization tool.

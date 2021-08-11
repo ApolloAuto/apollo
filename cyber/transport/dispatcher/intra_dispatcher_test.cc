@@ -16,8 +16,8 @@
 
 #include "cyber/transport/dispatcher/intra_dispatcher.h"
 
-#include <gtest/gtest.h>
 #include <memory>
+#include "gtest/gtest.h"
 
 #include "cyber/common/util.h"
 #include "cyber/message/raw_message.h"

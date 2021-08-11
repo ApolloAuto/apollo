@@ -22,6 +22,8 @@
 
 #include <limits>
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 namespace fusion {
@@ -87,6 +89,7 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
                          const Eigen::Affine3d& camera_sensor2world_pose,
                          double camera_ts, double camera_max_dist,
                          bool motion_compensation, bool all_in) {
+  constexpr float kFloatEpsilon = std::numeric_limits<float>::epsilon();
   float in_view_ratio = 0.0f;
   Eigen::Matrix4d world2sensor_pose =
       camera_sensor2world_pose.matrix().inverse();
@@ -132,8 +135,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
     if (all_in) {
       in_view_ratio = (in_view_point_num == point_num) ? 1.0 : 0.0;
     }
-  } else if (obj_width > FLT_EPSILON && obj_height > FLT_EPSILON &&
-             obj_length > FLT_EPSILON) {
+  } else if (obj_width > kFloatEpsilon && obj_height > kFloatEpsilon &&
+             obj_length > kFloatEpsilon) {
     // use object box
     std::vector<Eigen::Vector3d> box3d_vs(8);
     GetObjectEightVertices(sensor_object->GetBaseObject(), &box3d_vs);

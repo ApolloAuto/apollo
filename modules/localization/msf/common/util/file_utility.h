@@ -16,16 +16,16 @@
 #pragma once
 
 #include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

@@ -46,13 +46,21 @@ bool CheckBoxOverlapSlow(const Box2d &box1, const Box2d &box2,
     double t2 = -std::numeric_limits<double>::infinity();
     for (const auto &p : c1) {
       const double proj = p.x() * cos_heading + p.y() * sin_heading;
-      if (proj < s1) s1 = proj;
-      if (proj > t1) t1 = proj;
+      if (proj < s1) {
+        s1 = proj;
+      }
+      if (proj > t1) {
+        t1 = proj;
+      }
     }
     for (const auto &p : c2) {
       const double proj = p.x() * cos_heading + p.y() * sin_heading;
-      if (proj < s2) s2 = proj;
-      if (proj > t2) t2 = proj;
+      if (proj < s2) {
+        s2 = proj;
+      }
+      if (proj > t2) {
+        t2 = proj;
+      }
     }
     if (std::abs(s1 - t2) <= 1e-5 || std::abs(s2 - t1) <= 1e-5) {
       *ambiguous = true;

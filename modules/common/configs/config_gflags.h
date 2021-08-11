@@ -28,6 +28,7 @@ DECLARE_string(base_map_filename);
 DECLARE_string(sim_map_filename);
 DECLARE_string(routing_map_filename);
 DECLARE_string(end_way_point_filename);
+DECLARE_string(default_routing_filename);
 DECLARE_string(speed_control_filename);
 
 DECLARE_double(look_forward_time_sec);
@@ -42,9 +43,12 @@ DECLARE_string(localization_tf2_child_frame_id);
 DECLARE_bool(use_navigation_mode);
 DECLARE_string(navigation_mode_end_way_point_file);
 
+DECLARE_double(half_vehicle_width);
+
 DECLARE_bool(use_sim_time);
 
 DECLARE_bool(reverse_heading_vehicle_state);
 
 DECLARE_bool(state_transform_to_com_reverse);
 DECLARE_bool(state_transform_to_com_drive);
+DECLARE_bool(multithread_run);

@@ -14,19 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "screen.h"
-#include "cyber_topology_message.h"
-#include "general_channel_message.h"
-#include "renderable_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
-#include <ncurses.h>
 #include <unistd.h>
+
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <mutex>
-#include <string>
 #include <thread>
+
+#include "cyber/tools/cyber_monitor/cyber_topology_message.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/renderable_message.h"
+
+#include <ncurses.h> // NOLINT
 
 namespace {
 constexpr double MinHalfFrameRatio = 12.5;
@@ -89,8 +91,9 @@ inline bool Screen::IsInit(void) const { return (stdscr != nullptr); }
 
 void Screen::Init(void) {
   initscr();
-  if (stdscr == nullptr) return;
-
+  if (stdscr == nullptr) {
+    return;
+  }
   nodelay(stdscr, true);
   keypad(stdscr, true);
   meta(stdscr, true);
@@ -110,8 +113,6 @@ void Screen::Init(void) {
   clear();
 
   canRun_ = true;
-
-  return;
 }
 
 int Screen::Width(void) const { return COLS; }
@@ -119,7 +120,9 @@ int Screen::Width(void) const { return COLS; }
 int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
-  if (color == INVALID) return;
+  if (color == INVALID) {
+    return;
+  }
   if (IsInit()) {
     current_color_pair_ = color;
     attron(COLOR_PAIR(color));
@@ -160,20 +163,22 @@ void Screen::MoveOffsetXY(int offsetX, int offsetY) const {
   }
 }
 
-void Screen::HighlightLine(int lineNo) {
-  if (IsInit() && lineNo < Height()) {
+void Screen::HighlightLine(int line_no) {
+  if (IsInit() && line_no < Height()) {
     SetCurrentColor(WHITE_BLACK);
     for (int x = 0; x < Width(); ++x) {
-      chtype ch = mvinch(lineNo + highlight_direction_, x);
+      chtype ch = mvinch(line_no + highlight_direction_, x);
       ch &= A_CHARTEXT;
-      if (ch == ' ') mvaddch(lineNo + highlight_direction_, x, ch);
+      if (ch == ' ') {
+        mvaddch(line_no + highlight_direction_, x, ch);
+      }
     }
     ClearCurrentColor();
 
     SetCurrentColor(BLACK_WHITE);
     for (int x = 0; x < Width(); ++x) {
-      chtype ch = mvinch(lineNo, x);
-      mvaddch(lineNo, x, ch & A_CHARTEXT);
+      chtype ch = mvinch(line_no, x);
+      mvaddch(line_no, x, ch & A_CHARTEXT);
     }
     ClearCurrentColor();
   }
@@ -194,7 +199,8 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default: {}
+    default: {
+    }
   }
   return ch;
 }
@@ -222,7 +228,9 @@ void Screen::Run() {
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
 
     double fr = current_render_obj_->frame_ratio();
-    if (fr < MinHalfFrameRatio) fr = MinHalfFrameRatio;
+    if (fr < MinHalfFrameRatio) {
+      fr = MinHalfFrameRatio;
+    }
     int period = static_cast<int>(1000.0 / fr);
     period >>= 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(period));
@@ -238,7 +246,8 @@ void Screen::Resize(void) {
 
 void Screen::ShowRenderMessage(int ch) {
   erase();
-  current_render_obj_->Render(this, ch);
+  int line_num = current_render_obj_->Render(this, ch);
+  const int max_height = std::min(Height(), line_num);
 
   int* y = current_render_obj_->line_no();
 
@@ -252,8 +261,8 @@ void Screen::ShowRenderMessage(int ch) {
     case KEY_DOWN:
       ++(*y);
       highlight_direction_ = -1;
-      if (*y >= Height()) {
-        *y = Height() - 1;
+      if (*y >= max_height) {
+        *y = max_height - 1;
       }
       break;
 
@@ -261,7 +270,9 @@ void Screen::ShowRenderMessage(int ch) {
     case 'W':
     case KEY_UP:
       --(*y);
-      if (*y < 1) *y = 1;
+      if (*y < 1) {
+        *y = 1;
+      }
       highlight_direction_ = 1;
       if (*y < 0) {
         *y = 0;

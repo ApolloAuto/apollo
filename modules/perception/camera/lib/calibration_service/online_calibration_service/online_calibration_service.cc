@@ -31,8 +31,8 @@ bool OnlineCalibrationService::Init(
   sensor_name_ = options.calibrator_working_sensor_name;
   // Init k_matrix
   auto &name_intrinsic_map = options.name_intrinsic_map;
-  CHECK(name_intrinsic_map.find(master_sensor_name_) !=
-        name_intrinsic_map.end());
+  ACHECK(name_intrinsic_map.find(master_sensor_name_) !=
+         name_intrinsic_map.end());
   CameraStatus camera_status;
   name_camera_status_map_.clear();
   for (auto iter = name_intrinsic_map.begin(); iter != name_intrinsic_map.end();
@@ -59,8 +59,8 @@ bool OnlineCalibrationService::Init(
       name_camera_status_map_[master_sensor_name_].k_matrix[5]);
   calibrator_.reset(
       BaseCalibratorRegisterer::GetInstanceByName(options.calibrator_method));
-  CHECK(calibrator_ != nullptr);
-  CHECK(calibrator_->Init(calibrator_init_options))
+  ACHECK(calibrator_ != nullptr);
+  ACHECK(calibrator_->Init(calibrator_init_options))
       << "Failed to init " << options.calibrator_method;
   return true;
 }
@@ -75,7 +75,7 @@ bool OnlineCalibrationService::QueryDepthOnGroundPlane(int x, int y,
   if (!is_service_ready_) {
     return false;
   }
-  CHECK(depth != nullptr);
+  ACHECK(depth != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
 
@@ -97,7 +97,7 @@ bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
   if (!is_service_ready_) {
     return false;
   }
-  CHECK(point3d != nullptr);
+  ACHECK(point3d != nullptr);
   double pixel[2] = {static_cast<double>(x), static_cast<double>(y)};
   double point[3] = {0};
   auto iter = name_camera_status_map_.find(sensor_name_);
@@ -117,7 +117,10 @@ bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
 
 bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
     Eigen::Vector4d *plane_param) const {
-  CHECK(plane_param != nullptr);
+  if (plane_param == nullptr) {
+    AERROR << "plane_param is nullptr";
+    return false;
+  }
   if (!is_service_ready_) {
     (*plane_param)(0) = (*plane_param)(1) = (*plane_param)(2) =
         (*plane_param)(3) = 0.0;
@@ -133,8 +136,14 @@ bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
 
 bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
     float *height, float *pitch) const {
-  CHECK(height != nullptr);
-  CHECK(pitch != nullptr);
+  if (height == nullptr) {
+    AERROR << "height is nullptr";
+    return false;
+  }
+  if (pitch == nullptr) {
+    AERROR << "pitch is nullptr";
+    return false;
+  }
   if (!is_service_ready_) {
     *height = *pitch = 0.0;
     return false;
@@ -146,14 +155,17 @@ bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
 }
 
 void OnlineCalibrationService::Update(CameraFrame *frame) {
-  CHECK(frame != nullptr);
+  if (frame == nullptr) {
+    AERROR << "frame is nullptr";
+    return;
+  }
   sensor_name_ = frame->data_provider->sensor_name();
   if (sensor_name_ == master_sensor_name_) {
     CalibratorOptions calibrator_options;
     calibrator_options.lane_objects =
         std::make_shared<std::vector<base::LaneLine>>(frame->lane_objects);
-    calibrator_options.camera2world_pose =
-        std::make_shared<Eigen::Affine3d>(frame->camera2world_pose);
+    calibrator_options.camera2world_pose.reset(
+        new Eigen::Affine3d(frame->camera2world_pose));
     calibrator_options.timestamp = &(frame->timestamp);
     float pitch_angle = 0.f;
     bool updated = calibrator_->Calibrate(calibrator_options, &pitch_angle);
@@ -177,7 +189,7 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
         << " meter.";
   AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI
         << " degree.";
-  // CHECK(BuildIndex());
+  // ACHECK(BuildIndex());
   is_service_ready_ = true;
 }
 
@@ -193,8 +205,8 @@ void OnlineCalibrationService::SetCameraHeightAndPitch(
     auto iter_ground_height = name_camera_ground_height_map.find(iter->first);
     auto iter_pitch_angle_diff =
         name_camera_pitch_angle_diff_map.find(iter->first);
-    CHECK(iter_ground_height != name_camera_ground_height_map.end());
-    CHECK(iter_pitch_angle_diff != name_camera_pitch_angle_diff_map.end());
+    ACHECK(iter_ground_height != name_camera_ground_height_map.end());
+    ACHECK(iter_pitch_angle_diff != name_camera_pitch_angle_diff_map.end());
     // set camera status
     name_camera_status_map_[iter->first].camera_ground_height =
         iter_ground_height->second;

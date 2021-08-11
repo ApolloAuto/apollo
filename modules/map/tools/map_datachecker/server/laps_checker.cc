@@ -15,20 +15,20 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <limits>
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 namespace apollo {
 namespace hdmap {
 
 LapsChecker::LapsChecker(const std::vector<FramePose> &poses, int laps_to_check,
-                         std::shared_ptr<JSonConf> sp_conf)
+                         std::shared_ptr<JsonConf> sp_conf)
     : poses_(poses), sp_conf_(sp_conf) {
   laps_to_check_ = laps_to_check;
   maxx_ = 0.0;
@@ -56,7 +56,7 @@ double LapsChecker::GetConfidence() {
   double res = 0.0;
   lap_ = laps_to_check_;
   for (size_t i = 0; i < confidence_.size(); ++i) {
-    AINFO << "confidence[" << i << "]: " << std::to_string(confidence_[i]);
+    AINFO << "confidence[" << i << "]: " << confidence_[i];
   }
   AINFO << "laps to check: " << laps_to_check_;
   for (size_t i = laps_to_check_; i < confidence_.size(); ++i) {
@@ -65,7 +65,7 @@ double LapsChecker::GetConfidence() {
   AINFO << "current confidence: " << res
         << ",confidence thresh:" << sp_conf_->laps_rate_thresh;
   if (res < sp_conf_->laps_rate_thresh) {
-    if (confidence_.size() == 0) {
+    if (confidence_.empty()) {
       AINFO << "some problems induce lap problem";
       return 0.0;
     }
@@ -85,7 +85,7 @@ double LapsChecker::GetConfidence() {
 }
 
 ErrorCode LapsChecker::Check() {
-  if (poses_.size() == 0) {
+  if (poses_.empty()) {
     return_state_ = ErrorCode::ERROR_VERIFY_NO_GNSSPOS;
     return return_state_;
   }
@@ -168,7 +168,7 @@ int LapsChecker::CheckLaps() {
       for (size_t i = 0; i < t_size; ++i) {
         std::vector<double> stamps;
         GatherTimestamps(&stamps, grid[i].alpha, x, y);
-        if (stamps.size() == 0) {
+        if (stamps.empty()) {
           continue;
         }
         std::sort(stamps.begin(), stamps.end());

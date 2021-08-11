@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <boost/program_options.hpp>
+
 #include "modules/perception/tool/benchmark/lidar/detection_evaluation.h"
 
 int main(int argc, char** argv) {

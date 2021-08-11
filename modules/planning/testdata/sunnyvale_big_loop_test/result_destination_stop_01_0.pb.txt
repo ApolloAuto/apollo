@@ -12,10 +12,10 @@ decision {
       reason_code: STOP_REASON_DESTINATION
       reason: "stop by DEST"
       stop_point {
-        x: 587095.80889309058
-        y: 4141213.84193085
+        x: 587095.80899340415
+        y: 4141213.842325462
       }
-      stop_heading: 2.8934581837970028
+      stop_heading: 2.8934583126623985
       change_lane_type: FORWARD
     }
   }
@@ -28,11 +28,11 @@ decision {
           reason_code: STOP_REASON_DESTINATION
           distance_s: -0.5
           stop_point {
-            x: 587095.80889309058
-            y: 4141213.84193085
+            x: 587095.80899340415
+            y: 4141213.842325462
             z: 0
           }
-          stop_heading: 2.8934581837970028
+          stop_heading: 2.8934583126623985
         }
       }
     }
@@ -70,3 +70,21 @@ engage_advice {
 }
 trajectory_type: NORMAL
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "2693_1_-1"
+}
+target_lane_id {
+  id: "2691_1_-1"
+}
+target_lane_id {
+  id: "2690_1_-1"
+}
+target_lane_id {
+  id: "2688_1_-1"
+}
+target_lane_id {
+  id: "2687_1_-1"
+}
+target_lane_id {
+  id: "732_1_-1"
+}

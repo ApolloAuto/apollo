@@ -17,9 +17,9 @@
 #ifndef CYBER_CLASS_LOADER_UTILITY_CLASS_LOADER_UTILITY_H_
 #define CYBER_CLASS_LOADER_UTILITY_CLASS_LOADER_UTILITY_H_
 
-#include <Poco/SharedLibrary.h>
 #include <cassert>
 #include <cstdio>
+
 #include <map>
 #include <memory>
 #include <mutex>
@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/class_loader/shared_library/shared_library.h"
 #include "cyber/class_loader/utility/class_factory.h"
 #include "cyber/common/log.h"
 
@@ -42,18 +43,18 @@ class ClassLoader;
 
 namespace utility {
 
-using PocoLibraryPtr = std::shared_ptr<Poco::SharedLibrary>;
+using SharedLibraryPtr = std::shared_ptr<SharedLibrary>;
 using ClassClassFactoryMap =
     std::map<std::string, utility::AbstractClassFactoryBase*>;
 using BaseToClassFactoryMapMap = std::map<std::string, ClassClassFactoryMap>;
-using LibpathPocolibVector =
-    std::vector<std::pair<std::string, PocoLibraryPtr>>;
+using LibPathSharedLibVector =
+    std::vector<std::pair<std::string, SharedLibraryPtr>>;
 using ClassFactoryVector = std::vector<AbstractClassFactoryBase*>;
 
 BaseToClassFactoryMapMap& GetClassFactoryMapMap();
 std::recursive_mutex& GetClassFactoryMapMapMutex();
-LibpathPocolibVector& GetLibPathPocoShareLibVector();
-std::recursive_mutex& GetLibPathPocoShareLibMutex();
+LibPathSharedLibVector& GetLibPathSharedLibVector();
+std::recursive_mutex& GetLibPathSharedLibMutex();
 ClassClassFactoryMap& GetClassFactoryMapByBaseClass(
     const std::string& typeid_base_class_name);
 std::string GetCurLoadingLibraryName();
@@ -78,15 +79,15 @@ void RegisterClass(const std::string& class_name,
   AINFO << "registerclass:" << class_name << "," << base_class_name << ","
         << GetCurLoadingLibraryName();
 
-  utility::AbstractClassFactory<Base>* new_class_factrory_obj =
+  utility::AbstractClassFactory<Base>* new_class_factory_obj =
       new utility::ClassFactory<Derived, Base>(class_name, base_class_name);
-  new_class_factrory_obj->AddOwnedClassLoader(GetCurActiveClassLoader());
-  new_class_factrory_obj->SetRelativeLibraryPath(GetCurLoadingLibraryName());
+  new_class_factory_obj->AddOwnedClassLoader(GetCurActiveClassLoader());
+  new_class_factory_obj->SetRelativeLibraryPath(GetCurLoadingLibraryName());
 
   GetClassFactoryMapMapMutex().lock();
   ClassClassFactoryMap& factory_map =
       GetClassFactoryMapByBaseClass(typeid(Base).name());
-  factory_map[class_name] = new_class_factrory_obj;
+  factory_map[class_name] = new_class_factory_obj;
   GetClassFactoryMapMapMutex().unlock();
 }
 

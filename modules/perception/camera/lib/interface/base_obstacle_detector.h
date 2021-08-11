@@ -30,7 +30,9 @@ namespace camera {
 struct ObstacleDetectorInitOptions : public BaseInitOptions {
   std::shared_ptr<base::BaseCameraModel> base_camera_model = nullptr;
   Eigen::Matrix3f intrinsics;
-};
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
 
 struct ObstacleDetectorOptions {};
 

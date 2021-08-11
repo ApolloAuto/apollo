@@ -38,7 +38,7 @@ bool ModuleController::LoadAll() {
   const std::string work_root = common::WorkRoot();
   const std::string current_path = common::GetCurrentPath();
   const std::string dag_root_path = common::GetAbsolutePath(work_root, "dag");
-
+  std::vector<std::string> paths;
   for (auto& dag_conf : args_.GetDAGConfList()) {
     std::string module_path = "";
     if (dag_conf == common::GetFileName(dag_conf)) {
@@ -54,6 +54,14 @@ bool ModuleController::LoadAll() {
         module_path = common::GetAbsolutePath(work_root, dag_conf);
       }
     }
+    total_component_nums += GetComponentNum(module_path);
+    paths.emplace_back(std::move(module_path));
+  }
+  if (has_timer_component) {
+    total_component_nums += scheduler::Instance()->TaskPoolSize();
+  }
+  common::GlobalData::Instance()->SetComponentNums(total_component_nums);
+  for (auto module_path : paths) {
     AINFO << "Start initialize dag: " << module_path;
     if (!LoadModule(module_path)) {
       AERROR << "Failed to load module: " << module_path;
@@ -112,6 +120,20 @@ bool ModuleController::LoadModule(const std::string& path) {
     return false;
   }
   return LoadModule(dag_config);
+}
+
+int ModuleController::GetComponentNum(const std::string& path) {
+  DagConfig dag_config;
+  int component_nums = 0;
+  if (common::GetProtoFromFile(path, &dag_config)) {
+    for (auto module_config : dag_config.module_config()) {
+      component_nums += module_config.components_size();
+      if (module_config.timer_components_size() > 0) {
+        has_timer_component = true;
+      }
+    }
+  }
+  return component_nums;
 }
 
 }  // namespace mainboard

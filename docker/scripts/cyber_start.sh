@@ -15,267 +15,367 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+source "${CURR_DIR}/docker_base.sh"
 
-INCHINA="no"
-LOCAL_IMAGE="no"
-VERSION=""
-ARCH=$(uname -m)
-VERSION_X86_64="cyber-x86_64-18.04-20190613_1540"
-VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
-VERSION_OPT=""
+VERSION_X86_64="cyber-x86_64-18.04-20210315_1535"
+TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20210108_1510"
 
-# Check whether user has agreed license agreement
-function check_agreement() {
-  agreement_record="${HOME}/.apollo_agreement.txt"
-  if [ -e "$agreement_record" ]; then
-    return
-  fi
+#L4T
+VERSION_AARCH64="cyber-aarch64-18.04-20201217_1302"
 
-  AGREEMENT_FILE="$APOLLO_ROOT_DIR/scripts/AGREEMENT.txt"
-  if [ ! -e "$AGREEMENT_FILE" ]; then
-    error "AGREEMENT $AGREEMENT_FILE does not exist."
+CYBER_CONTAINER="apollo_cyber_${USER}"
+CYBER_INSIDE="in-cyber-docker"
+
+DOCKER_REPO="apolloauto/apollo"
+DOCKER_PULL_CMD="docker pull"
+SHM_SIZE="2G"
+
+SUPPORTED_ARCHS=(x86_64 aarch64)
+TARGET_ARCH=""
+
+USE_LOCAL_IMAGE=0
+CUSTOM_DIST=
+CUSTOM_VERSION=
+GEOLOC=
+
+function _target_arch_check() {
+    local arch="$1"
+    for k in "${SUPPORTED_ARCHS[@]}"; do
+        if [[ "${k}" == "${arch}" ]]; then
+            return
+        fi
+    done
+    error "Unsupported target architecture: ${arch}."
     exit 1
-  fi
-
-  cat $AGREEMENT_FILE
-  tip="Type 'y' or 'Y' to agree to the license agreement above, or type any other key to exit"
-  echo $tip
-  read -n 1 user_agreed
-  if [ "$user_agreed" == "y" ] || [ "$user_agreed" == "Y" ]; then
-    cp $AGREEMENT_FILE $agreement_record
-    echo "$tip" >> $agreement_record
-    echo "$user_agreed" >> $agreement_record
-  else
-    exit 1
-  fi
 }
 
-function check_host_environment() {
-  echo 'Host environment checking done.'
-}
-
-function show_usage()
-{
-cat <<EOF
-Usage: $(basename $0) [options] ...
+function show_usage() {
+    cat <<EOF
+Usage: $0 [options] ...
 OPTIONS:
-    -C                     Pull docker image from China mirror.
+    -g <us|cn>             Pull docker image from mirror registry based on geolocation.
     -h, --help             Display this help and exit.
-    -t, --tag <version>    Specify which version of a docker image to pull.
+    -t, --tag <TAG>        Specify docker image with tag to start
+    -d, --dist             Specify Apollo distribution(stable/testing)
     -l, --local            Use local docker image.
-    stop                   Stop all running Apollo containers.
+    -m <arch>              Specify docker image for a different CPU arch.
+    --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
+    stop [-f|--force]      Stop all running Apollo containers. Use "-f" to force removal.
 EOF
-exit 0
 }
 
-function stop_containers()
-{
-running_containers=$(docker ps --format "{{.Names}}")
+function parse_arguments() {
+    local use_local_image=0
+    local custom_version=""
+    local custom_dist=""
+    local target_arch=""
+    local shm_size=""
+    local geo=""
 
-for i in ${running_containers[*]}
-do
-  if [[ "$i" =~ apollo_* ]];then
-    printf %-*s 70 "stopping container: $i ..."
-    docker stop $i > /dev/null
-    if [ $? -eq 0 ];then
-      printf "\033[32m[DONE]\033[0m\n"
-    else
-      printf "\033[31m[FAILED]\033[0m\n"
-    fi
-  fi
-done
-}
-
-APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
-
-if [ ! -e /apollo ]; then
-    sudo ln -sf ${APOLLO_ROOT_DIR} /apollo
-fi
-
-if [ -e /proc/sys/kernel ]; then
-    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
-fi
-
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
-check_agreement
-check_host_environment
-
-while [ $# -gt 0 ]
-do
-    case "$1" in
-    -C|--docker-cn-mirror)
-        INCHINA="yes"
-        ;;
-    -t|--tag)
-        VAR=$1
-        [ -z $VERSION_OPT ] || echo -e "\033[093mWarning\033[0m: mixed option $VAR with $VERSION_OPT, only the last one will take effect.\n"
+    while [[ $# -gt 0 ]]; do
+        local opt="$1"
         shift
-        VERSION_OPT=$1
-        [ -z ${VERSION_OPT// /} ] && echo -e "Missing parameter for $VAR" && exit 2
-        [[ $VERSION_OPT =~ ^-.* ]] && echo -e "Missing parameter for $VAR" && exit 2
-        ;;
-    -h|--help)
-        show_usage
-        ;;
-    -l|--local)
-        LOCAL_IMAGE="yes"
-        ;;
-    stop)
-	stop_containers
-	exit 0
-	;;
-    *)
-        echo -e "\033[93mWarning\033[0m: Unknown option: $1"
-        exit 2
-        ;;
-    esac
-    shift
-done
+        case "${opt}" in
+            -g | --geo)
+                geo="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${geo}"
+                ;;
+            -t | --tag)
+                if [[ ! -z "${custom_version}" ]]; then
+                    warning "Multiple option ${opt} specified, only the last one will take effect."
+                fi
+                custom_version="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${custom_version}"
+                ;;
+            -d | --dist)
+                custom_dist="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${custom_dist}"
+                ;;
+            -h | --help)
+                show_usage
+                exit 1
+                ;;
+            -l | --local)
+                use_local_image=1
+                ;;
+            -m)
+                target_arch="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${target_arch}"
+                _target_arch_check "${target_arch}"
+                ;;
+            --shm-size)
+                shm_size="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${shm_size}"
+                ;;
+            stop)
+                local force="$1"
+                info "Now, stop all Apollo containers created by ${USER} ..."
+                stop_all_apollo_containers "${force}"
+                exit 0
+                ;;
+            *)
+                warning "Unknown option: $1"
+                exit 2
+                ;;
+        esac
+    done # End while loop
 
-if [ ! -z "$VERSION_OPT" ]; then
-    VERSION=$VERSION_OPT
-elif [ ${ARCH} == "x86_64" ]; then
-    VERSION=${VERSION_X86_64}
-elif [ ${ARCH} == "aarch64" ]; then
-    VERSION=${VERSION_AARCH64}
-else
-    echo "Unknown architecture: ${ARCH}"
-    exit 0
-fi
-
-if [ -z "${DOCKER_REPO}" ]; then
-    DOCKER_REPO=apolloauto/apollo
-fi
-
-if [ "$INCHINA" == "yes" ]; then
-    DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
-fi
-
-if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
-    VERSION="local_dev"
-fi
-
-
-IMG=${DOCKER_REPO}:$VERSION
-
-function local_volumes() {
-    # Apollo root and bazel cache dirs are required.
-    volumes="-v $APOLLO_ROOT_DIR:/apollo \
-             -v $HOME/.cache:${DOCKER_HOME}/.cache"
-    case "$(uname -s)" in
-        Linux)
-            case "$(lsb_release -r | cut -f2)" in
-                14.04)
-                    volumes="${volumes} "
-                    ;;
-                *)
-                    volumes="${volumes} -v /dev:/dev "
-                    ;;
-            esac
-            volumes="${volumes} -v /media:/media \
-                                -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-                                -v /etc/localtime:/etc/localtime:ro \
-                                -v /usr/src:/usr/src \
-                                -v /lib/modules:/lib/modules"
-            ;;
-        Darwin)
-            # MacOS has strict limitations on mapping volumes.
-            chmod -R a+wr ~/.cache/bazel
-            ;;
-    esac
-    echo "${volumes}"
+    [[ ! -z "${geo}" ]] && GEOLOC="${geo}"
+    USE_LOCAL_IMAGE="${use_local_image}"
+    [[ -n "${target_arch}" ]] && TARGET_ARCH="${target_arch}"
+    [[ -n "${custom_version}" ]] && CUSTOM_VERSION="${custom_version}"
+    [[ -n "${custom_dist}" ]] && CUSTOM_DIST="${custom_dist}"
+    [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
 }
 
-function main(){
+# if [ ! -e /apollo ]; then
+#    sudo ln -sf "${APOLLO_ROOT_DIR}" /apollo
+# fi
+# if [ -e /proc/sys/kernel ]; then
+#    echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
+# fi
+# <cyber|dev>-<arch>-<ubuntu-release>-<timestamp>
+function guess_arch_from_tag() {
+    local tag="$1"
+    local __result="$2"
 
-    if [ "$LOCAL_IMAGE" = "yes" ];then
-        info "Start docker container based on local image : $IMG"
+    local arch
+    IFS='-' read -ra __arr <<<"${tag}"
+    IFS=' ' # restore
+    if [[ ${#__arr[@]} -lt 3 ]]; then
+        warning "Unexpected image: ${tag}"
+        arch=""
     else
-        info "Start pulling docker image $IMG ..."
-        docker pull $IMG
-        if [ $? -ne 0 ];then
-            error "Failed to pull docker image."
+        arch="${__arr[1]}"
+    fi
+    eval "${__result}='${arch}'"
+}
+
+function determine_target_version_and_arch() {
+    local version="$1"
+    # If no custom version specified
+    if [[ -z "${version}" ]]; then
+        # if target arch not set, assume it is equal to host arch.
+        if [[ -z "${TARGET_ARCH}" ]]; then
+            TARGET_ARCH="${HOST_ARCH}"
+        fi
+        _target_arch_check "${TARGET_ARCH}"
+        if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+            if [[ "${CUSTOM_DIST}" == "testing" ]]; then
+                version="${TESTING_VERSION_X86_64}"
+            else
+                version="${VERSION_X86_64}"
+            fi
+        elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+            version="${VERSION_AARCH64}"
+        else
+            error "CAN'T REACH HERE"
+            exit 1
+        fi
+    else # CUSTOM_VERSION specified
+        local supposed_arch
+        guess_arch_from_tag "${version}" supposed_arch
+        if [[ -z "${supposed_arch}" ]]; then
+            error "Can't guess target arch from image tag: ${version}"
+            error "  Expected format <target>-<arch>-<ubuntu_release>-<timestamp>"
+            exit 1
+        fi
+        if [[ -z "${TARGET_ARCH}" ]]; then
+            _target_arch_check "${supposed_arch}"
+            TARGET_ARCH="${supposed_arch}"
+        elif [[ "${TARGET_ARCH}" != "${supposed_arch}" ]]; then
+            error "Target arch (${TARGET_ARCH}) doesn't match supposed arch" \
+                "(${supposed_arch}) from ${version}"
             exit 1
         fi
     fi
+    CUSTOM_VERSION="${version}"
+}
 
-    APOLLO_CYBER="apollo_cyber_${USER}"
-    docker ps -a --format "{{.Names}}" | grep "$APOLLO_CYBER" 1>/dev/null
-    if [ $? == 0 ]; then
-        docker stop $APOLLO_CYBER 1>/dev/null
-        docker rm -v -f $APOLLO_CYBER 1>/dev/null
+
+function setup_devices_and_mount_volumes() {
+    local __retval="$1"
+
+    if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+        source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
+        setup_device
     fi
 
-    local display=""
-    if [[ -z ${DISPLAY} ]];then
-        display=":0"
+    local volumes
+    volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
+
+    if [[ "${HOST_OS}" != "Linux" ]]; then
+        warning "Running Cyber container on ${HOST_OS} is experimental!"
     else
-        display="${DISPLAY}"
+        local os_release="$(lsb_release -rs)"
+        case "${os_release}" in
+            16.04)
+                # Mount host devices into container (/dev)
+                warning "[Deprecated] Support for Ubuntu 16.04 will be removed" \
+                    "in the near future. Please upgrade to ubuntu 18.04+."
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+            18.04 | 20.04 | *)
+                if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+                    volumes="${volumes} -v /dev:/dev"
+                fi
+                ;;
+        esac
     fi
 
-    setup_device
-
-    USER_ID=$(id -u)
-    GRP=$(id -g -n)
-    GRP_ID=$(id -g)
-    LOCAL_HOST=`hostname`
-    DOCKER_HOME="/home/$USER"
-    if [ "$USER" == "root" ];then
-        DOCKER_HOME="/root"
+    volumes="${volumes} -v /etc/localtime:/etc/localtime:ro"
+    # volumes="${volumes} -v /usr/src:/usr/src"
+    if [[ "${kernel}" == "Linux" ]]; then
+        if [[ "${HOST_ARCH}" == "${TARGET_ARCH}" ]]; then
+            volumes="${volumes} -v /dev/null:/dev/raw1394 \
+                            -v /media:/media \
+                            -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+                            -v /lib/modules:/lib/modules \
+                    "
+        fi
     fi
-    if [ ! -d "$HOME/.cache" ];then
-        mkdir "$HOME/.cache"
+    volumes="$(tr -s " " <<<"${volumes}")"
+    eval "${__retval}='${volumes}'"
+}
+
+function docker_pull_if_needed() {
+    local image="$1"
+    local use_local_image="$2"
+    if [[ ${use_local_image} -eq 1 ]]; then
+        info "Start cyber container based on local image: ${image}"
+    elif docker images -a --format '{{.Repository}}:{{.Tag}}' |
+        grep -q "${image}"; then
+        info "Image ${image} found locally, will be used."
+        use_local_image=1
+    fi
+    if [[ ${use_local_image} -eq 1 ]]; then
+        return
     fi
 
-    info "Starting docker container \"${APOLLO_CYBER}\" ..."
-
-    DOCKER_CMD="nvidia-docker"
-    USE_GPU=1
-    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
-        DOCKER_CMD="docker"
-        USE_GPU=0
+    image="${DOCKER_REPO}:${image##*:}"
+    echo "Start pulling docker image: ${image}"
+    if [[ -n "${GEO_REGISTRY}" ]]; then
+        image="${GEO_REGISTRY}/${image}"
     fi
-
-    ${DOCKER_CMD} run -it \
-        -d \
-        --privileged \
-        --name $APOLLO_CYBER \
-        -e DISPLAY=$display \
-        -e DOCKER_USER=$USER \
-        -e USER=$USER \
-        -e DOCKER_USER_ID=$USER_ID \
-        -e DOCKER_GRP="$GRP" \
-        -e DOCKER_GRP_ID=$GRP_ID \
-        -e DOCKER_IMG=$IMG \
-        -e USE_GPU=$USE_GPU \
-        -e OMP_NUM_THREADS=1 \
-        $(local_volumes) \
-        --net host \
-        -w /apollo \
-        --add-host in_cyber_docker:127.0.0.1 \
-        --add-host ${LOCAL_HOST}:127.0.0.1 \
-        --hostname in_cyber_docker \
-        --shm-size 2G \
-        --pid=host \
-        -v /dev/null:/dev/raw1394 \
-        $IMG \
-        /bin/bash
-
-    if [ $? -ne 0 ];then
-        error "Failed to start docker container \"${APOLLO_CYBER}\" based on image: $IMG"
+    if ! ${DOCKER_PULL_CMD} "${image}"; then
+        error "Failed to pull docker image: ${image}"
         exit 1
     fi
+}
 
-    if [ ${ARCH} == "x86_64" ]; then
-        if [ "${USER}" != "root" ]; then
-            docker exec $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
-        fi
-    else
-        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"
+function check_multi_arch_support() {
+    if [[ "${TARGET_ARCH}" == "${HOST_ARCH}" ]]; then
+        return
     fi
+    info "Cyber ${TARGET_ARCH} container running on ${HOST_ARCH} host."
 
-    ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/cyber_into.sh"
+    # Note(storypku):
+    # ubuntu 18.04: apt-get -y install qemu-user-static
+    # with sudo-no-suid problem
+
+    local qemu="multiarch/qemu-user-static"
+    local refer="https://github.com/multiarch/qemu-user-static"
+    local qemu_cmd="docker run --rm --privileged ${qemu} --reset -p yes"
+    if docker images --format "{{.Repository}}" | grep -q "${qemu}"; then
+        info "Run: ${qemu_cmd}"
+        ## docker run --rm --privileged "${qemu}" --reset -p yes >/dev/null
+        eval "${qemu_cmd}" >/dev/null
+        info "Multiarch support has been enabled. Ref: ${refer}"
+    else
+        warning "Multiarch support hasn't been enabled. Please make sure the"
+        warning "following command has been executed before continuing:"
+        warning "  ${qemu_cmd}"
+        warning "Refer to ${refer} for more."
+        exit 1
+    fi
+}
+
+function start_cyber_container() {
+    local image="$1"
+    info "Starting docker container \"${CYBER_CONTAINER}\" ..."
+
+    local user="${USER}"
+    local uid="$(id -u)"
+
+    local group=$(id -g -n)
+    local gid=$(id -g)
+    local local_host="$(hostname)"
+
+    local local_volumes
+    setup_devices_and_mount_volumes local_volumes
+
+    local display="${DISPLAY:-:0}"
+
+    set -x
+    ${DOCKER_RUN_CMD} -it \
+        -d \
+        --privileged \
+        --name "${CYBER_CONTAINER}" \
+        -e DISPLAY="${display}" \
+        -e DOCKER_USER="${user}" \
+        -e USER="${user}" \
+        -e DOCKER_USER_ID="${uid}" \
+        -e DOCKER_GRP="${group}" \
+        -e DOCKER_GRP_ID="${gid}" \
+        -e DOCKER_IMG="${image}" \
+        -e USE_GPU_HOST="${USE_GPU_HOST}" \
+        -e NVIDIA_VISIBLE_DEVICES=all \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
+        -e OMP_NUM_THREADS=1 \
+        ${local_volumes} \
+        --net host \
+        -w /apollo \
+        --add-host "${CYBER_INSIDE}:172.0.0.1" \
+        --add-host "${local_host}:127.0.0.1" \
+        --hostname "${CYBER_INSIDE}" \
+        --shm-size "${SHM_SIZE}" \
+        --pid=host \
+        "${image}" \
+        /bin/bash
+
+    if [ $? -ne 0 ]; then
+        error "Failed to start docker container \"${CYBER_CONTAINER}\" based on image: ${image}"
+        exit 1
+    fi
+    set +x
+}
+
+function main() {
+    check_agreement
+
+    parse_arguments "$@"
+    determine_target_version_and_arch "${CUSTOM_VERSION}"
+
+    check_multi_arch_support
+
+    local image="${DOCKER_REPO}:${CUSTOM_VERSION}"
+
+    geo_specific_config "${GEOLOC}"
+    info "GEO_REGISTRY evaluated to: ${GEO_REGISTRY}"
+
+    docker_pull_if_needed "${image}" "${USE_LOCAL_IMAGE}"
+
+    remove_container_if_exists "${CYBER_CONTAINER}"
+
+    determine_gpu_use_host
+    info "DOCKER_RUN_CMD evaluated to: ${DOCKER_RUN_CMD}"
+
+    start_cyber_container "${image}"
+
+    postrun_start_user "${CYBER_CONTAINER}"
+
+    ok "Congratulations! You have successfully finished setting up CyberRT Docker environment."
+    ok "To log into the newly created CyberRT container, please run the following command:"
+    ok "  bash docker/scripts/cyber_into.sh"
     ok "Enjoy!"
 }
 
-main
+main "$@"

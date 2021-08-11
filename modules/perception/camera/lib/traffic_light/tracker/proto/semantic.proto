@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.camera.traffic_light.tracker;
+
+message SemanticReviseParam {
+  optional float revise_time_second = 1 [default = 1.5];
+  optional float blink_threshold_second = 2 [default = 0.4];
+  optional int32 hysteretic_threshold_count = 3 [default = 2];
+}

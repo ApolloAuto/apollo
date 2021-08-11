@@ -22,8 +22,9 @@ Plane::Plane(const std::shared_ptr<Texture>& t)
     : RenderableObject(4, 4), texture_id_(0), texture_(t) {}
 
 bool Plane::FillVertexBuffer(GLfloat* pBuffer) {
-  if (texture_ == nullptr || !texture_->isDirty()) return false;
-
+  if (texture_ == nullptr || !texture_->isDirty()) {
+    return false;
+  }
   glGenTextures(1, &texture_id_);
 
   glBindTexture(GL_TEXTURE_2D, texture_id_);

@@ -21,7 +21,7 @@ namespace fusion {
 
 // class DummyFusionSystem implementation
 bool DummyFusionSystem::Init(const FusionInitOptions& options) {
-  main_sensor_ = options.main_sensor;
+  main_sensors_ = options.main_sensors;
   return true;
 }
 
@@ -33,7 +33,8 @@ bool DummyFusionSystem::Fuse(const FusionOptions& options,
   }
 
   fused_objects->clear();
-  if (sensor_frame->sensor_info.name != main_sensor_) {
+  if (std::find(main_sensors_.begin(), main_sensors_.end(),
+                sensor_frame->sensor_info.name) == main_sensors_.end()) {
     return true;
   }
 

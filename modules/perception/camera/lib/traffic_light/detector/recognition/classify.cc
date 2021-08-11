@@ -95,8 +95,9 @@ void ClassifyBySimple::Init(
         << input_reshape[net_inputs_[0]][1] << ", "
         << input_reshape[net_inputs_[0]][2] << ", "
         << input_reshape[net_inputs_[0]][3];
+
   if (!rt_net_->Init(input_reshape)) {
-    AINFO << "net init fail.";
+    AWARN << "net init fail.";
   }
 
   image_.reset(
@@ -112,6 +113,7 @@ void ClassifyBySimple::Perform(const CameraFrame* frame,
     return;
   }
   std::shared_ptr<base::Blob<uint8_t>> rectified_blob;
+
   auto input_blob_recog = rt_net_->get_blob(net_inputs_[0]);
   auto output_blob_recog = rt_net_->get_blob(net_outputs_[0]);
 

@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/common/geometry/roi_filter.h"
 
+#include <limits>
+
 #include "Eigen/Dense"
 
 #include "modules/perception/base/object_types.h"
@@ -63,7 +65,7 @@ bool IsObjectBboxInRoi(const HdmapStructConstPtr roi,
   ct.z = bbox_center[2];
   Eigen::Vector3d bbox_dir = obj->direction.cast<double>();
   bbox_dir(2) = 0.0;
-  if (bbox_dir.norm() < FLT_EPSILON) {
+  if (bbox_dir.norm() < std::numeric_limits<float>::epsilon()) {
     return IsPtInRoi(roi, ct);
   }
   bbox_dir.normalize();

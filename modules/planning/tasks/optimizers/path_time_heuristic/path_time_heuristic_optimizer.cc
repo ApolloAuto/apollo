@@ -20,13 +20,10 @@
 
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
-#include <vector>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
 namespace apollo {
@@ -34,19 +31,22 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_dp_st_speed_config());
-  dp_st_speed_config_ = config.dp_st_speed_config();
+  ACHECK(config.has_speed_heuristic_optimizer_config());
+  speed_heuristic_optimizer_config_ = config.speed_heuristic_optimizer_config();
 }
 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
     SpeedData* speed_data) const {
+  const auto& dp_st_speed_optimizer_config =
+      reference_line_info_->IsChangeLanePath()
+          ? speed_heuristic_optimizer_config_.lane_change_speed_config()
+          : speed_heuristic_optimizer_config_.default_speed_config();
+
   GriddedPathTimeGraph st_graph(
-      reference_line_info_->st_graph_data(), dp_st_speed_config_,
+      reference_line_info_->st_graph_data(), dp_st_speed_optimizer_config,
       reference_line_info_->path_decision()->obstacles().Items(), init_point_);
 
   if (!st_graph.Search(speed_data).ok()) {
@@ -62,14 +62,14 @@ Status PathTimeHeuristicOptimizer::Process(
   init_point_ = init_point;
 
   if (path_data.discretized_path().empty()) {
-    std::string msg("Empty path data");
+    const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (!SearchPathTimeGraph(speed_data)) {
-    const std::string msg(Name() +
-                          ":Failed to search graph with dynamic programming.");
+    const std::string msg = absl::StrCat(
+        Name(), ": Failed to search graph with dynamic programming.");
     AERROR << msg;
     RecordDebugInfo(*speed_data, reference_line_info_->mutable_st_graph_data()
                                      ->mutable_st_graph_debug());

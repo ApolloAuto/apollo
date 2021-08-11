@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
+#include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 // #include "modules/perception/lidar/common/pcl_util.h"
@@ -42,7 +42,7 @@ class LidarAppPipelineTest : public testing::Test {
 
   void TearDown() {}
 
-  LidarObstacleSegmentation segmentation_;
+  LidarObstacleDetection segmentation_;
   LidarObstacleTracking tracking_;
 };  // class DecisionForestClassifierTest
 

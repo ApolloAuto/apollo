@@ -37,7 +37,6 @@ void LossyMapConfig2D::CreateXml(boost::property_tree::ptree* config) const {
   config->put("map.map_runtime.max_intensity_value", max_intensity_value_);
   config->put("map.map_runtime.max_intensity_var_value",
               max_intensity_var_value_);
-  return;
 }
 
 void LossyMapConfig2D::LoadXml(const boost::property_tree::ptree& config) {
@@ -48,7 +47,6 @@ void LossyMapConfig2D::LoadXml(const boost::property_tree::ptree& config) {
       config.get<float>("map.map_runtime.max_intensity_value");
   max_intensity_var_value_ =
       config.get<float>("map.map_runtime.max_intensity_var_value");
-  return;
 }
 
 }  // namespace msf

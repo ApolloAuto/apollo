@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/message/raw_message.h"
@@ -33,18 +35,26 @@ namespace transport {
 using apollo::cyber::message::RawMessage;
 
 TEST(MessageInfoTest, message_info_test) {
+  char buff[ID_SIZE];
+  memset(buff, 0, sizeof(buff));
   Identity sender_id;
-  sender_id.set_data("sender");
+  std::strncpy(buff, "sender", sizeof(buff));
+  sender_id.set_data(buff);
   Identity spare_id;
-  spare_id.set_data("spare");
+  std::strncpy(buff, "spare", sizeof(buff));
+  spare_id.set_data(buff);
   Identity sender_id2;
-  sender_id2.set_data("sender2");
+  std::strncpy(buff, "sender2", sizeof(buff));
+  sender_id2.set_data(buff);
   Identity spare_id2;
-  spare_id2.set_data("spare2");
+  std::strncpy(buff, "spare2", sizeof(buff));
+  spare_id2.set_data(buff);
 
   MessageInfo info1(sender_id, 0, spare_id);
-  EXPECT_EQ(std::string("sender"), std::string(info1.sender_id().data()));
-  EXPECT_EQ(std::string("spare"), std::string(info1.spare_id().data()));
+  std::strncpy(buff, "sender", sizeof(buff));
+  EXPECT_EQ(0, memcmp(buff, info1.sender_id().data(), ID_SIZE));
+  std::strncpy(buff, "spare", sizeof(buff));
+  EXPECT_EQ(0, memcmp(buff, info1.spare_id().data(), ID_SIZE));
   EXPECT_EQ(0, info1.seq_num());
   MessageInfo info2(info1);
   MessageInfo info3(sender_id, 1, spare_id);
@@ -76,10 +86,14 @@ TEST(MessageInfoTest, message_info_test) {
 }
 
 TEST(HistoryTest, history_test) {
+  char buff[ID_SIZE];
+  memset(buff, 0, sizeof(buff));
   Identity sender_id;
-  sender_id.set_data("sender");
+  std::strncpy(buff, "sender", sizeof(buff));
+  sender_id.set_data(buff);
   Identity spare_id;
-  spare_id.set_data("spare");
+  std::strncpy(buff, "spare", sizeof(buff));
+  spare_id.set_data(buff);
   MessageInfo message_info(sender_id, 0, spare_id);
 
   HistoryAttributes attr;
@@ -119,10 +133,14 @@ TEST(HistoryTest, history_test) {
 }
 
 TEST(ListenerHandlerTest, listener_handler_test) {
+  char buff[ID_SIZE];
+  memset(buff, 0, sizeof(buff));
   Identity sender_id;
-  sender_id.set_data("sender");
+  std::strncpy(buff, "sender", sizeof(buff));
+  sender_id.set_data(buff);
   Identity spare_id;
-  spare_id.set_data("spare");
+  std::strncpy(buff, "spare", sizeof(buff));
+  spare_id.set_data(buff);
   MessageInfo message_info(sender_id, 0, spare_id);
   auto message = std::shared_ptr<RawMessage>(new RawMessage);
   int call_count = 0;
@@ -149,7 +167,8 @@ TEST(ListenerHandlerTest, listener_handler_test) {
   listener_handler.Run(message, message_info);
   EXPECT_EQ(1, call_count);
   Identity sender_id2;
-  sender_id2.set_data("YOU");
+  std::strncpy(buff, "YOU", sizeof(buff));
+  sender_id2.set_data(buff);
   message_info.set_sender_id(sender_id2);
   listener_handler.Run(message, message_info);
   EXPECT_EQ(2, call_count);

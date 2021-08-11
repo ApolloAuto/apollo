@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/radar/lib/interface/base_matcher.h"
+#include <numeric>
 
 namespace apollo {
 namespace perception {
@@ -55,7 +56,10 @@ void BaseMatcher::IDMatch(const std::vector<RadarTrackPtr> &radar_tracks,
   for (size_t i = 0; i < num_track; ++i) {
     const auto &track_object = radar_tracks[i]->GetObsRadar();
     double track_timestamp = radar_tracks[i]->GetTimestamp();
-    CHECK_NOTNULL(track_object.get());
+    if (track_object.get() == nullptr) {
+      AERROR << "track_object is not available";
+      continue;
+    }
     int track_object_track_id = track_object->track_id;
     for (size_t j = 0; j < num_obj; ++j) {
       int object_track_id = objects[j]->track_id;

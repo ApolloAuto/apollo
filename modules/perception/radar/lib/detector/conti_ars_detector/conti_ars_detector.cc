@@ -53,7 +53,7 @@ void ContiArsDetector::RawObs2Frame(
   ADEBUG << "angular_speed: " << angular_speed;
   ADEBUG << "rotation_radar: " << rotation_radar;
   for (const auto radar_obs : corrected_obstacles.contiobs()) {
-    base::ObjectPtr radar_object = std::make_shared<base::Object>();
+    base::ObjectPtr radar_object(new base::Object);
     radar_object->id = radar_obs.obstacle_id();
     radar_object->track_id = radar_obs.obstacle_id();
     Eigen::Vector4d local_loc(radar_obs.longitude_dist(),

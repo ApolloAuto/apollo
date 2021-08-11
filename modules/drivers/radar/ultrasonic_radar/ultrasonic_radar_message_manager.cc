@@ -20,6 +20,7 @@
  */
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
+
 #include "modules/common/util/message_util.h"
 
 namespace apollo {
@@ -57,14 +58,14 @@ void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
     sensor_data_.set_ranges(10, data[1]);
     sensor_data_.set_ranges(11, data[2]);
     common::util::FillHeader("ultrasonic_radar", &sensor_data_);
-    ultrasonic_radar_writer_->Write(std::make_shared<Ultrasonic>(sensor_data_));
+    ultrasonic_radar_writer_->Write(sensor_data_);
   }
 
   received_ids_.insert(message_id);
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time = Time::Now().ToMicrosecond();
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

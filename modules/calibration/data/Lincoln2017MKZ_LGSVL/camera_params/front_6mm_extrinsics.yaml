@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: velodyne128
+child_frame_id: front_6mm
+transform:
+  translation:
+    x: -0.09
+    y: 0
+    z: -0.612
+  rotation:
+    x: -0.5
+    y: 0.5
+    z: -0.5
+    w: 0.5

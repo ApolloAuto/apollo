@@ -16,6 +16,7 @@
 #include "modules/perception/lidar/common/lidar_object_util.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -76,8 +77,9 @@ void ComputeObjectShapeFromPolygon(std::shared_ptr<Object> object,
   Eigen::Vector2d direction = raw_direction.head<2>();
   Eigen::Vector2d odirection(-direction(1), direction(0));
 
-  Eigen::Vector2d min_polygon_xy(DBL_MAX, DBL_MAX);
-  Eigen::Vector2d max_polygon_xy(-DBL_MAX, -DBL_MAX);
+  constexpr double kDoubleMax = std::numeric_limits<double>::max();
+  Eigen::Vector2d min_polygon_xy(kDoubleMax, kDoubleMax);
+  Eigen::Vector2d max_polygon_xy(-kDoubleMax, -kDoubleMax);
 
   // note we keep this offset to avoid numeric precision issues in world frame
   Eigen::Vector2d offset(object->polygon[0].x, object->polygon[0].y);

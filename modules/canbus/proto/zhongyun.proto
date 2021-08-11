@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Gear_control_a1 {
-// Control Message
+  // Control Message
   enum Gear_state_targetType {
     GEAR_STATE_TARGET_P = 1;
     GEAR_STATE_TARGET_N = 2;
@@ -22,7 +22,7 @@ message Gear_control_a1 {
 }
 
 message Torque_control_a3 {
-// Control Message
+  // Control Message
   enum Driven_enable_controlType {
     DRIVEN_ENABLE_CONTROL_DRIVE_MANUAL = 0;
     DRIVEN_ENABLE_CONTROL_DRIVE_AUTO = 1;
@@ -34,7 +34,7 @@ message Torque_control_a3 {
 }
 
 message Steering_control_a2 {
-// Control Message
+  // Control Message
   enum Steering_enable_controlType {
     STEERING_ENABLE_CONTROL_STEERING_MANUALCONTROL = 0;
     STEERING_ENABLE_CONTROL_STEERING_AUTOCONTROL = 1;
@@ -46,7 +46,7 @@ message Steering_control_a2 {
 }
 
 message Parking_control_a5 {
-// Control Message
+  // Control Message
   enum Parking_targetType {
     PARKING_TARGET_RELEASE = 0;
     PARKING_TARGET_PARKING_TRIGGER = 1;
@@ -62,7 +62,7 @@ message Parking_control_a5 {
 }
 
 message Brake_control_a4 {
-// Control Message
+  // Control Message
   enum Brake_enable_controlType {
     BRAKE_ENABLE_CONTROL_BRAKE_MANUAL = 0;
     BRAKE_ENABLE_CONTROL_BRAKE_AUTO = 1;
@@ -74,7 +74,7 @@ message Brake_control_a4 {
 }
 
 message Enable_state_feedback_c3 {
-// Report Message
+  // Report Message
   enum Parking_enable_stateType {
     PARKING_ENABLE_STATE_PARKING_MANUALCONTROL = 0;
     PARKING_ENABLE_STATE_PARKING_AUTOCONTROL = 1;
@@ -113,7 +113,7 @@ message Enable_state_feedback_c3 {
 }
 
 message Vehicle_state_feedback_c1 {
-// Report Message
+  // Report Message
   enum Parking_actualType {
     PARKING_ACTUAL_RELEASE = 0;
     PARKING_ACTUAL_PARKING_TRIGGER = 1;
@@ -138,7 +138,7 @@ message Vehicle_state_feedback_c1 {
 }
 
 message Error_state_e1 {
-// Report Message
+  // Report Message
   enum Brake_error_codeType {
     BRAKE_ERROR_CODE_NO_ERROR = 0;
     BRAKE_ERROR_CODE_ERROR = 1;
@@ -172,7 +172,7 @@ message Error_state_e1 {
 }
 
 message Vehicle_state_feedback_2_c4 {
-// Report Message
+  // Report Message
   // [rpm] [0|4500]
   optional int32 motor_speed = 1;
   // [%] [0|100]
@@ -180,13 +180,16 @@ message Vehicle_state_feedback_2_c4 {
 }
 
 message Zhongyun {
-  optional Gear_control_a1 gear_control_a1 = 1; // control message
-  optional Torque_control_a3 torque_control_a3 = 2; // control message
-  optional Steering_control_a2 steering_control_a2 = 3; // control message
-  optional Parking_control_a5 parking_control_a5 = 4; // control message
-  optional Brake_control_a4 brake_control_a4 = 5; // control message
-  optional Enable_state_feedback_c3 enable_state_feedback_c3 = 6; // report message
-  optional Vehicle_state_feedback_c1 vehicle_state_feedback_c1 = 7; // report message
-  optional Error_state_e1 error_state_e1 = 8; // report message
-  optional Vehicle_state_feedback_2_c4 vehicle_state_feedback_2_c4 = 9; // report message
+  optional Gear_control_a1 gear_control_a1 = 1;          // control message
+  optional Torque_control_a3 torque_control_a3 = 2;      // control message
+  optional Steering_control_a2 steering_control_a2 = 3;  // control message
+  optional Parking_control_a5 parking_control_a5 = 4;    // control message
+  optional Brake_control_a4 brake_control_a4 = 5;        // control message
+  optional Enable_state_feedback_c3 enable_state_feedback_c3 =
+      6;  // report message
+  optional Vehicle_state_feedback_c1 vehicle_state_feedback_c1 =
+      7;                                       // report message
+  optional Error_state_e1 error_state_e1 = 8;  // report message
+  optional Vehicle_state_feedback_2_c4 vehicle_state_feedback_2_c4 =
+      9;  // report message
 }

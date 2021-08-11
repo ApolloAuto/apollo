@@ -16,9 +16,11 @@
 
 #include "modules/common/vehicle_model/vehicle_model.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
@@ -31,19 +33,19 @@ class VehicleModelTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string localization_pre_file =
-        "modules/common/testdata/localization_pre.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(localization_pre_file,
-                                          &localization_pre_));
+        "modules/common/vehicle_model/testdata/localization_pre.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(localization_pre_file,
+                                           &localization_pre_));
     std::string localization_post_file =
-        "modules/common/testdata/localization_post.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(localization_post_file,
-                                          &localization_post_));
+        "modules/common/vehicle_model/testdata/localization_post.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(localization_post_file,
+                                           &localization_post_));
     const std::string chassis_pre_file =
-        "modules/common/testdata/chassis_pre.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
+        "modules/common/vehicle_model/testdata/chassis_pre.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
     const std::string chassis_post_file =
-        "modules/common/testdata/chassis_post.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
+        "modules/common/vehicle_model/testdata/chassis_post.pb.txt";
+    ACHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
   }
 
  protected:
@@ -60,7 +62,8 @@ TEST_F(VehicleModelTest, RearCenteredKinematicBicycleModel) {
   double predicted_time_horizon = localization_post_.measurement_time() -
                                   localization_pre_.measurement_time();
 
-  auto vehicle_state_provider = VehicleStateProvider::Instance();
+  auto vehicle_state_provider =
+      std::make_shared<common::VehicleStateProvider>();
 
   vehicle_state_provider->Update(localization_pre_, chassis_pre_);
   cur_vehicle_state_ = vehicle_state_provider->vehicle_state();

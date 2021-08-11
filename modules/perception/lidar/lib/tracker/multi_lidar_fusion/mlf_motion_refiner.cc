@@ -17,6 +17,7 @@
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_refiner.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
@@ -32,15 +33,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_refiner.conf");
   MlfMotionRefinerConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   // read from proto config
   claping_speed_threshold_ = config.claping_speed_threshold();
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();
@@ -152,11 +153,12 @@ bool MlfMotionRefiner::CheckStaticHypothesisByVelocityAngleChange(
   // extrodinary small
   Eigen::Vector3d previous_velocity = latest_object->output_velocity;
   Eigen::Vector3d current_velocity = new_object->output_velocity;
-  if (previous_velocity.norm() < DBL_EPSILON) {
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+  if (previous_velocity.norm() < kEpsilon) {
     // return false; // without motion score, this should be true
     return true;
   }
-  if (current_velocity.norm() < DBL_EPSILON) {
+  if (current_velocity.norm() < kEpsilon) {
     return true;
   }
   // believe angle change is obvious if it is greater than threshold

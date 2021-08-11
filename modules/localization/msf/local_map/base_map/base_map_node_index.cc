@@ -25,29 +25,10 @@ namespace msf {
 MapNodeIndex::MapNodeIndex() {}
 
 bool MapNodeIndex::operator<(const MapNodeIndex& index) const {
-  if (resolution_id_ < index.resolution_id_) {
-    return true;
-  } else if (resolution_id_ == index.resolution_id_) {
-    if (zone_id_ < index.zone_id_) {
-      return true;
-    } else if (zone_id_ == index.zone_id_) {
-      if (m_ < index.m_) {
-        return true;
-      } else if (m_ == index.m_) {
-        if (n_ < index.n_) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  } else {
-    return false;
-  }
+  // Compare elements by priority.
+  return std::forward_as_tuple(resolution_id_, zone_id_, m_, n_) <
+         std::forward_as_tuple(index.resolution_id_, index.zone_id_, index.m_,
+                               index.n_);
 }
 
 bool MapNodeIndex::operator==(const MapNodeIndex& index) const {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
@@ -194,7 +194,7 @@ TEST(TrackTest, test) {
             << track.GetCameraObjects().size() << "\n";
   EXPECT_FALSE(track.IsAlive());
 
-  Track::s_track_idx_ = UINT_MAX;
+  Track::s_track_idx_ = std::numeric_limits<unsigned int>::max();
   size_t new_id = Track::GenerateNewTrackId();
   new_id = Track::GenerateNewTrackId();
   EXPECT_EQ(new_id, 1);

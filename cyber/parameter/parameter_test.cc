@@ -16,12 +16,14 @@
 
 #include "cyber/parameter/parameter.h"
 
-#include <gtest/gtest.h>
 #include <string>
+
+#include "gtest/gtest.h"
+
+#include "cyber/proto/parameter.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/proto/parameter.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -31,21 +33,12 @@ using apollo::cyber::proto::ParamType;
 
 class ParameterTest : public ::testing::Test {
  protected:
-  ParameterTest() {}
-  virtual ~ParameterTest() {}
-
-  Parameter* _bool_param;
-  Parameter* _int_param;
-  Parameter* _double_param;
-  Parameter* _string_param;
-  Parameter* _protobuf_param;
-
   virtual void SetUp() {
     // Called before every TEST_F(ParameterTest, *)
-    _bool_param = new Parameter("bool", true);
-    _int_param = new Parameter("int", 100);
-    _double_param = new Parameter("double", 0.0f);
-    _string_param = new Parameter("string", "test");
+    bool_param_.reset(new Parameter("bool", true));
+    int_param_.reset(new Parameter("int", 100));
+    double_param_.reset(new Parameter("double", 0.0f));
+    string_param_.reset(new Parameter("string", "test"));
     proto::Param param;
     param.set_name("param");
     std::string str;
@@ -53,16 +46,23 @@ class ParameterTest : public ::testing::Test {
     std::string desc;
     message::GetDescriptorString(param, &desc);
     std::string full_name = proto::Param::descriptor()->full_name();
-    _protobuf_param = new Parameter("protobuf", str, full_name, desc);
+    protobuf_param_.reset(new Parameter("protobuf", str, full_name, desc));
   }
 
   virtual void TearDown() {
-    // Called after every TEST_F(ParameterTest, *)
-    delete _bool_param;
-    delete _int_param;
-    delete _double_param;
-    delete _string_param;
+    bool_param_.reset();
+    int_param_.reset();
+    double_param_.reset();
+    string_param_.reset();
+    protobuf_param_.reset();
   }
+
+ protected:
+  std::unique_ptr<Parameter> bool_param_;
+  std::unique_ptr<Parameter> int_param_;
+  std::unique_ptr<Parameter> double_param_;
+  std::unique_ptr<Parameter> string_param_;
+  std::unique_ptr<Parameter> protobuf_param_;
 };
 
 TEST_F(ParameterTest, constructors) {
@@ -103,88 +103,88 @@ TEST_F(ParameterTest, from_pb) {
 }
 
 TEST_F(ParameterTest, to_pb) {
-  proto::Param param = _int_param->ToProtoParam();
+  proto::Param param = int_param_->ToProtoParam();
   EXPECT_EQ("int", param.name());
   EXPECT_EQ(ParamType::INT, param.type());
   EXPECT_EQ(100, param.int_value());
 }
 
 TEST_F(ParameterTest, type) {
-  EXPECT_EQ(ParamType::BOOL, _bool_param->Type());
-  EXPECT_EQ(ParamType::INT, _int_param->Type());
-  EXPECT_EQ(ParamType::DOUBLE, _double_param->Type());
-  EXPECT_EQ(ParamType::STRING, _string_param->Type());
-  EXPECT_EQ(ParamType::PROTOBUF, _protobuf_param->Type());
+  EXPECT_EQ(ParamType::BOOL, bool_param_->Type());
+  EXPECT_EQ(ParamType::INT, int_param_->Type());
+  EXPECT_EQ(ParamType::DOUBLE, double_param_->Type());
+  EXPECT_EQ(ParamType::STRING, string_param_->Type());
+  EXPECT_EQ(ParamType::PROTOBUF, protobuf_param_->Type());
 }
 
 TEST_F(ParameterTest, type_name) {
-  EXPECT_EQ("BOOL", _bool_param->TypeName());
-  EXPECT_EQ("INT", _int_param->TypeName());
-  EXPECT_EQ("DOUBLE", _double_param->TypeName());
-  EXPECT_EQ("STRING", _string_param->TypeName());
-  EXPECT_EQ("apollo.cyber.proto.Param", _protobuf_param->TypeName());
+  EXPECT_EQ("BOOL", bool_param_->TypeName());
+  EXPECT_EQ("INT", int_param_->TypeName());
+  EXPECT_EQ("DOUBLE", double_param_->TypeName());
+  EXPECT_EQ("STRING", string_param_->TypeName());
+  EXPECT_EQ("apollo.cyber.proto.Param", protobuf_param_->TypeName());
 }
 
 TEST_F(ParameterTest, name) {
-  EXPECT_EQ("bool", _bool_param->Name());
-  EXPECT_EQ("int", _int_param->Name());
-  EXPECT_EQ("double", _double_param->Name());
-  EXPECT_EQ("string", _string_param->Name());
-  EXPECT_EQ("protobuf", _protobuf_param->Name());
+  EXPECT_EQ("bool", bool_param_->Name());
+  EXPECT_EQ("int", int_param_->Name());
+  EXPECT_EQ("double", double_param_->Name());
+  EXPECT_EQ("string", string_param_->Name());
+  EXPECT_EQ("protobuf", protobuf_param_->Name());
 }
 
 TEST_F(ParameterTest, as_bool) {
-  EXPECT_TRUE(_bool_param->AsBool());
+  EXPECT_TRUE(bool_param_->AsBool());
   EXPECT_FALSE(Parameter("bool", false).AsBool());
 }
 
-TEST_F(ParameterTest, as_int) { EXPECT_EQ(100, _int_param->AsInt64()); }
+TEST_F(ParameterTest, as_int) { EXPECT_EQ(100, int_param_->AsInt64()); }
 
-TEST_F(ParameterTest, as_double) { EXPECT_EQ(0.0, _double_param->AsDouble()); }
+TEST_F(ParameterTest, as_double) { EXPECT_EQ(0.0, double_param_->AsDouble()); }
 
 TEST_F(ParameterTest, AsString) {
-  EXPECT_EQ(_string_param->AsString(), "test");
+  EXPECT_EQ(string_param_->AsString(), "test");
 }
 
 TEST_F(ParameterTest, value) {
-  EXPECT_TRUE(_bool_param->value<bool>());
-  EXPECT_EQ("", _bool_param->value<std::string>());
+  EXPECT_TRUE(bool_param_->value<bool>());
+  EXPECT_EQ("", bool_param_->value<std::string>());
 
-  EXPECT_EQ(100, _int_param->value<uint8_t>());
-  EXPECT_EQ(100, _int_param->value<uint32_t>());
-  EXPECT_EQ(100, _int_param->value<int64_t>());
-  EXPECT_EQ(100, _int_param->value<int>());
-  EXPECT_EQ("", _int_param->value<std::string>());
+  EXPECT_EQ(100, int_param_->value<uint8_t>());
+  EXPECT_EQ(100, int_param_->value<uint32_t>());
+  EXPECT_EQ(100, int_param_->value<int64_t>());
+  EXPECT_EQ(100, int_param_->value<int>());
+  EXPECT_EQ("", int_param_->value<std::string>());
 
-  EXPECT_EQ(0.0, _double_param->value<float>());
-  EXPECT_EQ(0.0, _double_param->value<double>());
-  EXPECT_EQ("", _double_param->value<std::string>());
+  EXPECT_EQ(0.0, double_param_->value<float>());
+  EXPECT_EQ(0.0, double_param_->value<double>());
+  EXPECT_EQ("", double_param_->value<std::string>());
 
-  EXPECT_EQ("test", _string_param->value<std::string>());
-  _string_param->value<int>();
+  EXPECT_EQ("test", string_param_->value<std::string>());
+  string_param_->value<int>();
 
-  auto param = _protobuf_param->value<proto::Param>();
-  EXPECT_EQ("protobuf", _protobuf_param->Name());
-  EXPECT_EQ("apollo.cyber.proto.Param", _protobuf_param->TypeName());
+  auto param = protobuf_param_->value<proto::Param>();
+  EXPECT_EQ("protobuf", protobuf_param_->Name());
+  EXPECT_EQ("apollo.cyber.proto.Param", protobuf_param_->TypeName());
   std::string str;
   param.SerializeToString(&str);
-  EXPECT_EQ(str, _protobuf_param->value<std::string>());
-  _protobuf_param->value<int>();
+  EXPECT_EQ(str, protobuf_param_->value<std::string>());
+  protobuf_param_->value<int>();
 }
 
 TEST_F(ParameterTest, debug_string) {
   EXPECT_EQ("{name: \"bool\", type: \"BOOL\", value: true}",
-            _bool_param->DebugString());
+            bool_param_->DebugString());
   EXPECT_EQ("{name: \"int\", type: \"INT\", value: 100}",
-            _int_param->DebugString());
+            int_param_->DebugString());
   EXPECT_EQ("{name: \"double\", type: \"DOUBLE\", value: 0.000000}",
-            _double_param->DebugString());
+            double_param_->DebugString());
   EXPECT_EQ("{name: \"string\", type: \"STRING\", value: \"test\"}",
-            _string_param->DebugString());
+            string_param_->DebugString());
   EXPECT_EQ(
       "{name: \"protobuf\", type: \"apollo.cyber.proto.Param\", value: "
       "\"name: \"param\"\"}",
-      _protobuf_param->DebugString());
+      protobuf_param_->DebugString());
 }
 
 }  // namespace cyber

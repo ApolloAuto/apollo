@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
 import shutil
 import sys
+
 import yaml
 
 
@@ -111,7 +112,7 @@ def gen_report_value_offset_precision(var, protocol):
     impl = ""
     if var["is_signed_var"]:
         fmt = "\n  x <<= %d;\n  x >>= %d;\n"
-        # x is a int32_t var
+        # x is an int32_t var
         shift_bit = 32 - var["len"]
         impl = impl + fmt % (shift_bit, shift_bit)
 
@@ -215,7 +216,7 @@ def get_byte_info(var):
     bit = var["bit"]
     byte_info = []
     left_len = var["len"]
-    byte_idx = bit / 8
+    byte_idx = bit // 8
     bit_start = bit % 8
     if var["order"] == "motorola":
         while left_len > 0:
@@ -322,9 +323,9 @@ def gen_control_value_func_impl(classname, var, protocol):
     """
     impl = ""
     if var["len"] > 32:
-        print "This generator not support big than four bytes var." + \
+        print("This generator not support big than four bytes var." +
               "protocol classname: %s, var_name:%s " % (
-                  class_name, var["name"])
+                  class_name, var["name"]))
         return impl
 
     fmt = """
@@ -399,7 +400,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
                     ) + "::" + var["enum"][0].upper()
                 else:
                     init_val = protocol["name"].capitalize(
-                    ) + "::" + var["enum"].values()[0].upper()
+                    ) + "::" + list(var["enum"].values())[0].upper()
 
             set_private_var_init_list.append("  %s_ = %s;" %
                                              (var["name"].lower(), init_val))
@@ -436,11 +437,11 @@ def gen_protocols(protocol_conf_file, protocol_dir):
     """
         doc string:
     """
-    print "Generating protocols"
+    print("Generating protocols")
     if not os.path.exists(protocol_dir):
         os.makedirs(protocol_dir)
     with open(protocol_conf_file, 'r') as fp:
-        content = yaml.load(fp)
+        content = yaml.safe_load(fp)
         protocols = content["protocols"]
         car_type = content["car_type"]
         for p_name in protocols:
@@ -454,25 +455,27 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 gen_control_cpp(car_type, protocol, protocol_dir)
 
             else:
-                print "Unknown protocol_type:%s" % protocol["protocol_type"]
+                print("Unknown protocol_type:%s" % protocol["protocol_type"])
         gen_build_file(car_type, protocol_dir)
+
 
 def gen_esd_can_extended(str):
     """
         id string:
     """
-    int_id = int(str,16)
+    int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
     int_id |= 0x20000000
     str = hex(int_id).replace('0x', '')
     return str
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage:\npython %s some_config.yml" % sys.argv[0]
+        print("Usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
     protocol_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower(

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -17,24 +17,37 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
-from imu_speed_acc import ImuSpeedAcc
+from modules.tools.plot_planning.record_reader import RecordItemReader
+from modules.tools.plot_planning.imu_speed_acc import ImuSpeedAcc
 
 
 class ImuSpeedJerk:
 
-    def __init__(self):
+    def __init__(self, is_lateral=False):
         self.timestamp_list = []
         self.jerk_list = []
-        self.imu_speed_acc = ImuSpeedAcc()
+        self.imu_speed_acc = ImuSpeedAcc(is_lateral)
 
     def add(self, location_est):
         self.imu_speed_acc.add(location_est)
         acc_timestamp_list = self.imu_speed_acc.get_timestamp_list()
-        if len(acc_timestamp_list) > 50:
+        if len(acc_timestamp_list) <= 0:
+            return
+
+        index_500ms = len(acc_timestamp_list) - 1
+        found_index_500ms = False
+        last_timestamp = acc_timestamp_list[-1]
+        while index_500ms >= 0:
+            current_timestamp = acc_timestamp_list[index_500ms]
+            if (last_timestamp - current_timestamp) >= 0.5:
+                found_index_500ms = True
+                break
+            index_500ms -= 1
+
+        if found_index_500ms:
             acc_list = self.imu_speed_acc.get_acc_list()
-            jerk = (acc_list[-1] - acc_list[-50]) / \
-                (acc_timestamp_list[-1] - acc_timestamp_list[-50])
+            jerk = (acc_list[-1] - acc_list[index_500ms]) / \
+                (acc_timestamp_list[-1] - acc_timestamp_list[index_500ms])
             self.jerk_list.append(jerk)
             self.timestamp_list.append(acc_timestamp_list[-1])
 
@@ -78,7 +91,7 @@ if __name__ == "__main__":
         fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = ImuSpeedJerk()
+            processor = ImuSpeedJerk(True)
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]

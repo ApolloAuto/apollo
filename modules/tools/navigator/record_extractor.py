@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -18,19 +18,19 @@
 
 import sys
 from datetime import datetime
-from cyber_py.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "usage: python record_extractor.py record_file1 record_file2 ..."
+        print("usage: python record_extractor.py record_file1 record_file2 ...")
 
     frecords = sys.argv[1:]
     now = datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
 
     with open("path_" + frecords[0].split('/')[-1] + ".txt", 'w') as f:
         for frecord in frecords:
-            print "processing " + frecord
+            print("processing " + frecord)
             reader = RecordReader(frecord)
             for msg in reader.read_messages():
                 if msg.topic == "/apollo/localization/pose":

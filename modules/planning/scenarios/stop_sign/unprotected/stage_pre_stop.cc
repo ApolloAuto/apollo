@@ -23,13 +23,13 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
@@ -41,7 +41,7 @@ namespace scenario {
 namespace stop_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::OverlapInfoConstPtr;
@@ -76,7 +76,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
     return FinishScenario();
   }
 
-  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+  static constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s - current_stop_sign_overlap->start_s;
@@ -112,7 +112,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
@@ -144,25 +144,24 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
       obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
       obstacle_type != PerceptionObstacle::BICYCLE &&
       obstacle_type != PerceptionObstacle::VEHICLE) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name << "]. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "]. skip";
     return 0;
   }
 
-  auto point = common::util::MakePointENU(perception_obstacle.position().x(),
-                                          perception_obstacle.position().y(),
-                                          perception_obstacle.position().z());
+  const auto point =
+      common::util::PointFactory::ToPointENU(perception_obstacle.position());
   double obstacle_s = 0.0;
   double obstacle_l = 0.0;
   LaneInfoConstPtr obstacle_lane;
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
           &obstacle_s, &obstacle_l) != 0) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name
            << "]: Failed to find nearest lane from map for position: "
-           << point.DebugString()
-           << "; heading[" << perception_obstacle.theta() << "]";
+           << point.DebugString() << "; heading[" << perception_obstacle.theta()
+           << "]";
     return -1;
   }
 
@@ -176,9 +175,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
   if (assoc_lane_it == GetContext()->associated_lanes.end()) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
-           << "] lane_id[" << obstable_lane_id
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "] lane_id[" << obstable_lane_id
            << "] not associated with current stop_sign. skip";
     return -1;
   }
@@ -196,11 +194,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
 
   if (distance_to_stop_line >
       scenario_config_.watch_vehicle_max_valid_stop_distance()) {
-    ADEBUG << "obstacle_id[" << perception_obstacle_id
-           << "] type[" << obstacle_type_name
-           << "] distance_to_stop_line[" << distance_to_stop_line
-           << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
-           << obstacle_end_s << "] too far from stop line. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "] distance_to_stop_line["
+           << distance_to_stop_line << "]; stop_line_s" << stop_line_s
+           << "]; obstacle_end_s[" << obstacle_end_s
+           << "] too far from stop line. skip";
     return -1;
   }
 
@@ -223,12 +221,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
  */
 bool StopSignUnprotectedStagePreStop::CheckADCStop(
     const double adc_front_edge_s, const double stop_line_s) {
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (adc_speed > max_adc_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

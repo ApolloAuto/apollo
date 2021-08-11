@@ -3,15 +3,14 @@ syntax = "proto2";
 package apollo.bridge;
 
 message UDPBridgeSenderRemoteInfo {
-    optional string remote_ip = 1 [default = "127.0.0.1"];
-    optional int32 remote_port = 2 [default = 8900];
-    optional string proto_name = 3 [default = "ProtoMsgName"];
+  optional string remote_ip = 1 [default = "127.0.0.1"];
+  optional int32 remote_port = 2 [default = 8900];
+  optional string proto_name = 3 [default = "ProtoMsgName"];
 }
 
 message UDPBridgeReceiverRemoteInfo {
-    optional string topic_name = 1 [default = ""];
-    optional int32 bind_port = 2 [default = 8500];
-    optional string proto_name = 3 [default = "ProtoMsgName"];
-    optional bool enable_timeout = 4 [default = true];
+  optional string topic_name = 1 [default = ""];
+  optional int32 bind_port = 2 [default = 8500];
+  optional string proto_name = 3 [default = "ProtoMsgName"];
+  optional bool enable_timeout = 4 [default = true];
 }
-

@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_approach_parking.h"
 
+#include <memory>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
@@ -31,8 +33,9 @@ namespace pull_over {
 using apollo::common::TrajectoryPoint;
 
 PullOverStageRetryApproachParking::PullOverStageRetryApproachParking(
-    const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageRetryApproachParking::FinishStage() {
   next_stage_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
@@ -60,8 +63,7 @@ Stage::StageStatus PullOverStageRetryApproachParking::Process(
 
 bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()

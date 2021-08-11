@@ -16,10 +16,9 @@
 
 #include "cyber/time/duration.h"
 
-#include <iostream>
+#include "gtest/gtest.h"
 
 #include "cyber/time/time.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

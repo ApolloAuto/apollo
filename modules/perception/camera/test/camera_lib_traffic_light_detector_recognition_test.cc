@@ -69,7 +69,7 @@ TEST(RecognizeTest, yellow) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_YELLOW == lights[0]->status.color);
@@ -125,7 +125,7 @@ TEST(RecognizeTest, red) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_RED == lights[0]->status.color);
@@ -233,7 +233,7 @@ TEST(RecognizeTest, black) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_BLACK == lights[0]->status.color);
@@ -285,7 +285,7 @@ TEST(RecognizeTest, no_detection) {
   lights[0]->region.is_detected = false;
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_UNKNOWN_COLOR == lights[0]->status.color);
@@ -341,7 +341,7 @@ TEST(RecognizeTest, unknown_class) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_FALSE(recognition->Detect(recognition_options, &frame));
 #endif
 }
@@ -395,7 +395,7 @@ TEST(RecognizeTest, quadrate) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_GREEN == lights[0]->status.color);
@@ -457,7 +457,7 @@ TEST(RecognizeTest, horizontal) {
 
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_GREEN == lights[0]->status.color);
@@ -507,7 +507,7 @@ TEST(RecognizeTest, no_light) {
   lights.clear();
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
   EXPECT_EQ(lights.size(), 0);
 #endif

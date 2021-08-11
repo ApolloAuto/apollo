@@ -81,7 +81,7 @@ bool Dense::Load(const DenseParameter& dense_pb) {
 
 void Dense::Run(const std::vector<Eigen::MatrixXf>& inputs,
                 Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf prod = static_cast<Eigen::MatrixXf>(inputs[0] * weights_);
   if (use_bias_) {
     Eigen::MatrixXf sum = prod.rowwise() + bias_.transpose();
@@ -128,8 +128,8 @@ bool Conv1d::Load(const Conv1dParameter& conv1d_pb) {
 
 void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
                  Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
-  CHECK_GT(kernel_.size(), 0);
+  CHECK_EQ(inputs.size(), 1U);
+  CHECK_GT(kernel_.size(), 0U);
   CHECK_EQ(kernel_[0].rows(), inputs[0].rows());
   int kernel_size = static_cast<int>(kernel_[0].cols());
   int output_num_col =
@@ -158,11 +158,10 @@ bool MaxPool1d::Load(const LayerParameter& layer_pb) {
   }
   MaxPool1dParameter maxpool1d_pb = layer_pb.maxpool1d();
   return Load(maxpool1d_pb);
-  return true;
 }
 
 bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
-  CHECK(maxpool1d_pb.has_kernel_size());
+  ACHECK(maxpool1d_pb.has_kernel_size());
   CHECK_GT(maxpool1d_pb.has_kernel_size(), 0);
   kernel_size_ = maxpool1d_pb.kernel_size();
   if (maxpool1d_pb.has_stride() && maxpool1d_pb.stride() > 0) {
@@ -176,7 +175,7 @@ bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
 
 void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
                     Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   int output_num_col =
       static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
   int output_num_row = static_cast<int>(inputs[0].rows());
@@ -202,11 +201,10 @@ bool AvgPool1d::Load(const LayerParameter& layer_pb) {
   }
   AvgPool1dParameter avgpool1d_pb = layer_pb.avgpool1d();
   return Load(avgpool1d_pb);
-  return true;
 }
 
 bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
-  CHECK(avgpool1d_pb.has_kernel_size());
+  ACHECK(avgpool1d_pb.has_kernel_size());
   CHECK_GT(avgpool1d_pb.has_kernel_size(), 0);
   kernel_size_ = avgpool1d_pb.kernel_size();
   if (avgpool1d_pb.has_stride() && avgpool1d_pb.stride() > 0) {
@@ -220,7 +218,7 @@ bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
 
 void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
                     Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   int output_num_col =
       static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
   int output_num_row = static_cast<int>(inputs[0].rows());
@@ -264,7 +262,7 @@ bool Activation::Load(const ActivationParameter& activation_pb) {
 
 void Activation::Run(const std::vector<Eigen::MatrixXf>& inputs,
                      Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   *output = inputs[0].unaryExpr(kactivation_);
 }
 
@@ -305,7 +303,7 @@ bool BatchNormalization::Load(const LayerParameter& layer_pb) {
 
 void BatchNormalization::Run(const std::vector<Eigen::MatrixXf>& inputs,
                              Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf temp = (inputs[0].rowwise() - mu_.transpose());
   Eigen::MatrixXf norm =
       temp.array().rowwise() / (sigma_.array().sqrt() + epsilon_).transpose();
@@ -449,7 +447,7 @@ void LSTM::Step(const Eigen::MatrixXf& input, Eigen::MatrixXf* output,
 
 void LSTM::Run(const std::vector<Eigen::MatrixXf>& inputs,
                Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   Eigen::MatrixXf sequences(inputs[0].rows(), units_);
   Eigen::MatrixXf temp;
   for (int i = 0; i < inputs[0].rows(); ++i) {
@@ -477,7 +475,7 @@ void LSTM::State(std::vector<Eigen::MatrixXf>* states) const {
 }
 
 void LSTM::SetState(const std::vector<Eigen::MatrixXf>& states) {
-  CHECK_EQ(states.size(), 2);
+  CHECK_EQ(states.size(), 2U);
   CHECK_EQ(states[0].rows(), 1);
   CHECK_EQ(states[1].rows(), 1);
   CHECK_EQ(states[0].cols(), units_);
@@ -496,7 +494,7 @@ bool Flatten::Load(const LayerParameter& layer_pb) {
 
 void Flatten::Run(const std::vector<Eigen::MatrixXf>& inputs,
                   Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> inp(
       inputs[0]);
   inp.resize(1, inp.size());
@@ -535,7 +533,7 @@ bool Input::Load(const LayerParameter& layer_pb) {
 
 void Input::Run(const std::vector<Eigen::MatrixXf>& inputs,
                 Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 1);
+  CHECK_EQ(inputs.size(), 1U);
   CHECK_EQ(inputs[0].cols(), input_shape_.back());
   *output = inputs[0];
 }
@@ -556,7 +554,7 @@ bool Concatenate::Load(const LayerParameter& layer_pb) {
 
 void Concatenate::Run(const std::vector<Eigen::MatrixXf>& inputs,
                       Eigen::MatrixXf* output) {
-  CHECK_EQ(inputs.size(), 2);
+  CHECK_EQ(inputs.size(), 2U);
   CHECK_EQ(inputs[0].rows(), inputs[1].rows());
   output->resize(inputs[0].rows(), inputs[0].cols() + inputs[1].cols());
   *output << inputs[0], inputs[1];

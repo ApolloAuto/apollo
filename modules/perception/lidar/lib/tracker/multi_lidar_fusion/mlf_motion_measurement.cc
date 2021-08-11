@@ -34,8 +34,10 @@ void MlfMotionMeasurement::ComputeMotionMeasurment(
   if (latest_object == nullptr) {
     latest_object = track_data->GetLatestObject().second;
   }
-  CHECK_NOTNULL(latest_object.get());
-
+  if (latest_object.get() == nullptr) {
+    AERROR << "latest_object is not available";
+    return;
+  }
   // should we estimate the measurement if the time diff is too small?
   double latest_time = latest_object->object_ptr->latest_tracked_time;
   double current_time = new_object->object_ptr->latest_tracked_time;

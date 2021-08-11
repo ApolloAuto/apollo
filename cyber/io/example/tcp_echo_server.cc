@@ -16,8 +16,8 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <sys/socket.h>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -76,15 +76,12 @@ int main(int argc, char* argv[]) {
           return;
         }
         session.Listen(10);
-        while (true) {
-          auto conn_session =
-              session.Accept((struct sockaddr*)nullptr, nullptr);
-          std::cout << "accepted" << std::endl;
-          auto routine_name =
-              "connected session" + std::to_string(Time::Now().ToNanosecond());
-          apollo::cyber::scheduler::Instance()->CreateTask(
-              std::bind(Echo, conn_session), routine_name);
-        }
+        auto conn_session = session.Accept((struct sockaddr*)nullptr, nullptr);
+        std::cout << "accepted" << std::endl;
+        auto routine_name =
+            "connected session" + std::to_string(Time::Now().ToNanosecond());
+        apollo::cyber::scheduler::Instance()->CreateTask(
+            std::bind(Echo, conn_session), routine_name);
       },
       "echo_server");
 

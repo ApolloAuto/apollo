@@ -17,7 +17,7 @@
 #ifndef CYBER_COMMON_TIME_CONVERSION_H_
 #define CYBER_COMMON_TIME_CONVERSION_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <ctime>
 #include <iostream>
 #include <string>
@@ -124,7 +124,7 @@ inline uint64_t StringToUnixSeconds(
 
 inline std::string UnixSecondsToString(
     uint64_t unix_seconds,
-    const std::string& format_str = "%Y-%m-%d %H:%M:%S") {
+    const std::string& format_str = "%Y-%m-%d-%H:%M:%S") {
   std::time_t t = unix_seconds;
   struct tm ptm;
   struct tm* ret = localtime_r(&t, &ptm);

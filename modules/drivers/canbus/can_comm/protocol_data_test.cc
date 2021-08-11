@@ -33,6 +33,16 @@ TEST(ProtocolDataTest, CheckSum) {
   EXPECT_EQ(0xE7, result);
 }
 
+TEST(ProtocolDataTest, BoundedValue) {
+  const double_t input = 5.0;
+  const double_t min_bound = 0.0;
+  const double_t max_bound = M_PI;
+  const double_t result =
+      ProtocolData<apollo::canbus::ChassisDetail>::BoundedValue(
+          min_bound, max_bound, input);
+  EXPECT_EQ(M_PI, result);
+}
+
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo

@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #pragma once
+#include <memory>
 
-#include "modules/planning/proto/decider_config.pb.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/rule_based_stop_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -26,7 +26,8 @@ namespace planning {
 
 class RuleBasedStopDecider : public Decider {
  public:
-  explicit RuleBasedStopDecider(const TaskConfig& config);
+  RuleBasedStopDecider(const TaskConfig& config,
+                       const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(
@@ -65,6 +66,7 @@ class RuleBasedStopDecider : public Decider {
                       const common::PathPoint& stop_point);
 
  private:
+  static constexpr char const* PATH_END_VO_ID_PREFIX = "PATH_END_";
   RuleBasedStopDeciderConfig rule_based_stop_decider_config_;
   bool is_clear_to_change_lane_ = false;
   bool is_change_lane_planning_succeed_ = false;

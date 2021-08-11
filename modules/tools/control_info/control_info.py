@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -27,11 +27,11 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy
-import tkFileDialog
+import tkinter.filedialog
 from matplotlib import patches
 from matplotlib import lines
-from cyber_py import cyber
 
+from cyber.python.cyber_py3 import cyber
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.planning.proto import planning_pb2
@@ -259,7 +259,7 @@ class ControlInfo(object):
         """
         Plot everything in time domain
         """
-        print "Showing Lateral"
+        print("Showing Lateral")
         for loc, ax in numpy.ndenumerate(self.ax):
             ax.clear()
         self.ax[0, 0].plot(
@@ -319,13 +319,13 @@ class ControlInfo(object):
         if event.key == 'q' or event.key == 'Q':
             plt.close('all')
         if event.key == 'a' or event.key == 'A':
-            self.longitutidinal()
+            self.longitudinal()
         if event.key == 'z' or event.key == 'Z':
             self.lateral()
 
 
 if __name__ == "__main__":
-    from cyber_py.record import RecordReader
+    from cyber.python.cyber_py3.record import RecordReader
 
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')
@@ -344,7 +344,7 @@ if __name__ == "__main__":
         # bag = rosbag.Bag(file_path)
         reader = RecordReader(file_path)
         for msg in reader.read_messages():
-            print msg.timestamp, msg.topic
+            print(msg.timestamp, msg.topic)
             if msg.topic == "/apollo/localization/pose":
                 localization = localization_pb2.LocalizationEstimate()
                 localization.ParseFromString(msg.message)
@@ -361,7 +361,7 @@ if __name__ == "__main__":
                 chassis = chassis_pb2.Chassis()
                 chassis.ParseFromString(msg.message)
                 controlinfo.callback_canbus(chassis)
-        print "Done reading the file"
+        print("Done reading the file")
 
     else:
         cyber.init()
@@ -379,7 +379,7 @@ if __name__ == "__main__":
         canbussub = node.create_reader('/apollo/canbus/chassis',
                                        chassis_pb2.Chassis,
                                        controlinfo.callback_canbus)
-        raw_input("Press Enter To Stop")
+        input("Press Enter To Stop")
 
     mng = plt.get_current_fig_manager()
     controlinfo.longitudinal()

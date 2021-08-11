@@ -19,8 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -44,7 +44,7 @@ AABox2d::AABox2d(const Vec2d &one_corner, const Vec2d &opposite_corner)
               std::abs(one_corner.y() - opposite_corner.y())) {}
 
 AABox2d::AABox2d(const std::vector<Vec2d> &points) {
-  CHECK(!points.empty());
+  ACHECK(!points.empty());
   double min_x = points[0].x();
   double max_x = points[0].x();
   double min_y = points[0].y();
@@ -146,7 +146,7 @@ void AABox2d::MergeFrom(const Vec2d &other_point) {
 }
 
 std::string AABox2d::DebugString() const {
-  return util::StrCat("aabox2d ( center = ", center_.DebugString(),
+  return absl::StrCat("aabox2d ( center = ", center_.DebugString(),
                       "  length = ", length_, "  width = ", width_, " )");
 }
 

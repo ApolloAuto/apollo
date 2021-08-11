@@ -18,14 +18,11 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
-
-#include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -41,7 +38,7 @@ class StopSignUnprotectedScenarioTest : public ::testing::Test {
   std::unique_ptr<StopSignUnprotectedScenario> scenario_;
 };
 
-TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
+TEST_F(StopSignUnprotectedScenarioTest, Init) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
       "/apollo/modules/planning/conf/"
       "scenario/stop_sign_unprotected_config.pb.txt";
@@ -49,19 +46,10 @@ TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
-}
-
-TEST_F(StopSignUnprotectedScenarioTest, Init) {
-  FLAGS_scenario_stop_sign_unprotected_config_file =
-      "/apollo/modules/planning/testdata/conf/"
-      "scenario/stop_sign_unprotected_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 
   ScenarioContext context;
-  scenario_.reset(new StopSignUnprotectedScenario(config, &context));
+  auto injector = std::make_shared<DependencyInjector>();
+  scenario_.reset(new StopSignUnprotectedScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }
 

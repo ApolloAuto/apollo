@@ -14,24 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-
-#include <boost/circular_buffer.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include <boost/circular_buffer.hpp>
 #include "Eigen/Core"
 
 #include "modules/perception/base/object_supplement.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/vehicle_struct.h"
+// #include "modules/prediction/proto/feature.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace base {
 
 struct alignas(16) Object {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Object();
   std::string ToString() const;
   void Reset();
@@ -113,6 +115,9 @@ struct alignas(16) Object {
   RadarObjectSupplement radar_supplement;
   CameraObjectSupplement camera_supplement;
   FusionObjectSupplement fusion_supplement;
+
+  // @debug feature to be used for semantic mapping
+//  std::shared_ptr<apollo::prediction::Feature> feature;
 };
 
 using ObjectPtr = std::shared_ptr<Object>;

@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/tools/cyber_recorder/recorder.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
@@ -31,11 +31,6 @@
 
 namespace apollo {
 namespace data {
-
-using apollo::common::util::StrCat;
-using cyber::Node;
-using cyber::Writer;
-using cyber::record::Recorder;
 
 /**
  * @class RealtimeRecordProcessor
@@ -48,7 +43,7 @@ class RealtimeRecordProcessor : public RecordProcessor {
   bool Init(const SmartRecordTrigger& trigger_conf) override;
   bool Process() override;
   std::string GetDefaultOutputFile() const override {
-    return StrCat(restored_output_dir_, "/", default_output_filename_);
+    return absl::StrCat(restored_output_dir_, "/", default_output_filename_);
   };
   void MonitorStatus();
   virtual ~RealtimeRecordProcessor() = default;
@@ -59,9 +54,9 @@ class RealtimeRecordProcessor : public RecordProcessor {
   void PublishStatus(const RecordingState state,
                      const std::string& message) const;
 
-  std::shared_ptr<Recorder> recorder_ = nullptr;
-  std::shared_ptr<Node> smart_recorder_node_ = nullptr;
-  std::shared_ptr<Writer<SmartRecorderStatus>> recorder_status_writer_ =
+  std::shared_ptr<cyber::record::Recorder> recorder_ = nullptr;
+  std::shared_ptr<cyber::Node> smart_recorder_node_ = nullptr;
+  std::shared_ptr<cyber::Writer<SmartRecorderStatus>> recorder_status_writer_ =
       nullptr;
   std::string default_output_filename_;
   std::string restore_path_;

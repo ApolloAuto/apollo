@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/common/math/mpc_osqp.h"
-#include "modules/common/math/mpc_solver.h"
 
 #include <chrono>
 #include <ctime>
@@ -30,7 +29,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-TEST(MPCOSQPSolverTest, OSQPvsQPOASES) {
+TEST(MPCOSQPSolverTest, ComputationTimeTest) {
   const int states = 4;
   const int controls = 2;
   const int horizon = 3;
@@ -80,32 +79,6 @@ TEST(MPCOSQPSolverTest, OSQPvsQPOASES) {
   auto end_time_osqp = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_OSQP = end_time_osqp - start_time_osqp;
   AINFO << "OSQP used time: " << diff_OSQP.count() * 1000 << " ms.";
-
-  // QPOASES
-  Eigen::MatrixXd C(states, 1);
-  C << 0, 0, 0, 0.1;
-
-  Eigen::MatrixXd control_matrix(controls, 1);
-  control_matrix << 0, 0;
-  std::vector<Eigen::MatrixXd> control(horizon, control_matrix);
-
-  Eigen::MatrixXd control_gain_matrix(controls, states);
-  control_gain_matrix << 0, 0, 0, 0, 0, 0, 0, 0;
-  std::vector<Eigen::MatrixXd> control_gain(horizon, control_gain_matrix);
-
-  Eigen::MatrixXd addition_gain_matrix(controls, 1);
-  addition_gain_matrix << 0, 0;
-  std::vector<Eigen::MatrixXd> addition_gain(horizon, addition_gain_matrix);
-
-  auto start_time_qpOASES = std::chrono::system_clock::now();
-  SolveLinearMPC(A, B, C, Q, R, lower_control_bound, upper_control_bound,
-                 initial_state, reference, eps, max_iter, &control,
-                 &control_gain, &addition_gain);
-  auto end_time_qpOASES = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff_qpOASES =
-      end_time_qpOASES - start_time_qpOASES;
-  AINFO << "qpOASES used time: " << diff_qpOASES.count() * 1000 << " ms.";
-  EXPECT_NEAR(-0.0202, control_cmd[0], 1e-3);
 }
 
 TEST(MPCOSQPSolverTest, NonFullRankMatrix) {

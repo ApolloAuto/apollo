@@ -23,11 +23,11 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
@@ -39,7 +39,7 @@ namespace scenario {
 namespace stop_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::OverlapInfoConstPtr;
@@ -78,7 +78,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
-  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
+  static constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s - stop_sign_start_s;
@@ -129,7 +129,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::Instance()
+    injector_->planning_context()
         ->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
@@ -201,15 +201,13 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
       PerceptionObstacle::Type obstacle_type = perception_obstacle->type();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
-      auto obstacle_point =
-          common::util::MakePointENU(perception_obstacle->position().x(),
-                                     perception_obstacle->position().y(),
-                                     perception_obstacle->position().z());
+      auto obstacle_point = common::util::PointFactory::ToPointENU(
+          perception_obstacle->position());
 
       double distance =
           common::util::DistanceXY(stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << perception_obstacle_id
-             << "] distance[" << distance << "]";
+      ADEBUG << "obstacle_id[" << perception_obstacle_id << "] distance["
+             << distance << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {
@@ -228,21 +226,14 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_stop_sign();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
-}
-
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::Instance()
+  injector_->planning_context()
       ->mutable_planning_status()
       ->mutable_stop_sign()
       ->set_done_stop_sign_overlap_id(
           GetContext()->current_stop_sign_overlap_id);
-  PlanningContext::Instance()
+  injector_->planning_context()
       ->mutable_planning_status()
       ->mutable_stop_sign()
       ->clear_wait_for_obstacle_id();

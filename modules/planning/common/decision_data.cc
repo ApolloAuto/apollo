@@ -69,7 +69,7 @@ DecisionData::DecisionData(
         continue;
       }
       const std::string obstacle_id =
-          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+          absl::StrCat(perception_id, "_", trajectory_index);
       obstacles_.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
       all_obstacle_.emplace_back(obstacles_.back().get());
@@ -98,8 +98,7 @@ std::vector<Obstacle*> DecisionData::GetObstacleByType(
   for (const std::string& id : ids) {
     ret.emplace_back(GetObstacleById(id));
     if (ret.back() == nullptr) {
-      AERROR << "can't find obstacle by id: " << id;
-      AERROR << "ignore...";
+      AERROR << "Ignore. can't find obstacle by id: " << id;
       ret.pop_back();
     }
   }

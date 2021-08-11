@@ -16,9 +16,3 @@ cyber_modules {
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
   }
 }
-cyber_modules {
-  key: "Tick"
-  value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
-  }
-}

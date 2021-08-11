@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "cyber/examples/common_component_example/common_component_example.h"
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-
 bool CommonComponentSample::Init() {
   AINFO << "Commontest component init";
   return true;

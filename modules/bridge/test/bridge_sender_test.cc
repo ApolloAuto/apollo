@@ -16,17 +16,20 @@
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cstdlib>
+#include <thread>
+
+#include "modules/canbus/proto/chassis.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"
+#include "cyber/time/clock.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/time/time.h"
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
   if (count == 0) {
@@ -35,7 +38,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
   float total = static_cast<float>(count);
   float hundred = 100.00;
   for (uint32_t i = 0; i < count; i++) {
-    double timestamp_ = Clock::NowInSeconds() - 2.0;
+    double timestamp_ = Clock::NowInSeconds() + 2.0;
     float coefficient = static_cast<float>(i);
     auto pb_msg = std::make_shared<apollo::canbus::Chassis>();
     pb_msg->mutable_header()->set_sequence_num(i);
@@ -48,7 +51,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     pb_msg->set_brake_percentage(coefficient * hundred / total);
     pb_msg->set_steering_percentage(coefficient * hundred / total);
     pb_msg->set_steering_torque_nm(coefficient);
-    pb_msg->set_parking_brake(i % 2 ? true : false);
+    pb_msg->set_parking_brake(i % 2);
     pb_msg->set_high_beam_signal(false);
     pb_msg->set_low_beam_signal(true);
     pb_msg->set_left_turn_signal(false);
@@ -92,7 +95,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     close(sock_fd);
 
     // 1000Hz
-    usleep(1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   return true;
 }
@@ -103,6 +106,7 @@ int main(int argc, char *argv[]) {
     count = 10000;
   } else {
     count = atoi(argv[1]);
+    CHECK_LE(count, 20000U);
   }
   send("127.0.0.1", 8900, count);
   return 0;

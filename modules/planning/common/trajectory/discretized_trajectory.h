@@ -22,10 +22,9 @@
 
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -69,7 +68,8 @@ class DiscretizedTrajectory : public std::vector<common::TrajectoryPoint> {
   void PrependTrajectoryPoints(
       const std::vector<common::TrajectoryPoint>& trajectory_points) {
     if (!empty() && trajectory_points.size() > 1) {
-      CHECK(trajectory_points.back().relative_time() < front().relative_time());
+      ACHECK(trajectory_points.back().relative_time() <
+             front().relative_time());
     }
     insert(begin(), trajectory_points.begin(), trajectory_points.end());
   }

@@ -20,9 +20,6 @@
 DEFINE_string(canbus_node_name, "chassis", "The chassis module name in proto");
 DEFINE_string(canbus_module_name, "canbus_component", "Module name");
 
-DEFINE_string(canbus_adapter_config_filename,
-              "modules/canbus/conf/adapter.conf", "The adapter config file");
-
 // data file
 DEFINE_string(canbus_conf_file,
               "/apollo/modules/canbus/conf/canbus_conf.pb.txt",
@@ -49,3 +46,6 @@ DEFINE_int32(guardian_cmd_pending_queue_size, 10,
              "Max guardian cmd pending queue size");
 DEFINE_int32(control_cmd_pending_queue_size, 10,
              "Max control cmd pending queue size");
+
+// enable forward Ultrasonic AEB
+DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");

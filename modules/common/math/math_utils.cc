@@ -19,8 +19,6 @@
 #include <cmath>
 #include <utility>
 
-#include "glog/logging.h"
-
 namespace apollo {
 namespace common {
 namespace math {
@@ -80,9 +78,6 @@ double Gaussian(const double u, const double std, const double x) {
   return (1.0 / std::sqrt(2 * M_PI * std * std)) *
          std::exp(-(x - u) * (x - u) / (2 * std * std));
 }
-
-// Sigmoid
-double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
 Eigen::Vector2d RotateVector2d(const Eigen::Vector2d& v_in,
                                const double theta) {

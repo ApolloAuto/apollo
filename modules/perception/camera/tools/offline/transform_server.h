@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include "Eigen/Geometry"
+
 namespace apollo {
 namespace perception {
 namespace camera {

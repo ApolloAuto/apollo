@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,9 +22,10 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import util
+import modules.tools.routing.util as util
+
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
@@ -120,14 +121,14 @@ def plot_central_curve(central_curve, color):
             px, py = draw_line(curve.line_segment, color)
             node_x = node_x + px
             node_y = node_y + py
-        #if curve.HasField('arc'):
+        # if curve.HasField('arc'):
         #    draw_arc(curve.arc)
-    return [node_x[len(node_x) / 2], node_y[len(node_y) / 2]]
+    return [node_x[len(node_x) // 2], node_y[len(node_y) // 2]]
 
 
 def plot_node(node, plot_id, color):
     """plot topology graph node"""
-    print 'length of %s: %f' % (node.lane_id, node.length)
+    print('length of %s: %f' % (node.lane_id, node.length))
     mid_pt = plot_central_curve(node.central_curve, color)
     if 'l' in plot_id:
         draw_id(mid_pt, node.lane_id, 'green')
@@ -206,26 +207,26 @@ def print_help_command():
     Args:
 
     """
-    print 'type in command: [q] [a] [i lane_id]'
-    print '         q               exit'
-    print '         a               plot all topology'
-    print '         a_id            plot all topology with lane id'
-    print '         a_rid           plot all topology with road id'
-    print '         i lane_id       plot lanes could be reached from lane with lane_id'
-    print '         i_map lane_id   plot lanes could be reached from lane with lane_id, with map'
+    print('type in command: [q] [a] [i lane_id]')
+    print('         q               exit')
+    print('         a               plot all topology')
+    print('         a_id            plot all topology with lane id')
+    print('         a_rid           plot all topology with road id')
+    print('         i lane_id       plot lanes could be reached from lane with lane_id')
+    print('         i_map lane_id   plot lanes could be reached from lane with lane_id, with map')
 
 
 if __name__ == '__main__':
     map_dir = util.get_map_dir(sys.argv)
     graph = util.get_topodata(map_dir)
     base_map = util.get_mapdata(map_dir)
-    print "district: %s" % graph.hdmap_district
-    print "version: %s" % graph.hdmap_version
+    print("district: %s" % graph.hdmap_district)
+    print("version: %s" % graph.hdmap_version)
 
     plt.ion()
     while 1:
         print_help_command()
-        print 'cmd>',
+        print('cmd>', end=' ')
         instruction = raw_input()
         argv = instruction.strip(' ').split(' ')
         if len(argv) == 1:
@@ -238,7 +239,7 @@ if __name__ == '__main__':
             elif argv[0] == 'a_rid':
                 plot_all(graph, 'r')
             else:
-                print '[ERROR] wrong command'
+                print('[ERROR] wrong command')
             continue
 
         if len(argv) == 2:
@@ -248,9 +249,9 @@ if __name__ == '__main__':
                 plot_id(graph, argv[1])
                 util.draw_map(plt.gca(), base_map)
             else:
-                print '[ERROR] wrong command'
+                print('[ERROR] wrong command')
             continue
 
         else:
-            print '[ERROR] wrong arguments'
+            print('[ERROR] wrong arguments')
             continue

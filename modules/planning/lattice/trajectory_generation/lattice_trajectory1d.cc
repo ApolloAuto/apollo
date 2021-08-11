@@ -76,17 +76,17 @@ bool LatticeTrajectory1d::has_target_velocity() const {
 bool LatticeTrajectory1d::has_target_time() const { return has_target_time_; }
 
 double LatticeTrajectory1d::target_position() const {
-  CHECK(has_target_position_);
+  ACHECK(has_target_position_);
   return target_position_;
 }
 
 double LatticeTrajectory1d::target_velocity() const {
-  CHECK(has_target_velocity_);
+  ACHECK(has_target_velocity_);
   return target_velocity_;
 }
 
 double LatticeTrajectory1d::target_time() const {
-  CHECK(has_target_time_);
+  ACHECK(has_target_time_);
   return target_time_;
 }
 

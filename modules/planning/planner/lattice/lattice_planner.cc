@@ -27,9 +27,9 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
-#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
@@ -50,7 +50,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::CartesianFrenetConverter;
 using apollo::common::math::PathMatcher;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 namespace {
 
@@ -173,7 +173,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   double speed_limit =
       reference_line_info->reference_line().GetSpeedLimitFromS(init_s[0]);
-  reference_line_info->SetCruiseSpeed(speed_limit);
+  reference_line_info->SetLatticeCruiseSpeed(speed_limit);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {
@@ -181,7 +181,8 @@ Status LatticePlanner::PlanOnReferenceLine(
            << "Current ego s: " << init_s[0];
   }
 
-  ADEBUG << "Decision_Time = " << (Clock::NowInSeconds() - current_time) * 1000;
+  ADEBUG << "Decision_Time = "
+         << (Clock::NowInSeconds() - current_time) * 1000;
   current_time = Clock::NowInSeconds();
 
   // 5. generate 1d trajectory bundle for longitudinal and lateral respectively.

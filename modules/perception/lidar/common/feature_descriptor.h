@@ -16,6 +16,7 @@
 #pragma once
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 #include "modules/perception/base/point_cloud.h"
@@ -72,8 +73,8 @@ class FeatureDescriptor {
     float xsum = 0.0f;
     float ysum = 0.0f;
     float zsum = 0.0f;
-    min_pt_.x = min_pt_.y = min_pt_.z = FLT_MAX;
-    max_pt_.x = max_pt_.y = max_pt_.z = -FLT_MAX;
+    min_pt_.x = min_pt_.y = min_pt_.z = std::numeric_limits<float>::max();
+    max_pt_.x = max_pt_.y = max_pt_.z = -std::numeric_limits<float>::max();
 
     float pt_num = static_cast<float>(cloud_->size());
     for (int i = 0; i < static_cast<int>(pt_num); ++i) {

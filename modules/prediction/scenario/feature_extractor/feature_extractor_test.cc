@@ -26,15 +26,17 @@ using apollo::common::adapter::AdapterConfig;
 class FeatureExtractorTest : public KMLMapBasedTest {};
 
 TEST_F(FeatureExtractorTest, junction) {
-  ContainerManager::Instance()->RegisterContainers();
+  std::unique_ptr<ContainerManager> container_manager(new ContainerManager());
+  container_manager->RegisterContainers();
   std::unique_ptr<Container> adc_traj_container =
-      ContainerManager::Instance()->CreateContainer(
-          AdapterConfig::PLANNING_TRAJECTORY);
+      container_manager->CreateContainer(AdapterConfig::PLANNING_TRAJECTORY);
 
   EnvironmentFeatures environment_features;
-  FeatureExtractor::ExtractFrontJunctionFeatures(&environment_features);
+  FeatureExtractor::ExtractFrontJunctionFeatures(&environment_features,
+                                                 container_manager.get());
 
-  environment_features = FeatureExtractor::ExtractEnvironmentFeatures();
+  environment_features =
+      FeatureExtractor::ExtractEnvironmentFeatures(container_manager.get());
   EXPECT_FALSE(environment_features.has_front_junction());
 }
 

@@ -16,7 +16,8 @@
 #pragma once
 
 #include <algorithm>
-#include <cfloat>
+#include <limits>
+#include <numeric>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -49,12 +50,13 @@ class ConvexHull2D {
     CLOUD_IN_TYPE in_cloud_without_ground;
     in_cloud_without_ground.reserve(in_cloud.size());
     for (std::size_t id = 0; id < in_cloud.size(); ++id) {
-      // compute point_heigh, note FLT_MAX is the default value
+      // compute point_heigh, note std::numeric_limits<float>::max() is the
+      // default value
       if (in_cloud.points_height(id) >= distance_above_ground_thres) {
         in_cloud_without_ground.push_back(in_cloud[id]);
       }
     }
-    if (in_cloud_without_ground.size() == 0) {
+    if (in_cloud_without_ground.empty()) {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground);
@@ -72,14 +74,15 @@ class ConvexHull2D {
     CLOUD_IN_TYPE in_cloud_without_ground_and_head;
     in_cloud_without_ground_and_head.reserve(in_cloud.size());
     for (std::size_t id = 0; id < in_cloud.size(); ++id) {
-      // compute point_heigh, note FLT_MAX is the default value
-      if (in_cloud.points_height(id) == FLT_MAX ||
+      // compute point_heigh, note std::numeric_limits<float>::max() is the
+      // default value
+      if (in_cloud.points_height(id) == std::numeric_limits<float>::max() ||
           (in_cloud.points_height(id) >= distance_above_ground_thres &&
            in_cloud.points_height(id) <= distance_beneath_head_thres)) {
         in_cloud_without_ground_and_head.push_back(in_cloud[id]);
       }
     }
-    if (in_cloud_without_ground_and_head.size() == 0) {
+    if (in_cloud_without_ground_and_head.empty()) {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground_and_head);

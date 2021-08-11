@@ -15,10 +15,10 @@
  *****************************************************************************/
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
-#include <omp.h>
-
 #include <limits>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
@@ -31,10 +31,6 @@
 
 namespace apollo {
 namespace prediction {
-
-using apollo::common::adapter::AdapterConfig;
-using apollo::cyber::common::GetProtoFromFile;
-using apollo::prediction::math_util::Sigmoid;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -54,7 +50,8 @@ CruiseMLPEvaluator::CruiseMLPEvaluator() : device_(torch::kCPU) {
 
 void CruiseMLPEvaluator::Clear() {}
 
-bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                  ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -77,7 +74,7 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }
@@ -103,7 +100,8 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     if (FLAGS_prediction_offline_mode ==
         PredictionConstants::kDumpDataForLearning) {
       std::vector<double> interaction_feature_values;
-      SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+      SetInteractionFeatureValues(obstacle_ptr, obstacles_container,
+                                  lane_sequence_ptr,
                                   &interaction_feature_values);
       if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
         ADEBUG << "Obstacle [" << id << "] has fewer than "
@@ -410,8 +408,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void CruiseMLPEvaluator::SetInteractionFeatureValues(
-    Obstacle* obstacle_ptr, LaneSequence* lane_sequence_ptr,
-    std::vector<double>* feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
   // forward / backward: relative_s, relative_l, speed, length
   feature_values->clear();
   // Initialize forward and backward obstacles
@@ -438,9 +436,6 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
     }
   }
 
-  auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
   // Set feature values for forward obstacle
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());
@@ -554,7 +549,7 @@ void CruiseMLPEvaluator::ModelInference(
       torch_output_tuple->elements()[0].toTensor().to(torch::kCPU);
   auto finish_time_tensor =
       torch_output_tuple->elements()[1].toTensor().to(torch::kCPU);
-  lane_sequence_ptr->set_probability(Sigmoid(
+  lane_sequence_ptr->set_probability(apollo::common::math::Sigmoid(
       static_cast<double>(probability_tensor.accessor<float, 2>()[0][0])));
   lane_sequence_ptr->set_time_to_lane_center(
       static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));

@@ -65,7 +65,9 @@ class Queue {
   // deletes the retrieved element, do not use for non integral types
   bool pop(T &v) {  // NOLINT
     std::unique_lock<std::mutex> lock(this->mutex);
-    if (this->q.empty()) return false;
+    if (this->q.empty()) {
+      return false;
+    }
     v = this->q.front();
     this->q.pop();
     return true;
@@ -146,7 +148,9 @@ class thread_pool {
     std::unique_ptr<std::function<void(int id)>> func(
         _f);  // at return, delete the function even if an exception occurred
     std::function<void(int)> f;
-    if (_f) f = *_f;
+    if (_f) {
+      f = *_f;
+    }
     return f;
   }
 
@@ -156,14 +160,18 @@ class thread_pool {
   // queue is cleared without running the functions
   void stop(bool isWait = false) {
     if (!isWait) {
-      if (this->isStop) return;
+      if (this->isStop) {
+        return;
+      }
       this->isStop = true;
       for (int i = 0, n = this->size(); i < n; ++i) {
         *this->flags[i] = true;  // command the threads to stop
       }
       this->clear_queue();  // empty the queue
     } else {
-      if (this->isDone || this->isStop) return;
+      if (this->isDone || this->isStop) {
+        return;
+      }
       this->isDone = true;  // give the waiting threads a command to finish
     }
     {
@@ -172,7 +180,9 @@ class thread_pool {
     }
     for (int i = 0; i < static_cast<int>(this->threads.size());
          ++i) {  // wait for the computing threads to finish
-      if (this->threads[i]->joinable()) this->threads[i]->join();
+      if (this->threads[i]->joinable()) {
+        this->threads[i]->join();
+      }
     }
     // if there were no threads in the pool but some functors in the queue, the
     // functors are not deleted by the threads

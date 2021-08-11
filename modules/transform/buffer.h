@@ -32,9 +32,6 @@ namespace transform {
 // extend the BufferInterface class and BufferCore class
 class Buffer : public BufferInterface, public tf2::BufferCore {
  public:
-  using tf2::BufferCore::canTransform;
-  using tf2::BufferCore::lookupTransform;
-
   /**
    * @brief  Constructor for a Buffer object
    * @param cache_time How long to keep a history of transforms
@@ -114,6 +111,10 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             const std::string& fixed_frame,
                             const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const;
+
+  bool GetLatestStaticTF(const std::string& frame_id,
+                         const std::string& child_frame_id,
+                         TransformStamped* tf);
 
  private:
   void SubscriptionCallback(

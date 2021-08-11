@@ -20,23 +20,14 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/trajectory_cost.h"
 
-#include <algorithm>
-#include <utility>
-
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/util.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
-using apollo::common::math::Sigmoid;
-using apollo::common::math::Vec2d;
 
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const ReferenceLine &reference_line,
@@ -95,7 +86,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
             ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
 
         Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
-        constexpr double kBuff = 0.5;
+        static constexpr double kBuff = 0.5;
         Box2d expanded_obstacle_box =
             Box2d(obstacle_box.center(), obstacle_box.heading(),
                   obstacle_box.length() + kBuff, obstacle_box.width() + kBuff);
@@ -148,7 +139,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
 bool TrajectoryCost::IsOffRoad(const double ref_s, const double l,
                                const double dl,
                                const bool is_change_lane_path) {
-  constexpr double kIgnoreDistance = 5.0;
+  static constexpr double kIgnoreDistance = 5.0;
   if (ref_s - init_sl_point_.s() < kIgnoreDistance) {
     return false;
   }
@@ -227,14 +218,14 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    const common::SLPoint sl = common::util::MakeSLPoint(ref_s, l);
+    const common::SLPoint sl = common::util::PointFactory::ToSLPoint(ref_s, l);
     const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
     for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
       obstacle_cost +=
           GetCostBetweenObsBoxes(ego_box, obstacle_trajectory.at(index));
     }
   }
-  constexpr double kDynamicObsWeight = 1e-6;
+  static constexpr double kDynamicObsWeight = 1e-6;
   obstacle_cost.safety_cost *=
       (config_.eval_time_interval() * kDynamicObsWeight);
   return obstacle_cost;
@@ -282,7 +273,7 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
   AWARN << obs_sl_boundary.ShortDebugString();
   */
 
-  constexpr double kSafeDistance = 0.6;
+  static constexpr double kSafeDistance = 0.6;
   if (delta_l < kSafeDistance) {
     obstacle_cost.safety_cost +=
         config_.obstacle_collision_cost() *

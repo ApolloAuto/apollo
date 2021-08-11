@@ -15,8 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <vector>
+
+#include "Eigen/Core"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
 

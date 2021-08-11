@@ -31,18 +31,18 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
 
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
 
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
 
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ground_service_detector.conf");
 
   GroundServiceDetectorConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   ground_threshold_ = config.ground_threshold();
 
   ground_service_ = std::dynamic_pointer_cast<GroundService>(

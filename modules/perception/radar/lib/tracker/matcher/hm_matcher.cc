@@ -44,14 +44,14 @@ bool HMMatcher::Init() {
 
   const std::string &work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();
   double bound_match_distance = config_params.bound_match_distance();
@@ -84,19 +84,10 @@ bool HMMatcher::RefinedTrack(const base::ObjectPtr &track_object,
                              double track_timestamp,
                              const base::ObjectPtr &radar_object,
                              double radar_timestamp) {
-  auto compute_distance = [](const base::ObjectPtr &object1, double timestamp1,
-                             const base::ObjectPtr &object2,
-                             double timestamp2) -> double {
-    double time_diff = timestamp2 - timestamp1;
-    return (object2->center - object1->center -
-            object1->velocity.cast<double>() * time_diff)
-        .head(2)
-        .norm();
-  };
-  double dist = 0.5 * compute_distance(track_object, track_timestamp,
-                                       radar_object, radar_timestamp) +
-                0.5 * compute_distance(radar_object, radar_timestamp,
-                                       track_object, track_timestamp);
+  double dist = 0.5 * DistanceBetweenObs(track_object, track_timestamp,
+                                         radar_object, radar_timestamp) +
+                0.5 * DistanceBetweenObs(radar_object, radar_timestamp,
+                                         track_object, track_timestamp);
 
   return dist < BaseMatcher::GetMaxMatchDistance();
 }
@@ -109,7 +100,7 @@ void HMMatcher::TrackObjectPropertyMatch(
   if (unassigned_tracks->empty() || unassigned_objects->empty()) {
     return;
   }
-  std::vector<std::vector<double> > association_mat(unassigned_tracks->size());
+  std::vector<std::vector<double>> association_mat(unassigned_tracks->size());
   for (size_t i = 0; i < association_mat.size(); ++i) {
     association_mat[i].resize(unassigned_objects->size(), 0);
   }
@@ -157,7 +148,7 @@ void HMMatcher::ComputeAssociationMat(
     const base::Frame &radar_frame,
     const std::vector<size_t> &unassigned_tracks,
     const std::vector<size_t> &unassigned_objects,
-    std::vector<std::vector<double> > *association_mat) {
+    std::vector<std::vector<double>> *association_mat) {
   double frame_timestamp = radar_frame.timestamp;
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
     for (size_t j = 0; j < unassigned_objects.size(); ++j) {

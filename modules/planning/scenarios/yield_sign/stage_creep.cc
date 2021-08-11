@@ -17,17 +17,15 @@
 /**
  * @file
  **/
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/yield_sign/stage_creep.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include <string>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -41,7 +39,7 @@ namespace scenario {
 namespace yield_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus YieldSignStageCreep::Process(
@@ -60,10 +58,13 @@ Stage::StageStatus YieldSignStageCreep::Process(
     AERROR << "YieldSignStageCreep planning error";
   }
 
-  const auto& reference_line_info = frame->reference_line_info().front();
+  if (GetContext()->current_yield_sign_overlap_ids.empty()) {
+    return FinishScenario();
+  }
 
+  const auto& reference_line_info = frame->reference_line_info().front();
   const std::string yield_sign_overlap_id =
-      GetContext()->current_yield_sign_overlap_id;
+      GetContext()->current_yield_sign_overlap_ids[0];
 
   // get overlap along reference line
   PathOverlap* current_yield_sign_overlap =

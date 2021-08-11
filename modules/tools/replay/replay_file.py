@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -26,10 +26,10 @@ import time
 
 from google.protobuf import text_format
 
-from cyber_py import cyber
+from cyber.python.cyber_py3 import cyber
 
-import common.proto_utils as proto_utils
-from common.message_manager import PbMessageManager
+import modules.tools.common.proto_utils as proto_utils
+from modules.tools.common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()
 
@@ -41,7 +41,7 @@ def topic_publisher(topic, filename, period):
     meta_msg = None
     msg = None
     if not topic:
-        print "Topic not specified, start to guess"
+        print("Topic not specified, start to guess")
         meta_msg, msg = g_message_manager.parse_file(filename)
         topic = meta_msg.topic()
     else:
@@ -63,7 +63,7 @@ def topic_publisher(topic, filename, period):
 
     if period == 0:
         while not cyber.is_shutdown():
-            raw_input("Press any key to publish one message...")
+            input("Press any key to publish one message...")
             writer.write(msg)
             print("Topic[%s] message published" % topic)
     else:
@@ -97,16 +97,16 @@ if __name__ == '__main__':
         files = glob.glob(args.filename + "/*")
         i = 0
         for f in files:
-            print "%d  %s" % (i, f)
+            print("%d  %s" % (i, f))
             i += 1
-        str_input = raw_input("Select message by number: ")
+        str_input = input("Select message by number: ")
         try:
             selected_file = int(str_input)
             if selected_file < 0 or selected_file > len(files):
-                print "%d is an invalid number" % selected_file
+                print("%d is an invalid number" % selected_file)
         except:
-            print "%s is not a number" % str_input
-        print "Will publish file[%d]: %s" % (selected_file,
-                                             files[selected_file])
+            print("%s is not a number" % str_input)
+        print("Will publish file[%d]: %s" % (selected_file,
+                                             files[selected_file]))
         to_replay = files[selected_file]
     topic_publisher(args.topic, to_replay, period)

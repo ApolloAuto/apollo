@@ -37,7 +37,7 @@ As a decentralized design framework, Cyber RT does not have a master/central nod
 
 ## CRoutine
 
-Referred to as Coroutine concept, Cyber RT implemented CRoutine to optimize thread usage and system reource allocation.
+Referred to as Coroutine concept, Cyber RT implemented CRoutine to optimize thread usage and system resource allocation.
 
 ## Scheduler
 
@@ -53,9 +53,8 @@ Dag file is the config file of module topology. You can define components used a
 
 ## Launch files
 
-The Launch file provides a easy way to start modules. By defining one or multiple dag files in the launch file, you can start multiple modules at the same time.
+The Launch file provides an easy way to start modules. By defining one or multiple dag files in the launch file, you can start multiple modules at the same time.
 
 ## Record file
 
 The Record file is used to record messages sent/received to/from channels in Cyber RT. Reply record files can help reproduce the behavior of previous operations of Cyber RT.
-

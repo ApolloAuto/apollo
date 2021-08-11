@@ -16,10 +16,11 @@
 
 #include "cyber/data/data_visitor.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -47,6 +48,7 @@ void DispatchMessage(uint64_t channel_id, int num) {
 
 std::vector<VisitorConfig> InitConfigs(int num) {
   std::vector<VisitorConfig> configs;
+  configs.reserve(num);
   for (int i = 0; i < num; ++i) {
     uint64_t channel_id = str_hash("/channel" + std::to_string(i));
     uint32_t queue_size = 10;

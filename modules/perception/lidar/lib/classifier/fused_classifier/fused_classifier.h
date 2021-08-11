@@ -53,8 +53,8 @@ class FusedClassifier : public BaseClassifier {
   std::string one_shot_fusion_method_;
   std::string sequence_fusion_method_;
 
-  std::unique_ptr<BaseOneShotTypeFusion> one_shot_fuser_;
-  std::unique_ptr<BaseSequenceTypeFusion> sequence_fuser_;
+  BaseOneShotTypeFusion* one_shot_fuser_;
+  BaseSequenceTypeFusion* sequence_fuser_;
 
   TypeFusionOption option_;
   TypeFusionInitOption init_option_;

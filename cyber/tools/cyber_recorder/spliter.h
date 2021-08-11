@@ -18,6 +18,7 @@
 #define CYBER_TOOLS_CYBER_RECORDER_SPLITER_H_
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <string>
 #include <vector>
@@ -42,7 +43,8 @@ class Spliter {
   Spliter(const std::string& input_file, const std::string& output_file,
           const std::vector<std::string>& white_channels,
           const std::vector<std::string>& black_channels,
-          uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX);
+          uint64_t begin_time = 0,
+          uint64_t end_time = std::numeric_limits<uint64_t>::max());
   virtual ~Spliter();
   bool Proc();
 

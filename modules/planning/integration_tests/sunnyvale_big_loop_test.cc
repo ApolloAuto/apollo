@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/time/clock.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -25,7 +25,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 /**
  * @class SunnyvaleBigLoopTest
@@ -48,8 +48,9 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
     FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
-    FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_planning_upper_speed_limit = 20.0;
 
+    FLAGS_enable_scenario_pull_over = false;
     FLAGS_enable_scenario_stop_sign = false;
     FLAGS_enable_scenario_traffic_light = false;
     FLAGS_enable_rss_info = false;
@@ -81,7 +82,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -106,7 +107,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -132,26 +133,26 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   const auto& stop_sign_status =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
 
-  usleep(1000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // STOP stage
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningContext content
   const auto& stop_sign_status_2 =
-      PlanningContext::Instance()->planning_status().stop_sign();
+      injector_->planning_context()->planning_status().stop_sign();
   EXPECT_EQ(stop_sign_status_2.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status_2.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status_2.wait_for_obstacle_id_size(), 0);
 }
 
 /*
- * kee_clear: keep clear zone clear
+ * keep_clear: keep clear zone clear
  * bag: 2018-05-22-13-59-27/2018-05-22-14-09-29_10.bag
  * decision: not stopped by KEEP_CLEAR
  */
@@ -171,7 +172,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 }
 
 /*
- * kee_clear: vehicle inside KEEP Clear zone, with speed and BLOCKING
+ * keep_clear: vehicle inside KEEP Clear zone, with speed and BLOCKING
  * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
  * decision: STOP
  */
@@ -191,7 +192,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
 }
 
 /*
- * kee_clear: vehicle inside KEEP Clear zone, with speed and NOT BLOCKING
+ * keep_clear: vehicle inside KEEP Clear zone, with speed and NOT BLOCKING
  * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
  * decision: CRUISE
  */
@@ -250,7 +251,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value
-  auto* crosswalk_status = PlanningContext::Instance()
+  auto* crosswalk_status = injector_->planning_context()
                                ->mutable_planning_status()
                                ->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
@@ -267,7 +268,8 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   double wait_time = stop_timeout + 0.5;
   for (auto& stop_time : *crosswalk_status->mutable_stop_time()) {
     if (stop_time.obstacle_id() == "11652") {
-      stop_time.set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
+      stop_time.set_stop_timestamp_sec(Clock::NowInSeconds() -
+                                       wait_time);
     }
   }
 

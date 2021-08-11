@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <assert.h>
 #include <algorithm>
+#include <cassert>
 #include <vector>
 
 #include "cyber/common/log.h"

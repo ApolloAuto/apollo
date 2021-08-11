@@ -21,15 +21,14 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
-#include "gtest/gtest.h"
-#include "third_party/json/json.hpp"
-
 #include "cyber/common/file.h"
+#include "gtest/gtest.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
+#include "nlohmann/json.hpp"
 
 namespace apollo {
 namespace relative_map {
@@ -92,11 +91,13 @@ bool GenerateNavigationInfo(
 class NavigationLaneTest : public testing::Test {
  public:
   virtual void SetUp() {
+    vehicle_state_provider_ = std::make_shared<VehicleStateProvider>();
     RelativeMapConfig config;
     EXPECT_TRUE(cyber::common::GetProtoFromFile(
         FLAGS_relative_map_config_filename, &config));
 
     navigation_lane_.SetConfig(config.navigation_lane());
+    navigation_lane_.SetVehicleStateProvider(vehicle_state_provider_.get());
     map_param_ = config.map_param();
     navigation_lane_.SetDefaultWidth(map_param_.default_left_width(),
                                      map_param_.default_right_width());
@@ -109,7 +110,8 @@ class NavigationLaneTest : public testing::Test {
         data_file_dir_ + "localization_info.pb.txt", &localization));
     EXPECT_TRUE(cyber::common::GetProtoFromFile(
         data_file_dir_ + "chassis_info.pb.txt", &chassis));
-    VehicleStateProvider::Instance()->Update(localization, chassis);
+
+    vehicle_state_provider_->Update(localization, chassis);
   }
 
  protected:
@@ -118,6 +120,7 @@ class NavigationLaneTest : public testing::Test {
   MapGenerationParam map_param_;
   std::vector<std::string> navigation_line_filenames_;
   std::string data_file_dir_;
+  std::shared_ptr<VehicleStateProvider> vehicle_state_provider_ = nullptr;
 };
 
 TEST_F(NavigationLaneTest, GenerateOneLaneMap) {

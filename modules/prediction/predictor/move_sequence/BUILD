@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,9 +19,7 @@ cc_library(
 cc_test(
     name = "move_sequence_predictor_test",
     size = "small",
-    srcs = [
-        "move_sequence_predictor_test.cc",
-    ],
+    srcs = ["move_sequence_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

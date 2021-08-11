@@ -1,15 +1,12 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "kalman_motion_fusion",
-    srcs = [
-        "kalman_motion_fusion.cc",
-    ],
-    hdrs = [
-        "kalman_motion_fusion.h",
-    ],
+    srcs = ["kalman_motion_fusion.cc"],
+    hdrs = ["kalman_motion_fusion.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
@@ -26,12 +23,10 @@ cc_library(
 cc_test(
     name = "kalman_motion_fusion_test",
     size = "small",
-    srcs = [
-        "kalman_motion_fusion_test.cc",
-    ],
+    srcs = ["kalman_motion_fusion_test.cc"],
     deps = [
         ":kalman_motion_fusion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

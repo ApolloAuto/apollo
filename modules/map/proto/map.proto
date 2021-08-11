@@ -14,6 +14,7 @@ import "modules/map/proto/map_yield_sign.proto";
 import "modules/map/proto/map_road.proto";
 import "modules/map/proto/map_parking_space.proto";
 import "modules/map/proto/map_pnc_junction.proto";
+import "modules/map/proto/map_rsu.proto";
 
 // This message defines how we project the ellipsoidal Earth surface to a plane.
 message Projection {
@@ -53,4 +54,5 @@ message Map {
   repeated Road road = 11;
   repeated ParkingSpace parking_space = 12;
   repeated PNCJunction pnc_junction = 13;
+  repeated RSU rsu = 14;
 }

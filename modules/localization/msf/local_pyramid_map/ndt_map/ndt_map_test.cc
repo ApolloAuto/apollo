@@ -16,11 +16,13 @@
 
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
 
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
+
+#include "absl/strings/str_cat.h"
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
@@ -42,7 +44,7 @@ TEST(MapNdtTestSuite, matrix) {
       "/apollo/modules/localization/msf/local_map/test_data/ndt_map/map_data";
   EXPECT_TRUE(apollo::cyber::common::EnsureDirectory(map_base_folder));
 
-  std::vector<Eigen::Affine3d> pcd_poses;
+  ::apollo::common::EigenAffine3dVec pcd_poses;
   std::vector<double> time_stamps;
   std::vector<unsigned int> pcd_indices;
   velodyne::LoadPcdPoses(pose_files, &pcd_poses, &time_stamps, &pcd_indices);
@@ -75,8 +77,8 @@ TEST(MapNdtTestSuite, matrix) {
   ndt_map.SetMapFolderPath(map_base_folder);
 
   for (unsigned int frame_idx = 0; frame_idx < pcd_poses.size(); ++frame_idx) {
-    const std::string pcd_file_path = apollo::common::util::StrCat(
-        pcd_folder, "/", pcd_indices[frame_idx], ".pcd");
+    const std::string pcd_file_path =
+        absl::StrCat(pcd_folder, "/", pcd_indices[frame_idx], ".pcd");
     velodyne::VelodyneFrame velodyne_frame;
     velodyne::LoadPcds(pcd_file_path, pcd_indices[frame_idx],
                        pcd_poses[frame_idx], &velodyne_frame, false);

@@ -17,17 +17,15 @@
 /**
  * @file
  **/
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include <string>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -41,7 +39,7 @@ namespace scenario {
 namespace stop_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageCreep::Process(
@@ -102,11 +100,6 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
                            wait_time, timeout_sec)) {
     return FinishStage();
   }
-
-  // set param for PROCEED_WITH_CAUTION_SPEED
-  // dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER))
-  //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-  //                                      stop_sign_end_s);
 
   return Stage::RUNNING;
 }

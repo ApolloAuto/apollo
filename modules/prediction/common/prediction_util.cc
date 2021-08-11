@@ -30,10 +30,6 @@ double Normalize(const double value, const double mean, const double std) {
   return (value - mean) / (std + eps);
 }
 
-double Sigmoid(const double value) {
-  return 1.0 / (1.0 + std::exp(-1.0 * value));
-}
-
 double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
 
 std::vector<double> Softmax(const std::vector<double>& value, bool use_exp) {

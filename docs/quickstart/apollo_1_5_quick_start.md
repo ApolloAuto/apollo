@@ -13,7 +13,7 @@ This quick start focuses on Apollo 1.5 new features. For general Apollo concepts
     Use your favorite browser to access HMI web service in your host machine browser with URL http://localhost:8887
 
 4. Select Vehicle and Map
-    
+
     You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/hmi/conf/config.pb.txt).
 
     *Note: It's also possible to change profile on the right panel of HMI, but just remember to click "Reset All" on the top-right corner to restart the system.*

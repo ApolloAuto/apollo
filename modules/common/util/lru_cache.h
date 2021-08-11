@@ -17,8 +17,8 @@
 #pragma once
 
 #include <iostream>
+#include <map>
 #include <mutex>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -32,10 +32,7 @@ struct Node {
   V val;
   Node* prev;
   Node* next;
-  Node() : prev(nullptr), next(nullptr) {
-    key = {};
-    val = {};
-  }
+  Node() : prev(nullptr), next(nullptr) {}
 
   template <typename VV>
   Node(const K& key, VV&& val)
@@ -45,20 +42,16 @@ struct Node {
 template <class K, class V>
 class LRUCache {
  public:
-  LRUCache() : capacity_(kDefaultCapacity), map_(0), head_(), tail_() {
-    Init();
-  }
-
-  explicit LRUCache(const size_t capacity)
-      : capacity_(capacity), map_(0), head_(), tail_() {
+  explicit LRUCache(const size_t capacity = kDefaultCapacity)
+      : capacity_(capacity), head_(), tail_() {
     Init();
   }
 
   ~LRUCache() { Clear(); }
 
-  void GetCache(std::unordered_map<K, V>* cache) {
+  void GetCache(std::map<K, V>* cache) {
     for (auto it = map_.begin(); it != map_.end(); ++it) {
-      cache->operator[](it->first) = it->second.val;
+      cache->emplace(it->first, it->second.val);
     }
   }
 
@@ -156,6 +149,13 @@ class LRUCache {
     return nullptr;
   }
 
+  Node<K, V>* Last() {
+    if (size()) {
+      return tail_.prev;
+    }
+    return nullptr;
+  }
+
   bool Contains(const K& key) { return map_.find(key) != map_.end(); }
 
   bool Prioritize(const K& key) {
@@ -173,12 +173,29 @@ class LRUCache {
     Init();
   }
 
+  bool Remove(const K& key) {
+    if (!Contains(key)) {
+      return false;
+    }
+    auto* node = &map_[key];
+    Detach(node);
+    return true;
+  }
+
+  bool ChangeCapacity(const size_t capacity) {
+    if (size() > capacity) {
+      return false;
+    }
+    capacity_ = capacity;
+    return true;
+  }
+
  private:
   static constexpr size_t kDefaultCapacity = 10;
 
   const size_t capacity_;
   size_t size_;
-  std::unordered_map<K, Node<K, V>> map_;
+  std::map<K, Node<K, V>> map_;
   Node<K, V> head_;
   Node<K, V> tail_;
 
@@ -188,6 +205,7 @@ class LRUCache {
     tail_.prev = &head_;
     tail_.next = nullptr;
     size_ = 0;
+    map_.clear();
   }
 
   void Detach(Node<K, V>* node) {

@@ -20,23 +20,25 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
 namespace apollo {
 namespace planning {
 class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  public:
-  explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
+  OpenSpaceTrajectoryPartition(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   ~OpenSpaceTrajectoryPartition() = default;
 
@@ -62,6 +64,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                            std::vector<TrajGearPair>* partitioned_trajectories);
 
   void LoadTrajectoryPoint(const common::TrajectoryPoint& trajectory_point,
+                           const bool is_trajectory_last_point,
                            const canbus::Chassis::GearPosition& gear,
                            common::math::Vec2d* last_pos_vec,
                            double* distance_s,

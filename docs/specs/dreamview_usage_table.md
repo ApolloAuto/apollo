@@ -1,7 +1,7 @@
 # Dreamview Usage Table
 
-Dreamview is a web application that, 
-1. visualizes the current output of relevant autonomous driving modules, e.g. planning trajectory, car localization, chassis status, etc. 
+Dreamview is a web application that,
+1. visualizes the current output of relevant autonomous driving modules, e.g. planning trajectory, car localization, chassis status, etc.
 2. provides human-machine interface for users to view hardware status, turn on/off of modules, and start the autonomous driving car.
 3. provides debugging tools, such as PnC Monitor to efficiently track module issues.
 
@@ -11,16 +11,16 @@ The application layout is divided into several regions: header, sidebar, main vi
 
 ### Header
 The Header has 3 drop-downs that can be set as shown:
-![](images/dreamview_usage_table/header.png) 
+![](images/dreamview_usage_table/header.png)
 
 The Co-Driver switch is used to detect disengagement event automatically. Once detected, Dreamview will display a pop-up of the data recorder window for the co-driver to enter a new drive event.
 
 Depending on the mode chosen from the mode selector, the corresponding modules and commands, defined in [hmi.conf](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/conf/hmi.conf), will be presented in the **Module Controller**, and **Quick Start**, respectively.
 
-Note: navigation mode is for the purpose of the low-cost feature introduced in Apollo 2.5. Under this mode, Baidu (or Google) Map presents the absolute position of the ego-vehicle, while the main view has all objects and map elements presented in relative positions to the ego-vehicle. 
+Note: navigation mode is for the purpose of the low-cost feature introduced in Apollo 2.5. Under this mode, Baidu (or Google) Map presents the absolute position of the ego-vehicle, while the main view has all objects and map elements presented in relative positions to the ego-vehicle.
 
 ### Sidebar and Tool View
-![](images/dreamview_usage_table/sidebar.png) 
+![](images/dreamview_usage_table/sidebar.png)
 Sidebar panel controls what is displayed in the tool view described below:
 
 ### Tasks
@@ -38,12 +38,12 @@ All the tasks that you could perform in DreamView:
 * **Console**: monitor messages from the Apollo platform
 ### Module Controller
 A panel to view the hardware status and turn the modules on/off
-![](images/dreamview_usage_table/module_controller.png) 
+![](images/dreamview_usage_table/module_controller.png)
 
 
 ### Layer Menu
 A toggle menu for visual elements displays.
-![](images/dreamview_usage_table/layer_menu.png) 
+![](images/dreamview_usage_table/layer_menu.png)
 
 ### Route Editing
 A visual tool to plan a route before sending the routing request to the Routing module
@@ -51,38 +51,38 @@ A visual tool to plan a route before sending the routing request to the Routing 
 
 ### Data Recorder
 A panel to report issues to drive event topic ("/apollo/drive_event") to rosbag.
-![](images/dreamview_usage_table/data_recorder.png)  
+![](images/dreamview_usage_table/data_recorder.png)
 
 ### Default Routing
-List of predefined routes or single points, known as point of interest (POI). 
+List of predefined routes or single points, known as point of interest (POI).
 
-![](images/dreamview_usage_table/default_routing.png) 
+![](images/dreamview_usage_table/default_routing.png)
 
-If route editing is on, routing point(s) can be added visually on the map. 
+If route editing is on, routing point(s) can be added visually on the map.
 
 If route editing is off, clicking a desired POI will send a routing request to the server. If the selected POI contains only a point, the start point of the routing request is the current position of the autonomous car; otherwise, the start position is the first point from the desired route.
 
-To edit POIs, see [default_end_way_point.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt) file under the directory of the Map. For example, if the map selected from the map selector is "Demo", then [default_end_way_point.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/map/data/demo/default_end_way_point.txt) is located under `modules/map/data/demo`.
+To edit POIs, see [default_end_way_point.txt](../../modules/map/data/demo/default_end_way_point.txt) file under the directory of the Map. For example, if the map selected from the map selector is "Demo", then [default_end_way_point.txt](../../modules/map/data/demo/default_end_way_point.txt) is located under `modules/map/data/demo`.
 
-### Main view: 
+### Main view:
 Main view animated 3D computer graphics in a web browser.
 
-![](images/dreamview_usage_table/mainview.png) 
+![](images/dreamview_usage_table/mainview.png)
 
 Elements in the main view are listed in the table below:
 
 | Visual Element                           | Depiction Explanation                    |
 | ---------------------------------------- | ---------------------------------------- |
 | ![](images/dreamview_usage_table/0clip_image002.png) | <ul><li>The autonomous car    </li></ul>                  |
-| ![](images/dreamview_usage_table/0clip_image004.png) | <ul><li>The wheel steering percentage.</li> <li>The status of left/right turn signals</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image004.png) | <ul><li>The wheel steering percentage.</li> <li>The status of left/right turn signals (In an emergency situation, both signals will be on.)</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image003.png) | <ul><li>  The traffic signal detected     </li></ul>          |
 | ![](images/dreamview_usage_table/0clip_image005.png) |<ul><li>  The driving mode (AUTO/DISENGAGED/MANUAL/etc.) </li></ul>  |
-| ![](images/dreamview_usage_table/0clip_image006.png) | <ul><li>The driving speed in km/h.</li> <li>The accelerator/brake percentage</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image006.png) | <ul><li>The driving speed in km/h as default. Click on the unit to change the unit.</li> <li>The accelerator/brake percentage</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image026.png) | <ul><li> The  red thick line shows the routing suggestion</li></ul>  |
 | ![](images/dreamview_usage_table/0clip_image038.png) |<ul><li>  Nudge object decision -- the orange zone indicates the area to avoid </li></ul> |
 | ![](images/dreamview_usage_table/0clip_image062.png) |<ul><li>  The  green thick curvy band indicates the planned trajectory </li></ul> |
 
- 
+
 #### Obstacles
 
 | Visual Element                           | Depiction Explanation                    |
@@ -124,8 +124,8 @@ When a yield decision is made based on the "Right of Way" laws at a stop-sign in
 
 ##### Stop reasons
 
-When a STOP decision fence is shown, the reason to stop is displayed on the right side of the stop icon. Possible reasons and the corresponding icons are: 
- 
+When a STOP decision fence is shown, the reason to stop is displayed on the right side of the stop icon. Possible reasons and the corresponding icons are:
+
 | Visual Element                           | Depiction Explanation                    |
 | ---------------------------------------- | ---------------------------------------- |
 | ![](images/dreamview_usage_table/0clip_image040.png) | <ul><li> **Clear-zone in front** </li></ul>|
@@ -179,15 +179,15 @@ To view the monitor:
 The Planning/Control tab from the monitor plots various graphs to reflect the internal states of its modules.
 
 #### Customizable Graphs for Planning Module
-[planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L180) is a protobuf that stores debugging information, which is processed by dreamview server and send to dreamview client to help engineers debug. For users who want to plot their own graphs for new planning algorithms:
+[planning_internal.proto](../../modules/planning/proto/planning_internal.proto#L180) is a protobuf that stores debugging information, which is processed by dreamview server and send to dreamview client to help engineers debug. For users who want to plot their own graphs for new planning algorithms:
 1. Fill in the information of your "chart" defined in planning_internal.proto.
-2. X/Y axis: [**chart.proto** ](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include 
+2. X/Y axis: [**chart.proto** ](../../modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include
     * min/max: minimum/maximum number for the scale
     * label_string: axis label
     * legend_display: to show or hide a chart legend.
         <img src="images/dreamview_usage_table/pncmonitor_options.png" width="600" height="300" />
-3. Dataset: 
-    * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto): 
+3. Dataset:
+    * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](../../modules/dreamview/proto/chart.proto):
         * Line:
 
             <img src="images/dreamview_usage_table/pncmonitor_line.png" width="600" height="300" />
@@ -197,11 +197,11 @@ The Planning/Control tab from the monitor plots various graphs to reflect the in
         * Car:
 
             <img src="images/dreamview_usage_table/pncmonitor_car.png" width="600" height="300" />
-    
+
     * Label: each dataset must have a unique "Label" to each chart in order to help dreamview identify which dataset to update.
     * Properties: for polygon and line, you can set styles. Dreamview uses **Chartjs.org** for graphs. Below are common ones:
 
-        | Name        | Description                             | Example                 | 
+        | Name        | Description                             | Example                 |
         | ----------- | --------------------------------------- | ----------------------- |
         | color       | The line color                          | rgba(27, 249, 105, 0.5) |
         | borderWidth | The line width                          | 2                       |
@@ -210,10 +210,10 @@ The Planning/Control tab from the monitor plots various graphs to reflect the in
         | showLine    | Whether to draw the line                | true                    |
 
     Refer to https://www.chartjs.org/docs/latest/charts/line.html for more properties.
-4. Sample: You could look into [on_lane_planning.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/on_lane_planning.cc#L562) for a code sample.
+4. Sample: You could look into [on_lane_planning.cc](../../modules/planning/on_lane_planning.cc#L562) for a code sample.
 
 #### Additional Planning Paths
-For users who want to render additional paths on dreamview 3D scene, add the desired paths to the "path" field in [planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L164). These paths will be rendered when PnC Monitor is on:
+For users who want to render additional paths on dreamview 3D scene, add the desired paths to the "path" field in [planning_internal.proto](../../modules/planning/proto/planning_internal.proto#L164). These paths will be rendered when PnC Monitor is on:
 ![](images/dreamview_usage_table/pncmonitor_paths.png)
 
 Dreamview has predefined styles for the first four paths:
@@ -225,7 +225,7 @@ Dreamview has predefined styles for the first four paths:
 | opacity    | 0.65     | 1        | 0.7       | 0.8      |
 | zOffset    | 4        | 7        | 6         | 5        |
 
-If you have more than four paths to render or want to change the styles, edit the planning.pathProperties value in [dreamview/frtonend/dist/parameters.json](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/frontend/dist/parameters.json)
+If you have more than four paths to render or want to change the styles, edit the planning.pathProperties value in [dreamview/frtonend/dist/parameters.json](../../modules/dreamview/frontend/dist/parameters.json)
 .
 
 ### Latency graph

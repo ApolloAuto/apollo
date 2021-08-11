@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,10 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import yaml
-import shlex
 import re
+import shlex
+import sys
+
+import yaml
+
 
 MAX_CAN_ID = 4096000000  # 2048
 
@@ -106,7 +108,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                     if len(protocol) != 0 and len(protocol["vars"]) != 0 and len(
                             protocol["vars"]) < 65:
                         protocols[protocol["id"]] = protocol
-                        #print protocol
+                        # print protocol
                         protocol = {}
 
             if len(items) == 5 and items[0] == "CM_" and items[1] == "SG_":
@@ -138,7 +140,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if var["name"].lower() in cpp_reserved_key_words:
                     var["name"] = "MY_" + var["name"]
 
-        #print protocols
+        # print protocols
         config = {}
         config["car_type"] = car_type
         config["protocols"] = protocols
@@ -151,20 +153,20 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         report_protocol_num =\
             len([key for key in protocols.keys()
                  if protocols[key]["protocol_type"] == "report"])
-        print "Extract car_type:%s's protocol meta info to file: %s" % (
-            car_type.upper(), out_file)
-        print "Total parsed protocols: %d" % len(protocols)
-        print "Control protocols: %d" % control_protocol_num
-        print "Report protocols: %d" % report_protocol_num
+        print("Extract car_type:%s's protocol meta info to file: %s" % (
+            car_type.upper(), out_file))
+        print("Total parsed protocols: %d" % len(protocols))
+        print("Control protocols: %d" % control_protocol_num)
+        print("Report protocols: %d" % report_protocol_num)
         return True
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0]
+        print("Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     dbc_file = conf["dbc_file"]
     protocol_conf_file = conf["protocol_conf"]
     car_type = conf["car_type"]

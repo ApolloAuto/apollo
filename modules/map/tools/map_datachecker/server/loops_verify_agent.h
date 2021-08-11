@@ -15,10 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <grpc++/grpc++.h>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include "grpc++/grpc++.h"
 
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
@@ -32,7 +33,7 @@ enum class LoopsVerifyAgentState { IDLE, RUNNING };
 class LoopsVerifyAgent {
  public:
   LoopsVerifyAgent(
-      std::shared_ptr<JSonConf> sp_conf,
+      std::shared_ptr<JsonConf> sp_conf,
       std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent);
   grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
                                   LoopsVerifyRequest *request,
@@ -59,7 +60,7 @@ class LoopsVerifyAgent {
   LoopsVerifyAgentState GetState();
 
  private:
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent_ = nullptr;
   std::shared_ptr<LapsChecker> sp_laps_checker_ = nullptr;
   LoopsVerifyAgentState state_;

@@ -23,17 +23,18 @@
 #include <memory>
 #include <string>
 
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "pcl/point_cloud.h"
-#include "pcl/point_types.h"
 
 /**
  * @namespace apollo::dreamview
@@ -53,8 +54,11 @@ class PointCloudUpdater {
    * @brief Constructor with the websocket handler.
    * @param websocket Pointer of the websocket handler that has been attached to
    * the server.
+   * @param simulationworldupdater pointer
    */
-  explicit PointCloudUpdater(WebSocketHandler *websocket);
+  PointCloudUpdater(WebSocketHandler *websocket,
+                    SimulationWorldUpdater *sim_world_updater);
+
   ~PointCloudUpdater();
 
   static void LoadLidarHeight(const std::string &file_path);
@@ -83,6 +87,8 @@ class PointCloudUpdater {
   void UpdateLocalizationTime(
       const std::shared_ptr<apollo::localization::LocalizationEstimate>
           &localization);
+  pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertPCLPointCloud(
+      const std::shared_ptr<drivers::PointCloud> &point_cloud);
 
   constexpr static float kDefaultLidarHeight = 1.91f;
 
@@ -102,10 +108,10 @@ class PointCloudUpdater {
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Reader<drivers::PointCloud>> point_cloud_reader_;
-
   double last_point_cloud_time_ = 0.0;
   double last_localization_time_ = 0.0;
+  SimulationWorldUpdater *simworld_updater_;
+  bool enable_voxel_filter_ = false;
 };
-
 }  // namespace dreamview
 }  // namespace apollo

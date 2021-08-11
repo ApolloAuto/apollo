@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "modules/common/util/string_util.h"
+#include "absl/strings/str_cat.h"
 #include "modules/monitor/common/monitor_manager.h"
 
 DEFINE_string(functional_safety_monitor_name, "FunctionalSafetyMonitor",
@@ -34,8 +34,8 @@ namespace {
 bool IsSafe(const std::string& name, const ComponentStatus& status) {
   if (status.status() == ComponentStatus::ERROR ||
       status.status() == ComponentStatus::FATAL) {
-    MonitorManager::Instance()->LogBuffer().ERROR(apollo::common::util::StrCat(
-        name, " triggers safe mode: ", status.message()));
+    MonitorManager::Instance()->LogBuffer().ERROR(
+        absl::StrCat(name, " triggers safe mode: ", status.message()));
     return false;
   }
   return true;

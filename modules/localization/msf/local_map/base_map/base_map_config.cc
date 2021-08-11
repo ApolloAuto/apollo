@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
-#include <boost/foreach.hpp>
+#include <algorithm>
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -75,7 +75,6 @@ void BaseMapConfig::CreateXml(boost::property_tree::ptree* config) const {
   for (size_t i = 0; i < map_datasets_.size(); ++i) {
     config->add("map.map_record.datasets.dataset", map_datasets_[i]);
   }
-  return;
 }
 
 void BaseMapConfig::LoadXml(const boost::property_tree::ptree& config) {
@@ -91,18 +90,19 @@ void BaseMapConfig::LoadXml(const boost::property_tree::ptree& config) {
   map_is_compression_ = config.get<bool>("map.map_config.compression");
   map_ground_height_offset_ =
       config.get<float>("map.map_runtime.map_ground_height_offset");
-  BOOST_FOREACH (const boost::property_tree::ptree::value_type& v,  // NOLINT
-                 config.get_child("map.map_config.resolutions")) {
-    map_resolutions_.push_back(
-        static_cast<float>(atof(v.second.data().c_str())));
-    AINFO << "Resolution: " << v.second.data();
-  }
-  BOOST_FOREACH (const boost::property_tree::ptree::value_type& v,  // NOLINT
-                 config.get_child("map.map_record.datasets")) {
-    map_datasets_.push_back(v.second.data());
-    AINFO << "Dataset: " << v.second.data();
-  }
-  return;
+  const auto& resolutions = config.get_child("map.map_config.resolutions");
+  std::for_each(resolutions.begin(), resolutions.end(),
+                [this](const boost::property_tree::ptree::value_type& v) {
+                  map_resolutions_.push_back(
+                      static_cast<float>(atof(v.second.data().c_str())));
+                  AINFO << "Resolution: " << v.second.data();
+                });
+  const auto& datasets = config.get_child("map.map_record.datasets");
+  std::for_each(datasets.begin(), datasets.end(),
+                [this](const boost::property_tree::ptree::value_type& v) {
+                  map_datasets_.push_back(v.second.data());
+                  AINFO << "Dataset: " << v.second.data();
+                });
 }
 
 void BaseMapConfig::ResizeMapRange() {

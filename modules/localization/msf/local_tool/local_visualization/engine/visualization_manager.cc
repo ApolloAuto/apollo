@@ -17,9 +17,10 @@
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 
 #include <algorithm>
+#include <thread>
 
-#include "boost/date_time/posix_time/posix_time.hpp"
-#include "boost/filesystem.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem.hpp>
 
 #include "cyber/common/log.h"
 
@@ -250,7 +251,7 @@ bool IntepolationMessageBuffer<MessageType>::WaitMessageBufferOk(
 
   while (last_iter->first < timestamp) {
     AINFO << "Waiting new message!";
-    usleep(5000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
     pthread_mutex_lock(&(this->buffer_mutex_));
     msg_list->clear();
     std::copy(this->msg_list_.begin(), this->msg_list_.end(),
@@ -367,7 +368,7 @@ void VisualizationManager::StopVisualization() {
 
 void VisualizationManager::DoVisualize() {
   while (!(stop_visualization_.load())) {
-    usleep(10000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     // if (!lidar_frame_buffer_.IsEmpty()) {
     if (lidar_frame_buffer_.BufferSize() > 5) {
       LidarVisFrame lidar_frame;
@@ -434,11 +435,9 @@ void VisualizationManager::DoVisualize() {
                           lidar_frame.frame_id);
       }
 
-      std::vector<LocalizatonInfo> loc_infos;
-      loc_infos.push_back(lidar_loc_info);
-      loc_infos.push_back(fusion_loc_info);
-      loc_infos.push_back(gnss_loc_info);
-      visual_engine_.Visualize(loc_infos, lidar_frame.pt3ds);
+      ::apollo::common::EigenVector<LocalizatonInfo> loc_infos{
+          lidar_loc_info, fusion_loc_info, gnss_loc_info};
+      visual_engine_.Visualize(std::move(loc_infos), lidar_frame.pt3ds);
     }
   }
 }

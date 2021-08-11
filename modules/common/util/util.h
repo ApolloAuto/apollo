@@ -26,61 +26,15 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
-#include "google/protobuf/util/message_differencer.h"
-
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/vec2d.h"
-
-// The helper function "std::make_unique()" is defined since C++14.
-// The definition of "std::make_unique()" borrowed from C++14 is given here
-// so that it can be used in C++11.
-#if __cplusplus == 201103L
-namespace std {
-
-template <typename _Tp>
-struct _MakeUniq {
-  typedef unique_ptr<_Tp> __single_object;
-};
-
-template <typename _Tp>
-struct _MakeUniq<_Tp[]> {
-  typedef unique_ptr<_Tp[]> __array;
-};
-
-template <typename _Tp, size_t _Bound>
-struct _MakeUniq<_Tp[_Bound]> {
-  struct __invalid_type {};
-};
-
-// std::make_unique for single objects
-template <typename _Tp, typename... _Args>
-inline typename _MakeUniq<_Tp>::__single_object make_unique(_Args&&... __args) {
-  return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-}
-
-// Alias template for remove_extent
-template <typename _Tp>
-using remove_extent_t = typename remove_extent<_Tp>::type;
-
-// std::make_unique for arrays of unknown bound
-template <typename _Tp>
-inline typename _MakeUniq<_Tp>::__array make_unique(size_t __num) {
-  return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__num]());
-}
-
-// Disable std::make_unique for arrays of known bound
-template <typename _Tp, typename... _Args>
-inline typename _MakeUniq<_Tp>::__invalid_type make_unique(_Args&&...) = delete;
-}  // namespace std
-#endif
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::util
@@ -109,31 +63,7 @@ bool WithinBound(T start, T end, T value) {
   return value >= start && value <= end;
 }
 
-/**
- * @brief create a SL point
- * @param s the s value
- * @param l the l value
- * @return a SLPoint instance
- */
-SLPoint MakeSLPoint(const double s, const double l);
-
-template <typename T>
-common::math::Vec2d MakeVec2d(const T& t) {
-  return common::math::Vec2d(t.x(), t.y());
-}
-
-PointENU MakePointENU(const double x, const double y, const double z);
-
 PointENU operator+(const PointENU enu, const math::Vec2d& xy);
-
-PointENU MakePointENU(const math::Vec2d& xy);
-
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da);
-
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa);
 
 /**
  * uniformly slice a segment [start, end] to num + 1 pieces
@@ -153,32 +83,6 @@ void uniform_slice(const T start, const T end, uint32_t num,
     sliced->at(i) = s;
   }
   sliced->at(num) = end;
-}
-
-template <typename Container>
-typename Container::value_type MaxElement(const Container& elements) {
-  return *std::max_element(elements.begin(), elements.end());
-}
-
-template <typename Container>
-typename Container::value_type MinElement(const Container& elements) {
-  return *std::min_element(elements.begin(), elements.end());
-}
-
-template <typename T>
-std::unordered_set<T> Intersection(const std::unordered_set<T>& s1,
-                                   const std::unordered_set<T>& s2) {
-  if (s1.size() < s2.size()) {
-    std::unordered_set<T> result;
-    for (const auto& v : s1) {
-      if (s2.count(v) > 0) {
-        result.insert(v);
-      }
-    }
-    return result;
-  } else {
-    return intersection(s2, s1);
-  }
 }
 
 /**
@@ -203,7 +107,7 @@ double DistanceXY(const U& u, const V& v) {
  */
 template <typename U, typename V>
 bool SamePointXY(const U& u, const V& v) {
-  constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
+  static constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
   return (u.x() - v.x()) * (u.x() - v.x()) < kMathEpsilonSqr &&
          (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
 }
@@ -211,48 +115,6 @@ bool SamePointXY(const U& u, const V& v) {
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
                                             const double w1, const double w2);
-
-// a wrapper template function for remove_if (notice that remove_if cannot
-// change the Container size)
-template <class Container, class F>
-void erase_where(Container& c, F&& f) {  // NOLINT
-  c.erase(std::remove_if(c.begin(), c.end(), std::forward<F>(f)), c.end());
-}
-
-// a wrapper template function for remove_if on associative containers
-template <class Container, class F>
-void erase_map_where(Container& c, F&& f) {  // NOLINT
-  for (auto it = c.begin(); it != c.end();) {
-    if (f(*it)) {
-      it = c.erase(it);
-    } else {
-      ++it;
-    }
-  }
-}
-
-template <typename T>
-void QuaternionToRotationMatrix(const T* quat, T* R) {
-  T x2 = quat[0] * quat[0];
-  T xy = quat[0] * quat[1];
-  T rx = quat[3] * quat[0];
-  T y2 = quat[1] * quat[1];
-  T yz = quat[1] * quat[2];
-  T ry = quat[3] * quat[1];
-  T z2 = quat[2] * quat[2];
-  T zx = quat[2] * quat[0];
-  T rz = quat[3] * quat[2];
-  T r2 = quat[3] * quat[3];
-  R[0] = r2 + x2 - y2 - z2;  // fill diagonal terms
-  R[4] = r2 - x2 + y2 - z2;
-  R[8] = r2 - x2 - y2 + z2;
-  R[3] = 2 * (xy + rz);  // fill off diagonal terms
-  R[6] = 2 * (zx - ry);
-  R[7] = 2 * (yz + rx);
-  R[1] = 2 * (xy - rz);
-  R[2] = 2 * (zx + ry);
-  R[5] = 2 * (yz - rx);
-}
 
 // Test whether two float or double numbers are equal.
 // ulp: units in the last place.
@@ -296,3 +158,9 @@ template <typename A, typename B>
 std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
   return os << "first: " << p.first << ", second: " << p.second;
 }
+
+#define UNIQUE_LOCK_MULTITHREAD(mutex_type)                         \
+  std::unique_ptr<std::unique_lock<std::mutex>> lock_ptr = nullptr; \
+  if (FLAGS_multithread_run) {                                      \
+    lock_ptr.reset(new std::unique_lock<std::mutex>(mutex_type));   \
+  }

@@ -42,18 +42,21 @@ lat_controller_conf {
   matrix_q: 0.0
   matrix_q: 1.0
   matrix_q: 0.0
-  reverse_matrix_q: 0.5
+  reverse_matrix_q: 0.05
   reverse_matrix_q: 0.0
-  reverse_matrix_q: 0.4
+  reverse_matrix_q: 1.0
   reverse_matrix_q: 0.0
   cutoff_freq: 10
   mean_filter_window_size: 10
   max_iteration: 150
   max_lateral_acceleration: 5.0
-  enable_reverse_leadlag_compensation: false
-  enable_look_ahead_back_control: false
-  lookahead_station: 0.0
-  lookback_station: 0.0
+  enable_reverse_leadlag_compensation: true
+  enable_steer_mrac_control: false
+  enable_look_ahead_back_control: true
+  lookahead_station: 1.4224
+  lookback_station: 2.8448
+  lookahead_station_high_speed: 1.4224
+  lookback_station_high_speed: 2.8448
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0
@@ -104,6 +107,19 @@ lat_controller_conf {
     beta: 1.0
     tau: 0.0
   }
+  steer_mrac_conf {
+    mrac_model_order: 1
+    reference_time_constant: 0.09
+    reference_natural_frequency: 10
+    reference_damping_ratio: 0.9
+    adaption_state_gain: 0.0001
+    adaption_desired_gain: 0.0001
+    adaption_nonlinear_gain: 0.0001
+    adaption_matrix_p: 1.0
+    mrac_saturation_level: 1.0
+    anti_windup_compensation_gain: 0.0001
+    clamping_time_constant: 0.08
+  }
 }
 lon_controller_conf {
   ts: 0.01
@@ -112,7 +128,7 @@ lon_controller_conf {
   speed_controller_input_limit: 2.0
   station_error_limit: 2.0
   preview_window: 20.0
-  standstill_acceleration: -3.0
+  standstill_acceleration: -0.3
   enable_reverse_leadlag_compensation: false
   station_pid_conf {
     integrator_enable: false
@@ -124,7 +140,7 @@ lon_controller_conf {
   low_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.3
-    kp: 0.5
+    kp: 2.0
     ki: 0.3
     kd: 0.0
   }
@@ -135,12 +151,13 @@ lon_controller_conf {
     ki: 0.3
     kd: 0.0
   }
-  switch_speed: 2.0
+  switch_speed: 3.0
+  switch_speed_window: 1.0
   reverse_station_pid_conf {
-    integrator_enable: false
+    integrator_enable: true
     integrator_saturation_level: 0.5
     kp: 0.4
-    ki: 0.2
+    ki: 0.1
     kd: 0.0
   }
   reverse_speed_pid_conf {
@@ -6662,109 +6679,124 @@ mpc_controller_conf {
   mass_rl: 520
   mass_rr: 520
   eps: 0.01
-  matrix_q: 0.05
+  matrix_q: 3.0
   matrix_q: 0.0
-  matrix_q: 1.0
+  matrix_q: 35
   matrix_q: 0.0
-  matrix_q: 0.0
-  matrix_q: 0.0
-  matrix_r: 1.0
+  matrix_q: 50.0
+  matrix_q: 10.0
+  matrix_r: 3.25
   matrix_r: 1.0
   cutoff_freq: 10
   mean_filter_window_size: 10
   max_iteration: 150
   max_lateral_acceleration: 5.0
-  standstill_acceleration: -3.0
+  standstill_acceleration: -0.3
   brake_minimum_action: 0.0
   throttle_minimum_action: 0.0
   enable_mpc_feedforward_compensation: false
-  unconstrained_control_diff_limit: 5.0
   lat_err_gain_scheduler {
     scheduler {
-      speed: 4.0
+      speed: 2.5
       ratio: 1.0
     }
     scheduler {
-      speed: 8.0
-      ratio: 0.6
+      speed: 5.0
+      ratio: 1.0
     }
     scheduler {
-      speed: 12.0
-      ratio: 0.2
+      speed: 10.0
+      ratio: 0.4
+    }
+    scheduler {
+      speed: 15.0
+      ratio: 0.3
     }
     scheduler {
       speed: 20.0
-      ratio: 0.1
+      ratio: 0.2
     }
     scheduler {
       speed: 25.0
-      ratio: 0.05
+      ratio: 0.1
     }
   }
   heading_err_gain_scheduler {
     scheduler {
-      speed: 4.0
+      speed: 2.5
       ratio: 1.0
     }
     scheduler {
-      speed: 8.0
-      ratio: 0.6
+      speed: 5.0
+      ratio: 1.0
     }
     scheduler {
-      speed: 12.0
+      speed: 10.0
+      ratio: 0.5
+    }
+    scheduler {
+      speed: 15.0
       ratio: 0.4
     }
     scheduler {
       speed: 20.0
-      ratio: 0.2
+      ratio: 0.35
     }
     scheduler {
       speed: 25.0
-      ratio: 0.1
+      ratio: 0.35
     }
   }
   feedforwardterm_gain_scheduler {
     scheduler {
-      speed: 4.0
-      ratio: 1.0
+      speed: 2.5
+      ratio: 0.7
     }
     scheduler {
-      speed: 8.0
-      ratio: 0.6
+      speed: 5.0
+      ratio: 0.05
     }
     scheduler {
-      speed: 12.0
-      ratio: 0.4
+      speed: 10.0
+      ratio: 0.0
+    }
+    scheduler {
+      speed: 15.0
+      ratio: 0.0
     }
     scheduler {
       speed: 20.0
-      ratio: 0.2
+      ratio: 0.0
     }
     scheduler {
       speed: 25.0
-      ratio: 0.1
+      ratio: 0.0
     }
   }
   steer_weight_gain_scheduler {
     scheduler {
-      speed: 4.0
+      speed: 2.5
       ratio: 1.0
     }
     scheduler {
-      speed: 8.0
-      ratio: 0.6
+      speed: 5.0
+      ratio: 1.0
     }
     scheduler {
-      speed: 12.0
-      ratio: 0.4
+      speed: 10.0
+      ratio: 1.1
+    }
+    scheduler {
+      speed: 15.0
+      ratio: 1.1
     }
     scheduler {
       speed: 20.0
-      ratio: 0.2
+      ratio: 1.35
     }
     scheduler {
       speed: 25.0
-      ratio: 0.1
+      ratio: 1.55
     }
   }
   calibration_table {

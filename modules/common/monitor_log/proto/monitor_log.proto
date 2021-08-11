@@ -25,6 +25,8 @@ message MonitorMessageItem {
     ULTRASONIC_RADAR = 17;
     MOBILEYE = 18;
     DELPHI_ESR = 19;
+    STORYTELLING = 20;
+    TASK_MANAGER = 21;
   }
 
   optional MessageSource source = 1 [default = UNKNOWN];

@@ -47,7 +47,9 @@ struct OpenSpaceTrajectoryThreadData {
 
 class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
  public:
-  explicit OpenSpaceTrajectoryProvider(const TaskConfig& config);
+  OpenSpaceTrajectoryProvider(
+      const TaskConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   ~OpenSpaceTrajectoryProvider();
 
@@ -63,7 +65,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   bool IsVehicleNearDestination(const common::VehicleState& vehicle_state,
                                 const std::vector<double>& end_pose,
                                 double rotate_angle,
-                                const Vec2d& translate_origin);
+                                const common::math::Vec2d& translate_origin);
 
   bool IsVehicleStopDueToFallBack(const bool is_on_fallback,
                                   const common::VehicleState& vehicle_state);

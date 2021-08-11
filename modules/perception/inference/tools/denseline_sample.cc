@@ -19,7 +19,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/inference.h"
-#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
@@ -77,13 +76,13 @@ int main(int argc, char **argv) {
         proto_file, weight_file, outputs, inputs, calibrator);
   } else {
     AINFO << "fp32";
-    rt_net = apollo::perception::inference::CreateInferenceByName(
-        "RTNet", proto_file, weight_file, outputs, inputs);
+    rt_net = new apollo::perception::inference::RTNet(proto_file, weight_file,
+                                                      outputs, inputs);
   }
   std::vector<int> shape = {1, 3, height, width};
   std::map<std::string, std::vector<int>> shape_map{{input_blob_name, shape}};
 
-  CHECK(rt_net->Init(shape_map));
+  ACHECK(rt_net->Init(shape_map));
 
   auto input_blob = rt_net->get_blob(input_blob_name);
   std::vector<std::string> image_lists;

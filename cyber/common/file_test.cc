@@ -16,11 +16,12 @@
 
 #include "cyber/common/file.h"
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <vector>
+
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"
 
@@ -72,7 +73,6 @@ TEST(FileTest, file_utils_test) {
   EXPECT_FALSE(DirectoryExists("message.binary"));
 
   EXPECT_FALSE(CopyFile("not_exists_file", "1.txt"));
-  EXPECT_FALSE(CopyFile("message.binary", "/not_exists_file"));
   EXPECT_TRUE(CopyFile("message.binary", "message.binary.copy"));
 
   std::string current_path = GetCurrentPath();

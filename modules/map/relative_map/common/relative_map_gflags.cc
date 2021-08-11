@@ -16,9 +16,6 @@
 
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
-DEFINE_string(relative_map_adapter_config_filename,
-              "/apollo/modules/map/relative_map/conf/adapter.conf",
-              "gflags conf file for relative map");
 DEFINE_string(
     relative_map_config_filename,
     "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",

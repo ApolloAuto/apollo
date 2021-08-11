@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/semantic_map.h"
 
-#include <cmath>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -25,8 +23,8 @@
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -36,10 +34,29 @@
 namespace apollo {
 namespace prediction {
 
+namespace {
+
+bool ValidFeatureHistory(const ObstacleHistory& obstacle_history,
+                         const double curr_base_x, const double curr_base_y) {
+  if (obstacle_history.feature_size() == 0) {
+    return false;
+  }
+
+  double center_x = curr_base_x + FLAGS_base_image_half_range;
+  double center_y = curr_base_y + FLAGS_base_image_half_range;
+
+  const Feature& feature = obstacle_history.feature(0);
+  double diff_x = feature.position().x() - center_x;
+  double diff_y = feature.position().y() - center_y;
+  double distance = std::hypot(diff_x, diff_y);
+  return distance < FLAGS_caution_distance_threshold;
+}
+
+}  // namespace
+
 SemanticMap::SemanticMap() {}
 
 void SemanticMap::Init() {
-  curr_base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   obstacle_id_history_map_.clear();
 }
@@ -52,26 +69,30 @@ void SemanticMap::RunCurrFrame(
   }
 
   ego_feature_ = obstacle_id_history_map.at(FLAGS_ego_vehicle_id).feature(0);
-  // TODO(all): move to somewhere else
   if (!FLAGS_enable_async_draw_base_image) {
     double x = ego_feature_.position().x();
     double y = ego_feature_.position().y();
     curr_base_x_ = x - FLAGS_base_image_half_range;
     curr_base_y_ = y - FLAGS_base_image_half_range;
     DrawBaseMap(x, y, curr_base_x_, curr_base_y_);
-    base_img_.copyTo(curr_base_img_);
+    base_img_.copyTo(curr_img_);
   } else {
-    base_img_.copyTo(curr_base_img_);
+    base_img_.copyTo(curr_img_);
     curr_base_x_ = base_x_;
     curr_base_y_ = base_y_;
     task_future_ = cyber::Async(&SemanticMap::DrawBaseMapThread, this);
+    // This is only for the first frame without base image yet
+    if (!started_drawing_) {
+      started_drawing_ = true;
+      return;
+    }
   }
 
-  if (!base_img_drawn_) {
-    return;
+  // Draw ADC trajectory
+  if (FLAGS_enable_draw_adc_trajectory) {
+    DrawADCTrajectory(cv::Scalar(0, 255, 255),
+                curr_base_x_, curr_base_y_, &curr_img_);
   }
-
-  curr_base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
@@ -94,17 +115,16 @@ void SemanticMap::RunCurrFrame(
 
 void SemanticMap::DrawBaseMap(const double x, const double y,
                               const double base_x, const double base_y) {
-  base_img_drawn_ = false;
   base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
-  common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
+  common::PointENU center_point = common::util::PointFactory::ToPointENU(x, y);
   DrawRoads(center_point, base_x, base_y);
   DrawJunctions(center_point, base_x, base_y);
   DrawCrosswalks(center_point, base_x, base_y);
   DrawLanes(center_point, base_x, base_y);
-  base_img_drawn_ = true;
 }
 
 void SemanticMap::DrawBaseMapThread() {
+  std::lock_guard<std::mutex> lock(draw_base_map_thread_mutex_);
   double x = ego_feature_.position().x();
   double y = ego_feature_.position().y();
   base_x_ = x - FLAGS_base_image_half_range;
@@ -131,15 +151,16 @@ void SemanticMap::DrawRoads(const common::PointENU& center_point,
         } else if (edge.type() == 3) {  // right edge
           for (const auto& segment : edge.curve().segment()) {
             for (const auto& point : segment.line_segment().point()) {
-              polygon.insert(
-                  polygon.begin(), std::move(
-                  GetTransPoint(point.x(), point.y(), base_x, base_y)));
+              polygon.insert(polygon.begin(),
+                             std::move(GetTransPoint(point.x(), point.y(),
+                                                     base_x, base_y)));
             }
           }
         }
       }
-      cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>(
-                                                {std::move(polygon)}), color);
+      cv::fillPoly(base_img_,
+                   std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+                   color);
     }
   }
 }
@@ -156,8 +177,9 @@ void SemanticMap::DrawJunctions(const common::PointENU& center_point,
       polygon.push_back(
           std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
-    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>(
-                                                {std::move(polygon)}), color);
+    cv::fillPoly(base_img_,
+                 std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+                 color);
   }
 }
 
@@ -173,8 +195,9 @@ void SemanticMap::DrawCrosswalks(const common::PointENU& center_point,
       polygon.push_back(
           std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
-    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>(
-                                                {std::move(polygon)}), color);
+    cv::fillPoly(base_img_,
+                 std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+                 color);
   }
 }
 
@@ -282,16 +305,16 @@ void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
       obs_x + (cos(theta) * -obs_l - sin(theta) * obs_w) / 2,
       obs_y + (sin(theta) * -obs_l + cos(theta) * obs_w) / 2, base_x, base_y)));
   // point 3 (back-left point)
-  polygon.push_back(std::move(GetTransPoint(
-      obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
-      obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2,
-      base_x, base_y)));
+  polygon.push_back(std::move(
+      GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
+                    obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2,
+                    base_x, base_y)));
   // point 4 (back-right point)
   polygon.push_back(std::move(GetTransPoint(
       obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
       obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2, base_x, base_y)));
-  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>(
-                                                  {std::move(polygon)}), color);
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+               color);
 }
 
 void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
@@ -302,8 +325,8 @@ void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
     polygon.push_back(std::move(
         GetTransPoint(polygon_point.x(), polygon_point.y(), base_x, base_y)));
   }
-  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>(
-                                                  {std::move(polygon)}), color);
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+               color);
 }
 
 void SemanticMap::DrawHistory(const ObstacleHistory& history,
@@ -316,8 +339,25 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
     if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, base_x, base_y, img);
     } else {
+      if (feature.polygon_point_size() == 0) {
+        AERROR << "No polygon points in feature, please check!";
+        continue;
+      }
       DrawPoly(feature, decay_color, base_x, base_y, img);
     }
+  }
+}
+
+void SemanticMap::DrawADCTrajectory(const cv::Scalar& color,
+                              const double base_x,
+                              const double base_y,
+                              cv::Mat* img) {
+  size_t traj_num = ego_feature_.adc_trajectory_point().size();
+  for (size_t i = 0; i < traj_num; ++i) {
+    double time_decay = ego_feature_.adc_trajectory_point(i).relative_time() -
+                        ego_feature_.adc_trajectory_point(0).relative_time();
+    cv::Scalar decay_color = color * time_decay;
+    DrawPoly(ego_feature_, decay_color, base_x, base_y, img);
   }
 }
 
@@ -350,6 +390,12 @@ bool SemanticMap::GetMapById(const int obstacle_id, cv::Mat* feature_map) {
       obstacle_id_history_map_.end()) {
     return false;
   }
+  const auto& obstacle_history = obstacle_id_history_map_[obstacle_id];
+
+  if (!ValidFeatureHistory(obstacle_history, curr_base_x_, curr_base_y_)) {
+    return false;
+  }
+
   cv::Mat output_img =
       CropByHistory(obstacle_id_history_map_[obstacle_id],
                     cv::Scalar(0, 0, 255), curr_base_x_, curr_base_y_);

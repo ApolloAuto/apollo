@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -17,13 +17,15 @@
 ###############################################################################
 """Real Time ACC Calculate Test Tool Based on Speed"""
 
-import sys
-import os
-import datetime
 import argparse
-from cyber_py import cyber
-from modules.localization.proto import localization_pb2
+import datetime
+import os
+import sys
+
+from cyber.python.cyber_py3 import cyber
 from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
+
 
 SmoothParam = 9
 
@@ -55,13 +57,13 @@ class RealTimeTest(object):
             deltv = sum(self.buff) / len(self.buff) - self.last_speed
             if deltt <= 1e-10:
                 deltt = 0.000000000001
-                print "delt=0 ", t, ",", self.last_t
+                print("delt=0 ", t, ",", self.last_t)
             self.acc = deltv / deltt
 
             self.accs.append(self.acc)
             if abs(self.acc) > self.acclimit:
-                print t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t", \
-                    self.acc, "\t", self.count, "\t", self.acclimit
+                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t",
+                      self.acc, "\t", self.count, "\t", self.acclimit)
         self.last_acc = self.acc
         self.last_t = t
         self.last_speed = sum(self.buff) / len(self.buff)
@@ -82,7 +84,7 @@ if __name__ == '__main__':
         help="Acc limit default must > 0")
     args = parser.parse_args()
     if args.acc < 0:
-        print "acc must larger than 0"
+        print("acc must larger than 0")
     cyber.init()
     rttest = RealTimeTest()
     rttest.acclimit = args.acc

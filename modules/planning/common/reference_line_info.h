@@ -24,24 +24,25 @@
 #include <list>
 #include <memory>
 #include <string>
-#include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -55,10 +56,10 @@ class ReferenceLineInfo {
   enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
 
-  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
-                             const common::TrajectoryPoint& adc_planning_point,
-                             const ReferenceLine& reference_line,
-                             const hdmap::RouteSegments& segments);
+  ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                    const common::TrajectoryPoint& adc_planning_point,
+                    const ReferenceLine& reference_line,
+                    const hdmap::RouteSegments& segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
@@ -85,9 +86,12 @@ class ReferenceLineInfo {
   double PriorityCost() const { return priority_cost_; }
   void SetPriorityCost(double cost) { priority_cost_ = cost; }
   // For lattice planner'speed planning target
-  void SetStopPoint(const StopPoint& stop_point);
-  void SetCruiseSpeed(double speed);
+  void SetLatticeStopPoint(const StopPoint& stop_point);
+  void SetLatticeCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
+
+  void SetCruiseSpeed(double speed) { cruise_speed_ = speed; }
+  double GetCruiseSpeed() const;
 
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
@@ -123,6 +127,13 @@ class ReferenceLineInfo {
       const double relative_time, const double start_s,
       DiscretizedTrajectory* discretized_trajectory);
 
+  // adjust trajectory if it starts from cur_vehicle postion rather planning
+  // init point from upstream
+  bool AdjustTrajectoryWhichStartsFromCurrentPos(
+      const common::TrajectoryPoint& planning_start_point,
+      const std::vector<common::TrajectoryPoint>& trajectory,
+      DiscretizedTrajectory* adjusted_trajectory);
+
   const SLBoundary& AdcSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
@@ -145,21 +156,23 @@ class ReferenceLineInfo {
   void SetDrivable(bool drivable);
   bool IsDrivable() const;
 
-  void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
+  void ExportEngageAdvice(common::EngageAdvice* engage_advice,
+                          PlanningContext* planning_context) const;
 
   const hdmap::RouteSegments& Lanes() const;
-  const std::list<hdmap::Id> TargetLaneId() const;
+  std::list<hdmap::Id> TargetLaneId() const;
 
-  void ExportDecision(DecisionResult* decision_result) const;
+  void ExportDecision(DecisionResult* decision_result,
+                      PlanningContext* planning_context) const;
 
   void SetJunctionRightOfWay(const double junction_s,
                              const bool is_protected) const;
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
+  hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRightofWayStatus(
+  bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {
@@ -172,17 +185,17 @@ class ReferenceLineInfo {
   const std::vector<PathBoundary>& GetCandidatePathBoundaries() const;
 
   void SetCandidatePathBoundaries(
-      std::vector<PathBoundary> candidate_path_boundaries);
+      std::vector<PathBoundary>&& candidate_path_boundaries);
 
   const std::vector<PathData>& GetCandidatePathData() const;
 
-  void SetCandidatePathData(std::vector<PathData> candidate_path_data);
+  void SetCandidatePathData(std::vector<PathData>&& candidate_path_data);
 
   Obstacle* GetBlockingObstacle() const { return blocking_obstacle_; }
   void SetBlockingObstacle(const std::string& blocking_obstacle_id);
 
   bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
-  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+  void set_is_path_lane_borrow(const bool is_path_lane_borrow) {
     is_path_lane_borrow_ = is_path_lane_borrow;
   }
 
@@ -226,20 +239,34 @@ class ReferenceLineInfo {
 
   std::vector<common::SLPoint> GetAllStopDecisionSLPoint() const;
 
+  void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
+  void SetEmergencyLight();
+
+  void set_path_reusable(const bool path_reusable) {
+    path_reusable_ = path_reusable;
+  }
+
+  bool path_reusable() const { return path_reusable_; }
+
  private:
   void InitFirstOverlaps();
 
   bool CheckChangeLane() const;
 
-  void ExportTurnSignal(common::VehicleSignal* signal) const;
+  void SetTurnSignalBasedOnLaneTurnType(
+      common::VehicleSignal* vehicle_signal) const;
+
+  void ExportVehicleSignal(common::VehicleSignal* vehicle_signal) const;
 
   bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
-  void MakeDecision(DecisionResult* decision_result) const;
+  void MakeDecision(DecisionResult* decision_result,
+                    PlanningContext* planning_context) const;
 
   int MakeMainStopDecision(DecisionResult* decision_result) const;
 
-  void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
+  void MakeMainMissionCompleteDecision(DecisionResult* decision_result,
+                                       PlanningContext* planning_context) const;
 
   void MakeEStopDecision(DecisionResult* decision_result) const;
 
@@ -251,6 +278,7 @@ class ReferenceLineInfo {
                        hdmap::PathOverlap* path_overlap);
 
  private:
+  static std::unordered_map<std::string, bool> junction_right_of_way_map_;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   ReferenceLine reference_line_;
@@ -315,6 +343,12 @@ class ReferenceLineInfo {
    * different st optimizer
    */
   StGraphData st_graph_data_;
+
+  common::VehicleSignal vehicle_signal_;
+
+  double cruise_speed_ = 0.0;
+
+  bool path_reusable_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

@@ -16,8 +16,8 @@
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
 
-#include <gtest/gtest.h>
 #include <string>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {

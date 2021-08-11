@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/component/timer_component.h"
+
 #include "cyber/timer/timer.h"
 
 namespace apollo {

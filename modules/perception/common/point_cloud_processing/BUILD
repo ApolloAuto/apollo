@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -23,7 +24,7 @@ cc_library(
     ],
     deps = [
         ":point_cloud_processing",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

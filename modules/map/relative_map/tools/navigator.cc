@@ -19,7 +19,7 @@
 #include <thread>
 #include <vector>
 
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
   // such as the network delay, We send it several times to ensure that the data
   // is sent successfully.
   Rate rate(1.0);
-  constexpr int kTransNum = 3;
+  static constexpr int kTransNum = 3;
   int trans_num = 0;
   while (apollo::cyber::OK()) {
     if (trans_num > kTransNum) {
@@ -203,13 +203,13 @@ bool GetNavigationPathFromFile(const std::string& filename,
 
 void CheckConfig(
     const apollo::relative_map::NavigatorConfig& navigator_config) {
-  CHECK(navigator_config.has_sample_param());
+  ACHECK(navigator_config.has_sample_param());
   const auto& sample_param = navigator_config.sample_param();
-  CHECK(sample_param.has_straight_sample_interval());
-  CHECK(sample_param.has_small_kappa_sample_interval());
-  CHECK(sample_param.has_middle_kappa_sample_interval());
-  CHECK(sample_param.has_large_kappa_sample_interval());
-  CHECK(sample_param.has_small_kappa());
-  CHECK(sample_param.has_middle_kappa());
-  CHECK(sample_param.has_large_kappa());
+  ACHECK(sample_param.has_straight_sample_interval());
+  ACHECK(sample_param.has_small_kappa_sample_interval());
+  ACHECK(sample_param.has_middle_kappa_sample_interval());
+  ACHECK(sample_param.has_large_kappa_sample_interval());
+  ACHECK(sample_param.has_small_kappa());
+  ACHECK(sample_param.has_middle_kappa());
+  ACHECK(sample_param.has_large_kappa());
 }

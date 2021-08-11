@@ -16,10 +16,9 @@
 
 #include "cyber/service_discovery/specific_manager/service_manager.h"
 
-#include <gtest/gtest.h>
 #include <memory>
-#include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 
@@ -55,12 +54,12 @@ TEST_F(ServiceManagerTest, server_operation) {
   role_attr.set_service_name("service");
   uint64_t service_id = common::GlobalData::RegisterService("service");
   role_attr.set_service_id(service_id);
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
   EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_NODE));
   EXPECT_TRUE(service_manager_->HasService("service"));
   EXPECT_FALSE(service_manager_->HasService("client"));
   // repeated call
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
 
   // get servers
   std::vector<RoleAttributes> servers;
@@ -69,7 +68,7 @@ TEST_F(ServiceManagerTest, server_operation) {
   EXPECT_EQ(servers.size(), 1);
 
   // leave
-  EXPECT_TRUE(service_manager_->Leave(role_attr, RoleType::ROLE_SERVER));
+  EXPECT_FALSE(service_manager_->Leave(role_attr, RoleType::ROLE_SERVER));
   EXPECT_FALSE(service_manager_->HasService("service"));
 
   servers.clear();
@@ -89,9 +88,9 @@ TEST_F(ServiceManagerTest, client_operation) {
   role_attr.set_service_name("service");
   uint64_t service_id = common::GlobalData::RegisterService("service");
   role_attr.set_service_id(service_id);
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
   // repeated call
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
 
   // get clients
   std::vector<RoleAttributes> clients;
@@ -100,7 +99,7 @@ TEST_F(ServiceManagerTest, client_operation) {
   EXPECT_EQ(clients.size(), 2);
 
   // leave
-  EXPECT_TRUE(service_manager_->Leave(role_attr, RoleType::ROLE_CLIENT));
+  EXPECT_FALSE(service_manager_->Leave(role_attr, RoleType::ROLE_CLIENT));
 
   clients.clear();
   EXPECT_TRUE(clients.empty());
@@ -118,8 +117,8 @@ TEST_F(ServiceManagerTest, topo_module_leave) {
   role_attr.set_service_name("service");
   uint64_t service_id = common::GlobalData::RegisterService("service");
   role_attr.set_service_id(service_id);
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
-  EXPECT_TRUE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_SERVER));
+  EXPECT_FALSE(service_manager_->Join(role_attr, RoleType::ROLE_CLIENT));
 
   EXPECT_TRUE(service_manager_->HasService("service"));
 }

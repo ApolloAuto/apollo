@@ -49,7 +49,10 @@ double SensorObject::GetTimestamp() const {
 }
 
 bool SensorObject::GetRelatedFramePose(Eigen::Affine3d* pose) const {
-  CHECK_NOTNULL(pose);
+  if (pose == nullptr) {
+    AERROR << "pose is not available";
+    return false;
+  }
   if (frame_header_ == nullptr) {
     return false;
   }

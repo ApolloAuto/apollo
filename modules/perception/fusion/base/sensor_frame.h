@@ -38,7 +38,9 @@ struct SensorFrameHeader {
   SensorFrameHeader(const base::SensorInfo& info, double ts,
                     const Eigen::Affine3d& pose)
       : sensor_info(info), timestamp(ts), sensor2world_pose(pose) {}
-};
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+} EIGEN_ALIGN16;
 
 class SensorFrame {
  public:
@@ -55,7 +57,10 @@ class SensorFrame {
   inline double GetTimestamp() const { return header_->timestamp; }
 
   inline bool GetPose(Eigen::Affine3d* pose) const {
-    CHECK_NOTNULL(pose);
+    if (pose == nullptr) {
+      AERROR << "pose is not available";
+      return false;
+    }
     *pose = header_->sensor2world_pose;
     return true;
   }

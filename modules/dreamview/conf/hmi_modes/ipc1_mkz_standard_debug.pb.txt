@@ -26,7 +26,7 @@ cyber_modules {
 cyber_modules {
   key: "Localization"
   value: {
-    dag_files: "/apollo/modules/localization/dag/dag_streaming_msf_localization.dag"
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
 cyber_modules {
@@ -62,13 +62,7 @@ cyber_modules {
 cyber_modules {
   key: "Velodyne"
   value: {
-    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
-  }
-}
-cyber_modules {
-  key: "Tick"
-  value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
+    dag_files: "/apollo/modules/drivers/lidar/velodyne/dag/velodyne.dag"
   }
 }
 modules {

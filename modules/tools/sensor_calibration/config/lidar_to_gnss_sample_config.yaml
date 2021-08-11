@@ -1,0 +1,22 @@
+#LiDAR-to-GNSS calibration data service configurations
+#Sensor names: calibrate the source_sensor in destination_sensor coordinate
+calibration_task: "lidar_to_gnss"
+source_sensor: "velodyne128"
+destination_sensor: "novatel"
+
+#for lidar-gnss. use odometry message and lidar message.
+#provide the local file directory( relevant to this config file), for the sensor message storage.
+odometry_file: "./_sensor_novatel_Odometry/odometry"
+sensor_files_directory: "./_sensor_velodyne64_VelodyneScan/"
+#initial calibration paramters, including translation and raotation, to project a point in source
+#source_sensor coordinate to destination_sensor coordinate. translation is in meter. rotation is in quaternion
+transform:
+  translation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation:
+    x: 0.0
+    y: 0.0
+    z: 0.7071
+    w: 0.7071

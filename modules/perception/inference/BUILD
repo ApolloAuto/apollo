@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,7 +18,7 @@ cc_test(
     srcs = ["layer_test.cc"],
     deps = [
         ":layer_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -27,6 +28,7 @@ cc_library(
     hdrs = ["inference.h"],
     deps = [
         "//modules/perception/base:blob",
+        "@boost",
     ],
 )
 
@@ -36,18 +38,19 @@ cc_test(
     srcs = ["inference_test.cc"],
     deps = [
         ":inference_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "inference_factory_lib",
+    name = "inference_factory",
     srcs = ["inference_factory.cc"],
     hdrs = ["inference_factory.h"],
     deps = [
         ":inference_lib",
-        "//modules/perception/inference/caffe:caffe_net_lib",
-        "//modules/perception/inference/paddlepaddle:paddle_net_lib",
+        "//modules/perception/inference/libtorch:torch_det",
+        "//modules/perception/inference/libtorch:torch_net",
+        "//modules/perception/inference/onnx:libtorch_obstacle_detector",
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_util_lib",
     ],
@@ -58,8 +61,8 @@ cc_test(
     size = "small",
     srcs = ["inference_factory_test.cc"],
     deps = [
-        ":inference_factory_lib",
-        "@gtest//:main",
+        ":inference_factory",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

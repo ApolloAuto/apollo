@@ -18,7 +18,6 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <pthread.h>
-#include <stdlib.h>
 #include <sys/epoll.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
@@ -26,12 +25,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <cstdlib>
+
+#include "modules/canbus/proto/chassis.pb.h"
+
 #include "cyber/common/log.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/udp_listener.h"
 #include "modules/bridge/common/util.h"
-#include "modules/canbus/proto/chassis.pb.h"
 
 using apollo::bridge::BRIDGE_HEADER_FLAG;
 using apollo::bridge::BridgeHeader;
@@ -182,7 +184,9 @@ bool receive(uint16_t port) {
         }
       }
     }
-    if (!res) break;
+    if (!res) {
+      break;
+    }
   }
   close(listener_sock);
   return res;

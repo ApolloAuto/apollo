@@ -14,35 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
+#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+
 #include "gtest/gtest.h"
 
-#define private public
-
-#include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
-
-TEST(ICaffePoolOutputDimensionsFormulaTest, test_compute) {
-  nvinfer1::ICaffePoolOutputDimensionsFormula poolFormula;
-
-  nvinfer1::DimsHW input_dims(4, 4);
-  nvinfer1::DimsHW kernel_size(3, 3);
-  nvinfer1::DimsHW stride(2, 2);
-  nvinfer1::DimsHW padding(0, 0);
-  nvinfer1::DimsHW dilation(1, 1);
-
-  auto dim_as_conv = poolFormula.compute(input_dims, kernel_size, stride,
-                                         padding, dilation, "pool_as_conv");
-  auto dim_as_pool = poolFormula.compute(input_dims, kernel_size, stride,
-                                         padding, dilation, "pool_as_pool");
-  EXPECT_EQ(dim_as_conv.h(), 1);
-  EXPECT_EQ(dim_as_conv.w(), 1);
-  EXPECT_EQ(dim_as_pool.h(), 2);
-  EXPECT_EQ(dim_as_pool.w(), 2);
-}
 
 TEST(Int8EntropyCalibratorTest, test_init) {
   // test empty batch_stream

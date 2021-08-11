@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <grpc++/grpc++.h>
 #include <string>
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "grpc++/grpc++.h"
 
 namespace apollo {
 namespace hdmap {
@@ -34,6 +34,6 @@ namespace hdmap {
 #endif
 
 std::vector<std::string> GetFileLines(const std::string& path);
-inline double UnixtimeNow() { return apollo::cyber::Time::Now().ToSecond(); }
+inline double UnixNow() { return apollo::cyber::Time::Now().ToSecond(); }
 }  // namespace hdmap
 }  // namespace apollo

@@ -31,12 +31,13 @@ message VehicleStatus {
   optional float velocity_x = 5;
   optional float velocity_y = 6;
   optional float velocity_z = 7;
-  optional double time_ts = 8;                          // time stamp
+  optional double time_ts = 8;  // time stamp
   optional double time_d = 9;
   optional MotionType motion = 10;
 }
 
 message Motion_Service {
-  repeated VehicleStatus vehicle_status = 1;  // An array of vehicle_information stored for previous timestamps
-  optional apollo.common.Header header = 2;                    // Header
+  repeated VehicleStatus vehicle_status =
+      1;  // An array of vehicle_information stored for previous timestamps
+  optional apollo.common.Header header = 2;  // Header
 }

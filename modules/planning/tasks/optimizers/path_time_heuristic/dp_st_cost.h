@@ -26,11 +26,11 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
-
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/proto/st_drivable_boundary.pb.h"
+#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 
 namespace apollo {
@@ -38,18 +38,21 @@ namespace planning {
 
 class DpStCost {
  public:
-  DpStCost(const DpStSpeedConfig& dp_st_speed_config, const double total_time,
-           const std::vector<const Obstacle*>& obstacles,
+  DpStCost(const DpStSpeedOptimizerConfig& config, const double total_t,
+           const double total_s, const std::vector<const Obstacle*>& obstacles,
+           const STDrivableBoundary& st_drivable_boundary,
            const common::TrajectoryPoint& init_point);
 
   double GetObstacleCost(const StGraphPoint& point);
+
+  double GetSpatialPotentialCost(const StGraphPoint& point);
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
 
   double GetSpeedCost(const STPoint& first, const STPoint& second,
                       const double speed_limit,
-                      const double soft_speed_limit) const;
+                      const double cruise_speed) const;
 
   double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
                                  const STPoint& second);
@@ -76,11 +79,15 @@ class DpStCost {
       std::vector<std::pair<double, double>>* keep_clear_range_);
   bool InKeepClearRange(double s) const;
 
-  const DpStSpeedConfig& config_;
+  const DpStSpeedOptimizerConfig& config_;
   const std::vector<const Obstacle*>& obstacles_;
+
+  STDrivableBoundary st_drivable_boundary_;
+
   const common::TrajectoryPoint& init_point_;
 
   double unit_t_ = 0.0;
+  double total_s_ = 0.0;
 
   std::unordered_map<std::string, int> boundary_map_;
   std::vector<std::vector<std::pair<double, double>>> boundary_cost_;

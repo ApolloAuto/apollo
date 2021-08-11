@@ -37,6 +37,7 @@ class CyberRecordReader {
   void Subscribe(const std::string& topic,
                  const std::function<void(const std::string&)> call_back);
   void Read(const std::string& file_name);
+  void Read(const std::vector<std::string> &file_names);
 
  private:
   std::vector<std::string> topics_;

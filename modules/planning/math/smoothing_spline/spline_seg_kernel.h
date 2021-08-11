@@ -27,7 +27,6 @@
 #include <string>
 
 #include "Eigen/Core"
-
 #include "cyber/common/macros.h"
 
 namespace apollo {

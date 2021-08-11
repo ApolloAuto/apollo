@@ -21,13 +21,14 @@
 #include <vector>
 
 #include "cyber/component/component.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
@@ -41,12 +42,17 @@
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
+using apollo::common::EigenMap;
+using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
 class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   FusionCameraDetectionComponent() : seq_num_(0) {}
   ~FusionCameraDetectionComponent();
@@ -57,10 +63,10 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       const FusionCameraDetectionComponent&) = delete;
 
   bool Init() override;
-
- private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
                       const std::string& camera_name);
+
+ private:
   int InitConfig();
   int InitSensorInfo();
   int InitAlgorithmPlugin();
@@ -128,8 +134,8 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       data_providers_map_;
 
   // map for store params
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
   Eigen::Matrix3d homography_im2car_;
 
   // camera obstacle pipeline
@@ -140,7 +146,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   // fixed size camera frames
   int frame_capacity_ = 20;
   int frame_id_ = 0;
-  std::vector<camera::CameraFrame> camera_frames_;
+  EigenVector<camera::CameraFrame> camera_frames_;
 
   // image info.
   int image_width_ = 1920;
@@ -196,13 +202,10 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   // // variables for CIPV
   bool enable_cipv_ = false;
-  Cipv cipv_;
-  float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-  float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-  float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-  float average_frame_rate_ = kAverageFrameRate;
-  bool image_based_cipv_ = false;
-  int debug_level_ = 0;
+  std::unique_ptr<camera::BaseCipv> cipv_;
+  camera::CipvInitOptions cipv_init_options_;
+  std::string cipv_name_;
+
   // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;

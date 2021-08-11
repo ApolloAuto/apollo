@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <random>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -212,7 +213,7 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   // Sanity check
   CHECK_NOTNULL(point2d);
   CHECK_GT(xWS.cols(), 1);
-  CHECK_GT(point2d->size(), 3);
+  CHECK_GT(point2d->size(), 3U);
 
   // Set initial heading and bounds
   const double initial_heading = xWS(2, 0);
@@ -653,7 +654,8 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(), x_ref);
+  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(),
+                                   std::move(x_ref));
   piecewise_jerk_problem.set_weight_ddx(s_curve_config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(s_curve_config.jerk_weight());
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
@@ -700,16 +702,16 @@ bool IterativeAnchoringSmoother::CombinePathAndSpeed(
   CHECK_NOTNULL(discretized_trajectory);
   discretized_trajectory->clear();
   // TODO(Jinyun): move to confs
-  const double kDenseTimeResoltuion = 0.1;
+  const double kDenseTimeResolution = 0.1;
   const double time_horizon =
-      speed_points.TotalTime() + kDenseTimeResoltuion * 1.0e-6;
+      speed_points.TotalTime() + kDenseTimeResolution * 1.0e-6;
   if (path_points.empty()) {
     AERROR << "path data is empty";
     return false;
   }
   ADEBUG << "speed_points.TotalTime() " << speed_points.TotalTime();
   for (double cur_rel_time = 0.0; cur_rel_time < time_horizon;
-       cur_rel_time += kDenseTimeResoltuion) {
+       cur_rel_time += kDenseTimeResolution) {
     common::SpeedPoint speed_point;
     if (!speed_points.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
@@ -758,8 +760,8 @@ void IterativeAnchoringSmoother::AdjustPathAndSpeedByGear(
 bool IterativeAnchoringSmoother::GenerateStopProfileFromPolynomial(
     const double init_acc, const double init_speed, const double stop_distance,
     SpeedData* smoothed_speeds) {
-  constexpr double kMaxT = 8.0;
-  constexpr double kUnitT = 0.2;
+  static constexpr double kMaxT = 8.0;
+  static constexpr double kUnitT = 0.2;
   for (double t = 2.0; t <= kMaxT; t += kUnitT) {
     QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, stop_distance,
                                    0.0, 0.0, t);
@@ -786,7 +788,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
        evaluate_t += 0.2) {
     const double v = curve.Evaluate(1, evaluate_t);
     const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
+    static constexpr double kEpsilon = 1e-3;
     if (v < -kEpsilon || a > 1.0) {
       return false;
     }
@@ -796,7 +798,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
 
 double IterativeAnchoringSmoother::CalcHeadings(
     const DiscretizedPath& path_points, const size_t index) {
-  CHECK_GT(path_points.size(), 2);
+  CHECK_GT(path_points.size(), 2U);
   double dx = 0.0;
   double dy = 0.0;
   if (index == 0) {

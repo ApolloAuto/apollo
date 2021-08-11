@@ -2,12 +2,15 @@ Python API tutorial
 =====================
 
 ## 1. Background
+
 The core functions of Cyber RT are developed in C++. We also provide more python interfaces to help developers build their own utilities for specific projects.
 
 ## 2. Cyber RT Python Interfaces
+
 The python interfaces of Cyber RT are wrapper the corresponding C++ interfaces. The implementation doesn't rely on other third-party tools, e.g. swig, which makes it easier to maintain.
 
 ## 3. Overview of Python Interfaces in Cyber RT
+
 So far, the python interfaces covers:
 
 * access the information of channels
@@ -27,7 +30,7 @@ Steps shown as below:
 
 The interfaces are shown below:
 
-```
+```python
 class Node:
     """
     Class for cyber Node wrapper.
@@ -73,6 +76,7 @@ class Writer(object):
         writer msg string
         """
 ```
+
 ### 3.2 Record Interfaces
 
 Read from record：
@@ -82,12 +86,12 @@ Read from record：
 
 Write to record：
 
-  1. Create a RecordWriter
-  2. Write messages to record；
+1. Create a RecordWriter
+2. Write messages to record；
 
 The interfaces are shown below:
 
-```
+```python
 class RecordReader(object):
     """
     Class for cyber RecordReader wrapper.
@@ -122,7 +126,7 @@ class RecordReader(object):
         ""
         return _CYBER_RECORD.PyRecordReader_Reset(self.record_reader)
 
-     def get_channellist(self):
+    def get_channellist(self):
         """
         return channel list.
         """
@@ -145,7 +149,7 @@ class RecordWriter(object):
         """
         writer msg:channelname,data,time,is data raw
         """
-	
+
 	def set_size_fileseg(self, size_kilobytes):
         """
         return filesegment size.
@@ -172,14 +176,13 @@ class RecordWriter(object):
         """
 
 ```
+
 ### 3.3 Time Interfaces
 
-```
+```python
 class Time(object):
 	@staticmethod
     def now():
-        # print _CYBER_TIME.PyTime_now()
-        # print type(_CYBER_TIME.PyTime_now())
         time_now = Time(_CYBER_TIME.PyTime_now())
         return time_now
 
@@ -198,34 +201,31 @@ class Time(object):
         return _CYBER_TIME.PyTime_sleep_until(self.time, nanoseconds)
 ```
 
-
 ### 3.4 Timer Interfaces
-```
 
+```python
 class Timer(object):
 
-	def set_option(self, period, callback, oneshot=0):
-        '''
-        period The period of the timer, unit is ms
-        callback The tasks that the timer needs to perform
-        oneshot 1: perform the callback only after the first timing cycle
-                0:perform the callback every timed period
-        '''
-
+    def set_option(self, period, callback, oneshot=0):
+        """
+        set the option of timer.
+        @param period The period of the timer, unit is ms.
+        @param callback The tasks that the timer needs to perform.
+        @param oneshot 1:perform the callback only after the first timing cycle
+        0:perform the callback every timed period
+        """
 
     def start(self):
 
-
     def stop(self):
 
-
 ```
-
 
 ## 4. Examples
+
 ### 4.1 Read from Channel (in cyber/python/examples/listener.py)
 
-```
+```python
 import sys
 sys.path.append("../")
 from cyber_py import cyber
@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
 ### 4.2 Write to Channel(in cyber/python/examples/talker.py)
 
- ```
+ ```python
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 from cyber_py import cyber
 """Module for example of talker."""
@@ -298,7 +298,7 @@ if __name__ == '__main__':
 
 ### 4.3 Read and Write Messages from/to Record File(in cyber/python/examples/record.py)
 
-```
+```python
 """Module for example of record."""
 
 import time
@@ -361,7 +361,6 @@ def test_record_reader(reader_path):
         print "msgtime -> %d" % timestamp
         print "msgnum -> %d" % freader.get_messagenumber(channelname)
         print "msgtype -> %s" % datatype
-        # print "pbdesc -> %s" % freader.get_protodesc(channelname)
         count = count + 1
 
 if __name__ == '__main__':
@@ -371,4 +370,3 @@ if __name__ == '__main__':
     cyber.shutdown()
 
 ```
-

@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SERVICE_DISCOVERY_ROLE_GRAPH_H_
-#define CYBER_SERVICE_DISCOVERY_ROLE_GRAPH_H_
+#ifndef CYBER_SERVICE_DISCOVERY_CONTAINER_GRAPH_H_
+#define CYBER_SERVICE_DISCOVERY_CONTAINER_GRAPH_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -130,4 +130,4 @@ class Graph {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SERVICE_DISCOVERY_ROLE_GRAPH_H_
+#endif  // CYBER_SERVICE_DISCOVERY_CONTAINER_GRAPH_H_

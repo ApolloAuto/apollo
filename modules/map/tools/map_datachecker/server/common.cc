@@ -20,7 +20,7 @@
 namespace apollo {
 namespace hdmap {
 
-std::shared_ptr<JSonConf> ParseJson(std::string conf_path) {
+std::shared_ptr<JsonConf> ParseJson(std::string conf_path) {
   AINFO << "parsing json config";
   boost::filesystem::path path(conf_path);
   if (!boost::filesystem::exists(path)) {
@@ -28,7 +28,7 @@ std::shared_ptr<JSonConf> ParseJson(std::string conf_path) {
     return nullptr;
   }
 
-  std::shared_ptr<JSonConf> conf(new JSonConf);
+  std::shared_ptr<JsonConf> conf(new JsonConf);
   boost::property_tree::ptree pt;
   try {
     boost::property_tree::read_json(conf_path, pt);

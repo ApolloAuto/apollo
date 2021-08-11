@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -20,8 +20,8 @@ import sys
 
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
-import mkz_polygon
+import modules.tools.common.proto_utils as proto_utils
+from modules.tools.planning.plot_trajectory import mkz_polygon
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 
@@ -48,10 +48,10 @@ def find_closest_t(points_t, current_t):
             return points_t[0]
         else:
             return points_t[1]
-    if points_t[len(points_t) / 2] > current_t:
-        return find_closest_t(points_t[0:len(points_t) / 2], current_t)
-    elif points_t[len(points_t) / 2] < current_t:
-        return find_closest_t(points_t[len(points_t) / 2 + 1:], current_t)
+    if points_t[len(points_t) // 2] > current_t:
+        return find_closest_t(points_t[0:len(points_t) // 2], current_t)
+    elif points_t[len(points_t) // 2] < current_t:
+        return find_closest_t(points_t[len(points_t) // 2 + 1:], current_t)
     else:
         return current_t
 

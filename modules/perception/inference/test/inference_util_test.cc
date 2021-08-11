@@ -25,7 +25,7 @@ namespace perception {
 namespace inference {
 
 TEST(loadTest, test) {
-  CHECK(!apollo::perception::inference::load_binary_data("unknow.txt"));
+  ACHECK(!apollo::perception::inference::load_binary_data("unknow.txt"));
 }
 
 TEST(UtilTest, GemmTest) {

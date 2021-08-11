@@ -16,7 +16,7 @@
 
 #include "modules/planning/planning_base.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -27,16 +27,15 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::dreamview::Chart;
-using apollo::planning_internal::SLFrameDebug;
-using apollo::planning_internal::SpeedPlan;
-using apollo::planning_internal::STGraphDebug;
+
+PlanningBase::PlanningBase(const std::shared_ptr<DependencyInjector>& injector)
+    : injector_(injector) {}
 
 PlanningBase::~PlanningBase() {}
 
 Status PlanningBase::Init(const PlanningConfig& config) {
-  PlanningContext::Instance()->Instance()->Init();
-  TaskFactory::Init(config);
+  injector_->planning_context()->Init();
+  TaskFactory::Init(config, injector_);
   return Status::OK();
 }
 

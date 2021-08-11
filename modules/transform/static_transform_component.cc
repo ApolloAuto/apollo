@@ -102,7 +102,7 @@ void StaticTransformComponent::SendTransform(
   }
 
   common::util::FillHeader(node_->Name(), &transform_stampeds_);
-  writer_->Write(std::make_shared<TransformStampeds>(transform_stampeds_));
+  writer_->Write(transform_stampeds_);
 }
 
 }  // namespace transform

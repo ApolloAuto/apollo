@@ -16,10 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function setup() {
   bash scripts/canbus.sh start
@@ -29,16 +27,16 @@ function setup() {
 }
 
 function start() {
-  NUM_PROCESSES="$(pgrep -c -f "record_play/rtk_player.py")"
+  NUM_PROCESSES="$(pgrep -f "record_play/rtk_player" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
-    pkill -SIGKILL -f rtk_player.py
+    pkill -SIGKILL -f rtk_player
   fi
 
-  python modules/tools/record_play/rtk_player.py
+  ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player
 }
 
 function stop() {
-  pkill -SIGKILL -f rtk_player.py
+  pkill -SIGKILL -f rtk_player
 }
 
 case $1 in
@@ -50,6 +48,10 @@ case $1 in
     ;;
   stop)
     stop
+    ;;
+  restart)
+    stop
+    start
     ;;
   *)
     start

@@ -16,13 +16,13 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
 #include "torch/script.h"
 #include "torch/torch.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
@@ -43,15 +43,18 @@ class LaneScanningEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    * @param vector of all Obstacles
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**

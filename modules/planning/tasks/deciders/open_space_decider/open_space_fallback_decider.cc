@@ -19,7 +19,6 @@
  **/
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
 namespace planning {
@@ -28,8 +27,10 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
-    : Decider(config) {}
+OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
                                                               const double b,
@@ -86,8 +87,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // Fallback starts from current location but with vehicle velocity
     auto fallback_start_point =
         fallback_trajectory_pair_candidate.first[fallback_start_index];
-    const auto& vehicle_state =
-        apollo::common::VehicleStateProvider::Instance()->vehicle_state();
+    const auto& vehicle_state = injector_->vehicle_state()->vehicle_state();
     fallback_start_point.set_v(vehicle_state.linear_velocity());
 
     *(frame_->mutable_open_space_info()->mutable_future_collision_point()) =
@@ -145,8 +145,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       }
     }
 
-    AERROR << "stop index before is: " << stop_index;
-    AERROR << "fallback_start index before is: " << fallback_start_index;
+    ADEBUG << "stop index before is: " << stop_index
+           << "; fallback_start index before is: " << fallback_start_index;
 
     for (size_t i = 0; i < fallback_start_index; ++i) {
       fallback_trajectory_pair_candidate.first[i].set_v(
@@ -159,7 +159,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 
     // If stop_index == fallback_start_index;
     if (fallback_start_index == stop_index) {
-      // 1. Set fallback start speed to 0, accleration to max accleration.
+      // 1. Set fallback start speed to 0, acceleration to max acceleration.
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
       fallback_start_point.set_a(0.0);

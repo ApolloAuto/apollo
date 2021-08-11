@@ -16,6 +16,7 @@
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
 
 #include <map>
+#include <numeric>
 #include <utility>
 
 #include "modules/perception/common/graph/secure_matrix.h"
@@ -64,6 +65,7 @@ bool HMTrackersObjectsAssociation::Associate(
   double measurement_timestamp = sensor_objects[0]->GetTimestamp();
   track_object_distance_.ResetProjectionCache(measurement_sensor_id,
                                               measurement_timestamp);
+  // TODO(chenjiahao): specify prohibited sensors in config
   bool do_nothing = (sensor_objects[0]->GetSensorId() == "radar_front");
   IdAssign(fusion_tracks, sensor_objects, &association_result->assignments,
            &association_result->unassigned_tracks,

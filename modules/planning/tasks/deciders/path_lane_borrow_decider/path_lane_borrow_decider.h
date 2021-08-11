@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include "modules/planning/proto/decider_config.pb.h"
+#include <memory>
+
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -29,7 +30,8 @@ namespace planning {
 
 class PathLaneBorrowDecider : public Decider {
  public:
-  explicit PathLaneBorrowDecider(const TaskConfig& config);
+  PathLaneBorrowDecider(const TaskConfig& config,
+                        const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   common::Status Process(Frame* frame,

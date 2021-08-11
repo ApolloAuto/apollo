@@ -29,7 +29,7 @@ EmergencyModeTrigger::EmergencyModeTrigger() {
   trigger_name_ = "EmergencyModeTrigger";
 }
 
-void EmergencyModeTrigger::Pull(const RecordMessage& msg) {
+void EmergencyModeTrigger::Pull(const cyber::record::RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }

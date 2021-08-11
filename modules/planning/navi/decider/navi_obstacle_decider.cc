@@ -37,7 +37,6 @@ namespace planning {
 using apollo::common::PathPoint;
 using apollo::common::math::PathMatcher;
 using apollo::common::math::Vec2d;
-using apollo::common::util::MakePathPoint;
 
 namespace {
 constexpr double kEpislon = 1e-6;
@@ -75,11 +74,8 @@ void NaviObstacleDecider::AddObstacleOffsetDirection(
     const common::PathPoint& projection_point,
     const std::vector<common::PathPoint>& path_data_points,
     const Obstacle* current_obstacle, const double proj_len, double* dist) {
-  Vec2d p1(0.0, 0.0);
+  Vec2d p1(projection_point.x(), projection_point.y());
   Vec2d p2(0.0, 0.0);
-
-  p1.set_x(projection_point.x());
-  p1.set_y(projection_point.y());
   if ((proj_len + 1) > path_data_points.back().s()) {
     p2.set_x(path_data_points.back().x());
     p2.set_y(path_data_points.back().y());
@@ -149,8 +145,7 @@ void NaviObstacleDecider::ProcessObstacle(
     return sqrt(dx * dx + dy * dy);
   };
 
-  PathPoint projection_point = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  PathPoint point = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  PathPoint projection_point;
   PathPoint vehicle_projection_point =
       PathMatcher::MatchToPath(path_data_points, 0, 0);
   for (const auto& current_obstacle : obstacles) {

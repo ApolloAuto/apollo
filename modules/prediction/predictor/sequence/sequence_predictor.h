@@ -55,9 +55,14 @@ class SequencePredictor : public Predictor {
 
   /**
    * @brief Make prediction
+   * @param ADC trajectory container
    * @param Obstacle pointer
+   * @param Obstacles container
+   * @return If predicted successfully
    */
-  void Predict(Obstacle* obstacle) override;
+  bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+               Obstacle* obstacle,
+               ObstaclesContainer* obstacles_container) override;
 
   FRIEND_TEST(SequencePredictorTest, General);
 
@@ -75,10 +80,15 @@ class SequencePredictor : public Predictor {
    * @brief Filter lane sequences
    * @param Lane graph
    * @param Current lane id
+   * @param Ego vehicle pointer
+   * @param ADC trajectory container
    * @param Vector of boolean indicating if a lane sequence is disqualified
    */
-  void FilterLaneSequences(const Feature& feature, const std::string& lane_id,
-                           std::vector<bool>* enable_lane_sequence);
+  void FilterLaneSequences(
+      const Feature& feature, const std::string& lane_id,
+      const Obstacle* ego_vehicle_ptr,
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      std::vector<bool>* enable_lane_sequence);
 
   /**
    * @brief Get lane change type
@@ -92,9 +102,13 @@ class SequencePredictor : public Predictor {
   /**
    * @brief Get lane change distance with ADC
    * @param Target lane sequence
+   * @param Ego vehicle pointer
+   * @param ADC trajectory container
    * @return Lane change distance with ADC
    */
-  double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
+  double GetLaneChangeDistanceWithADC(
+      const LaneSequence& lane_sequence, const Obstacle* ego_vehicle_ptr,
+      const ADCTrajectoryContainer* adc_trajectory_container);
 
   /**
    * @brief Draw constant acceleration trajectory points

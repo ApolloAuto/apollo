@@ -72,7 +72,7 @@ template <typename M>
 bool Transmitter<M>::Transmit(const MessagePtr& msg) {
   msg_info_.set_seq_num(NextSeqNum());
   PerfEventCache::Instance()->AddTransportEvent(
-      TransPerf::TRANS_FROM, attr_.channel_id(), msg_info_.seq_num());
+      TransPerf::TRANSMIT_BEGIN, attr_.channel_id(), msg_info_.seq_num());
   return Transmit(msg, msg_info_);
 }
 

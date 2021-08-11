@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
@@ -26,6 +28,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::EigenMap;
+using apollo::common::EigenVector;
+
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::base::ObjectType;
@@ -33,19 +38,19 @@ using apollo::perception::base::ObjectType;
 bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   std::string classifiers_property_file_path =
       GetAbsolutePath(work_root, config.classifiers_property_file_path());
-  CHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
-                                       &smooth_matrices_));
+  ACHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
+                                        &smooth_matrices_));
 
   for (auto& pair : smooth_matrices_) {
     util::NormalizeRow(&pair.second);
@@ -124,23 +129,23 @@ bool CCRFOneShotTypeFusion::FuseOneShotTypeProbs(const ObjectPtr& object,
 }
 
 bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
-  CHECK(one_shot_fuser_.Init(option));
+  ACHECK(one_shot_fuser_.Init(option));
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   std::string transition_property_file_path =
       GetAbsolutePath(work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();
-  CHECK(util::LoadSingleMatrixFile(transition_property_file_path,
-                                   &transition_matrix_));
+  ACHECK(util::LoadSingleMatrixFile(transition_property_file_path,
+                                    &transition_matrix_));
   transition_matrix_ += Matrixd::Ones() * 1e-6;
   util::NormalizeRow(&transition_matrix_);
   AINFO << "transition matrix";
@@ -192,7 +197,7 @@ bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(
   for (std::size_t i = 1; i < length; ++i) {
     for (std::size_t right = 0; right < VALID_OBJECT_TYPE; ++right) {
       double prob = 0.0;
-      double max_prob = -DBL_MAX;
+      double max_prob = -std::numeric_limits<double>::max();
       std::size_t id = 0;
       for (std::size_t left = 0; left < VALID_OBJECT_TYPE; ++left) {
         prob = fused_sequence_probs_[i - 1](left) +

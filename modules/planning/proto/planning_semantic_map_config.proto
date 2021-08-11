@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PlanningSemanticMapConfig {
+  //  resolution(m / pixel) of local map img and base map img
+  optional double resolution = 1;
+
+  // [height, width] of a local map img centering around ego vehicle
+  optional int32 height = 100;
+  optional int32 width = 101;
+  //  ego vehicle rear center location in the local map img with origin point at
+  //  top left corner
+  optional int32 ego_idx_x = 102;
+  optional int32 ego_idx_y = 103;
+  //  ego vehicle is normally heading upward in the local map img, but a
+  //  randomized change of heading could be used
+  optional double max_rand_delta_phi = 104;
+  //  ego vehicle max future trajectory time horizon
+  optional double max_ego_future_horizon = 105;
+  //  ego vehicle max past trajectory time horizon
+  optional double max_ego_past_horizon = 106;
+  //  ego obstacle max prediction trajectory time horizon
+  optional double max_obs_future_horizon = 107;
+  //  ego obstacle max past trajectory time horizon
+  optional double max_obs_past_horizon = 108;
+
+  //  padding(pixel) around base map of region map
+  optional int32 base_map_padding = 200;
+  //  max_speed_limit in base speed limit map
+  optional double city_driving_max_speed = 201;
+}

@@ -23,10 +23,9 @@
 #include <memory>
 #include <vector>
 
+#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
-
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -44,7 +43,7 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
-  void SetAnchorPoints(const std::vector<AnchorPoint>& achor_points) override;
+  void SetAnchorPoints(const std::vector<AnchorPoint>& anchor_points) override;
 
  private:
   void Clear();

@@ -16,13 +16,16 @@
 #pragma once
 
 #include <netinet/in.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
@@ -33,8 +36,6 @@
 #include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/common/udp_listener.h"
-#include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
 namespace apollo {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/common.h"
 
@@ -22,7 +22,7 @@ namespace perception {
 namespace base {
 
 TEST(CommonTest, GPUAssertTest) {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   GPUAssert(cudaSetDevice(-1), __FILE__, __LINE__, false);
 #endif
 }

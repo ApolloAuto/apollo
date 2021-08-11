@@ -15,12 +15,10 @@
  *****************************************************************************/
 
 #include "modules/localization/rtk/rtk_localization_component.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 
 namespace apollo {
 namespace localization {
-
-using apollo::common::time::Clock;
 
 RTKLocalizationComponent::RTKLocalizationComponent()
     : localization_(new RTKLocalization()) {}
@@ -65,20 +63,20 @@ bool RTKLocalizationComponent::InitIO() {
   corrected_imu_listener_ = node_->CreateReader<localization::CorrectedImu>(
       imu_topic_, std::bind(&RTKLocalization::ImuCallback, localization_.get(),
                             std::placeholders::_1));
-  DCHECK_NOTNULL(corrected_imu_listener_);
+  ACHECK(corrected_imu_listener_);
 
   gps_status_listener_ = node_->CreateReader<drivers::gnss::InsStat>(
       gps_status_topic_, std::bind(&RTKLocalization::GpsStatusCallback,
                                    localization_.get(), std::placeholders::_1));
-  DCHECK_NOTNULL(gps_status_listener_);
+  ACHECK(gps_status_listener_);
 
   localization_talker_ =
       node_->CreateWriter<LocalizationEstimate>(localization_topic_);
-  DCHECK_NOTNULL(localization_talker_);
+  ACHECK(localization_talker_);
 
   localization_status_talker_ =
       node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
-  DCHECK_NOTNULL(localization_status_talker_);
+  ACHECK(localization_status_talker_);
   return true;
 }
 
@@ -124,19 +122,16 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
   tf2_broadcaster_->SendTransform(tf2_msg);
-  return;
 }
 
 void RTKLocalizationComponent::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
-  return;
 }
 
 void RTKLocalizationComponent::PublishLocalizationStatus(
     const LocalizationStatus& localization_status) {
   localization_status_talker_->Write(localization_status);
-  return;
 }
 
 }  // namespace localization

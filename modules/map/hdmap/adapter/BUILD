@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,39 +6,41 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "opendrive_adapter",
     srcs = [
-        "coordinate_convert_tool.cc",
         "opendrive_adapter.cc",
-        "proto_organizer.cc",
-        "xml_parser/header_xml_parser.cc",
-        "xml_parser/junctions_xml_parser.cc",
-        "xml_parser/lanes_xml_parser.cc",
-        "xml_parser/objects_xml_parser.cc",
-        "xml_parser/roads_xml_parser.cc",
-        "xml_parser/signals_xml_parser.cc",
-        "xml_parser/util_xml_parser.cc",
     ],
     hdrs = [
-        "coordinate_convert_tool.h",
         "opendrive_adapter.h",
-        "proto_organizer.h",
-        "xml_parser/common_define.h",
-        "xml_parser/header_xml_parser.h",
-        "xml_parser/junctions_xml_parser.h",
-        "xml_parser/lanes_xml_parser.h",
-        "xml_parser/objects_xml_parser.h",
-        "xml_parser/roads_xml_parser.h",
-        "xml_parser/signals_xml_parser.h",
-        "xml_parser/status.h",
-        "xml_parser/util_xml_parser.h",
     ],
+    deps = [
+        ":coordinate_convert_tool",
+        ":proto_organizer",
+        "//cyber/common:log",
+        "//modules/map/hdmap/adapter/xml_parser",
+    ],
+)
+
+cc_library(
+    name = "coordinate_convert_tool",
+    srcs = ["coordinate_convert_tool.cc"],
+    hdrs = ["coordinate_convert_tool.h"],
+    deps = [
+        "//modules/map/hdmap/adapter/xml_parser:status",
+        "@com_github_google_glog//:glog",
+        "@proj",
+    ],
+)
+
+cc_library(
+    name = "proto_organizer",
+    srcs = ["proto_organizer.cc"],
+    hdrs = ["proto_organizer.h"],
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
-        "//modules/common/status",
         "//modules/common/util",
-        "//modules/map/proto:map_proto",
-        "@proj4",
-        "@tinyxml2",
+        "//modules/map/hdmap/adapter/xml_parser:common_define",
+        "//modules/map/proto:map_cc_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 

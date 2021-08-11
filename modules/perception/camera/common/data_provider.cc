@@ -14,6 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/common/data_provider.h"
+
+#if USE_GPU == 1
+#include <nppi.h>
+#endif
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -121,7 +126,7 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
 
   bool success = false;
 
-#ifdef PERCEPTION_CPU_ONLY  // copy to host memory
+#if USE_GPU == 0  // copy to host memory
   AINFO << "Fill in CPU mode ...";
   if (handler_ != nullptr) {
     AERROR << "Undistortion DO NOT support CPU mode!";

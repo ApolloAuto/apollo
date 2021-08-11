@@ -14,21 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/radar/lib/preprocessor/conti_ars_preprocessor/conti_ars_preprocessor.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace perception {
 namespace radar {
 
 int ContiArsPreprocessor::current_idx_ = 0;
-int ContiArsPreprocessor::local2global_[ORIGIN_CONTI_MAX_ID_NUM] = {0};
+std::unordered_map<int, int> ContiArsPreprocessor::local2global_;
 
 bool ContiArsPreprocessor::Init() {
   std::string model_name = "ContiArsPreprocessor";
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
-                                                       &model_config));
-  CHECK(model_config->get_value("delay_time", &delay_time_));
+  ACHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
+                                                        &model_config));
+  ACHECK(model_config->get_value("delay_time", &delay_time_));
   return true;
 }
 
@@ -36,7 +36,7 @@ bool ContiArsPreprocessor::Preprocess(
     const drivers::ContiRadar& raw_obstacles,
     const PreprocessorOptions& options,
     drivers::ContiRadar* corrected_obstacles) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   SkipObjects(raw_obstacles, corrected_obstacles);
   ExpandIds(corrected_obstacles);
   CorrectTime(corrected_obstacles);
@@ -70,15 +70,20 @@ void ContiArsPreprocessor::ExpandIds(drivers::ContiRadar* corrected_obstacles) {
   for (int iobj = 0; iobj < corrected_obstacles->contiobs_size(); ++iobj) {
     const auto& contiobs = corrected_obstacles->contiobs(iobj);
     int id = contiobs.obstacle_id();
-    if (CONTI_NEW == contiobs.meas_state()) {
-      local2global_[id] = GetNextId();
-    } else {
-      if (local2global_[id] == 0) {
-        local2global_[id] = GetNextId();
+    int corrected_id = 0;
+    auto ob = local2global_.find(id);
+    if (ob != local2global_.end()) {
+      if (CONTI_NEW == contiobs.meas_state()) {
+        corrected_id = GetNextId();
+        ob->second = corrected_id;
+      } else {
+        corrected_id = ob->second;
       }
+    } else {
+      corrected_id = GetNextId();
+      local2global_.insert({id, corrected_id});
     }
-    corrected_obstacles->mutable_contiobs(iobj)->set_obstacle_id(
-        local2global_[id]);
+    corrected_obstacles->mutable_contiobs(iobj)->set_obstacle_id(corrected_id);
   }
 }
 

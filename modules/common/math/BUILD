@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,10 +16,32 @@ cc_library(
         ":kalman_filter",
         ":linear_interpolation",
         ":lqr",
-        ":mpc",
+        ":mpc_osqp",
         ":quaternion",
         ":search",
         ":sin_table",
+    ],
+)
+
+cc_library(
+    name = "math_utils",
+    srcs = ["math_utils.cc"],
+    hdrs = ["math_utils.h"],
+    linkopts = ["-lm"],
+    deps = [
+        ":vec2d",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "vec2d",
+    srcs = ["vec2d.cc"],
+    hdrs = ["vec2d.h"],
+    linkopts = ["-lm"],
+    deps = [
+        "//cyber/common:log",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -28,10 +51,7 @@ cc_library(
         "aabox2d.cc",
         "box2d.cc",
         "line_segment2d.cc",
-        "math_utils.cc",
-        "math_utils.h",
         "polygon2d.cc",
-        "vec2d.cc",
     ],
     hdrs = [
         "aabox2d.h",
@@ -39,34 +59,27 @@ cc_library(
         "box2d.h",
         "line_segment2d.h",
         "polygon2d.h",
-        "vec2d.h",
     ],
+    linkopts = ["-lm"],
     deps = [
+        ":math_utils",
         "//cyber/common:log",
         "//modules/common/util:string_util",
-        "@eigen",
+        "@com_google_absl//absl/strings",
         "@osqp",
     ],
 )
 
 cc_library(
     name = "sin_table",
-    srcs = [
-        "sin_table.cc",
-    ],
-    hdrs = [
-        "sin_table.h",
-    ],
+    srcs = ["sin_table.cc"],
+    hdrs = ["sin_table.h"],
 )
 
 cc_library(
     name = "angle",
-    srcs = [
-        "angle.cc",
-    ],
-    hdrs = [
-        "angle.h",
-    ],
+    srcs = ["angle.cc"],
+    hdrs = ["angle.h"],
     deps = [
         ":sin_table",
     ],
@@ -74,9 +87,7 @@ cc_library(
 
 cc_library(
     name = "euler_angles_zxy",
-    hdrs = [
-        "euler_angles_zxy.h",
-    ],
+    hdrs = ["euler_angles_zxy.h"],
     deps = [
         ":geometry",
         "@eigen",
@@ -85,22 +96,18 @@ cc_library(
 
 cc_library(
     name = "quaternion",
-    hdrs = [
-        "quaternion.h",
-    ],
+    hdrs = ["quaternion.h"],
     deps = [
         ":euler_angles_zxy",
         ":geometry",
-        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:geometry_cc_proto",
         "@eigen",
     ],
 )
 
 cc_library(
     name = "curve_fitting",
-    hdrs = [
-        "curve_fitting.h",
-    ],
+    hdrs = ["curve_fitting.h"],
     deps = [
         ":matrix_operations",
         "@eigen",
@@ -109,12 +116,8 @@ cc_library(
 
 cc_library(
     name = "matrix_operations",
-    srcs = [
-        "matrix_operations.cc",
-    ],
-    hdrs = [
-        "matrix_operations.h",
-    ],
+    srcs = ["matrix_operations.cc"],
+    hdrs = ["matrix_operations.h"],
     deps = [
         "//cyber/common:log",
         "@eigen",
@@ -124,32 +127,17 @@ cc_library(
 cc_test(
     name = "matrix_operations_test",
     size = "small",
-    srcs = [
-        "matrix_operations_test.cc",
-    ],
+    srcs = ["matrix_operations_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":matrix_operations",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "kalman_filter",
-    hdrs = [
-        "kalman_filter.h",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "extended_kalman_filter",
-    hdrs = [
-        "extended_kalman_filter.h",
-    ],
+    hdrs = ["kalman_filter.h"],
     deps = [
         "//cyber/common:log",
         "//modules/common/math:matrix_operations",
@@ -159,35 +147,23 @@ cc_library(
 
 cc_library(
     name = "factorial",
-    hdrs = [
-        "factorial.h",
-    ],
-    deps = [
-    ],
+    hdrs = ["factorial.h"],
 )
 
 cc_library(
     name = "path_matcher",
-    srcs = [
-        "path_matcher.cc",
-    ],
-    hdrs = [
-        "path_matcher.h",
-    ],
+    srcs = ["path_matcher.cc"],
+    hdrs = ["path_matcher.h"],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
 cc_library(
     name = "mpc_osqp",
-    srcs = [
-        "mpc_osqp.cc",
-    ],
-    hdrs = [
-        "mpc_osqp.h",
-    ],
+    srcs = ["mpc_osqp.cc"],
+    hdrs = ["mpc_osqp.h"],
     deps = [
         "//cyber/common:log",
         "@eigen",
@@ -198,65 +174,36 @@ cc_library(
 cc_test(
     name = "angle_test",
     size = "small",
-    srcs = [
-        "angle_test.cc",
+    srcs = ["angle_test.cc"],
+    linkopts = [
+        "-lm",
     ],
     deps = [
         ":angle",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "search",
-    srcs = [
-        "search.cc",
-    ],
-    hdrs = [
-        "search.h",
-    ],
-    deps = [
-    ],
+    srcs = ["search.cc"],
+    hdrs = ["search.h"],
 )
 
 cc_library(
     name = "linear_interpolation",
-    srcs = [
-        "linear_interpolation.cc",
-    ],
-    hdrs = [
-        "linear_interpolation.h",
-    ],
+    srcs = ["linear_interpolation.cc"],
+    hdrs = ["linear_interpolation.h"],
     deps = [
         ":geometry",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-cc_library(
-    name = "nonlinear_interpolation",
-    srcs = [
-        "nonlinear_interpolation.cc",
-    ],
-    hdrs = [
-        "nonlinear_interpolation.h",
-    ],
-    deps = [
-        ":geometry",
-        ":hermite_spline",
-        ":integral",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
 cc_library(
     name = "integral",
-    srcs = [
-        "integral.cc",
-    ],
-    hdrs = [
-        "integral.h",
-    ],
+    srcs = ["integral.cc"],
+    hdrs = ["integral.h"],
     deps = [
         "//cyber/common:log",
     ],
@@ -264,42 +211,18 @@ cc_library(
 
 cc_library(
     name = "lqr",
-    srcs = [
-        "linear_quadratic_regulator.cc",
-    ],
-    hdrs = [
-        "linear_quadratic_regulator.h",
-    ],
+    srcs = ["linear_quadratic_regulator.cc"],
+    hdrs = ["linear_quadratic_regulator.h"],
     deps = [
         "//cyber/common:log",
-        "@eigen",
-    ],
-)
-
-cc_library(
-    name = "mpc",
-    srcs = [
-        "mpc_solver.cc",
-    ],
-    hdrs = [
-        "mpc_solver.h",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
     ],
 )
 
 cc_library(
     name = "cartesian_frenet_conversion",
-    srcs = [
-        "cartesian_frenet_conversion.cc",
-    ],
-    hdrs = [
-        "cartesian_frenet_conversion.h",
-    ],
+    srcs = ["cartesian_frenet_conversion.cc"],
+    hdrs = ["cartesian_frenet_conversion.h"],
     deps = [
         ":geometry",
         "//cyber/common:log",
@@ -309,9 +232,7 @@ cc_library(
 
 cc_library(
     name = "hermite_spline",
-    hdrs = [
-        "hermite_spline.h",
-    ],
+    hdrs = ["hermite_spline.h"],
     deps = [
         "//cyber/common:log",
     ],
@@ -320,199 +241,160 @@ cc_library(
 cc_test(
     name = "mpc_osqp_test",
     size = "small",
-    srcs = [
-        "mpc_osqp_test.cc",
-    ],
+    srcs = ["mpc_osqp_test.cc"],
     deps = [
-        ":mpc",
         ":mpc_osqp",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "mpc_test",
-    size = "small",
-    srcs = [
-        "mpc_solver_test.cc",
-    ],
-    deps = [
-        ":mpc",
-        "//modules/common/math/qp_solver",
-        "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
+        "//cyber/common:log",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "math_utils_test",
     size = "small",
-    srcs = [
-        "math_utils_test.cc",
-    ],
+    srcs = ["math_utils_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "linear_interpolation_test",
     size = "small",
-    srcs = [
-        "linear_interpolation_test.cc",
-    ],
+    srcs = ["linear_interpolation_test.cc"],
     deps = [
         ":linear_interpolation",
         "//cyber/common:log",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
 cc_test(
     name = "search_test",
     size = "small",
-    srcs = [
-        "search_test.cc",
+    srcs = ["search_test.cc"],
+    linkopts = [
+        "-lm",
     ],
     deps = [
         ":search",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "integral_test",
     size = "small",
-    srcs = [
-        "integral_test.cc",
+    srcs = ["integral_test.cc"],
+    linkopts = [
+        "-lm",
     ],
     deps = [
         ":integral",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "vec2d_test",
     size = "small",
-    srcs = [
-        "vec2d_test.cc",
-    ],
+    srcs = ["vec2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "quaternion_test",
     size = "small",
-    srcs = [
-        "quaternion_test.cc",
-    ],
+    srcs = ["quaternion_test.cc"],
     deps = [
         ":quaternion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "euler_angles_zxy_test",
     size = "small",
-    srcs = [
-        "euler_angles_zxy_test.cc",
-    ],
+    srcs = ["euler_angles_zxy_test.cc"],
     deps = [
         ":euler_angles_zxy",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "aabox2d_test",
     size = "small",
-    srcs = [
-        "aabox2d_test.cc",
-    ],
+    srcs = ["aabox2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "aaboxkdtree2d_test",
     size = "small",
-    srcs = [
-        "aaboxkdtree2d_test.cc",
-    ],
+    srcs = ["aaboxkdtree2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "box2d_test",
     size = "small",
-    srcs = [
-        "box2d_test.cc",
-    ],
+    srcs = ["box2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "polygon2d_test",
     size = "small",
-    srcs = [
-        "polygon2d_test.cc",
-    ],
+    srcs = ["polygon2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "line_segment2d_test",
     size = "small",
-    srcs = [
-        "line_segment2d_test.cc",
-    ],
+    srcs = ["line_segment2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "kalman_filter_test",
     size = "small",
-    srcs = [
-        "kalman_filter_test.cc",
-    ],
+    srcs = ["kalman_filter_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "cartesian_frenet_conversion_test",
     size = "small",
-    srcs = [
-        "cartesian_frenet_conversion_test.cc",
-    ],
+    srcs = ["cartesian_frenet_conversion_test.cc"],
     deps = [
         ":cartesian_frenet_conversion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

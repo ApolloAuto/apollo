@@ -24,10 +24,11 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/file.h"
+#include "absl/strings/str_cat.h"
 #include "google/protobuf/message.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
+
+#include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 
 /**
  * @namespace apollo::common::util
@@ -37,15 +38,13 @@ namespace apollo {
 namespace common {
 namespace util {
 
-// Expose some useful utils from protobuf.
-using ::google::protobuf::Message;
-
 template <typename T, typename std::enable_if<
-                          std::is_base_of<Message, T>::value, int>::type = 0>
+                          std::is_base_of<google::protobuf::Message, T>::value,
+                          int>::type = 0>
 static void FillHeader(const std::string& module_name, T* msg) {
   static std::atomic<uint64_t> sequence_num = {0};
   auto* header = msg->mutable_header();
-  double timestamp = apollo::common::time::Clock::NowInSeconds();
+  double timestamp = ::apollo::cyber::Clock::NowInSeconds();
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(
@@ -53,20 +52,8 @@ static void FillHeader(const std::string& module_name, T* msg) {
 }
 
 template <typename T, typename std::enable_if<
-                          !std::is_base_of<Message, T>::value, int>::type = 0>
-static bool DumpMessage(const std::shared_ptr<T>& msg,
-                        const std::string& dump_dir = "/tmp") {
-  return true;
-}
-
-template <typename T, typename std::enable_if<
-                          !std::is_base_of<Message, T>::value, int>::type = 0>
-static bool DumpMessage(const T& msg, const std::string& dump_dir = "/tmp") {
-  return true;
-}
-
-template <typename T, typename std::enable_if<
-                          std::is_base_of<Message, T>::value, int>::type = 0>
+                          std::is_base_of<google::protobuf::Message, T>::value,
+                          int>::type = 0>
 bool DumpMessage(const std::shared_ptr<T>& msg,
                  const std::string& dump_dir = "/tmp") {
   if (!msg) {
@@ -86,7 +73,7 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 
   auto sequence_num = msg->header().sequence_num();
   return cyber::common::SetProtoToASCIIFile(
-      *msg, util::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
+      *msg, absl::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
 }
 
 inline size_t MessageFingerprint(const google::protobuf::Message& message) {

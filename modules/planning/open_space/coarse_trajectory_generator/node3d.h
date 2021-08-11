@@ -24,16 +24,12 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planner_open_space_config.pb.h"
-
 #include "modules/common/math/box2d.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 
 class Node3d {
  public:
@@ -47,8 +43,9 @@ class Node3d {
          const std::vector<double>& XYbounds,
          const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~Node3d() = default;
-  static Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_,
-                              const double x, const double y, const double phi);
+  static apollo::common::math::Box2d GetBoundingBox(
+      const common::VehicleParam& vehicle_param_, const double x,
+      const double y, const double phi);
   double GetCost() const { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() const { return traj_cost_; }
   double GetHeuCost() const { return heuristic_cost_; }

@@ -28,6 +28,9 @@ namespace fusion {
 
 class KalmanMotionFusion : public BaseMotionFusion {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   explicit KalmanMotionFusion(TrackPtr track) : BaseMotionFusion(track) {}
   ~KalmanMotionFusion() = default;
 

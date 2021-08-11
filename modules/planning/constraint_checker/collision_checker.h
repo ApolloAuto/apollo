@@ -34,7 +34,7 @@ namespace planning {
 
 class CollisionChecker {
  public:
-  explicit CollisionChecker(
+  CollisionChecker(
       const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
       const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line,

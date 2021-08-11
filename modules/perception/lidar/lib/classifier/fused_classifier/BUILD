@@ -1,17 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "util",
-    srcs = [
-        "util.cc",
-    ],
-    hdrs = [
-        "util.h",
-    ],
+    srcs = ["util.cc"],
+    hdrs = ["util.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "@eigen",
     ],
@@ -19,9 +17,7 @@ cc_library(
 
 cc_library(
     name = "type_fusion_interface",
-    hdrs = [
-        "type_fusion_interface.h",
-    ],
+    hdrs = ["type_fusion_interface.h"],
     deps = [
         "//modules/perception/base:object",
         "//modules/perception/lib/registerer",
@@ -31,33 +27,26 @@ cc_library(
 
 cc_library(
     name = "ccrf_type_fusion",
-    srcs = [
-        "ccrf_type_fusion.cc",
-    ],
-    hdrs = [
-        "ccrf_type_fusion.h",
-    ],
+    srcs = ["ccrf_type_fusion.cc"],
+    hdrs = ["ccrf_type_fusion.h"],
     deps = [
         ":type_fusion_interface",
         ":util",
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
-        "//modules/perception/proto:ccrf_type_fusion_config_proto",
+        "//modules/perception/proto:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
 
 cc_library(
     name = "fused_classifier",
-    srcs = [
-        "fused_classifier.cc",
-    ],
-    hdrs = [
-        "fused_classifier.h",
-    ],
+    srcs = ["fused_classifier.cc"],
+    hdrs = ["fused_classifier.h"],
     deps = [
         ":type_fusion_interface",
         "//cyber",
@@ -65,20 +54,18 @@ cc_library(
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//modules/perception/proto:fused_classifier_config_proto",
+        "//modules/perception/proto:fused_classifier_config_cc_proto",
     ],
     alwayslink = True,
 )
 
 cc_library(
     name = "fused_classifier_test",
-    srcs = [
-        "fused_classifier_test.cc",
-    ],
+    srcs = ["fused_classifier_test.cc"],
     deps = [
         ":fused_classifier",
         ":util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

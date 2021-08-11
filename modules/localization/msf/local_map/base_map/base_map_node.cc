@@ -50,7 +50,6 @@ void BaseMapNode::Init(const BaseMapConfig* map_config,
   if (create_map_cells) {
     InitMapMatrix(map_config_);
   }
-  return;
 }
 
 void BaseMapNode::InitMapMatrix(const BaseMapConfig* map_config) {

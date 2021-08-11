@@ -77,7 +77,7 @@ Status ObjectsXmlParser::ParseClearAreas(
       PbClearArea clear_area;
       clear_area.mutable_id()->set_id(object_id);
       PbPolygon* polygon = clear_area.mutable_polygon();
-      CHECK(polygon != nullptr);
+      ACHECK(polygon != nullptr);
       const tinyxml2::XMLElement* outline_node =
           sub_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
@@ -122,7 +122,7 @@ Status ObjectsXmlParser::ParseSpeedBumps(
         RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
         sub_node = sub_node->NextSiblingElement("geometry");
       }
-      if (speed_bump.position_size() <= 0) {
+      if (speed_bump.position().empty()) {
         std::string err_msg = "Error speed bump miss stop line.";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }
@@ -155,7 +155,7 @@ Status ObjectsXmlParser::ParseStopLines(
       StopLineInternal stop_line;
       stop_line.id = object_id;
       PbCurveSegment* curve_segment = stop_line.curve.add_segment();
-      CHECK(curve_segment != nullptr);
+      ACHECK(curve_segment != nullptr);
       const auto sub_node = object_node->FirstChildElement("geometry");
       if (sub_node == nullptr) {
         std::string err_msg = "Error parse stopline geometry";
@@ -357,6 +357,60 @@ Status ObjectsXmlParser::ToPassageType(const std::string& type,
     *passage_type = apollo::hdmap::Passage_Type_EXIT;
   } else {
     *passage_type = apollo::hdmap::Passage_Type_UNKNOWN;
+  }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ParseRSUs(
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<RSUInternal>* rsus) {
+  CHECK_NOTNULL(rsus);
+
+  auto rsu_node = xml_node.FirstChildElement("object");
+  while (rsu_node) {
+    std::string object_type;
+    std::string object_id;
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*rsu_node, "type", &object_type);
+    checker +=
+        UtilXmlParser::QueryStringAttribute(*rsu_node, "id", &object_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse rsu type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    if (object_type == "rsu") {
+      std::string junction_id;
+      checker = UtilXmlParser::QueryStringAttribute(*rsu_node,
+                                            "junctionID", &junction_id);
+      if (checker != tinyxml2::XML_SUCCESS) {
+        std::string err_msg = "Error parse rsu junction id.";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+
+      RSUInternal rsu;
+      rsu.rsu.mutable_id()->set_id(object_id);
+      rsu.rsu.mutable_junction_id()->set_id(junction_id);
+      rsu.id = object_id;
+      rsus->emplace_back(rsu);
+
+      rsu_node = rsu_node->NextSiblingElement("object");
+    }
+  }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ParseObjects(const tinyxml2::XMLElement& xml_node,
+                                      ObjectInternal* objects) {
+  CHECK_NOTNULL(objects);
+
+  // objects
+  auto sub_node = xml_node.FirstChildElement("objects");
+  if (sub_node != nullptr) {
+    // rsus
+    RETURN_IF_ERROR(ObjectsXmlParser::ParseRSUs(*sub_node, &objects->rsus));
   }
 
   return Status::OK();

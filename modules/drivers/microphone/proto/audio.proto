@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.drivers.microphone.config;
+
+import "modules/common/proto/header.proto";
+import "modules/drivers/microphone/proto/microphone_config.proto";
+
+message ChannelData {
+  optional ChannelType channel_type = 1;
+  optional bytes data = 2;
+}
+
+message AudioData {
+  optional apollo.common.Header header = 1;
+  optional MicrophoneConfig microphone_config = 2;
+  repeated ChannelData channel_data = 3;
+}

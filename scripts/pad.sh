@@ -16,19 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "${DIR}/.."
-
-source "$DIR/apollo_base.sh"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function start() {
-    eval "${APOLLO_BIN_PREFIX}/modules/control/tools/pad_terminal  \
-        --log_dir=${APOLLO_ROOT_DIR}/data/log"
+  ${TOP_DIR}/bazel-bin/modules/control/tools/pad_terminal \
+    --log_dir=${APOLLO_ROOT_DIR}/data/log
 }
 
 function stop() {
-    pkill -SIGKILL -f pad_terminal
+  pkill -SIGKILL -f pad_terminal
 }
 
 case $1 in
@@ -37,6 +34,10 @@ case $1 in
     ;;
   stop)
     stop
+    ;;
+  restart)
+    stop
+    start
     ;;
   *)
     start

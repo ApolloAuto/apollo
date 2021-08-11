@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -35,19 +34,19 @@ namespace park_and_go {
 class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    apollo::cyber::common::GetProtoFromFile(
-        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
+    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CRUISE);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
-  ScenarioConfig park_and_go_config_;
+  ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(ParkAndGoStageCruiseTest, Init) {
-  ParkAndGoStageCruise park_and_go_stage_cruise(
-      park_and_go_config_.stage_config(2));
-  EXPECT_EQ(park_and_go_stage_cruise.stage_type(),
-            ScenarioConfig::PARK_AND_GO_CRUISE);
+  ParkAndGoStageCruise park_and_go_stage_cruise(config_, injector_);
+  EXPECT_EQ(park_and_go_stage_cruise.Name(),
+            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_CRUISE));
 }
 
 }  // namespace park_and_go

@@ -46,7 +46,7 @@ TEST_F(PedestrianInteractionEvaluatorTest, Evaluate) {
   Obstacle* obstacle_ptr = container.GetObstacle(101);
   EXPECT_NE(obstacle_ptr, nullptr);
   PedestrianInteractionEvaluator evaluator;
-  evaluator.Evaluate(obstacle_ptr);
+  evaluator.Evaluate(obstacle_ptr, &container);
 }
 
 }  // namespace prediction

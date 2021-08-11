@@ -59,3 +59,15 @@ DECLARE_string(lidar_height_yaml);
 DECLARE_int32(monitor_msg_pending_queue_size);
 
 DECLARE_string(default_data_collection_config_path);
+
+DECLARE_int32(loop_routing_end_to_start_distance_threshold);
+
+DECLARE_string(default_preprocess_config_path);
+
+DECLARE_string(vehicle_calibration_mode);
+
+DECLARE_string(lidar_calibration_mode);
+
+DECLARE_string(camera_calibration_mode);
+
+DECLARE_double(parking_routing_distance_threshold);

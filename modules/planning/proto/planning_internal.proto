@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.planning_internal;
 
+import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
@@ -13,7 +14,6 @@ import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_config.proto";
-import "modules/planning/proto/planning_status.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -32,6 +32,7 @@ message StGraphBoundaryDebug {
     ST_BOUNDARY_TYPE_YIELD = 4;
     ST_BOUNDARY_TYPE_OVERTAKE = 5;
     ST_BOUNDARY_TYPE_KEEP_CLEAR = 6;
+    ST_BOUNDARY_TYPE_DRIVABLE_REGION = 7;
   }
   optional string name = 1;
   repeated apollo.common.SpeedPoint point = 2;
@@ -112,8 +113,8 @@ message ReferenceLineDebug {
   optional bool is_protected = 6;
   optional bool is_offroad = 7;
   optional double minimum_boundary = 8;
-  optional double average_kappa = 9[deprecated = true];
-  optional double average_dkappa = 10[deprecated = true];
+  optional double average_kappa = 9 [deprecated = true];
+  optional double average_dkappa = 10 [deprecated = true];
   optional double kappa_rms = 11;
   optional double dkappa_rms = 12;
   optional double kappa_max_abs = 13;
@@ -158,6 +159,9 @@ message OpenSpaceDebug {
   optional apollo.planning_internal.Trajectories fallback_trajectory = 15;
   optional apollo.common.TrajectoryPoint trajectory_stitching_point = 16;
   optional apollo.common.TrajectoryPoint future_collision_point = 17;
+  optional double time_latency = 18 [default = 0.0];  // ms
+  optional apollo.common.PointENU origin_point = 19;  // meter
+  optional double origin_heading_rad = 20;
 }
 
 message SmootherDebug {
@@ -169,6 +173,15 @@ message SmootherDebug {
 
   optional SmootherType type = 2 [default = SMOOTHER_NONE];
   optional string reason = 3;
+}
+
+message PullOverDebug {
+  optional apollo.common.PointENU position = 1;
+  optional double theta = 2;
+  optional double length_front = 3;
+  optional double length_back = 4;
+  optional double width_left = 5;
+  optional double width_right = 6;
 }
 
 // next ID: 30
@@ -199,8 +212,8 @@ message PlanningData {
   optional ScenarioDebug scenario = 26;
   optional OpenSpaceDebug open_space = 27;
   optional SmootherDebug smoother = 28;
-
-  optional apollo.planning.PullOverStatus pull_over_status = 29;
+  optional PullOverDebug pull_over = 29;
+  optional HybridModelDebug hybrid_model = 30;
 }
 
 message LatticeStPixel {
@@ -240,4 +253,11 @@ message CloudReferenceLineRoutingRequest {
 
 message CloudReferenceLineResponse {
   repeated apollo.common.Path segment = 1;
+}
+
+message HybridModelDebug {
+  optional bool using_learning_model_output = 1 [default = false];
+  optional double learning_model_output_usage_ratio = 2;
+  optional string learning_model_output_fail_reason = 3;
+  optional apollo.common.Path evaluated_path_reference = 4;
 }

@@ -1,320 +1,469 @@
-import STORE from "store";
-import RENDERER from "renderer";
-import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
-import UTTERANCE from "store/utterance";
+import STORE from 'store';
+import RENDERER from 'renderer';
+import MAP_NAVIGATOR from 'components/Navigation/MapNavigator';
+import UTTERANCE from 'store/utterance';
 import Worker from 'utils/webworker.js';
 
 export default class RealtimeWebSocketEndpoint {
-    constructor(serverAddr) {
-        this.serverAddr = serverAddr;
-        this.websocket = null;
-        this.simWorldUpdatePeriodMs = 100;
-        this.simWorldLastUpdateTimestamp = 0;
-        this.mapUpdatePeriodMs = 1000;
-        this.mapLastUpdateTimestamp = 0;
-        this.updatePOI = true;
-        this.routingTime = undefined;
-        this.currentMode = null;
-        this.worker = new Worker();
+  constructor(serverAddr) {
+    this.serverAddr = serverAddr;
+    this.websocket = null;
+    this.simWorldUpdatePeriodMs = 100;
+    this.simWorldLastUpdateTimestamp = 0;
+    this.mapUpdatePeriodMs = 1000;
+    this.mapLastUpdateTimestamp = 0;
+    this.updatePOI = true;
+    this.updateDefaultRoutingPoints = true;
+    this.routingTime = undefined;
+    this.currentMode = null;
+    this.worker = new Worker();
+    this.pointcloudWS = null;
+    this.requestHmiStatus = this.requestHmiStatus.bind(this);
+    this.updateParkingRoutingDistance = true;
+  }
+
+  initialize() {
+    try {
+      this.websocket = new WebSocket(this.serverAddr);
+      this.websocket.binaryType = 'arraybuffer';
+    } catch (error) {
+      console.error(`Failed to establish a connection: ${error}`);
+      setTimeout(() => {
+        this.initialize();
+      }, 1000);
+      return;
     }
+    this.websocket.onmessage = (event) => {
+      this.worker.postMessage({
+        source: 'realtime',
+        data: event.data,
+      });
+    };
+    this.worker.onmessage = (event) => {
+      const message = event.data;
+      switch (message.type) {
+        case 'HMIStatus':
+          STORE.hmi.updateStatus(message.data);
+          RENDERER.updateGroundImage(STORE.hmi.currentMap);
+          break;
+        case 'VehicleParam':
+          STORE.hmi.updateVehicleParam(message.data);
+          break;
+        case 'SimControlStatus':
+          STORE.setOptionStatus('enableSimControl', message.enabled);
+          break;
+        case 'SimWorldUpdate':
+          this.checkMessage(message);
 
-    initialize() {
-        try {
-            this.websocket = new WebSocket(this.serverAddr);
-            this.websocket.binaryType = "arraybuffer";
-        } catch (error) {
-            console.error("Failed to establish a connection: " + error);
-            setTimeout(() => {
-                this.initialize();
-            }, 1000);
-            return;
-        }
-        this.websocket.onmessage = event => {
-            this.worker.postMessage({
-                source: 'realtime',
-                data: event.data,
-            });
-        };
-        this.worker.onmessage = event => {
-            const message = event.data;
-            switch (message.type) {
-                case "HMIStatus":
-                    STORE.hmi.updateStatus(message.data);
-                    RENDERER.updateGroundImage(STORE.hmi.currentMap);
-                    break;
-                case "VehicleParam":
-                    STORE.hmi.updateVehicleParam(message.data);
-                    break;
-                case "SimControlStatus":
-                    STORE.setOptionStatus('enableSimControl', message.enabled);
-                    break;
-                case "SimWorldUpdate":
-                    this.checkMessage(message);
-
-                    const isNewMode = (this.currentMode &&
-                                       this.currentMode !== STORE.hmi.currentMode);
-                    this.currentMode = STORE.hmi.currentMode;
-                    if (STORE.hmi.inNavigationMode) {
-                        // In navigation mode, the coordinate system is FLU and
-                        // relative position of the ego-car is (0, 0). But,
-                        // absolute position of the ego-car is needed in MAP_NAVIGATOR.
-                        if (MAP_NAVIGATOR.isInitialized()) {
-                            MAP_NAVIGATOR.update(message);
-                        }
-                        message.autoDrivingCar.positionX = 0;
-                        message.autoDrivingCar.positionY = 0;
-                        message.autoDrivingCar.heading = 0;
-
-                        RENDERER.coordinates.setSystem("FLU");
-                        this.mapUpdatePeriodMs = 100;
-                    } else {
-                        RENDERER.coordinates.setSystem("ENU");
-                        this.mapUpdatePeriodMs = 1000;
-                    }
-
-                    STORE.update(message, isNewMode);
-                    RENDERER.maybeInitializeOffest(
-                        message.autoDrivingCar.positionX,
-                        message.autoDrivingCar.positionY,
-                        isNewMode);
-                    RENDERER.updateWorld(message);
-                    this.updateMapIndex(message);
-                    if (this.routingTime !== message.routingTime) {
-                        // A new routing needs to be fetched from backend.
-                        this.requestRoutePath();
-                        this.routingTime = message.routingTime;
-                    }
-                    break;
-                case "MapElementIds":
-                    RENDERER.updateMapIndex(message.mapHash,
-                            message.mapElementIds, message.mapRadius);
-                    break;
-                case "DefaultEndPoint":
-                    STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
-                    break;
-                case "RoutePath":
-                    RENDERER.updateRouting(message.routingTime, message.routePath);
-                    break;
-                case "RoutingPointCheckResult":
-                    if (message.error) {
-                        RENDERER.removeInvalidRoutingPoint(message.pointId, message.error);
-                    }
-                    break;
-                case "DataCollectionProgress":
-                    if (message) {
-                        STORE.hmi.updateDataCollectionProgress(message.data);
-                    }
-                    break;
-            }
-        };
-        this.websocket.onclose = event => {
-            console.log("WebSocket connection closed, close_code: " + event.code);
-
-            // If connection has been lost for more than 10 sec, send the error message every 2 sec
-            const now = new Date().getTime();
-            const lossDuration = now - this.simWorldLastUpdateTimestamp;
-            const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
-            if (this.simWorldLastUpdateTimestamp !== 0 &&
-                lossDuration > 10000 && alertDuration > 2000) {
-                const message = "Connection to the server has been lost.";
-                STORE.monitor.insert("FATAL", message, now);
-                if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking() ) {
-                    UTTERANCE.speakOnce(message);
-                }
+          const isNewMode = (this.currentMode
+                                       && this.currentMode !== STORE.hmi.currentMode);
+          const isNavigationModeInvolved = (this.currentMode === 'Navigation'
+                                                    || STORE.hmi.currentMode === 'Navigation');
+          this.currentMode = STORE.hmi.currentMode;
+          if (STORE.hmi.shouldDisplayNavigationMap) {
+            if (MAP_NAVIGATOR.isInitialized()) {
+              MAP_NAVIGATOR.update(message);
             }
 
-            this.initialize();
-        };
+            if (STORE.hmi.inNavigationMode) {
+              // In navigation mode, the coordinate system is FLU and
+              // relative position of the ego-car is (0, 0). But,
+              // absolute position of the ego-car is needed in MAP_NAVIGATOR.
+              message.autoDrivingCar.positionX = 0;
+              message.autoDrivingCar.positionY = 0;
+              message.autoDrivingCar.heading = 0;
 
-        // Request simulation world every 100ms.
-        clearInterval(this.timer);
-        this.timer = setInterval(() => {
-            if (this.websocket.readyState === this.websocket.OPEN) {
-                // Load default routing end point.
-                if (this.updatePOI) {
-                    this.requestDefaultRoutingEndPoint();
-                    this.updatePOI = false;
-                }
-
-                this.requestSimulationWorld(STORE.options.showPNCMonitor);
-                if (STORE.hmi.isCalibrationMode) {
-                    this.requestDataCollectionProgress();
-                }
+              RENDERER.coordinates.setSystem('FLU');
+              this.mapUpdatePeriodMs = 100;
             }
-        }, this.simWorldUpdatePeriodMs);
-    }
+          } else {
+            RENDERER.coordinates.setSystem('ENU');
+            this.mapUpdatePeriodMs = 1000;
+          }
 
-    updateMapIndex(message) {
-        const now = new Date();
-        const duration = now - this.mapLastUpdateTimestamp;
-        if (message.mapHash && duration >= this.mapUpdatePeriodMs) {
-            RENDERER.updateMapIndex(message.mapHash, message.mapElementIds, message.mapRadius);
-            this.mapLastUpdateTimestamp = now;
+          STORE.update(message, isNewMode);
+          RENDERER.maybeInitializeOffest(
+            message.autoDrivingCar.positionX,
+            message.autoDrivingCar.positionY,
+            // Updating offset only if navigation mode is involved since
+            // its coordination system is different from rest of the modes.
+            isNewMode && isNavigationModeInvolved,
+          );
+          RENDERER.updateWorld(message);
+          this.updateMapIndex(message);
+          if (this.routingTime !== message.routingTime) {
+            // A new routing needs to be fetched from backend.
+            this.requestRoutePath();
+            this.routingTime = message.routingTime;
+          }
+          break;
+        case 'MapElementIds':
+          RENDERER.updateMapIndex(message.mapHash,
+            message.mapElementIds, message.mapRadius);
+          break;
+        case 'DefaultEndPoint':
+          STORE.routeEditingManager.updateDefaultRoutingEndPoint(message);
+          break;
+        case 'DefaultRoutings':
+          STORE.routeEditingManager.updateDefaultRoutingPoints(message);
+          break;
+        case 'AddDefaultRoutingPath':
+          STORE.routeEditingManager.addDefaultRoutingPath(message);
+          break;
+        case 'RoutePath':
+          RENDERER.updateRouting(message.routingTime, message.routePath);
+          break;
+        case 'RoutingPointCheckResult':
+          if (message.error) {
+            RENDERER.removeInvalidRoutingPoint(message.pointId, message.error);
+          }
+          break;
+        case 'DataCollectionProgress':
+          if (message) {
+            STORE.hmi.updateDataCollectionProgress(message.data);
+          }
+          break;
+        case 'PreprocessProgress':
+          if (message) {
+            STORE.hmi.updatePreprocessProgress(message.data);
+          }
+          break;
+        case 'ParkingRoutingDistance':
+          if (message) {
+            STORE.routeEditingManager.updateParkingRoutingDistance(message.threshold);
+          }
+          break;
+      }
+    };
+    this.websocket.onclose = (event) => {
+      console.log(`WebSocket connection closed, close_code: ${event.code}`);
+
+      // If connection has been lost for more than 10 sec, send the error message every 2 sec
+      const now = new Date().getTime();
+      const lossDuration = now - this.simWorldLastUpdateTimestamp;
+      const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
+      if (this.simWorldLastUpdateTimestamp !== 0
+                && lossDuration > 10000 && alertDuration > 2000) {
+        const message = 'Connection to the server has been lost.';
+        STORE.monitor.insert('FATAL', message, now);
+        if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking()) {
+          UTTERANCE.speakOnce(message);
         }
-    }
+      }
 
-    checkMessage(world) {
-        const now = new Date().getTime();
-        const duration = now - this.simWorldLastUpdateTimestamp;
-        if (this.simWorldLastUpdateTimestamp !== 0 && duration > 200) {
-            console.warn("Last sim_world_update took " + duration + "ms");
+      this.initialize();
+    };
+
+    // Request simulation world every 100ms.
+    clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      if (this.websocket.readyState === this.websocket.OPEN) {
+        // Load default routing end point.
+        if (this.updatePOI) {
+          this.requestDefaultRoutingEndPoint();
+          this.updatePOI = false;
         }
-        if (this.secondLastSeqNum === world.sequenceNum) {
-            // Receiving multiple duplicated simulation_world messages
-            // indicates a backend lag.
-            console.warn("Received duplicate simulation_world:", this.lastSeqNum);
+        // Load default routing points user defined
+        if (this.updateDefaultRoutingPoints) {
+          this.requestDefaultRoutingPoints();
+          this.updateDefaultRoutingPoints = false;
         }
-        this.secondLastSeqNum = this.lastSeqNum;
-        this.lastSeqNum = world.sequenceNum;
-        this.simWorldLastUpdateTimestamp = now;
-    }
-
-    requestSimulationWorld(requestPlanningData) {
-        this.websocket.send(JSON.stringify({
-            type : "RequestSimulationWorld",
-            planning : requestPlanningData,
-        }));
-    }
-
-    checkRoutingPoint(point) {
-        const request = {
-            type: "CheckRoutingPoint",
-            point: point
-        };
-        this.websocket.send(JSON.stringify(request));
-    }
-
-    requestMapElementIdsByRadius(radius) {
-        this.websocket.send(JSON.stringify({
-            type: "RetrieveMapElementIdsByRadius",
-            radius: radius,
-        }));
-    }
-
-    requestRoute(start, start_heading, waypoint, end, parkingSpaceId) {
-        const request = {
-            type: "SendRoutingRequest",
-            start: start,
-            end: end,
-            waypoint: waypoint,
-        };
-
-        if (parkingSpaceId) {
-            request.parkingSpaceId = parkingSpaceId;
+        if (this.pointcloudWS.isEnabled()) {
+          this.pointcloudWS.requestPointCloud();
         }
-
-        if (start_heading) {
-            request.start.heading = start_heading;
+        this.requestSimulationWorld(STORE.options.showPNCMonitor);
+        if (this.updateParkingRoutingDistance) {
+          this.requestParkingRoutingDistance();
+          this.updateParkingRoutingDistance = false;
         }
-        this.websocket.send(JSON.stringify(request));
-    }
-
-    requestDefaultRoutingEndPoint() {
-        this.websocket.send(JSON.stringify({
-            type: "GetDefaultEndPoint",
-        }));
-    }
-
-    resetBackend() {
-        this.websocket.send(JSON.stringify({
-            type: "Reset",
-        }));
-    }
-
-    dumpMessages() {
-        this.websocket.send(JSON.stringify({
-            type: "Dump",
-        }));
-    }
-
-    changeSetupMode(mode) {
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: "CHANGE_MODE",
-            value: mode,
-        }));
-    }
-
-    changeMap(map) {
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: "CHANGE_MAP",
-            value: map,
-        }));
-        this.updatePOI = true;
-    }
-
-    changeVehicle(vehicle) {
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: "CHANGE_VEHICLE",
-            value: vehicle,
-        }));
-    }
-
-    executeModeCommand(action) {
-        if (!['SETUP_MODE', 'RESET_MODE', 'ENTER_AUTO_MODE'].includes(action)) {
-            console.error("Unknown mode command found:", action);
-            return;
+        if (STORE.hmi.isVehicleCalibrationMode) {
+          this.requestDataCollectionProgress();
+          this.requestPreprocessProgress();
         }
-
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: action,
-        }));
-    }
-
-    executeModuleCommand(moduleName, command) {
-        if (!['START_MODULE', 'STOP_MODULE'].includes(command)) {
-            console.error("Unknown module command found:", command);
-            return;
+        if (STORE.hmi.isSensorCalibrationMode) {
+          this.requestPreprocessProgress();
         }
+      }
+    }, this.simWorldUpdatePeriodMs);
+  }
 
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: command,
-            value: moduleName
-        }));
+  updateMapIndex(message) {
+    const now = new Date();
+    const duration = now - this.mapLastUpdateTimestamp;
+    if (message.mapHash && duration >= this.mapUpdatePeriodMs) {
+      RENDERER.updateMapIndex(message.mapHash, message.mapElementIds, message.mapRadius);
+      this.mapLastUpdateTimestamp = now;
+    }
+  }
+
+  checkMessage(world) {
+    const now = new Date().getTime();
+    const duration = now - this.simWorldLastUpdateTimestamp;
+    if (this.simWorldLastUpdateTimestamp !== 0 && duration > 200) {
+      console.warn(`Last sim_world_update took ${duration}ms`);
+    }
+    if (this.secondLastSeqNum === world.sequenceNum) {
+      // Receiving multiple duplicated simulation_world messages
+      // indicates a backend lag.
+      console.warn('Received duplicate simulation_world:', this.lastSeqNum);
+    }
+    this.secondLastSeqNum = this.lastSeqNum;
+    this.lastSeqNum = world.sequenceNum;
+    this.simWorldLastUpdateTimestamp = now;
+  }
+
+  requestSimulationWorld(requestPlanningData) {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestSimulationWorld',
+      planning: requestPlanningData,
+    }));
+  }
+
+  checkRoutingPoint(point) {
+    const request = {
+      type: 'CheckRoutingPoint',
+      point,
+    };
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  requestMapElementIdsByRadius(radius) {
+    this.websocket.send(JSON.stringify({
+      type: 'RetrieveMapElementIdsByRadius',
+      radius,
+    }));
+  }
+
+  requestRoute(start, start_heading, waypoint, end, parkingInfo) {
+    const request = {
+      type: 'SendRoutingRequest',
+      start,
+      end,
+      waypoint,
+    };
+
+    if (parkingInfo) {
+      request.parkingInfo = parkingInfo;
     }
 
-    submitDriveEvent(eventTimeMs, eventMessage, eventTypes, isReportable) {
-    	this.websocket.send(JSON.stringify({
-            type: "SubmitDriveEvent",
-            event_time_ms: eventTimeMs,
-            event_msg: eventMessage,
-            event_type: eventTypes,
-            is_reportable: isReportable,
-        }));
+    if (start_heading) {
+      request.start.heading = start_heading;
+    }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  requestDefaultCycleRouting(start, start_heading, waypoint, end, cycleNumber) {
+    const request = {
+      type: 'SendDefaultCycleRoutingRequest',
+      start,
+      end,
+      waypoint,
+      cycleNumber,
+    };
+    if (start_heading) {
+      request.start.heading = start_heading;
+    }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  requestDefaultRoutingEndPoint() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetDefaultEndPoint',
+    }));
+  }
+
+  requestDefaultRoutingPoints() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetDefaultRoutings',
+    }));
+  }
+
+  requestParkingRoutingDistance() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetParkingRoutingDistance',
+    }));
+  }
+
+  resetBackend() {
+    this.websocket.send(JSON.stringify({
+      type: 'Reset',
+    }));
+  }
+
+  dumpMessages() {
+    this.websocket.send(JSON.stringify({
+      type: 'Dump',
+    }));
+  }
+
+  changeSetupMode(mode) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_MODE',
+      value: mode,
+    }));
+  }
+
+  changeMap(map) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_MAP',
+      value: map,
+    }));
+    this.updatePOI = true;
+    this.updateDefaultRoutingPoints = true;
+  }
+
+  changeVehicle(vehicle) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_VEHICLE',
+      value: vehicle,
+    }));
+  }
+
+  executeModeCommand(action) {
+    if (!['SETUP_MODE', 'RESET_MODE', 'ENTER_AUTO_MODE'].includes(action)) {
+      console.error('Unknown mode command found:', action);
+      return;
     }
 
-    sendAudioPiece(data) {
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: "RECORD_AUDIO",
-            value: btoa(String.fromCharCode(...data)),
-        }));
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action,
+    }));
+
+    setTimeout(this.requestHmiStatus, 5000);
+  }
+
+  executeModuleCommand(moduleName, command) {
+    if (!['START_MODULE', 'STOP_MODULE'].includes(command)) {
+      console.error('Unknown module command found:', command);
+      return;
     }
 
-    toggleSimControl(enable) {
-        this.websocket.send(JSON.stringify({
-            type: "ToggleSimControl",
-            enable: enable,
-        }));
-    }
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: command,
+      value: moduleName,
+    }));
 
-    requestRoutePath() {
-        this.websocket.send(JSON.stringify({
-            type: "RequestRoutePath",
-        }));
-    }
+    setTimeout(this.requestHmiStatus, 5000);
+  }
 
-    publishNavigationInfo(data) {
-        this.websocket.send(data);
-    }
+  submitDriveEvent(eventTimeMs, eventMessage, eventTypes, isReportable) {
+    this.websocket.send(JSON.stringify({
+      type: 'SubmitDriveEvent',
+      event_time_ms: eventTimeMs,
+      event_msg: eventMessage,
+      event_type: eventTypes,
+      is_reportable: isReportable,
+    }));
+  }
 
-    requestDataCollectionProgress() {
-        this.websocket.send(JSON.stringify({
-            type: "RequestDataCollectionProgress",
-        }));
+  submitAudioEvent(eventTimeMs, obstacleId, audioType, movingResult, direction, isSirenOn) {
+    this.websocket.send(JSON.stringify({
+      type: 'SubmitAudioEvent',
+      event_time_ms: eventTimeMs,
+      obstacle_id: obstacleId,
+      audio_type: audioType,
+      moving_result: movingResult,
+      audio_direction: direction,
+      is_siren_on: isSirenOn,
+    }));
+  }
+
+  toggleSimControl(enable) {
+    this.websocket.send(JSON.stringify({
+      type: 'ToggleSimControl',
+      enable,
+    }));
+  }
+
+  requestRoutePath() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestRoutePath',
+    }));
+  }
+
+  requestHmiStatus() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIStatus',
+    }));
+  }
+
+  publishNavigationInfo(data) {
+    this.websocket.send(data);
+  }
+
+  requestDataCollectionProgress() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestDataCollectionProgress',
+    }));
+  }
+
+  setPointCloudWS(pointcloudws) {
+    this.pointcloudWS = pointcloudws;
+  }
+
+  saveDefaultRouting(routingName,points) {
+    const request = {
+      type: 'SaveDefaultRouting',
+      name: routingName,
+      point: points,
+    };
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  requestPreprocessProgress() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestPreprocessProgress',
+    }));
+  }
+
+  startPreprocessData(data, type) {
+    const request = {
+      type,
+    };
+    if (data) {
+      request.data = data;
     }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, id) {
+    const request = {
+      type: 'SendParkingRoutingRequest',
+      start,
+      end,
+      waypoint,
+      parkingInfo,
+      laneWidth,
+      cornerPoints,
+    };
+    if (id) {
+      request.end.id = id;
+    }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  sendDeadEndJunctionRoutingRequest(
+    start1, end1, start2, end2, inLaneIds, outLaneIds, routingPoint,
+  ) {
+    const request = {
+      type: 'SendDeadEndJunctionRoutingRequest',
+      start1,
+      end1,
+      start2,
+      end2,
+      inLaneIds,
+      outLaneIds,
+      routingPoint,
+    };
+    // construct lane way point with lane id for end1 start2
+    // are intersection point may get error lane id
+    request.end1.id = inLaneIds[0];
+    request.start2.id = outLaneIds[0];
+    this.websocket.send(JSON.stringify(request));
+  }
 }

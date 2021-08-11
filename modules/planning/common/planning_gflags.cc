@@ -20,10 +20,6 @@
 
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
-DEFINE_double(test_duration, -1.0,
-              "The runtime duration in test mode. There is no runtime limit if "
-              "the value is not positive");
-
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_int32(history_max_record_num, 5,
@@ -39,6 +35,14 @@ DEFINE_string(scenario_lane_follow_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/lane_follow_config.pb.txt",
               "The lane_follow scenario configuration file");
+DEFINE_string(scenario_lane_follow_hybrid_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/lane_follow_hybrid_config.pb.txt",
+              "The lane_follow scenario configuration file for HYBRID");
+DEFINE_string(scenario_learning_model_sample_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/learning_model_sample_config.pb.txt",
+              "learning_model_sample scenario config file");
 DEFINE_string(scenario_narrow_street_u_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/narrow_street_u_turn_config.pb.txt",
@@ -51,6 +55,14 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
+DEFINE_string(scenario_emergency_pull_over_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/emergency_pull_over_config.pb.txt",
+              "The emergency_pull_over scenario configuration file");
+DEFINE_string(scenario_emergency_stop_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/emergency_stop_config.pb.txt",
+              "The emergency_stop scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -71,22 +83,29 @@ DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
               "valet_parking scenario config file");
+DEFINE_string(scenario_deadend_turnaround_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/deadend_turnaround_config.pb.txt",
+              "deadend_turnaround scenario config file");
 DEFINE_string(scenario_yield_sign_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/yield_sign_config.pb.txt",
               "yield_sign scenario config file");
 
-DEFINE_bool(enable_scenario_bare_intersection, false,
+DEFINE_bool(enable_scenario_bare_intersection, true,
             "enable bare_intersection scenarios in planning");
 
-DEFINE_bool(enable_scenario_park_and_go, false,
+DEFINE_bool(enable_scenario_park_and_go, true,
             "enable park-and-go scenario in planning");
 
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_bool(enable_pull_over_exit, false,
-            "allow pull-over scenario exit to lane follow in planning");
+DEFINE_bool(enable_scenario_emergency_pull_over, true,
+            "enable emergency-pull-over scenario in planning");
+
+DEFINE_bool(enable_scenario_emergency_stop, true,
+            "enable emergency-stop scenario in planning");
 
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
@@ -109,10 +128,6 @@ DEFINE_string(traffic_rule_config_filename,
               "Traffic rule config filename");
 
 DEFINE_string(smoother_config_filename,
-              "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for qp_spline smoother");
-
-DEFINE_string(reopt_smoother_config_filename,
               "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
@@ -144,30 +159,9 @@ DEFINE_bool(enable_smooth_reference_line, true,
 DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
-DEFINE_bool(reckless_change_lane, false,
-            "Always allow the vehicle change lane. The vehicle may continue "
-            "changing lane. This is mainly test purpose");
-DEFINE_double(change_lane_fail_freeze_time, 3.0,
-              "seconds. Not allowed to change lane this amount of time "
-              "if it just finished change lane or failed to change lane");
-DEFINE_double(change_lane_success_freeze_time, 3.0,
-              "seconds. Not allowed to change lane this amount of time "
-              "if it just finished change lane or failed to change lane");
 DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");
-DEFINE_bool(enable_change_lane_decider, false,
-            "True to use change lane state machine decider.");
-DEFINE_double(change_lane_speed_relax_percentage, 0.05,
-              "The percentage of change lane speed relaxation.");
-
-DEFINE_double(max_collision_distance, 0.1,
-              "considered as collision if distance (meters) is smaller than or "
-              "equal to this (meters)");
-
-DEFINE_bool(ignore_overlapped_obstacle, false,
-            "ignore obstacle that overlapps with ADC. Only enable this flag "
-            "when you found fake obstacle result from poorly lidar");
 
 DEFINE_double(replan_lateral_distance_threshold, 0.5,
               "The lateral distance threshold of replan");
@@ -189,6 +183,13 @@ DEFINE_double(planning_upper_speed_limit, 31.3,
 
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 
+DEFINE_double(threshold_distance_for_destination, 0.01,
+              "threshold distance for destination");
+
+DEFINE_double(buffer_in_routing, 0.0, "buffer for select in lane for boundary");
+
+DEFINE_double(buffer_out_routing, 2.0,
+              "buffer for select out lane for boundary");
 // planning trajectory output time density control
 DEFINE_double(
     trajectory_time_min_interval, 0.02,
@@ -206,7 +207,7 @@ DEFINE_bool(enable_trajectory_check, false,
 DEFINE_double(speed_lower_bound, -0.1, "The lowest speed allowed.");
 DEFINE_double(speed_upper_bound, 40.0, "The highest speed allowed.");
 
-DEFINE_double(longitudinal_acceleration_lower_bound, -4.5,
+DEFINE_double(longitudinal_acceleration_lower_bound, -6.0,
               "The lowest longitudinal acceleration allowed.");
 DEFINE_double(longitudinal_acceleration_upper_bound, 4.0,
               "The highest longitudinal acceleration allowed.");
@@ -217,34 +218,25 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_bound, 4.0,
-              "Bound of longitudinal jerk; symmetric for front and back");
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
-DEFINE_double(dl_bound, 0.10,
-              "The bound for derivative l in s-l coordinate system.");
 DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
-DEFINE_double(dkappa_bound, 0.02,
-              "The bound for trajectory curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
-DEFINE_bool(enable_always_stop_for_pedestrian, true,
-            "True to always STOP for pedestrian when path cross");
 
-DEFINE_bool(enable_side_radar, false,
-            "If there is no radar on the side,ignore it");
 DEFINE_double(static_obstacle_nudge_l_buffer, 0.3,
               "minimum l-distance to nudge a static obstacle (meters)");
 DEFINE_double(nonstatic_obstacle_nudge_l_buffer, 0.4,
               "minimum l-distance to nudge a non-static obstacle (meters)");
+DEFINE_double(lane_change_obstacle_nudge_l_buffer, 0.3,
+              "minimum l-distance to nudge when changing lane (meters)");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -256,21 +248,15 @@ DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(follow_min_obs_lateral_distance, 2.5,
               "obstacle min lateral distance to follow");
-DEFINE_double(yield_distance, 3.0,
+DEFINE_double(yield_distance, 5.0,
               "min yield distance for vehicles/moving objects "
               "other than pedestrians/bicycles");
-DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
-              "min yield distance for pedestrians/bicycles");
 DEFINE_double(follow_time_buffer, 2.5,
               "time buffer in second to calculate the following distance.");
 DEFINE_double(follow_min_time_sec, 2.0,
               "min follow time in st region before considering a valid follow,"
               " this is to differentiate a moving obstacle cross adc's"
               " current lane and move to a different direction");
-DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
-DEFINE_double(signal_light_min_pass_s_distance, 4.0,
-              "min s_distance for adc to be considered "
-              "have passed signal_light (stop_line_end_s)");
 DEFINE_double(signal_expire_time_sec, 5.0,
               "traffic light signal info read expire time in sec");
 DEFINE_string(destination_obstacle_id, "DEST",
@@ -285,6 +271,9 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
 // Path Deciders
+DEFINE_bool(enable_skip_path_tasks, false,
+            "skip all path tasks and use trimmed previous path");
+
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -298,8 +287,8 @@ DEFINE_double(static_obstacle_speed_threshold, 0.5,
               "or not.");
 DEFINE_double(lane_borrow_max_speed, 5.0,
               "The speed threshold for lane-borrow");
-DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
-             "The cycle threhold for long-term blocking obstacle.");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threshold, 3,
+             "The cycle threshold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -314,41 +303,30 @@ DEFINE_double(
     turn_signal_distance, 100.00,
     "In meters. If there is a turn within this distance, use turn signal");
 
-// planning config file
-DEFINE_string(planning_config_file,
-              "/apollo/modules/planning/conf/planning_config.pb.txt",
-              "planning config file");
-
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
-DEFINE_bool(enable_lag_prediction, true,
-            "Enable lagged prediction, which is more tolerant to obstacles "
-            "that appear and disappear quickly");
-DEFINE_int32(lag_prediction_min_appear_num, 5,
-             "The minimum of appearance of the obstacle for lagged prediction");
-DEFINE_double(lag_prediction_max_disappear_num, 3,
-              "In lagged prediction, ignore obstacle disappeared for more "
-              "than this value");
-DEFINE_double(lag_prediction_protection_distance, 30,
-              "Within this distance, we do not use lagged prediction");
+DEFINE_double(lane_change_prepare_length, 80.0,
+              "The distance of lane-change preparation on current lane.");
 
-DEFINE_double(perception_confidence_threshold, 0.4,
-              "Skip the obstacle if its confidence is lower than "
-              "this threshold.");
+DEFINE_double(min_lane_change_prepare_length, 10.0,
+              "The minimal distance needed of lane-change on current lane.");
+
+DEFINE_double(allowed_lane_change_failure_time, 2.0,
+              "The time allowed for lane-change failure before updating"
+              "preparation distance.");
+
+DEFINE_bool(enable_smarter_lane_change, false,
+            "enable smarter lane change with longer preparation distance.");
 
 // QpSt optimizer
 DEFINE_double(slowdown_profile_deceleration, -4.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
-DEFINE_bool(enable_follow_accel_constraint, true,
-            "Enable follow acceleration constraint.");
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_uint64(max_planning_thread_pool_size, 15,
-              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
@@ -357,7 +335,6 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 /// Lattice Planner
 DEFINE_double(numerical_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
@@ -442,25 +419,19 @@ DEFINE_double(default_delta_s_lateral_optimization, 1.0,
 DEFINE_double(bound_buffer, 0.1, "buffer to boundary for lateral optimization");
 DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 
-DEFINE_bool(use_planning_fallback, true,
-            "Use fallback trajectory for planning.");
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.1,
               "fallback trajectory unit time in seconds");
-DEFINE_double(
-    fallback_distance_buffer, 0.5,
-    "fallback distance to end buffer when doing fixed distance speed fallback");
-DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
-              "velocity to use polynomial speed fallback.");
 
 DEFINE_double(speed_bump_speed_limit, 4.4704,
               "the speed limit when passing a speed bump, m/s. The default "
               "speed limit is 10 mph.");
+DEFINE_double(default_city_road_speed_limit, 15.67,
+              "default speed limit (m/s) for city road. 35 mph.");
+DEFINE_double(default_highway_speed_limit, 29.06,
+              "default speed limit (m/s) for highway. 65 mph.");
 
 // navigation mode
-DEFINE_double(navigation_fallback_cruise_time, 8.0,
-              "The time range of fallback cruise under navigation mode.");
-
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
 
@@ -509,8 +480,6 @@ DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
-DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
-            "Use OSQP optimizer for reference line optimization.");
 DEFINE_bool(enable_osqp_debug, false,
             "True to turn on OSQP verbose debug output in log.");
 
@@ -539,21 +508,14 @@ DEFINE_double(smoother_stop_distance, 10.0,
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 
-DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
-
 DEFINE_double(open_space_standstill_acceleration, 0.0,
               "(unit: meter/sec^2) for open space stand still at destination");
-
-DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
-
-DEFINE_bool(enable_nonscenario_side_pass, false,
-            "True to enable side pass without scenario management");
 
 DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
 
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
-DEFINE_bool(enable_lane_change_urgency_checking, true,
+DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");
@@ -563,3 +525,48 @@ DEFINE_uint64(trajectory_stitching_preserved_length, 20,
 
 DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
               "(unit: meter) for side pass driving width l buffer");
+
+DEFINE_bool(use_st_drivable_boundary, false,
+            "True to use st_drivable boundary in speed planning");
+
+DEFINE_bool(enable_reuse_path_in_lane_follow, false,
+            "True to enable reuse path in lane follow");
+DEFINE_bool(
+    use_smoothed_dp_guide_line, false,
+    "True to penalize speed optimization result to be close to dp guide line");
+
+DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
+            "False to disallow soft bound in nonlinear speed opt");
+
+DEFINE_bool(use_front_axe_center_in_path_planning, false,
+            "If using front axe center in path planning, the path can be "
+            "more agile.");
+
+DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
+
+DEFINE_bool(planning_offline_learning, false,
+            "offline learning. read record files and dump learning_data");
+DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
+              "Prefix of files to store feature data");
+DEFINE_string(planning_offline_bags, "",
+              "a list of source files or directories for offline mode. "
+              "The items need to be separated by colon ':'. ");
+DEFINE_int32(learning_data_obstacle_history_time_sec, 3.0,
+             "time sec (second) of history trajectory points for a obstacle");
+DEFINE_int32(learning_data_frame_num_per_file, 100,
+             "number of learning_data_frame to write out in one data file.");
+DEFINE_string(
+    planning_birdview_img_feature_renderer_config_file,
+    "/apollo/modules/planning/conf/planning_semantic_map_config.pb.txt",
+    "config file for renderer singleton");
+
+DEFINE_bool(
+    skip_path_reference_in_side_pass, false,
+    "skipping using learning model output as path reference in side pass");
+DEFINE_bool(
+    skip_path_reference_in_change_lane, true,
+    "skipping using learning model output as path reference in change lane");
+
+DEFINE_int32(min_past_history_points_len, 0,
+             "minimun past history points length for trainsition from "
+             "rule-based planning to learning-based planning");

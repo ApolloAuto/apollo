@@ -19,13 +19,14 @@
 #include <dirent.h>
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_viewer.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
@@ -33,7 +34,6 @@
 namespace apollo {
 namespace data {
 
-using apollo::common::util::StrCat;
 using cyber::common::DirectoryExists;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
@@ -60,9 +60,10 @@ bool PostRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
 bool PostRecordProcessor::Process() {
   // First scan, get intervals
   for (const std::string& record : source_record_files_) {
-    const auto reader =
-        std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    const auto reader = std::make_shared<RecordReader>(
+        absl::StrCat(source_record_dir_, "/", record));
+    RecordViewer viewer(reader, 0,
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
     for (const auto& msg : viewer) {
@@ -75,9 +76,10 @@ bool PostRecordProcessor::Process() {
   IntervalPool::Instance()->ReorgIntervals();
   IntervalPool::Instance()->PrintIntervals();
   for (const std::string& record : source_record_files_) {
-    const auto reader =
-        std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    const auto reader = std::make_shared<RecordReader>(
+        absl::StrCat(source_record_dir_, "/", record));
+    RecordViewer viewer(reader, 0,
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
       // If the message fall into generated intervals,
@@ -99,7 +101,7 @@ std::string PostRecordProcessor::GetDefaultOutputFile() const {
   const std::string record_flag(".record");
   src_file_name.resize(src_file_name.size() - src_file_name.find(record_flag) +
                        record_flag.size() + 1);
-  return StrCat(restored_output_dir_, "/", src_file_name);
+  return absl::StrCat(restored_output_dir_, "/", src_file_name);
 }
 
 void PostRecordProcessor::LoadSourceRecords() {

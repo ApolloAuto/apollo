@@ -198,12 +198,10 @@ void Frame::build_indices() {
   bool objects_has_indices = true;
   bool gt_objects_has_indices = true;
   if (objects.size() > 0) {
-    objects_has_indices =
-        objects[0]->indices->indices.size() > 0 ? true : false;
+    objects_has_indices = objects[0]->indices->indices.size() > 0;
   }
   if (gt_objects.size() > 0) {
-    gt_objects_has_indices =
-        gt_objects[0]->indices->indices.size() > 0 ? true : false;
+    gt_objects_has_indices = gt_objects[0]->indices->indices.size() > 0;
   }
   if (objects_has_indices && gt_objects_has_indices) {
     return;
@@ -224,10 +222,10 @@ void Frame::build_points() {
   bool objects_has_points = true;
   bool gt_objects_has_points = true;
   if (objects.size() > 0) {
-    objects_has_points = objects[0]->cloud->size() > 0 ? true : false;
+    objects_has_points = objects[0]->cloud->size() > 0;
   }
   if (gt_objects.size() > 0) {
-    gt_objects_has_points = gt_objects[0]->cloud->size() > 0 ? true : false;
+    gt_objects_has_points = gt_objects[0]->cloud->size() > 0;
   }
   if (objects_has_points && gt_objects_has_points) {
     return;

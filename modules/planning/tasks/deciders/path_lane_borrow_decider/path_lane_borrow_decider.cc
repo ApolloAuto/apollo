@@ -17,6 +17,7 @@
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
@@ -31,14 +32,23 @@ using apollo::common::Status;
 constexpr double kIntersectionClearanceDist = 20.0;
 constexpr double kJunctionClearanceDist = 15.0;
 
-PathLaneBorrowDecider::PathLaneBorrowDecider(const TaskConfig& config)
-    : Decider(config) {}
+PathLaneBorrowDecider::PathLaneBorrowDecider(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Decider(config, injector) {}
 
 Status PathLaneBorrowDecider::Process(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+
+  // skip path_lane_borrow_decider if reused path
+  if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
+    // for debug
+    AINFO << "skip due to reusing path";
+    return Status::OK();
+  }
 
   // By default, don't borrow any lane.
   reference_line_info->set_is_path_lane_borrow(false);
@@ -53,7 +63,7 @@ Status PathLaneBorrowDecider::Process(
 
 bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  auto* mutable_path_decider_status = PlanningContext::Instance()
+  auto* mutable_path_decider_status = injector_->planning_context()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
   if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
@@ -69,40 +79,54 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     // If originally not borrowing neighbor lane:
     ADEBUG << "Blocking obstacle ID["
            << mutable_path_decider_status->front_static_obstacle_id() << "]";
-    if (HasSingleReferenceLine(frame) && IsWithinSidePassingSpeedADC(frame) &&
-        IsBlockingObstacleFarFromIntersection(reference_line_info) &&
-        IsLongTermBlockingObstacle() &&
-        IsBlockingObstacleWithinDestination(reference_line_info) &&
-        IsSidePassableObstacle(reference_line_info)) {
-      // switch to lane-borrowing
-      // set side-pass direction
-      const auto& path_decider_status =
-          PlanningContext::Instance()->planning_status().path_decider();
-      if (path_decider_status.decided_side_pass_direction_size() <= 0) {
-        // first time init decided_side_pass_direction
-        bool left_borrowable;
-        bool right_borrowable;
-        CheckLaneBorrow(reference_line_info, &left_borrowable,
-                        &right_borrowable);
-        if (!left_borrowable && !right_borrowable) {
-          mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(
-              false);
-        } else {
-          mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(
-              true);
-          if (left_borrowable) {
-            mutable_path_decider_status->add_decided_side_pass_direction(
-                PathDeciderStatus::LEFT_BORROW);
-          }
-          if (right_borrowable) {
-            mutable_path_decider_status->add_decided_side_pass_direction(
-                PathDeciderStatus::RIGHT_BORROW);
-          }
+    // ADC requirements check for lane-borrowing:
+    if (!HasSingleReferenceLine(frame)) {
+      return false;
+    }
+    if (!IsWithinSidePassingSpeedADC(frame)) {
+      return false;
+    }
+
+    // Obstacle condition check for lane-borrowing:
+    if (!IsBlockingObstacleFarFromIntersection(reference_line_info)) {
+      return false;
+    }
+    if (!IsLongTermBlockingObstacle()) {
+      return false;
+    }
+    if (!IsBlockingObstacleWithinDestination(reference_line_info)) {
+      return false;
+    }
+    if (!IsSidePassableObstacle(reference_line_info)) {
+      return false;
+    }
+
+    // switch to lane-borrowing
+    // set side-pass direction
+    const auto& path_decider_status =
+        injector_->planning_context()->planning_status().path_decider();
+    if (path_decider_status.decided_side_pass_direction().empty()) {
+      // first time init decided_side_pass_direction
+      bool left_borrowable;
+      bool right_borrowable;
+      CheckLaneBorrow(reference_line_info, &left_borrowable, &right_borrowable);
+      if (!left_borrowable && !right_borrowable) {
+        mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(false);
+        return false;
+      } else {
+        mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(true);
+        if (left_borrowable) {
+          mutable_path_decider_status->add_decided_side_pass_direction(
+              PathDeciderStatus::LEFT_BORROW);
+        }
+        if (right_borrowable) {
+          mutable_path_decider_status->add_decided_side_pass_direction(
+              PathDeciderStatus::RIGHT_BORROW);
         }
       }
-
-      AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
     }
+
+    AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
   }
   return mutable_path_decider_status->is_in_path_lane_borrow_scenario();
 }
@@ -119,11 +143,11 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  if (PlanningContext::Instance()
+  if (injector_->planning_context()
           ->planning_status()
           .path_decider()
           .front_static_obstacle_cycle_counter() >=
-      FLAGS_long_term_blocking_obstacle_cycle_threhold) {
+      FLAGS_long_term_blocking_obstacle_cycle_threshold) {
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {
@@ -135,7 +159,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -167,7 +191,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -222,7 +246,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decider_status =
-      PlanningContext::Instance()->planning_status().path_decider();
+      injector_->planning_context()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -248,7 +272,7 @@ void PathLaneBorrowDecider::CheckLaneBorrow(
   *left_neighbor_lane_borrowable = true;
   *right_neighbor_lane_borrowable = true;
 
-  constexpr double kLookforwardDistance = 100.0;
+  static constexpr double kLookforwardDistance = 100.0;
   double check_s = reference_line_info.AdcSlBoundary().end_s();
   const double lookforward_distance =
       std::min(check_s + kLookforwardDistance, reference_line.Length());
@@ -261,7 +285,8 @@ void PathLaneBorrowDecider::CheckLaneBorrow(
     }
 
     const auto waypoint = ref_point.lane_waypoints().front();
-    hdmap::LaneBoundaryType::Type lane_boundary_type;
+    hdmap::LaneBoundaryType::Type lane_boundary_type =
+        hdmap::LaneBoundaryType::UNKNOWN;
 
     if (*left_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::LeftBoundaryType(waypoint);

@@ -24,6 +24,25 @@ namespace apollo {
 namespace perception {
 namespace base {
 
+bool DownSamplePointCloudBeams(base::PointFCloudPtr cloud_ptr,
+                               base::PointFCloudPtr out_cloud_ptr,
+                               int downsample_factor) {
+  if (downsample_factor <= 0) {
+    return false;
+  }
+  for (size_t i = 0; i < cloud_ptr->size(); ++i) {
+    int32_t beam_id = cloud_ptr->points_beam_id(i);
+    if (beam_id % downsample_factor == 0) {
+      base::PointF point = cloud_ptr->at(i);
+      double timestamp = cloud_ptr->points_timestamp(i);
+      float height = cloud_ptr->points_height(i);
+      uint8_t label = cloud_ptr->points_label(i);
+      out_cloud_ptr->push_back(point, timestamp, height, beam_id, label);
+    }
+  }
+  return true;
+}
+
 void GetPointCloudCentroid(const PointFCloud& cloud, PointF* centroid) {
   for (size_t i = 0; i < cloud.size(); ++i) {
     centroid->x += cloud[i].x;
@@ -75,8 +94,8 @@ bool GetPointCloudMinareaBbox(const PointFCloud& pc, BoundingCube* box,
     return false;
   }
   std::vector<cv::Point2f> pts;
-  float min_z = FLT_MAX;
-  float max_z = -FLT_MAX;
+  float min_z = std::numeric_limits<float>::max();
+  float max_z = -std::numeric_limits<float>::max();
   for (size_t i = 0; i < pc.size(); ++i) {
     pts.push_back(cv::Point2f(pc[i].x, pc[i].y));
     min_z = std::min(min_z, pc[i].z);

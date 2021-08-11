@@ -29,8 +29,8 @@
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/drivers/canbus/common/byte.h"
 
@@ -43,7 +43,7 @@ namespace drivers {
 namespace canbus {
 
 using apollo::common::ErrorCode;
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 using micros = std::chrono::microseconds;
 
 /**
@@ -192,7 +192,7 @@ void MessageManager<SensorType>::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = apollo::common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time = Time::Now().ToNanosecond() / 1e3;
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/data/channel_buffer.h"
+
 #include <memory>
 #include <vector>
 
 #include "gtest/gtest.h"
 
 #include "cyber/common/util.h"
-#include "cyber/data/channel_buffer.h"
 
 namespace apollo {
 namespace cyber {

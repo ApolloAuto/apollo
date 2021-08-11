@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/init.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
@@ -48,11 +48,11 @@ TEST_F(BaseMapPoolTestSuite, MapNodePoolTest) {
   pool.FreeMapNodeTask(node3);
 
   unsigned int pool_size = pool.GetPoolSize();
-  ASSERT_EQ(pool_size, 3);
+  EXPECT_EQ(pool_size, 3);
 
   pool.Release();
   pool_size = pool.GetPoolSize();
-  ASSERT_EQ(pool_size, 0);
+  EXPECT_EQ(pool_size, 0);
 }
 
 }  // namespace msf

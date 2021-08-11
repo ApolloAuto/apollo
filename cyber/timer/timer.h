@@ -41,7 +41,7 @@ struct TimerOption {
       : period(period), callback(callback), oneshot(oneshot) {}
 
   /**
-   * @brief Default onstructor for initializer list
+   * @brief Default constructor for initializer list
    *
    */
   TimerOption() : period(), callback(), oneshot() {}

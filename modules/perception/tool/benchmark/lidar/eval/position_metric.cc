@@ -15,15 +15,19 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/eval/position_metric.h"
+
 #include <algorithm>
 #include <vector>
+
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace perception {
 namespace benchmark {
 
 void PositionMetric::cal_position_metric(const ObjectPtr& object,
                                          const PositionMetricOption& option) {
-  if (object->cloud->points.size() == 0) {
+  if (object->cloud->points.empty()) {
     return;
   }
   std::vector<double> distance;
@@ -78,13 +82,12 @@ std::string DistanceBasedRangeInterface::get_element(unsigned int index) const {
   } else {
     switch (index) {
       case 0:
-        return "0 - " + std::to_string(static_cast<int>(_s_half_distance)) +
-               "m";
+        return absl::StrCat("0 - ", static_cast<int>(_s_half_distance), "m");
       case 1:
-        return std::to_string(static_cast<int>(_s_half_distance)) + " - " +
-               std::to_string(static_cast<int>(_s_distance)) + "m";
+        return absl::StrCat(static_cast<int>(_s_half_distance), " - ",
+                            static_cast<int>(_s_distance), "m");
       default:
-        return std::to_string(static_cast<int>(_s_distance)) + " - 500m";
+        return absl::StrCat(static_cast<int>(_s_distance), " - 500m");
     }
   }
 }
@@ -187,13 +190,12 @@ std::string ViewBasedRangeInterface::get_element(unsigned int index) const {
   } else {
     switch (index) {
       case 0:
-        return "Front(" +
-               std::to_string(static_cast<int>(_s_front_view_angle)) + "d" +
-               std::to_string(static_cast<int>(_s_front_view_distance)) + "m)";
+        return absl::StrCat("Front(", static_cast<int>(_s_front_view_angle),
+                            "d", static_cast<int>(_s_front_view_distance),
+                            "m)");
       case 1:
-        return "Rear(" + std::to_string(static_cast<int>(_s_rear_view_angle)) +
-               "d" + std::to_string(static_cast<int>(_s_rear_view_distance)) +
-               "m)";
+        return absl::StrCat("Rear(", static_cast<int>(_s_rear_view_angle), "d",
+                            static_cast<int>(_s_rear_view_distance), "m)");
       case 2:
         return "Side(30m)";
       default:
@@ -237,10 +239,9 @@ std::string BoxBasedRangeInterface::get_element(unsigned int index) const {
   } else {
     switch (index) {
       case 0:
-        return "Box(F" +
-               std::to_string(static_cast<int>(_s_front_box_distance)) + "R" +
-               std::to_string(static_cast<int>(_s_rear_box_distance)) + "S" +
-               std::to_string(static_cast<int>(_s_side_box_distance)) + ")";
+        return absl::StrCat("Box(F", static_cast<int>(_s_front_box_distance),
+                            "R", static_cast<int>(_s_rear_box_distance), "S",
+                            static_cast<int>(_s_side_box_distance), ")");
       case 1:
       default:
         return "Outside-box";
@@ -281,30 +282,27 @@ std::string RoiDistanceBasedRangeInterface::get_element(
   if (_s_ignore_roi_outside) {
     switch (index) {
       case 0:
-        return "I.0-" + std::to_string(static_cast<int>(_s_half_distance)) +
-               "m";
+        return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
       case 1:
-        return "I." + std::to_string(static_cast<int>(_s_half_distance)) + "-" +
-               std::to_string(static_cast<int>(_s_distance)) + "m";
+        return absl::StrCat("I.", static_cast<int>(_s_half_distance), "-",
+                            static_cast<int>(_s_distance), "m");
       default:
         return "Outside";
     }
   } else {
     switch (index) {
       case 0:
-        return "I.0-" + std::to_string(static_cast<int>(_s_half_distance)) +
-               "m";
+        return absl::StrCat("I.0-", static_cast<int>(_s_half_distance), "m");
       case 1:
-        return "I." + std::to_string(static_cast<int>(_s_half_distance)) + "-" +
-               std::to_string(static_cast<int>(_s_distance)) + "m";
+        return absl::StrCat("I.", static_cast<int>(_s_half_distance), "-",
+                            static_cast<int>(_s_distance), "m");
       case 2:
-        return "O.0-" + std::to_string(static_cast<int>(_s_half_distance)) +
-               "m";
+        return absl::StrCat("O.0-", static_cast<int>(_s_half_distance), "m");
       case 3:
-        return "O." + std::to_string(static_cast<int>(_s_half_distance)) + "-" +
-               std::to_string(static_cast<int>(_s_distance)) + "m";
+        return absl::StrCat("O.", static_cast<int>(_s_half_distance), "-",
+                            static_cast<int>(_s_distance), "m");
       default:
-        return std::to_string(static_cast<int>(_s_distance)) + "-500m";
+        return absl::StrCat(static_cast<int>(_s_distance), "-500m");
     }
   }
 }

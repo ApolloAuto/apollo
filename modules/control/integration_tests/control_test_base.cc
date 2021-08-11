@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/control/integration_tests/control_test_base.h"
+
 #include <memory>
 
 #include "cyber/common/file.h"
 #include "google/protobuf/text_format.h"
 #include "modules/common/util/util.h"
-#include "modules/control/integration_tests/control_test_base.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
@@ -50,7 +52,10 @@ bool ControlTestBase::test_control() {
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";
 
   // set controller
-  if (!control_.controller_agent_.Init(&(control_.control_conf_)).ok()) {
+  control_.injector_ = std::make_shared<DependencyInjector>();
+  if (!control_.controller_agent_
+           .Init(control_.injector_, &(control_.control_conf_))
+           .ok()) {
     AERROR << "Control init controller failed! Stopping...";
     exit(EXIT_FAILURE);
   }
@@ -120,6 +125,12 @@ bool ControlTestBase::test_control() {
     control_.OnMonitor(monitor_message);
   }
 
+  control_.local_view_.mutable_chassis()->CopyFrom(control_.latest_chassis_);
+  control_.local_view_.mutable_trajectory()->CopyFrom(
+      control_.latest_trajectory_);
+  control_.local_view_.mutable_localization()->CopyFrom(
+      control_.latest_localization_);
+
   auto err = control_.ProduceControlCommand(&control_command_);
   if (!err.ok()) {
     ADEBUG << "control ProduceControlCommand failed";
@@ -137,8 +148,8 @@ void ControlTestBase::trim_control_command(ControlCommand *origin) {
 
 bool ControlTestBase::test_control(const std::string &test_case_name,
                                    int case_num) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
+  const std::string golden_result_file =
+      absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   control_command_.Clear();

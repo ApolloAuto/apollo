@@ -16,26 +16,25 @@
 
 #include "modules/planning/common/path/discretized_path.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/util/util.h"
+#include "gtest/gtest.h"
+#include "modules/common/util/point_factory.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
-using apollo::common::util::MakePathPoint;
+using apollo::common::util::PointFactory;
 
 TEST(DiscretizedPathTest, basic_test) {
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(std::sqrt(1.0 + 1.0) + p1.s());
-  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p3.set_s(std::sqrt(1.0 + 1.0) + p2.s());
-  PathPoint p4 = MakePathPoint(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p4.set_s(std::sqrt(1.0 + 1.0) + p3.s());
+  const double s1 = 0.0;
+  const double s2 = s1 + std::sqrt(1.0 + 1.0);
+  const double s3 = s2 + std::sqrt(1.0 + 1.0);
+  const double s4 = s3 + std::sqrt(1.0 + 1.0);
+  PathPoint p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
+  PathPoint p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
+  PathPoint p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
+  PathPoint p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
 
   std::vector<PathPoint> path_points{p1, p2, p3, p4};
 
@@ -69,14 +68,14 @@ TEST(DiscretizedPathTest, basic_test) {
 }
 
 TEST(DiscretizedPathTest, reverse_case) {
-  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p1.set_s(0.0);
-  PathPoint p2 = MakePathPoint(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p2.set_s(-std::sqrt(1.0 + 1.0) + p1.s());
-  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p3.set_s(-std::sqrt(1.0 + 1.0) + p2.s());
-  PathPoint p4 = MakePathPoint(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-  p4.set_s(-std::sqrt(1.0 + 1.0) + p3.s());
+  const double s1 = 0.0;
+  const double s2 = s1 - std::sqrt(1.0 + 1.0);
+  const double s3 = s2 - std::sqrt(1.0 + 1.0);
+  const double s4 = s3 - std::sqrt(1.0 + 1.0);
+  PathPoint p1 = PointFactory::ToPathPoint(0.0, 0.0, 0.0, s1);
+  PathPoint p2 = PointFactory::ToPathPoint(1.0, 1.0, 0.0, s2);
+  PathPoint p3 = PointFactory::ToPathPoint(2.0, 2.0, 0.0, s3);
+  PathPoint p4 = PointFactory::ToPathPoint(3.0, 3.0, 0.0, s4);
 
   std::vector<PathPoint> path_points{p1, p2, p3, p4};
 

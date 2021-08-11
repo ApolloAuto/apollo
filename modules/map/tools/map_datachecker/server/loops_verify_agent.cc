@@ -23,7 +23,7 @@ namespace apollo {
 namespace hdmap {
 
 LoopsVerifyAgent::LoopsVerifyAgent(
-    std::shared_ptr<JSonConf> sp_conf,
+    std::shared_ptr<JsonConf> sp_conf,
     std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
   sp_conf_ = sp_conf;
   sp_pose_collection_agent_ = sp_pose_collection_agent;
@@ -105,7 +105,7 @@ void LoopsVerifyAgent::CheckVerify(LoopsVerifyRequest *request,
     LoopResult *loop_result = response->mutable_loop_result();
 
     loop_result->set_loop_num(static_cast<double>(lap));
-    bool is_reached = lap >= GetLoopsToCheck(request) ? true : false;
+    bool is_reached = lap >= GetLoopsToCheck(request);
     loop_result->set_is_reached(is_reached);
 
     DataType data_type = request->type();
@@ -139,7 +139,7 @@ void LoopsVerifyAgent::StopVerify(LoopsVerifyRequest *request,
     AINFO << "acquired lap: " << lap << ", conf: " << conf;
     LoopResult *loop_result = response->mutable_loop_result();
     loop_result->set_loop_num(static_cast<double>(lap));
-    bool is_reached = lap >= GetLoopsToCheck(request) ? true : false;
+    bool is_reached = lap >= GetLoopsToCheck(request);
     loop_result->set_is_reached(is_reached);
 
     DataType data_type = request->type();
@@ -193,8 +193,8 @@ double LoopsVerifyAgent::GetRangeIndex(
   double max_time = std::numeric_limits<double>::min();
   for (size_t i = 0; i < size; ++i) {
     if (range[i].first >= range[i].second) {
-      AINFO << "range error, [" << std::to_string(range[i].first) << ","
-            << std::to_string(range[i].second) << "]";
+      AINFO << "range error, [" << range[i].first << "," << range[i].second
+            << "]";
       continue;
     }
     if (range[i].first < min_time) {
@@ -204,8 +204,8 @@ double LoopsVerifyAgent::GetRangeIndex(
       max_time = range[i].second;
     }
   }
-  AINFO << "[get_range_index] min_time:" << std::to_string(min_time)
-        << ", max_time" << std::to_string(max_time);
+  AINFO << "[get_range_index] min_time:" << min_time << ", max_time"
+        << max_time;
 
   std::vector<bool> &range_index = *sp_range_index;
   if (size == 0 || max_time <= 0) {
@@ -229,7 +229,7 @@ double LoopsVerifyAgent::GetRangeIndex(
       }
     }
   }
-  AINFO << "returned min_time:" << std::to_string(min_time);
+  AINFO << "returned min_time:" << min_time;
   return min_time;
 }
 
@@ -249,8 +249,7 @@ int LoopsVerifyAgent::GetPosesToCheck(
 
   std::vector<bool> range_index;
   double min_time = GetRangeIndex(sp_range, &range_index, sp_vec_poses);
-  if (min_time == std::numeric_limits<double>::max() ||
-      range_index.size() == 0) {
+  if (min_time == std::numeric_limits<double>::max() || range_index.empty()) {
     AINFO << "min_time: " << min_time
           << ", range_index size: " << range_index.size();
     return -1;

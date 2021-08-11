@@ -1,60 +1,87 @@
-# How to document source code for doxygen
+# How to Document Source Code in Apollo
 
-Developers who are not familiar with doxygen can get more information from its [official website](http://www.stack.nl/~dimitri/doxygen/).
+Apollo uses [Doxygen](https://www.doxygen.nl/index.html) for source code
+documentation. Developers who are not familiar with Doxygen can refer to
+official Doxygen Manual(https://www.doxygen.nl/manual/index.html) for an
+in-depth knowledge on documenting code with Doxygen. This document serves as a
+brief version of
+[Doxygen Manual: Documenting the code](https://www.doxygen.nl/manual/docblocks.html))
+focusing specificly on C/C++ and Python.
 
-We use [time.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/time/time.h) as an example to explain how to successfully document code.
+We will take
+[modules/common/math/kalman_filter.h](../../modules/common/math/kalman_filter.h)
+as an example to show you how to document code the Doxygen way. Note that
+Javadoc style is preferred rather than Qt style for comment blocks.
+
 ### File
-```
+
+```c++
 /**
  * @file
- *
- * @brief This library provides the utilities to deal with timestamps.
- * currently our assumption is that every timestamp will be of a
- * precision at 1 us.
+ * @brief Defines the templated KalmanFilter class.
  */
 ```
 
 ### Namespace
+
 ```
 /**
- * @namespace apollo::common::time
- * @brief apollo::common::time
+ * @namespace apollo::common::math
+ * @brief apollo::common::math
  */
+
 namespace apollo {
 namespace common {
-namespace time {
+namespace math {
 ```
 
 ### Class
+
 ```
 /**
- * @class Clock
- * @brief a singleton clock that can be used to get the current current
- * timestamp. The source can be either system clock or a mock clock.
- * Mock clock is for testing purpose mainly. The mock clock related
- * methods are not thread-safe.
+ * @class KalmanFilter
+ *
+ * @brief Implements a discrete-time Kalman filter.
+ *
+ * @param XN dimension of state
+ * @param ZN dimension of observations
+ * @param UN dimension of controls
  */
-class Clock {
+template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
+class KalmanFilter {
  public:
  ...
 ```
 
 ### Function
+
 ```
-/**
-  * @brief Set the behavior of the \class Clock.
-  * @param is_system_clock if provided with value TRUE, further call
-  * to Now() will return timestamp based on the system clock. If
-  * provided with FALSE, it will use the mock clock instead.
-  */
- static void UseSystemClock(bool is_system_clock) {
-   Clock::instance()->is_system_clock_ = is_system_clock;
- }
+  /**
+   * @brief Sets the initial state belief distribution.
+   *
+   * @param x Mean of the state belief distribution
+   * @param P Covariance of the state belief distribution
+   */
+  void SetStateEstimate(const Eigen::Matrix<T, XN, 1> &x,
+                        const Eigen::Matrix<T, XN, XN> &P) {
+    ...
+  }
+
+  /**
+   * @brief Get initialization state of the filter
+   * @return True if the filter is initialized
+   */
+  bool IsInitialized() const { return is_initialized_; }
+
 ```
 
 ### Public / protected class member variables
+
 ```
-/// Stores the currently set timestamp, which serves mock clock
-/// queries.
-Timestamp mock_now_;
+ protected:
+  /// Mean of current state belief distribution
+  Eigen::Matrix<T, XN, 1> x_;
 ```
+
+> Note: There is no public/protected member variables for `KalmanFilter`. The
+> code above serves for illustration purpose only.

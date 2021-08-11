@@ -20,15 +20,14 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
+#include "cyber/common/log.h"
+#include "cyber/time/clock.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_intersection_cruise.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
@@ -39,7 +38,6 @@ namespace scenario {
 namespace traffic_light {
 
 using apollo::hdmap::HDMapUtil;
-using apollo::perception::TrafficLight;
 
 void TrafficLightUnprotectedRightTurnScenario::Init() {
   if (init_) {
@@ -54,9 +52,9 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
   }
 
   const auto& traffic_light_status =
-      PlanningContext::Instance()->planning_status().traffic_light();
+      injector_->planning_context()->planning_status().traffic_light();
 
-  if (traffic_light_status.current_traffic_light_overlap_id_size() == 0) {
+  if (traffic_light_status.current_traffic_light_overlap_id().empty()) {
     AERROR << "Could not find traffic-light(s)";
     return;
   }
@@ -82,7 +80,8 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+               const std::shared_ptr<DependencyInjector>& injector)>
     TrafficLightUnprotectedRightTurnScenario::s_stage_factory_;
 
 void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
@@ -91,29 +90,33 @@ void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
   }
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightUnprotectedRightTurnStageStop(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new TrafficLightUnprotectedRightTurnStageStop(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightUnprotectedRightTurnStageCreep(config);
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
+        return new TrafficLightUnprotectedRightTurnStageCreep(config, injector);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+      [](const ScenarioConfig::StageConfig& config,
+         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(
-            config);
+            config, injector);
       });
 }
 
 std::unique_ptr<Stage> TrafficLightUnprotectedRightTurnScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
+    const ScenarioConfig::StageConfig& stage_config,
+    const std::shared_ptr<DependencyInjector>& injector) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
+                                                 stage_config, injector);
   if (ptr) {
     ptr->SetContext(&context_);
   }

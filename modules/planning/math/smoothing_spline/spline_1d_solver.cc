@@ -67,8 +67,6 @@ void Spline1dSolver::GenerateProblemProto(
       qp_proto->add_optimal_param(value);
     }
   }
-
-  return;
 }
 
 void Spline1dSolver::ConvertMatrixXdToProto(const Eigen::MatrixXd& matrix,

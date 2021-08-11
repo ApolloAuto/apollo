@@ -63,17 +63,17 @@ class ConditionClustering {
     condition_function_ = condition_function;
   }
 
-  inline void set_min_cluster_size(int size) { min_cluster_size_ = size; }
+  inline void set_min_cluster_size(size_t size) { min_cluster_size_ = size; }
 
-  inline void set_max_cluster_size(int size) { max_cluster_size_ = size; }
+  inline void set_max_cluster_size(size_t size) { max_cluster_size_ = size; }
 
   // main interface of ConditionClustering class to segment.
   void Segment(IndicesClusters* xy_clusters);
 
  private:
   typename std::shared_ptr<base::PointCloud<PointT>> cloud_;
-  int min_cluster_size_ = 0;
-  int max_cluster_size_ = 0;
+  size_t min_cluster_size_ = 0;
+  size_t max_cluster_size_ = 0;
   bool extract_removed_clusters_ = true;
   std::shared_ptr<IndicesClusters> small_clusters_;
   std::shared_ptr<IndicesClusters> large_clusters_;
@@ -111,7 +111,8 @@ void ConditionClustering<PointT>::Segment(IndicesClusters* xy_clusters) {
         continue;
       }
       for (std::size_t nii = 1; nii < nn_indices.size(); ++nii) {
-        if (nn_indices[nii] < 0 || nn_indices[nii] >= processed.size() ||
+        if (nn_indices[nii] < 0 ||
+            nn_indices[nii] >= static_cast<int>(processed.size()) ||
             processed[nn_indices[nii]]) {
           continue;
         }

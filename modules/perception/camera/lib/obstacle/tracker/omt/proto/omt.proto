@@ -1,0 +1,83 @@
+syntax = "proto2";
+
+package apollo.perception.camera.omt;
+
+message KalmanParam {
+  optional float init_variance = 1;
+  optional float process_variance = 2;
+  optional float measure_variance = 3;
+}
+message TargetParam {
+  optional float velocity_threshold = 1 [default = 2.0];
+  optional int32 velocity_output_delay = 2 [default = 2];
+  optional KalmanParam world_center = 3;
+  optional KalmanParam image_center = 4;
+  optional float image_wh_update_rate = 5;
+  optional int32 world_lhw_history = 6 [default = 15];
+  optional float height_diff_ratio = 7 [default = 0.1];
+
+  // params for checking static obstacles
+  optional int32 world_state_history = 8 [default = 30];
+  optional int32 min_cached_world_state_history_size = 9 [default = 5];
+  optional int32 min_cached_velocity_size = 10 [default = 10];
+  optional int32 min_cached_position_size = 11 [default = 25];
+  optional int32 calc_avg_position_window_size = 12 [default = 7];
+
+  optional float static_speed_threshold = 13 [default = 0.5];
+  optional float static_speed_threshold_ped = 14 [default = 0.3];
+  optional float min_moving_avg_speed = 15 [default = 1.0];
+  optional float min_moving_avg_speed_ped = 16 [default = 0.5];
+
+  optional float abnormal_acc_threshold = 17 [default = 6.0];
+  optional float abnormal_acc_threshold_ped = 18 [default = 3.0];
+
+  optional float abnormal_velocity_heading_angle_threshold = 19
+      [default = 0.7854];  // M_PI / 4
+
+  optional bool clapping_velocity = 20 [default = false];
+  optional int32 world_mean_velocity_duration = 21 [default = 10];
+
+  optional int32 tracked_life = 22 [default = 3];
+  optional float type_filter_var = 23 [default = 0.3];
+  optional float large_velocity_ratio = 24 [default = 2.5];
+  optional float too_large_velocity_ratio = 25 [default = 1.5];
+
+  optional int32 mean_filter_window = 26 [default = 10];
+  optional float direction_filter_ratio = 27 [default = 0.7];
+  optional float displacement_theta_var = 28 [default = 0.25];
+  optional float velocity_theta_var = 29 [default = 0.5];
+  optional float stable_moving_speed = 30 [default = 2.0];
+}
+message ReferenceParam {
+  optional int32 margin = 1 [default = 2];
+  optional int32 min_allow_height = 2 [default = 50];
+  optional float area_decay = 3 [default = 0.99];
+  optional int32 down_sampling = 4 [default = 40];
+  optional float height_diff_ratio = 5 [default = 0.1];
+}
+message WeightParam {
+  optional float appearance = 1 [default = 0];
+  optional float motion = 2 [default = 0];
+  optional float shape = 3 [default = 0];
+  optional float tracklet = 4 [default = 0];
+  optional float overlap = 5 [default = 0];
+}
+message OmtParam {
+  optional int32 img_capability = 1 [default = 7];
+  optional int32 lost_age = 2 [default = 2];
+  optional int32 reserve_age = 3 [default = 3];
+  optional WeightParam weight_same_camera = 4;
+  optional WeightParam weight_diff_camera = 5;
+  optional float border = 9 [default = 30];
+  optional float target_thresh = 10 [default = 0.65];
+  optional bool correct_type = 11 [default = false];
+  optional TargetParam target_param = 12;
+  optional float min_init_height_ratio = 13 [default = 17];
+  optional float target_combine_iou_threshold = 14 [default = 0.5];
+  optional float fusion_target_thresh = 15 [default = 0.45];
+  optional float image_displacement = 16 [default = 50];
+  optional float abnormal_movement = 17 [default = 0.3];
+  optional double same_ts_eps = 18 [default = 0.05];
+  optional ReferenceParam reference = 19;
+  optional string type_change_cost = 20;
+}

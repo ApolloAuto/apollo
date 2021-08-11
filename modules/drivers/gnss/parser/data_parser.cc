@@ -25,7 +25,6 @@
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"
@@ -57,9 +56,6 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
   switch (config.data().format()) {
     case config::Stream::NOVATEL_BINARY:
       return Parser::CreateNovatel(config);
-
-    case config::Stream::NEWTONM2_BINARY:
-      return Parser::CreateNewtonM2(config);
 
     default:
       return nullptr;
@@ -103,9 +99,9 @@ bool DataParser::Init() {
   gps_writer_ = node_->CreateWriter<Gps>(FLAGS_gps_topic);
 
   common::util::FillHeader("gnss", &ins_status_);
-  insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
+  insstatus_writer_->Write(ins_status_);
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
+  gnssstatus_writer_->Write(gnss_status_);
 
   AINFO << "Creating data parser of format: " << config_.data().format();
   data_parser_.reset(CreateParser(config_, false));
@@ -130,7 +126,9 @@ void DataParser::ParseRawData(const std::string &msg) {
 
   while (cyber::OK()) {
     type = data_parser_->GetMessage(&msg_ptr);
-    if (type == Parser::MessageType::NONE) break;
+    if (type == Parser::MessageType::NONE) {
+      break;
+    }
     DispatchMessage(type, msg_ptr);
   }
 }
@@ -158,7 +156,7 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
     }
 
     common::util::FillHeader("gnss", &ins_status_);
-    insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
+    insstatus_writer_->Write(ins_status_);
   }
 }
 
@@ -174,7 +172,7 @@ void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
     gnss_status_.set_solution_completed(false);
   }
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
+  gnssstatus_writer_->Write(gnss_status_);
 }
 
 void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {

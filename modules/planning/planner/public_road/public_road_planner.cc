@@ -16,8 +16,6 @@
 
 #include "modules/planning/planner/public_road/public_road_planner.h"
 
-#include <set>
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -28,14 +26,13 @@ using apollo::common::TrajectoryPoint;
 
 Status PublicRoadPlanner::Init(const PlanningConfig& config) {
   config_ = config;
-  scenario_manager_.Init();
+  scenario_manager_.Init(config);
   return Status::OK();
 }
 
 Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                Frame* frame,
                                ADCTrajectory* ptr_computed_trajectory) {
-  DCHECK_NOTNULL(frame);
   scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);

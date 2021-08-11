@@ -15,10 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+
 #include "modules/perception/tool/benchmark/lidar/util/object_supplement.h"
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 
@@ -67,6 +69,8 @@ SensorType translate_string_to_sensor_type(const std::string& str);
 std::string translate_sensor_type_to_string(const SensorType& type);
 
 struct alignas(16) Object {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Object();
   // shallow copy for copy constructor and assignment
   Object(const Object& rhs);

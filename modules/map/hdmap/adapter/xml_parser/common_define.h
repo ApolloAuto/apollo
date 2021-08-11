@@ -32,6 +32,7 @@ using PbLane = apollo::hdmap::Lane;
 using PbJunction = apollo::hdmap::Junction;
 using PbSignal = apollo::hdmap::Signal;
 using PbSubSignal = apollo::hdmap::Subsignal;
+using PbRSU = apollo::hdmap::RSU;
 using PbCrosswalk = apollo::hdmap::Crosswalk;
 using PbParkingSpace = apollo::hdmap::ParkingSpace;
 using PbSpeedBump = apollo::hdmap::SpeedBump;
@@ -134,6 +135,7 @@ struct RoadInternal {
   std::vector<RoadSectionInternal> sections;
 
   std::vector<TrafficLightInternal> traffic_lights;
+  // std::vector<RSUInternal> rsus;
   std::vector<StopSignInternal> stop_signs;
   std::vector<YieldSignInternal> yield_signs;
   std::vector<PbCrosswalk> crosswalks;
@@ -144,6 +146,15 @@ struct RoadInternal {
   std::vector<PbPNCJunction> pnc_junctions;
 
   RoadInternal() : in_junction(false) { junction_id = ""; }
+};
+
+struct RSUInternal {
+  std::string id;
+  PbRSU rsu;
+};
+
+struct ObjectInternal {
+  std::vector<RSUInternal> rsus;
 };
 
 }  // namespace adapter

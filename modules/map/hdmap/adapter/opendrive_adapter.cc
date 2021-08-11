@@ -36,7 +36,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
 
   // root node
   const tinyxml2::XMLElement* root_node = document.RootElement();
-  CHECK(root_node != nullptr);
+  ACHECK(root_node != nullptr);
   // header
   PbHeader* map_header = pb_map->mutable_header();
   Status status = HeaderXmlParser::Parse(*root_node, map_header);
@@ -45,7 +45,7 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
     return false;
   }
 
-  // roads
+  // road
   std::vector<RoadInternal> roads;
   status = RoadsXmlParser::Parse(*root_node, &roads);
   if (!status.ok()) {
@@ -61,9 +61,18 @@ bool OpendriveAdapter::LoadData(const std::string& filename,
     return false;
   }
 
+  // objects
+  ObjectInternal objects;
+  status = ObjectsXmlParser::ParseObjects(*root_node, &objects);
+  if (!status.ok()) {
+    AERROR << "fail to parse opendrive objects, " << status.error_message();
+    return false;
+  }
+
   ProtoOrganizer proto_organizer;
   proto_organizer.GetRoadElements(&roads);
   proto_organizer.GetJunctionElements(junctions);
+  proto_organizer.GetObjectElements(objects);
   proto_organizer.GetOverlapElements(roads, junctions);
   proto_organizer.OutputData(pb_map);
 

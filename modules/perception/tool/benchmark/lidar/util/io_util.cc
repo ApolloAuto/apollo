@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
-#include <pcl/io/pcd_io.h>
+
 #include <fstream>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "pcl/io/pcd_io.h"
+
 #include "modules/perception/tool/benchmark/lidar/util/geo_util.h"
 
 namespace apollo {
@@ -105,7 +108,10 @@ bool load_frame_objects(const std::string& filename,
   int frame_id = -1;
   int object_number = -1;
   fin >> frame_id >> object_number;
-
+  if (object_number < 0 || object_number > 10000) {
+    fin.close();
+    return false;
+  }
   objects_out->clear();
 
   for (int i = 0; i < object_number; ++i) {
@@ -176,6 +182,7 @@ bool load_frame_objects(const std::string& filename,
                point_number != indice_number) {
       std::cerr << "illegal object with different points & indices" << filename
                 << " object " << i << std::endl;
+      fin.close();
       return false;
     }
 
@@ -197,7 +204,7 @@ bool load_frame_objects(const std::string& filename,
     obj->velocity = Eigen::Vector3d(velocity_x, velocity_y, velocity_z);
     obj->sensor_type = translate_string_to_sensor_type(sensor_type);
 
-    if (black_list.size() == 0 || black_list.find(type) == black_list.end()) {
+    if (black_list.empty() || black_list.find(type) == black_list.end()) {
       objects_out->push_back(obj);
     } else {
       std::cerr << "Ignore object " << i
@@ -208,6 +215,10 @@ bool load_frame_objects(const std::string& filename,
   auto load_polygon = [&](PointCloud* poly) {
     size_t size = 0;
     fin >> size;
+    if (size > 10000) {
+      fin.close();
+      return;
+    }
     poly->resize(size);
     for (size_t i = 0; i < size; ++i) {
       fin >> poly->points[i].x >> poly->points[i].y >> poly->points[i].z;

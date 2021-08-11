@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/fem_pos_deviation_smoother_config.pb.h"
+#include "modules/planning/proto/math/fem_pos_deviation_smoother_config.pb.h"
 
 namespace apollo {
 namespace planning {

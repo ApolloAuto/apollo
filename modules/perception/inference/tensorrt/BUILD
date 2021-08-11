@@ -1,20 +1,18 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rt_common",
-    srcs = [
-        "rt_common.cc",
-    ],
-    hdrs = [
-        "rt_common.h",
-    ],
+    srcs = ["rt_common.cc"],
+    hdrs = ["rt_common.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:common",
-        "//modules/perception/proto:rt_proto",
-        "@tensorrt",
+        "//modules/perception/proto:rt_cc_proto",
+        "@com_google_absl//absl/strings",
+        "@local_config_cuda//cuda:cudnn_header",
     ],
 )
 
@@ -24,22 +22,18 @@ cc_test(
     srcs = ["rt_common_test.cc"],
     deps = [
         ":rt_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "rt_utils",
-    srcs = [
-        "rt_utils.cc",
-    ],
-    hdrs = [
-        "rt_utils.h",
-    ],
+    srcs = ["rt_utils.cc"],
+    hdrs = ["rt_utils.h"],
     deps = [
         "//cyber",
-        "//modules/perception/proto:rt_proto",
-        "@tensorrt",
+        "//modules/perception/proto:rt_cc_proto",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
@@ -49,20 +43,17 @@ cc_test(
     srcs = ["rt_utils_test.cc"],
     deps = [
         ":rt_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "rt_net",
-    srcs = [
-        "rt_net.cc",
-    ],
+    srcs = ["rt_net.cc"],
     hdrs = [
         "entropy_calibrator.h",
         "rt_net.h",
     ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         ":batch_stream",
         ":entropy_calibrator",
@@ -72,10 +63,9 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/tensorrt/plugins:perception_inference_tensorrt_plugins",
-        "//modules/perception/proto:rt_proto",
-        "@caffe",
         "@com_google_protobuf//:protobuf",
-        "@tensorrt",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -88,24 +78,23 @@ cc_test(
     ],
     deps = [
         ":rt_net",
-        "//modules/perception/inference:inference_factory_lib",
-        "@gtest//:main",
+        "//modules/perception/inference/utils:inference_util_cuda_lib",
+        "@atlas//:cblas",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "entropy_calibrator",
-    hdrs = [
-        "entropy_calibrator.h",
-    ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
+    srcs = ["entropy_calibrator.cc"],
+    hdrs = ["entropy_calibrator.h"],
     deps = [
         ":batch_stream",
         ":rt_utils",
-        "@caffe",
         "@com_google_protobuf//:protobuf",
-        "@cuda",
-        "@tensorrt",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -113,30 +102,26 @@ cc_test(
     name = "entropy_calibrator_test",
     size = "small",
     srcs = ["entropy_calibrator_test.cc"],
+    copts = ["-fno-access-control"],
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
     deps = [
         ":entropy_calibrator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "batch_stream",
-    srcs = [
-        "batch_stream.cc",
-    ],
-    hdrs = [
-        "batch_stream.h",
-    ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
+    srcs = ["batch_stream.cc"],
+    hdrs = ["batch_stream.h"],
     deps = [
         "//cyber",
-        "//modules/perception/proto:rt_proto",
-        "@caffe",
+        "//modules/perception/proto:rt_cc_proto",
+        "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
-        "@tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -144,12 +129,13 @@ cc_test(
     name = "batch_stream_test",
     size = "small",
     srcs = ["batch_stream_test.cc"],
+    copts = ["-fno-access-control"],
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
     deps = [
         ":batch_stream",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

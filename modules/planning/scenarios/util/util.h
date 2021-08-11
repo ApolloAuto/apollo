@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 
@@ -34,28 +35,21 @@ enum PullOverStatus {
   PASS_DESTINATION = 4,
 };
 
-enum ParkAndGoStatus {
-  CRUISING = 1,
-  CRUISE_COMPLETE = 2,
-  ADJUST = 3,
-  ADJUST_COMPLETE = 4,
-  FAIL = 5,
-};
-
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type);
 
-PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
-                                const ScenarioPullOverConfig& scenario_config);
+PullOverStatus CheckADCPullOver(
+    const common::VehicleStateProvider* vehicle_state_provider,
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioPullOverConfig& scenario_config,
+    const PlanningContext* planning_context);
 
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioPullOverConfig& scenario_config,
-    const common::PathPoint& path_point);
-
-PullOverStatus CheckADCPullOverOpenSpace(
-    const ScenarioPullOverConfig& scenario_config);
+    const common::PathPoint& path_point,
+    const PlanningContext* planning_context);
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
@@ -64,18 +58,9 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const common::math::Vec2d& target_position,
                                const double target_theta, const bool check_s);
 
-bool CheckPullOverPositionByDistance(
-    const ScenarioPullOverConfig& scenario_config,
-    const common::math::Vec2d& adc_position, const double adc_theta,
-    const common::math::Vec2d& target_position, const double target_theta);
-
-/* park_and_go */
-ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
-    const ReferenceLineInfo& reference_line_info,
+bool CheckADCReadyToCruise(
+    const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
     const ScenarioParkAndGoConfig& scenario_config);
-
-bool CheckADCReadyToCruise(Frame* frame,
-                           const ScenarioParkAndGoConfig& scenario_config);
 
 bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
                                const double adc_heading, Frame* frame,

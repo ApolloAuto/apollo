@@ -17,6 +17,6 @@ message PbfGatekeeperConfig {
   optional bool use_track_time_pub_strategy = 10;
   optional int32 pub_track_time_thresh = 11;
 
-  optional double existance_threshold = 12;
-  optional double radar_existance_threshold = 13;
+  optional double existence_threshold = 12;
+  optional double radar_existence_threshold = 13;
 }

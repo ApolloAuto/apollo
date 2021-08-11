@@ -40,7 +40,7 @@ class HistoryObjectDecision {
             const std::vector<ObjectDecisionType>& object_decisions);
 
   const std::string& id() const { return id_; }
-  const std::vector<const ObjectDecisionType*> GetObjectDecision() const;
+  std::vector<const ObjectDecisionType*> GetObjectDecision() const;
 
  private:
   std::string id_;
@@ -55,10 +55,8 @@ class HistoryFrame {
 
   int seq_num() const { return seq_num_; }
 
-  const std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
-
-  const std::vector<const HistoryObjectDecision*>
-  GetStopObjectDecisions() const;
+  std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
+  std::vector<const HistoryObjectDecision*> GetStopObjectDecisions() const;
 
   const HistoryObjectDecision* GetObjectDecisionsById(
       const std::string& id) const;
@@ -70,18 +68,46 @@ class HistoryFrame {
   std::vector<HistoryObjectDecision> object_decisions_;
 };
 
+class HistoryObjectStatus {
+ public:
+  HistoryObjectStatus() = default;
+
+  void Init(const std::string& id, const ObjectStatus& object_status);
+
+  const std::string& id() const { return id_; }
+  const ObjectStatus GetObjectStatus() const { return object_status_; }
+
+ private:
+  std::string id_;
+  ObjectStatus object_status_;
+};
+
+class HistoryStatus {
+ public:
+  HistoryStatus() = default;
+
+  void SetObjectStatus(const std::string& id,
+                       const ObjectStatus& object_status);
+
+  bool GetObjectStatus(const std::string& id,
+                       ObjectStatus* const object_status);
+
+ private:
+  std::unordered_map<std::string, ObjectStatus> object_id_to_status_;
+};
+
 class History {
  public:
+  History() = default;
   const HistoryFrame* GetLastFrame() const;
   int Add(const ADCTrajectory& adc_trajectory_pb);
   void Clear();
   size_t Size() const;
+  HistoryStatus* mutable_history_status() { return &history_status_; }
 
  private:
   std::list<HistoryFrame> history_frames_;
-
-  // this is a singleton class
-  DECLARE_SINGLETON(History)
+  HistoryStatus history_status_;
 };
 
 }  // namespace planning

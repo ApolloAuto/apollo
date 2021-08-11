@@ -19,10 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/StdVector"
+#include "modules/common/math/math_utils.h"
 #include "modules/perception/fusion/base/sensor_object.h"
-
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2d);
 
 namespace apollo {
 namespace perception {
@@ -64,10 +62,8 @@ class ProjectionCacheFrame {
   ProjectionCacheFrame(std::string sensor_id, double timestamp)
       : sensor_id_(sensor_id), timestamp_(timestamp) {}
   bool VerifyKey(std::string sensor_id, double timestamp) {
-    if (sensor_id_ != sensor_id || fabs(timestamp_ - timestamp) > DBL_EPSILON) {
-      return false;
-    }
-    return true;
+    return sensor_id_ == sensor_id &&
+           apollo::common::math::almost_equal(timestamp_, timestamp, 2);
   }
   ProjectionCacheObject* BuildObject(int lidar_object_id) {
     objects_[lidar_object_id] = ProjectionCacheObject();
@@ -160,11 +156,9 @@ class ProjectionCache {
 
  private:
   bool VerifyKey(const std::string& sensor_id, double timestamp) {
-    if (measurement_sensor_id_ != sensor_id ||
-        fabs(measurement_timestamp_ - timestamp) > DBL_EPSILON) {
-      return false;
-    }
-    return true;
+    return measurement_sensor_id_ == sensor_id &&
+           apollo::common::math::almost_equal(measurement_timestamp_, timestamp,
+                                              2);
   }
   ProjectionCacheFrame* BuildFrame(const std::string& sensor_id,
                                    double timestamp) {

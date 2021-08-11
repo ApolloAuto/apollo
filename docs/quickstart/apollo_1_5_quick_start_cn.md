@@ -1,6 +1,6 @@
 # Apollo 1.5 快速入门指南
 
-这个快速入门指南专注于Apollo 1.5新功能的介绍。对于Apollo的一般概念，请参考 [Apollo 1.0 快速入门指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start_cn.md)和[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)。
+这个快速入门指南专注于Apollo 1.5新功能的介绍。对于Apollo的一般概念，请参考 [Apollo 1.0 快速入门指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start_cn.md)和[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/apollo_software_installation_guide_cn.md)。
 
 # 上车测试
 
@@ -13,7 +13,7 @@
     打开浏览器（譬如Chrome）然后在地址栏输入**localhost:8887**来开始Apollo的HMI。
 
     ![](images/hmi_setup_profile.png)
- 
+
 4. 选择车辆和地图
 
     单击右上角下拉菜单选择车辆和地图。这个列表是在[HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/hmi/conf/config.pb.txt)中定义的。

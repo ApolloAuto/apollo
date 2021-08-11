@@ -16,19 +16,28 @@
 
 #include "modules/transform/buffer.h"
 
+#include "absl/strings/str_cat.h"
+
 #include "cyber/cyber.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
+
+using Time = ::apollo::cyber::Time;
+using Clock = ::apollo::cyber::Clock;
+
+namespace {
+constexpr float kSecondToNanoFactor = 1e9f;
+constexpr uint64_t kMilliToNanoFactor = 1e6;
+}  // namespace
 
 namespace apollo {
 namespace transform {
 
-static constexpr float kSecondToNanoFactor = 1e9f;
-
 Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
-  std::string node_name =
-      "transform_listener_" + std::to_string(cyber::Time::Now().ToNanosecond());
+  const std::string node_name =
+      absl::StrCat("transform_listener_", Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
@@ -61,7 +70,7 @@ void Buffer::StaticSubscriptionCallback(
 
 void Buffer::SubscriptionCallbackImpl(
     const std::shared_ptr<const TransformStampeds>& msg_evt, bool is_static) {
-  cyber::Time now = cyber::Time::Now();
+  cyber::Time now = Clock::Now();
   std::string authority =
       "cyber_tf";  // msg_evt.getPublisherName(); // lookup the authority
   if (now.ToNanosecond() < last_update_.ToNanosecond()) {
@@ -111,6 +120,20 @@ void Buffer::SubscriptionCallbackImpl(
   }
 }
 
+bool Buffer::GetLatestStaticTF(const std::string& frame_id,
+                               const std::string& child_frame_id,
+                               TransformStamped* tf) {
+  for (auto reverse_iter = static_msgs_.rbegin();
+       reverse_iter != static_msgs_.rend(); ++reverse_iter) {
+    if ((*reverse_iter).header.frame_id == frame_id &&
+        (*reverse_iter).child_frame_id == child_frame_id) {
+      TF2MsgToCyber((*reverse_iter), (*tf));
+      return true;
+    }
+  }
+  return false;
+}
+
 void Buffer::TF2MsgToCyber(
     const geometry_msgs::TransformStamped& tf2_trans_stamped,
     TransformStamped& trans_stamped) const {
@@ -148,7 +171,7 @@ TransformStamped Buffer::lookupTransform(const std::string& target_frame,
                                          const float timeout_second) const {
   tf2::Time tf2_time(time.ToNanosecond());
   geometry_msgs::TransformStamped tf2_trans_stamped =
-      lookupTransform(target_frame, source_frame, tf2_time);
+      tf2::BufferCore::lookupTransform(target_frame, source_frame, tf2_time);
   TransformStamped trans_stamped;
   TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
@@ -161,8 +184,9 @@ TransformStamped Buffer::lookupTransform(const std::string& target_frame,
                                          const std::string& fixed_frame,
                                          const float timeout_second) const {
   geometry_msgs::TransformStamped tf2_trans_stamped =
-      lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                      source_time.ToNanosecond(), fixed_frame);
+      tf2::BufferCore::lookupTransform(target_frame, target_time.ToNanosecond(),
+                                       source_frame, source_time.ToNanosecond(),
+                                       fixed_frame);
   TransformStamped trans_stamped;
   TF2MsgToCyber(tf2_trans_stamped, trans_stamped);
   return trans_stamped;
@@ -174,17 +198,25 @@ bool Buffer::canTransform(const std::string& target_frame,
                           std::string* errstr) const {
   uint64_t timeout_ns =
       static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
-  uint64_t start_time = cyber::Time::Now().ToNanosecond();
-  while (
-      cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
-      !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
-      !cyber::IsShutdown()) {
-    usleep(3000);
+  uint64_t start_time = Clock::Now().ToNanosecond();  // time.ToNanosecond();
+  while (Clock::Now().ToNanosecond() < start_time + timeout_ns &&
+         !cyber::IsShutdown()) {
+    errstr->clear();
+    bool retval = tf2::BufferCore::canTransform(target_frame, source_frame,
+                                                time.ToNanosecond(), errstr);
+    if (retval) {
+      return true;
+    } else {
+      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+        break;
+      }
+      const int sleep_time_ms = 3;
+      AWARN << "BufferCore::canTransform failed: " << *errstr;
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+    }
   }
-  bool retval =
-      canTransform(target_frame, source_frame, time.ToNanosecond(), errstr);
-  // conditionally_append_timeout_info(errstr, start_time, timeout);
-  return retval;
+  *errstr = *errstr + ":timeout";
+  return false;
 }
 
 bool Buffer::canTransform(const std::string& target_frame,
@@ -197,18 +229,27 @@ bool Buffer::canTransform(const std::string& target_frame,
   // poll for transform if timeout is set
   uint64_t timeout_ns =
       static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
-  uint64_t start_time = cyber::Time::Now().ToNanosecond();
-  while (cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
-         !canTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                       source_time.ToNanosecond(),
-                       fixed_frame) &&
+  uint64_t start_time = Clock::Now().ToNanosecond();
+  while (Clock::Now().ToNanosecond() < start_time + timeout_ns &&
          !cyber::IsShutdown()) {  // Make sure we haven't been stopped
-    usleep(3000);
+    errstr->clear();
+    bool retval = tf2::BufferCore::canTransform(
+        target_frame, target_time.ToNanosecond(), source_frame,
+        source_time.ToNanosecond(), fixed_frame, errstr);
+    if (retval) {
+      return true;
+    } else {
+      const int sleep_time_ms = 3;
+      AWARN << "BufferCore::canTransform failed: " << *errstr;
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+        Clock::SetNow(Time(Clock::Now().ToNanosecond() +
+                           sleep_time_ms * kMilliToNanoFactor));
+      }
+    }
   }
-  bool retval =
-      canTransform(target_frame, target_time.ToNanosecond(), source_frame,
-                   source_time.ToNanosecond(), fixed_frame, errstr);
-  return retval;
+  *errstr = *errstr + ":timeout";
+  return false;
 }
 
 }  // namespace transform

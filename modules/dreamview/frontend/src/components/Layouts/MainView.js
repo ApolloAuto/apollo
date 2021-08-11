@@ -1,59 +1,74 @@
-import React from "react";
-import { inject, observer } from "mobx-react";
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 import Loadable from 'react-loadable';
 
-import RouteEditingBar from "components/RouteEditingBar";
-import StatusBar from "components/StatusBar";
-import Scene from "components/Scene";
-import Loader from "components/common/Loader";
-import PlaybackControls from "components/PlaybackControls";
+import EmergencyNotification from 'components/common/EmergencyNotification';
+import Loader from 'components/common/Loader';
+import PlaybackControls from 'components/PlaybackControls';
+import RouteEditingBar from 'components/RouteEditingBar';
+import Scene from 'components/Scene';
+import StatusBar from 'components/StatusBar';
 
 const Navigation = Loadable({
-    loader: () => import("components/Navigation"),
-    loading() {
-      return <div>Loading...</div>;
-    }
+  loader: () => import('components/Navigation'),
+  loading() {
+    return <div className="navigation-view">Loading...</div>;
+  },
 });
 
-@inject("store") @observer
+@inject('store') @observer
 class SceneView extends React.Component {
-    render() {
-        const { sceneDimension, meters, monitor,
-                options, trafficSignal, video, hmi } = this.props.store;
+  render() {
+    const {
+      dimension, meters, monitor,
+      hmi, options, trafficSignal,
+    } = this.props.store;
 
-        const sceneHeightOffset = OFFLINE_PLAYBACK ? 40 /* height of playback control */ : 0;
-        return (
-            <div className="main-view" style={{ height: sceneDimension.height }}>
-                <Scene  width={sceneDimension.width}
-                        height={sceneDimension.height - sceneHeightOffset}
-                        options={options}
-                        invisible={false} />
+    return (
+            <React.Fragment>
+                <Scene
+                    width={dimension.scene.width}
+                    height={dimension.scene.height}
+                    options={options}
+                    shouldDisplayOnRight={dimension.shouldDivideSceneAndMapSpace}
+                />
+                {monitor.isSirenOn &&
+                  <EmergencyNotification msg="Emergency Siren Detected" />}
                 {options.showRouteEditingBar
-                    ? <RouteEditingBar />
-                    : <StatusBar meters={meters}
-                                 trafficSignal={trafficSignal}
-                                 showNotification={!options.showTasks}
-                                 showPlanningRSSInfo={options.showPlanningRSSInfo}
-                                 monitor={monitor} />}
+                  ? <RouteEditingBar />
+                  : (
+                        <StatusBar
+                            meters={meters}
+                            trafficSignal={trafficSignal}
+                            showNotification={!options.showTasks}
+                            showPlanningRSSInfo={options.showPlanningRSSInfo}
+                            monitor={monitor}
+                        />
+                  )}
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
-                {hmi.inNavigationMode &&
-                    <Navigation viewHeight={sceneDimension.height}
-                                viewWidth={sceneDimension.width} />}
-            </div>
-        );
-    }
+                {hmi.shouldDisplayNavigationMap
+                    && (
+                        <Navigation
+                            onResize={() => dimension.toggleNavigationSize()}
+                            hasRoutingControls={hmi.inNavigationMode}
+                            {...dimension.navigation}
+                        />
+                    )}
+            </React.Fragment>
+    );
+  }
 }
 
-@inject("store") @observer
+@inject('store') @observer
 export default class MainView extends React.Component {
-    render() {
-        const { isInitialized, sceneDimension } = this.props.store;
+  render() {
+    const { isInitialized, dimension } = this.props.store;
 
-        if (!isInitialized && !OFFLINE_PLAYBACK) {
-            return <Loader height={sceneDimension.height} />;
-        } else {
-            return <SceneView />;
-        }
-    }
+    const height = dimension.main.height;
+    return (
+            <div className="main-view" style={{ height }}>
+                {(!isInitialized && !OFFLINE_PLAYBACK) ? <Loader /> : <SceneView />}
+            </div>
+    );
+  }
 }
-

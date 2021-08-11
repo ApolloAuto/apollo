@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>control_mpc</name>
+        <dag_conf>/apollo/modules/control/dag/mpc_module.dag</dag_conf>
+        <process_name>control_mpc</process_name>
+    </module>
+</cyber>

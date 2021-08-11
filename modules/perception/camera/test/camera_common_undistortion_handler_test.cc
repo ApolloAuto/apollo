@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/camera/common/undistortion_handler.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"
 #include "modules/perception/camera/test/camera_common_undistortion.h"
-#include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {
 namespace perception {
@@ -139,7 +139,7 @@ TEST(UndistortionHandlerTest, test_verify) {
     }
 
     ImageGpuPreprocessHandler handler;
-    lib::Timer timer;
+    apollo::common::time timer;
     timer.Start();
     err = handler.init(
         "/apollo/modules/perception/testdata/"

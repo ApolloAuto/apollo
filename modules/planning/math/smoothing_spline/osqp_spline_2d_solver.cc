@@ -21,10 +21,7 @@
 #include "modules/planning/math/smoothing_spline/osqp_spline_2d_solver.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/math/matrix_operations.h"
-#include "modules/common/math/qp_solver/qp_solver_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -106,8 +103,8 @@ bool OsqpSpline2dSolver::Solve() {
   auto constraint_num = inequality_constraint_boundary.rows() +
                         equality_constraint_boundary.rows();
 
-  constexpr float kEpsilon = 1e-9f;
-  constexpr float kUpperLimit = 1e9f;
+  static constexpr float kEpsilon = 1e-9f;
+  static constexpr float kUpperLimit = 1e9f;
   c_float l[constraint_num];  // NOLINT
   c_float u[constraint_num];  // NOLINT
   for (int i = 0; i < constraint_num; ++i) {
@@ -147,7 +144,9 @@ bool OsqpSpline2dSolver::Solve() {
   settings->verbose = FLAGS_enable_osqp_debug;
 
   // Setup workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  work = osqp_setup(data, settings);
+  // osqp_setup(&work, data, settings);
 
   // Solve Problem
   osqp_solve(work);

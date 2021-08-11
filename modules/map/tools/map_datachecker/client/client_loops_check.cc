@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/map/tools/map_datachecker/client/client_loops_check.h"
 
-#include <grpc++/grpc++.h>
-#include <yaml-cpp/yaml.h>
-#include <boost/algorithm/string.hpp>
 #include <utility>
+
+#include <boost/algorithm/string.hpp>
+#include "grpc++/grpc++.h"
+#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace hdmap {
+
 LoopsChecker::LoopsChecker(const std::string& time_flag_file)
     : time_flag_file_(time_flag_file) {
   YAML::Node node = YAML::LoadFile(FLAGS_client_conf_yaml);
@@ -139,8 +142,8 @@ int LoopsChecker::Start(
     VerifyRange* range = request.add_range();
     range->set_start_time(time_ranges[i].first);
     range->set_end_time(time_ranges[i].second);
-    AINFO << "range[" << i << "] is [" << std::to_string(time_ranges[i].first)
-          << "," << std::to_string(time_ranges[i].second) << "]";
+    AINFO << "range[" << i << "] is [" << time_ranges[i].first << ","
+          << time_ranges[i].second << "]";
   }
   LoopsVerifyResponse response;
   return GrpcStub(&request, &response);

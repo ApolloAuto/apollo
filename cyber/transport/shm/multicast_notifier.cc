@@ -19,10 +19,10 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cstring>
 #include <string>
 
 #include "cyber/common/global_data.h"

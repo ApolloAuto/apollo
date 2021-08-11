@@ -116,7 +116,7 @@ TEST(DetectionTest, all) {
   gt_lights.push_back(light2);
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   EXPECT_TRUE(detector->Detect(detetor_options, &frame));
 
   EXPECT_EQ(lights.size(), gt_lights.size());
@@ -185,7 +185,7 @@ TEST(DetectionTest, no_light) {
   lights.clear();
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   EXPECT_TRUE(detector->Detect(detetor_options, &frame));
 #endif
 }
@@ -255,7 +255,7 @@ TEST(DetectionTest, out_of_img_light) {
   gt_lights.push_back(light2);
   frame.traffic_lights = lights;
 
-#ifndef CPU_ONLY
+#if USE_GPU == 1
   EXPECT_TRUE(detector->Detect(detetor_options, &frame));
 
   EXPECT_FALSE(lights[0]->region.is_detected);

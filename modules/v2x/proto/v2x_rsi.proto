@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+import "modules/common/proto/header.proto";
+
+message RsiPoint {
+  optional double x = 1;  // in meters.
+  optional double y = 2;  // in meters.
+}
+message RsiMsg {
+  optional apollo.common.Header header = 1;
+  repeated RsiPoint points = 2;
+  optional double speed = 3;
+  optional double low_speed = 4;
+  optional double high_speed = 5;
+  optional string description = 6;
+  optional int32 rsi_type = 7;
+  optional double radius = 8;
+  optional int32 priority = 9;
+}

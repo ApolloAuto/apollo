@@ -20,6 +20,7 @@
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h"
 
 #include <algorithm>
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -42,10 +43,10 @@ DualVariableWarmStartSlackOSQPInterface::
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
       xWS_(xWS) {
-  CHECK(horizon < std::numeric_limits<int>::max())
+  ACHECK(horizon < std::numeric_limits<int>::max())
       << "Invalid cast on horizon in open space planner";
   horizon_ = static_cast<int>(horizon);
-  CHECK(obstacles_num < std::numeric_limits<int>::max())
+  ACHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
   obstacles_num_ = static_cast<int>(obstacles_num);
   w_ev_ = ego_(1, 0) + ego_(3, 0);
@@ -207,7 +208,9 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   data->u = ub;
 
   // Workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Solve Problem
   osqp_solve(work);
@@ -302,7 +305,6 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
 void DualVariableWarmStartSlackOSQPInterface::checkSolution(
     const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up) {
   // TODO(Runxin): extend
-  return;
 }
 
 void DualVariableWarmStartSlackOSQPInterface::assembleP(
@@ -359,13 +361,13 @@ void DualVariableWarmStartSlackOSQPInterface::assembleP(
     }
   }
 
-  CHECK_EQ(P_indptr->size(), lambda_horizon_);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(lambda_horizon_));
   for (int i = lambda_horizon_; i < num_of_variables_ + 1; ++i) {
     P_indptr->emplace_back(first_row_location);
   }
 
   CHECK_EQ(P_data->size(), P_indices->size());
-  CHECK_EQ(P_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
@@ -495,7 +497,7 @@ void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
   A_indptr->emplace_back(first_row_location);
 
   CHECK_EQ(A_data->size(), A_indices->size());
-  CHECK_EQ(A_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(A_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(
@@ -515,8 +517,8 @@ void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(
     }
   }
 
-  ADEBUG << "max_s: " << std::to_string(max_s);
-  ADEBUG << "min_s: " << std::to_string(min_s);
+  ADEBUG << "max_s: " << max_s;
+  ADEBUG << "min_s: " << min_s;
 }
 }  // namespace planning
 }  // namespace apollo

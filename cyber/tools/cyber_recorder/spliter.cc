@@ -20,6 +20,9 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::SectionType;
+
 Spliter::Spliter(const std::string& input_file, const std::string& output_file,
                  const std::vector<std::string>& white_channels,
                  const std::vector<std::string>& black_channels,

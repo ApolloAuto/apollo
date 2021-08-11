@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.drivers.hesai;
+
+import "modules/drivers/lidar/proto/hesai.proto";
+
+message Config {
+  optional Model model = 1;
+  optional string ip = 2 [default = "192.168.20.13"];
+  optional uint32 lidar_recv_port = 3;
+  optional uint32 gps_recv_port = 4;
+  optional uint32 start_angle = 5;
+  optional string pointcloud_channel = 6;
+  optional uint32 time_zone = 7;
+  optional string frame_id = 8;
+  optional string scan_channel = 9;
+  optional bool is_online_calibration = 11 [default = true];
+  optional string calibration_file = 12;
+  optional uint32 tcp_cmd_port = 13 [default = 9347];
+}

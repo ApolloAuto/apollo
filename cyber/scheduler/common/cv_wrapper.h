@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_CV_WRAPPER_H_
-#define CYBER_SCHEDULER_CV_WRAPPER_H_
+#ifndef CYBER_SCHEDULER_COMMON_CV_WRAPPER_H_
+#define CYBER_SCHEDULER_COMMON_CV_WRAPPER_H_
 
-#include <mutex>
+#include <condition_variable>
 
 namespace apollo {
 namespace cyber {
@@ -35,4 +35,5 @@ class CvWrapper {
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
-#endif  // CYBER_SCHEDULER_CV_WRAPPER_H_
+
+#endif  // CYBER_SCHEDULER_COMMON_CV_WRAPPER_H_

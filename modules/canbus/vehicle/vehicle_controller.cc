@@ -43,7 +43,7 @@ ErrorCode VehicleController::SetDrivingMode(
   }
 
   // vehicle in emergency mode only response to manual mode to reset.
-  if (driving_mode_ == Chassis::EMERGENCY_MODE &&
+  if (this->driving_mode() == Chassis::EMERGENCY_MODE &&
       driving_mode != Chassis::COMPLETE_MANUAL) {
     AINFO
         << "Vehicle in EMERGENCY_MODE, only response to COMPLETE_MANUAL mode.";
@@ -52,7 +52,7 @@ ErrorCode VehicleController::SetDrivingMode(
   }
 
   // if current mode is same as previous, no need to set.
-  if (driving_mode_ == driving_mode) {
+  if (this->driving_mode() == driving_mode) {
     return ErrorCode::OK;
   }
 
@@ -73,7 +73,7 @@ ErrorCode VehicleController::SetDrivingMode(
     }
     case Chassis::AUTO_STEER_ONLY: {
       if (EnableSteeringOnlyMode() != ErrorCode::OK) {
-        AERROR << "Failed to enable speed only mode.";
+        AERROR << "Failed to enable steer only mode.";
         return ErrorCode::CANBUS_ERROR;
       }
       break;
@@ -91,14 +91,11 @@ ErrorCode VehicleController::SetDrivingMode(
   return ErrorCode::OK;
 }
 
-ErrorCode VehicleController::Update(const ControlCommand &command) {
+ErrorCode VehicleController::Update(const ControlCommand &control_command) {
   if (!is_initialized_) {
     AERROR << "Controller is not initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
-
-  ControlCommand control_command;
-  control_command.CopyFrom(command);
 
   // Execute action to transform driving mode
   if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
@@ -120,11 +117,14 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
         break;
       }
     }
-    SetDrivingMode(mode);
+    auto error_code = SetDrivingMode(mode);
+    if (error_code != ErrorCode::OK) {
+      AERROR << "Failed to set driving mode.";
+    }
   }
 
-  if (driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE ||
-      driving_mode_ == Chassis::AUTO_SPEED_ONLY) {
+  if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+      driving_mode() == Chassis::AUTO_SPEED_ONLY) {
     Gear(control_command.gear_location());
     Throttle(control_command.throttle());
     Acceleration(control_command.acceleration());
@@ -133,8 +133,8 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
     SetLimits();
   }
 
-  if (driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE ||
-      driving_mode_ == Chassis::AUTO_STEER_ONLY) {
+  if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+      driving_mode() == Chassis::AUTO_STEER_ONLY) {
     const double steering_rate_threshold = 1.0;
     if (control_command.steering_rate() > steering_rate_threshold) {
       Steer(control_command.steering_target(), control_command.steering_rate());
@@ -143,9 +143,9 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
     }
   }
 
-  if ((driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE ||
-       driving_mode_ == Chassis::AUTO_SPEED_ONLY ||
-       driving_mode_ == Chassis::AUTO_STEER_ONLY) &&
+  if ((driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+       driving_mode() == Chassis::AUTO_SPEED_ONLY ||
+       driving_mode() == Chassis::AUTO_STEER_ONLY) &&
       control_command.has_signal()) {
     SetHorn(control_command);
     SetTurningSignal(control_command);

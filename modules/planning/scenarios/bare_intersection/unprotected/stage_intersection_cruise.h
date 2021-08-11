@@ -20,9 +20,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
+#include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 
 namespace apollo {
 namespace planning {
@@ -33,9 +35,10 @@ struct BareIntersectionUnprotectedContext;
 
 class BareIntersectionUnprotectedStageIntersectionCruise : public Stage {
  public:
-  explicit BareIntersectionUnprotectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  BareIntersectionUnprotectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

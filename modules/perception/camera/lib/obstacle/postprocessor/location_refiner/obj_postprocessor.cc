@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"
 
+#include <limits>
+
 // TODO(Xun & Yucheng): code completion
 namespace apollo {
 namespace perception {
@@ -74,7 +76,7 @@ bool ObjPostProcessor::AdjustCenterWithGround(const float *bbox,
   const int MAX_ITERATION = params_.max_nr_iter;
 
   float lr = params_.learning_r;
-  float cost_pre = FLT_MAX;
+  float cost_pre = std::numeric_limits<float>::max();
   float cost_delta = 0.0f;
   float center_input[3] = {center[0], center[1], center[2]};
   float center_test[3] = {0};

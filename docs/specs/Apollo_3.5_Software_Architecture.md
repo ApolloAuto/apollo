@@ -30,7 +30,7 @@ Every module is running as a separate CarOS-based ROS node. Each module node pub
 Apollo Perception 3.5 has following new features:
 
  * **Support for VLS-128 Line LiDAR**
- * **Obstacle detection though multiple cameras**
+ * **Obstacle detection through multiple cameras**
  * **Advanced traffic light detection**
  * **Configurable sensor fusion**
 

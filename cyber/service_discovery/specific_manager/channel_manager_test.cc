@@ -16,10 +16,10 @@
 
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/message/message_traits.h"
@@ -111,12 +111,12 @@ TEST_F(ChannelManagerTest, get_proto_desc) {
   transport::Identity id_0;
   role_attr.set_id(id_0.HashValue());
   role_attr.set_proto_desc("");
-  EXPECT_TRUE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
+  EXPECT_FALSE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
 
   channel_manager_.GetProtoDesc("wasd", &proto_desc);
   EXPECT_EQ(proto_desc, "");
 
-  EXPECT_TRUE(channel_manager_.Leave(role_attr, RoleType::ROLE_WRITER));
+  EXPECT_FALSE(channel_manager_.Leave(role_attr, RoleType::ROLE_WRITER));
 
   // add a writer with real proto desc
   role_attr.set_node_name("proto");
@@ -131,14 +131,14 @@ TEST_F(ChannelManagerTest, get_proto_desc) {
   message::GetDescriptorString<proto::Chatter>(
       message::MessageType<proto::Chatter>(), &tmp);
   role_attr.set_proto_desc(tmp);
-  EXPECT_TRUE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
+  EXPECT_FALSE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
 
   proto_desc = guard;
   EXPECT_TRUE(channel_manager_.HasWriter("jkl"));
   channel_manager_.GetProtoDesc("jkl", &proto_desc);
   EXPECT_NE(proto_desc, guard);
 
-  EXPECT_TRUE(channel_manager_.Leave(role_attr, RoleType::ROLE_WRITER));
+  EXPECT_FALSE(channel_manager_.Leave(role_attr, RoleType::ROLE_WRITER));
 }
 
 TEST_F(ChannelManagerTest, has_writer) {
@@ -216,13 +216,13 @@ TEST_F(ChannelManagerTest, get_readers_attr) {
   EXPECT_EQ(readers.size(), 1);
 
   RoleAttributes role_attr(readers[0]);
-  EXPECT_TRUE(channel_manager_.Leave(role_attr, RoleType::ROLE_READER));
+  EXPECT_FALSE(channel_manager_.Leave(role_attr, RoleType::ROLE_READER));
 
   readers.clear();
   channel_manager_.GetReadersOfChannel("channel_0", &readers);
   EXPECT_EQ(readers.size(), 0);
 
-  EXPECT_TRUE(channel_manager_.Join(role_attr, RoleType::ROLE_READER));
+  EXPECT_FALSE(channel_manager_.Join(role_attr, RoleType::ROLE_READER));
   readers.clear();
   channel_manager_.GetReadersOfChannel("channel_0", &readers);
   EXPECT_EQ(readers.size(), 1);
@@ -266,7 +266,7 @@ TEST_F(ChannelManagerTest, change) {
 
   transport::Identity id;
   role_attr.set_id(id.HashValue());
-  EXPECT_TRUE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
+  EXPECT_FALSE(channel_manager_.Join(role_attr, RoleType::ROLE_WRITER));
 
   EXPECT_TRUE(channel_manager_.HasWriter("channel_0"));
 }

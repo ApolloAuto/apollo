@@ -50,9 +50,6 @@
 namespace apollo {
 namespace canbus {
 
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
-
 /**
  * @class Canbus
  *
@@ -94,20 +91,19 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
   void RegisterCanClients();
 
   CanbusConf canbus_conf_;
-  std::shared_ptr<Reader<apollo::guardian::GuardianCommand>>
+  std::shared_ptr<cyber::Reader<apollo::guardian::GuardianCommand>>
       guardian_cmd_reader_;
-  std::shared_ptr<Reader<apollo::control::ControlCommand>>
+  std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>
       control_command_reader_;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<ChassisDetail> can_sender_;
   apollo::drivers::canbus::CanReceiver<ChassisDetail> can_receiver_;
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
-      message_manager_;
+  std::unique_ptr<MessageManager<ChassisDetail>> message_manager_;
   std::unique_ptr<VehicleController> vehicle_controller_;
   int64_t last_timestamp_ = 0;
   ::apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  std::shared_ptr<Writer<Chassis>> chassis_writer_;
-  std::shared_ptr<Writer<ChassisDetail>> chassis_detail_writer_;
+  std::shared_ptr<cyber::Writer<Chassis>> chassis_writer_;
+  std::shared_ptr<cyber::Writer<ChassisDetail>> chassis_detail_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(CanbusComponent)

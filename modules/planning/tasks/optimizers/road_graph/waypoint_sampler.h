@@ -20,11 +20,7 @@
 
 #pragma once
 
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/dp_poly_path_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
@@ -32,6 +28,7 @@
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/proto/dp_poly_path_config.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/tasks/optimizers/road_graph/trajectory_cost.h"
 
@@ -42,7 +39,7 @@ class WaypointSampler {
  public:
   explicit WaypointSampler(const WaypointSamplerConfig &config)
       : config_(config) {}
-  ~WaypointSampler() = default;
+  virtual ~WaypointSampler() = default;
 
   virtual void Init(const ReferenceLineInfo *reference_line_info,
                     const common::SLPoint &init_sl_point_,

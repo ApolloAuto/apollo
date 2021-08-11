@@ -20,8 +20,9 @@
 #include <string>
 #include <utility>
 
-#include "cyber/common/global_data.h"
 #include "cyber/proto/run_mode_conf.pb.h"
+
+#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
@@ -37,8 +38,7 @@ std::unique_ptr<Node> CreateNode(const std::string& node_name,
     AERROR << "please initialize cyber firstly.";
     return nullptr;
   }
-  std::unique_ptr<Node> node(new Node(node_name, name_space));
-  return std::move(node);
+  return std::unique_ptr<Node>(new Node(node_name, name_space));
 }
 
 }  // namespace cyber

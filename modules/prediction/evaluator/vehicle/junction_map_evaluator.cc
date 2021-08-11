@@ -16,28 +16,30 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 
-#include <omp.h>
 #include <unordered_map>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/prediction/common/semantic_map.h"
 
 namespace apollo {
 namespace prediction {
 
-JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
+JunctionMapEvaluator::JunctionMapEvaluator(SemanticMap* semantic_map)
+    : device_(torch::kCPU), semantic_map_(semantic_map) {
   evaluator_type_ = ObstacleConf::JUNCTION_MAP_EVALUATOR;
   LoadModel();
 }
 
 void JunctionMapEvaluator::Clear() {}
 
-bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
 
@@ -71,14 +73,14 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return false;
   }
   cv::Mat feature_map;
-  if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
+  if (!semantic_map_->GetMapById(id, &feature_map)) {
     return false;
   }
 
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
   // Process the feature_map
-  cv::cvtColor(feature_map, feature_map, CV_BGR2RGB);
+  cv::cvtColor(feature_map, feature_map, cv::COLOR_BGR2RGB);
   cv::Mat img_float;
   feature_map.convertTo(img_float, CV_32F, 1.0 / 255);
   torch::Tensor img_tensor = torch::from_blob(img_float.data, {1, 224, 224, 3});
@@ -93,9 +95,9 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
 
-  torch_inputs.push_back(c10::ivalue::Tuple::create(
-      {std::move(img_tensor.to(device_)),
-       std::move(junction_exit_mask.to(device_))}));
+  torch_inputs.push_back(
+      c10::ivalue::Tuple::create({std::move(img_tensor.to(device_)),
+                                  std::move(junction_exit_mask.to(device_))}));
 
   // Compute probability
   std::vector<double> probability;
@@ -125,7 +127,7 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }

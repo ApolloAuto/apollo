@@ -1,0 +1,25 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/librobosense_driver_component.so"
+    components {
+        class_name : "RobosenseComponent"
+        config {
+          name : "RS128_Driver"
+          config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/rs128.pb.txt"
+        }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "RS128_Compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/rs128_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/rs128/PointCloud2"}
+      }
+    }
+}
+
+
+

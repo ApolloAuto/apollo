@@ -26,12 +26,13 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/proto/topology_change.pb.h"
+
 #include "cyber/blocker/blocker.h"
 #include "cyber/common/global_data.h"
 #include "cyber/croutine/routine_factory.h"
 #include "cyber/data/data_visitor.h"
 #include "cyber/node/reader_base.h"
-#include "cyber/proto/topology_change.pb.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/time/time.h"
@@ -276,7 +277,7 @@ bool Reader<MessageT>::Init() {
       croutine::CreateRoutineFactory<MessageT>(std::move(func), dv);
   if (!sched->CreateTask(factory, croutine_name_)) {
     AERROR << "Create Task Failed!";
-    init_.exchange(false);
+    init_.store(false);
     return false;
   }
 

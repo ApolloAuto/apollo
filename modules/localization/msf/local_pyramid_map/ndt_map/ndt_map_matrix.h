@@ -16,11 +16,13 @@
 
 #pragma once
 
-#include <Eigen/Eigenvalues>
 #include <limits>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "Eigen/Eigenvalues"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix.h"
 
@@ -66,6 +68,8 @@ class NdtMapSingleCell {
   void MergeCell(const NdtMapSingleCell& cell_new);
 
   void CentroidEigenSolver(const Eigen::Matrix3f& centroid_cov);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
   /**@brief The average intensity value. */

@@ -16,7 +16,6 @@
 
 #include "modules/planning/common/util/util.h"
 
-#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -31,7 +30,6 @@ namespace util {
 
 using apollo::common::VehicleState;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 using apollo::routing::RoutingResponse;
 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {
@@ -48,19 +46,15 @@ bool IsVehicleStateValid(const VehicleState& vehicle_state) {
 bool IsDifferentRouting(const RoutingResponse& first,
                         const RoutingResponse& second) {
   if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
+    return first.header().sequence_num() != second.header().sequence_num();
   }
+  return true;
 }
 
-double GetADCStopDeceleration(const double adc_front_edge_s,
-                              const double stop_line_s) {
-  double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+double GetADCStopDeceleration(
+    apollo::common::VehicleStateProvider* vehicle_state,
+    const double adc_front_edge_s, const double stop_line_s) {
+  double adc_speed = vehicle_state->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -124,18 +118,36 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
     return false;
   }
 
-  constexpr double kIntersectionPassDist = 2.0;  // unit: m
+  static constexpr double kIntersectionPassDist = 2.0;  // unit: m
   const double distance_adc_pass_intersection =
       adc_back_edge_s - pnc_junction_overlap.end_s;
   ADEBUG << "distance_adc_pass_intersection[" << distance_adc_pass_intersection
          << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
          << "] start_s[" << pnc_junction_overlap.start_s << "]";
 
-  if (distance_adc_pass_intersection >= kIntersectionPassDist) {
-    return false;
-  }
+  return distance_adc_pass_intersection < kIntersectionPassDist;
+}
 
-  return true;
+/*
+ * @brief: get files at a path
+ */
+void GetFilesByPath(const boost::filesystem::path& path,
+                    std::vector<std::string>* files) {
+  ACHECK(files);
+  if (!boost::filesystem::exists(path)) {
+    return;
+  }
+  if (boost::filesystem::is_regular_file(path)) {
+    AINFO << "Found record file: " << path.c_str();
+    files->push_back(path.c_str());
+    return;
+  }
+  if (boost::filesystem::is_directory(path)) {
+    for (auto& entry : boost::make_iterator_range(
+             boost::filesystem::directory_iterator(path), {})) {
+      GetFilesByPath(entry.path(), files);
+    }
+  }
 }
 
 }  // namespace util

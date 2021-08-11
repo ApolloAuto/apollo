@@ -14,39 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "cyber/parameter/parameter_server.h"
+
 #include <memory>
 #include <vector>
+
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
-#include "cyber/parameter/parameter_server.h"
 
 namespace apollo {
 namespace cyber {
 
-using apollo::cyber::proto::Param;
-using apollo::cyber::proto::ParamType;
-
 class ParameterServerTest : public ::testing::Test {
  protected:
-  ParameterServerTest() {}
-  virtual ~ParameterServerTest() {}
-
-  std::shared_ptr<Node> node_;
-  std::shared_ptr<ParameterServer> ps_;
+  ParameterServerTest() {
+    apollo::cyber::Init("parameter_server_test");
+    node_ = CreateNode("parameter_server");
+  }
 
   virtual void SetUp() {
     // Called before every TEST_F(ParameterServerTest, *)
-    apollo::cyber::Init("parameter_server_test");
-    node_ = CreateNode("parameter_server");
     ps_.reset(new ParameterServer(node_));
   }
 
-  virtual void TearDown() {
-    // Called after every TEST_F(ParameterServerTest, *)
-  }
+  virtual void TearDown() { ps_.reset(); }
+
+ protected:
+  std::shared_ptr<Node> node_;
+  std::unique_ptr<ParameterServer> ps_;
 };
 
 TEST_F(ParameterServerTest, set_parameter) {

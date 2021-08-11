@@ -93,7 +93,9 @@ void NaviSpeedTsGraph::UpdateConstraints(
     const NaviSpeedTsConstraints& constraints) {
   CheckConstraints(constraints);
 
-  for (auto& pc : constraints_) CombineConstraints(constraints, &pc);
+  for (auto& pc : constraints_) {
+    CombineConstraints(constraints, &pc);
+  }
 }
 
 void NaviSpeedTsGraph::UpdateRangeConstraints(
@@ -265,8 +267,9 @@ Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
     auto t_max = std::numeric_limits<double>::infinity();
     auto b_max = constraints.b_max;
     auto r0 = prev.v * prev.v - 2 * b_max * s_step_;
-    if (r0 > 0.0) t_max = prev.t + (prev.v - std::sqrt(r0)) / b_max;
-
+    if (r0 > 0.0) {
+      t_max = prev.t + (prev.v - std::sqrt(r0)) / b_max;
+    }
     // if t_max < t_min
     if (t_max < t_min) {
       AERROR << "failure to satisfy the constraints.";

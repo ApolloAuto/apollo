@@ -1,12 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
-    srcs = [
-        "hybrid_a_star_wrapper.cc",
-    ],
+    srcs = ["hybrid_a_star_wrapper.cc"],
     linkshared = True,
     linkstatic = False,
     deps = [
@@ -16,9 +15,7 @@ cc_binary(
 
 cc_binary(
     name = "distance_approach_problem_wrapper_lib.so",
-    srcs = [
-        "distance_approach_problem_wrapper.cc",
-    ],
+    srcs = ["distance_approach_problem_wrapper.cc"],
     copts = ["-fopenmp"],
     linkshared = True,
     linkstatic = False,
@@ -31,9 +28,7 @@ cc_binary(
 
 cc_binary(
     name = "open_space_roi_wrapper_lib.so",
-    srcs = [
-        "open_space_roi_wrapper.cc",
-    ],
+    srcs = ["open_space_roi_wrapper.cc"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
@@ -44,7 +39,7 @@ cc_binary(
         "//modules/common/math",
         "//modules/map/pnc_map",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
         "@eigen",
     ],
 )

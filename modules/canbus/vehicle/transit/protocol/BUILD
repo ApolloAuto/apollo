@@ -1,6 +1,9 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
 cc_library(
     name = "canbus_transit_protocol",
@@ -22,17 +25,14 @@ cc_library(
 
 cc_library(
     name = "adc_auxiliarycontrol_110",
-    srcs = [
-        "adc_auxiliarycontrol_110.cc",
-    ],
-    hdrs = [
-        "adc_auxiliarycontrol_110.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["adc_auxiliarycontrol_110.cc"],
+    hdrs = ["adc_auxiliarycontrol_110.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -43,23 +43,20 @@ cc_test(
     deps = [
         ":adc_auxiliarycontrol_110",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "adc_motioncontrol1_10",
-    srcs = [
-        "adc_motioncontrol1_10.cc",
-    ],
-    hdrs = [
-        "adc_motioncontrol1_10.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["adc_motioncontrol1_10.cc"],
+    hdrs = ["adc_motioncontrol1_10.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -70,23 +67,20 @@ cc_test(
     deps = [
         ":adc_motioncontrol1_10",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "adc_motioncontrollimits1_12",
-    srcs = [
-        "adc_motioncontrollimits1_12.cc",
-    ],
-    hdrs = [
-        "adc_motioncontrollimits1_12.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["adc_motioncontrollimits1_12.cc"],
+    hdrs = ["adc_motioncontrollimits1_12.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -97,23 +91,20 @@ cc_test(
     deps = [
         ":adc_motioncontrollimits1_12",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_auxiliaryfeedback_120",
-    srcs = [
-        "llc_auxiliaryfeedback_120.cc",
-    ],
-    hdrs = [
-        "llc_auxiliaryfeedback_120.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_auxiliaryfeedback_120.cc"],
+    hdrs = ["llc_auxiliaryfeedback_120.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -124,23 +115,20 @@ cc_test(
     deps = [
         ":llc_auxiliaryfeedback_120",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_diag_brakecontrol_721",
-    srcs = [
-        "llc_diag_brakecontrol_721.cc",
-    ],
-    hdrs = [
-        "llc_diag_brakecontrol_721.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_diag_brakecontrol_721.cc"],
+    hdrs = ["llc_diag_brakecontrol_721.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -151,23 +139,20 @@ cc_test(
     deps = [
         ":llc_diag_brakecontrol_721",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_diag_fault_620",
-    srcs = [
-        "llc_diag_fault_620.cc",
-    ],
-    hdrs = [
-        "llc_diag_fault_620.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_diag_fault_620.cc"],
+    hdrs = ["llc_diag_fault_620.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -178,23 +163,20 @@ cc_test(
     deps = [
         ":llc_diag_fault_620",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_diag_steeringcontrol_722",
-    srcs = [
-        "llc_diag_steeringcontrol_722.cc",
-    ],
-    hdrs = [
-        "llc_diag_steeringcontrol_722.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_diag_steeringcontrol_722.cc"],
+    hdrs = ["llc_diag_steeringcontrol_722.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -205,23 +187,20 @@ cc_test(
     deps = [
         ":llc_diag_steeringcontrol_722",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_motioncommandfeedback1_22",
-    srcs = [
-        "llc_motioncommandfeedback1_22.cc",
-    ],
-    hdrs = [
-        "llc_motioncommandfeedback1_22.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_motioncommandfeedback1_22.cc"],
+    hdrs = ["llc_motioncommandfeedback1_22.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -232,23 +211,20 @@ cc_test(
     deps = [
         ":llc_motioncommandfeedback1_22",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_motionfeedback1_20",
-    srcs = [
-        "llc_motionfeedback1_20.cc",
-    ],
-    hdrs = [
-        "llc_motionfeedback1_20.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_motionfeedback1_20.cc"],
+    hdrs = ["llc_motionfeedback1_20.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -259,23 +235,20 @@ cc_test(
     deps = [
         ":llc_motionfeedback1_20",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_motionfeedback2_21",
-    srcs = [
-        "llc_motionfeedback2_21.cc",
-    ],
-    hdrs = [
-        "llc_motionfeedback2_21.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_motionfeedback2_21.cc"],
+    hdrs = ["llc_motionfeedback2_21.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -286,23 +259,20 @@ cc_test(
     deps = [
         ":llc_motionfeedback2_21",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_vehiclelimits_24",
-    srcs = [
-        "llc_vehiclelimits_24.cc",
-    ],
-    hdrs = [
-        "llc_vehiclelimits_24.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_vehiclelimits_24.cc"],
+    hdrs = ["llc_vehiclelimits_24.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -313,23 +283,20 @@ cc_test(
     deps = [
         ":llc_vehiclelimits_24",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "llc_vehiclestatus_25",
-    srcs = [
-        "llc_vehiclestatus_25.cc",
-    ],
-    hdrs = [
-        "llc_vehiclestatus_25.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    srcs = ["llc_vehiclestatus_25.cc"],
+    hdrs = ["llc_vehiclestatus_25.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:canbus_proto",
+        "//modules/canbus/proto:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -340,7 +307,7 @@ cc_test(
     deps = [
         ":llc_vehiclestatus_25",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

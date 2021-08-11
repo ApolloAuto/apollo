@@ -2,6 +2,11 @@ syntax = "proto2";
 
 package apollo.routing;
 
+message TopicConfig {
+  optional string routing_response_topic = 1;
+  optional string routing_response_history_topic = 2;
+}
+
 message RoutingConfig {
   optional double base_speed = 1;  // base speed for node creator [m/s]
   optional double left_turn_penalty =
@@ -12,4 +17,5 @@ message RoutingConfig {
   optional double change_penalty = 5;  // change penalty for edge creator [m]
   optional double base_changing_length =
       6;  // base change length penalty for edge creator [m]
+  optional TopicConfig topic_config = 7;
 }

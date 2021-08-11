@@ -1,0 +1,9 @@
+score_params {
+  prob_scale: 0.125
+  max_match_distance: 10
+  min_score: 0
+  use_mahalanobis_distance: true
+  check_type: false
+  confidence_level: C99P
+}
+

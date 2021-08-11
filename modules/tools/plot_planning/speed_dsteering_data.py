@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -17,10 +17,11 @@
 ###############################################################################
 
 import sys
-from record_reader import RecordItemReader
+from modules.tools.plot_planning.record_reader import RecordItemReader
 import matplotlib.pyplot as plt
-from cyber_py.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
+
 
 class SpeedDsteeringData:
     def __init__(self):
@@ -29,11 +30,11 @@ class SpeedDsteeringData:
         self.last_timestamp_sec = None
         self.speed_data = []
         self.d_steering_data = []
-    
+
     def add(self, chassis):
         steering_percentage = chassis.steering_percentage
         speed_mps = chassis.speed_mps
-        timestamp_sec = chassis.header.timestamp_sec        
+        timestamp_sec = chassis.header.timestamp_sec
 
         if self.last_timestamp_sec is None:
             self.last_steering_percentage = steering_percentage
@@ -52,7 +53,8 @@ class SpeedDsteeringData:
             self.last_timestamp_sec = timestamp_sec
 
     def get_speed_dsteering(self):
-        return self.speed_data, self.d_steering_data 
+        return self.speed_data, self.d_steering_data
+
 
 if __name__ == "__main__":
     import sys

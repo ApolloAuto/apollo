@@ -23,12 +23,15 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {
 namespace prediction {
@@ -39,6 +42,11 @@ class ObstaclesContainer : public Container {
    * @brief Constructor
    */
   ObstaclesContainer();
+
+  /**
+   * @brief Constructor from container output
+   */
+  explicit ObstaclesContainer(const SubmoduleOutput& submodule_output);
 
   /**
    * @brief Destructor
@@ -65,12 +73,6 @@ class ObstaclesContainer : public Container {
    * @param feature proto message
    */
   void InsertFeatureProto(const Feature& feature);
-
-  /*
-   * @brief Build current frame id mapping for all obstacles
-   */
-  void BuildCurrentFrameIdMapping(
-      const perception::PerceptionObstacles& perception_obstacles);
 
   /**
    * @brief Build lane graph for obstacles
@@ -132,16 +134,22 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
+  SubmoduleOutput GetSubmoduleOutput(
+      const size_t history_size, const apollo::cyber::Time& frame_start_time);
+
+  /**
+   * @brief Get current scenario
+   */
+  const Scenario& curr_scenario() const;
+
+  /**
+   * @brief Get the raw pointer of clusters_
+   */
+  ObstacleClusters* GetClustersPtr() const;
+  JunctionAnalyzer* GetJunctionAnalyzer();
+
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
-  /**
-   * @brief Check if a perception_obstacle is an old existed obstacle
-   * @param A PerceptionObstacle
-   * @param An obstacle_ptr
-   * @return True if the perception_obstacle is this obstacle; otherwise false;
-   */
-  bool AdaptTracking(const perception::PerceptionObstacle& perception_obstacle,
-                     Obstacle* obstacle_ptr);
 
   /**
    * @brief Check if an obstacle is movable
@@ -150,21 +158,15 @@ class ObstaclesContainer : public Container {
    */
   bool IsMovable(const perception::PerceptionObstacle& perception_obstacle);
 
-  int PerceptionIdToPredictionId(const int perception_id);
-
  private:
   double timestamp_ = -1.0;
   common::util::LRUCache<int, std::unique_ptr<Obstacle>> ptr_obstacles_;
-  // an id_mapping from perception_id to prediction_id
-  common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
-  // perception_id -> prediction_id
-  std::unordered_map<int, int> curr_frame_id_mapping_;
-  // prediction_id -> perception_obstacle
-  std::unordered_map<int, apollo::perception::PerceptionObstacle>
-      curr_frame_id_perception_obstacle_map_;
+  Scenario curr_scenario_;
+  std::unique_ptr<ObstacleClusters> clusters_;
+  JunctionAnalyzer junction_analyzer_;
 };
 
 }  // namespace prediction

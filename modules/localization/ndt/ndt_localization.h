@@ -15,10 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Geometry>
 #include <list>
 #include <memory>
 #include <string>
+
+#include "Eigen/Geometry"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/ndt/localization_pose_buffer.h"
@@ -38,11 +39,15 @@ struct LidarHeight {
 };
 
 struct TimeStampPose {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   double timestamp = 0.0;
   Eigen::Affine3d pose;
 };
 
 class NDTLocalization {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   NDTLocalization() {}
   ~NDTLocalization() { tf_buffer_ = nullptr; }

@@ -27,8 +27,8 @@ namespace planning {
 
 FemPosDeviationIpoptInterface::FemPosDeviationIpoptInterface(
     std::vector<std::pair<double, double>> points, std::vector<double> bounds) {
-  CHECK_GT(points.size(), 1);
-  CHECK_GT(bounds.size(), 1);
+  CHECK_GT(points.size(), 1U);
+  CHECK_GT(bounds.size(), 1U);
   bounds_around_refs_ = std::move(bounds);
   ref_points_ = std::move(points);
   num_of_points_ = ref_points_.size();
@@ -43,7 +43,7 @@ void FemPosDeviationIpoptInterface::get_optimization_results(
 bool FemPosDeviationIpoptInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
                                                  int& nnz_h_lag,
                                                  IndexStyleEnum& index_style) {
-  CHECK_GT(num_of_points_, 3);
+  CHECK_GT(num_of_points_, 3U);
   // Number of variables
   // Variables include 2D points and curvature constraints slack variable
   num_of_slack_var_ = num_of_points_ - 2;

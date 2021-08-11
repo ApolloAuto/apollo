@@ -359,14 +359,15 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_dump_txt_map.empty()) {
     apollo::hdmap::Map map;
-    CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
-    CHECK(apollo::cyber::common::SetProtoToASCIIFile(map, FLAGS_dump_txt_map));
+    ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
+    ACHECK(apollo::cyber::common::SetProtoToASCIIFile(map, FLAGS_dump_txt_map));
     valid_arg = true;
   }
   if (!FLAGS_dump_bin_map.empty()) {
     apollo::hdmap::Map map;
-    CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
-    CHECK(apollo::cyber::common::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
+    ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
+    ACHECK(
+        apollo::cyber::common::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
     valid_arg = true;
   }
   if (!valid_arg) {

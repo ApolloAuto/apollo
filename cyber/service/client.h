@@ -28,7 +28,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
-
 #include "cyber/node/node_channel_impl.h"
 #include "cyber/service/client_base.h"
 
@@ -152,6 +151,7 @@ class Client : public ClientBase {
  private:
   void HandleResponse(const std::shared_ptr<Response>& response,
                       const transport::MessageInfo& request_info);
+
   bool IsInit(void) const { return response_receiver_ != nullptr; }
 
   std::string node_name_;
@@ -204,12 +204,12 @@ bool Client<Request, Response>::Init() {
   role.set_channel_id(channel_id);
   response_receiver_ = transport->CreateReceiver<Response>(
       role,
-      [=](const std::shared_ptr<Response>& request,
+      [=](const std::shared_ptr<Response>& response,
           const transport::MessageInfo& message_info,
           const proto::RoleAttributes& reader_attr) {
         (void)message_info;
         (void)reader_attr;
-        response_callback_(request, message_info);
+        response_callback_(response, message_info);
       },
       proto::OptionalMode::RTPS);
   if (response_receiver_ == nullptr) {

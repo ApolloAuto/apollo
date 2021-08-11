@@ -23,7 +23,7 @@
 
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/lib/utils/timer.h"
+#include "modules/perception/camera/common/timer.h"
 
 namespace apollo {
 namespace perception {
@@ -224,17 +224,17 @@ bool DarkSCNNLanePostprocessor::Process2D(
   coeffs.resize(lane_type_num_);
   img_coeffs.resize(lane_type_num_);
   for (int i = 1; i < lane_type_num_; ++i) {
+    coeffs[i] << 0, 0, 0, 0;
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // Solve linear system to estimate polynomial coefficients
     if (RansacFitting<float>(xy_points[i], &selected_xy_points, &coeff, 200,
-                      static_cast<int>(minNumPoints_), 0.1f)) {
+                             static_cast<int>(minNumPoints_), 0.1f)) {
       coeffs[i] = coeff;
 
       xy_points[i].clear();
       xy_points[i] = selected_xy_points;
     } else {
-      coeffs[i] << 0, 0, 0, 0;
       xy_points[i].clear();
     }
   }
@@ -436,7 +436,6 @@ void DarkSCNNLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
       camera_point_set.push_back(camera_point);
     }
   }
-  return;
 }
 
 // @brief: Fit camera lane line using polynomial
@@ -474,7 +473,6 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
-  return;
 }
 
 std::string DarkSCNNLanePostprocessor::Name() const {

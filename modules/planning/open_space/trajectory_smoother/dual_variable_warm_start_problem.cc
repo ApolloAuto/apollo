@@ -20,10 +20,11 @@
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
-#include "modules/common/time/time.h"
+#include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -40,7 +41,7 @@ bool DualVariableWarmStartProblem::Solve(
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
     Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* s_warm_up) {
-  auto t_start = cyber::Time::Now().ToSecond();
+  PERF_BLOCK_START()
   bool solver_flag = false;
 
   if (planner_open_space_config_.dual_variable_warm_start_config()
@@ -54,10 +55,7 @@ bool DualVariableWarmStartProblem::Solve(
       ADEBUG << "dual warm up done.";
       ptop.get_optimization_results(l_warm_up, n_warm_up);
 
-      auto t_end = cyber::Time::Now().ToSecond();
-      ADEBUG << "Dual variable warm start solving time in second : "
-             << t_end - t_start;
-
+      PERF_BLOCK_END("DualVariableWarmStartSolving");
       solver_flag = true;
     } else {
       AWARN << "dual warm up fail.";
@@ -75,10 +73,7 @@ bool DualVariableWarmStartProblem::Solve(
       ADEBUG << "dual warm up done.";
       ptop.get_optimization_results(l_warm_up, n_warm_up, s_warm_up);
 
-      auto t_end = cyber::Time::Now().ToSecond();
-      ADEBUG << "Dual variable warm start solving time in second : "
-             << t_end - t_start;
-
+      PERF_BLOCK_END("DualVariableWarmStartSolving");
       solver_flag = true;
     } else {
       AWARN << "dual warm up fail.";
@@ -169,10 +164,7 @@ bool DualVariableWarmStartProblem::Solve(
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
       ADEBUG << "*** The final value of the objective function is " << final_obj
              << '.';
-      auto t_end = cyber::Time::Now().ToSecond();
-
-      ADEBUG << "Dual variable warm start solving time in second : "
-             << t_end - t_start;
+      PERF_BLOCK_END("DualVariableWarmStartSolving");
     } else {
       ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
@@ -262,10 +254,7 @@ bool DualVariableWarmStartProblem::Solve(
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
       ADEBUG << "*** The final value of the objective function is " << final_obj
              << '.';
-      auto t_end = cyber::Time::Now().ToSecond();
-
-      ADEBUG << "Dual variable warm start solving time in second : "
-             << t_end - t_start;
+      PERF_BLOCK_END("DualVariableWarmStartSolving");
     } else {
       ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
@@ -289,9 +278,7 @@ bool DualVariableWarmStartProblem::Solve(
     ADEBUG << "dual warm up done.";
     ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
 
-    auto t_end = cyber::Time::Now().ToSecond();
-    ADEBUG << "Dual variable warm start solving time in second : "
-           << t_end - t_start;
+    PERF_BLOCK_END("DualVariableWarmStartSolving");
 
     // ipoptqp result
     Eigen::MatrixXd l_warm_up_ipoptqp(l_warm_up->rows(), l_warm_up->cols());

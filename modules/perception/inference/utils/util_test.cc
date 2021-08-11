@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 
 TEST(loadTest, test) {
-  CHECK(!apollo::perception::inference::load_binary_data("unknown.txt"));
+  ACHECK(!apollo::perception::inference::load_binary_data("unknown.txt"));
 }
 
 TEST(UtilTest, test) {
@@ -73,7 +73,7 @@ TEST(UtilTest, test) {
   //     cv::resize(img_roi, img_small, cv::Size(w_small, h_small));
   //     src_gpu->set_cpu_data(img_roi.data);
 
-  //     CHECK(apollo::perception::inference::resize(
+  //     ACHECK(apollo::perception::inference::resize(
   //         img_roi.channels(), img_roi.rows, img_roi.cols,
   //         img_roi.step1(0) / img_roi.step1(1), blob, src_gpu, 0));
   //     for (int i = 0;
@@ -104,7 +104,7 @@ TEST(UtilTest, test) {
 
   //     cv::Mat img_small;
   //     cv::resize(img_roi, img_small, cv::Size(w_small, h_small));
-  //     CHECK(apollo::perception::inference::resize(
+  //     ACHECK(apollo::perception::inference::resize(
   //         img_roi.channels(), img_roi.rows, img_roi.cols,
   //         img_roi.step1(0) / img_roi.step1(1), blob, src_gpu, 0));
   //     for (int i = 0;
@@ -135,7 +135,7 @@ TEST(UtilTest, test) {
 
   //     cv::Mat img_small;
   //     cv::resize(img_roi, img_small, cv::Size(w_small, h_small));
-  //     CHECK(apollo::perception::inference::resize(
+  //     ACHECK(apollo::perception::inference::resize(
   //         img_roi.channels(), img_roi.rows, img_roi.cols,
   //         img_roi.step1(0) / img_roi.step1(1), blob, src_gpu, 0));
   //     for (int i = 0;

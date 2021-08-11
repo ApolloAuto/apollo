@@ -19,8 +19,8 @@
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/time/timer.h"
+#include "cyber/time/clock.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -28,6 +28,7 @@ namespace localization {
 namespace msf {
 
 using apollo::common::Status;
+using apollo::cyber::Clock;
 
 LocalizationIntegProcess::LocalizationIntegProcess()
     : sins_(new Sins()),
@@ -91,14 +92,31 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   static double pre_imu_time = cur_imu_time;
   double delta_time = cur_imu_time - pre_imu_time;
   if (delta_time > 0.1) {
-    ADEBUG << std::setprecision(16) << "the imu message loss more than 10, "
+    AERROR << std::setprecision(16) << "the imu message loss more than 10, "
            << "the pre time and current time: " << pre_imu_time << " "
            << cur_imu_time;
   } else if (delta_time < 0.0) {
-    ADEBUG << std::setprecision(16)
+    AERROR << std::setprecision(16)
            << "received imu message's time is eary than last imu message, "
            << "the pre time and current time: " << pre_imu_time << " "
            << cur_imu_time;
+  }
+
+  double cur_system_time = Clock::NowInSeconds();
+  static double pre_system_time = cur_system_time;
+
+  double delta_system_time = cur_system_time - pre_system_time;
+  if (delta_system_time > 0.1) {
+    AERROR << std::setprecision(16)
+           << "the imu message loss more than 10 according to system time, "
+           << "the pre system time and current system time: " << pre_system_time
+           << " " << cur_system_time;
+  } else if (delta_system_time < 0.0) {
+    AERROR << std::setprecision(16)
+           << "received imu message's time is eary than last imu message "
+              "according to system time, "
+           << "the pre system time and current system time: " << pre_system_time
+           << " " << cur_system_time;
   }
 
   // add imu msg and get current predict pose
@@ -129,8 +147,7 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   }
 
   pre_imu_time = cur_imu_time;
-
-  return;
+  pre_system_time = cur_system_time;
 }
 
 void LocalizationIntegProcess::GetValidFromOK() {
@@ -144,14 +161,12 @@ void LocalizationIntegProcess::GetValidFromOK() {
       pva_covariance_[2][2] < 0.3 * 0.3 && pva_covariance_[8][8] < 0.1 * 0.1) {
     integ_state_ = IntegState::VALID;
   }
-  return;
 }
 
 void LocalizationIntegProcess::GetState(IntegState *state) {
   CHECK_NOTNULL(state);
 
   *state = integ_state_;
-  return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
@@ -182,7 +197,7 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::localization::Pose *posepb_loc = localization->mutable_pose();
 
   localization->set_measurement_time(ins_pva_.time);
-  headerpb_loc->set_timestamp_sec(apollo::common::time::Clock::NowInSeconds());
+  headerpb_loc->set_timestamp_sec(apollo::cyber::Clock::NowInSeconds());
 
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();
@@ -230,7 +245,6 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   orientation_std_dev->set_x(std::sqrt(pva_covariance_[6][6]));
   orientation_std_dev->set_y(std::sqrt(pva_covariance_[7][7]));
   orientation_std_dev->set_z(std::sqrt(pva_covariance_[8][8]));
-  return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
@@ -242,14 +256,12 @@ void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
   *state = integ_state_;
   *sins_pva = ins_pva_;
   memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
-  return;
 }
 
 void LocalizationIntegProcess::GetCorrectedImu(ImuData *imu_data) {
   CHECK_NOTNULL(imu_data);
 
   *imu_data = corrected_imu_;
-  return;
 }
 
 void LocalizationIntegProcess::GetEarthParameter(
@@ -257,7 +269,6 @@ void LocalizationIntegProcess::GetEarthParameter(
   CHECK_NOTNULL(earth_param);
 
   *earth_param = earth_param_;
-  return;
 }
 
 void LocalizationIntegProcess::MeasureDataProcess(
@@ -316,7 +327,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
 
 void LocalizationIntegProcess::MeasureDataProcessImpl(
     const MeasureData &measure_msg) {
-  common::time::Timer timer;
+  common::util::Timer timer;
   timer.Start();
 
   if (!CheckIntegMeasureData(measure_msg)) {
@@ -326,7 +337,6 @@ void LocalizationIntegProcess::MeasureDataProcessImpl(
   sins_->AddMeasurement(measure_msg);
 
   timer.End("time of integrated navigation measure update");
-  return;
 }
 
 bool LocalizationIntegProcess::CheckIntegMeasureData(

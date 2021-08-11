@@ -18,6 +18,7 @@
 #define CYBER_RECORD_RECORD_VIEWER_H_
 
 #include <cstddef>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -47,8 +48,8 @@ class RecordViewer {
    * @param channels
    */
   RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time = 0,
-               uint64_t end_time = UINT64_MAX,
-               const std::set<std::string>& channels = std::set<std::string>());
+               uint64_t end_time = std::numeric_limits<uint64_t>::max(),
+               const std::set<std::string>& channels = {});
 
   /**
    * @brief The constructor with multiple readers.
@@ -59,7 +60,8 @@ class RecordViewer {
    * @param channels
    */
   RecordViewer(const std::vector<RecordReaderPtr>& readers,
-               uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX,
+               uint64_t begin_time = 0,
+               uint64_t end_time = std::numeric_limits<uint64_t>::max(),
                const std::set<std::string>& channels = std::set<std::string>());
 
   /**
@@ -93,14 +95,9 @@ class RecordViewer {
   /**
    * @brief The iterator.
    */
-  class Iterator {
+  class Iterator : public std::iterator<std::input_iterator_tag, RecordMessage,
+                                        int, RecordMessage*, RecordMessage&> {
    public:
-    using iterator_category = std::input_iterator_tag;
-    using value_type = RecordMessage;
-    using difference_type = int;
-    using pointer = RecordMessage*;
-    using reference = RecordMessage&;
-
     /**
      * @brief The constructor of iterator with viewer.
      *
@@ -140,27 +137,21 @@ class RecordViewer {
     /**
      * @brief Overloading operator ++.
      *
-     * @param other
-     *
      * @return The result.
      */
-    void operator++();
+    Iterator& operator++();
 
     /**
      * @brief Overloading operator ->.
      *
-     * @param other
-     *
-     * @return The result.
+     * @return The pointer.
      */
     pointer operator->();
 
     /**
      * @brief Overloading operator *.
      *
-     * @param other
-     *
-     * @return The result.
+     * @return The reference.
      */
     reference operator*();
 
@@ -195,7 +186,7 @@ class RecordViewer {
   bool Update(RecordMessage* message);
 
   uint64_t begin_time_ = 0;
-  uint64_t end_time_ = UINT64_MAX;
+  uint64_t end_time_ = std::numeric_limits<uint64_t>::max();
   // User defined channels
   std::set<std::string> channels_;
   // All channel in user defined readers

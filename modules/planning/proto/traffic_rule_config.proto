@@ -8,29 +8,6 @@ message BacksideVehicleConfig {
   optional double backside_lane_width = 1 [default = 4.0];
 }
 
-message ChangeLaneConfig {
-  optional double min_overtake_distance = 1 [default = 10.0];
-  optional double min_overtake_time = 2 [default = 2.0];
-  optional bool enable_guard_obstacle = 3 [default = false];
-  optional double guard_distance = 4 [default = 100.0];
-  optional double min_guard_speed = 5 [default = 1.0];
-}
-
-message CreepConfig {
-  optional bool enabled = 1;
-  // stop distance(m) to the stop line of next lane overlap while creeping
-  optional double creep_distance_to_stop_line = 2 [default = 1.0];  // meter
-  // stop distance(m) to the stop line of next lane overlap while creeping
-  optional double stop_distance = 3 [default = 0.5];  // meter
-  optional double speed_limit = 4 [default = 1.0];    // m/s
-  // max distance(m) to the stop line to be considered as a valid stop for creap
-  optional double max_valid_stop_distance = 5 [default = 0.3];  // meter
-  // min boundary t to ignore obstacles while creeping
-  optional double min_boundary_t = 6 [default = 6.0];  // second
-  // min boundary s to ignore obstacles while creeping
-  optional double min_boundary_s = 7 [default = 3.0];  // meter
-}
-
 message CrosswalkConfig {
   // stop distance from stop line of crosswalk
   optional double stop_distance = 1 [default = 1.0];  // meter
@@ -61,8 +38,10 @@ message KeepClearConfig {
   optional bool enable_keep_clear_zone = 1 [default = true];
   optional bool enable_junction = 2 [default = true];
   optional double min_pass_s_distance = 3 [default = 2.0];  // meter
-  // tolerance distance to align pnc_junction boundary with stop_line of traffic sign(s)
-  optional double align_with_traffic_sign_tolerance = 4 [default = 4.5];  // meter
+  // tolerance distance to align pnc_junction boundary with stop_line of traffic
+  // sign(s)
+  optional double align_with_traffic_sign_tolerance = 4
+      [default = 4.5];  // meter
 }
 
 message ReferenceLineEndConfig {
@@ -94,37 +73,34 @@ message TrafficLightConfig {
 message YieldSignConfig {
   optional bool enabled = 1 [default = true];
   // stop distance(m) to the stop line of the yield sign
-  optional double stop_distance = 2 [default = 1.0];  // meter
+  optional double stop_distance = 2 [default = 1.0];         // meter
   optional double start_watch_distance = 3 [default = 2.0];  // meter
 }
 
-// TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
     BACKSIDE_VEHICLE = 1;
-    CHANGE_LANE = 2;
-    CROSSWALK = 3;
-    DESTINATION = 4;
-    KEEP_CLEAR = 5;
-    REFERENCE_LINE_END = 6;
-    REROUTING = 7;
-    STOP_SIGN = 8;
-    TRAFFIC_LIGHT = 9;
-    YIELD_SIGN = 10;
+    CROSSWALK = 2;
+    DESTINATION = 3;
+    KEEP_CLEAR = 4;
+    REFERENCE_LINE_END = 5;
+    REROUTING = 6;
+    STOP_SIGN = 7;
+    TRAFFIC_LIGHT = 8;
+    YIELD_SIGN = 9;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
   oneof config {
     BacksideVehicleConfig backside_vehicle = 3;
-    ChangeLaneConfig change_lane = 4;
-    CrosswalkConfig crosswalk = 5;
-    DestinationConfig destination = 6;
-    KeepClearConfig keep_clear = 7;
-    ReferenceLineEndConfig reference_line_end = 8;
-    ReroutingConfig rerouting = 9;
-    StopSignConfig stop_sign = 10;
-    TrafficLightConfig traffic_light = 11;
-    YieldSignConfig yield_sign = 12;
+    CrosswalkConfig crosswalk = 4;
+    DestinationConfig destination = 5;
+    KeepClearConfig keep_clear = 6;
+    ReferenceLineEndConfig reference_line_end = 7;
+    ReroutingConfig rerouting = 8;
+    StopSignConfig stop_sign = 9;
+    TrafficLightConfig traffic_light = 10;
+    YieldSignConfig yield_sign = 11;
   }
 }
 

@@ -16,10 +16,7 @@
 
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h"
 
-#include <algorithm>
-
 #include "cyber/common/log.h"
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -32,7 +29,7 @@ constexpr double kMaxVariableRange = 1.0e10;
 PiecewiseJerkProblem::PiecewiseJerkProblem(
     const size_t num_of_knots, const double delta_s,
     const std::array<double, 3>& x_init) {
-  CHECK_GE(num_of_knots, 2);
+  CHECK_GE(num_of_knots, 2U);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
@@ -47,6 +44,8 @@ PiecewiseJerkProblem::PiecewiseJerkProblem(
 
   ddx_bounds_.resize(num_of_knots_,
                      std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+
+  weight_x_ref_vec_ = std::vector<double>(num_of_knots_, 0.0);
 }
 
 OSQPData* PiecewiseJerkProblem::FormulateProblem() {
@@ -94,7 +93,9 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   OSQPSettings* settings = SolverDefaultSettings();
   settings->max_iter = max_iter;
 
-  OSQPWorkspace* osqp_work = osqp_setup(data, settings);
+  OSQPWorkspace* osqp_work = nullptr;
+  osqp_work = osqp_setup(data, settings);
+  // osqp_setup(&osqp_work, data, settings);
 
   osqp_solve(osqp_work);
 
@@ -313,6 +314,18 @@ void PiecewiseJerkProblem::set_x_ref(const double weight_x_ref,
                                      std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
   weight_x_ref_ = weight_x_ref;
+  // set uniform weighting
+  weight_x_ref_vec_ = std::vector<double>(num_of_knots_, weight_x_ref);
+  x_ref_ = std::move(x_ref);
+  has_x_ref_ = true;
+}
+
+void PiecewiseJerkProblem::set_x_ref(std::vector<double> weight_x_ref_vec,
+                                     std::vector<double> x_ref) {
+  CHECK_EQ(x_ref.size(), num_of_knots_);
+  CHECK_EQ(weight_x_ref_vec.size(), num_of_knots_);
+  // set piecewise weighting
+  weight_x_ref_vec_ = std::move(weight_x_ref_vec);
   x_ref_ = std::move(x_ref);
   has_x_ref_ = true;
 }

@@ -20,14 +20,12 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
-#include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/string_tokenizer.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -50,7 +48,8 @@ using apollo::common::ErrorCode;
 using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::common::util::PointFactory;
+using apollo::cyber::Clock;
 
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -58,8 +57,10 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-LaneFollowStage::LaneFollowStage(const ScenarioConfig::StageConfig& config)
-    : Stage(config) {}
+LaneFollowStage::LaneFollowStage(
+    const ScenarioConfig::StageConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Stage(config, injector) {}
 
 void LaneFollowStage::RecordObstacleDebugInfo(
     ReferenceLineInfo* reference_line_info) {
@@ -89,25 +90,6 @@ void LaneFollowStage::RecordObstacleDebugInfo(
   }
 }
 
-void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
-                                      const std::string& name,
-                                      const double time_diff_ms) {
-  if (!FLAGS_enable_record_debug) {
-    ADEBUG << "Skip record debug info";
-    return;
-  }
-  if (reference_line_info == nullptr) {
-    AERROR << "Reference line info is null.";
-    return;
-  }
-
-  auto ptr_latency_stats = reference_line_info->mutable_latency_stats();
-
-  auto ptr_stats = ptr_latency_stats->add_task_stats();
-  ptr_stats->set_name(name);
-  ptr_stats->set_time_ms(time_diff_ms);
-}
-
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
@@ -115,7 +97,16 @@ Stage::StageStatus LaneFollowStage::Process(
   ADEBUG << "Number of reference lines:\t"
          << frame->mutable_reference_line_info()->size();
 
+  unsigned int count = 0;
+
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+    // TODO(SHU): need refactor
+    if (count++ == frame->mutable_reference_line_info()->size()) {
+      break;
+    }
+    ADEBUG << "No: [" << count << "] Reference Line.";
+    ADEBUG << "IsChangeLanePath: " << reference_line_info.IsChangeLanePath();
+
     if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);
       break;
@@ -127,12 +118,22 @@ Stage::StageStatus LaneFollowStage::Process(
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
+        ADEBUG << "FLAGS_enable_smarter_lane_change: "
+               << FLAGS_enable_smarter_lane_change;
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
+            (LaneChangeDecider::IsClearToChangeLane(&reference_line_info) ||
+             FLAGS_enable_smarter_lane_change)) {
+          // If the path and speed optimization succeed on target lane while
+          // under smart lane-change or IsClearToChangeLane under older version
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
+          LaneChangeDecider::UpdatePreparationDistance(
+              true, frame, &reference_line_info, injector_->planning_context());
           ADEBUG << "\tclear for lane change";
         } else {
+          LaneChangeDecider::UpdatePreparationDistance(
+              false, frame, &reference_line_info,
+              injector_->planning_context());
           reference_line_info.SetDrivable(false);
           ADEBUG << "\tlane change failed";
         }
@@ -156,24 +157,34 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
+  ADEBUG << "Current reference_line_info is IsChangeLanePath: "
+         << reference_line_info->IsChangeLanePath();
 
   auto ret = Status::OK();
-  for (auto* optimizer : task_list_) {
+  for (auto* task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
-    ret = optimizer->Execute(frame, reference_line_info);
+
+    ret = task->Execute(frame, reference_line_info);
+
+    const double end_timestamp = Clock::NowInSeconds();
+    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+    ADEBUG << "after task[" << task->Name()
+           << "]:" << reference_line_info->PathSpeedDebugString();
+    ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
+    RecordDebugInfo(reference_line_info, task->Name(), time_diff_ms);
+
     if (!ret.ok()) {
-      AERROR << "Failed to run tasks[" << optimizer->Name()
+      AERROR << "Failed to run tasks[" << task->Name()
              << "], Error message: " << ret.error_message();
       break;
     }
-    const double end_timestamp = Clock::NowInSeconds();
-    const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
-    ADEBUG << "after optimizer " << optimizer->Name() << ":"
-           << reference_line_info->PathSpeedDebugString();
-    ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
-
-    RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
+    // TODO(SHU): disable reference line order changes for now
+    // updated reference_line_info, because it is changed in
+    // lane_change_decider by PrioritizeChangeLane().
+    // reference_line_info = &frame->mutable_reference_line_info()->front();
+    // ADEBUG << "Current reference_line_info is IsChangeLanePath: "
+    //        << reference_line_info->IsChangeLanePath();
   }
 
   RecordObstacleDebugInfo(reference_line_info);
@@ -188,7 +199,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
           planning_start_point.path_point().s(), &trajectory)) {
-    std::string msg("Fail to aggregate planning trajectory.");
+    const std::string msg = "Fail to aggregate planning trajectory.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -226,8 +237,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
         }
       }
       if (add_stop_obstacle_cost) {
-        constexpr double kRefrenceLineStaticObsCost = 1e3;
-        reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+        static constexpr double kReferenceLineStaticObsCost = 1e3;
+        reference_line_info->AddCost(kReferenceLineStaticObsCost);
       }
     }
   }
@@ -235,7 +246,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   if (FLAGS_enable_trajectory_check) {
     if (ConstraintChecker::ValidTrajectory(trajectory) !=
         ConstraintChecker::Result::VALID) {
-      std::string msg("Current planning trajectory is not valid.");
+      const std::string msg = "Current planning trajectory is not valid.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -275,26 +286,8 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
-  // TODO(Hongyi): refine the fall-back handling here.
-  // To use piecewise jerk speed fallback, stop distance here
-  // is an upper bound of s, not a target.
-  // TODO(Jiacheng): move this stop_path_threshold to a gflag
-  const double path_stop_distance =
-      reference_line_info->path_data().discretized_path().Length();
-
-  const double obstacle_stop_distance =
-      reference_line_info->st_graph_data().is_initialized()
-          ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
-          : std::numeric_limits<double>::infinity();
-
-  const double curr_speed_distance =
-      FLAGS_fallback_total_time *
-      std::min({FLAGS_default_cruise_speed,
-                reference_line_info->vehicle_state().linear_velocity()});
-
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
-          {path_stop_distance, obstacle_stop_distance, curr_speed_distance}));
+      SpeedProfileGenerator::GenerateFallbackSpeed(injector_->ego_info());
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
@@ -307,13 +300,13 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   const double unit_s = 1.0;
   const auto& reference_line = reference_line_info->reference_line();
 
-  auto adc_point = EgoInfo::Instance()->start_point();
+  auto adc_point = injector_->ego_info()->start_point();
   DCHECK(adc_point.has_path_point());
   const auto adc_point_x = adc_point.path_point().x();
   const auto adc_point_y = adc_point.path_point().y();
 
   common::SLPoint adc_point_s_l;
-  if (!reference_line.XYToSL({adc_point_x, adc_point_y}, &adc_point_s_l)) {
+  if (!reference_line.XYToSL(adc_point.path_point(), &adc_point_s_l)) {
     AERROR << "Fail to project ADC to reference line when calculating path "
               "fallback. Straight forward path is generated";
     const auto adc_point_heading = adc_point.path_point().theta();
@@ -325,11 +318,9 @@ void LaneFollowStage::GenerateFallbackPathProfile(
 
     const double max_s = 100.0;
     for (double s = 0; s < max_s; s += unit_s) {
-      common::PathPoint path_point = common::util::MakePathPoint(
-          adc_traversed_x, adc_traversed_y, 0.0, adc_point_heading,
-          adc_point_kappa, adc_point_dkappa, 0.0);
-      path_point.set_s(s);
-      path_points.push_back(std::move(path_point));
+      path_points.push_back(PointFactory::ToPathPoint(
+          adc_traversed_x, adc_traversed_y, 0.0, s, adc_point_heading,
+          adc_point_kappa, adc_point_dkappa));
       adc_traversed_x += unit_s * std::cos(adc_point_heading);
       adc_traversed_y += unit_s * std::sin(adc_point_heading);
     }
@@ -348,11 +339,9 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   const double max_s = reference_line.Length();
   for (double s = adc_s; s < max_s; s += unit_s) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
-    common::PathPoint path_point = common::util::MakePathPoint(
-        ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
-        ref_point.kappa(), ref_point.dkappa(), 0.0);
-    path_point.set_s(s - adc_s);
-    path_points.push_back(std::move(path_point));
+    path_points.push_back(PointFactory::ToPathPoint(
+        ref_point.x() + dx, ref_point.y() + dy, 0.0, s - adc_s,
+        ref_point.heading(), ref_point.kappa(), ref_point.dkappa()));
   }
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
@@ -360,7 +349,7 @@ void LaneFollowStage::GenerateFallbackPathProfile(
 bool LaneFollowStage::RetrieveLastFramePathProfile(
     const ReferenceLineInfo* reference_line_info, const Frame* frame,
     PathData* path_data) {
-  const auto* ptr_last_frame = FrameHistory::Instance()->Latest();
+  const auto* ptr_last_frame = injector_->frame_history()->Latest();
   if (ptr_last_frame == nullptr) {
     AERROR
         << "Last frame doesn't succeed, fail to retrieve last frame path data";
@@ -388,9 +377,7 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
 SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
                                    const ReferenceLine& reference_line) const {
   SLPoint sl_point;
-  reference_line.XYToSL(
-      {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
-      &sl_point);
+  reference_line.XYToSL(stop_decision.stop_point(), &sl_point);
   return sl_point;
 }
 

@@ -29,16 +29,16 @@ using apollo::cyber::common::GetAbsolutePath;
 bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "filter_bank.conf");
   FilterBankConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();
   for (int i = 0; i < config.filter_name_size(); ++i) {
     const auto& name = config.filter_name(i);

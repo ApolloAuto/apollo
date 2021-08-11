@@ -16,9 +16,10 @@
 
 #include "modules/monitor/software/process_monitor.h"
 
+#include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gflags/gflags.h"
 #include "modules/common/util/map_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
@@ -72,6 +73,14 @@ void ProcessMonitor::RunOnce(const double current_time) {
       auto* status = components->at(name).mutable_process_status();
       UpdateStatus(running_processes, config, status);
     }
+  }
+
+  // Check other components.
+  auto* other_components = manager->GetStatus()->mutable_other_components();
+  for (const auto& iter : mode.other_components()) {
+    const std::string& name = iter.first;
+    const auto& config = iter.second;
+    UpdateStatus(running_processes, config, &other_components->at(name));
   }
 }
 

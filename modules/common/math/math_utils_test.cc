@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "osqp/include/osqp.h"
+#include "osqp/osqp.h"
 
 namespace apollo {
 namespace common {
@@ -114,6 +114,14 @@ TEST(MathUtilsTest, RotateVector2d) {
   EXPECT_NEAR(expected_y, result.y(), tol);
 }
 
+TEST(MathUtilsTest, AlmostEqualTest) {
+  double x = 2.0;
+  double x_root = std::sqrt(x);
+  double y = Square(x_root);
+  EXPECT_TRUE(almost_equal(x, y, 2));
+  EXPECT_FALSE(almost_equal(y, 2.0001, 2));
+}
+
 TEST(MathUtilsTest, QPSTTest) {
   // Load problem data
   c_float P_x[4] = {
@@ -174,8 +182,8 @@ TEST(MathUtilsTest, QPSTTest) {
       reinterpret_cast<OSQPSettings *>(c_malloc(sizeof(OSQPSettings)));
 
   // Structures
-  OSQPWorkspace *work;  // Workspace
-  OSQPData *data;       // OSQPData
+  OSQPWorkspace *work = NULL;  // Workspace
+  OSQPData *data;              // OSQPData
 
   // Populate data
   data = reinterpret_cast<OSQPData *>(c_malloc(sizeof(OSQPData)));
@@ -192,6 +200,7 @@ TEST(MathUtilsTest, QPSTTest) {
 
   // Setup workspace
   work = osqp_setup(data, settings);
+  // osqp_setup(&work, data, settings);
 
   // Solve Problem
   osqp_solve(work);

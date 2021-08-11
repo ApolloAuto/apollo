@@ -16,20 +16,20 @@
 
 #pragma once
 
-#include <assert.h>
-#include <errno.h>
 #include <fcntl.h> /* low-level i/o */
 #include <malloc.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <cassert>
+#include <cerrno>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <immintrin.h>
 #include <x86intrin.h>

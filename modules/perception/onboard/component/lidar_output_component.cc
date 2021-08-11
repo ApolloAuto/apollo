@@ -35,9 +35,9 @@ bool LidarOutputComponent::Proc(
     return false;
   }
 
-  if (!MsgSerializer::SerializeMsg(message->timestamp_, message->seq_num_,
-                                   message->frame_->objects,
-                                   message->error_code_, out_message.get())) {
+  if (!MsgSerializer::SerializeMsg(
+          message->timestamp_, message->lidar_timestamp_, message->seq_num_,
+          message->frame_->objects, message->error_code_, out_message.get())) {
     AERROR << "Failed to serialize PerceptionObstacles object.";
     return false;
   }

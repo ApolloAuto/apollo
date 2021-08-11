@@ -18,10 +18,10 @@
 
 #include <vector>
 
+#include "absl/strings/match.h"
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/topo_creator/edge_creator.h"
@@ -34,7 +34,6 @@ using apollo::common::PointENU;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::kMathEpsilon;
 using apollo::common::math::Vec2d;
-using apollo::common::util::EndWith;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneBoundary;
 using apollo::hdmap::LaneBoundaryType;
@@ -62,7 +61,7 @@ GraphCreator::GraphCreator(const std::string& base_map_file_path,
       routing_conf_(routing_conf) {}
 
 bool GraphCreator::Create() {
-  if (EndWith(base_map_file_path_, ".xml")) {
+  if (absl::EndsWith(base_map_file_path_, ".xml")) {
     if (!hdmap::adapter::OpendriveAdapter::LoadData(base_map_file_path_,
                                                     &pbmap_)) {
       AERROR << "Failed to load base map file from " << base_map_file_path_;
@@ -142,8 +141,8 @@ bool GraphCreator::Create() {
     }
   }
 
-  if (!EndWith(dump_topo_file_path_, ".bin") &&
-      !EndWith(dump_topo_file_path_, ".txt")) {
+  if (!absl::EndsWith(dump_topo_file_path_, ".bin") &&
+      !absl::EndsWith(dump_topo_file_path_, ".txt")) {
     AERROR << "Failed to dump topo data into file, incorrect file type "
            << dump_topo_file_path_;
     return false;

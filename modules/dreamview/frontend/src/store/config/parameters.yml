@@ -16,6 +16,10 @@ camera:
     fov: 70
     near: 1
     far: 4000
+  CameraView:
+    fov: 30.5
+    near: 1
+    far: 1500
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
@@ -61,21 +65,21 @@ planning:
       color: 0x8DFCB4
       opacity: 0.8
       zOffset: 1.2
-    QpSplinePathOptimizer:
+    PIECEWISE_JERK_PATH_OPTIMIZER:
       width: 0.2
       color: 0x36A2EB
       opacity: 1
       zOffset: 1.3
     planning_path_boundary_1:
       style: dash
-      width: 0.05
-      color: 0xFF0000
+      width: 0.1
+      color: 0xF0FF00
       opacity: 1
       zOffset: 1.3
     planning_path_boundary_2:
       style: dash
-      width: 0.05
-      color: 0xFF0000
+      width: 0.1
+      color: 0xF0FF00
       opacity: 1
       zOffset: 1.3
 
@@ -91,8 +95,6 @@ options:
     default: false
   showPOI:
     default: false
-  enableAudioCapture:
-    default: false
   showDataRecorder:
     default: false
 
@@ -101,6 +103,8 @@ options:
     default: false
   showDataCollectionMonitor:
     default: false
+  showFuelClient:
+    default: false
   enableSimControl:
     default: false
   lockTaskPanel:
@@ -108,9 +112,16 @@ options:
   showVideo:
     default: false
 
+  # teleop
+  showConsoleTeleopMonitor:
+      default: false
+  showCarTeleopMonitor:
+      default: false
+
   # layer Menu options
   cameraAngle:
     default: Default
+    hasCameraView: false
   showDecisionMain:
     default: true
     menuId: decisionMain
@@ -135,9 +146,15 @@ options:
   showPredictionMinor:
     default: true
     menuId: predictionMinor
+  showGaussianInfo:
+    default: false
+    menuId: predictionGaussianInfo
   showPredictionPriority:
     default: true
     menuId: predictionPriority
+  showPredictionInteractiveTag:
+    default: true
+    menuId: predictionInteractiveTag
   showPointCloud:
     default: false
     menuId: perceptionPointCloud
@@ -180,6 +197,18 @@ options:
   showObstaclesInfo:
     default: true
     menuId: perceptionObstacleInfo
+  showObstaclesLidarSensor:
+    default: false
+    menuId: perceptionLidarSensor
+  showObstaclesRadarSensor:
+    default: false
+    menuId: perceptionRadarSensor
+  showObstaclesCameraSensor:
+    default: false
+    menuId: perceptionCameraSensor
+  showObstaclesV2xInfo:
+    default: false
+    menuId: perceptionV2xInfo
   showPositionGps:
     default: false
     menuId: positionGps
@@ -225,6 +254,10 @@ options:
   showMapLaneId:
     default: false
     menuId: mapLaneId
+  showDefaultRoutingInput:
+    default: false
+  showCycleNumberInput:
+    default: false
 
 routingEditor:
   radiusOfMapRequest: 2000.0 # meters

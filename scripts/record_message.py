@@ -37,6 +37,7 @@ import sys
 
 import psutil
 
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -49,8 +50,10 @@ def shell_cmd(cmd, alert_on_failure=True):
         sys.stderr.write('{}\n'.format(stderr))
     return (ret, stdout, stderr)
 
+
 class ArgManager(object):
     """Arguments manager."""
+
     def __init__(self):
         """Init."""
         self.parser = argparse.ArgumentParser(
@@ -66,11 +69,13 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
+
 
 class DiskManager(object):
     """Disk manager."""
+
     def __init__(self):
         """Manage disks."""
         disks = []
@@ -96,6 +101,7 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
+
     def __init__(self, args):
         """Init."""
         self.args = args
@@ -116,9 +122,9 @@ class Recorder(object):
 
     def record_task(self, disk):
         """
-        Save the full data into <disk>/data/bag/ReusedRecordsPool, 
+        Save the full data into <disk>/data/bag/ReusedRecordsPool,
         which will be cleared every time the smart recorder get started.
-        Meanwhile restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
+        Meanwhile, restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
         """
         reuse_pool_dir = os.path.join(disk, 'data/bag', 'ReusedRecordsPool')
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
@@ -128,7 +134,7 @@ class Recorder(object):
         recorder_exe = '/apollo/bazel-bin/modules/data/tools/smart_recorder/smart_recorder'
         cmd = '''
             source /apollo/scripts/apollo_base.sh
-            source /apollo/framework/install/setup.bash
+            source /apollo/cyber/setup.bash
             nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
         '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
         shell_cmd(cmd)
@@ -136,7 +142,7 @@ class Recorder(object):
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -c -f "smart_recorder"', False)
+        _, stdout, _ = shell_cmd('pgrep -f "smart_recorder" | grep -cv \'^1$\'', False)
         # If stdout is the pgrep command itself, no such process is running.
         return stdout.strip() != '1' if stdout else False
 
@@ -150,6 +156,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

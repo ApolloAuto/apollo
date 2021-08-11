@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,7 +8,8 @@ cc_binary(
     srcs = ["video2jpg.cc"],
     deps = [
         ":frame_processor",
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
+        "@ffmpeg//:avutil",
     ],
 )
 
@@ -18,6 +20,7 @@ cc_library(
     deps = [
         ":h265_decoder",
         "//modules/common/util",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -27,7 +30,7 @@ cc_library(
     hdrs = ["h265_decoder.h"],
     deps = [
         "//cyber/common:log",
-        "@ffmpeg",
+        "@ffmpeg//:avcodec",
     ],
 )
 

@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.perception.camera.traffic_light.recognition;
+
+message ClassifyParam {
+  optional string model_name = 1;
+  optional string model_type = 2 [default = "CaffeNet"];
+  optional string input_blob = 3;
+  optional string output_blob = 4;
+  optional string weight_file = 5;
+  optional string proto_file = 6;
+  optional float classify_threshold = 7;
+  optional int32 classify_resize_width = 8;
+  optional int32 classify_resize_height = 9;
+  optional float scale = 10;
+  optional float mean_b = 12 [default = 95];
+  optional float mean_g = 13 [default = 99];
+  optional float mean_r = 14 [default = 96];
+  optional bool is_bgr = 15 [default = true];
+}
+
+message RecognizeBoxParam {
+  optional ClassifyParam vertical_model = 1;
+  optional ClassifyParam quadrate_model = 2;
+  optional ClassifyParam horizontal_model = 3;
+}

@@ -16,6 +16,8 @@
 
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
@@ -241,11 +243,11 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   // Init camera list
-  std::vector<std::string> camera_names;
-  apollo::common::util::Split(FLAGS_sensor_name, ',', &camera_names);
+  const std::vector<std::string> camera_names =
+      absl::StrSplit(FLAGS_sensor_name, ',');
   // Init data provider
   DataProvider::InitOptions data_options;
   data_options.image_height = 1080;
@@ -258,7 +260,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
 
   for (int i = 0; i < camera_names.size(); i++) {
     data_options.sensor_name = camera_names[i];
-    CHECK(data_providers[i].Init(data_options));
+    ACHECK(data_providers[i].Init(data_options));
     name_provider_map.insert(std::pair<std::string, DataProvider *>(
         camera_names[i], &data_providers[i]));
     AINFO << "Init data_provider for " << camera_names[i];
@@ -334,8 +336,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   fin.open(filename, std::ifstream::in);
   ASSERT_TRUE(fin.is_open());
   while (fin >> line) {
-    std::vector<std::string> temp_strs;
-    apollo::common::util::Split(line, '/', &temp_strs);
+    const std::vector<std::string> temp_strs = absl::StrSplit(line, '/');
     if (temp_strs.size() != 2) {
       AERROR << "invaid format in " << FLAGS_test_list;
     }
@@ -348,8 +349,8 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     CameraFrame &frame = frames[frame_num];
 
     // read detections from txt
-    std::string filename = FLAGS_data_root + "/detection_feature/" +
-                           std::to_string(frame_num) + ".txt";
+    const std::string filename =
+        absl::StrCat(FLAGS_data_root, "/detection_feature/", frame_num, ".txt");
     read_detections(filename, FLAGS_feature_length, camera_name, &frame);
     AINFO << "Frame " << frame_num << " has " << frame.detected_objects.size()
           << " detection objects";

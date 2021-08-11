@@ -15,7 +15,7 @@
  *****************************************************************************/
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include "opencv2/opencv.hpp"
 

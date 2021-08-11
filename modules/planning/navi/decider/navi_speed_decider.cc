@@ -55,60 +55,60 @@ bool NaviSpeedDecider::Init(const PlanningConfig& planning_config) {
   CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
   NavigationPlanningConfig config =
       planning_config.navigation_planning_config();
-  CHECK(config.has_planner_navi_config());
-  CHECK(config.planner_navi_config().has_navi_speed_decider_config());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_preferred_accel());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_preferred_decel());
-  CHECK(
+  ACHECK(config.has_planner_navi_config());
+  ACHECK(config.planner_navi_config().has_navi_speed_decider_config());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_preferred_accel());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_preferred_decel());
+  ACHECK(
       config.planner_navi_config().navi_speed_decider_config().has_max_accel());
-  CHECK(
+  ACHECK(
       config.planner_navi_config().navi_speed_decider_config().has_max_decel());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_preferred_jerk());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_obstacle_buffer());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_safe_distance_base());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_safe_distance_ratio());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_following_accel_ratio());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_soft_centric_accel_limit());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_hard_centric_accel_limit());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_hard_speed_limit());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_hard_accel_limit());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_enable_safe_path());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_enable_planning_start_point());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_enable_accel_auto_compensation());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_kappa_preview());
-  CHECK(config.planner_navi_config()
-            .navi_speed_decider_config()
-            .has_kappa_threshold());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_preferred_jerk());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_obstacle_buffer());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_safe_distance_base());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_safe_distance_ratio());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_following_accel_ratio());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_soft_centric_accel_limit());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_hard_centric_accel_limit());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_hard_speed_limit());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_hard_accel_limit());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_enable_safe_path());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_enable_planning_start_point());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_enable_accel_auto_compensation());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_kappa_preview());
+  ACHECK(config.planner_navi_config()
+             .navi_speed_decider_config()
+             .has_kappa_threshold());
 
   max_speed_ = FLAGS_planning_upper_speed_limit;
   preferred_accel_ = std::abs(config.planner_navi_config()
@@ -251,7 +251,7 @@ Status NaviSpeedDecider::MakeSpeedDecision(
     const std::function<const Obstacle*(const std::string&)>& find_obstacle,
     SpeedData* const speed_data) {
   CHECK_NOTNULL(speed_data);
-  CHECK_GE(path_points.size(), 2);
+  CHECK_GE(path_points.size(), 2U);
 
   auto start_s = path_points.front().has_s() ? path_points.front().s() : 0.0;
   auto end_s = path_points.back().has_s() ? path_points.back().s() : start_s;
@@ -262,9 +262,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
          << " start_s: " << start_s << " planning_length: " << planning_length;
 
   if (start_v > max_speed_) {
-    AERROR << "exceeding maximum allowable speed.";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "exceeding maximum allowable speed.");
+    const std::string msg = "exceeding maximum allowable speed.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   start_v = std::max(0.0, start_v);
 
@@ -323,8 +323,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
       ts_point.v = hard_speed_limit_;
     }
 
-    if (std::abs(ts_point.v) < kZeroSpeedEpsilon) ts_point.v = 0.0;
-
+    if (std::abs(ts_point.v) < kZeroSpeedEpsilon) {
+      ts_point.v = 0.0;
+    }
     if (ts_point.a > hard_accel_limit_) {
       AERROR << "The a: " << ts_point.a << " of point with s: " << ts_point.s
              << " and t: " << ts_point.t << "is greater than hard_accel_limit "
@@ -332,8 +333,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
       ts_point.a = hard_accel_limit_;
     }
 
-    if (std::abs(ts_point.a) < kZeroAccelEpsilon) ts_point.a = 0.0;
-
+    if (std::abs(ts_point.a) < kZeroAccelEpsilon) {
+      ts_point.a = 0.0;
+    }
     // apply acceleration adjust
     if (enable_accel_auto_compensation_) {
       if (ts_point.a > 0)
@@ -416,8 +418,9 @@ Status AddTrafficDecisionConstraints() {
 Status NaviSpeedDecider::AddCentricAccelerationConstraints(
     const std::vector<PathPoint>& path_points) {
   if (path_points.size() < 2) {
-    AERROR << "Too few path points";
-    return Status(ErrorCode::PLANNING_ERROR, "too few path points.");
+    const std::string msg = "Too few path points";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   double max_kappa = 0.0;
@@ -444,8 +447,9 @@ Status NaviSpeedDecider::AddCentricAccelerationConstraints(
     auto start_k = prev.has_kappa() ? prev.kappa() : 0.0;
     auto end_k = cur.has_kappa() ? cur.kappa() : 0.0;
     auto kappa = std::abs((start_k + end_k) / 2.0);
-    if (std::abs(kappa) < kappa_threshold_) kappa /= kKappaAdjustRatio;
-
+    if (std::abs(kappa) < kappa_threshold_) {
+      kappa /= kKappaAdjustRatio;
+    }
     auto v_preffered = std::min(std::sqrt(soft_centric_accel_limit_ / kappa),
                                 std::numeric_limits<double>::max());
     auto v_max = std::min(std::sqrt(hard_centric_accel_limit_ / kappa),

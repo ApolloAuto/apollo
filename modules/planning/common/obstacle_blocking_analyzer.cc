@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
+
 #include <algorithm>
 #include <memory>
 #include <vector>
 
-#include "modules/planning/common/obstacle_blocking_analyzer.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -114,7 +115,7 @@ bool IsBlockingObstacleToSidePass(const Frame& frame, const Obstacle* obstacle,
   }
 
   // Obstacle is far away.
-  constexpr double kAdcDistanceSidePassThreshold = 15.0;
+  static constexpr double kAdcDistanceSidePassThreshold = 15.0;
   if (obstacle->PerceptionSLBoundary().start_s() >
       adc_sl_boundary.end_s() + kAdcDistanceSidePassThreshold) {
     ADEBUG << " - It is too far ahead.";
@@ -217,8 +218,8 @@ bool IsParkedVehicle(const ReferenceLine& reference_line,
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> lanes;
   auto obstacle_box = obstacle->PerceptionBoundingBox();
   HDMapUtil::BaseMapPtr()->GetLanes(
-      common::util::MakePointENU(obstacle_box.center().x(),
-                                 obstacle_box.center().y(), 0.0),
+      common::util::PointFactory::ToPointENU(obstacle_box.center().x(),
+                                             obstacle_box.center().y()),
       std::min(obstacle_box.width(), obstacle_box.length()), &lanes);
   bool is_on_parking_lane = false;
   if (lanes.size() == 1 &&

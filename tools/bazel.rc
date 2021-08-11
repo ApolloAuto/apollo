@@ -1,22 +1,102 @@
+# Apollo Bazel configuration file.
+# This file tries to group and simplify build options for Apollo
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
 startup --batch_cpu_scheduling
+startup --host_jvm_args="-XX:-UseParallelGC"
 
-startup --host_jvm_args=-XX:-UseParallelGC
+fetch --experimental_multi_threaded_digest=true
+query --experimental_multi_threaded_digest=true
+
+# +------------------------------------------------------------+
+# | Common Options                                             |
+# +------------------------------------------------------------+
+# Force bazel output to use colors (good for jenkins) and print useful errors.
+common --color=yes
+
+# +------------------------------------------------------------+
+# | Build Configurations                                       |
+# +------------------------------------------------------------+
+# Make Bazel print out all options from rc files.
+# build --announce_rc
+build --show_timestamps
+
+# Work around the sandbox issue.
+build --spawn_strategy=standalone
+
+# Enable colorful output of GCC
+build --cxxopt="-fdiagnostics-color=always"
+
+# Do not show warnings from external dependencies.
+# build --output_filter="^//"
+
+build --per_file_copt=external/upb/.*@-Wno-sign-compare
+build --copt="-Werror=sign-compare"
+build --copt="-Werror=return-type"
+build --copt="-Werror=unused-variable"
+build --copt="-Werror=unused-but-set-variable"
+build --copt="-Werror=switch"
+build --cxxopt="-Werror=reorder"
+
+# Default paths for SYSTEM LIBRARIES
+build --define=PREFIX=/usr
+build --define=LIBDIR=$(PREFIX)/lib
+build --define=INCLUDEDIR=$(PREFIX)/include
+build --define=use_fast_cpp_protos=true
+
+# dbg config, as a shorthand for '--config=optimize -c dbg'
+build:dbg -c dbg
+build:opt -c opt
+
+build --config=optimize
+# Instruction set optimizations
+build:optimize --copt=-march=native
+build:optimize --host_copt=-march=native
+
+# Now "cpu" configuration was dummy
+build:cpu --verbose_failures
+build:gpu --define USE_GPU=true
+build:gpu --cxxopt="-DUSE_GPU=1"
+
+# Build with profiling
+build:prof --linkopt=-lprofiler
+build:prof --cxxopt="-DENABLE_PERF=1"
+
+# Build Apollo with C++ 17 features.
+build:c++17 --cxxopt=-std=c++1z
+# build:c++17 --cxxopt=-stdlib=libc++
+build:c++1z --config=c++17
+
+# Enable C++14 (aka c++1y) by default
+build --cxxopt="-std=c++14"
+build --host_cxxopt="-std=c++14"
 
 # +------------------------------------------------------------+
 # | Test Configurations                                        |
 # +------------------------------------------------------------+
+test --flaky_test_attempts=3
+test --test_size_filters=small,medium
+# test --test_env=LD_LIBRARY_PATH
+# test --test_env=PYTHONPATH
 
 # By default prints output only from failed tests.
 test --test_output=errors
 
-# Work around the sandbox issue.
-test --spawn_strategy=standalone
+test:unit_test --test_verbose_timeout_warnings
 
-# Specify protobuf cc toolchain
-test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
+# coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
+coverage --instrument_test_targets
+coverage --combined_report=lcov
+coverage --nocache_test_results
+# coverage --coverage_report_generator="@bazel_tools//tools/test/CoverageOutputGenerator/java/com/google/devtools/coverageoutputgenerator:Main"
+
+coverage --cxxopt=--coverage
+coverage --cxxopt=-fprofile-arcs
+coverage --cxxopt=-ftest-coverage
+coverage --linkopt=-lgcov
+
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -30,50 +110,13 @@ test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # at the end.
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
-
+test:cpplint --flaky_test_attempts=1
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
-
 # Coverage tests
-test:coverage --test_tag_filters=-cpplint
-test:coverage --copt=--coverage
-test:coverage --cxxopt=--coverage
-test:coverage --cxxopt=-fprofile-arcs
-test:coverage --cxxopt=-ftest-coverage
-test:coverage --linkopt=-coverage
-test:coverage --linkopt=-lgcov
-test:coverage --linkopt=-lgcc
-test:coverage --linkopt=-lc
+coverage --test_tag_filters=-cpplint
 
 # +------------------------------------------------------------+
-# | Build Configurations                                       |
+# | Python Configurations                                      |
 # +------------------------------------------------------------+
-# Do not show warnings from external dependencies.
-build --output_filter="^//"
-
-build --show_timestamps
-
-# Work around the sandbox issue.
-build --spawn_strategy=standalone
-
-# Specify protobuf cc toolchain
-build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
-
-# build with profiling
-build:cpu_prof --linkopt=-lprofiler
-
-build --copt="-Werror=sign-compare"
-build --copt="-Werror=return-type"
-build --copt="-Werror=reorder"
-build --copt="-Werror=unused-variable"
-build --copt="-Werror=unused-but-set-variable"
-build --copt="-Werror=switch"
-
-# Strict check on type conversion.
-build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Werror=conversion
-
-
-# Enable C++14
-build --cxxopt="-std=c++1y"
-# Enable colorful output of GCC
-# build --cxxopt="-fdiagnostics-color=always"
+# Python support was configured by third_party/py .

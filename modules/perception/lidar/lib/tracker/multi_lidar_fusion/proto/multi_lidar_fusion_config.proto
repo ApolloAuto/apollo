@@ -2,7 +2,7 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message MlfDistanceWeight {
-  optional string sensor_name_pair = 1 [default=""];
+  optional string sensor_name_pair = 1 [default = ""];
 
   optional float location_dist_weight = 2 [default = 0];
   optional float direction_dist_weight = 3 [default = 0];
@@ -11,6 +11,7 @@ message MlfDistanceWeight {
   optional float histogram_dist_weight = 6 [default = 0];
   optional float centroid_shift_dist_weight = 7 [default = 0];
   optional float bbox_iou_dist_weight = 8 [default = 0];
+  optional float semantic_map_dist_weight = 9 [default = 0];
 }
 
 message MlfDistanceConfig {
@@ -19,10 +20,12 @@ message MlfDistanceConfig {
 }
 
 message MlfTrackObjectMatcherConfig {
-  optional string foreground_mathcer_method = 1 [default="MultiHmBipartiteGraphMatcher"];
-  optional string background_matcher_method = 2 [default="GnnBipartiteGraphMatcher"];
+  optional string foreground_mathcer_method = 1
+      [default = "MultiHmBipartiteGraphMatcher"];
+  optional string background_matcher_method = 2
+      [default = "GnnBipartiteGraphMatcher"];
   optional float bound_value = 3 [default = 100.0];
-  optional float max_match_distance = 4 [default=4.0];
+  optional float max_match_distance = 4 [default = 4.0];
 }
 
 message MlfTrackerConfig {
@@ -30,38 +33,38 @@ message MlfTrackerConfig {
 }
 
 message MlfMotionFilterConfig {
-  optional bool use_adaptive = 1 [default=true];
-  optional bool use_breakdown = 2 [default=true];
-  optional bool use_convergence_boostup = 3 [default=true];
+  optional bool use_adaptive = 1 [default = true];
+  optional bool use_breakdown = 2 [default = true];
+  optional bool use_convergence_boostup = 3 [default = true];
 
-  optional double init_velocity_variance = 4 [default=5.0];
-  optional double init_acceleration_variance = 5 [default=10.0];
-  optional double measured_velocity_variance = 6 [default=0.4];
-  optional double predict_variance_per_sqrsec = 7 [default=10.0];
+  optional double init_velocity_variance = 4 [default = 5.0];
+  optional double init_acceleration_variance = 5 [default = 10.0];
+  optional double measured_velocity_variance = 6 [default = 0.4];
+  optional double predict_variance_per_sqrsec = 7 [default = 10.0];
 
-  optional uint32 boostup_history_size_minimum = 8 [default=3];
-  optional uint32 boostup_history_size_maximum = 9 [default=6];
-  optional double converged_confidence_minimum = 10 [default=0.5];
-  optional double noise_maximum = 12 [default=0.1];
+  optional uint32 boostup_history_size_minimum = 8 [default = 3];
+  optional uint32 boostup_history_size_maximum = 9 [default = 6];
+  optional double converged_confidence_minimum = 10 [default = 0.5];
+  optional double noise_maximum = 12 [default = 0.1];
 
-  optional double trust_orientation_range = 13 [default=40];
+  optional double trust_orientation_range = 13 [default = 40];
 }
 
 message MlfMotionRefinerConfig {
-  optional double claping_acceleration_threshold = 1 [default=10];
-  optional double claping_speed_threshold = 2 [default=1.0];
+  optional double claping_acceleration_threshold = 1 [default = 10];
+  optional double claping_speed_threshold = 2 [default = 1.0];
 }
 
 message MlfShapeFilterConfig {
-  optional double bottom_points_ignore_threshold = 1 [default=0.1];
-  optional double top_points_ignore_threshold = 2 [default=1.6];
+  optional double bottom_points_ignore_threshold = 1 [default = 0.1];
+  optional double top_points_ignore_threshold = 2 [default = 1.6];
 }
 
 message MlfEngineConfig {
   repeated string main_sensor = 1;
-  optional bool use_histogram_for_match = 2 [default=true];
-  optional uint32 histogram_bin_size = 3 [default=10];
-  optional bool output_predict_objects = 4 [default=false];
-  optional double reserved_invisible_time = 5 [default=0.2];
-  optional bool use_frame_timestamp = 6 [default=false];
+  optional bool use_histogram_for_match = 2 [default = true];
+  optional uint32 histogram_bin_size = 3 [default = 10];
+  optional bool output_predict_objects = 4 [default = false];
+  optional double reserved_invisible_time = 5 [default = 0.2];
+  optional bool use_frame_timestamp = 6 [default = false];
 }

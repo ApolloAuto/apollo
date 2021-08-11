@@ -2,7 +2,8 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message LidarObstacleTrackingConfig {
-  optional string multi_target_tracker = 1 [default="DummyMultiTargetTracker"];
-  optional string frame_classifier = 2 [default="DummyClassifier"];
-  optional string fusion_classifier = 3 [default="DummyClassifier"];
+  optional string multi_target_tracker = 1
+      [default = "DummyMultiTargetTracker"];
+  optional string frame_classifier = 2 [default = "DummyClassifier"];
+  optional string fusion_classifier = 3 [default = "DummyClassifier"];
 }

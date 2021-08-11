@@ -44,7 +44,10 @@ void CarPose::SetCameraPose(const std::string &camera_name,
 
 bool CarPose::GetCameraPose(const std::string &camera_name,
                             Eigen::Matrix4d *c2w_pose) const {
-  CHECK_NOTNULL(c2w_pose);
+  if (c2w_pose == nullptr) {
+    AERROR << "c2w_pose is not available";
+    return false;
+  }
   if (c2w_poses_.find(camera_name) == c2w_poses_.end()) {
     return false;
   }

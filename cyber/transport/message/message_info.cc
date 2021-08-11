@@ -16,7 +16,7 @@
 
 #include "cyber/transport/message/message_info.h"
 
-#include <arpa/inet.h>
+#include <cstring>
 
 #include "cyber/common/log.h"
 
@@ -26,7 +26,7 @@ namespace transport {
 
 const std::size_t MessageInfo::kSize = 2 * ID_SIZE + sizeof(uint64_t);
 
-MessageInfo::MessageInfo() : sender_id_(false), seq_num_(0), spare_id_(false) {}
+MessageInfo::MessageInfo() : sender_id_(false), spare_id_(false) {}
 
 MessageInfo::MessageInfo(const Identity& sender_id, uint64_t seq_num)
     : sender_id_(sender_id), seq_num_(seq_num), spare_id_(false) {}
@@ -37,6 +37,7 @@ MessageInfo::MessageInfo(const Identity& sender_id, uint64_t seq_num,
 
 MessageInfo::MessageInfo(const MessageInfo& another)
     : sender_id_(another.sender_id_),
+      channel_id_(another.channel_id_),
       seq_num_(another.seq_num_),
       spare_id_(another.spare_id_) {}
 
@@ -45,6 +46,7 @@ MessageInfo::~MessageInfo() {}
 MessageInfo& MessageInfo::operator=(const MessageInfo& another) {
   if (this != &another) {
     sender_id_ = another.sender_id_;
+    channel_id_ = another.channel_id_;
     seq_num_ = another.seq_num_;
     spare_id_ = another.spare_id_;
   }
@@ -52,44 +54,36 @@ MessageInfo& MessageInfo::operator=(const MessageInfo& another) {
 }
 
 bool MessageInfo::operator==(const MessageInfo& another) const {
-  if (sender_id_ != another.sender_id_) {
-    return false;
-  }
+  return sender_id_ == another.sender_id_ &&
+         channel_id_ == another.channel_id_ && seq_num_ == another.seq_num_ &&
+         spare_id_ == another.spare_id_;
+}
 
-  if (seq_num_ != another.seq_num_) {
-    return false;
-  }
-
-  if (spare_id_ != another.spare_id_) {
-    return false;
-  }
-  return true;
+bool MessageInfo::operator!=(const MessageInfo& another) const {
+  return !(*this == another);
 }
 
 bool MessageInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
   dst->assign(sender_id_.data(), ID_SIZE);
-  dst->append(reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
-              sizeof(seq_num_));
+  dst->append(reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   dst->append(spare_id_.data(), ID_SIZE);
 
   return true;
 }
 
 bool MessageInfo::SerializeTo(char* dst, std::size_t len) const {
-  RETURN_VAL_IF_NULL(dst, false);
-  if (len < kSize) {
+  if (dst == nullptr || len < kSize) {
     return false;
   }
 
   char* ptr = dst;
-  memcpy(ptr, sender_id_.data(), ID_SIZE);
+  std::memcpy(ptr, sender_id_.data(), ID_SIZE);
   ptr += ID_SIZE;
-  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
-         sizeof(seq_num_));
+  std::memcpy(ptr, reinterpret_cast<const char*>(&seq_num_), sizeof(seq_num_));
   ptr += sizeof(seq_num_);
-  memcpy(ptr, spare_id_.data(), ID_SIZE);
+  std::memcpy(ptr, spare_id_.data(), ID_SIZE);
 
   return true;
 }
@@ -108,7 +102,7 @@ bool MessageInfo::DeserializeFrom(const char* src, std::size_t len) {
   char* ptr = const_cast<char*>(src);
   sender_id_.set_data(ptr);
   ptr += ID_SIZE;
-  memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
+  std::memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
   ptr += sizeof(seq_num_);
   spare_id_.set_data(ptr);
 

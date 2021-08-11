@@ -65,6 +65,9 @@ struct ObjMapperParams {
 
 class ObjMapper {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   ObjMapper() : width_(0), height_(0) {
     memset(k_mat_, 0, sizeof(float) * 9);
     resize_ry_score(params_.nr_bins_ry);

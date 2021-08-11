@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
-#include "modules/bridge/common/bridge_proto_serialized_buf.h"
+#include "gtest/gtest.h"
 
 #include "modules/planning/proto/planning.pb.h"
 
 #include "cyber/init.h"
-#include "gtest/gtest.h"
+#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
+#include "modules/bridge/common/bridge_proto_serialized_buf.h"
 
 namespace apollo {
 namespace bridge {

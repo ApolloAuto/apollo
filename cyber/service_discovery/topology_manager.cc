@@ -85,7 +85,7 @@ bool TopologyManager::Init() {
     node_manager_ = nullptr;
     channel_manager_ = nullptr;
     service_manager_ = nullptr;
-    init_.exchange(false);
+    init_.store(false);
     return false;
   }
 

@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
@@ -25,4 +24,6 @@ source "$DIR/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run third_party_perception "$@" --use_navigation_mode
+# run third_party_perception "$@" --use_navigation_mode
+cyber_launch stop modules/third_party_perception/launch/third_party_perception.launch
+cyber_launch start modules/third_party_perception/launch/third_party_perception.launch

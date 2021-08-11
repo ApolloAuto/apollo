@@ -17,7 +17,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "tinyxml2/tinyxml2.h"
+#include <tinyxml2.h>
 
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
@@ -50,6 +50,12 @@ class ObjectsXmlParser {
                                 std::vector<std::string>* passage_node_ids);
   static Status ToPassageType(const std::string& type,
                               PbPassageType* passage_type);
+
+  static Status ParseRSUs(const tinyxml2::XMLElement& xml_node,
+                            std::vector<RSUInternal>* rsus);
+
+  static Status ParseObjects(const tinyxml2::XMLElement& xml_node,
+                        ObjectInternal* objects);
 };
 
 }  // namespace adapter

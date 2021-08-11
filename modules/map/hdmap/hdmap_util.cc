@@ -14,8 +14,11 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
+#include <string>
+#include <vector>
+
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_tokenizer.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
@@ -27,19 +30,17 @@ namespace {
 
 // Find the first existing file from a list of candidates: "file_a|file_b|...".
 std::string FindFirstExist(const std::string& dir, const std::string& files) {
-  const auto candidates =
-      apollo::common::util::StringTokenizer::Split(files, "|");
+  const std::vector<std::string> candidates = absl::StrSplit(files, '|');
   for (const auto& filename : candidates) {
-    const std::string file_path =
-        apollo::common::util::StrCat(FLAGS_map_dir, "/", filename);
+    const std::string file_path = absl::StrCat(FLAGS_map_dir, "/", filename);
     if (cyber::common::PathExists(file_path)) {
       return file_path;
     }
   }
   AERROR << "No existing file found in " << dir << "/" << files
          << ". Fallback to first candidate as default result.";
-  CHECK(!candidates.empty()) << "Please specify at least one map.";
-  return apollo::common::util::StrCat(FLAGS_map_dir, "/", candidates[0]);
+  ACHECK(!candidates.empty()) << "Please specify at least one map.";
+  return absl::StrCat(FLAGS_map_dir, "/", candidates[0]);
 }
 
 }  // namespace

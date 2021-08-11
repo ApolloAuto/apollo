@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Hazard_lights_rpt_214 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool output_value = 1;
   // [] [0|1]
@@ -27,7 +27,7 @@ message Hazard_lights_rpt_214 {
 }
 
 message Steering_cmd_12c {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool ignore_overrides = 1;
   // [] [0|1]
@@ -43,7 +43,7 @@ message Steering_cmd_12c {
 }
 
 message Dash_controls_right_rpt_210 {
-// Control Message
+  // Control Message
   enum Output_valueType {
     OUTPUT_VALUE_DASH_CONTROL_NONE = 0;
     OUTPUT_VALUE_DASH_CONTROL_OK = 1;
@@ -91,7 +91,7 @@ message Dash_controls_right_rpt_210 {
 }
 
 message Dash_controls_left_cmd_10c {
-// Report Message
+  // Report Message
   enum Dash_controls_buttonType {
     DASH_CONTROLS_BUTTON_DASH_CONTROL_NONE = 0;
     DASH_CONTROLS_BUTTON_DASH_CONTROL_OK = 1;
@@ -113,7 +113,7 @@ message Dash_controls_left_cmd_10c {
 }
 
 message Steering_rpt_22c {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool vehicle_fault = 1;
   // [] [0|1]
@@ -137,7 +137,7 @@ message Steering_rpt_22c {
 }
 
 message Turn_aux_rpt_330 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool pass_blinker_bulb_on_is_valid = 1;
   // [] [0|1]
@@ -149,7 +149,7 @@ message Turn_aux_rpt_330 {
 }
 
 message Headlight_rpt_218 {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_HEADLIGHTS_OFF = 0;
     OUTPUT_VALUE_LOW_BEAMS = 1;
@@ -188,7 +188,7 @@ message Headlight_rpt_218 {
 }
 
 message Hazard_lights_cmd_114 {
-// Control Message
+  // Control Message
   // [] [0|1]
   optional bool hazard_lights_cmd = 1;
   // [] [0|1]
@@ -202,7 +202,7 @@ message Hazard_lights_cmd_114 {
 }
 
 message Dash_controls_left_rpt_20c {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_DASH_CONTROL_NONE = 0;
     OUTPUT_VALUE_DASH_CONTROL_OK = 1;
@@ -250,7 +250,7 @@ message Dash_controls_left_rpt_20c {
 }
 
 message Headlight_aux_rpt_318 {
-// Report Message
+  // Report Message
   enum Headlights_modeType {
     HEADLIGHTS_MODE_HEADLIGHTS_OFF = 0;
     HEADLIGHTS_MODE_PARKING_LIGHTS_ONLY = 1;
@@ -276,7 +276,7 @@ message Headlight_aux_rpt_318 {
 }
 
 message Dash_controls_right_cmd_110 {
-// Report Message
+  // Report Message
   enum Dash_controls_buttonType {
     DASH_CONTROLS_BUTTON_DASH_CONTROL_NONE = 0;
     DASH_CONTROLS_BUTTON_DASH_CONTROL_OK = 1;
@@ -298,7 +298,7 @@ message Dash_controls_right_cmd_110 {
 }
 
 message Wiper_cmd_134 {
-// Control Message
+  // Control Message
   enum Wiper_cmdType {
     WIPER_CMD_WIPERS_OFF = 0;
     WIPER_CMD_INTERMITTENT_1 = 1;
@@ -322,7 +322,7 @@ message Wiper_cmd_134 {
 }
 
 message Wiper_rpt_234 {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_WIPERS_OFF = 0;
     OUTPUT_VALUE_INTERMITTENT_1 = 1;
@@ -376,7 +376,7 @@ message Wiper_rpt_234 {
 }
 
 message Turn_rpt_230 {
-// Report Message
+  // Report Message
   enum Manual_inputType {
     MANUAL_INPUT_RIGHT = 0;
     MANUAL_INPUT_NONE = 1;
@@ -418,7 +418,7 @@ message Turn_rpt_230 {
 }
 
 message Headlight_cmd_118 {
-// Control Message
+  // Control Message
   enum Headlight_cmdType {
     HEADLIGHT_CMD_HEADLIGHTS_OFF = 0;
     HEADLIGHT_CMD_LOW_BEAMS = 1;
@@ -437,7 +437,7 @@ message Headlight_cmd_118 {
 }
 
 message Door_rpt_417 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool fuel_door_open_is_valid = 1;
   // [] [0|1]
@@ -469,7 +469,7 @@ message Door_rpt_417 {
 }
 
 message Component_rpt_20 {
-// Report Message
+  // Report Message
   enum Component_typeType {
     COMPONENT_TYPE_PACMOD = 0;
     COMPONENT_TYPE_PACMINI = 1;
@@ -498,7 +498,7 @@ message Component_rpt_20 {
 }
 
 message Wheel_speed_rpt_407 {
-// Report Message
+  // Report Message
   // [rad/s] [-327.68|327.67]
   optional double wheel_spd_rear_right = 1;
   // [rad/s] [-327.68|327.67]
@@ -510,7 +510,7 @@ message Wheel_speed_rpt_407 {
 }
 
 message Steering_motor_rpt_3_406 {
-// Report Message
+  // Report Message
   // [N-m] [-2147483.648|2147483.647]
   optional double torque_output = 1;
   // [N-m] [-2147483.648|2147483.647]
@@ -518,7 +518,7 @@ message Steering_motor_rpt_3_406 {
 }
 
 message Steering_motor_rpt_2_405 {
-// Report Message
+  // Report Message
   // [deg C] [-32808|32727]
   optional int32 encoder_temperature = 1;
   // [deg C] [-32808|32727]
@@ -528,7 +528,7 @@ message Steering_motor_rpt_2_405 {
 }
 
 message Steering_motor_rpt_1_404 {
-// Report Message
+  // Report Message
   // [amps] [0|4294967.295]
   optional double motor_current = 1;
   // [amps] [-2147483.648|2147483.647]
@@ -536,7 +536,7 @@ message Steering_motor_rpt_1_404 {
 }
 
 message Brake_motor_rpt_3_403 {
-// Report Message
+  // Report Message
   // [N-m] [-2147483.648|2147483.647]
   optional double torque_output = 1;
   // [N-m] [-2147483.648|2147483.647]
@@ -544,7 +544,7 @@ message Brake_motor_rpt_3_403 {
 }
 
 message Brake_motor_rpt_2_402 {
-// Report Message
+  // Report Message
   // [deg C] [-32808|32727]
   optional int32 encoder_temperature = 1;
   // [deg C] [-32808|32727]
@@ -554,7 +554,7 @@ message Brake_motor_rpt_2_402 {
 }
 
 message Brake_motor_rpt_1_401 {
-// Report Message
+  // Report Message
   // [amps] [0|4294967.295]
   optional double motor_current = 1;
   // [radians] [-2147483.648|2147483.647]
@@ -562,7 +562,7 @@ message Brake_motor_rpt_1_401 {
 }
 
 message Wiper_aux_rpt_334 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool spray_empty_is_valid = 1;
   // [] [0|1]
@@ -590,7 +590,7 @@ message Wiper_aux_rpt_334 {
 }
 
 message Shift_aux_rpt_328 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool speed_interlock_active_is_valid = 1;
   // [] [0|1]
@@ -610,7 +610,7 @@ message Shift_aux_rpt_328 {
 }
 
 message Accel_rpt_200 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool vehicle_fault = 1;
   // [] [0|1]
@@ -634,7 +634,7 @@ message Accel_rpt_200 {
 }
 
 message Brake_rpt_204 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool command_output_fault = 1;
   // [] [0|1]
@@ -658,7 +658,7 @@ message Brake_rpt_204 {
 }
 
 message Horn_cmd_11c {
-// Report Message
+  // Report Message
   enum Horn_cmdType {
     HORN_CMD_OFF = 0;
     HORN_CMD_ON = 1;
@@ -676,7 +676,7 @@ message Horn_cmd_11c {
 }
 
 message Global_rpt_10 {
-// Report Message
+  // Report Message
   enum Pacmod_system_enabledType {
     PACMOD_SYSTEM_ENABLED_CONTROL_DISABLED = 0;
     PACMOD_SYSTEM_ENABLED_CONTROL_ENABLED = 1;
@@ -712,7 +712,7 @@ message Global_rpt_10 {
 }
 
 message Accel_aux_rpt_300 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool user_interaction_is_valid = 1;
   // [] [0|1]
@@ -728,7 +728,7 @@ message Accel_aux_rpt_300 {
 }
 
 message Cruise_control_buttons_rpt_208 {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_CRUISE_CONTROL_NONE = 0;
     OUTPUT_VALUE_CRUISE_CONTROL_CNCL = 1;
@@ -779,7 +779,7 @@ message Cruise_control_buttons_rpt_208 {
 }
 
 message Vehicle_speed_rpt_400 {
-// Report Message
+  // Report Message
   enum Vehicle_speed_validType {
     VEHICLE_SPEED_VALID_INVALID = 0;
     VEHICLE_SPEED_VALID_VALID = 1;
@@ -791,7 +791,7 @@ message Vehicle_speed_rpt_400 {
 }
 
 message Brake_aux_rpt_304 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool brake_on_off_is_valid = 1;
   // [] [0|1]
@@ -815,7 +815,7 @@ message Brake_aux_rpt_304 {
 }
 
 message Media_controls_cmd_120 {
-// Report Message
+  // Report Message
   enum Media_controls_cmdType {
     MEDIA_CONTROLS_CMD_MEDIA_CONTROL_NONE = 0;
     MEDIA_CONTROLS_CMD_MEDIA_CONTROL_VOICE_COMMAND = 1;
@@ -838,7 +838,7 @@ message Media_controls_cmd_120 {
 }
 
 message Cruise_control_buttons_cmd_108 {
-// Control Message
+  // Control Message
   enum Cruise_control_buttonType {
     CRUISE_CONTROL_BUTTON_CRUISE_CONTROL_NONE = 0;
     CRUISE_CONTROL_BUTTON_CRUISE_CONTROL_CNCL = 1;
@@ -861,7 +861,7 @@ message Cruise_control_buttons_cmd_108 {
 }
 
 message Parking_brake_cmd_124 {
-// Control Message
+  // Control Message
   // [] [0|1]
   optional bool ignore_overrides = 1;
   // [] [0|1]
@@ -875,7 +875,7 @@ message Parking_brake_cmd_124 {
 }
 
 message Horn_rpt_21c {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_OFF = 0;
     OUTPUT_VALUE_ON = 1;
@@ -911,7 +911,7 @@ message Horn_rpt_21c {
 }
 
 message Shift_rpt_228 {
-// Report Message
+  // Report Message
   enum Manual_inputType {
     MANUAL_INPUT_PARK = 0;
     MANUAL_INPUT_REVERSE = 1;
@@ -963,7 +963,7 @@ message Shift_rpt_228 {
 }
 
 message Shift_cmd_128 {
-// Control Message
+  // Control Message
   enum Shift_cmdType {
     SHIFT_CMD_PARK = 0;
     SHIFT_CMD_REVERSE = 1;
@@ -980,12 +980,13 @@ message Shift_cmd_128 {
   optional bool clear_override = 3;
   // [] [0|1]
   optional bool clear_faults = 4;
-  // FORWARD is also HIGH on vehicles with LOW/HIGH, PARK and LOW only available on certain Vehicles. [] [0|4]
+  // FORWARD is also HIGH on vehicles with LOW/HIGH, PARK and LOW only available
+  // on certain Vehicles. [] [0|4]
   optional Shift_cmdType shift_cmd = 5;
 }
 
 message Accel_cmd_100 {
-// Control Message
+  // Control Message
   // [] [0|1]
   optional bool ignore_overrides = 1;
   // [] [0|1]
@@ -999,7 +1000,7 @@ message Accel_cmd_100 {
 }
 
 message Parking_brake_rpt_224 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool vehicle_fault = 1;
   // [] [0|1]
@@ -1023,7 +1024,7 @@ message Parking_brake_rpt_224 {
 }
 
 message Brake_cmd_104 {
-// Control Message
+  // Control Message
   // [] [0|1]
   optional bool ignore_overrides = 1;
   // [] [0|1]
@@ -1037,7 +1038,7 @@ message Brake_cmd_104 {
 }
 
 message Media_controls_rpt_220 {
-// Report Message
+  // Report Message
   enum Output_valueType {
     OUTPUT_VALUE_MEDIA_CONTROL_NONE = 0;
     OUTPUT_VALUE_MEDIA_CONTROL_VOICE_COMMAND = 1;
@@ -1088,7 +1089,7 @@ message Media_controls_rpt_220 {
 }
 
 message Steering_aux_rpt_32c {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool user_interaction_is_valid = 1;
   // [] [0|1]
@@ -1108,7 +1109,7 @@ message Steering_aux_rpt_32c {
 }
 
 message Lat_lon_heading_rpt_40e {
-// Report Message
+  // Report Message
   // [deg] [-327.68|327.67]
   optional double heading = 1;
   // [sec] [-128|127]
@@ -1126,13 +1127,13 @@ message Lat_lon_heading_rpt_40e {
 }
 
 message Yaw_rate_rpt_40d {
-// Report Message
+  // Report Message
   // [rad/s] [-327.68|327.67]
   optional double yaw_rate = 1;
 }
 
 message Date_time_rpt_40f {
-// Report Message
+  // Report Message
   // [sec] [0|60]
   optional int32 time_second = 1;
   // [min] [0|60]
@@ -1148,7 +1149,7 @@ message Date_time_rpt_40f {
 }
 
 message Vin_rpt_414 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 veh_serial = 1;
   // [] [0|0]
@@ -1158,7 +1159,7 @@ message Vin_rpt_414 {
 }
 
 message Occupancy_rpt_415 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool rear_seatbelt_buckled_is_valid = 1;
   // [] [0|1]
@@ -1186,7 +1187,7 @@ message Occupancy_rpt_415 {
 }
 
 message Interior_lights_rpt_416 {
-// Report Message
+  // Report Message
   enum Dim_levelType {
     DIM_LEVEL_DIM_LEVEL_MIN = 0;
     DIM_LEVEL_DIM_LEVEL_1 = 1;
@@ -1221,7 +1222,7 @@ message Interior_lights_rpt_416 {
 }
 
 message Turn_cmd_130 {
-// Control Message
+  // Control Message
   enum Turn_signal_cmdType {
     TURN_SIGNAL_CMD_RIGHT = 0;
     TURN_SIGNAL_CMD_NONE = 1;
@@ -1241,7 +1242,7 @@ message Turn_cmd_130 {
 }
 
 message Detected_object_rpt_411 {
-// Report Message
+  // Report Message
   // [m] [0|16777.215]
   optional double front_object_distance_high_res = 1;
   // [m] [0|16777.215]
@@ -1249,7 +1250,7 @@ message Detected_object_rpt_411 {
 }
 
 message Veh_specific_rpt_1_412 {
-// Report Message
+  // Report Message
   // [] [0|0]
   optional int32 shift_pos_2 = 1;
   // [] [0|0]
@@ -1257,13 +1258,13 @@ message Veh_specific_rpt_1_412 {
 }
 
 message Veh_dynamics_rpt_413 {
-// Report Message
+  // Report Message
   // [] [-32.768|32.767]
   optional double veh_g_forces = 1;
 }
 
 message Rear_lights_rpt_418 {
-// Report Message
+  // Report Message
   // [] [0|1]
   optional bool reverse_lights_on_is_valid = 1;
   // [] [0|1]
@@ -1275,60 +1276,75 @@ message Rear_lights_rpt_418 {
 }
 
 message Lexus {
-  optional Hazard_lights_rpt_214 hazard_lights_rpt_214 = 1; // report message
-  optional Steering_cmd_12c steering_cmd_12c = 2; // report message
-  optional Dash_controls_right_rpt_210 dash_controls_right_rpt_210 = 3; // control message
-  optional Dash_controls_left_cmd_10c dash_controls_left_cmd_10c = 4; // report message
-  optional Steering_rpt_22c steering_rpt_22c = 5; // report message
-  optional Turn_aux_rpt_330 turn_aux_rpt_330 = 6; // report message
-  optional Headlight_rpt_218 headlight_rpt_218 = 7; // report message
-  optional Hazard_lights_cmd_114 hazard_lights_cmd_114 = 8; // control message
-  optional Dash_controls_left_rpt_20c dash_controls_left_rpt_20c = 9; // report message
-  optional Headlight_aux_rpt_318 headlight_aux_rpt_318 = 10; // report message
-  optional Dash_controls_right_cmd_110 dash_controls_right_cmd_110 = 11; // report message
-  optional Wiper_cmd_134 wiper_cmd_134 = 12; // control message
-  optional Wiper_rpt_234 wiper_rpt_234 = 13; // report message
-  optional Turn_rpt_230 turn_rpt_230 = 14; // report message
-  optional Headlight_cmd_118 headlight_cmd_118 = 15; // control message
-  optional Door_rpt_417 door_rpt_417 = 16; // report message
-  optional Component_rpt_20 component_rpt_20 = 17; // report message
-  optional Wheel_speed_rpt_407 wheel_speed_rpt_407 = 18; // report message
-  optional Steering_motor_rpt_3_406 steering_motor_rpt_3_406 = 19; // report message
-  optional Steering_motor_rpt_2_405 steering_motor_rpt_2_405 = 20; // report message
-  optional Steering_motor_rpt_1_404 steering_motor_rpt_1_404 = 21; // report message
-  optional Brake_motor_rpt_3_403 brake_motor_rpt_3_403 = 22; // report message
-  optional Brake_motor_rpt_2_402 brake_motor_rpt_2_402 = 23; // report message
-  optional Brake_motor_rpt_1_401 brake_motor_rpt_1_401 = 24; // report message
-  optional Wiper_aux_rpt_334 wiper_aux_rpt_334 = 25; // report message
-  optional Shift_aux_rpt_328 shift_aux_rpt_328 = 26; // report message
-  optional Accel_rpt_200 accel_rpt_200 = 27; // report message
-  optional Brake_rpt_204 brake_rpt_204 = 28; // report message
-  optional Horn_cmd_11c horn_cmd_11c = 29; // report message
-  optional Global_rpt_10 global_rpt_10 = 30; // report message
-  optional Accel_aux_rpt_300 accel_aux_rpt_300 = 31; // report message
-  optional Cruise_control_buttons_rpt_208 cruise_control_buttons_rpt_208 = 32; // report message
-  optional Vehicle_speed_rpt_400 vehicle_speed_rpt_400 = 33; // report message
-  optional Brake_aux_rpt_304 brake_aux_rpt_304 = 34; // report message
-  optional Media_controls_cmd_120 media_controls_cmd_120 = 35; // report message
-  optional Cruise_control_buttons_cmd_108 cruise_control_buttons_cmd_108 = 36; // control message
-  optional Parking_brake_cmd_124 parking_brake_cmd_124 = 37; // control message
-  optional Horn_rpt_21c horn_rpt_21c = 38; // report message
-  optional Shift_rpt_228 shift_rpt_228 = 39; // report message
-  optional Shift_cmd_128 shift_cmd_128 = 40; // control message
-  optional Accel_cmd_100 accel_cmd_100 = 41; // control message
-  optional Parking_brake_rpt_224 parking_brake_rpt_224 = 42; // report message
-  optional Brake_cmd_104 brake_cmd_104 = 43; // control message
-  optional Media_controls_rpt_220 media_controls_rpt_220 = 44; // report message
-  optional Steering_aux_rpt_32c steering_aux_rpt_32c = 45; // report message
-  optional Lat_lon_heading_rpt_40e lat_lon_heading_rpt_40e = 46; // report message
-  optional Yaw_rate_rpt_40d yaw_rate_rpt_40d = 47; // report message
-  optional Date_time_rpt_40f date_time_rpt_40f = 48; // report message
-  optional Vin_rpt_414 vin_rpt_414 = 49; // report message
-  optional Occupancy_rpt_415 occupancy_rpt_415 = 50; // report message
-  optional Interior_lights_rpt_416 interior_lights_rpt_416 = 51; // report message
-  optional Turn_cmd_130 turn_cmd_130 = 52; // control message
-  optional Detected_object_rpt_411 detected_object_rpt_411 = 53; // report message
-  optional Veh_specific_rpt_1_412 veh_specific_rpt_1_412 = 54; // report message
-  optional Veh_dynamics_rpt_413 veh_dynamics_rpt_413 = 55; // report message
-  optional Rear_lights_rpt_418 rear_lights_rpt_418 = 56; // report message
+  optional Hazard_lights_rpt_214 hazard_lights_rpt_214 = 1;  // report message
+  optional Steering_cmd_12c steering_cmd_12c = 2;            // report message
+  optional Dash_controls_right_rpt_210 dash_controls_right_rpt_210 =
+      3;  // control message
+  optional Dash_controls_left_cmd_10c dash_controls_left_cmd_10c =
+      4;                                                     // report message
+  optional Steering_rpt_22c steering_rpt_22c = 5;            // report message
+  optional Turn_aux_rpt_330 turn_aux_rpt_330 = 6;            // report message
+  optional Headlight_rpt_218 headlight_rpt_218 = 7;          // report message
+  optional Hazard_lights_cmd_114 hazard_lights_cmd_114 = 8;  // control message
+  optional Dash_controls_left_rpt_20c dash_controls_left_rpt_20c =
+      9;                                                      // report message
+  optional Headlight_aux_rpt_318 headlight_aux_rpt_318 = 10;  // report message
+  optional Dash_controls_right_cmd_110 dash_controls_right_cmd_110 =
+      11;                                                 // report message
+  optional Wiper_cmd_134 wiper_cmd_134 = 12;              // control message
+  optional Wiper_rpt_234 wiper_rpt_234 = 13;              // report message
+  optional Turn_rpt_230 turn_rpt_230 = 14;                // report message
+  optional Headlight_cmd_118 headlight_cmd_118 = 15;      // control message
+  optional Door_rpt_417 door_rpt_417 = 16;                // report message
+  optional Component_rpt_20 component_rpt_20 = 17;        // report message
+  optional Wheel_speed_rpt_407 wheel_speed_rpt_407 = 18;  // report message
+  optional Steering_motor_rpt_3_406 steering_motor_rpt_3_406 =
+      19;  // report message
+  optional Steering_motor_rpt_2_405 steering_motor_rpt_2_405 =
+      20;  // report message
+  optional Steering_motor_rpt_1_404 steering_motor_rpt_1_404 =
+      21;                                                     // report message
+  optional Brake_motor_rpt_3_403 brake_motor_rpt_3_403 = 22;  // report message
+  optional Brake_motor_rpt_2_402 brake_motor_rpt_2_402 = 23;  // report message
+  optional Brake_motor_rpt_1_401 brake_motor_rpt_1_401 = 24;  // report message
+  optional Wiper_aux_rpt_334 wiper_aux_rpt_334 = 25;          // report message
+  optional Shift_aux_rpt_328 shift_aux_rpt_328 = 26;          // report message
+  optional Accel_rpt_200 accel_rpt_200 = 27;                  // report message
+  optional Brake_rpt_204 brake_rpt_204 = 28;                  // report message
+  optional Horn_cmd_11c horn_cmd_11c = 29;                    // report message
+  optional Global_rpt_10 global_rpt_10 = 30;                  // report message
+  optional Accel_aux_rpt_300 accel_aux_rpt_300 = 31;          // report message
+  optional Cruise_control_buttons_rpt_208 cruise_control_buttons_rpt_208 =
+      32;                                                     // report message
+  optional Vehicle_speed_rpt_400 vehicle_speed_rpt_400 = 33;  // report message
+  optional Brake_aux_rpt_304 brake_aux_rpt_304 = 34;          // report message
+  optional Media_controls_cmd_120 media_controls_cmd_120 =
+      35;  // report message
+  optional Cruise_control_buttons_cmd_108 cruise_control_buttons_cmd_108 =
+      36;                                                     // control message
+  optional Parking_brake_cmd_124 parking_brake_cmd_124 = 37;  // control message
+  optional Horn_rpt_21c horn_rpt_21c = 38;                    // report message
+  optional Shift_rpt_228 shift_rpt_228 = 39;                  // report message
+  optional Shift_cmd_128 shift_cmd_128 = 40;                  // control message
+  optional Accel_cmd_100 accel_cmd_100 = 41;                  // control message
+  optional Parking_brake_rpt_224 parking_brake_rpt_224 = 42;  // report message
+  optional Brake_cmd_104 brake_cmd_104 = 43;                  // control message
+  optional Media_controls_rpt_220 media_controls_rpt_220 =
+      44;                                                   // report message
+  optional Steering_aux_rpt_32c steering_aux_rpt_32c = 45;  // report message
+  optional Lat_lon_heading_rpt_40e lat_lon_heading_rpt_40e =
+      46;                                             // report message
+  optional Yaw_rate_rpt_40d yaw_rate_rpt_40d = 47;    // report message
+  optional Date_time_rpt_40f date_time_rpt_40f = 48;  // report message
+  optional Vin_rpt_414 vin_rpt_414 = 49;              // report message
+  optional Occupancy_rpt_415 occupancy_rpt_415 = 50;  // report message
+  optional Interior_lights_rpt_416 interior_lights_rpt_416 =
+      51;                                   // report message
+  optional Turn_cmd_130 turn_cmd_130 = 52;  // control message
+  optional Detected_object_rpt_411 detected_object_rpt_411 =
+      53;  // report message
+  optional Veh_specific_rpt_1_412 veh_specific_rpt_1_412 =
+      54;                                                   // report message
+  optional Veh_dynamics_rpt_413 veh_dynamics_rpt_413 = 55;  // report message
+  optional Rear_lights_rpt_418 rear_lights_rpt_418 = 56;    // report message
 }

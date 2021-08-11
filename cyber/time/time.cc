@@ -16,15 +16,12 @@
 
 #include "cyber/time/time.h"
 
-#include <time.h>
 #include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <limits>
 #include <sstream>
 #include <thread>
-
-#if __GNUC__ >= 5
-#include <iomanip>
-#endif
 
 namespace apollo {
 namespace cyber {
@@ -34,7 +31,7 @@ using std::chrono::steady_clock;
 using std::chrono::system_clock;
 
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
-const Time Time::MIN = Time(1);
+const Time Time::MIN = Time(0);
 
 Time::Time(uint64_t nanoseconds) { nanoseconds_ = nanoseconds; }
 
@@ -85,6 +82,10 @@ bool Time::IsZero() const { return nanoseconds_ == 0; }
 
 uint64_t Time::ToNanosecond() const { return nanoseconds_; }
 
+uint64_t Time::ToMicrosecond() const {
+  return static_cast<uint64_t>(nanoseconds_ / 1000.0);
+}
+
 std::string Time::ToString() const {
   auto nano = std::chrono::nanoseconds(nanoseconds_);
   system_clock::time_point tp(nano);
@@ -94,14 +95,16 @@ std::string Time::ToString() const {
   if (ret == nullptr) {
     return std::to_string(static_cast<double>(nanoseconds_) / 1000000000.0);
   }
+
   std::stringstream ss;
 #if __GNUC__ >= 5
   ss << std::put_time(ret, "%F %T");
-  ss << "." << nanoseconds_ % 1000000000UL;
+  ss << "." << std::setw(9) << std::setfill('0') << nanoseconds_ % 1000000000UL;
 #else
   char date_time[128];
   strftime(date_time, sizeof(date_time), "%F %T", ret);
-  ss << std::string(date_time) << "." << nanoseconds_ % 1000000000UL;
+  ss << std::string(date_time) << "." << std::setw(9) << std::setfill('0')
+     << nanoseconds_ % 1000000000UL;
 #endif
   return ss.str();
 }

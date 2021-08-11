@@ -20,18 +20,17 @@
 
 DECLARE_string(third_party_perception_node_name);
 
-DECLARE_string(adapter_config_filename);
-
 DECLARE_double(third_party_perception_freq);
-DECLARE_bool(enable_mobileye);
 DECLARE_bool(enable_radar);
 
 // flags to calibrate mobileye, radar and localization
 DECLARE_double(mobileye_pos_adjust);
+DECLARE_double(smartereye_pos_adjust);
 DECLARE_double(radar_pos_adjust);
 
 // object id offset
 DECLARE_int32(mobileye_id_offset);
+DECLARE_int32(smartereye_id_offset);
 DECLARE_int32(radar_id_offset);
 
 // flags to create fake bounding box

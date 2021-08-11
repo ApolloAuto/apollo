@@ -16,11 +16,8 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
-
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -47,17 +44,50 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
     AERROR << "ParkAndGoStageAdjust planning error";
     return StageStatus::ERROR;
   }
-  bool ready_to_cruise =
-      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
-  if (ready_to_cruise) {
-    return FinishStage();
+  const bool is_ready_to_cruise = scenario::util::CheckADCReadyToCruise(
+      injector_->vehicle_state(), frame, scenario_config_);
+
+  bool is_end_of_trajectory = false;
+  const auto& history_frame = injector_->frame_history()->Latest();
+  if (history_frame) {
+    const auto& trajectory_points =
+        history_frame->current_frame_planned_trajectory().trajectory_point();
+    if (!trajectory_points.empty()) {
+      is_end_of_trajectory =
+          (trajectory_points.rbegin()->relative_time() < 0.0);
+    }
   }
-  return StageStatus::RUNNING;
+
+  if (!is_ready_to_cruise && !is_end_of_trajectory) {
+    return StageStatus::RUNNING;
+  }
+  return FinishStage();
 }
 
 Stage::StageStatus ParkAndGoStageAdjust::FinishStage() {
-  next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  const auto vehicle_status = injector_->vehicle_state();
+  ADEBUG << vehicle_status->steering_percentage();
+  if (std::fabs(vehicle_status->steering_percentage()) <
+      scenario_config_.max_steering_percentage_when_cruise()) {
+    next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  } else {
+    ResetInitPostion();
+    next_stage_ = ScenarioConfig::PARK_AND_GO_PRE_CRUISE;
+  }
   return Stage::FINISHED;
+}
+
+void ParkAndGoStageAdjust::ResetInitPostion() {
+  auto* park_and_go_status = injector_->planning_context()
+                                 ->mutable_planning_status()
+                                 ->mutable_park_and_go();
+  park_and_go_status->mutable_adc_init_position()->set_x(
+      injector_->vehicle_state()->x());
+  park_and_go_status->mutable_adc_init_position()->set_y(
+      injector_->vehicle_state()->y());
+  park_and_go_status->mutable_adc_init_position()->set_z(0.0);
+  park_and_go_status->set_adc_init_heading(
+      injector_->vehicle_state()->heading());
 }
 
 }  // namespace park_and_go

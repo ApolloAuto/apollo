@@ -31,9 +31,6 @@ class State {
   explicit State(const uint64_t& ceiling_msg_size);
   virtual ~State();
 
-  void IncreaseWroteNum() { wrote_num_.fetch_add(1); }
-  void ResetWroteNum() { wrote_num_.store(0); }
-
   void DecreaseReferenceCounts() {
     uint32_t current_reference_count = reference_count_.load();
     do {
@@ -46,16 +43,18 @@ class State {
 
   void IncreaseReferenceCounts() { reference_count_.fetch_add(1); }
 
+  uint32_t FetchAddSeq(uint32_t diff) { return seq_.fetch_add(diff); }
+  uint32_t seq() { return seq_.load(); }
+
   void set_need_remap(bool need) { need_remap_.store(need); }
   bool need_remap() { return need_remap_; }
 
   uint64_t ceiling_msg_size() { return ceiling_msg_size_.load(); }
   uint32_t reference_counts() { return reference_count_.load(); }
-  uint32_t wrote_num() { return wrote_num_.load(); }
 
  private:
   std::atomic<bool> need_remap_ = {false};
-  std::atomic<uint32_t> wrote_num_ = {0};
+  std::atomic<uint32_t> seq_ = {0};
   std::atomic<uint32_t> reference_count_ = {0};
   std::atomic<uint64_t> ceiling_msg_size_;
 };

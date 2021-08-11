@@ -16,9 +16,8 @@
 
 #include "modules/planning/common/st_graph_data.h"
 
-#include "gmock/gmock.h"
-
 #include "cyber/common/log.h"
+#include "gmock/gmock.h"
 #include "modules/planning/common/speed/st_boundary.h"
 
 namespace apollo {
@@ -40,12 +39,14 @@ TEST(StGraphDataTest, basic_test) {
   traj_point.set_relative_time(1010.022);
 
   SpeedLimit speed_limit;
+  double cruise_speed = 5.0;
   double path_data_length = 100.0;
   double total_time_by_conf = 7.0;
   planning_internal::STGraphDebug* st_graph_debug = nullptr;
   StGraphData st_graph_data;
   st_graph_data.LoadData(boundary_vec, 0.0, traj_point, speed_limit,
-                         path_data_length, total_time_by_conf, st_graph_debug);
+                         cruise_speed, path_data_length, total_time_by_conf,
+                         st_graph_debug);
   EXPECT_EQ(st_graph_data.st_boundaries().size(), 1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 1.1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 2.1);

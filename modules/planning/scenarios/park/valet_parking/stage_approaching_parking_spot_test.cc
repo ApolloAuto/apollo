@@ -31,17 +31,20 @@ class StageApproachingParkingSpotTest : public ::testing::Test {
   virtual void SetUp() {
     config_.set_stage_type(
         ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
-  struct ValetParkingContext;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(config_);
+  StageApproachingParkingSpot stage_approaching_parking_spot(config_,
+                                                             injector_);
   EXPECT_EQ(stage_approaching_parking_spot.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT));
 }
 
 }  // namespace valet_parking

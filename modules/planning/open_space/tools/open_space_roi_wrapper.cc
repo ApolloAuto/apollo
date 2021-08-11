@@ -18,12 +18,8 @@
  * @file
  **/
 
-#include <iostream>
-#include <vector>
-
 #include "Eigen/Dense"
 #include "cyber/common/file.h"
-
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -35,14 +31,12 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::hdmap::PathOverlap;
 
 constexpr double kMathEpsilon = 1e-10;
 
@@ -61,19 +55,18 @@ class OpenSpaceROITest {
     double right_top_l = 0.0;
     if (!(nearby_path_->GetProjection(left_top, &left_top_s, &left_top_l) &&
           nearby_path_->GetProjection(right_top, &right_top_s, &right_top_l))) {
-      std::string msg(
-          "fail to get parking spot points' projections on reference line");
-      AERROR << msg;
+      AERROR <<  "fail to get parking spot points' projections "
+                 "on reference line";
       return false;
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
         center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
         center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
@@ -236,19 +229,18 @@ class OpenSpaceROITest {
     double right_top_l = 0.0;
     if (!(nearby_path_->GetProjection(left_top, &left_top_s, &left_top_l) &&
           nearby_path_->GetProjection(right_top, &right_top_s, &right_top_l))) {
-      std::string msg(
-          "fail to get parking spot points' projections on reference line");
-      AERROR << msg;
+      AERROR <<  "fail to get parking spot points' projections "
+                 "on reference line";
       return false;
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
         center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
         center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
@@ -360,7 +352,7 @@ class OpenSpaceROITest {
       return false;
     }
 
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

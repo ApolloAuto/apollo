@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.drivers.microphone.config;
+
+enum ChannelType {
+  UNKNOWN = 0;
+  ASR = 1;  // Automatic Speech Recognition
+  RAW = 2;
+  PLAYBACK = 3;
+}
+
+message MicrophoneConfig {
+  enum MicrophoneModel {
+    UNKNOWN = 0;
+    RESPEAKER = 1;
+  }
+  optional MicrophoneModel microphone_model = 2;
+  optional int32 chunk = 3;
+  optional float sample_rate = 4;
+  optional float record_seconds = 5;
+  optional int32 sample_width = 6;  // in bytes
+  optional string channel_name = 7;
+  optional string frame_id = 8;
+  optional float mic_distance = 9;
+  repeated ChannelType channel_type = 1;
+}

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -17,17 +17,20 @@
 ###############################################################################
 
 import argparse
-import matplotlib.pyplot as plt
+
 import matplotlib.animation as animation
-from cyber_py import cyber
+import matplotlib.pyplot as plt
+
+from cyber.python.cyber_py3 import cyber
 from modules.planning.proto import planning_pb2
-from subplot_st_main import StMainSubplot
-from subplot_path import PathSubplot
-from subplot_sl_main import SlMainSubplot
-from subplot_st_speed import StSpeedSubplot
-from subplot_speed import SpeedSubplot
-from localization import Localization
-from planning import Planning
+from modules.tools.mapshow.libs.localization import Localization
+from modules.tools.mapshow.libs.planning import Planning
+from modules.tools.mapshow.libs.subplot_path import PathSubplot
+from modules.tools.mapshow.libs.subplot_sl_main import SlMainSubplot
+from modules.tools.mapshow.libs.subplot_speed import SpeedSubplot
+from modules.tools.mapshow.libs.subplot_st_main import StMainSubplot
+from modules.tools.mapshow.libs.subplot_st_speed import StSpeedSubplot
+
 
 planning = Planning()
 localization = Localization()
@@ -59,7 +62,7 @@ def planning_callback(planning_pb):
 def add_listener():
     planning_sub = cyber.Node("st_plot")
     planning_sub.create_reader('/apollo/planning', planning_pb2.ADCTrajectory,
-                     planning_callback)
+                               planning_callback)
 
 
 def press_key(event):

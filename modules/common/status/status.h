@@ -24,6 +24,7 @@
 
 #include "google/protobuf/descriptor.h"
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::common
@@ -42,24 +43,15 @@ namespace common {
 class Status {
  public:
   /**
-   * @brief Create a success status.
-   */
-  Status() : code_(ErrorCode::OK), msg_() {}
-  ~Status() = default;
-
-  /**
    * @brief Create a status with the specified error code and msg as a
    * human-readable string containing more detailed information.
    * @param code the error code.
    * @param msg the message associated with the error.
    */
-  Status(ErrorCode code, const std::string &msg) : code_(code), msg_(msg) {}
+  explicit Status(ErrorCode code = ErrorCode::OK, std::string_view msg = "")
+      : code_(code), msg_(msg.data()) {}
 
-  /**
-   * @brief Create a status with the specified error code and empty msg
-   * @param code the error code.
-   */
-  explicit Status(ErrorCode code) : code_(code), msg_("") {}
+  ~Status() = default;
 
   /**
    * @brief generate a success status.

@@ -15,16 +15,17 @@
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
-#include <pcl/io/pcd_io.h>
-#include <opencv2/opencv.hpp>
-
 #include <fstream>
 #include <memory>
 #include <vector>
 
+#include <opencv2/opencv.hpp>
+
+#include "absl/strings/str_split.h"
+#include "pcl/io/pcd_io.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
@@ -68,12 +69,13 @@ MsgExporter::MsgExporter(std::shared_ptr<apollo::cyber::Node> node,
     }
   }
 }
+
 void MsgExporter::ImageMessageHandler(
     const std::shared_ptr<const ImgMsg>& img_msg, const std::string& channel,
     const std::string& child_frame_id, const std::string& folder) {
   double timestamp = img_msg->measurement_time();
   // std::cout << "Receive image message from channel: " << channel <<
-  //    " at time: " << GLOG_TIMESTAMP(timestamp) << std::endl;
+  //    " at time: " << FORMAT_TIMESTAMP(timestamp) << std::endl;
   const unsigned char* data =
       reinterpret_cast<const unsigned char*>(img_msg->data().data());
   const unsigned char* range_data = nullptr;
@@ -91,12 +93,13 @@ void MsgExporter::ImageMessageHandler(
               << child_frame_id << std::endl;
   }
 }
+
 void MsgExporter::PointCloudMessageHandler(
     const std::shared_ptr<const PcMsg>& cloud_msg, const std::string& channel,
     const std::string& child_frame_id, const std::string& folder) {
   double timestamp = cloud_msg->measurement_time();
   // std::cout << "Receive point cloud message from channel: " << channel <<
-  //    " at time: " << GLOG_TIMESTAMP(timestamp) << std::endl;
+  //    " at time: " << FORMAT_TIMESTAMP(timestamp) << std::endl;
   pcl::PointCloud<PCLPointXYZIT> cloud;
   if (cloud_msg->point_size() > 0) {
     cloud.resize(cloud_msg->point_size());
@@ -125,6 +128,7 @@ void MsgExporter::PointCloudMessageHandler(
               << std::endl;
   }
 }
+
 bool MsgExporter::SavePointCloud(
     const pcl::PointCloud<PCLPointXYZIT>& point_cloud, double timestamp,
     const std::string& folder) {
@@ -134,6 +138,7 @@ bool MsgExporter::SavePointCloud(
   writer.writeBinaryCompressed(path, point_cloud);
   return true;
 }
+
 bool MsgExporter::SaveImage(const unsigned char* color_image,
                             const unsigned char* range_image, std::size_t width,
                             std::size_t height, double timestamp,
@@ -158,6 +163,7 @@ bool MsgExporter::SaveImage(const unsigned char* color_image,
   }
   return true;
 }
+
 bool MsgExporter::QuerySensorToWorldPose(double timestamp,
                                          const std::string& child_frame_id,
                                          Eigen::Matrix4d* pose) {
@@ -177,6 +183,7 @@ bool MsgExporter::QuerySensorToWorldPose(double timestamp,
   *pose = novatel2world_pose * sensor2novatel_extrinsics;
   return true;
 }
+
 bool MsgExporter::QueryPose(double timestamp, const std::string& frame_id,
                             const std::string& child_frame_id,
                             Eigen::Matrix4d* pose) {
@@ -184,7 +191,7 @@ bool MsgExporter::QueryPose(double timestamp, const std::string& frame_id,
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time, 0.05f,
                                  &err_string)) {
-    AERROR << "Can not find transform. "  //<< GLOG_TIMESTAMP(timestamp)
+    AERROR << "Can not find transform. "  //<< FORMAT_TIMESTAMP(timestamp)
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;
     return false;
@@ -208,6 +215,7 @@ bool MsgExporter::QueryPose(double timestamp, const std::string& frame_id,
   }
   return true;
 }
+
 bool MsgExporter::SavePose(const Eigen::Matrix4d& pose, double timestamp,
                            const std::string& folder) {
   Eigen::Affine3d affine(pose);
@@ -223,33 +231,24 @@ bool MsgExporter::SavePose(const Eigen::Matrix4d& pose, double timestamp,
   }
   return true;
 }
+
 bool MsgExporter::IsStereoCamera(const std::string& channel) {
-  std::vector<std::string> strs;
-  apollo::common::util::Split(channel, '/', &strs);
-  if (strs.size() > 2 && strs[2] == "smartereye") {
-    return true;
-  }
-  return false;
+  const std::vector<std::string> strs = absl::StrSplit(channel, '/');
+  return strs.size() > 2 && strs[2] == "smartereye";
 }
+
 bool MsgExporter::IsCamera(const std::string& channel) {
-  std::vector<std::string> strs;
-  apollo::common::util::Split(channel, '/', &strs);
-  if (strs.size() > 1 && strs[1] == "camera") {
-    return true;
-  }
-  return false;
+  const std::vector<std::string> strs = absl::StrSplit(channel, '/');
+  return strs.size() > 1 && strs[1] == "camera";
 }
+
 bool MsgExporter::IsLidar(const std::string& channel) {
-  std::vector<std::string> strs;
-  apollo::common::util::Split(channel, '/', &strs);
-  if (strs.size() > 0 && strs.back() == "PointCloud2") {
-    return true;
-  }
-  return false;
+  const std::vector<std::string> strs = absl::StrSplit(channel, '/');
+  return strs.size() > 0 && strs.back() == "PointCloud2";
 }
+
 std::string MsgExporter::TransformChannelToFolder(const std::string& channel) {
-  std::vector<std::string> strs;
-  apollo::common::util::Split(channel, '/', &strs);
+  const std::vector<std::string> strs = absl::StrSplit(channel, '/');
   std::string target = "";
   for (auto& str : strs) {
     target += str + "_";
@@ -257,6 +256,7 @@ std::string MsgExporter::TransformChannelToFolder(const std::string& channel) {
   target += "data";
   return target;
 }
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

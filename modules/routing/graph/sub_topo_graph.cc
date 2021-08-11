@@ -17,6 +17,7 @@
 #include "modules/routing/graph/sub_topo_graph.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include "modules/routing/graph/range_utils.h"

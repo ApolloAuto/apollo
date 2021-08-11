@@ -15,12 +15,20 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/roi_boundary_filter_config.pb.h"
+
+using apollo::common::EigenVector;
+
+namespace {
+constexpr double kDoubleMax = std::numeric_limits<double>::max();
+}  // namespace
 
 namespace apollo {
 namespace perception {
@@ -31,15 +39,15 @@ using cyber::common::GetAbsolutePath;
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "roi_boundary_filter.conf");
   ROIBoundaryFilterConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
   confidence_threshold_ = config.confidence_threshold();
   cross_roi_threshold_ = config.cross_roi_threshold();
@@ -146,12 +154,12 @@ void ROIBoundaryFilter::FillObjectRoiFlag(const ObjectFilterOptions& options,
 void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
     const ObjectFilterOptions& options, LidarFrame* frame,
     std::vector<bool>* objects_valid_flag) {
-  const std::vector<base::RoadBoundary>& road_boundary =
+  const EigenVector<base::RoadBoundary>& road_boundary =
       frame->hdmap_struct->road_boundary;
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;
   Eigen::Vector3d direction;
-  double min_dist_to_boundary = DBL_MAX;
+  double min_dist_to_boundary = kDoubleMax;
   Eigen::Vector3d world_point;
   for (size_t i = 0; i < objects.size(); ++i) {
     auto& obj = objects[i];
@@ -160,7 +168,7 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
       (*objects_valid_flag)[i] = false;
       for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
-        min_dist_to_boundary = DBL_MAX;
+        min_dist_to_boundary = kDoubleMax;
         world_point << point.x, point.y, point.z;
         for (const auto& boundary : road_boundary) {
           perception::common::CalculateDistAndDirToBoundary(
@@ -188,12 +196,12 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
 void ROIBoundaryFilter::FilterObjectsInsideBoundary(
     const ObjectFilterOptions& options, LidarFrame* frame,
     std::vector<bool>* objects_valid_flag) {
-  const std::vector<base::RoadBoundary>& road_boundary =
+  const EigenVector<base::RoadBoundary>& road_boundary =
       frame->hdmap_struct->road_boundary;
   auto& objects = frame->segmented_objects;
   double dist_to_boundary = 0.0;
   Eigen::Vector3d direction;
-  double min_dist_to_boundary = DBL_MAX;
+  double min_dist_to_boundary = kDoubleMax;
   Eigen::Vector3d world_point;
   for (size_t i = 0; i < objects.size(); ++i) {
     auto& obj = objects[i];
@@ -203,7 +211,7 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
       (*objects_valid_flag)[i] = false;
       for (auto& point : polygons_in_world_[i].points()) {
         dist_to_boundary = 0.0;
-        min_dist_to_boundary = DBL_MAX;
+        min_dist_to_boundary = kDoubleMax;
         world_point << point.x, point.y, point.z;
         for (auto& boundary : road_boundary) {
           perception::common::CalculateDistAndDirToBoundary(

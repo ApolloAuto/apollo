@@ -22,21 +22,9 @@ DEFINE_string(localization_module_name, "localization",
 DEFINE_double(localization_publish_freq, 100,
               "localization publishing frequency.");
 
-DEFINE_string(rtk_adapter_config_file,
-              "/apollo/modules/localization/conf/rtk_adapter.conf",
-              "rtk adapter configuration");
-
 DEFINE_string(localization_config_file,
               "/apollo/modules/localization/conf/localization_config.pb.txt",
               "localization config file");
-
-DEFINE_string(msf_adapter_config_file,
-              "/apollo/modules/localization/conf/msf_adapter.conf",
-              "msf adapter configuration");
-
-DEFINE_string(msf_visual_adapter_config_file,
-              "/apollo/modules/localization/conf/msf_visual_adapter.conf",
-              "msf visualization adapter configuration");
 
 // features
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");

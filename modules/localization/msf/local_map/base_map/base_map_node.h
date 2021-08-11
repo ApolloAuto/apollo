@@ -127,6 +127,8 @@ class BaseMapNode {
   static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option,
                                           const MapNodeIndex& index);
 
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  protected:
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).

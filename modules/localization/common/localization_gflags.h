@@ -28,9 +28,6 @@ DECLARE_string(localization_module_name);
 DECLARE_double(localization_publish_freq);
 
 DECLARE_string(localization_config_file);
-DECLARE_string(rtk_adapter_config_file);
-DECLARE_string(msf_adapter_config_file);
-DECLARE_string(msf_visual_adapter_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);

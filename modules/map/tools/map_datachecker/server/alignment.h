@@ -33,7 +33,7 @@ typedef struct BadOrGoodPoseInfo {
 
 class Alignment {
  public:
-  explicit Alignment(std::shared_ptr<JSonConf> sp_conf)
+  explicit Alignment(std::shared_ptr<JsonConf> sp_conf)
       : return_state_(ErrorCode::SUCCESS),
         sp_conf_(sp_conf),
         sp_good_pose_info_(std::make_shared<BadOrGoodPoseInfo>()),
@@ -95,12 +95,12 @@ class Alignment {
     if (pose_info.pose_count == 0) {
       pose_info.start_time = pose.time_stamp;
       ++pose_info.pose_count;
-      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+      AINFO << "update start time: " << pose_info.start_time
             << ",pose count: " << pose_info.pose_count;
     } else {
       pose_info.end_time = pose.time_stamp;
       ++pose_info.pose_count;
-      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+      AINFO << "update start time: " << pose_info.start_time
             << ",pose count: " << pose_info.pose_count;
     }
   }
@@ -138,7 +138,7 @@ class Alignment {
   int start_index_;
   double end_index_;
   ErrorCode return_state_;
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   // BadOrGoodPoseInfo _bad_pose_info, _good_pose_info;
   std::shared_ptr<BadOrGoodPoseInfo> sp_good_pose_info_ = nullptr;
   std::shared_ptr<BadOrGoodPoseInfo> sp_bad_pose_info_ = nullptr;

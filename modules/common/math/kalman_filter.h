@@ -254,7 +254,7 @@ class KalmanFilter {
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline void KalmanFilter<T, XN, ZN, UN>::Predict(
     const Eigen::Matrix<T, UN, 1> &u) {
-  CHECK(is_initialized_);
+  ACHECK(is_initialized_);
 
   x_ = F_ * x_ + B_ * u;
 
@@ -264,7 +264,7 @@ inline void KalmanFilter<T, XN, ZN, UN>::Predict(
 template <typename T, unsigned int XN, unsigned int ZN, unsigned int UN>
 inline void KalmanFilter<T, XN, ZN, UN>::Correct(
     const Eigen::Matrix<T, ZN, 1> &z) {
-  CHECK(is_initialized_);
+  ACHECK(is_initialized_);
   y_ = z - H_ * x_;
 
   S_ = static_cast<Eigen::Matrix<T, ZN, ZN>>(H_ * P_ * H_.transpose() + R_);

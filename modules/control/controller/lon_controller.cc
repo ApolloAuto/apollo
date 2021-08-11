@@ -18,11 +18,11 @@
 #include <algorithm>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -33,7 +33,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -91,7 +91,8 @@ void LonController::Stop() { CloseLogFile(); }
 
 LonController::~LonController() { CloseLogFile(); }
 
-Status LonController::Init(const ControlConf *control_conf) {
+Status LonController::Init(std::shared_ptr<DependencyInjector> injector,
+                           const ControlConf *control_conf) {
   control_conf_ = control_conf;
   if (control_conf_ == nullptr) {
     controller_initialized_ = false;
@@ -99,6 +100,7 @@ Status LonController::Init(const ControlConf *control_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "Failed to load LonController conf");
   }
+  injector_ = injector;
   const LonControllerConf &lon_controller_conf =
       control_conf_->lon_controller_conf();
   double ts = lon_controller_conf.ts();
@@ -147,7 +149,7 @@ void LonController::LoadControlCalibrationTable(
                                   calibration.command()));
   }
   control_interpolation_.reset(new Interpolation2D);
-  CHECK(control_interpolation_->Init(xyz))
+  ACHECK(control_interpolation_->Init(xyz))
       << "Fail to load control calibration table";
 }
 
@@ -185,8 +187,8 @@ Status LonController::ComputeControlCommand(
       lon_controller_conf.enable_reverse_leadlag_compensation();
 
   if (preview_time < 0.0) {
-    const auto error_msg = common::util::StrCat(
-        "Preview time set as: ", preview_time, " less than 0");
+    const auto error_msg =
+        absl::StrCat("Preview time set as: ", preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -214,7 +216,7 @@ Status LonController::ComputeControlCommand(
       speed_leadlag_controller_.SetLeadlag(
           lon_controller_conf.reverse_speed_leadlag_conf());
     }
-  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
+  } else if (injector_->vehicle_state()->linear_velocity() <=
              lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
   } else {
@@ -253,14 +255,14 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
-      GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
+  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
+      GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
-  if (std::isnan(slope_offset_compenstaion)) {
-    slope_offset_compenstaion = 0;
+  if (std::isnan(slope_offset_compensation)) {
+    slope_offset_compensation = 0;
   }
 
-  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+  debug->set_slope_offset_compensation(slope_offset_compensation);
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
@@ -269,7 +271,7 @@ Status LonController::ComputeControlCommand(
   GetPathRemain(debug);
 
   // At near-stop stage, replace the brake control command with the standstill
-  // accleration if the former is even softer than the latter
+  // acceleration if the former is even softer than the latter
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
@@ -355,9 +357,8 @@ Status LonController::ComputeControlCommand(
   cmd->set_brake(brake_cmd);
   cmd->set_acceleration(acceleration_cmd);
 
-  if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
+  if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
-      chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
@@ -388,18 +389,16 @@ void LonController::ComputeLongitudinalErrors(
   double d_matched = 0.0;
   double d_dot_matched = 0.0;
 
+  auto vehicle_state = injector_->vehicle_state();
   auto matched_point = trajectory_analyzer->QueryMatchedPathPoint(
-      VehicleStateProvider::Instance()->x(),
-      VehicleStateProvider::Instance()->y());
+      vehicle_state->x(), vehicle_state->y());
 
   trajectory_analyzer->ToTrajectoryFrame(
-      VehicleStateProvider::Instance()->x(),
-      VehicleStateProvider::Instance()->y(),
-      VehicleStateProvider::Instance()->heading(),
-      VehicleStateProvider::Instance()->linear_velocity(), matched_point,
-      &s_matched, &s_dot_matched, &d_matched, &d_dot_matched);
+      vehicle_state->x(), vehicle_state->y(), vehicle_state->heading(),
+      vehicle_state->linear_velocity(), matched_point, &s_matched,
+      &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSeconds();
+  double current_control_time = Time::Now().ToSecond();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =
@@ -426,17 +425,14 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
 
-  double heading_error = common::math::NormalizeAngle(
-      VehicleStateProvider::Instance()->heading() - matched_point.theta());
-  double lon_speed = VehicleStateProvider::Instance()->linear_velocity() *
-                     std::cos(heading_error);
+  double heading_error = common::math::NormalizeAngle(vehicle_state->heading() -
+                                                      matched_point.theta());
+  double lon_speed = vehicle_state->linear_velocity() * std::cos(heading_error);
   double lon_acceleration =
-      VehicleStateProvider::Instance()->linear_acceleration() *
-      std::cos(heading_error);
-  double one_minus_kappa_lat_error =
-      1 - reference_point.path_point().kappa() *
-              VehicleStateProvider::Instance()->linear_velocity() *
-              std::sin(heading_error);
+      vehicle_state->linear_acceleration() * std::cos(heading_error);
+  double one_minus_kappa_lat_error = 1 - reference_point.path_point().kappa() *
+                                             vehicle_state->linear_velocity() *
+                                             std::sin(heading_error);
 
   debug->set_station_reference(reference_point.path_point().s());
   debug->set_current_station(s_matched);
@@ -475,35 +471,41 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
 // TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
+  static constexpr double kSpeedThreshold = 1e-3;
+  static constexpr double kForwardAccThreshold = -1e-2;
+  static constexpr double kBackwardAccThreshold = 1e-1;
+  static constexpr double kParkingSpeed = 0.1;
 
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (fabs(current_trajectory_point.v()) < kSpeedThreshold &&
+          current_trajectory_point.a() > kForwardAccThreshold &&
+          current_trajectory_point.a() < 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   } else {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.1 &&
-          trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (current_trajectory_point.v() < kSpeedThreshold &&
+          current_trajectory_point.a() < kBackwardAccThreshold &&
+          current_trajectory_point.a() > 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   }
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
-    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
+    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
+        kParkingSpeed) {
       ADEBUG << "the last point is selected as parking point";
     } else {
       ADEBUG << "the last point found in path and speed > speed_deadzone";
-      debug->set_path_remain(10000);
     }
   }
   debug->set_path_remain(

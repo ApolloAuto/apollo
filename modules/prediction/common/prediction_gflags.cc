@@ -53,9 +53,13 @@ DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
               "Radius to determine if pedestrian-like obstacle is near lane.");
 DEFINE_int32(road_graph_max_search_horizon, 20,
              "Maximal search depth for building road graph");
+DEFINE_double(surrounding_lane_search_radius, 3.0,
+              "Search radius for surrounding lanes.");
 
 // Semantic Map
 DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
+DEFINE_bool(enable_draw_adc_trajectory, true,
+            "If draw adc trajectory in semantic map");
 DEFINE_bool(img_show_semantic_map, false, "If show the image of semantic map.");
 
 // Scenario
@@ -64,6 +68,16 @@ DEFINE_double(junction_distance_threshold, 10.0,
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
+DEFINE_bool(enable_all_pedestrian_caution_in_front, false,
+            "If true, then all pedestrian in front of ADC are marked caution.");
+DEFINE_bool(enable_rank_caution_obstacles, true,
+            "Rank the caution-level obstacles.");
+DEFINE_bool(enable_rank_interactive_obstacles, true,
+            "Rank the interactive obstacles.");
+DEFINE_int32(caution_obs_max_nums, 6,
+             "The max number of caution-level obstacles");
+DEFINE_double(caution_distance_threshold, 60.0,
+              "Distance threshold for caution obstacles");
 DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
 DEFINE_double(caution_search_distance_backward, 50.0,
@@ -76,6 +90,20 @@ DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "in the case of overlap");
 DEFINE_double(caution_pedestrian_approach_time, 3.0,
               "The time for a pedestrian to approach adc trajectory");
+DEFINE_int32(interactive_obs_max_nums, 6,
+             "The max number of interactive obstacles");
+DEFINE_double(interaction_distance_threshold, 60.0,
+              "Distance threshold for interactive obstacles");
+DEFINE_double(interaction_search_distance_ahead, 50.0,
+              "The distance ahead to search interactive obstacles");
+DEFINE_double(interaction_search_distance_backward, 50.0,
+              "The distance backward to search interactive obstacles");
+DEFINE_double(interaction_search_distance_backward_for_merge, 60.0,
+              "The distance backward to search interactive obstacles "
+              "in the case of merging");
+DEFINE_double(interaction_search_distance_backward_for_overlap, 30.0,
+              "The distance backward to search interactive obstacles "
+              "in the case of overlap");
 
 // Obstacle features
 DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
@@ -141,12 +169,29 @@ DEFINE_string(evaluator_vehicle_mlp_file,
 DEFINE_string(evaluator_vehicle_rnn_file,
               "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
+DEFINE_string(
+    torch_vehicle_jointly_model_file,
+    "/apollo/modules/prediction/data/"
+    "jointly_prediction_planning_vehicle_model.pt",
+    "Vehicle jointly prediction and planning model file");
+DEFINE_string(
+    torch_vehicle_jointly_model_cpu_file,
+    "/apollo/modules/prediction/data/"
+    "jointly_prediction_planning_vehicle_cpu_model.pt",
+    "Vehicle jointly prediction and planning cpu model file");
 DEFINE_string(torch_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");
 DEFINE_string(torch_vehicle_junction_map_file,
               "/apollo/modules/prediction/data/junction_map_vehicle_model.pt",
               "Vehicle junction map model file");
+DEFINE_string(torch_vehicle_semantic_lstm_file,
+              "/apollo/modules/prediction/data/semantic_lstm_vehicle_model.pt",
+              "Vehicle semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_vehicle_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_vehicle_cpu_model.pt",
+    "Vehicle semantic lstm cpu model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
@@ -156,6 +201,12 @@ DEFINE_string(torch_vehicle_cruise_cutin_file,
 DEFINE_string(torch_vehicle_lane_scanning_file,
               "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
+DEFINE_string(torch_vehicle_vectornet_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_model.pt",
+              "Vehicle vectornet model file");
+DEFINE_string(torch_vehicle_vectornet_cpu_file,
+              "/apollo/modules/prediction/data/vectornet_vehicle_cpu_model.pt",
+              "Vehicle vectornet cpu model file");
 DEFINE_string(torch_pedestrian_interaction_position_embedding_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_position_embedding.pt",
@@ -172,6 +223,14 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_model.pt",
+    "Pedestrian semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_pedestrian_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_pedestrian_cpu_model.pt",
+    "Pedestrian semantic lstm cpu model file");
 DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
               "/apollo/modules/prediction/data/"
               "traced_online_obs_enc.pt",
@@ -235,7 +294,7 @@ DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
               "The default l value if no obstacle in the lane sequence.");
-DEFINE_bool(enable_semantic_map, false, "If enable semantic map on prediction");
+DEFINE_bool(enable_semantic_map, true, "If enable semantic map on prediction");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,

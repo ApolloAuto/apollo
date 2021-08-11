@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 namespace Ui {
 class SceneCameraDialog;
@@ -44,11 +44,11 @@ class SceneCameraDialog : public QDialog {
   void pitchValueChanged(double);
   void rollValueChanged(double);
 
- public slots:
+ public slots:  // NOLINT
   void updateCameraAttitude(const QVector3D &);
   void updateCameraPos(const QVector3D &);
 
- private slots:
+ private slots:  // NOLINT
   void OnStepSlideChanged(int v);
   void onCameraTypeChanged(int);
 

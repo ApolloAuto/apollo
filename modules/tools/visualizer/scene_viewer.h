@@ -16,7 +16,10 @@
 
 #pragma once
 
-#include <QOpenGLWidget>
+#include <QtWidgets/QOpenGLWidget>
+#include <map>
+#include <memory>
+#include <string>
 
 #include "modules/tools/visualizer/free_camera.h"
 #include "modules/tools/visualizer/plane.h"
@@ -76,11 +79,11 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
     }
   }
 
- signals:
+ signals:  // NOLINT
   void CameraPosChanged(const QVector3D& pos);
   void CameraAttitudeChanged(const QVector3D& attitude);
 
- public slots:
+ public slots:  // NOLINT
   void ChangeCameraType(int index);
   //  void ChangeCameraMode(int index);
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-from statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.common.statistical_analyzer import PrintColors
 
 
 class DistributionAnalyzer:
@@ -25,7 +25,7 @@ class DistributionAnalyzer:
     def print_distribution_results(self, data):
         """distribution analyzer"""
         if len(data) == 0:
-            print PrintColors.FAIL + "No Data Generated!" + PrintColors.ENDC
+            print(PrintColors.FAIL + "No Data Generated!" + PrintColors.ENDC)
             return
 
         total = 0
@@ -34,5 +34,5 @@ class DistributionAnalyzer:
 
         for k, v in data.items():
             percentage = "{0:.2f}".format((float(v) / total) * 100)
-            print PrintColors.OKBLUE + k + " = " + str(v) + \
-                "(" + percentage + "%)" + PrintColors.ENDC
+            print(PrintColors.OKBLUE + k + " = " + str(v) +
+                  "(" + percentage + "%)" + PrintColors.ENDC)

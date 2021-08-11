@@ -16,12 +16,14 @@
 
 #include "cyber/record/record_viewer.h"
 
-#include <gtest/gtest.h>
 #include <unistd.h>
+
 #include <algorithm>
 #include <atomic>
 #include <memory>
 #include <string>
+
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
@@ -33,25 +35,27 @@ namespace record {
 
 using apollo::cyber::message::RawMessage;
 
-const char CHANNEL_NAME_1[] = "/test/channel1";
-const char CHANNEL_NAME_2[] = "/test/channel2";
-const char MESSAGE_TYPE_1[] = "apollo.cyber.proto.Test";
-const char MESSAGE_TYPE_2[] = "apollo.cyber.proto.Channel";
-const char PROTO_DESC[] = "1234567890";
-const char TEST_FILE[] = "viewer_test.record";
+constexpr char kChannelName1[] = "/test/channel1";
+constexpr char kMessageType1[] = "apollo.cyber.proto.Test";
+constexpr char kProtoDesc1[] = "1234567890";
+constexpr char kTestFile[] = "viewer_test.record";
 
-void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
-                     uint64_t time_step) {
+static void ConstructRecord(uint64_t msg_num, uint64_t begin_time,
+                            uint64_t time_step, bool reverse = false) {
   RecordWriter writer;
   writer.SetSizeOfFileSegmentation(0);
   writer.SetIntervalOfFileSegmentation(0);
-  writer.Open(TEST_FILE);
-  writer.WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC);
+  writer.Open(kTestFile);
+  writer.WriteChannel(kChannelName1, kMessageType1, kProtoDesc1);
   for (uint64_t i = 0; i < msg_num; i++) {
-    auto msg = std::make_shared<RawMessage>(std::to_string(i));
-    writer.WriteMessage(CHANNEL_NAME_1, msg, begin_time + time_step * i);
+    auto ai = i;
+    if (reverse) {
+      ai = msg_num - 1 - i;
+    }
+    auto msg = std::make_shared<RawMessage>(std::to_string(ai));
+    writer.WriteMessage(kChannelName1, msg, begin_time + time_step * ai);
   }
-  ASSERT_EQ(msg_num, writer.GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(msg_num, writer.GetMessageNumber(kChannelName1));
   writer.Close();
 }
 
@@ -72,7 +76,7 @@ TEST(RecordTest, iterator_test) {
   uint64_t end_time = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(TEST_FILE);
+  auto reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer(reader);
   EXPECT_TRUE(viewer.IsValid());
   EXPECT_EQ(begin_time, viewer.begin_time());
@@ -80,7 +84,7 @@ TEST(RecordTest, iterator_test) {
 
   uint64_t i = 0;
   for (auto& msg : viewer) {
-    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(kChannelName1, msg.channel_name);
     EXPECT_EQ(begin_time + step_time * i, msg.time);
     EXPECT_EQ(std::to_string(i), msg.content);
     i++;
@@ -89,7 +93,7 @@ TEST(RecordTest, iterator_test) {
 
   i = 0;
   std::for_each(viewer.begin(), viewer.end(), [&i](RecordMessage& msg) {
-    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(kChannelName1, msg.channel_name);
     // EXPECT_EQ(begin_time + step_time * i, msg.time);
     EXPECT_EQ(std::to_string(i), msg.content);
     i++;
@@ -98,12 +102,49 @@ TEST(RecordTest, iterator_test) {
 
   i = 0;
   for (auto it = viewer.begin(); it != viewer.end(); ++it) {
-    EXPECT_EQ(CHANNEL_NAME_1, it->channel_name);
+    EXPECT_EQ(kChannelName1, it->channel_name);
     EXPECT_EQ(begin_time + step_time * i, it->time);
     EXPECT_EQ(std::to_string(i), it->content);
     i++;
   }
   EXPECT_EQ(msg_num, i);
+  ASSERT_FALSE(remove(kTestFile));
+}
+
+TEST(RecordTest, iterator_test_reverse) {
+  uint64_t msg_num = 200;
+  uint64_t begin_time = 1000;
+  uint64_t step_time = 10;
+  // TODO(storypku): investigtate why the following fails
+  // uint64_t begin_time = 100000000;
+  // uint64_t step_time = 100000000;  // 100ms
+  uint64_t end_time = begin_time + step_time * (msg_num - 1);
+  ConstructRecord(msg_num, begin_time, step_time, true);
+
+  auto reader = std::make_shared<RecordReader>(kTestFile);
+  RecordViewer viewer(reader);
+  EXPECT_TRUE(viewer.IsValid());
+  EXPECT_EQ(begin_time, viewer.begin_time());
+  EXPECT_EQ(end_time, viewer.end_time());
+
+  uint64_t i = 0;
+  for (auto& msg : viewer) {
+    EXPECT_EQ(kChannelName1, msg.channel_name);
+    EXPECT_EQ(begin_time + step_time * i, msg.time);
+    EXPECT_EQ(std::to_string(i), msg.content);
+    i++;
+  }
+  EXPECT_EQ(msg_num, i);
+
+  i = 0;
+  for (auto it = viewer.begin(); it != viewer.end(); ++it) {
+    EXPECT_EQ(kChannelName1, it->channel_name);
+    EXPECT_EQ(begin_time + step_time * i, it->time);
+    EXPECT_EQ(std::to_string(i), it->content);
+    i++;
+  }
+  EXPECT_EQ(msg_num, i);
+  ASSERT_FALSE(remove(kTestFile));
 }
 
 TEST(RecordTest, filter_test) {
@@ -113,7 +154,7 @@ TEST(RecordTest, filter_test) {
   uint64_t end_time = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(TEST_FILE);
+  auto reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer_0(reader);
   EXPECT_EQ(CheckCount(viewer_0), msg_num);
   EXPECT_EQ(begin_time, viewer_0.begin_time());
@@ -152,8 +193,9 @@ TEST(RecordTest, filter_test) {
   EXPECT_EQ(CheckCount(viewer_6), 0);
 
   // filter with exist channel
-  RecordViewer viewer_7(reader, 0, end_time, {CHANNEL_NAME_1});
+  RecordViewer viewer_7(reader, 0, end_time, {kChannelName1});
   EXPECT_EQ(CheckCount(viewer_7), msg_num);
+  ASSERT_FALSE(remove(kTestFile));
 }
 
 TEST(RecordTest, mult_iterator_test) {
@@ -163,7 +205,7 @@ TEST(RecordTest, mult_iterator_test) {
   uint64_t end_time = begin_time + step_time * (msg_num - 1);
   ConstructRecord(msg_num, begin_time, step_time);
 
-  auto reader = std::make_shared<RecordReader>(TEST_FILE);
+  auto reader = std::make_shared<RecordReader>(kTestFile);
   RecordViewer viewer(reader);
   EXPECT_TRUE(viewer.IsValid());
   EXPECT_EQ(begin_time, viewer.begin_time());
@@ -173,12 +215,13 @@ TEST(RecordTest, mult_iterator_test) {
 
   uint64_t i = 0;
   for (auto& msg : viewer) {  // #2 iterator
-    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(kChannelName1, msg.channel_name);
     EXPECT_EQ(begin_time + step_time * i, msg.time);
     EXPECT_EQ(std::to_string(i), msg.content);
     i++;
   }
   EXPECT_EQ(msg_num, i);
+  ASSERT_FALSE(remove(kTestFile));
 }
 
 }  // namespace record

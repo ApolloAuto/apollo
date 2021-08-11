@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
 #include "cyber/blocker/blocker_manager.h"
+#include "cyber/time/clock.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -24,11 +25,11 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 
 using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
+using apollo::cyber::ClockMode;
 using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
@@ -110,9 +111,8 @@ TEST_F(SimControlTest, Test) {
   sim_control_->OnPlanning(std::make_shared<ADCTrajectory>(adc_trajectory));
 
   {
-    Clock::SetMode(Clock::MOCK);
-    const auto timestamp = apollo::common::time::From(100.01);
-    Clock::SetNow(timestamp.time_since_epoch());
+    Clock::SetMode(ClockMode::MODE_MOCK);
+    Clock::SetNowInSeconds(100.01);
     sim_control_->RunOnce();
 
     BlockerManager::Instance()->Observe();
@@ -167,7 +167,7 @@ TEST_F(SimControlTest, Test) {
 }
 
 TEST_F(SimControlTest, TestDummyPrediction) {
-  Clock::SetMode(Clock::MOCK);
+  Clock::SetMode(ClockMode::MODE_MOCK);
 
   sim_control_->Init(false);
   sim_control_->enabled_ = true;
@@ -176,7 +176,7 @@ TEST_F(SimControlTest, TestDummyPrediction) {
 
   {
     const double timestamp = 100.01;
-    Clock::SetNow(apollo::common::time::From(timestamp).time_since_epoch());
+    Clock::SetNowInSeconds(timestamp);
     obstacles->mutable_header()->set_timestamp_sec(timestamp);
     obstacles->mutable_header()->set_module_name("NoneSimPrediction");
     sim_control_->OnPredictionObstacles(obstacles);
@@ -194,7 +194,7 @@ TEST_F(SimControlTest, TestDummyPrediction) {
 
   {
     const double timestamp = 100.2;
-    Clock::SetNow(apollo::common::time::From(timestamp).time_since_epoch());
+    Clock::SetNowInSeconds(timestamp);
     obstacles->mutable_header()->set_timestamp_sec(timestamp);
     obstacles->mutable_header()->set_module_name("SimPrediction");
     sim_control_->OnPredictionObstacles(obstacles);

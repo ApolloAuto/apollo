@@ -30,8 +30,10 @@ class RegularIntervalTrigger : public TriggerBase {
  public:
   RegularIntervalTrigger();
 
-  void Pull(const RecordMessage& msg) override;
-  bool ShouldRestore(const RecordMessage& msg) const override { return false; };
+  void Pull(const cyber::record::RecordMessage& msg) override;
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
+    return false;
+  };
 
   virtual ~RegularIntervalTrigger() = default;
 

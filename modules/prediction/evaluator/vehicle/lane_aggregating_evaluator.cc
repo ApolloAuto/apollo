@@ -18,25 +18,16 @@
 
 #include <algorithm>
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
-
-using apollo::common::Point3D;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
   evaluator_type_ = ObstacleConf::LANE_AGGREGATING_EVALUATOR;
@@ -53,7 +44,8 @@ void LaneAggregatingEvaluator::LoadModel() {
       FLAGS_torch_lane_aggregating_prediction_layer_file, device_);
 }
 
-bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneAggregatingEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 
@@ -74,7 +66,7 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }
@@ -448,7 +440,7 @@ torch::Tensor LaneAggregatingEvaluator::AggregateLaneEncodings(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
@@ -462,7 +454,7 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
 
 torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  CHECK(!lane_encoding_list.empty());
+  ACHECK(!lane_encoding_list.empty());
   torch::Tensor output_tensor = lane_encoding_list[0];
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {

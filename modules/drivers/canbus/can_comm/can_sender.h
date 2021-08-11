@@ -34,8 +34,8 @@
 #include "cyber/common/macros.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -78,7 +78,7 @@ class SenderMessage {
   /**
    * @brief Destructor.
    */
-  ~SenderMessage() = default;
+  virtual ~SenderMessage() = default;
 
   /**
    * @brief Update the current period for sending messages by a difference.
@@ -158,7 +158,7 @@ class CanSender {
    *        the protocol data as one. By default, it is false.
    */
   void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
-                  bool init_one = false);
+                  bool init_with_one = false);
 
   /**
    * @brief Start the CAN sender.
@@ -287,8 +287,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+    tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
     new_delta_period = INIT_PERIOD;
 
     for (auto &message : send_messages_) {
@@ -310,8 +309,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       }
     }
     delta_period = new_delta_period;
-    tm_end =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+    tm_end = cyber::Time::Now().ToNanosecond() / 1e3;
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {

@@ -15,8 +15,10 @@
  *****************************************************************************/
 #pragma once
 
+#define ACCEPT_USE_OF_DEPRECATED_PROJ_API_H
 #include <proj_api.h>
-#include <Eigen/Geometry>
+
+#include "Eigen/Geometry"
 
 namespace apollo {
 namespace localization {

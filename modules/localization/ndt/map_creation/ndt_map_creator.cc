@@ -14,16 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
-#include <string>
-#include <vector>
+
+#include "absl/strings/str_cat.h"
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
+
+using ::apollo::common::EigenAffine3dVec;
+using ::apollo::common::EigenVector3dVec;
 
 int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");
@@ -83,26 +90,29 @@ int main(int argc, char** argv) {
   }
 
   float single_resolution_map = boost_args["resolution"].as<float>();
-  if (fabs(single_resolution_map - 0.03125) > 1e-8 &&
-      fabs(single_resolution_map - 0.0625) > 1e-8 &&
-      fabs(single_resolution_map - 0.125) < 1e-8 &&
-      fabs(single_resolution_map - 0.25) < 1e-8 &&
-      fabs(single_resolution_map - 0.5) < 1e-8 &&
-      fabs(single_resolution_map - 1.0) < 1e-8 &&
-      fabs(single_resolution_map - 2.0) < 1e-8 &&
-      fabs(single_resolution_map - 4.0) < 1e-8 &&
-      fabs(single_resolution_map - 8.0) < 1e-8 &&
-      fabs(single_resolution_map - 16.0) < 1e-8) {
+  constexpr double epsilon = 1e-8;
+  if (std::fabs(single_resolution_map - 0.03125) > epsilon &&
+      std::fabs(single_resolution_map - 0.0625) > epsilon &&
+      std::fabs(single_resolution_map - 0.125) > epsilon &&
+      std::fabs(single_resolution_map - 0.25) > epsilon &&
+      std::fabs(single_resolution_map - 0.5) > epsilon &&
+      std::fabs(single_resolution_map - 1.0) > epsilon &&
+      std::fabs(single_resolution_map - 2.0) > epsilon &&
+      std::fabs(single_resolution_map - 4.0) > epsilon &&
+      std::fabs(single_resolution_map - 8.0) > epsilon &&
+      std::fabs(single_resolution_map - 16.0) > epsilon) {
     std::cerr << "map resolution can only be: 0.03125, "
               << "0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, "
               << "4.0, 8.0 or 16.0." << std::endl;
+    return -1;
   }
+
   float single_resolution_map_z = boost_args["resolution_z"].as<float>();
   std::cout << "single_resolution_map_z: " << single_resolution_map_z
             << std::endl;
 
   // load all poses
-  std::vector<std::vector<Eigen::Affine3d>> pcd_poses(pcd_folder_paths.size());
+  std::vector<EigenAffine3dVec> pcd_poses(pcd_folder_paths.size());
   std::vector<std::vector<double>> time_stamps(pcd_folder_paths.size());
   std::vector<std::vector<unsigned int>> pcd_indices(pcd_folder_paths.size());
   for (std::size_t i = 0; i < pose_files.size(); ++i) {
@@ -117,7 +127,8 @@ int main(int argc, char** argv) {
   }
 
   // Output Config file
-  apollo::localization::msf::NdtMapConfig ndt_map_config("map_ndt_v01");
+  apollo::localization::msf::pyramid_map::NdtMapConfig ndt_map_config(
+      "map_ndt_v01");
   if (strcasecmp(resolution_type.c_str(), "single") == 0) {
     ndt_map_config.SetSingleResolutions(single_resolution_map);
     ndt_map_config.SetSingleResolutionZ(single_resolution_map_z);
@@ -141,10 +152,10 @@ int main(int argc, char** argv) {
   ndt_map_config.Save(file_buf);
 
   // Initialize map and pool
-  apollo::localization::msf::NdtMap ndt_map(&ndt_map_config);
+  apollo::localization::msf::pyramid_map::NdtMap ndt_map(&ndt_map_config);
   unsigned int thread_size = 4;
-  apollo::localization::msf::NdtMapNodePool ndt_map_node_pool(pool_size,
-                                                              thread_size);
+  apollo::localization::msf::pyramid_map::NdtMapNodePool ndt_map_node_pool(
+      pool_size, thread_size);
   ndt_map_node_pool.Initial(&ndt_map_config);
   ndt_map.InitMapNodeCaches(pool_size / 2, pool_size);
   ndt_map.AttachMapNodePool(&ndt_map_node_pool);
@@ -154,14 +165,12 @@ int main(int argc, char** argv) {
   apollo::localization::msf::FeatureXYPlane plane_extractor;
 
   for (unsigned int i = 0; i < pcd_folder_paths.size(); ++i) {
-    const std::vector<Eigen::Affine3d>& pcd_poses_i = pcd_poses[i];
+    const EigenAffine3dVec& pcd_poses_i = pcd_poses[i];
     for (unsigned int frame_idx = 0; frame_idx < pcd_poses_i.size();
          ++frame_idx) {
       apollo::localization::msf::velodyne::VelodyneFrame velodyne_frame;
-      std::string pcd_file_path;
-      std::ostringstream ss;
-      ss << pcd_indices[i][frame_idx];
-      pcd_file_path = pcd_folder_paths[i] + "/" + ss.str() + ".pcd";
+      std::string pcd_file_path = absl::StrCat(
+          pcd_folder_paths[i], "/", pcd_indices[i][frame_idx], ".pcd");
       Eigen::Affine3d pcd_pose = pcd_poses_i[frame_idx];
       // Load pcd
       apollo::localization::msf::velodyne::LoadPcds(
@@ -180,16 +189,17 @@ int main(int argc, char** argv) {
 
         for (size_t res = 0; res < ndt_map_config.map_resolutions_.size();
              ++res) {
-          apollo::localization::msf::MapNodeIndex index =
-              apollo::localization::msf::MapNodeIndex::GetMapNodeIndex(
-                  ndt_map_config, pt3d_global, static_cast<unsigned int>(res),
-                  zone_id);
+          apollo::localization::msf::pyramid_map::MapNodeIndex index =
+              apollo::localization::msf::pyramid_map::MapNodeIndex::
+                  GetMapNodeIndex(ndt_map_config, pt3d_global,
+                                  static_cast<unsigned int>(res), zone_id);
 
-          apollo::localization::msf::NdtMapNode* ndt_map_node =
-              static_cast<apollo::localization::msf::NdtMapNode*>(
+          apollo::localization::msf::pyramid_map::NdtMapNode* ndt_map_node =
+              static_cast<apollo::localization::msf::pyramid_map::NdtMapNode*>(
                   ndt_map.GetMapNodeSafe(index));
-          apollo::localization::msf::NdtMapMatrix& ndt_map_matrix =
-              static_cast<apollo::localization::msf::NdtMapMatrix&>(
+          apollo::localization::msf::pyramid_map::NdtMapMatrix& ndt_map_matrix =
+              static_cast<
+                  apollo::localization::msf::pyramid_map::NdtMapMatrix&>(
                   ndt_map_node->GetMapCellMatrix());
 
           Eigen::Vector2d coord2d;
@@ -209,7 +219,7 @@ int main(int argc, char** argv) {
           centroid[1] = static_cast<float>(coord2d[1]) -
                         static_cast<float>(left_top_corner[1]) -
                         resolution * static_cast<float>(y);
-          apollo::localization::msf::NdtMapCells& ndt_map_cell =
+          apollo::localization::msf::pyramid_map::NdtMapCells& ndt_map_cell =
               ndt_map_matrix.GetMapCell(y, x);
           int altitude_index = ndt_map_cell.CalAltitudeIndex(
               ndt_map_config.map_resolutions_z_[res],

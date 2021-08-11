@@ -94,9 +94,20 @@ TEST_F(DigitalFilterTest, MovingAverage) {
 
   const std::vector<double> step_input(100, 1.0);
   // Check step input, transients.
-  for (size_t i = 0; i < 4; ++i) {
+  for (size_t i = 0; i < numerators.size(); ++i) {
     double expected_filter_out = static_cast<double>(i + 1) * 0.25;
     EXPECT_DOUBLE_EQ(digital_filter.Filter(step_input[i]), expected_filter_out);
+    EXPECT_EQ(digital_filter.inputs_queue().size(), numerators.size());
+    EXPECT_EQ(digital_filter.outputs_queue().size(), denominators.size());
+    for (size_t j = 0; j < numerators.size(); ++j) {
+      double input_state = (i >= j) ? step_input[i - j] : 0.0;
+      EXPECT_DOUBLE_EQ(digital_filter.inputs_queue()[j], input_state);
+    }
+    for (size_t j = 0; j < denominators.size(); ++j) {
+      double output_state =
+          (i >= j) ? static_cast<double>(i - j + 1) * 0.25 : 0.0;
+      EXPECT_DOUBLE_EQ(digital_filter.outputs_queue()[j], output_state);
+    }
   }
   // Check step input, steady state
   for (size_t i = 4; i < step_input.size(); ++i) {

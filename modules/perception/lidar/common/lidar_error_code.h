@@ -26,7 +26,7 @@ enum class LidarErrorCode {
   InitError = 1,
   PointCloudPreprocessorError = 2,
   MapManagerError = 3,
-  SegmentationError = 4,
+  DetectionError = 4,
   ObjectBuilderError = 5,
   ObjectFilterError = 6,
   ClassifierError = 7,

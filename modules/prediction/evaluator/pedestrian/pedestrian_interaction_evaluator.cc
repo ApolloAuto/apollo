@@ -17,7 +17,6 @@
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
@@ -31,12 +30,7 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
     : device_(torch::kCPU) {
@@ -44,6 +38,7 @@ PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
   LoadModel();
 }
 
+/* TODO(kechxu) figure out if this function is necessary. It is not being used
 void PedestrianInteractionEvaluator::Clear() {
   auto ptr_obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
@@ -60,6 +55,7 @@ void PedestrianInteractionEvaluator::Clear() {
     obstacle_id_lstm_state_map_.erase(key);
   }
 }
+*/
 
 void PedestrianInteractionEvaluator::LoadModel() {
   torch::set_num_threads(1);
@@ -83,7 +79,8 @@ torch::Tensor PedestrianInteractionEvaluator::GetSocialPooling() {
   return torch::zeros({1, kGridSize * kGridSize * kHiddenSize});
 }
 
-bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool PedestrianInteractionEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 
@@ -110,9 +107,9 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return true;
   }
 
-  constexpr double kShortTermPredictionTimeResolution = 0.4;
-  constexpr int kShortTermPredictionPointNum = 5;
-  constexpr int kHiddenStateUpdateCycle = 4;
+  static constexpr double kShortTermPredictionTimeResolution = 0.4;
+  static constexpr int kShortTermPredictionPointNum = 5;
+  static constexpr int kHiddenStateUpdateCycle = 4;
 
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();
@@ -194,8 +191,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (int i = 1; i <= kShortTermPredictionPointNum; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
-    CHECK(obstacle_id_lstm_state_map_.find(id) !=
-          obstacle_id_lstm_state_map_.end());
+    ACHECK(obstacle_id_lstm_state_map_.find(id) !=
+           obstacle_id_lstm_state_map_.end());
     torch::Tensor torch_position = torch::zeros({1, 2});
     double curr_rel_x = rel_x;
     double curr_rel_y = rel_y;
@@ -208,7 +205,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch_position[0][0] = curr_rel_x;
     torch_position[0][1] = curr_rel_y;
     std::vector<torch::jit::IValue> position_embedding_inputs;
-    position_embedding_inputs.push_back(std::move(torch_position));
+    position_embedding_inputs.push_back(std::move(torch_position.to(device_)));
     torch::Tensor position_embedding =
         torch_position_embedding_.forward(position_embedding_inputs)
             .toTensor()
@@ -227,7 +224,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
     }
     std::vector<torch::jit::IValue> lstm_inputs;
-    lstm_inputs.push_back(std::move(lstm_input));
+    lstm_inputs.push_back(std::move(lstm_input.to(device_)));
     auto lstm_out_tuple = torch_single_lstm_.forward(lstm_inputs).toTuple();
     ht = lstm_out_tuple->elements()[0].toTensor();
     ct = lstm_out_tuple->elements()[1].toTensor();

@@ -26,50 +26,50 @@ function print_usage() {
   .${BOLD}/start_gdb_server.sh${NONE} MODULE_NAME PORT_NUMBER"
 
   echo -e "${RED}MODULE_NAME${NONE}:
-  ${BLUE}planning${NONE}: debug the planning module. 
+  ${BLUE}planning${NONE}: debug the planning module.
   ${BLUE}control${NONE}: debug the control module.
   ${BLUE}routing${NONE}: debug the routing module.
   ..., and so on."
 
-  echo -e "${RED}PORT_NUMBER${NONE}: 
+  echo -e "${RED}PORT_NUMBER${NONE}:
   ${NONE}a port number, such as '1111'."
 }
 
-if [ $# -lt 2 ];then
-    print_usage
-    exit 1
+if [ $# -lt 2 ]; then
+  print_usage
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${DIR}/apollo_base.sh"
 
 MODULE_NAME=$1
 PORT_NUM=$2
 shift 2
 
-# If there is a gdbserver process running, stop it first. 
+# If there is a gdbserver process running, stop it first.
 GDBSERVER_NUMS=$(pgrep -c -x "gdbserver")
 if [ ${GDBSERVER_NUMS} -ne 0 ]; then
   sudo pkill -SIGKILL -f "gdbserver"
 fi
 
 echo ${MODULE_NAME}
-# Because the "grep ${MODULE_NAME}" always generates a process with the name of 
+# Because the "grep ${MODULE_NAME}" always generates a process with the name of
 # "${MODULE_NAME}", I added another grep to remove grep itself from the output.
 PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
 echo ${PROCESS_ID}
 
-# If the moudle is not started, start it first. 
-if [ -z ${PROCESS_ID} ]; then       
-  #echo "The '${MODULE_NAME}' module is not started, please start it in the dreamview first. "  
-  #exit 1 
+# If the moudle is not started, start it first.
+if [ -z ${PROCESS_ID} ]; then
+  #echo "The '${MODULE_NAME}' module is not started, please start it in the dreamview first. "
+  #exit 1
 
   # run function from apollo_base.sh
   # run command_name module_name
-  run ${MODULE_NAME} "$@"
+  run_module ${MODULE_NAME} "$@"
 
   PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
   echo ${PROCESS_ID}
-fi 
+fi
 
 sudo gdbserver :${PORT_NUM} --attach ${PROCESS_ID}

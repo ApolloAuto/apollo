@@ -15,11 +15,13 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client.h"
 
-#include <yaml-cpp/yaml.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_alignment.h"
@@ -152,11 +154,11 @@ int Client::DataCollectStage() {
   AINFO << "cmd [" << cmd << "]";
   std::vector<std::string> lines = GetFileLines(data_collect_time_flag_file_);
   std::ofstream time_file_handler(data_collect_time_flag_file_);
-  double now = UnixtimeNow();
+  double now = UnixNow();
   if (cmd == "start") {
-    if (lines.size() == 0) {
-      time_file_handler << std::to_string(now) << " start\n";
-      AINFO << "write [" << std::to_string(now) << " start] to file "
+    if (lines.empty()) {
+      time_file_handler << now << " start\n";
+      AINFO << "write [" << now << " start] to file "
             << data_collect_time_flag_file_;
       fprintf(USER_STREAM,
               "Start success. At the end of the collection, you should run: "
@@ -172,8 +174,8 @@ int Client::DataCollectStage() {
                 "This progress has been already started, this command will be "
                 "ignored\n");
       } else {
-        time_file_handler << std::to_string(now) << " start\n";
-        AINFO << "write [" << std::to_string(now) << " start] to file "
+        time_file_handler << now << " start\n";
+        AINFO << "write [" << now << " start] to file "
               << data_collect_time_flag_file_;
         fprintf(USER_STREAM,
                 "Start success. At the end of the collection, you should run: "
@@ -181,15 +183,15 @@ int Client::DataCollectStage() {
       }
     }
   } else if (cmd == "stop") {
-    if (lines.size() == 0) {
+    if (lines.empty()) {
       AINFO << "Start first, this command will be ignored";
     } else {
       std::string& the_last_line = lines.back();
       std::vector<std::string> s;
       boost::split(s, the_last_line, boost::is_any_of(" ,\t\n"));
       if (s[1] == "start") {
-        time_file_handler << std::to_string(now) << " stop\n";
-        AINFO << "write [" << std::to_string(now) << " stop] to file "
+        time_file_handler << now << " stop\n";
+        AINFO << "write [" << now << " stop] to file "
               << data_collect_time_flag_file_;
         fprintf(USER_STREAM,
                 "Stop success. Next you may want to run: bash client.sh "

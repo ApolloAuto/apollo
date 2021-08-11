@@ -16,6 +16,7 @@
 
 #include <algorithm>
 
+#include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
 #include "opencv2/opencv.hpp"
 
@@ -83,7 +84,7 @@ int evaluate_image_list() {
   // Main loop
   for (size_t i = 0; i < img_list.size(); ++i) {
     std::string image_path = img_list[i] + FLAGS_image_ext;
-    cv::Mat img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+    cv::Mat img = cv::imread(image_path, cv::IMAGE_COLOR);
     cv::Mat img_org;
 
     img.copyTo(img_org);
@@ -109,8 +110,7 @@ int evaluate_image_list() {
     // Prepare the input data
     if (i % FLAGS_batch_size == 0) {
       out_car.close();
-      std::string name = "Batch" + std::to_string(i / FLAGS_batch_size);
-      out_file = FLAGS_batch_root + name;
+      out_file = absl::StrCat(FLAGS_batch_root, "Batch", i / FLAGS_batch_size);
 
       out_car.open(out_file, std::ofstream::out | std::ofstream::binary);
       if (!out_car.is_open()) {

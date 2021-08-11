@@ -21,4 +21,5 @@ message VehicleState {
   optional apollo.canbus.Chassis.GearPosition gear = 13;
   optional apollo.canbus.Chassis.DrivingMode driving_mode = 14;
   optional apollo.localization.Pose pose = 15;
+  optional double steering_percentage = 16;
 }

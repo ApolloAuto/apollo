@@ -31,16 +31,18 @@ class ParkAndGoStageCheckTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CHECK);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(ParkAndGoStageCheckTest, Init) {
-  ParkAndGoStageCheck park_and_go_stage_check(config_);
+  ParkAndGoStageCheck park_and_go_stage_check(config_, injector_);
   EXPECT_EQ(park_and_go_stage_check.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_CHECK));
 }
 
 }  // namespace park_and_go

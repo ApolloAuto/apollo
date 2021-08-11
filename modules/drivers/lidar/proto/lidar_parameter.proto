@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.drivers.lidar;
+
+message LidarParameter {
+  enum LidarBrand {
+    VELODYNE = 0;
+    HESAI = 1;
+    ROBOSENSE = 2;
+  }
+
+  enum LidarChannelId {
+    CHANNEL_ID_ZERO = 0;
+    CHANNEL_ID_ONE = 1;
+    CHANNEL_ID_TWO = 2;
+    CHANNEL_ID_THREE = 3;
+  }
+  required LidarBrand brand = 1;
+}

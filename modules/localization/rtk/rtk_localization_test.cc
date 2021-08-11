@@ -33,7 +33,7 @@ class RTKLocalizationTest : public ::testing::Test {
  protected:
   template <class T>
   void load_data(const std::string &filename, T *data) {
-    CHECK(cyber::common::GetProtoFromFile(filename, data))
+    ACHECK(cyber::common::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }
 
@@ -106,7 +106,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
     apollo::localization::CorrectedImu expected_result;
-    load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
+    load_data("modules/localization/testdata/1_imu_2.pb.txt", &expected_result);
 
     apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.70;
@@ -133,8 +133,12 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
 
     EXPECT_EQ(1, localization.header().sequence_num());
     EXPECT_STREQ("localization", localization.header().module_name().c_str());
-    EXPECT_STREQ(expected_result.pose().DebugString().c_str(),
-                 localization.pose().DebugString().c_str());
+    EXPECT_NEAR(expected_result.pose().position().x(),
+                localization.pose().position().x(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().y(),
+                localization.pose().position().y(), 1.0e-7);
+    EXPECT_NEAR(expected_result.pose().position().z(),
+                localization.pose().position().z(), 1.0e-7);
   }
 
   // TODO(Qi Luo) Update test once got new imu data for euler angle.

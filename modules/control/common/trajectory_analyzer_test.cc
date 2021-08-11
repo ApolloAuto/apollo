@@ -17,12 +17,12 @@
 #include "modules/control/common/trajectory_analyzer.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "gtest/gtest.h"
-#include "modules/common/time/time.h"
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 namespace apollo {
 namespace control {

@@ -8,7 +8,6 @@ import "modules/map/proto/map_geometry.proto";
 // A stop sign is a traffic sign to notify drivers that they must stop before
 // proceeding.
 message StopSign {
-
   optional Id id = 1;
 
   repeated Curve stop_line = 2;

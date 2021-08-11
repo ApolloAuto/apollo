@@ -16,14 +16,87 @@
 
 #include "cyber/blocker/blocker_manager.h"
 
-#include "cyber/proto/unit_test.pb.h"
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
+
+#include "cyber/blocker/intra_reader.h"
+#include "cyber/blocker/intra_writer.h"
 
 namespace apollo {
 namespace cyber {
 namespace blocker {
 
 using apollo::cyber::proto::UnitTest;
+
+void cb(const std::shared_ptr<UnitTest>& msg_ptr) { UNUSED(msg_ptr); }
+
+TEST(BlockerTest, blocker_manager_test) {
+  auto block_mgr = BlockerManager::Instance();
+  Blocker<UnitTest>::MessageType msgtype;
+
+  block_mgr->Publish<UnitTest>("ch1", msgtype);
+  block_mgr->Subscribe<UnitTest>("ch1", 10, "cb1", cb);
+  auto blocker = block_mgr->GetOrCreateBlocker<UnitTest>(BlockerAttr("ch1"));
+  EXPECT_NE(blocker, nullptr);
+  block_mgr->Unsubscribe<UnitTest>("ch1", "cb1");
+  block_mgr->Subscribe<UnitTest>("ch_null", 10, "cb1", cb);
+  block_mgr->Observe();
+  block_mgr->Reset();
+}
+
+TEST(BlockerTest, blocker_intra_writer) {
+  proto::RoleAttributes role_attr;
+  auto msg_ptr = std::make_shared<UnitTest>();
+  UnitTest msg;
+  IntraWriter<UnitTest> writer(role_attr);
+  EXPECT_FALSE(writer.Write(msg_ptr));
+
+  EXPECT_TRUE(writer.Init());
+  EXPECT_TRUE(writer.Init());
+
+  EXPECT_TRUE(writer.Write(msg_ptr));
+
+  writer.Shutdown();
+  writer.Shutdown();
+}
+
+TEST(BlockerTest, blocker_intra_reader) {
+  auto block_mgr = BlockerManager::Instance();
+  Blocker<UnitTest>::MessageType msgtype;
+  block_mgr->Publish<UnitTest>("ch1", msgtype);
+
+  proto::RoleAttributes role_attr;
+  auto msg = std::make_shared<UnitTest>();
+
+  IntraWriter<UnitTest> writer(role_attr);
+  writer.Init();
+  writer.Write(msg);
+
+  IntraReader<UnitTest> reader(role_attr, cb);
+  reader.Init();
+  reader.Init();
+  reader.SetHistoryDepth(10);
+  EXPECT_EQ(10, reader.GetHistoryDepth());
+  reader.Observe();
+  reader.Begin();
+  reader.End();
+  EXPECT_TRUE(reader.HasReceived());
+  block_mgr->GetOrCreateBlocker<UnitTest>(BlockerAttr("ch1"));
+  reader.Observe();
+  EXPECT_FALSE(reader.Empty());
+  reader.ClearData();
+  EXPECT_TRUE(reader.Empty());
+  block_mgr->Reset();
+  EXPECT_TRUE(reader.Empty());
+  EXPECT_FALSE(reader.HasReceived());
+  reader.GetLatestObserved();
+  reader.GetOldestObserved();
+  reader.SetHistoryDepth(10);
+  EXPECT_EQ(reader.GetHistoryDepth(), 0);
+  reader.ClearData();
+  reader.Shutdown();
+}
 
 }  // namespace blocker
 }  // namespace cyber

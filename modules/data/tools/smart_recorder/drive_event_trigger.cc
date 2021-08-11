@@ -27,7 +27,7 @@ using apollo::common::DriveEvent;
 
 DriveEventTrigger::DriveEventTrigger() { trigger_name_ = "DriveEventTrigger"; }
 
-void DriveEventTrigger::Pull(const RecordMessage& msg) {
+void DriveEventTrigger::Pull(const cyber::record::RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }

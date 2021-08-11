@@ -28,7 +28,7 @@ class MLPEvaluatorTest : public KMLMapBasedTest {
   void SetUp() override {
     const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
@@ -47,7 +47,7 @@ TEST_F(MLPEvaluatorTest, OnLaneCase) {
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {

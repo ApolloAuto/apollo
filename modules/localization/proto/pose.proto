@@ -35,7 +35,7 @@ message Pose {
   optional apollo.common.Point3D linear_velocity = 3;
 
   // Linear acceleration of the VRP in the map reference frame.
-  // East/north/up in meters per second.
+  // East/north/up in meters per square second.
   optional apollo.common.Point3D linear_acceleration = 4;
 
   // Angular velocity of the vehicle in the map reference frame.

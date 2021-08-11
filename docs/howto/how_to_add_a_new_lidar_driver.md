@@ -10,23 +10,23 @@ As default, Apollo platform support multiple types of Lidar drivers, including 1
 
 Taking velodyne lidar driver as an example, there are three major components:
 
-1. [Driver](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/driver): Driver receives UDP data packets from lidar sensor, and packages the data packets into a frame of scanning data in the format of VelodyneScan. VelodyneScan is defined in file below:
+1. [Driver](../../modules/drivers/lidar/velodyne/driver): Driver receives UDP data packets from lidar sensor, and packages the data packets into a frame of scanning data in the format of VelodyneScan. VelodyneScan is defined in file below:
 ```
-modules/drivers/velodyne/proto/velodyne.proto
+modules/drivers/lidar/velodyne/proto/velodyne.proto
 ```
 
-2. [Parser](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/parser): Parser takes one frame data in format of VelodyneScan as input, converts the cloud points in the frame from spherical coordinate system to Cartesian coordinates system, then sends out the point cloud as output. The pointcloud format is defined in file below:
+2. [Parser](../../modules/drivers/lidar/velodyne/parser): Parser takes one frame data in format of VelodyneScan as input, converts the cloud points in the frame from spherical coordinate system to Cartesian coordinates system, then sends out the point cloud as output. The pointcloud format is defined in file below:
 ```
 modules/drivers/proto/pointcloud.proto
 ```
 
-3. [Compensator](https://github.com/ApolloAuto/apollo/tree/master/modules/drivers/velodyne/compensator): Compensator takes pointcloud data and pose data as inputs. Based on the corresponding pose information for each cloud point, it converts each cloud point information aligned with the latest time in the current lidar scan frame, minimizing the motion error due the movement of the vehicle. Thus, each cloud point needs carry its own timestamp information.
+3. [Compensator](../../modules/drivers/lidar/velodyne/compensator): Compensator takes pointcloud data and pose data as inputs. Based on the corresponding pose information for each cloud point, it converts each cloud point information aligned with the latest time in the current lidar scan frame, minimizing the motion error due the movement of the vehicle. Thus, each cloud point needs carry its own timestamp information.
 
 ## Steps to add a new Lidar driver
 
-#### 1. Get familiar with Apollo Cyber RT framework. 
+#### 1. Get familiar with Apollo Cyber RT framework.
 
-Please refer to the [manuals of Apollo Cyber RT](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber).
+Please refer to the [manuals of Apollo Cyber RT](../cyber/README.md).
 
 
 #### 2. Define message for raw data
@@ -45,14 +45,14 @@ message ScanData {
 }
 ```
 
-In velodyne driver, the scan data message is define as [VelodyneScan](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/velodyne/proto/velodyne.proto#L29).
+In velodyne driver, the scan data message is define as [VelodyneScan](../../modules/drivers/lidar/velodyne/proto/velodyne.proto#L29).
 
 #### 3. Access the raw data
 
 Each seconds, Lidar will generate a lot of data, so it relied on UDP to efficiently transport the raw data. You need to create a DriverComponent class, which inherits the Component withotu any parameter. In its Init function, you need to start a async polling thread, whic will receive Lidar data from the specific port. Then depending on the Lidar's frequency, the DriverComponent needs to package all the packets in a fix period into a frame of ScanData. Eventually, the writer will send the ScanData through a corresponding channel.
 
 ```c++
-// Inherit component with no template parameters, 
+// Inherit component with no template parameters,
 // do not receive message from any channel
 class DriverComponent : public Component<> {
  public:
@@ -62,8 +62,8 @@ class DriverComponent : public Component<> {
   		this->Poll();
   	}));
   }
-	
- private: 
+
+ private:
   void Poll() {
   	while (apollo::cyber::Ok()) {
   	  // poll data from port xxx
@@ -74,11 +74,11 @@ class DriverComponent : public Component<> {
   	  writer_.write(scan);
   	}
   }
-   
+
   std::shared_ptr<std::thread> poll_thread_;
   std::shared_ptr<apollo::cyber::Writer<ScanData>> writer_;
 };
-	
+
 CYBER_REGISTER_COMPONENT(DriverComponent)
 ```
 
@@ -87,7 +87,7 @@ CYBER_REGISTER_COMPONENT(DriverComponent)
  If the new lidar driver already provides the pointcloud data in Cartesian coordinates system, then you just need to store those data in the protobuf format defined in Apollo.
 
 The Parser converts the lidar raw data to the pointcloud format in Cartesian coordinates system. Parser takes ScanData as input. For each cloud point, it will parse the timestamp, x/y/z coordinates and intensity, then packages all the cloudpoint information into a frame of pointcloud. Each cloud point transformed into the FLU (Front: x, Left: y, Up: z）coordinates with Lidar as the origin point.
-	
+
 ```c++
 message PointXYZIT {
   optional float x = 1 [default = nan];
@@ -97,7 +97,7 @@ message PointXYZIT {
   optional uint64 timestamp = 5 [default = 0];
 }
 ```
-	
+
 Then you need to create a new ParserComponent，which inherits Components templates with ScanData. ParserComponent takes ScanData as input, then generates pointcloud message and sents it out.
 
 ```c++
@@ -107,26 +107,26 @@ class ParserComponent : public Component<ScanData> {
   bool Init() override {
   	...
   }
-  
+
   bool Proc(const std::shared_ptr<ScanData>& scan_msg) override {
     // get a pointcloud object from objects pool
-  	auto point_cloud_out = point_cloud_pool_->GetObject(); 
+  	auto point_cloud_out = point_cloud_pool_->GetObject();
   	// clear befor using
-  	point_cloud_out->clear();	
+  	point_cloud_out->clear();
   	// parse scan data and generate pointcloud
   	parser_->parse(scan_msg, point_cloud_out);
   	// write pointcloud to a specific channel
   	writer_->write(point_cloud);
   }
-	
+
  private:
   std::shared_ptr<Writer<PointCloud>> writer_;
   std::unique_ptr<Parser> parser_ = nullptr;
-  
-  std::shared_ptr<CCObjectPool<PointCloud>> point_cloud_pool_ = nullptr; 
+
+  std::shared_ptr<CCObjectPool<PointCloud>> point_cloud_pool_ = nullptr;
   int pool_size_ = 8;
 };
-	
+
 CYBER_REGISTER_COMPONENT(ParserComponent)
 ```
 
@@ -137,11 +137,11 @@ Motion compensation is optional depends on lidar hardware design. E.g. if the th
 #### 6. Configure the dag file
 
 After done with each component, you just need to configure the DAG config file to add each component into the data processing pipeline. E.g.  lidar_driver.dag:
-		
+
 ```python
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/driver/libxxx_driver_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/driver/libxxx_driver_component.so"
     components {
       class_name : "DriverComponent"
       config {
@@ -150,9 +150,9 @@ module_config {
       }
     }
 }
-	
+
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/parser/libxxx_parser_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/parser/libxxx_parser_component.so"
     components {
       class_name : "ParserComponent"
       config {
@@ -162,14 +162,14 @@ module_config {
       }
     }
 }
-	
+
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/xxx/compensator/libxxx_compensator_component.so"
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/xxx/compensator/libxxx_compensator_component.so"
     components {
       class_name : "CompensatorComponent"
       config {
         name : "pointcloud_compensator"
-        config_file_path : "/apollo/modules/drivers/xxx/conf/xxx_compensator_conf.pb.txt"
+        config_file_path : "/apollo/modules/drivers/lidar/xxx/conf/xxx_compensator_conf.pb.txt"
         readers {channel: "/apollo/sensor/xxx/PointCloud2"}
       }
     }

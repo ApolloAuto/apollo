@@ -88,7 +88,7 @@ void ROIPoolingLayer<Dtype>::ForwardCPU(
   int batch_size = feat_bottom->num();
   int top_count = top[0]->count();
   Dtype *top_data = top[0]->mutable_cpu_data();
-  memset(top_data, -1, static_cast<size_t>(FLT_MAX * sizeof(Dtype)));
+  memset(top_data, -1, static_cast<size_t>(float_max_ * sizeof(Dtype)));
   int *argmax_data = max_idx_.mutable_cpu_data();
   memset(argmax_data, -1, top_count * sizeof(int));
   // For each ROI R = [batch_index x1 y1 x2 y2]: max pool over R

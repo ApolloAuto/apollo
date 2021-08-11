@@ -16,8 +16,8 @@
 
 #include "modules/localization/msf/msf_localization_component.h"
 
+#include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
@@ -25,7 +25,7 @@
 namespace apollo {
 namespace localization {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 
@@ -102,7 +102,7 @@ bool MSFLocalizationComponent::InitIO() {
 
 bool MSFLocalizationComponent::Proc(
     const std::shared_ptr<drivers::gnss::Imu>& imu_msg) {
-  localization_.OnRawImu(imu_msg);
+  localization_.OnRawImuCache(imu_msg);
   return true;
 }
 
@@ -158,25 +158,38 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
   tf2_broadcaster_.SendTransform(tf2_msg);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
+  double cur_system_time = localization.header().timestamp_sec();
+  if (pre_system_time_ > 0.0 && cur_system_time - pre_system_time_ > 0.02) {
+    AERROR << std::setprecision(16)
+           << "the localization processing time enlonged more than 2 times "
+              "according to system time, "
+           << "the pre system time and current system time: "
+           << pre_system_time_ << " " << cur_system_time;
+  } else if (pre_system_time_ > 0.0 &&
+             cur_system_time - pre_system_time_ < 0.0) {
+    AERROR << std::setprecision(16)
+           << "published localization message's time is eary than last imu "
+              "message "
+              "according to system time, "
+           << "the pre system time and current system time: "
+           << pre_system_time_ << " " << cur_system_time;
+  }
+  pre_system_time_ = cur_system_time;
   localization_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationMsfGnss(
     const LocalizationEstimate& localization) {
   gnss_local_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationMsfLidar(
     const LocalizationEstimate& localization) {
   lidar_local_talker_->Write(localization);
-  return;
 }
 
 void LocalizationMsgPublisher::PublishLocalizationStatus(

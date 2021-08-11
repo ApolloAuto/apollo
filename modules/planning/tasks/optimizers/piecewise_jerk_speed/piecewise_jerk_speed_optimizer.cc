@@ -20,14 +20,11 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
-#include <memory>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -46,7 +43,7 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config_.has_piecewise_jerk_speed_config());
+  ACHECK(config_.has_piecewise_jerk_speed_optimizer_config());
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
@@ -56,11 +53,11 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     return Status::OK();
   }
 
-  CHECK(speed_data != nullptr);
+  ACHECK(speed_data != nullptr);
   SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
-    std::string msg("Empty path data");
+    const std::string msg = "Empty path data";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -79,12 +76,9 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  const auto& piecewise_jerk_speed_config =
-      config_.piecewise_jerk_speed_config();
-  piecewise_jerk_problem.set_weight_ddx(
-      piecewise_jerk_speed_config.acc_weight());
-  piecewise_jerk_problem.set_weight_dddx(
-      piecewise_jerk_speed_config.jerk_weight());
+  const auto& config = config_.piecewise_jerk_speed_optimizer_config();
+  piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
+  piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
 
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
   piecewise_jerk_problem.set_dx_bounds(
@@ -95,11 +89,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
                                         FLAGS_longitudinal_jerk_upper_bound);
 
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
-
-  piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
-                                    FLAGS_default_cruise_speed);
+  piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(),
+                                    reference_line_info_->GetCruiseSpeed());
 
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;
@@ -130,7 +121,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
       }
     }
     if (s_lower_bound > s_upper_bound) {
-      std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+      const std::string msg =
+          "s_lower_bound larger than s_upper_bound on STGraph";
       AERROR << msg;
       speed_data->clear();
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -153,22 +145,21 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     x_ref.emplace_back(path_s);
     // get curvature
     PathPoint path_point = path_data.GetPathPointWithPathS(path_s);
-    penalty_dx.push_back(std::fabs(path_point.dkappa()) *
-                         piecewise_jerk_speed_config.dkappa_penalty_weight());
+    penalty_dx.push_back(std::fabs(path_point.kappa()) *
+                         config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
-  piecewise_jerk_problem.set_x_ref(piecewise_jerk_speed_config.ref_s_weight(),
-                                   x_ref);
+  piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), std::move(x_ref));
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
-    std::string msg("Piecewise jerk speed optimizer failed!");
+    const std::string msg = "Piecewise jerk speed optimizer failed!";
     AERROR << msg;
     speed_data->clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);

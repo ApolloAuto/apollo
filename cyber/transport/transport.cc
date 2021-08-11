@@ -22,13 +22,7 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-Transport::Transport()
-    : is_shutdown_(false),
-      participant_(nullptr),
-      notifier_(nullptr),
-      intra_dispatcher_(nullptr),
-      shm_dispatcher_(nullptr),
-      rtps_dispatcher_(nullptr) {
+Transport::Transport() {
   CreateParticipant();
   notifier_ = NotifierFactory::CreateNotifier();
   intra_dispatcher_ = IntraDispatcher::Instance();

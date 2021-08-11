@@ -14,23 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
-#define INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
+#ifndef CYBER_LOGGER_ASYNC_LOGGER_H_
+#define CYBER_LOGGER_ASYNC_LOGGER_H_
 
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <ctime>
+#include <deque>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
 #include "glog/logging.h"
+
+#include "cyber/common/macros.h"
+#include "cyber/logger/log_file_object.h"
 
 namespace apollo {
 namespace cyber {
@@ -68,7 +72,7 @@ namespace logger {
  */
 class AsyncLogger : public google::base::Logger {
  public:
-  explicit AsyncLogger(google::base::Logger* wrapped, int max_buffer_bytes);
+  explicit AsyncLogger(google::base::Logger* wrapped);
 
   ~AsyncLogger();
 
@@ -119,7 +123,7 @@ class AsyncLogger : public google::base::Logger {
    *
    * @return the pointer of log thread
    */
-  const std::thread* LogThread() const { return &thread_; }
+  std::thread* LogThread() { return &log_thread_; }
 
  private:
   // A buffered message.
@@ -132,87 +136,60 @@ class AsyncLogger : public google::base::Logger {
     time_t ts;
     std::string message;
     int32_t level;
-
+    Msg() : ts(0), message(), level(google::INFO) {}
     Msg(time_t ts, std::string&& message, int32_t level)
         : ts(ts), message(std::move(message)), level(level) {}
+    Msg(const Msg& rsh) {
+      ts = rsh.ts;
+      message = rsh.message;
+      level = rsh.level;
+    }
+    Msg(Msg&& rsh) {
+      ts = rsh.ts;
+      message = rsh.message;
+      level = rsh.level;
+    }
+    Msg& operator=(Msg&& rsh) {
+      ts = rsh.ts;
+      message = std::move(rsh.message);
+      level = rsh.level;
+      return *this;
+    }
+    Msg& operator=(const Msg& rsh) {
+      ts = rsh.ts;
+      message = rsh.message;
+      level = rsh.level;
+      return *this;
+    }
   };
 
-  // A buffer of messages waiting to be flushed.
-  struct Buffer {
-    std::vector<Msg> messages;
-
-    // Estimate of the size of 'messages'.
-    std::atomic<int> size = {0};
-
-    // Whether this buffer needs an explicit flush of the
-    // underlying logger.
-    bool flush = false;
-
-    Buffer() {}
-
-    inline void clear() {
-      messages.clear();
-      size = 0;
-      flush = false;
-    }
-
-    inline void add(Msg&& msg, bool force_flush) {
-      size +=
-          static_cast<int>(sizeof(msg)) + static_cast<int>(msg.message.size());
-      messages.emplace_back(std::move(msg));
-      flush |= force_flush;
-    }
-
-    inline bool needs_flush_or_write() const {
-      return flush || !messages.empty();
-    }
-
-   private:
-    DISALLOW_COPY_AND_ASSIGN(Buffer);
-  };
-
-  bool BufferFull(const Buffer& buf) const;
   void RunThread();
-
-  // The maximum number of bytes used by the entire class.
-  int max_buffer_bytes_;
+  void FlushBuffer(const std::unique_ptr<std::deque<Msg>>& msg);
 
   google::base::Logger* const wrapped_;
-  std::thread thread_;
+  std::thread log_thread_;
 
   // Count of how many times the writer thread has flushed the buffers.
   // 64 bits should be enough to never worry about overflow.
-  uint64_t flush_count_ = 0;
+  std::atomic<uint64_t> flush_count_ = {0};
 
   // Count of how many times the writer thread has dropped the log messages.
   // 64 bits should be enough to never worry about overflow.
   uint64_t drop_count_ = 0;
 
-  // Protects buffers as well as 'state_'.
-  std::mutex mutex_;
-
-  // Signaled by app threads to wake up the flusher, either for new
-  // data or because 'state_' changed.
-  std::condition_variable wake_flusher_cv_;
-
-  // Signaled by the flusher thread when the flusher has swapped in
-  // a free buffer to write to.
-  // std::condition_variable free_buffer_cv_;
-
-  // Signaled by the flusher thread when it has completed flushing
-  // the current buffer.
-  std::condition_variable flush_complete_cv_;
-
   // The buffer to which application threads append new log messages.
-  std::unique_ptr<Buffer> active_buf_;
+  std::unique_ptr<std::deque<Msg>> active_buf_;
 
   // The buffer currently being flushed by the logger thread, cleared
   // after a successful flush.
-  std::unique_ptr<Buffer> flushing_buf_;
+  std::unique_ptr<std::deque<Msg>> flushing_buf_;
 
   // Trigger for the logger thread to stop.
   enum State { INITTED, RUNNING, STOPPED };
-  State state_ = INITTED;
+  std::atomic<State> state_ = {INITTED};
+  std::atomic_flag flag_ = ATOMIC_FLAG_INIT;
+  std::unordered_map<std::string, std::unique_ptr<LogFileObject>>
+      module_logger_map_;
 
   DISALLOW_COPY_AND_ASSIGN(AsyncLogger);
 };
@@ -221,4 +198,4 @@ class AsyncLogger : public google::base::Logger {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_COMMON_ASYNC_LOGGER_H_
+#endif  // CYBER_LOGGER_ASYNC_LOGGER_H_

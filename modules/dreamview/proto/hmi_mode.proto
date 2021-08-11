@@ -10,10 +10,23 @@ message ProcessMonitorConfig {
   repeated string command_keywords = 1;
 }
 
+// For ModuleMonitor
+message ModuleMonitorConfig {
+  repeated string node_name = 1;
+}
+
 // For ChannelMonitor.
 message ChannelMonitorConfig {
   optional string name = 1;
   optional double delay_fatal = 2 [default = 3.0];  // In seconds.
+
+  // The fields will be checked to make sure they are existing
+  // Specify in the format of "a.b.c"
+  repeated string mandatory_fields = 3;
+
+  // Minimum and maximum frequency allowed for this channel
+  optional double min_frequency_allowed = 4 [default = 0.0];
+  optional double max_frequency_allowed = 5 [default = 1000.0];
 }
 
 // For ResourceMonitor.
@@ -25,7 +38,34 @@ message ResourceMonitorConfig {
     optional int32 insufficient_space_warning = 2;  // In GB.
     optional int32 insufficient_space_error = 3;
   }
+
+  message CPUUsage {
+    optional float high_cpu_usage_warning = 1;
+    optional float high_cpu_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall CPU
+    // usage
+    optional string process_dag_path = 3;
+  }
+
+  message MemoryUsage {
+    optional int32 high_memory_usage_warning = 1;
+    optional int32 high_memory_usage_error = 2;
+    // The process's dag path, if not set it will check the system's overall
+    // memory usage
+    optional string process_dag_path = 3;
+  }
+
+  message DiskLoad {
+    optional int32 high_disk_load_warning = 1;
+    optional int32 high_disk_load_error = 2;
+    // Disk device name, such as sda, sdb and etc
+    optional string device_name = 3;
+  }
+
   repeated DiskSpace disk_spaces = 1;
+  repeated CPUUsage cpu_usages = 2;
+  repeated MemoryUsage memory_usages = 3;
+  repeated DiskLoad disk_load_usages = 4;
 }
 
 // A monitored component will be listed on HMI which only shows its status but
@@ -51,6 +91,11 @@ message MonitoredComponent {
 
   // Whether to trigger safe-mode if the component is down.
   optional bool required_for_safety = 4 [default = true];
+
+  // Generate SystemStatus.components[i].module_status.
+  // OK if the module is running.
+  // FATAL if the module is down.
+  optional ModuleMonitorConfig module = 5;
 }
 
 // A module which can be started and stopped by HMI.
@@ -75,4 +120,5 @@ message HMIMode {
   map<string, CyberModule> cyber_modules = 1;
   map<string, Module> modules = 2;
   map<string, MonitoredComponent> monitored_components = 3;
+  map<string, ProcessMonitorConfig> other_components = 4;
 }

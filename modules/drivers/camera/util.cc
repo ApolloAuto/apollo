@@ -16,8 +16,8 @@
 
 #include "modules/drivers/camera/util.h"
 
-#include <stdarg.h>
-#include <stdint.h>
+#include <cstdarg>
+#include <cstdint>
 
 namespace apollo {
 namespace drivers {

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -18,7 +20,8 @@ import argparse
 import os
 import re
 
-from features_labels_utils import *
+from modules.tools.prediction.data_pipelines.data_preprocessing.features_labels_utils import CombineFeaturesAndLabels
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -35,5 +38,5 @@ if __name__ == "__main__":
         if file.split('.')[-1] == 'bin' and \
            file.split('.')[0] == 'datalearn':
             label_path = args.labels_dirpath
-            CombineFeaturesAndLabels(full_file_path, label_path + \
-                '/junction_label.npy', 'junction_label')
+            CombineFeaturesAndLabels(full_file_path, label_path +
+                                     '/junction_label.npy', 'junction_label')

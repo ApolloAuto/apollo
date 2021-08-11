@@ -9,6 +9,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
@@ -28,6 +29,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
@@ -40,63 +42,6 @@ module_config {
       }
     }
 
-#    components {
-#      class_name : "CameraComponent"
-#      config {
-#        name : "camera_front_fisheye"
-#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-#      }
-#    }
-#    components {
-#      class_name : "CompressComponent"
-#      config {
-#        name : "camera_front_fisheye_compress"
-#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-#        readers {
-#          channel: "/apollo/sensor/camera/front_fisheye/image"
-#          pending_queue_size: 10
-#        }
-#      }
-#    }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_left_front"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_front.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_left_front_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_front.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/left_front/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_left_rear"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_rear.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_left_rear_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_rear.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/left_rear/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
     components {
       class_name : "CameraComponent"
       config {
@@ -104,6 +49,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_fisheye.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
@@ -116,44 +62,6 @@ module_config {
       }
     }
 
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_right_front"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_front.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_right_front_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_front.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/right_front/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_right_rear"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_rear.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_right_rear_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_rear.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/right_rear/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
     components {
       class_name : "CameraComponent"
       config {
@@ -161,6 +69,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_fisheye.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
@@ -180,6 +89,7 @@ module_config {
         config_file_path : "/apollo/modules/drivers/camera/conf/camera_rear_6mm.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
@@ -192,4 +102,3 @@ module_config {
       }
     }
 }
-

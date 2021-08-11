@@ -2,7 +2,7 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message CcrfTypeFusionConfig {
-    optional string classifiers_property_file_path = 1 [default = ""];
-    optional string transition_property_file_path = 2 [default = ""];
-    optional float transition_matrix_alpha = 3 [default = 1.8];
+  optional string classifiers_property_file_path = 1 [default = ""];
+  optional string transition_property_file_path = 2 [default = ""];
+  optional float transition_matrix_alpha = 3 [default = 1.8];
 }

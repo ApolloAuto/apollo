@@ -17,6 +17,7 @@
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 
 #include "gtest/gtest.h"
+
 #include "modules/perception/proto/rt.pb.h"
 
 TEST(SlicePluginsTest, test) {

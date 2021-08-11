@@ -22,9 +22,11 @@
 
 #include <algorithm>
 
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/common/util/string_util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -45,13 +47,13 @@ void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a,
   double t0 = t_.back();
 
   double v1 = v0 + a * t_duration;
-  CHECK(v1 >= -FLAGS_numerical_epsilon);
+  ACHECK(v1 >= -FLAGS_numerical_epsilon);
 
   double delta_s = (v0 + v1) * t_duration * 0.5;
   double s1 = s0 + delta_s;
   double t1 = t0 + t_duration;
 
-  CHECK(s1 >= s0 - FLAGS_numerical_epsilon);
+  ACHECK(s1 >= s0 - FLAGS_numerical_epsilon);
   s1 = std::max(s1, s0);
   s_.push_back(s1);
   v_.push_back(v1);
@@ -69,22 +71,19 @@ void PiecewiseAccelerationTrajectory1d::PopSegment() {
 }
 
 double PiecewiseAccelerationTrajectory1d::ParamLength() const {
-  CHECK_GT(t_.size(), 1);
+  CHECK_GT(t_.size(), 1U);
   return t_.back() - t_.front();
 }
 
 std::string PiecewiseAccelerationTrajectory1d::ToString() const {
-  return apollo::common::util::StrCat(apollo::common::util::PrintIter(s_, "\t"),
-                                      apollo::common::util::PrintIter(t_, "\t"),
-                                      apollo::common::util::PrintIter(v_, "\t"),
-                                      apollo::common::util::PrintIter(a_, "\t"),
-                                      "\n");
+  return absl::StrCat(absl::StrJoin(s_, "\t"), absl::StrJoin(t_, "\t"),
+                      absl::StrJoin(v_, "\t"), absl::StrJoin(a_, "\t"), "\n");
 }
 
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
                                                    const double param) const {
-  CHECK_GT(t_.size(), 1);
-  CHECK(t_.front() <= param && param <= t_.back());
+  CHECK_GT(t_.size(), 1U);
+  ACHECK(t_.front() <= param && param <= t_.back());
 
   switch (order) {
     case 0:
@@ -141,8 +140,8 @@ double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const {
 
 std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(
     const double t) const {
-  CHECK_GT(t_.size(), 1);
-  CHECK(t_.front() <= t && t <= t_.back());
+  CHECK_GT(t_.size(), 1U);
+  ACHECK(t_.front() <= t && t <= t_.back());
 
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);

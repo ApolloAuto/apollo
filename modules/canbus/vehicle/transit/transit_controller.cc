@@ -19,10 +19,10 @@
 #include "modules/common/proto/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -61,6 +61,7 @@ ErrorCode TransitController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Canbus sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
@@ -396,7 +397,6 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
       break;
     }
   }
-  return;
 }
 
 // brake with new acceleration
@@ -551,8 +551,7 @@ void TransitController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -586,8 +585,7 @@ void TransitController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

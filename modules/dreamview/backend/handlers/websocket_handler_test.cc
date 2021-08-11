@@ -95,7 +95,7 @@ TEST(WebSocketTest, handleData) {
   // Wait for a small amount of time to make sure that the server is up.
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
-  mg_connection *conn;
+  mg_connection *conn = nullptr;
   std::string data = "{\"type\":\"test\"}";
   char *data_char = const_cast<char *>(data.c_str());
   EXPECT_TRUE(

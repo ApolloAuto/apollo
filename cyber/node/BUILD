@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -26,6 +27,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "node_channel_impl_test",
+    size = "small",
+    srcs = ["node_channel_impl_test.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "node_service_impl",
     hdrs = ["node_service_impl.h"],
@@ -42,13 +54,11 @@ cc_library(
 cc_test(
     name = "node_test",
     size = "small",
-    srcs = [
-        "node_test.cc",
-    ],
+    srcs = ["node_test.cc"],
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -75,6 +85,17 @@ cc_library(
     deps = [
         "//cyber/event:perf_event_cache",
         "//cyber/transport",
+    ],
+)
+
+cc_test(
+    name = "reader_test",
+    size = "small",
+    srcs = ["reader_test.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -107,7 +128,19 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "writer_test",
+    size = "small",
+    srcs = ["writer_test.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/node:writer_base",
+        "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest",
     ],
 )
 

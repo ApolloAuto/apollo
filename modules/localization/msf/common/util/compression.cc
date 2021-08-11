@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/common/util/compression.h"
 
+#include <cstring>
+
 #include <zlib.h>
 
 #include "cyber/common/log.h"
@@ -49,8 +51,9 @@ int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
   stream_data.zfree = Z_NULL;
   stream_data.opaque = Z_NULL;
   ret = deflateInit(&stream_data, Z_BEST_SPEED);
-  if (ret != Z_OK) return ret;
-
+  if (ret != Z_OK) {
+    return ret;
+  }
   /* compress until end of file */
   do {
     in = &((*src)[src_idx]);
@@ -78,7 +81,7 @@ int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
       }
       out = &((*dst)[dst_idx]);
     } while (stream_data.avail_out == 0);
-    DCHECK_EQ(stream_data.avail_in, 0); /* all input will be used */
+    DCHECK_EQ(stream_data.avail_in, 0U); /* all input will be used */
 
     /* done when last data in file processed */
   } while (flush != Z_FINISH);
@@ -101,14 +104,12 @@ int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
   unsigned int dst_idx = 0;
 
   /* allocate inflate state */
-  stream_data.zalloc = Z_NULL;
-  stream_data.zfree = Z_NULL;
-  stream_data.opaque = Z_NULL;
-  stream_data.avail_in = 0;
-  stream_data.next_in = Z_NULL;
-  ret = inflateInit(&stream_data);
-  if (ret != Z_OK) return ret;
+  std::memset(&stream_data, 0, sizeof(z_stream));
 
+  ret = inflateInit(&stream_data);
+  if (ret != Z_OK) {
+    return ret;
+  }
   /* decompress until deflate stream ends or end of file */
   do {
     in = &((*src)[src_idx]);
@@ -119,8 +120,9 @@ int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
     }
     stream_data.next_in = in;
     src_idx += stream_data.avail_in;
-    if (stream_data.avail_in == 0) break;
-
+    if (stream_data.avail_in == 0) {
+      break;
+    }
     /* run inflate() on input until output buffer not full */
     do {
       stream_data.avail_out = zlib_chunk;

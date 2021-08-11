@@ -30,6 +30,7 @@
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/transform/transform_broadcaster.h"
 
@@ -65,6 +66,9 @@ class MSFLocalizationComponent final
  private:
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
   MSFLocalization localization_;
+
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 CYBER_REGISTER_COMPONENT(MSFLocalizationComponent);
@@ -106,6 +110,7 @@ class LocalizationMsgPublisher {
   std::string localization_status_topic_ = "";
   std::shared_ptr<cyber::Writer<LocalizationStatus>>
       localization_status_talker_ = nullptr;
+  double pre_system_time_ = 0.0;
 };
 
 }  // namespace localization

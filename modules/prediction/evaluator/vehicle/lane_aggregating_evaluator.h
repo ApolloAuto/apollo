@@ -21,14 +21,13 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "torch/script.h"
 #include "torch/torch.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator.h"
 
 /**
@@ -53,8 +52,10 @@ class LaneAggregatingEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.

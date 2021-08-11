@@ -31,7 +31,7 @@ This step involves two major tasks,
 - Smooth the trajectory to get better riding comfort experience and to make it easier for the control module to track
 - Ensure collision avoidance
 
-The received raw trajectory is taken as an initial guess for optimization to iterate on. The generated result is a set of points that are not distributed evenly but are closer to eachother near the turning while those on a linear path are more spread-out.
+The received raw trajectory is taken as an initial guess for optimization to iterate on. The generated result is a set of points that are not distributed evenly but are closer to each other near the turning while those on a linear path are more spread-out.
 This not only ensures better turns, but as time/space is fixed, the nearer the points, the slower the speed of the ego-car. Which also means that velocity tracking in this step is possible but more reasonable acceleration, braking and steering.
 
 ![](images/os_step2.png)
@@ -40,7 +40,7 @@ Once this stage is complete, the output is directly sent to the Control module t
 
 ![](images/os_step3.png)
 
-## Use Cases 
+## Use Cases
 
 Currently Open Space Planner is used for 2 parking scenarios in the planning stage namely:
 

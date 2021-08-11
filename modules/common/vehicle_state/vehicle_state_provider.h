@@ -23,15 +23,12 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/macros.h"
-
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::common
@@ -94,7 +91,7 @@ class VehicleStateProvider {
 
   /**
    * @brief Get the kappa of vehicle position.
-   *  the poistive or negative sign is decided by the vehicle heading vector
+   *  the positive or negative sign is decided by the vehicle heading vector
    *  along the path
    * @return The kappa of vehicle position.
    */
@@ -153,6 +150,12 @@ class VehicleStateProvider {
   double gear() const;
 
   /**
+   * @brief Get the vehicle's steering angle.
+   * @return double
+   */
+  double steering_percentage() const;
+
+  /**
    * @brief Set the vehicle's linear velocity.
    * @param linear_velocity The value to set the vehicle's linear velocity.
    */
@@ -184,8 +187,6 @@ class VehicleStateProvider {
 
   common::VehicleState vehicle_state_;
   localization::LocalizationEstimate original_localization_;
-
-  DECLARE_SINGLETON(VehicleStateProvider)
 };
 
 }  // namespace common

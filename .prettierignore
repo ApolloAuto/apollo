@@ -1,0 +1,12 @@
+bazel-*
+.cache
+
+# Temporarily settings for markdown prettier
+# tools
+
+*.py
+*.sh
+*.bash
+*.bashrc
+*.bazelrc
+*.html

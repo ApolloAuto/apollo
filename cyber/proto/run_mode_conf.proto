@@ -7,6 +7,12 @@ enum RunMode {
   MODE_SIMULATION = 1;
 }
 
+enum ClockMode {
+  MODE_CYBER = 0;
+  MODE_MOCK = 1;
+}
+
 message RunModeConf {
   optional RunMode run_mode = 1 [default = MODE_REALITY];
+  optional ClockMode clock_mode = 2 [default = MODE_CYBER];
 }

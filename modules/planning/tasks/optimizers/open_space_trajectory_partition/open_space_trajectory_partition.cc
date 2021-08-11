@@ -17,14 +17,14 @@
 /**
  * @file
  **/
-#include <limits>
-#include <queue>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
+#include <memory>
+#include <queue>
+
+#include "absl/strings/str_cat.h"
+
+#include "cyber/time/clock.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
@@ -40,11 +40,12 @@ using apollo::common::math::Box2d;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
-    const TaskConfig& config)
-    : TrajectoryOptimizer(config) {
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : TrajectoryOptimizer(config, injector) {
   open_space_trajectory_partition_config_ =
       config_.open_space_trajectory_partition_config();
   heading_search_range_ =
@@ -103,10 +104,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
                       partitioned_trajectories);
 
   const auto& open_space_status =
-      PlanningContext::Instance()->planning_status().open_space();
+      injector_->planning_context()->planning_status().open_space();
   if (!open_space_status.position_init() &&
       frame_->open_space_info().open_space_provider_success()) {
-    auto* open_space_status = PlanningContext::Instance()
+    auto* open_space_status = injector_->planning_context()
                                   ->mutable_planning_status()
                                   ->mutable_open_space();
     open_space_status->set_position_init(true);
@@ -149,7 +150,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     const auto& gear = partitioned_trajectories->at(i).second;
     const auto& trajectory = partitioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
 
     flag_change_to_next = CheckReachTrajectoryEnd(
         trajectory, gear, trajectories_size, i, &current_trajectory_index,
@@ -233,7 +234,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
       if (!UseFailSafeSearch(*partitioned_trajectories, trajectories_encodings,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
-        std::string msg("Fail to find nearest trajectory point to follow");
+        const std::string msg =
+            "Fail to find nearest trajectory point to follow";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
@@ -278,8 +280,8 @@ void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
-  CHECK_GT(stitched_trajectory_result.size(), 0);
-  CHECK_GT(interpolated_pieces_num, 0);
+  CHECK_GT(stitched_trajectory_result.size(), 0U);
+  CHECK_GT(interpolated_pieces_num, 0U);
   size_t trajectory_to_be_partitioned_intervals_num =
       stitched_trajectory_result.size() - 1;
   size_t interpolated_points_num = interpolated_pieces_num - 1;
@@ -325,39 +327,36 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
     AERROR << "Fail to encode trajectory because it is empty";
     return false;
   }
-  constexpr double encoding_origin_x = 58700.0;
-  constexpr double encoding_origin_y = 4141000.0;
+  static constexpr double encoding_origin_x = 58700.0;
+  static constexpr double encoding_origin_y = 4141000.0;
   const auto& init_path_point = trajectory.front().path_point();
   const auto& last_path_point = trajectory.back().path_point();
 
-  const std::string init_point_x_encoding = std::to_string(
-      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0));
-  const std::string init_point_y_encoding = std::to_string(
-      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0));
-  const std::string init_point_heading_encoding =
-      std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
-  const std::string last_point_x_encoding = std::to_string(
-      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0));
-  const std::string last_point_y_encoding = std::to_string(
-      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
-  const std::string last_point_heading_encoding =
-      std::to_string(static_cast<int>(last_path_point.theta() * 10000.0));
+  const int init_point_x =
+      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0);
+  const int init_point_y =
+      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0);
+  const int init_point_heading =
+      static_cast<int>(init_path_point.theta() * 10000.0);
+  const int last_point_x =
+      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0);
+  const int last_point_y =
+      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0);
+  const int last_point_heading =
+      static_cast<int>(last_path_point.theta() * 10000.0);
 
-  const std::string init_point_encoding = init_point_x_encoding + "_" +
-                                          init_point_y_encoding + "_" +
-                                          init_point_heading_encoding;
-  const std::string last_point_encoding = last_point_x_encoding + "_" +
-                                          last_point_y_encoding + "_" +
-                                          last_point_heading_encoding;
-
-  *encoding = init_point_encoding + "/" + last_point_encoding;
+  *encoding = absl::StrCat(
+      // init point
+      init_point_x, "_", init_point_y, "_", init_point_heading, "/",
+      // last point
+      last_point_x, "_", last_point_y, "_", last_point_heading);
   return true;
 }
 
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
     const std::string& trajectory_encoding_to_check) {
   const auto& open_space_status =
-      PlanningContext::Instance()->planning_status().open_space();
+      injector_->planning_context()->planning_status().open_space();
   const int index_history_size =
       open_space_status.partitioned_trajectories_index_history_size();
 
@@ -376,12 +375,12 @@ bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
 
 void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
     const std::string& chosen_trajectory_encoding) {
-  auto* open_space_status = PlanningContext::Instance()
+  auto* open_space_status = injector_->planning_context()
                                 ->mutable_planning_status()
                                 ->mutable_open_space();
 
   const auto& trajectory_history =
-      PlanningContext::Instance()
+      injector_->planning_context()
           ->planning_status()
           .open_space()
           .partitioned_trajectories_index_history();
@@ -428,6 +427,7 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
   // Set accumulated distance
   Vec2d last_pos_vec(first_path_point.x(), first_path_point.y());
   double distance_s = 0.0;
+  bool is_trajectory_last_point = false;
 
   for (size_t i = 0; i < horizon - 1; ++i) {
     const TrajectoryPoint& trajectory_point = raw_trajectory.at(i);
@@ -447,29 +447,31 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
             : canbus::Chassis::GEAR_REVERSE;
 
     if (cur_gear != *gear) {
-      LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
-                          trajectory);
-
+      is_trajectory_last_point = true;
+      LoadTrajectoryPoint(trajectory_point, is_trajectory_last_point, *gear,
+                          &last_pos_vec, &distance_s, trajectory);
       partitioned_trajectories->emplace_back();
       current_trajectory_gear = &(partitioned_trajectories->back());
       current_trajectory_gear->second = cur_gear;
       distance_s = 0.0;
+      is_trajectory_last_point = false;
     }
 
     trajectory = &(current_trajectory_gear->first);
     gear = &(current_trajectory_gear->second);
 
-    LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
-                        trajectory);
+    LoadTrajectoryPoint(trajectory_point, is_trajectory_last_point, *gear,
+                        &last_pos_vec, &distance_s, trajectory);
   }
-
+  is_trajectory_last_point = true;
   const TrajectoryPoint& last_trajectory_point = raw_trajectory.back();
-  LoadTrajectoryPoint(last_trajectory_point, *gear, &last_pos_vec, &distance_s,
-                      trajectory);
+  LoadTrajectoryPoint(last_trajectory_point, is_trajectory_last_point, *gear,
+                      &last_pos_vec, &distance_s, trajectory);
 }
 
 void OpenSpaceTrajectoryPartition::LoadTrajectoryPoint(
     const TrajectoryPoint& trajectory_point,
+    const bool is_trajectory_last_point,
     const canbus::Chassis::GearPosition& gear, Vec2d* last_pos_vec,
     double* distance_s, DiscretizedTrajectory* current_trajectory) {
   current_trajectory->emplace_back();
@@ -485,7 +487,8 @@ void OpenSpaceTrajectoryPartition::LoadTrajectoryPoint(
   *distance_s += (gear == canbus::Chassis::GEAR_REVERSE ? -1.0 : 1.0) *
                  (cur_pos_vec.DistanceTo(*last_pos_vec));
   *last_pos_vec = cur_pos_vec;
-  point->mutable_path_point()->set_kappa(std::tan(trajectory_point.steer()) /
+  point->mutable_path_point()->set_kappa((is_trajectory_last_point ? -1 : 1) *
+                                         std::tan(trajectory_point.steer()) /
                                          wheel_base_);
   point->set_a(trajectory_point.a());
 }
@@ -580,7 +583,7 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = partitioned_trajectories.at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
     std::priority_queue<std::pair<size_t, double>,
                         std::vector<std::pair<size_t, double>>, comp_>
         failsafe_closest_point;
@@ -642,7 +645,7 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
     const bool flag_change_to_next, const size_t current_trajectory_index,
     const std::vector<TrajGearPair>& partitioned_trajectories,
     TrajGearPair* gear_switch_idle_time_trajectory) {
-  const auto* last_frame = FrameHistory::Instance()->Latest();
+  const auto* last_frame = injector_->frame_history()->Latest();
   const auto& last_gear_status =
       last_frame->open_space_info().gear_switch_states();
   auto* current_gear_status =
@@ -652,7 +655,8 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
   if (flag_change_to_next || !current_gear_status->gear_shift_period_finished) {
     current_gear_status->gear_shift_period_finished = false;
     if (current_gear_status->gear_shift_period_started) {
-      current_gear_status->gear_shift_start_time = Clock::NowInSeconds();
+      current_gear_status->gear_shift_start_time =
+          Clock::Instance()->NowInSeconds();
       current_gear_status->gear_shift_position =
           partitioned_trajectories.at(current_trajectory_index).second;
       current_gear_status->gear_shift_period_started = false;
@@ -665,7 +669,8 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
       GenerateGearShiftTrajectory(current_gear_status->gear_shift_position,
                                   gear_switch_idle_time_trajectory);
       current_gear_status->gear_shift_period_time =
-          Clock::NowInSeconds() - current_gear_status->gear_shift_start_time;
+          Clock::Instance()->NowInSeconds() -
+          current_gear_status->gear_shift_start_time;
       return true;
     }
   }

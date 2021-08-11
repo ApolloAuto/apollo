@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/tasks/task.h"
@@ -30,7 +32,10 @@ namespace planning {
 class Decider : public Task {
  public:
   explicit Decider(const TaskConfig& config);
+  Decider(const TaskConfig& config,
+          const std::shared_ptr<DependencyInjector>& injector);
   virtual ~Decider() = default;
+
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 

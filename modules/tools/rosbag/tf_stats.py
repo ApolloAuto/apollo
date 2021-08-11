@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -23,10 +23,13 @@ usage:
 """
 
 import argparse
-from cyber_py.record import RecordReader
+
+from cyber.python.cyber_py3.record import RecordReader
 from modules.transform.proto import transform_pb2
 
+
 g_args = None
+
 
 def tf_stats(in_bag):
     """
@@ -46,7 +49,8 @@ def tf_stats(in_bag):
                 stats[key] += 1
             else:
                 stats[key] = 1
-    print 'tf stats: {}'.format(stats)
+    print('tf stats: {}'.format(stats))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

@@ -1,0 +1,110 @@
+modules {
+  key: "Router"
+  value: {
+    start_command: "run_teleop_router.bash start"
+    stop_command:  "run_teleop_router.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "router.py"
+    }
+  }
+}
+modules {
+  key: "Voip Decoder"
+  value: {
+    start_command: "run_teleop_voip_decoder.bash start"
+    stop_command: "run_teleop_voip_decoder.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "voip_decoder.py"
+    }
+  }
+}
+modules {
+  key: "Voip Encoder"
+  value: {
+    start_command: "run_teleop_voip_encoder.bash start"
+    stop_command: "run_teleop_voip_encoder.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "voip_encoder.py"
+    }
+  }
+}
+modules {
+  key: "Daemon"
+  value: {
+    start_command: "run_teleop_daemon.bash start"
+    stop_command: "run_teleop_daemon.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "daemon.py"
+    }
+  }
+}
+modules {
+  key: "Telecine 0"
+  value: {
+    start_command: "run_teleop_telecine0.bash start"
+    stop_command: "run_teleop_telecine0.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py 0"
+    }
+  }
+}
+modules {
+  key: "Telecine 1"
+  value: {
+    start_command: "run_teleop_telecine1.bash start"
+    stop_command: "run_teleop_telecine1.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py 1"
+    }
+  }
+}
+modules {
+  key: "Telecine 2"
+  value: {
+    start_command: "run_teleop_telecine2.bash start"
+    stop_command: "run_teleop_telecine2.bash kill"
+    process_monitor_config {
+      command_keywords: "python"
+      command_keywords: "telecine.py 2"
+    }
+  }
+}
+modules {
+  key: "Video Decoder 0"
+  value: {
+    start_command: "run_teleop_video_decoder0.bash start"
+    stop_command: "run_teleop_video_decoder0.bash kill"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_0"
+    }
+  }
+}
+modules {
+  key: "Video Decoder 1"
+  value: {
+    start_command: "run_teleop_video_decoder1.bash start"
+    stop_command: "run_teleop_video_decoder1.bash kill"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_1"
+    }
+  }
+}
+modules {
+  key: "Video Decoder 2"
+  value: {
+    start_command: "run_teleop_video_decoder2.bash start"
+    stop_command: "run_teleop_video_decoder2.bash kill"
+    process_monitor_config {
+      command_keywords: "video_decoder"
+      command_keywords: "decoder_2"
+    }
+  }
+}

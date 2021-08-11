@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,8 +16,8 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_thread_pool",
         "//modules/prediction/common:semantic_map",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/cyclist:cyclist_keep_lane_evaluator",
-        "//modules/prediction/evaluator/pedestrian:pedestrian_interaction_evaluator",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_map_evaluator",
@@ -24,8 +25,12 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:lane_aggregating_evaluator",
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
-        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
+        "//modules/prediction/evaluator/vehicle:jointly_prediction_planning_evaluator",
+        "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/pipeline:vector_net",
+        "//third_party:libtorch",
     ],
 )
 
@@ -36,6 +41,9 @@ cc_test(
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
+    ],
+    linkopts = [
+        "-lgomp",
     ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
@@ -48,6 +56,7 @@ cc_library(
     hdrs = ["evaluator.h"],
     deps = [
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
     ],
 )
 

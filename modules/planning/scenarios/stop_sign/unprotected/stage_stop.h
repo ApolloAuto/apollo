@@ -20,12 +20,12 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
@@ -38,9 +38,10 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStageStop : public Stage {
  public:
-  explicit StopSignUnprotectedStageStop(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  StopSignUnprotectedStageStop(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -54,7 +55,6 @@ class StopSignUnprotectedStageStop : public Stage {
           watch_vehicles);
 
  private:
-  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:

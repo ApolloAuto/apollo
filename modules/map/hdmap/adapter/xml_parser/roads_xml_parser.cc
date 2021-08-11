@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace {
 bool IsRoadBelongToJunction(const std::string& road_id) {
-  CHECK(!road_id.empty());
+  ACHECK(!road_id.empty());
   return road_id != "-1";
 }
 }  // namespace

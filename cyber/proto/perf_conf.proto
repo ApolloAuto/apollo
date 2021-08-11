@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+enum PerfType {
+  SCHED = 1;
+  TRANSPORT = 2;
+  DATA_CACHE = 3;
+  ALL = 4;
+}
+
+message PerfConf {
+  optional bool enable = 1 [default = false];
+  optional PerfType type = 2 [default = ALL];
+}

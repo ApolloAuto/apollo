@@ -28,6 +28,8 @@ namespace perception {
 namespace lidar {
 
 struct MlfPredict {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   Eigen::VectorXf state;
   base::PolygonDType polygon;
   base::PointDCloud cloud;
@@ -43,6 +45,8 @@ struct MlfPredict {
 
 class MlfTrackData : public TrackData {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   MlfTrackData() = default;
   ~MlfTrackData() = default;
 
@@ -103,6 +107,9 @@ class MlfTrackData : public TrackData {
   double first_tracked_time_ = 0.0;
 
   bool is_current_state_predicted_ = true;
+
+  // @debug feature to be used for semantic mapping based tracking
+//  std::shared_ptr<apollo::prediction::Feature> feature_;
 
   static const double kMaxHistoryTime;
 };

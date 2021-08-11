@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/inference/utils/binary_data.h"
+
 #include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/perception/inference/utils/binary_data.h"
 
 namespace apollo {
 namespace perception {
@@ -52,23 +53,23 @@ size_t BinaryWriteString(FILE *fp, const std::string &str) {
 }
 
 template <typename Dtype>
-boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
+std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
   int ndim;
-  boost::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
+  std::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
   char dtype[kMaxStrLen];
 
   // read dtype
   size_t nmemb = BinaryReadString(fp, dtype);
-  CHECK_GT(nmemb, 0);
+  CHECK_GT(nmemb, 0U);
   CHECK_EQ(get_dtype(*blob), dtype);
 
   // read dims
   nmemb = fread(&ndim, sizeof(ndim), 1, fp);
-  CHECK_EQ(nmemb, 1);
+  CHECK_EQ(nmemb, 1U);
   std::vector<int> shape(ndim);
   for (int i = 0; i < ndim; ++i) {
     nmemb = fread(&shape[i], sizeof(shape[i]), 1, fp);
-    CHECK_EQ(nmemb, 1);
+    CHECK_EQ(nmemb, 1U);
   }
   if (ndim == 0) {
     return blob;
@@ -80,7 +81,7 @@ boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
 
   // read data
   nmemb = fread(blob->mutable_cpu_data(), sizeof(Dtype), blob->count(), fp);
-  CHECK_EQ(nmemb, blob->count());
+  CHECK_EQ(static_cast<int>(nmemb), blob->count());
 
   return blob;
 }
@@ -104,17 +105,17 @@ void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob) {
   }
 }
 
-template boost::shared_ptr<base::Blob<float>> BinaryReadBlob(FILE *fp);
-template boost::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
+template std::shared_ptr<base::Blob<float>> BinaryReadBlob(FILE *fp);
+template std::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
 
 template void BinaryWriteBlob(FILE *fp, const base::Blob<float> &blob);
 template void BinaryWriteBlob(FILE *fp, const base::Blob<double> &blob);
 
 template <typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
+std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
     const char *file_path) {
   char name[kMaxStrLen];
-  std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> data_dict;
+  std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> data_dict;
 
   FILE *fp = fopen(file_path, "rb");
   if (NULL == fp) {
@@ -157,18 +158,17 @@ bool BinaryWriteFile(const char *file_path,
   return true;
 }
 
-template std::map<std::string, boost::shared_ptr<base::Blob<float>>>
+template std::map<std::string, std::shared_ptr<base::Blob<float>>>
 BinaryReadFile(const char *file_path);
-template std::map<std::string, boost::shared_ptr<base::Blob<double>>>
+template std::map<std::string, std::shared_ptr<base::Blob<double>>>
 BinaryReadFile(const char *file_path);
 
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string, boost::shared_ptr<base::Blob<float>>>
-        &data_dict);
+    const std::map<std::string, std::shared_ptr<base::Blob<float>>> &data_dict);
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string, boost::shared_ptr<base::Blob<double>>>
+    const std::map<std::string, std::shared_ptr<base::Blob<double>>>
         &data_dict);
 
 template bool BinaryWriteFile(

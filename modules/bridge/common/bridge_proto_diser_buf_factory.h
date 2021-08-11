@@ -18,8 +18,10 @@
 
 #include <memory>
 #include <string>
-#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
+
 #include "modules/canbus/proto/chassis.pb.h"
+
+#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {

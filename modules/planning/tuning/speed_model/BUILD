@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:error_code_cc_proto",
         "//modules/planning/tuning:autotuning_feature_builder",
     ],
 )
@@ -22,7 +23,7 @@ cc_test(
     srcs = ["autotuning_speed_feature_builder_test.cc"],
     deps = [
         ":autotuning_speed_feature_builder",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -42,7 +43,7 @@ cc_test(
     srcs = ["autotuning_speed_mlp_model_test.cc"],
     deps = [
         ":autotuning_speed_mlp_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

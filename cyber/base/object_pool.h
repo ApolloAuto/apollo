@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <new>
@@ -111,7 +112,9 @@ ObjectPool<T>::~ObjectPool() {
 
 template <typename T>
 void ObjectPool<T>::ReleaseObject(T *object) {
-  if (unlikely(object == nullptr)) return;
+  if (cyber_unlikely(object == nullptr)) {
+    return;
+  }
 
   reinterpret_cast<Node *>(object)->next = free_head_;
   free_head_ = reinterpret_cast<Node *>(object);
@@ -119,7 +122,9 @@ void ObjectPool<T>::ReleaseObject(T *object) {
 
 template <typename T>
 std::shared_ptr<T> ObjectPool<T>::GetObject() {
-  if (unlikely(free_head_ == nullptr)) return nullptr;
+  if (cyber_unlikely(free_head_ == nullptr)) {
+    return nullptr;
+  }
 
   auto self = this->shared_from_this();
   auto obj =

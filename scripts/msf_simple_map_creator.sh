@@ -1,10 +1,10 @@
 #! /bin/bash
 if [ $# -lt 4 ]; then
-    echo "Usage: msf_simple_map_creator.sh [records folder] [extrinsic_file] [zone_id] [map folder]"
-    exit 1;
+  echo "Usage: msf_simple_map_creator.sh [records folder] [extrinsic_file] [zone_id] [map folder] [lidar_type]"
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
@@ -13,7 +13,6 @@ GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
 LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar"
 FUSION_LOC_TOPIC="/apollo/localization/pose"
 ODOMETRY_LOC_TOPIC="/apollo/sensor/gnss/odometry"
-CLOUD_TOPIC="/apollo/sensor/lidar128/compensator/PointCloud2"
 
 GNSS_LOC_FILE="gnss_loc.txt"
 LIDAR_LOC_FILE="lidar_loc.txt"
@@ -24,12 +23,15 @@ IN_FOLDER=$1
 EXTRINSIC_FILE=$2
 ZONE_ID=$3
 OUT_MAP_FOLDER=$4
+LIDAR_TYPE=${5:-lidar128}
+
 PARSED_DATA_FOLDER="$OUT_MAP_FOLDER/parsed_data"
+CLOUD_TOPIC="/apollo/sensor/$LIDAR_TYPE/compensator/PointCloud2"
 
 function data_exporter() {
   local BAG_FILE=$1
   local OUT_FOLDER=$2
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/data_extraction/cyber_record_parser \
+  /apollo/bazel-bin/modules/localization/msf/local_tool/data_extraction/cyber_record_parser \
     --bag_file $BAG_FILE \
     --out_folder $OUT_FOLDER \
     --cloud_topic $CLOUD_TOPIC \
@@ -44,38 +46,38 @@ function poses_interpolation() {
   local REF_TIMESTAMPS_PATH=$2
   local EXTRINSIC_PATH=$3
   local OUTPUT_POSES_PATH=$4
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/poses_interpolator \
-   --input_poses_path $INPUT_POSES_PATH \
-   --ref_timestamps_path $REF_TIMESTAMPS_PATH \
-   --extrinsic_path $EXTRINSIC_PATH \
-   --output_poses_path $OUTPUT_POSES_PATH
+  /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/poses_interpolator \
+    --input_poses_path $INPUT_POSES_PATH \
+    --ref_timestamps_path $REF_TIMESTAMPS_PATH \
+    --extrinsic_path $EXTRINSIC_PATH \
+    --output_poses_path $OUTPUT_POSES_PATH
 }
 
 function create_lossless_map() {
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map_creator \
-      --use_plane_inliers_only true \
-      --pcd_folders $1 \
-      --pose_files $2 \
-      --map_folder $OUT_MAP_FOLDER \
-      --zone_id $ZONE_ID \
-      --coordinate_type UTM \
-      --map_resolution_type single
+  /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/lossless_map_creator \
+    --use_plane_inliers_only true \
+    --pcd_folders $1 \
+    --pose_files $2 \
+    --map_folder $OUT_MAP_FOLDER \
+    --zone_id $ZONE_ID \
+    --coordinate_type UTM \
+    --map_resolution_type single
 }
 
 function create_lossy_map() {
-  $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map_to_lossy_map \
+  /apollo/bazel-bin/modules/localization/msf/local_tool/map_creation/lossless_map_to_lossy_map \
     --srcdir $OUT_MAP_FOLDER/lossless_map \
-    --dstdir $OUT_MAP_FOLDER \
+    --dstdir $OUT_MAP_FOLDER
 
   rm -fr $OUT_MAP_FOLDER/lossless_map
+  rm -fr $OUT_MAP_FOLDER/parsed_data
   mv $OUT_MAP_FOLDER/lossy_map $OUT_MAP_FOLDER/local_map
 }
 
 cd $IN_FOLDER
 mkdir -p $OUT_MAP_FOLDER
 mkdir -p $PARSED_DATA_FOLDER
-for item in $(ls -l *record.* | awk '{print $9}')
-do
+for item in $(ls -l *.record* | awk '{print $9}'); do
   SEGMENTS=$(echo $item | awk -F'.' '{print NF}')
   DIR_NAME=$(echo $item | cut -d . -f ${SEGMENTS})
   DIR_NAME="${PARSED_DATA_FOLDER}/${DIR_NAME}"

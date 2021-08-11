@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
+#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -28,6 +27,8 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/util/util.h"
 
@@ -40,8 +41,9 @@ struct ParkAndGoContext;
 
 class ParkAndGoStageCheck : public Stage {
  public:
-  explicit ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config,
+                      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
@@ -54,7 +56,7 @@ class ParkAndGoStageCheck : public Stage {
 
  private:
   bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-  void ADCInitStatus(Frame* frame);
+  void ADCInitStatus();
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

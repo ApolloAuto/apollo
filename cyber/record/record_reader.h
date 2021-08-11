@@ -17,12 +17,14 @@
 #ifndef CYBER_RECORD_RECORD_READER_H_
 #define CYBER_RECORD_RECORD_READER_H_
 
+#include <limits>
 #include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
 
 #include "cyber/proto/record.pb.h"
+
 #include "cyber/record/file/record_file_reader.h"
 #include "cyber/record/record_base.h"
 #include "cyber/record/record_message.h"
@@ -65,10 +67,10 @@ class RecordReader : public RecordBase {
    * @param begin_time
    * @param end_time
    *
-   * @return True for success, flase for not.
+   * @return True for success, false for not.
    */
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
-                   uint64_t end_time = UINT64_MAX);
+                   uint64_t end_time = std::numeric_limits<uint64_t>::max());
 
   /**
    * @brief Reset the message index of record reader.

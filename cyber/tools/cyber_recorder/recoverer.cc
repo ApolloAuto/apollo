@@ -23,6 +23,10 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::ChunkHeader;
+using apollo::cyber::proto::SectionType;
+
 Recoverer::Recoverer(const std::string& input_file,
                      const std::string& output_file)
     : input_file_(input_file), output_file_(output_file) {}
@@ -36,7 +40,7 @@ bool Recoverer::Proc() {
   }
 
   // open output file
-  Header new_hdr = HeaderBuilder::GetHeader();
+  proto::Header new_hdr = HeaderBuilder::GetHeader();
   if (!writer_.Open(output_file_)) {
     AERROR << "open output file failed. file: " << output_file_;
     return false;
@@ -48,9 +52,9 @@ bool Recoverer::Proc() {
 
   // write channel sections
   if (reader_.ReadIndex()) {
-    Index index = reader_.GetIndex();
+    proto::Index index = reader_.GetIndex();
     FOR_EACH(i, 0, index.indexes_size()) {
-      SingleIndex* single_index = index.mutable_indexes(i);
+      proto::SingleIndex* single_index = index.mutable_indexes(i);
       if (single_index->type() != SectionType::SECTION_CHANNEL) {
         continue;
       }

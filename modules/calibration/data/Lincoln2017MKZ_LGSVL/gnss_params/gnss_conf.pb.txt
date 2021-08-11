@@ -1,0 +1,49 @@
+data {
+    format: NOVATEL_BINARY
+    serial {
+        device: "/dev/novatel0"
+        baud_rate: 115200
+    }
+}
+
+rtk_from {
+    format: RTCM_V3
+    ntrip {
+        address: "<IP>"
+        port: <PORT>
+        mount_point: "<MOUNTPOINT>"
+        user: "<USER>"
+        password: "<PASSWORD>"
+        timeout_s: 5
+    }
+    push_location: true
+}
+
+rtk_to {
+    format: NOVATEL_BINARY
+    serial {
+        device: "/dev/novatel1"
+        baud_rate: 115200
+    }
+}
+
+command {
+    format: NOVATEL_BINARY
+    serial {
+        device: "/dev/novatel2"
+        baud_rate: 115200
+    }
+}
+
+rtk_solution_type: RTK_RECEIVER_SOLUTION
+imu_type: ADIS16488
+proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+
+tf {
+    frame_id: "world"
+    child_frame_id: "novatel"
+}
+
+# If given, the driver will send velocity info into novatel one time per second
+wheel_parameters: "SETWHEELPARAMETERS 100 1 1\r\n"
+

@@ -1,5 +1,6 @@
 roi_config {
-  roi_longitudinal_range: 15.0
+  roi_longitudinal_range_start: 15.0
+  roi_longitudinal_range_end: 15.0
   parking_start_range: 12.0
   parking_inwards: false
 }
@@ -18,7 +19,7 @@ warm_start_config {
   s_curve_config {
     acc_weight: 1.0
     jerk_weight: 0.0
-    dkappa_penalty_weight: 100.0
+    kappa_penalty_weight: 100.0
     ref_s_weight: 0.1
     ref_v_weight: 0.0
   }
@@ -134,7 +135,7 @@ iterative_anchoring_smoother_config {
   s_curve_config {
     acc_weight: 1.0
     jerk_weight: 1.0
-    dkappa_penalty_weight: 100.0
+    kappa_penalty_weight: 100.0
     ref_s_weight: 10.0
     ref_v_weight: 0.0
   }

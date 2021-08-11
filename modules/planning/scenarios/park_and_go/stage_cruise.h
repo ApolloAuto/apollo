@@ -16,8 +16,9 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include <memory>
 
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -30,8 +31,17 @@ struct ParkAndGoContext;
 
 class ParkAndGoStageCruise : public Stage {
  public:
-  explicit ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  enum ParkAndGoStatus {
+    CRUISING = 1,
+    CRUISE_COMPLETE = 2,
+    ADJUST = 3,
+    ADJUST_COMPLETE = 4,
+    FAIL = 5,
+  };
+
+  ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config,
+                       const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
@@ -41,6 +51,10 @@ class ParkAndGoStageCruise : public Stage {
   }
 
   Stage::StageStatus FinishStage();
+
+ private:
+  ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
+      const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

@@ -20,10 +20,8 @@
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 
-#include <limits>
-
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "cyber/common/log.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"

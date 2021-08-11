@@ -10,7 +10,7 @@ Please follow the steps below to add a new GPS Receiver.
   3. In `config.proto`, add the new data format for the new GPS receiver
   4. In function `create_parser` from file data_parser.cpp, add the new parser instance for the new GPS receiver
 
-Let's look at how to add the GPS Receiver using the above mentioned steps for Reciever: `u-blox`.
+Let's look at how to add the GPS Receiver using the above-mentioned steps for Receiver: `u-blox`.
 
 ### Step 1
 

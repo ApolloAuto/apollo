@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -23,11 +23,11 @@ import math
 import sys
 
 import numpy as np
-import tkFileDialog
+import tkinter.filedialog
 
-from process import get_start_index
-from process import preprocess
-from process import process
+from modules.tools.vehicle_calibration.process import get_start_index
+from modules.tools.vehicle_calibration.process import preprocess
+from modules.tools.vehicle_calibration.process import process
 
 
 class Plotter(object):
@@ -76,13 +76,13 @@ def main():
         # get the latest file
         file_path = sys.argv[1]
     else:
-        file_path = tkFileDialog.askopenfilename(
+        file_path = tkinter.filedialog.askopenfilename(
             initialdir="/home/caros/.ros",
             filetypes=(("csv files", ".csv"), ("all files", "*.*")))
     plotter = Plotter(file_path)
     plotter.process_data(file_path)
     plotter.save_data()
-    print 'save result to:', file_path + ".result"
+    print('save result to:', file_path + ".result")
 
 
 if __name__ == '__main__':

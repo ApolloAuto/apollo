@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
@@ -22,21 +22,13 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-class BaseMapNodeIndexTestSuite : public ::testing::Test {
- protected:
-  BaseMapNodeIndexTestSuite() {}
-  virtual ~BaseMapNodeIndexTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
 /**@brief Test the get method. */
-TEST_F(BaseMapNodeIndexTestSuite, GetMethodTest) {
+TEST(BaseMapNodeIndexTestSuite, GetMethodTest) {
   MapNodeIndex node_index;
-  ASSERT_EQ(node_index.resolution_id_, 0);
-  ASSERT_EQ(node_index.zone_id_, 50);
-  ASSERT_EQ(node_index.m_, 0);
-  ASSERT_EQ(node_index.n_, 0);
+  EXPECT_EQ(node_index.resolution_id_, 0);
+  EXPECT_EQ(node_index.zone_id_, 50);
+  EXPECT_EQ(node_index.m_, 0);
+  EXPECT_EQ(node_index.n_, 0);
 
   BaseMapConfig option;
   option.map_resolutions_.push_back(0.125);
@@ -49,32 +41,29 @@ TEST_F(BaseMapNodeIndexTestSuite, GetMethodTest) {
   MapNodeIndex node_index2 =
       MapNodeIndex::GetMapNodeIndex(option, coordinate2d, 0, 50);
 
-  ASSERT_TRUE(node_index1 == node_index2);
+  EXPECT_TRUE(node_index1 == node_index2);
 }
 
 /**@brief Test the operators. */
-TEST_F(BaseMapNodeIndexTestSuite, OperatorTest) {
+TEST(BaseMapNodeIndexTestSuite, OperatorTest) {
   MapNodeIndex node_index1;
-  ASSERT_EQ(node_index1.resolution_id_, 0);
-  ASSERT_EQ(node_index1.zone_id_, 50);
-  ASSERT_EQ(node_index1.m_, 0);
-  ASSERT_EQ(node_index1.n_, 0);
+  EXPECT_EQ(node_index1.resolution_id_, 0);
+  EXPECT_EQ(node_index1.zone_id_, 50);
+  EXPECT_EQ(node_index1.m_, 0);
+  EXPECT_EQ(node_index1.n_, 0);
 
   MapNodeIndex node_index2;
   node_index2.n_ = 1;
 
   bool res = node_index1 < node_index2;
-  ASSERT_TRUE(res);
+  EXPECT_TRUE(res);
 
   res = node_index1 != node_index2;
-  ASSERT_TRUE(res);
+  EXPECT_TRUE(res);
 
   node_index2.n_ = 0;
   res = node_index1 == node_index2;
-  ASSERT_TRUE(res);
-
-  std::cout << node_index2 << std::endl;
-  ASSERT_TRUE(true);
+  EXPECT_TRUE(res);
 }
 
 }  // namespace msf

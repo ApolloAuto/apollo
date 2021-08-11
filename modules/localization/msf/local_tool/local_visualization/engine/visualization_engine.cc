@@ -16,7 +16,10 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
-#include "boost/filesystem.hpp"
+#include <limits>
+
+#include <boost/filesystem.hpp>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
@@ -38,16 +41,10 @@ const char car_img_path[3][1024] = {
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
-  if (level != key.level) {
-    return level < key.level;
-  }
-  if (zone_id != key.zone_id) {
-    return zone_id < key.zone_id;
-  }
-  if (node_north_id != key.node_north_id) {
-    return node_north_id < key.node_north_id;
-  }
-  return node_east_id < key.node_east_id;
+  // Compare elements by priority.
+  return std::forward_as_tuple(level, zone_id, node_north_id, node_east_id) <
+         std::forward_as_tuple(key.level, key.zone_id, key.node_north_id,
+                               key.node_east_id);
 }
 
 // =================MapImageCache=================
@@ -136,7 +133,7 @@ bool VisualizationEngine::Init(const std::string &map_folder,
     AERROR << "Init other params failed.";
   }
 
-  cv::namedWindow(window_name_, CV_WINDOW_NORMAL);
+  cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
   cv::resizeWindow(window_name_, 1024, 1024);
 
   is_init_ = true;
@@ -145,8 +142,8 @@ bool VisualizationEngine::Init(const std::string &map_folder,
 }
 
 void VisualizationEngine::Visualize(
-    const std::vector<LocalizatonInfo> &loc_infos,
-    const std::vector<Eigen::Vector3d> &cloud) {
+    ::apollo::common::EigenVector<LocalizatonInfo> &&loc_infos,
+    const ::apollo::common::EigenVector3dVec &cloud) {
   if (!is_init_) {
     AERROR << "Visualziation should be init first.";
     return;
@@ -157,7 +154,7 @@ void VisualizationEngine::Visualize(
     return;
   }
 
-  cur_loc_infos_ = loc_infos;
+  cur_loc_infos_ = std::move(loc_infos);
 
   if (!UpdateCarLocId(expected_car_loc_id_)) {
     if (!UpdateCarLocId(car_loc_id_)) {
@@ -284,14 +281,14 @@ void VisualizationEngine::Draw() {
   int left_top_y = node_grid_index.y + 1024 - dis;
 
   cv::resize(big_window_(cv::Rect(left_top_x, left_top_y, width, width)),
-             image_window_, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
+             image_window_, cv::Size(1024, 1024), 0, 0, cv::INTER_LINEAR);
   cv::flip(image_window_, image_window_, 0);
 
   DrawLegend();
   DrawInfo();
   DrawTips();
 
-  cv::namedWindow(window_name_, CV_WINDOW_NORMAL);
+  cv::namedWindow(window_name_, cv::WINDOW_NORMAL);
   // cv::setMouseCallback(window_name_, processMouse, 0);
   cv::imshow(window_name_, image_window_);
 
@@ -386,7 +383,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
 
           cv::Mat mat_tem;
           cv::resize(car_img_mats_[i], mat_tem, cv::Size(48, 24), 0, 0,
-                     CV_INTER_LINEAR);
+                     cv::INTER_LINEAR);
           cv::Mat rotated_mat;
           // AINFO << "yaw: " << yaw;
           // RotateImg(mat_tem, rotated_mat, 90 - yaw);
@@ -400,7 +397,7 @@ void VisualizationEngine::DrawLoc(const cv::Point &bias) {
           if (car_lt.x >= 0 && car_lt.y >= 0 && car_rb.x <= 1024 * 3 &&
               car_rb.y <= 1024 * 3) {
             cv::Mat mat_mask;
-            cv::cvtColor(rotated_mat, mat_mask, CV_BGR2GRAY);
+            cv::cvtColor(rotated_mat, mat_mask, cv::COLOR_BGR2GRAY);
             rotated_mat.copyTo(
                 big_window_(cv::Rect(car_lt.x, car_lt.y, rotated_mat.cols,
                                      rotated_mat.rows)),
@@ -572,9 +569,12 @@ void VisualizationEngine::DrawTips() {
 }
 
 void VisualizationEngine::UpdateLevel() {
-  if (cur_scale_ > max_stride_ * 1.5) SetScale(max_stride_ * 1.5);
-  if (cur_scale_ < 0.5) SetScale(0.5);
-
+  if (cur_scale_ > max_stride_ * 1.5) {
+    SetScale(max_stride_ * 1.5);
+  }
+  if (cur_scale_ < 0.5) {
+    SetScale(0.5);
+  }
   // calculate which image level to use
   cur_level_ = 0;
   cur_stride_ = 1;
@@ -589,9 +589,9 @@ void VisualizationEngine::UpdateLevel() {
 void VisualizationEngine::GenerateMutiResolutionImages(
     const std::vector<std::string> &src_files, const int base_path_length,
     const std::string &dst_folder) {
-  int x_min = INT_MAX;
+  int x_min = std::numeric_limits<int>::max();
   int x_max = -1;
-  int y_min = INT_MAX;
+  int y_min = std::numeric_limits<int>::max();
   int y_max = -1;
   for (size_t i = 0; i < src_files.size(); ++i) {
     int len = static_cast<int>(src_files[i].length());
@@ -657,7 +657,8 @@ void VisualizationEngine::GenerateMutiResolutionImages(
         if (flag) {
           snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                    image_visual_path_dst.c_str(), pt_y, pt_x, lvl);
-          cv::resize(large, small, cv::Size(1024, 1024), 0, 0, CV_INTER_LINEAR);
+          cv::resize(large, small, cv::Size(1024, 1024), 0, 0,
+                     cv::INTER_LINEAR);
           cv::imwrite(ss, small);
         }
       }
@@ -675,7 +676,6 @@ void VisualizationEngine::GenerateMutiResolutionImages(
               image_visual_path_dst.length() - dst_folder.length() - 3)
        << std::endl;
   outf.close();
-  return;
 }
 
 bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
@@ -694,6 +694,10 @@ bool VisualizationEngine::InitOtherParams(const std::string &params_file) {
 
   inf >> x_min >> y_min >> x_max >> y_max >> level >> path;
   inf.close();
+
+  if (level > 5) {
+    level = 5;
+  }
 
   InitOtherParams(x_min, y_min, x_max, y_max, level, path);
 
@@ -728,11 +732,10 @@ void VisualizationEngine::InitOtherParams(const int x_min, const int y_min,
   AINFO << "image_visual_leaf_path: " << image_visual_leaf_path_;
 }
 
-void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
-                                     const Eigen::Affine3d &velodyne_extrinsic,
-                                     const std::vector<Eigen::Vector3d> &cloud,
-                                     cv::Mat *cloud_img,
-                                     cv::Mat *cloud_img_mask) {
+void VisualizationEngine::CloudToMat(
+    const Eigen::Affine3d &cur_pose, const Eigen::Affine3d &velodyne_extrinsic,
+    const ::apollo::common::EigenVector3dVec &cloud, cv::Mat *cloud_img,
+    cv::Mat *cloud_img_mask) {
   unsigned int img_width = map_param_.map_node_size_x;
   unsigned int img_height = map_param_.map_node_size_y;
   Eigen::Vector3d cen = car_pose_.translation();
@@ -794,11 +797,15 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
   }
 
   m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
-  if (m < 0) m = m - (cur_stride_ - 1);
+  if (m < 0) {
+    m = m - (cur_stride_ - 1);
+  }
   key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
 
   n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
-  if (n < 0) n = n - (cur_stride_ - 1);
+  if (n < 0) {
+    n = n - (cur_stride_ - 1);
+  }
   key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
 }
 

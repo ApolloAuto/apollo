@@ -20,9 +20,9 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -35,22 +35,23 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
-using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::GetSByConstantAcceleration;
 
 InteractionPredictor::InteractionPredictor() {
   predictor_type_ = ObstacleConf::INTERACTION_PREDICTOR;
-  BuildADCTrajectory(FLAGS_collision_cost_time_resolution);
 }
 
-void InteractionPredictor::Predict(Obstacle* obstacle) {
+bool InteractionPredictor::Predict(
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container) {
   Clear();
-
   CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+  CHECK_GT(obstacle->history_size(), 0U);
+
+  BuildADCTrajectory(adc_trajectory_container,
+                     FLAGS_collision_cost_time_resolution);
 
   obstacle->SetPredictorType(predictor_type_);
 
@@ -58,7 +59,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   if (!feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
   }
   auto* lane_graph = feature_ptr->mutable_lane()->mutable_lane_graph();
 
@@ -72,8 +73,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& lane_sequence = lane_graph->lane_sequence(i);
     for (const double lon_acceleration : candidate_lon_accelerations) {
-      double cost =
-          ComputeTrajectoryCost(*obstacle, lane_sequence, lon_acceleration);
+      double cost = ComputeTrajectoryCost(
+          *obstacle, lane_sequence, lon_acceleration, adc_trajectory_container);
       if (cost < smallest_cost) {
         smallest_cost = cost;
         best_lon_accelerations[i] = lon_acceleration;
@@ -89,7 +90,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   int best_seq_idx = 0;
   double largest_posterior = 0.0;
-  CHECK_EQ(posteriors.size(), lane_graph->lane_sequence_size());
+  CHECK_EQ(posteriors.size(),
+           static_cast<size_t>(lane_graph->lane_sequence_size()));
   for (int i = 0; i < num_lane_sequence; ++i) {
     double normalized_posterior =
         posteriors[i] / (posterior_sum + FLAGS_double_precision);
@@ -141,14 +143,14 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 void InteractionPredictor::Clear() { Predictor::Clear(); }
 
-void InteractionPredictor::BuildADCTrajectory(const double time_resolution) {
-  auto adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
-          AdapterConfig::PLANNING_TRAJECTORY);
+void InteractionPredictor::BuildADCTrajectory(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    const double time_resolution) {
   if (adc_trajectory_container == nullptr) {
     AERROR << "Null adc trajectory container";
     return;
@@ -238,8 +240,9 @@ bool InteractionPredictor::DrawTrajectory(
 
 double InteractionPredictor::ComputeTrajectoryCost(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double acceleration) {
-  CHECK_GT(obstacle.history_size(), 0);
+    const double acceleration,
+    const ADCTrajectoryContainer* adc_trajectory_container) {
+  CHECK_GT(obstacle.history_size(), 0U);
   double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
 
@@ -251,7 +254,8 @@ double InteractionPredictor::ComputeTrajectoryCost(
   total_cost += FLAGS_centripedal_acceleration_cost_weight * centri_acc_cost;
 
   double collision_cost = 0.0;
-  if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
+  if (LowerRightOfWayThanEgo(obstacle, lane_sequence,
+                             adc_trajectory_container)) {
     collision_cost =
         CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
   }
@@ -333,6 +337,7 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
                                distance * distance);
         cost_abs_sum += std::abs(cost);
         cost_sqr_sum += cost * cost;
+        break;
       } else {
         ++lane_seg_idx;
         remained_s -= lane_length;
@@ -345,10 +350,8 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
 }
 
 bool InteractionPredictor::LowerRightOfWayThanEgo(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence) {
-  auto adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
-          AdapterConfig::PLANNING_TRAJECTORY);
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const ADCTrajectoryContainer* adc_trajectory_container) {
   if (adc_trajectory_container != nullptr &&
       adc_trajectory_container->IsProtected()) {
     return true;

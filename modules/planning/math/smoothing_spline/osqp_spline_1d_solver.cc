@@ -21,9 +21,7 @@
 #include "modules/planning/math/smoothing_spline/osqp_spline_1d_solver.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/math/matrix_operations.h"
-#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -123,8 +121,8 @@ bool OsqpSpline1dSolver::Solve() {
   int constraint_num = static_cast<int>(inequality_constraint_boundary.rows() +
                                         equality_constraint_boundary.rows());
 
-  constexpr double kEpsilon = 1e-9;
-  constexpr float kUpperLimit = 1e9;
+  static constexpr double kEpsilon = 1e-9;
+  static constexpr float kUpperLimit = 1e9;
   c_float l[constraint_num];  // NOLINT
   c_float u[constraint_num];  // NOLINT
   for (int i = 0; i < constraint_num; ++i) {
@@ -149,6 +147,7 @@ bool OsqpSpline1dSolver::Solve() {
   data_->l = l;
   data_->u = u;
 
+  // osqp_setup(&work_, data_, settings_);
   work_ = osqp_setup(data_, settings_);
 
   // Solve Problem

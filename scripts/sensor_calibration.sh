@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -25,8 +25,8 @@ function calibrate_camera_camera() {
   MODULE="camera_camera_calibrator"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "${MODULE}")"
-  
+  NUM_PROCESSES="$(pgrep -f "${MODULE}" | grep -cv '^1$')"
+
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start to calibrate Camera-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
@@ -41,8 +41,8 @@ function calibrate_lidar_camera() {
   MODULE="lidar_camera_calibrator"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "${MODULE}")"
-  
+  NUM_PROCESSES="$(pgrep -f "${MODULE}" | grep -cv '^1$')"
+
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start to calibrate LiDAR-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
@@ -56,8 +56,8 @@ function calibrate_radar_camera() {
   MODULE="radar_camera_calibrator"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "${MODULE}")"
-  
+  NUM_PROCESSES="$(pgrep -f "${MODULE}" | grep -cv '^1$')"
+
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start to calibrate Radar-Camera extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
@@ -71,8 +71,8 @@ function visualize_radar_lidar() {
   MODULE="radar_lidar_visualizer"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "${MODULE}")"
-  
+  NUM_PROCESSES="$(pgrep -f "${MODULE}" | grep -cv '^1$')"
+
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Visualize Radar and LiDAR data, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \
@@ -86,8 +86,8 @@ function calibrate_imu_vehicle() {
   MODULE="imu_car_calibrator"
 
   # check if the module has started
-  NUM_PROCESSES="$(pgrep -c -f "${MODULE}")"
-  
+  NUM_PROCESSES="$(pgrep -f "${MODULE}" | grep -cv '^1$')"
+
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     echo "Start to calibrate Imu-Vehicle extrinsics, Ctrl+C to exit."
     eval "${APOLLO_ROOT_DIR}/modules/calibration/${MODULE}/${MODULE} \

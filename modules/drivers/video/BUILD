@@ -1,10 +1,31 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+install(
+    name = "install",
+    data = [
+        ":runtime_files",
+    ],
+    targets = [
+        "libvideo_driver_component.so",
+    ],
+)
+
+filegroup(
+    name = "runtime_files",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ])
+)
+
 cc_binary(
     name = "libvideo_driver_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
     linkstatic = False,
     deps = [":video_driver_component_lib"],
 )
@@ -24,34 +45,31 @@ cc_library(
 
 cc_library(
     name = "driver",
-    srcs = [
-        "driver.cc",
-    ],
+    srcs = ["driver.cc"],
     hdrs = [
         "driver.h",
         "socket_input.h",
     ],
     deps = [
         "//cyber",
-        "//modules/common/util",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/drivers/video/proto:video_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/drivers/video/proto:video_h265cfg_cc_proto",
     ],
 )
 
 cc_library(
     name = "socket",
-    srcs = [
-        "socket_input.cc",
-    ],
+    srcs = ["socket_input.cc"],
     hdrs = [
         "input.h",
         "socket_input.h",
     ],
     deps = [
         "//cyber",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
         "//modules/common/util",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
     ],
 )
 

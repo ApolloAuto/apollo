@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
-
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
@@ -99,7 +98,7 @@ class SpiralSmootherUtil {
                   [&start_point](Eigen::Vector2d& p) { p = p - start_point; });
 
     ReferenceLineSmootherConfig config;
-    CHECK(cyber::common::GetProtoFromFile(
+    ACHECK(cyber::common::GetProtoFromFile(
         "modules/planning/conf/spiral_smoother_config.pb.txt", &config));
 
     std::vector<double> opt_theta;

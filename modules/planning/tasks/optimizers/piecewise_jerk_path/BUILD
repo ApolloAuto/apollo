@@ -1,24 +1,21 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "piecewise_jerk_path_optimizer",
-    srcs = [
-        "piecewise_jerk_path_optimizer.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_path_optimizer.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    srcs = ["piecewise_jerk_path_optimizer.cc"],
+    hdrs = ["piecewise_jerk_path_optimizer.h"],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math:cartesian_frenet_conversion",
         "//modules/common/math/qp_solver",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_boundary",
         "//modules/planning/common:path_decision",
@@ -33,7 +30,7 @@ cc_library(
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_path_problem",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/reference_line",
         "//modules/planning/tasks/optimizers:path_optimizer",
         "@eigen",
@@ -42,13 +39,9 @@ cc_library(
 
 cc_library(
     name = "piecewise_jerk_path_ipopt_solver",
-    srcs = [
-        "piecewise_jerk_path_ipopt_solver.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_path_ipopt_solver.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    srcs = ["piecewise_jerk_path_ipopt_solver.cc"],
+    hdrs = ["piecewise_jerk_path_ipopt_solver.h"],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber",
         "@eigen",

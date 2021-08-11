@@ -15,23 +15,25 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/lane_detection_component.h"
 
-#include <yaml-cpp/yaml.h>
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <tuple>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
+#include "Eigen/Core"
+#include "Eigen/Dense"
+#include "absl/strings/str_cat.h"
+#include "yaml-cpp/yaml.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
@@ -42,6 +44,7 @@ namespace perception {
 namespace onboard {
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
+using ::apollo::cyber::Clock;
 
 FunInfoType LaneDetectionComponent::init_func_arry_[] = {
     {&LaneDetectionComponent::InitSensorInfo, "InitSensorInfo"},
@@ -70,12 +73,13 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
 
 static bool SetCameraHeight(const std::string &sensor_name,
                             const std::string &params_dir,
+                            const std::string &lidar_sensor_name,
                             float default_camera_height, float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
   try {
     YAML::Node lidar_height =
-        YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
+        YAML::LoadFile(params_dir + "/" + lidar_sensor_name + "_height.yaml");
     base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
     AINFO << base_h;
     YAML::Node camera_ex =
@@ -155,8 +159,8 @@ static bool LoadExtrinsics(const std::string &yaml_file,
 // @description: get project matrix
 static bool GetProjectMatrix(
     const std::vector<std::string> &camera_names,
-    const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
+    const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+    const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   if (camera_names.size() != 2) {
     AINFO << "camera number must be 2!";
@@ -205,15 +209,16 @@ bool LaneDetectionComponent::Init() {
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                     "velodyne128_novatel_extrinsics.yaml",
+                     FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml",
                  &ex_lidar2imu);
-  AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
+  AINFO << FLAGS_lidar_sensor_name + "_novatel_extrinsics.yaml: "
+        << ex_lidar2imu;
 
-  CHECK(visualize_.Init_all_info_single_camera(
-      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
-      pitch_adj_degree, yaw_adj_degree, roll_adj_degree, image_height_,
-      image_width_));
-  homography_image2ground_ = visualize_.homography_im2car();
+  ACHECK(visualize_.Init_all_info_single_camera(
+      camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
+      ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
+      image_height_, image_width_));
+  homography_image2ground_ = visualize_.homography_im2car(visual_camera_);
   camera_lane_pipeline_->SetIm2CarHomography(homography_image2ground_);
 
   if (enable_visualization_) {
@@ -272,9 +277,8 @@ void LaneDetectionComponent::OnReceiveImage(
     const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double msg_timestamp = message->measurement_time() + timestamp_offset_;
-  AINFO << "Enter LaneDetectionComponent::Proc(), "
-        << " camera_name: " << camera_name
-        << " image ts: " + std::to_string(msg_timestamp);
+  AINFO << "Enter LaneDetectionComponent::Proc(), camera_name: " << camera_name
+        << " image ts: " << msg_timestamp;
   // timestamp should be almost monotonic
   if (last_timestamp_ - msg_timestamp > ts_diff_) {
     AINFO << "Received an old message. Last ts is " << std::setprecision(19)
@@ -287,11 +291,11 @@ void LaneDetectionComponent::OnReceiveImage(
 
   // for e2e lantency statistics
   {
-    const double cur_time = apollo::common::time::Clock::NowInSeconds();
+    const double cur_time = Clock::NowInSeconds();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(cur_time) << "]:cur_latency[" << start_latency
           << "]";
   }
 
@@ -311,12 +315,12 @@ void LaneDetectionComponent::OnReceiveImage(
 
   // for e2e lantency statistics
   {
-    const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
+    const double end_timestamp = Clock::NowInSeconds();
     const double end_latency =
         (end_timestamp - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
-          << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
-          << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
+          << FORMAT_TIMESTAMP(message->measurement_time()) << "]:cur_time["
+          << FORMAT_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
           << "]";
   }
 }
@@ -509,7 +513,8 @@ int LaneDetectionComponent::InitCameraFrames() {
   for (const auto &camera_name : camera_names_) {
     float height = 0.0f;
     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
-                    default_camera_height_, &height);
+                    FLAGS_lidar_sensor_name, default_camera_height_,
+                    &height);
     camera_height_map_[camera_name] = height;
   }
 
@@ -544,7 +549,7 @@ int LaneDetectionComponent::InitMotionService() {
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
   if (mot_buffer_ == nullptr) {
-    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+    mot_buffer_.reset(new base::MotionBuffer(motion_buffer_size_));
   } else {
     mot_buffer_->set_capacity(motion_buffer_size_);
   }
@@ -595,9 +600,9 @@ int LaneDetectionComponent::InternalProc(
   Eigen::Affine3d camera2world_trans;
   if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
           msg_timestamp, &camera2world_trans)) {
-    std::string err_str = "failed to get camera to world pose, ts: " +
-                          std::to_string(msg_timestamp) +
-                          " camera_name: " + camera_name;
+    const std::string err_str =
+        absl::StrCat("failed to get camera to world pose, ts: ", msg_timestamp,
+                     " camera_name: ", camera_name);
     AERROR << err_str;
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     prefused_message->error_code_ = *error_code;
@@ -631,8 +636,8 @@ int LaneDetectionComponent::InternalProc(
 
   if (!camera_lane_pipeline_->Perception(camera_perception_options_,
                                          &camera_frame)) {
-    AERROR << "camera_lane_pipeline_->Perception() failed"
-           << " msg_timestamp: " << std::to_string(msg_timestamp);
+    AERROR << "camera_lane_pipeline_->Perception() failed msg_timestamp: "
+           << msg_timestamp;
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     prefused_message->error_code_ = *error_code;
     return cyber::FAIL;
@@ -666,17 +671,14 @@ int LaneDetectionComponent::InternalProc(
     std::shared_ptr<base::Blob<uint8_t>> image_blob(new base::Blob<uint8_t>);
     camera_frame.data_provider->GetImageBlob(image_options, image_blob.get());
 
-    // visualize right away
-    if (camera_name == visual_camera_) {
-      cv::Mat output_image(image_height_, image_width_, CV_8UC3,
-                           cv::Scalar(0, 0, 0));
-      base::Image8U out_image(image_height_, image_width_, base::Color::RGB);
-      camera_frame.data_provider->GetImage(image_options, &out_image);
-      memcpy(output_image.data, out_image.cpu_data(),
-             out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
-                                                   mot_buffer_, world2camera);
-    }
+    cv::Mat output_image(image_height_, image_width_, CV_8UC3,
+                         cv::Scalar(0, 0, 0));
+    base::Image8U out_image(image_height_, image_width_, base::Color::RGB);
+    camera_frame.data_provider->GetImage(image_options, &out_image);
+    memcpy(output_image.data, out_image.cpu_data(),
+           out_image.total() * sizeof(uint8_t));
+    visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                 mot_buffer_, world2camera);
   }
 
   // send out lane message
@@ -696,7 +698,10 @@ int LaneDetectionComponent::InternalProc(
 int LaneDetectionComponent::ConvertLaneToCameraLaneline(
     const base::LaneLine &lane_line,
     apollo::perception::camera::CameraLaneLine *camera_laneline) {
-  CHECK_NOTNULL(camera_laneline);
+  if (camera_laneline == nullptr) {
+    AERROR << "camera_laneline is not available";
+    return false;
+  }
   // fill the lane line attribute
   apollo::perception::camera::LaneLineType line_type =
       static_cast<apollo::perception::camera::LaneLineType>(lane_line.type);
@@ -771,7 +776,10 @@ int LaneDetectionComponent::MakeProtobufMsg(
     double msg_timestamp, const std::string &camera_name,
     const camera::CameraFrame &camera_frame,
     apollo::perception::PerceptionLanes *lanes_msg) {
-  CHECK_NOTNULL(lanes_msg);
+  if (lanes_msg == nullptr) {
+    AERROR << "lanes_msg is not available";
+    return false;
+  }
   auto itr = std::find(camera_names_.begin(), camera_names_.end(), camera_name);
   if (itr == camera_names_.end()) {
     AERROR << "invalid camera_name: " << camera_name;

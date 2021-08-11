@@ -7,18 +7,6 @@ config: {
 }
 
 config: {
-  rule_id: CHANGE_LANE
-  enabled: true
-  change_lane {
-    min_overtake_distance: 10.0
-    min_overtake_time: 2.0
-    enable_guard_obstacle: true
-    guard_distance: 100.0
-    min_guard_speed: 1.0
-  }
-}
-
-config: {
   rule_id: CROSSWALK
   enabled: true
   crosswalk {
@@ -83,7 +71,7 @@ config: {
   enabled: true
   traffic_light {
     stop_distance: 1.0
-    max_stop_deceleration: 6.0
+    max_stop_deceleration: 4.0
   }
 }
 

@@ -50,7 +50,7 @@ class MlfTrackObjectMatcher {
   void Match(const MlfTrackObjectMatcherOptions &options,
              const std::vector<TrackedObjectPtr> &objects,
              const std::vector<MlfTrackDataPtr> &tracks,
-             std::vector<std::pair<size_t, size_t> > *assignments,
+             std::vector<std::pair<size_t, size_t>> *assignments,
              std::vector<size_t> *unassigned_tracks,
              std::vector<size_t> *unassigned_objects);
 
@@ -67,11 +67,12 @@ class MlfTrackObjectMatcher {
 
  protected:
   std::unique_ptr<MlfTrackObjectDistance> track_object_distance_;
-  std::unique_ptr<BaseBipartiteGraphMatcher> foreground_matcher_;
-  std::unique_ptr<BaseBipartiteGraphMatcher> background_matcher_;
+  BaseBipartiteGraphMatcher *foreground_matcher_;
+  BaseBipartiteGraphMatcher *background_matcher_;
 
   float bound_value_ = 100.f;
   float max_match_distance_ = 4.0f;
+  bool use_semantic_map = false;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(MlfTrackObjectMatcher);

@@ -1,15 +1,12 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rule_based_stop_decider",
-    srcs = [
-        "rule_based_stop_decider.cc",
-    ],
-    hdrs = [
-        "rule_based_stop_decider.h",
-    ],
+    srcs = ["rule_based_stop_decider.cc"],
+    hdrs = ["rule_based_stop_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",

@@ -16,7 +16,7 @@
 
 #include "modules/tools/visualizer/scene_camera_dialog.h"
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 #include "modules/tools/visualizer/ui_scene_camera_dialog.h"
 

@@ -16,7 +16,7 @@
 
 #include "modules/control/common/hysteresis_filter.h"
 
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 #include "gtest/gtest.h"

@@ -25,6 +25,7 @@
 
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
@@ -49,8 +50,12 @@ class Predictor {
   /**
    * @brief Make prediction
    * @param Obstacle pointer
+   * @param Obstacles container
+   * @return If predicted successfully
    */
-  virtual void Predict(Obstacle* obstacle) = 0;
+  virtual bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+                       Obstacle* obstacle,
+                       ObstaclesContainer* obstacles_container) = 0;
 
   /**
    * @brief Get trajectory size

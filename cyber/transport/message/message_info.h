@@ -38,6 +38,7 @@ class MessageInfo {
 
   MessageInfo& operator=(const MessageInfo& another);
   bool operator==(const MessageInfo& another) const;
+  bool operator!=(const MessageInfo& another) const;
 
   bool SerializeTo(std::string* dst) const;
   bool SerializeTo(char* dst, std::size_t len) const;
@@ -47,6 +48,9 @@ class MessageInfo {
   // getter and setter
   const Identity& sender_id() const { return sender_id_; }
   void set_sender_id(const Identity& sender_id) { sender_id_ = sender_id; }
+
+  uint64_t channel_id() const { return channel_id_; }
+  void set_channel_id(uint64_t channel_id) { channel_id_ = channel_id; }
 
   uint64_t seq_num() const { return seq_num_; }
   void set_seq_num(uint64_t seq_num) { seq_num_ = seq_num; }
@@ -58,7 +62,8 @@ class MessageInfo {
 
  private:
   Identity sender_id_;
-  uint64_t seq_num_;
+  uint64_t channel_id_ = 0;
+  uint64_t seq_num_ = 0;
   Identity spare_id_;
 };
 

@@ -36,7 +36,7 @@ class Monitor : public apollo::cyber::TimerComponent {
   bool Proc() override;
 
  private:
-  std::vector<std::unique_ptr<RecurrentRunner>> runners_;
+  std::vector<std::shared_ptr<RecurrentRunner>> runners_;
 };
 
 CYBER_REGISTER_COMPONENT(Monitor)

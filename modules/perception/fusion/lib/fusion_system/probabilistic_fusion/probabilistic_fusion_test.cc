@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
-#define private public
-#define protected public
+#include "gtest/gtest.h"
+
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
-#include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -38,7 +37,7 @@ TEST(ProbabliticFusionTest, test_init) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
+  init_options.main_sensors = std::vector<std::string>{"velodyne64"};
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
@@ -107,7 +106,7 @@ TEST(ProbabliticFusionTest, test_update) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
+  init_options.main_sensors = std::vector<std::string>{"velodyne64"};
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
@@ -258,7 +257,7 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
+  init_options.main_sensors = std::vector<std::string>{"velodyne64"};
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");

@@ -20,8 +20,8 @@
 #include <cmath>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -266,8 +266,8 @@ double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
         return 0.0;
     }
   }
-  CHECK(0) << "unimplemented state: " << gx1 << " " << gy1 << " " << gx2 << " "
-           << gy2;
+  ACHECK(0) << "unimplemented state: " << gx1 << " " << gy1 << " " << gx2 << " "
+            << gy2;
   return 0.0;
 }
 
@@ -344,7 +344,7 @@ void Box2d::LateralExtend(const double extension_length) {
 }
 
 std::string Box2d::DebugString() const {
-  return util::StrCat("box2d ( center = ", center_.DebugString(),
+  return absl::StrCat("box2d ( center = ", center_.DebugString(),
                       "  heading = ", heading_, "  length = ", length_,
                       "  width = ", width_, " )");
 }

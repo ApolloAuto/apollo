@@ -18,8 +18,9 @@
 
 #include <memory>
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {

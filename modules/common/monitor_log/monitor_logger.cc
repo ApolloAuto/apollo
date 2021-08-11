@@ -17,13 +17,17 @@
 
 #include <memory>
 
+#include "absl/strings/str_cat.h"
+
+using ::apollo::cyber::Time;
+
 namespace apollo {
 namespace common {
 namespace monitor {
 
 MonitorLogger::MonitorLogger() {
-  auto node_name =
-      "monitor_logger" + std::to_string(cyber::Time::Now().ToNanosecond());
+  const std::string node_name =
+      absl::StrCat("monitor_logger", Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   if (node_ != nullptr) {
     monitor_msg_writer_ =
@@ -53,7 +57,7 @@ void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
   RETURN_IF_NULL(monitor_msg_writer_);
   common::util::FillHeader("monitor", message);
-  monitor_msg_writer_->Write(std::make_shared<MonitorMessage>(*message));
+  monitor_msg_writer_->Write(*message);
 }
 
 }  // namespace monitor

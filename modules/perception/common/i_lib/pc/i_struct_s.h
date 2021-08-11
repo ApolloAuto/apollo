@@ -331,11 +331,11 @@ class VoxelGridXY {
 
   unsigned int NrIndexedPoints() const;
 
-  std::vector<Voxel<T> > &GetVoxels() { return voxels_; }
+  std::vector<Voxel<T>> &GetVoxels() { return voxels_; }
 
-  const std::vector<Voxel<T> > &GetConstVoxels() const { return voxels_; }
+  const std::vector<Voxel<T>> &GetConstVoxels() const { return voxels_; }
 
-  void SetVoxels(const std::vector<Voxel<T> > &voxels) {
+  void SetVoxels(const std::vector<Voxel<T>> &voxels) {
     voxels_.assign(voxels.begin(), voxels.end());
   }
 
@@ -459,7 +459,7 @@ class VoxelGridXY {
   T dim_x_[2], dim_y_[2], dim_z_[2], voxel_dim_[3];
   float *mem_aligned16_f32_ = nullptr;
   int *mem_aligned16_i32_ = nullptr;
-  std::vector<Voxel<T> > voxels_;
+  std::vector<Voxel<T>> voxels_;
 };
 
 template <typename T>
@@ -548,8 +548,6 @@ void VoxelGridXY<T>::Reserve() {
     m = IMax(8, static_cast<int>(s_nr_max_reserved_points_ * kernel[i]));
     voxels_[i].Reserve(m);
   }
-
-  return;
 }
 
 template <typename T>
@@ -1010,7 +1008,6 @@ static void IPushBackVectors(const std::vector<T> &src, std::vector<T> *dst) {
     dst->resize(i + j);
     ICopy(src.data(), dst->data() + j, static_cast<int>(i));
   }
-  return;
 }
 
 // VoxelgridXY downsample functions
@@ -1111,7 +1108,7 @@ bool IDownsampleVoxelGridXY(const VoxelGridXY<T> &src, VoxelGridXY<T> *dst,
     vxs[i] = vxs[i - 1] + voxel_width_x_dst;
   }
 
-  std::vector<Voxel<T> > voxels(nr_voxel_y_dst * nr_voxel_x_dst);
+  std::vector<Voxel<T>> voxels(nr_voxel_y_dst * nr_voxel_x_dst);
 
   for (r = 0; r < nr_voxel_y_dst; r++) {
     rs = (r * sf_y);
@@ -1243,7 +1240,7 @@ class VoxelGridXYPyramid {
   unsigned int nr_points_, nr_point_element_;
   unsigned int dsf_x_, dsf_y_, dsf_z_;
   const DATA_TYPE *pc_;
-  std::vector<VoxelGridXY<DATA_TYPE> > vgrids_;
+  std::vector<VoxelGridXY<DATA_TYPE>> vgrids_;
 };
 
 template <typename DATA_TYPE>

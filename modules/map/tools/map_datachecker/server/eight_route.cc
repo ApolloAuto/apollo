@@ -21,7 +21,7 @@
 namespace apollo {
 namespace hdmap {
 
-EightRoute::EightRoute(std::shared_ptr<JSonConf> sp_conf) : Alignment(sp_conf) {
+EightRoute::EightRoute(std::shared_ptr<JsonConf> sp_conf) : Alignment(sp_conf) {
   Reset();
 }
 
@@ -32,7 +32,7 @@ void EightRoute::Reset() {
 
 bool EightRoute::IsEightRoutePose(const std::vector<FramePose>& poses,
                                   int pose_index) {
-  if (poses.size() == 0 || pose_index <= 0 ||
+  if (poses.empty() || pose_index <= 0 ||
       pose_index >= static_cast<int>(poses.size())) {
     AINFO << "params error, poses size: " << poses.size()
           << ", pose_index: " << pose_index;
@@ -56,9 +56,8 @@ bool EightRoute::IsEightRoutePose(const std::vector<FramePose>& poses,
     return false;
   }
   double vel = dist / during;
-  AINFO << std::to_string(poses[pose_index].time_stamp)
-        << ", yaw_diff:" << yaw_diff << ", dist: " << dist
-        << ", during: " << during << ", vel: " << vel;
+  AINFO << poses[pose_index].time_stamp << ", yaw_diff:" << yaw_diff
+        << ", dist: " << dist << ", during: " << during << ", vel: " << vel;
   if (yaw_diff > sp_conf_->eight_angle && vel > sp_conf_->eight_vel) {
     return true;
   }
@@ -86,9 +85,8 @@ double EightRoute::GetEightRouteProgress(const std::vector<FramePose>& poses) {
     ++start_index;
   }
   if (start_index >= size) {
-    AINFO << "not find first good pose, start_time: "
-          << std::to_string(start_time_) << ", start_index: " << start_index
-          << ", pose size: " << size;
+    AINFO << "not find first good pose, start_time: " << start_time_
+          << ", start_index: " << start_index << ", pose size: " << size;
     return 0.0;
   }
   if (start_index + 1 >= size) {

@@ -17,13 +17,14 @@
 #include "modules/localization/msf/local_tool/local_visualization/online_visual/online_visualizer_component.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/config_gflags.h"
+
+#include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/string_tokenizer.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
@@ -70,7 +71,7 @@ bool OnlineVisualizerComponent::InitConfig() {
   }
   std::cout << "Load lidar extrinsic succeed." << std::endl;
 
-  BaseMapConfig map_config;
+  pyramid_map::BaseMapConfig map_config;
   std::string config_file = map_folder_ + "/config.xml";
   map_config.map_version_ = "lossy_map";
   success = map_config.Load(config_file);
@@ -229,7 +230,7 @@ void OnlineVisualizerComponent::OnFusionLocalization(
 
 void OnlineVisualizerComponent::ParsePointCloudMessage(
     const std::shared_ptr<drivers::PointCloud> &msg,
-    std::vector<Eigen::Vector3d> *pt3ds,
+    ::apollo::common::EigenVector3dVec *pt3ds,
     std::vector<unsigned char> *intensities) {
   CHECK_NOTNULL(pt3ds);
   CHECK_NOTNULL(intensities);
@@ -265,7 +266,6 @@ void OnlineVisualizerComponent::ParsePointCloudMessage(
       }
     }
   }
-  return;
 }
 
 }  // namespace msf

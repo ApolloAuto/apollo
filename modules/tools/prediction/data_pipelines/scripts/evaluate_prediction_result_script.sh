@@ -30,5 +30,5 @@ set -e
 source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash
 
-python /apollo/modules/tools/prediction/data_pipelines/performance_evaluation/evaluate_prediction_result.py \
+/apollo/bazel-bin/modules/tools/prediction/data_pipelines/performance_evaluation/evaluate_prediction_result \
     ${RESULTS_DIR} ${LABELS_DIR} ${TIME_RANGE}

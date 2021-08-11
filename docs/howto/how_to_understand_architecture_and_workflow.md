@@ -3,20 +3,19 @@ HOW TO UNDERSTAND ARCHITECTURE AND WORKFLOW
 
 ## Fundamentals to understand AplloAuto - core
 
-Autonomous vehicles \(AV\) dynamics controlled by planning engine through Controller Area Network bus \(CAN bus\). Software reads data from
-hardware registers and writes them back just like we did in Assembly language. To compute concisely, Location Module, Perception Module, Planning Module as independent
-input sources and output sources work together though Peer2Peer. P2P supported by RPC networks application.
+Autonomous vehicles \(AV\) dynamics are controlled by the planning engine through the Controller Area Network bus \(CAN bus\). The software reads data from hardware registers and writes them back just like we would in Assembly language. For high-precision computation, the Localization, Perception and Planning modules function as independent
+input sources, while output sources work together though the Peer2Peer (P2P) protocol. P2P is supported by the RPC network application.
 
-ApolloAuto uses ROS1 as the underlying network which means that ApolloAuto borrows Master-Nodes framework from ROS1. Since xmlRPC from ROS1 is really old \(compared
-to the recent brpc and [grpc](https://yiakwy.github.io/blog/2017/10/01/gRPC-C-CORE)\), Baidu develops its own protobuf version of RPC.
+ApolloAuto uses ROS1 as the underlying network which means that ApolloAuto borrows the Master-Nodes framework from ROS1. Since xmlRPC from ROS1 is really old \(compared
+to the recent brpc and [grpc](https://yiakwy.github.io/blog/2017/10/01/gRPC-C-CORE)\), Baidu has developed its own protobuf version of RPC.
 
 In Baidu ApolloAuto, three stages of development have already been described
 
-1. Offline Simulation Engine Dreamviewer & ApolloAuto core software module
+1. Dreamviewer Offline Simulation Engine & ApolloAuto core software module
    - Get a first taste on how the algorithms work for a car
    - We don't need to touch a real car or hardware and start development immediately
 2. Core modules Integration:
-   - Location
+   - Localization
    - Perception \(support third parties' solution like Mobileye ES4 chip based camera for L2 development\) process point cloud data from `Lidar` and return segmented objects info on request
    - Planning: compute the fine-tuned path, car dynamic controlling info for path segments from route service
    - Routine: local implementation of finding path segments through `Navigator` interface; Using A\*star algorithm.

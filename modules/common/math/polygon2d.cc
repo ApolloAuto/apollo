@@ -21,6 +21,9 @@
 #include <limits>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/string_util.h"
@@ -39,7 +42,7 @@ Polygon2d::Polygon2d(std::vector<Vec2d> points) : points_(std::move(points)) {
 }
 
 double Polygon2d::DistanceTo(const Vec2d &point) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (IsPointIn(point)) {
     return 0.0;
   }
@@ -51,7 +54,7 @@ double Polygon2d::DistanceTo(const Vec2d &point) const {
 }
 
 double Polygon2d::DistanceSquareTo(const Vec2d &point) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (IsPointIn(point)) {
     return 0.0;
   }
@@ -67,7 +70,7 @@ double Polygon2d::DistanceTo(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return DistanceTo(line_segment.start());
   }
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (IsPointIn(line_segment.center())) {
     return 0.0;
   }
@@ -87,12 +90,12 @@ double Polygon2d::DistanceTo(const LineSegment2d &line_segment) const {
 }
 
 double Polygon2d::DistanceTo(const Box2d &box) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   return DistanceTo(Polygon2d(box));
 }
 
 double Polygon2d::DistanceTo(const Polygon2d &polygon) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   CHECK_GE(polygon.num_points(), 3);
 
   if (IsPointIn(polygon.points()[0])) {
@@ -117,14 +120,14 @@ double Polygon2d::DistanceToBoundary(const Vec2d &point) const {
 }
 
 bool Polygon2d::IsPointOnBoundary(const Vec2d &point) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   return std::any_of(
       line_segments_.begin(), line_segments_.end(),
       [&](const LineSegment2d &poly_seg) { return poly_seg.IsPointIn(point); });
 }
 
 bool Polygon2d::IsPointIn(const Vec2d &point) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (IsPointOnBoundary(point)) {
     return true;
   }
@@ -143,7 +146,7 @@ bool Polygon2d::IsPointIn(const Vec2d &point) const {
 }
 
 bool Polygon2d::HasOverlap(const Polygon2d &polygon) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (polygon.max_x() < min_x() || polygon.min_x() > max_x() ||
       polygon.max_y() < min_y() || polygon.min_y() > max_y()) {
     return false;
@@ -155,7 +158,7 @@ bool Polygon2d::Contains(const LineSegment2d &line_segment) const {
   if (line_segment.length() <= kMathEpsilon) {
     return IsPointIn(line_segment.start());
   }
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (!IsPointIn(line_segment.start())) {
     return false;
   }
@@ -174,7 +177,7 @@ bool Polygon2d::Contains(const LineSegment2d &line_segment) const {
 }
 
 bool Polygon2d::Contains(const Polygon2d &polygon) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (area_ < polygon.area() - kMathEpsilon) {
     return false;
   }
@@ -326,14 +329,14 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
   }
 
   points->swap(new_points);
-  return points->size() >= 3;
+  return points->size() >= 3U;
 }
 
 bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
                                Polygon2d *const overlap_polygon) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   CHECK_NOTNULL(overlap_polygon);
-  CHECK(is_convex_ && other_polygon.is_convex());
+  ACHECK(is_convex_ && other_polygon.is_convex());
   std::vector<Vec2d> points = other_polygon.points();
   for (int i = 0; i < num_points_; ++i) {
     if (!ClipConvexHull(line_segments_[i], &points)) {
@@ -354,7 +357,7 @@ double Polygon2d::ComputeIoU(const Polygon2d &other_polygon) const {
 }
 
 bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if ((line_segment.start().x() < min_x_ && line_segment.end().x() < min_x_) ||
       (line_segment.start().x() > max_x_ && line_segment.end().x() > max_x_) ||
       (line_segment.start().y() < min_y_ && line_segment.end().y() < min_y_) ||
@@ -368,7 +371,7 @@ bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
 
 bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,
                            Vec2d *const first, Vec2d *const last) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   CHECK_NOTNULL(first);
   CHECK_NOTNULL(last);
 
@@ -419,7 +422,7 @@ std::vector<Vec2d> Polygon2d::GetAllVertices() const { return points_; }
 
 std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     const LineSegment2d &line_segment) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
 
   if (line_segment.length() <= kMathEpsilon) {
     std::vector<LineSegment2d> overlaps;
@@ -473,7 +476,7 @@ std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
 
 void Polygon2d::ExtremePoints(const double heading, Vec2d *const first,
                               Vec2d *const last) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   CHECK_NOTNULL(first);
   CHECK_NOTNULL(last);
 
@@ -498,7 +501,7 @@ AABox2d Polygon2d::AABoundingBox() const {
 }
 
 Box2d Polygon2d::BoundingBoxWithHeading(const double heading) const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   const Vec2d direction_vec = Vec2d::CreateUnitVec2d(heading);
   Vec2d px1;
   Vec2d px2;
@@ -517,11 +520,11 @@ Box2d Polygon2d::BoundingBoxWithHeading(const double heading) const {
 }
 
 Box2d Polygon2d::MinAreaBoundingBox() const {
-  CHECK_GE(points_.size(), 3);
+  CHECK_GE(points_.size(), 3U);
   if (!is_convex_) {
     Polygon2d convex_polygon;
     ComputeConvexHull(points_, &convex_polygon);
-    CHECK(convex_polygon.is_convex());
+    ACHECK(convex_polygon.is_convex());
     return convex_polygon.MinAreaBoundingBox();
   }
   double min_area = std::numeric_limits<double>::infinity();
@@ -579,7 +582,7 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
   if (!is_convex_) {
     Polygon2d convex_polygon;
     ComputeConvexHull(points_, &convex_polygon);
-    CHECK(convex_polygon.is_convex());
+    ACHECK(convex_polygon.is_convex());
     return convex_polygon.ExpandByDistance(distance);
   }
   const double kMinAngle = 0.1;
@@ -601,15 +604,15 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
     }
   }
   Polygon2d new_polygon;
-  CHECK(ComputeConvexHull(points, &new_polygon));
+  ACHECK(ComputeConvexHull(points, &new_polygon));
   return new_polygon;
 }
 
 std::string Polygon2d::DebugString() const {
-  return util::StrCat("polygon2d (  num_points = ", num_points_, "  points = (",
-                      util::PrintDebugStringIter(points_), " )  ",
-                      is_convex_ ? "convex" : "non-convex", "  area = ", area_,
-                      " )");
+  return absl::StrCat("polygon2d (  num_points = ", num_points_, "  points = (",
+                      absl::StrJoin(points_, " ", util::DebugStringFormatter()),
+                      " )  ", is_convex_ ? "convex" : "non-convex",
+                      "  area = ", area_, " )");
 }
 
 }  // namespace math

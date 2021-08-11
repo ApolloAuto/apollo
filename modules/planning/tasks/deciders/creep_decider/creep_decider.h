@@ -20,10 +20,9 @@
 
 #pragma once
 
+#include <memory>
+
 #include "cyber/common/macros.h"
-
-#include "modules/planning/proto/decider_config.pb.h"
-
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -34,7 +33,8 @@ namespace planning {
 
 class CreepDecider : public Decider {
  public:
-  explicit CreepDecider(const TaskConfig& config);
+  CreepDecider(const TaskConfig& config,
+               const std::shared_ptr<DependencyInjector>& injector);
 
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
@@ -49,7 +49,6 @@ class CreepDecider : public Decider {
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-  static uint32_t creep_clear_counter_;
   common::TrajectoryPoint adc_planning_start_point_;
   hdmap::Lane curr_lane_;
 };

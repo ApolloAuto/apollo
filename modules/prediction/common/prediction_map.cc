@@ -277,6 +277,9 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
 bool PredictionMap::IsPointInJunction(
     const double x, const double y,
     const std::shared_ptr<const JunctionInfo> junction_info_ptr) {
+  if (junction_info_ptr == nullptr) {
+    return false;
+  }
   const Polygon2d& polygon = junction_info_ptr->polygon();
   return polygon.IsPointIn({x, y});
 }
@@ -405,7 +408,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
         if (s < 0.0 || s >= nearby_lane->total_length() ||
-                       std::fabs(l) > radius) {
+            std::fabs(l) > radius) {
           continue;
         }
         lane_ids.insert(id);
@@ -421,7 +424,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
         if (s < 0.0 || s >= nearby_lane->total_length() ||
-                       std::fabs(l) > radius) {
+            std::fabs(l) > radius) {
           continue;
         }
         lane_ids.insert(id);
@@ -656,13 +659,57 @@ int PredictionMap::LaneTurnType(const std::string& lane_id) {
 
 std::vector<std::shared_ptr<const LaneInfo>> PredictionMap::GetNearbyLanes(
     const common::PointENU& position, const double nearby_radius) {
-  CHECK(position.has_x() && position.has_y() && position.has_z());
-  CHECK(nearby_radius > 0.0);
+  ACHECK(position.has_x() && position.has_y() && position.has_z());
+  ACHECK(nearby_radius > 0.0);
 
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
 
   HDMapUtil::BaseMap().GetLanes(position, nearby_radius, &nearby_lanes);
   return nearby_lanes;
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::LaneWithSmallestAverageCurvature(
+    const std::vector<std::shared_ptr<const LaneInfo>>& lane_infos) {
+  ACHECK(!lane_infos.empty());
+  size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
+  std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
+  if (selected_lane_info == nullptr) {
+    AERROR << "Lane Vector first element: selected_lane_info is nullptr.";
+    return nullptr;
+  }
+  double smallest_curvature =
+      AverageCurvature(selected_lane_info->id().id(), sample_size);
+  for (size_t i = 1; i < lane_infos.size(); ++i) {
+    std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
+    if (lane_info == nullptr) {
+      AWARN << "Lane vector element: one lane_info is nullptr.";
+      continue;
+    }
+    double curvature = AverageCurvature(lane_info->id().id(), sample_size);
+    if (curvature < smallest_curvature) {
+      smallest_curvature = curvature;
+      selected_lane_info = lane_info;
+    }
+  }
+  return selected_lane_info;
+}
+
+double PredictionMap::AverageCurvature(const std::string& lane_id,
+                                       const size_t sample_size) {
+  CHECK_GT(sample_size, 0U);
+  std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
+      PredictionMap::LaneById(lane_id);
+  if (lane_info_ptr == nullptr) {
+    return 0.0;
+  }
+  double lane_length = lane_info_ptr->total_length();
+  double s_gap = lane_length / static_cast<double>(sample_size);
+  double curvature_sum = 0.0;
+  for (size_t i = 0; i < sample_size; ++i) {
+    double s = s_gap * static_cast<double>(i);
+    curvature_sum += std::abs(PredictionMap::CurvatureOnLane(lane_id, s));
+  }
+  return curvature_sum / static_cast<double>(sample_size);
 }
 
 }  // namespace prediction

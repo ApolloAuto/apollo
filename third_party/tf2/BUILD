@@ -1,7 +1,4 @@
-# JSON for Modern C++
-package(default_visibility = ["//visibility:public"])
-
-licenses(["notice"])
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "tf2",
@@ -12,10 +9,13 @@ cc_library(
         "src/time.cpp",
     ],
     hdrs = glob([
-        "include/**/*.h",
+        "include/geometry_msgs/**",
+        "include/tf2_msgs/**",
+        "include/tf2/**",
     ]),
-    includes = [
-        "include",
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@boost",
     ],
-    linkopts = ["-L/usr/local/apollo/boost/lib -lboost_signals -lboost_system -lboost_thread"],
 )

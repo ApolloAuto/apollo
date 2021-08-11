@@ -15,75 +15,119 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
+ARCH="$(uname -m)"
+
+##==============================================================##
+## Note(storypku): DRY broken for this self-contained script.
+##==============================================================##
+BOLD='\033[1m'
+RED='\033[0;31m'
+WHITE='\033[34m'
+NO_COLOR='\033[0m'
+
+function info() {
+  (echo >&2 -e "[${WHITE}${BOLD}INFO${NO_COLOR}] $*")
+}
+
+function error() {
+  (echo >&2 -e "[${RED}ERROR${NO_COLOR}] $*")
+}
+##==============================================================##
+
 function install_filesystem_support() {
-MACHINE_VERSION=$(uname -r)
-if [ "$MACHINE_VERSION" == "4.4.32-apollo-2-RT" ]; then
-   echo "system have install realtime kernel"
-   echo "it support overlay2, no need to install aufs"
-   sudo modprobe overlay
-else
-   MAIN_KERNEL_VERSION=${MACHINE_VERSION:0:1}
-   if [ ${MAIN_KERNEL_VERSION} -gt 3 \
-       -a -f /lib/modules/$MACHINE_VERSION/kernel/fs/overlayfs/overlay.ko ]; then
-     echo "the kernel version 4 or higher;"
-     echo "it has support overlay2"
-     sudo modprobe overlay
-   else
-     echo "the kernel version is lower than 4"
-     echo "try to install aufs"
-     sudo apt-get update
-     sudo apt-get install \
-      linux-image-extra-$(uname -r) \
-      linux-image-extra-virtual
-   fi
-fi
-sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  local kernel_version="$(uname -r)"
+  if [ "$kernel_version" == "4.4.32-apollo-2-RT" ]; then
+    info "Apollo realtime kernel ${kernel_version} found."
+    sudo modprobe overlay
+  else
+    local kernel_version_major=${kernel_version:0:1}
+    local overlay_ko_path="/lib/modules/$kernel_version/kernel/fs/overlayfs/overlay.ko"
+    if [ "${kernel_version_major}" -ge 4 ] && [ -f "${overlay_ko_path}" ] ; then
+      info "Linux kernel ${kernel_version} has builtin overlay2 support."
+      sudo modprobe overlay
+    elif [ ${kernel_version_major} -ge 4 ]; then
+      error "Overlay kernel module not found at ${overlay_ko_path}." \
+            "Are you running on a customized Linux kernel? "
+      exit 1
+    else
+      error "Linux kernel version >= 4 expected. Got ${kernel_version}"
+      exit 1
+    fi
+  fi
 }
 
-function install_docker_x86() {
+function install_prereq_packages() {
+  sudo apt-get -y update
+  sudo apt-get -y install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+}
+
+
+function setup_docker_repo_and_install() {
+  local issues_link="https://github.com/ApolloAuto/apollo/issues"
+  local arch_alias=
+  if [ "${ARCH}" == "x86_64" ]; then
+    arch_alias="amd64"
+  elif [ "${ARCH}" == "aarch64" ]; then
+    arch_alias="arm64"
+  else
+    error "Currently, ${ARCH} support has not been implemented yet." \
+          "You can create an issue at ${issues_link}."
+    exit 1
+  fi
+
+  curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" | sudo apt-key add -
   sudo add-apt-repository \
-     "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    "deb [arch=${arch_alias}] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
   sudo apt-get update
-  sudo apt-get install -y docker-ce
-  sudo groupadd docker
-  sudo gpasswd -a $USER docker
-  newgrp docker
+  sudo apt-get install -y docker-ce \
+    docker-ce-cli \
+    containerd.io
 }
 
-function install_docker_arm() {
-  sudo bash -c 'echo "deb [arch=arm64] https://download.docker.com/linux/ubuntu xenial edge" > /etc/apt/sources.list.d/docker.list'
-  sudo apt-get update
-  sudo apt-get install -y docker-ce
-  sudo groupadd docker
-  sudo gpasswd -a $USER docker
-  newgrp docker
+function post_install_settings() {
+  sudo usermod -aG docker $USER
+  sudo systemctl restart docker
+  # sudo groupadd docker
+  # sudo gpasswd -a $USER docker
+  # newgrp docker
 }
 
-function install() {
-   # the machine type, currently support x86_64, aarch64
-install_filesystem_support
-MACHINE_ARCH=$(uname -m)
-if [ "$MACHINE_ARCH" == 'x86_64' ]; then
-  install_docker_x86
-elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
-  install_docker_arm
-else
-  echo "Unknown machine architecture $MACHINE_ARCH"
-  exit 1
-fi
+function install_docker() {
+  # Architecture support, currently: x86_64, aarch64
+  install_filesystem_support
+  install_prereq_packages
+  setup_docker_repo_and_install
+  post_install_settings
 }
 
-case $1 in
-　　install)
-      install
+function uninstall_docker() {
+  sudo apt-get -y remove docker docker-engine docker.io
+  sudo apt-get purge docker-ce
+
+  sudo sed -i '/download.docker.com/d' /etc/apt/sources.list
+  sudo apt-key del 0EBFCD88
+}
+
+function main() {
+  case $1 in
+    install)
+      install_docker
       ;;
-   uninstall)
-      sudo apt-get remove docker docker-engine docker.io
-      sudo apt-get purge docker-ce
+    uninstall)
+      uninstall_docker
       ;;
-   *)
-      install
+    *)
+      install_docker
       ;;
-esac
+  esac
+}
+
+main "$@"

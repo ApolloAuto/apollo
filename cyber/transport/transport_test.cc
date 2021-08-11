@@ -16,12 +16,14 @@
 
 #include "cyber/transport/transport.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <typeinfo>
 
-#include "cyber/init.h"
+#include "gtest/gtest.h"
+
 #include "cyber/proto/unit_test.pb.h"
+
+#include "cyber/init.h"
 #include "cyber/transport/common/identity.h"
 
 namespace apollo {

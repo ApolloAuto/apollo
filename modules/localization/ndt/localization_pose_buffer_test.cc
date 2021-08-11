@@ -15,11 +15,14 @@
  *****************************************************************************/
 
 #include "modules/localization/ndt/localization_pose_buffer.h"
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+
 #include <memory>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "gtest/gtest.h"
-#include "modules/common/time/time.h"
+
+#include "cyber/time/clock.h"
 
 namespace apollo {
 namespace localization {
@@ -37,29 +40,29 @@ class NDTLocalizationTest : public ::testing::Test {
 TEST_F(NDTLocalizationTest, UpdateLidarPose) {
   Eigen::Affine3d odometry_pose = Eigen::Affine3d::Identity();
   Eigen::Affine3d lidar_pose = Eigen::Affine3d::Identity();
-  double time_now = apollo::common::time::Clock::NowInSeconds();
+  double time_now = apollo::cyber::Clock::NowInSeconds();
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
-  time_now = apollo::common::time::Clock::NowInSeconds();
+  time_now = apollo::cyber::Clock::NowInSeconds();
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
-  ASSERT_EQ(pose_buffer_ptr_->GetUsedBufferSize(), 2);
-  ASSERT_EQ(pose_buffer_ptr_->GetHeadIndex(), 0);
+  EXPECT_EQ(pose_buffer_ptr_->GetUsedBufferSize(), 2);
+  EXPECT_EQ(pose_buffer_ptr_->GetHeadIndex(), 0);
 }
 
 TEST_F(NDTLocalizationTest, UpdateOdometryPose) {
   Eigen::Affine3d odometry_pose = Eigen::Affine3d::Identity();
   Eigen::Affine3d lidar_pose = Eigen::Affine3d::Identity();
-  double time_now = apollo::common::time::Clock::NowInSeconds();
+  double time_now = apollo::cyber::Clock::NowInSeconds();
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
-  time_now = apollo::common::time::Clock::NowInSeconds();
+  time_now = apollo::cyber::Clock::NowInSeconds();
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
   odometry_pose.translation()[0] = 1.0;
   odometry_pose.translation()[1] = 0.0;
   odometry_pose.translation()[2] = 0.0;
 
-  time_now = apollo::common::time::Clock::NowInSeconds();
+  time_now = apollo::cyber::Clock::NowInSeconds();
   Eigen::Affine3d pose =
       pose_buffer_ptr_->UpdateOdometryPose(time_now, odometry_pose);
-  ASSERT_LE(std::abs(pose.translation()[0] - 1.0), 1e-5);
+  EXPECT_LE(std::abs(pose.translation()[0] - 1.0), 1e-5);
 }
 
 }  // namespace ndt

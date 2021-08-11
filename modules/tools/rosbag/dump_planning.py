@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -20,21 +20,25 @@ This program can dump a rosbag into separate text files that contains the pb mes
 """
 
 import argparse
+from datetime import datetime
 import os
 import shutil
-from cyber_py.record import RecordReader
-from datetime import datetime
+
+from cyber.python.cyber_py3.record import RecordReader
+
 
 g_args = None
 
 g_delta_t = 0.5  # 1 second approximate time match region.
+
 
 def write_to_file(file_path, topic_pb):
     """
     write pb message to file
     """
     with open(file_path, 'w') as fp:
-        f.write(str(topic_pb))
+        fp.write(str(topic_pb))
+
 
 def dump_bag(in_bag, out_dir):
     """
@@ -68,21 +72,22 @@ def dump_bag(in_bag, out_dir):
         dt1 = datetime.utcfromtimestamp(t/1000000000)
         dt2 = datetime.utcfromtimestamp(first_time/1000000000)
         relative_time = (dt1 - dt2).seconds - g_args.start_time
-        print "relative_time", relative_time
+        print ("relative_time", relative_time)
         if ((g_args.time_duration > 0) and
-            (relative_time < 0 or relative_time > g_args.time_duration)):
+                (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
         if channel == '/apollo/planning':
             seq += 1
             topic_name_map[channel][1] = msg
             print('Generating seq: %d' % seq)
-            for t, name_pb in topic_name_map.iteritems():
+            for t, name_pb in topic_name_map.items():
                 if name_pb[1] is None:
                     continue
                 file_path = os.path.join(out_dir,
                                          str(seq) + "_" + name_pb[0] + ".pb.txt")
                 write_to_file(file_path, name_pb[1])
         topic_name_map[channel][1] = msg
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

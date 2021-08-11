@@ -21,7 +21,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
@@ -31,7 +31,7 @@
 namespace apollo {
 namespace control {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using PlanningTrajectoryPb = planning::ADCTrajectory;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
@@ -44,10 +44,11 @@ class LatControllerTest : public ::testing::Test, LatController {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     ControlConf control_conf;
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     lateral_conf_ = control_conf.lat_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
@@ -62,7 +63,7 @@ class LatControllerTest : public ::testing::Test, LatController {
  protected:
   LocalizationPb LoadLocalizaionPb(const std::string &filename) {
     LocalizationPb localization_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &localization_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &localization_pb))
         << "Failed to open file " << filename;
     localization_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return localization_pb;
@@ -70,7 +71,7 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return chassis_pb;
@@ -78,7 +79,7 @@ class LatControllerTest : public ::testing::Test, LatController {
 
   PlanningTrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     PlanningTrajectoryPb planning_trajectory_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &planning_trajectory_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &planning_trajectory_pb))
         << "Failed to open file " << filename;
     planning_trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return planning_trajectory_pb;
@@ -97,7 +98,7 @@ TEST_F(LatControllerTest, ComputeLateralErrors) {
       "/apollo/modules/control/testdata/lateral_controller_test/"
       "1_chassis.pb.txt");
   FLAGS_enable_map_reference_unify = false;
-  auto vehicle_state = VehicleStateProvider::Instance();
+  auto vehicle_state = injector_->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
 
   auto planning_trajectory_pb = LoadPlanningTrajectoryPb(

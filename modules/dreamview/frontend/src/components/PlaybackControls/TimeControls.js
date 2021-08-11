@@ -1,62 +1,62 @@
-import React from "react";
+import React from 'react';
 import Slider from 'react-rangeslider';
 import styled from 'styled-components';
 
 export default class TimeControls extends React.Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            frame: -1,
-            loadingProcess: '#2D3B50'
-        };
+    this.state = {
+      frame: -1,
+      loadingProcess: '#2D3B50',
+    };
 
-        this.updatingSeekingTime = false;
+    this.updatingSeekingTime = false;
 
-        this.handleSliderChange = this.handleSliderChange.bind(this);
-        this.handleSliderChangeComplete = this.handleSliderChangeComplete.bind(this);
+    this.handleSliderChange = this.handleSliderChange.bind(this);
+    this.handleSliderChangeComplete = this.handleSliderChangeComplete.bind(this);
+  }
+
+  getTimeFromFrame(fps, frame) {
+    const numIntervals = Math.max(0, frame - 1);
+    return (numIntervals / fps).toFixed(1);
+  }
+
+  handleSliderChange(frame) {
+    this.setState({ frame });
+    this.updatingSeekingTime = true;
+  }
+
+  handleSliderChangeComplete() {
+    this.props.handleFrameSeek(this.state.frame);
+    this.updatingSeekingTime = false;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.updatingSeekingTime && !nextProps.isSeeking) {
+      this.setState({ frame: nextProps.currentFrame });
     }
-
-    getTimeFromFrame(fps, frame) {
-        const numIntervals = Math.max(0, frame - 1);
-        return (numIntervals / fps).toFixed(1);
+    if (nextProps.loadingMarker <= nextProps.numFrames) {
+      const loadingPercent = (nextProps.loadingMarker / nextProps.numFrames) * 100;
+      const unloadingPercent = 100 - loadingPercent;
+      const backgroundColor = `linear-gradient(90deg, #212c3d ${loadingPercent.toFixed()}%,`
+                + ` #2d3b50 ${loadingPercent.toFixed()}%, #2d3b50 ${unloadingPercent.toFixed()}%)`;
+      this.setState({
+        loadingProcess: backgroundColor,
+      });
     }
+  }
 
-    handleSliderChange(frame) {
-        this.setState({frame: frame});
-        this.updatingSeekingTime = true;
-    }
+  render() {
+    const { numFrames, currentFrame, fps } = this.props;
 
-    handleSliderChangeComplete() {
-        this.props.handleFrameSeek(this.state.frame);
-        this.updatingSeekingTime = false;
-    }
+    const totalTime = this.getTimeFromFrame(fps, numFrames);
+    const currentTime = this.getTimeFromFrame(fps, currentFrame);
 
-    componentWillReceiveProps(nextProps) {
-        if (!this.updatingSeekingTime && !nextProps.isSeeking) {
-            this.setState({frame: nextProps.currentFrame});
-        }
-        if (nextProps.loadingMarker <= nextProps.numFrames) {
-            const loadingPercent = (nextProps.loadingMarker / nextProps.numFrames) * 100;
-            const unloadingPercent = 100 - loadingPercent;
-            const backgroundColor = `linear-gradient(90deg, #212c3d ${loadingPercent.toFixed()}%,` +
-                ` #2d3b50 ${loadingPercent.toFixed()}%, #2d3b50 ${unloadingPercent.toFixed()}%)`;
-            this.setState({
-                loadingProcess: backgroundColor
-            });
-        }
-    }
-
-    render() {
-        const { numFrames, currentFrame, fps } = this.props;
-
-        const totalTime = this.getTimeFromFrame(fps, numFrames);
-        const currentTime = this.getTimeFromFrame(fps, currentFrame);
-
-        const StyledSlider = styled(Slider)`
+    const StyledSlider = styled(Slider)`
             background: ${this.state.loadingProcess}
         `;
-        return (
+    return (
             <div className="time-controls">
                 <StyledSlider
                     tooltip={false}
@@ -70,6 +70,6 @@ export default class TimeControls extends React.Component {
                     {`${currentTime} / ${totalTime} s`}
                 </div>
             </div>
-        );
-    }
+    );
+  }
 }

@@ -19,8 +19,10 @@
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
+
+using apollo::cyber::Clock;
 
 namespace apollo {
 namespace localization {
@@ -73,7 +75,6 @@ void LocalizationGnssProcess::SetDefaultOption() {
   gnss_lever_arm_.arm_x = -0.030;
   gnss_lever_arm_.arm_y = 0.338;
   gnss_lever_arm_.arm_z = 1.291;
-  return;
 }
 
 void LocalizationGnssProcess::RawObservationProcess(
@@ -88,7 +89,7 @@ void LocalizationGnssProcess::RawObservationProcess(
                                                        raw_obs.gnss_second_s());
 
   double sys_secs_to_gnss =
-      common::time::Clock::NowInSeconds() - unix_to_gps + leap_second_s;
+      Clock::NowInSeconds() - unix_to_gps + leap_second_s;
   double obs_secs =
       raw_obs.gnss_second_s() + raw_obs.gnss_week() * sec_per_week;
   double obs_delay = sys_secs_to_gnss - obs_secs;
@@ -157,7 +158,6 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   GnssEphemerisMsg gnss_orbit_msg;
   GnssMagTransfer::Transfer(gnss_orbit, &gnss_orbit_msg);
   gnss_solver_->save_gnss_ephemris(gnss_orbit_msg);
-  return;
 }
 
 void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
@@ -191,7 +191,6 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
 
   gnss_solver_->motion_update(sec_s, llh, std_pos, velocity, std_vel, euler,
                               lever_arm);
-  return;
 }
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(
@@ -199,7 +198,8 @@ LocalizationMeasureState LocalizationGnssProcess::GetResult(
   CHECK_NOTNULL(gnss_msg);
 
   // convert GnssPntResult to IntegMeasure
-  // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
+  // double sec_s = Clock::NowInSeconds(); //
+  // ros::Time::now().toSec();
   const unsigned int second_per_week = 604800;
   double sec_s = gnss_pnt_result_.gnss_week() * second_per_week +
                  gnss_pnt_result_.gnss_second_s();

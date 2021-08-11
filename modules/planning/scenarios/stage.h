@@ -25,11 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -45,7 +44,8 @@ class Stage {
     FINISHED = 4,
   };
 
-  explicit Stage(const ScenarioConfig::StageConfig& config);
+  Stage(const ScenarioConfig::StageConfig& config,
+        const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~Stage() = default;
 
@@ -84,9 +84,15 @@ class Stage {
   bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool ExecuteTaskOnReferenceLineForOnlineLearning(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame);
+
   bool ExecuteTaskOnOpenSpace(Frame* frame);
 
   virtual Stage::StageStatus FinishScenario();
+
+  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                       const std::string& name, const double time_diff_ms);
 
  protected:
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
@@ -95,6 +101,7 @@ class Stage {
   ScenarioConfig::StageType next_stage_;
   void* context_ = nullptr;
   std::string name_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 #define DECLARE_STAGE(NAME, CONTEXT)                          \

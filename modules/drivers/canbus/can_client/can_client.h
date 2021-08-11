@@ -27,10 +27,11 @@
 #include <string>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+
+#include "cyber/common/log.h"
+#include "modules/drivers/canbus/common/byte.h"
 
 /**
  * @namespace apollo::drivers::canbus
@@ -137,7 +138,7 @@ class CanClient {
    */
   virtual apollo::common::ErrorCode SendSingleFrame(
       const std::vector<CanFrame> &frames) {
-    CHECK_EQ(frames.size(), 1)
+    CHECK_EQ(frames.size(), 1U)
         << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);

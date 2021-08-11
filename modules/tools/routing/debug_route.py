@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -23,10 +23,9 @@ import sys
 import gflags
 import matplotlib.pyplot as plt
 
-import debug_topo
+import modules.tools.routing.debug_topo as debug_topo
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import util
-
+import modules.tools.routing.util
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
@@ -80,10 +79,10 @@ def print_help_command():
     Args:
 
     """
-    print 'type in command: [q] [r]'
-    print '         q               exit'
-    print '         r               plot route result'
-    print '         r_map           plot route result with map'
+    print('type in command: [q] [r]')
+    print('         q               exit')
+    print('         r               plot route result')
+    print('         r_map           plot route result with map')
 
 
 if __name__ == '__main__':
@@ -99,7 +98,7 @@ if __name__ == '__main__':
     plt.ion()
     while 1:
         print_help_command()
-        print 'cmd>',
+        print('cmd>', end=' ')
         instruction = raw_input()
         argv = instruction.strip(' ').split(' ')
         if len(argv) == 1:
@@ -111,9 +110,9 @@ if __name__ == '__main__':
                 plot_route(route, central_curves)
                 util.draw_map(plt.gca(), base_map)
             else:
-                print '[ERROR] wrong command'
+                print('[ERROR] wrong command')
             continue
 
         else:
-            print '[ERROR] wrong arguments'
+            print('[ERROR] wrong arguments')
             continue

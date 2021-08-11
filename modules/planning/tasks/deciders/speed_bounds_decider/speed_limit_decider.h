@@ -21,16 +21,14 @@
 #pragma once
 
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/speed_limit.h"
+#include "modules/planning/proto/task_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {

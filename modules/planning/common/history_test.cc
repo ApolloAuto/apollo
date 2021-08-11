@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "modules/planning/common/history.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/file.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -24,10 +24,13 @@ namespace planning {
 
 class HistoryTest : public ::testing::Test {
  public:
-  HistoryTest() { history_->Clear(); }
+  HistoryTest() {
+    history_.reset(new History());
+    history_->Clear();
+  }
 
  protected:
-  History* history_ = History::Instance();
+  std::unique_ptr<History> history_;
 };
 
 TEST_F(HistoryTest, Add) {
@@ -95,11 +98,11 @@ TEST_F(HistoryTest, GetObjectDecisions) {
   EXPECT_EQ(3, object_decisions.size());
 
   // sort
-  std::sort(object_decisions.begin(), object_decisions.end(),
-            [](const HistoryObjectDecision* lhs,
-               const HistoryObjectDecision* rhs) {
-              return lhs->id() < rhs->id();
-            });
+  std::sort(
+      object_decisions.begin(), object_decisions.end(),
+      [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
+        return lhs->id() < rhs->id();
+      });
 
   for (const HistoryObjectDecision* object_decision : object_decisions) {
     ADEBUG << "object_decision[" << object_decision->id() << "]";
@@ -115,8 +118,7 @@ TEST_F(HistoryTest, GetObjectDecisions) {
   EXPECT_EQ(2, obj_decision.size());
   // sort
   std::sort(obj_decision.begin(), obj_decision.end(),
-            [](const ObjectDecisionType* lhs,
-               const ObjectDecisionType* rhs) {
+            [](const ObjectDecisionType* lhs, const ObjectDecisionType* rhs) {
               return lhs->object_tag_case() < rhs->object_tag_case();
             });
   EXPECT_TRUE(obj_decision[0]->has_stop());
@@ -185,8 +187,7 @@ TEST_F(HistoryTest, GetObjectDecisionsById) {
   auto obj_decision = object_decision->GetObjectDecision();
   // sort
   std::sort(obj_decision.begin(), obj_decision.end(),
-            [](const ObjectDecisionType* lhs,
-               const ObjectDecisionType* rhs) {
+            [](const ObjectDecisionType* lhs, const ObjectDecisionType* rhs) {
               return lhs->object_tag_case() < rhs->object_tag_case();
             });
   EXPECT_EQ(2, obj_decision.size());

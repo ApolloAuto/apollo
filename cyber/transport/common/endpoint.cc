@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/transport/common/endpoint.h"
+
 #include "cyber/common/global_data.h"
 
 namespace apollo {

@@ -16,12 +16,12 @@
 
 #include "cyber/scheduler/policy/choreography_context.h"
 
+#include <limits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "cyber/common/types.h"
-#include "cyber/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cyber {
@@ -31,11 +31,9 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_.load())) {
     return nullptr;
   }
 
@@ -47,15 +45,10 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
     }
 
     if (cr->UpdateState() == RoutineState::READY) {
-      PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
-                                                cr->processor_id());
       return cr;
     }
-
     cr->Release();
   }
-
-  notified_.clear();
   return nullptr;
 }
 
@@ -66,15 +59,27 @@ bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
 }
 
 void ChoreographyContext::Notify() {
-  if (!notified_.test_and_set(std::memory_order_acquire)) {
-    cv_wq_.notify_one();
-    return;
-  }
+  mtx_wq_.lock();
+  notify++;
+  mtx_wq_.unlock();
+  cv_wq_.notify_one();
 }
 
 void ChoreographyContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wq_);
-  cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
+  cv_wq_.wait_for(lk, std::chrono::milliseconds(1000),
+                  [&]() { return notify > 0; });
+  if (notify > 0) {
+    notify--;
+  }
+}
+
+void ChoreographyContext::Shutdown() {
+  stop_.store(true);
+  mtx_wq_.lock();
+  notify = std::numeric_limits<unsigned char>::max();
+  mtx_wq_.unlock();
+  cv_wq_.notify_all();
 }
 
 bool ChoreographyContext::RemoveCRoutine(uint64_t crid) {

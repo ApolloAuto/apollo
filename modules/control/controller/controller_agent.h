@@ -24,12 +24,12 @@
 #include <memory>
 #include <vector>
 
+#include "modules/common/util/factory.h"
+#include "modules/control/common/dependency_injector.h"
+#include "modules/control/controller/controller.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-
-#include "modules/common/util/factory.h"
-#include "modules/control/controller/controller.h"
 
 /**
  * @namespace apollo::control
@@ -50,7 +50,8 @@ class ControllerAgent {
    * @param control_conf control configurations
    * @return Status initialization status
    */
-  common::Status Init(const ControlConf *control_conf);
+  common::Status Init(std::shared_ptr<DependencyInjector> injector,
+                      const ControlConf *control_conf);
 
   /**
    * @brief compute control command based on current vehicle status
@@ -86,6 +87,7 @@ class ControllerAgent {
   common::util::Factory<ControlConf::ControllerType, Controller>
       controller_factory_;
   std::vector<std::unique_ptr<Controller>> controller_list_;
+  std::shared_ptr<DependencyInjector> injector_ = nullptr;
 };
 
 }  // namespace control

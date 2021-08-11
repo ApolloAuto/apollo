@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,7 +22,7 @@ import sys
 import gflags
 import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 import modules.map.proto.map_pb2 as map_pb2
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import modules.routing.proto.routing_pb2 as routing_pb2
@@ -55,7 +55,7 @@ def get_mapdata(map_dir):
 def get_topodata(map_dir):
     print('Please wait for loading routing topo data...')
     topo_data_path = os.path.join(map_dir, 'routing_map.bin')
-    print("File: %s" % )
+    print("File: %s" % topo_data_path)
     return proto_utils.get_pb_from_bin_file(topo_data_path, topo_graph_pb2.Graph())
 
 

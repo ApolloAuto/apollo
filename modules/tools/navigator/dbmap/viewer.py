@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import json
-import pyproj
+import sys
+
 from yattag import Doc
-import common.proto_utils as proto_utils
+import pyproj
+
 from modules.map.relative_map.proto import navigation_pb2
+import modules.tool.common.proto_utils as proto_utils
 
 
 class DBMapViewer:
@@ -92,11 +94,11 @@ class DBMapViewer:
                     doc.asis('function initMap() {\n')
                     doc.asis("map = new google.maps.Map("
                              "document.getElementById('map'), {\n")
-                    doc.asis('center: {lat: ' + str(self.center_lat) + \
+                    doc.asis('center: {lat: ' + str(self.center_lat) +
                              ', lng: ' + str(self.center_lon) + '},\n')
                     doc.asis('zoom: 16\n')
                     doc.asis('});\n')
-                    doc.asis('var navi_lines = ' + \
+                    doc.asis('var navi_lines = ' +
                              json.dumps(self.navigation_lines) + ';\n')
                     doc.asis("""
                         for (var i = 0; i < navi_lines.length; i++) {
@@ -120,7 +122,7 @@ if __name__ == "__main__":
     import google.protobuf.text_format as text_format
 
     if len(sys.argv) < 2:
-        print "usage: python map_viewer.py dbmap_file [utm_zone=10]"
+        print("usage: python map_viewer.py dbmap_file [utm_zone=10]")
         sys.exit(0)
 
     map_file = sys.argv[1]

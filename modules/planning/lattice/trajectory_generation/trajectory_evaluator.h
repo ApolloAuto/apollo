@@ -47,7 +47,7 @@ class TrajectoryEvaluator {
       PairCostWithComponents;
 
  public:
-  explicit TrajectoryEvaluator(
+  TrajectoryEvaluator(
       const std::array<double, 3>& init_s,
       const PlanningTarget& planning_target,
       const std::vector<std::shared_ptr<Curve1d>>& lon_trajectories,

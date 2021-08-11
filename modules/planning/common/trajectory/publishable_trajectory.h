@@ -20,9 +20,8 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {

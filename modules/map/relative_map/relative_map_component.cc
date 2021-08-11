@@ -26,8 +26,10 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
 
 bool RelativeMapComponent::Init() {
+  vehicle_state_provider_ = std::make_shared<common::VehicleStateProvider>();
   InitReaders();
-  return relative_map_.Init().ok() && relative_map_.Start().ok();
+  return relative_map_.Init(vehicle_state_provider_.get()).ok() &&
+         relative_map_.Start().ok();
 }
 
 bool RelativeMapComponent::Proc() {

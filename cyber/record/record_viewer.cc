@@ -17,6 +17,7 @@
 #include "cyber/record/record_viewer.h"
 
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -109,7 +110,7 @@ void RecordViewer::Reset() {
 }
 
 void RecordViewer::UpdateTime() {
-  uint64_t min_begin_time = UINT64_MAX;
+  uint64_t min_begin_time = std::numeric_limits<uint64_t>::max();
   uint64_t max_end_time = 0;
 
   for (auto& reader : readers_) {
@@ -196,11 +197,12 @@ bool RecordViewer::Iterator::operator!=(const Iterator& rhs) const {
   return !(*this == rhs);
 }
 
-void RecordViewer::Iterator::operator++() {
+RecordViewer::Iterator& RecordViewer::Iterator::operator++() {
   index_++;
   if (!viewer_->Update(&message_instance_)) {
     end_ = true;
   }
+  return *this;
 }
 
 RecordViewer::Iterator::pointer RecordViewer::Iterator::operator->() {

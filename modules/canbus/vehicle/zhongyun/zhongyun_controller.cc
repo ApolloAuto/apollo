@@ -18,9 +18,9 @@ limitations under the License.
 #include "modules/common/proto/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -56,6 +56,7 @@ ErrorCode ZhongyunController::Init(
   }
 
   if (can_sender == nullptr) {
+    AERROR << "Canbus sender is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   can_sender_ = can_sender;
@@ -119,7 +120,7 @@ ZhongyunController::~ZhongyunController() {}
 
 bool ZhongyunController::Start() {
   if (!is_initialized_) {
-    AERROR << "ZhongyunController has NOT been initialized.";
+    AERROR << "ZhongyunController has not been initialized.";
     return false;
   }
   const auto& update_func = [this] { SecurityDogThreadFunc(); };
@@ -297,7 +298,7 @@ ErrorCode ZhongyunController::DisableAutoMode() {
   can_sender_->Update();
   set_driving_mode(Chassis::COMPLETE_MANUAL);
   set_chassis_error_code(Chassis::NO_ERROR);
-  AINFO << "Switch to COMPLETE_MANUAL ok.";
+  AINFO << "Switch to COMPLETE_MANUAL mode ok.";
   return ErrorCode::OK;
 }
 
@@ -353,7 +354,7 @@ ErrorCode ZhongyunController::EnableSpeedOnlyMode() {
 
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    AERROR << "Failed to switch to AUTO_SPEED_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
@@ -441,10 +442,10 @@ void ZhongyunController::Acceleration(double acc) {
   // None
 }
 
-// zhongyun default, -30 ~ 30, left:+, right:-
+// zhongyun default, -30% ~ 30%, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// angle:-99.99~0.00~99.99, unit:%, left:-, right:+
 void ZhongyunController::Steer(double angle) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
@@ -458,7 +459,7 @@ void ZhongyunController::Steer(double angle) {
 
 // steering with new angle speed
 // zhongyun has no angle_speed
-// angle:-30~30, unit:deg, left:+, right:-
+// angle:-30~30, unit:%, left:+, right:-
 void ZhongyunController::Steer(double angle, double angle_spd) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
@@ -574,8 +575,7 @@ void ZhongyunController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -613,8 +613,7 @@ void ZhongyunController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

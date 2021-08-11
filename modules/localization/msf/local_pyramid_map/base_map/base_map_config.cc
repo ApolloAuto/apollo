@@ -16,7 +16,6 @@
 
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
-#include <boost/foreach.hpp>
 #include <exception>
 #include <iostream>
 
@@ -46,12 +45,10 @@ bool BaseMapConfig::Save(const std::string &file_path) {
   bool success = CreateXml(&config);
   if (success) {
     boost::property_tree::write_xml(file_path, config);
-    std::cerr << "Saved the map configuration to: " << file_path << "."
-              << std::endl;
+    AINFO << "Saved the map configuration to: " << file_path;
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 bool BaseMapConfig::Load(const std::string &file_path) {
@@ -60,12 +57,10 @@ bool BaseMapConfig::Load(const std::string &file_path) {
   bool success = LoadXml(config);
 
   if (success) {
-    std::cerr << "Loaded the map configuration from: " << file_path << "."
-              << std::endl;
+    AINFO << "Loaded the map configuration from: " << file_path;
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 bool BaseMapConfig::CreateXml(boost::property_tree::ptree *config) const {
@@ -159,20 +154,19 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
 
   auto resolutions = config.get_child_optional("map.map_config.resolutions");
   if (resolutions) {
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
-                   *resolutions) {
-      map_resolutions_.push_back(
-          static_cast<float>(atof(v.second.data().c_str())));
-      AINFO << "Resolution: " << v.second.data();
-    }
+    std::for_each(resolutions->begin(), resolutions->end(),
+                  [this](const boost::property_tree::ptree::value_type &v) {
+                    map_resolutions_.push_back(
+                        static_cast<float>(atof(v.second.data().c_str())));
+                    AINFO << "Resolution: " << v.second.data();
+                  });
   } else {
     return false;
   }
 
   auto datasets = config.get_child_optional("map.map_record.datasets");
   if (datasets) {
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
-                   *datasets) {
+    for (const boost::property_tree::ptree::value_type &v : *datasets) {
       map_datasets_.push_back(v.second.data());
       AINFO << "Dataset: " << v.second.data();
     }
@@ -181,15 +175,14 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
   // load md5 check info
   auto nodes = config.get_child_optional("map.check_info.nodes");
   if (nodes) {
-    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, *nodes) {
+    for (const boost::property_tree::ptree::value_type &v : *nodes) {
       const boost::property_tree::ptree &child = v.second;
       auto path = child.get_optional<std::string>("path");
       auto md5 = child.get_optional<std::string>("md5");
       if (!path || !md5) {
-        std::cerr << "Lack path or md5." << std::endl;
+        AERROR << "Lack path or md5.";
         return false;
       }
-
       node_md5_map_[*path] = *md5;
     }
   }

@@ -66,8 +66,8 @@ static void ShiftMap(Map* map_pb) {
 static void OutputMap(const Map& map_pb) {
   const std::string txt_file = FLAGS_output_dir + "/base_map.txt";
   const std::string bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::cyber::common::SetProtoToASCIIFile(map_pb, txt_file));
-  CHECK(apollo::cyber::common::SetProtoToBinaryFile(map_pb, bin_file));
+  ACHECK(apollo::cyber::common::SetProtoToASCIIFile(map_pb, txt_file));
+  ACHECK(apollo::cyber::common::SetProtoToBinaryFile(map_pb, bin_file));
 }
 
 int main(int32_t argc, char** argv) {
@@ -79,7 +79,7 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map_pb))
+  ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map_pb))
       << "Fail to open:" << map_file;
   ShiftMap(&map_pb);
   OutputMap(map_pb);

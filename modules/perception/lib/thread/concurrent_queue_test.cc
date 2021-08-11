@@ -16,6 +16,8 @@
 
 #include "modules/perception/lib/thread/concurrent_queue.h"
 
+#include <thread>
+
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
 #include "modules/perception/lib/thread/thread.h"
@@ -35,14 +37,14 @@ class PushThread : public Thread {
     for (int idx = 1; idx < 10; ++idx) {
       queue_->Push(idx);
       AINFO << "PushThread push value: " << idx;
-      ::usleep(100);
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
     queue_->Push(0);
 
     for (int idx = 10; idx < 15; ++idx) {
       queue_->Push(idx);
       AINFO << "PushThread push value: " << idx;
-      ::usleep(100);
+      std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 
     AINFO << "PushThread finished.";

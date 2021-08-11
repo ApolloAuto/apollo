@@ -18,14 +18,11 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
-
-#include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -41,7 +38,7 @@ class TrafficLightUnprotectedLeftTurnScenarioTest : public ::testing::Test {
   std::unique_ptr<TrafficLightUnprotectedLeftTurnScenario> scenario_;
 };
 
-TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, VerifyConf) {
+TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
   FLAGS_scenario_traffic_light_unprotected_left_turn_config_file =
       "/apollo/modules/planning/conf/"
       "scenario/traffic_light_unprotected_left_turn_config.pb.txt";
@@ -49,20 +46,11 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, VerifyConf) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
-}
-
-TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
-  FLAGS_scenario_traffic_light_unprotected_left_turn_config_file =
-      "/apollo/modules/planning/testdata/conf/"
-      "scenario/traffic_light_unprotected_left_turn_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
 
   ScenarioContext context;
+  auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(
-      new TrafficLightUnprotectedLeftTurnScenario(config, &context));
+      new TrafficLightUnprotectedLeftTurnScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
 }

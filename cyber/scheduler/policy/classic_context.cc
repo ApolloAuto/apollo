@@ -16,7 +16,7 @@
 
 #include "cyber/scheduler/policy/classic_context.h"
 
-#include "cyber/event/perf_event_cache.h"
+#include <limits>
 
 namespace apollo {
 namespace cyber {
@@ -27,13 +27,12 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 alignas(CACHELINE_SIZE) GRP_WQ_MUTEX ClassicContext::mtx_wq_;
 alignas(CACHELINE_SIZE) GRP_WQ_CV ClassicContext::cv_wq_;
 alignas(CACHELINE_SIZE) RQ_LOCK_GROUP ClassicContext::rq_locks_;
 alignas(CACHELINE_SIZE) CR_GROUP ClassicContext::cr_group_;
+alignas(CACHELINE_SIZE) NOTIFY_GRP ClassicContext::notify_grp_;
 
 ClassicContext::ClassicContext() { InitGroup(DEFAULT_GROUP_NAME); }
 
@@ -46,10 +45,12 @@ void ClassicContext::InitGroup(const std::string& group_name) {
   lq_ = &rq_locks_[group_name];
   mtx_wrapper_ = &mtx_wq_[group_name];
   cw_ = &cv_wq_[group_name];
+  notify_grp_[group_name] = 0;
+  current_grp = group_name;
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_.load())) {
     return nullptr;
   }
 
@@ -61,16 +62,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       }
 
       if (cr->UpdateState() == RoutineState::READY) {
-        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
-                                                  cr->processor_id());
         return cr;
-      }
-
-      if (unlikely(cr->state() == RoutineState::SLEEP)) {
-        if (!need_sleep_ || wake_time_ > cr->wake_time()) {
-          need_sleep_ = true;
-          wake_time_ = cr->wake_time();
-        }
       }
 
       cr->Release();
@@ -82,30 +74,25 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
 void ClassicContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wrapper_->Mutex());
-  if (stop_) {
-    return;
-  }
-
-  if (unlikely(need_sleep_)) {
-    auto duration = wake_time_ - std::chrono::steady_clock::now();
-    cw_->Cv().wait_for(lk, duration);
-    need_sleep_ = false;
-  } else {
-    cw_->Cv().wait(lk);
+  cw_->Cv().wait_for(lk, std::chrono::milliseconds(1000),
+                     [&]() { return notify_grp_[current_grp] > 0; });
+  if (notify_grp_[current_grp] > 0) {
+    notify_grp_[current_grp]--;
   }
 }
 
 void ClassicContext::Shutdown() {
-  {
-    std::lock_guard<std::mutex> lg(mtx_wrapper_->Mutex());
-    if (!stop_) {
-      stop_ = true;
-    }
-  }
+  stop_.store(true);
+  mtx_wrapper_->Mutex().lock();
+  notify_grp_[current_grp] = std::numeric_limits<unsigned char>::max();
+  mtx_wrapper_->Mutex().unlock();
   cw_->Cv().notify_all();
 }
 
 void ClassicContext::Notify(const std::string& group_name) {
+  (&mtx_wq_[group_name])->Mutex().lock();
+  notify_grp_[group_name]++;
+  (&mtx_wq_[group_name])->Mutex().unlock();
   cv_wq_[group_name].Cv().notify_one();
 }
 

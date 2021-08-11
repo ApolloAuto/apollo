@@ -85,7 +85,6 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
           << "][height:" << msg.height() << "][width:" << msg.width()
           << "][point_cnt:" << msg.point_size() << "]";
   }
-  return;
 }
 
 }  // namespace msf

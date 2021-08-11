@@ -3,12 +3,12 @@ package apollo.drivers.video.config;
 
 message CameraH265Config {
   required uint32 udp_port = 1;
-  //required string camera_dev = 1;
+  // required string camera_dev = 1;
   required string frame_id = 2;
-  //v4l pixel format
+  // v4l pixel format
   required string pixel_format = 3 [default = "yuyv"];
-  //mmap, userptr, read
-  //required IOMethod io_method = 4;
+  // mmap, userptr, read
+  // required IOMethod io_method = 4;
   required uint32 record = 4;
   required uint32 width = 5;
   required uint32 height = 6;
@@ -36,5 +36,4 @@ message CameraH265Config {
     optional uint32 image_pool_size = 2 [default = 20];
   }
   optional CompressConfig compress_conf = 25;
-
 }

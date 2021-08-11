@@ -44,8 +44,6 @@ namespace third_party_perception {
 
 class ThirdPartyPerceptionTestBase : public ::testing::Test {
  public:
-  static void SetUpTestCase();
-
   virtual void SetUp();
 
  private:

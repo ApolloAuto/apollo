@@ -23,12 +23,11 @@
 #include <vector>
 
 #include "Eigen/Core"
-
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_1d_kernel.h"
-#include "modules/planning/proto/qp_problem.pb.h"
+#include "modules/planning/proto/math/qp_problem.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -39,6 +38,8 @@ class Spline1dSolver {
       : spline_(x_knots, order),
         constraint_(x_knots, order),
         kernel_(x_knots, order) {}
+
+  virtual ~Spline1dSolver() = default;
 
   virtual void Reset(const std::vector<double>& x_knots, const uint32_t order) {
     spline_ = Spline1d(x_knots, order);

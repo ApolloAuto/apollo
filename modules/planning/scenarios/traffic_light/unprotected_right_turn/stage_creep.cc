@@ -18,18 +18,16 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include <string>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -43,9 +41,8 @@ namespace scenario {
 namespace traffic_light {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -63,7 +60,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
   }
 
-  if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
+  if (GetContext()->current_traffic_light_overlap_ids.empty()) {
     return FinishScenario();
   }
 
@@ -104,20 +101,12 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   }
 
   if (task->CheckCreepDone(*frame, reference_line_info,
-                           current_traffic_light_overlap->end_s,
-                           wait_time, timeout_sec)) {
+                           current_traffic_light_overlap->end_s, wait_time,
+                           timeout_sec)) {
     return FinishStage();
   }
 
   return Stage::RUNNING;
-}
-
-Stage::StageStatus
-TrafficLightUnprotectedRightTurnStageCreep::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {

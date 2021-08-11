@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <opencv2/opencv.hpp>
+
 #include <string>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/base/lane_struct.h"
 #include "modules/perception/base/point.h"

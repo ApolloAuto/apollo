@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "Eigen/Core"
-
 #include "modules/planning/math/smoothing_spline/affine_constraint.h"
 #include "modules/planning/math/smoothing_spline/spline_1d.h"
 

@@ -54,8 +54,7 @@ int main(int32_t argc, char **argv) {
 
   while (apollo::cyber::OK()) {
     // pub.publish(msg);
-    control_command_writer_->Write(
-        std::make_shared<ControlCommand>(control_cmd));
+    control_command_writer_->Write(control_cmd);
     rate.Sleep();
   }
 

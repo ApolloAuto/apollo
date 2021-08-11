@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,23 +6,17 @@ package(default_visibility = ["//visibility:public"])
 cc_test(
     name = "adaptive_kalman_filter_test",
     size = "small",
-    srcs = [
-        "adaptive_kalman_filter_test.cc",
-    ],
+    srcs = ["adaptive_kalman_filter_test.cc"],
     deps = [
         ":adaptive_kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
     name = "adaptive_kalman_filter",
-    srcs = [
-        "adaptive_kalman_filter.cc",
-    ],
-    hdrs = [
-        "adaptive_kalman_filter.h",
-    ],
+    srcs = ["adaptive_kalman_filter.cc"],
+    hdrs = ["adaptive_kalman_filter.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/radar/lib/interface:base_filter",

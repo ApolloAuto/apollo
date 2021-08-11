@@ -17,12 +17,16 @@
 #ifndef CYBER_RECORD_RECORD_MESSAGE_H_
 #define CYBER_RECORD_RECORD_MESSAGE_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 namespace apollo {
 namespace cyber {
 namespace record {
+
+static constexpr size_t kGB = 1 << 30;
+static constexpr size_t kMB = 1 << 20;
+static constexpr size_t kKB = 1 << 10;
 
 /**
  * @brief Basic data struct of record message.

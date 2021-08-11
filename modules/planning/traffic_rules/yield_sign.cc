@@ -20,6 +20,8 @@
 
 #include "modules/planning/traffic_rules/yield_sign.h"
 
+#include <memory>
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -31,7 +33,9 @@ namespace planning {
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
-YieldSign::YieldSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
+YieldSign::YieldSign(const TrafficRuleConfig& config,
+                     const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status YieldSign::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
@@ -49,7 +53,7 @@ void YieldSign::MakeDecisions(Frame* const frame,
   }
 
   const auto& yield_sign_status =
-      PlanningContext::Instance()->planning_status().yield_sign();
+      injector_->planning_context()->planning_status().yield_sign();
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
   const std::vector<PathOverlap>& yield_sign_overlaps =
@@ -59,8 +63,16 @@ void YieldSign::MakeDecisions(Frame* const frame,
       continue;
     }
 
-    if (yield_sign_overlap.object_id ==
-        yield_sign_status.done_yield_sign_overlap_id()) {
+    // check if yield-sign-stop already finished, set by scenario/stage
+    bool yield_sign_done = false;
+    for (const auto& done_yield_sign_overlap_id :
+         yield_sign_status.done_yield_sign_overlap_id()) {
+      if (yield_sign_overlap.object_id == done_yield_sign_overlap_id) {
+        yield_sign_done = true;
+        break;
+      }
+    }
+    if (yield_sign_done) {
       continue;
     }
 

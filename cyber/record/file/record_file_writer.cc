@@ -25,7 +25,17 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-RecordFileWriter::RecordFileWriter() {}
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::ChannelCache;
+using apollo::cyber::proto::ChunkBody;
+using apollo::cyber::proto::ChunkBodyCache;
+using apollo::cyber::proto::ChunkHeader;
+using apollo::cyber::proto::ChunkHeaderCache;
+using apollo::cyber::proto::Header;
+using apollo::cyber::proto::SectionType;
+using apollo::cyber::proto::SingleIndex;
+
+RecordFileWriter::RecordFileWriter() : is_writing_(false) {}
 
 RecordFileWriter::~RecordFileWriter() { Close(); }
 
@@ -56,7 +66,13 @@ bool RecordFileWriter::Open(const std::string& path) {
 void RecordFileWriter::Close() {
   if (is_writing_) {
     // wait for the flush operation that may exist now
-    while (!chunk_flush_->empty()) {
+    while (1) {
+      {
+        std::unique_lock<std::mutex> flush_lock(flush_mutex_);
+        if (chunk_flush_->empty()) {
+          break;
+        }
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -68,7 +84,13 @@ void RecordFileWriter::Close() {
     }
 
     // wait for the last flush operation
-    while (!chunk_flush_->empty()) {
+    while (1) {
+      {
+        std::unique_lock<std::mutex> flush_lock(flush_mutex_);
+        if (chunk_flush_->empty()) {
+          break;
+        }
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -91,7 +113,6 @@ void RecordFileWriter::Close() {
     if (close(fd_) < 0) {
       AERROR << "Close file failed, file: " << path_ << ", fd: " << fd_
              << ", errno: " << errno;
-      return;
     }
   }
 }
@@ -120,7 +141,7 @@ bool RecordFileWriter::WriteIndex() {
     }
   }
   header_.set_index_position(CurrentPosition());
-  if (!WriteSection<Index>(index_)) {
+  if (!WriteSection<proto::Index>(index_)) {
     AERROR << "Write section fail";
     return false;
   }
@@ -186,7 +207,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
   return true;
 }
 
-bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
+bool RecordFileWriter::WriteMessage(const proto::SingleMessage& message) {
   chunk_active_->add(message);
   auto it = channel_message_number_map_.find(message.channel_name());
   if (it != channel_message_number_map_.end()) {
@@ -232,7 +253,6 @@ void RecordFileWriter::Flush() {
     }
     chunk_flush_->clear();
   }
-  return;
 }
 
 uint64_t RecordFileWriter::GetMessageNumber(

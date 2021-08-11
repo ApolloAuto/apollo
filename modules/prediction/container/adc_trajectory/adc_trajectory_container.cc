@@ -23,52 +23,39 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::math::Polygon2d;
-using ::apollo::common::math::Vec2d;
-using ::apollo::hdmap::JunctionInfo;
-using ::apollo::hdmap::PNCJunctionInfo;
-using ::apollo::planning::ADCTrajectory;
+using apollo::common::PathPoint;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::JunctionInfo;
+using apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
-    : adc_junction_info_ptr_(nullptr),
-      adc_pnc_junction_info_ptr_(nullptr),
-      s_dist_to_junction_(0.0) {}
+    : adc_junction_info_ptr_(nullptr), s_dist_to_junction_(0.0) {}
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
   adc_lane_ids_.clear();
   adc_lane_seq_.clear();
+  adc_target_lane_ids_.clear();
+  adc_target_lane_seq_.clear();
   adc_junction_polygon_ = std::move(Polygon2d());
 
-  std::lock_guard<std::mutex> lock(adc_trajectory_mutex_);
   adc_trajectory_.CopyFrom(dynamic_cast<const ADCTrajectory&>(message));
   ADEBUG << "Received a planning message ["
          << adc_trajectory_.ShortDebugString() << "].";
-
-  // Find junction
-  SetJunctionPolygon();
-  ADEBUG << "Generate a polygon [" << adc_junction_polygon_.DebugString()
-         << "].";
-  SetPNCJunctionPolygon();
-  ADEBUG << "Generate a polygon [" << adc_pnc_junction_polygon_.DebugString()
-         << "].";
 
   // Find ADC lane sequence
   SetLaneSequence();
   ADEBUG << "Generate an ADC lane id sequence [" << ToString(adc_lane_seq_)
          << "].";
+
+  // Find ADC target lane sequence
+  SetTargetLaneSequence();
+  ADEBUG << "Generate an ADC target lane id sequence ["
+         << ToString(adc_target_lane_seq_) << "].";
 }
 
 bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
-  if (adc_pnc_junction_info_ptr_ != nullptr) {
-    return IsPointInPNCJunction(point);
-  }
-  return IsPointInRegularJunction(point);
-}
-
-bool ADCTrajectoryContainer::IsPointInRegularJunction(
-    const PathPoint& point) const {
   if (adc_junction_polygon_.points().size() < 3) {
     return false;
   }
@@ -85,17 +72,26 @@ bool ADCTrajectoryContainer::IsPointInRegularJunction(
   return in_polygon && on_virtual_lane;
 }
 
-bool ADCTrajectoryContainer::IsPointInPNCJunction(
-    const PathPoint& point) const {
-  if (adc_pnc_junction_polygon_.points().size() < 3) {
-    return false;
-  }
-  return adc_pnc_junction_polygon_.IsPointIn({point.x(), point.y()});
-}
-
 bool ADCTrajectoryContainer::IsProtected() const {
   return adc_trajectory_.has_right_of_way_status() &&
          adc_trajectory_.right_of_way_status() == ADCTrajectory::PROTECTED;
+}
+
+void ADCTrajectoryContainer::SetJunction(const std::string& junction_id,
+                                         const double distance) {
+  std::shared_ptr<const JunctionInfo> junction_info =
+      PredictionMap::JunctionById(junction_id);
+  if (junction_info != nullptr && junction_info->junction().has_polygon()) {
+    std::vector<Vec2d> vertices;
+    for (const auto& point : junction_info->junction().polygon().point()) {
+      vertices.emplace_back(point.x(), point.y());
+    }
+    if (vertices.size() >= 3) {
+      adc_junction_info_ptr_ = junction_info;
+      s_dist_to_junction_ = distance;
+      adc_junction_polygon_ = std::move(Polygon2d{vertices});
+    }
+  }
 }
 
 void ADCTrajectoryContainer::SetJunctionPolygon() {
@@ -140,48 +136,6 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
   }
 }
 
-void ADCTrajectoryContainer::SetPNCJunctionPolygon() {
-  std::shared_ptr<const PNCJunctionInfo> junction_info(nullptr);
-
-  double s_start = 0.0;
-  double s_at_junction = 0.0;
-  if (adc_trajectory_.trajectory_point_size() > 0) {
-    s_start = adc_trajectory_.trajectory_point(0).path_point().s();
-  }
-  for (int i = 0; i < adc_trajectory_.trajectory_point_size(); ++i) {
-    double s = adc_trajectory_.trajectory_point(i).path_point().s();
-
-    if (s > FLAGS_adc_trajectory_search_length) {
-      break;
-    }
-
-    if (junction_info != nullptr) {
-      s_at_junction = s;
-      break;
-    }
-
-    double x = adc_trajectory_.trajectory_point(i).path_point().x();
-    double y = adc_trajectory_.trajectory_point(i).path_point().y();
-    std::vector<std::shared_ptr<const PNCJunctionInfo>> junctions =
-        PredictionMap::GetPNCJunctions({x, y}, FLAGS_junction_search_radius);
-    if (!junctions.empty() && junctions.front() != nullptr) {
-      junction_info = junctions.front();
-    }
-  }
-
-  if (junction_info != nullptr && junction_info->pnc_junction().has_polygon()) {
-    std::vector<Vec2d> vertices;
-    for (const auto& point : junction_info->pnc_junction().polygon().point()) {
-      vertices.emplace_back(point.x(), point.y());
-    }
-    if (vertices.size() >= 3) {
-      adc_pnc_junction_info_ptr_ = junction_info;
-      s_dist_to_junction_ = s_at_junction - s_start;
-      adc_pnc_junction_polygon_ = std::move(Polygon2d{vertices});
-    }
-  }
-}
-
 std::shared_ptr<const apollo::hdmap::JunctionInfo>
 ADCTrajectoryContainer::ADCJunction() const {
   return adc_junction_info_ptr_;
@@ -200,6 +154,11 @@ bool ADCTrajectoryContainer::IsLaneIdInReferenceLine(
   return adc_lane_ids_.find(lane_id) != adc_lane_ids_.end();
 }
 
+bool ADCTrajectoryContainer::IsLaneIdInTargetReferenceLine(
+    const std::string& lane_id) const {
+  return adc_target_lane_ids_.find(lane_id) != adc_target_lane_ids_.end();
+}
+
 void ADCTrajectoryContainer::SetLaneSequence() {
   for (const auto& lane : adc_trajectory_.lane_id()) {
     if (!lane.id().empty()) {
@@ -210,6 +169,20 @@ void ADCTrajectoryContainer::SetLaneSequence() {
   }
   adc_lane_ids_.clear();
   adc_lane_ids_.insert(adc_lane_seq_.begin(), adc_lane_seq_.end());
+}
+
+void ADCTrajectoryContainer::SetTargetLaneSequence() {
+  for (const auto& lane : adc_trajectory_.target_lane_id()) {
+    if (!lane.id().empty()) {
+      if (adc_target_lane_seq_.empty() ||
+          lane.id() != adc_target_lane_seq_.back()) {
+        adc_target_lane_seq_.emplace_back(lane.id());
+      }
+    }
+  }
+  adc_target_lane_ids_.clear();
+  adc_target_lane_ids_.insert(adc_target_lane_seq_.begin(),
+                              adc_target_lane_seq_.end());
 }
 
 std::string ADCTrajectoryContainer::ToString(
@@ -240,7 +213,8 @@ std::string ADCTrajectoryContainer::ToString(
   return str_lane_sequence;
 }
 
-bool ADCTrajectoryContainer::HasOverlap(const LaneSequence& lane_sequence) {
+bool ADCTrajectoryContainer::HasOverlap(
+    const LaneSequence& lane_sequence) const {
   for (const auto& lane_segment : lane_sequence.lane_segment()) {
     std::string lane_id = lane_segment.lane_id();
     if (adc_lane_ids_.find(lane_id) != adc_lane_ids_.end()) {
@@ -265,6 +239,11 @@ void ADCTrajectoryContainer::SetPosition(const Vec2d& position) {
 const std::vector<std::string>& ADCTrajectoryContainer::GetADCLaneIDSequence()
     const {
   return adc_lane_seq_;
+}
+
+const std::vector<std::string>&
+ADCTrajectoryContainer::GetADCTargetLaneIDSequence() const {
+  return adc_target_lane_seq_;
 }
 
 }  // namespace prediction

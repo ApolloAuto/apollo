@@ -249,8 +249,8 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   const char *GetLabel() const;
   const VoxelGridXY<float> *GetGrid() const;
   const GroundPlaneLiDAR *GetGroundPlane(int r, int c) const;
-  const unsigned int GetGridDimX() const;
-  const unsigned int GetGridDimY() const;
+  unsigned int GetGridDimX() const;
+  unsigned int GetGridDimY() const;
   float GetUnknownHeight();
   PlaneFitPointCandIndices **GetCandis() const;
 
@@ -265,16 +265,16 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   int FitInOrder();
   int FilterCandidates(int r, int c, const float *point_cloud,
                        PlaneFitPointCandIndices *candi,
-                       std::vector<std::pair<int, int> > *neighbors,
+                       std::vector<std::pair<int, int>> *neighbors,
                        unsigned int nr_point_element);
   int FitGridWithNeighbors(int r, int c, const float *point_cloud,
                            GroundPlaneLiDAR *groundplane,
                            unsigned int nr_points,
                            unsigned int nr_point_element, float dist_thre);
   void GetNeighbors(int r, int c, int rows, int cols,
-                    std::vector<std::pair<int, int> > *neighbors);
+                    std::vector<std::pair<int, int>> *neighbors);
   float CalculateAngleDist(const GroundPlaneLiDAR &plane,
-                           const std::vector<std::pair<int, int> > &neighbors);
+                           const std::vector<std::pair<int, int>> &neighbors);
   int Filter();
   int FilterLine(unsigned int r);
   int FilterGrid(const Voxel<float> &vg, const float *point_cloud,

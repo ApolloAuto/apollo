@@ -15,10 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/camera/common/undistortion_handler.h"
 
-#include <npp.h>
-
-#include <Eigen/Dense>
 #include <vector>
+
+#if USE_GPU == 1
+#include <npp.h>
+#endif
+
+#include "Eigen/Dense"
 
 #include "cyber/common/log.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"

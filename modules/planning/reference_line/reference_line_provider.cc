@@ -27,9 +27,10 @@
 
 #include "cyber/common/file.h"
 #include "cyber/task/task.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -48,7 +49,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
 using apollo::common::math::AngleDiff;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
@@ -58,8 +59,10 @@ using apollo::hdmap::RouteSegments;
 ReferenceLineProvider::~ReferenceLineProvider() {}
 
 ReferenceLineProvider::ReferenceLineProvider(
+    const common::VehicleStateProvider *vehicle_state_provider,
     const hdmap::HDMap *base_map,
-    const std::shared_ptr<relative_map::MapMsg> &relative_map) {
+    const std::shared_ptr<relative_map::MapMsg> &relative_map)
+    : vehicle_state_provider_(vehicle_state_provider) {
   if (!FLAGS_use_navigation_mode) {
     pnc_map_ = std::make_unique<hdmap::PncMap>(base_map);
     relative_map_ = nullptr;
@@ -68,8 +71,8 @@ ReferenceLineProvider::ReferenceLineProvider(
     relative_map_ = relative_map;
   }
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                        &smoother_config_))
+  ACHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                         &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
   if (smoother_config_.has_qp_spline()) {
@@ -79,8 +82,8 @@ ReferenceLineProvider::ReferenceLineProvider(
   } else if (smoother_config_.has_discrete_points()) {
     smoother_.reset(new DiscretePointsReferenceLineSmoother(smoother_config_));
   } else {
-    CHECK(false) << "unknown smoother config "
-                 << smoother_config_.DebugString();
+    ACHECK(false) << "unknown smoother config "
+                  << smoother_config_.DebugString();
   }
   is_initialized_ = true;
 }
@@ -111,6 +114,7 @@ void ReferenceLineProvider::UpdateVehicleState(
 }
 
 bool ReferenceLineProvider::Start() {
+  is_stop_ = false;
   if (FLAGS_use_navigation_mode) {
     return true;
   }
@@ -123,6 +127,13 @@ bool ReferenceLineProvider::Start() {
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
+}
+
+void ReferenceLineProvider::Wait() {
+  is_stop_ = true;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    task_future_.wait();
+  }
 }
 
 void ReferenceLineProvider::Stop() {
@@ -177,7 +188,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
   // update history
   reference_line_history_.push(reference_lines_);
   route_segments_history_.push(route_segments_);
-  constexpr int kMaxHistoryNum = 3;
+  static constexpr int kMaxHistoryNum = 3;
   if (reference_line_history_.size() > kMaxHistoryNum) {
     reference_line_history_.pop();
     route_segments_history_.pop();
@@ -186,7 +197,8 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    constexpr int32_t kSleepTime = 50;  // milliseconds
+    is_reference_line_updated_ = true;
+    static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
@@ -196,6 +208,7 @@ void ReferenceLineProvider::GenerateThread() {
     std::list<ReferenceLine> reference_lines;
     std::list<hdmap::RouteSegments> segments;
     if (!CreateReferenceLine(&reference_lines, &segments)) {
+      is_reference_line_updated_ = false;
       AERROR << "Fail to get reference line";
       continue;
     }
@@ -306,8 +319,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   // get current adc lane info by vehicle state
-  common::VehicleState vehicle_state =
-      common::VehicleStateProvider::Instance()->vehicle_state();
+  common::VehicleState vehicle_state = vehicle_state_provider_->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;
   if (!GetNearestWayPointFromNavigationPath(vehicle_state, navigation_lane_ids,
                                             &adc_lane_way_point)) {
@@ -455,7 +467,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
   const double kMaxDistance = 10.0;
   waypoint->lane = nullptr;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
+  auto point = common::util::PointFactory::ToPointENU(state);
   if (std::isnan(point.x()) || std::isnan(point.y())) {
     AERROR << "vehicle state is invalid";
     return false;
@@ -496,7 +508,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
       continue;
     }
-    constexpr double kEpsilon = 1e-6;
+    static constexpr double kEpsilon = 1e-6;
     if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
       continue;
     }
@@ -585,11 +597,10 @@ bool ReferenceLineProvider::CreateReferenceLine(
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
-        Vec2d vec2d(vehicle_state.x(), vehicle_state.y());
         common::SLPoint sl;
-        if (!reference_lines->back().XYToSL(vec2d, &sl)) {
-          AWARN << "Failed to project point: " << vec2d.DebugString()
-                << " to stitched reference line";
+        if (!reference_lines->back().XYToSL(vehicle_state, &sl)) {
+          AWARN << "Failed to project point: {" << vehicle_state.x() << ","
+                << vehicle_state.y() << "} to stitched reference line";
         }
         Shrink(sl, &reference_lines->back(), &(*iter));
         ++iter;
@@ -702,7 +713,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
+  static constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();
@@ -728,8 +739,6 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   if (last_index != ref_points.size() - 1) {
     need_shrink = true;
     common::SLPoint forward_sl;
-    common::math::Vec2d vec2d{ref_points[last_index].x(),
-                              ref_points[last_index].y()};
     reference_line->XYToSL(ref_points[last_index], &forward_sl);
     new_forward_distance = forward_sl.s() - sl.s();
   }
@@ -748,7 +757,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
 
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
-  constexpr double kReferenceLineDiffCheckStep = 10.0;
+  static constexpr double kReferenceLineDiffCheckStep = 10.0;
   for (double s = 0.0; s < smoothed.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_new = smoothed.GetReferencePoint(s);
@@ -887,8 +896,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
   // modify anchor points based on prefix_ref
   for (auto &point : anchor_points) {
     common::SLPoint sl_point;
-    Vec2d xy{point.path_point.x(), point.path_point.y()};
-    if (!prefix_ref.XYToSL(xy, &sl_point)) {
+    if (!prefix_ref.XYToSL(point.path_point, &sl_point)) {
       continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {

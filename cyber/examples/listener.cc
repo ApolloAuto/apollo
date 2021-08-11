@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
+
+#include "cyber/cyber.h"
 
 void MessageCallback(
     const std::shared_ptr<apollo::cyber::examples::proto::Chatter>& msg) {

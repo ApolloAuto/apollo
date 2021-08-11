@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -19,10 +19,10 @@
 config navigation mode
 """
 import sys
-import ConfigParser
+import configparser
 from modules.dreamview.proto import hmi_config_pb2
 from modules.planning.proto import planning_config_pb2
-from common import proto_utils
+from modules.tools.common import proto_utils
 
 DEFAULT_NAVI_CONFIG_FILE = "/apollo/modules/tools/navigation/config/default.ini"
 HMI_CONF_FILE = "/apollo/modules/dreamview/conf/hmi.conf"
@@ -122,10 +122,10 @@ def set_planning_flag(config):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "\nusage: python navi_config.py config.ini\n\n"
+        print("\nusage: python navi_config.py config.ini\n\n")
         sys.exit(0)
     config_file = sys.argv[1]
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config_file)
 
     set_hmi_conf(config)

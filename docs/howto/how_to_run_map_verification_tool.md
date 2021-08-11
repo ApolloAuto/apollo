@@ -6,9 +6,9 @@ The Map Data Verification tool is designed to help Apollo developers detect any 
 
 In order to run your data on this tool, please follow the steps below:
 
-1. Build Apollo as recommended in the [Build Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) until the `./apollo.sh build` step.
+1. Build Apollo as recommended in the [Build Guide](../quickstart/apollo_software_installation_guide.md) until the `./apollo.sh build` step.
 2. Once instde dev docker and after running `./apollo.sh build` please go to the folder `modules/tools/map_datachecker/`
-3. Starting the server: 
+3. Starting the server:
     ```bash
     bash server.sh start
     ```
@@ -54,5 +54,5 @@ In order to run your data on this tool, please follow the steps below:
 
 ## Tips
 
-1. The default value of `cmd` is `start` 
+1. The default value of `cmd` is `start`
 2. All error messages will be printed to help better prepare your map data. Please follow the error messages exactly as recommended

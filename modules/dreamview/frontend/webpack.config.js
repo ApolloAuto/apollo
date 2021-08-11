@@ -3,10 +3,10 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const WebappWebpackPlugin = require('webapp-webpack-plugin');
+const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     context: path.join(__dirname, "src"),
@@ -190,7 +190,7 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["app"]
         }),
-        new WebappWebpackPlugin({
+        new FaviconsWebpackPlugin({
             logo: "./favicon.png",
             cache: true,
             prefix: "icons/"

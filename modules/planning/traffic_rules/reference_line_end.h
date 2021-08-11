@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/traffic_rules/traffic_rule.h"
@@ -33,14 +34,15 @@ namespace planning {
  */
 class ReferenceLineEnd : public TrafficRule {
  public:
-  explicit ReferenceLineEnd(const TrafficRuleConfig& config);
+  ReferenceLineEnd(const TrafficRuleConfig& config,
+                   const std::shared_ptr<DependencyInjector>& injector);
   virtual ~ReferenceLineEnd() = default;
 
   common::Status ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const REF_LINE_END_VO_ID_PREFIX = "REF_END_";
+  static constexpr char const* REF_LINE_END_VO_ID_PREFIX = "REF_END_";
 };
 
 }  // namespace planning

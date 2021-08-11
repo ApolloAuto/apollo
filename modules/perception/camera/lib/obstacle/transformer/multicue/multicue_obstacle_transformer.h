@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
-#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue.pb.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/obj_mapper.h"
+#include "modules/perception/camera/lib/obstacle/transformer/multicue/proto/multicue.pb.h"
 
 namespace apollo {
 namespace perception {

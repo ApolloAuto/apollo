@@ -44,13 +44,14 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   EXPECT_EQ(perception_obstacle.id(), 1);
   MLPEvaluator mlp_evaluator;
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   MoveSequencePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
@@ -66,7 +67,7 @@ TEST_F(MoveSequencePredictorTest, Polynomial) {
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   MoveSequencePredictor predictor;
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
@@ -94,7 +95,7 @@ TEST_F(MoveSequencePredictorTest, Utils) {
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   MoveSequencePredictor predictor;
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();

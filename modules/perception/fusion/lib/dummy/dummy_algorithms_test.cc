@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -29,7 +29,7 @@ namespace fusion {
 
 TEST(DummyFusionSystemTest, test) {
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
+  init_options.main_sensors = std::vector<std::string>{"velodyne64"};
   DummyFusionSystem system;
   EXPECT_TRUE(system.Init(init_options));
 

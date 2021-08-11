@@ -1,35 +1,18 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_proto_library(
-    name = "trafficlight_detector_recognition_proto",
-    deps = [
-        ":trafficlight_detector_recognition_lib",
-    ],
-)
-
-proto_library(
-    name = "trafficlight_detector_recognition_lib",
-    srcs = [
-        "recognition.proto",
-    ],
-)
-
 cc_library(
     name = "classify",
-    srcs = [
-        "classify.cc",
-    ],
-    hdrs = [
-        "classify.h",
-    ],
+    srcs = ["classify.cc"],
+    hdrs = ["classify.h"],
     deps = [
-        ":trafficlight_detector_recognition_proto",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/camera/lib/traffic_light/detector/recognition/proto:recognition_cc_proto",
+        "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
@@ -38,15 +21,10 @@ cc_library(
 
 cc_library(
     name = "recognition",
-    srcs = [
-        "recognition.cc",
-    ],
-    hdrs = [
-        "recognition.h",
-    ],
+    srcs = ["recognition.cc"],
+    hdrs = ["recognition.h"],
     deps = [
         ":classify",
-        ":trafficlight_detector_recognition_proto",
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",

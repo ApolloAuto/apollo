@@ -15,7 +15,10 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/util/option_parser.h"
+
 #include <vector>
+
+#include "absl/strings/str_split.h"
 #include "modules/common/util/string_util.h"
 
 namespace apollo {
@@ -24,24 +27,19 @@ namespace benchmark {
 
 bool OptionParser::parse_from_string(const std::string& input) {
   _options.clear();
-  std::vector<std::string> option_pairs;
-  std::vector<std::string> key_value;
-  std::vector<std::string> values;
+  std::vector<std::string> option_pairs = absl::StrSplit(input, '|');
   // std::string str = StringUtil::trim_all(input);
-  apollo::common::util::Split(input, '|', &option_pairs);
-  if (option_pairs.size() == 0) {  // single option
+  if (option_pairs.empty()) {  // single option
     option_pairs.push_back(input);
   }
   for (auto& opt : option_pairs) {
-    key_value.clear();
-    apollo::common::util::Split(opt, ':', &key_value);
+    const std::vector<std::string> key_value = absl::StrSplit(opt, ':');
     if (key_value.size() != 2) {
       std::cerr << "Fail to parse " << opt << std::endl;
       continue;
     }
-    values.clear();
-    apollo::common::util::Split(key_value[1], ',', &values);
-    if (values.size() == 0) {
+    std::vector<std::string> values = absl::StrSplit(key_value[1], ',');
+    if (values.empty()) {
       values.push_back(key_value[1]);
     }
     auto iter = _options.find(key_value[0]);

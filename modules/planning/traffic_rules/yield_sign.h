@@ -20,9 +20,11 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -30,7 +32,8 @@ namespace planning {
 
 class YieldSign : public TrafficRule {
  public:
-  explicit YieldSign(const TrafficRuleConfig& config);
+  YieldSign(const TrafficRuleConfig& config,
+            const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~YieldSign() = default;
 
@@ -42,7 +45,7 @@ class YieldSign : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const YIELD_SIGN_VO_ID_PREFIX = "YS_";
+  static constexpr char const* YIELD_SIGN_VO_ID_PREFIX = "YS_";
 };
 
 }  // namespace planning

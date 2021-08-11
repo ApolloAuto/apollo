@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +11,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/prediction/proto:scenario_proto",
+        "//modules/prediction/proto:scenario_cc_proto",
     ],
 )
 
@@ -44,12 +45,10 @@ cc_library(
 cc_test(
     name = "cruise_scenario_features_test",
     size = "small",
-    srcs = [
-        "cruise_scenario_features_test.cc",
-    ],
+    srcs = ["cruise_scenario_features_test.cc"],
     deps = [
         ":cruise_scenario_features",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -17,11 +17,11 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -51,7 +51,7 @@ bool TrafficLightCameraPerception::Init(
   init_options.gpu_id = tl_param_.gpu_id();
   detector_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
       plugin_param.name()));
-  CHECK(detector_ != nullptr);
+  ACHECK(detector_ != nullptr);
   if (!detector_->Init(init_options)) {
     AERROR << "tl detector init failed";
     return false;
@@ -63,7 +63,7 @@ bool TrafficLightCameraPerception::Init(
   init_options.gpu_id = tl_param_.gpu_id();
   recognizer_.reset(BaseTrafficLightDetectorRegisterer::GetInstanceByName(
       plugin_param.name()));
-  CHECK(recognizer_ != nullptr);
+  ACHECK(recognizer_ != nullptr);
   if (!recognizer_->Init(init_options)) {
     AERROR << "tl recognizer init failed";
     return false;
@@ -76,7 +76,7 @@ bool TrafficLightCameraPerception::Init(
   tracker_init_options.conf_file = tracker_plugin_param.config_file();
   tracker_.reset(BaseTrafficLightTrackerRegisterer::GetInstanceByName(
       tracker_plugin_param.name()));
-  CHECK(tracker_ != nullptr);
+  ACHECK(tracker_ != nullptr);
   AINFO << tracker_init_options.root_dir << " "
         << tracker_init_options.conf_file;
   if (!tracker_->Init(tracker_init_options)) {
@@ -90,40 +90,25 @@ bool TrafficLightCameraPerception::Init(
 
 bool TrafficLightCameraPerception::Perception(
     const CameraPerceptionOptions &options, CameraFrame *frame) {
-  PERCEPTION_PERF_FUNCTION();
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_FUNCTION();
+  PERF_BLOCK_START();
   TrafficLightDetectorOptions detector_options;
   if (!detector_->Detect(detector_options, frame)) {
     AERROR << "tl failed to detect.";
     return false;
   }
-  const auto traffic_light_detect_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_detect");
 
   TrafficLightDetectorOptions recognizer_options;
   if (!recognizer_->Detect(recognizer_options, frame)) {
     AERROR << "tl failed to recognize.";
     return false;
   }
-  const auto traffic_light_recognize_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_recognize");
 
   TrafficLightTrackerOptions tracker_options;
   if (!tracker_->Track(tracker_options, frame)) {
     AERROR << "tl failed to track.";
     return false;
   }
-  const auto traffic_light_track_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_track");
-  AINFO << "TrafficLightsPerception perf_info."
-        << " number_of_lights: " << frame->traffic_lights.size()
-        << " traffic_light_detect_time: " << traffic_light_detect_time << " ms."
-        << " traffic_light_recognize_time: " << traffic_light_recognize_time
-        << " ms."
-        << " traffic_light_track_time: " << traffic_light_track_time << " ms.";
   return true;
 }
 

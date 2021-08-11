@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -59,7 +60,23 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "record_file_integration_test",
+    size = "small",
+    srcs = ["file/record_file_integration_test.cc"],
+    tags = [
+        "cpu:3",
+        "exclusive",
+        "manual",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:record_cc_proto",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -103,7 +120,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -124,7 +141,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -20,8 +20,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include "modules/planning/scenarios/common/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
 namespace apollo {
@@ -33,9 +35,10 @@ struct TrafficLightProtectedContext;
 
 class TrafficLightProtectedStageIntersectionCruise : public Stage {
  public:
-  explicit TrafficLightProtectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  TrafficLightProtectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config,
+      const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

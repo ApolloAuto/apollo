@@ -35,6 +35,7 @@ void MlfTrackData::Reset() {
   sensor_history_objects_.clear();
   cached_objects_.clear();
   predict_.Reset();
+//  feature_.reset();
 }
 
 void MlfTrackData::Reset(TrackedObjectPtr obj, int track_id) {
@@ -51,7 +52,10 @@ void MlfTrackData::PushTrackedObjectToTrack(TrackedObjectPtr obj) {
     sensor_history_objects_[obj->sensor_info.name].insert(pair);
     age_++;
     if (age_ == 1) {  // the first timestamp
-      CHECK(!obj->is_fake);
+      if (obj->is_fake) {
+        AERROR << "obj is fake";
+        return;
+      }
       latest_visible_time_ = timestamp;
       first_tracked_time_ = timestamp;
     }

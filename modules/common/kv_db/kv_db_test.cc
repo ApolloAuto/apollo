@@ -24,26 +24,19 @@ namespace common {
 
 TEST(KVDBTest, CRUD) {
   EXPECT_TRUE(KVDB::Delete("test_key"));
-  EXPECT_FALSE(KVDB::Has("test_key"));
+  EXPECT_FALSE(KVDB::Get("test_key").has_value());
 
   // Put
   EXPECT_TRUE(KVDB::Put("test_key", "val0"));
-  EXPECT_TRUE(KVDB::Has("test_key"));
-  EXPECT_EQ("val0", KVDB::Get("test_key"));
+  EXPECT_EQ("val0", KVDB::Get("test_key").value());
 
   // Update
   EXPECT_TRUE(KVDB::Put("test_key", "val1"));
-  EXPECT_TRUE(KVDB::Has("test_key"));
-  EXPECT_EQ("val1", KVDB::Get("test_key"));
+  EXPECT_EQ("val1", KVDB::Get("test_key").value());
 
   // Delete
   EXPECT_TRUE(KVDB::Delete("test_key"));
-  EXPECT_FALSE(KVDB::Has("test_key"));
-}
-
-TEST(KVDBTest, GetDefault) {
-  EXPECT_EQ("", KVDB::Get("test_key"));
-  EXPECT_EQ("default", KVDB::Get("test_key", "default"));
+  EXPECT_FALSE(KVDB::Get("test_key").has_value());
 }
 
 TEST(KVDBTest, MultiThreads) {
@@ -53,7 +46,6 @@ TEST(KVDBTest, MultiThreads) {
   for (auto &th : threads) {
     th.reset(new std::thread([]() {
       KVDB::Delete("test_key");
-      KVDB::Has("test_key");
       KVDB::Put("test_key", "val0");
       KVDB::Get("test_key");
     }));

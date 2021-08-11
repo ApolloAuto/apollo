@@ -1,0 +1,12 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/storytelling/libstorytelling_component.so"
+    timer_components {
+        class_name : "Storytelling"
+        config {
+            name: "storytelling"
+            config_file_path: "/apollo/modules/storytelling/conf/storytelling_conf.pb.txt"
+            flag_file_path: "/apollo/modules/common/data/global_flagfile.txt"
+            interval: 100
+        }
+    }
+}

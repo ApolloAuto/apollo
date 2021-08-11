@@ -20,12 +20,12 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -33,7 +33,8 @@ namespace planning {
 
 class SpeedDecider : public Task {
  public:
-  explicit SpeedDecider(const TaskConfig& config);
+  SpeedDecider(const TaskConfig& config,
+               const std::shared_ptr<DependencyInjector>& injector);
 
   common::Status Execute(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
@@ -66,9 +67,7 @@ class SpeedDecider : public Task {
   bool CheckIsFollow(const Obstacle& obstacle,
                      const STBoundary& boundary) const;
 
-  bool CheckStopForPedestrian(
-      const Obstacle& obstacle,
-      std::unordered_map<std::string, double>* pedestrian_stop_times) const;
+  bool CheckStopForPedestrian(const Obstacle& obstacle) const;
 
   bool CreateStopDecision(const Obstacle& obstacle,
                           ObjectDecisionType* const stop_decision,

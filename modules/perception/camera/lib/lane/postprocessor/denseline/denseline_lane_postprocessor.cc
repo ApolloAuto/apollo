@@ -21,8 +21,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
-#include "modules/perception/lib/utils/timer.h"
+#include "modules/perception/camera/lib/lane/common/proto/denseline.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -210,7 +209,7 @@ void DenselineLanePostprocessor::CalLaneMap(
 void DenselineLanePostprocessor::InferPointSetFromLaneCenter(
     const std::vector<ConnectedComponent>& lane_ccs,
     const std::vector<LaneType>& ccs_pos_type,
-    std::vector<std::vector<LanePointInfo> >* lane_map_group_point_set) {
+    std::vector<std::vector<LanePointInfo>>* lane_map_group_point_set) {
   //  0: adj-left lane center
   //  1: ego-lane center;
   //  2: adj-right lane center
@@ -240,7 +239,7 @@ void DenselineLanePostprocessor::InferPointSetFromLaneCenter(
 // @brief infer the lane line points from one CC
 void DenselineLanePostprocessor::InferPointSetFromOneCC(
     const ConnectedComponent& lane_cc, int left_index, int right_index,
-    std::vector<std::vector<LanePointInfo> >* lane_map_group_point_set) {
+    std::vector<std::vector<LanePointInfo>>* lane_map_group_point_set) {
   //  find the points which belongs to this CC
   const std::vector<base::Point2DI>& pixels = lane_cc.GetPixels();
   //  initialize the memory
@@ -388,7 +387,11 @@ bool DenselineLanePostprocessor::LocateLanelinePointSet(
   input_image_height_ = data_provider->src_height();
   std::vector<int> out_put_shape = frame->lane_detected_blob->shape();
   int channels = frame->lane_detected_blob->channels();
-  CHECK_GE(channels, net_model_channel_num_);
+  if (channels < net_model_channel_num_) {
+    AERROR << "channel (" << channels << ") is less than net channel ("
+           << net_model_channel_num_ << ")";
+    return false;
+  }
 
   lane_map_height_ = frame->lane_detected_blob->height();
   lane_map_width_ = frame->lane_detected_blob->width();
@@ -435,7 +438,7 @@ bool DenselineLanePostprocessor::LocateLanelinePointSet(
   }
 
   //  5. get the lane line points
-  std::vector<std::vector<LanePointInfo> > lane_map_group_point_set(4);
+  std::vector<std::vector<LanePointInfo>> lane_map_group_point_set(4);
   InferPointSetFromLaneCenter(select_lane_ccs_, ccs_pos_type,
                               &lane_map_group_point_set);
 
@@ -513,7 +516,7 @@ bool DenselineLanePostprocessor::ClassifyLaneCCsPosTypeInImage(
 // @brief classify lane line pos type in image
 // [adj-left/ego-left/ego-right/adj-right]
 void DenselineLanePostprocessor::ClassifyLanelinePosTypeInImage(
-    const std::vector<std::vector<LanePointInfo> >& image_group_point_set,
+    const std::vector<std::vector<LanePointInfo>>& image_group_point_set,
     std::vector<base::LaneLinePositionType>* laneline_type,
     std::vector<bool>* line_flag) {
   int set_size = static_cast<int>(image_group_point_set.size());
@@ -623,8 +626,8 @@ bool DenselineLanePostprocessor::LocateNeighborLaneLine(
 
 // @brief: convert the point to the original image
 void DenselineLanePostprocessor::Convert2OriginalCoord(
-    const std::vector<std::vector<LanePointInfo> >& lane_map_group_point_set,
-    std::vector<std::vector<LanePointInfo> >* image_group_point_set) {
+    const std::vector<std::vector<LanePointInfo>>& lane_map_group_point_set,
+    std::vector<std::vector<LanePointInfo>>* image_group_point_set) {
   float x_ratio =
       static_cast<float>(input_crop_width_) * lane_map_width_inverse_;
   float y_ratio =
@@ -657,7 +660,7 @@ void DenselineLanePostprocessor::AddImageLaneline(
     return;
   }
   base::LaneLine lane_mark;
-  std::vector<Eigen::Matrix<float, 2, 1> > img_pos_vec(image_point_set_size);
+  std::vector<Eigen::Matrix<float, 2, 1>> img_pos_vec(image_point_set_size);
   Eigen::Matrix<float, max_poly_order + 1, 1> img_coeff;
   bool is_x_axis = false;
   float r_start = -1;
@@ -734,7 +737,7 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     float x_start = camera_point_set[0].z;
     float x_end = 0.0f;
     Eigen::Matrix<float, max_poly_order + 1, 1> camera_coeff;
-    std::vector<Eigen::Matrix<float, 2, 1> > camera_pos_vec;
+    std::vector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
     for (int i = 0; i < static_cast<int>(camera_point_set.size()); i++) {
       x_end = std::max(camera_point_set[i].z, x_end);
       x_start = std::min(camera_point_set[i].z, x_start);
@@ -765,7 +768,7 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
   }
 }
 
-std::vector<std::vector<LanePointInfo> >
+std::vector<std::vector<LanePointInfo>>
 DenselineLanePostprocessor::GetLanelinePointSet() {
   return image_group_point_set_;
 }

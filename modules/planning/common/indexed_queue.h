@@ -56,13 +56,12 @@ class IndexedQueue {
       map_.erase(queue_.front().first);
       queue_.pop();
     }
-    queue_.push(std::make_pair(id, ptr.get()));
+    queue_.emplace(id, ptr.get());
     map_[id] = std::move(ptr);
     return true;
   }
 
   void Clear() {
-    capacity_ = 0;
     while (!queue_.empty()) {
       queue_.pop();
     }

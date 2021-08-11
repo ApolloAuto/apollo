@@ -19,6 +19,8 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
+using Time = ::apollo::cyber::Time;
+
 namespace apollo {
 namespace guardian {
 
@@ -52,6 +54,7 @@ bool GuardianComponent::Init() {
       [this](const std::shared_ptr<SystemStatus>& status) {
         ADEBUG << "Received system status data: run system status callback.";
         std::lock_guard<std::mutex> lock(mutex_);
+        last_status_received_s_ = Time::Now().ToSecond();
         system_status_.CopyFrom(*status);
       });
 
@@ -61,11 +64,17 @@ bool GuardianComponent::Init() {
 }
 
 bool GuardianComponent::Proc() {
-  ADEBUG << "Timer is triggered: publish GuardianComponent result";
+  constexpr double kSecondsTillTimeout(2.5);
+
   bool safety_mode_triggered = false;
   if (guardian_conf_.guardian_enable()) {
     std::lock_guard<std::mutex> lock(mutex_);
-    safety_mode_triggered = system_status_.has_safety_mode_trigger_time();
+    if (Time::Now().ToSecond() - last_status_received_s_ >
+        kSecondsTillTimeout) {
+      safety_mode_triggered = true;
+    }
+    safety_mode_triggered =
+        safety_mode_triggered || system_status_.has_safety_mode_trigger_time();
   }
 
   if (safety_mode_triggered) {
@@ -77,7 +86,7 @@ bool GuardianComponent::Proc() {
   }
 
   common::util::FillHeader(node_->Name(), &guardian_cmd_);
-  guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
+  guardian_writer_->Write(guardian_cmd_);
   return true;
 }
 

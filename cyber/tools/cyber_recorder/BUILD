@@ -1,22 +1,29 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+install(
+    name = "install",
+    targets = [
+      ":cyber_recorder",
+    ],
+)
+
 cc_binary(
     name = "cyber_recorder",
     srcs = ["main.cc"],
-    linkopts = [
-        "-pthread",
-    ],
+    linkopts = ["-pthread"],
     deps = [
         ":info",
-        ":player",
         ":recorder",
         ":recoverer",
         ":spliter",
         "//cyber:init",
         "//cyber/common:file",
         "//cyber/common:time_conversion",
+        "//cyber/tools/cyber_recorder/player",
     ],
 )
 
@@ -28,31 +35,7 @@ cc_library(
         "//cyber/common:time_conversion",
         "//cyber/proto:record_cc_proto",
         "//cyber/record:record_file_reader",
-    ],
-)
-
-cc_library(
-    name = "player",
-    srcs = [
-        "player/play_task.cc",
-        "player/play_task_buffer.cc",
-        "player/play_task_consumer.cc",
-        "player/play_task_producer.cc",
-        "player/player.cc",
-    ],
-    hdrs = [
-        "player/play_param.h",
-        "player/play_task.h",
-        "player/play_task_buffer.h",
-        "player/play_task_consumer.h",
-        "player/play_task_producer.h",
-        "player/player.h",
-    ],
-    deps = [
-        "//cyber",
-        "//cyber/common:log",
-        "//cyber/proto:record_cc_proto",
-        "//cyber/record:record_reader",
+        "//cyber/record:record_message",
     ],
 )
 

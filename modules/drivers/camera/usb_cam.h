@@ -144,7 +144,7 @@ class UsbCam {
   bool close_device(void);
   bool open_device(void);
   bool read_frame(CameraImagePtr raw_image);
-  bool process_image(const void* src, int len, CameraImagePtr dest);
+  bool process_image(void* src, int len, CameraImagePtr dest);
   bool start_capturing(void);
   bool stop_capturing(void);
   void reconnect();

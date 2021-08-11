@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 namespace apollo {
 namespace planning {

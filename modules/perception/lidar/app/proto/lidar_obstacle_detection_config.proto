@@ -1,0 +1,9 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message LidarObstacleDetectionConfig {
+  optional string preprocessor = 1 [default = "PointCloudPreprocessor"];
+  optional string detector = 2 [default = "PointPillarsDetection"];
+  optional bool use_map_manager = 3 [default = true];
+  optional bool use_object_filter_bank = 4 [default = true];
+}

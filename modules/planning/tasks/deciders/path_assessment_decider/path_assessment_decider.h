@@ -16,14 +16,11 @@
 
 #pragma once
 
-#include <functional>
-#include <set>
+#include <memory>
 #include <string>
 #include <tuple>
-#include <unordered_map>
 #include <vector>
 
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -32,7 +29,8 @@ namespace planning {
 
 class PathAssessmentDecider : public Decider {
  public:
-  explicit PathAssessmentDecider(const TaskConfig& config);
+  PathAssessmentDecider(const TaskConfig& config,
+                        const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   /** @brief Every time when Process function is called, it will:
@@ -90,6 +88,7 @@ class PathAssessmentDecider : public Decider {
 
   void SetPathPointType(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+      const bool is_lane_change_path,
       std::vector<std::tuple<double, PathData::PathPointType, double>>* const
           path_point_decision);
 

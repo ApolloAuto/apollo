@@ -23,60 +23,12 @@ namespace apollo {
 namespace common {
 namespace util {
 
-SLPoint MakeSLPoint(const double s, const double l) {
-  SLPoint sl;
-  sl.set_s(s);
-  sl.set_l(l);
-  return sl;
-}
-
-PointENU MakePointENU(const double x, const double y, const double z) {
-  PointENU point_enu;
-  point_enu.set_x(x);
-  point_enu.set_y(y);
-  point_enu.set_z(z);
-  return point_enu;
-}
-
 PointENU operator+(const PointENU enu, const math::Vec2d& xy) {
   PointENU point;
   point.set_x(enu.x() + xy.x());
   point.set_y(enu.y() + xy.y());
   point.set_z(enu.z());
   return point;
-}
-
-PointENU MakePointENU(const math::Vec2d& xy) {
-  PointENU point_enu;
-  point_enu.set_x(xy.x());
-  point_enu.set_y(xy.y());
-  point_enu.set_z(0.0);
-  return point_enu;
-}
-
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da) {
-  SpeedPoint speed_point;
-  speed_point.set_s(s);
-  speed_point.set_t(t);
-  speed_point.set_v(v);
-  speed_point.set_a(a);
-  speed_point.set_da(da);
-  return speed_point;
-}
-
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa) {
-  PathPoint path_point;
-  path_point.set_x(x);
-  path_point.set_y(y);
-  path_point.set_z(z);
-  path_point.set_theta(theta);
-  path_point.set_kappa(kappa);
-  path_point.set_dkappa(dkappa);
-  path_point.set_ddkappa(ddkappa);
-  return path_point;
 }
 
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,

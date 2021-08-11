@@ -1,5 +1,5 @@
 header {
-  timestamp_sec: 1527023661.6182117
+  timestamp_sec: 1527023661.6182115
   lidar_timestamp: 0
   camera_timestamp: 0
   radar_timestamp: 0
@@ -20,11 +20,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586436.91460396955
-            y: 4140728.4578750865
+            x: 586437.398381711
+            y: 4140728.3364840685
             z: 0
           }
-          fence_heading: 1.317975721968581
+          fence_heading: 1.3287040549205817
         }
       }
     }
@@ -40,10 +40,13 @@ routing_header {
 }
 right_of_way_status: UNPROTECTED
 lane_id {
-  id: "2849_1_-1"
+  id: "2900_1_-1"
 }
 lane_id {
-  id: "10591a_1_-1"
+  id: "11043_1_-1"
+}
+lane_id {
+  id: "2907_1_-1"
 }
 lane_id {
   id: "2906_1_-1"
@@ -92,3 +95,54 @@ engage_advice {
 }
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "2900_1_-1"
+}
+target_lane_id {
+  id: "11043_1_-1"
+}
+target_lane_id {
+  id: "2907_1_-1"
+}
+target_lane_id {
+  id: "2906_1_-1"
+}
+target_lane_id {
+  id: "10590_1_-1"
+}
+target_lane_id {
+  id: "10589_1_-1"
+}
+target_lane_id {
+  id: "2912_1_-1"
+}
+target_lane_id {
+  id: "2911_1_-1"
+}
+target_lane_id {
+  id: "2914_1_-1"
+}
+target_lane_id {
+  id: "2919_1_-1"
+}
+target_lane_id {
+  id: "2918_1_-1"
+}
+target_lane_id {
+  id: "338_1_-1"
+}
+target_lane_id {
+  id: "10557_1_-1"
+}
+target_lane_id {
+  id: "11044_1_-1"
+}
+target_lane_id {
+  id: "373_1_-1"
+}
+target_lane_id {
+  id: "2923_1_-1"
+}
+target_lane_id {
+  id: "2922_1_-1"
+}

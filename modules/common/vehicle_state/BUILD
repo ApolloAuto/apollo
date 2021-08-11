@@ -1,22 +1,19 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "vehicle_state_provider",
-    srcs = [
-        "vehicle_state_provider.cc",
-    ],
-    hdrs = [
-        "vehicle_state_provider.h",
-    ],
+    srcs = ["vehicle_state_provider.cc"],
+    hdrs = ["vehicle_state_provider.h"],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",
         "//modules/common/status",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/localization/common:localization_common",
         "@eigen",
     ],
@@ -25,17 +22,15 @@ cc_library(
 cc_test(
     name = "vehicle_state_provider_test",
     size = "small",
-    srcs = [
-        "vehicle_state_provider_test.cc",
-    ],
+    srcs = ["vehicle_state_provider_test.cc"],
     data = [
-        "//modules/canbus:canbus_testdata",
+        "//modules/canbus:test_data",
         "//modules/localization:localization_testdata",
     ],
     deps = [
         ":vehicle_state_provider",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

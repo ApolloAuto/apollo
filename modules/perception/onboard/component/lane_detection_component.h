@@ -15,23 +15,25 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
+#include "Eigen/Core"
+#include "Eigen/Dense"
+#include "Eigen/StdVector"
+
 #include "cyber/component/component.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/lane_camera_perception.h"
-#include "modules/perception/camera/app/perception.pb.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/motion_service/motion_service.h"
@@ -43,6 +45,8 @@
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_lane.pb.h"
 
+using apollo::common::EigenMap;
+using apollo::common::EigenVector;
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
 
@@ -55,6 +59,9 @@ typedef Eigen::Matrix4d MotionType;
 class LaneDetectionComponent;
 typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   LaneDetectionComponent() : seq_num_(0) {}
   ~LaneDetectionComponent();
@@ -122,8 +129,8 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
       data_providers_map_;
 
   // map for store params
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
   Eigen::Matrix3d homography_image2ground_;
 
   // camera lane pipeline
@@ -134,7 +141,7 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
   // fixed size camera frames
   int frame_capacity_ = 20;
   int frame_id_ = 0;
-  std::vector<camera::CameraFrame> camera_frames_;
+  EigenVector<camera::CameraFrame> camera_frames_;
 
   // image info.
   int image_width_ = 1920;

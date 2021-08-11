@@ -28,25 +28,31 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/log.h"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "gtest/gtest_prod.h"
 
-#include "third_party/json/json.hpp"
+#include "nlohmann/json.hpp"
 
-#include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
-
-#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/audio/proto/audio.pb.h"
+#include "modules/audio/proto/audio_event.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
+#include "modules/task_manager/proto/task_manager.pb.h"
+
+#include "cyber/common/log.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/dreamview/backend/map/map_service.h"
 
 /**
  * @namespace apollo::dreamview
@@ -143,6 +149,8 @@ class SimulationWorldService {
   void PublishRoutingRequest(
       const std::shared_ptr<apollo::routing::RoutingRequest> &);
 
+  void PublishTask(const std::shared_ptr<apollo::task_manager::Task> &);
+
   void GetMapElementIds(double radius, MapElementIds *ids) const;
 
   const apollo::hdmap::Map &GetRelativeMap() const;
@@ -166,11 +174,19 @@ class SimulationWorldService {
 
   Object &CreateWorldObjectIfAbsent(
       const apollo::perception::PerceptionObstacle &obstacle);
+  void CreateWorldObjectFromSensorMeasurement(
+      const apollo::perception::SensorMeasurement &sensor,
+      Object *world_object);
   void SetObstacleInfo(const apollo::perception::PerceptionObstacle &obstacle,
                        Object *world_object);
   void SetObstaclePolygon(
       const apollo::perception::PerceptionObstacle &obstacle,
       Object *world_object);
+  void SetObstacleSensorMeasurements(
+      const apollo::perception::PerceptionObstacle &obstacle,
+      Object *world_object);
+  void SetObstacleSource(const apollo::perception::PerceptionObstacle &obstacle,
+                         Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
   void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);
@@ -289,12 +305,12 @@ class SimulationWorldService {
   void DownsampleSpeedPointsByInterval(const Points &points,
                                        size_t downsampleInterval,
                                        Points *downsampled_points) {
-    if (points.size() == 0) {
+    if (points.empty()) {
       return;
     }
 
-    for (size_t i = 0; i + 1 < points.size(); i += downsampleInterval) {
-      *downsampled_points->Add() = points[static_cast<int>(i)];
+    for (int i = 0; i + 1 < points.size(); i += downsampleInterval) {
+      *downsampled_points->Add() = points[i];
     }
 
     // add the last point
@@ -308,6 +324,7 @@ class SimulationWorldService {
   SimulationWorld world_;
 
   // Downsampled route paths to be rendered in frontend.
+  mutable boost::shared_mutex route_paths_mutex_;
   std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
@@ -359,6 +376,7 @@ class SimulationWorldService {
       navigation_reader_;
   std::shared_ptr<cyber::Reader<apollo::relative_map::MapMsg>>
       relative_map_reader_;
+  std::shared_ptr<cyber::Reader<apollo::audio::AudioEvent>> audio_event_reader_;
   std::shared_ptr<cyber::Reader<apollo::common::DriveEvent>>
       drive_event_reader_;
   std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>>
@@ -367,6 +385,11 @@ class SimulationWorldService {
       routing_request_reader_;
   std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>
+      storytelling_reader_;
+  std::shared_ptr<cyber::Reader<apollo::audio::AudioDetection>>
+      audio_detection_reader_;
+  std::shared_ptr<cyber::Reader<apollo::task_manager::Task>> task_reader_;
 
   // Writers.
   std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>
@@ -375,6 +398,7 @@ class SimulationWorldService {
       routing_request_writer_;
   std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
       routing_response_writer_;
+  std::shared_ptr<cyber::Writer<apollo::task_manager::Task>> task_writer_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);

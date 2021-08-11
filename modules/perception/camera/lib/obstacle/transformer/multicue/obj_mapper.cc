@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/obj_mapper.h"
 
+#include <limits>
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -49,7 +51,10 @@ bool ObjMapper::SolveCenterFromNearestVerticalEdge(const float *bbox,
   center[0] = center[1] = center[2] = 0.0f;
   float height_bbox = bbox[3] - bbox[1];
   float width_bbox = bbox[2] - bbox[0];
-  CHECK(width_bbox > 0.0f && height_bbox > 0.0f);
+  if (width_bbox <= 0.0f || height_bbox <= 0.0f) {
+    AERROR << "width or height of bbox is 0";
+    return false;
+  }
 
   if (common::IRound(bbox[3]) >= height_ - 1) {
     height_bbox /= params_.occ_ratio;
@@ -294,10 +299,10 @@ void ObjMapper::GetCenter(const float *bbox, const float &z_ref,
   while (!stop) {
     common::IBackprojectCanonical(x, k_mat_, z_ref, center_test);
     center_test[1] += hwl[0] / 2;
-    float x_min = FLT_MAX;
-    float x_max = -FLT_MAX;
-    float y_min = FLT_MAX;
-    float y_max = -FLT_MAX;
+    float x_min = std::numeric_limits<float>::max();
+    float x_max = -std::numeric_limits<float>::max();
+    float y_min = std::numeric_limits<float>::max();
+    float y_max = -std::numeric_limits<float>::max();
     float x_proj[3] = {0};
 
     for (int i = 0; i < 8; ++i) {

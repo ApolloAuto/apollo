@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <queue>
 
@@ -215,8 +216,8 @@ double AStarStrategy::HeuristicCost(const TopoNode* src_node,
                                     const TopoNode* dest_node) {
   const auto& src_point = src_node->AnchorPoint();
   const auto& dest_point = dest_node->AnchorPoint();
-  double distance = fabs(src_point.x() - dest_point.x()) +
-                    fabs(src_point.y() - dest_point.y());
+  double distance = std::fabs(src_point.x() - dest_point.x()) +
+                    std::fabs(src_point.y() - dest_point.y());
   return distance;
 }
 

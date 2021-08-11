@@ -23,13 +23,11 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
-
-#include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/util/factory.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -40,20 +38,22 @@ namespace yield_sign {
 // stage context
 struct YieldSignContext {
   ScenarioYieldSignConfig scenario_config;
-  std::string current_yield_sign_overlap_id;
+  std::vector<std::string> current_yield_sign_overlap_ids;
   double creep_start_time = 0.0;
 };
 
 class YieldSignScenario : public Scenario {
  public:
   YieldSignScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context)
-      : Scenario(config, context) {}
+                    const ScenarioContext* context,
+                    const std::shared_ptr<DependencyInjector>& injector)
+      : Scenario(config, context, injector) {}
 
   void Init() override;
 
   std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
+      const ScenarioConfig::StageConfig& stage_config,
+      const std::shared_ptr<DependencyInjector>& injector);
 
   YieldSignContext* GetContext() { return &context_; }
 
@@ -64,7 +64,8 @@ class YieldSignScenario : public Scenario {
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
+                 const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;
   bool init_ = false;
   YieldSignContext context_;

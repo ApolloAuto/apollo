@@ -23,7 +23,11 @@
 
 #include "Eigen/Dense"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
+
+using apollo::common::EigenVector;
+using apollo::common::EigenMap;
 
 namespace apollo {
 namespace perception {
@@ -31,6 +35,9 @@ namespace base {
 
 template <class PointT>
 class PointCloud {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   using PointType = PointT;
   // @brief default constructor
@@ -448,6 +455,9 @@ class AttributePointCloud : public PointCloud<PointT> {
 
   const std::vector<int32_t>& points_beam_id() const { return points_beam_id_; }
   std::vector<int32_t>* mutable_points_beam_id() { return &points_beam_id_; }
+  int32_t& points_beam_id(size_t i) { return points_beam_id_[i]; }
+  const int32_t& points_beam_id(size_t i) const { return points_beam_id_[i]; }
+
   const std::vector<uint8_t>& points_label() const { return points_label_; }
   std::vector<uint8_t>* mutable_points_label() { return &points_label_; }
 

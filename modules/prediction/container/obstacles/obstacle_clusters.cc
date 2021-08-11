@@ -26,49 +26,14 @@ namespace prediction {
 
 using ::apollo::hdmap::LaneInfo;
 
-std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
-std::unordered_map<std::string, std::vector<LaneObstacle>>
-    ObstacleClusters::lane_obstacles_;
-std::unordered_map<std::string, StopSign>
-    ObstacleClusters::lane_id_stop_sign_map_;
-
-void ObstacleClusters::Clear() {
-  lane_graphs_.clear();
-  lane_obstacles_.clear();
-  lane_id_stop_sign_map_.clear();
-}
-
-void ObstacleClusters::Init() { Clear(); }
-
-const LaneGraph& ObstacleClusters::GetLaneGraph(
-    const double start_s, const double length, const bool is_on_lane,
+LaneGraph ObstacleClusters::GetLaneGraph(
+    const double start_s, const double length, const bool consider_lane_split,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
-  if (lane_graphs_.find(lane_id) != lane_graphs_.end()) {
-    // If this lane_segment has been used for constructing LaneGraph,
-    // fetch the previously saved LaneGraph, modify its start_s,
-    // then return this (save the time to construct the entire LaneGraph).
-    LaneGraph* lane_graph = &lane_graphs_[lane_id];
-    for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
-      LaneSequence* lane_seq_ptr = lane_graph->mutable_lane_sequence(i);
-      if (lane_seq_ptr->lane_segment_size() == 0) {
-        continue;
-      }
-      LaneSegment* first_lane_seg_ptr = lane_seq_ptr->mutable_lane_segment(0);
-      if (first_lane_seg_ptr->lane_id() != lane_id) {
-        continue;
-      }
-      first_lane_seg_ptr->set_start_s(start_s);
-    }
-  } else {
-    // If this lane_segment has not been used for constructing LaneGraph,
-    // construct the LaneGraph and return.
-    RoadGraph road_graph(start_s, length, is_on_lane, lane_info_ptr);
-    LaneGraph lane_graph;
-    road_graph.BuildLaneGraph(&lane_graph);
-    lane_graphs_[lane_id] = std::move(lane_graph);
-  }
-  return lane_graphs_[lane_id];
+  RoadGraph road_graph(start_s, length, consider_lane_split, lane_info_ptr);
+  LaneGraph lane_graph;
+  road_graph.BuildLaneGraph(&lane_graph);
+  return lane_graph;
 }
 
 LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
@@ -135,7 +100,7 @@ bool ObstacleClusters::BackwardNearbyObstacle(
     const LaneSequence& lane_sequence, const int obstacle_id,
     const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
-  if (lane_sequence.lane_segment_size() == 0) {
+  if (lane_sequence.lane_segment().empty()) {
     AERROR << "Empty lane sequence found.";
     return false;
   }

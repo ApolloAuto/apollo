@@ -14,13 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
 #pragma once
-
-#include <memory>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
@@ -33,19 +27,27 @@ namespace prediction {
 class ScenarioManager {
  public:
   /**
+   * @brief Constructor
+   */
+  ScenarioManager() = default;
+
+  /**
+   * @brief Destructor
+   */
+  ~ScenarioManager() = default;
+
+  /**
    * @brief Run scenario analysis
    */
-  void Run();
+  void Run(ContainerManager* container_manager);
 
   /**
    * @brief Get scenario analysis result
    */
-  const Scenario& scenario() const;
+  const Scenario scenario() const;
 
  private:
   Scenario current_scenario_;
-
-  DECLARE_SINGLETON(ScenarioManager)
 };
 
 }  // namespace prediction

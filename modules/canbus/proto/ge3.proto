@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 message Pc_bcm_201 {
-// Control Message
+  // Control Message
   enum Pc_reverselampreqType {
     PC_REVERSELAMPREQ_NOREQ = 0;
     PC_REVERSELAMPREQ_REQ = 1;
@@ -49,7 +49,7 @@ message Pc_bcm_201 {
 }
 
 message Scu_bcs_3_308 {
-// Report Message
+  // Report Message
   enum Bcs_rrwheelspdvdType {
     BCS_RRWHEELSPDVD_INVALID = 0;
     BCS_RRWHEELSPDVD_VALID = 1;
@@ -133,7 +133,7 @@ message Scu_bcs_3_308 {
 }
 
 message Pc_epb_203 {
-// Control Message
+  // Control Message
   enum Pc_epbreqType {
     PC_EPBREQ_INVALID = 0;
     PC_EPBREQ_RELEASE = 1;
@@ -150,7 +150,7 @@ message Pc_epb_203 {
 }
 
 message Pc_bcs_202 {
-// Control Message
+  // Control Message
   enum Pc_brkpedenableType {
     PC_BRKPEDENABLE_DISABLE = 0;
     PC_BRKPEDENABLE_ENABLE = 1;
@@ -162,7 +162,7 @@ message Pc_bcs_202 {
 }
 
 message Pc_vcu_205 {
-// Control Message
+  // Control Message
   enum Pc_accpedenableType {
     PC_ACCPEDENABLE_DISABLE = 0;
     PC_ACCPEDENABLE_ENABLE = 1;
@@ -197,7 +197,7 @@ message Pc_vcu_205 {
 }
 
 message Pc_eps_204 {
-// Control Message
+  // Control Message
   enum Pc_steerenableType {
     PC_STEERENABLE_DISABLE = 0;
     PC_STEERENABLE_ENABLE = 1;
@@ -211,7 +211,7 @@ message Pc_eps_204 {
 }
 
 message Scu_vcu_2_313 {
-// Report Message
+  // Report Message
   // Max positive torque [Nm] [0|3000]
   optional double vcu_torqposmax = 1;
   // Max negative torque [Nm] [-3000|0]
@@ -223,7 +223,7 @@ message Scu_vcu_2_313 {
 }
 
 message Scu_1_301 {
-// Report Message
+  // Report Message
   enum Scu_stopbutstType {
     SCU_STOPBUTST_UNPRESSED = 0;
     SCU_STOPBUTST_PRESSED = 1;
@@ -249,7 +249,7 @@ message Scu_1_301 {
 }
 
 message Scu_2_302 {
-// Report Message
+  // Report Message
   // VIN string character 07 [-] [0|255]
   optional int32 vin07 = 1;
   // VIN string character 06 [-] [0|255]
@@ -269,7 +269,7 @@ message Scu_2_302 {
 }
 
 message Scu_3_303 {
-// Report Message
+  // Report Message
   // VIN string character 15 [-] [0|255]
   optional int32 vin15 = 1;
   // VIN string character 14 [-] [0|255]
@@ -289,7 +289,7 @@ message Scu_3_303 {
 }
 
 message Scu_bcm_304 {
-// Report Message
+  // Report Message
   enum Bcm_vehreversestType {
     BCM_VEHREVERSEST_NORMAL = 0;
     BCM_VEHREVERSEST_REVERSE = 1;
@@ -367,7 +367,7 @@ message Scu_bcm_304 {
 }
 
 message Scu_bcs_1_306 {
-// Report Message
+  // Report Message
   enum Bcs_aebavailableType {
     BCS_AEBAVAILABLE_UNAVAILABLE = 0;
     BCS_AEBAVAILABLE_AVAILABLE = 1;
@@ -433,7 +433,7 @@ message Scu_bcs_1_306 {
 }
 
 message Scu_bcs_2_307 {
-// Report Message
+  // Report Message
   enum Bcs_vehspdvdType {
     BCS_VEHSPDVD_INVALID = 0;
     BCS_VEHSPDVD_VALID = 1;
@@ -451,7 +451,7 @@ message Scu_bcs_2_307 {
 }
 
 message Scu_epb_310 {
-// Report Message
+  // Report Message
   enum Epb_intidxType {
     EPB_INTIDX_NOINT = 0;
     EPB_INTIDX_OVERFLOW = 1;
@@ -486,7 +486,7 @@ message Scu_epb_310 {
 }
 
 message Scu_vcu_1_312 {
-// Report Message
+  // Report Message
   enum Vcu_elcsysfaultType {
     VCU_ELCSYSFAULT_NORMAL = 0;
     VCU_ELCSYSFAULT_FAULT = 1;
@@ -583,7 +583,7 @@ message Scu_vcu_1_312 {
 }
 
 message Scu_eps_311 {
-// Report Message
+  // Report Message
   enum Eps_intidxType {
     EPS_INTIDX_NOINT = 0;
     EPS_INTIDX_OVERFLOW = 1;
@@ -613,20 +613,20 @@ message Scu_eps_311 {
 }
 
 message Ge3 {
-  optional Pc_bcm_201 pc_bcm_201 = 1; // control message
-  optional Scu_bcs_3_308 scu_bcs_3_308 = 2; // report message
-  optional Pc_epb_203 pc_epb_203 = 3; // control message
-  optional Pc_bcs_202 pc_bcs_202 = 4; // control message
-  optional Pc_vcu_205 pc_vcu_205 = 5; // control message
-  optional Pc_eps_204 pc_eps_204 = 6; // control message
-  optional Scu_vcu_2_313 scu_vcu_2_313 = 7; // report message
-  optional Scu_1_301 scu_1_301 = 8; // report message
-  optional Scu_2_302 scu_2_302 = 9; // report message
-  optional Scu_3_303 scu_3_303 = 10; // report message
-  optional Scu_bcm_304 scu_bcm_304 = 11; // report message
-  optional Scu_bcs_1_306 scu_bcs_1_306 = 12; // report message
-  optional Scu_bcs_2_307 scu_bcs_2_307 = 13; // report message
-  optional Scu_epb_310 scu_epb_310 = 14; // report message
-  optional Scu_vcu_1_312 scu_vcu_1_312 = 15; // report message
-  optional Scu_eps_311 scu_eps_311 = 16; // report message
+  optional Pc_bcm_201 pc_bcm_201 = 1;         // control message
+  optional Scu_bcs_3_308 scu_bcs_3_308 = 2;   // report message
+  optional Pc_epb_203 pc_epb_203 = 3;         // control message
+  optional Pc_bcs_202 pc_bcs_202 = 4;         // control message
+  optional Pc_vcu_205 pc_vcu_205 = 5;         // control message
+  optional Pc_eps_204 pc_eps_204 = 6;         // control message
+  optional Scu_vcu_2_313 scu_vcu_2_313 = 7;   // report message
+  optional Scu_1_301 scu_1_301 = 8;           // report message
+  optional Scu_2_302 scu_2_302 = 9;           // report message
+  optional Scu_3_303 scu_3_303 = 10;          // report message
+  optional Scu_bcm_304 scu_bcm_304 = 11;      // report message
+  optional Scu_bcs_1_306 scu_bcs_1_306 = 12;  // report message
+  optional Scu_bcs_2_307 scu_bcs_2_307 = 13;  // report message
+  optional Scu_epb_310 scu_epb_310 = 14;      // report message
+  optional Scu_vcu_1_312 scu_vcu_1_312 = 15;  // report message
+  optional Scu_eps_311 scu_eps_311 = 16;      // report message
 }

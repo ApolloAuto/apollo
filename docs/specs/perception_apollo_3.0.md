@@ -4,13 +4,13 @@ June 27, 2018
 
 ## Introduction
 
-Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for comercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
+Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for commercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
 
  * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
-  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines.
   * **Visual localization**: Camera's are currently being tested to aide and enhance localization
   * **16 beam LiDAR support**
 
@@ -26,7 +26,7 @@ Apollo 3.0 *does not* support a high curvature road, roads without lane lines in
 	- ***Road without lane line marks***
 	- ***Intersections***
 	- ***Dotted lane lines***
-	- ***Public roads with alot of pedestrians or cars***
+	- ***Public roads with a lot of pedestrians or cars***
 
 ## Perception module
 The flow chart of Apollo 3.0 Perception module:
@@ -62,9 +62,9 @@ The lane can be represented by multiple sets of polylines such as next left lane
 A CIPV is the closest vehicle in the ego-lane. An object is represented by 3D bounding box and its 2D projection from the top-down view localizes the object on the ground. Then, each object will be checked if it is in the ego-lane or not. Among the objects in our ego-lane, the closest one will be selected as a CIPV.
 
 ### Tailgating
-Tailgating is a maneuver to follow the vehicle or object in front of the autonomous car. From the tracked objects and ego-vehicle motion, the trajectories of objects are estimated. This trajectory will guide how the objects are moving as a group on the road and the future trajectory can be predicted. There is two kinds of tailgating, the one is pure tailgating by following the specific car and the other is CIPV-guided tailgating, which the ego-vehicle follows the CIPV's trajectory when the no lane line is detected.  
+Tailgating is a maneuver to follow the vehicle or object in front of the autonomous car. From the tracked objects and ego-vehicle motion, the trajectories of objects are estimated. This trajectory will guide how the objects are moving as a group on the road and the future trajectory can be predicted. There is two kinds of tailgating, the one is pure tailgating by following the specific car and the other is CIPV-guided tailgating, which the ego-vehicle follows the CIPV's trajectory when the no lane line is detected.
 
-The snapshot of visualization of the output is shown in the figure below: 
+The snapshot of visualization of the output is shown in the figure below:
 ![Image](images/perception_visualization_apollo_3.0.png)
 
 The figure above depicts visualization of the Perception output in Apollo 3.0. The top left image shows image-based output. The bottom-left image shows the 3D bounding box of objects. Therefore, the left image shows 3-D top-down view of lane lines and objects. The CIPV is marked with a red bounding box. The yellow lines depicts the trajectory of each vehicle
@@ -72,8 +72,8 @@ The figure above depicts visualization of the Perception output in Apollo 3.0. T
 ### Radar + Camera Output Fusion
 Given multiple sensors, their output should be combined in a synergic fashion. Apollo 3.0. introduces a sensor set with a radar and a camera. For this process, both sensors need to be calibrated. Each sensor will be calibrated using the same method introduced in Apollo 2.0. After calibration, the output will be represented in a 3-D world coordinate system and each output will be fused by their similarity in location, size, time and the utility of each sensor. After learning the utility function of each sensor, the camera contributes more on lateral distance and the radar contributes more on longitudinal distance measurement. Asynchronous sensor fusion algorithm can also be used as an option.
 
-### Psuedo Lane
-All lane detection results will be combined spatially and temporarily to induce the psuedo lane which will be fed to Planning and Control modules. Some lane lines would be incorrect or missing in a certain frame. To provide the smooth lane line output, the history of lane lines using vehicle odometry is used. As the vehicle moves, the odometer of each frame is saved and lane lines in previous frames will be also saved in the history buffer. The detected lane line which does not match with the history lane lines will be removed and the history output will replace the lane line and be provided to the planning module.
+### Pseudo Lane
+All lane detection results will be combined spatially and temporarily to induce the pseudo lane which will be fed to Planning and Control modules. Some lane lines would be incorrect or missing in a certain frame. To provide the smooth lane line output, the history of lane lines using vehicle odometry is used. As the vehicle moves, the odometer of each frame is saved and lane lines in previous frames will be also saved in the history buffer. The detected lane line which does not match with the history lane lines will be removed and the history output will replace the lane line and be provided to the planning module.
 
 ### Ultrasonic Sensors
 Apollo 3.0 supports ultrasonic sensors. Each ultrasonic sensor provides the distance of a detected object through the CANBus. The distance measurement from the ultrasonic sensor is then gathered and broadcasted as a ROS topic. In the future, after fusing ultrasonic sensor output, the map of objects and boundary will be published as a ROS output.

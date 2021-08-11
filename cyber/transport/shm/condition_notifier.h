@@ -17,9 +17,9 @@
 #ifndef CYBER_TRANSPORT_SHM_CONDITION_NOTIFIER_H_
 #define CYBER_TRANSPORT_SHM_CONDITION_NOTIFIER_H_
 
-#include <stdint.h>
 #include <sys/types.h>
 #include <atomic>
+#include <cstdint>
 
 #include "cyber/common/macros.h"
 #include "cyber/transport/shm/notifier_base.h"

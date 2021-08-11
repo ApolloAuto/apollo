@@ -17,7 +17,7 @@
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
 namespace apollo {
@@ -95,8 +95,6 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
 
 void LocalizationIntegImpl::PcdProcess(const LidarFrame& lidar_frame) {
   PcdProcessImpl(lidar_frame);
-
-  return;
 }
 
 void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
@@ -230,7 +228,6 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
       gnss_process_->IntegSinsPvaProcess(integ_sins_pva, covariance);
     }
   }
-  return;
 }
 
 void LocalizationIntegImpl::RawObservationProcess(
@@ -240,8 +237,6 @@ void LocalizationIntegImpl::RawObservationProcess(
   }
 
   RawObservationProcessImpl(raw_obs_msg);
-
-  return;
 }
 
 void LocalizationIntegImpl::RawEphemerisProcess(
@@ -251,8 +246,6 @@ void LocalizationIntegImpl::RawEphemerisProcess(
   }
 
   RawEphemerisProcessImpl(gnss_orbit_msg);
-
-  return;
 }
 
 void LocalizationIntegImpl::GnssBestPoseProcess(
@@ -262,8 +255,6 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
   }
 
   GnssBestPoseProcessImpl(bestgnsspos_msg);
-
-  return;
 }
 
 void LocalizationIntegImpl::RawObservationProcessImpl(
@@ -284,14 +275,11 @@ void LocalizationIntegImpl::RawObservationProcessImpl(
   TransferGnssMeasureToLocalization(measure, &gnss_localization);
 
   lastest_gnss_localization_ = LocalizationResult(state, gnss_localization);
-
-  return;
 }
 
 void LocalizationIntegImpl::RawEphemerisProcessImpl(
     const drivers::gnss::GnssEphemeris& gnss_orbit_msg) {
   gnss_process_->RawEphemerisProcess(gnss_orbit_msg);
-  return;
 }
 
 void LocalizationIntegImpl::GnssBestPoseProcessImpl(
@@ -309,13 +297,11 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     lastest_gnss_localization_ =
         LocalizationResult(LocalizationMeasureState::OK, gnss_localization);
   }
-  return;
 }
 
 void LocalizationIntegImpl::GnssHeadingProcess(
     const drivers::gnss::Heading& gnssheading_msg) {
   GnssHeadingProcessImpl(gnssheading_msg);
-  return;
 }
 
 void LocalizationIntegImpl::GnssHeadingProcessImpl(
@@ -374,8 +360,6 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   orientation_std_dev->set_x(-1.0);
   orientation_std_dev->set_y(-1.0);
   orientation_std_dev->set_z(-1.0);
-
-  return;
 }
 
 const LocalizationResult& LocalizationIntegImpl::GetLastestLidarLocalization()

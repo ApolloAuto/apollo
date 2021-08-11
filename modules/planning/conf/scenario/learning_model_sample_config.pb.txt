@@ -1,0 +1,27 @@
+scenario_type: LEARNING_MODEL_SAMPLE
+learning_model_sample_config: {
+}
+
+stage_type: LEARNING_MODEL_RUN
+
+stage_config: {
+  stage_type: LEARNING_MODEL_RUN
+  enabled: true
+  task_type: LEARNING_MODEL_INFERENCE_TASK
+  task_type: LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK
+  task_config: {
+    task_type: LEARNING_MODEL_INFERENCE_TASK
+    learning_model_inference_task_config {
+      model_type: CNN_LSTM
+      cpu_model_file: "/apollo/modules/planning/data/model/cpu_test_model_cnn_lstm.pt"
+      gpu_model_file: "/apollo/modules/planning/data/model/gpu_test_model_cnn_lstm.pt"
+      use_cuda: true
+    }
+  }
+  task_config: {
+    task_type: LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK
+    learning_model_inference_trajectory_task_config {
+      min_adc_future_trajectory_time_length: 1.8
+    }
+  }
+}

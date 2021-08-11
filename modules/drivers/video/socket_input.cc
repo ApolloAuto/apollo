@@ -15,13 +15,13 @@
  *****************************************************************************/
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <memory>
 
 #include "cyber/cyber.h"
@@ -127,7 +127,7 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
     if (pdu_len < 0) {
       if (errno != EWOULDBLOCK) {
         AERROR << "Failed to receive package from port: " << port_;
-        return RECIEVE_FAIL;
+        return RECEIVE_FAIL;
       }
     }
 

@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: front_6mm
+child_frame_id: front_12mm
+transform:
+  translation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation:
+    x: 0.0348994967025007
+    y: 0.0
+    z: 0.0
+    w: 0.9993908270190957

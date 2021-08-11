@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.third_party_perception;
+
+enum ThirdPartyPerceptionDeviceType {
+  SMARTEREYE = 0;
+  MOBILEYE = 1;
+};
+
+message ThirdPartyPerceptionDevice {
+  optional ThirdPartyPerceptionDeviceType device_type = 1;
+}

@@ -88,7 +88,6 @@ void LossyMapMatrix2D::Init(const BaseMapConfig* config) {
     return;
   }
   Init(rows, cols);
-  return;
 }
 
 void LossyMapMatrix2D::Init(unsigned int rows, unsigned int cols) {
@@ -103,7 +102,6 @@ void LossyMapMatrix2D::Init(unsigned int rows, unsigned int cols) {
 
 void LossyMapMatrix2D::Reset(const BaseMapConfig* config) {
   Reset(config->map_node_size_y_, config->map_node_size_x_);
-  return;
 }
 
 void LossyMapMatrix2D::Reset(unsigned int rows, unsigned int cols) {
@@ -170,7 +168,6 @@ void LossyMapMatrix2D::DecodeAltitudeGround(uint16_t data,
                                             LossyMapCell2D* cell) const {
   float ratio = data;
   cell->altitude_ground = alt_ground_min_ + ratio * alt_ground_interval_;
-  return;
 }
 
 uint16_t LossyMapMatrix2D::EncodeAltitudeAvg(const LossyMapCell2D& cell) const {
@@ -190,7 +187,6 @@ void LossyMapMatrix2D::DecodeAltitudeAvg(uint16_t data,
                                          LossyMapCell2D* cell) const {
   float ratio = data;
   cell->altitude = alt_avg_min_ + ratio * alt_avg_interval_;
-  return;
 }
 
 unsigned char LossyMapMatrix2D::EncodeCount(const LossyMapCell2D& cell) const {

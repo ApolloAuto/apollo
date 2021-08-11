@@ -66,7 +66,7 @@ void EnvironmentFeatures::SetEgoLane(const std::string& lane_id,
 }
 
 std::pair<std::string, double> EnvironmentFeatures::GetEgoLane() const {
-  CHECK(has_ego_lane_);
+  ACHECK(has_ego_lane_);
   return {ego_lane_id_, ego_lane_s_};
 }
 
@@ -87,7 +87,7 @@ void EnvironmentFeatures::SetLeftNeighborLane(const std::string& lane_id,
 
 std::pair<std::string, double> EnvironmentFeatures::GetLeftNeighborLane()
     const {
-  CHECK(has_left_neighbor_lane_);
+  ACHECK(has_left_neighbor_lane_);
   return {left_neighbor_lane_id_, left_neighbor_lane_s_};
 }
 
@@ -108,7 +108,7 @@ void EnvironmentFeatures::SetRightNeighborLane(const std::string& lane_id,
 
 std::pair<std::string, double> EnvironmentFeatures::GetRightNeighborLane()
     const {
-  CHECK(has_right_neighbor_lane_);
+  ACHECK(has_right_neighbor_lane_);
   return {right_neighbor_lane_id_, right_neighbor_lane_s_};
 }
 
@@ -128,7 +128,7 @@ void EnvironmentFeatures::SetFrontJunction(const std::string& junction_id,
 }
 
 std::pair<std::string, double> EnvironmentFeatures::GetFrontJunction() const {
-  CHECK(has_front_junction_);
+  ACHECK(has_front_junction_);
   return {front_junction_id_, dist_to_front_junction_};
 }
 

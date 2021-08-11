@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <string>
+
+#include "Eigen/Dense"
 
 namespace apollo {
 namespace perception {
@@ -24,6 +25,9 @@ namespace fusion {
 
 // @brief base filter inference
 class BaseFilter {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   // @brief constructor
   explicit BaseFilter(const std::string name)

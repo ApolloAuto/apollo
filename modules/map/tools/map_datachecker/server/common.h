@@ -15,17 +15,19 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <cmath>
 #include <ctime>
+
 #include <iostream>
 #include <memory>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/filesystem.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "cyber/cyber.h"
 
@@ -53,7 +55,7 @@ struct FramePose {
 
 enum class State { IDLE, RUNNING };
 
-struct JSonConf {
+struct JsonConf {
   std::vector<std::pair<std::string, double>> topic_list;
   bool use_system_time;
   double topic_rate_tolerance;
@@ -97,14 +99,14 @@ struct JSonConf {
   int laps_search_diameter;
   /*loops to check*/
   size_t laps_number;
-  /*addtional loops to check*/
+  /*additional loops to check*/
   int laps_number_additional;
   /*Proportional thresholds for all required points
   in acquisition cycle checking*/
   double laps_rate_thresh;
 };
 
-std::shared_ptr<JSonConf> ParseJson(std::string conf_path);
+std::shared_ptr<JsonConf> ParseJson(std::string conf_path);
 
 inline double GetYaw(double from_x, double from_y, double to_x, double to_y) {
   double vecx = to_x - from_x;
@@ -116,7 +118,7 @@ inline double GetYaw(double from_x, double from_y, double to_x, double to_y) {
   return kRADIANS_TO_DEGREES * alpha;
 }
 
-inline double UnixtimeNow() { return apollo::cyber::Time::Now().ToSecond(); }
+inline double UnixNow() { return apollo::cyber::Time::Now().ToSecond(); }
 
 }  // namespace hdmap
 }  // namespace apollo

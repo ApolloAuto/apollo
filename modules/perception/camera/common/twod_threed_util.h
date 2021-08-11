@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <float.h>
 #include <algorithm>
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -186,10 +186,10 @@ T GetScoreViaRotDimensionCenter(const T *k_mat, int width, int height,
   T z_corners[8] = {0};
   GenCorners(h, w, l, x_corners, y_corners, z_corners);
 
-  T x_min = FLT_MAX;
-  T x_max = -FLT_MAX;
-  T y_min = FLT_MAX;
-  T y_max = -FLT_MAX;
+  T x_min = std::numeric_limits<float>::max();
+  T x_max = -std::numeric_limits<float>::max();
+  T y_min = std::numeric_limits<float>::max();
+  T y_max = -std::numeric_limits<float>::max();
   T x_proj[3];
   T x_box[3];
   T pts_proj[16];
@@ -251,7 +251,7 @@ bool CheckXY(const T &x, const T &y, int width, int height) {
 template <typename T>
 void UpdateOffsetZ(T x_start, T z_start, T x_end, T z_end,
                    const std::pair<T, T> &range, T *z_offset) {
-  CHECK(range.first < range.second);
+  ACHECK(range.first < range.second);
   if (x_start > x_end) {
     std::swap(x_start, x_end);
     std::swap(z_start, z_end);
@@ -283,7 +283,7 @@ void GetDxDzForCenterFromGroundLineSeg(const LineSegment2D<T> &ls,
   const T Z_UNSTABLE_RATIO = static_cast<T>(0.3f);
 
   dx_dz[0] = dx_dz[1] = (T)0;
-  CHECK(ls.pt_start[0] < ls.pt_end[0]);
+  ACHECK(ls.pt_start[0] < ls.pt_end[0]);
   if (!CheckXY(ls.pt_start[0], ls.pt_start[1], width, height) ||
       !CheckXY(ls.pt_end[0], ls.pt_end[1], width, height)) {
     return;

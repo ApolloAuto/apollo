@@ -2,11 +2,12 @@ syntax = "proto2";
 package apollo.control;
 
 import "modules/canbus/proto/chassis.proto";
-import "modules/common/proto/header.proto";
-import "modules/common/proto/vehicle_signal.proto";
-import "modules/control/proto/pad_msg.proto";
 import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
+import "modules/control/proto/input_debug.proto";
+import "modules/control/proto/pad_msg.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
@@ -157,6 +158,10 @@ message SimpleLateralDebug {
 
   // Augmented feedback control term in addition to LQR control
   optional double steer_angle_feedback_augment = 31;
+
+  // Mrac control status and feedback states for steer control
+  optional MracDebug steer_mrac_debug = 32;
+  optional bool steer_mrac_enable_status = 33;
 }
 
 message SimpleMPCDebug {
@@ -222,11 +227,19 @@ message SimpleMPCDebug {
   optional double jerk_error = 49;
 }
 
-message InputDebug {
-  optional apollo.common.Header localization_header = 1;
-  optional apollo.common.Header canbus_header = 2;
-  optional apollo.common.Header trajectory_header = 3;
-  optional apollo.common.Header latest_replan_trajectory_header = 4;
+message MracDebug {
+  optional int32 mrac_model_order = 1;
+  repeated double mrac_reference_state = 2;
+  repeated double mrac_state_error = 3;
+  optional MracAdaptiveGain mrac_adaptive_gain = 4;
+  optional int32 mrac_reference_saturation_status = 5;
+  optional int32 mrac_control_saturation_status = 6;
+}
+
+message MracAdaptiveGain {
+  repeated double state_adaptive_gain = 1;
+  repeated double input_adaptive_gain = 2;
+  repeated double nonlinear_adaptive_gain = 3;
 }
 
 message Debug {

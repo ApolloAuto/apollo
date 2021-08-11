@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"
@@ -33,7 +33,7 @@ TEST(DenselineLaneDetector, denseline_lane_detector_test) {
   cv::Mat img = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/lane/detector/denseline/data/test.jpg");
-  CHECK(!img.empty()) << "input image is empty.";
+  ACHECK(!img.empty()) << "input image is empty.";
 
   std::cout << img.rows << std::endl;
 

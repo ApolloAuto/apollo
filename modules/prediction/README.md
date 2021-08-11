@@ -4,6 +4,8 @@
 The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
 Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
 
+In **Apollo 5.5**, the Prediction module introduces a new model - **Caution Obstacle**. Together with aggressively emphasizing on caution when proceeding to a junction, this model will now scan all obstacles that have entered the junction as long as computing resources permit. The Semantic LSTM Evaluator and the Extrapolation Predictor have also been introduced in Apolo 5.5 to support the Caution Obstacle model.
+
 ```
 Note:
 The Prediction module only predicts the behavior of obstacles and not the EGO car. The Planning module plans the trajectory of the EGO car.
@@ -20,7 +22,7 @@ The Prediction module only predicts the behavior of obstacles and not the EGO ca
 
 ## Functionalities
 
-Based on the figure below, the prediction module comprises of 4 main functionalities: Container, Scenario, Evaluator and Predictor.  Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we introduced the Scenario functionality as we have moved towards a more scenario-based approach for Apollo's autonomous driving capabilities.
+Based on the figure below, the prediction module comprises 4 main functionalities: Container, Scenario, Evaluator and Predictor.  Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we introduced the Scenario functionality as we have moved towards a more scenario-based approach for Apollo's autonomous driving capabilities.
 ![](images/prediction.png)
 
 ### Container
@@ -64,6 +66,9 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 
 * **Social Interaction evaluator**: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
 
+* **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
+
+* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_documents/jointly_prediction_planning_evaluator.md).
 
 ### Predictor
 
@@ -77,6 +82,7 @@ Predictor generates predicted trajectories for obstacles. Currently, the support
 * **Regional movement**: obstacle moves in a possible region
 * **Junction**: Obstacles move toward junction exits with high probabilities
 * **Interaction predictor**: compute the likelihood to create posterior prediction results after all evaluators have run. This predictor was created for caution level obstacles
+* **Extrapolation predictor**: extends the Semantic LSTM evaluator's results to create an 8 sec trajectory.
 
 ## Prediction Architecture
 
@@ -88,6 +94,6 @@ The prediction module also takes messages from both localization and planning as
 
 ![](images/architecture2.png)
 
+## Related Paper
 
-
-
+1. [Xu K, Xiao X, Miao J, Luo Q. "Data Driven Prediction Architecture for Autonomous Driving and its Application on Apollo Platform." *arXiv preprint arXiv:2006.06715.* ](https://arxiv.org/pdf/2006.06715.pdf)

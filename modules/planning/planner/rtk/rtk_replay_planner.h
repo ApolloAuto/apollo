@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -43,7 +44,8 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
   /**
    * @brief Constructor
    */
-  RTKReplayPlanner();
+  explicit RTKReplayPlanner(
+      const std::shared_ptr<DependencyInjector>& injector);
 
   /**
    * @brief Destructor

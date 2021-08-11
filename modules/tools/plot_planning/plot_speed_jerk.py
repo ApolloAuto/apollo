@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,23 +16,36 @@
 # limitations under the License.
 ###############################################################################
 
-import math
-import sys
-import matplotlib.pyplot as plt
-import numpy as np
 from os import listdir
 from os.path import isfile, join
+import math
+import sys
 
-from record_reader import RecordItemReader
-from imu_speed_jerk import ImuSpeedJerk
-from imu_speed import ImuSpeed
+import matplotlib.pyplot as plt
+import numpy as np
+
+from modules.tools.plot_planning.imu_speed import ImuSpeed
+from modules.tools.plot_planning.imu_speed_jerk import ImuSpeedJerk
+from modules.tools.plot_planning.record_reader import RecordItemReader
 
 
 def grid(data_list, shift):
     data_grid = []
     for data in data_list:
-        data_grid.append(round(data) + shift/10.0)
+        data_grid.append(round(data) + shift / 10.0)
     return data_grid
+
+
+def generate_speed_jerk_dict(speed_jerk_dict, speed_list, jerk_list):
+    for i in range(len(speed_list)):
+        speed = int(speed_list[i])
+        jerk = int(jerk_list[i])
+        if speed in speed_jerk_dict:
+            if jerk not in speed_jerk_dict[speed]:
+                speed_jerk_dict[speed].append(jerk)
+        else:
+            speed_jerk_dict[speed] = [jerk]
+    return speed_jerk_dict
 
 
 if __name__ == "__main__":
@@ -41,6 +54,8 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, 1)
     colors = ["g", "b", "r", "m", "y"]
     markers = [".", ".", ".", "."]
+    speed_jerk_dict = {}
+
     for i in range(len(folders)):
         x = []
         y = []
@@ -51,8 +66,8 @@ if __name__ == "__main__":
         fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            jerk_processor = ImuSpeedJerk()
-            speed_processor = ImuSpeed()
+            jerk_processor = ImuSpeedJerk(True)
+            speed_processor = ImuSpeed(True)
 
             topics = ["/apollo/localization/pose"]
             for data in reader.read(topics):
@@ -66,6 +81,7 @@ if __name__ == "__main__":
             data_x = data_x[-1 * len(data_y):]
             x.extend(data_x)
             y.extend(data_y)
+            speed_jerk_dict = generate_speed_jerk_dict(speed_jerk_dict, x, y)
 
         if len(x) <= 0:
             continue
@@ -74,5 +90,5 @@ if __name__ == "__main__":
 
         ax.set_xlabel('Speed')
         ax.set_ylabel('Jerk')
-
+    print(speed_jerk_dict)
     plt.show()

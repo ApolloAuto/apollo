@@ -23,12 +23,12 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
-using apollo::common::util::MakePathPoint;
+using apollo::common::util::PointFactory;
 
 namespace apollo {
 namespace planning {
@@ -41,23 +41,19 @@ class NaviPathDeciderTest : public ::testing::Test {
   static void GeneratePathData(
       double s, double init_y, double kappa,
       std::vector<common::PathPoint>* const path_points) {
-    DCHECK_NOTNULL(path_points);
     for (double x = 0.0, y = init_y; x < s; ++x) {
       path_points->clear();
-      auto path_point = MakePathPoint(x, y, 0.0, 0.0, kappa, 0.0, 0.0);
-      path_points->emplace_back(path_point);
+      path_points->push_back(
+          PointFactory::ToPathPoint(x, y, 0.0, 0.0, 0.0, kappa));
     }
   }
 
   static void InitPlannigConfig(PlanningConfig* const plannig_config) {
-    DCHECK_NOTNULL(plannig_config);
     auto* navi_planner_config =
         plannig_config->mutable_navigation_planning_config()
             ->mutable_planner_navi_config();
-    DCHECK_NOTNULL(navi_planner_config);
     auto* navi_path_decider_config =
         navi_planner_config->mutable_navi_path_decider_config();
-    DCHECK_NOTNULL(navi_path_decider_config);
     navi_path_decider_config->set_min_path_length(5.0);
     navi_path_decider_config->set_min_look_forward_time(2.0);
     navi_path_decider_config->set_max_keep_lane_distance(0.4);
@@ -68,9 +64,7 @@ class NaviPathDeciderTest : public ::testing::Test {
     navi_path_decider_config->clear_move_dest_lane_config_talbe();
     auto* move_dest_lane_cfg_table =
         navi_path_decider_config->mutable_move_dest_lane_config_talbe();
-    DCHECK_NOTNULL(move_dest_lane_cfg_table);
     auto* move_shift_config = move_dest_lane_cfg_table->add_lateral_shift();
-    DCHECK_NOTNULL(move_shift_config);
     move_shift_config->set_max_speed(34);
     move_shift_config->set_max_move_dest_lane_shift_y(0.45);
   }
@@ -92,7 +86,7 @@ TEST_F(NaviPathDeciderTest, MoveToDestLane) {
   navi_path_decider.Init(config);
 
   // generate path point
-  constexpr double kMaxS = 152.0;
+  static constexpr double kMaxS = 152.0;
   std::vector<common::PathPoint> path_points;
 
   // 1.std::fabs(target_path_init_y) < max_keep_lane_distance not need move to
@@ -139,7 +133,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   navi_path_decider.Init(config);
 
   // generate path point
-  constexpr double kMaxS = 152.0;
+  static constexpr double kMaxS = 152.0;
   std::vector<common::PathPoint> path_points;
 
   // 1.std::fabs(target_path_init_y) > max_keep_lane_distance not need keep lane
@@ -161,8 +155,8 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   LocalView local_view;
   navi_path_decider.frame_ =
       new Frame(1, local_view, plan_start_point, vehicle_state, nullptr);
-  DCHECK_NOTNULL(navi_path_decider.reference_line_info_);
-  DCHECK_NOTNULL(navi_path_decider.frame_);
+  CHECK_NOTNULL(navi_path_decider.reference_line_info_);
+  CHECK_NOTNULL(navi_path_decider.frame_);
   GeneratePathData(kMaxS, 0.19, 0.03, &path_points);
   dest_y = path_points[0].y();
   expect_y = path_points[0].y();

@@ -29,7 +29,7 @@ namespace onboard {
 
 enum class ProcessStage {
   LIDAR_PREPROCESS = 0,
-  LIDAR_SEGMENTATION = 1,
+  LIDAR_DETECTION = 1,
   LIDAR_RECOGNITION = 2,
   STEREO_CAMERA_DETECTION = 3,
   MONOCULAR_CAMERA_DETECTION = 4,
@@ -58,6 +58,7 @@ class SensorFrameMessage {
 
   std::string sensor_id_;
   double timestamp_ = 0.0;
+  uint64_t lidar_timestamp_ = 0;
   uint32_t seq_num_ = 0;
   std::string type_name_;
   base::HdmapStructConstPtr hdmap_;

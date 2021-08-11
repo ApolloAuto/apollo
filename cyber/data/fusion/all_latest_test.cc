@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>tick</name>
-        <dag_conf>/apollo/modules/tick/dag/tick.dag</dag_conf>
-        <process_name>tick</process_name>
-    </module>
-</cyber>

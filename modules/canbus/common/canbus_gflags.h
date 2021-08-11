@@ -22,8 +22,6 @@
 DECLARE_string(canbus_node_name);
 DECLARE_string(canbus_module_name);
 
-DECLARE_string(canbus_adapter_config_filename);
-
 // data file
 DECLARE_string(canbus_conf_file);
 
@@ -42,3 +40,6 @@ DECLARE_bool(receive_guardian);
 
 DECLARE_int32(guardian_cmd_pending_queue_size);
 DECLARE_int32(control_cmd_pending_queue_size);
+
+// enable forward Ultrasonic AEB
+DECLARE_bool(enable_aeb);

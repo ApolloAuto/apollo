@@ -16,11 +16,11 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
-#include <omp.h>
-
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -32,12 +32,11 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::prediction::math_util::ComputePolynomial;
 using apollo::prediction::math_util::EvaluateCubicPolynomial;
 
@@ -62,7 +61,8 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
 
 void JunctionMLPEvaluator::Clear() {}
 
-bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -86,7 +86,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   std::vector<double> feature_values;
-  ExtractFeatureValues(obstacle_ptr, &feature_values);
+  ExtractFeatureValues(obstacle_ptr, obstacles_container, &feature_values);
 
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode ==
@@ -126,7 +126,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }
@@ -161,7 +161,8 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* feature_values) {
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
 
@@ -176,7 +177,8 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   }
 
   std::vector<double> ego_vehicle_feature_values;
-  SetEgoVehicleFeatureValues(obstacle_ptr, &ego_vehicle_feature_values);
+  SetEgoVehicleFeatureValues(obstacle_ptr, obstacles_container,
+                             &ego_vehicle_feature_values);
   if (ego_vehicle_feature_values.size() != EGO_VEHICLE_FEATURE_SIZE) {
     AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected ego vehicle feature_values"
@@ -249,22 +251,21 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* const feature_values) {
   feature_values->clear();
   *feature_values = std::vector<double>(4, 0.0);
-  auto ego_pose_container_ptr =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  if (ego_pose_container_ptr == nullptr) {
+  auto ego_pose_obstacle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_pose_obstacle_ptr == nullptr ||
+      ego_pose_obstacle_ptr->history_size() == 0) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;
     return;
   }
-  const auto ego_pose_obstacle_ptr =
-      ego_pose_container_ptr->ToPerceptionObstacle();
-  const auto ego_position = ego_pose_obstacle_ptr->position();
-  const auto ego_velocity = ego_pose_obstacle_ptr->velocity();
-  CHECK_GT(obstacle_ptr->history_size(), 0);
+  const auto ego_position = ego_pose_obstacle_ptr->latest_feature().position();
+  const auto ego_velocity = ego_pose_obstacle_ptr->latest_feature().velocity();
+  CHECK_GT(obstacle_ptr->history_size(), 0U);
   const Feature& obstacle_feature = obstacle_ptr->latest_feature();
   apollo::common::math::Vec2d ego_relative_position(
       ego_position.x() - obstacle_feature.position().x(),

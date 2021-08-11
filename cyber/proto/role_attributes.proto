@@ -5,25 +5,25 @@ package apollo.cyber.proto;
 import "cyber/proto/qos_profile.proto";
 
 message SocketAddr {
-    optional string ip = 1;  // dotted decimal
-    optional uint32 port = 2;
+  optional string ip = 1;  // dotted decimal
+  optional uint32 port = 2;
 };
 
 message RoleAttributes {
-    optional string host_name = 1;
-    optional string host_ip = 2;
-    optional int32 process_id = 3;
-    optional string node_name = 4;
-    optional uint64 node_id = 5;           // hash value of node_name
-    // especially for WRITER and READER
-    optional string channel_name = 6;
-    optional uint64 channel_id = 7;        // hash value of channel_name
-    optional string message_type = 8;
-    optional bytes proto_desc = 9;
-    optional uint64 id = 10;
-    optional QosProfile qos_profile = 11;
-    optional SocketAddr socket_addr = 12;  // reserved for socket communication
-    // especially for SERVER and CLIENT
-    optional string service_name = 13;
-    optional uint64 service_id = 14;       // hash value of service_name
+  optional string host_name = 1;
+  optional string host_ip = 2;
+  optional int32 process_id = 3;
+  optional string node_name = 4;
+  optional uint64 node_id = 5;  // hash value of node_name
+  // especially for WRITER and READER
+  optional string channel_name = 6;
+  optional uint64 channel_id = 7;  // hash value of channel_name
+  optional string message_type = 8;
+  optional bytes proto_desc = 9;
+  optional uint64 id = 10;
+  optional QosProfile qos_profile = 11;
+  optional SocketAddr socket_addr = 12;  // reserved for socket communication
+  // especially for SERVER and CLIENT
+  optional string service_name = 13;
+  optional uint64 service_id = 14;  // hash value of service_name
 };

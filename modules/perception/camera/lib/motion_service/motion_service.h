@@ -15,12 +15,13 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"

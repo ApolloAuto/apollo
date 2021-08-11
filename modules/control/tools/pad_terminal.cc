@@ -23,18 +23,17 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace {
 
 using apollo::canbus::Chassis;
-using apollo::common::time::AsInt64;
-using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
+using apollo::cyber::Clock;
 using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
 using apollo::cyber::Reader;
@@ -69,7 +68,7 @@ class PadTerminal {
       AINFO << "sending start action command.";
     }
     apollo::common::util::FillHeader("terminal", &pad);
-    pad_writer_->Write(std::make_shared<PadMessage>(pad));
+    pad_writer_->Write(pad);
     AINFO << "send pad_message OK";
   }
 
@@ -82,14 +81,14 @@ class PadTerminal {
     // manual
     if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
       if (is_first_emergency_mode) {
-        count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+        count_start = Clock::Now().ToNanosecond() / 1e3;
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";
       } else {
         int64_t diff =
-            AsInt64<std::chrono::microseconds>(Clock::Now()) - count_start;
+            Clock::Now().ToNanosecond() / 1e3 - count_start;
         if (diff > EMERGENCY_MODE_HOLD_TIME) {
-          count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+          count_start = Clock::Now().ToNanosecond() / 1e3;
           waiting_reset = true;
           // send a reset command to control
           send(RESET_COMMAND);

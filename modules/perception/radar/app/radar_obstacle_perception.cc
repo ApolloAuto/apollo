@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/radar/app/radar_obstacle_perception.h"
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/lib/utils/perf.h"
 
 using apollo::perception::lib::ConfigManager;
 using apollo::perception::lib::ModelConfig;
@@ -29,19 +29,19 @@ namespace radar {
 bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   std::string model_name = pipeline_name;
   const ModelConfig* model_config = nullptr;
-  CHECK(ConfigManager::Instance()->GetModelConfig(model_name, &model_config))
+  ACHECK(ConfigManager::Instance()->GetModelConfig(model_name, &model_config))
       << "not found model: " << model_name;
 
   std::string detector_name;
-  CHECK(model_config->get_value("Detector", &detector_name))
+  ACHECK(model_config->get_value("Detector", &detector_name))
       << "Detector not found";
 
   std::string roi_filter_name;
-  CHECK(model_config->get_value("RoiFilter", &roi_filter_name))
+  ACHECK(model_config->get_value("RoiFilter", &roi_filter_name))
       << "RoiFilter not found";
 
   std::string tracker_name;
-  CHECK(model_config->get_value("Tracker", &tracker_name))
+  ACHECK(model_config->get_value("Tracker", &tracker_name))
       << "Tracker not found";
 
   BaseDetector* detector =
@@ -58,9 +58,9 @@ bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
   CHECK_NOTNULL(tracker);
   tracker_.reset(tracker);
 
-  CHECK(detector_->Init()) << "radar detector init error";
-  CHECK(roi_filter_->Init()) << "radar roi filter init error";
-  CHECK(tracker_->Init()) << "radar tracker init error";
+  ACHECK(detector_->Init()) << "radar detector init error";
+  ACHECK(roi_filter_->Init()) << "radar roi filter init error";
+  ACHECK(tracker_->Init()) << "radar tracker init error";
 
   return true;
 }
@@ -69,30 +69,35 @@ bool RadarObstaclePerception::Perceive(
     const drivers::ContiRadar& corrected_obstacles,
     const RadarPerceptionOptions& options,
     std::vector<base::ObjectPtr>* objects) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   const std::string& sensor_name = options.sensor_name;
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   base::FramePtr detect_frame_ptr(new base::Frame());
-  CHECK(detector_->Detect(corrected_obstacles, options.detector_options,
-                          detect_frame_ptr))
-      << "radar detect error";
+
+  if (!detector_->Detect(corrected_obstacles, options.detector_options,
+                         detect_frame_ptr)) {
+    AERROR << "radar detect error";
+    return false;
+  }
   ADEBUG << "Detected frame objects number: "
          << detect_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
   if (!roi_filter_->RoiFilter(options.roi_filter_options, detect_frame_ptr)) {
     ADEBUG << "All radar objects were filtered out";
   }
   ADEBUG << "RoiFiltered frame objects number: "
          << detect_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
 
-  base::FramePtr tracker_frame_ptr = std::make_shared<base::Frame>();
-  CHECK(tracker_->Track(*detect_frame_ptr, options.track_options,
-                        tracker_frame_ptr))
-      << "radar track error";
+  base::FramePtr tracker_frame_ptr(new base::Frame);
+  if (!tracker_->Track(*detect_frame_ptr, options.track_options,
+                       tracker_frame_ptr)) {
+    AERROR << "radar track error";
+    return false;
+  }
   ADEBUG << "tracked frame objects number: "
          << tracker_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 
   *objects = tracker_frame_ptr->objects;
 

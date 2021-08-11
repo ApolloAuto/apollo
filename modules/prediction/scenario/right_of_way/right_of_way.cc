@@ -25,22 +25,19 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::adapter::AdapterConfig;
+using apollo::hdmap::LaneInfo;
 using apollo::perception::PerceptionObstacle;
-using common::adapter::AdapterConfig;
-using hdmap::LaneInfo;
-using hdmap::OverlapInfo;
-using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-void RightOfWay::Analyze() {
+void RightOfWay::Analyze(ContainerManager* container_manager) {
   ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+      container_manager->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container == nullptr) {
     AERROR << "Null obstacles container found";
@@ -48,7 +45,7 @@ void RightOfWay::Analyze() {
   }
 
   ADCTrajectoryContainer* adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+      container_manager->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   if (adc_trajectory_container == nullptr) {
     AERROR << "adc_trajectory_container is nullptr";
@@ -60,9 +57,8 @@ void RightOfWay::Analyze() {
     return;
   }
 
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
+  auto pose_container = container_manager->GetContainer<PoseContainer>(
+      AdapterConfig::LOCALIZATION);
   if (pose_container == nullptr) {
     AERROR << "Pose container pointer is a null pointer.";
     return;

@@ -16,8 +16,8 @@
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 
-#include <pcl/io/pcd_io.h>
-#include <yaml-cpp/yaml.h>
+#include "pcl/io/pcd_io.h"
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
@@ -37,7 +37,8 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
 }
 
 void LoadPcds(const std::string& file_path, const unsigned int frame_index,
-              const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>* pt3ds,
+              const Eigen::Affine3d& pose,
+              ::apollo::common::EigenVector3dVec* pt3ds,
               std::vector<unsigned char>* intensities, bool is_global) {
   Eigen::Affine3d pose_inv = pose.inverse();
   pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
@@ -91,14 +92,14 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
 }
 
 void LoadPcdPoses(const std::string& file_path,
-                  std::vector<Eigen::Affine3d>* poses,
+                  ::apollo::common::EigenAffine3dVec* poses,
                   std::vector<double>* timestamps) {
   std::vector<unsigned int> pcd_indices;
   LoadPcdPoses(file_path, poses, timestamps, &pcd_indices);
 }
 
 void LoadPcdPoses(const std::string& file_path,
-                  std::vector<Eigen::Affine3d>* poses,
+                  ::apollo::common::EigenAffine3dVec* poses,
                   std::vector<double>* timestamps,
                   std::vector<unsigned int>* pcd_indices) {
   poses->clear();
@@ -111,7 +112,7 @@ void LoadPcdPoses(const std::string& file_path,
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
-    constexpr int kSize = 9;
+    static constexpr int kSize = 9;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
                   &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
@@ -127,8 +128,8 @@ void LoadPcdPoses(const std::string& file_path,
 }
 
 void LoadPosesAndStds(const std::string& file_path,
-                      std::vector<Eigen::Affine3d>* poses,
-                      std::vector<Eigen::Vector3d>* stds,
+                      ::apollo::common::EigenAffine3dVec* poses,
+                      ::apollo::common::EigenVector3dVec* stds,
                       std::vector<double>* timestamps) {
   poses->clear();
   stds->clear();
@@ -141,7 +142,7 @@ void LoadPosesAndStds(const std::string& file_path,
     double x, y, z;
     double qx, qy, qz, qr;
     double std_x, std_y, std_z;
-    constexpr int kSize = 12;
+    static constexpr int kSize = 12;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                   &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
                   &std_y, &std_z) == kSize) {

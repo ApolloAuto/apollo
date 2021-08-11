@@ -20,8 +20,10 @@
 
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +51,6 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
     const QuinticPolynomialCurve1d& other) {
   param_ = other.param_;
   coef_ = other.coef_;
-  return;
 }
 
 double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,
@@ -96,7 +97,7 @@ void QuinticPolynomialCurve1d::SetParam(const double x0, const double dx0,
 
 void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
     const PolynomialCurve1d& other, const double init_value) {
-  CHECK_EQ(other.Order(), 4);
+  CHECK_EQ(other.Order(), 4U);
   param_ = other.ParamLength();
   coef_[0] = init_value;
   for (size_t i = 0; i < 5; ++i) {
@@ -128,12 +129,11 @@ void QuinticPolynomialCurve1d::ComputeCoefficients(
 }
 
 std::string QuinticPolynomialCurve1d::ToString() const {
-  return apollo::common::util::StrCat(
-      apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
+  return absl::StrCat(absl::StrJoin(coef_, "\t"), param_, "\n");
 }
 
 double QuinticPolynomialCurve1d::Coef(const size_t order) const {
-  CHECK_GT(6, order);
+  CHECK_GT(6U, order);
   return coef_[order];
 }
 }  // namespace planning

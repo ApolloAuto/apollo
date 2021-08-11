@@ -98,24 +98,6 @@ class RoadGraph {
       std::list<LaneSegment>* const lane_segments,
       LaneGraph* const lane_graph_ptr) const;
 
-  /**
-   * @brief Get the pointer to the lane with the smallest average curvature
-   * @param The vector of lane infos
-   * @return The pointer to the lane with the smallest average curvature
-   */
-  std::shared_ptr<const hdmap::LaneInfo> LaneWithSmallestAverageCurvature(
-      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
-      const;
-
-  /**
-   * @brief Get the average curvature along a lane with the ID lane_id
-   * @param The ID of the lane
-   * @param The size of samples alone the lane to compute the average curvature
-   * @return The average curvature
-   */
-  double AverageCurvature(const std::string& lane_id,
-                          const size_t sample_size) const;
-
  private:
   // The s of the obstacle on its own lane_segment.
   double start_s_ = 0;

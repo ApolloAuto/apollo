@@ -16,10 +16,11 @@
 
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 
-#include <signal.h>
+#include <csignal>
 
 #include <algorithm>
 #include <chrono>
+#include <limits>
 #include <set>
 #include <sstream>
 #include <thread>
@@ -36,13 +37,14 @@
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 
+using Time = ::apollo::cyber::Time;
+
 namespace apollo {
 namespace data {
 
 namespace {
 
 using apollo::common::Header;
-using apollo::common::util::StrCat;
 using apollo::monitor::MonitorManager;
 using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
@@ -57,7 +59,7 @@ using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
 
 std::string GetNextRecordFileName(const std::string& record_path) {
-  constexpr int kSuffixLen = 5;
+  static constexpr int kSuffixLen = 5;
   const std::string kInitialSequence = "00000";
   if (record_path.empty()) {
     return kInitialSequence;
@@ -65,10 +67,9 @@ std::string GetNextRecordFileName(const std::string& record_path) {
   std::stringstream record_suffix;
   record_suffix.fill('0');
   record_suffix.width(kSuffixLen);
-  record_suffix << std::to_string(
-      std::stoi(
-          record_path.substr(record_path.size() - kSuffixLen, kSuffixLen)) +
-      1);
+  record_suffix << std::stoi(record_path.substr(record_path.size() - kSuffixLen,
+                                                kSuffixLen)) +
+                       1;
   return record_suffix.str();
 }
 
@@ -98,7 +99,7 @@ RealtimeRecordProcessor::RealtimeRecordProcessor(
                   default_output_filename_.end(), '-'),
       default_output_filename_.end());
   default_output_filename_ =
-      GetFileName(StrCat(default_output_filename_, ".record"), false);
+      GetFileName(absl::StrCat(default_output_filename_, ".record"), false);
 }
 
 bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
@@ -116,8 +117,7 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   }
   // Init recorder
   cyber::Init("smart_recorder");
-  smart_recorder_node_ =
-      CreateNode(StrCat("smart_recorder_", std::to_string(getpid())));
+  smart_recorder_node_ = CreateNode(absl::StrCat("smart_recorder_", getpid()));
   if (smart_recorder_node_ == nullptr) {
     AERROR << "create smart recorder node failed: " << getpid();
     return false;
@@ -128,13 +128,14 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   max_backward_time_ = trigger_conf.max_backward_time();
   min_restore_chunk_ = trigger_conf.min_restore_chunk();
   std::vector<std::string> all_channels;
+  std::vector<std::string> black_channels;
   const std::set<std::string>& all_channels_set =
       ChannelPool::Instance()->GetAllChannels();
   std::copy(all_channels_set.begin(), all_channels_set.end(),
             std::back_inserter(all_channels));
   recorder_ = std::make_shared<Recorder>(
-      StrCat(source_record_dir_, "/", default_output_filename_), false,
-      all_channels, HeaderBuilder::GetHeader());
+      absl::StrCat(source_record_dir_, "/", default_output_filename_), false,
+      all_channels, black_channels, HeaderBuilder::GetHeader());
   // Init base
   if (!RecordProcessor::Init(trigger_conf)) {
     AERROR << "base init failed";
@@ -158,7 +159,7 @@ bool RealtimeRecordProcessor::Process() {
       break;
     }
     auto reader = std::make_shared<RecordReader>(record_path);
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    RecordViewer viewer(reader, 0, std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
           << viewer.end_time();
@@ -175,7 +176,7 @@ bool RealtimeRecordProcessor::Process() {
     }
   } while (!is_terminating_);
   // Try restore the rest of messages one last time
-  RestoreMessage(UINT64_MAX);
+  RestoreMessage(std::numeric_limits<uint64_t>::max());
   if (monitor_thread && monitor_thread->joinable()) {
     monitor_thread->join();
     monitor_thread = nullptr;
@@ -199,7 +200,7 @@ void RealtimeRecordProcessor::MonitorStatus() {
   recorder_->Stop();
   is_terminating_ = true;
   AINFO << "wait for a while trying to complete the restore work";
-  constexpr int kMessageInterval = 1000;
+  static constexpr int kMessageInterval = 1000;
   int interval_counter = 0;
   while (++interval_counter * kMessageInterval < recorder_wait_time_) {
     MonitorManager::Instance()->LogBuffer().WARN(
@@ -212,7 +213,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
                                             const std::string& message) const {
   SmartRecorderStatus status;
   Header* status_headerpb = status.mutable_header();
-  status_headerpb->set_timestamp_sec(cyber::Time::Now().ToSecond());
+  status_headerpb->set_timestamp_sec(Time::Now().ToSecond());
   status.set_recording_state(state);
   status.set_state_message(message);
   AINFO << "send message with state " << state << ", " << message;
@@ -221,8 +222,8 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
 
 bool RealtimeRecordProcessor::GetNextValidRecord(
     std::string* record_path) const {
-  *record_path = StrCat(source_record_dir_, "/", default_output_filename_, ".",
-                        GetNextRecordFileName(*record_path));
+  *record_path = absl::StrCat(source_record_dir_, "/", default_output_filename_,
+                              ".", GetNextRecordFileName(*record_path));
   while (!is_terminating_ && !IsRecordValid(*record_path)) {
     AINFO << "next record unavailable, wait " << recorder_wait_time_ << " ms";
     std::this_thread::sleep_for(std::chrono::milliseconds(recorder_wait_time_));

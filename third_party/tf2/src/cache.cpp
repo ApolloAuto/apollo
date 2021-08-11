@@ -157,7 +157,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, T
   {
     if (storage_it->stamp_ <= target_time)
       break;
-    storage_it++;
+    ++storage_it;
   }
 
   if (storage_it == storage_.end()) {
@@ -264,7 +264,7 @@ bool TimeCache::insertData(const TransformStorage& new_data)
   {
     if (storage_it->stamp_ <= new_data.stamp_)
       break;
-    storage_it++;
+    ++storage_it;
   }
   storage_.insert(storage_it, new_data);
 

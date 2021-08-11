@@ -20,10 +20,11 @@
 #include <string>
 #include <vector>
 
+#include "cyber/proto/dag_conf.pb.h"
+
 #include "cyber/class_loader/class_loader_manager.h"
 #include "cyber/component/component.h"
 #include "cyber/mainboard/module_argument.h"
-#include "cyber/proto/dag_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -43,6 +44,9 @@ class ModuleController {
  private:
   bool LoadModule(const std::string& path);
   bool LoadModule(const DagConfig& dag_config);
+  int GetComponentNum(const std::string& path);
+  int total_component_nums = 0;
+  bool has_timer_component = false;
 
   ModuleArgument args_;
   class_loader::ClassLoaderManager class_loader_manager_;

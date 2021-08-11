@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2017-2021 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DREAMVIEW_URL="http://localhost:8888"
 
 cd "${DIR}/.."
@@ -27,22 +27,30 @@ ulimit -c unlimited
 source "${DIR}/apollo_base.sh"
 
 function start() {
-    ./scripts/monitor.sh start
-    ./scripts/dreamview.sh start
-    if [ $? -eq 0 ]; then
-        sleep 2  # wait for some time before starting to check
-        http_status="$(curl -o /dev/null -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
-        if [ $http_status -eq 200 ]; then
-            echo "Dreamview is running at" $DREAMVIEW_URL
-        else
-            echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
-        fi
+  for mod in ${APOLLO_BOOTSTRAP_EXTRA_MODULES}; do
+    echo "Starting ${mod}"
+    nohup cyber_launch start ${mod} &
+  done
+  ./scripts/monitor.sh start
+  ./scripts/dreamview.sh start
+  if [ $? -eq 0 ]; then
+    sleep 2 # wait for some time before starting to check
+    http_status="$(curl -o /dev/null -x '' -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
+    if [ $http_status -eq 200 ]; then
+      echo "Dreamview is running at" $DREAMVIEW_URL
+    else
+      echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
     fi
+  fi
 }
 
 function stop() {
-    ./scripts/dreamview.sh stop
-    ./scripts/monitor.sh stop
+  ./scripts/dreamview.sh stop
+  ./scripts/monitor.sh stop
+  for mod in ${APOLLO_BOOTSTRAP_EXTRA_MODULES}; do
+    echo "Stopping ${mod}"
+    nohup cyber_launch stop ${mod}
+  done
 }
 
 case $1 in
@@ -51,6 +59,10 @@ case $1 in
     ;;
   stop)
     stop
+    ;;
+  restart)
+    stop
+    start
     ;;
   *)
     start

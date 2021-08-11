@@ -16,26 +16,47 @@
 
 #include "cyber/logger/logger.h"
 
-#include <glog/logging.h>
-#include <gtest/gtest.h>
-#include <string>
+#include "gtest/gtest.h"
 
-#include "cyber/time/time.h"
+#include "glog/logging.h"
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-TEST(LoggerTest, init_and_write) {
+TEST(LoggerTest, WriteAndFlush) {
   Logger logger(google::base::GetLogger(google::INFO));
   time_t timep;
   time(&timep);
-  std::string message = "cyber logger test";
-  logger.Write(false, timep, message.c_str(), 20);
-  message = "**[CyberLoggerTest]** cyber logger test";
-  logger.Write(false, timep, message.c_str(), 20);
-  logger.LogSize();
+  std::string message = "I0909 99:99:99.999999 99999 logger_test.cc:999] ";
+  message.append(LEFT_BRACKET);
+  message.append("LoggerTest");
+  message.append(RIGHT_BRACKET);
+  message.append("logger test message\n");
+  logger.Write(false, timep, message.c_str(),
+               static_cast<int>(message.length()));
+  EXPECT_EQ(logger.LogSize(), 0);  // always zero
+  logger.Write(true, timep, message.c_str(),
+               static_cast<int>(message.length()));
+  EXPECT_EQ(logger.LogSize(), 0);  // always zero
   logger.Flush();
+}
+
+TEST(LoggerTest, SetLoggerToGlog) {
+  google::InitGoogleLogging("LoggerTest2");
+  google::SetLogDestination(google::ERROR, "");
+  google::SetLogDestination(google::WARNING, "");
+  google::SetLogDestination(google::FATAL, "");
+  Logger* logger = new Logger(google::base::GetLogger(google::INFO));
+  google::base::SetLogger(FLAGS_minloglevel, logger);
+
+  ALOG_MODULE("LoggerTest2", INFO) << "test set logger to glog";
+  ALOG_MODULE("LoggerTest2", WARN) << "test set logger to glog";
+  ALOG_MODULE("LoggerTest2", ERROR) << "test set logger to glog";
+  logger = nullptr;
+  google::ShutdownGoogleLogging();
 }
 
 }  // namespace logger

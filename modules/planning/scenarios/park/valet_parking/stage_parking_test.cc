@@ -31,16 +31,18 @@ class StageParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(StageParkingTest, Init) {
-  StageParking stage_parking(config_);
-  EXPECT_EQ(stage_parking.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+  StageParking stage_parking(config_, injector_);
+  EXPECT_EQ(stage_parking.Name(), ScenarioConfig::StageType_Name(
+                                      ScenarioConfig::VALET_PARKING_PARKING));
 }
 
 }  // namespace valet_parking

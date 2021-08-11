@@ -31,6 +31,9 @@ DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",
               "Routing map files in the map_dir, search in order.");
 DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
               "End way point of the map, will be sent in RoutingRequest.");
+DEFINE_string(default_routing_filename, "default_cycle_routing.txt",
+              "Default cycle routing of the map, will be sent in Task to Task "
+              "Manager Module.");
 DEFINE_string(speed_control_filename, "speed_control.pb.txt",
               "The speed control region in a map.");
 
@@ -58,6 +61,8 @@ DEFINE_string(
     "modules/dreamview/conf/navigation_mode_default_end_way_point.txt",
     "end_way_point file used if navigation mode is set.");
 
+DEFINE_double(half_vehicle_width, 1.05, "half vehicle width");
+
 DEFINE_double(look_forward_time_sec, 8.0,
               "look forward time times adc speed to calculate this distance "
               "when creating reference line from routing");
@@ -73,3 +78,5 @@ DEFINE_bool(state_transform_to_com_reverse, false,
 DEFINE_bool(state_transform_to_com_drive, true,
             "Enable vehicle states coordinate transformation from center of "
             "rear-axis to center of mass, during forward driving");
+DEFINE_bool(multithread_run, false,
+            "multi-thread run flag mainly used by simulation");

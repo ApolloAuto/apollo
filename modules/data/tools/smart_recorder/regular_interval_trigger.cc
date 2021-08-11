@@ -25,7 +25,7 @@ RegularIntervalTrigger::RegularIntervalTrigger() {
   trigger_name_ = "RegularIntervalTrigger";
 }
 
-void RegularIntervalTrigger::Pull(const RecordMessage& msg) {
+void RegularIntervalTrigger::Pull(const cyber::record::RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }

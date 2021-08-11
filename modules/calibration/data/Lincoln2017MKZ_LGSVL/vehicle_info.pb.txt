@@ -1,0 +1,6 @@
+name : "SVL"
+brand : LG
+model : SVL
+license {
+    vin : "<VIN>"
+}

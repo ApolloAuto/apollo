@@ -17,6 +17,8 @@ limitations under the License.
 
 #include <string>
 
+#include "absl/strings/str_cat.h"
+
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
@@ -111,8 +113,9 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     zone_id = std::to_string(westZone);
   }
 
-  std::string to_coordinate = "+proj=utm +zone=" + zone_id +
-                              " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+  std::string to_coordinate =
+      absl::StrCat("+proj=utm +zone=", zone_id,
+                   " +ellps=WGS84 +datum=WGS84 +units=m +no_defs");
   CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
                                                         to_coordinate);
 

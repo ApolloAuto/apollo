@@ -24,7 +24,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/common/util/eigen_defs.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -52,6 +53,8 @@ class OfflineLocalVisualizer {
 
   void Visualize();
 
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  private:
   bool PCDTimestampFileHandler();
   bool LidarLocFileHandler(const std::vector<double> &pcd_timestamps);
@@ -59,14 +62,14 @@ class OfflineLocalVisualizer {
   bool FusionLocFileHandler(const std::vector<double> &pcd_timestamps);
 
   //   void PoseInterpolationByTime(
-  //       const std::vector<Eigen::Affine3d> &in_poses,
+  //       const ::apollo::common::EigenAffine3dVec &in_poses,
   //       const std::vector<double> &in_timestamps,
   //       const std::vector<double> &ref_timestamps,
   //       std::map<unsigned int, Eigen::Affine3d> &out_poses);
  public:
   static void PoseAndStdInterpolationByTime(
-      const std::vector<Eigen::Affine3d> &in_poses,
-      const std::vector<Eigen::Vector3d> &in_stds,
+      const ::apollo::common::EigenAffine3dVec &in_poses,
+      const ::apollo::common::EigenVector3dVec &in_stds,
       const std::vector<double> &in_timestamps,
       const std::vector<double> &ref_timestamps,
       std::map<unsigned int, Eigen::Affine3d> *out_poses,
@@ -93,7 +96,7 @@ class OfflineLocalVisualizer {
   std::map<unsigned int, Eigen::Affine3d> fusion_poses_;
   std::map<unsigned int, Eigen::Vector3d> fusion_stds_;
 
-  BaseMapConfig map_config_;
+  pyramid_map::BaseMapConfig map_config_;
   unsigned int resolution_id_;
   int zone_id_;
 

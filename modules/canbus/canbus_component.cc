@@ -16,21 +16,21 @@
 
 #include "modules/canbus/canbus_component.h"
 
+#include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 
-namespace apollo {
-namespace canbus {
-
 using apollo::common::ErrorCode;
-using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
+using apollo::cyber::Time;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::guardian::GuardianCommand;
+
+namespace apollo {
+namespace canbus {
 
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
@@ -177,7 +177,7 @@ void CanbusComponent::Clear() {
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
   common::util::FillHeader(node_->Name(), &chassis);
-  chassis_writer_->Write(std::make_shared<Chassis>(chassis));
+  chassis_writer_->Write(chassis);
   ADEBUG << chassis.ShortDebugString();
 }
 
@@ -185,8 +185,7 @@ void CanbusComponent::PublishChassisDetail() {
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   ADEBUG << chassis_detail.ShortDebugString();
-  chassis_detail_writer_->Write(
-      std::make_shared<ChassisDetail>(chassis_detail));
+  chassis_detail_writer_->Write(chassis_detail);
 }
 
 bool CanbusComponent::Proc() {
@@ -198,8 +197,7 @@ bool CanbusComponent::Proc() {
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp =
-      apollo::common::time::AsInt64<common::time::micros>(Clock::Now());
+  int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
@@ -213,7 +211,9 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   ADEBUG << "Control_sequence_number:"
          << control_command.header().sequence_num() << ", Time_of_delay:"
          << current_timestamp -
-                static_cast<int64_t>(control_command.header().timestamp_sec());
+                static_cast<int64_t>(control_command.header().timestamp_sec() *
+                                     1e6)
+         << " micro seconds";
 
   if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
     AERROR << "Failed to process callback function OnControlCommand because "
@@ -225,9 +225,7 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
 
 void CanbusComponent::OnGuardianCommand(
     const GuardianCommand &guardian_command) {
-  apollo::control::ControlCommand control_command;
-  control_command.CopyFrom(guardian_command.control_command());
-  OnControlCommand(control_command);
+  OnControlCommand(guardian_command.control_command());
 }
 
 common::Status CanbusComponent::OnError(const std::string &error_msg) {

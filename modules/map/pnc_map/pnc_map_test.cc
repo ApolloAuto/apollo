@@ -44,12 +44,12 @@ class PncMapTest : public ::testing::Test {
     AINFO << "map file: " << FLAGS_test_map_file;
     if (hdmap_.LoadMapFromFile(FLAGS_test_map_file) != 0) {
       AERROR << "Failed to load map: " << FLAGS_test_map_file;
-      CHECK(false);
+      ACHECK(false);
     }
     pnc_map_.reset(new PncMap(&hdmap_));
     if (!cyber::common::GetProtoFromFile(FLAGS_test_routing_file, &routing_)) {
       AERROR << "Failed to load routing: " << FLAGS_test_routing_file;
-      CHECK(false);
+      ACHECK(false);
     }
     pnc_map_->UpdateRoutingResponse(routing_);
   }

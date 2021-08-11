@@ -16,11 +16,10 @@
 
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 
-#include <omp.h>
-
 #include <algorithm>
-#include <limits>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/common/math/vec2d.h"
@@ -30,28 +29,27 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
-using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
   evaluator_type_ = ObstacleConf::LANE_SCANNING_EVALUATOR;
   LoadModel();
 }
 
-bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
-  Evaluate(obstacle_ptr, dummy_dynamic_env);
+  Evaluate(obstacle_ptr, obstacles_container, dummy_dynamic_env);
   return true;
 }
 
 bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   omp_set_num_threads(1);
@@ -74,7 +72,7 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return false;
   }

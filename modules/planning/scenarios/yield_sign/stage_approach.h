@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "modules/planning/scenarios/stage.h"
@@ -34,8 +35,9 @@ struct YieldSignContext;
 
 class YieldSignStageApproach : public Stage {
  public:
-  explicit YieldSignStageApproach(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  YieldSignStageApproach(const ScenarioConfig::StageConfig& config,
+                         const std::shared_ptr<DependencyInjector>& injector)
+      : Stage(config, injector) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -43,7 +45,6 @@ class YieldSignStageApproach : public Stage {
   YieldSignContext* GetContext() { return GetContextAs<YieldSignContext>(); }
 
  private:
-  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:

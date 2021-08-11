@@ -17,9 +17,10 @@
 #ifndef CYBER_BASE_UNBOUNDED_QUEUE_H_
 #define CYBER_BASE_UNBOUNDED_QUEUE_H_
 
-#include <stdint.h>
 #include <unistd.h>
+
 #include <atomic>
+#include <cstdint>
 #include <memory>
 
 namespace apollo {
@@ -29,25 +30,15 @@ namespace base {
 template <typename T>
 class UnboundedQueue {
  public:
-  UnboundedQueue() {
-    auto node = new Node();
-    head_.store(node);
-    tail_.store(node);
-    size_.store(0);
-  }
+  UnboundedQueue() { Reset(); }
   UnboundedQueue& operator=(const UnboundedQueue& other) = delete;
   UnboundedQueue(const UnboundedQueue& other) = delete;
 
-  ~UnboundedQueue() { Clear(); }
+  ~UnboundedQueue() { Destroy(); }
 
   void Clear() {
-    auto ite = head_.load();
-    Node* tmp = nullptr;
-    while (ite != nullptr) {
-      tmp = ite->next;
-      delete ite;
-      ite = tmp;
-    }
+    Destroy();
+    Reset();
   }
 
   void Enqueue(const T& element) {
@@ -98,6 +89,23 @@ class UnboundedQueue {
       }
     }
   };
+
+  void Reset() {
+    auto node = new Node();
+    head_.store(node);
+    tail_.store(node);
+    size_.store(0);
+  }
+
+  void Destroy() {
+    auto ite = head_.load();
+    Node* tmp = nullptr;
+    while (ite != nullptr) {
+      tmp = ite->next;
+      delete ite;
+      ite = tmp;
+    }
+  }
 
   std::atomic<Node*> head_;
   std::atomic<Node*> tail_;

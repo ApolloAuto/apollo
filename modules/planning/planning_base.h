@@ -22,23 +22,23 @@
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/dreamview/proto/chart.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/traffic_rule_config.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/dreamview/proto/chart.pb.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/planner/planner_dispatcher.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/traffic_rule_config.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -53,7 +53,9 @@ namespace planning {
  */
 class PlanningBase {
  public:
-  PlanningBase() = default;
+  PlanningBase() = delete;
+
+  explicit PlanningBase(const std::shared_ptr<DependencyInjector>& injector);
 
   virtual ~PlanningBase();
 
@@ -88,6 +90,7 @@ class PlanningBase {
   std::unique_ptr<Planner> planner_;
   std::unique_ptr<PublishableTrajectory> last_publishable_trajectory_;
   std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 }  // namespace planning

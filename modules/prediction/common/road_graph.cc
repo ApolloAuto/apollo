@@ -94,7 +94,7 @@ RoadGraph::RoadGraph(const double start_s, const double length,
 Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   // Sanity checks.
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = common::util::StrCat(
+    const auto error_msg = absl::StrCat(
         "Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);
@@ -118,7 +118,7 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
 Status RoadGraph::BuildLaneGraphBidirection(LaneGraph* const lane_graph_ptr) {
   // Sanity checks.
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = common::util::StrCat(
+    const auto error_msg = absl::StrCat(
         "Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);
@@ -251,8 +251,8 @@ void RoadGraph::ConstructLaneSequence(
   // End condition: if search reached the maximum search distance,
   // or if there is no more successor lane_segment.
   if (search_forward_direction) {
-    if (lane_segment.end_s() < lane_info_ptr->total_length() ||
-        lane_info_ptr->lane().successor_id_size() == 0) {
+    if (lane_segments->back().end_s() < lane_info_ptr->total_length() ||
+        lane_info_ptr->lane().successor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
         *(sequence->add_lane_segment()) = it;
@@ -261,8 +261,8 @@ void RoadGraph::ConstructLaneSequence(
       return;
     }
   } else {
-    if (lane_segment.start_s() > 0.0 ||
-        lane_info_ptr->lane().predecessor_id_size() == 0) {
+    if (lane_segments->front().start_s() > 0.0 ||
+        lane_info_ptr->lane().predecessor_id().empty()) {
       LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
       for (const auto& it : *lane_segments) {
         *(sequence->add_lane_segment()) = it;
@@ -290,7 +290,8 @@ void RoadGraph::ConstructLaneSequence(
     std::sort(candidate_lanes.begin(), candidate_lanes.end(), IsAtLeft);
     // Based on other conditions, select what successor lanes should be used.
     if (!consider_lane_split) {
-      candidate_lanes = {LaneWithSmallestAverageCurvature(candidate_lanes)};
+      candidate_lanes = {
+          PredictionMap::LaneWithSmallestAverageCurvature(candidate_lanes)};
     }
   } else {
     new_accumulated_s = accumulated_s + curr_s;
@@ -323,53 +324,6 @@ void RoadGraph::ConstructLaneSequence(
   } else {
     lane_segments->pop_front();
   }
-  return;
-}
-
-std::shared_ptr<const hdmap::LaneInfo>
-RoadGraph::LaneWithSmallestAverageCurvature(
-    const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
-    const {
-  CHECK(!lane_infos.empty());
-  size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
-  std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
-  if (selected_lane_info == nullptr) {
-    AERROR << "Lane Vector first element: selected_lane_info is nullptr.";
-    return nullptr;
-  }
-  double smallest_curvature =
-      AverageCurvature(selected_lane_info->id().id(), sample_size);
-  for (size_t i = 1; i < lane_infos.size(); ++i) {
-    std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
-    if (lane_info == nullptr) {
-      AWARN << "Lane vector element: one lane_info is nullptr.";
-      continue;
-    }
-    double curvature = AverageCurvature(lane_info->id().id(), sample_size);
-    if (curvature < smallest_curvature) {
-      smallest_curvature = curvature;
-      selected_lane_info = lane_info;
-    }
-  }
-  return selected_lane_info;
-}
-
-double RoadGraph::AverageCurvature(const std::string& lane_id,
-                                   const size_t sample_size) const {
-  CHECK_GT(sample_size, 0);
-  std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
-      PredictionMap::LaneById(lane_id);
-  if (lane_info_ptr == nullptr) {
-    return 0.0;
-  }
-  double lane_length = lane_info_ptr->total_length();
-  double s_gap = lane_length / static_cast<double>(sample_size);
-  double curvature_sum = 0.0;
-  for (size_t i = 0; i < sample_size; ++i) {
-    double s = s_gap * static_cast<double>(i);
-    curvature_sum += std::abs(PredictionMap::CurvatureOnLane(lane_id, s));
-  }
-  return curvature_sum / static_cast<double>(sample_size);
 }
 
 }  // namespace prediction

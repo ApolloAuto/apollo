@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include <string>
-
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -35,13 +33,15 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
   GetContext()->target_parking_spot_id.clear();
-  if (frame->local_view().routing->routing_request().has_parking_space() &&
-      frame->local_view().routing->routing_request().parking_space().has_id()) {
+  if (frame->local_view().routing->routing_request().has_parking_info() &&
+      frame->local_view()
+          .routing->routing_request()
+          .parking_info()
+          .has_parking_space_id()) {
     GetContext()->target_parking_spot_id = frame->local_view()
                                                .routing->routing_request()
-                                               .parking_space()
-                                               .id()
-                                               .id();
+                                               .parking_info()
+                                               .parking_space_id();
   } else {
     AERROR << "No parking space id from routing";
     return StageStatus::ERROR;
@@ -79,8 +79,7 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
 
 bool StageApproachingParkingSpot::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()

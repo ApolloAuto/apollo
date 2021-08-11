@@ -40,7 +40,7 @@ class Gearcontrola1 : public ::apollo::drivers::canbus::ProtocolData<
   // 'GEAR_STATE_TARGET_P', 2: 'GEAR_STATE_TARGET_N', 3: 'GEAR_STATE_TARGET_D',
   // 4: 'GEAR_STATE_TARGET_R', 5: 'GEAR_STATE_TARGET_INVALID'},
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
+  // 'physical_range': '[1|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
   Gearcontrola1* set_gear_state_target(
       Gear_control_a1::Gear_state_targetType gear_state_target);
@@ -58,7 +58,7 @@ class Gearcontrola1 : public ::apollo::drivers::canbus::ProtocolData<
   // 'GEAR_STATE_TARGET_P', 2: 'GEAR_STATE_TARGET_N', 3: 'GEAR_STATE_TARGET_D',
   // 4: 'GEAR_STATE_TARGET_R', 5: 'GEAR_STATE_TARGET_INVALID'},
   // 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
+  // 'physical_range': '[1|5]', 'bit': 8, 'type': 'enum', 'order': 'intel',
   // 'physical_unit': ''}
   void set_p_gear_state_target(
       uint8_t* data, Gear_control_a1::Gear_state_targetType gear_state_target);

@@ -22,7 +22,7 @@
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
@@ -32,7 +32,7 @@
 namespace apollo {
 namespace control {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
@@ -50,12 +50,13 @@ class LonControllerTest : public ::testing::Test, LonController {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
 
-    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = Clock::NowInSeconds();
+    timestamp_ = Time::Now().ToSecond();
 
     controller_.reset(new LonController());
+    injector_ = std::make_shared<DependencyInjector>();
   }
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
@@ -66,13 +67,13 @@ class LonControllerTest : public ::testing::Test, LonController {
   }
 
   common::Status Init(const ControlConf *control_conf) {
-    return LonController::Init(control_conf);
+    return LonController::Init(injector_, control_conf);
   }
 
  protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization;
-    CHECK(cyber::common::GetProtoFromFile(filename, &localization))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
     localization.mutable_header()->set_timestamp_sec(timestamp_);
     return localization;
@@ -80,7 +81,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return chassis_pb;
@@ -88,7 +89,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     TrajectoryPb trajectory_pb;
-    CHECK(cyber::common::GetProtoFromFile(filename, &trajectory_pb))
+    ACHECK(cyber::common::GetProtoFromFile(filename, &trajectory_pb))
         << "Failed to open file " << filename;
 
     trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
@@ -109,10 +110,10 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = Clock::NowInSeconds();
+  double time_now = Time::Now().ToSecond();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
-  auto vehicle_state = VehicleStateProvider::Instance();
+  auto vehicle_state = injector_->vehicle_state();
   vehicle_state->Update(localization_pb, chassis_pb);
   TrajectoryAnalyzer trajectory_analyzer(&trajectory_pb);
 

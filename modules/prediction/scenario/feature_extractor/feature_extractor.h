@@ -41,7 +41,8 @@ class FeatureExtractor {
    * @brief Extract features for scenario analysis
    * @return Scenario features
    */
-  static EnvironmentFeatures ExtractEnvironmentFeatures();
+  static EnvironmentFeatures ExtractEnvironmentFeatures(
+      ContainerManager* container_manager);
 
   FRIEND_TEST(FeatureExtractorTest, junction);
 
@@ -57,7 +58,8 @@ class FeatureExtractor {
       const common::math::Vec2d& ego_position);
 
   static void ExtractFrontJunctionFeatures(
-      EnvironmentFeatures* ptr_environment_features);
+      EnvironmentFeatures* ptr_environment_features,
+      ContainerManager* container_manager);
 
   static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
       const common::Point3D& position, const double heading);

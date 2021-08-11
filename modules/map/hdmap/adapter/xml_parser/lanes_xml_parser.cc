@@ -50,7 +50,7 @@ Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     sub_node = sub_node->NextSiblingElement("laneSection");
   }
 
-  CHECK_GT(sections->size(), 0);
+  CHECK_NE(sections->size(), 0U);
 
   return Status::OK();
 }
@@ -200,7 +200,7 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("border");
   if (sub_node) {
     PbLaneBoundary* lane_boundary = lane->mutable_right_boundary();
-    CHECK(lane_boundary != nullptr);
+    ACHECK(lane_boundary != nullptr);
     success =
         UtilXmlParser::ParseCurve(*sub_node, lane_boundary->mutable_curve());
     if (!success.ok()) {

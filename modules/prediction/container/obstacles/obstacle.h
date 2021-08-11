@@ -31,9 +31,12 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -53,14 +56,22 @@ class Obstacle {
    */
   static std::unique_ptr<Obstacle> Create(
       const perception::PerceptionObstacle& perception_obstacle,
-      const double timestamp, const int prediction_id);
+      const double timestamp, const int prediction_id,
+      ObstacleClusters* clusters_ptr);
 
-  static std::unique_ptr<Obstacle> Create(const Feature& feature);
+  static std::unique_ptr<Obstacle> Create(const Feature& feature,
+                                          ObstacleClusters* clusters_ptr);
+
+  Obstacle() = default;
 
   /**
    * @brief Destructor
    */
   virtual ~Obstacle() = default;
+
+  void SetJunctionAnalyzer(JunctionAnalyzer* junction_analyzer) {
+    junction_analyzer_ = junction_analyzer;
+  }
 
   /**
    * @brief Insert a perception obstacle with its timestamp.
@@ -76,11 +87,17 @@ class Obstacle {
    */
   bool InsertFeature(const Feature& feature);
 
+  void ClearOldInformation();
+
+  void TrimHistory(const size_t remain_size);
+
   /**
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.
    */
   perception::PerceptionObstacle::Type type() const;
+
+  bool IsPedestrian() const;
 
   /**
    * @brief Get the obstacle's ID.
@@ -140,19 +157,6 @@ class Obstacle {
   size_t history_size() const;
 
   /**
-   * @brief Get the motion Kalman filter.
-   * @return The motion Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 6, 2, 0>& kf_motion_tracker() const;
-
-  /**
-   * @brief Get the pedestrian Kalman filter.
-   * @return The pedestrian Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
-      const;
-
-  /**
    * @brief Check if the obstacle is still.
    * @return If the obstacle is still.
    */
@@ -193,13 +197,13 @@ class Obstacle {
    * @brief Check if the obstacle is close to a junction exit.
    * @return If the obstacle is closed to a junction exit.
    */
-  bool IsCloseToJunctionExit();
+  bool IsCloseToJunctionExit() const;
 
   /**
    * @brief Check if the obstacle has junction feature.
    * @return If the obstacle has junction feature.
    */
-  bool HasJunctionFeatureWithExits();
+  bool HasJunctionFeatureWithExits() const;
 
   /**
    * @brief Build junction feature.
@@ -218,32 +222,22 @@ class Obstacle {
   void BuildLaneGraphFromLeftToRight();
 
   /**
-   * @brief Set RNN state
-   * @param RNN state matrix
-   */
-  void SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states);
-
-  /**
-   * @brief Get RNN state
-   * @param A pointer to RNN state matrix
-   */
-  void GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states);
-
-  /**
-   * @brief Initialize RNN state
-   */
-  void InitRNNStates();
-
-  /**
-   * @brief Check if RNN is enabled
-   * @return True if RNN is enabled
-   */
-  bool RNNEnabled() const;
-
-  /**
    * @brief Set the obstacle as caution level
    */
   void SetCaution();
+
+  bool IsCaution() const;
+
+  /**
+   * @brief Set the obstacle as interactive obstacle.
+   */
+  void SetInteractiveTag();
+  /**
+   * @brief Set the obstacle as noninteractive obstacle.
+   */
+  void SetNonInteractiveTag();
+
+  bool IsInteractiveObstacle() const;
 
   void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
 
@@ -251,13 +245,11 @@ class Obstacle {
 
   const ObstacleConf& obstacle_conf() { return obstacle_conf_; }
 
- private:
-  Obstacle() = default;
+  PredictionObstacle GeneratePredictionObstacle();
 
+ private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
-
-  void UpdateStatus(Feature* feature);
 
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
              Feature* feature, const int prediction_id = -1);
@@ -297,15 +289,13 @@ class Obstacle {
       const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
-  void InitKFMotionTracker(const Feature& feature);
-
-  void UpdateKFMotionTracker(const Feature& feature);
-
   void UpdateLaneBelief(Feature* feature);
 
   void SetCurrentLanes(Feature* feature);
 
   void SetNearbyLanes(Feature* feature);
+
+  void SetSurroundingLaneIds(Feature* feature, const double radius);
 
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
@@ -320,10 +310,6 @@ class Obstacle {
   /** @brief This functions is mainly for lane-sequence kappa calculation.
    */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
-
-  void InitKFPedestrianTracker(const Feature& feature);
-
-  void UpdateKFPedestrianTracker(const Feature& feature);
 
   void SetMotionStatus();
 
@@ -348,6 +334,8 @@ class Obstacle {
       const LaneSequence& lane_sequence,
       const std::unordered_set<std::string>& exit_lane_id_set);
 
+  void SetClusters(ObstacleClusters* clusters_ptr);
+
  private:
   int id_ = FLAGS_ego_vehicle_id;
 
@@ -356,17 +344,12 @@ class Obstacle {
 
   std::deque<Feature> feature_history_;
 
-  common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
-
-  common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 
-  std::vector<Eigen::MatrixXf> rnn_states_;
-
-  bool rnn_enabled_ = false;
-
   ObstacleConf obstacle_conf_;
+
+  ObstacleClusters* clusters_ptr_ = nullptr;
+  JunctionAnalyzer* junction_analyzer_ = nullptr;
 };
 
 }  // namespace prediction

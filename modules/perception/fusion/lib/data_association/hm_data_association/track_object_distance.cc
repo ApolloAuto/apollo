@@ -20,7 +20,7 @@
 #include <map>
 #include <utility>
 
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/point.h"
@@ -65,7 +65,6 @@ void TrackObjectDistance::GetModified2DRadarBoxVertices(
         camera_intrinsic->Project(local_box_vertex.head(3).cast<float>());
     radar_box2d_vertices->push_back(temp_vertex.cast<double>());
   }
-  return;
 }
 
 base::BaseCameraModelPtr TrackObjectDistance::QueryCameraModel(
@@ -132,10 +131,10 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
   }
   size_t start_ind = projection_cache_.GetPoint2dsSize();
   size_t end_ind = projection_cache_.GetPoint2dsSize();
-  float xmin = FLT_MAX;
-  float ymin = FLT_MAX;
-  float xmax = -FLT_MAX;
-  float ymax = -FLT_MAX;
+  float xmin = std::numeric_limits<float>::max();
+  float ymin = std::numeric_limits<float>::max();
+  float xmax = -std::numeric_limits<float>::max();
+  float ymax = -std::numeric_limits<float>::max();
   // 4. check whether all lidar's 8 3d vertices would projected outside frustum,
   // if not, build projection object of its cloud and cache it
   // else, build empty projection object and cache it
@@ -151,11 +150,15 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
               world2camera_pose * Eigen::Vector4d(vt(0) + offset(0),
                                                   vt(1) + offset(1),
                                                   vt(2) + offset(2), 1.0));
-      if (project_vt(2) <= 0) continue;
+      if (project_vt(2) <= 0) {
+        continue;
+      }
       Eigen::Vector2f project_vt2f = camera_model->Project(Eigen::Vector3f(
           static_cast<float>(project_vt(0)), static_cast<float>(project_vt(1)),
           static_cast<float>(project_vt(2))));
-      if (!IsPtInFrustum(project_vt2f, width, height)) continue;
+      if (!IsPtInFrustum(project_vt2f, width, height)) {
+        continue;
+      }
       is_all_lidar_3d_vertices_outside_frustum = false;
       break;
     }
@@ -170,22 +173,36 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
           cloud.size() / s_lidar2camera_projection_downsample_target_pts_num_;
     }
     for (size_t i = 0; i < cloud.size(); ++i) {
-      if ((every_n > 1) && (i % every_n != 0)) continue;
+      if ((every_n > 1) && (i % every_n != 0)) {
+        continue;
+      }
       const base::PointF& pt = cloud.at(i);
       Eigen::Vector4d project_pt =
           static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
               lidar2camera_pose * Eigen::Vector4d(pt.x + offset(0),
                                                   pt.y + offset(1),
                                                   pt.z + offset(2), 1.0));
-      if (project_pt(2) <= 0) continue;
+      if (project_pt(2) <= 0) {
+        continue;
+      }
       Eigen::Vector2f project_pt2f = camera_model->Project(Eigen::Vector3f(
           static_cast<float>(project_pt(0)), static_cast<float>(project_pt(1)),
           static_cast<float>(project_pt(2))));
-      if (!IsPtInFrustum(project_pt2f, width, height)) continue;
-      if (project_pt2f.x() < xmin) xmin = project_pt2f.x();
-      if (project_pt2f.y() < ymin) ymin = project_pt2f.y();
-      if (project_pt2f.x() > xmax) xmax = project_pt2f.x();
-      if (project_pt2f.y() > ymax) ymax = project_pt2f.y();
+      if (!IsPtInFrustum(project_pt2f, width, height)) {
+        continue;
+      }
+      if (project_pt2f.x() < xmin) {
+        xmin = project_pt2f.x();
+      }
+      if (project_pt2f.y() < ymin) {
+        ymin = project_pt2f.y();
+      }
+      if (project_pt2f.x() > xmax) {
+        xmax = project_pt2f.x();
+      }
+      if (project_pt2f.y() > ymax) {
+        ymax = project_pt2f.y();
+      }
       projection_cache_.AddPoint(project_pt2f);
     }
   }
@@ -214,8 +231,9 @@ ProjectionCacheObject* TrackObjectDistance::QueryProjectionCacheObject(
   ProjectionCacheObject* cache_object = projection_cache_.QueryObject(
       measurement_sensor_id, measurement_timestamp, projection_sensor_id,
       projection_timestamp, lidar_object_id);
-  if (cache_object != nullptr) return cache_object;
-  // 2. if query failed, build projection and cache it
+  if (cache_object != nullptr) {
+    return cache_object;
+  }  // 2. if query failed, build projection and cache it
   return BuildProjectionCacheObject(
       lidar, camera, camera_model, measurement_sensor_id, measurement_timestamp,
       projection_sensor_id, projection_timestamp);

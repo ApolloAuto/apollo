@@ -18,4 +18,7 @@
 
 # e.g. replay.sh 1_chassis.pb.txt
 
-python /apollo/modules/tools/replay/replay_file.py $@
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
+
+${TOP_DIR}/bazel-bin/modules/tools/replay/replay_file "$@"

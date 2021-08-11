@@ -19,29 +19,72 @@
 # Fail on first error.
 set -e
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+BUILD_TYPE="${1:-download}"
 
-QT_VERSION_A=5.5
-QT_VERSION_B=5.5.1
-QT_VERSION_SCRIPT=551
+CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+. ${CURR_DIR}/installer_base.sh
 
-wget https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/qt-opensource-linux-x64-${QT_VERSION_B}.run
+TARGET_ARCH="$(uname -m)"
 
-chmod +x qt-opensource-linux-x64-${QT_VERSION_B}.run 
+apt_get_update_and_install \
+    libx11-xcb1 \
+    libfreetype6 \
+    libdbus-1-3 \
+    libfontconfig1 \
+    libxkbcommon0   \
+    libxkbcommon-x11-0
 
-# The '-platform' flag causes a message to stdout "Unknown option: p, l, a, t, f, o, r, m": message is incorrectly printed (it's a bug). The command still succeeds.
-# https://stackoverflow.com/a/34032216/1158977
+# Note(storypku)
+# 1) libicu6X: required by uic
+# 2) libxkbcommonX required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
-# the below error can be ignored since Ubuntu 14 does not have sslv2
-# qt.network.ssl: QSslSocket: cannot resolve SSLv2_client_method
-# qt.network.ssl: QSslSocket: cannot resolve SSLv2_server_method
-./qt-opensource-linux-x64-${QT_VERSION_B}.run --script qt-noninteractive.qs  -platform minimal
+if [ "${TARGET_ARCH}" = "aarch64" ]; then
+    bash ${CURR_DIR}/install_qt5_qtbase.sh "${BUILD_TYPE}"
+    exit 0
+fi
 
-# this will install to "/qt" so need to symlink to /usr/local/Qt5.5.1
-# as needed in https://github.com/ApolloAuto/apollo/blob/master/tools/qt.bzl
-ln -s /qt /usr/local/Qt$QT_VERSION_B
+QT_VERSION_A=5.12
+QT_VERSION_B=5.12.9
+QT_VERSION_Z=$(echo "$QT_VERSION_B" | tr -d '.')
+
+QT_INSTALLER=qt-opensource-linux-x64-${QT_VERSION_B}.run
+CHECKSUM="63ef2b991d5fea2045b4e7058f86e36868cafae0738f36f8b0a88dc8de64ab2e"
+DOWLOAD_LINK=https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/${QT_INSTALLER}
+
+pip3_install cuteci
+
+download_if_not_cached $QT_INSTALLER $CHECKSUM $DOWLOAD_LINK
+chmod +x $QT_INSTALLER
+
+MY_DEST_DIR="/usr/local/Qt${QT_VERSION_B}"
+cuteci \
+    --installer "$PWD/$QT_INSTALLER" \
+    install \
+    --destdir="$MY_DEST_DIR" \
+    --packages "qt.qt5.${QT_VERSION_Z}.gcc_64" \
+    --keep-tools
+
+QT5_PATH="/usr/local/qt5"
+# Hide qt5 version from end users
+ln -s ${MY_DEST_DIR}/${QT_VERSION_B}/gcc_64 "${QT5_PATH}"
+
+echo "${QT5_PATH}/lib" > /etc/ld.so.conf.d/qt.conf
+ldconfig
+
+__mytext="""
+export QT5_PATH=\"${QT5_PATH}\"
+export QT_QPA_PLATFORM_PLUGIN_PATH=\"\${QT5_PATH}/plugins\"
+add_to_path \"\${QT5_PATH}/bin\"
+"""
+
+echo "${__mytext}" | tee -a "${APOLLO_PROFILE}"
 
 # clean up
-rm qt-opensource-linux-x64-${QT_VERSION_B}.run
-rm -rf /usr/local/Qt$QT_VERSION_B/{Docs,Examples,Extras,Tools}
+rm -f ${QT_INSTALLER}
+# Keep License files
+rm -rf ${MY_DEST_DIR}/{Docs,Examples,Tools,dist} || true
+rm -rf ${MY_DEST_DIR}/MaintenanceTool* || true
+rm -rf ${MY_DEST_DIR}/{InstallationLog.txt,installer-changelog} || true
+rm -rf ${MY_DEST_DIR}/{components,network}.xml || true
 
+pip3 uninstall -y cuteci

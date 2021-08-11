@@ -37,8 +37,6 @@ namespace bare_intersection {
 using apollo::common::TrajectoryPoint;
 using apollo::hdmap::PathOverlap;
 
-uint32_t BareIntersectionUnprotectedStageApproach::clear_counter_ = 0;
-
 Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Approach";
@@ -67,7 +65,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     return FinishScenario();
   }
 
-  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+  static constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_to_pnc_junction =
       current_pnc_junction->start_s - adc_front_edge_s;
@@ -75,18 +73,14 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
          << "] start_s[" << current_pnc_junction->start_s
          << "] distance_adc_to_pnc_junction[" << distance_adc_to_pnc_junction
          << "]";
-  if (distance_adc_to_pnc_junction > kPassStopLineBuffer) {
+  if (distance_adc_to_pnc_junction < -kPassStopLineBuffer) {
     // passed stop line
-    return FinishStage();
+    return FinishStage(frame);
   }
 
-  // set speed_limit to slow down
-  if (frame->mutable_reference_line_info()) {
-    auto* reference_line =
-        frame->mutable_reference_line_info()->front().mutable_reference_line();
-    reference_line->AddSpeedLimit(0.0, current_pnc_junction->start_s,
-                                  scenario_config_.approach_speed_limit());
-  }
+  // set cruise_speed to slow down
+  frame->mutable_reference_line_info()->front().SetCruiseSpeed(
+      scenario_config_.approach_cruise_speed());
 
   // set right_of_way_status
   reference_line_info.SetJunctionRightOfWay(current_pnc_junction->start_s,
@@ -97,12 +91,60 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     AERROR << "BareIntersectionUnprotectedStageApproach planning error";
   }
 
-  // TODO(all): move to conf
-  constexpr double kConf_min_boundary_t = 6.0;        // second
-  constexpr double kConf_ignore_max_st_min_t = 0.1;   // second
-  constexpr double kConf_ignore_min_st_min_s = 15.0;  // meter
-
   std::vector<std::string> wait_for_obstacle_ids;
+  bool clear = CheckClear(reference_line_info, &wait_for_obstacle_ids);
+
+  if (scenario_config_.enable_explicit_stop()) {
+    bool stop = false;
+    static constexpr double kCheckClearDistance = 5.0;  // meter
+    static constexpr double kStartWatchDistance = 2.0;  // meter
+    if (distance_adc_to_pnc_junction <= kCheckClearDistance &&
+        distance_adc_to_pnc_junction >= kStartWatchDistance && !clear) {
+      stop = true;
+    } else if (distance_adc_to_pnc_junction < kStartWatchDistance) {
+      // creeping area
+      auto* bare_intersection_status = injector_->planning_context()
+                                                ->mutable_planning_status()
+                                                ->mutable_bare_intersection();
+      int clear_counter = bare_intersection_status->clear_counter();
+      clear_counter = clear ? clear_counter + 1 : 0;
+
+      if (clear_counter >= 5) {
+        clear_counter = 0;  // reset
+      } else {
+        stop = true;
+      }
+      // use PlanningContext instead of static counter for multi-ADC
+      bare_intersection_status->set_clear_counter(clear_counter);
+    }
+
+    if (stop) {
+      // build stop decision
+      ADEBUG << "BuildStopDecision: bare pnc_junction["
+             << pnc_junction_overlap_id << "] start_s["
+             << current_pnc_junction->start_s << "]";
+      const std::string virtual_obstacle_id =
+          "PNC_JUNCTION_" + current_pnc_junction->object_id;
+      planning::util::BuildStopDecision(
+          virtual_obstacle_id, current_pnc_junction->start_s,
+          scenario_config_.stop_distance(),
+          StopReasonCode::STOP_REASON_STOP_SIGN, wait_for_obstacle_ids,
+          "bare intersection", frame,
+          &(frame->mutable_reference_line_info()->front()));
+    }
+  }
+
+  return Stage::RUNNING;
+}
+
+bool BareIntersectionUnprotectedStageApproach::CheckClear(
+    const ReferenceLineInfo& reference_line_info,
+    std::vector<std::string>* wait_for_obstacle_ids) {
+  // TODO(all): move to conf
+  static constexpr double kConf_min_boundary_t = 6.0;        // second
+  static constexpr double kConf_ignore_max_st_min_t = 0.1;   // second
+  static constexpr double kConf_ignore_min_st_min_s = 15.0;  // meter
+
   bool all_far_away = true;
   for (auto* obstacle :
        reference_line_info.path_decision().obstacles().Items()) {
@@ -130,56 +172,22 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
         continue;
       }
 
-      wait_for_obstacle_ids.push_back(obstacle->Id());
+      wait_for_obstacle_ids->push_back(obstacle->Id());
       all_far_away = false;
     }
   }
-
-  if (scenario_config_.enable_explicit_stop()) {
-    clear_counter_ = all_far_away ? clear_counter_ + 1 : 0;
-
-    bool stop = false;
-    constexpr double kCheckClearDistance = 5.0;  // meter
-    constexpr double kStartWatchDistance = 2.0;  // meter
-    if (distance_adc_to_pnc_junction <= kCheckClearDistance &&
-        distance_adc_to_pnc_junction >= kStartWatchDistance && !all_far_away) {
-      clear_counter_ = 0;  // reset
-      stop = true;
-    } else if (distance_adc_to_pnc_junction < kStartWatchDistance) {
-      // creeping area
-      if (clear_counter_ >= 5) {
-        clear_counter_ = 0;  // reset
-        return FinishStage();
-      } else {
-        stop = true;
-      }
-    }
-
-    if (stop) {
-      // build stop decision
-      ADEBUG << "BuildStopDecision: bare pnc_junction["
-             << pnc_junction_overlap_id << "] start_s["
-             << current_pnc_junction->start_s << "]";
-      const std::string virtual_obstacle_id =
-          "PNC_JUNCTION_" + current_pnc_junction->object_id;
-      planning::util::BuildStopDecision(
-          virtual_obstacle_id, current_pnc_junction->start_s,
-          scenario_config_.stop_distance(),
-          StopReasonCode::STOP_REASON_STOP_SIGN, wait_for_obstacle_ids,
-          "bare intersection", frame,
-          &(frame->mutable_reference_line_info()->front()));
-    }
-  } else if (distance_adc_to_pnc_junction <= 0) {
-    // rely on st-graph
-    return FinishStage();
-  }
-
-  return Stage::RUNNING;
+  return all_far_away;
 }
 
-Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage() {
+Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage(
+    Frame* frame) {
   next_stage_ =
       ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE;
+
+  // reset cruise_speed
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
+
   return Stage::FINISHED;
 }
 

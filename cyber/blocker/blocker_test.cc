@@ -16,8 +16,9 @@
 
 #include "cyber/blocker/blocker.h"
 
-#include <gtest/gtest.h>
 #include <memory>
+
+#include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"
 
@@ -35,6 +36,26 @@ TEST(BlockerTest, constructor) {
 
   blocker.set_capacity(20);
   EXPECT_EQ(blocker.capacity(), 20);
+}
+
+TEST(BlockerTest, set_capacity) {
+  BlockerAttr attr(0, "channel");
+  Blocker<UnitTest> blocker(attr);
+  EXPECT_EQ(blocker.capacity(), 0);
+
+  UnitTest msg;
+  msg.set_class_name("BlockerTest");
+  msg.set_case_name("publish");
+  blocker.Publish(msg);
+
+  blocker.set_capacity(2);
+  EXPECT_EQ(blocker.capacity(), 2);
+
+  blocker.Publish(msg);
+  blocker.Publish(msg);
+  blocker.Publish(msg);
+  blocker.set_capacity(1);
+  EXPECT_EQ(blocker.capacity(), 1);
 }
 
 TEST(BlockerTest, publish) {

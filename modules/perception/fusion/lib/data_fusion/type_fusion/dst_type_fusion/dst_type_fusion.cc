@@ -15,7 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
-#include "boost/format.hpp"
+#include <limits>
+#include <numeric>
+
+#include <boost/format.hpp>
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
@@ -32,13 +37,7 @@ using cyber::common::GetAbsolutePath;
 
 template <typename Type>
 std::string vector2string(const std::vector<Type> &values) {
-  std::ostringstream oss;
-  oss << "(";
-  for (size_t i = 0; i < values.size(); i++) {
-    oss << values[i] << " ";
-  }
-  oss << ")";
-  return oss.str();
+  return absl::StrCat("(", absl::StrJoin(values, " "), ")");
 }
 
 std::string DstTypeFusion::name_ = "DstTypeFusion";  // NOLINT
@@ -144,7 +143,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     SensorDataManager *sensor_data_manager = SensorDataManager::Instance();
     base::BaseCameraModelPtr camera_model =
         sensor_data_manager->GetCameraIntrinsic(sensor_id);
-    CHECK(camera_model != nullptr)
+    ACHECK(camera_model != nullptr)
         << "Failed to get camera intrinsic for " << sensor_id;
 
     Eigen::Affine3d sensor2world_pose;
@@ -180,7 +179,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     // in a box detected by the camera.
     auto loss_fun = [](double dist_score) {
       CHECK_GE(dist_score, 0.0);
-      constexpr double th = 0.9;
+      static constexpr double th = 0.9;
       if (dist_score >= th) {
         return 0.0;
       }
@@ -225,7 +224,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   Dst res_dst(name_);
   double type_probs_sum =
       std::accumulate(type_probs.begin(), type_probs.end(), 0.0);
-  if (type_probs_sum < DBL_MIN) {
+  if (type_probs_sum < std::numeric_limits<double>::min()) {
     // AWARN << "the sum of types probability equal 0.0";
     return res_dst;
   }
@@ -252,7 +251,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   //         find_res->second += (1 - type_probs_sum);
   //     }
   // }
-  CHECK(res_dst.SetBba(res_bba_map));
+  ACHECK(res_dst.SetBba(res_bba_map));
   return res_dst;
 }
 

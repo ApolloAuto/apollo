@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <Eigen/Dense>
+
 #include <utility>
+
+#include "Eigen/Dense"
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
 
@@ -25,10 +27,12 @@ namespace common {
 
 template <typename T>
 inline void IEigSymmetric2x2Closed(const T *A, T *EV, T *Q) {
-  if (A == nullptr) return;
+  if (A == nullptr) {
+    return;
+  }
   Eigen::Matrix<T, 2, 2> a;
   a << A[0], A[1], A[2], A[3];
-  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 2, 2> > es(a);
+  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 2, 2>> es(a);
   if (es.info() != Eigen::Success) {
     return;
   }
@@ -50,10 +54,12 @@ inline void IEigSymmetric2x2Closed(const T *A, T *EV, T *Q) {
 
 template <typename T>
 inline void IEigSymmetric3x3Closed(const T *A, T *EV, T *Q) {
-  if (A == nullptr) return;
+  if (A == nullptr) {
+    return;
+  }
   Eigen::Matrix<T, 3, 3> a;
   a << A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[8];
-  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 3, 3> > es(a);
+  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 3, 3>> es(a);
   if (es.info() != Eigen::Success) {
     return;
   }
@@ -201,7 +207,7 @@ inline bool IBackprojectPlaneIntersectionCanonical(const T *x, const T *K,
   X[0] = Z * umcx;
   X[1] = Z * vmcy;
   X[2] = Z;
-  return Z > static_cast<T>(0.0) ? true : false;
+  return Z > static_cast<T>(0.0);
 }
 
 }  // namespace common

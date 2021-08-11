@@ -22,7 +22,7 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +35,7 @@ TEST(TargetTest, target_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
   std::string omt_config = cyber::common::GetAbsolutePath(
@@ -202,7 +202,7 @@ TEST(TargetTest, clapping_velocity_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
   std::string omt_config = cyber::common::GetAbsolutePath(
@@ -213,8 +213,8 @@ TEST(TargetTest, clapping_velocity_test) {
   ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
   auto read_pos_and_theta_vec =
-      [](const std::string& fname) -> std::vector<std::vector<double> > {
-    std::vector<std::vector<double> > pos_and_theta_vec;
+      [](const std::string& fname) -> std::vector<std::vector<double>> {
+    std::vector<std::vector<double>> pos_and_theta_vec;
     std::ifstream fin(fname);
     if (!fin.is_open()) {
       AERROR << "Cannot open : " << fname;

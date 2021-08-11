@@ -20,13 +20,14 @@
 #include <memory>
 #include <string>
 
+#include "cyber/proto/run_mode_conf.pb.h"
+
 #include "cyber/blocker/intra_reader.h"
 #include "cyber/blocker/intra_writer.h"
 #include "cyber/common/global_data.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/node/reader.h"
 #include "cyber/node/writer.h"
-#include "cyber/proto/run_mode_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

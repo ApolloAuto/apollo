@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
+#include <limits>
+
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/base/object_pool_types.h"
@@ -34,16 +36,16 @@ bool PointCloudPreprocessor::Init(
     const PointCloudPreprocessorInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
-  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
   box_forward_x_ = config.box_forward_x();
@@ -56,7 +58,7 @@ bool PointCloudPreprocessor::Init(
   box_backward_x_ = static_cast<float>(-vehicle_param.left_edge_to_center());
   box_forward_y_ = static_cast<float>(vehicle_param.front_edge_to_center());
   box_backward_y_ = static_cast<float>(-vehicle_param.back_edge_to_center());*/
-  filter_high_z_points_ = static_cast<float>(config.filter_high_z_points());
+  filter_high_z_points_ = config.filter_high_z_points();
   z_threshold_ = config.z_threshold();
   return true;
 }
@@ -107,7 +109,7 @@ bool PointCloudPreprocessor::Preprocess(
       point.z = pt.z();
       point.intensity = static_cast<float>(pt.intensity());
       frame->cloud->push_back(point, static_cast<double>(pt.timestamp()) * 1e-9,
-                              FLT_MAX, i, 0);
+                              std::numeric_limits<float>::max(), i, 0);
     }
     TransformCloud(frame->cloud, frame->lidar2world_pose, frame->world_cloud);
   }
@@ -180,10 +182,13 @@ bool PointCloudPreprocessor::TransformCloud(
     world_point.z = trans_point(2);
     world_point.intensity = pt.intensity;
     world_cloud->push_back(world_point, local_cloud->points_timestamp(i),
-                           FLT_MAX, local_cloud->points_beam_id()[i], 0);
+                           std::numeric_limits<float>::max(),
+                           local_cloud->points_beam_id()[i], 0);
   }
   return true;
 }
+
+PERCEPTION_REGISTER_POINTCLOUDPREPROCESSOR(PointCloudPreprocessor);
 
 }  // namespace lidar
 }  // namespace perception

@@ -20,10 +20,9 @@
 
 #include "modules/planning/traffic_rules/traffic_light.h"
 
+#include <memory>
 #include <string>
 #include <vector>
-
-#include "modules/planning/proto/planning_internal.pb.h"
 
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -32,17 +31,17 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::VehicleState;
-using apollo::common::math::Vec2d;
 using apollo::hdmap::PathOverlap;
 
-TrafficLight::TrafficLight(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
+TrafficLight::TrafficLight(const TrafficRuleConfig& config,
+                           const std::shared_ptr<DependencyInjector>& injector)
+    : TrafficRule(config, injector) {}
 
 Status TrafficLight::ApplyRule(Frame* const frame,
                                ReferenceLineInfo* const reference_line_info) {
@@ -61,7 +60,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
   }
 
   const auto& traffic_light_status =
-      PlanningContext::Instance()->planning_status().traffic_light();
+      injector_->planning_context()->planning_status().traffic_light();
 
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
@@ -73,7 +72,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
           ->mutable_signal_light();
   signal_light_debug->set_adc_front_s(adc_front_edge_s);
   signal_light_debug->set_adc_speed(
-      common::VehicleStateProvider::Instance()->linear_velocity());
+      injector_->vehicle_state()->linear_velocity());
 
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info->reference_line().map_path().signal_overlaps();
@@ -96,23 +95,21 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     }
 
     // work around incorrect s-projection along round routing
-    constexpr double kSDiscrepanceTolerance = 10.0;
+    static constexpr double kSDiscrepanceTolerance = 10.0;
     const auto& reference_line = reference_line_info->reference_line();
     common::SLPoint traffic_light_sl;
     traffic_light_sl.set_s(traffic_light_overlap.start_s);
     traffic_light_sl.set_l(0);
     common::math::Vec2d traffic_light_point;
     reference_line.SLToXY(traffic_light_sl, &traffic_light_point);
-    common::math::Vec2d adc_position = {
-        common::VehicleStateProvider::Instance()->x(),
-        common::VehicleStateProvider::Instance()->y()};
+    common::math::Vec2d adc_position = {injector_->vehicle_state()->x(),
+                                        injector_->vehicle_state()->y()};
     const double distance =
         common::util::DistanceXY(traffic_light_point, adc_position);
     const double s_distance = traffic_light_overlap.start_s - adc_front_edge_s;
     ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s
-           << "] s_distance[" << s_distance
-           << "] actual_distance[" << distance << "]";
+           << "] start_s[" << traffic_light_overlap.start_s << "] s_distance["
+           << s_distance << "] actual_distance[" << distance << "]";
     if (s_distance >= 0 &&
         fabs(s_distance - distance) > kSDiscrepanceTolerance) {
       ADEBUG << "SKIP traffic_light[" << traffic_light_overlap.object_id
@@ -123,11 +120,12 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     auto signal_color =
         frame->GetSignal(traffic_light_overlap.object_id).color();
     const double stop_deceleration = util::GetADCStopDeceleration(
-        adc_front_edge_s, traffic_light_overlap.start_s);
+        injector_->vehicle_state(), adc_front_edge_s,
+        traffic_light_overlap.start_s);
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s
-           << "] color[" << signal_color
-           << "] stop_deceleration[" << stop_deceleration << "]";
+           << "] start_s[" << traffic_light_overlap.start_s << "] color["
+           << signal_color << "] stop_deceleration[" << stop_deceleration
+           << "]";
 
     // debug info
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
@@ -139,23 +137,22 @@ void TrafficLight::MakeDecisions(Frame* const frame,
 
     if (signal_color == perception::TrafficLight::GREEN) {
       continue;
-    } else {
-      // Red/Yellow/Unown: check deceleration
-      if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
-        AWARN << "stop_deceleration too big to achieve.  SKIP red light";
-        continue;
-      }
+    }
+
+    // Red/Yellow/Unknown: check deceleration
+    if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
+      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
+      continue;
     }
 
     // build stop decision
     ADEBUG << "BuildStopDecision: traffic_light["
-           << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s << "]";
+           << traffic_light_overlap.object_id << "] start_s["
+           << traffic_light_overlap.start_s << "]";
     std::string virtual_obstacle_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const std::vector<std::string> wait_for_obstacles;
-    util::BuildStopDecision(virtual_obstacle_id,
-                            traffic_light_overlap.start_s,
+    util::BuildStopDecision(virtual_obstacle_id, traffic_light_overlap.start_s,
                             config_.traffic_light().stop_distance(),
                             StopReasonCode::STOP_REASON_SIGNAL,
                             wait_for_obstacles,

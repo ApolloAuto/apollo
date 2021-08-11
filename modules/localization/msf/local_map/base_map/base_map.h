@@ -20,7 +20,7 @@
 #include <set>
 #include <string>
 
-#include "modules/localization/msf/local_map/base_map/base_map_cache.h"
+#include "modules/localization/msf/common/util/base_map_cache.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
@@ -106,10 +106,12 @@ class BaseMap {
   /**@brief All the map nodes in the Map (in the disk). */
   std::list<MapNodeIndex> map_nodes_disk_;
 
+  MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl1_;
+  MapNodeCache<MapNodeIndex, BaseMapNode>::DestroyFunc destroy_func_lvl2_;
   /**@brief The cache for map node preload. */
-  MapNodeCacheL1<MapNodeIndex, BaseMapNode>* map_node_cache_lvl1_;
+  MapNodeCache<MapNodeIndex, BaseMapNode>* map_node_cache_lvl1_;
   /**brief The dynamic map node preloading thread pool pointer. */
-  MapNodeCacheL2<MapNodeIndex, BaseMapNode>* map_node_cache_lvl2_;
+  MapNodeCache<MapNodeIndex, BaseMapNode>* map_node_cache_lvl2_;
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_;
   /**@bried Keep the index of preloading nodes. */

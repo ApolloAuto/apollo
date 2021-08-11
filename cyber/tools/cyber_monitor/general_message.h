@@ -19,16 +19,16 @@
 
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "general_message_base.h"
+#include "cyber/tools/cyber_monitor/general_message_base.h"
 
 class Screen;
 
 class GeneralMessage : public GeneralMessageBase {
  public:
-  explicit GeneralMessage(GeneralMessageBase* parent,
-                          const google::protobuf::Message* msg,
-                          const google::protobuf::Reflection* reflection,
-                          const google::protobuf::FieldDescriptor* field);
+  GeneralMessage(GeneralMessageBase* parent,
+                 const google::protobuf::Message* msg,
+                 const google::protobuf::Reflection* reflection,
+                 const google::protobuf::FieldDescriptor* field);
 
   ~GeneralMessage() {
     field_ = nullptr;
@@ -36,13 +36,13 @@ class GeneralMessage : public GeneralMessageBase {
     reflection_ptr_ = nullptr;
   }
 
-  void Render(const Screen* s, int key) override;
+  int Render(const Screen* s, int key) override;
 
  private:
   GeneralMessage(const GeneralMessage&) = delete;
   GeneralMessage& operator=(const GeneralMessage&) = delete;
 
-  int itemIndex_;
+  int item_index_;
   bool is_folded_;
   const google::protobuf::FieldDescriptor* field_;
   const google::protobuf::Message* message_ptr_;

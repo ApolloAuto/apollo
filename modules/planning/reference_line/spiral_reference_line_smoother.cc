@@ -23,18 +23,15 @@
 #include <algorithm>
 #include <utility>
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
-#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_spiral_path.h"
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::time::Clock;
 
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
@@ -43,7 +40,6 @@ SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  const double start_timestamp = Clock::NowInSeconds();
   std::vector<double> opt_x;
   std::vector<double> opt_y;
   std::vector<double> opt_theta;
@@ -157,7 +153,7 @@ bool SpiralReferenceLineSmoother::Smooth(
     const double dkappa = p.dkappa();
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
+    if (!raw_reference_line.XYToSL(p, &ref_sl_point)) {
       return false;
     }
     if (ref_sl_point.s() < 0 ||
@@ -178,9 +174,6 @@ bool SpiralReferenceLineSmoother::Smooth(
     return false;
   }
   *smoothed_reference_line = ReferenceLine(ref_points);
-  const double end_timestamp = Clock::NowInSeconds();
-  ADEBUG << "Spiral reference line smoother time: "
-         << (end_timestamp - start_timestamp) * 1000 << " ms.";
   return true;
 }
 
@@ -189,7 +182,7 @@ int SpiralReferenceLineSmoother::SmoothStandAlone(
     std::vector<double>* ptr_kappa, std::vector<double>* ptr_dkappa,
     std::vector<double>* ptr_s, std::vector<double>* ptr_x,
     std::vector<double>* ptr_y) const {
-  CHECK_GT(point2d.size(), 1);
+  CHECK_GT(point2d.size(), 1U);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
@@ -247,7 +240,7 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
                                          std::vector<double>* ptr_s,
                                          std::vector<double>* ptr_x,
                                          std::vector<double>* ptr_y) const {
-  CHECK_GT(point2d.size(), 1);
+  CHECK_GT(point2d.size(), 1U);
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
@@ -380,7 +373,7 @@ void SpiralReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
   anchor_points_ = std::move(anchor_points);
 
-  CHECK_GT(anchor_points_.size(), 1);
+  CHECK_GT(anchor_points_.size(), 1U);
   zero_x_ = anchor_points_.front().path_point.x();
   zero_y_ = anchor_points_.front().path_point.y();
 

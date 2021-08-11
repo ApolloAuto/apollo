@@ -46,7 +46,7 @@ void FrameStatistics::set_roi_is_main_lanes(bool value) {
 }
 
 double FrameStatistics::jaccard_index_percentile() const {
-  if (_jaccard_indices.size() == 0) {
+  if (_jaccard_indices.empty()) {
     return 0.0;
   }
   std::size_t id = static_cast<std::size_t>(
@@ -105,7 +105,7 @@ bool FrameStatistics::find_association() {
   int match_id = 0;
   for (unsigned int i = 0; i < gt_objects.size(); ++i) {
     // 1. no match found with objects
-    if (intersections[i].size() == 0) {
+    if (intersections[i].empty()) {
       _isolated_gt_object_indices_2017.push_back(i);
       continue;
     }
@@ -202,7 +202,7 @@ bool FrameStatistics::find_association() {
   std::sort(_jaccard_indices.begin(), _jaccard_indices.end());
   // 7. record under-segmented gt object indices
   for (auto& i : _isolated_gt_object_indices_2017) {
-    if (grt_match_ids[i].size() == 0) {
+    if (grt_match_ids[i].empty()) {
       continue;
     }
     ObjectMatch& match = _matches[grt_match_ids[i][0]];
