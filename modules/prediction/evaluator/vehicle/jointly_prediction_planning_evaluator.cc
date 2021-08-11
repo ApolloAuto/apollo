@@ -242,8 +242,12 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
 
   // Process input tensor
   auto start_time_data_prep = std::chrono::system_clock::now();
-  torch::Tensor map_data = torch::zeros({map_polyline_num, 50, 9});
-  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
+  int map_polyline_num_valid =
+      ((obs_num + map_polyline_num) < 450) ? map_polyline_num : (450 - obs_num);
+  map_polyline_num_valid =
+      map_polyline_num_valid > 0 ? map_polyline_num_valid : 0;
+  torch::Tensor map_data = torch::zeros({map_polyline_num_valid, 50, 9});
+  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num_valid, 2});
 
   if (!VectornetProcessMapData(&map_feature,
                                &map_p_id,
