@@ -24,7 +24,7 @@ message ParkingRoutingTask {
 
 message ParkGoRoutingTask {
   optional int32 park_time = 1; // sec
-  repeated apollo.routing.RoutingRequest routing_requests = 2;
+  optional apollo.routing.RoutingRequest routing_request = 2;
 }
 
 message Task {

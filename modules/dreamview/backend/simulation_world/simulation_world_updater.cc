@@ -45,7 +45,6 @@ using apollo::task_manager::ParkingRoutingTask;
 using apollo::task_manager::Task;
 
 using Json = nlohmann::json;
-using google::protobuf::RepeatedPtrField;
 using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
@@ -209,8 +208,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
                     "time";
           return;
         }
-        bool succeed = ConstructRoutingRequests(
-            json, park_go_routing_task->mutable_routing_requests());
+        bool succeed = ConstructRoutingRequest(
+            json, park_go_routing_task->mutable_routing_request());
         if (succeed) {
           park_go_routing_task->set_park_time(
               static_cast<int>(json["parkTime"]));
@@ -646,36 +645,6 @@ Json SimulationWorldUpdater::GetConstructRoutingRequestJson(
       result["start"] = start;
       result["end"] = end;
       return result;
-}
-
-bool SimulationWorldUpdater::ConstructRoutingRequests(
-    const Json &json,
-    RepeatedPtrField<apollo::routing::RoutingRequest>
-        *routing_requests) {
-  auto iter = json.find("waypoint");
-  // Park point is required
-  if (!ContainsKey(json, "start") || !ContainsKey(json, "end") ||
-      iter == json.end() || !iter->is_array()) {
-    AERROR << "Failed to prepare a park go routing request.";
-    return false;
-  }
-  bool constructSuccess = ConstructRoutingRequest(
-      GetConstructRoutingRequestJson(json["start"], (*iter)[0]),
-      routing_requests->Add());
-  size_t i = 1;
-  for (; i < iter->size() && constructSuccess; ++i) {
-    constructSuccess = ConstructRoutingRequest(
-        GetConstructRoutingRequestJson((*iter)[i - 1], (*iter)[i]),
-        routing_requests->Add());
-  }
-  if (!constructSuccess) {
-    AERROR << "Failed to construct routing requests for park go routing task.";
-    return false;
-  }
-  constructSuccess = ConstructRoutingRequest(
-      GetConstructRoutingRequestJson((*iter)[i - 1], json["end"]),
-      routing_requests->Add());
-  return constructSuccess;
 }
 
 bool SimulationWorldUpdater::ConstructParkingRoutingTask(

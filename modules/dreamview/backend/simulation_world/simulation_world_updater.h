@@ -106,17 +106,6 @@ class SimulationWorldUpdater {
       const nlohmann::json &start, const nlohmann::json &end);
 
   /**
-   * @brief The function to construct routing requests from the given json,
-   * @param json that contains start, end, and waypoints, end
-   * @param routing_requests(repeated routing request)
-   * @return True if routing requests is constructed successfully
-   */
-  bool ConstructRoutingRequests(
-      const nlohmann::json &json,
-      google::protobuf::RepeatedPtrField<apollo::routing::RoutingRequest>
-          *routing_requests);
-
-  /**
    * @brief The function to construct a parking routing task from the given
    * json,
    * @param json that contains start, end, waypoint, parking info, lane width,
