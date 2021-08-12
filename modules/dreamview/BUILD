@@ -40,13 +40,10 @@ install(
         ":dreamview_conf",
         ":frontend",
     ],
-    runtime_dest = "modules/dreamview",
     targets = ["dreamview"],
     deps = [
         ":pb_dreamview",
         "//cyber:install",
-        "//modules/calibration:install",
-        "//modules/common/data:install",
     ],
 )
 

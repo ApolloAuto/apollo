@@ -1140,7 +1140,7 @@ export default class Map {
     // Ideally, there are some points outside of junction.
     deadJunctionInfo.in = deadJunctionInfo.in[0];
     deadJunctionInfo.out = deadJunctionInfo.out[0];
-    const laneDistanceThreshold = 20;
+    const laneDistanceThreshold = 100;
     deadJunctionInfo.inEndPoint = getLaneLastPoint(deadJunctionInfo.in);
     deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.inEndPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');

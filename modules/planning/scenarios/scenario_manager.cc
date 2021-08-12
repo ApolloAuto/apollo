@@ -363,7 +363,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
   return default_scenario_type_;
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectIntersectionScenario(
+ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
     const Frame& frame) {
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
@@ -945,7 +945,7 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
   ////////////////////////////////////////
   // intersection scenarios
   if (scenario_type == default_scenario_type_) {
-    scenario_type = SelectIntersectionScenario(frame);
+    scenario_type = SelectInterceptionScenario(frame);
   }
 
   ////////////////////////////////////////

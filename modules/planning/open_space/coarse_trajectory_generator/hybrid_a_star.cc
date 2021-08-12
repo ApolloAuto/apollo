@@ -20,8 +20,6 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
-#include <limits>
-
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
@@ -405,11 +403,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                                               path_length * max_reverse_acc) /
                                              (max_reverse_acc * max_reverse_v),
                                   10.0);
-  if (total_t + delta_t >= delta_t * std::numeric_limits<size_t>::max()) {
-    AERROR << "Number of knots overflow. total_t: " << total_t
-           << ", delta_t: " << delta_t;
-    return false;
-  }
+
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
