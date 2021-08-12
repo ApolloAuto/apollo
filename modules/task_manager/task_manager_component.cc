@@ -158,7 +158,9 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
         double s,l,heading;
         while (stage<wp_size) {
           if (park_go_manager_->near(localization_,stage)&&chassis_.speed_mps()<0.2) {
+                AINFO<<"into stage"<<stage<<" start to sleep";
                 cyber::SleepFor(std::chrono::milliseconds(park_time));
+                AINFO<<"start to next stage";
                 stage++;
                 if (stage==wp_size)
                       break;
@@ -168,10 +170,11 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
                 basemap->GetNearestLaneWithHeading(point,5,heading,2,&lane,&s,&l);
                 routing_request_=park_go_manager_->generate(localization_,stage,lane->id().id(),s);
                 common::util::FillHeader(node_->Name(), &routing_request_  );
+                AINFO<<"PUBLISH"<<routing_request_.DebugString();
                 request_writer_->Write(routing_request_);
           }
         }
-  
+        AINFO<<"FINISH PARKGO";
        
         
   }
