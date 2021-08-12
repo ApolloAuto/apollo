@@ -38,12 +38,10 @@ bool ParkGoManager::near(LocalizationEstimate& localization,int index) {
     }
     return false;
 }
-common::Status ParkGoManager::Init(const ParkGOTask& park_go_task) {
+common::Status ParkGoManager::Init(ParkGoRoutingTask* park_go_task) {
   // get the message form routing
     wp_list_.clear();
-    ParkGOTask tmp_park_go_task;
-    tmp_park_go_task.CopyFrom(park_go_task);
-    for (auto wp : tmp_park_go_task.mutable_routing_request()->waypoint()) {
+    for (auto wp : park_go_task->mutable_routing_request()->waypoint()) {
           wp_list_.push_back(wp);
     } 
       return common::Status::OK();

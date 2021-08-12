@@ -77,7 +77,7 @@ bool TaskManagerComponent::Init() {
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   task_name_ = task->task_name();
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING && task->task_type()!=PARK_GO) {
+      task->task_type() != PARKING_ROUTING && task->task_type()!=PARK_GO_ROUTING) {
     AERROR << "Task type is not cycle_routing or parking_routing or park go.";
     return false;
   }
@@ -143,22 +143,22 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       AERROR << "plot verification failed, please select suitable plot!";
       return false;
     }
-  } else if (task->task_type() == PARK_GO) {
+  } else if (task->task_type() == PARK_GO_ROUTING) {
         AINFO<<"Enter park&go task";
         if (park_go_manager_==nullptr) {
                 park_go_manager_ = std::make_shared<ParkGoManager>();
-                park_go_manager_->Init(task->park_go_task());
+                park_go_manager_->Init(task->mutable_park_go_routing_task());
         }
-        int wp_size=task->mutable_park_go_task()->mutable_routing_request()->waypoint_size();
+        int wp_size=task->mutable_park_go_routing_task()->mutable_routing_request()->waypoint_size();
         int stage=0;
-        int stay_time=task->mutable_park_go_task()->stay_time()*1000;
+        int park_time=task->mutable_park_go_routing_task()->park_time()*1000;
         auto basemap=HDMapUtil::BaseMapPtr();
         apollo::hdmap::LaneInfoConstPtr lane;
         apollo::common::PointENU point;
         double s,l,heading;
         while (stage<wp_size) {
           if (park_go_manager_->near(localization_,stage)&&chassis_.speed_mps()<0.2) {
-                cyber::SleepFor(std::chrono::milliseconds(stay_time));
+                cyber::SleepFor(std::chrono::milliseconds(park_time));
                 stage++;
                 if (stage==wp_size)
                       break;

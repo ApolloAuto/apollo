@@ -38,7 +38,7 @@ class ParkGoManager {
    * @brief module initialization function
    * @return initialization status
    */
-common::Status Init(const ParkGOTask& park_go_task);
+common::Status Init(ParkGoRoutingTask* park_go_task);
 RoutingRequest generate(LocalizationEstimate& localization,int index ,std::string lane_id,double s);
   
 bool near(LocalizationEstimate& localization,int index);
