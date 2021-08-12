@@ -20,6 +20,19 @@ py_binary(
 )
 
 py_binary(
+    name = "pipeline_local",
+    srcs = ["pipeline_local.py"],
+    deps = [
+        "//modules/map/proto:map_overlap_py_pb2",
+        "//modules/map/proto:map_py_pb2",
+        "//modules/map/proto:map_signal_py_pb2",
+        "//modules/map/proto:map_yield_sign_py_pb2",
+        "//modules/map/proto:map_stop_sign_py_pb2",
+        "//modules/map/proto:map_crosswalk_py_pb2",
+    ],
+)
+
+py_binary(
     name = "extract_path",
     srcs = ["extract_path.py"],
     deps = [

@@ -81,17 +81,9 @@ def callback(planning_pb):
     for traj_point in planning_pb.trajectory_point:
         CURRENT_TRAJ_DATA.append(traj_point.v)
         CURRENT_TRAJ_T_DATA.append(current_t - begin_t + traj_point.relative_time)
-
     lock.release()
 
     last_t = current_t
-
-
-def listener():
-    cyber.init()
-    test_node = cyber.Node("planning_listener")
-    test_node.create_reader("/apollo/planning",
-                            planning_pb2.ADCTrajectory, callback)
 
 
 def compensate(data_list):
@@ -112,6 +104,9 @@ def update(frame_number):
 
     init_data_line.set_xdata(INIT_T_DATA)
     init_data_line.set_ydata(INIT_V_DATA)
+    if len(CURRENT_TRAJ_T_DATA)>0:
+        ax.set_xlim(0,max(CURRENT_TRAJ_T_DATA))
+        ax.set_ylim(-2.5,2.5)
     lock.release()
     #brake_text.set_text('brake = %.1f' % brake_data[-1])
     #throttle_text.set_text('throttle = %.1f' % throttle_data[-1])
@@ -121,7 +116,10 @@ def update(frame_number):
 
 if __name__ == '__main__':
     argv = FLAGS(sys.argv)
-    listener()
+    cyber.init()
+    test_node = cyber.Node("planning_listener")
+    test_node.create_reader("/apollo/planning",
+                            planning_pb2.ADCTrajectory, callback)
     fig, ax = plt.subplots()
     X = range(FLAGS.data_length)
     Xs = [i * -1 for i in X]
@@ -132,12 +130,12 @@ if __name__ == '__main__':
         CURRENT_TRAJ_T_DATA, CURRENT_TRAJ_DATA, 'r', lw=1, alpha=0.5, label='current_traj')
     last_traj, = ax.plot(
         LAST_TRAJ_T_DATA, LAST_TRAJ_DATA, 'g', lw=1, alpha=0.5, label='last_traj')
-
     #brake_text = ax.text(0.75, 0.85, '', transform=ax.transAxes)
     #throttle_text = ax.text(0.75, 0.90, '', transform=ax.transAxes)
     init_data_text = ax.text(0.75, 0.95, '', transform=ax.transAxes)
     ani = animation.FuncAnimation(fig, update, interval=100)
-    ax.set_ylim(-1, 30)
+    ax.set_ylim(-1, 5)
     ax.set_xlim(-1, 60)
     ax.legend(loc="upper left")
     plt.show()
+    cyber.shutdown()

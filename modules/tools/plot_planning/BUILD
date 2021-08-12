@@ -104,6 +104,7 @@ py_binary(
         "//cyber/python/cyber_py3:cyber",
         "//modules/canbus/proto:chassis_py_pb2",
         "//modules/control/proto:control_cmd_py_pb2",
+        "//modules/planning/proto:planning_py_pb2"
     ],
 )
 

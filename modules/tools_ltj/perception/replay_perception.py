@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -20,19 +20,17 @@
 This module creates a node and fake perception data based
 on json configurations
 """
-
 import argparse
 import math
 import time
 
 import simplejson
-
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
-from modules.common.proto.geometry_pb2 import Point3D
+
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-
+from modules.common.proto.geometry_pb2 import Point3D
 
 _s_seq_num = 0
 _s_delta_t = 0.1
@@ -103,7 +101,7 @@ def load_descrptions(files):
                             print('same trace point found in obstacle: %s' % obstacle["id"])
                             return None
                     objects.append(obstacle)
-            else:  # Default case. handles only one obstacle
+            else: # Default case. handles only one obstacle
                 obstacle = obstacles
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):
@@ -132,12 +130,16 @@ def init_perception(description):
     """
     perception = PerceptionObstacle()
     perception.id = description["id"]
-    perception.position.x = description["position"][0]
-    perception.position.y = description["position"][1]
-    perception.position.z = description["position"][2]
-    perception.theta = description["theta"]
+    tmp = description["trace"]
+    perception.position.x = tmp[0][0]
+    perception.position.y = tmp[0][1]
+    perception.position.z = tmp[0][2]
+    perception.theta = math.atan2(tmp[1][1]-tmp[0][1],tmp[1][0]-tmp[0][0])
+   # print("id ",perception.id, "theta ",perception.theta,tmp[1][1]-tmp[0][1],tmp[1][0]-tmp[0][0])
+   # print(tmp)
+    #perception.theta = description["theta"]
     perception.velocity.CopyFrom(get_velocity(
-        description["theta"], description["speed"]))
+        perception.theta, description["speed"]))
     perception.length = description["length"]
     perception.width = description["width"]
     perception.height = description["height"]
@@ -214,7 +216,8 @@ def linear_project_perception(description, prev_perception):
     trace = description["trace"]
     prev_point = (prev_perception.position.x, prev_perception.position.y,
                   prev_perception.position.z)
-    delta_s = description["speed"] * _s_delta_t
+    #delta_s = description["speed"] * _s_delta_t
+    delta_s = description["speed"] * 0
     for i in range(1, len(trace)):
         if on_segment(trace[i - 1], trace[i], prev_point):
             dist = distance(trace[i - 1], trace[i])
@@ -291,7 +294,7 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--channel", action="store", type=str,
                         default="/apollo/perception/obstacles",
                         help="set the perception channel")
-    parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
+    parser.add_argument("-p", "--period", action="store", type=float, default=10,
                         help="set the perception channel publish time duration")
     args = parser.parse_args()
 
