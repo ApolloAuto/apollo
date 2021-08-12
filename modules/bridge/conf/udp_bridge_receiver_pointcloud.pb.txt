@@ -1,0 +1,4 @@
+topic_name: "/apollo/sensor/lidar/PointCloud"
+bind_port: 8904
+proto_name: "PointCloud"
+enable_timeout: false

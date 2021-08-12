@@ -1,0 +1,12 @@
+module_config {
+    module_library: "/apollo/bazel-bin/modules/bridge/libudp_bridge_receiver_component.so"
+
+    components {
+
+        class_name: "UDPBridgeReceiverComponent<drivers::PointCloud>"
+        config {
+            name: "bridge_receiver_PointCloud"
+            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_receiver_pointcloud.pb.txt"
+      }
+    }
+}
