@@ -325,14 +325,14 @@ class Renderer {
     }
   }
 
-  addDefaultEndPoint(points, offset = true) {
+  addDefaultEndPoint(points) {
     for (let i = 0; i < points.length; i++) {
-      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, offset);
+      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, true);
     }
   }
 
   addDefaultRouting(routingName) {
-    return this.routingEditor.addDefaultRouting(routingName);
+    return this.routingEditor.addDefaultRouting(routingName, this.coordinates);
   }
 
   removeInvalidRoutingPoint(pointId, error) {
@@ -498,7 +498,7 @@ class Renderer {
     const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
     if (newData.parkingSpace && !_.isEmpty(extraInfo[0])) {
       this.routingEditor.setParkingSpaceInfo(
-        newData.parkingSpace, extraInfo, this.coordinates, this.scene
+        newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
       );
     }
     if (!_.isEmpty(extraInfo[1])) {

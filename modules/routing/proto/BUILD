@@ -100,26 +100,3 @@ py_proto_library(
         "//modules/map/proto:map_geometry_py_pb2",
     ],
 )
-
-cc_proto_library(
-    name = "default_routing_cc_proto",
-    deps = [
-        ":default_routing_proto",
-    ],
-)
-
-proto_library(
-    name = "default_routing_proto",
-    srcs = ["default_routing.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "default_routing_py_pb2",
-    deps = [
-        ":default_routing_proto",
-        "//modules/common/proto:geometry_py_pb2",
-    ],
-)
