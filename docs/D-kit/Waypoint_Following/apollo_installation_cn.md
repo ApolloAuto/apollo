@@ -11,7 +11,7 @@
         - [连接电源](#连接电源)
     - [工控机软件系统安装](#工控机软件系统安装)
       - [配置Linux系统](#配置Linux系统)
-        - [安装并降级GCC和G++](#安装并降级GCC和G++)
+        - [安装GCC和G++](#安装GCC和G++)
       - [升级Apollo源代码](#升级Apollo源代码)
       - [设置Apollo编译环境](#设置Apollo编译环境)
       - [编译Apollo源代码](#编译Apollo源代码)
@@ -166,13 +166,12 @@
 
 ![warning_icon](images/warning_icon.png)**WARNING**：在整个Apollo系统的操作过程中，全程禁用root账户，皆用普通账户进行操作，切记！
 
-##### 安装并降级GCC和G++
+##### 安装GCC和G++
 
-请执行以下命令安装4.8版本的gcc和g++，命令如下：
+请执行以下命令安装gcc和g++，命令如下：
 ```
 sudo apt update
-sudo apt-get install g++-4.8 g++-4.8-multilib gcc-4.8 gcc-4.8-multilib
-sudo /usr/bin/update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 99 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8
+sudo apt install gcc g++ -y
 ```
 
 安装完成后，请先用以下命令检查gcc和g++的版本：
@@ -181,7 +180,7 @@ gcc --version
 g++ --version
 ```
 
-若输出的gcc和g++是4.8版本的，则确认安装成功；否则请重新安装直到成功为止。
+若输出的gcc和g++是7.5.0版本的，则确认安装成功；否则请重新安装直到成功为止。
 
 ![warning_icon](images/warning_icon.png)**WARNING**：在以下模块的操作中，如非本文档或操作系统要求，禁用一切`sudo`操作，切记！
 
@@ -192,7 +191,7 @@ g++ --version
 ```
 cd ~/apollo
 git checkout .
-git pull origin r5.5.0
+git pull origin v6.0_edu
 ```
 
 #### 设置Apollo编译环境
@@ -218,7 +217,7 @@ sudo chmod 777 /var/run/docker.sock
 c.请输入以下命令加载docker的image镜像：
 
 ```
-cd ~/images_r5.5.0
+cd ~/images_v6.0_edu
 sudo bash LoadImages.sh
 ```
 
@@ -228,18 +227,18 @@ a.启动并进入docker容器，在终端输入以下命令：
 
 ```
 cd ~/apollo
-bash docker/scripts/dev_start.sh
+bash docker/scripts/dev_start.sh -g cn
 ```
 
-第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；如果你确信计算机本地有你需要的image镜像文件或者你不希望更新image镜像时，可以使用`bash docker/scripts/dev_start.sh -n`这个命令代替上面的命令，这样apollo就不会去github的官方网站比较本地image镜像和官方网站image镜像的区别了，这样可以省去二者比较的时间和避免因网络问题而导致的二者比较失败的现象，可以加快启动docker容器的速度。这个过程完成后，请输入以下命令以进入docker环境中：
+第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；如果你确信计算机本地有你需要的image镜像文件或者你不希望更新image镜像时，可以使用`bash docker/scripts/dev_start.sh -l`这个命令代替上面的命令，这样apollo就不会去github的官方网站比较本地image镜像和官方网站image镜像的区别了，这样可以省去二者比较的时间和避免因网络问题而导致的二者比较失败的现象，可以加快启动docker容器的速度。这个过程完成后，请输入以下命令以进入docker环境中：
 ```
 bash docker/scripts/dev_into.sh
 ```
 
-b.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时25分钟：
+b.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时30分钟：
 
 ```
-bash apollo.sh build_opt
+bash apollo.sh build_opt_gpu
 ```
 
 #### 运行DreamView
@@ -362,6 +361,6 @@ git remote add origin https://gitee.com/ApolloAuto/apollo.git
 git clean -fd
 git pull origin master
 git pull
-git checkout -b r5.5.0 origin/r5.5.0
+git checkout -b r5.5.0 origin/v6.0_edu
 git branch -D master
 ```
