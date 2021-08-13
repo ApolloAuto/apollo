@@ -29,7 +29,6 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/routing/proto/default_routing.pb.h"
 #include "modules/routing/proto/poi.pb.h"
 #include "modules/task_manager/proto/task_manager.pb.h"
 
@@ -147,6 +146,14 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
+    /**
+   * @brief get point from lanewaypoint in poi or default routings
+   * @param lanewaypoint
+   * @return json that contains point's coordinate x and y
+   */
+  nlohmann::json GetPointJsonFromLaneWaypoint(
+      const apollo::routing::LaneWaypoint &waypoint);
+
   /**
    * @brief Tries to load the user-defined default routings from the txt file
    * @return False if failed to load from file,file doesn't exist
@@ -176,8 +183,8 @@ class SimulationWorldUpdater {
   apollo::routing::POI poi_;
 
   // default routings
-  apollo::routing::DefaultRoutings default_routings_;
-  apollo::routing::DefaultRouting *default_routing_;
+  apollo::routing::POI default_routings_;
+  apollo::routing::Landmark *default_routing_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.

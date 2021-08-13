@@ -102,7 +102,8 @@ export default class RouteEditingManager {
         return;
       }
       const drouting = message.data;
-      this.defaultRoutings[drouting.name] = drouting.point;
+      const waypoints = drouting.waypoint.map(point => point.pose);
+      this.defaultRoutings[drouting.name] = waypoints;
     }
 
     addDefaultRouting(routingName) {
