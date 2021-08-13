@@ -327,7 +327,7 @@ class Renderer {
 
   addDefaultEndPoint(points) {
     for (let i = 0; i < points.length; i++) {
-      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, true);
+      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
     }
   }
 
