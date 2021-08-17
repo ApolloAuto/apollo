@@ -349,7 +349,7 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
     double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
-    Vec2d rotated_offset = offset.rotate(heading);
+    Vec2d rotated_offset = offset.rotate(heading - (M_PI / 2));
     double point_x = pos_x + rotated_offset.x();
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
@@ -402,9 +402,10 @@ bool VectornetEvaluator::ExtractObstaclesHistory(
       break;
     }
     target_pos_history->at(i) =
-        WorldCoordToObjCoord(std::make_pair(target_feature.position().x(),
-                                            target_feature.position().y()),
-                             obs_curr_pos, obs_curr_heading);
+        WorldCoordToObjCoordNorth(
+            std::make_pair(target_feature.position().x(),
+                           target_feature.position().y()),
+                           obs_curr_pos, obs_curr_heading);
   }
   all_obs_length->emplace_back(
       std::make_pair(obs_curr_feature.length(), obs_curr_feature.width()));
@@ -443,7 +444,7 @@ bool VectornetEvaluator::ExtractObstaclesHistory(
       if (!feature.IsInitialized()) {
         break;
       }
-      pos_history[i] = WorldCoordToObjCoord(
+      pos_history[i] = WorldCoordToObjCoordNorth(
           std::make_pair(feature.position().x(), feature.position().y()),
           obs_curr_pos, obs_curr_heading);
     }
