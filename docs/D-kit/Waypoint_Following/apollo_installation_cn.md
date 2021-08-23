@@ -191,7 +191,7 @@ g++ --version
 ```
 cd ~/apollo
 git checkout .
-git pull origin r5.5.0
+git pull origin v6.0_edu
 ```
 
 #### 设置Apollo编译环境
@@ -217,7 +217,7 @@ sudo chmod 777 /var/run/docker.sock
 c.请输入以下命令加载docker的image镜像：
 
 ```
-cd ~/images_r5.5.0
+cd ~/images_v6.0_edu
 sudo bash LoadImages.sh
 ```
 
