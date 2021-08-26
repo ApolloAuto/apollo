@@ -554,6 +554,7 @@ int HDMapImpl::GetNearestLaneWithHeading(
   size_t s_index = 0;
   Vec2d map_point;
   double min_distance = distance;
+  nearest_lane->reset();
   for (const auto& lane : lanes) {
     double s_offset = 0.0;
     int s_offset_index = 0;
