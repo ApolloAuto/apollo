@@ -6,5 +6,6 @@ message velometer  {
 
   optional int32 overspeed_count = 2;
   
-  optional bool is_overspeed = 3;
+  optional int32 is_overspeed = 3;
+  
 };

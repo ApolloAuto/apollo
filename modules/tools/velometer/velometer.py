@@ -43,7 +43,7 @@ class VelometerRecord(object):
     rtk recording class
     """
     class track_line(object):
-        def __init__(self, name,x1, y1,x2,y2,breadth,limiting_Speed):
+        def __init__(self, name,x1, y1,x2,y2,breadth,low_Speed,high_Speed):
             self.name=name
             self.x1 = x1
             self.y1 = y1
@@ -55,14 +55,15 @@ class VelometerRecord(object):
 
             self.theta=math.atan2(self.y2-self.y1,self.x2-self.x1)
             self.L=math.sqrt((self.x1-self.x2)*(self.x1-self.x2)+(self.y1-self.y2)*(self.y1-self.y2))
-            self.limiting_Speed=limiting_Speed
+            self.low_Speed=low_Speed
+            self.high_Speed=high_Speed
             self.overspeed_count=0
-            self.is_overspeed=False
+            self.is_overspeed=0
             self.behavior=''
             self.pre_behavior=''
     
     class track_curve(object):
-        def __init__(self,name,x, y,r,theta1,theta2,breadth,limiting_Speed):
+        def __init__(self,name,x, y,r,theta1,theta2,breadth,low_Speed,high_Speed):
             self.name=name
             self.x = x
             self.y = y
@@ -70,10 +71,11 @@ class VelometerRecord(object):
             self.theta1 = theta1
             self.theta2 = theta2
             self.breadth = breadth
-            self.limiting_Speed=limiting_Speed
+            self.low_Speed=low_Speed
+            self.high_Speed=high_Speed
             
             self.overspeed_count=0
-            self.is_overspeed=False
+            self.is_overspeed=0
             self.behavior=''
             self.pre_behavior=''
 
@@ -121,11 +123,17 @@ class VelometerRecord(object):
         self.curve_count=0        
         self.behavior=''
         self.pre_behavior=''
-        self.is_overspeed=False
-        self.line=[self.track_line('line1',437887.305696044+0.252,4433040.36715134-0.426,37.8263+437847,5.5697+4433039,3,1),
-                            self.track_line('line2',437879.722246044,4433046.98429134,437875.67904539,4433046.58808531,3,1)]
-        self.curve=[self.track_curve('curve1',437887.305696044-7.6575,4433040.36715134-0.0972,6.7722,0.61,1.66,3,1),
-                                self.track_curve('curve2',0,0,0,0,0,0,0)]
+        self.is_overspeed=0
+        # self.line=[self.track_line('line1',437887.305696044+0.252,4433040.36715134-0.426,37.8263+437847,5.5697+4433039,3,0.1,1),
+        #                     self.track_line('line2',437879.722246044,4433046.98429134,437875.67904539,4433046.58808531,3,0.1,1)]
+        # self.curve=[self.track_curve('curve1',437887.305696044-7.6575,4433040.36715134-0.0972,6.7722,0.61,1.66,3,0.1,1),
+        #                         self.track_curve('curve2',0,0,0,0,0,0,0,0)]
+        self.line=[self.track_line('line1',437867.2011,                       4433038.3235,                     12.8907+437867.2011,      4433038.3235+1.9213,       2,0.5,1),
+                            self.track_line('line2',437867.2011+12.5406,    4433038.3235+7.6568,    437867.2011+6.2765,          4433038.3235+5.9148,       2,0.5,1),
+                            self.track_line('line3',437867.2011+5.4715,       4433038.3235+11.6867, 437867.2011+11.8029,        4433038.3235+10.3152,    2,0.5,1)]
+
+        self.curve=[self.track_curve('curve1',437867.2011+12.5264,  4433038.3235+4.7885,  2.8338, -1.5708,     1.7453,      2,0.5,1),
+                                self.track_curve('curve2',437867.2011+5.46792,  4433038.3235+8.7052,  2.8991,  1.3963,     5.0615,      2,0.5,1)]
 
     def is_in_track_curve(self,carx,cary):
         if self.behavior=='out':
@@ -138,15 +146,19 @@ class VelometerRecord(object):
                 theta=math.atan2(delty,deltx)
                 if R<curve.r+curve.breadth/2.0 and R>curve.r-curve.breadth/2.0 and theta>curve.theta1 and theta<curve.theta2:
                     self.behavior=curve.name
-                    if carspeed<=curve.limiting_Speed:
-                        curve.is_overspeed=False
-                    else:
-                        if curve.is_overspeed==False :
-                            curve.is_overspeed=True
+                    if carspeed>curve.high_Speed:
+                        if curve.is_overspeed!=1 :
+                            curve.is_overspeed=1
                             curve.overspeed_count =1
+                    elif carspeed<curve.low_Speed:
+                        if curve.is_overspeed!=2 :
+                            curve.is_overspeed=2
+                            curve.overspeed_count =1
+                    else:
+                        curve.is_overspeed=0
                     self.is_overspeed=curve.is_overspeed
                 else:
-                    curve.is_overspeed=False
+                    curve.is_overspeed=0
                 self.curve_count+=curve.overspeed_count
 
     def is_in_track_line(self,carx,cary):
@@ -164,11 +176,15 @@ class VelometerRecord(object):
 
             if abs(deltx_)<line.L/2.0 and abs(delty_)<line.breadth/2.0:
                 self.behavior=line.name
-                if carspeed<=line.limiting_Speed:
-                    line.is_overspeed=False
-                else:
-                    line.is_overspeed=True
+                if carspeed>line.high_Speed:
+                    line.is_overspeed=1
                     line.overspeed_count =1
+                elif carspeed<line.low_Speed:
+                    line.is_overspeed=2
+                    line.overspeed_count =1
+                else:
+                    line.is_overspeed=0
+
                 self.is_overspeed=line.is_overspeed
             self.line_count+=line.overspeed_count
               
