@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.common;
+message velometer  {
+  optional string behavior = 1;
+
+  optional int32 overspeed_count = 2;
+  
+  optional bool is_overspeed = 3;
+};

@@ -5,7 +5,7 @@ pixel_format: "yuyv"
 io_method: IO_METHOD_MMAP
 width: 1920
 height: 1080
-frame_rate: 20
+frame_rate: 15
 monochrome: false
 brightness: -1
 contrast: -1
@@ -20,7 +20,7 @@ auto_white_balance: true
 white_balance: 4000
 bytes_per_pixel: 2
 trigger_internal: 0
-trigger_fps: 20
+trigger_fps: 15
 channel_name: "/apollo/sensor/camera/front_6mm/image"
 device_wait_ms: 2000
 spin_rate: 200

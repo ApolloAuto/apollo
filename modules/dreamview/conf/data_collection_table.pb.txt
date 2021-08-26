@@ -1,5 +1,5 @@
 frame_threshold: 20
-total_frames: 6000
+total_frames: 4000
 scenario {
   key: "Go Straight"
   value {
@@ -32,7 +32,7 @@ scenario {
     feature {
       name: "Speed"
       range {
-        name: "Speed 0 ~ 10mps"
+        name: "Speed 0 ~ 2.5mps"
         criterion {
           field: "speed_mps"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -41,35 +41,22 @@ scenario {
         criterion {
           field: "speed_mps"
           comparison_operator: LESS_THAN
-          value: 10
+          value: 2.5
         }
       }
       range {
-        name: "Speed 10 ~ 20mps"
+        name: "Speed >= 2.5mps"
         criterion {
           field: "speed_mps"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 10
-        }
-        criterion {
-          field: "speed_mps"
-          comparison_operator: LESS_THAN
-          value: 20
-        }
-      }
-      range {
-        name: "Speed >= 20mps"
-        criterion {
-          field: "speed_mps"
-          comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 2.5
         }
       }
     }
     feature {
       name: "Accelerator (Decelerator)"
       range {
-        name: "Throttle deadzone ~ 25%"
+        name: "Throttle deadzone ~ 24%"
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -78,32 +65,19 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 25
+          value: 24
         }
       }
       range {
-        name: "Throttle 25% ~ 30%"
+        name: "Throttle >= 24%"
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 25
-        }
-        criterion {
-          field: "throttle_percentage"
-          comparison_operator: LESS_THAN
-          value: 30
+          value: 24
         }
       }
       range {
-        name: "Throttle >= 30%"
-        criterion {
-          field: "throttle_percentage"
-          comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
-        }
-      }
-      range {
-        name: "Brake deadzone ~ 20%"
+        name: "Brake deadzone ~ 28%"
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -112,28 +86,15 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 28
         }
       }
       range {
-        name: "Brake 20% ~ 25%"
+        name: "Brake >= 28%"
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
-        }
-        criterion {
-          field: "brake_percentage"
-          comparison_operator: LESS_THAN
-          value: 25
-        }
-      }
-      range {
-        name: "Brake >= 25%"
-        criterion {
-          field: "brake_percentage"
-          comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 25
+          value: 28
         }
       }
     }

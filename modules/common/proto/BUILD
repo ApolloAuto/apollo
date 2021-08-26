@@ -166,3 +166,21 @@ py_proto_library(
         "//modules/localization/proto:pose_py_pb2",
     ],
 )
+cc_proto_library(
+    name = "velometer_cc_proto",
+    deps = [
+        ":velometer_proto",
+    ],
+)
+
+proto_library(
+    name = "velometer_proto",
+    srcs = ["velometer.proto"],
+)
+
+py_proto_library(
+    name = "velometer_py_pb2",
+    deps = [
+        ":velometer_proto",
+    ],
+)

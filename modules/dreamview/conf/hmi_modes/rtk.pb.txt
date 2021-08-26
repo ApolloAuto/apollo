@@ -31,10 +31,10 @@ cyber_modules {
 modules {
   key: "RTK Recorder"
   value: {
-    start_command: "nohup /apollo/scripts/rtk_recorder.sh start &"
-    stop_command: "/apollo/scripts/rtk_recorder.sh stop"
+    start_command: "nohup /apollo/scripts/velometer.sh start &"
+    stop_command: "/apollo/scripts/velometer.sh stop"
     process_monitor_config {
-      command_keywords: "record_play/rtk_recorder"
+      command_keywords: "velometer/velometer.py"
     }
     # RTK Recorder is not running in self-driving mode.
     required_for_safety: false
@@ -46,7 +46,7 @@ modules {
     start_command: "nohup /apollo/scripts/rtk_player.sh start &"
     stop_command: "/apollo/scripts/rtk_player.sh stop"
     process_monitor_config {
-      command_keywords: "record_play/rtk_player"
+      command_keywords: "record_play/rtk_player.py"
     }
   }
 }
