@@ -97,7 +97,7 @@ class VelometerRecord(object):
             self.logger.error("Open file %s failed" % (record_file))
             self.file_handler.close()
             sys.exit(1)
-        self.write("behavior,is_overspeed,count,line_count,curve_count,x,y,z,speed,acceleration,curvature,"
+        self.write("behavior,is_overspeed,count,line_count,curve_count,out_count,x,y,z,speed,acceleration,curvature,"
                    "curvature_change_rate,time,theta,gear,s,throttle,brake,steering\n")
 
         self.localization = localization_pb2.LocalizationEstimate()
@@ -120,20 +120,21 @@ class VelometerRecord(object):
         self.vehicle_param = vehicle_config.vehicle_param
         self.count=0
         self.line_count=0
-        self.curve_count=0        
+        self.curve_count=0
+        self.out_count=0        
         self.behavior=''
         self.pre_behavior=''
         self.is_overspeed=0
-        # self.line=[self.track_line('line1',437887.305696044+0.252,4433040.36715134-0.426,37.8263+437847,5.5697+4433039,3,0.1,1),
-        #                     self.track_line('line2',437879.722246044,4433046.98429134,437875.67904539,4433046.58808531,3,0.1,1)]
-        # self.curve=[self.track_curve('curve1',437887.305696044-7.6575,4433040.36715134-0.0972,6.7722,0.61,1.66,3,0.1,1),
-        #                         self.track_curve('curve2',0,0,0,0,0,0,0,0)]
-        self.line=[self.track_line('line1',437867.2011,                       4433038.3235,                     12.8907+437867.2011,      4433038.3235+1.9213,       2,0.5,1),
-                            self.track_line('line2',437867.2011+12.5406,    4433038.3235+7.6568,    437867.2011+6.2765,          4433038.3235+5.9148,       2,0.5,1),
-                            self.track_line('line3',437867.2011+5.4715,       4433038.3235+11.6867, 437867.2011+11.8029,        4433038.3235+10.3152,    2,0.5,1)]
+        self.line=[self.track_line('line1',437887.305696044+0.252,4433040.36715134-0.426,37.8263+437847,5.5697+4433039,3,0.1,1),
+                            self.track_line('line2',437879.722246044,4433046.98429134,437875.67904539,4433046.58808531,3,0.1,1)]
+        self.curve=[self.track_curve('curve1',437887.305696044-7.6575,4433040.36715134-0.0972,6.7722,0.61,1.66,3,0.1,1),
+                                self.track_curve('curve2',0,0,0,0,0,0,0,0)]
+        # self.line=[self.track_line('line1',437867.2011,                       4433038.3235,                     12.8907+437867.2011,      4433038.3235+1.9213,       2,0.5,1),
+        #                     self.track_line('line2',437867.2011+12.5406,    4433038.3235+7.6568,    437867.2011+6.2765,          4433038.3235+5.9148,       2,0.5,1),
+        #                     self.track_line('line3',437867.2011+5.4715,       4433038.3235+11.6867, 437867.2011+11.8029,        4433038.3235+10.3152,    2,0.5,1)]
 
-        self.curve=[self.track_curve('curve1',437867.2011+12.5264,  4433038.3235+4.7885,  2.8338, -1.5708,     1.7453,      2,0.5,1),
-                                self.track_curve('curve2',437867.2011+5.46792,  4433038.3235+8.7052,  2.8991,  1.3963,     5.0615,      2,0.5,1)]
+        # self.curve=[self.track_curve('curve1',437867.2011+12.5264,  4433038.3235+4.7885,  2.8338, -1.5708,     1.7453,      2,0.5,1),
+        #                         self.track_curve('curve2',437867.2011+5.46792,  4433038.3235+8.7052,  2.8991,  1.3963,     5.0615,      2,0.5,1)]
 
     def is_in_track_curve(self,carx,cary):
         if self.behavior=='out':
@@ -263,13 +264,16 @@ class VelometerRecord(object):
         if self.startmoving:
             self.is_in_track_line(carx,cary)
             self.is_in_track_curve(carx,cary)
+            if self.pre_behavior != 'out' and self.behavior == 'out':
+                self.out_count = self.out_count +1
+            self.pre_behavior = self.behavior
             self.count=self.line_count+self.curve_count
             self.write(self.behavior+'\t')
             
             self.cars += carspeed * 0.01
             self.write(
-                "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %.4f, %s, %s, %s, %s, %s, %s\n" %
-                (self.is_overspeed, self.count,self.line_count,self.curve_count, carx,cary,carz, carspeed, caracceleration, self.carcurvature,
+                "%s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s, %.4f, %s, %s, %s, %s, %s, %s\n" %
+                (self.is_overspeed, self.count,self.line_count,self.curve_count,self.out_count, carx,cary,carz, carspeed, caracceleration, self.carcurvature,
                  carcurvature_change_rate, cartime, cartheta, cargear,
                  self.cars, self.chassis.throttle_percentage,
                  self.chassis.brake_percentage,
@@ -288,6 +292,7 @@ class VelometerRecord(object):
         """
         velometerdata = velometer_pb2.velometer()
         velometerdata.behavior=self.behavior
+        velometerdata.out_count=self.out_count
         velometerdata.overspeed_count=self.count
         velometerdata.is_overspeed=self.is_overspeed
         self.velometer_pub.write(velometerdata)
@@ -321,7 +326,7 @@ def main(argv):
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "Velometer.log"))
 
-    record_file = log_dir + "/velometer.csv"
+    record_file = log_dir + "/velometer.xlsx"
     recorder = VelometerRecord(record_file,node)
     atexit.register(recorder.shutdown)
     node.create_reader('/apollo/canbus/chassis',

@@ -4,8 +4,10 @@ package apollo.common;
 message velometer  {
   optional string behavior = 1;
 
-  optional int32 overspeed_count = 2;
+  optional int32 out_count = 2;
+
+  optional int32 overspeed_count = 3;
   
-  optional int32 is_overspeed = 3;
+  optional int32 is_overspeed = 4;
   
 };
