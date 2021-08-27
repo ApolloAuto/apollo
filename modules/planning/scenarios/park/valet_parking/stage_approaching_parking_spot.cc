@@ -59,10 +59,6 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
       GetContext()->pre_stop_rightaway_point;
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStagePreStop planning error";
-    return StageStatus::ERROR;
-  }
 
   GetContext()->pre_stop_rightaway_flag =
       frame->open_space_info().pre_stop_rightaway_flag();
@@ -72,6 +68,10 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
   if (CheckADCStop(*frame)) {
     next_stage_ = ScenarioConfig::VALET_PARKING_PARKING;
     return Stage::FINISHED;
+  }
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedStagePreStop planning error";
+    return StageStatus::ERROR;
   }
 
   return Stage::RUNNING;
