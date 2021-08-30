@@ -105,6 +105,8 @@ options:
     default: false
   showFuelClient:
     default: false
+  showManualCompetition:
+    default: false
   enableSimControl:
     default: false
   lockTaskPanel:

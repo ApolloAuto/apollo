@@ -34,6 +34,10 @@ const MONITOR_WIDTH_IN_PX = {
     small: 400,
     large: 450,
   },
+  [MONITOR_MENU.MANUAL_COMPETITION]: {
+    small: 400,
+    large: 450,
+  },
   default: {
     small: 200,
     large: 240,

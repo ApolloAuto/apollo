@@ -345,3 +345,80 @@ $monitor-header-height: 32px;
         }
     }
 }
+
+.manual-competition{
+    .monitor-content{
+        display:flex;
+        display: -webkit-flex;
+        flex-direction: column;
+        .speed-section{
+            flex:5;
+            -webkit-flex:5;
+            background-color:#FFFFFF;
+            border: #000000 1px solid;
+            margin:5px 5px 40px 5px;
+            //margin-bottom: 40px;
+        }
+        .section{
+            flex:1;
+            -webkit-flex:1,
+        }
+        .foul-section{
+            flex:3;
+            -webkit-flex:3,
+        }
+        .number-section{
+            flex:1;
+            -webkit-flex:1;
+            display: flex;
+            display: -webkit-flex;
+            justify-content: space-between;
+            .number-label{
+                flex:6;
+                -webkit-flex:6;
+                margin-right: 4px;
+                background-color: #FFFFFF;
+                border: #000000 1px solid;
+            }
+            .number-input{
+                flex:2;
+                -webkit-flex:2;
+                margin-right: 4px;
+                background-color: #006AFF;
+                border: #000000 1px solid;
+            }
+            .number-btn{
+                flex:2;
+                -webkit-flex:2;
+                background-color: #FFFFFF;
+                border: #000000 1px solid;
+            }
+        }
+        .monitor-row{
+            color: #000000;
+            // margin:1rem;
+            // height:3rem;
+            height: 100%;
+            line-height: 100%;
+            text-align: center;
+            display:flex;
+            display: -webkit-flex;
+            justify-content: space-between;
+            .one{
+                flex:6;
+                -webkit-flex:6;
+                margin-right: 4px;
+                // width:60%;
+                background-color: #FFFFFF;
+                border: #000000 1px solid;
+            }
+            .two{
+                flex:4;
+                -webkit-flex:4;
+                //width:35%;
+                background-color: #006AFF;
+                border: #000000 1px solid;
+            }
+        }
+    }
+}

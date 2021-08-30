@@ -14,6 +14,7 @@ import PNCMonitor from 'components/PNCMonitor';
 import ConsoleTeleOp from 'components/TeleopMonitor/ConsoleTeleop';
 import CarTeleOp from 'components/TeleopMonitor/CarTeleop';
 import FuelClient from 'components/FuelClient';
+import ManualCompetition from 'components/ManualCompetition';
 
 export default class MonitorPanel extends React.Component {
   renderMonitor() {
@@ -32,6 +33,8 @@ export default class MonitorPanel extends React.Component {
         return <PNCMonitor />;
       case MONITOR_MENU.FUEL_CLIENT:
         return <FuelClient />;
+      case MONITOR_MENU.MANUAL_COMPETITION:
+        return <ManualCompetition />;
       default:
         return null;
     }

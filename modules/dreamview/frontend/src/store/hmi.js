@@ -65,6 +65,8 @@ export default class HMI {
 
   @observable isSensorCalibrationMode = false;
 
+  @observable isManualCompetitionMode = false;
+
   @observable dataCollectionUpdateStatus = observable.map();
 
   @observable dataCollectionProgress = observable.map();
@@ -93,6 +95,16 @@ export default class HMI {
 
   @observable counter = 0;
 
+  @observable teamNumber = '';
+
+  @action setTeamNumber(val) {
+    this.teamNumber = val;
+  }
+
+  @action clearTeamNumber() {
+    this.teamNumber = '';
+  }
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -120,8 +132,12 @@ export default class HMI {
       this.isSensorCalibrationMode = newStatus.currentMode
         .toLowerCase()
         .includes('sensor calibration');
+      this.isManualCompetitionMode = newStatus.currentMode
+        .toLowerCase()
+        .includes('manual competition');
       if (this.currentMode !== newStatus.currentMode) {
         this.resetDataCollectionProgress();
+        this.clearTeamNumber(); // clear it when change mode
         this.resetSensorCalibrationConfiguration();
         this.resetPreprocessProgress();
         this.currentMode = newStatus.currentMode;

@@ -11,6 +11,8 @@ export default class Others extends React.Component {
 
     const disablePanel = enableHMIButtonsOnly || options.lockTaskPanel;
     const hasPncMonitor = !hmi.inTeleopMode && !options.showCameraView;
+    const hasManualCompetition = hmi.isManualCompetitionMode;
+    const disableManualCompetition = !hmi.moduleStatus.get('Localization');
 
     return (
             <div className="others card">
@@ -69,6 +71,19 @@ export default class Others extends React.Component {
                                 onClick={() => {
                                   const showParam = (hmi.isSensorCalibrationMode) ? 'showFuelClient' : 'showDataCollectionMonitor';
                                   this.props.store.handleOptionToggle(showParam);
+                                }}
+                            />
+                      )}
+                      {hasManualCompetition
+                      && (
+                            <CheckboxItem
+                                id="showManualCompetition"
+                                title="Manual Competition"
+                                isChecked={options.showManualCompetition}
+                                disabled={disablePanel || disableManualCompetition}
+                                extraClasses="others-checkbox"
+                                onClick={() => {
+                                  this.props.store.handleOptionToggle('showManualCompetition');
                                 }}
                             />
                       )}

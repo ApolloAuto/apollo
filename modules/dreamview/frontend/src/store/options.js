@@ -12,6 +12,7 @@ export const MONITOR_MENU = Object.freeze({
   CAR_TELEOP_MONITOR: 'showCarTeleopMonitor',
   CAMERA_PARAM: 'showCameraView',
   FUEL_CLIENT: 'showFuelClient',
+  MANUAL_COMPETITION:'showManualCompetition',
 });
 
 export default class Options {
@@ -94,6 +95,8 @@ export default class Options {
         return MONITOR_MENU.PNC_MONITOR;
       } if (this.showFuelClient) {
         return MONITOR_MENU.FUEL_CLIENT;
+      } if (this.showManualCompetition) {
+        return MONITOR_MENU.MANUAL_COMPETITION;
       }
       return null;
     }

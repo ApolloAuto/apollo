@@ -129,6 +129,9 @@
 		"showFuelClient": {
 			"default": false
 		},
+		"showManualCompetition":{
+			"default": false
+		},
 		"enableSimControl": {
 			"default": false
 		},
