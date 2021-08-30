@@ -449,6 +449,19 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "RequestVelometerInfo",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response = sim_world_service_.RequestVelometerInfo();
+        if (response.is_null()) {
+          sim_world_service_.PublishMonitorMessage(
+              MonitorMessageItem::ERROR, "Failed to get velometer info.");
+        } else {
+          response["type"] = "VelometerInfo";
+          websocket_->SendData(conn, response.dump());
+        }
+      });
+
+  websocket_->RegisterMessageHandler(
       "SaveDefaultRouting",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         bool succeed = AddDefaultRouting(json);

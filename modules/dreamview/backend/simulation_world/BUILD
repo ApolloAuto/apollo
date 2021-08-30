@@ -20,6 +20,7 @@ cc_library(
         "//modules/common/math:quaternion",
         "//modules/common/monitor_log",
         "//modules/common/proto:drive_event_cc_proto",
+        "//modules/common/proto:velometer_cc_proto",
         "//modules/common/proto:geometry_cc_proto",
         "//modules/common/util",
         "//modules/common/util:map_util",

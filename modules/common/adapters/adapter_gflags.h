@@ -24,6 +24,7 @@ DECLARE_string(imu_topic);
 DECLARE_string(raw_imu_topic);
 DECLARE_string(audio_detection_topic);
 DECLARE_string(chassis_topic);
+DECLARE_string(velometer_topic);
 DECLARE_string(chassis_detail_topic);
 DECLARE_string(localization_topic);
 DECLARE_string(planning_learning_data_topic);

@@ -26,5 +26,6 @@ install_files(
         "//modules/common/proto:vehicle_signal_py_pb2",
         "//modules/common/proto:drive_event_py_pb2",
         "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common/proto:velometer_py_pb2",
     ],
 )

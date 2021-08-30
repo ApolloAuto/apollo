@@ -9,7 +9,8 @@ import StatusDisplay from 'components/ModuleController/StatusDisplay';
 export default class ModuleController extends React.Component {
   determineModuleDisabled(key) {
     const {
-      isCalibrationMode, isManualCompetitionMode, teamNumber,
+      isCalibrationMode,
+      isManualCompetitionMode, teamNumber,
       preConditionModule, allMonitoredComponentSuccess,
     } = this.props.store.hmi;
     if (isCalibrationMode && (key === preConditionModule)) {

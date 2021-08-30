@@ -19,6 +19,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "time.h"
 
 #include "cyber/proto/dag_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -464,6 +465,17 @@ void HMIWorker::SensorCalibrationPreprocess(const std::string& task_type) {
   std::string start_command = absl::StrCat(
       "nohup bash /apollo/scripts/extract_data.sh -t ", task_type, " &");
   System(start_command);
+}
+
+void HMIWorker::GenerateVelometerInfo(const std::string& team_number) {
+  time_t t = time(0);
+  char tmp[32]{0};
+  strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&t));
+  std::string data_path =
+              "/apollo/data/log/" + team_number + "_" + tmp + "_velometer.csv";
+  std::string command =
+      absl::StrCat("cp /apollo/data/log/velometer.csv ", data_path);
+  System(command);
 }
 
 void HMIWorker::VehicleCalibrationPreprocess() {

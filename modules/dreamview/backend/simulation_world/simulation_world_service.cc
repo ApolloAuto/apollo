@@ -48,6 +48,7 @@ using apollo::common::Point3D;
 using apollo::common::PointENU;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::velometer;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::DownsampleByAngle;
@@ -312,6 +313,8 @@ void SimulationWorldService::InitReaders() {
         monitor_msgs_.push_back(monitor_message);
       });
   task_reader_ = node_->CreateReader<Task>(FLAGS_task_topic);
+  velometer_reader_ =
+      node_->CreateReader<velometer>(FLAGS_velometer_topic);
 }
 
 void SimulationWorldService::InitWriters() {
@@ -438,6 +441,26 @@ Json SimulationWorldService::GetUpdateAsJson(double radius) const {
   update["world"] = sim_world_json_string;
 
   return update;
+}
+
+Json SimulationWorldService::RequestVelometerInfo() {
+  Json result;
+  if (!velometer_reader_ || velometer_reader_->Empty() ||
+      chassis_reader_->Empty()) {
+    AINFO_EVERY(100) << "Has not received any data from "
+                         << velometer_reader_->GetChannelName();
+    return result;
+  }
+  const std::shared_ptr<velometer> info =
+      velometer_reader_->GetLatestObserved();
+  double speed = chassis_reader_->GetLatestObserved()->speed_mps();
+
+  result["behavior"] = info->behavior();
+  result["out_count"] = info->out_count();
+  result["overspeed_count"] = info->overspeed_count();
+  result["is_overspeed"] = info->is_overspeed();
+  result["speed"] = speed;
+  return result;
 }
 
 void SimulationWorldService::GetMapElementIds(double radius,

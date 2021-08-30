@@ -162,6 +162,18 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
+  // HMI client asks for generate team velometer info.
+  websocket_->RegisterMessageHandler(
+      "GenerateVelometerData",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        std::string team_number;
+        if (JsonUtil::GetString(json, "teamNumber", &team_number)){
+          hmi_worker_->GenerateVelometerInfo(team_number);
+        } else {
+          monitor_log_buffer_.WARN("Failed to generate team velometer info.");
+        }
+      });
+
   websocket_->RegisterMessageHandler(
       "HMIStatus",
       [this](const Json& json, WebSocketHandler::Connection* conn) {

@@ -78,6 +78,9 @@ class HMIWorker {
   // Run sensor calibration preprocess
   void SensorCalibrationPreprocess(const std::string& task_type);
 
+  // Run cp command to generate velometer info
+  void GenerateVelometerInfo(const std::string& data_path);
+
   // Run vehicle calibration preprocess
   void VehicleCalibrationPreprocess();
 

@@ -39,6 +39,7 @@
 #include "modules/audio/proto/audio_event.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/proto/velometer.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/localization/proto/gps.pb.h"
@@ -158,6 +159,11 @@ class SimulationWorldService {
   nlohmann::json GetRoutePathAsJson() const;
 
   void DumpMessages();
+
+  /**
+   * @brief request velometer info when in manual competition mode
+   */
+  nlohmann::json RequestVelometerInfo();
 
  private:
   void InitReaders();
@@ -390,6 +396,7 @@ class SimulationWorldService {
   std::shared_ptr<cyber::Reader<apollo::audio::AudioDetection>>
       audio_detection_reader_;
   std::shared_ptr<cyber::Reader<apollo::task_manager::Task>> task_reader_;
+  std::shared_ptr<cyber::Reader<apollo::common::velometer>> velometer_reader_;
 
   // Writers.
   std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>

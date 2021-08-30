@@ -138,6 +138,10 @@ export default class RealtimeWebSocketEndpoint {
             STORE.routeEditingManager.updateParkingRoutingDistance(message.threshold);
           }
           break;
+        case 'VelometerInfo':
+          if (message) {
+            STORE.hmi.updateVelometerInfo(message);
+          }
       }
     };
     this.websocket.onclose = (event) => {
@@ -192,6 +196,9 @@ export default class RealtimeWebSocketEndpoint {
         }
         if (STORE.hmi.isSensorCalibrationMode) {
           this.requestPreprocessProgress();
+        }
+        if (STORE.hmi.shouldRequestVelometerInfo) {
+          this.requestVelometerInfo();
         }
       }
     }, this.simWorldUpdatePeriodMs);
@@ -453,6 +460,12 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
+  requestVelometerInfo() {
+    this.websocket.send(JSON.stringify({
+      type: 'RequestVelometerInfo',
+    }));
+  }
+
   startPreprocessData(data, type) {
     const request = {
       type,
@@ -479,6 +492,14 @@ export default class RealtimeWebSocketEndpoint {
     if (id) {
       request.end.id = id;
     }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  generateVelometerData(teamNumber) {
+    const request = {
+      type: 'GenerateVelometerData',
+      teamNumber,
+    };
     this.websocket.send(JSON.stringify(request));
   }
 }

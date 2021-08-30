@@ -354,43 +354,75 @@ $monitor-header-height: 32px;
         .speed-section{
             flex:5;
             -webkit-flex:5;
-            background-color:#FFFFFF;
+            color:#FFFFFF;
             border: #000000 1px solid;
             margin:5px 5px 40px 5px;
-            //margin-bottom: 40px;
+            font-size: 100px;
+            display: inline-block;
+            text-align: center;
+            padding: 50px 0;
+            .speed-unit{
+                display: block;
+                text-align: right;
+                margin-right: 10px;
+                font-size: 20px;
+            }
+        }
+        .black-theme{
+            color:#000000;
+        }// to remove
+        .white-theme{
+            color: #FFFFFF;
+        }
+        .red-theme{
+            color:#ff0000;
+        }
+        .orange-theme{
+            color: #ffa500;
         }
         .section{
-            flex:1;
-            -webkit-flex:1,
+            flex:1.5;
+            -webkit-flex:1.5;
         }
         .foul-section{
             flex:3;
-            -webkit-flex:3,
+            -webkit-flex:3;
+            padding: 5px 10px;
+            .two{
+                display: inline-block;
+                font-size: 50px;
+                padding: 50px 0 !important;
+            }
         }
         .number-section{
-            flex:1;
-            -webkit-flex:1;
+            flex:1.5;
+            -webkit-flex:1.5;
             display: flex;
             display: -webkit-flex;
             justify-content: space-between;
+            padding: 5px 10px;
             .number-label{
-                flex:6;
-                -webkit-flex:6;
+                flex:4;
+                -webkit-flex:4;
                 margin-right: 4px;
-                background-color: #FFFFFF;
+                display: inline-block;
+                padding: 10px 0;
+                text-align: center;
+                font-size: 15px;
+                color: #FFFFFF;
                 border: #000000 1px solid;
             }
             .number-input{
                 flex:2;
                 -webkit-flex:2;
                 margin-right: 4px;
-                background-color: #006AFF;
+                color: #000000;
                 border: #000000 1px solid;
             }
             .number-btn{
                 flex:2;
                 -webkit-flex:2;
-                background-color: #FFFFFF;
+                // color: #FFFFFF;
                 border: #000000 1px solid;
             }
         }
@@ -400,6 +432,7 @@ $monitor-header-height: 32px;
             // height:3rem;
             height: 100%;
             line-height: 100%;
+            font-size: 20px;
             text-align: center;
             display:flex;
             display: -webkit-flex;
@@ -409,15 +442,33 @@ $monitor-header-height: 32px;
                 -webkit-flex:6;
                 margin-right: 4px;
                 // width:60%;
-                background-color: #FFFFFF;
+                // font-size: 20px;
+                // line-height: 100%;
+                // text-align: center;
+                // height:100%;
+                display: inline-block;
+                color: #FFFFFF;
                 border: #000000 1px solid;
+                .label-txt{
+                    display: inline-block;
+                    font-size: 20px;
+                    text-align: center;
+                    // margin:auto;
+                    // line-height: 100%;
+                    // height: 100%;
+                    padding: 20px 0;
+                }
+                .label-txt-foul{
+                    padding: 50px 0;
+                }
             }
             .two{
                 flex:4;
                 -webkit-flex:4;
                 //width:35%;
-                background-color: #006AFF;
+                color: #FFFFFF;
                 border: #000000 1px solid;
+                padding: 20px 0;
             }
         }
     }
