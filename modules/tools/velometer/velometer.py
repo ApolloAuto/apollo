@@ -326,7 +326,7 @@ def main(argv):
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "Velometer.log"))
 
-    record_file = log_dir + "/velometer.xlsx"
+    record_file = log_dir + "/velometer.csv"
     recorder = VelometerRecord(record_file,node)
     atexit.register(recorder.shutdown)
     node.create_reader('/apollo/canbus/chassis',
