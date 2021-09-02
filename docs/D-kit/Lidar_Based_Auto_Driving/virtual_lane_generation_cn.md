@@ -16,7 +16,7 @@
 
 ## 前提条件
 
- - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](sensor_calibration_cn.md)
+ - 完成了[基于激光雷达的封闭园区自动驾驶搭建--感知设备标定](Sensor_Calibration_cn.md)
  - 完成了[开通云服务账号向导](../../Apollo_Fuel/apply_fuel_account_cn.md)
  
 ## 主要步骤
