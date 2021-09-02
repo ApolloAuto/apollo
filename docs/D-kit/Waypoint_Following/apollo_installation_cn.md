@@ -5,10 +5,8 @@
     - [工控机硬件安装](#工控机硬件安装)
       - [IPC配置](#IPC配置)
       - [准备IPC](#准备IPC)
-        - [准备好CAN卡并进行安装](#准备好CAN卡并进行安装)
         - [配置IPC加电组件](#配置IPC加电组件)
         - [启动计算机](#启动计算机)
-        - [连接电源](#连接电源)
     - [工控机软件系统安装](#工控机软件系统安装)
       - [配置Linux系统](#配置Linux系统)
         - [安装GCC和G++](#安装GCC和G++)
@@ -25,29 +23,15 @@
 
 ## 工控机系统安装
 
-在集成车辆之前，首先需要完成工控机的硬件安装，如CAN卡安装；之后需要完成工控机的软件安装，包括Ubuntu Linux安装、Apollo软件系统安装等。
+在集成车辆之前，首先需要完成工控机的硬件安装，如电源模块的安装；之后需要完成工控机的软件安装，包括Ubuntu Linux安装、Apollo软件系统安装等。
 
 ### 工控机硬件安装
 
-工控机硬件安装包括CAN卡的安装和相关线缆的连接，以及BIOS相关的设置。
+工控机硬件安装包括电源模块的安装和相关线缆的连接，以及BIOS相关的设置。
 
 #### IPC配置
 
 参考下述IPC配置：
-
-- Nuvo-6108GC-RTX2060s-E3-1275
-
-- DDR4-32GB-ECC
-
-- 三星 SSD 256G
-
-- EMUC-B202 CAN
-
-- PA-280W-OW
-
-  ![IPC-6108GC-front-side](images/ipc_hardware_before_cover.jpg)
-  
-  或者：
 
 - Nuvo-8108GC-RTX2070s-i9-9900k
 
@@ -61,55 +45,18 @@
 
   ![IPC-8108GC-front-side](images/software_installation_look_8108.png)
 
-注意，在较早版本的8108工控机中，CAN口的标号为从右向左分别为CAN1、CAN2，文档中将统一按照上图所示，分别称为CAN0、CAN1，请使用较早版本8108的用户注意。新用户可以忽略。
 
 #### 准备IPC
 
 参考下述步骤：
 
-##### 准备好CAN卡并进行安装
-
-在IPC中，显卡被预先安装在一个PCI插槽中。如果我们收到的是EMUC-B202 CAN，它已被预装在IPC内，则CAN卡安装这一步，可以跳过。如果我们收到的是ESDCan，我们需要将CAN卡安装在另外一个PCI插槽中，步骤如下：
-
-   a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
-
-   ![Positions_of_Screws](images/ipc_hardware_cover1.jpg)
-
-   b. 移除机器盖板
-
-   ![removing the cover](images/ipc_hardware_cover2.jpg)
-
-   在机箱底部将能看到固定着的3个PCI插槽（其中一个已经被显卡占据）
-   
-  ![Before installing the CAN card](images/ipc_hardware_slot1.png)
-  
-   c. 设置CAN卡的终端跳线：将4个红色的跳线帽从原位置移除并放置在终端位置，如下图所示：
-
-   ![prepare_can_card2](images/ipc_hardware_slot2.jpg)
-
-   ![warning_icon](images/warning_icon.png)**WARNING**：如果终端跳线没有被正确设置，CAN卡将不能正确工作。
-
-   d. 将CAN卡插入到一个PCI插槽中
-
-   ![installed CAN](images/ipc_hardware_slot3.png)
-
-   e. 安装IPC的盖板
-    
-   ![IPC-6108GC-Screw-Positions](images/ipc_hardware_after_cover.png)
-
 ##### 配置IPC加电组件
 
-   a. 将电源线接入到为IPC配置的电源连接器（接线板）
-   
-- 6108的电源线
+  将电源线接入到为IPC配置的电源连接器（接线板）
 
-   ![warning_icon](images/warning_icon.png)**WARNING**：确保电源线的正极（标记为 **R** 表示红色）和负极（标记为 **B** 表示黑色）接入到了IPC接线板的正确接口，如下图所示：
-
-   ![ipc_power_RB](images/ipc_hardware_rb.png)
-   
 - 8108的电源线
 
-8108的电源线是四跟，两正两负，正极的两根电源线是贴有`V+`的白色标签的，如下图所示：
+8108的电源线是四根，两正两负，正极的两根电源线是贴有`V+`的白色标签的，如下图所示：
 
    ![ipc_power_RB](images/software_installation_power_8108_1.jpg)
 
@@ -117,9 +64,9 @@
 
    ![ipc_power_RB](images/software_installation_power_8108_2.jpg)
 
-   b. 将显示器、以太网线、键盘和鼠标接入IPC
-   
-   ![CableConnected-overexposed](images/ipc_hardware_connection.png)
+   如果工控机在办公室使用的话，请使用下图中的电源适配器给工控机供电；如果工控机在小车上使用的话，请使用小车上的接线盒引出的24V的电源来给工控机供电。
+
+   ![ipc_power](images/ipc_power.png)
   
 ##### 启动计算机
 
@@ -136,13 +83,12 @@
 
 ![graphic_config](images/graphic_config.jpg)
 
-如果使用的是较早没有预装显卡驱动及Apollo镜像的工控机版本，则需使用DVI线或AGV线将显示器与工控机集成显卡接口相连，按照如下步骤将显示模式设置为AUTO，设置成功后，使用HMDI线连接显示器与工控机的HDMI接口，并重启工控机：
+工控机需要外接大量的外部设备，下面给出一些常用的外设的接口安装位置的建议。
 
-```
-- 计算机启动时按F2进入BIOS设置菜单
-- 进入 [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> 设置为 "AUTO"
-```
+![ipc_panel](images/ipc_panel.png)
 
+如上图所示，1-8是8个usb接口；9-12是独立显卡的4个接口，其中9、11和12是dp接口，10是hdmi接口；13和14是两个can卡接口；15和16是两个有线网卡接口；17和18是两个com接口。
+8个usb接口中，指定1接车头的左边的6mm相机，2接车头的中间的12mm相机，3接车头的右边的6mm相机，4接imu的usb数据线。5-8四个usb接口给客户自己外接键盘鼠标等其他外设，不做指定。独立显卡的4个接口中，10接hdmi延长线和车尾的显示器相连接，其他三个dp接口暂时不用。13和14这两个can口中，接口14是can0接口，接底盘的can线；接口13是can1接口，接毫米波雷达的can线。15和16这两个有线网口分别接4G路由器和激光雷达的网口。17和18是com接口，在配置imu时，需要将imu的升级口通过串口延长线接到接口17的COM1上。
 
 ![tip_icon](images/tip_icon.png)建议设置IPC的运行状态为一直以最佳性能状态运行：
 
@@ -150,11 +96,6 @@
 - 计算机启动时按F2进入BIOS设置菜单
 - 进入 [Power] => [SKU POWER CONFIG] => 设置为 "MAX TDP"
 ```
-
-##### 连接电源
-
-![IPC-6108GC-PowerCable.JPG](images/ipc_hardware_power_on.jpg)
-
 
 ### 工控机软件系统安装
 
