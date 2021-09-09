@@ -111,19 +111,17 @@ double Wheelspeed6a::parse_two_frames(const std::uint8_t low_byte,
 
 WheelSpeed::WheelSpeedType Wheelspeed6a::wheel_direction_convert(
     double wheel_speed) const {
-  int8_t wheel_direction = 0;
+  WheelSpeed::WheelSpeedType wheel_direction = WheelSpeed::INVALID;
   if (wheel_speed > 0) {
-    wheel_direction = 0;
+    wheel_direction = WheelSpeed::FORWARD;
   } else if ((wheel_speed > -0.01) && (wheel_speed < 0.01)) {
-    wheel_direction = 2;
+    wheel_direction = WheelSpeed::STANDSTILL;
   } else if (wheel_speed < 0) {
-    wheel_direction = 1;
+    wheel_direction = WheelSpeed::BACKWARD;
   } else {
-    wheel_direction = 3;
+    wheel_direction = WheelSpeed::INVALID;
   }
-  WheelSpeed::WheelSpeedType ret =
-      static_cast<WheelSpeed::WheelSpeedType>(wheel_direction);
-  return ret;
+  return wheel_direction;
 }
 
 }  // namespace lincoln
