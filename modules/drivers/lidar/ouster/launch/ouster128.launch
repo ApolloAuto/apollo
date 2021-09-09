@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>ouster</name>
+        <dag_conf>/apollo/modules/drivers/lidar/ouster/dag/ouster128.dag</dag_conf>
+        <process_name>ouster128</process_name>
+    </module>
+</cyber>

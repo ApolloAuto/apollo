@@ -129,12 +129,52 @@ cc_library(
     ],
 )
 
+##ouster
+py_proto_library(
+    name = "ouster_py_pb2",
+    deps = [
+        ":ouster_proto",
+        "//modules/common/proto:header_py_pb2",
+    ],
+)
+
+proto_library(
+    name = "ouster_proto",
+    srcs = ["ouster.proto"],
+    deps = [
+        "//modules/common/proto:header_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "ouster_cc_proto",
+    deps = [
+        ":ouster_proto",
+    ],
+)
+
+proto_library(
+    name = "ouster_config_proto",
+    srcs = ["ouster_config.proto"],
+    deps = [
+        ":ouster_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "ouster_config_cc_proto",
+    deps = [
+        ":ouster_config_proto",
+    ],
+)
+
 proto_library(
     name = "config_proto_lib",
     srcs = [
         "config.proto",
     ],
     deps = [
+        ":ouster_config_proto",
         ":hesai_config_proto",
         ":lidar_parameter_proto_lib",
         ":robosense_proto_lib",

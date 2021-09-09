@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.drivers.ouster;
+
+import "modules/common/proto/header.proto";
+
+enum Model {
+  UNKOWN = 0;
+  OUSTER128 = 1;
+  OUSTER64 = 2;
+}
+
+message OusterScanPacket {
+  optional uint64 stamp = 1;
+  optional bytes data = 2;
+}
+
+message OusterScan {
+  optional apollo.common.Header header = 1;
+  optional Model model = 2;  // ouster device model
+  repeated OusterScanPacket firing_pkts = 3;
+  optional uint64 basetime = 4 [default = 0];
+}

@@ -1,0 +1,15 @@
+model: OUSTER128
+hostname: "192.168.1.100"
+lidar_recv_port: 7502
+imu_recv_port: 7503
+pointcloud_channel: "/apollo/sensor/ouster128/PointCloud2"
+scan_channel: "/apollo/sensor/ouster128/Scan"
+time_zone: 8
+frame_id: "ouster128"
+is_main_frame: true
+lidar_mode: "1024x10"
+timestamp_mode: "TIME_FROM_SYNC_PULSE_IN"
+udp_dest_host: "192.168.1.120"
+metadata_path:"/apollo/modules/drivers/lidar/ouster/params/"
+synchronic_time: false
+offset_time: 0
