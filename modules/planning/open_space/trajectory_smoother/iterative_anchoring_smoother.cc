@@ -142,7 +142,7 @@ bool IterativeAnchoringSmoother::Smooth(
     AERROR << "Set path profile fails";
     return false;
   }
-  
+
   // Generate feasible bounds for each path point
   std::vector<double> bounds;
   if (!GenerateInitialBounds(interpolated_warm_start_path, &bounds)) {
@@ -527,7 +527,8 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
           colliding_point_index->push_back(i);
           AINFO << "point at " << i << "collied with LineSegment "
                 << linesegment.DebugString();
-          AINFO << "ego box" << ego_box.DebugString() is_colliding = true;
+          AINFO << "ego box" << ego_box.DebugString();
+          is_colliding = true;
           break;
         }
       }
