@@ -112,11 +112,20 @@ bool IterativeAnchoringSmoother::Smooth(
 
   const size_t interpolated_size = interpolated_warm_start_point2ds.size();
   if (interpolated_size < 4) {
-    AERROR << "interpolated_warm_start_path smaller than 4, can't enforce "
+    AERROR << "interpolated_warm_start_path smaller than 4("
+           << interpolated_size
+           << "), can't enforce "
               "heading continuity";
-    return false;
+    interpolated_warm_start_point2ds.clear();
+    for (double s = 0; s < path_length; s += path_length / 6) {
+      const auto point2d = warm_start_path.Evaluate(s);
+      interpolated_warm_start_point2ds.emplace_back(point2d.x(), point2d.y());
+    }
+    AINFO << "resize to " << interpolated_warm_start_point2ds.size();
   } else if (interpolated_size < 6) {
-    ADEBUG << "interpolated_warm_start_path smaller than 4, can't enforce "
+    AERROR << "interpolated_warm_start_path smaller than 6("
+           << interpolated_size
+           << "), can't enforce "
               "initial zero kappa";
     enforce_initial_kappa_ = false;
   } else {
@@ -133,7 +142,7 @@ bool IterativeAnchoringSmoother::Smooth(
     AERROR << "Set path profile fails";
     return false;
   }
-
+  
   // Generate feasible bounds for each path point
   std::vector<double> bounds;
   if (!GenerateInitialBounds(interpolated_warm_start_path, &bounds)) {
@@ -516,9 +525,9 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
           colliding_point_index->push_back(i);
-          ADEBUG << "point at " << i << "collied with LineSegment "
-                 << linesegment.DebugString();
-          is_colliding = true;
+          AINFO << "point at " << i << "collied with LineSegment "
+                << linesegment.DebugString();
+          AINFO << "ego box" << ego_box.DebugString() is_colliding = true;
           break;
         }
       }
@@ -665,8 +674,12 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
-    AERROR << "Piecewise jerk speed optimizer failed!";
-    return false;
+    AWARN << "Piecewise jerk speed optimizer failed! Cancel jerk constraint";
+    piecewise_jerk_problem.set_dddx_bound(10);
+    if (!piecewise_jerk_problem.Optimize()) {
+      AERROR << "Piecewise jerk speed optimizer failed!";
+      return false;
+    }
   }
 
   // Extract output
