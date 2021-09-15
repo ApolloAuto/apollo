@@ -158,7 +158,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // loading optimizer configs
 
     // If stop_index == fallback_start_index;
-    if (fallback_start_index == stop_index) {
+    if (fallback_start_index >= stop_index) {
       // 1. Set fallback start speed to 0, acceleration to max acceleration.
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
@@ -225,9 +225,6 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         fallback_trajectory_pair_candidate.first[i].set_relative_time(
             new_relative_time);
       } else {
-        AINFO << "QuardraticFormulaLowerSolution solving failed, stop "
-                 "immediately!";
-
         if (i != 0) {
           fallback_trajectory_pair_candidate.first[i]
               .mutable_path_point()
