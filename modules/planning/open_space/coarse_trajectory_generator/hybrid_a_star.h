@@ -107,6 +107,16 @@ class HybridAStar {
   double heu_rs_gear_switch_penalty_ = 0.0;
   double heu_rs_steer_penalty_ = 0.0;
   double heu_rs_steer_change_penalty_ = 0.0;
+  double acc_weight_= 0.0;
+  double jerk_weight_= 0.0;
+  double kappa_penalty_weight_= 0.0;
+  double ref_s_weight_= 0.0;
+  double ref_v_weight_=0.0;
+  double max_forward_v_= 0.0;
+  double max_reverse_v_= 0.0;
+  double max_forward_acc_= 0.0;
+  double max_reverse_acc_= 0.0;
+  double max_acc_jerk_= 0.0;
   std::vector<double> XYbounds_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
