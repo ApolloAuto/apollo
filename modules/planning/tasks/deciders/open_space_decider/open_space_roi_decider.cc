@@ -56,6 +56,7 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(
   injector->vehicle_state();
   temp_state_.set_x(injector->vehicle_state()->x());
   temp_state_.set_y(injector->vehicle_state()->y());
+  AINFO<<config_.DebugString();
 }
 
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
