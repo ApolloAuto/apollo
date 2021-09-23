@@ -21,8 +21,6 @@ import PointCloud from 'renderer/point_cloud.js';
 
 const _ = require('lodash');
 
-const preventEditTag = ['BUTTON', 'INPUT'];
-
 class Renderer {
   constructor() {
     // Disable antialias for mobile devices.
@@ -351,8 +349,8 @@ class Renderer {
     }
   }
 
-  addDefaultRouting(routingName) {
-    return this.routingEditor.addDefaultRouting(routingName, this.coordinates);
+  addDefaultRouting(routingName, type = 'defaultRouting') {
+    return this.routingEditor.addDefaultRouting(routingName, this.coordinates, type);
   }
 
   removeInvalidRoutingPoint(pointId, error) {
@@ -389,14 +387,23 @@ class Renderer {
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
-    return this.routingEditor.sendCycleRoutingRequest
-    (defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+    return this.routingEditor.sendCycleRoutingRequest(
+      defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+      this.adc.mesh.rotation.y,
+      this.coordinates);
+  }
+
+  sendParkGoRoutingRequest(points, parkTime) {
+    return this.routingEditor.sendParkGoRoutingRequest(
+      points, parkTime, this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
 
   editRoute(event) {
-    if (event.target && preventEditTag.includes(event.target.tagName)) {
+    // Distinguish between operating on the screen and
+    // selecting points on the screen
+    if (event.target && !_.isEqual('CANVAS', event.target.tagName)) {
       return;
     }
     if (!this.routingEditor.isInEditingMode() || event.button !== THREE.MOUSE.LEFT) {

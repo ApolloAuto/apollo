@@ -329,6 +329,9 @@
 		},
 		"showCycleNumberInput": {
 			"default": false
+		},
+		"showParkTimeInput": {
+			"default": false
 		}
 	},
 	"routingEditor": {
