@@ -39,8 +39,10 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       std::make_unique<GridSearch>(planner_open_space_config_);
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
-  max_steer_angle_ =
-      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio() * 0.7;
+  max_steer_angle_ = vehicle_param_.max_steer_angle() / 
+                     vehicle_param_.steer_ratio() *
+                     planner_open_space_config_.warm_start_config()
+                         .traj_kappa_contraint_ratio();
   step_size_ = planner_open_space_config_.warm_start_config().step_size();
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config().xy_grid_resolution();
