@@ -34,6 +34,8 @@ DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
 DEFINE_string(default_routing_filename, "default_cycle_routing.txt",
               "Default cycle routing of the map, will be sent in Task to Task "
               "Manager Module.");
+DEFINE_string(park_go_routing_filename, "park_go_routing.txt",
+              "Park go routing of the map, support for dreamview contest.");
 DEFINE_string(speed_control_filename, "speed_control.pb.txt",
               "The speed control region in a map.");
 
