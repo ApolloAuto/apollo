@@ -77,9 +77,9 @@ if [ "${BUILD_CONTRIB}" = "yes" ]; then
 fi
 
 # https://stackoverflow.com/questions/12427928/configure-and-build-opencv-to-custom-ffmpeg-install
-export LD_LIBRARY_PATH=${SYSROOT_DIR}/lib
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${SYSROOT_DIR}/lib/pkgconfig
-export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:${SYSROOT_DIR}/lib
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYSROOT_DIR}/lib
+# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${SYSROOT_DIR}/lib/pkgconfig
+# export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:${SYSROOT_DIR}/lib
 
 # libgtk-3-dev libtbb2 libtbb-dev
 # -DWITH_GTK=ON -DWITH_TBB=ON
@@ -107,45 +107,48 @@ fi
 
 # -DBUILD_LIST=core,highgui,improc
 pushd "opencv-${VERSION}"
-mkdir build && cd build
-cmake .. \
-    -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_SHARED_LIBS=ON \
-    -DENABLE_PRECOMPILED_HEADERS=OFF \
-    -DOPENCV_GENERATE_PKGCONFIG=ON \
-    -DBUILD_EXAMPLES=OFF \
-    -DBUILD_DOCS=OFF \
-    -DBUILD_TESTS=OFF \
-    -DBUILD_PERF_TESTS=OFF \
-    -DBUILD_JAVA=OFF \
-    -DBUILD_PROTOBUF=OFF \
-    -DPROTOBUF_UPDATE_FILES=ON \
-    -DINSTALL_C_EXAMPLES=OFF \
-    -DWITH_GTK=OFF \
-    -DWITH_IPP=OFF \
-    -DWITH_ITT=OFF \
-    -DWITH_TBB=OFF \
-    -DWITH_EIGEN=ON \
-    -DWITH_FFMPEG=ON \
-    -DWITH_LIBV4L=ON \
-    -DWITH_OPENMP=ON \
-    -DWITH_OPENNI=ON \
-    -DWITH_OPENCL=ON \
-    -DWITH_WEBP=ON \
-    -DOpenGL_GL_PREFERENCE=GLVND \
-    -DBUILD_opencv_python2=OFF \
-    -DBUILD_opencv_python3=ON \
-    -DBUILD_NEW_PYTHON_SUPPORT=ON \
-    -DPYTHON_DEFAULT_EXECUTABLE="$(which python3)" \
-    -DOPENCV_PYTHON3_INSTALL_PATH="/usr/local/lib/python$(py3_version)/dist-packages" \
-    -DOPENCV_ENABLE_NONFREE=ON \
-    -DCV_TRACE=OFF \
-    ${GPU_OPTIONS} \
-    ${EXTRA_OPTIONS}
-
-make -j$(nproc)
-make install
+    [[ ! -e build ]] && mkdir build
+    pushd build
+        cmake .. \
+            -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=ON \
+            -DENABLE_PRECOMPILED_HEADERS=OFF \
+            -DOPENCV_GENERATE_PKGCONFIG=ON \
+            -DBUILD_EXAMPLES=OFF \
+            -DBUILD_DOCS=OFF \
+            -DBUILD_TESTS=OFF \
+            -DBUILD_PERF_TESTS=OFF \
+            -DBUILD_JAVA=OFF \
+            -DBUILD_PROTOBUF=OFF \
+            -DPROTOBUF_UPDATE_FILES=ON \
+            -DINSTALL_C_EXAMPLES=OFF \
+            -DWITH_QT=OFF \
+            -DWITH_GTK=ON \
+            -DWITH_GTK_2_X=ON \
+            -DWITH_IPP=OFF \
+            -DWITH_ITT=OFF \
+            -DWITH_TBB=OFF \
+            -DWITH_EIGEN=ON \
+            -DWITH_FFMPEG=ON \
+            -DWITH_LIBV4L=ON \
+            -DWITH_OPENMP=ON \
+            -DWITH_OPENNI=ON \
+            -DWITH_OPENCL=ON \
+            -DWITH_WEBP=ON \
+            -DOpenGL_GL_PREFERENCE=GLVND \
+            -DBUILD_opencv_python2=OFF \
+            -DBUILD_opencv_python3=ON \
+            -DBUILD_NEW_PYTHON_SUPPORT=ON \
+            -DPYTHON_DEFAULT_EXECUTABLE="$(which python3)" \
+            -DOPENCV_PYTHON3_INSTALL_PATH="/usr/local/lib/python$(py3_version)/dist-packages" \
+            -DOPENCV_ENABLE_NONFREE=ON \
+            -DCV_TRACE=OFF \
+            ${GPU_OPTIONS} \
+            ${EXTRA_OPTIONS}
+        make -j$(nproc)
+        make install
+    popd
 popd
 
 ldconfig
@@ -169,4 +172,5 @@ if [[ -n "${CLEAN_DEPS}" ]]; then
         libxvidcore-dev \
         libx264-dev \
         libopenni-dev
+    apt_get_update_and_install libgtk2.0-0
 fi

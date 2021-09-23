@@ -400,7 +400,7 @@ function docker_build_run() {
     fi
 
     set -x
-    docker build ${extra_args} -t "${IMAGE_OUT}" \
+    docker build --network=host ${extra_args} -t "${IMAGE_OUT}" \
             ${build_args} \
             -f "${DOCKERFILE}" \
             "${context}"
