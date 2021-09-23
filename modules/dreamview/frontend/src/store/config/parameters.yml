@@ -260,6 +260,8 @@ options:
     default: false
   showCycleNumberInput:
     default: false
+  showParkTimeInput:
+    default: false
 
 routingEditor:
   radiusOfMapRequest: 2000.0 # meters
