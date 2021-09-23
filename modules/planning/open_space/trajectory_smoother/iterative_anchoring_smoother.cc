@@ -680,13 +680,9 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   piecewise_jerk_problem.set_dddx_bound(max_acc_jerk);
 
   // Solve the problem
-  if (!piecewise_jerk_problem.Optimize()) {
-    AWARN << "Piecewise jerk speed optimizer failed! Cancel jerk constraint";
-    piecewise_jerk_problem.set_dddx_bound(10);
-    if (!piecewise_jerk_problem.Optimize()) {
-      AERROR << "Piecewise jerk speed optimizer failed!";
-      return false;
-    }
+   if (!piecewise_jerk_problem.Optimize()) {
+    AERROR << "Piecewise jerk speed optimizer failed!";
+    return false;
   }
 
   // Extract output
