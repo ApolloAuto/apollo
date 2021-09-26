@@ -465,7 +465,7 @@ def gen_esd_can_extended(str):
     """
     int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
-    int_id |= 0x20000000
+    int_id |= 0x80000000
     str = hex(int_id).replace('0x', '')
     return str
 
