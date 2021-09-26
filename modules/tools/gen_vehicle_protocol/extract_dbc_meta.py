@@ -72,7 +72,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
 
     """
     sender_list = map(str, sender_list)
-    with open(dbc_file) as fp:
+    with open(dbc_file, encoding='utf-8') as fp:
         in_protocol = False
         protocols = {}
         protocol = {}
@@ -144,7 +144,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         config = {}
         config["car_type"] = car_type
         config["protocols"] = protocols
-        with open(out_file, 'w') as fp_write:
+        with open(out_file, 'w', encoding='utf-8') as fp_write:
             fp_write.write(yaml.dump(config))
 
         control_protocol_num =\
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0])
         sys.exit(0)
-    with open(sys.argv[1], 'r') as fp:
+    with open(sys.argv[1], 'r', encoding='utf-8') as fp:
         conf = yaml.safe_load(fp)
     dbc_file = conf["dbc_file"]
     protocol_conf_file = conf["protocol_conf"]

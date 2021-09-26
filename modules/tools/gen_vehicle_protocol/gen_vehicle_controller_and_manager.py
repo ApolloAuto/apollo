@@ -29,11 +29,11 @@ import yaml
 def gen_vehicle_controller_header(content, output_dir):
     controller_header_tpl_file = "template/controller.h.tpl"
     car_type = content["car_type"]
-    with open(controller_header_tpl_file, 'r') as tpl:
+    with open(controller_header_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     controller_header_file = output_dir + (
         "%s_controller.h" % content["car_type"].lower())
-    with open(controller_header_file, 'w') as header:
+    with open(controller_header_file, 'w', encoding='utf-8') as header:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
@@ -69,11 +69,11 @@ def gen_vehicle_controller_header(content, output_dir):
 
 def gen_vehicle_controller_cpp(content, output_dir):
     controller_cpp_tpl_file = "template/controller.cc.tpl"
-    with open(controller_cpp_tpl_file, 'r') as tpl:
+    with open(controller_cpp_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     controller_cpp_file = output_dir + ("%s_controller.cc" % car_type.lower())
-    with open(controller_cpp_file, 'w') as cpp:
+    with open(controller_cpp_file, 'w', encoding='utf-8') as cpp:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
@@ -113,12 +113,12 @@ def gen_vehicle_controller_cpp(content, output_dir):
 
 def gen_message_manager_header(content, output_dir):
     message_manager_header_tpl_file = "template/message_manager.h.tpl"
-    with open(message_manager_header_tpl_file, 'r') as tpl:
+    with open(message_manager_header_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     message_manager_header_file = output_dir + (
         "%s_message_manager.h" % car_type.lower())
-    with open(message_manager_header_file, 'w') as header:
+    with open(message_manager_header_file, 'w', encoding='utf-8') as header:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_namespace"] = car_type.lower()
@@ -129,12 +129,12 @@ def gen_message_manager_header(content, output_dir):
 
 def gen_message_manager_cpp(content, output_dir):
     message_manager_cpp_tpl_file = "template/message_manager.cc.tpl"
-    with open(message_manager_cpp_tpl_file, 'r') as tpl:
+    with open(message_manager_cpp_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     message_manager_cpp_file = output_dir + (
         "%s_message_manager.cc" % car_type.lower())
-    with open(message_manager_cpp_file, 'w') as cpp:
+    with open(message_manager_cpp_file, 'w', encoding='utf-8') as cpp:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
@@ -174,12 +174,12 @@ def gen_message_manager_cpp(content, output_dir):
 
 def gen_vehicle_factory_header(content, output_dir):
     vehicle_factory_header_tpl_file = "template/vehicle_factory.h.tpl"
-    with open(vehicle_factory_header_tpl_file, 'r') as tpl:
+    with open(vehicle_factory_header_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     vehicle_factory_header_file = output_dir + (
         "%s_vehicle_factory.h" % car_type.lower())
-    with open(vehicle_factory_header_file, 'w') as header:
+    with open(vehicle_factory_header_file, 'w', encoding='utf-8') as header:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_cap"] = car_type.capitalize()
@@ -190,12 +190,12 @@ def gen_vehicle_factory_header(content, output_dir):
 
 def gen_vehicle_factory_cpp(content, output_dir):
     vehicle_factory_cpp_tpl_file = "template/vehicle_factory.cc.tpl"
-    with open(vehicle_factory_cpp_tpl_file, 'r') as tpl:
+    with open(vehicle_factory_cpp_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     vehicle_factory_cpp_file = output_dir + (
         "%s_vehicle_factory.cc" % car_type.lower())
-    with open(vehicle_factory_cpp_file, 'w') as cpp:
+    with open(vehicle_factory_cpp_file, 'w', encoding='utf-8') as cpp:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
@@ -206,11 +206,11 @@ def gen_vehicle_factory_cpp(content, output_dir):
 
 def gen_build_file(content, output_dir):
     build_tpl_file = "template/controller_manager_BUILD.tpl"
-    with open(build_tpl_file, 'r') as tpl:
+    with open(build_tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     car_type = content["car_type"]
     build_file = output_dir + "BUILD"
-    with open(build_file, 'w') as fp:
+    with open(build_file, 'w', encoding='utf-8') as fp:
         FMT = "".join(fmt)
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
@@ -235,7 +235,7 @@ if __name__ == "__main__":
         print('Usage: python %s some_config.yml' % sys.argv[0])
         sys.exit(0)
 
-    with open(sys.argv[1], 'r') as fp:
+    with open(sys.argv[1], 'r', encoding='utf-8') as fp:
         conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
