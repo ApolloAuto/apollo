@@ -48,6 +48,7 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(
   CHECK_NOTNULL(hdmap_);
   vehicle_params_ =
       apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
+  AINFO<<config_.DebugString();
 }
 
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
