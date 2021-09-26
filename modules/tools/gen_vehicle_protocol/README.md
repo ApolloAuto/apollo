@@ -1,13 +1,10 @@
 
 ## Gen Vehicle Protocol Tool
-	It's a convinent tool to let you quickly generate a nearly complete code for a new vehicle.
+	It's a convenient tool to let you quickly generate a nearly complete code for a new vehicle.
 You only have to do is to have the dbc file (which is a communication protocol for the car, which is usually made by the vehicle integrated company), and write a less 10 lines config for generate an encode/decode `
 
-## Dependency
-
-> sudo pip install pyyaml
-
 ## Usage:
+It is assumed that the user is within Apollo docker environment and has successfully [built](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_and_run_apollo.md#build-apollo) it.
 
 The tool's input is :
 
@@ -16,7 +13,9 @@ The tool's input is :
 
 Run:
 
-> python gen.py lincoln_conf.yml
+```sh
+$ /apollo/bazel-bin/modules/tools/gen_vehicle_protocol/gen lincoln_conf.yml
+```
 
 ## Tool Framework
 
