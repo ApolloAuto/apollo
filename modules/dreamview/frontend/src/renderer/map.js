@@ -1105,7 +1105,7 @@ export default class Map {
         laneGroup1[0].predecessorId, _.last(laneGroup1).successorId, lanes[i],
       );
       if (relation1) {
-        (relation1 > 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
+        (relation1 === 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
       } else {
         if (_.isEmpty(laneGroup2)) {
           laneGroup2.push(lanes[i]);
