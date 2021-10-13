@@ -544,7 +544,8 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
       closest_index = i;
     }
     lane_heading = valid_way_points[i].lane->Heading(valid_way_points[i].s);
-    if (common::math::NormalizeAngle(lane_heading - vehicle_heading) < M_PI_2) {
+    if (std::abs(common::math::AngleDiff(lane_heading, vehicle_heading)) <
+        M_PI_2) {
       // Choose the lane with the closest distance to the vehicle and with the
       // right heading.
       if (-1 == right_heading_index || closest_index == i) {
