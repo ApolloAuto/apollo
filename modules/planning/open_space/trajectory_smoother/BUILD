@@ -247,6 +247,7 @@ cc_library(
     name = "iterative_anchoring_smoother",
     srcs = ["iterative_anchoring_smoother.cc"],
     hdrs = ["iterative_anchoring_smoother.h"],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",

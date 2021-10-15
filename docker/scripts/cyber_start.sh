@@ -372,8 +372,8 @@ function main() {
 
     postrun_start_user "${CYBER_CONTAINER}"
 
-    ok "Congrats, you have successfully finished setting up Apollo cyber docker environment." \
-        "To login into cyber container, please run the following command:"
+    ok "Congratulations! You have successfully finished setting up CyberRT Docker environment."
+    ok "To log into the newly created CyberRT container, please run the following command:"
     ok "  bash docker/scripts/cyber_into.sh"
     ok "Enjoy!"
 }

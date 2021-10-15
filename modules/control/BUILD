@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install", "install_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -48,6 +49,37 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [":control_component_lib"],
+)
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libcontrol_component.so",
+    ],
+    deps = [
+        ":pb_control",
+    ],
+)
+
+install_files(
+    name = "pb_control",
+    dest = "modules/control",
+    files = [
+        "//modules/control/proto:pad_msg_py_pb2",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "conf/*.conf",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
 )
 
 cc_test(

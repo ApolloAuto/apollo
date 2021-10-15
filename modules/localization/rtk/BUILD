@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -53,6 +54,13 @@ cc_test(
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":librtk_localization_component.so",
     ],
 )
 

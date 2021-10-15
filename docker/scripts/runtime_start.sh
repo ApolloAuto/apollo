@@ -21,6 +21,7 @@ source "${CURR_DIR}/docker_base.sh"
 DOCKER_REPO="apolloauto/apollo"
 RUNTIME_CONTAINER="apollo_runtime_${USER}"
 RUNTIME_INSIDE="in-runtime-docker"
+RUNTIME_STANDALONE="false"
 
 TARGET_ARCH="$(uname -m)"
 
@@ -59,6 +60,7 @@ OPTIONS:
     -f, --fast             Fast mode without pulling all map volumes.
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
+    -s, --standalone       Run standalone container with all volumes and apollo itself included.
     -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
     --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
 EOF
@@ -99,6 +101,10 @@ function parse_arguments() {
 
             -l | --local)
                 USE_LOCAL_IMAGE=1
+                ;;
+
+            -s | --standalone)
+                RUNTIME_STANDALONE="true"
                 ;;
 
             --shm-size)
@@ -149,12 +155,6 @@ function check_host_environment() {
         warning "Apollo Runtime Docker supports x86_64 ONLY!"
         exit 2
     fi
-
-    if [[ -f "${CURR_DIR}/dev_start.sh" ]]; then
-        warning "${CURR_DIR}/dev_start.sh detected."
-        warning "Apollo Runtime Docker is expected to run with release builds."
-        exit 3
-    fi
 }
 
 function setup_devices_and_mount_local_volumes() {
@@ -163,7 +163,15 @@ function setup_devices_and_mount_local_volumes() {
     source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
     setup_device
 
-    local volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
+    local volumes=""
+    if $RUNTIME_STANDALONE; then
+        volumes="-v ${APOLLO_ROOT_DIR}/data:/apollo/data \
+                 -v ${APOLLO_ROOT_DIR}/modules/calibration/data:/apollo/modules/calibration/data \
+                 -v ${APOLLO_ROOT_DIR}/modules/map/data:/apollo/modules/map/data \
+                 -v ${APOLLO_ROOT_DIR}/output:/apollo/output"
+    else
+        volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
+    fi
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
@@ -205,18 +213,21 @@ function docker_pull() {
 }
 
 function docker_restart_volume() {
-    local container="$1"
+    local volume="$1"
     local image="$2"
-    info "Restart volume ${container} from image: ${image}"
-    docker stop "${container}" &>/dev/null
+    local path="$3"
+    info "Create volume ${volume} from image: ${image}"
     docker_pull "${image}"
-    docker run -itd --rm --name "${container}" "${image}"
+    docker volume rm "${volume}" >/dev/null 2>&1
+    docker run -v "${volume}":"${path}" --rm "${image}" true
 }
 
 function restart_map_volume_if_needed() {
     local map_name="$1"
     local map_version="$2"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
+    local map_path="/apollo/modules/map/data/${map_name}"
+
     if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
     else
@@ -228,8 +239,8 @@ function restart_map_volume_if_needed() {
         fi
         info "Load map ${map_name} from image: ${map_image}"
 
-        docker_restart_volume "${map_volume}" "${map_image}"
-        MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volumes-from ${map_volume}"
+        docker_restart_volume "${map_volume}" "${map_image}" "${map_path}"
+        MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volume ${map_volume}:${map_path}"
     fi
 }
 
@@ -259,27 +270,31 @@ function mount_other_volumes() {
     # AUDIO
     local audio_volume="apollo_audio_volume_${USER}"
     local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${audio_volume}" "${audio_image}"
-    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+    local audio_path="/apollo/modules/audio/data/"
+    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
+    volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
 
     # YOLOV4
     local yolov4_volume="apollo_yolov4_volume_${USER}"
     local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
-    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+    local yolov4_path="/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model/"
+    docker_restart_volume "${yolov4_volume}" "${yolov4_image}" "${yolov4_path}"
+    volume_conf="${volume_conf} --volume ${yolov4_volume}:${yolov4_path}"
 
     # FASTER_RCNN
     local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
     local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
-    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
+    local faster_rcnn_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/faster_rcnn_model"
+    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}" "${faster_rcnn_path}"
+    volume_conf="${volume_conf} --volume ${faster_rcnn_volume}:${faster_rcnn_path}"
 
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"
         local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
-        docker_restart_volume "${smoke_volume}" "${smoke_image}"
-        volume_conf="${volume_conf} --volumes-from ${smoke_volume}"
+        local smoke_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/smoke_libtorch_model"
+        docker_restart_volume "${smoke_volume}" "${smoke_image}" "${smoke_path}"
+        volume_conf="${volume_conf} --volume ${smoke_volume}:${smoke_path}"
     fi
 
     OTHER_VOLUMES_CONF="${volume_conf}"
@@ -302,6 +317,8 @@ function main() {
         exit 1
     fi
 
+    $RUNTIME_STANDALONE && RUNTIME_CONTAINER="apollo_runtime_standalone_$USER"
+
     info "Check and remove existing Apollo Runtime container ..."
     remove_container_if_exists "${RUNTIME_CONTAINER}"
 
@@ -312,32 +329,34 @@ function main() {
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes
 
-    # mount_map_volumes
-    # mount_other_volumes
+    mount_map_volumes
+    $RUNTIME_STANDALONE || mount_other_volumes
 
     info "Starting docker container \"${RUNTIME_CONTAINER}\" ..."
 
     local local_host="$(hostname)"
     local display="${DISPLAY:-:0}"
-    local user="${USER}"
-    local uid="$(id -u)"
-    local group="$(id -g -n)"
-    local gid="$(id -g)"
+    local docker_user="${USER}"
+    local docker_uid="$(id -u)"
+    local docker_group="$(id -g -n)"
+    local docker_gid="$(id -g)"
 
     set -x
     ${DOCKER_RUN_CMD} -itd \
         --privileged \
         --name "${RUNTIME_CONTAINER}" \
         -e DISPLAY="${display}" \
-        -e DOCKER_USER="${user}" \
-        -e USER="${user}" \
-        -e DOCKER_USER_ID="${uid}" \
-        -e DOCKER_GRP="${group}" \
-        -e DOCKER_GRP_ID="${gid}" \
+        -e USER="${USER}" \
+        -e DOCKER_USER="${docker_user}" \
+        -e DOCKER_USER_ID="${docker_uid}" \
+        -e DOCKER_GRP="${docker_group}" \
+        -e DOCKER_GRP_ID="${docker_gid}" \
         -e DOCKER_IMG="${RUNTIME_IMAGE}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
+        ${MAP_VOLUMES_CONF} \
+        ${OTHER_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \
@@ -358,9 +377,12 @@ function main() {
 
     postrun_start_user ${RUNTIME_CONTAINER}
 
+    $RUNTIME_STANDALONE && docker exec -u root "${RUNTIME_CONTAINER}" bash -c "chown -R ${docker_uid}:${docker_gid} /apollo"
+
     ok "Congratulations! You have successfully finished setting up Apollo Runtime Environment."
     ok "To login into the newly created ${RUNTIME_CONTAINER} container, please run the following command:"
-    ok "  bash docker/scripts/runtime_into.sh"
+    $RUNTIME_STANDALONE || ok "  bash docker/scripts/runtime_into.sh"
+    $RUNTIME_STANDALONE && ok "  bash docker/scripts/runtime_into_standalone.sh"
     ok "Enjoy!"
 }
 

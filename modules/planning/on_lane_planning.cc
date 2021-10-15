@@ -21,11 +21,17 @@
 #include <list>
 #include <utility>
 
+#include "gtest/gtest_prod.h"
+
 #include "absl/strings/str_cat.h"
+
+#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/proto/planning_semantic_map_config.pb.h"
+#include "modules/routing/proto/routing.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
-#include "gtest/gtest_prod.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -37,12 +43,9 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/proto/planning_semantic_map_config.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -60,7 +63,36 @@ using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
-
+void SetChartminmax(apollo::dreamview::Chart* chart, std::string label_name_x,
+                    std::string label_name_y) {
+  auto* options = chart->mutable_options();
+  double xmin(std::numeric_limits<double>::max()),
+      xmax(std::numeric_limits<double>::lowest()),
+      ymin(std::numeric_limits<double>::max()),
+      ymax(std::numeric_limits<double>::lowest());
+  for (int i = 0; i < chart->line_size(); i++) {
+    auto* line = chart->mutable_line(i);
+    for (auto& pt : line->point()) {
+      xmin = std::min(xmin, pt.x());
+      ymin = std::min(ymin, pt.y());
+      xmax = std::max(xmax, pt.x());
+      ymax = std::max(ymax, pt.y());
+    }
+    auto* properties = line->mutable_properties();
+    (*properties)["borderWidth"] = "2";
+    (*properties)["pointRadius"] = "0";
+    (*properties)["lineTension"] = "0";
+    (*properties)["fill"] = "false";
+    (*properties)["showLine"] = "true";
+  }
+  options->mutable_x()->set_min(xmin);
+  options->mutable_x()->set_max(xmax);
+  options->mutable_x()->set_label_string(label_name_x);
+  options->mutable_y()->set_min(ymin);
+  options->mutable_y()->set_max(ymax);
+  options->mutable_y()->set_label_string(label_name_y);
+  // Set chartJS's dataset properties
+}
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
@@ -137,6 +169,16 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
 
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
+  }
+
+  // Get the parking space information from routing request of local view.
+  auto& routing_request = local_view_.routing->routing_request();
+  if (routing_request.has_parking_info() &&
+      routing_request.parking_info().has_parking_space_id()) {
+    *(frame_->mutable_open_space_info()->mutable_target_parking_spot_id()) =
+        routing_request.parking_info().parking_space_id();
+  } else {
+    ADEBUG << "No parking space id from routing";
   }
 
   std::list<ReferenceLine> reference_lines;
@@ -252,6 +294,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
 
+  // Update reference line provider and reset pull over if necessary
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     ADEBUG << "last_routing_:" << last_routing_.ShortDebugString();
@@ -278,9 +322,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     GenerateStopTrajectory(ptr_trajectory_pb);
     return;
   }
-
-  // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
@@ -816,6 +857,8 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
                        open_space_debug.xy_boundary(3) + 1.0, "y (meter)", true,
                        chart);
 
+  chart->mutable_options()->set_sync_xy_window_size(true);
+  chart->mutable_options()->set_aspect_ratio(0.9);
   int obstacle_index = 1;
   for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* obstacle_outline = chart->add_line();
@@ -839,22 +882,24 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* smoothed_line = chart->add_line();
   smoothed_line->set_label("Smooth");
-  size_t adc_label = 0;
-  for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
+  // size_t adc_label = 0;
+  for (int i = 0; i < smoothed_trajectory.vehicle_motion_point_size() / 2;
+       i++) {
+    auto& point = smoothed_trajectory.vehicle_motion_point(i);
     const auto x = point.trajectory_point().path_point().x();
     const auto y = point.trajectory_point().path_point().y();
-    const auto heading = point.trajectory_point().path_point().theta();
-
-    // Draw vehicle shape along the trajectory
-    auto* adc_shape = chart->add_car();
-    adc_shape->set_x(x);
-    adc_shape->set_y(y);
-    adc_shape->set_heading(heading);
-    adc_shape->set_color("rgba(54, 162, 235, 1)");
-    adc_shape->set_label(std::to_string(adc_label));
-    adc_shape->set_hide_label_in_legend(true);
-    ++adc_label;
-
+    // const auto heading = point.trajectory_point().path_point().theta();
+    /*
+        // Draw vehicle shape along the trajectory
+        auto* adc_shape = chart->add_car();
+        adc_shape->set_x(x);
+        adc_shape->set_y(y);
+        adc_shape->set_heading(heading);
+        adc_shape->set_color("rgba(54, 162, 235, 1)");
+        adc_shape->set_label(std::to_string(adc_label));
+        adc_shape->set_hide_label_in_legend(true);
+        ++adc_label;
+    */
     // Draw vehicle trajectory points
     auto* point_debug = smoothed_line->add_point();
     point_debug->set_x(x);
@@ -872,8 +917,10 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
   auto* warm_start_line = chart->add_line();
   warm_start_line->set_label("WarmStart");
-  for (const auto& point : warm_start_trajectory.vehicle_motion_point()) {
+  for (int i = 0; i < warm_start_trajectory.vehicle_motion_point_size() / 2;
+       i++) {
     auto* point_debug = warm_start_line->add_point();
+    auto& point = warm_start_trajectory.vehicle_motion_point(i);
     point_debug->set_x(point.trajectory_point().path_point().x());
     point_debug->set_y(point.trajectory_point().path_point().y());
   }
@@ -904,7 +951,11 @@ void OnLanePlanning::AddPartitionedTrajectory(
 
   const auto& vehicle_state = frame_->vehicle_state();
   auto chart = debug_chart->mutable_planning_data()->add_chart();
+  auto chart_kappa = debug_chart->mutable_planning_data()->add_chart();
+  auto chart_theta = debug_chart->mutable_planning_data()->add_chart();
   chart->set_title("Open Space Partitioned Trajectory");
+  chart_kappa->set_title("total kappa");
+  chart_theta->set_title("total theta");
   auto* options = chart->mutable_options();
   options->mutable_x()->set_label_string("x (meter)");
   options->mutable_y()->set_label_string("y (meter)");
@@ -934,7 +985,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
   (*chosen_properties)["lineTension"] = "0";
   (*chosen_properties)["fill"] = "false";
   (*chosen_properties)["showLine"] = "true";
-
+  auto* theta_line = chart_theta->add_line();
+  auto* kappa_line = chart_kappa->add_line();
   // Draw partitioned trajectories
   size_t partitioned_trajectory_label = 0;
   for (const auto& partitioned_trajectory :
@@ -945,8 +997,14 @@ void OnLanePlanning::AddPartitionedTrajectory(
     ++partitioned_trajectory_label;
     for (const auto& point : partitioned_trajectory.trajectory_point()) {
       auto* point_debug = partition_line->add_point();
+      auto* point_theta = theta_line->add_point();
+      auto* point_kappa = kappa_line->add_point();
       point_debug->set_x(point.path_point().x());
       point_debug->set_y(point.path_point().y());
+      point_theta->set_x(point.relative_time());
+      point_kappa->set_x(point.relative_time());
+      point_theta->set_y(point.path_point().theta());
+      point_kappa->set_y(point.path_point().kappa());
     }
 
     auto* partition_properties = partition_line->mutable_properties();
@@ -955,6 +1013,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["lineTension"] = "0";
     (*partition_properties)["fill"] = "false";
     (*partition_properties)["showLine"] = "true";
+    SetChartminmax(chart_kappa, "time", "total kappa");
+    SetChartminmax(chart_theta, "time", "total theta");
   }
 
   // Draw trajectory stitching point (line with only one point)
@@ -1033,12 +1093,10 @@ void OnLanePlanning::AddStitchSpeedProfile(
   chart->set_title("Open Space Speed Plan Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
-  options->mutable_x()->set_window_size(20.0);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(2.1);
-  options->mutable_y()->set_max(-1.1);
-  options->mutable_y()->set_label_string("speed (m/s)");
-
+  double xmin(std::numeric_limits<double>::max()),
+      xmax(std::numeric_limits<double>::lowest()),
+      ymin(std::numeric_limits<double>::max()),
+      ymax(std::numeric_limits<double>::lowest());
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
@@ -1049,7 +1107,16 @@ void OnLanePlanning::AddStitchSpeedProfile(
     point_debug->set_x(point.relative_time() +
                        last_trajectory.header().timestamp_sec());
     point_debug->set_y(point.v());
+    if (point_debug->x() > xmax) xmax = point_debug->x();
+    if (point_debug->x() < xmin) xmin = point_debug->x();
+    if (point_debug->y() > ymax) ymax = point_debug->y();
+    if (point_debug->y() < ymin) ymin = point_debug->y();
   }
+  options->mutable_x()->set_window_size(xmax - xmin);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(ymin);
+  options->mutable_y()->set_max(ymax);
+  options->mutable_y()->set_label_string("speed (m/s)");
   // Set chartJS's dataset properties
   auto* speed_profile_properties = speed_profile->mutable_properties();
   (*speed_profile_properties)["borderWidth"] = "2";
@@ -1070,15 +1137,13 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   chart->set_title("Speed Partition Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
-  options->mutable_x()->set_window_size(10.0);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(2.1);
-  options->mutable_y()->set_max(-1.1);
-  options->mutable_y()->set_label_string("speed (m/s)");
-
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
+  double xmin(std::numeric_limits<double>::max()),
+      xmax(std::numeric_limits<double>::lowest()),
+      ymin(std::numeric_limits<double>::max()),
+      ymax(std::numeric_limits<double>::lowest());
   for (const auto& point : trajectory_pb.trajectory_point()) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() +
@@ -1089,7 +1154,16 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
     if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE) {
       point_debug->set_y(-point.v());
     }
+    if (point_debug->x() > xmax) xmax = point_debug->x();
+    if (point_debug->x() < xmin) xmin = point_debug->x();
+    if (point_debug->y() > ymax) ymax = point_debug->y();
+    if (point_debug->y() < ymin) ymin = point_debug->y();
   }
+  options->mutable_x()->set_window_size(xmax - xmin);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(ymin);
+  options->mutable_y()->set_max(ymax);
+  options->mutable_y()->set_label_string("speed (m/s)");
   // Set chartJS's dataset properties
   auto* speed_profile_properties = speed_profile->mutable_properties();
   (*speed_profile_properties)["borderWidth"] = "2";
@@ -1137,16 +1211,14 @@ void OnLanePlanning::AddPublishedAcceleration(
   if (!frame_->open_space_info().open_space_provider_success()) {
     return;
   }
-
+  double xmin(std::numeric_limits<double>::max()),
+      xmax(std::numeric_limits<double>::lowest()),
+      ymin(std::numeric_limits<double>::max()),
+      ymax(std::numeric_limits<double>::lowest());
   auto chart = debug->mutable_planning_data()->add_chart();
   chart->set_title("Acceleration Partition Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
-  options->mutable_x()->set_window_size(10.0);
-  options->mutable_x()->set_label_string("time (s)");
-  options->mutable_y()->set_min(2.1);
-  options->mutable_y()->set_max(-1.1);
-  options->mutable_y()->set_label_string("Acceleration (m/s^2)");
 
   auto* acceleration_profile = chart->add_line();
   acceleration_profile->set_label("Acceleration Profile");
@@ -1158,7 +1230,16 @@ void OnLanePlanning::AddPublishedAcceleration(
       point_debug->set_y(point.a());
     if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE)
       point_debug->set_y(-point.a());
+    if (point_debug->x() > xmax) xmax = point_debug->x();
+    if (point_debug->x() < xmin) xmin = point_debug->x();
+    if (point_debug->y() > ymax) ymax = point_debug->y();
+    if (point_debug->y() < ymin) ymin = point_debug->y();
   }
+  options->mutable_x()->set_window_size(xmax - xmin);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(ymin);
+  options->mutable_y()->set_max(ymax);
+  options->mutable_y()->set_label_string("acceleration (m/s)");
   // Set chartJS's dataset properties
   auto* acceleration_profile_properties =
       acceleration_profile->mutable_properties();

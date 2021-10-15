@@ -50,9 +50,13 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
     if path != None:
         return path
 
-    # print("{}: installing file {} ({}) which is not in current package".format(
-    #      ctx.label, input_file.path, input_file.short_path))
-    return input_file.basename
+    owner = input_file.owner
+    if owner.workspace_name != "":
+        dest = join_paths("third_party", owner.workspace_name, owner.package, input_file.basename)
+    else:
+        dest = join_paths(owner.package, input_file.basename)
+    # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
+    return dest
 
 #------------------------------------------------------------------------------
 def _guess_files(target, candidates, scope, attr_name):
@@ -322,6 +326,7 @@ def _install_impl(ctx):
             installed_files[a.dst] = src
         elif src != installed_files[a.dst]:
             orig = installed_files[a.dst]
+
             # Note(storypku):
             # Workaround for detected conflict betwen
             # <generated file external/local_config_cuda/cuda/cuda/lib/libcudart.so.11.0> and

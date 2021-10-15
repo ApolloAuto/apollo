@@ -1,7 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//third_party/qt5:qt.bzl", "qt_cc_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":cyber_visualizer",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
+)
 
 cc_binary(
     name = "cyber_visualizer",

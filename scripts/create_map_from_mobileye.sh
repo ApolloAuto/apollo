@@ -34,5 +34,5 @@ else
   fi
   echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt
   ./scripts/generate_routing_topo_graph.sh
-  ./bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
+  ${APOLLO_BIN_PREFIX}/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
 fi

@@ -97,6 +97,14 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+    /**
+   * @brief get json which construct routing request needs
+   * @param json that contains start point,json that contains end point
+   * @return json that contains start point,end point without waypoint
+   */
+  nlohmann::json GetConstructRoutingRequestJson(
+      const nlohmann::json &start, const nlohmann::json &end);
+
   /**
    * @brief The function to construct a parking routing task from the given
    * json,
@@ -143,11 +151,14 @@ class SimulationWorldUpdater {
       const apollo::routing::LaneWaypoint &waypoint);
 
   /**
-   * @brief Tries to load the user-defined default routings from the txt file
+   * @brief Tries to load the user-defined routings from the txt file
+   * @param file_name: txt file name
+   * @param message: protobuf message to store user defined routings
    * @return False if failed to load from file,file doesn't exist
    * true otherwise or if it's already loaded.
    */
-  bool LoadDefaultRoutings();
+  bool LoadUserDefinedRoutings(const std::string &file_name,
+                               google::protobuf::Message *message);
 
   /**
    * @brief Tries to save the points to a fixed location file
@@ -173,6 +184,9 @@ class SimulationWorldUpdater {
   // default routings
   apollo::routing::POI default_routings_;
   apollo::routing::Landmark *default_routing_;
+
+  // park and go
+  apollo::routing::POI park_go_routings_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.

@@ -97,15 +97,21 @@ function generate_solibs() {
     )
 
     for libdir in ${SYSLIB_DIRS[@]}; do
-        find ${libdir} -name "*.so" \
+        find ${libdir} \( -type f -or -type l \) -name "*.so" \
             -exec bash -c 'retrieve_so_deps "$0"' {} \
                 >> ${listing} \;
     done
+    find /usr/local/qt5/ -name "*.so" -exec bash -c 'retrieve_so_deps "$0"' {}  \
+            >> ${listing} \;
+
     cat ${listing} | sort -u
 }
 
 function solib_locate() {
     solib="$1"
+    if [[ ${solib} != "/"* || ! -e ${solib} ]]; then
+        return
+    fi
     dest="$2"
     # https://superuser.com/questions/363444
     # /how-do-i-get-the-output-and-exit-value-of-a-subshell-when-using-bash-e
@@ -147,8 +153,10 @@ function main() {
     fi
 
     info "Resolve directory path for Apollo binary distribution..."
-    find "${PREFIX_DIR}" -name "*.dag" -exec \
+    find "${PREFIX_DIR}" \( -name "*.dag" -or -name "*.launch" \) -exec \
         sed -i 's@/apollo/bazel-bin@/apollo@g' {} \;
+    find "${PREFIX_DIR}" -name "*.sh" -exec \
+        sed -i 's@${TOP_DIR}/bazel-bin/modules@${TOP_DIR}/modules@g' {} \;
     ok "Done."
     if [[ "${RESOLVE_DEPS}" -gt 0 ]]; then
         info "Resolve runtime library dependencies and generate APT packages list..."

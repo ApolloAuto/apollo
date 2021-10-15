@@ -2,6 +2,13 @@ load("@rules_python//python:defs.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "py_files",
+    srcs = glob([
+        "*.py",
+    ]),
+)
+
 py_binary(
     name = "rtk_player",
     srcs = ["rtk_player.py"],

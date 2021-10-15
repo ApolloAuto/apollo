@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -44,8 +45,8 @@ cc_library(
         "//modules/localization/proto:sins_pva_cc_proto",
         "//modules/transform:transform_broadcaster",
         "@boost",
-        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_github_google_glog//:glog",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -70,6 +71,19 @@ cc_test(
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+install(
+    name = "install",
+    targets = [
+        ":libmsf_localization_component.so",
+    ],
+    deps = [
+        "//modules/localization/msf/local_tool/data_extraction:install",
+        "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
+        "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+        "//modules/localization/msf/params:install",
     ],
 )
 

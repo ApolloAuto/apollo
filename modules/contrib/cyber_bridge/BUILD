@@ -1,7 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+      ":cyber_bridge",
+    ],
+    runtime_dest = "modules/contrib/cyber_bridge",
+    deps = [
+        "//cyber:install",
+    ],
+)
 
 cc_binary(
     name = "cyber_bridge",

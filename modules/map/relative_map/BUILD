@@ -1,13 +1,29 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
+install(
+    name = "install",
+    data = [
+        ":relative_map_conf",
+        ":testdata",
+    ],
+    targets = [
+        ":librelative_map_component.so",
+    ],
+)
+
 filegroup(
     name = "relative_map_conf",
-    srcs = glob(["conf/**"]),
+    srcs = glob([
+        "conf/**",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
 )
 
 cc_library(

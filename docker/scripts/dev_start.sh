@@ -27,7 +27,7 @@ DEV_INSIDE="in-dev-docker"
 SUPPORTED_ARCHS=(x86_64 aarch64)
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20210517_1712"
+VERSION_X86_64="dev-x86_64-18.04-20210914_1336"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
 VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
@@ -248,18 +248,21 @@ function docker_pull() {
 }
 
 function docker_restart_volume() {
-    local container="$1"
+    local volume="$1"
     local image="$2"
-    info "Restart volume ${container} from image: ${image}"
-    docker stop "${container}" &>/dev/null
+    local path="$3"
+    info "Create volume ${volume} from image: ${image}"
     docker_pull "${image}"
-    docker run -itd --rm --name "${container}" "${image}"
+    docker volume rm "${volume}" >/dev/null 2>&1
+    docker run -v "${volume}":"${path}" --rm "${image}" true
 }
 
 function restart_map_volume_if_needed() {
     local map_name="$1"
     local map_version="$2"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
+    local map_path="/apollo/modules/map/data/${map_name}"
+
     if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
     else
@@ -271,8 +274,8 @@ function restart_map_volume_if_needed() {
         fi
         info "Load map ${map_name} from image: ${map_image}"
 
-        docker_restart_volume "${map_volume}" "${map_image}"
-        MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volumes-from ${map_volume}"
+        docker_restart_volume "${map_volume}" "${map_image}" "${map_path}"
+        MAP_VOLUMES_CONF="${MAP_VOLUMES_CONF} --volume ${map_volume}:${map_path}"
     fi
 }
 
@@ -302,27 +305,31 @@ function mount_other_volumes() {
     # AUDIO
     local audio_volume="apollo_audio_volume_${USER}"
     local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${audio_volume}" "${audio_image}"
-    volume_conf="${volume_conf} --volumes-from ${audio_volume}"
+    local audio_path="/apollo/modules/audio/data/"
+    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
+    volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
 
     # YOLOV4
     local yolov4_volume="apollo_yolov4_volume_${USER}"
     local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${yolov4_volume}" "${yolov4_image}"
-    volume_conf="${volume_conf} --volumes-from ${yolov4_volume}"
+    local yolov4_path="/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model/"
+    docker_restart_volume "${yolov4_volume}" "${yolov4_image}" "${yolov4_path}"
+    volume_conf="${volume_conf} --volume ${yolov4_volume}:${yolov4_path}"
 
     # FASTER_RCNN
     local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
     local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
-    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}"
-    volume_conf="${volume_conf} --volumes-from ${faster_rcnn_volume}"
+    local faster_rcnn_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/faster_rcnn_model"
+    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}" "${faster_rcnn_path}"
+    volume_conf="${volume_conf} --volume ${faster_rcnn_volume}:${faster_rcnn_path}"
 
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"
         local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
-        docker_restart_volume "${smoke_volume}" "${smoke_image}"
-        volume_conf="${volume_conf} --volumes-from ${smoke_volume}"
+        local smoke_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/smoke_libtorch_model"
+        docker_restart_volume "${smoke_volume}" "${smoke_image}" "${smoke_path}"
+        volume_conf="${volume_conf} --volume ${smoke_volume}:${smoke_path}"
     fi
 
     OTHER_VOLUMES_CONF="${volume_conf}"

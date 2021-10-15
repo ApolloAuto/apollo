@@ -48,6 +48,7 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(
   CHECK_NOTNULL(hdmap_);
   vehicle_params_ =
       apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
+  AINFO<<config_.DebugString();
 }
 
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
@@ -1216,10 +1217,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
     return false;
   }
 
-  auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
   LaneInfoConstPtr nearest_lane;
-  double vehicle_lane_s = 0.0;
-  double vehicle_lane_l = 0.0;
   // Check if last frame lane is available
   const auto &ptr_last_frame = injector_->frame_history()->Latest();
 
@@ -1230,18 +1228,83 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   }
 
   const auto &previous_open_space_info = ptr_last_frame->open_space_info();
+  const auto &parking_spot_id_string =
+      frame->open_space_info().target_parking_spot_id();
   if (previous_open_space_info.target_parking_lane() != nullptr &&
       previous_open_space_info.target_parking_spot_id() ==
-          frame->open_space_info().target_parking_spot_id()) {
+          parking_spot_id_string) {
     nearest_lane = previous_open_space_info.target_parking_lane();
   } else {
-    int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-        point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
-        &vehicle_lane_s, &vehicle_lane_l);
-    if (status != 0) {
-      AERROR
-          << "Getlane failed at OpenSpaceRoiDecider::GetParkingSpotFromMap()";
+    hdmap::Id parking_spot_id = hdmap::MakeMapId(parking_spot_id_string);
+    auto parking_spot = hdmap_->GetParkingSpaceById(parking_spot_id);
+    if (nullptr == parking_spot) {
+      AERROR << "The parking spot id is invalid!";
       return false;
+    }
+    auto parking_space = parking_spot->parking_space();
+    auto overlap_ids = parking_space.overlap_id();
+    if (overlap_ids.empty()) {
+      AERROR << "There is no lane overlaps with the parking spot: "
+             << parking_spot_id_string;
+      return false;
+    }
+    std::vector<routing::LaneSegment> lane_segments;
+    GetAllLaneSegments(*(frame->local_view().routing), lane_segments);
+    bool has_found_nearest_lane = false;
+    size_t nearest_lane_index = 0;
+    for (auto id : overlap_ids) {
+      auto overlaps = hdmap_->GetOverlapById(id)->overlap();
+      for (auto object : overlaps.object()) {
+        if (!object.has_lane_overlap_info()) {
+          continue;
+        }
+        nearest_lane = hdmap_->GetLaneById(object.id());
+        if (nearest_lane == nullptr) {
+          continue;
+        }
+        // Check if the lane is contained in the routing response.
+        for (auto &segment : lane_segments) {
+          if (segment.id() == nearest_lane->id().id()) {
+            has_found_nearest_lane = true;
+            break;
+          }
+          ++nearest_lane_index;
+        }
+        if (has_found_nearest_lane) {
+          break;
+        }
+      }
+    }
+    if (!has_found_nearest_lane) {
+      AERROR << "Cannot find the lane nearest to the parking spot when "
+                "GetParkingSpot!";
+    }
+
+    // Get the lane nearest to the current position of the vehicle. If the
+    // vehicle has not reached the nearest lane to the parking spot, set the
+    // lane nearest to the vehicle as "nearest_lane".
+    LaneInfoConstPtr nearest_lane_to_vehicle;
+    auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
+    double vehicle_lane_s = 0.0;
+    double vehicle_lane_l = 0.0;
+    int status = hdmap_->GetNearestLaneWithHeading(
+        point, 10.0, vehicle_state_.heading(), M_PI / 2.0,
+        &nearest_lane_to_vehicle, &vehicle_lane_s, &vehicle_lane_l);
+    if (status == 0) {
+      size_t nearest_lane_to_vehicle_index = 0;
+      bool has_found_nearest_lane_to_vehicle = false;
+      for (auto &segment : lane_segments) {
+        if (segment.id() == nearest_lane_to_vehicle->id().id()) {
+          has_found_nearest_lane_to_vehicle = true;
+          break;
+        }
+        ++nearest_lane_to_vehicle_index;
+      }
+      // The vehicle has not reached the nearest lane to the parking spot。
+      if (has_found_nearest_lane_to_vehicle &&
+          nearest_lane_to_vehicle_index < nearest_lane_index) {
+        nearest_lane = nearest_lane_to_vehicle;
+      }
     }
   }
   frame->mutable_open_space_info()->set_target_parking_lane(nearest_lane);
@@ -1752,6 +1815,19 @@ void OpenSpaceRoiDecider::GetParkSpotFromMap(
   Vec2d tmp = (*vertices)[0];
   ADEBUG << "Parking Lot";
   ADEBUG << "parking_lot_vertices: (" << tmp.x() << ", " << tmp.y() << ")";
+}
+
+void OpenSpaceRoiDecider::GetAllLaneSegments(
+    const routing::RoutingResponse &routing_response,
+    std::vector<routing::LaneSegment> &routing_segments) {
+  routing_segments.clear();
+  for (const auto &road : routing_response.road()) {
+    for (const auto &passage : road.passage()) {
+      for (const auto &segment : passage.segment()) {
+        routing_segments.emplace_back(segment);
+      }
+    }
+  }
 }
 
 }  // namespace planning
