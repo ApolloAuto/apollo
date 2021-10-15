@@ -16,3 +16,15 @@
 --use_sim_time=false
 
 --use_cyber_time=true
+
+--map_dir=/apollo/modules/map/data/haidianjiaxiao
+
+--map_dir=/apollo/modules/map/data/apollo_map
+
+--map_dir=/apollo/modules/map/data/apollo_map_parking
+
+--map_dir=/apollo/modules/map/data/haidiandaluwang
+
+--map_dir=/apollo/modules/map/data/haidianjiaxiao
+
+--map_dir=/apollo/modules/map/data/apollo_map_parking

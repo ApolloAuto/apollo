@@ -154,12 +154,14 @@ bool CanbusComponent::Init() {
     AERROR << "Failed to start can sender.";
     return false;
   }
+  AINFO << "start send.";
 
   // 4. start controller
   if (!vehicle_controller_->Start()) {
     AERROR << "Failed to start vehicle controller.";
     return false;
   }
+  AINFO << "start controller.";
 
   monitor_logger_buffer_.INFO("Canbus is started.");
 

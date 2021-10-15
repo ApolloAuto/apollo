@@ -1,0 +1,158 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: ACU SCU
+VAL_TABLE_ brake_status 1 "lock brake" 0 "unlock brake" ;
+VAL_TABLE_ error_clear_instruction 7 "celar remote control signal loss" 6 "clear steer encoder communicate " 5 "clear battery undervoltage fault" 4 "non" 3 "clear back-left motor failure" 2 "clear back-right motor failure" 1 "clear steer communicate failure" 0 "clear all non-critical faults" ;
+VAL_TABLE_ control_mode_setting 1 "CAN command control" 0 "standby" ;
+VAL_TABLE_ brake_status 1 "brake lock" 0 "brake release" ;
+VAL_TABLE_ current_vehicle_status 2 "system exception" 1 "Emergency shutdownd mode" 0 "system ok" ;
+VAL_TABLE_ control_mode 2 "remote control" 1 "CAN command control" 0 "standby" ;
+
+
+BO_ 305 brake_control_command: 8 ACU
+ SG_ brake_control_command : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1089 status_setting: 8 ACU
+ SG_ error_clear_instruction : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 1057 control_mode_setting: 8 ACU
+ SG_ control_mode_setting : 7|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 273 motion_control_instruction: 8 ACU
+ SG_ steer_instruction : 55|16@0- (0.001,0) [-32.768|32.767] "rad" Vector__XXX
+ SG_ speed_instruction : 7|16@0- (0.001,0) [-32.768|32.767] "m/s" Vector__XXX
+
+BO_ 545 motion_control_feedback: 8 SCU
+ SG_ steer : 55|16@0- (0.001,0) [-32.768|32.767] "rad" Vector__XXX
+ SG_ speed : 7|16@0- (0.001,0) [-32.768|32.767] "m/s" Vector__XXX
+
+BO_ 529 chassis_status_feedback: 8 SCU
+ SG_ count : 63|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ brake_status : 55|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ fault_message : 39|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ battery_voltage : 23|16@0+ (0.1,0) [0|6553.5] "V" Vector__XXX
+ SG_ control_mode : 15|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ current_vehicle_status : 7|8@0+ (1,0) [0|255] ""  SCU
+
+
+
+CM_ BU_ ACU "Apollo node";
+CM_ BU_ SCU "vehicle node";
+BA_DEF_ BO_  "TpJ1939VarDlc" ENUM  "No","Yes";
+BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl","MessageCounter","MessageChecksum";
+BA_DEF_ SG_  "GenSigEVName" STRING ;
+BA_DEF_ SG_  "GenSigILSupport" ENUM  "No","Yes";
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ BO_  "GenMsgFastOnStart" INT 0 100000;
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 3600000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 1000000;
+BA_DEF_ SG_  "GenSigStartValue" INT 0 2147483647;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 100000;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "NmJ1939SystemInstance" INT 0 15;
+BA_DEF_ BU_  "NmJ1939System" INT 0 127;
+BA_DEF_ BU_  "NmJ1939ManufacturerCode" INT 0 2047;
+BA_DEF_ BU_  "NmJ1939IndustryGroup" INT 0 7;
+BA_DEF_ BU_  "NmJ1939IdentityNumber" INT 0 2097151;
+BA_DEF_ BU_  "NmJ1939FunctionInstance" INT 0 7;
+BA_DEF_ BU_  "NmJ1939Function" INT 0 255;
+BA_DEF_ BU_  "NmJ1939ECUInstance" INT 0 3;
+BA_DEF_ BU_  "NmJ1939AAC" INT 0 1;
+BA_DEF_ BU_  "NmStationAddress" INT 0 255;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclic","NotUsed","IfActive","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed","noMsgSendType";
+BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_ SG_  "SPN" INT 0 524287;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG";
+BA_DEF_DEF_  "TpJ1939VarDlc" "No";
+BA_DEF_DEF_  "SigType" "Default";
+BA_DEF_DEF_  "GenSigEVName" "Env@Nodename_@Signame";
+BA_DEF_DEF_  "GenSigILSupport" "Yes";
+BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "GenMsgFastOnStart" 0;
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "NmJ1939SystemInstance" 0;
+BA_DEF_DEF_  "NmJ1939System" 0;
+BA_DEF_DEF_  "NmJ1939ManufacturerCode" 0;
+BA_DEF_DEF_  "NmJ1939IndustryGroup" 0;
+BA_DEF_DEF_  "NmJ1939IdentityNumber" 0;
+BA_DEF_DEF_  "NmJ1939FunctionInstance" 0;
+BA_DEF_DEF_  "NmJ1939Function" 0;
+BA_DEF_DEF_  "NmJ1939ECUInstance" 0;
+BA_DEF_DEF_  "NmJ1939AAC" 0;
+BA_DEF_DEF_  "NmStationAddress" 254;
+BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
+BA_DEF_DEF_  "GenMsgRequestable" 1;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "SPN" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "ProtocolType" "J1939";
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_ "DBName" "Hunter2_0";
+BA_ "NmStationAddress" BU_ ACU 2;
+BA_ "NmStationAddress" BU_ SCU 1;
+BA_ "VFrameFormat" BO_ 305 0;
+BA_ "VFrameFormat" BO_ 1089 0;
+BA_ "VFrameFormat" BO_ 1057 0;
+BA_ "GenMsgCycleTime" BO_ 273 20;
+BA_ "VFrameFormat" BO_ 273 0;
+BA_ "GenMsgCycleTime" BO_ 545 20;
+BA_ "VFrameFormat" BO_ 545 0;
+BA_ "VFrameFormat" BO_ 529 0;
+BA_ "GenMsgCycleTime" BO_ 529 100;
+VAL_ 305 brake_control_command 1 "brake lock" 0 "brake release" ;
+VAL_ 1089 error_clear_instruction 7 "celar remote control signal loss" 6 "clear steer encoder communicate " 5 "clear battery undervoltage fault" 4 "non" 3 "clear back-left motor failure" 2 "clear back-right motor failure" 1 "clear steer communicate failure" 0 "clear all non-critical faults" ;
+VAL_ 1057 control_mode_setting 1 "CAN command control" 0 "standby" ;
+VAL_ 529 brake_status 1 "brake lock" 0 "brake release" ;
+VAL_ 529 control_mode 2 "remote control" 1 "CAN command control" 0 "standby" ;
+VAL_ 529 current_vehicle_status 2 "system exception" 1 "Emergency shutdownd mode" 0 "system ok" ;
+

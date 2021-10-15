@@ -1,5 +1,5 @@
 
-udp_port: 2008
+udp_port: 2001
 frame_id: "video_right_fisheye"
 pixel_format: "yuyv"
 trigger_param: "f2ff"
@@ -7,7 +7,7 @@ metric_error_code: 33
 record:0
 width: 1920
 height: 1080
-frame_rate: 5
+frame_rate: 20
 monochrome: false
 brightness: -1
 contrast: -1
@@ -25,6 +25,6 @@ fpga_dev_number: 0
 camera_seq_number: 7
 
 compress_conf {
-    output_channel: "/apollo/sensor/camera/right_fisheye/image/compressed"
+    output_channel: "/apollo/sensor/camera/right_fisheye/video/compressed"
     image_pool_size: 100
 }

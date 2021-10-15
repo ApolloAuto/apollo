@@ -10,10 +10,7 @@ topic_config {
   routing_response_topic: "/apollo/routing_response"
   story_telling_topic: "/apollo/storytelling"
   traffic_light_detection_topic: "/apollo/perception/traffic_light"
-  planning_learning_data_topic: "/apollo/planning/learning_data"
 }
-# NO_LEARNING / E2E / HYBRID / RL_TEST / E2E_TEST / HYBRID_TEST
-learning_mode: NO_LEARNING
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
@@ -23,7 +20,7 @@ default_task_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   piecewise_jerk_path_optimizer_config {
     default_path_config {
-      l_weight: 1.0
+      l_weight: 30.0
       dl_weight: 20.0
       ddl_weight: 1000.0
       dddl_weight: 50000.0
@@ -88,7 +85,7 @@ default_task_config: {
       positive_jerk_coeff: 1.0
       negative_jerk_coeff: 1.0
 
-      max_acceleration: 2.0
+      max_acceleration: 1.0
       max_deceleration: -4.0
       spatial_potential_penalty: 1.0e2
     }
@@ -118,7 +115,7 @@ default_task_config: {
       positive_jerk_coeff: 1.0
       negative_jerk_coeff: 1.0
 
-      max_acceleration: 2.0
+      max_acceleration: 1.0
       max_deceleration: -2.5
       spatial_potential_penalty: 1.0e5
       is_lane_changing: true
@@ -142,17 +139,17 @@ default_task_config: {
 default_task_config: {
   task_type: ST_BOUNDS_DECIDER
   st_bounds_decider_config {
-    total_time: 7.0
+    total_time: 15.0
   }
 }
 default_task_config: {
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   speed_bounds_decider_config {
-    total_time: 7.0
+    total_time: 15.0
     boundary_buffer: 0.25
     max_centric_acceleration_limit: 2.0
     point_extension: 0.0
-    lowest_speed: 2.5
+    lowest_speed: 0.1
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
   }
@@ -160,11 +157,11 @@ default_task_config: {
 default_task_config: {
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   speed_bounds_decider_config {
-    total_time: 7.0
+    total_time: 15.0
     boundary_buffer: 0.1
     max_centric_acceleration_limit: 2.0
     point_extension: 0.0
-    lowest_speed: 2.5
+    lowest_speed: 0.1
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
   }
@@ -234,9 +231,9 @@ default_task_config: {
           weight_end_state: 1.0
           weight_slack: 1.0
           min_safety_distance: 0.01
-          max_speed_forward: 2.0
+          max_speed_forward: 1.5
           max_speed_reverse: 1.0
-          max_acceleration_forward: 2.0
+          max_acceleration_forward: 1.0
           max_acceleration_reverse: 1.0
           min_time_sample_scaling: 0.8
           max_time_sample_scaling: 1.2
@@ -300,7 +297,7 @@ default_task_config: {
           delta_t: 0.2
         }
         delta_t: 0.5
-        is_near_destination_threshold: 0.1
+        is_near_destination_threshold: 0.2
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
         is_near_destination_theta_threshold: 0.05
@@ -340,6 +337,7 @@ default_task_config: {
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
     curb_heading_tangent_change_upper_limit: 0.4
+    parallel_park_end_x_buffer: 0.2
   }
 }
 default_task_config: {

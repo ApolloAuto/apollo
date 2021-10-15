@@ -45,11 +45,6 @@
 # default: false
 --obs_save_fusion_supplement=true
 
-# Enable saving result images for visualization
-# type: bool
-# default: false
---start_visualizer=false
-
 ###########################################################################
 # Flags from transform_wrapper
 
@@ -89,63 +84,7 @@
 --obs_max_local_pose_extrapolation_latency=0.15
 
 --config_manager_path=./
+--start_visualizer=false
+--lidar_model_version=velodyne128
 
-###########################################################################
-# Flags from lidar_point_pillars
-
-# classification score threshold
-# type: double
-# default: 0.5
---score_threshold=0.5
-
-# enable ground removal
-# type: bool
-# default: false
---enable_ground_removal=false
-
-# remove point cloud that under this height
-# type: double
-# default: -1.5
---ground_removal_height=-1.5
-
-# enable down-sampling point cloud by beams. Set false to use full cloud for
-# more accurate detection, but some obstacles in front of ego vehicle might
-# not be detected if you use 128c Lidar.
-# type: bool
-# default: false
---enable_downsample_beams=false
-
-# factor for down-sampling point cloud beams
-# type: int
-# default: 4
---downsample_beams_factor=4
-
-# enable down-sampling point cloud by voxelization
-# type: bool
-# default: false
---enable_downsample_pointcloud=false
-
-# down-sample voxel size along x-axis
-# type: double
-# default: 0.01
---downsample_voxel_size_x=0.1
-
-# down-sample voxel size along y-axis
-# type: double
-# default: 0.01
---downsample_voxel_size_y=0.1
-
-# down-sample voxel size along z-axis
-# type: double
-# default: 0.01
---downsample_voxel_size_z=0.1
-
-# enable fusing point cloud of preceding frames
-# type: bool
-# default: false
---enable_fuse_frames=false
-
-# number of frames (including current frame) for fusing point cloud
-# type: int
-# default: 5
---num_fuse_frames=5
+--lidar_sensor_name=lidar16

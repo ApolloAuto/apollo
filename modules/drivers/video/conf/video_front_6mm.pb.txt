@@ -1,5 +1,5 @@
 
-udp_port: 2000
+udp_port: 2004
 frame_id: "video_front_6mm"
 pixel_format: "yuyv"
 trigger_param: "f2ff"
@@ -7,7 +7,7 @@ metric_error_code: 18
 record:0
 width: 1920
 height: 1080
-frame_rate: 15
+frame_rate: 20
 monochrome: false
 brightness: -1
 contrast: -1
@@ -25,6 +25,6 @@ fpga_dev_number: 0
 camera_seq_number: 3
 
 compress_conf {
-    output_channel: "/apollo/sensor/camera/front_6mm/image/compressed"
+    output_channel: "/apollo/sensor/camera/front_6mm/video/compressed"
     image_pool_size: 100
 }

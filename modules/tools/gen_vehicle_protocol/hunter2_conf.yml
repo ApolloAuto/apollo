@@ -1,0 +1,9 @@
+dbc_file: hunter2.dbc
+protocol_conf: hunter2.yml
+car_type: hunter2
+sender_list: []
+sender: ACU
+black_list: []
+
+output_dir: output/
+
