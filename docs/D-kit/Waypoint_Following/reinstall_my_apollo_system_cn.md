@@ -220,7 +220,7 @@ cd ~
 sudo apt update
 sudo apt install git -y
 git init
-git clone -b v6.0_edu https://gitee.com/ApolloAuto/apollo.git
+git clone -b r5.5.0 https://gitee.com/ApolloAuto/apollo.git
 ```
 
 代码下载的时间视网速的快慢而有所区别，请耐心等待；下载完成后的代码在~/apollo目录下，若您需要和Apollo代码保持完全同步，请接着执行以下命令：
