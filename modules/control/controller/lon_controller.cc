@@ -21,6 +21,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
@@ -421,7 +422,8 @@ void LonController::ComputeLongitudinalErrors(
       vehicle_state->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Time::Now().ToSecond();
+  //double current_control_time = Time::Now().ToSecond();
+  double current_control_time = ::apollo::cyber::Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =
