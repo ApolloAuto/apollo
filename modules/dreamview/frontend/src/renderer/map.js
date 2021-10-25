@@ -1157,7 +1157,11 @@ export default class Map {
     if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
       return null;
     }
-    deadJunctionInfo.routingPoint = routingPointInfo[0];
+    const offsetRoutingPoint = coordinates.applyOffset(
+      { x: routingPointInfo[0].x, y: routingPointInfo[0].y },
+      true
+    );
+    deadJunctionInfo.routingPoint = offsetRoutingPoint;
     deadJunctionInfo.deadJunctionPoints = deadJunction.polygon.point;
     deadJunctionInfo.outLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.outStartPoint, deadJunctionInfo.out, laneDistanceThreshold, 'successorId');
