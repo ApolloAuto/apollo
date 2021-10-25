@@ -9,6 +9,7 @@ install(
     runtime_dest = "modules/localization/msf/local_tool/data_extraction",
     targets = [
         ":compare_poses",
+        ":cyber_record_parser",
     ],
 )
 

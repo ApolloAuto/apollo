@@ -23,6 +23,8 @@ filegroup(
         "rtk_player.sh",
         "rtk_recorder.sh",
         "extract_data.sh",
+        "msf_simple_map_creator.sh",
+        "localization_online_visualizer.sh"
     ],
 )
 
