@@ -80,6 +80,7 @@ install(
         ":libmsf_localization_component.so",
     ],
     deps = [
+        "//modules/localization/msf/local_tool/map_creation:install",
         "//modules/localization/msf/local_tool/data_extraction:install",
         "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",

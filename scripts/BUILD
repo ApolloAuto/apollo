@@ -15,19 +15,21 @@ install(
         ":recorder",
         ":tools",
     ],
-    data_dest = "scripts/src"
+    data_dest = "scripts/src",
 )
 
 install(
     name = "install",
     data = [":cyberfile.xml"],
     data_dest = "scripts",
-    deps = ["install_scripts"]
+    deps = ["install_scripts"],
 )
 
 filegroup(
     name = "tools",
     srcs = [
+        "localization_online_visualizer.sh",
+        "msf_simple_map_creator.sh",
         "rtk_player.sh",
         "rtk_recorder.sh",
     ],
@@ -46,9 +48,9 @@ filegroup(
 filegroup(
     name = "recorder",
     srcs = [
+        "cyberfile.xml",
         "record_bag.py",
         "record_bag.sh",
-	"cyberfile.xml"
     ],
 )
 
