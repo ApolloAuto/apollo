@@ -1,7 +1,18 @@
+load("//tools/install:install.bzl", "install")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "modules/localization/msf/local_tool/map_creation",
+    targets = [
+        ":poses_interpolator",
+        ":lossless_map_creator",
+        ":lossless_map_to_lossy_map",
+    ],
+)
 
 cc_binary(
     name = "lossless_map_creator",
