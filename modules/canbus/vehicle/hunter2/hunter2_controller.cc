@@ -362,11 +362,23 @@ void Hunter2Controller::Brake(double pedal) {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   brake_60_->set_pedal(pedal);
   */
- if(chassis_.speed_mps()<=0)
-    motion_control_instruction_111_->set_speed_instruction(-1.0*pedal/100);
+//  if(chassis_.speed_mps()<=0)
+//     motion_control_instruction_111_->set_speed_instruction(-1.0*pedal/100);
 
 }
 
+// drive with old acceleration
+// gas:0.00~99.99 unit:
+void Hunter2Controller::Speed(double pedal) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "The current drive mode does not need to set throttle pedal.";
+    return;
+  }
+  if(chassis_.speed_mps()>=0)
+    motion_control_instruction_111_->set_speed_instruction(pedal/100);
+
+}
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void Hunter2Controller::Throttle(double pedal) {
@@ -375,11 +387,8 @@ void Hunter2Controller::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set throttle pedal.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  throttle_62_->set_pedal(pedal);
-  */
-  if(chassis_.speed_mps()>=0)
-    motion_control_instruction_111_->set_speed_instruction(pedal/100);
+ AINFO<<"throttle"<<pedal;
+  motion_control_instruction_111_->set_speed_instruction(pedal);
 
 }
 

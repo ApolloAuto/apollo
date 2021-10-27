@@ -22,8 +22,8 @@ vehicle_param {
   wheel_rolling_radius: 0.202
   max_abs_speed_when_stopped: 0.15
 
-  brake_deadzone: 3.0
-  throttle_deadzone: 5.0
+  brake_deadzone: 0.0
+  throttle_deadzone: 0.0
 
   steering_latency_param
   {

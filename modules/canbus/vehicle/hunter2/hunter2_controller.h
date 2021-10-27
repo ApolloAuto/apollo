@@ -77,6 +77,10 @@ class Hunter2Controller final : public VehicleController {
   // acceleration_spd: 60 ~ 100, suggest: 90
   void Brake(double acceleration) override;
 
+  // drive with old speed
+  // speed:0.00~99.99 unit:
+  void Speed(double speed) ;
+
   // drive with old acceleration
   // gas:0.00~99.99 unit:
   void Throttle(double throttle) override;

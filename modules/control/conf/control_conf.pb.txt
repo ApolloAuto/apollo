@@ -1,5 +1,5 @@
 control_test_duration: -1
-enable_csv_debug: false
+enable_csv_debug: true
 enable_speed_station_preview: false
 is_control_test_mode: false
 use_preview_speed_for_table: false
@@ -23,7 +23,7 @@ max_planning_delay_threshold: 4.0
 action: STOP
 soft_estop_brake: 50.0
 active_controllers: LAT_CONTROLLER
-active_controllers: LON_CONTROLLER
+active_controllers: SPEED_CONTROLLER
 max_steering_percentage_allowed: 100
 minimum_speed_resolution: 0.2
 query_relative_time: 0.8
@@ -982,6 +982,68 @@ lon_controller_conf {
       command: -33.0
     }
   }
+}
+speed_controller_conf {
+  ts: 0.01
+  brake_minimum_action: 0.0
+  throttle_minimum_action: 0.0
+  speed_controller_input_limit: 1.5
+  station_error_limit: 2.0
+  preview_window: 20.0
+  standstill_acceleration: 0
+  enable_reverse_leadlag_compensation: false
+  station_pid_conf {
+    integrator_enable: false
+    integrator_saturation_level: 0.3
+    kp: 0.1
+    ki: 0.0
+    kd: 0.0
+  }
+  low_speed_pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.3
+    kp: 0.2
+    ki: 0.05
+    kd: 0.0
+  }
+  high_speed_pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.3
+    kp: 0.3
+    ki: 0.1
+    kd: 0.0
+  }
+  switch_speed: 6.0
+    reverse_station_pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.5
+    kp: 0.4
+    ki: 0.1
+    kd: 0.0
+  }
+  reverse_speed_pid_conf {
+    integrator_enable: true
+    integrator_saturation_level: 0.5
+    kp: 0.8
+    ki: 0.3
+    kd: 0.0
+  }
+  reverse_station_leadlag_conf {
+    innerstate_saturation_level: 1000
+    alpha: 1.0
+    beta: 1.0
+    tau: 0.0
+  }
+  reverse_speed_leadlag_conf {
+    innerstate_saturation_level: 1000
+    alpha: 1.0
+    beta: 1.0
+    tau: 0.0
+  }
+  pitch_angle_filter_conf {
+    cutoff_freq: 5
+  }
+
 }
 mpc_controller_conf {
   ts: 0.01

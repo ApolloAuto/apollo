@@ -262,14 +262,14 @@ class ControlInfo(object):
         self.current_speed.append(entity.debug.simple_lon_debug.speed_reference -
                                         entity.debug.simple_lon_debug.speed_error)
         self.drivingAction.append(entity.pad_msg.action)
-        self.station_kp.append(entity.debug.simple_lon_debug.station_kp)
-        self.station_ki.append(entity.debug.simple_lon_debug.station_ki)
-        self.station_kd.append(entity.debug.simple_lon_debug.station_kd)
-        self.speed_kp.append(entity.debug.simple_lon_debug.speed_kp)
-        self.speed_ki.append(entity.debug.simple_lon_debug.speed_ki)
-        self.speed_kd.append(entity.debug.simple_lon_debug.speed_kd)
-        self.speed_integral.append(entity.debug.simple_lon_debug.speed_integral)
-        self.station_integral.append(entity.debug.simple_lon_debug.station_integral)
+        # self.station_kp.append(entity.debug.simple_lon_debug.station_kp)
+        # self.station_ki.append(entity.debug.simple_lon_debug.station_ki)
+        # self.station_kd.append(entity.debug.simple_lon_debug.station_kd)
+        # self.speed_kp.append(entity.debug.simple_lon_debug.speed_kp)
+        # self.speed_ki.append(entity.debug.simple_lon_debug.speed_ki)
+        # self.speed_kd.append(entity.debug.simple_lon_debug.speed_kd)
+        # self.speed_integral.append(entity.debug.simple_lon_debug.speed_integral)
+        # self.station_integral.append(entity.debug.simple_lon_debug.station_integral)
 
         self.curvature.append(entity.debug.simple_lat_debug.curvature*100.0)
         self.heading_error.append(entity.debug.simple_lat_debug.heading_error)
@@ -288,14 +288,14 @@ class ControlInfo(object):
         self.steer_angle_lateral_rate_contribution.append(entity.debug.simple_lat_debug.steer_angle_lateral_rate_contribution)
         self.steer_angle_heading_contribution.append(entity.debug.simple_lat_debug.steer_angle_heading_contribution)
         self.steer_angle_heading_rate_contribution.append(entity.debug.simple_lat_debug.steer_angle_heading_rate_contribution)
-        self.matrix_k_0.append(entity.debug.simple_lat_debug.matrix_k_0)
-        self.matrix_k_1.append(entity.debug.simple_lat_debug.matrix_k_1)
-        self.matrix_k_2.append(entity.debug.simple_lat_debug.matrix_k_2)
-        self.matrix_k_3.append(entity.debug.simple_lat_debug.matrix_k_3)
-        self.matrix_q_0.append(entity.debug.simple_lat_debug.matrix_q_0)
-        self.matrix_q_1.append(entity.debug.simple_lat_debug.matrix_q_1)
-        self.matrix_q_2.append(entity.debug.simple_lat_debug.matrix_q_2)
-        self.matrix_q_3.append(entity.debug.simple_lat_debug.matrix_q_3)
+        # self.matrix_k_0.append(entity.debug.simple_lat_debug.matrix_k_0)
+        # self.matrix_k_1.append(entity.debug.simple_lat_debug.matrix_k_1)
+        # self.matrix_k_2.append(entity.debug.simple_lat_debug.matrix_k_2)
+        # self.matrix_k_3.append(entity.debug.simple_lat_debug.matrix_k_3)
+        # self.matrix_q_0.append(entity.debug.simple_lat_debug.matrix_q_0)
+        # self.matrix_q_1.append(entity.debug.simple_lat_debug.matrix_q_1)
+        # self.matrix_q_2.append(entity.debug.simple_lat_debug.matrix_q_2)
+        # self.matrix_q_3.append(entity.debug.simple_lat_debug.matrix_q_3)
 
     def read_bag(self, bag_file):
         file_path = bag_file
@@ -556,8 +556,8 @@ class ControlInfo(object):
             self.controltime, self.speed_controller_input_limited, marker = '*',markersize=2,linewidth=1.0, label='speed_controller_input_limited')
         ax[1, 0].plot(
                 self.controltime, self.speed_offset, marker = '*',markersize=2,linewidth=1.0, label='speed_offset')
-        ax[1, 0].plot(
-                self.controltime, self.station_integral, marker = '*',markersize=2,linewidth=1.0, label='station_integral')
+        # ax[1, 0].plot(
+        #         self.controltime, self.station_integral, marker = '*',markersize=2,linewidth=1.0, label='station_integral')
         ax[1, 0].legend(fontsize='medium')
         ax[1, 0].grid(True)
         ax[1, 0].set_title('Speed Info')
@@ -567,8 +567,8 @@ class ControlInfo(object):
         ax[1, 1].plot(self.controltime, self.acc_open, label='Acc Open')
         ax[1, 1].plot(self.controltime, self.acceleration_lookup, label='Lookup Acc')
         ax[1, 1].plot(self.controltime, self.acc_close, label='Acc Close')#speed_PID的输出
-        ax[1, 1].plot(
-                self.controltime, self.speed_integral, marker = '*',markersize=2,linewidth=1.0, label='speed_integral')
+        # ax[1, 1].plot(
+        #         self.controltime, self.speed_integral, marker = '*',markersize=2,linewidth=1.0, label='speed_integral')
         # ax[1, 1].plot(self.controltime, self.slope_offset_compensation ,label='slope_offset_compensation')
         # ax[1, 1].plot(self.controltime, self.calibration_value, label='calibration_value')#查表所得油门指令
         # ax[1, 1].plot(
@@ -933,7 +933,7 @@ class ControlInfo(object):
         self.plot_lateral_all()
         # self.plot_heading()
         # self.plot_steering()
-        self.add_lateral_sheet()
+        # self.add_lateral_sheet()
         # plt.show()
 
     def show_localization(self):
@@ -1117,10 +1117,10 @@ if __name__ == "__main__":
     
     controlinfo.Print_len()
     # controlinfo.show_longitudinal()
-    controlinfo.show_lateral()
+    # controlinfo.show_lateral()
     controlinfo.show_localization()
     controlinfo.show_longitudinal_all()
-    controlinfo.plot_matrix_kq()
+    # controlinfo.plot_matrix_kq()
     # controlinfo.plot_PID()
     
     book.close()
