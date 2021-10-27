@@ -217,12 +217,6 @@ function main() {
         fi
     done
 
-    info "Resolve directory path for Apollo binary distribution..."
-    find "${PREFIX_DIR}" \( -name "*.dag" -or -name "*.launch" \) -exec \
-        sed -i 's@/apollo/bazel-bin@/apollo@g' {} \;
-    find "${PREFIX_DIR}" -name "*.sh" -exec \
-        sed -i 's@${TOP_DIR}/bazel-bin/modules@${TOP_DIR}/modules@g' {} \;
-    ok "Done."
     if [[ "${RESOLVE_DEPS}" -gt 0 ]]; then
         info "Resolve runtime library dependencies and generate APT packages list..."
         generate_apt_pkgs
