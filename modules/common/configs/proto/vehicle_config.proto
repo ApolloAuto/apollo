@@ -36,6 +36,7 @@ enum VehicleBrand {
   CH = 7;
   DKIT = 8;
   NEOLIX = 9;
+  HUNTER2 = 10;
 }
 
 message VehicleID {
