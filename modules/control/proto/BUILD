@@ -33,33 +33,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "speed_controller_conf_cc_proto",
-    deps = [
-        ":speed_controller_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "speed_controller_conf_proto",
-    srcs = ["speed_controller_conf.proto"],
-    deps = [
-        ":calibration_table_proto",
-        ":leadlag_conf_proto",
-        ":pid_conf_proto",
-        ":lon_controller_conf_proto",
-    ],
-)
-
-py_proto_library(
-    name = "speed_controller_conf_py_pb2",
-    deps = [
-        ":calibration_table_py_pb2",
-        ":leadlag_conf_py_pb2",
-        ":speed_controller_conf_proto",
-        ":pid_conf_py_pb2",
-    ],
-)
-cc_proto_library(
     name = "preprocessor_cc_proto",
     deps = [
         ":preprocessor_proto",
@@ -320,7 +293,6 @@ proto_library(
     deps = [
         ":lat_controller_conf_proto",
         ":lon_controller_conf_proto",
-        ":speed_controller_conf_proto",
         ":mpc_controller_conf_proto",
         ":pad_msg_proto",
         "//modules/canbus/proto:chassis_proto",
@@ -333,7 +305,6 @@ py_proto_library(
         ":control_conf_proto",
         ":lat_controller_conf_py_pb2",
         ":lon_controller_conf_py_pb2",
-        ":speed_controller_conf_py_pb2",
         ":mpc_controller_conf_py_pb2",
         ":pad_msg_py_pb2",
         "//modules/canbus/proto:chassis_py_pb2",

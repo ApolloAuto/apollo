@@ -239,25 +239,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "hunter2_cc_proto",
-    deps = [
-        ":hunter2_proto",
-    ],
-)
-
-proto_library(
-    name = "hunter2_proto",
-    srcs = ["hunter2.proto"],
-)
-
-py_proto_library(
-    name = "hunter2_py_pb2",
-    deps = [
-        ":hunter2_proto",
-    ],
-)
-
-cc_proto_library(
     name = "chassis_detail_cc_proto",
     deps = [
         ":chassis_detail_proto",
@@ -274,7 +255,6 @@ proto_library(
         ":ge3_proto",
         ":lexus_proto",
         ":neolix_edu_proto",
-        ":hunter2_proto",
         ":transit_proto",
         ":wey_proto",
         ":zhongyun_proto",
@@ -292,7 +272,6 @@ py_proto_library(
         ":ge3_py_pb2",
         ":lexus_py_pb2",
         ":neolix_edu_py_pb2",
-        ":hunter2_py_pb2",
         ":transit_py_pb2",
         ":wey_py_pb2",
         ":zhongyun_py_pb2",

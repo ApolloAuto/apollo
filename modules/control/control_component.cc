@@ -176,7 +176,7 @@ Status ControlComponent::ProduceControlCommand(
     Status status_ts = CheckTimestamp(local_view_);
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
-      estop_ = true;
+      // estop_ = true;
       status = status_ts;
       if (local_view_.chassis().driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
