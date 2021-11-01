@@ -7,12 +7,14 @@ import "modules/control/proto/pad_msg.proto";
 import "modules/control/proto/lat_controller_conf.proto";
 import "modules/control/proto/lon_controller_conf.proto";
 import "modules/control/proto/mpc_controller_conf.proto";
+import "modules/control/proto/speed_controller_conf.proto";
 
 message ControlConf {
   enum ControllerType {
     LAT_CONTROLLER = 0;
     LON_CONTROLLER = 1;
     MPC_CONTROLLER = 2;
+    SPEED_CONTROLLER = 3;
   };
 
   // configs from gflags
@@ -63,4 +65,8 @@ message ControlConf {
   optional double minimum_speed_protection = 36;
 
   optional double max_path_remain_when_stopped = 37 [default = 0.3];
+
+  optional apollo.control.SpeedControllerConf speed_controller_conf = 38;
+
+
 }
