@@ -30,7 +30,7 @@ bool ObstacleMultiSensorFusion::Init(
   fusion_.reset(fusion);
 
   FusionInitOptions init_options;
-  init_options.main_sensors = param.main_sensors;
+  init_options.main_sensor = param.main_sensor;
   if (fusion_ == nullptr || !fusion_->Init(init_options)) {
     AINFO << "Failed to Get Instance or Initialize " << param.fusion_method;
     return false;
