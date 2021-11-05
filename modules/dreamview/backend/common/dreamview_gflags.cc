@@ -93,7 +93,7 @@ DEFINE_string(default_data_collection_config_path,
               "/apollo/modules/dreamview/conf/data_collection_table.pb.txt",
               "Data collection table config path.");
 
-DEFINE_double(loop_routing_end_to_start_distance_threshold, 10.0,
+DEFINE_int32(loop_routing_end_to_start_distance_threshold, 10,
              "Loop routing distance threshold: start to end");
 
 DEFINE_string(default_preprocess_config_path,
@@ -108,3 +108,7 @@ DEFINE_string(lidar_calibration_mode, "Lidar-IMU Sensor Calibration",
 
 DEFINE_string(camera_calibration_mode, "Camera-Lidar Sensor Calibration",
               "Name of camera_to_lidar calibration mode.");
+
+DEFINE_double(parking_routing_distance_threshold, 20.0,
+              "For open space planner parking situation: get the routing"
+              "end point based on this threshold.");

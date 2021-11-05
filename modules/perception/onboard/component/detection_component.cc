@@ -34,11 +34,13 @@ std::atomic<uint32_t> DetectionComponent::seq_num_{0};
 bool DetectionComponent::Init() {
   LidarDetectionComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
+    AERROR << "Get config failed";
     return false;
   }
-  ADEBUG << "Lidar Component Configs: " << comp_config.DebugString();
+  AINFO << "Lidar Component Configs: " << comp_config.DebugString();
   output_channel_name_ = comp_config.output_channel_name();
   sensor_name_ = comp_config.sensor_name();
+  detector_name_ = comp_config.detector_name();
   lidar2novatel_tf2_child_frame_id_ =
       comp_config.lidar2novatel_tf2_child_frame_id();
   lidar_query_tf_offset_ =
@@ -74,21 +76,17 @@ bool DetectionComponent::InitAlgorithmPlugin() {
   ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
                                                           &sensor_info_));
 
-  detector_.reset(new lidar::LidarObstacleDetection);
-  if (detector_ == nullptr) {
-    AERROR << "sensor_name_ "
-           << "Failed to get detection instance";
-    return false;
-  }
+  lidar::BaseLidarObstacleDetection* detector =
+      lidar::BaseLidarObstacleDetectionRegisterer::
+      GetInstanceByName(detector_name_);
+  CHECK_NOTNULL(detector);
+  detector_.reset(detector);
   lidar::LidarObstacleDetectionInitOptions init_options;
   init_options.sensor_name = sensor_name_;
   init_options.enable_hdmap_input =
       FLAGS_obs_enable_hdmap_input && enable_hdmap_;
-  if (!detector_->Init(init_options)) {
-    AINFO << "sensor_name_ "
-          << "Failed to init detection.";
-    return false;
-  }
+  ACHECK(detector_->Init(init_options)) <<
+                            "lidar obstacle detection init error";
 
   lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);
   return true;

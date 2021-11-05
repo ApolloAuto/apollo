@@ -34,6 +34,7 @@
 #include "modules/planning/scenarios/learning_model/learning_model_sample_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
+#include "modules/planning/scenarios/dead_end/deadend_turnaround/deadend_turnaround_scenario.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
@@ -121,6 +122,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new scenario::yield_sign::YieldSignScenario(
           config_map_[scenario_type], &scenario_context_, injector_));
       break;
+    case ScenarioConfig::DEADEND_TURNAROUND:
+      ptr.reset(new scenario::deadend_turnaround::DeadEndTurnAroundScenario(
+          config_map_[scenario_type], &scenario_context_, injector_));
+      break;
     default:
       return nullptr;
   }
@@ -193,6 +198,10 @@ void ScenarioManager::RegisterScenarios() {
   // yield_sign
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
                               &config_map_[ScenarioConfig::YIELD_SIGN]));
+  // turn around
+  ACHECK(Scenario::LoadConfig(
+      FLAGS_scenario_deadend_turnaround_config_file,
+      &config_map_[ScenarioConfig::DEADEND_TURNAROUND]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
@@ -312,6 +321,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
     case ScenarioConfig::VALET_PARKING:
+    case ScenarioConfig::DEADEND_TURNAROUND:
     case ScenarioConfig::YIELD_SIGN:
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
@@ -328,7 +338,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
     const Frame& frame) {
   const auto& pad_msg_driving_action = frame.GetPadMsgDrivingAction();
-
   switch (pad_msg_driving_action) {
     case DrivingAction::PULL_OVER:
       if (FLAGS_enable_scenario_emergency_pull_over) {
@@ -351,11 +360,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
     default:
       break;
   }
-
   return default_scenario_type_;
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectIntersectionScenario(
+ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
     const Frame& frame) {
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
@@ -730,6 +738,33 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
   return default_scenario_type_;
 }
 
+ScenarioConfig::ScenarioType ScenarioManager::SelectDeadEndScenario(
+    const Frame& frame) {
+  size_t waypoint_num =
+    frame.local_view().routing->routing_request().waypoint().size();
+  const auto& routing_type =
+    frame.local_view().routing->routing_request().dead_end_info().
+    dead_end_routing_type();
+  if (routing_type == routing::ROUTING_IN) {
+    dead_end_point_ = frame.local_view().routing->routing_request().
+                    waypoint().at(waypoint_num - 1).pose();
+  } else if (routing_type == routing::ROUTING_OUT) {
+    dead_end_point_ = frame.local_view().routing->routing_request().
+                    waypoint().at(0).pose();
+  }
+  const auto& scenario_config =
+    config_map_[ScenarioConfig::DEADEND_TURNAROUND].deadend_turnaround_config();
+  double dead_end_start_range =
+      scenario_config.dead_end_start_range();
+  if (scenario::deadend_turnaround::DeadEndTurnAroundScenario::IsTransferable(
+          frame, dead_end_point_, dead_end_start_range) &&
+          routing_type == routing::ROUTING_IN) {
+    return ScenarioConfig::DEADEND_TURNAROUND;
+  }
+
+  return default_scenario_type_;
+}
+
 ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
     const Frame& frame) {
   bool park_and_go = false;
@@ -760,7 +795,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
-  ADEBUG << "adc_distance_to_dest:" << adc_distance_to_dest;
   // if vehicle is static, far enough to destination and (off-lane or not on
   // city_driving lane)
   if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&
@@ -804,6 +838,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   ScenarioDispatch(frame);
 }
 
+
 void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   ACHECK(!frame.reference_line_info().empty());
   ScenarioConfig::ScenarioType scenario_type;
@@ -842,16 +877,31 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchLearning() {
   return scenario_type;
 }
 
+bool ScenarioManager::JudgeReachTargetPoint(
+  const common::VehicleState& car_position,
+  const common::PointENU& target_point) {
+  double distance_to_vehicle =
+    (car_position.x() - target_point.x()) *
+    (car_position.x() - target_point.x()) +
+    (car_position.y() - target_point.y()) *
+    (car_position.y() - target_point.y());
+  return distance_to_vehicle < FLAGS_threshold_distance_for_destination;
+}
+
 ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
     const Frame& frame) {
   ////////////////////////////////////////
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
-
   ////////////////////////////////////////
   // Pad Msg scenario
   scenario_type = SelectPadMsgScenario(frame);
 
+  const auto vehicle_state_provider = injector_->vehicle_state();
+  common::VehicleState vehicle_state = vehicle_state_provider->vehicle_state();
+  const common::PointENU& target_point =
+  frame.local_view().routing->routing_request().dead_end_info().target_point();
+  const common::VehicleState& car_position = frame.vehicle_state();
   if (scenario_type == default_scenario_type_) {
     // check current_scenario (not switchable)
     switch (current_scenario_->scenario_type()) {
@@ -867,6 +917,12 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       case ScenarioConfig::VALET_PARKING:
+      case ScenarioConfig::DEADEND_TURNAROUND:
+        // transfer dead_end to lane follow, should enhance transfer logic
+        if (JudgeReachTargetPoint(car_position, target_point)) {
+          scenario_type = ScenarioConfig::LANE_FOLLOW;
+          reach_target_pose_ = true;
+        }
       case ScenarioConfig::YIELD_SIGN:
         // must continue until finish
         if (current_scenario_->GetStatus() !=
@@ -878,11 +934,10 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
         break;
     }
   }
-
   ////////////////////////////////////////
   // ParkAndGo / starting scenario
   if (scenario_type == default_scenario_type_) {
-    if (FLAGS_enable_scenario_park_and_go) {
+    if (FLAGS_enable_scenario_park_and_go && !reach_target_pose_) {
       scenario_type = SelectParkAndGoScenario(frame);
     }
   }
@@ -890,7 +945,7 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
   ////////////////////////////////////////
   // intersection scenarios
   if (scenario_type == default_scenario_type_) {
-    scenario_type = SelectIntersectionScenario(frame);
+    scenario_type = SelectInterceptionScenario(frame);
   }
 
   ////////////////////////////////////////
@@ -906,7 +961,12 @@ ScenarioConfig::ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectValetParkingScenario(frame);
   }
-
+  ////////////////////////////////////////
+  // dead end
+  if (scenario_type == default_scenario_type_) {
+    scenario_type = SelectDeadEndScenario(frame);
+  }
+  ////////////////////////////////////////
   return scenario_type;
 }
 

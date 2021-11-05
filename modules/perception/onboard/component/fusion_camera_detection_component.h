@@ -202,13 +202,10 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   // // variables for CIPV
   bool enable_cipv_ = false;
-  Cipv cipv_;
-  float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-  float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-  float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-  float average_frame_rate_ = kAverageFrameRate;
-  bool image_based_cipv_ = false;
-  int debug_level_ = 0;
+  std::unique_ptr<camera::BaseCipv> cipv_;
+  camera::CipvInitOptions cipv_init_options_;
+  std::string cipv_name_;
+
   // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;

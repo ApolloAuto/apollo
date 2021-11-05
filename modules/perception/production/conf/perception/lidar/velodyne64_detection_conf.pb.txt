@@ -1,4 +1,5 @@
 sensor_name: "velodyne64"
+detector_name: "LidarObstacleDetection"
 enable_hdmap: true
 lidar_query_tf_offset: 0
 lidar2novatel_tf2_child_frame_id: "velodyne64"

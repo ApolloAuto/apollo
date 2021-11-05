@@ -48,6 +48,7 @@ class DetectionComponent : public cyber::Component<drivers::PointCloud> {
  private:
   static std::atomic<uint32_t> seq_num_;
   std::string sensor_name_;
+  std::string detector_name_;
   bool enable_hdmap_ = true;
   float lidar_query_tf_offset_ = 20.0f;
   std::string lidar2novatel_tf2_child_frame_id_;

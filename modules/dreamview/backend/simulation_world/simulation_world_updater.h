@@ -22,13 +22,13 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/routing/proto/default_routing.pb.h"
 #include "modules/routing/proto/poi.pb.h"
 #include "modules/task_manager/proto/task_manager.pb.h"
 
@@ -98,6 +98,30 @@ class SimulationWorldUpdater {
       const nlohmann::json &json,
       apollo::routing::RoutingRequest *routing_request);
 
+  /**
+   * @brief The function to construct a parking routing task from the given
+   * json,
+   * @param json that contains start, end, waypoint, parking info, lane width,
+   * @param parking_routing_task
+   * @return True if parking routing task is constructed successfully
+   */
+  bool ConstructParkingRoutingTask(
+      const nlohmann::json &json,
+      apollo::task_manager::ParkingRoutingTask *parking_routing_task);
+
+  /**
+   * @brief The function to construct a dead end junction routing task from the
+   * given json,
+   * @param json that contains start1, end1, start2, end2, inLaneIds,
+   * outLaneIds, junctionInfo
+   * @param dead_junction_routing_task
+   * @return True if dead junction routing task is constructed successfully
+   */
+  bool ConstructDeadJunctionRoutingTask(
+      const nlohmann::json &json,
+      apollo::task_manager::DeadEndRoutingTask
+          *dead_end_routing_task);
+
   bool ValidateCoordinate(const nlohmann::json &json);
 
   /**
@@ -108,12 +132,27 @@ class SimulationWorldUpdater {
   nlohmann::json CheckRoutingPoint(const nlohmann::json &json);
 
   /**
+   * @brief Check if routing point is located on a lane that included by arr
+   * @param json that contains point and ids array
+   * @return json contains error means check failed else means check succeed
+   */
+  nlohmann::json CheckDeadEndJunctionPoints(const nlohmann::json &json);
+
+  /**
    * @brief Tries to load the points of interest from the file if it has
    * not been.
    * @return False if failed to load from file,
    * true otherwise or if it's already loaded.
    */
   bool LoadPOI();
+
+    /**
+   * @brief get point from lanewaypoint in poi or default routings
+   * @param lanewaypoint
+   * @return json that contains point's coordinate x and y
+   */
+  nlohmann::json GetPointJsonFromLaneWaypoint(
+      const apollo::routing::LaneWaypoint &waypoint);
 
   /**
    * @brief Tries to load the user-defined default routings from the txt file
@@ -144,8 +183,8 @@ class SimulationWorldUpdater {
   apollo::routing::POI poi_;
 
   // default routings
-  apollo::routing::DefaultRoutings default_routings_;
-  apollo::routing::DefaultRouting *default_routing_;
+  apollo::routing::POI default_routings_;
+  apollo::routing::Landmark *default_routing_;
 
   // The simulation_world in wire format to be pushed to frontend, which is
   // updated by timer.

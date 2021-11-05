@@ -12,4 +12,13 @@ message Junction {
   optional Polygon polygon = 2;
 
   repeated Id overlap_id = 3;
+  enum Type {
+    UNKNOWN = 0;
+    IN_ROAD = 1;
+    CROSS_ROAD = 2;
+    FORK_ROAD = 3;
+    MAIN_SIDE = 4;
+    DEAD_END = 5;
+  };
+  optional Type type = 4;
 }

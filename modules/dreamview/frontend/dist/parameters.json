@@ -188,6 +188,10 @@
 			"default": true,
 			"menuId": "predictionPriority"
 		},
+		"showPredictionInteractiveTag": {
+			"default": true,
+			"menuId": "predictionInteractiveTag"
+		},
 		"showPointCloud": {
 			"default": false,
 			"menuId": "perceptionPointCloud"

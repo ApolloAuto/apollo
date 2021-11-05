@@ -28,6 +28,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 /**
  * @namespace apollo::prediction
@@ -72,6 +73,17 @@ class Evaluator {
   }
 
   /**
+   * @brief Evaluate an obstacle
+   * @param ADC trajectory container
+   * @param Obstacle pointer
+   * @param Obstacles container
+   */
+  virtual bool Evaluate(const ADCTrajectoryContainer* adc_trajectory_container,
+                        Obstacle* obstacle,
+                        ObstaclesContainer* obstacles_container) {
+    return Evaluate(obstacle, obstacles_container);
+  }
+  /**
    * @brief Get the name of evaluator
    */
   virtual std::string GetName() = 0;
@@ -88,6 +100,17 @@ class Evaluator {
     double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
 
     return std::make_pair(std::cos(theta) * rho, std::sin(theta) * rho);
+  }
+
+  std::pair<double, double> WorldCoordToObjCoordNorth(
+      std::pair<double, double> input_world_coord,
+      std::pair<double, double> obj_world_coord, double obj_world_angle) {
+    double x_diff = input_world_coord.first - obj_world_coord.first;
+    double y_diff = input_world_coord.second - obj_world_coord.second;
+    double theta = M_PI / 2 - obj_world_angle;
+    double x = std::cos(theta) * x_diff - std::sin(theta) * y_diff;
+    double y = std::sin(theta) * x_diff + std::cos(theta) * y_diff;
+    return std::make_pair(x, y);
   }
 
   double WorldAngleToObjAngle(double input_world_angle,
