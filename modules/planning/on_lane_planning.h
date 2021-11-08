@@ -114,7 +114,7 @@ class OnLanePlanning : public PlanningBase {
   routing::RoutingResponse last_routing_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
   Smoother planning_smoother_;
-  bool wait_flag_ = false;
+  bool wait_flag_ = true;
   bool routing_in_flag_ = true;
   common::PointENU dead_end_point_;
 };
