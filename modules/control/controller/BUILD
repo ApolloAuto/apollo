@@ -61,6 +61,7 @@ cc_library(
     copts = CONTROL_COPTS,
     deps = [
         ":controller_interface",
+        "//cyber/time:clock",
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
