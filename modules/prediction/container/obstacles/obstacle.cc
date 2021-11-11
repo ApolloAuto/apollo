@@ -110,7 +110,7 @@ bool Obstacle::IsOnLane() const {
     return false;
   }
   for (const auto& curr_lane : latest_feature().lane().current_lane_feature()) {
-    if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING) {
+    if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING &&curr_lane.lane_type() != hdmap::Lane::BIKING) {
       return false;
     }
   }
