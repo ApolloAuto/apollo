@@ -17,11 +17,11 @@
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
 #include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/util.h"
 
@@ -36,8 +36,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::InverseQuaternionRotate;
-using apollo::common::time::Clock;
 using apollo::common::util::FillHeader;
+using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
@@ -102,14 +102,14 @@ void SimControl::InitTimerAndIO() {
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(
-      new cyber::Timer(kSimPredictionIntervalMs,
-                       [this]() { this->PublishDummyPrediction(); }, false));
+  sim_prediction_timer_.reset(new cyber::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
-void SimControl::Init(bool set_start_point, double start_velocity,
+void SimControl::Init(double start_velocity,
                       double start_acceleration) {
-  if (set_start_point && !FLAGS_use_navigation_mode) {
+  if (!FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
@@ -252,8 +252,7 @@ void SimControl::Start() {
     // When localization is already available, we do not need to
     // reset/override the start point.
     localization_reader_->Observe();
-    Init(localization_reader_->Empty(),
-         next_point_.has_v() ? next_point_.v() : 0.0,
+    Init(next_point_.has_v() ? next_point_.v() : 0.0,
          next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();

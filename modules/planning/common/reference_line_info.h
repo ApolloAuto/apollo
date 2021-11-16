@@ -185,11 +185,11 @@ class ReferenceLineInfo {
   const std::vector<PathBoundary>& GetCandidatePathBoundaries() const;
 
   void SetCandidatePathBoundaries(
-      std::vector<PathBoundary> candidate_path_boundaries);
+      std::vector<PathBoundary>&& candidate_path_boundaries);
 
   const std::vector<PathData>& GetCandidatePathData() const;
 
-  void SetCandidatePathData(std::vector<PathData> candidate_path_data);
+  void SetCandidatePathData(std::vector<PathData>&& candidate_path_data);
 
   Obstacle* GetBlockingObstacle() const { return blocking_obstacle_; }
   void SetBlockingObstacle(const std::string& blocking_obstacle_id);

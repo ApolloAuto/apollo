@@ -16,9 +16,8 @@
 
 #include "modules/planning/common/st_graph_data.h"
 
-#include "gmock/gmock.h"
-
 #include "cyber/common/log.h"
+#include "gmock/gmock.h"
 #include "modules/planning/common/speed/st_boundary.h"
 
 namespace apollo {

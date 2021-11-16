@@ -29,6 +29,8 @@ namespace drivers {
 namespace canbus {
 namespace can {
 
+#define CAN_ID_MASK 0x1FFFF800U  // can_filter mask
+
 using apollo::common::ErrorCode;
 
 bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
@@ -41,6 +43,12 @@ bool SocketCanClientRaw::Init(const CANCardParameter &parameter) {
 
   port_ = parameter.channel_id();
   interface_ = parameter.interface();
+  auto num_ports = parameter.num_ports();
+  if (port_ > static_cast<int32_t>(num_ports) || port_ < 0) {
+    AERROR << "Can port number [" << port_ << "] is out of range [0, "
+           << num_ports << ") !";
+    return false;
+  }
   return true;
 }
 
@@ -62,12 +70,6 @@ ErrorCode SocketCanClientRaw::Start() {
   // if more than one card, when install driver u can specify the minior id
   // int32_t ret = canOpen(net, pCtx->mode, txbufsize, rxbufsize, 0, 0,
   // &dev_handler_);
-  if (port_ > MAX_CAN_PORT || port_ < 0) {
-    AERROR << "can port number [" << port_ << "] is out of the range [0,"
-           << MAX_CAN_PORT << "]";
-    return ErrorCode::CAN_CLIENT_ERROR_BASE;
-  }
-
   dev_handler_ = socket(PF_CAN, SOCK_RAW, CAN_RAW);
   if (dev_handler_ < 0) {
     AERROR << "open device error code [" << dev_handler_ << "]: ";
@@ -79,11 +81,10 @@ ErrorCode SocketCanClientRaw::Start() {
 
   // 1. for non virtual busses, set receive message_id filter, ie white list
   if (interface_ != CANCardParameter::VIRTUAL) {
-    struct can_filter filter[2048];
-    for (int i = 0; i < 2048; ++i) {
-      filter[i].can_id = 0x000 + i;
-      filter[i].can_mask = CAN_SFF_MASK;
-    }
+    // set a scope for each EID instead of a single filter rule for each EID
+    struct can_filter filter[1];
+    filter[0].can_id = 0x000;
+    filter[0].can_mask = CAN_ID_MASK;
 
     ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
                      sizeof(filter));

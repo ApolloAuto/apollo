@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -30,6 +31,7 @@ cc_library(
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
+        "@npp",
     ],
 )
 
@@ -53,7 +55,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/base",
-        "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
+        "//modules/perception/camera/common/proto:object_template_meta_schema_cc_proto",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",

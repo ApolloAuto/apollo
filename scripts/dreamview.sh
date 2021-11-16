@@ -16,13 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+. "${TOP_DIR}/scripts/apollo_base.sh"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
-
-# run function from apollo_base.sh
-# run command_name module_name
-run dreamview "$@"
+# run_module command_name module_name
+run_module dreamview "$@"

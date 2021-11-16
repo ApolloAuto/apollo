@@ -51,7 +51,6 @@ bool PathData::SetDiscretizedPath(DiscretizedPath path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -67,7 +66,6 @@ bool PathData::SetFrenetPath(FrenetFramePath frenet_path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -103,11 +101,6 @@ const std::vector<std::tuple<double, PathData::PathPointType, double>>
 
 bool PathData::Empty() const {
   return discretized_path_.empty() && frenet_path_.empty();
-}
-
-std::list<std::pair<DiscretizedPath, FrenetFramePath>>
-    &PathData::path_data_history() {
-  return path_data_history_;
 }
 
 void PathData::SetReferenceLine(const ReferenceLine *reference_line) {

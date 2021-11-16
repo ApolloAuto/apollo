@@ -26,7 +26,7 @@ from configparser import ConfigParser
 import secure_upgrade_export as sec_api
 
 from modules.data.proto.static_info_pb2 import VehicleInfo
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 
 
 sys.path.append('/home/caros/secure_upgrade/python')

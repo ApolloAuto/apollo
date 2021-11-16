@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include <limits>
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/io/zero_copy_stream_impl.h"
 #include "google/protobuf/message.h"
@@ -62,7 +63,8 @@ class RecordFileReader : public RecordFileBase {
 
 template <typename T>
 bool RecordFileReader::ReadSection(int64_t size, T* message) {
-  if (size < INT_MIN || size > INT_MAX) {
+  if (size < std::numeric_limits<int>::min() ||
+      size > std::numeric_limits<int>::max()) {
     AERROR << "Size value greater than the range of int value.";
     return false;
   }
@@ -79,9 +81,9 @@ bool RecordFileReader::ReadSection(int64_t size, T* message) {
     return false;
   }
   coded_input.PopLimit(limit);
-  if (message->ByteSize() != size) {
+  if (static_cast<int64_t>(message->ByteSizeLong()) != size) {
     AERROR << "Message size is not consistent in section header"
-           << ", expect: " << size << ", actual: " << message->ByteSize();
+           << ", expect: " << size << ", actual: " << message->ByteSizeLong();
     return false;
   }
   return true;

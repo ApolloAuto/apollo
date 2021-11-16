@@ -102,7 +102,7 @@ Status SpeedBoundsDecider::Process(
   if (!speed_limit_decider
            .GetSpeedLimits(path_decision->obstacles(), &speed_limit)
            .ok()) {
-    std::string msg("Getting speed limits failed!");
+    const std::string msg = "Getting speed limits failed!";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

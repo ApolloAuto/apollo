@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-cd "${DIR}/.."
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-bazel-bin/modules/contrib/cyber_bridge/cyber_bridge
+${TOP_DIR}/bazel-bin/modules/contrib/cyber_bridge/cyber_bridge

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,6 +16,7 @@ cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:box",
         "//modules/perception/base:point_cloud",
     ],
@@ -55,6 +57,7 @@ cc_test(
     name = "basic_test",
     size = "small",
     srcs = ["basic_test.cc"],
+    linkopts = ["-lm"],
     deps = [
         ":basic",
         "@com_google_googletest//:gtest_main",

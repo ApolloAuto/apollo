@@ -4,7 +4,7 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境
+ - 按照[教程](../quickstart/apollo_software_installation_guide.md)设置Docker环境
  - ~~从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)的“多传感器融合定位数据”栏目下载多传感器融合定位demo数据包（仅限美国地区）。~~
  - 下载数据集： 请发邮件至*zhouyao@baidu.com*来申请数据。邮件中需要包含以下内容：(1) 你所在的机构名称和邮件地址; (2)数据集使用目的。
 
@@ -25,12 +25,6 @@ bash docker/scripts/dev_into.sh
 bash apollo.sh clean
 # Build the full system
 bash apollo.sh build_opt
-```
-
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
 ```
 
 ## 3. 生产定位地图

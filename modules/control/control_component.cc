@@ -18,9 +18,9 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
-#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
@@ -31,7 +31,7 @@ using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
@@ -277,8 +277,7 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
-  const auto start_time =
-      FLAGS_use_system_time_in_control ? absl::Now() : Clock::Now();
+  const auto start_time = Clock::Now();
 
   chassis_reader_->Observe();
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
@@ -357,7 +356,7 @@ bool ControlComponent::Proc() {
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
-      absl::ToDoubleSeconds(start_time - init_time_) >
+      (start_time - init_time_).ToSecond() >
           control_conf_.control_test_duration()) {
     AERROR << "Control finished testing. exit";
     return false;
@@ -395,15 +394,13 @@ bool ControlComponent::Proc() {
     return true;
   }
 
-  const auto end_time =
-      FLAGS_use_system_time_in_control ? absl::Now() : Clock::Now();
-  const double time_diff_ms = absl::ToDoubleMilliseconds(end_time - start_time);
+  const auto end_time = Clock::Now();
+  const double time_diff_ms = (end_time - start_time).ToSecond() * 1e3;
   ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
 
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms > absl::ToDoubleMilliseconds(
-                         absl::Seconds(control_conf_.control_period())));
+      time_diff_ms > control_conf_.control_period() * 1e3);
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 

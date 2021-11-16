@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "cyber/timer/timing_wheel.h"
+
+#include <cmath>
+
 #include "cyber/task/task.h"
 
 namespace apollo {
@@ -50,10 +53,11 @@ void TimingWheel::Tick() {
       if (task) {
         ADEBUG << "index: " << current_work_wheel_index_
                << " timer id: " << task->timer_id_;
-        auto callback = task->callback;
+        auto* callback =
+            reinterpret_cast<std::function<void()>*>(&(task->callback));
         cyber::Async([this, callback] {
           if (this->running_) {
-            callback();
+            (*callback)();
           }
         });
       }

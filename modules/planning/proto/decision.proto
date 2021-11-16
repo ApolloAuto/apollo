@@ -14,8 +14,7 @@ message TargetLane {
   optional double speed_limit = 4;  // in m/s
 }
 
-message ObjectIgnore {
-}
+message ObjectIgnore {}
 
 enum StopReasonCode {
   STOP_REASON_HEAD_VEHICLE = 1;
@@ -51,9 +50,10 @@ message ObjectStop {
 // dodge the obstacle in lateral direction when driving
 message ObjectNudge {
   enum Type {
-    LEFT_NUDGE = 1;   // drive from the left side of the obstacle
-    RIGHT_NUDGE = 2;  // drive from the right side of the obstacle
-    NO_NUDGE = 3;     // No nudge is set.
+    LEFT_NUDGE = 1;   // drive from the left side to nudge a static obstacle
+    RIGHT_NUDGE = 2;  // drive from the right side to nudge a static obstacle
+    DYNAMIC_LEFT_NUDGE = 3;   // drive from the left side to nudge a dynamic obstacle
+    DYNAMIC_RIGHT_NUDGE = 4;  // drive from the right side to nudge a dynamic obstacle
   };
   optional Type type = 1;
   // minimum lateral distance in meters. positive if type = LEFT_NUDGE
@@ -92,19 +92,16 @@ message ObjectSidePass {
 }
 
 // unified object decision while estop
-message ObjectAvoid {
-}
+message ObjectAvoid {}
 
 message ObjectStatus {
   optional ObjectMotionType motion_type = 1;
   optional ObjectDecisionType decision_type = 2;
 }
 
-message ObjectStatic {
-}
+message ObjectStatic {}
 
-message ObjectDynamic {
-}
+message ObjectDynamic {}
 
 message ObjectMotionType {
   oneof motion_tag {
@@ -146,11 +143,9 @@ message MainStop {
   optional apollo.routing.ChangeLaneType change_lane_type = 5;
 }
 
-message EmergencyStopHardBrake {
-}
+message EmergencyStopHardBrake {}
 
-message EmergencyStopCruiseToStop {
-}
+message EmergencyStopCruiseToStop {}
 
 message MainEmergencyStop {
   // Unexpected event happened, human driver is required to take over

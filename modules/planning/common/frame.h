@@ -36,13 +36,11 @@
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/indexed_queue.h"
-#include "modules/planning/common/learning_based_data.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/open_space_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -178,13 +176,6 @@ class Frame {
     return &open_space_info_;
   }
 
-  const LearningBasedData &learning_based_data() const {
-    return learning_based_data_;
-  }
-  LearningBasedData *mutable_learning_based_data() {
-    return &learning_based_data_;
-  }
-
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
   const DrivingAction &GetPadMsgDrivingAction() const {
@@ -220,8 +211,6 @@ class Frame {
   void ReadPadMsgDrivingAction();
   void ResetPadMsgDrivingAction();
 
-  void ReadLearningDataFrame();
-
  private:
   static DrivingAction pad_msg_driving_action_;
   uint32_t sequence_num_ = 0;
@@ -252,8 +241,6 @@ class Frame {
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 
   OpenSpaceInfo open_space_info_;
-
-  LearningBasedData learning_based_data_;
 
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 

@@ -59,7 +59,6 @@ TEST(SecureMatTest, test_fill_mat) {
   test_mat(0, 1) = 2;
   test_mat(1, 0) = 3;
   test_mat(1, 1) = 4;
-  test_mat.ToString(&std::cout);
   EXPECT_EQ(1, test_mat(0, 0));
   EXPECT_EQ(2, test_mat(0, 1));
   EXPECT_EQ(3, test_mat(1, 0));

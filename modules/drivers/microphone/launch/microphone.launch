@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>microphone</name>
+        <dag_conf>/apollo/modules/drivers/microphone/dag/microphone.dag</dag_conf>
+        <process_name>respeaker</process_name>
+    </module>
+</cyber>

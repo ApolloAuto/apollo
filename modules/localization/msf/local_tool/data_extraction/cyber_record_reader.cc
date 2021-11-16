@@ -47,6 +47,12 @@ void CyberRecordReader::Read(const std::string &file_name) {
   }
 }
 
+void CyberRecordReader::Read(const std::vector<std::string> &file_names) {
+  for (const std::string &file_name : file_names) {
+    Read(file_name);
+  }
+}
+
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

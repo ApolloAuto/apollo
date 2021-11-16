@@ -57,8 +57,7 @@ class JunctionAnalyzer {
    * @param start lane ID
    * @return junction
    */
-  const JunctionFeature& GetJunctionFeature(
-      const std::string& start_lane_id);
+  const JunctionFeature& GetJunctionFeature(const std::string& start_lane_id);
 
   /**
    * @brief Get junction feature starting from start_lane_ids
@@ -79,8 +78,7 @@ class JunctionAnalyzer {
    * @param start lane ID
    * @return Filtered junction exits
    */
-  std::vector<JunctionExit> GetJunctionExits(
-      const std::string& start_lane_id);
+  std::vector<JunctionExit> GetJunctionExits(const std::string& start_lane_id);
 
   /**
    * @brief Determine if a lane with lane_id is an exit lane of this junction

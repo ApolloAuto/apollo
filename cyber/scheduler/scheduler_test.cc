@@ -18,12 +18,14 @@
 
 #include <string>
 #include <thread>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/scheduler_conf.pb.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler_factory.h"
 

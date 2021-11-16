@@ -430,7 +430,7 @@ bool OpenSpaceTrajectoryOptimizer::IsInitPointNearDestination(
     const common::TrajectoryPoint& planning_init_point,
     const std::vector<double>& end_pose, double rotate_angle,
     const Vec2d& translate_origin) {
-  CHECK_EQ(end_pose.size(), 4);
+  CHECK_EQ(end_pose.size(), 4U);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
   end_pose_to_world_frame.SelfRotate(rotate_angle);
@@ -857,7 +857,7 @@ void OpenSpaceTrajectoryOptimizer::LoadResult(
     Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
     Eigen::MatrixXd* time_result_dc) {
   const size_t points_size = discretized_trajectory.size();
-  CHECK_GT(points_size, 1);
+  CHECK_GT(points_size, 1U);
   *state_result_dc = Eigen::MatrixXd::Zero(4, points_size);
   *control_result_dc = Eigen::MatrixXd::Zero(2, points_size - 1);
   *time_result_dc = Eigen::MatrixXd::Zero(1, points_size - 1);

@@ -19,6 +19,8 @@
  **/
 #include "modules/planning/math/curve_math.h"
 
+#include <cmath>
+
 #include "gtest/gtest.h"
 
 namespace apollo {
@@ -33,13 +35,13 @@ TEST(TestSuite, curvature_math_test) {
       CurveMath::ComputeCurvatureDerivative(1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
   EXPECT_NEAR(curvature_derivative, 0.0, 1e-6);
 
-  // Unit circle X = (cos(t), sin(t)), at t = 0.0
+  // Unit circle X = (std::cos(t), std::sin(t)), at t = 0.0
   curvature = CurveMath::ComputeCurvature(0.0, -1, 1.0, 0.0);
   EXPECT_NEAR(curvature, 1.0, 1e-6);
 
-  // Unit circle X = (cos(t), sin(t)), at t = PI/4,
-  double cos_angle = cos(M_PI / 4);
-  double sin_angle = sin(M_PI / 4);
+  // Unit circle X = (std::cos(t), std::sin(t)), at t = PI/4,
+  double cos_angle = std::cos(M_PI / 4);
+  double sin_angle = std::sin(M_PI / 4);
   curvature = CurveMath::ComputeCurvature(-sin_angle, -cos_angle, cos_angle,
                                           -sin_angle);
   EXPECT_NEAR(curvature, 1.0, 1e-6);

@@ -38,7 +38,7 @@
 #include <string>
 
 #ifndef __aarch64__
-#include "adv_plat/include/adv_trigger.h"
+#include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
 #endif
 #include "modules/drivers/camera/usb_cam.h"
@@ -927,13 +927,23 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
   return true;
 }
 
-bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
+bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
   if (src == nullptr || dest == nullptr) {
     AERROR << "process image error. src or dest is null";
     return false;
   }
   if (pixel_format_ == V4L2_PIX_FMT_YUYV ||
       pixel_format_ == V4L2_PIX_FMT_UYVY) {
+    if (pixel_format_ == V4L2_PIX_FMT_UYVY) {
+      unsigned char yuyvbuf[len];
+      unsigned char uyvybuf[len];
+      memcpy(yuyvbuf, src, len);
+      for (int index = 0; index < len; index = index + 2) {
+        uyvybuf[index] = yuyvbuf[index + 1];
+        uyvybuf[index + 1] = yuyvbuf[index];
+      }
+      memcpy(src, uyvybuf, len);
+    }
     if (config_->output_type() == YUYV) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {

@@ -15,22 +15,25 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/circular_buffer.hpp>
+#include <memory>
 #include <vector>
+
+#include <boost/circular_buffer.hpp>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/track_object.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-struct Target {
+struct alignas(16) Target {
  public:
+  // EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   explicit Target(const omt::TargetParam &param);
   void Init(const omt::TargetParam &param);
   void Add(TrackObjectPtr object);
@@ -87,7 +90,7 @@ struct Target {
   void ClappingTrackVelocity(const base::ObjectPtr &obj);
   bool CheckStatic();
 
-  boost::circular_buffer<base::Object> history_world_states_;
+  boost::circular_buffer<std::shared_ptr<base::Object>> history_world_states_;
 
  protected:
   ObjectTemplateManager *object_template_manager_ = nullptr;

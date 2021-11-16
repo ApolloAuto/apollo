@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -14,7 +15,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 
@@ -28,7 +29,7 @@ cc_library(
     ],
     deps = [
         ":task",
-        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/tasks/deciders/creep_decider",
         "//modules/planning/tasks/deciders/lane_change_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_fallback_decider",

@@ -25,9 +25,9 @@ import sys
 import numpy as np
 import tkinter.filedialog
 
-from process import get_start_index
-from process import preprocess
-from process import process
+from modules.tools.vehicle_calibration.process import get_start_index
+from modules.tools.vehicle_calibration.process import preprocess
+from modules.tools.vehicle_calibration.process import process
 
 
 class Plotter(object):

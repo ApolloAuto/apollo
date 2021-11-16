@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package apollo.v2x.obu;
+
+import "modules/common/proto/header.proto";
+import "modules/v2x/proto/v2x_traffic_light.proto";
+
+message SingleTrafficLight {
+  enum Type {
+    STRAIGHT = 1;
+    LEFT = 2;
+    RIGHT = 3;
+    U_TURN = 4;
+  };
+
+  optional apollo.v2x.SingleTrafficLight.Color color = 1;
+  optional int32 traffic_light_type = 2;
+  // Traffic light string-ID in the map data.
+  optional string id = 3;
+  optional int32 color_remaining_time_s = 4;
+  optional bool right_turn_light = 5;
+  // v2x next traffic light color
+  optional apollo.v2x.SingleTrafficLight.Color next_color = 6;
+  // v2x next traffic light remaining time
+  optional double next_remaining_time = 7;
+  // next 2nd traffic ligth color
+  optional apollo.v2x.SingleTrafficLight.Color next_2nd_color = 8;
+  optional double next_2nd_remaining_time = 9;
+}
+
+message LaneTrafficLight {
+  // Feature points of lane in the map reference frame.
+  optional double gps_x_m = 1;
+  optional double gps_y_m = 2;
+  repeated SingleTrafficLight single_traffic_light = 3;
+}
+
+message RoadTrafficLight {
+  repeated LaneTrafficLight lane_traffic_light = 1;
+  optional int32 road_direction = 2;
+}
+message ObuTrafficLight {
+  optional apollo.common.Header header = 1;
+  repeated RoadTrafficLight road_traffic_light = 2;
+  optional int32 intersection_id = 3;
+  optional bytes hdmap_junction_id = 4;
+}

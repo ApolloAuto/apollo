@@ -20,6 +20,10 @@ message CANCardParameter {
     CHANNEL_ID_ONE = 1;
     CHANNEL_ID_TWO = 2;
     CHANNEL_ID_THREE = 3;
+    CHANNEL_ID_FOUR = 4;
+    CHANNEL_ID_FIVE = 5;
+    CHANNEL_ID_SIX = 6;
+    CHANNEL_ID_SEVEN = 7;
   }
 
   enum CANInterface {
@@ -32,4 +36,5 @@ message CANCardParameter {
   optional CANCardType type = 2;
   optional CANChannelId channel_id = 3;
   optional CANInterface interface = 4;
+  optional uint32 num_ports = 5 [default = 4];
 }

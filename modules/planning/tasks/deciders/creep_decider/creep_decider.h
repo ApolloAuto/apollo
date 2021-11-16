@@ -23,7 +23,6 @@
 #include <memory>
 
 #include "cyber/common/macros.h"
-
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -50,7 +49,6 @@ class CreepDecider : public Decider {
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-  static uint32_t creep_clear_counter_;
   common::TrajectoryPoint adc_planning_start_point_;
   hdmap::Lane curr_lane_;
 };

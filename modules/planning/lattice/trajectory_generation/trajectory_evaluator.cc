@@ -339,7 +339,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
 
 bool TrajectoryEvaluator::InterpolateDenseStPoints(
     const std::vector<SpeedPoint>& st_points, double t, double* traj_s) const {
-  CHECK_GT(st_points.size(), 1);
+  CHECK_GT(st_points.size(), 1U);
   if (t < st_points[0].t() || t > st_points[st_points.size() - 1].t()) {
     AERROR << "AutoTuning InterpolateDenseStPoints Error";
     return false;

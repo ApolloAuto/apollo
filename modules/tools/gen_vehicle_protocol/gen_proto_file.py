@@ -109,7 +109,7 @@ def gen_proto_file(config_file, work_dir):
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
     with open(config_file, 'r') as fp:
-        content = yaml.load(fp)
+        content = yaml.safe_load(fp)
         protocols = content["protocols"]
         car_type = content["car_type"]
         with open("%s/%s.proto" % (work_dir, car_type.lower()), 'w') as pb_fp:
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         print("usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
-        conf = yaml.load(fp)
+        conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 
     work_dir = conf["output_dir"] + "proto/"

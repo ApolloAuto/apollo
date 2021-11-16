@@ -16,18 +16,18 @@
 
 #include "modules/prediction/submodules/predictor_submodule.h"
 
-#include "absl/time/time.h"
+#include "cyber/time/time.h"
 
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::perception::PerceptionObstacles;
 
 std::string PredictorSubmodule::Name() const {
@@ -62,7 +62,8 @@ bool PredictorSubmodule::Proc(
       perception_obstacles->header();
   const apollo::common::ErrorCode& perception_error_code =
       perception_obstacles->error_code();
-  const absl::Time& frame_start_time = submodule_output->frame_start_time();
+  const apollo::cyber::Time& frame_start_time =
+      submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
   predictor_manager_->Run(*perception_obstacles, adc_trajectory_container.get(),
                           &obstacles_container);
@@ -81,9 +82,9 @@ bool PredictorSubmodule::Proc(
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
   predictor_writer_->Write(prediction_obstacles);
 
-  const absl::Time& end_time = absl::Now();
+  const apollo::cyber::Time& end_time = Clock::Now();
   ADEBUG << "End to end time = "
-         << absl::ToDoubleMilliseconds(end_time - frame_start_time) << " ms";
+         << (end_time - frame_start_time).ToSecond() * 1000 << " ms";
 
   return true;
 }

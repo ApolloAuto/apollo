@@ -15,17 +15,22 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
-
 #include <map>
 #include <string>
 #include <vector>
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
+
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/proto/motion_service.pb.h"
+
+using apollo::common::EigenMap;
 
 namespace apollo {
 namespace perception {
@@ -33,18 +38,18 @@ namespace camera {
 
 class Visualizer {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   bool Init(const std::vector<std::string> &camera_names,
             TransformServer *tf_server);
   bool Init_all_info_single_camera(
       const std::vector<std::string> &camera_names,
       const std::string &visual_camera,
-      const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
-      const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-      const Eigen::Matrix4d &ex_lidar2imu,
-      const double pitch_adj,
-      const double yaw_adj,
-      const double roll_adj,
-      const int image_height,
+      const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
+      const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+      const Eigen::Matrix4d &ex_lidar2imu, const double pitch_adj,
+      const double yaw_adj, const double roll_adj, const int image_height,
       const int image_width);
   bool adjust_angles(const std::string &camera_name, const double pitch_adj,
                      const double yaw_adj, const double roll_adj);
@@ -52,17 +57,13 @@ class Visualizer {
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
   void ShowResult_all_info_single_camera(
-      const cv::Mat &img,
-      const CameraFrame &frame,
+      const cv::Mat &img, const CameraFrame &frame,
       const base::MotionBufferPtr motion_buffer,
       const Eigen::Affine3d &world2camera);
   void Draw2Dand3D_all_info_single_camera(
-      const std::string &camera_name,
-      const cv::Mat &img,
-      const CameraFrame &frame,
-      const Eigen::Matrix3d &intrinsic,
-      const Eigen::Matrix4d &extrinsic,
-      const Eigen::Affine3d &world2camera,
+      const std::string &camera_name, const cv::Mat &img,
+      const CameraFrame &frame, const Eigen::Matrix3d &intrinsic,
+      const Eigen::Matrix4d &extrinsic, const Eigen::Affine3d &world2camera,
       const base::MotionBufferPtr motion_buffer);
   bool DrawTrajectories(const base::ObjectPtr &object,
                         const base::MotionBufferPtr motion_buffer);
@@ -152,10 +153,10 @@ class Visualizer {
   std::vector<std::string> camera_names_;
   std::string visual_camera_ = "front_6mm";
   // map for store params
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map_;
   Eigen::Matrix4d ex_lidar2imu_;
-  std::map<std::string, Eigen::Matrix4d> ex_camera2lidar_;
+  EigenMap<std::string, Eigen::Matrix4d> ex_camera2lidar_;
   Eigen::Matrix4d ex_camera2imu_;
   Eigen::Matrix4d ex_imu2camera_;
   Eigen::Matrix4d ex_car2camera_;
@@ -164,7 +165,7 @@ class Visualizer {
   Eigen::Matrix4d adjusted_camera2car_ = Eigen::Matrix4d::Identity();
 
   Eigen::Matrix4d projection_matrix_;
-  std::map<std::string, Eigen::Matrix3d> K_;
+  EigenMap<std::string, Eigen::Matrix3d> K_;
 
   // Visualization related variables
   bool use_class_color_ = true;

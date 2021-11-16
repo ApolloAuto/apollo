@@ -20,9 +20,9 @@ import argparse
 
 import matplotlib.pyplot as plt
 
-from libs.localization import Localization
-from libs.map import Map
-from libs.path import Path
+from modules.tools.mapshow.libs.localization import Localization
+from modules.tools.mapshow.libs.map import Map
+from modules.tools.mapshow.libs.path import Path
 
 
 def draw(map):

@@ -23,13 +23,15 @@
 
 #include "Eigen/LU"
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/linear_quadratic_regulator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -40,7 +42,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using Matrix = Eigen::MatrixXd;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 namespace {
 
@@ -85,9 +87,7 @@ LatController::LatController() : name_("LQR-based Lateral Controller") {
   AINFO << "Using " << name_;
 }
 
-LatController::~LatController() {
-  CloseLogFile();
-}
+LatController::~LatController() { CloseLogFile(); }
 
 bool LatController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
@@ -308,13 +308,9 @@ void LatController::LoadLatGainScheduler(
       << "Fail to load heading error gain scheduler";
 }
 
-void LatController::Stop() {
-  CloseLogFile();
-}
+void LatController::Stop() { CloseLogFile(); }
 
-std::string LatController::Name() const {
-  return name_;
-}
+std::string LatController::Name() const { return name_; }
 
 Status LatController::ComputeControlCommand(
     const localization::LocalizationEstimate *localization,

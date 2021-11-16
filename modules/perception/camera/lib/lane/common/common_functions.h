@@ -17,8 +17,9 @@
 
 #include <vector>
 
-#include "Eigen/Core"
+#include <limits>
 
+#include "Eigen/Core"
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point.h"
@@ -110,8 +111,7 @@ bool PolyEval(const Dtype& x, int order,
 template <typename Dtype>
 bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
                    std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
-                   Eigen::Matrix<Dtype, 4, 1>* coeff,
-                   const int max_iters = 100,
+                   Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
                    const int N = 5,
                    const Dtype inlier_thres = static_cast<Dtype>(0.1)) {
   if (coeff == nullptr) {
@@ -133,7 +133,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   std::vector<int> index(3, 0);
   int max_inliers = 0;
-  Dtype min_residual = FLT_MAX;
+  Dtype min_residual = std::numeric_limits<float>::max();
   Dtype early_stop_ratio = 0.95f;
   Dtype good_lane_ratio = 0.666f;
   for (int j = 0; j < max_iters; ++j) {
@@ -142,12 +142,9 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     index[2] = q3 + std::rand() % q1;
 
     Eigen::Matrix<Dtype, 3, 3> matA;
-    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0),
-        pos_vec[index[0]](0), 1,
-        pos_vec[index[1]](0) * pos_vec[index[1]](0),
-        pos_vec[index[1]](0), 1,
-        pos_vec[index[2]](0) * pos_vec[index[2]](0),
-        pos_vec[index[2]](0), 1;
+    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0), pos_vec[index[0]](0),
+        1, pos_vec[index[1]](0) * pos_vec[index[1]](0), pos_vec[index[1]](0), 1,
+        pos_vec[index[2]](0) * pos_vec[index[2]](0), pos_vec[index[2]](0), 1;
 
     Eigen::FullPivLU<Eigen::Matrix<Dtype, 3, 3>> mat(matA);
     mat.setThreshold(1e-5f);

@@ -137,6 +137,8 @@ class BaseMapNode {
   static Eigen::Vector2d GetLeftTopCorner(const BaseMapConfig& option,
                                           const MapNodeIndex& index);
 
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  protected:
   /**@brief Try to create the map directory. */
   bool CreateMapDirectory(const std::string& path) const;

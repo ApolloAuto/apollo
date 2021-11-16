@@ -1,6 +1,15 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = [
+        ":cyber_monitor",
+    ],
+)
 
 cc_binary(
     name = "cyber_monitor",
@@ -13,14 +22,14 @@ cc_binary(
         "renderable_message.cc",
         "screen.cc",
     ],
+    linkopts = ["-pthread"],
     deps = [
         ":cyber_topology_message",
         ":general_channel_message",
         ":screen",
         "//cyber:init",
         "//cyber/service_discovery:topology_manager",
-        "//third_party:ncurses",
-        "//third_party:pthread",
+        "@ncurses5",
     ],
 )
 
@@ -39,6 +48,7 @@ cc_library(
         ":general_message",
         ":general_message_base",
         ":screen",
+        "//cyber",
         "//cyber/message:raw_message",
         "//cyber/record:record_message",
     ],
@@ -75,4 +85,4 @@ cc_library(
     hdrs = ["screen.h"],
 )
 
-#cpplint()
+cpplint()

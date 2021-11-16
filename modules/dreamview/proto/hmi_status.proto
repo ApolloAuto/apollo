@@ -28,4 +28,6 @@ message HMIStatus {
   // Message which will be read aloud to drivers and passengers through
   // Dreamview.
   optional string passenger_msg = 12;
+  // {component_name: status}
+  map<string, apollo.monitor.ComponentStatus> other_components = 13;
 }

@@ -1,118 +1,96 @@
-# Apollo简介
-
-Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，全面，可靠的软件平台。合作伙伴可以使用Apollo软件平台和通过Apollo认证的参考硬件模板来定制自己的自主车辆研发。
-
 # Apollo软件安装指南
 
-本节包括：
+本文档介绍了在Ubuntu 18.04.5 LTS（Bionic Beaver）（建议用于Apollo 6.0的Ubuntu版本）上安装Apollo软件所需的步骤。
 
-- 下载Apollo发行包
-- 设置Docker支持
-- 自定义你的发布容器
+## 前期准备
 
-在开始之前，请确保您已经按照[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc)中的步骤安装了Ubuntu Linux 14.04.3和Apollo Kernel。
+在开始之前，请确保已按照[必备软件安装指南](../specs/prerequisite_software_installation_guide.md)中的说明完成了所有必备步骤。
 
-## 下载Apollo源代码
+同时也要确保Docker正在运行。键入`systemctl status docker`以检查Docker守护进程的运行状态，并根据需要键入`systemctl start docker`以启动 Docker。
 
-1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
+## 下载Apollo源文件
 
-    ```
-    git clone git@github.com:ApolloAuto/apollo.git
-    cd apollo
-    git checkout [release_branch_name]
-    ```
+运行以下命令克隆[Apollo的GitHub仓库](https://github.com/ApolloAuto/apollo.git)。
 
-2. 参考以下命令设置环境变量 `APOLLO_HOME`:
+```bash
+# 使用 SSH 的方式
+git clone git@github.com:ApolloAuto/apollo.git
 
-    ```
-    echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
-    ```
+# 使用 HTTPS 的方式
+git clone https://github.com/ApolloAuto/apollo.git
 
-3. 在一个新的终端或者已有的终端中输入`source ~/.bashrc`
+```
 
-![tip](images/tip_icon.png) 在以下部分中，假设Apollo目录位于 `$APOLLO_HOME`.
+切换到`master`分支:
 
-## 设置Docker支持
+```bash
+cd apollo
+git checkout master
+```
 
-Docker容器是设置Apollo构建环境的最简单方法。
+对于中国用户, 如果从GitHub克隆仓库有困难，可参考[国内环境下如何克隆Apollo仓库](../howto/how_to_clone_apollo_repo_from_china_cn.md)。
 
-有关更多信息，请参阅Docker详细教程 [here](https://docs.docker.com/).
+（可选）为方便起见，可以在Apollo的根目录运行以下命令来设置指向该目录的环境变量`APOLLO_ROOT_DIR`：
 
-1. 请参考[Ubuntu安装docker-ce指南](https://docs.docker.com/install/linux/docker-ce/ubuntu)
-以及[Linux安装后续](https://docs.docker.com/install/linux/linux-postinstall).
+```bash
+echo "export APOLLO_ROOT_DIR=$(pwd)" >> ~/.bashrc  && source ~/.bashrc
+```
 
-2. 安装完成后，注销并重新登录系统以启用Docker。
+![tip](images/tip_icon.png) 在下面的章节中，我们会把Apollo的根目录称为`$APOLLO_ROOT_DIR`。
 
-3. （可选）如果您已经安装了Docker（在安装Apollo内核之前），请在其中添加以下行 `/etc/default/docker`:
+## 启动Docker容器
 
-    ```
-    DOCKER_OPTS = "-s overlay"
-    ```
-4. 安装最新的 [nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-docker).
+在`${APOLLO_ROOT_DIR}`目录, 输入：
 
-## 使用你的Release Container
+```bash
+bash docker/scripts/dev_start.sh
+```
 
-1. 通过运行以下命令下载并启动Apollo 发布的 Docker映像：
+来启动Apollo的Docker开发容器。
 
-    ```
-    cd $APOLLO_HOME
-    bash docker/scripts/release_start.sh
-    ```
+如果成功，你将在屏幕下方看到以下信息：
 
-2. （可选）如果你需要定制化你的Docker映像，通过运行以下命令登录你已下载的 Docker映像：
+```bash
+[ OK ] Congratulations! You have successfully finished setting up Apollo Dev Environment.
+[ OK ] To login into the newly created apollo_dev_michael container, please run the following command:
+[ OK ]   bash docker/scripts/dev_into.sh
+[ OK ] Enjoy!
+```
 
-    ```
-    bash docker/scripts/release_into.sh
-    ```
+## 进入Apollo的Docker容器
 
-3. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此布）通过修改文件中的以下行来设置全球导航卫星系统（GNSS）驱动程序的区域编号 `./modules/drivers/gnss/conf/gnss_conf.pb.txt`.
+运行以下命令以登录到新启动的容器：
 
-    ```
-    proj4_text: "+proj=utm +zone=10 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-    ```
+```bash
+bash docker/scripts/dev_into.sh
+```
 
-    你只需修改上面一行的`+zone=10`的值即可。请参考[Apollo's Coordinate System](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/coordination.pdf) 找到您当地的区号。例如，如果你在中国北京，你必须设置`+zone=50`。
+## 在容器内构建Apollo
 
-5. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此步）通过修改以下文件，为GNSS驱动程序设置实时运动（RTK）基站：
-   `./modules/drivers/gnss/conf/gnss_conf.pb.txt`
+在Docker容器的`/apollo`目录中, 输入:
 
-   有关典型的RTK设置，请参阅以下示例：
+```bash
+./apollo.sh build
+```
 
-    ```
-    rtk_from {
-	    format: RTCM_V3
-		    ntrip {
-		    address: <provide your own value>
-		    port: <provide your own value>
-		    mount_point: <provide your own value>
-		    user: <provide your own username>
-		    password: <provide your own password>
-		    timeout_s: <provide your own value, e.g., 5>
-	    }
-    }
-    rtk_to {
-	    format: RTCM_V3
-	    serial {
-		    device: <provide your own value, e.g., "/dev/ttyUSB1">
-		    baud_rate: <provide your own value, e.g., 115200>
-	    }
-    }
-    ```
+以构建整个Apollo工程。或者输入
 
-    `rtk_from` 用于RTK基站信息。
+```bash
+./apollo.sh build_opt
+```
 
-    `rtk_to` 用于将RTK差分数据发送到接收器。
+来进行优化模式的构建。可以参考[Apollo构建和测试说明](../specs/apollo_build_and_test_explained.md)来全面了解Apollo的构建和测试。
 
-6. （该步骤只用于车上设置。如果是在docker release container里线下实验，请跳过此步）添加ESD CAN支持
+## 启动并运行Apollo
 
-    请参考 [ESD CAN README](https://github.com/ApolloAuto/apollo/blob/master/third_party/can_card_library/esd_can/README.md)来设置ESD CAN库。
+请参考[如何启动并运行Apollo](../howto/how_to_launch_and_run_apollo.md)中的[运行Apollo](../howto/how_to_launch_and_run_apollo.md#run-apollo)部分。
 
-7.  （如果你没有修改过本地的Docker release container里的配置，可跳过此步）按照以下步骤保存你的本地环境：
+## （可选）在Dreamview中支持新的车型
 
-    ```
-    # EXIT OUT OF DOCKER ENV
-    # commit your docker local changes to local docker image.
-    exit # exit from docker environment
-    cd $APOLLO_HOME
-    bash docker/scripts/release_commit.sh
-    ```
+为了在Dreamview中支持新的车型，请按照以下步骤操作：
+
+1. 在`modules/calibration/data`目录下为你的车型创建一个新文件夹。
+
+2. 在`modules/calibration/data`文件夹中已经有一个叫作`mkz_example`的示例文件夹。请参考此结构，并以此结构包含所有必需的配置文件。如果需要的话，请记得使用自己的参数更新配置文件。
+
+3. 重启Dreamview，你将能够在可选车型列表中看到你的新车型（名称与你创建的文件夹相同）。

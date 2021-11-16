@@ -31,9 +31,9 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
 #include "glog/logging.h"
 
+#include "cyber/common/macros.h"
 #include "cyber/logger/log_file_object.h"
 
 namespace apollo {

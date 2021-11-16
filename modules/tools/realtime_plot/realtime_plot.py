@@ -25,14 +25,14 @@ import gflags
 import matplotlib.pyplot as plt
 import numpy as np
 
-from cyber_py3 import cyber
-from item import Item
+from cyber.python.cyber_py3 import cyber
+from modules.tools.realtime_plot.item import Item
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.planning.proto.planning_pb2 import ADCTrajectory
-from stitem import Stitem
-from xyitem import Xyitem
-import common.proto_utils as proto_utils
+from modules.tools.realtime_plot.stitem import Stitem
+from modules.tools.realtime_plot.xyitem import Xyitem
+import modules.tools.common.proto_utils as proto_utils
 
 
 VehicleLength = 2.85

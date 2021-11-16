@@ -112,7 +112,9 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
   settings->eps_dual_inf = 1e-5;
 
   // Define osqp workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Initial solution
   bool initial_solve_res = OptimizeWithOsqp(primal_warm_start, &work);
@@ -336,7 +338,7 @@ void FemPosDeviationSqpOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
 std::vector<double>
 FemPosDeviationSqpOsqpInterface::CalculateLinearizedFemPosParams(
     const std::vector<std::pair<double, double>>& points, const size_t index) {
-  CHECK_GT(index, 0);
+  CHECK_GT(index, 0U);
   CHECK_LT(index, points.size() - 1);
 
   double x_f = points[index - 1].first;
@@ -450,8 +452,8 @@ void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
 void FemPosDeviationSqpOsqpInterface::SetPrimalWarmStart(
     const std::vector<std::pair<double, double>>& points,
     std::vector<c_float>* primal_warm_start) {
-  CHECK_EQ(points.size(), num_of_points_);
-  CHECK_GT(points.size(), 1);
+  CHECK_EQ(points.size(), static_cast<size_t>(num_of_points_));
+  CHECK_GT(points.size(), 1U);
 
   // Set states
   primal_warm_start->resize(num_of_variables_);
@@ -516,7 +518,7 @@ bool FemPosDeviationSqpOsqpInterface::OptimizeWithOsqp(
 
 double FemPosDeviationSqpOsqpInterface::CalculateConstraintViolation(
     const std::vector<std::pair<double, double>>& points) {
-  CHECK_GT(points.size(), 2);
+  CHECK_GT(points.size(), 2U);
 
   double total_length = 0.0;
   auto pre_point = points.front();

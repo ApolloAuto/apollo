@@ -16,12 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
 
-run prediction "$@" --flagfile=modules/prediction/conf/prediction_navi.conf
+run_module prediction "$@" --flagfile=modules/prediction/conf/prediction_navi.conf

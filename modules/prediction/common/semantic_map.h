@@ -29,6 +29,8 @@ namespace prediction {
 
 class SemanticMap {
  public:
+  SemanticMap();
+
   virtual ~SemanticMap() = default;
 
   void Init();
@@ -77,6 +79,10 @@ class SemanticMap {
   void DrawHistory(const ObstacleHistory& history, const cv::Scalar& color,
                    const double base_x, const double base_y, cv::Mat* img);
 
+  // Draw adc trajectory in semantic map
+  void DrawADCTrajectory(const cv::Scalar& color, const double base_x,
+                         const double base_y, cv::Mat* img);
+
   cv::Mat CropArea(const cv::Mat& input_img, const cv::Point2i& center_point,
                    const double heading);
 
@@ -102,8 +108,6 @@ class SemanticMap {
   std::future<void> task_future_;
 
   bool started_drawing_ = false;
-
-  DECLARE_SINGLETON(SemanticMap)
 };
 
 }  // namespace prediction

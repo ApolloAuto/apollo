@@ -1,17 +1,18 @@
 # Perception
 
-The Perception module has been upgraded completely to handle comprehensive sensor fusion of our brand-new sensor suite and also keep up with the brand new scenario-based planning.
-
 ## Introduction
-Apollo 5.0 Perception has following new features:
 
- * **Supports PaddlePaddle**: [PaddlePaddle](https://github.com/PaddlePaddle/Paddle) (PArallel Distributed Deep LEarning) is an easy-to-use, efficient, flexible and scalable deep learning platform, which is originally developed by Baidu scientists and engineers for the purpose of applying deep learning to many products at Baidu.
- * **Online sensor calibration service**
- * **Manual camera calibration**
- * **Closest In-Path Object (CIPO) Detection**
- * **Vanishing Point Detection**
+The perception module incorporates the capability of using multiple cameras, radars (front and rear) and LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list.
+The obstacle sub-module detects, classifies and tracks obstacles.
+This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
+For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
-The perception module incorporates the capability of using multiple cameras, radars (front and rear) and LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list. The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
+Apollo 7.0 Perception has following new features:
+
+ * **SMOKE: Camera-based Obstacle Detection Model**
+ * **Mask-Pillars: Lidar-based Obstacle Detection Model**
+
+For more detail about new models, please refer to [Camera Perception in Apollo 7.0](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/camera/README.md) and [Lidar Perception in Apollo 7.0](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/lidar/README.md)
 
 ## Architecture
 
@@ -19,7 +20,7 @@ The general architecture of the perception module is shown:
 ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_sensor_based.png)
 
 The detailed perception modules are displayed below.
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_detail.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo6.0_perception_detail.png)
 
 ## Input
 
@@ -41,7 +42,7 @@ The perception module outputs are:
 * The output of traffic light detection and recognition (cyber channel /apollo/perception/traffic_light)
 
 ### Note
-1. Nvidia GPU and CUDA are required to run the perception module with Caffe or PaddlePaddle. Apollo provides the CUDA and Caffe libraries in the release docker image. However, the Nvidia GPU driver is not installed in the dev docker image.
+1. Nvidia GPU and CUDA are required to run the perception module with Caffe. Apollo provides the CUDA and Caffe libraries in the release docker image. However, the Nvidia GPU driver is not installed in the dev docker image.
 
 2. To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker image that is installed on your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_opt_gpu`).
 

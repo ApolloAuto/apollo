@@ -78,10 +78,10 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_init_point, Frame*,
     ReferenceLineInfo* reference_line_info) {
   if (complete_rtk_trajectory_.empty() || complete_rtk_trajectory_.size() < 2) {
-    std::string msg(
+    const std::string msg =
         "RTKReplayPlanner doesn't have a recorded trajectory or "
         "the recorded trajectory doesn't have enough valid trajectory "
-        "points.");
+        "points.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

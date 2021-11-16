@@ -24,7 +24,7 @@ usage:
 
 import argparse
 
-from cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordReader
 from modules.transform.proto import transform_pb2
 
 

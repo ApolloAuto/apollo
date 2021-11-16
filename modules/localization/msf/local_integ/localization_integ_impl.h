@@ -77,6 +77,8 @@ class LocalizationIntegImpl {
 
   const LocalizationResult& GetLastestGnssLocalization() const;
 
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  protected:
   void PcdProcessImpl(const LidarFrame& pcd_data);
 

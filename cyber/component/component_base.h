@@ -22,13 +22,15 @@
 #include <string>
 #include <vector>
 
+#include "gflags/gflags.h"
+
+#include "cyber/proto/component_conf.pb.h"
+
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/node/node.h"
-#include "cyber/proto/component_conf.pb.h"
 #include "cyber/scheduler/scheduler.h"
-#include "gflags/gflags.h"
 
 namespace apollo {
 namespace cyber {

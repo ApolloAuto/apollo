@@ -147,8 +147,8 @@ TEST_F(PredictionMapTest, get_path_heading) {
   common::PointENU point;
   point.set_x(124.85931);
   point.set_y(347.52733);
-  EXPECT_DOUBLE_EQ(-0.066973788088279029,
-                   PredictionMap::PathHeading(lane_info, point));
+  auto actual_heading = PredictionMap::PathHeading(lane_info, point);
+  EXPECT_NEAR(-0.066973788088279029, actual_heading, 1.0e-10);
 }
 
 TEST_F(PredictionMapTest, get_smooth_point_from_lane) {

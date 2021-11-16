@@ -22,7 +22,7 @@
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/time/time.h"
+#include "cyber/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/control_conf.pb.h"
@@ -32,7 +32,7 @@
 namespace apollo {
 namespace control {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 using LocalizationPb = localization::LocalizationEstimate;
 using ChassisPb = canbus::Chassis;
 using TrajectoryPb = planning::ADCTrajectory;
@@ -53,7 +53,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     ACHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
-    timestamp_ = Clock::NowInSeconds();
+    timestamp_ = Time::Now().ToSecond();
 
     controller_.reset(new LonController());
     injector_ = std::make_shared<DependencyInjector>();
@@ -110,7 +110,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
   auto trajectory_pb =
       LoadPlanningTrajectoryPb(std::string(data_path) + "1_planning.pb.txt");
 
-  double time_now = Clock::NowInSeconds();
+  double time_now = Time::Now().ToSecond();
   trajectory_pb.mutable_header()->set_timestamp_sec(time_now);
 
   auto vehicle_state = injector_->vehicle_state();

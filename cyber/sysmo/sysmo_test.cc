@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <thread>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/environment.h"

@@ -32,7 +32,7 @@ namespace valet_parking {
 
 class StageApproachingParkingSpot : public Stage {
  public:
-  explicit StageApproachingParkingSpot(
+  StageApproachingParkingSpot(
       const ScenarioConfig::StageConfig& config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}

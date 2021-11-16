@@ -47,13 +47,15 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
-#include "cyber/logger/logger_util.h"
 #include "glog/log_severity.h"
+
+#include "cyber/logger/logger_util.h"
 
 namespace apollo {
 namespace cyber {

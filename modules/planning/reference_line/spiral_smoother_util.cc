@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
-
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"

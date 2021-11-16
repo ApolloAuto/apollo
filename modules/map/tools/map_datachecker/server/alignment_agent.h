@@ -38,7 +38,7 @@ template <typename ALIGNMENT_TYPE, typename REQUEST_TYPE,
 class AlignmentAgent {
  public:
   AlignmentAgent(
-      std::shared_ptr<JSonConf> sp_conf,
+      std::shared_ptr<JsonConf> sp_conf,
       std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
     sp_conf_ = sp_conf;
     sp_pose_collection_agent_ = sp_pose_collection_agent;
@@ -93,7 +93,7 @@ class AlignmentAgent {
   int AsyncStartAlignment() {
     SetState(AlignmentAgentState::RUNNING);
     std::thread alignment_thread([=]() {
-      sp_alignment_->SetStartTime(UnixtimeNow());
+      sp_alignment_->SetStartTime(UnixNow());
       AINFO << "set state RUNNING";
       while (!need_stop_ && !apollo::cyber::IsShutdown()) {
         std::shared_ptr<std::vector<FramePose>> sp_poses = GetPoses();
@@ -175,7 +175,7 @@ class AlignmentAgent {
   AlignmentAgentState GetState() const { return state_; }
 
  private:
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<ALIGNMENT_TYPE> sp_alignment_ = nullptr;
   std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent_ = nullptr;
   AlignmentAgentState state_;

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,12 +11,12 @@ cc_library(
         "//cyber",
         "//modules/common/math",
         "//modules/map/hdmap",
-        "//modules/map/proto:map_proto",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/map/hdmap:hdmap_input",
-        "//modules/perception/proto:map_manager_config_proto",
+        "//modules/perception/proto:map_manager_config_cc_proto",
+        "@com_google_googletest//:gtest",
     ],
 )
 

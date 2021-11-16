@@ -696,7 +696,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneWithSmallestAverageCurvature(
 
 double PredictionMap::AverageCurvature(const std::string& lane_id,
                                        const size_t sample_size) {
-  CHECK_GT(sample_size, 0);
+  CHECK_GT(sample_size, 0U);
   std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
       PredictionMap::LaneById(lane_id);
   if (lane_info_ptr == nullptr) {

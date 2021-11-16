@@ -7,6 +7,6 @@ enum ThirdPartyPerceptionDeviceType {
   MOBILEYE = 1;
 };
 
-message ThirdPartyPerceptionDevice {  
+message ThirdPartyPerceptionDevice {
   optional ThirdPartyPerceptionDeviceType device_type = 1;
 }

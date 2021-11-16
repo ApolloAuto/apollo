@@ -517,6 +517,10 @@ bool BaseMapNode::SaveAltitudeImage() const {
 bool BaseMapNode::SaveAltitudeImage(const std::string& path) const {
   cv::Mat image;
   map_matrix_->GetAltitudeImg(&image);
+  if (image.empty()) {
+    return false;
+  }
+
   bool success = cv::imwrite(path, image);
   return success;
 }

@@ -17,9 +17,9 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
-from imu_angular_velocity import ImuAngularVelocity
-from imu_speed import ImuSpeed
+from modules.tools.plot_planning.record_reader import RecordItemReader
+from modules.tools.plot_planning.imu_angular_velocity import ImuAngularVelocity
+from modules.tools.plot_planning.imu_speed import ImuSpeed
 
 
 class ImuAvCurvature:

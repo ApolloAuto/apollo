@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/proto/cos_theta_smoother_config.proto";
-import "modules/planning/proto/fem_pos_deviation_smoother_config.proto";
+import "modules/planning/proto/math/cos_theta_smoother_config.proto";
+import "modules/planning/proto/math/fem_pos_deviation_smoother_config.proto";
 
 message QpSplineSmootherConfig {
   optional uint32 spline_order = 1 [default = 5];

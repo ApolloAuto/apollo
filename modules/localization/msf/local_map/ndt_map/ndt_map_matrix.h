@@ -69,6 +69,8 @@ class NdtMapSingleCell {
 
   inline void CentroidEigenSolver(const Eigen::Matrix3f& centroid_cov);
 
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   /**@brief The average intensity value. */
   float intensity_ = 0;

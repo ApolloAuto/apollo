@@ -19,19 +19,26 @@
 #include <libgen.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 #include <csignal>
 #include <cstdio>
 #include <ctime>
+#include <memory>
 #include <string>
 
+#include "cyber/proto/clock.pb.h"
+
 #include "cyber/binary.h"
+#include "cyber/common/file.h"
 #include "cyber/common/global_data.h"
 #include "cyber/data/data_dispatcher.h"
 #include "cyber/logger/async_logger.h"
+#include "cyber/node/node.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/sysmo/sysmo.h"
 #include "cyber/task/task.h"
+#include "cyber/time/clock.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
 
@@ -43,16 +50,21 @@ using apollo::cyber::service_discovery::TopologyManager;
 
 namespace {
 
+const std::string& kClockChannel = "/clock";
+const std::string& kClockNode = "clock";
+
 bool g_atexit_registered = false;
 std::mutex g_mutex;
+std::unique_ptr<Node> clock_node;
+
 logger::AsyncLogger* async_logger = nullptr;
 
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
   if (slash) {
-    ::apollo::cyber::Binary::SetName(slash + 1);
+    ::apollo::cyber::binary::SetName(slash + 1);
   } else {
-    ::apollo::cyber::Binary::SetName(binary_name);
+    ::apollo::cyber::binary::SetName(binary_name);
   }
 
   // Init glog
@@ -68,9 +80,7 @@ void InitLogger(const char* binary_name) {
   async_logger->Start();
 }
 
-void StopLogger() {
-  delete async_logger;
-}
+void StopLogger() { delete async_logger; }
 
 }  // namespace
 
@@ -104,6 +114,19 @@ bool Init(const char* binary_name) {
     g_atexit_registered = true;
   }
   SetState(STATE_INITIALIZED);
+
+  auto global_data = GlobalData::Instance();
+  if (global_data->IsMockTimeMode()) {
+    auto node_name = kClockNode + std::to_string(getpid());
+    clock_node = std::unique_ptr<Node>(new Node(node_name));
+    auto cb =
+        [](const std::shared_ptr<const apollo::cyber::proto::Clock>& msg) {
+          if (msg->has_clock()) {
+            Clock::Instance()->SetNow(Time(msg->clock()));
+          }
+        };
+    clock_node->CreateReader<apollo::cyber::proto::Clock>(kClockChannel, cb);
+  }
   return true;
 }
 

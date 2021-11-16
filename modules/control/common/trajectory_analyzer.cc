@@ -67,7 +67,7 @@ TrajectoryAnalyzer::TrajectoryAnalyzer(
 
 PathPoint TrajectoryAnalyzer::QueryMatchedPathPoint(const double x,
                                                     const double y) const {
-  CHECK_GT(trajectory_points_.size(), 0);
+  CHECK_GT(trajectory_points_.size(), 0U);
 
   double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
@@ -237,7 +237,7 @@ PathPoint TrajectoryAnalyzer::FindMinDistancePoint(const TrajectoryPoint &p0,
 
 void TrajectoryAnalyzer::TrajectoryTransformToCOM(
     const double rear_to_com_distance) {
-  CHECK_GT(trajectory_points_.size(), 0);
+  CHECK_GT(trajectory_points_.size(), 0U);
   for (size_t i = 0; i < trajectory_points_.size(); ++i) {
     auto com = ComputeCOMPosition(rear_to_com_distance,
                                   trajectory_points_[i].path_point());

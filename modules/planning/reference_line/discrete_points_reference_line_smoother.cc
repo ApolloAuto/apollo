@@ -20,7 +20,6 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/discrete_points_math.h"
@@ -37,8 +36,6 @@ DiscretePointsReferenceLineSmoother::DiscretePointsReferenceLineSmoother(
 bool DiscretePointsReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  const auto start_timestamp = std::chrono::system_clock::now();
-
   std::vector<std::pair<double, double>> raw_point2d;
   std::vector<double> anchorpoints_lateralbound;
 
@@ -54,8 +51,6 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   anchorpoints_lateralbound.back() = 0.0;
 
   NormalizePoints(&raw_point2d);
-
-  const auto solver_start_timestamp = std::chrono::system_clock::now();
 
   bool status = false;
 
@@ -80,12 +75,6 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
     return false;
   }
 
-  const auto solver_end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> solver_diff =
-      solver_end_timestamp - solver_start_timestamp;
-  ADEBUG << "discrete_points reference line smoother solver time: "
-         << solver_diff.count() * 1000.0 << " ms.";
-
   DeNormalizePoints(&smoothed_point2d);
 
   std::vector<ReferencePoint> ref_points;
@@ -99,12 +88,6 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   }
 
   *smoothed_reference_line = ReferenceLine(ref_points);
-
-  const auto end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
-  ADEBUG << "discrete_points reference line smoother totoal time: "
-         << diff.count() * 1000.0 << " ms.";
-
   return true;
 }
 
@@ -192,7 +175,7 @@ bool DiscretePointsReferenceLineSmoother::FemPosSmooth(
 
 void DiscretePointsReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
-  CHECK_GT(anchor_points.size(), 1);
+  CHECK_GT(anchor_points.size(), 1U);
   anchor_points_ = anchor_points;
 }
 

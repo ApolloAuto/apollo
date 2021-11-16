@@ -32,7 +32,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from common.configure import parameters
+from modules.tools.prediction.data_pipelines.common.configure import parameters
 from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\

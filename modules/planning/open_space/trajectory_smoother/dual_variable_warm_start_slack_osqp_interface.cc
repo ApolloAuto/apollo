@@ -20,6 +20,7 @@
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h"
 
 #include <algorithm>
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -207,7 +208,9 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   data->u = ub;
 
   // Workspace
-  OSQPWorkspace* work = osqp_setup(data, settings);
+  OSQPWorkspace* work = nullptr;
+  // osqp_setup(&work, data, settings);
+  work = osqp_setup(data, settings);
 
   // Solve Problem
   osqp_solve(work);
@@ -358,13 +361,13 @@ void DualVariableWarmStartSlackOSQPInterface::assembleP(
     }
   }
 
-  CHECK_EQ(P_indptr->size(), lambda_horizon_);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(lambda_horizon_));
   for (int i = lambda_horizon_; i < num_of_variables_ + 1; ++i) {
     P_indptr->emplace_back(first_row_location);
   }
 
   CHECK_EQ(P_data->size(), P_indices->size());
-  CHECK_EQ(P_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(P_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
@@ -494,7 +497,7 @@ void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
   A_indptr->emplace_back(first_row_location);
 
   CHECK_EQ(A_data->size(), A_indices->size());
-  CHECK_EQ(A_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(A_indptr->size(), static_cast<size_t>(num_of_variables_) + 1);
 }
 
 void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(

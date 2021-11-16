@@ -22,6 +22,7 @@
 #include <string>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -47,7 +48,7 @@ bool InteractionPredictor::Predict(
     ObstaclesContainer* obstacles_container) {
   Clear();
   CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+  CHECK_GT(obstacle->history_size(), 0U);
 
   BuildADCTrajectory(adc_trajectory_container,
                      FLAGS_collision_cost_time_resolution);
@@ -89,7 +90,8 @@ bool InteractionPredictor::Predict(
 
   int best_seq_idx = 0;
   double largest_posterior = 0.0;
-  CHECK_EQ(posteriors.size(), lane_graph->lane_sequence_size());
+  CHECK_EQ(posteriors.size(),
+           static_cast<size_t>(lane_graph->lane_sequence_size()));
   for (int i = 0; i < num_lane_sequence; ++i) {
     double normalized_posterior =
         posteriors[i] / (posterior_sum + FLAGS_double_precision);
@@ -240,7 +242,7 @@ double InteractionPredictor::ComputeTrajectoryCost(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const double acceleration,
     const ADCTrajectoryContainer* adc_trajectory_container) {
-  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(obstacle.history_size(), 0U);
   double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
 

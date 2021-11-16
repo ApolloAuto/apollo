@@ -1,4 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,7 +19,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
     ],
 )
@@ -29,10 +31,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -42,10 +45,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cc_test(
@@ -55,10 +59,11 @@ cc_test(
     data = [
         "//modules/planning:planning_conf",
     ],
+    linkopts = ["-lgomp"],
     deps = [
         ":valet_parking",
         "@com_google_googletest//:gtest_main",
-    ],
+    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
 
 cpplint()

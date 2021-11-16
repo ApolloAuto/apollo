@@ -1,7 +1,4 @@
-# JSON for Modern C++
-package(default_visibility = ["//visibility:public"])
-
-licenses(["notice"])
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "tf2",
@@ -11,9 +8,14 @@ cc_library(
         "src/static_cache.cpp",
         "src/time.cpp",
     ],
-    hdrs = glob(["include/**/*.h"]),
-    includes = ["include"],
+    hdrs = glob([
+        "include/geometry_msgs/**",
+        "include/tf2_msgs/**",
+        "include/tf2/**",
+    ]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
     deps = [
-        "//third_party:boost",
+        "@boost",
     ],
 )

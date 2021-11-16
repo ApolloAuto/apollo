@@ -39,7 +39,7 @@ namespace camera {
 // show detect point_set
 void show_detect_point_set(
     const cv::Mat& image,
-    const std::vector<std::vector<LanePointInfo> >& detect_laneline_point_set,
+    const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set,
     const std::string& save_path) {
   cv::Scalar color = cv::Scalar(0, 255, 0);
   int draw_size = 2;

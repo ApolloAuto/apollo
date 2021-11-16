@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/radar/app/radar_obstacle_perception.h"
 
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/lib/utils/perf.h"
 
 using apollo::perception::lib::ConfigManager;
 using apollo::perception::lib::ModelConfig;
@@ -69,9 +69,9 @@ bool RadarObstaclePerception::Perceive(
     const drivers::ContiRadar& corrected_obstacles,
     const RadarPerceptionOptions& options,
     std::vector<base::ObjectPtr>* objects) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   const std::string& sensor_name = options.sensor_name;
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   base::FramePtr detect_frame_ptr(new base::Frame());
 
   if (!detector_->Detect(corrected_obstacles, options.detector_options,
@@ -81,15 +81,15 @@ bool RadarObstaclePerception::Perceive(
   }
   ADEBUG << "Detected frame objects number: "
          << detect_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
   if (!roi_filter_->RoiFilter(options.roi_filter_options, detect_frame_ptr)) {
     ADEBUG << "All radar objects were filtered out";
   }
   ADEBUG << "RoiFiltered frame objects number: "
          << detect_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
 
-  base::FramePtr tracker_frame_ptr = std::make_shared<base::Frame>();
+  base::FramePtr tracker_frame_ptr(new base::Frame);
   if (!tracker_->Track(*detect_frame_ptr, options.track_options,
                        tracker_frame_ptr)) {
     AERROR << "radar track error";
@@ -97,7 +97,7 @@ bool RadarObstaclePerception::Perceive(
   }
   ADEBUG << "tracked frame objects number: "
          << tracker_frame_ptr->objects.size();
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 
   *objects = tracker_frame_ptr->objects;
 

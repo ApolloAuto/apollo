@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include <fstream>
 #include <opencv2/opencv.hpp>
 
-#include <fstream>
-
 #include "gtest/gtest.h"
-
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
@@ -212,7 +210,7 @@ int main() {
         FLAGS_image_root + "/" + image_name + FLAGS_image_ext;
     std::string result_path = FLAGS_dest_dir + "/" + image_name + ".txt";
 
-    auto cv_img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
+    auto cv_img = cv::imread(image_path, cv::IMAGE_COLOR);
 
     if (FLAGS_pre_detected_dir != "") {
       std::string kitti_path =

@@ -30,10 +30,10 @@ void ConvertGround3ToGround4(const float &baseline,
                              const std::vector<float> &ground3,
                              std::vector<float> *ground4) {
   CHECK_GT(baseline, 0.0f);
-  CHECK_EQ(k_mat.size(), 9);
-  CHECK_EQ(ground3.size(), 3);
+  CHECK_EQ(k_mat.size(), 9U);
+  CHECK_EQ(ground3.size(), 3U);
   CHECK_NOTNULL(ground4);
-  CHECK_EQ(ground4->size(), 4);
+  CHECK_EQ(ground4->size(), 4U);
   const float &b = baseline;
   const float &fx = k_mat[0];
   const float &fy = k_mat[4];
@@ -51,10 +51,10 @@ bool ConvertGround4ToGround3(const float &baseline,
                              const std::vector<float> &ground4,
                              std::vector<float> *ground3) {
   CHECK_GT(baseline, 0.0f);
-  CHECK_EQ(k_mat.size(), 9);
-  CHECK_EQ(ground4.size(), 4);
+  CHECK_EQ(k_mat.size(), 9U);
+  CHECK_EQ(ground4.size(), 4U);
   CHECK_NOTNULL(ground3);
-  CHECK_EQ(ground3->size(), 3);
+  CHECK_EQ(ground3->size(), 3U);
   // normalization
   float p[4] = {ground4[0], ground4[1], ground4[2], ground4[3]};
   float norm = common::ISqrt(common::ISquaresum3(p));
@@ -80,8 +80,8 @@ void GetGroundPlanePitchHeight(const float &baseline,
                                const std::vector<float> &ground3, float *pitch,
                                float *cam_height) {
   CHECK_GT(baseline, 0.0f);
-  CHECK_EQ(k_mat.size(), 9);
-  CHECK_EQ(ground3.size(), 3);
+  CHECK_EQ(k_mat.size(), 9U);
+  CHECK_EQ(ground3.size(), 3U);
   CHECK_NOTNULL(pitch);
   CHECK_NOTNULL(cam_height);
   std::vector<float> ground4(4, 0.0f);
@@ -99,11 +99,11 @@ void GetGround3FromPitchHeight(const std::vector<float> &k_mat,
                                const float &baseline, const float &pitch,
                                const float &cam_height,
                                std::vector<float> *ground3) {
-  CHECK_EQ(k_mat.size(), 9);
+  CHECK_EQ(k_mat.size(), 9U);
   CHECK_GT(baseline, 0.0f);
   CHECK_GT(cam_height, 0.0f);
   CHECK_NOTNULL(ground3);
-  CHECK_EQ(ground3->size(), 3);
+  CHECK_EQ(ground3->size(), 3U);
   float sin_pitch = static_cast<float>(sin(pitch));
   float cos_pitch = static_cast<float>(cos(pitch));
   std::vector<float> ground4 = {0, cos_pitch, -sin_pitch, -cam_height};
@@ -133,7 +133,7 @@ GroundPlaneTracker::GroundPlaneTracker(int track_length) {
 
 void GroundPlaneTracker::Push(const std::vector<float> &ph,
                               const float &inlier_ratio) {
-  CHECK_EQ(ph.size(), 2);
+  CHECK_EQ(ph.size(), 2U);
   int i = 0;
   int length = static_cast<int>(pitch_height_inlier_tracks_.size());
   if (head_ == 0) {

@@ -27,8 +27,8 @@
 #include "Eigen/Geometry"
 
 // TODO(Localization): Fix the typo of "forecast".
-#include "include/pose_forcast.h"
-#include "include/sins_struct.h"
+#include "localization_msf/pose_forcast.h"
+#include "localization_msf/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
@@ -162,6 +162,9 @@ class LocalizationLidarProcess {
 
   static constexpr double DEG_TO_RAD = 0.017453292519943;
   static constexpr double DEG_TO_RAD2 = DEG_TO_RAD * DEG_TO_RAD;
+
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 }  // namespace msf

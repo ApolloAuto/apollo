@@ -23,7 +23,7 @@ from yattag import Doc
 import pyproj
 
 from modules.map.relative_map.proto import navigation_pb2
-import common.proto_utils as proto_utils
+import modules.tool.common.proto_utils as proto_utils
 
 
 class DBMapViewer:

@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
@@ -26,13 +25,13 @@ source "${DIR}/apollo_base.sh"
 function start() {
   LAUNCH_FILE=$1
   LOG="/apollo/data/log/$(basename ${LAUNCH_FILE}).start.log"
-  nohup cyber_launch start "${LAUNCH_FILE}" </dev/null >"${LOG}" 2>&1 &
+  nohup cyber_launch start "${LAUNCH_FILE}" < /dev/null > "${LOG}" 2>&1 &
 }
 
 function stop() {
   LAUNCH_FILE=$1
   LOG="/apollo/data/log/$(basename ${LAUNCH_FILE}).stop.log"
-  nohup cyber_launch stop "${LAUNCH_FILE}" < /dev/null >"${LOG}" 2>&1 &
+  nohup cyber_launch stop "${LAUNCH_FILE}" < /dev/null > "${LOG}" 2>&1 &
 }
 
 # run command_name launch_file.
@@ -45,6 +44,11 @@ function run() {
     stop)
       shift
       stop $@
+      ;;
+    restart)
+      shift
+      stop $@
+      start $@
       ;;
     *)
       echo "Unknow command: $1"

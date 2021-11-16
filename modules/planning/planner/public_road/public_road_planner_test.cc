@@ -17,10 +17,8 @@
 #include "modules/planning/planner/public_road/public_road_planner.h"
 
 #include "gtest/gtest.h"
-
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"

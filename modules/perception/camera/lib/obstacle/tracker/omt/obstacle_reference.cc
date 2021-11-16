@@ -53,7 +53,7 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
 }
 
 void ObstacleReference::UpdateReference(const CameraFrame *frame,
-                                        const std::vector<Target> &targets) {
+                                        const EigenVector<Target> &targets) {
   std::string sensor = frame->data_provider->sensor_name();
   SyncGroundEstimator(sensor, frame->camera_k_matrix,
                       static_cast<int>(img_width_),
@@ -133,7 +133,8 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
   }
 
   int count_samples = static_cast<int>(vd_samples.size() / 2);
-  if (count_samples > ground_estimator.get_min_nr_samples()) {
+    if (count_samples > ground_estimator.get_min_nr_samples() &&
+      frame->calibration_service != nullptr) {
     ground_estimator.DetetGround(
         frame->calibration_service->QueryPitchAngle(),
         frame->calibration_service->QueryCameraToGroundHeight(),

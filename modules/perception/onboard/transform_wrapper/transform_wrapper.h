@@ -21,6 +21,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Dense"
+#include "gflags/gflags.h"
 
 #include "modules/transform/buffer.h"
 

@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
@@ -39,7 +38,7 @@ struct StopSignUnprotectedContext;
 
 class StopSignUnprotectedStagePreStop : public Stage {
  public:
-  explicit StopSignUnprotectedStagePreStop(
+  StopSignUnprotectedStagePreStop(
       const ScenarioConfig::StageConfig& config,
       const std::shared_ptr<DependencyInjector>& injector)
       : Stage(config, injector) {}

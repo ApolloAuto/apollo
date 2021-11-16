@@ -21,7 +21,7 @@
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -34,7 +34,7 @@ namespace scenario {
 namespace yield_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus YieldSignStageApproach::Process(

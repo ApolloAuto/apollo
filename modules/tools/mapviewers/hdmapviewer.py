@@ -20,7 +20,7 @@ import argparse
 
 from bokeh.plotting import figure, output_file, show
 from modules.map.proto import map_pb2
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 
 
 def draw(map_pb, plot):

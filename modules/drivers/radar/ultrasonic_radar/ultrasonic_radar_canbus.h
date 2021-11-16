@@ -27,9 +27,9 @@
 
 #include "cyber/common/macros.h"
 
+#include "cyber/time/time.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -60,7 +60,7 @@ namespace ultrasonic_radar {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;

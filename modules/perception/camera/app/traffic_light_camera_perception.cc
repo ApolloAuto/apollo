@@ -17,11 +17,11 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -90,40 +90,25 @@ bool TrafficLightCameraPerception::Init(
 
 bool TrafficLightCameraPerception::Perception(
     const CameraPerceptionOptions &options, CameraFrame *frame) {
-  PERCEPTION_PERF_FUNCTION();
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_FUNCTION();
+  PERF_BLOCK_START();
   TrafficLightDetectorOptions detector_options;
   if (!detector_->Detect(detector_options, frame)) {
     AERROR << "tl failed to detect.";
     return false;
   }
-  const auto traffic_light_detect_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_detect");
 
   TrafficLightDetectorOptions recognizer_options;
   if (!recognizer_->Detect(recognizer_options, frame)) {
     AERROR << "tl failed to recognize.";
     return false;
   }
-  const auto traffic_light_recognize_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_recognize");
 
   TrafficLightTrackerOptions tracker_options;
   if (!tracker_->Track(tracker_options, frame)) {
     AERROR << "tl failed to track.";
     return false;
   }
-  const auto traffic_light_track_time =
-      PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-          frame->data_provider->sensor_name(), "traffic_light_track");
-  AINFO << "TrafficLightsPerception perf_info."
-        << " number_of_lights: " << frame->traffic_lights.size()
-        << " traffic_light_detect_time: " << traffic_light_detect_time << " ms."
-        << " traffic_light_recognize_time: " << traffic_light_recognize_time
-        << " ms."
-        << " traffic_light_track_time: " << traffic_light_track_time << " ms.";
   return true;
 }
 

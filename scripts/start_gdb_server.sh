@@ -35,12 +35,12 @@ function print_usage() {
   ${NONE}a port number, such as '1111'."
 }
 
-if [ $# -lt 2 ];then
-    print_usage
-    exit 1
+if [ $# -lt 2 ]; then
+  print_usage
+  exit 1
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${DIR}/apollo_base.sh"
 
 MODULE_NAME=$1
@@ -66,7 +66,7 @@ if [ -z ${PROCESS_ID} ]; then
 
   # run function from apollo_base.sh
   # run command_name module_name
-  run ${MODULE_NAME} "$@"
+  run_module ${MODULE_NAME} "$@"
 
   PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
   echo ${PROCESS_ID}

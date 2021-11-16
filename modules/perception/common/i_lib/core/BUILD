@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +11,6 @@ cc_library(
         "i_blas.h",
         "i_constant.h",
         "i_rand.h",
-        "i_struct.h",
     ],
 )
 

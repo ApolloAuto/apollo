@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.drivers.hesai;
+
+import "modules/common/proto/header.proto";
+
+enum Model {
+  UNKNOWN = 0;
+  HESAI40P = 1;
+  HESAI64 = 2;
+}
+
+message HesaiScanPacket {
+  optional uint64 stamp = 1;
+  optional bytes data = 2;
+}
+
+message HesaiScan {
+  optional apollo.common.Header header = 1;
+  optional Model model = 2;  // hesai device model
+  repeated HesaiScanPacket firing_pkts = 3;
+  optional uint64 basetime = 4 [default = 0];
+}

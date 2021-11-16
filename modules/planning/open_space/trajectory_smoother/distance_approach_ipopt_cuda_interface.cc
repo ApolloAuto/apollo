@@ -19,7 +19,10 @@
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 
-#ifdef USE_GPU
+#include <algorithm>
+#include <limits>
+
+#if USE_GPU == 1
 #include "modules/planning/open_space/trajectory_smoother/planning_block.h"
 #endif
 
@@ -2270,7 +2273,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
   if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
-#ifdef USE_GPU
+#if USE_GPU == 1
     fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
 #else
     AFATAL << "CUDA enabled without GPU!";
@@ -2280,7 +2283,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
     // triangle only
 
     obj_lam[0] = obj_factor;
-#ifdef USE_GPU
+#if USE_GPU == 1
     data_transfer(&obj_lam[1], lambda, m);
 #else
     AFATAL << "CUDA enabled without GPU!";
@@ -2290,7 +2293,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
-#ifdef USE_GPU
+#if USE_GPU == 1
     if (!data_transfer(values, hessval, nnz_L)) {
       for (int idx = 0; idx < nnz_L; idx++) {
         values[idx] = hessval[idx];

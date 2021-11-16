@@ -15,15 +15,20 @@
  *****************************************************************************/
 #pragma once
 
+#include <cmath>
 #include <vector>
 
 #include "Eigen/Core"
+#include "modules/common/util/eigen_defs.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 class KalmanFilterConstVelocity {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   KalmanFilterConstVelocity();
 
@@ -59,6 +64,9 @@ class KalmanFilterConstVelocity {
 template <std::size_t N>
 class KalmanFilterConstState {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   typedef Eigen::Matrix<double, N, N> MatrixNd;
   typedef Eigen::Matrix<double, N, 1> VectorNd;
 
@@ -93,6 +101,9 @@ class KalmanFilterConstState {
 
 class ExtendedKalmanFilter {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   ExtendedKalmanFilter() : inited_(false) {}
   void Init();
 
@@ -125,6 +136,8 @@ class ExtendedKalmanFilter {
 
 class FirstOrderRCLowPassFilter {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   FirstOrderRCLowPassFilter() : alpha_(0), inited_(false) {}
   void SetAlpha(float alpha);
   void AddMeasure(const Eigen::VectorXd &z);
@@ -138,6 +151,8 @@ class FirstOrderRCLowPassFilter {
 
 class MaxNMeanFilter {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+ public:
   MaxNMeanFilter() : index_(0), window_(1) {}
   void SetWindow(int window);
 
@@ -148,12 +163,14 @@ class MaxNMeanFilter {
   Eigen::VectorXd get_state() const;
 
  private:
-  std::vector<Eigen::VectorXd> measures_;
+  apollo::common::EigenVector<Eigen::VectorXd> measures_;
   int index_;
   int window_;
 };
 
 class MeanFilter {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  public:
   MeanFilter() : index_(0), window_(1) {}
   void SetWindow(int window);
@@ -165,7 +182,7 @@ class MeanFilter {
   int size() const { return static_cast<int>(measures_.size()); }
 
  private:
-  std::vector<Eigen::VectorXd> measures_;
+  apollo::common::EigenVector<Eigen::VectorXd> measures_;
   Eigen::VectorXd state_;
   Eigen::MatrixXd variance_;
   int index_;
@@ -205,9 +222,11 @@ void KalmanFilterConstState<N>::Correct(const VectorNd &measurement) {
 
     // compute likelihood
     residual_ = measurement - predict_state_;
-    likelihood_ = std::exp(-0.5 * residual_.transpose() *
-                           measurements_cov.inverse() * residual_) /
-                  std::sqrt(2 * M_PI * measurements_cov.determinant());
+    // Ref: https://eigen.tuxfamily.org/bz/show_bug.cgi?id=1610
+    double kval = -0.5 * residual_.transpose().adjoint().dot(
+                             measurements_cov.inverse() * residual_);
+    likelihood_ =
+        std::exp(kval) / std::sqrt(2 * M_PI * measurements_cov.determinant());
   }
 }
 // [END] KalmanFilterConstState

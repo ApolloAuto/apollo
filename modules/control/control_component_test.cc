@@ -32,7 +32,7 @@ namespace control {
 
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 using apollo::localization::LocalizationEstimate;
@@ -97,7 +97,7 @@ void ControlComponentTest::SetupCyber() {
   // init cyber framework
   apollo::cyber::Init("control_test");
 
-  Clock::SetMode(Clock::CYBER);
+  Clock::SetMode(apollo::cyber::proto::MODE_CYBER);
 
   component_config_.set_name("control_test");
 

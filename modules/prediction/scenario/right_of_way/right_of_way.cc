@@ -57,9 +57,8 @@ void RightOfWay::Analyze(ContainerManager* container_manager) {
     return;
   }
 
-  auto pose_container =
-      container_manager->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
+  auto pose_container = container_manager->GetContainer<PoseContainer>(
+      AdapterConfig::LOCALIZATION);
   if (pose_container == nullptr) {
     AERROR << "Pose container pointer is a null pointer.";
     return;

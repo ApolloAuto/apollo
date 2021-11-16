@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -45,14 +46,14 @@ cc_library(
     name = "swap",
     srcs = select(
         {
-            "//tools/platform:x86_mode": [
+            "@platforms//cpu:x86_64": [
                 "detail/swap_x86_64.S",
             ],
-            "//tools/platform:aarch64_mode": [
+            "@platforms//cpu:aarch64": [
                 "detail/swap_aarch64.S",
             ],
         },
-        no_match_error = "Please Build with an ARM or Linux x86_64 platform",
+        no_match_error = "Please Build with a Linux aarch64 or x86_64 platform",
     ),
 )
 

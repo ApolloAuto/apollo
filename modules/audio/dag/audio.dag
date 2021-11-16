@@ -1,0 +1,19 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/audio/libaudio_component.so"
+    components {
+        class_name : "AudioComponent"
+        config {
+            name: "audio"
+            config_file_path: "/apollo/modules/audio/conf/audio_conf.pb.txt"
+            flag_file_path: "/apollo/modules/audio/conf/audio.conf"
+            readers: [
+                {
+                    channel: "/apollo/sensor/microphone"
+                    qos_profile: {
+                        depth : 1
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -62,6 +62,14 @@ inline std::string EndWayPointFile() {
 }
 
 /**
+ * @brief get default routing file path from flags.
+ * @return default routing points file path
+ */
+inline std::string DefaultRoutingFile() {
+    return absl::StrCat(FLAGS_map_dir, "_", FLAGS_default_routing_filename);
+}
+
+/**
  * @brief create a Map ID given a string.
  * @param id a string id
  * @return a Map ID instance

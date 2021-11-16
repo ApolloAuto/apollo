@@ -29,9 +29,8 @@ namespace planning {
 
 class PathAssessmentDecider : public Decider {
  public:
-  PathAssessmentDecider(
-      const TaskConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector);
+  PathAssessmentDecider(const TaskConfig& config,
+                        const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   /** @brief Every time when Process function is called, it will:

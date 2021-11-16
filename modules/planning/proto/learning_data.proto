@@ -4,6 +4,7 @@ package apollo.planning;
 
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/map/proto/map_lane.proto";
 import "modules/perception/proto/perception_obstacle.proto";
@@ -152,7 +153,7 @@ message PredictionObstacleFeature {
 }
 
 message ObstacleFeature {
-  optional int32 id = 1;  // obstacle ID.
+  optional int32 id = 1;       // obstacle ID.
   optional double length = 2;  // obstacle length.
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
@@ -170,6 +171,7 @@ message RoutingResponseFeature {
 message RoutingFeature {
   optional RoutingResponseFeature routing_response = 1;
   repeated string local_routing_lane_id = 2;  // local routing close to ADC
+  optional RoutingResponseFeature local_routing = 3;
 }
 
 // based on apollo.perception.TrafficLight
@@ -228,5 +230,10 @@ message LearningDataFrame {
 }
 
 message LearningData {
-  repeated LearningDataFrame learning_data = 1;
+  repeated LearningDataFrame learning_data_frame = 1;
+}
+
+message PlanningLearningData {
+  optional apollo.common.Header header = 1;
+  optional LearningDataFrame learning_data_frame = 2;
 }

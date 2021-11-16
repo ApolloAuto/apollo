@@ -75,7 +75,7 @@ SyncedMemory::SyncedMemory(bool use_cuda)
       cpu_malloc_use_cuda_(use_cuda),
       own_gpu_data_(false),
       device_(-1) {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
 #ifdef PERCEPTION_DEBUG
   BASE_CUDA_CHECK(cudaGetDevice(&device_));
 #endif
@@ -91,7 +91,7 @@ SyncedMemory::SyncedMemory(size_t size, bool use_cuda)
       cpu_malloc_use_cuda_(use_cuda),
       own_gpu_data_(false),
       device_(-1) {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
 #ifdef PERCEPTION_DEBUG
   BASE_CUDA_CHECK(cudaGetDevice(&device_));
 #endif
@@ -104,11 +104,11 @@ SyncedMemory::~SyncedMemory() {
     PerceptionFreeHost(cpu_ptr_, cpu_malloc_use_cuda_);
   }
 
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   if (gpu_ptr_ && own_gpu_data_) {
     BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
   }
-#endif  // PERCEPTION_CPU_ONLY
+#endif  // USE_GPU
 }
 
 inline void SyncedMemory::to_cpu() {
@@ -125,7 +125,7 @@ inline void SyncedMemory::to_cpu() {
       own_cpu_data_ = true;
       break;
     case HEAD_AT_GPU:
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
       if (cpu_ptr_ == nullptr) {
         PerceptionMallocHost(&cpu_ptr_, size_, cpu_malloc_use_cuda_);
         own_cpu_data_ = true;
@@ -144,7 +144,7 @@ inline void SyncedMemory::to_cpu() {
 
 inline void SyncedMemory::to_gpu() {
   check_device();
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   switch (head_) {
     case UNINITIALIZED:
       BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
@@ -188,7 +188,7 @@ void SyncedMemory::set_cpu_data(void* data) {
 
 const void* SyncedMemory::gpu_data() {
   check_device();
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   to_gpu();
   return (const void*)gpu_ptr_;
 #else
@@ -199,7 +199,7 @@ const void* SyncedMemory::gpu_data() {
 
 void SyncedMemory::set_gpu_data(void* data) {
   check_device();
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   ACHECK(data);
   if (own_gpu_data_) {
     BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
@@ -221,7 +221,7 @@ void* SyncedMemory::mutable_cpu_data() {
 
 void* SyncedMemory::mutable_gpu_data() {
   check_device();
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   to_gpu();
   head_ = HEAD_AT_GPU;
   return gpu_ptr_;
@@ -231,7 +231,7 @@ void* SyncedMemory::mutable_gpu_data() {
 #endif
 }
 
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
 void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
   check_device();
   CHECK_EQ(head_, HEAD_AT_CPU);
@@ -247,7 +247,7 @@ void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
 #endif
 
 void SyncedMemory::check_device() {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
 #ifdef PERCEPTION_DEBUG
   int device;
   cudaGetDevice(&device);

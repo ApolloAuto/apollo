@@ -1,1 +1,2 @@
-Please refer to the  [Apollo Cyber RT FAQ](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_FAQs.md) under docs/cyber directory.
+Please refer to [Apollo CyberRT FAQ](../cyber/CyberRT_FAQs.md) under the
+`docs/cyber` directory.

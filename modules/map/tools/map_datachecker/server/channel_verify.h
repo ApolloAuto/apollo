@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
+
 #include "modules/map/tools/map_datachecker/server/common.h"
 
 namespace apollo {
@@ -44,7 +45,7 @@ struct CyberRecordInfo {
 
 struct OneRecordChannelCheckResult {
   std::string record_path;
-  uint64_t start_time;
+  uint64_t start_time = 0;
   std::vector<std::string> lack_channels;
   // inadequate_rate: channel_name <---> (expected_rate, actual_rate)
   std::map<std::string, std::pair<double, double>> inadequate_rate;
@@ -55,7 +56,7 @@ typedef std::vector<OneRecordChannelCheckResult>::iterator CheckResultIterator;
 
 class ChannelVerify {
  public:
-  explicit ChannelVerify(std::shared_ptr<JSonConf> sp_conf);
+  explicit ChannelVerify(std::shared_ptr<JsonConf> sp_conf);
   ErrorCode Check(const std::string& record_dir_or_record_full_path);
   std::shared_ptr<std::vector<OneRecordChannelCheckResult>> get_check_result()
       const;
@@ -74,7 +75,7 @@ class ChannelVerify {
   void Reset();
 
  private:
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   CheckedResult sp_vec_check_result_ = nullptr;
   ErrorCode return_state_;
   std::set<std::string> checked_records_;

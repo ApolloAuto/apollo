@@ -44,9 +44,8 @@ message LaneChangeDeciderConfig {
 
 message LearningModelInferenceTaskConfig {
   enum ModelType {
-    CONV_RNN = 1;
-    CNN = 2;
-    CNN_LSTM = 3;
+    CNN = 1;
+    CNN_LSTM = 2;
   }
   optional ModelType model_type = 1;
   optional string cpu_model_file = 2;
@@ -54,6 +53,8 @@ message LearningModelInferenceTaskConfig {
   optional bool use_cuda = 4 [default = true];
   // delta_t depends on the model output, not a configurable value here
   optional double trajectory_delta_t = 5 [default = 0.2];  // second
+  optional bool allow_empty_learning_based_data = 6 [default = false];
+  optional bool allow_empty_output_trajectory = 7 [default = false];
 }
 
 //////////////////////////////////
@@ -128,8 +129,7 @@ message NaviSpeedDeciderConfig {
 //////////////////////////////////
 // PathAssessmentDeciderConfig
 
-message PathAssessmentDeciderConfig {
-}
+message PathAssessmentDeciderConfig {}
 
 //////////////////////////////////
 // PathBoundsDeciderConfig
@@ -148,6 +148,8 @@ message PathBoundsDeciderConfig {
   optional double pull_over_road_edge_buffer = 5 [default = 0.15];
   optional double pull_over_approach_lon_distance_adjust_factor = 6
       [default = 1.5];
+  optional double adc_buffer_coeff = 7 [default = 1.0];
+  optional bool is_extend_lane_bounds_to_include_adc = 8 [default = true];
 }
 
 //////////////////////////////////
@@ -170,6 +172,8 @@ message PathLaneBorrowDeciderConfig {
 
 message PathReferenceDeciderConfig {
   optional uint32 min_path_reference_length = 1 [default = 20];
+  // learning model s weight
+  optional double weight_x_ref_path_reference = 2;
 }
 
 //////////////////////////////////
@@ -215,7 +219,9 @@ message PiecewiseJerkNonlinearSpeedOptimizerConfig {
 message PiecewiseJerkPathOptimizerConfig {
   optional PiecewiseJerkPathWeights default_path_config = 1;
   optional PiecewiseJerkPathWeights lane_change_path_config = 2;
+  optional double path_reference_l_weight = 3 [default = 0.0];
 }
+
 message PiecewiseJerkPathWeights {
   optional double l_weight = 1 [default = 1.0];
   optional double dl_weight = 2 [default = 100.0];

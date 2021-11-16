@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <limits>
 #include <map>
+#include <memory>
 #include <string>
 
 #include "modules/perception/base/blob.h"
@@ -25,20 +26,20 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-static const int kMaxStrLen = 64;
-static const int kMinDim = 1;
-static const int kMaxDim = INT_MAX;
+constexpr size_t kMaxStrLen = 64;
+constexpr int kMinDim = 1;
+constexpr int kMaxDim = std::numeric_limits<int>::max();
 
 size_t BinaryReadString(FILE *fp, char *name);
 size_t BinaryWriteString(FILE *fp, const std::string &str);
 
 template <typename Dtype>
-boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp);
+std::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp);
 template <typename Dtype>
 void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob);
 
 template <typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
+std::map<std::string, std::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
     const char *file_path);
 template <typename Btype>
 bool BinaryWriteFile(const char *file_path,

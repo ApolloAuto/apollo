@@ -17,11 +17,13 @@
 #include "cyber/parameter/parameter.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/parameter.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/proto/parameter.pb.h"
 
 namespace apollo {
 namespace cyber {

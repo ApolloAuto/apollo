@@ -45,14 +45,14 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   use_tracked_objects_ = config.use_tracked_objects();
   one_shot_fusion_method_ = config.one_shot_fusion_method();
   sequence_fusion_method_ = config.sequence_fusion_method();
-  one_shot_fuser_.reset(BaseOneShotTypeFusionRegisterer::GetInstanceByName(
-      one_shot_fusion_method_));
+  one_shot_fuser_ = BaseOneShotTypeFusionRegisterer::GetInstanceByName(
+      one_shot_fusion_method_);
   bool init_success = true;
-  CHECK_NOTNULL(one_shot_fuser_.get());
+  CHECK_NOTNULL(one_shot_fuser_);
   ACHECK(one_shot_fuser_->Init(init_option_));
-  sequence_fuser_.reset(BaseSequenceTypeFusionRegisterer::GetInstanceByName(
-      sequence_fusion_method_));
-  CHECK_NOTNULL(sequence_fuser_.get());
+  sequence_fuser_ = BaseSequenceTypeFusionRegisterer::GetInstanceByName(
+      sequence_fusion_method_);
+  CHECK_NOTNULL(sequence_fuser_);
   ACHECK(sequence_fuser_->Init(init_option_));
   return init_success;
 }

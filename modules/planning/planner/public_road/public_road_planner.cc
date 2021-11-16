@@ -26,7 +26,7 @@ using apollo::common::TrajectoryPoint;
 
 Status PublicRoadPlanner::Init(const PlanningConfig& config) {
   config_ = config;
-  scenario_manager_.Init();
+  scenario_manager_.Init(config);
   return Status::OK();
 }
 

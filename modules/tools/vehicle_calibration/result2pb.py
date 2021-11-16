@@ -20,7 +20,7 @@ import sys
 
 import numpy as np
 
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 from modules.control.proto import calibration_table_pb2
 from modules.control.proto.control_conf_pb2 import ControlConf
 

@@ -4,14 +4,14 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo master分支源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境并搭建Apollo工程
+ - 按照[教程](../quickstart/apollo_software_installation_guide.md)设置Docker环境并搭建Apollo工程
  - 从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载定位数据（仅限美国地区）
 
-此定位数据为实验性质的demo数据，用于验证定位模块的可用性。数据主要包含定位地图(ndt_map/), 车辆参数(params/), 传感器数据(records/)。具体属性如下：  
-时长：5分钟  
-里程：3km  
-场景：Sunnyvale 城市道路  
-天气：晴天  
+此定位数据为实验性质的demo数据，用于验证定位模块的可用性。数据主要包含定位地图(ndt_map/), 车辆参数(params/), 传感器数据(records/)。具体属性如下：
+时长：5分钟
+里程：3km
+场景：Sunnyvale 城市道路
+天气：晴天
 
 ## 2. 配置定位模块
 为了使定位模块正确运行，需要对地图路径和传感器外参进行配置。假设下载的定位数据的所在路径为DATA_PATH。
@@ -65,7 +65,7 @@ channel: /apollo/sensor/velodyne64/compensator/PointCloud2
 ps -e | grep ndt_localization
 ```
 
-在/apollo/data/log目录下，可以看到定位模块输出的相关文件。 
+在/apollo/data/log目录下，可以看到定位模块输出的相关文件。
 
  - localization.INFO : INFO级别的log信息
  - localization.WARNING : WARNING级别的log信息
@@ -150,7 +150,7 @@ NDT模块定位结果的验证使用MSF模块的验证工具。
 
 NDT模块的统计结果只有一组，即定位输出`/apollo/localization/pose`的统计结果。
 
-表格中各项的意义， 
+表格中各项的意义，
  - error：  平面误差，单位为米
  - error lon：  车前进方向的误差，单位为米
  - error lat：  车横向方向的误差，单位为米

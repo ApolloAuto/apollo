@@ -17,16 +17,14 @@
 #include <boost/filesystem.hpp>
 
 #include "absl/strings/str_split.h"
-
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/pipeline/evaluator.h"
 
-DEFINE_string(
-    planning_source_dirs, "",
-    "a list of source files or directories for offline mode. "
-    "The items need to be separated by colon ':'. ");
+DEFINE_string(planning_source_dirs, "",
+              "a list of source files or directories for offline mode. "
+              "The items need to be separated by colon ':'. ");
 
 namespace apollo {
 namespace planning {

@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <atomic>
 #include <string>
+
+#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
 #include "cyber/record/file/record_file_base.h"

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/time/clock.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -25,7 +25,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 /**
  * @class SunnyvaleBigLoopTest
@@ -48,7 +48,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_map_dir = "modules/map/data/sunnyvale_big_loop";
     FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
-    FLAGS_planning_upper_speed_limit = 12.5;
+    FLAGS_planning_upper_speed_limit = 20.0;
 
     FLAGS_enable_scenario_pull_over = false;
     FLAGS_enable_scenario_stop_sign = false;
@@ -268,7 +268,8 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   double wait_time = stop_timeout + 0.5;
   for (auto& stop_time : *crosswalk_status->mutable_stop_time()) {
     if (stop_time.obstacle_id() == "11652") {
-      stop_time.set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
+      stop_time.set_stop_timestamp_sec(Clock::NowInSeconds() -
+                                       wait_time);
     }
   }
 

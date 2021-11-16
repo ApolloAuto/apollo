@@ -17,22 +17,22 @@
 ###############################################################################
 
 if [ "$1" == "" ]; then
-    echo "Must designate a map name"
+  echo "Must designate a map name"
 else
-    echo "Generating map ${MAP}"
-	MAP=$1
-	rm -rf modules/map/data/${MAP}
-	mkdir modules/map/data/${MAP}
-	if [ "$2" == "" ]; then
-	    echo "Generating map with a single lane"
-		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt
-	else
-		LEFT_LANES=$2
-		RIGHT_LANES=$3
-	    echo "Generating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lane(s)"
-		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt --left_lanes ${LEFT_LANES} --right_lanes ${RIGHT_LANES}
-	fi
-	echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt
-	./scripts/generate_routing_topo_graph.sh
-	./bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
+  echo "Generating map ${MAP}"
+  MAP=$1
+  rm -rf modules/map/data/${MAP}
+  mkdir modules/map/data/${MAP}
+  if [ "$2" == "" ]; then
+    echo "Generating map with a single lane"
+    python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt
+  else
+    LEFT_LANES=$2
+    RIGHT_LANES=$3
+    echo "Generating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lane(s)"
+    python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt --left_lanes ${LEFT_LANES} --right_lanes ${RIGHT_LANES}
+  fi
+  echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt
+  ./scripts/generate_routing_topo_graph.sh
+  ${APOLLO_BIN_PREFIX}/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
 fi

@@ -33,8 +33,7 @@ namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 }
 
-DpStCost::DpStCost(const DpStSpeedOptimizerConfig& config,
-                   const double total_t,
+DpStCost::DpStCost(const DpStSpeedOptimizerConfig& config, const double total_t,
                    const double total_s,
                    const std::vector<const Obstacle*>& obstacles,
                    const STDrivableBoundary& st_drivable_boundary,

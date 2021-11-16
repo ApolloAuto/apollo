@@ -15,17 +15,18 @@
  *****************************************************************************/
 
 #pragma once
-
 #include <vector>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "Eigen/StdVector"
 
 namespace apollo {
 namespace localization {
 namespace ndt {
 
 struct LocalizationStampedPosePair {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   double timestamp;
   Eigen::Affine3d novatel_pose;
   Eigen::Affine3d locator_pose;
@@ -33,6 +34,7 @@ struct LocalizationStampedPosePair {
 
 class LocalizationPoseBuffer {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   LocalizationPoseBuffer();
   ~LocalizationPoseBuffer();
   /**@brief receive a pair of lidar pose and
@@ -54,7 +56,9 @@ class LocalizationPoseBuffer {
   static const unsigned int s_buffer_size_;
 
  private:
-  std::vector<LocalizationStampedPosePair> lidar_poses_;
+  std::vector<LocalizationStampedPosePair,
+              Eigen::aligned_allocator<LocalizationStampedPosePair>>
+      lidar_poses_;
   unsigned int used_buffer_size_;
   unsigned int head_index_;
   bool has_initialized_;

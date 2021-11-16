@@ -18,6 +18,7 @@
 #define CYBER_EVENT_PERF_EVENT_H_
 
 #include <cstdint>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -157,7 +158,7 @@ class TransportEvent : public EventBase {
  private:
   std::string adder_ = "";
   uint64_t msg_seq_ = 0;
-  uint64_t channel_id_ = UINT64_MAX;
+  uint64_t channel_id_ = std::numeric_limits<uint64_t>::max();
 };
 
 }  // namespace event

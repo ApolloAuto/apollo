@@ -16,10 +16,13 @@
 #pragma once
 
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "modules/perception/camera/proto/yolo.pb.h"
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"
@@ -27,7 +30,6 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/lib/obstacle/detector/yolo/proto/yolo.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -162,7 +164,16 @@ void compute_overlapped_by_idx_gpu(const int nthreads, const float *bbox_data,
                                    bool *overlapped_data,
                                    const cudaStream_t &_stream);
 
-void get_objects_gpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
+int get_objects_gpu(
+    const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
+    const std::vector<base::ObjectSubType> &types, const NMSParam &nms,
+    const yolo::ModelParam &model_param, float light_vis_conf_threshold,
+    float light_swt_conf_threshold, base::Blob<bool> *overlapped,
+    base::Blob<int> *idx_sm,
+    const std::map<base::ObjectSubType, std::vector<int>> &indices,
+    const std::map<base::ObjectSubType, std::vector<float>> &conf_scores);
+
+void get_objects_cpu(const YoloBlobs &yolo_blobs, const cudaStream_t &stream,
                      const std::vector<base::ObjectSubType> &types,
                      const NMSParam &nms, const yolo::ModelParam &model_param,
                      float light_vis_conf_threshold,

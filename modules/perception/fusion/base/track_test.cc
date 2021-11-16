@@ -194,7 +194,7 @@ TEST(TrackTest, test) {
             << track.GetCameraObjects().size() << "\n";
   EXPECT_FALSE(track.IsAlive());
 
-  Track::s_track_idx_ = UINT_MAX;
+  Track::s_track_idx_ = std::numeric_limits<unsigned int>::max();
   size_t new_id = Track::GenerateNewTrackId();
   new_id = Track::GenerateNewTrackId();
   EXPECT_EQ(new_id, 1);

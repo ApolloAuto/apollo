@@ -16,10 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-source "${DIR}/apollo_base.sh"
-
-python ./modules/tools/plot_trace/plot_trace.py $@
+${TOP_DIR}/bazel-bin/modules/tools/plot_trace/plot_trace "$@"

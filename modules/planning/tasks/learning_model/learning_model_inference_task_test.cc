@@ -36,7 +36,7 @@ class LearningModelInferenceTaskTest : public ::testing::Test {
     config_.set_task_type(TaskConfig::LEARNING_MODEL_INFERENCE_TASK);
     auto* inference_config =
         config_.mutable_learning_model_inference_task_config();
-
+    injector_ = std::make_shared<DependencyInjector>();
     FLAGS_test_model_inference_task_config_file =
         "/apollo/modules/planning/testdata/model_inference_test/"
         "test_libtorch_inference_task_config.pb.txt";
@@ -51,10 +51,11 @@ class LearningModelInferenceTaskTest : public ::testing::Test {
 
  protected:
   TaskConfig config_;
+  std::shared_ptr<DependencyInjector> injector_;
 };
 
 TEST_F(LearningModelInferenceTaskTest, Init) {
-  LearningModelInferenceTask learning_model_inference_task(config_);
+  LearningModelInferenceTask learning_model_inference_task(config_, injector_);
   EXPECT_EQ(learning_model_inference_task.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }

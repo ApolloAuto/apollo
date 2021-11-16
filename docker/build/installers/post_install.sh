@@ -19,14 +19,16 @@
 # Fail on first error.
 set -e
 
-rm -rf /tmp/archive
+build_stage="${1:-dev}"
 
-# Create required soft links.
-ln -rs /usr/lib/x86_64-linux-gnu/libprofiler.so.0 /usr/lib/libprofiler.so
-ln -rs /usr/lib/x86_64-linux-gnu/libtcmalloc_and_profiler.so.4 /usr/lib/libtcmalloc_and_profiler.so
-# https://stackoverflow.com/questions/25193161/chfn-pam-system-error-intermittently-in-docker-hub-builds
+echo "stage=${build_stage}" > /etc/apollo.conf
 
-ln -s -f /bin/true /usr/bin/chfn
+if [[ "${build_stage}" == "cyber" ]]; then
+    #TODO(storypku): revisit this later
+    # https://stackoverflow.com/questions/25193161
+    # /chfn-pam-system-error-intermittently-in-docker-hub-builds
+    ln -s -f /bin/true /usr/bin/chfn
+else
+    echo "Nothing else need to be done in stage ${build_stage}"
+fi
 
-# Remove tarballs
-rm -rf /tmp/archive

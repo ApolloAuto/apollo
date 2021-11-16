@@ -1,14 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "lattice_trajectory1d",
     srcs = ["lattice_trajectory1d.cc"],
     hdrs = ["lattice_trajectory1d.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/planning/math/curve1d",
@@ -25,7 +25,7 @@ cc_library(
         "//modules/planning/lattice/behavior:feasible_region",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/behavior:prediction_querier",
-        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/proto:lattice_structure_cc_proto",
     ],
 )
 
@@ -47,8 +47,7 @@ cc_library(
         "//modules/planning/lattice/trajectory_generation:lattice_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/proto:lattice_sampling_config_proto",
-        "//modules/planning/proto:lattice_structure_proto",
+        "//modules/planning/proto:lattice_structure_cc_proto",
     ],
 )
 
@@ -56,9 +55,7 @@ cc_library(
     name = "trajectory_evaluator",
     srcs = ["trajectory_evaluator.cc"],
     hdrs = ["trajectory_evaluator.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
@@ -67,7 +64,6 @@ cc_library(
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
-        "//modules/planning/proto:lattice_sampling_config_proto",
     ],
 )
 
@@ -113,9 +109,7 @@ cc_library(
     name = "lateral_qp_optimizer",
     srcs = ["lateral_qp_optimizer.cc"],
     hdrs = ["lateral_qp_optimizer.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
@@ -126,12 +120,11 @@ cc_library(
     name = "lateral_osqp_optimizer",
     srcs = ["lateral_osqp_optimizer.cc"],
     hdrs = ["lateral_osqp_optimizer.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":lateral_qp_optimizer",
         "//cyber/common:log",
+        "//modules/common/math:matrix_operations",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",

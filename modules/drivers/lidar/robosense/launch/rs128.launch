@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>RS128</name>
+        <dag_conf>/apollo/modules/drivers/lidar/robosense/dag/rs128.dag</dag_conf>
+        <process_name>robosense</process_name>
+    </module>
+</cyber>

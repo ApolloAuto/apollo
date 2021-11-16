@@ -20,12 +20,12 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
+#include "nlohmann/json.hpp"
 #include "pcl/filters/voxel_grid.h"
-#include "third_party/json/json.hpp"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {
@@ -235,8 +235,8 @@ void PointCloudUpdater::FilterPointCloud(
 }
 
 void PointCloudUpdater::UpdateLocalizationTime(
-      const std::shared_ptr<LocalizationEstimate> &localization) {
-    last_localization_time_ = localization->header().timestamp_sec();
+    const std::shared_ptr<LocalizationEstimate> &localization) {
+  last_localization_time_ = localization->header().timestamp_sec();
 }
 }  // namespace dreamview
 }  // namespace apollo

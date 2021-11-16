@@ -48,7 +48,7 @@ class Rect2D {
 
  private:
   /**@brief min_x, min_y, max_x, max_y. */
-  Eigen::Matrix<T, 4, 1> _data;
+  Eigen::Matrix<T, 4, 1, Eigen::DontAlign> _data;
 };
 
 template <typename T>

@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -30,12 +32,12 @@ bool FrameTransform::LatlonToUtmXY(double lon_rad, double lat_rad,
   zone = static_cast<int>((lon_rad * RAD_TO_DEG + 180) / 6) + 1;
   std::string latlon_src =
       "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-  std::ostringstream utm_dst;
-  utm_dst << "+proj=utm +zone=" << zone << " +ellps=GRS80 +units=m +no_defs";
+  std::string utm_dst =
+      absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
   if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) {
     return false;
   }
-  if (!(pj_utm = pj_init_plus(utm_dst.str().c_str()))) {
+  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) {
     return false;
   }
   double longitude = lon_rad;
@@ -53,12 +55,12 @@ bool FrameTransform::UtmXYToLatlon(double x, double y, int zone, bool southhemi,
   projPJ pj_utm;
   std::string latlon_src =
       "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs";
-  std::ostringstream utm_dst;
-  utm_dst << "+proj=utm +zone=" << zone << " +ellps=GRS80 +units=m +no_defs";
+  std::string utm_dst =
+      absl::StrCat("+proj=utm +zone=", zone, " +ellps=GRS80 +units=m +no_defs");
   if (!(pj_latlon = pj_init_plus(latlon_src.c_str()))) {
     return false;
   }
-  if (!(pj_utm = pj_init_plus(utm_dst.str().c_str()))) {
+  if (!(pj_utm = pj_init_plus(utm_dst.c_str()))) {
     return false;
   }
   pj_transform(pj_utm, pj_latlon, 1, 1, &x, &y, nullptr);

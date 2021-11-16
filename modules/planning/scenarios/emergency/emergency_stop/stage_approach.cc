@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "cyber/common/log.h"
-
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -58,8 +57,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
   // add a stop fence
   const auto& reference_line_info = frame->reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
-  const double adc_speed =
-      injector_->vehicle_state()->linear_velocity();
+  const double adc_speed = injector_->vehicle_state()->linear_velocity();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_distance = scenario_config_.stop_distance();
 

@@ -17,6 +17,7 @@
 #include "cyber/base/signal.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
 
 namespace apollo {

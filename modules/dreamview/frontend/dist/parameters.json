@@ -126,6 +126,9 @@
 		"showDataCollectionMonitor": {
 			"default": false
 		},
+		"showFuelClient": {
+			"default": false
+		},
 		"enableSimControl": {
 			"default": false
 		},
@@ -184,6 +187,10 @@
 		"showPredictionPriority": {
 			"default": true,
 			"menuId": "predictionPriority"
+		},
+		"showPredictionInteractiveTag": {
+			"default": true,
+			"menuId": "predictionInteractiveTag"
 		},
 		"showPointCloud": {
 			"default": false,
@@ -253,6 +260,10 @@
 			"default": false,
 			"menuId": "perceptionCameraSensor"
 		},
+		"showObstaclesV2xInfo": {
+			"default": false,
+			"menuId": "perceptionV2xInfo"
+		},
 		"showPositionGps": {
 			"default": false,
 			"menuId": "positionGps"
@@ -312,6 +323,12 @@
 		"showMapLaneId": {
 			"default": false,
 			"menuId": "mapLaneId"
+		},
+		"showDefaultRoutingInput": {
+			"default": false
+		},
+		"showCycleNumberInput": {
+			"default": false
 		}
 	},
 	"routingEditor": {

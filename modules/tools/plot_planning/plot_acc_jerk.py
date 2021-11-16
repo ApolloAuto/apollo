@@ -23,9 +23,9 @@ import numpy as np
 from os import listdir
 from os.path import isfile, join
 
-from record_reader import RecordItemReader
-from imu_speed_jerk import ImuSpeedJerk
-from imu_speed_acc import ImuSpeedAcc
+from modules.tools.plot_planning.record_reader import RecordItemReader
+from modules.tools.plot_planning.imu_speed_jerk import ImuSpeedJerk
+from modules.tools.plot_planning.imu_speed_acc import ImuSpeedAcc
 
 
 def grid(data_list, shift):

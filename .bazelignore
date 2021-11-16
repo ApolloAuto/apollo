@@ -1,4 +1,2 @@
 .cache
-docs
-docker
-scripts
+docker/build

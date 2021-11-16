@@ -16,21 +16,21 @@
 
 #include "modules/canbus/canbus_component.h"
 
+#include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 
-namespace apollo {
-namespace canbus {
-
 using apollo::common::ErrorCode;
-using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
+using apollo::cyber::Time;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::guardian::GuardianCommand;
+
+namespace apollo {
+namespace canbus {
 
 std::string CanbusComponent::Name() const { return FLAGS_canbus_module_name; }
 
@@ -197,7 +197,7 @@ bool CanbusComponent::Proc() {
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp = absl::ToUnixMicros(Clock::Now());
+  int64_t current_timestamp = Time::Now().ToMicrosecond();
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "

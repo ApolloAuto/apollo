@@ -13,147 +13,207 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 /**
  * @file v2x_proxy.cc
  * @brief define v2x proxy class
  */
-
 #include "modules/v2x/v2x_proxy/app/v2x_proxy.h"
+
+#include <cmath>
+#include <cstdio>
+#include <ostream>
+#include <vector>
+
+#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace v2x {
+using ::apollo::canbus::ChassisDetail;
+using ::apollo::v2x::CarStatus;
+using ::apollo::v2x::StatusResponse;
+using ::apollo::v2x::obu::ObuRsi;
+using ::apollo::v2x::obu::ObuTrafficLight;
 
-using apollo::localization::LocalizationEstimate;
+V2xProxy::~V2xProxy() {
+  if (recv_thread_ != nullptr && recv_thread_->joinable()) {
+    recv_thread_->join();
+  }
+  if (planning_thread_ != nullptr && planning_thread_->joinable()) {
+    planning_thread_->join();
+  }
+  if (obs_thread_ != nullptr && obs_thread_->joinable()) {
+    obs_thread_->join();
+  }
+}
 
-V2xProxy::V2xProxy()
-    : node_(cyber::CreateNode("v2x_proxy")), init_flag_(false) {
+V2xProxy::V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap)
+    : node_(::apollo::cyber::CreateNode("v2x_proxy")), exit_(false) {
   if (node_ == nullptr) {
     AFATAL << "Create v2x proxy node failed.";
     exit(1);
   }
-
-  auto x2v_trafficlight_timer_period = ceil(
-      (1.0 / static_cast<int>(FLAGS_x2v_trafficlight_timer_frequency)) * 1000);
-  x2v_trafficlight_timer_.reset(
-      new cyber::Timer(static_cast<uint32_t>(x2v_trafficlight_timer_period),
-                       [this]() { this->OnX2vTrafficLightTimer(); }, false));
-  auto v2x_carstatus_timer_period = ceil(
-      (1.0 / static_cast<int>(FLAGS_v2x_carstatus_timer_frequency)) * 1000);
-  v2x_carstatus_timer_.reset(
-      new cyber::Timer(static_cast<uint32_t>(v2x_carstatus_timer_period),
-                       [this]() { this->OnV2xCarStatusTimer(); }, false));
-
+  internal_ = std::make_shared<InternalData>();
+  hdmap_ = std::make_shared<::apollo::hdmap::HDMap>();
+  const auto hdmap_file = apollo::hdmap::BaseMapFile();
+  if (0 != hdmap_->LoadMapFromFile(hdmap_file)) {
+    AERROR << "Failed to load hadmap file: " << hdmap_file;
+    return;
+  }
+  ::apollo::cyber::TimerOption v2x_car_status_timer_option;
+  v2x_car_status_timer_option.period =
+      static_cast<uint32_t>((1000 + FLAGS_v2x_car_status_timer_frequency - 1) /
+                            FLAGS_v2x_car_status_timer_frequency);
+  v2x_car_status_timer_option.callback = [this]() {
+    this->OnV2xCarStatusTimer();
+  };
+  v2x_car_status_timer_option.oneshot = false;
+  v2x_car_status_timer_.reset(
+      new ::apollo::cyber::Timer(v2x_car_status_timer_option));
   os_interface_.reset(new OsInterFace());
   obu_interface_.reset(new ObuInterFaceGrpcImpl());
-
-  x2v_trafficlight_ = std::make_shared<IntersectionTrafficLightData>();
-  v2x_carstatus_ = std::make_shared<CarStatus>();
-
-  if (!x2v_trafficlight_timer_ || !v2x_carstatus_timer_ || !os_interface_ ||
-      !obu_interface_ || !x2v_trafficlight_ || !v2x_carstatus_) {
-    AFATAL << "Create timer or interface failed.";
-    exit(1);
-  }
-
-  hdmap_.reset(new apollo::hdmap::HDMap());
-  std::string map_name = FLAGS_map_dir + "/" + FLAGS_base_map_filename;
-  if (FLAGS_debug_flag) {
-    map_name = FLAGS_hdmap_file_name;
-  }
-  if (hdmap_->LoadMapFromFile(map_name) != 0) {
-    AFATAL << "Failed to load hadmap file: " << FLAGS_hdmap_file_name;
-    return;
-  }
-  AINFO << "load hdmap file: " << FLAGS_hdmap_file_name;
-
-  if (!os_interface_->InitFlag() || !obu_interface_->InitFlag()) {
-    AFATAL << "Failed to init os interface or obu interface";
-    return;
-  }
-  first_flag_reader_ = node_->CreateReader<StatusResponse>(
-      "/apollo/v2x/inner/sync_flag",
-      [this](const std::shared_ptr<const StatusResponse>& msg) {
-        x2v_trafficlight_timer_->Start();
-      });
-  if (first_flag_reader_ == nullptr) {
-    AERROR << "Create sync flag reader failed";
-    exit(1);
-  }
-  // x2v_trafficlight_timer_->Start();
-  v2x_carstatus_timer_->Start();
-
+  recv_thread_.reset(new std::thread([this]() {
+    while (!exit_.load()) {
+      this->RecvTrafficlight();
+    }
+  }));
+  CHECK(!!hdmap_ && !!v2x_car_status_timer_);
+  CHECK(!!os_interface_ && !!obu_interface_);
+  CHECK(os_interface_->InitFlag() && obu_interface_->InitFlag());
+  planning_thread_.reset(new std::thread([this]() {
+    while (!exit_.load()) {
+      this->RecvOsPlanning();
+    }
+  }));
+  obs_thread_.reset(new std::thread([this]() {
+    while (!exit_.load()) {
+      std::shared_ptr<::apollo::v2x::V2XObstacles> obs = nullptr;
+      this->obu_interface_->GetV2xObstaclesFromObu(&obs);  // Blocked
+      this->os_interface_->SendV2xObstacles2Sys(obs);
+    }
+  }));
+  v2x_car_status_timer_->Start();
+  GetRsuListFromFile(FLAGS_rsu_whitelist_name, &rsu_list_);
   init_flag_ = true;
+}
+
+bool V2xProxy::GetRsuListFromFile(const std::string &filename,
+                                  std::set<std::string> *whitelist) {
+  if (nullptr == whitelist) {
+    return false;
+  }
+  std::ifstream input_file(filename);
+  if (!input_file) {
+    return false;
+  }
+  std::string line;
+  while (getline(input_file, line)) {
+    whitelist->insert(line);
+  }
+  return !whitelist->empty();
 }
 
 bool V2xProxy::InitFlag() { return init_flag_; }
 
-bool V2xProxy::TrafficLightProc(CurrentLaneTrafficLight* msg) {
-  if (!msg->has_gps_x_m() || !msg->has_gps_y_m()) {
-    AERROR << "Error::v2x trafficlight ignore, gps point is null";
-    return false;
-  }
-  apollo::common::PointENU point;
-  point.set_x(msg->gps_x_m());
-  point.set_y(msg->gps_y_m());
-  std::vector<apollo::hdmap::SignalInfoConstPtr> signals;
-  if (hdmap_->GetForwardNearestSignalsOnLane(point, 1000.0, &signals) != 0) {
-    AERROR << "Error::v2x trafficlight ignore, hdmap get no signals";
-    AERROR << "traffic light size : " << signals.size();
-    return false;
-  }
-  for (auto i = signals.begin(); i != signals.end(); i++) {
-    if ((*i)->id().id().empty()) {
-      AERROR << "Error::v2x trafficlight ignore, signals id is empty";
-      return false;
+void V2xProxy::RecvOsPlanning() {
+  auto adc_trajectory = std::make_shared<::apollo::planning::ADCTrajectory>();
+  auto res_light =
+      std::make_shared<::apollo::perception::TrafficLightDetection>();
+  os_interface_->GetPlanningAdcFromOs(adc_trajectory);
+  // OK get planning message
+  std::shared_ptr<OSLight> last_os_light = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(lock_last_os_light_);
+
+    auto now_us = ::apollo::cyber::Time::MonoTime().ToMicrosecond();
+    if (last_os_light_ == nullptr ||
+        2000LL * 1000 * 1000 < now_us - ts_last_os_light_) {
+      AWARN << "V2X Traffic Light is too old!";
+      last_os_light_ = nullptr;
+    } else {
+      ADEBUG << "V2X Traffic Light is on time.";
+      last_os_light = std::make_shared<OSLight>();
+      last_os_light->CopyFrom(*last_os_light_);
     }
   }
-  if (signals.size() == 1) {
-    auto single = msg->mutable_single_traffic_light(0);
-    single->set_id(signals[0]->id().id());
-    return true;
+  // proc planning message
+  bool res_proc_planning_msg = internal_->ProcPlanningMessage(
+      adc_trajectory.get(), last_os_light.get(), &res_light);
+  if (!res_proc_planning_msg) {
+    return;
   }
-  auto color = msg->single_traffic_light(0).color();
-  msg->clear_single_traffic_light();
-
-  for (auto i = signals.begin(); i != signals.end(); i++) {
-    auto single = msg->add_single_traffic_light();
-    single->set_id((*i)->id().id());
-    single->set_color(color);
-  }
-  return true;
+  os_interface_->SendV2xTrafficLight4Hmi2Sys(res_light);
 }
 
-void V2xProxy::OnX2vTrafficLightTimer() {
-  x2v_trafficlight_->Clear();
-  obu_interface_->GetV2xTrafficLightFromObu(x2v_trafficlight_);
-  if (!x2v_trafficlight_->has_current_lane_trafficlight()) {
-    AERROR << "Error:v2x trafficlight ignore, no traffic light contained.";
+void V2xProxy::RecvTrafficlight() {
+  // get traffic light from obu
+  std::shared_ptr<ObuLight> x2v_traffic_light = nullptr;
+  obu_interface_->GetV2xTrafficLightFromObu(&x2v_traffic_light);
+  os_interface_->SendV2xObuTrafficLightToOs(x2v_traffic_light);
+  auto os_light = std::make_shared<OSLight>();
+  std::string junction_id = "";
+  {
+    std::lock_guard<std::mutex> lg(lock_hdmap_junction_id_);
+    junction_id = hdmap_junction_id_;
+  }
+  bool res_success_ProcTrafficlight = internal_->ProcTrafficlight(
+      hdmap_, x2v_traffic_light.get(), junction_id, u_turn_,
+      FLAGS_traffic_light_distance, FLAGS_check_time, &os_light);
+  if (!res_success_ProcTrafficlight) {
     return;
   }
-  auto current_traff = x2v_trafficlight_->mutable_current_lane_trafficlight();
-  if (current_traff->single_traffic_light().empty()) {
-    AERROR << "Error:v2x trafficlight ignore, no traffic light contained.";
-    return;
-  }
-  ADEBUG << x2v_trafficlight_->DebugString();
-  if (!TrafficLightProc(current_traff)) {
-    return;
-  }
-  os_interface_->SendV2xTrafficLightToOs(x2v_trafficlight_);
+  utils::UniqueOslight(os_light.get());
+  os_interface_->SendV2xTrafficLightToOs(os_light);
+  // save for hmi
+  std::lock_guard<std::mutex> lock(lock_last_os_light_);
+  ts_last_os_light_ = ::apollo::cyber::Time::MonoTime().ToMicrosecond();
+  last_os_light_ = os_light;
+}
+
+double cal_distance(const ::apollo::common::PointENU &p1,
+                    const ::apollo::common::PointENU &p2) {
+  double x = p1.x() - p2.x();
+  double y = p1.y() - p2.y();
+  return std::sqrt(x * x + y * y);
 }
 
 void V2xProxy::OnV2xCarStatusTimer() {
-  v2x_carstatus_->Clear();
-  auto localization = std::make_shared<LocalizationEstimate>();
+  // get loc
+  auto localization =
+      std::make_shared<::apollo::localization::LocalizationEstimate>();
   os_interface_->GetLocalizationFromOs(localization);
-  if (!localization || !localization->has_header() ||
-      !localization->has_pose()) {
-    AERROR << "Error:localization ignore, no pose or header in it.";
+  if (nullptr == localization) {
     return;
   }
-  v2x_carstatus_->mutable_localization()->CopyFrom(*localization);
-  obu_interface_->SendCarStatusToObu(v2x_carstatus_);
+  std::set<std::string> rsu_whitelist;
+  {
+    std::lock_guard<std::mutex> lg(rsu_list_mutex_);
+    rsu_whitelist.insert(rsu_list_.cbegin(), rsu_list_.cend());
+  }
+  ::apollo::common::PointENU car_position;
+  car_position.set_x(localization->pose().position().x());
+  car_position.set_y(localization->pose().position().y());
+  std::shared_ptr<::apollo::v2x::CarStatus> v2x_car_status = nullptr;
+  double heading = 0.0;
+  std::string res_junction_id = "";
+  bool ret_get_rsu_info = utils::GetRsuInfo(
+      hdmap_, *localization, rsu_whitelist, FLAGS_traffic_light_distance,
+      FLAGS_heading_difference, &v2x_car_status, &res_junction_id, &heading);
+  {
+    std::lock_guard<std::mutex> lg(lock_hdmap_junction_id_);
+    hdmap_junction_id_ = res_junction_id;
+  }
+  if (!ret_get_rsu_info) {
+    return;
+  }
+  // calc heading
+  if (!init_heading_) {
+    heading_ = heading;
+    init_heading_ = true;
+  }
+  if (std::fabs(heading_ - heading) > 1.0) {
+    u_turn_ = true;
+  }
+  obu_interface_->SendCarStatusToObu(v2x_car_status);
 }
 
 }  // namespace v2x

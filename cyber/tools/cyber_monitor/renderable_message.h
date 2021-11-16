@@ -26,8 +26,8 @@ class RenderableMessage {
   static constexpr int FrameRatio_Precision = 2;
 
   explicit RenderableMessage(RenderableMessage* parent = nullptr,
-                             int lineNo = 0)
-      : line_no_(lineNo),
+                             int line_no = 0)
+      : line_no_(line_no),
         pages_(1),
         page_index_(0),
         page_item_count_(24),
@@ -36,8 +36,8 @@ class RenderableMessage {
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
-  virtual void Render(const Screen* s, int key) = 0;
-  virtual RenderableMessage* Child(int /* lineNo */) const = 0;
+  virtual int Render(const Screen* s, int key) = 0;
+  virtual RenderableMessage* Child(int /* line_no */) const = 0;
 
   virtual double frame_ratio(void) { return frame_ratio_; }
 
@@ -53,7 +53,7 @@ class RenderableMessage {
 
  protected:
   int* line_no(void) { return &line_no_; }
-  void set_line_no(int lineNo) { line_no_ = lineNo; }
+  void set_line_no(int line_no) { line_no_ = line_no; }
   void reset_line_page(void) {
     line_no_ = 0;
     page_index_ = 0;

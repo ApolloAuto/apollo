@@ -22,15 +22,7 @@
 
 #include "cyber/transport/rtps/underlay_message.h"
 
-#include "fastcdr/Cdr.h"
 #include "fastcdr/exceptions/BadParamException.h"
-
-#ifdef _WIN32
-// Remove linker warning LNK4221 on Visual Studio
-namespace {
-char dummy;
-}
-#endif
 
 namespace apollo {
 namespace cyber {

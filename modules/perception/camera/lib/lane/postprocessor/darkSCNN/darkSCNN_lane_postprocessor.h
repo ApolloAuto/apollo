@@ -15,17 +15,18 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
-#include "modules/perception/camera/lib/lane/common/darkSCNN.pb.h"
-#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_postprocessor.pb.h"
+#include "modules/perception/camera/lib/lane/common/proto/darkSCNN.pb.h"
+#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/proto/darkSCNN_postprocessor.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {
@@ -33,6 +34,9 @@ namespace perception {
 namespace camera {
 
 class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   DarkSCNNLanePostprocessor() : BaseLanePostprocessor() {}
 

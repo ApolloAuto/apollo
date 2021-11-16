@@ -23,7 +23,7 @@ namespace apollo {
 namespace hdmap {
 
 LoopsVerifyAgent::LoopsVerifyAgent(
-    std::shared_ptr<JSonConf> sp_conf,
+    std::shared_ptr<JsonConf> sp_conf,
     std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
   sp_conf_ = sp_conf;
   sp_pose_collection_agent_ = sp_pose_collection_agent;

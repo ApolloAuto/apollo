@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
 
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/time_util.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
@@ -26,7 +26,7 @@ namespace localization {
 namespace msf {
 
 using common::Status;
-using common::time::TimeUtil;
+using common::util::TimeUtil;
 
 LocalizationInteg::LocalizationInteg()
     : localization_integ_impl_(new LocalizationIntegImpl()) {}
@@ -98,7 +98,7 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
   CHECK_NOTNULL(imu_rfu);
 
-  double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
+  double measurement_time = TimeUtil::Gps2Unix(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
   imu_rfu->fb[0] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;
   imu_rfu->fb[1] = imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
@@ -113,7 +113,7 @@ void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
   CHECK_NOTNULL(imu_flu);
 
-  double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
+  double measurement_time = TimeUtil::Gps2Unix(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;
   imu_flu->fb[0] = -imu_msg.linear_acceleration().y() * FLAGS_imu_rate;
   imu_flu->fb[1] = imu_msg.linear_acceleration().x() * FLAGS_imu_rate;

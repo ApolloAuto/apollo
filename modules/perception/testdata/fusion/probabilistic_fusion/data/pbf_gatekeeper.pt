@@ -12,5 +12,5 @@ toic_threshold: 0.8
 use_track_time_pub_strategy: false
 pub_track_time_thresh: 1
 
-existance_threshold: 0.7
-radar_existance_threshold: 0.9
+existence_threshold: 0.7
+radar_existence_threshold: 0.9

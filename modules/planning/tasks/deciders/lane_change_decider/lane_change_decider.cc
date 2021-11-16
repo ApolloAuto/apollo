@@ -19,7 +19,7 @@
 #include <limits>
 #include <memory>
 
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -29,7 +29,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::SLPoint;
 using apollo::common::Status;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 LaneChangeDecider::LaneChangeDecider(
     const TaskConfig& config,
@@ -155,14 +155,16 @@ void LaneChangeDecider::UpdatePreparationDistance(
   ADEBUG << "Lane Change Status: " << lane_change_status->status();
   // If lane change planning succeeded, update and return
   if (is_opt_succeed) {
-    lane_change_status->set_last_succeed_timestamp(Clock::NowInSeconds());
+    lane_change_status->set_last_succeed_timestamp(
+        Clock::NowInSeconds());
     lane_change_status->set_is_current_opt_succeed(true);
     return;
   }
   // If path optimizer or speed optimizer failed, report the status
   lane_change_status->set_is_current_opt_succeed(false);
   // If the planner just succeed recently, let's be more patient and try again
-  if (Clock::NowInSeconds() - lane_change_status->last_succeed_timestamp() <
+  if (Clock::NowInSeconds() -
+          lane_change_status->last_succeed_timestamp() <
       FLAGS_allowed_lane_change_failure_time) {
     return;
   }

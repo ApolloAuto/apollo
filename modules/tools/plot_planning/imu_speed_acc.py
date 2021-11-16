@@ -18,8 +18,8 @@
 
 import math
 
-from imu_speed import ImuSpeed
-from record_reader import RecordItemReader
+from modules.tools.plot_planning.imu_speed import ImuSpeed
+from modules.tools.plot_planning.record_reader import RecordItemReader
 
 
 class ImuSpeedAcc:

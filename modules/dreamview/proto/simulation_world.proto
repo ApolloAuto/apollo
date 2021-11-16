@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+import "modules/canbus/proto/chassis.proto";
 import "modules/common/monitor_log/proto/monitor_log.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
@@ -71,7 +72,7 @@ message Decision {
   optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
-// Next-id: 36
+// Next-id: 41
 message Object {
   // ID
   optional string id = 1;  // primary identifier for each object
@@ -121,6 +122,8 @@ message Object {
   optional double steering_percentage = 25;
   optional double steering_angle = 26;
   optional double steering_ratio = 27;
+  optional int32 battery_percentage = 38;
+  optional apollo.canbus.Chassis.GearPosition gear_location = 39;
   enum DisengageType {
     DISENGAGE_NONE = 0;
     DISENGAGE_UNKNOWN = 1;
@@ -152,6 +155,13 @@ message Object {
   // perception confidence level. Range: [0,1]
   optional double confidence = 31 [default = 1];
   optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
+  optional apollo.prediction.ObstacleInteractiveTag interactive_tag = 40;
+
+  // v2x for perception obstacle
+  optional apollo.perception.PerceptionObstacle.Source source = 36
+      [default = HOST_VEHICLE];  // source type
+  // v2x use case info
+  optional apollo.perception.V2XInformation v2x_info = 37;
 }
 
 message DelaysInMs {
@@ -201,11 +211,11 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-message SensorMeasurements{
+message SensorMeasurements {
   repeated Object sensor_measurement = 1;
 }
 
-// Next-id: 30
+// Next-id: 31
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -284,4 +294,6 @@ message SimulationWorld {
 
   // A map from a sensor_id to a group of sensor_measurements
   map<string, SensorMeasurements> sensor_measurements = 29;
+
+  optional bool is_siren_on = 30 [default = false];
 }

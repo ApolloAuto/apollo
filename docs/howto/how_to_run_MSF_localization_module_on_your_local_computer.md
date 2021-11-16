@@ -2,29 +2,23 @@
 
 ## 1. Preparation
  - Download source code of Apollo from [GitHub](https://github.com/ApolloAuto/apollo)
- - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md).
+ - Follow the tutorial to set up [docker environment](../quickstart/apollo_software_installation_guide.md).
  - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only).
 
-the localization data is a experimental dataset to verify the availability of localization. It contains localization map(local_map/), vehicle params(params/), sensor recording data(records/). The specific attributes are as follows:  
-duration: 5 mins  
-mileage: 3km  
-areas: city roads in Sunnyvale  
-weather: sunny day  
+the localization data is a experimental dataset to verify the availability of localization. It contains localization map(local_map/), vehicle params(params/), sensor recording data(records/). The specific attributes are as follows:
+duration: 5 mins
+mileage: 3km
+areas: city roads in Sunnyvale
+weather: sunny day
 
 ## 2. Build Apollo
 
-First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. 
+First check and make sure you are in development docker container before you proceed. Now you will need to build from the source.
 ```
 # To make sure you start clean
 bash apollo.sh clean
 # Build the full system
 bash apollo.sh build_opt
-```
-
-`note:` If the computer is very slow, you can enter the following command to limit the CPU.
-
-```
-bash apollo.sh build_opt --local_resources 2048,1.0,1.0
 ```
 
 ## 3. Configuring Parameters
@@ -52,7 +46,7 @@ run the script in apollo directory
 cyber_launch start /apollo/modules/localization/launch/msf_localization.launch
 ```
 
-In /apollo/data/log directory, you can see the localization log files.     
+In /apollo/data/log directory, you can see the localization log files.
  - localization.INFO : INFO log
  - localization.WARNING : WARNING log
  - localization.ERROR : ERROR log
@@ -89,7 +83,7 @@ If everything is fine, you should see this on screen.
 
 `Note:` The visualization tool will show up the windows after the localization module started to published localization msgs to topic /apollo/localization/pose. You can use command *cyber_monitor* to monitor the status of topics.
 
-## 7. Stop localization module  
+## 7. Stop localization module
 If you record localization result in step 6, you will also need to end the recording process:
 ```
 python /apollo/scripts/record_bag.py --stop

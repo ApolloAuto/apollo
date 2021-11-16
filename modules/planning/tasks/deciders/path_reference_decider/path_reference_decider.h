@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,7 +32,8 @@ namespace apollo {
 namespace planning {
 class PathReferenceDecider : public Task {
  public:
-  explicit PathReferenceDecider(const TaskConfig &config);
+  PathReferenceDecider(const TaskConfig &config,
+                       const std::shared_ptr<DependencyInjector> &injector);
 
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
@@ -51,7 +53,7 @@ class PathReferenceDecider : public Task {
   bool IsValidPathReference(
       const ReferenceLineInfo &reference_line_info,
       const PathBoundary &path_bound,
-      const std::vector<common::TrajectoryPoint> &path_reference);
+      const std::vector<common::PathPoint> &path_reference);
 
   /**
    * @brief convert discrete path bounds to line segments
@@ -71,7 +73,7 @@ class PathReferenceDecider : public Task {
    */
   void EvaluatePathReference(
       const PathBoundary &path_bound,
-      const std::vector<common::TrajectoryPoint> &path_reference,
+      const std::vector<common::PathPoint> &path_reference,
       std::vector<common::PathPoint> *evaluated_path_reference);
 
   /**
@@ -109,6 +111,14 @@ class PathReferenceDecider : public Task {
   bool IsADCBoxAlongPathReferenceWithinPathBounds(
       const std::vector<common::TrajectoryPoint> &path_reference,
       const PathBoundary &regular_path_bound);
+
+  void ConvertTrajectoryToPath(
+      const std::vector<common::TrajectoryPoint> &trajectory,
+      std::vector<common::PathPoint> *path);
+
+  void RecordDebugInfo(const std::vector<common::PathPoint> &path_points,
+                       const std::string &path_name,
+                       ReferenceLineInfo *const reference_line_info);
 
  private:
   static int valid_path_reference_counter_;  // count valid path reference

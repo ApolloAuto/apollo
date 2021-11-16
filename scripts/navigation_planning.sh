@@ -16,11 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run planning "$@" --flagfile=modules/planning/conf/planning_navi.conf --use_navigation_mode
+run_module planning "$@" --flagfile=modules/planning/conf/planning_navi.conf --use_navigation_mode

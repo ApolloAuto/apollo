@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/map/proto/map_id.proto";
+
+message RSU {
+  optional Id id = 1;
+  optional Id junction_id = 2;
+  repeated Id overlap_id = 3;
+};

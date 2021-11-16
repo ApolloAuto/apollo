@@ -23,8 +23,9 @@
 #include <memory>
 #include <string>
 
-#include "cyber/task/task.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+
+#include "cyber/task/task.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
@@ -37,7 +38,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
     const TaskConfig& config,
@@ -289,44 +290,58 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, double rotate_angle,
     const Vec2d& translate_origin) {
-  CHECK_EQ(end_pose.size(), 4);
+  CHECK_EQ(end_pose.size(), 4U);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
   end_pose_to_world_frame.SelfRotate(rotate_angle);
   end_pose_to_world_frame += translate_origin;
-
+  double distance_to_vehicle2 =
+      std::sqrt((vehicle_state.x() - end_pose_to_world_frame.x()) *
+                      (vehicle_state.x() - end_pose_to_world_frame.x()) +
+                  (vehicle_state.y() - end_pose_to_world_frame.y()) *
+                      (vehicle_state.y() - end_pose_to_world_frame.y()));
   double end_theta_to_world_frame = end_pose[2];
   end_theta_to_world_frame += rotate_angle;
-
+  double distance_to_vehicle1 =
+      std::sqrt((vehicle_state.x() - end_pose[0]) *
+                    (vehicle_state.x() - end_pose[0]) +
+                (vehicle_state.y() - end_pose[1]) *
+                    (vehicle_state.y() - end_pose[1]));
   double distance_to_vehicle =
       std::sqrt((vehicle_state.x() - end_pose_to_world_frame.x()) *
                     (vehicle_state.x() - end_pose_to_world_frame.x()) +
                 (vehicle_state.y() - end_pose_to_world_frame.y()) *
                     (vehicle_state.y() - end_pose_to_world_frame.y()));
-
   double theta_to_vehicle = std::abs(common::math::AngleDiff(
       vehicle_state.heading(), end_theta_to_world_frame));
-  ADEBUG << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
+  AERROR << "distance_to_vehicle1 is: " << distance_to_vehicle1;
+  AERROR << "distance_to_vehicle2 is: " << distance_to_vehicle2;
+  AERROR << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
          << end_theta_to_world_frame << "rotate_angle" << rotate_angle;
-  ADEBUG << "is_near_destination_threshold"
+  AERROR << "is_near_destination_threshold"
          << config_.open_space_trajectory_provider_config()
                 .open_space_trajectory_optimizer_config()
                 .planner_open_space_config()
                 .is_near_destination_threshold();  // which config file
-  ADEBUG << "is_near_destination_theta_threshold"
+  AERROR << "is_near_destination_theta_threshold"
          << config_.open_space_trajectory_provider_config()
                 .open_space_trajectory_optimizer_config()
                 .planner_open_space_config()
                 .is_near_destination_theta_threshold();
-  if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
+  distance_to_vehicle = std::min(
+                        std::min(distance_to_vehicle, distance_to_vehicle1),
+                        distance_to_vehicle2);
+  theta_to_vehicle = std::min(theta_to_vehicle,
+                     std::abs(vehicle_state.heading()));
+ if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
                                 .open_space_trajectory_optimizer_config()
                                 .planner_open_space_config()
                                 .is_near_destination_threshold() &&
-      theta_to_vehicle < config_.open_space_trajectory_provider_config()
+     theta_to_vehicle < config_.open_space_trajectory_provider_config()
                              .open_space_trajectory_optimizer_config()
                              .planner_open_space_config()
                              .is_near_destination_theta_threshold()) {
-    ADEBUG << "vehicle reach end_pose";
+    AERROR << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);
     return true;
   }

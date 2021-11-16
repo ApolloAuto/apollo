@@ -18,19 +18,17 @@
  * @file main.cc
  * @brief v2x proxy main function
  */
-
 #include "modules/v2x/v2x_proxy/app/v2x_proxy.h"
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::cyber::Init(argv[0]);
-
-  apollo::v2x::V2xProxy v2x_proxy;
+  ::apollo::cyber::Init(argv[0]);
+  ::apollo::v2x::V2xProxy v2x_proxy;
   if (!v2x_proxy.InitFlag()) {
     AERROR << "Failed to initialize v2x proxy";
+    ::apollo::cyber::Clear();
     return -1;
   }
-
-  apollo::cyber::WaitForShutdown();
+  ::apollo::cyber::WaitForShutdown();
   return 0;
 }

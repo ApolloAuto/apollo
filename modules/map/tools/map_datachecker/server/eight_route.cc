@@ -21,7 +21,7 @@
 namespace apollo {
 namespace hdmap {
 
-EightRoute::EightRoute(std::shared_ptr<JSonConf> sp_conf) : Alignment(sp_conf) {
+EightRoute::EightRoute(std::shared_ptr<JsonConf> sp_conf) : Alignment(sp_conf) {
   Reset();
 }
 

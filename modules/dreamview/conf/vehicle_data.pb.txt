@@ -15,6 +15,14 @@ data_files {
   dest_path: "/apollo/modules/dreamview/conf/data_collection_table.pb.txt"
 }
 data_files {
+  source_path: "dreamview_conf/preprocess_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview/conf/preprocess_table.pb.txt"
+}
+data_files {
+  source_path: "dreamview_conf/lidar_to_gnss_preprocess_table.pb.txt"
+  dest_path: "/apollo/modules/dreamview/conf/lidar_to_gnss_preprocess_table.pb.txt"
+}
+data_files {
   source_path: "navigation_lincoln.pb.txt"
   dest_path: "/apollo/modules/control/conf/navigation_lincoln.pb.txt"
 }
@@ -24,7 +32,7 @@ data_files {
 }
 data_files {
   source_path: "velodyne_params"
-  dest_path: "/apollo/modules/drivers/velodyne/params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
 }
 data_files {
   source_path: "velodyne_params"
@@ -43,6 +51,10 @@ data_files {
   dest_path: "/apollo/modules/perception/data/params"
 }
 data_files {
+  source_path: "microphone_params"
+  dest_path: "/apollo/modules/audio/conf/respeaker_extrinsics.yaml"
+}
+data_files {
   source_path: "gnss_params/ant_imu_leverarm.yaml"
   dest_path: "/apollo/modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
 }
@@ -59,12 +71,20 @@ data_files {
   dest_path: "/apollo/modules/drivers/radar/conti_radar/conf"
 }
 data_files {
+  source_path: "radar_dag"
+  dest_path: "/apollo/modules/drivers/radar/conti_radar/dag"
+}
+data_files {
   source_path: "gnss_conf"
   dest_path: "/apollo/modules/drivers/gnss/conf"
 }
 data_files {
   source_path: "velodyne_conf"
-  dest_path: "/apollo/modules/drivers/velodyne/conf"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/conf"
+}
+data_files {
+  source_path: "hesai_conf"
+  dest_path: "/apollo/modules/drivers/lidar/hesai/conf"
 }
 data_files {
   source_path: "camera_conf"
@@ -133,4 +153,64 @@ data_files {
 data_files {
   source_path: "perception_launch"
   dest_path: "/apollo/modules/perception/production/launch"
+}
+data_files {
+  source_path: "perception_conf"
+  dest_path: "/apollo/modules/perception/production/conf/perception"
+}
+data_files {
+  source_path: "lidar_dag"
+  dest_path: "/apollo/modules/drivers/lidar/dag"
+}
+data_files {
+  source_path: "lidar_conf"
+  dest_path: "/apollo/modules/drivers/lidar/conf"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/drivers/lidar/velodyne/params"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/localization/msf/params/velodyne_params"
+}
+data_files {
+  source_path: "lidar_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "perception_conf/pointcloud_preprocessor.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/pointcloud_preprocessor/velodyne128/pointcloud_preprocessor.conf"
+}
+data_files {
+  source_path: "canbus_conf/canbus_conf.pb.txt"
+  dest_path: "/apollo/modules/canbus/conf/canbus_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_camera_params"
+  dest_path: "/apollo/modules/perception/production/data/perception/camera/params"
+}
+data_files {
+  source_path: "perception_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
+  source_path: "perception_conf/fusion_component_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/perception_common.flag"
+  dest_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+}
+data_files {
+  source_path: "perception_conf/velodyne16_segmentation_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/recognition_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/recognition_conf.pb.txt"
+}
+data_files {
+  source_path: "perception_conf/mlf_engine.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
 }

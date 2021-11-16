@@ -47,8 +47,9 @@ TEST_F(Interpolation1DTest, normal) {
   Interpolation1D estimator;
   EXPECT_TRUE(estimator.Init(xy));
 
+  constexpr double episilon = 1.0e-10;
   for (unsigned i = 0; i < xy.size(); i++) {
-    EXPECT_DOUBLE_EQ(xy[i].second, estimator.Interpolate(xy[i].first));
+    EXPECT_NEAR(xy[i].second, estimator.Interpolate(xy[i].first), episilon);
   }
 
   EXPECT_DOUBLE_EQ(4.7777777777777777, estimator.Interpolate(5));

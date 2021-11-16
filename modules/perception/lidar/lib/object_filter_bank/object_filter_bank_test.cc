@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"

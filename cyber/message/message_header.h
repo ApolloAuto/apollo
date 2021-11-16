@@ -18,6 +18,7 @@
 #define CYBER_MESSAGE_MESSAGE_HEADER_H_
 
 #include <arpa/inet.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <cstring>

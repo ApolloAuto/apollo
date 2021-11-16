@@ -40,9 +40,9 @@ import itertools
 import os
 import six
 
-import mlp_data
-import mlp_model
-import mlp_utils
+import modules.tools.multiple_gpu_estimator.mlp_data
+import modules.tools.multiple_gpu_estimator.mlp_model
+import modules.tools.multiple_gpu_estimator.mlp_utils
 import numpy as np
 import tensorflow as tf
 

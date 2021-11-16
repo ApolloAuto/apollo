@@ -28,7 +28,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
-
 #include "cyber/node/node_channel_impl.h"
 #include "cyber/service/client_base.h"
 

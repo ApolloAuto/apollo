@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lib/config_manager/config_manager.h"
+
 #include "gtest/gtest.h"
 
-#define private public
-#define protected public
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
 namespace perception {

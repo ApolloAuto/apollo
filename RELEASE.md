@@ -1,7 +1,28 @@
+# Release 6.0
+
+Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new additions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
+
+## Major Features and Improvements
+* Upgraded Deep Learning Models
+    * PointPillars based obstacle detection model
+    * Semantic map based pedestrian prediction model
+    * Learning based trajectory planning model
+* Brand New Data Pipeline Services
+    * Low speed obstacle prediction model training service with semantic map support
+    * PointPillars based obstacle detection model training service
+    * Control profiling service
+    * Vehicle dynamic model training service
+    * Open space planner profiling service
+    * Complete control parameter auto-tune service
+* Driverless Research
+    * Remote control interface with DreamView integration
+    * Audio based emergency vehicle detection system
+
+**[Note]** All models and methodologies included in Apollo 6.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 6.0 with enough safety protection mechanism. Your feedback is highly appreciated for us to continuously improve the models.
+
 # Release 5.5
 
-Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. 
-The car has complete 360-degree visibility, along with upgraded perception deep learning model a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. New Planning scenarios have been introduced to support curb-side functionality.
+Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. The car has complete 360-degree visibility, along with upgraded perception deep learning model a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. New Planning scenarios have been introduced to support curb-side functionality.
 
 ## Major Features And Improvements
 * Brand new Data Pipeline Service

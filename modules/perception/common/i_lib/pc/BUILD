@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -6,7 +7,6 @@ cc_library(
     name = "i_ground",
     srcs = ["i_ground.cc"],
     hdrs = ["i_ground.h"],
-    copts = ["-msse4.1"],
     deps = [
         ":i_struct_s",
         ":i_util",

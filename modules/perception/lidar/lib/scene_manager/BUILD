@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,8 +12,8 @@ cc_library(
         "//modules/common/util",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",
-        "//modules/perception/lidar/lib/scene_manager/proto:scene_manager_config_proto",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/lidar/lib/scene_manager/proto:scene_manager_config_cc_proto",
+        "//modules/perception/proto:perception_config_schema_cc_proto",
     ],
 )
 
@@ -31,7 +32,7 @@ cc_test(
     deps = [
         ":scene_manager",
         "//modules/map/hdmap",
-        "//modules/map/proto:map_proto",
+        "//modules/map/proto:map_cc_proto",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
@@ -42,7 +43,7 @@ cc_test(
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/map/hdmap:hdmap_input",
         "@com_google_googletest//:gtest_main",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,6 +10,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/lidar/common:lidar_log",
+        "@boost",
         "@eigen",
     ],
 )
@@ -26,7 +28,7 @@ cc_library(
         "//modules/perception/lidar/common:lidar_point_label",
         "//modules/perception/lidar/lib/interface:base_object_filter",
         "//modules/perception/lidar/lib/interface:base_roi_filter",
-        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/proto:hdmap_roi_filter_proto",
+        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/proto:hdmap_roi_filter_cc_proto",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "@eigen",

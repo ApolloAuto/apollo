@@ -113,7 +113,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   if (stop_obstacle) {
     bool success = MapStopDecision(stop_obstacle, stop_decision);
     if (!success) {
-      std::string msg = "Fail to MapStopDecision.";
+      const std::string msg = "Fail to MapStopDecision.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -195,7 +195,6 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
   // Sanity checks.
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
-  DCHECK_GT(path_points.size(), 0);
   if (path_points.empty()) {
     AERROR << "No points in path_data_.discretized_path().";
     return false;

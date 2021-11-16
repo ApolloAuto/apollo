@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
@@ -30,8 +29,11 @@ case $1 in
   stop)
     stop_customized_path localization ndt_localization "$@"
     ;;
+  restart)
+    stop_customized_path localization ndt_localization "$@"
+    start_customized_path localization ndt_localization "$@"
+    ;;
   *)
     start_customized_path localization ndt_localization "$@"
     ;;
 esac
-

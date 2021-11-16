@@ -23,7 +23,7 @@
 
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/lib/utils/timer.h"
+#include "modules/perception/camera/common/timer.h"
 
 namespace apollo {
 namespace perception {

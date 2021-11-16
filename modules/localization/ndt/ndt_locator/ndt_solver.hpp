@@ -212,7 +212,7 @@ template <typename PointSource, typename PointTarget>
 void NormalDistributionsTransform<PointSource, PointTarget>::
     ComputeTransformation(PointCloudSourcePtr output,
                           const Eigen::Matrix4f &guess) {
-  apollo::common::time::Timer timer;
+  apollo::common::util::Timer timer;
   timer.Start();
 
   nr_iterations_ = 0;
@@ -259,7 +259,7 @@ void NormalDistributionsTransform<PointSource, PointTarget>::
   score = ComputeDerivatives(&score_gradient, &hessian, output, &p);
   timer.End("Ndt ComputeDerivatives");
 
-  apollo::common::time::Timer loop_timer;
+  apollo::common::util::Timer loop_timer;
   loop_timer.Start();
   while (!converged_) {
     // Store previous transformation

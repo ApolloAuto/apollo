@@ -16,9 +16,7 @@
 
 #include "modules/storytelling/common/storytelling_gflags.h"
 
-DEFINE_double(search_radius, 1.0,
-              "Search radius for a junction");
+DEFINE_double(search_radius, 1.0, "Search radius for a junction");
 
 DEFINE_double(adc_trajectory_search_distance, 10.0,
               "How far to search junction along adc planning trajectory");
-

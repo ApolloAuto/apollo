@@ -16,9 +16,8 @@
 
 #include "modules/planning/common/path/discretized_path.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/common/util/point_factory.h"
 
 namespace apollo {

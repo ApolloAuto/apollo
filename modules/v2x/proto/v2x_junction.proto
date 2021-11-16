@@ -1,0 +1,38 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+import "modules/common/proto/geometry.proto";
+
+message Id {
+  optional bytes id = 1;
+}
+
+message Junction {
+  optional Id id = 1;
+  optional apollo.common.Polygon polygon = 2;
+
+  // crosswalk in junction
+  repeated Id crosswalk_id = 3;
+  repeated Id overlap_id = 4;
+
+  // The number of road segments (arms) that are involved.
+  // e.g 3-way junction indicates a T junction (two arms form one road) or a Y
+  // junction.
+  optional int32 num_road_segments = 5 [default = 4];
+  // lanes in the junction
+  repeated Id lane_id = 6;
+
+  enum Type {
+    UNKNOWN = 0;
+    IN_ROAD = 1;
+    CROSS_ROAD = 2;
+  };
+  optional Type type = 7;
+
+  enum EdgeType {
+    PHYSICAL = 0;
+    VIRTUAL = 1;
+  };
+  repeated EdgeType edge_type = 8;
+}

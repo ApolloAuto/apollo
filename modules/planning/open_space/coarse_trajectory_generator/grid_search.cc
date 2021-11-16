@@ -47,7 +47,8 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
     for (const common::math::LineSegment2d& linesegment :
          obstacle_linesegments) {
-      if (linesegment.DistanceTo({node->GetX(), node->GetY()}) < node_radius_) {
+      if (linesegment.DistanceTo({node->GetGridX(), node->GetGridY()}) <
+          node_radius_) {
         return false;
       }
     }
@@ -57,42 +58,34 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
 
 std::vector<std::shared_ptr<Node2d>> GridSearch::GenerateNextNodes(
     std::shared_ptr<Node2d> current_node) {
-  double current_node_x = current_node->GetX();
-  double current_node_y = current_node->GetY();
+  double current_node_x = current_node->GetGridX();
+  double current_node_y = current_node->GetGridY();
   double current_node_path_cost = current_node->GetPathCost();
   double diagonal_distance = std::sqrt(2.0);
   std::vector<std::shared_ptr<Node2d>> next_nodes;
-  std::shared_ptr<Node2d> up = std::make_shared<Node2d>(
-      current_node_x, current_node_y + xy_grid_resolution_, xy_grid_resolution_,
-      XYbounds_);
+  std::shared_ptr<Node2d> up =
+      std::make_shared<Node2d>(current_node_x, current_node_y + 1.0, XYbounds_);
   up->SetPathCost(current_node_path_cost + 1.0);
   std::shared_ptr<Node2d> up_right = std::make_shared<Node2d>(
-      current_node_x + xy_grid_resolution_,
-      current_node_y + xy_grid_resolution_, xy_grid_resolution_, XYbounds_);
+      current_node_x + 1.0, current_node_y + 1.0, XYbounds_);
   up_right->SetPathCost(current_node_path_cost + diagonal_distance);
   std::shared_ptr<Node2d> right =
-      std::make_shared<Node2d>(current_node_x + xy_grid_resolution_,
-                               current_node_y, xy_grid_resolution_, XYbounds_);
+      std::make_shared<Node2d>(current_node_x + 1.0, current_node_y, XYbounds_);
   right->SetPathCost(current_node_path_cost + 1.0);
   std::shared_ptr<Node2d> down_right = std::make_shared<Node2d>(
-      current_node_x + xy_grid_resolution_,
-      current_node_y - xy_grid_resolution_, xy_grid_resolution_, XYbounds_);
+      current_node_x + 1.0, current_node_y - 1.0, XYbounds_);
   down_right->SetPathCost(current_node_path_cost + diagonal_distance);
-  std::shared_ptr<Node2d> down = std::make_shared<Node2d>(
-      current_node_x, current_node_y - xy_grid_resolution_, xy_grid_resolution_,
-      XYbounds_);
+  std::shared_ptr<Node2d> down =
+      std::make_shared<Node2d>(current_node_x, current_node_y - 1.0, XYbounds_);
   down->SetPathCost(current_node_path_cost + 1.0);
   std::shared_ptr<Node2d> down_left = std::make_shared<Node2d>(
-      current_node_x - xy_grid_resolution_,
-      current_node_y - xy_grid_resolution_, xy_grid_resolution_, XYbounds_);
+      current_node_x - 1.0, current_node_y - 1.0, XYbounds_);
   down_left->SetPathCost(current_node_path_cost + diagonal_distance);
   std::shared_ptr<Node2d> left =
-      std::make_shared<Node2d>(current_node_x - xy_grid_resolution_,
-                               current_node_y, xy_grid_resolution_, XYbounds_);
+      std::make_shared<Node2d>(current_node_x - 1.0, current_node_y, XYbounds_);
   left->SetPathCost(current_node_path_cost + 1.0);
   std::shared_ptr<Node2d> up_left = std::make_shared<Node2d>(
-      current_node_x - xy_grid_resolution_,
-      current_node_y + xy_grid_resolution_, xy_grid_resolution_, XYbounds_);
+      current_node_x - 1.0, current_node_y + 1.0, XYbounds_);
   up_left->SetPathCost(current_node_path_cost + diagonal_distance);
 
   next_nodes.emplace_back(up);

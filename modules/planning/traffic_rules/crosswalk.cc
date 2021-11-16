@@ -26,8 +26,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "cyber/time/clock.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -45,7 +45,7 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
@@ -91,8 +91,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   CrosswalkStopTimer crosswalk_stop_timer;
   std::unordered_map<std::string, double> stop_times;
   for (const auto& stop_time : mutable_crosswalk_status->stop_time()) {
-    stop_times.emplace(stop_time.obstacle_id(),
-                       stop_time.obstacle_stop_timestamp());
+    stop_times.emplace(stop_time.obstacle_id(), stop_time.stop_timestamp_sec());
   }
   crosswalk_stop_timer.emplace(mutable_crosswalk_status->crosswalk_id(),
                                stop_times);
@@ -162,7 +161,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
           if (crosswalk_stop_timer[crosswalk_id].count(obstacle_id) < 1) {
             // add timestamp
             ADEBUG << "add timestamp: obstacle_id[" << obstacle_id
-                   << "] timestamp[" << Clock::NowInSeconds() << "]";
+                   << "] timestamp[" << Clock::NowInSeconds()
+                   << "]";
             crosswalk_stop_timer[crosswalk_id].insert(
                 {obstacle_id, Clock::NowInSeconds()});
           } else {
@@ -226,7 +226,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     for (const auto& timer : crosswalk_stop_timer[crosswalk]) {
       auto* stop_time = mutable_crosswalk_status->add_stop_time();
       stop_time->set_obstacle_id(timer.first);
-      stop_time->set_obstacle_stop_timestamp(timer.second);
+      stop_time->set_stop_timestamp_sec(timer.second);
       ADEBUG << "UPDATE stop_time: id[" << crosswalk << "] obstacle_id["
              << timer.first << "] stop_timestamp[" << timer.second << "]";
     }

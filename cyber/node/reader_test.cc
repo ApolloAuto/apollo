@@ -17,11 +17,13 @@
 #include "cyber/node/reader.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -30,7 +32,7 @@ namespace reader {
 using proto::Chatter;
 
 auto callback = [](const std::shared_ptr<proto::Chatter>& msg) {
-  AINFO << "msg size = " << msg->ByteSize();
+  AINFO << "msg size = " << msg->ByteSizeLong();
 };
 
 TEST(ReaderTest, test1) {

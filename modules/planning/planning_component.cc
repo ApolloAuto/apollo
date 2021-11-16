@@ -51,8 +51,9 @@ bool PlanningComponent::Init() {
       << "failed to load planning config file "
       << ComponentBase::ConfigFilePath();
 
-  if (FLAGS_planning_learning_mode > 0) {
-    if (!message_process_.Init(config_)) {
+  if (FLAGS_planning_offline_learning ||
+      config_.learning_mode() != PlanningConfig::NO_LEARNING) {
+    if (!message_process_.Init(config_, injector_)) {
       AERROR << "failed to init MessageProcess";
       return false;
     }
@@ -108,6 +109,9 @@ bool PlanningComponent::Init() {
   rerouting_writer_ = node_->CreateWriter<RoutingRequest>(
       config_.topic_config().routing_request_topic());
 
+  planning_learning_data_writer_ = node_->CreateWriter<PlanningLearningData>(
+      config_.topic_config().planning_learning_data_topic());
+
   return true;
 }
 
@@ -154,7 +158,7 @@ bool PlanningComponent::Proc(
     return false;
   }
 
-  if (FLAGS_planning_learning_mode == 2 || FLAGS_planning_learning_mode == 3) {
+  if (config_.learning_mode() != PlanningConfig::NO_LEARNING) {
     // data process for online training
     message_process_.OnChassis(*local_view_.chassis);
     message_process_.OnPrediction(*local_view_.prediction_obstacles);
@@ -164,12 +168,29 @@ bool PlanningComponent::Proc(
     message_process_.OnLocalization(*local_view_.localization_estimate);
   }
 
+  // publish learning data frame for RL test
+  if (config_.learning_mode() == PlanningConfig::RL_TEST) {
+    PlanningLearningData planning_learning_data;
+    LearningDataFrame* learning_data_frame =
+        injector_->learning_based_data()->GetLatestLearningDataFrame();
+    if (learning_data_frame) {
+      planning_learning_data.mutable_learning_data_frame()
+                            ->CopyFrom(*learning_data_frame);
+      common::util::FillHeader(node_->Name(), &planning_learning_data);
+      planning_learning_data_writer_->Write(planning_learning_data);
+    } else {
+      AERROR << "fail to generate learning data frame";
+      return false;
+    }
+    return true;
+  }
+
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
-  auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
   // modify trajectory relative time due to the timestamp change in header
+  auto start_time = adc_trajectory_pb.header().timestamp_sec();
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);

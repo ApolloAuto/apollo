@@ -17,6 +17,7 @@
 #include "cyber/component/component.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
 
 #include "cyber/init.h"

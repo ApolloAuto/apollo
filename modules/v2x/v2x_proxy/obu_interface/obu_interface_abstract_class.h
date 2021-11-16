@@ -21,7 +21,16 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
+
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/v2x/proto/v2x_car_status.pb.h"
+#include "modules/v2x/proto/v2x_obstacles.pb.h"
+#include "modules/v2x/proto/v2x_obu_rsi.pb.h"
+#include "modules/v2x/proto/v2x_traffic_light.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace v2x {
@@ -29,18 +38,24 @@ namespace v2x {
 class ObuInterFaceBase {
  public:
   ObuInterFaceBase() {}
+
   virtual ~ObuInterFaceBase() {}
 
  public:
   virtual bool InitialServer() = 0;
+
   virtual bool InitialClient() = 0;
-  virtual void GetV2xObstaclesFromObu(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg) {}
+
   virtual void GetV2xTrafficLightFromObu(
-      const std::shared_ptr<IntersectionTrafficLightData> &msg) {}
-  virtual void SendCarStatusToObu(const std::shared_ptr<CarStatus> &msg) {}
-  virtual void SendObstaclesToObu(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg) {}
+      std::shared_ptr<::apollo::v2x::obu::ObuTrafficLight> *msg) {}
+
+  virtual void SendCarStatusToObu(
+      const std::shared_ptr<::apollo::v2x::CarStatus> &msg) {}
+
+  virtual void GetV2xRsiFromObu(
+      std::shared_ptr<::apollo::v2x::obu::ObuRsi> *msg) {}
+  virtual void GetV2xObstaclesFromObu(
+      std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {}
 };
 
 }  // namespace v2x

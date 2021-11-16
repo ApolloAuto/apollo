@@ -10,7 +10,7 @@ cyber_modules {
 cyber_modules {
   key: "Velodyne"
   value: {
-    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
+    dag_files: "/apollo/modules/drivers/lidar/velodyne/dag/velodyne.dag"
   }
 }
 cyber_modules {

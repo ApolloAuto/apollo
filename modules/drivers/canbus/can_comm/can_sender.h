@@ -34,8 +34,8 @@
 #include "cyber/common/macros.h"
 
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -287,7 +287,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start = absl::ToUnixMicros(common::time::Clock::Now());
+    tm_start = cyber::Time::Now().ToNanosecond() / 1e3;
     new_delta_period = INIT_PERIOD;
 
     for (auto &message : send_messages_) {
@@ -309,7 +309,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       }
     }
     delta_period = new_delta_period;
-    tm_end = absl::ToUnixMicros(common::time::Clock::Now());
+    tm_end = cyber::Time::Now().ToNanosecond() / 1e3;
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {

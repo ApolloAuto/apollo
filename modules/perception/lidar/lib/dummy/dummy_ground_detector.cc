@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/dummy/dummy_ground_detector.h"
+#include <numeric>
 
 namespace apollo {
 namespace perception {

@@ -17,25 +17,22 @@
 #ifndef CYBER_TIME_DURATION_H_
 #define CYBER_TIME_DURATION_H_
 
-#include <climits>
-#include <cmath>
 #include <cstdint>
 #include <iostream>
-#include <stdexcept>
 
 namespace apollo {
 namespace cyber {
 
 class Duration {
  public:
-  Duration() {}
+  Duration() = default;
   explicit Duration(int64_t nanoseconds);
   explicit Duration(int nanoseconds);
   explicit Duration(double seconds);
-  explicit Duration(uint32_t seconds, uint32_t nanoseconds);
+  Duration(uint32_t seconds, uint32_t nanoseconds);
   Duration(const Duration &other);
   Duration &operator=(const Duration &other);
-  ~Duration() {}
+  ~Duration() = default;
 
   double ToSecond() const;
   int64_t ToNanosecond() const;

@@ -16,8 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 cd "${DIR}/.."
 
@@ -32,7 +31,7 @@ source "${DIR}/apollo_base.sh"
 VEHICLE_PATH=$1
 if [ -d ${VEHICLE_PATH} ]; then
   ${APOLLO_BIN_PREFIX}/modules/dreamview/backend/hmi/vehicle_manager_main \
-      --vehicle_data_path="${VEHICLE_PATH}"
+    --vehicle_data_path="${VEHICLE_PATH}"
 else
   error "Cannot open directory: ${VEHICLE_PATH}"
   info "Available vehicles:"

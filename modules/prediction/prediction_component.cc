@@ -18,6 +18,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
@@ -37,7 +38,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 
@@ -121,7 +122,7 @@ bool PredictionComponent::Proc(
 bool PredictionComponent::ContainerSubmoduleProcess(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
   constexpr static size_t kHistorySize = 10;
-  const auto frame_start_time = absl::Now();
+  const auto frame_start_time = Clock::Now();
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
   localization_reader_->Observe();

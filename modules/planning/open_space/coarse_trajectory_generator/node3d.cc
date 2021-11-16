@@ -36,7 +36,7 @@ Node3d::Node3d(double x, double y, double phi) {
 Node3d::Node3d(double x, double y, double phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
-  CHECK_EQ(XYbounds.size(), 4)
+  CHECK_EQ(XYbounds.size(), 4U)
       << "XYbounds size is not 4, but" << XYbounds.size();
 
   x_ = x;
@@ -65,7 +65,7 @@ Node3d::Node3d(const std::vector<double>& traversed_x,
                const std::vector<double>& traversed_phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
-  CHECK_EQ(XYbounds.size(), 4)
+  CHECK_EQ(XYbounds.size(), 4U)
       << "XYbounds size is not 4, but" << XYbounds.size();
   CHECK_EQ(traversed_x.size(), traversed_y.size());
   CHECK_EQ(traversed_x.size(), traversed_phi.size());

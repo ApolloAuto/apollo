@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
+
+#include <string>
+
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -42,7 +45,7 @@ AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
       stop_boundaries_(num_points, std::vector<std::array<double, 3>>()),
       nudge_boundaries_(num_points, std::vector<std::array<double, 3>>()),
       side_pass_boundaries_(num_points, std::vector<std::array<double, 3>>()) {
-  CHECK_GT(num_points, 0);
+  CHECK_GT(num_points, 0U);
   CHECK_GT(time_range, kMinTimeRange);
   double res = time_range / static_cast<double>(num_points);
   for (double t = 0; t < res + time_range; t += res) {
@@ -127,17 +130,18 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
     const std::vector<common::SpeedPoint>& speed_profile,
     autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   if (speed_profile.size() != eval_time_.size()) {
-    AERROR << "Evaluated time size and speed profile size is different";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "mismatched evaluated time and speed profile size");
+    const std::string msg = "mismatched evaluated time and speed profile size";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   for (size_t i = 0; i < eval_time_.size(); ++i) {
     auto* trajectory_point_feature = trajectory_feature->add_point_feature();
     auto status =
         EvaluateSpeedPoint(speed_profile[i], i, trajectory_point_feature);
     if (status != common::Status::OK()) {
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Extracting speed profile error");
+      const std::string msg = "Extracting speed profile error";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
   return common::Status::OK();

@@ -43,13 +43,19 @@ BaseMap::~BaseMap() {
   }
 }
 
-void BaseMap::InitMapNodeCaches(int cacheL1_size, int cahceL2_size) {
+void BaseMap::InitMapNodeCaches(int cacheL1_size, int cacheL2_size) {
+  destroy_func_lvl1_ =
+      std::bind(MapNodeCache<MapNodeIndex, BaseMapNode>::CacheL1Destroy,
+                std::placeholders::_1);
+  destroy_func_lvl2_ =
+      std::bind(MapNodeCache<MapNodeIndex, BaseMapNode>::CacheL2Destroy,
+                std::placeholders::_1);
   ACHECK(map_node_cache_lvl1_ == nullptr);
   ACHECK(map_node_cache_lvl2_ == nullptr);
-  map_node_cache_lvl1_ =
-      new MapNodeCacheL1<MapNodeIndex, BaseMapNode>(cacheL1_size);
-  map_node_cache_lvl2_ =
-      new MapNodeCacheL2<MapNodeIndex, BaseMapNode>(cahceL2_size);
+  map_node_cache_lvl1_ = new MapNodeCache<MapNodeIndex, BaseMapNode>(
+      cacheL1_size, destroy_func_lvl1_);
+  map_node_cache_lvl2_ = new MapNodeCache<MapNodeIndex, BaseMapNode>(
+      cacheL2_size, destroy_func_lvl2_);
 }
 
 BaseMapNode* BaseMap::GetMapNode(const MapNodeIndex& index) {
@@ -112,7 +118,7 @@ void BaseMap::AddDataset(const std::string dataset_path) {
 }
 
 void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
-  CHECK_LE(static_cast<int>(map_ids->size()), map_node_cache_lvl1_->Capacity());
+  CHECK_LE(map_ids->size(), map_node_cache_lvl1_->Capacity());
   // check in cacheL1
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
   while (itr != map_ids->end()) {
@@ -179,8 +185,7 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
 }
 
 void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
-  DCHECK_LE(static_cast<int>(map_ids->size()),
-            map_node_cache_lvl2_->Capacity());
+  DCHECK_LE(map_ids->size(), map_node_cache_lvl2_->Capacity());
   // check in cacheL2
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
   while (itr != map_ids->end()) {

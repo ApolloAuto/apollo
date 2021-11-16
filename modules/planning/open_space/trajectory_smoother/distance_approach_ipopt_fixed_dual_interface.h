@@ -20,17 +20,19 @@
 
 #pragma once
 
+#include <algorithm>
+#include <limits>
+#include <vector>
+
+#include <omp.h>
+
 #include <adolc/adolc.h>
 #include <adolc/adolc_openmp.h>
 #include <adolc/adolc_sparse.h>
 #include <adolc/adouble.h>
-#include <omp.h>
+
 #include <coin/IpTNLP.hpp>
 #include <coin/IpTypes.hpp>
-
-#include <algorithm>
-#include <limits>
-#include <vector>
 
 #include "Eigen/Dense"
 
@@ -55,7 +57,7 @@ namespace planning {
 class DistanceApproachIPOPTFixedDualInterface
     : public DistanceApproachInterface {
  public:
-  explicit DistanceApproachIPOPTFixedDualInterface(
+  DistanceApproachIPOPTFixedDualInterface(
       const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,

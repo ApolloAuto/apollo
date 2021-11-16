@@ -20,13 +20,14 @@
 
 #pragma once
 
-#include <adolc/adolc.h>
-#include <adolc/adolc_sparse.h>
-#include <coin/IpTNLP.hpp>
-#include <coin/IpTypes.hpp>
-
 #include <limits>
 #include <vector>
+
+#include <adolc/adolc.h>
+#include <adolc/adolc_sparse.h>
+
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 
 #include "Eigen/Dense"
 
@@ -44,7 +45,7 @@ namespace planning {
 
 class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DualVariableWarmStartIPOPTInterface(
+  DualVariableWarmStartIPOPTInterface(
       size_t horizon, double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,

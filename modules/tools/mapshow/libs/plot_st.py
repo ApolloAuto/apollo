@@ -19,11 +19,11 @@
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from modules.planning.proto import planning_pb2
-from .planning import Planning
-from .subplot_st_main import StMainSubplot
-from .subplot_st_speed import StSpeedSubplot
+from modules.tools.mapshow.libs.planning import Planning
+from modules.tools.mapshow.libs.subplot_st_main import StMainSubplot
+from modules.tools.mapshow.libs.subplot_st_speed import StSpeedSubplot
 
 
 planning = Planning()

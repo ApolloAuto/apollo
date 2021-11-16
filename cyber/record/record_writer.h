@@ -25,10 +25,11 @@
 #include <string>
 #include <unordered_map>
 
+#include "cyber/proto/record.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/proto/record.pb.h"
 #include "cyber/record/file/record_file_writer.h"
 #include "cyber/record/header_builder.h"
 #include "cyber/record/record_base.h"

@@ -22,11 +22,16 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
-#include "grpc++/grpc++.h"
+#include <grpc++/grpc++.h>
 
-#include "modules/v2x/common/v2x_proxy_gflags.h"
+#include "modules/v2x/proto/v2x_car_status.pb.h"
+#include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
 #include "modules/v2x/proto/v2x_service_car_to_obu.grpc.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace v2x {
@@ -34,7 +39,7 @@ namespace v2x {
 class GrpcClientImpl {
  public:
   /* construct function
-  @param input carstatus type msg shared ptr
+  @param input car_status type msg shared ptr
   */
   explicit GrpcClientImpl(std::shared_ptr<grpc::Channel> channel);
 
@@ -43,21 +48,14 @@ class GrpcClientImpl {
   bool InitFlag() { return init_flag_; }
 
   /*function that send car status msg through grpc
-  @param input carstatus type msg shared ptr
+  @param input car_status type msg shared ptr
   */
-  void SendMsgToGrpc(const std::shared_ptr<CarStatus> &msg);
-
-  /*function that send perception obstacles msg through grpc
-  @param input perception obstacles type msg shared ptr
-  */
-  void SendMsgToGrpc(
-      const std::shared_ptr<apollo::perception::PerceptionObstacles> &msg);
+  void SendMsgToGrpc(const std::shared_ptr<::apollo::v2x::CarStatus> &msg);
 
  private:
   //  grpc service stub
-  std::unique_ptr<CarToObu::Stub> stub_;
-  int carstatus_tv_nsec_ = 0;
-  int perception_tv_nsec_ = 0;
+  std::unique_ptr<::apollo::v2x::CarToObu::Stub> stub_;
+  int car_status_tv_nsec_ = 0;
   bool init_flag_ = false;
 };
 

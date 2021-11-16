@@ -19,6 +19,7 @@
 #include <dirent.h>
 
 #include <algorithm>
+#include <limits>
 #include <memory>
 
 #include "absl/strings/str_cat.h"
@@ -61,7 +62,8 @@ bool PostRecordProcessor::Process() {
   for (const std::string& record : source_record_files_) {
     const auto reader = std::make_shared<RecordReader>(
         absl::StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    RecordViewer viewer(reader, 0,
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
     for (const auto& msg : viewer) {
@@ -76,7 +78,8 @@ bool PostRecordProcessor::Process() {
   for (const std::string& record : source_record_files_) {
     const auto reader = std::make_shared<RecordReader>(
         absl::StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX,
+    RecordViewer viewer(reader, 0,
+                        std::numeric_limits<uint64_t>::max(),
                         ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
       // If the message fall into generated intervals,

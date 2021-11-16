@@ -21,6 +21,7 @@
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/timer_component.h"
+#include "cyber/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -31,10 +32,10 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/util/util.h"
+#include "modules/control/common/dependency_injector.h"
 #include "modules/control/controller/controller_agent.h"
 #include "modules/control/proto/preprocessor.pb.h"
 #include "modules/control/submodules/preprocessor_submodule.h"
-#include "modules/control/common/dependency_injector.h"
 
 /**
  * @namespace apollo::control
@@ -81,7 +82,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::Status CheckPad();
 
  private:
-  absl::Time init_time_;
+  apollo::cyber::Time init_time_;
 
   localization::LocalizationEstimate latest_localization_;
   canbus::Chassis latest_chassis_;

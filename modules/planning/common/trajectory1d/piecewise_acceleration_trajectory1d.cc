@@ -24,6 +24,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -70,7 +71,7 @@ void PiecewiseAccelerationTrajectory1d::PopSegment() {
 }
 
 double PiecewiseAccelerationTrajectory1d::ParamLength() const {
-  CHECK_GT(t_.size(), 1);
+  CHECK_GT(t_.size(), 1U);
   return t_.back() - t_.front();
 }
 
@@ -81,7 +82,7 @@ std::string PiecewiseAccelerationTrajectory1d::ToString() const {
 
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
                                                    const double param) const {
-  CHECK_GT(t_.size(), 1);
+  CHECK_GT(t_.size(), 1U);
   ACHECK(t_.front() <= param && param <= t_.back());
 
   switch (order) {
@@ -139,7 +140,7 @@ double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const {
 
 std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(
     const double t) const {
-  CHECK_GT(t_.size(), 1);
+  CHECK_GT(t_.size(), 1U);
   ACHECK(t_.front() <= t && t <= t_.back());
 
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);

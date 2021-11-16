@@ -21,6 +21,7 @@
  **/
 
 #include "modules/drivers/canbus/can_client/esd/esd_can_client.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
 
@@ -39,6 +40,15 @@ bool EsdCanClient::Init(const CANCardParameter &parameter) {
     return false;
   }
   port_ = parameter.channel_id();
+
+  int num_ports = parameter.num_ports();
+
+  if (port_ > num_ports || port_ < 0) {
+    AERROR << "Can port number [" << port_ << "] is out of range [0, "
+           << num_ports << ") !";
+    return false;
+  }
+
   return true;
 }
 
@@ -63,12 +73,8 @@ ErrorCode EsdCanClient::Start() {
   if (FLAGS_esd_can_extended_frame) {
     mode = NTCAN_MODE_NO_RTR;
   }
+
   // mode |= NTCAN_MODE_NO_RTR;
-  if (port_ > MAX_CAN_PORT || port_ < 0) {
-    AERROR << "can port number [" << port_ << "] is out of the range [0,"
-           << MAX_CAN_PORT << "]";
-    return ErrorCode::CAN_CLIENT_ERROR_BASE;
-  }
   int32_t ret = canOpen(port_, mode, NTCAN_MAX_TX_QUEUESIZE,
                         NTCAN_MAX_RX_QUEUESIZE, 5, 5, &dev_handler_);
   if (ret != NTCAN_SUCCESS) {

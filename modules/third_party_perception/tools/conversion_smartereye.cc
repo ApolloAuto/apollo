@@ -18,10 +18,10 @@
  * @file
  */
 
+#include <cmath>
+#include <iostream>
 #include <map>
 #include <vector>
-#include <iostream>
-#include <cmath>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
@@ -169,7 +169,7 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
     }
 
     if (sma_l > FLAGS_max_mobileye_obstacle_length) {
-        sma_l = GetDefaultObjectLength(sma_type);
+      sma_l = GetDefaultObjectLength(sma_type);
     }
     if (sma_w > FLAGS_max_mobileye_obstacle_width) {
       sma_w = GetDefaultObjectWidth(sma_type);
@@ -220,11 +220,11 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
       double nearest_lane_heading =
           converted_vx > 0
               ? std::atan2(3 * path_c3 * converted_x * converted_x +
-                                2 * path_c2 * converted_x + path_c1,
-                            1)
+                               2 * path_c2 * converted_x + path_c1,
+                           1)
               : std::atan2(3 * path_c3 * converted_x * converted_x +
-                                2 * path_c2 * converted_x + path_c1,
-                            1) +
+                               2 * path_c2 * converted_x + path_c1,
+                           1) +
                     M_PI;
       AINFO << "nearest lane heading is" << nearest_lane_heading;
       sma->set_theta(nearest_lane_heading);

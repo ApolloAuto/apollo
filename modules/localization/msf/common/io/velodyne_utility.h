@@ -25,19 +25,22 @@
 #include <vector>
 
 #include "Eigen/Geometry"
+#include "modules/common/util/eigen_defs.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+
 namespace velodyne {
 
 struct VelodyneFrame {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   /**@brief The frame index. */
   unsigned int frame_index;
   /**@brief The time stamp. */
   double timestamp;
   /**@brief The 3D point cloud in this frame. */
-  std::vector<Eigen::Vector3d> pt3ds;
+  ::apollo::common::EigenVector3dVec pt3ds;
   /**@brief The laser reflection values in this frames. */
   std::vector<unsigned char> intensities;
   /**@brief The laser IDs. */
@@ -51,29 +54,30 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
               const bool is_global = false);
 
 void LoadPcds(const std::string& file_path, const unsigned int frame_index,
-              const Eigen::Affine3d& pose, std::vector<Eigen::Vector3d>* pt3ds,
+              const Eigen::Affine3d& pose,
+              ::apollo::common::EigenVector3dVec* pt3ds,
               std::vector<unsigned char>* intensities, bool is_global = false);
 
 /**@brief Load the PCD poses with their timestamps. */
 void LoadPcdPoses(const std::string& file_path,
-                  std::vector<Eigen::Affine3d>* poses,
+                  ::apollo::common::EigenAffine3dVec* poses,
                   std::vector<double>* timestamps);
 
 /**@brief Load the PCD poses with their timestamps and indices. */
 void LoadPcdPoses(const std::string& file_path,
-                  std::vector<Eigen::Affine3d>* poses,
+                  ::apollo::common::EigenAffine3dVec* poses,
                   std::vector<double>* timestamps,
                   std::vector<unsigned int>* pcd_indices);
 
 /**@brief Load poses and stds their timestamps. */
 void LoadPosesAndStds(const std::string& file_path,
-                      std::vector<Eigen::Affine3d>* poses,
-                      std::vector<Eigen::Vector3d>* stds,
+                      ::apollo::common::EigenAffine3dVec* poses,
+                      ::apollo::common::EigenVector3dVec* stds,
                       std::vector<double>* timestamps);
 
 // /**@brief Save the PCD poses with their timestamps. */
 // void save_pcd_poses(std::string file_path,
-//    const std::vector<Eigen::Affine3d>& poses,
+//    const ::apollo::common::EigenAffine3dVec& poses,
 //    const std::vector<double>& timestamps);
 
 /**@brief Load the velodyne extrinsic from a YAML file. */

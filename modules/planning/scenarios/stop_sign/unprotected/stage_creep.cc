@@ -17,16 +17,15 @@
 /**
  * @file
  **/
-#include <string>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include <string>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -40,7 +39,7 @@ namespace scenario {
 namespace stop_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageCreep::Process(

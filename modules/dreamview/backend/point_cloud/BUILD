@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,14 +14,15 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
-        "//modules/dreamview/proto:point_cloud_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto",
-        "//third_party:boost",
-        "//third_party/json",
+        "//modules/dreamview/proto:point_cloud_cc_proto",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/localization/proto:localization_cc_proto",
+        "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_github_nlohmann_json//:json",
         "@com_google_protobuf//:protobuf",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 

@@ -20,7 +20,7 @@
 
 import time
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 

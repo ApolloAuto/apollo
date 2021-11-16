@@ -100,7 +100,7 @@ TEST_F(SyncedMemoryTest, TestInitialization) {
   delete p_mem;
 }
 
-#ifndef PERCEPTION_CPU_ONLY  // GPU test
+#if USE_GPU == 1  // GPU test
 
 TEST_F(SyncedMemoryTest, TestAllocationCPUGPU) {
   SyncedMemory mem(10, true);
@@ -118,7 +118,7 @@ TEST_F(SyncedMemoryTest, TestAllocationCPU) {
   EXPECT_TRUE(mem.mutable_cpu_data());
 }
 
-#ifndef PERCEPTION_CPU_ONLY  // GPU test
+#if USE_GPU == 1  // GPU test
 
 TEST_F(SyncedMemoryTest, TestAllocationGPU) {
   SyncedMemory mem(10, true);
@@ -145,7 +145,7 @@ TEST_F(SyncedMemoryTest, TestCPUWrite) {
   }
 }
 
-#ifndef PERCEPTION_CPU_ONLY  // GPU test
+#if USE_GPU == 1  // GPU test
 
 TEST_F(SyncedMemoryTest, TestGPURead) {
   SyncedMemory mem(10, true);

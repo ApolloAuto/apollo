@@ -16,7 +16,7 @@
 
 #include "cyber/scheduler/policy/choreography_context.h"
 
-#include <climits>
+#include <limits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -77,7 +77,7 @@ void ChoreographyContext::Wait() {
 void ChoreographyContext::Shutdown() {
   stop_.store(true);
   mtx_wq_.lock();
-  notify = UCHAR_MAX;
+  notify = std::numeric_limits<unsigned char>::max();
   mtx_wq_.unlock();
   cv_wq_.notify_all();
 }

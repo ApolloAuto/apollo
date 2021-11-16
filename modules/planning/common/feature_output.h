@@ -51,7 +51,7 @@ class FeatureOutput {
    * @param A feature in proto
    */
   static void InsertLearningDataFrame(
-       const std::string& record_filename,
+      const std::string& record_filename,
       const LearningDataFrame& learning_data_frame);
 
   static void InsertPlanningResult();
@@ -72,7 +72,6 @@ class FeatureOutput {
 
  private:
   static LearningData learning_data_;
-  static std::size_t idx_learning_data_;
   static int learning_data_file_index_;
 };
 

@@ -16,12 +16,14 @@
 #pragma once
 
 #include <fstream>
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "Eigen/Dense"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/object_types.h"
 
 namespace apollo {
@@ -56,8 +58,9 @@ bool LoadSingleMatrix(std::ifstream& fin, Matrixd* matrix);
 
 bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix);
 
-bool LoadMultipleMatricesFile(const std::string& filename,
-                              std::map<std::string, Matrixd>* matrices);
+bool LoadMultipleMatricesFile(
+    const std::string& filename,
+    apollo::common::EigenMap<std::string, Matrixd>* matrices);
 
 }  // namespace util
 }  // namespace lidar

@@ -22,7 +22,6 @@
 
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
-#define protected public
 // TODO(all) #include "modules/planning/navi_planning.h"
 #include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planning_base.h"

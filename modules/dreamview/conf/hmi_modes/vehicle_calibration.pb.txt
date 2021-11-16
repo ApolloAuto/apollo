@@ -1,9 +1,13 @@
 cyber_modules {
-  key: "Sensors"
+  key: "Gps"
   value: {
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+  }
+}
+cyber_modules {
+  key: "Localization"
+  value: {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
-    process_group: "compute_sched"
   }
 }
 cyber_modules {
@@ -19,6 +23,18 @@ modules {
     stop_command: "/apollo/scripts/record_bag.py --stop --stop_signal SIGINT"
     process_monitor_config {
       command_keywords: "cyber_recorder record"
+    }
+  }
+}
+monitored_components {
+  key: "Canbus"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/canbus/dag/canbus.dag"
+    }
+    channel {
+      name: "/apollo/canbus/chassis_detail"
     }
   }
 }
@@ -45,7 +61,7 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "GPS"
+  key: "GNSS"
   value: {
     process {
       command_keywords: "mainboard"
@@ -55,8 +71,21 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Localization"
+  key: "RTK"
   value: {
-    # Special LocalizationMonitor.
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/pose"
+    }
+  }
+}
+other_components {
+  key: "Preprocess"
+  value: {
+    command_keywords: "bash"
+    command_keywords: "preprocess.sh"
   }
 }

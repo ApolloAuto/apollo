@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/abstract_camera.h"
+#include <cmath>
 
 const QVector3D AbstractCamera::UP{0.0f, 1.0f, 0.0f};
 

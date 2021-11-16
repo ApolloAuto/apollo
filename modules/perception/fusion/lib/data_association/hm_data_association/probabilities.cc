@@ -15,6 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_association/hm_data_association/probabilities.h"
 
+#include <cmath>
+#include <numeric>
+
 namespace apollo {
 namespace perception {
 namespace fusion {

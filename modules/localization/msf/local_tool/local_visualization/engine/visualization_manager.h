@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -40,19 +41,19 @@ struct LidarVisFrame {
   /**@brief The time stamp. */
   double timestamp;
   /**@brief The 3D point cloud in this frame. */
-  std::vector<Eigen::Vector3d> pt3ds;
+  ::apollo::common::EigenVector3dVec pt3ds;
 };
 
 struct LocalizationMsg {
-  double timestamp;
-  double x;
-  double y;
-  double z;
+  double timestamp = 0.0;
+  double x = 0;
+  double y = 0;
+  double z = 0;
 
-  double qx;
-  double qy;
-  double qz;
-  double qw;
+  double qx = 0.0;
+  double qy = 0.0;
+  double qz = 0.0;
+  double qw = 0.0;
 
   double std_x = 0;
   double std_y = 0;
@@ -134,6 +135,7 @@ class IntepolationMessageBuffer : public MessageBuffer<MessageType> {
 };
 
 struct VisualizationManagerParams {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   std::string map_folder;
   std::string map_visual_folder;
   Eigen::Affine3d velodyne_extrinsic;

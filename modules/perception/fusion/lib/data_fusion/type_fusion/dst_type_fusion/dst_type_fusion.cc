@@ -15,7 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
+#include <limits>
+#include <numeric>
+
 #include <boost/format.hpp>
+#include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
@@ -32,13 +37,7 @@ using cyber::common::GetAbsolutePath;
 
 template <typename Type>
 std::string vector2string(const std::vector<Type> &values) {
-  std::ostringstream oss;
-  oss << "(";
-  for (size_t i = 0; i < values.size(); i++) {
-    oss << values[i] << " ";
-  }
-  oss << ")";
-  return oss.str();
+  return absl::StrCat("(", absl::StrJoin(values, " "), ")");
 }
 
 std::string DstTypeFusion::name_ = "DstTypeFusion";  // NOLINT
@@ -225,7 +224,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   Dst res_dst(name_);
   double type_probs_sum =
       std::accumulate(type_probs.begin(), type_probs.end(), 0.0);
-  if (type_probs_sum < DBL_MIN) {
+  if (type_probs_sum < std::numeric_limits<double>::min()) {
     // AWARN << "the sum of types probability equal 0.0";
     return res_dst;
   }

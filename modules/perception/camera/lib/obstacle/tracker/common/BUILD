@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,9 +11,9 @@ cuda_library(
     deps = [
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
+        "//modules/perception/camera/common:util",
         "//modules/perception/inference/utils:inference_gemm_lib",
-	"//modules/prediction/proto:feature_proto",
-	"@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -46,6 +47,7 @@ cc_library(
     deps = [
         "//cyber",
         "@eigen",
+        "//modules/common/util:eigen_defs"
     ],
 )
 

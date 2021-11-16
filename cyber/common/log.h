@@ -24,15 +24,16 @@
 #include <cstdarg>
 #include <string>
 
-#include "cyber/binary.h"
 #include "glog/logging.h"
 #include "glog/raw_logging.h"
+
+#include "cyber/binary.h"
 
 #define LEFT_BRACKET "["
 #define RIGHT_BRACKET "]"
 
 #ifndef MODULE_NAME
-#define MODULE_NAME apollo::cyber::Binary::GetName().c_str()
+#define MODULE_NAME apollo::cyber::binary::GetName().c_str()
 #endif
 
 #define ADEBUG_MODULE(module) \

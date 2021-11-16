@@ -256,7 +256,7 @@ void FemPosDeviationOsqpInterface::CalculateAffineConstraint(
 
 void FemPosDeviationOsqpInterface::SetPrimalWarmStart(
     std::vector<c_float>* primal_warm_start) {
-  CHECK_EQ(ref_points_.size(), num_of_points_);
+  CHECK_EQ(ref_points_.size(), static_cast<size_t>(num_of_points_));
   for (const auto& ref_point_xy : ref_points_) {
     primal_warm_start->push_back(ref_point_xy.first);
     primal_warm_start->push_back(ref_point_xy.second);
@@ -284,6 +284,7 @@ bool FemPosDeviationOsqpInterface::OptimizeWithOsqp(
   data->u = upper_bounds->data();
 
   *work = osqp_setup(data, settings);
+  // osqp_setup(work, data, settings);
 
   osqp_warm_start_x(*work, primal_warm_start->data());
 

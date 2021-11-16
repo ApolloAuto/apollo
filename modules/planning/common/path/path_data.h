@@ -64,8 +64,6 @@ class PathData {
 
   common::PathPoint GetPathPointWithPathS(const double s) const;
 
-  std::list<std::pair<DiscretizedPath, FrenetFramePath>> &path_data_history();
-
   /*
    * brief: this function will find the path_point in discretized_path whose
    * projection to reference line has s value closest to ref_s.
@@ -101,6 +99,15 @@ class PathData {
     is_valid_path_reference_ = is_valid_path_reference;
   }
 
+  const bool is_optimized_towards_trajectory_reference() const {
+    return is_optimized_towards_trajectory_reference_;
+  }
+  void set_is_optimized_towards_trajectory_reference(
+      bool is_optimized_towards_trajectory_reference) {
+    is_optimized_towards_trajectory_reference_ =
+        is_optimized_towards_trajectory_reference;
+  }
+
   const std::vector<common::PathPoint> &path_reference() const;
   void set_path_reference(const std::vector<common::PathPoint> &path_reference);
 
@@ -123,7 +130,6 @@ class PathData {
    */
   std::vector<std::tuple<double, PathPointType, double>>
       path_point_decision_guide_;
-  std::list<std::pair<DiscretizedPath, FrenetFramePath>> path_data_history_;
 
   std::string path_label_ = "";
   std::string blocking_obstacle_id_;
@@ -132,8 +138,18 @@ class PathData {
    * @brief parameters for using the learning model output as a path reference
    *
    */
-  // use path reference for optimization target
+  // wheter this PathData is a path reference serving as an optimization target
+  // for later modules
   bool is_valid_path_reference_ = false;
+
+  /**
+   * @brief Given a trajectory reference, whether this PathData is optimized
+   * according to the "path" part of the trajectory so that "speed" part of the
+   * trajectory could be used in later modules accordingly
+   *
+   */
+  bool is_optimized_towards_trajectory_reference_ = false;
+
   // path reference
   std::vector<common::PathPoint> path_reference_;
 };

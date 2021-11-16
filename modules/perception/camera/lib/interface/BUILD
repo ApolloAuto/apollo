@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,6 +20,30 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+    ],
+)
+
+cc_library(
+    name = "base_cipv",
+    hdrs = ["base_cipv.h"],
+    deps = [
+        "//cyber",
+        ":base_init_options",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "base_tl_preprocessor",
+    hdrs = ["base_tl_preprocessor.h"],
+    deps = [
+        "//cyber",
+        ":base_init_options",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
+        "//modules/perception/base:traffic_light",
     ],
 )
 
@@ -187,6 +212,8 @@ cc_library(
         ":base_scene_parser",
         ":base_traffic_light_detector",
         ":base_traffic_light_tracker",
+        ":base_cipv",
+        ":base_tl_preprocessor",
     ],
 )
 

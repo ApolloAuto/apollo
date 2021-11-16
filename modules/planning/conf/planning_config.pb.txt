@@ -10,7 +10,10 @@ topic_config {
   routing_response_topic: "/apollo/routing_response"
   story_telling_topic: "/apollo/storytelling"
   traffic_light_detection_topic: "/apollo/perception/traffic_light"
+  planning_learning_data_topic: "/apollo/planning/learning_data"
 }
+# NO_LEARNING / E2E / HYBRID / RL_TEST / E2E_TEST / HYBRID_TEST
+learning_mode: NO_LEARNING
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
@@ -297,10 +300,10 @@ default_task_config: {
           delta_t: 0.2
         }
         delta_t: 0.5
-        is_near_destination_threshold: 0.1
+        is_near_destination_threshold: 1
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
-        is_near_destination_theta_threshold: 0.05
+        is_near_destination_theta_threshold: 0.1
       }
     }
   }

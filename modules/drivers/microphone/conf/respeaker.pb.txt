@@ -1,0 +1,14 @@
+microphone_model: RESPEAKER
+chunk: 8192
+sample_rate: 48000
+record_seconds: 0.17
+sample_width: 2
+channel_name: "/apollo/sensor/microphone"
+frame_id: "respeaker"
+mic_distance: 0.065
+channel_type: ASR
+channel_type: RAW
+channel_type: RAW
+channel_type: RAW
+channel_type: RAW
+channel_type: PLAYBACK

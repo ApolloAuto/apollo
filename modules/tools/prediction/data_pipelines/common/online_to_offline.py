@@ -25,8 +25,8 @@ from google.protobuf.internal import encoder
 import numpy as np
 
 from modules.prediction.proto import offline_features_pb2
-from .bounding_rectangle import BoundingRectangle
-from .configure import parameters
+from modules.tools.prediction.data_pipelines.common.bounding_rectangle import BoundingRectangle
+from modules.tools.prediction.data_pipelines.common.configure import parameters
 
 
 param_fea = parameters['feature']

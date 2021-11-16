@@ -17,12 +17,14 @@
 #include "cyber/node/node_channel_impl.h"
 
 #include <iostream>
+
 #include "gtest/gtest.h"
+
+#include "cyber/proto/unit_test.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/node/node.h"
-#include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -93,7 +95,7 @@ TEST(Node_Channel_ImplTest, test3) {
   std::string nameSpace("");
 
   auto callback = [](const std::shared_ptr<proto::Chatter>& msg) {
-    std::cout << "msg size = " << msg->ByteSize() << std::endl;
+    std::cout << "msg size = " << msg->ByteSizeLong() << std::endl;
   };
 
   {

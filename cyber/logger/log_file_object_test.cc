@@ -18,8 +18,9 @@
 
 #include <string>
 
-#include "glog/logging.h"
 #include "gtest/gtest.h"
+
+#include "glog/logging.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"

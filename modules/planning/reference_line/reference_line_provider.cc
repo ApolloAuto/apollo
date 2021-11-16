@@ -27,9 +27,9 @@
 
 #include "cyber/common/file.h"
 #include "cyber/task/task.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -49,7 +49,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleState;
 using apollo::common::math::AngleDiff;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneWaypoint;
 using apollo::hdmap::MapPathPoint;
@@ -114,6 +114,7 @@ void ReferenceLineProvider::UpdateVehicleState(
 }
 
 bool ReferenceLineProvider::Start() {
+  is_stop_ = false;
   if (FLAGS_use_navigation_mode) {
     return true;
   }
@@ -126,6 +127,13 @@ bool ReferenceLineProvider::Start() {
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
+}
+
+void ReferenceLineProvider::Wait() {
+  is_stop_ = true;
+  if (FLAGS_enable_reference_line_provider_thread) {
+    task_future_.wait();
+  }
 }
 
 void ReferenceLineProvider::Stop() {
@@ -189,6 +197,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
+    is_reference_line_updated_ = true;
     static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();

@@ -73,22 +73,23 @@ struct PointXYZITd {
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     apollo::localization::msf::velodyne::PointXYZIT,
-    (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity,
+    (float, x, x)(float, y, y)(float, z, z)(std::uint8_t, intensity,
                                             intensity)(double, timestamp,
                                                        timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     apollo::localization::msf::velodyne::PointXYZIRT,
-    (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(
-        uint8_t, ring, ring)(double, timestamp, timestamp))
+    (float, x, x)(float, y, y)(float, z, z)(std::uint8_t, intensity, intensity)(
+        std::uint8_t, ring, ring)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     apollo::localization::msf::velodyne::PointXYZITd,
-    (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity,
+    (double, x, x)(double, y, y)(double, z, z)(std::uint8_t, intensity,
                                                intensity)(double, timestamp,
                                                           timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     apollo::localization::msf::velodyne::PointXYZIRTd,
-    (double, x, x)(double, y, y)(double, z, z)(uint8_t, intensity, intensity)(
-        uint8_t, ring, ring)(double, timestamp, timestamp))
+    (double, x, x)(double, y, y)(double, z, z)(
+        std::uint8_t, intensity, intensity)(std::uint8_t, ring,
+                                            ring)(double, timestamp, timestamp))

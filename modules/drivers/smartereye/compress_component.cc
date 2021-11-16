@@ -57,7 +57,7 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
 
   std::vector<int> params;
   params.resize(3, 0);
-  params[0] = CV_IMWRITE_JPEG_QUALITY;
+  params[0] = cv::IMWRITE_JPEG_QUALITY;
   params[1] = 95;
 
   try {

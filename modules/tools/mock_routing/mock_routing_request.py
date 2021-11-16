@@ -25,8 +25,8 @@ import os
 import sys
 import time
 
-from cyber_py3 import cyber
-from cyber_py3 import cyber_time
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber_time
 from modules.routing.proto import routing_pb2
 
 

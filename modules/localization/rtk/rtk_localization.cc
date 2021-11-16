@@ -18,14 +18,15 @@
 
 #include <limits>
 
+#include "cyber/time/clock.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
+#include "modules/common/util/string_util.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
 namespace apollo {
 namespace localization {
 
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using ::Eigen::Vector3d;
 
 RTKLocalization::RTKLocalization()
@@ -43,10 +44,9 @@ void RTKLocalization::InitConfig(const rtk_config::Config &config) {
 
 void RTKLocalization::GpsCallback(
     const std::shared_ptr<localization::Gps> &gps_msg) {
-  double time_delay =
-      last_received_timestamp_sec_
-          ? common::time::Clock::NowInSeconds() - last_received_timestamp_sec_
-          : last_received_timestamp_sec_;
+  double time_delay = last_received_timestamp_sec_
+                          ? Clock::NowInSeconds() - last_received_timestamp_sec_
+                          : last_received_timestamp_sec_;
   if (time_delay > gps_time_delay_tolerance_) {
     std::stringstream ss;
     ss << "GPS message time interval: " << time_delay;
@@ -82,13 +82,13 @@ void RTKLocalization::GpsCallback(
                          &last_localization_status_result_);
   service_started_ = true;
   if (service_started_time == 0.0) {
-    service_started_time = common::time::Clock::NowInSeconds();
+    service_started_time = Clock::NowInSeconds();
   }
 
   // watch dog
   RunWatchDog(gps_msg->header().timestamp_sec());
 
-  last_received_timestamp_sec_ = common::time::Clock::NowInSeconds();
+  last_received_timestamp_sec_ = Clock::NowInSeconds();
 }
 
 void RTKLocalization::GpsStatusCallback(
@@ -130,9 +130,8 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   }
 
   // check GPS time stamp against system time
-  double gps_delay_sec = common::time::Clock::NowInSeconds() - gps_timestamp;
-  double gps_service_delay =
-      common::time::Clock::NowInSeconds() - service_started_time;
+  double gps_delay_sec = Clock::NowInSeconds() - gps_timestamp;
+  double gps_service_delay = Clock::NowInSeconds() - service_started_time;
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
 
@@ -151,7 +150,7 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   auto imu_msg = imu_list_.back();
   lock.unlock();
   double imu_delay_sec =
-      common::time::Clock::NowInSeconds() - imu_msg.header().timestamp_sec();
+      Clock::NowInSeconds() - imu_msg.header().timestamp_sec();
   int64_t imu_delay_cycle_cnt =
       static_cast<int64_t>(imu_delay_sec * localization_publish_freq_);
   if (imu_delay_cycle_cnt > report_threshold_err_num_ &&
@@ -164,11 +163,11 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   }
 
   // to prevent it from beeping continuously
-  if (msg_delay && (last_reported_timestamp_sec_ < 1. ||
-                    common::time::Clock::NowInSeconds() >
-                        last_reported_timestamp_sec_ + 1.)) {
+  if (msg_delay &&
+      (last_reported_timestamp_sec_ < 1. ||
+       Clock::NowInSeconds() > last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/imu frame Delay!";
-    last_reported_timestamp_sec_ = common::time::Clock::NowInSeconds();
+    last_reported_timestamp_sec_ = Clock::NowInSeconds();
   }
 }
 
@@ -189,7 +188,7 @@ void RTKLocalization::PrepareLocalizationMsg(
 void RTKLocalization::FillLocalizationMsgHeader(
     LocalizationEstimate *localization) {
   auto *header = localization->mutable_header();
-  double timestamp = apollo::common::time::Clock::NowInSeconds();
+  double timestamp = apollo::cyber::Clock::NowInSeconds();
   header->set_module_name(module_name_);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(static_cast<unsigned int>(++localization_seq_num_));
@@ -199,7 +198,7 @@ void RTKLocalization::FillLocalizationStatusMsg(
     const drivers::gnss::InsStat &status,
     LocalizationStatus *localization_status) {
   apollo::common::Header *header = localization_status->mutable_header();
-  double timestamp = apollo::common::time::Clock::NowInSeconds();
+  double timestamp = apollo::cyber::Clock::NowInSeconds();
   header->set_timestamp_sec(timestamp);
   localization_status->set_measurement_time(status.header().timestamp_sec());
 
@@ -404,14 +403,13 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
     AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";
     return false;
   }
-  if (timestamp_sec - imu1.header().timestamp_sec() <
-      std::numeric_limits<double>::min()) {
-    AERROR << "[InterpolateIMU1]: the given time stamp[" << timestamp_sec
+  if (timestamp_sec < imu1.header().timestamp_sec()) {
+    AERROR << "[InterpolateIMU1]: the given time stamp["
+           << FORMAT_TIMESTAMP(timestamp_sec)
            << "] is older than the 1st message["
-           << imu1.header().timestamp_sec() << "]";
+           << FORMAT_TIMESTAMP(imu1.header().timestamp_sec()) << "]";
     *imu_msg = imu1;
-  } else if (timestamp_sec - imu2.header().timestamp_sec() >
-             std::numeric_limits<double>::min()) {
+  } else if (timestamp_sec > imu2.header().timestamp_sec()) {
     AERROR << "[InterpolateIMU2]: the given time stamp[" << timestamp_sec
            << "] is newer than the 2nd message["
            << imu2.header().timestamp_sec() << "]";

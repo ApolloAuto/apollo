@@ -288,7 +288,7 @@ bool BirdviewImgFeatureRenderer::RenderEgoCurrentBox(
     color = gray_scale;
   }
   const auto& param = ego_vehicle_config_.vehicle_param();
-  const std::vector<cv::Point2i> box_corner_points =
+  std::vector<cv::Point2i> box_corner_points =
       GetAffinedBoxImgIdx(0.0, 0.0, M_PI_2,
                           {
                               std::make_pair(param.front_edge_to_center(),
@@ -368,7 +368,7 @@ bool BirdviewImgFeatureRenderer::RenderObsPastBox(
       gradual_change_color =
           color * (1 - relative_time / config_.max_obs_past_horizon());
       const auto& path_point = traj_point.trajectory_point().path_point();
-      const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
+      std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
@@ -415,7 +415,7 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
               past_traj_points_size - 1);
       const auto& path_point =
           last_past_traj_point.trajectory_point().path_point();
-      const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
+      std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),
@@ -461,7 +461,7 @@ bool BirdviewImgFeatureRenderer::RenderObsFutureBox(
       gradual_change_color =
           color * relative_time / config_.max_obs_past_horizon();
       const auto& path_point = traj_point.trajectory_point().path_point();
-      const std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
+      std::vector<cv::Point2i> box_corner_points = GetAffinedBoxImgIdx(
           path_point.x(), path_point.y(), M_PI_2 + path_point.theta(),
           {
               std::make_pair(obstacle_box_length / 2, obstacle_box_width / 2),

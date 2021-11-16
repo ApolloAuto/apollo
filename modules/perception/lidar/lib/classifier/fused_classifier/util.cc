@@ -21,6 +21,7 @@ namespace perception {
 namespace lidar {
 namespace util {
 
+using apollo::common::EigenMap;
 using apollo::perception::base::ObjectType;
 
 void FromStdToVector(const std::vector<float>& src_prob, Vectord* dst_prob) {
@@ -103,7 +104,7 @@ bool LoadSingleMatrixFile(const std::string& filename, Matrixd* matrix) {
 }
 
 bool LoadMultipleMatricesFile(const std::string& filename,
-                              std::map<std::string, Matrixd>* matrices) {
+                              EigenMap<std::string, Matrixd>* matrices) {
   if (matrices == nullptr) {
     return false;
   }
@@ -115,6 +116,10 @@ bool LoadMultipleMatricesFile(const std::string& filename,
   matrices->clear();
   size_t num = 0;
   fin >> num;
+  if (num > 100) {
+    fin.close();
+    return false;
+  }
   for (size_t i = 0; i < num; ++i) {
     std::string name;
     fin >> name;

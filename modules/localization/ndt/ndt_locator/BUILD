@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -16,20 +17,20 @@ cc_library(
         "//cyber",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/time",
+        "//modules/common/util:perf_util",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/local_pyramid_map/ndt_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
         "@eigen",
-        "@pcl",
+        "@local_config_pcl//:pcl",
     ],
 )
 
 filegroup(
-    name = "ndt_lidar_locator_test_data",
+    name = "test_data",
     srcs = glob([
         "ndt/test_data/**",
     ]),
@@ -37,31 +38,28 @@ filegroup(
 
 cc_test(
     name = "ndt_lidar_locator_test",
-    size = "small",
+    size = "large",
     timeout = "short",
     srcs = ["lidar_locator_ndt_test.cc"],
-    data = [":ndt_lidar_locator_test_data"],
+    data = [":test_data"],
     deps = [
+        ":ndt_lidar_locator",
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
+        "//modules/localization/msf/common/io:common_io",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "ndt_solver_test",
-    size = "small",
+    size = "large",
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
-    data = [":ndt_lidar_locator_test_data"],
-    linkopts = [
-        "-llz4",
-    ],
+    data = [":test_data"],
     deps = [
+        ":ndt_lidar_locator",
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
+        "//modules/localization/msf/common/io:common_io",
         "@com_google_googletest//:gtest_main",
     ],
 )

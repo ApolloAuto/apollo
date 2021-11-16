@@ -24,8 +24,8 @@
 #include <utility>
 
 #include "cyber/common/log.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
@@ -41,7 +41,7 @@ namespace scenario {
 namespace stop_sign {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::OverlapInfoConstPtr;

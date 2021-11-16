@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+APOLLO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CACHE_DIR="${APOLLO_ROOT}/.cache"
 
 function update() {
@@ -33,7 +33,7 @@ function update() {
     exit 1
   fi
   cp ${APOLLO_ROOT}/scripts/ota.sh "${CACHE_DIR}"
-  ssh $DOCKER_USER@localhost  bash ${CACHE_DIR}/ota.sh download $UPDATE_TAG
+  ssh $DOCKER_USER@localhost bash ${CACHE_DIR}/ota.sh download $UPDATE_TAG
   python ${APOLLO_ROOT}/modules/tools/ota/verify_client.py
   if [ "$?" != "0" ]; then
     exit 1
@@ -43,7 +43,7 @@ function update() {
   tar xzf ${CACHE_DIR}/apollo_release.tar.gz -C ${CACHE_DIR}
   NEW_TAG="${UPDATE_TAG}-local"
 
-  ssh $DOCKER_USER@localhost  bash ${CACHE_DIR}/ota.sh setup $NEW_TAG
+  ssh $DOCKER_USER@localhost bash ${CACHE_DIR}/ota.sh setup $NEW_TAG
   python ${APOLLO_ROOT}/modules/tools/ota/update_client.py ${UPDATE_TAG}
 }
 
@@ -52,8 +52,8 @@ function clean() {
   rm -rf ${CACHE_DIR}/apollo_release.tar.gz
   rm -rf ${CACHE_DIR}/sec_apollo_release.tar.gz
   rm -rf ${CACHE_DIR}/ota.sh
-  docker stop test_container 1>/dev/null
-  docker rm test_container 1>/dev/null
+  docker stop test_container 1> /dev/null
+  docker rm test_container 1> /dev/null
 }
 
 function setup() {
@@ -72,10 +72,10 @@ function download() {
   else
     echo "New release image has been downloaded!"
   fi
-  docker ps -a --format "{{.Names}}" | grep 'test_container' 1>/dev/null
+  docker ps -a --format "{{.Names}}" | grep 'test_container' 1> /dev/null
   if [ $? == 0 ]; then
-      docker stop test_container 1>/dev/null
-      docker rm -f test_container 1>/dev/null
+    docker stop test_container 1> /dev/null
+    docker rm -f test_container 1> /dev/null
   fi
   docker run -d -it --name test_container -v ${CACHE_DIR}:/root/mnt $UPDATE_TAG
   docker exec test_container cp /root/sec_apollo_release.tar.gz /root/mnt

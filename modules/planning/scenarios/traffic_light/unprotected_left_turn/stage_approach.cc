@@ -21,7 +21,7 @@
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
@@ -37,7 +37,7 @@ namespace scenario {
 namespace traffic_light {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
 

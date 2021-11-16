@@ -28,11 +28,11 @@
 #include <utility>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 /**
  * @namespace apollo::relative_map

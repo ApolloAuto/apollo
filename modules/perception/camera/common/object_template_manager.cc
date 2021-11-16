@@ -16,7 +16,7 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 
 #include <algorithm>
-#include <cfloat>
+#include <limits>
 #include <tuple>
 #include <utility>
 
@@ -24,6 +24,10 @@
 #include "cyber/common/log.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+
+namespace {
+constexpr float kFloatEpsilon = std::numeric_limits<float>::epsilon();
+}  // namespace
 
 namespace apollo {
 namespace perception {
@@ -176,7 +180,7 @@ bool ObjectTemplateManager::Init(
 }
 
 void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
-  std::vector<std::tuple<float, float, float> > list_tpl;
+  std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
     Dim dim = tmplt.dim(i);
@@ -192,7 +196,7 @@ void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
 
 void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
     const base::ObjectSubType &type, const ObjectTemplate &tmplt) {
-  std::vector<std::tuple<float, float, float> > list_tpl;
+  std::vector<std::tuple<float, float, float>> list_tpl;
   list_tpl.resize(0);
   for (int i = 0; i < tmplt.dim_size(); ++i) {
     Dim dim = tmplt.dim(i);
@@ -231,9 +235,9 @@ float ObjectTemplateManager::Get3dDimensionSimilarity(const float *hwl1,
   float max_l = std::max(hwl1[2], hwl2[2]);
   float min_l = hwl1[2] + hwl2[2] - max_l;
 
-  float iou_h = min_h / (FLT_EPSILON + max_h);
-  float iou_w = min_w / (FLT_EPSILON + max_w);
-  float iou_l = min_l / (FLT_EPSILON + max_l);
+  float iou_h = min_h / (kFloatEpsilon + max_h);
+  float iou_w = min_w / (kFloatEpsilon + max_w);
+  float iou_l = min_l / (kFloatEpsilon + max_l);
 
   return iou_h * iou_h * iou_w * iou_l;  // h^2 * w * l
 }
@@ -245,7 +249,7 @@ float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
   ACHECK(hwl != nullptr);
 
   float hwl_flip[3] = {hwl[0], hwl[2], hwl[1]};
-  float score_best = -FLT_MAX;
+  float score_best = -std::numeric_limits<float>::max();
   int i_best = -1;
   int i3 = 0;
   bool from_flip = false;
@@ -280,7 +284,7 @@ float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
   float dl_ratio = dl / hwl_tmplt_matched[2];
   float dh_dw_dl_ratio_mean = (dh_ratio + dw_ratio + dl_ratio) / 3;
   float dh_ratio_check = std::min(dh_ratio, dh_dw_dl_ratio_mean);
-  if (score_best < FLT_EPSILON || dh_ratio_check > max_dim_change_ratio_) {
+  if (score_best < kFloatEpsilon || dh_ratio_check > max_dim_change_ratio_) {
     return -1.0f;
   }
   ADEBUG << dh_ratio << ", " << dw_ratio << ", " << dl_ratio;

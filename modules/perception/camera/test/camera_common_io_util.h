@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
 #include <string>
 #include "gtest/gtest.h"
+
+#include <opencv2/opencv.hpp>
 
 #include "cyber/common/log.h"
 

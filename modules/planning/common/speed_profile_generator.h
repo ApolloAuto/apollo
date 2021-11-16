@@ -20,10 +20,10 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"

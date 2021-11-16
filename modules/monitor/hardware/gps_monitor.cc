@@ -19,8 +19,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
-#include "modules/drivers/gnss/proto/gnss_status.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
@@ -31,8 +30,8 @@ DEFINE_string(gps_component_name, "GPS", "GPS component name.");
 namespace apollo {
 namespace monitor {
 
-using apollo::drivers::gnss::GnssStatus;
-using apollo::drivers::gnss::InsStatus;
+using apollo::drivers::gnss::GnssBestPose;
+using apollo::drivers::gnss::SolutionType;
 
 GpsMonitor::GpsMonitor()
     : RecurrentRunner(FLAGS_gps_monitor_name, FLAGS_gps_monitor_interval) {}
@@ -48,47 +47,26 @@ void GpsMonitor::RunOnce(const double current_time) {
   ComponentStatus* component_status = component->mutable_other_status();
   component_status->clear_status();
 
-  // Check Gnss status.
-  static auto gnss_status_reader =
-      manager->CreateReader<GnssStatus>(FLAGS_gnss_status_topic);
-  gnss_status_reader->Observe();
-  const auto gnss_status = gnss_status_reader->GetLatestObserved();
-  if (gnss_status == nullptr) {
+  static auto gnss_best_pose_reader =
+      manager->CreateReader<GnssBestPose>(FLAGS_gnss_best_pose_topic);
+  gnss_best_pose_reader->Observe();
+  const auto gnss_best_pose_status = gnss_best_pose_reader->GetLatestObserved();
+  if (gnss_best_pose_status == nullptr) {
     SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                   "No GNSS status message", component_status);
+                                   "No GnssBestPose message", component_status);
     return;
   }
-  if (!gnss_status->solution_completed()) {
-    SummaryMonitor::EscalateStatus(
-        ComponentStatus::WARN, "GNSS solution uncompleted", component_status);
-    return;
-  }
-
-  // Check Ins status.
-  static auto ins_status_reader =
-      manager->CreateReader<InsStatus>(FLAGS_ins_status_topic);
-  ins_status_reader->Observe();
-  const auto ins_status = ins_status_reader->GetLatestObserved();
-  if (ins_status == nullptr) {
-    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                   "No INS status message", component_status);
-    return;
-  }
-  switch (ins_status->type()) {
-    case InsStatus::CONVERGING:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::WARN, "INS not ready, converging", component_status);
-      break;
-    case InsStatus::GOOD:
+  switch (gnss_best_pose_status->sol_type()) {
+    case SolutionType::NARROW_INT:
       SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
-    case InsStatus::INVALID:
-      SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                     "INS status invalid", component_status);
+    case SolutionType::SINGLE:
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN, "SolutionType is SINGLE", component_status);
       break;
     default:
       SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
-                                     "INS status unknown", component_status);
+                                     "SolutionType is wrong", component_status);
       break;
   }
 }

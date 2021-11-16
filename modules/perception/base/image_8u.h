@@ -59,7 +59,7 @@ class Image8U {
     CHECK_EQ(blob_->num_axes(), 3);
     CHECK_EQ(blob_->shape(2), channels_);
     CHECK_LE(offset_ + blob_->offset({rows - 1, cols - 1, channels_ - 1}),
-             blob_->count());
+             (int)(blob_->count()));
     width_step_ = blob_->offset({1, 0, 0}) * static_cast<int>(sizeof(uint8_t));
   }
 

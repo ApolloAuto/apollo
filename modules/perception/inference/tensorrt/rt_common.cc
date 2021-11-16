@@ -53,17 +53,16 @@ void ParseNetParam(const NetParameter &net_param,
     LayerParameter tensorrt_layer_param = net_param.layer(i);
     if (tensorrt_layer_param.type() == "Input") {
       InputParameter input = tensorrt_layer_param.input_param();
-      nvinfer1::DimsCHW dims{static_cast<int>(input.shape(0).dim(1)),
-                             static_cast<int>(input.shape(0).dim(2)),
-                             static_cast<int>(input.shape(0).dim(3))};
-      auto name = tensorrt_layer_param.top(0);
-      tensor_dims_map->insert(std::make_pair(name, dims));
-      tensor_modify_map->insert(
-          std::make_pair(name, tensorrt_layer_param.top(0)));
-    } else if (net_param.layer(i).type() == "Pooling") {
-      if (tensorrt_layer_param.pooling_param().cmp_out_shape_floor_as_conv()) {
-        tensorrt_layer_param.set_name(tensorrt_layer_param.name() + "as_conv");
+      for (int j = 0; j < tensorrt_layer_param.top().size(); ++j) {
+        nvinfer1::DimsCHW dims{static_cast<int>(input.shape(j).dim(1)),
+                               static_cast<int>(input.shape(j).dim(2)),
+                               static_cast<int>(input.shape(j).dim(3))};
+        auto name = tensorrt_layer_param.top(j);
+        tensor_dims_map->insert(std::make_pair(name, dims));
+        tensor_modify_map->insert(
+            std::make_pair(name, tensorrt_layer_param.top(j)));
       }
+    } else if (net_param.layer(i).type() == "Pooling") {
       if (tensorrt_layer_param.pooling_param().pad() == 0) {
         order->push_back(tensorrt_layer_param);
         continue;

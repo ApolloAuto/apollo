@@ -34,7 +34,7 @@ void Target::Clear() { tracked_objects.clear(); }
 
 TrackObjectPtr Target::operator[](int index) const { return get_object(index); }
 TrackObjectPtr Target::get_object(int index) const {
-  CHECK_GT(tracked_objects.size(), 0);
+  CHECK_GT(static_cast<int>(tracked_objects.size()), 0);
   CHECK_LT(index, static_cast<int>(tracked_objects.size()));
   CHECK_GE(index, -static_cast<int>(tracked_objects.size()));
   return tracked_objects[(index + tracked_objects.size()) %
@@ -297,7 +297,7 @@ void Target::Update3D(CameraFrame *frame) {
     }
 
     // check history states
-    history_world_states_.push_back(*object);
+    history_world_states_.push_back(object);
     ClappingTrackVelocity(object);
   }
 
@@ -397,20 +397,23 @@ bool Target::CheckStatic() {
       std::min(static_cast<int>(history_world_states_.size()),
                target_param_.min_cached_velocity_size());
   // calculate average velocity
-  base::Object tmp_obj_vel_avg;
-  tmp_obj_vel_avg.velocity = Eigen::Vector3f(0, 0, 0);
+  std::shared_ptr<base::Object> tmp_obj_vel_avg = nullptr;
+  tmp_obj_vel_avg.reset(new base::Object);
+  tmp_obj_vel_avg->velocity = Eigen::Vector3f(0, 0, 0);
   tmp_obj_vel_avg =
       std::accumulate(history_world_states_.begin() +
                           history_world_states_.size() - min_vel_size,
                       history_world_states_.end(), tmp_obj_vel_avg,
-                      [](const base::Object &obj1, const base::Object &obj2) {
-                        base::Object ret_obj;
-                        ret_obj.velocity = obj1.velocity + obj2.velocity;
+                      [](const std::shared_ptr<base::Object> obj1,
+                         const std::shared_ptr<base::Object> obj2) {
+                        std::shared_ptr<base::Object> ret_obj = nullptr;
+                        ret_obj.reset(new base::Object);
+                        ret_obj->velocity = obj1->velocity + obj2->velocity;
                         return ret_obj;
                       });
-  tmp_obj_vel_avg.velocity /= static_cast<float>(min_vel_size);
-  double speed_avg = tmp_obj_vel_avg.velocity.head(2).norm();
-  const auto &obj_type = history_world_states_.back().type;
+  tmp_obj_vel_avg->velocity /= static_cast<float>(min_vel_size);
+  double speed_avg = tmp_obj_vel_avg->velocity.head(2).norm();
+  const auto &obj_type = history_world_states_.back()->type;
   // check speed by type
   if (obj_type == base::ObjectType::PEDESTRIAN) {
     small_speed = speed_avg < target_param_.static_speed_threshold_ped();
@@ -440,11 +443,11 @@ bool Target::CheckStatic() {
             static_cast<int>(history_world_states_.size()) &&
         end_idx - target_param_.calc_avg_position_window_size() + 1 >= 0) {
       for (int i = 0; i < target_param_.calc_avg_position_window_size(); ++i) {
-        start_position += history_world_states_[start_idx + i].center;
-        end_position += history_world_states_[end_idx - i].center;
+        start_position += history_world_states_[start_idx + i]->center;
+        end_position += history_world_states_[end_idx - i]->center;
       }
-      double time_diff = history_world_states_[end_idx].latest_tracked_time -
-                         history_world_states_[start_idx].latest_tracked_time;
+      double time_diff = history_world_states_[end_idx]->latest_tracked_time -
+                         history_world_states_[start_idx]->latest_tracked_time;
       // do not consider moved distance when time_diff is small
       if (std::fabs(time_diff) > 1e-3) {
         start_position /= target_param_.calc_avg_position_window_size();
@@ -469,8 +472,8 @@ bool Target::CheckStatic() {
   std::transform(history_world_states_.begin() + history_world_states_.size() -
                      min_vel_size,
                  history_world_states_.end(), theta_vec.begin(),
-                 [](const base::Object &obj) -> double {
-                   return std::atan2(obj.velocity[1], obj.velocity[0]);
+                 [](const std::shared_ptr<base::Object> obj) -> double {
+                   return std::atan2(obj->velocity[1], obj->velocity[0]);
                  });
   double mean = 0.0;
   double var = 0.0;

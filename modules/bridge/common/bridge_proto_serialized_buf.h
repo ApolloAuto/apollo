@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/common/macro.h"
 
@@ -62,9 +63,8 @@ BridgeProtoSerializedBuf<T>::~BridgeProtoSerializedBuf() {
 template <typename T>
 bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
                                             const std::string &msg_name) {
-  bsize msg_len = proto->ByteSize();
-  char *tmp = new char[msg_len];
-  memset(tmp, 0, sizeof(char) * msg_len);
+  bsize msg_len = static_cast<bsize>(proto->ByteSizeLong());
+  char *tmp = new char[msg_len]();
   if (!proto->SerializeToArray(tmp, static_cast<int>(msg_len))) {
     FREE_ARRY(tmp);
     return false;

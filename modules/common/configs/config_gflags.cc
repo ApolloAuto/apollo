@@ -31,6 +31,9 @@ DEFINE_string(routing_map_filename, "routing_map.bin|routing_map.txt",
               "Routing map files in the map_dir, search in order.");
 DEFINE_string(end_way_point_filename, "default_end_way_point.txt",
               "End way point of the map, will be sent in RoutingRequest.");
+DEFINE_string(default_routing_filename, "default_cycle_routing.txt",
+              "Default cycle routing of the map, will be sent in Task to Task "
+              "Manager Module.");
 DEFINE_string(speed_control_filename, "speed_control.pb.txt",
               "The speed control region in a map.");
 

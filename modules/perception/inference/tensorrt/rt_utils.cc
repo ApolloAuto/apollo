@@ -18,6 +18,8 @@
 
 #include <fcntl.h>
 
+#include <limits>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -48,7 +50,7 @@ bool ReadProtoFromBinaryFile(const std::string &filename,
   }
   google::protobuf::io::FileInputStream raw_input(fd);
   google::protobuf::io::CodedInputStream coded_input(&raw_input);
-  coded_input.SetTotalBytesLimit(INT_MAX, 536870912);
+  coded_input.SetTotalBytesLimit(std::numeric_limits<int>::max(), 536870912);
 
   bool success = proto->ParseFromCodedStream(&coded_input);
 

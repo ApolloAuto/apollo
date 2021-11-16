@@ -17,6 +17,7 @@
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_refiner.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
@@ -152,11 +153,12 @@ bool MlfMotionRefiner::CheckStaticHypothesisByVelocityAngleChange(
   // extrodinary small
   Eigen::Vector3d previous_velocity = latest_object->output_velocity;
   Eigen::Vector3d current_velocity = new_object->output_velocity;
-  if (previous_velocity.norm() < DBL_EPSILON) {
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+  if (previous_velocity.norm() < kEpsilon) {
     // return false; // without motion score, this should be true
     return true;
   }
-  if (current_velocity.norm() < DBL_EPSILON) {
+  if (current_velocity.norm() < kEpsilon) {
     return true;
   }
   // believe angle change is obvious if it is greater than threshold

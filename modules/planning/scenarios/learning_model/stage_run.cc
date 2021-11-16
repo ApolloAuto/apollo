@@ -36,8 +36,8 @@ Stage::StageStatus LearningModelSampleStageRun::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  bool plan_ok = ExecuteTaskOnReferenceLineForOnlineLearning(
-      planning_init_point, frame);
+  bool plan_ok =
+      ExecuteTaskOnReferenceLineForOnlineLearning(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "LearningModelSampleStageRun planning error";
     return Stage::RUNNING;

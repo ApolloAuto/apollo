@@ -121,7 +121,7 @@ const std::vector<PathData>& ReferenceLineInfo::GetCandidatePathData() const {
 }
 
 void ReferenceLineInfo::SetCandidatePathData(
-    std::vector<PathData> candidate_path_data) {
+    std::vector<PathData>&& candidate_path_data) {
   candidate_path_data_ = std::move(candidate_path_data);
 }
 
@@ -131,7 +131,7 @@ const std::vector<PathBoundary>& ReferenceLineInfo::GetCandidatePathBoundaries()
 }
 
 void ReferenceLineInfo::SetCandidatePathBoundaries(
-    std::vector<PathBoundary> path_boundaries) {
+    std::vector<PathBoundary>&& path_boundaries) {
   candidate_path_boundaries_ = std::move(path_boundaries);
 }
 

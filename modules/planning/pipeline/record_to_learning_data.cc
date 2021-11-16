@@ -17,7 +17,6 @@
 #include <boost/filesystem.hpp>
 
 #include "absl/strings/str_split.h"
-
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/planning/common/feature_output.h"
@@ -44,8 +43,8 @@ void GenerateLearningData() {
   const std::string planning_config_file =
       "/apollo/modules/planning/conf/planning_config.pb.txt";
   PlanningConfig planning_config;
-  ACHECK(cyber::common::GetProtoFromFile(planning_config_file,
-                                         &planning_config))
+  ACHECK(
+      cyber::common::GetProtoFromFile(planning_config_file, &planning_config))
       << "failed to load planning config file " << planning_config_file;
 
   MessageProcess message_process;

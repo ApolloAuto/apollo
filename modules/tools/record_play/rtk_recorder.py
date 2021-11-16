@@ -26,11 +26,13 @@ import os
 import sys
 import time
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from gflags import FLAGS
 
-from common.logger import Logger
+from modules.tools.common.logger import Logger
+import modules.tools.common.proto_utils as proto_utils
 from modules.canbus.proto import chassis_pb2
+from modules.common.configs.proto import vehicle_config_pb2
 from modules.localization.proto import localization_pb2
 
 
@@ -71,6 +73,11 @@ class RtkRecord(object):
         self.carcurvature = 0.0
 
         self.prev_carspeed = 0.0
+
+        vehicle_config = vehicle_config_pb2.VehicleConfig()
+        proto_utils.get_pb_from_text_file(
+            "/apollo/modules/common/data/vehicle_param.pb.txt", vehicle_config)
+        self.vehicle_param = vehicle_config.vehicle_param
 
     def chassis_callback(self, data):
         """
@@ -124,7 +131,11 @@ class RtkRecord(object):
             caracceleration = 0.0
 
         carsteer = self.chassis.steering_percentage
-        curvature = math.tan(math.radians(carsteer / 100 * 470) / 16) / 2.85
+        carmax_steer_angle = self.vehicle_param.max_steer_angle
+        carsteer_ratio = self.vehicle_param.steer_ratio
+        carwheel_base = self.vehicle_param.wheel_base
+        curvature = math.tan(math.radians(carsteer / 100
+                                          * math.degrees(carmax_steer_angle)) / carsteer_ratio) / carwheel_base
         if abs(carspeed) >= speed_epsilon:
             carcurvature_change_rate = (curvature - self.carcurvature) / (
                 carspeed * 0.01)
@@ -172,15 +183,20 @@ def main(argv):
     """
     node = cyber.Node("rtk_recorder")
     argv = FLAGS(argv)
-    log_dir = os.path.dirname(os.path.abspath(
-        __file__)) + "/../../../data/log/"
+
+    log_dir = "/apollo/data/log"
+    if len(argv) > 1:
+        log_dir = argv[1]
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
+
     Logger.config(
         log_file=log_dir + "rtk_recorder.log",
         use_stdout=True,
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "rtk_recorder.log"))
+
     record_file = log_dir + "/garage.csv"
     recorder = RtkRecord(record_file)
     atexit.register(recorder.shutdown)

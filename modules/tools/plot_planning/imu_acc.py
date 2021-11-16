@@ -17,7 +17,7 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
+from modules.tools.plot_planning.record_reader import RecordItemReader
 
 
 class ImuAcc:

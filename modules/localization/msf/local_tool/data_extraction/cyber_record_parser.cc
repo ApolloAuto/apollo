@@ -29,7 +29,7 @@ using apollo::localization::msf::PCDExporter;
 int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");
   boost_desc.add_options()("help", "produce help message")(
-      "bag_file", boost::program_options::value<std::string>(),
+      "bag_files", boost::program_options::value<std::vector<std::string>>(),
       "provide the bag file")("out_folder",
                               boost::program_options::value<std::string>(),
                               "provide the output folder")(
@@ -60,13 +60,14 @@ int main(int argc, char **argv) {
       boost_args);
   boost::program_options::notify(boost_args);
 
-  if (boost_args.count("help") || !boost_args.count("bag_file") ||
+  if (boost_args.count("help") || !boost_args.count("bag_files") ||
       !boost_args.count("out_folder")) {
     AERROR << boost_desc;
     return 0;
   }
 
-  const std::string bag_file = boost_args["bag_file"].as<std::string>();
+  const std::vector<std::string> bag_files =
+      boost_args["bag_files"].as<std::vector<std::string>>();
   const std::string pcd_folder =
       boost_args["out_folder"].as<std::string>() + "/pcd";
   if (!boost::filesystem::exists(pcd_folder)) {
@@ -108,7 +109,7 @@ int main(int argc, char **argv) {
     loc_exporter->OdometryLocCallback(msg);
   });
 
-  reader.Read(bag_file);
+  reader.Read(bag_files);
 
   return 0;
 }

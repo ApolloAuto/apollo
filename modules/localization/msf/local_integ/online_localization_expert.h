@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "include/sins_struct.h"
+#include "localization_msf/sins_struct.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"

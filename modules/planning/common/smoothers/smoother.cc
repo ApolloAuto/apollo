@@ -56,17 +56,17 @@ apollo::common::Status Smoother::Smooth(
     const FrameHistory* frame_history, const Frame* current_frame,
     ADCTrajectory* const current_trajectory_pb) {
   if (frame_history == nullptr) {
-    std::string msg("frame history is null.");
+    const std::string msg = "frame history is null.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (current_frame == nullptr) {
-    std::string msg("frame is null.");
+    const std::string msg = "frame is null.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   if (current_trajectory_pb == nullptr) {
-    std::string msg("current trajectory pb is null");
+    const std::string msg = "current trajectory pb is null";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -96,7 +96,7 @@ apollo::common::Status Smoother::Smooth(
 
   auto previous_frame = frame_history->Latest();
   if (previous_frame == nullptr) {
-    std::string msg("previous frame is null");
+    const std::string msg = "previous frame is null";
     AWARN << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }

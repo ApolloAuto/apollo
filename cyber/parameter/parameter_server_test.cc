@@ -14,14 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/parameter/parameter_server.h"
+
 #include <memory>
 #include <vector>
+
 #include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
-#include "cyber/parameter/parameter_server.h"
 
 namespace apollo {
 namespace cyber {

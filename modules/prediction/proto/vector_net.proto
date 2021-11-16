@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+message VNVector {
+  repeated double element = 1;
+}
+
+message Polyline {
+  repeated VNVector vector = 1;
+  optional double p_id_x = 2;
+  optional double p_id_y = 3;
+}
+
+message CarPosition {
+  optional double x = 1;
+  optional double y = 2;
+  optional double phi = 3;
+  optional string id = 4;
+}
+
+message VectorNetFeature {
+  optional CarPosition car_position = 1;
+  repeated Polyline polyline = 2;
+}
+
+message WorldCoord {
+  repeated CarPosition pose = 1;
+}

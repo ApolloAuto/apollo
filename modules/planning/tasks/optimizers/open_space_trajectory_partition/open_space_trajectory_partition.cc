@@ -23,6 +23,8 @@
 #include <queue>
 
 #include "absl/strings/str_cat.h"
+
+#include "cyber/time/clock.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
@@ -38,7 +40,7 @@ using apollo::common::math::Box2d;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     const TaskConfig& config,
@@ -148,7 +150,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     const auto& gear = partitioned_trajectories->at(i).second;
     const auto& trajectory = partitioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
 
     flag_change_to_next = CheckReachTrajectoryEnd(
         trajectory, gear, trajectories_size, i, &current_trajectory_index,
@@ -232,7 +234,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
       if (!UseFailSafeSearch(*partitioned_trajectories, trajectories_encodings,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
-        std::string msg("Fail to find nearest trajectory point to follow");
+        const std::string msg =
+            "Fail to find nearest trajectory point to follow";
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
@@ -277,8 +280,8 @@ void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
-  CHECK_GT(stitched_trajectory_result.size(), 0);
-  CHECK_GT(interpolated_pieces_num, 0);
+  CHECK_GT(stitched_trajectory_result.size(), 0U);
+  CHECK_GT(interpolated_pieces_num, 0U);
   size_t trajectory_to_be_partitioned_intervals_num =
       stitched_trajectory_result.size() - 1;
   size_t interpolated_points_num = interpolated_pieces_num - 1;
@@ -580,7 +583,7 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = partitioned_trajectories.at(i).first;
     size_t trajectory_size = trajectory.size();
-    CHECK_GT(trajectory_size, 0);
+    CHECK_GT(trajectory_size, 0U);
     std::priority_queue<std::pair<size_t, double>,
                         std::vector<std::pair<size_t, double>>, comp_>
         failsafe_closest_point;
@@ -652,7 +655,8 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
   if (flag_change_to_next || !current_gear_status->gear_shift_period_finished) {
     current_gear_status->gear_shift_period_finished = false;
     if (current_gear_status->gear_shift_period_started) {
-      current_gear_status->gear_shift_start_time = Clock::NowInSeconds();
+      current_gear_status->gear_shift_start_time =
+          Clock::Instance()->NowInSeconds();
       current_gear_status->gear_shift_position =
           partitioned_trajectories.at(current_trajectory_index).second;
       current_gear_status->gear_shift_period_started = false;
@@ -662,10 +666,16 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
       current_gear_status->gear_shift_period_finished = true;
       current_gear_status->gear_shift_period_started = true;
     } else {
+      // send N gear to protect idle
+      if (!last_frame->open_space_info().open_space_provider_success()) {
+        current_gear_status->gear_shift_position = canbus::Chassis::GEAR_NEUTRAL;
+      }
+      
       GenerateGearShiftTrajectory(current_gear_status->gear_shift_position,
                                   gear_switch_idle_time_trajectory);
       current_gear_status->gear_shift_period_time =
-          Clock::NowInSeconds() - current_gear_status->gear_shift_start_time;
+          Clock::Instance()->NowInSeconds() -
+          current_gear_status->gear_shift_start_time;
       return true;
     }
   }

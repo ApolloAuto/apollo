@@ -23,8 +23,11 @@
 
 #include <string>
 
-#include "google/protobuf/stubs/stringprintf.h"
+#include "absl/strings/str_format.h"
 #include "modules/common/util/future.h"
+
+#define FORMAT_TIMESTAMP(timestamp) \
+  std::fixed << std::setprecision(9) << timestamp
 
 /**
  * @namespace apollo::common::util
@@ -34,8 +37,7 @@ namespace apollo {
 namespace common {
 namespace util {
 
-// TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
-using google::protobuf::StringPrintf;
+using absl::StrFormat;
 
 struct DebugStringFormatter {
   template <class T>

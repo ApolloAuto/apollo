@@ -1,24 +1,27 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "class_loader",
-    srcs = [
-        "class_loader.cc",
-        "utility/class_factory.cc",
-        "utility/class_loader_utility.cc",
-    ],
-    hdrs = [
-        "class_loader.h",
-        "class_loader_register_macro.h",
-        "utility/class_factory.h",
-        "utility/class_loader_utility.h",
-    ],
+    srcs = ["class_loader.cc"],
+    hdrs = ["class_loader.h"],
     deps = [
+        ":class_loader_register_macro",
         "//cyber:init",
+        "//cyber/class_loader/shared_library",
+        "//cyber/class_loader/utility:class_factory",
+        "//cyber/class_loader/utility:class_loader_utility",
         "//cyber/common:log",
-        "//third_party:PocoFoundation",
+    ],
+)
+
+cc_library(
+    name = "class_loader_register_macro",
+    hdrs = ["class_loader_register_macro.h"],
+    deps = [
+        "//cyber/class_loader/utility:class_loader_utility",
     ],
 )
 

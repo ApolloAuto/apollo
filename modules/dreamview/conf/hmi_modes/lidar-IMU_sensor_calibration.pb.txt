@@ -1,0 +1,88 @@
+cyber_modules {
+  key: "GPS"
+  value: {
+    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+  }
+}
+cyber_modules {
+  key: "Lidar"
+  value: {
+    dag_files: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+  }
+}
+cyber_modules {
+  key: "Localization"
+  value: {
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+  }
+}
+modules {
+  key: "Recorder"
+  value: {
+    start_command: "/apollo/scripts/record_bag.py --start --all"
+    stop_command: "/apollo/scripts/record_bag.py --stop --stop_signal SIGINT"
+    process_monitor_config {
+      command_keywords: "cyber_recorder record"
+    }
+  }
+}
+monitored_components {
+  key: "Recorder"
+  value: {
+    process {
+      command_keywords: "cyber_recorder record"
+    }
+    resource {
+      disk_spaces {
+        # For logs.
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        # For records.
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "GPS"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    # We also have a special GPSMonitor to check message status.
+  }
+}
+monitored_components {
+  key: "Lidar"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/lidar/dag/lidar.dag"
+    }
+  }
+}
+monitored_components {
+  key: "RTK"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/pose"
+    }
+  }
+}
+other_components {
+  key: "Preprocess"
+  value: {
+    command_keywords: "bash"
+    command_keywords: "extract_data.sh"
+  }
+}

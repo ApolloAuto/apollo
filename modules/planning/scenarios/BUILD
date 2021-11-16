@@ -1,12 +1,14 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "scenario",
     srcs = ["scenario.cc"],
     hdrs = ["scenario.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         ":stage",
         "//modules/planning/common:planning_common",
@@ -19,7 +21,7 @@ cc_library(
     name = "stage",
     srcs = ["stage.cc"],
     hdrs = ["stage.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:util_lib",
@@ -32,7 +34,7 @@ cc_library(
     name = "scenario_manager",
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -52,6 +54,7 @@ cc_library(
         "//modules/planning/scenarios/traffic_light/unprotected_left_turn:traffic_light_unprotected_left_turn_scenario",
         "//modules/planning/scenarios/traffic_light/unprotected_right_turn:traffic_light_unprotected_right_turn_scenario",
         "//modules/planning/scenarios/yield_sign:yield_sign_scenario",
+        "//modules/planning/scenarios/dead_end/deadend_turnaround",
     ],
 )
 

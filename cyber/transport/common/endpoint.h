@@ -21,6 +21,7 @@
 #include <string>
 
 #include "cyber/proto/role_attributes.pb.h"
+
 #include "cyber/transport/common/identity.h"
 
 namespace apollo {

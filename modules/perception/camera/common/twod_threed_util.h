@@ -16,7 +16,7 @@
 #pragma once
 
 #include <algorithm>
-#include <cfloat>
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -186,10 +186,10 @@ T GetScoreViaRotDimensionCenter(const T *k_mat, int width, int height,
   T z_corners[8] = {0};
   GenCorners(h, w, l, x_corners, y_corners, z_corners);
 
-  T x_min = FLT_MAX;
-  T x_max = -FLT_MAX;
-  T y_min = FLT_MAX;
-  T y_max = -FLT_MAX;
+  T x_min = std::numeric_limits<float>::max();
+  T x_max = -std::numeric_limits<float>::max();
+  T y_min = std::numeric_limits<float>::max();
+  T y_max = -std::numeric_limits<float>::max();
   T x_proj[3];
   T x_box[3];
   T pts_proj[16];

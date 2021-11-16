@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,7 +10,8 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "@boost",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -17,11 +19,10 @@ cc_library(
     name = "inference_cuda_util_lib",
     srcs = [":inference_cuda_util_cuda_lib"],
     hdrs = ["cuda_util.h"],
-    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -31,8 +32,9 @@ cuda_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "//modules/perception/base",
         "@eigen",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -43,15 +45,14 @@ cc_library(
         ":inference_util_cuda_lib",
     ],
     hdrs = ["util.h"],
-    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/base:box",
         "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
-        "@caffe",
-        "@opencv",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -65,7 +66,8 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -73,11 +75,10 @@ cc_library(
     name = "inference_resize_lib",
     srcs = [":inference_resize_cuda_lib"],
     hdrs = ["resize.h"],
-    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -91,7 +92,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -99,11 +100,10 @@ cc_library(
     name = "inference_gemm_lib",
     srcs = [":inference_gemm_cuda_lib"],
     hdrs = ["gemm.h"],
-    linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -124,16 +124,15 @@ cc_library(
     name = "inference_binary_data_lib",
     srcs = ["binary_data.cc"],
     hdrs = ["binary_data.h"],
-    linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//modules/perception/base:blob",
-        "@caffe",
-        "@opencv",
+        "@local_config_tensorrt//:tensorrt",
+        "@opencv//:imgcodecs",
     ],
 )
 
 cc_test(
-    name = "inference_binary_data_test",
+    name = "binary_data_test",
     size = "small",
     srcs = ["binary_data_test.cc"],
     data = [

@@ -20,9 +20,9 @@
 #include <string>
 
 #include "CivetServer.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
-#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/image_handler.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
@@ -31,7 +31,7 @@
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#ifdef TELEOP
+#if WITH_TELEOP == 1
 #include "modules/dreamview/backend/teleop/teleop.h"
 #endif
 
@@ -66,9 +66,8 @@ class Dreamview {
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
-  std::unique_ptr<DataCollectionMonitor> data_collection_monitor_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
-#ifdef TELEOP
+#if WITH_TELEOP == 1
   std::unique_ptr<TeleopService> teleop_;
   std::unique_ptr<WebSocketHandler> teleop_ws_;
 #endif

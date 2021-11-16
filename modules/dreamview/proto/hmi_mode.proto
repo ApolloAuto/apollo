@@ -10,6 +10,11 @@ message ProcessMonitorConfig {
   repeated string command_keywords = 1;
 }
 
+// For ModuleMonitor
+message ModuleMonitorConfig {
+  repeated string node_name = 1;
+}
+
 // For ChannelMonitor.
 message ChannelMonitorConfig {
   optional string name = 1;
@@ -86,6 +91,11 @@ message MonitoredComponent {
 
   // Whether to trigger safe-mode if the component is down.
   optional bool required_for_safety = 4 [default = true];
+
+  // Generate SystemStatus.components[i].module_status.
+  // OK if the module is running.
+  // FATAL if the module is down.
+  optional ModuleMonitorConfig module = 5;
 }
 
 // A module which can be started and stopped by HMI.
@@ -110,4 +120,5 @@ message HMIMode {
   map<string, CyberModule> cyber_modules = 1;
   map<string, Module> modules = 2;
   map<string, MonitoredComponent> monitored_components = 3;
+  map<string, ProcessMonitorConfig> other_components = 4;
 }

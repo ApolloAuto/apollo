@@ -21,9 +21,9 @@
 #include <map>
 
 #include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 #include "google/protobuf/repeated_field.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
@@ -45,7 +45,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 
 NaviPlanning::~NaviPlanning() {
@@ -57,9 +57,7 @@ NaviPlanning::~NaviPlanning() {
   injector_->planning_context()->mutable_planning_status()->Clear();
 }
 
-std::string NaviPlanning::Name() const {
-  return "navi_planning";
-}
+std::string NaviPlanning::Name() const { return "navi_planning"; }
 
 Status NaviPlanning::Init(const PlanningConfig& config) {
   config_ = config;
@@ -103,7 +101,8 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
   std::list<hdmap::RouteSegments> segments;
   if (!reference_line_provider_->GetReferenceLines(&reference_lines,
                                                    &segments)) {
-    std::string msg = "Failed to create reference line";
+    const std::string msg = "Failed to create reference line";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -181,7 +180,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
                         ->mutable_not_ready();
 
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
-    std::string msg("Update VehicleStateProvider failed");
+    const std::string msg = "Update VehicleStateProvider failed";
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
@@ -204,7 +203,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (!frame_) {
-    std::string msg("Failed to init frame");
+    const std::string msg = "Failed to init frame";
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
@@ -275,7 +274,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
 
-  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
+  const auto time_diff_ms =
+      (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
   trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
@@ -486,7 +486,7 @@ Status NaviPlanning::Plan(
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
   if (!best_ref_info) {
-    std::string msg("planner failed to make a driving plan");
+    const std::string msg = "planner failed to make a driving plan";
     AERROR << msg;
     if (last_publishable_trajectory_) {
       last_publishable_trajectory_->Clear();

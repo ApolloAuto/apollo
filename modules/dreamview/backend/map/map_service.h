@@ -20,14 +20,17 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
 #include <string>
 #include <vector>
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
+#include "nlohmann/json.hpp"
+
 #include "modules/dreamview/proto/simulation_world.pb.h"
+
 #include "modules/map/pnc_map/pnc_map.h"
-#include "third_party/json/json.hpp"
 
 /**
  * @namespace apollo::dreamview
@@ -75,7 +78,14 @@ class MapService {
       const double x, const double y, const double heading,
       routing::LaneWaypoint *laneWayPoint) const;
 
+  bool ConstructLaneWayPointWithLaneId(
+      const double x, const double y, const std::string id,
+      routing::LaneWaypoint *laneWayPoint) const;
+
   bool CheckRoutingPoint(const double x, const double y) const;
+
+  bool CheckRoutingPointLaneId(const double x, const double y,
+                               const std::vector<std::string> idsArr) const;
 
   bool CheckRoutingPointLaneType(apollo::hdmap::LaneInfoConstPtr lane) const;
 

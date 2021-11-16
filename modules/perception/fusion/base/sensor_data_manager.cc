@@ -52,7 +52,7 @@ void SensorDataManager::AddSensorMeasurements(
       AERROR << "Failed to find sensor " << sensor_id << " in sensor manager.";
       return;
     }
-    sensor_ptr = std::make_shared<Sensor>(Sensor(sensor_info));
+    sensor_ptr.reset(new Sensor(sensor_info));
     sensors_.emplace(sensor_id, sensor_ptr);
   } else {
     sensor_ptr = it->second;

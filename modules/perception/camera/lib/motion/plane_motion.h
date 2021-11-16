@@ -70,7 +70,7 @@ class PlaneMotion {
     buffer_size_ = s;
     // mot_buffer_.reserve(buffer_size_);
     if (mot_buffer_ == nullptr) {
-      mot_buffer_ = std::make_shared<base::MotionBuffer>(buffer_size_);
+      mot_buffer_.reset(new base::MotionBuffer(buffer_size_));
     } else {
       mot_buffer_->set_capacity(buffer_size_);
     }

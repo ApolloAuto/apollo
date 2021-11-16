@@ -15,10 +15,10 @@
  *****************************************************************************/
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
-#include <omp.h>
-
 #include <limits>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"

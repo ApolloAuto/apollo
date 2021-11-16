@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -42,7 +43,7 @@ cc_library(
     hdrs = ["log.h"],
     deps = [
         "//cyber:binary",
-        "@com_google_glog//:glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 
@@ -59,12 +60,28 @@ cc_test(
 cc_library(
     name = "environment",
     hdrs = ["environment.h"],
+    deps = [
+        "//cyber/common:log",
+    ],
+)
+
+cc_test(
+    name = "environment_test",
+    size = "small",
+    srcs = ["environment_test.cc"],
+    deps = [
+        ":environment",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_library(
     name = "global_data",
     srcs = ["global_data.cc"],
     hdrs = ["global_data.h"],
+    data = [
+        "//cyber:cyber_conf",
+    ],
     deps = [
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",

@@ -24,12 +24,12 @@
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
 
-#include "modules/localization/ndt/ndt_locator/ndt_solver.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_node.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
-#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
-#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
+#include "modules/localization/ndt/ndt_locator/ndt_solver.h"
 
 #define USE_PRELOAD_MAP_NODE
 
@@ -184,6 +184,9 @@ class LidarLocatorNdt {
   double ndt_target_resolution_ = 1.0;
   double ndt_line_search_step_size_ = 0.1;
   double ndt_transformation_epsilon_ = 0.01;
+
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 }  // namespace ndt

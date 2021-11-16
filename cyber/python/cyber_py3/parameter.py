@@ -26,15 +26,11 @@ import sys
 # init vars
 CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
-sys.path.append(CYBER_PATH + "/third_party/")
-sys.path.append(CYBER_PATH + "/lib/")
+wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                '../internal'))
+sys.path.append(wrapper_lib_path)
 
-sys.path.append(CYBER_PATH + "/lib/python/")
-
-sys.path.append(CYBER_DIR + "/python/")
-sys.path.append(CYBER_DIR + "/cyber/")
-
-_CYBER_PARAM = importlib.import_module('_cyber_parameter_py3')
+_CYBER_PARAM = importlib.import_module('_cyber_parameter_wrapper')
 
 
 class Parameter(object):

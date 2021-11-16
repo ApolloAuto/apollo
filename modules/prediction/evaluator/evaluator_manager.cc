@@ -24,7 +24,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
-#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
@@ -36,6 +35,8 @@
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/jointly_prediction_planning_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/vectornet_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -93,7 +94,7 @@ void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
 
 }  // namespace
 
-EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
+EvaluatorManager::EvaluatorManager() {}
 
 void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
@@ -105,9 +106,19 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::LANE_AGGREGATING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::VECTORNET_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
+  if (FLAGS_enable_semantic_map) {
+    semantic_map_.reset(new SemanticMap());
+    semantic_map_->Init();
+    ADEBUG << "Init SemanticMap instance.";
+  }
+
+  RegisterEvaluators();
+
   for (const auto& obstacle_conf : config.obstacle_conf()) {
     if (!obstacle_conf.has_obstacle_type()) {
       AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
@@ -162,8 +173,12 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           }
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
+    } else if (obstacle_conf.has_interactive_tag()) {
+      interaction_evaluator_ = obstacle_conf.evaluator_type();
     }
   }
 
@@ -173,11 +188,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
         << cyclist_on_lane_evaluator_ << "]";
   AINFO << "Defined default on lane obstacle evaluator ["
         << default_on_lane_evaluator_ << "]";
-
-  if (FLAGS_enable_semantic_map) {
-    SemanticMap::Instance()->Init();
-    ADEBUG << "Init SemanticMap instance.";
-  }
 }
 
 Evaluator* EvaluatorManager::GetEvaluator(
@@ -186,7 +196,9 @@ Evaluator* EvaluatorManager::GetEvaluator(
   return it != evaluators_.end() ? it->second.get() : nullptr;
 }
 
-void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::Run(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container) {
   if (FLAGS_enable_semantic_map ||
       FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
     size_t max_num_frame = 10;
@@ -198,7 +210,7 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
     if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
       return;
     }
-    SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
+    semantic_map_->RunCurrFrame(obstacle_id_history_map_);
   }
 
   std::vector<Obstacle*> dynamic_env;
@@ -210,7 +222,8 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
         id_obstacle_map.begin(), id_obstacle_map.end(),
         [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
           for (auto obstacle_ptr : obstacles_iter.second) {
-            EvaluateObstacle(obstacle_ptr, obstacles_container, dynamic_env);
+            EvaluateObstacle(adc_trajectory_container, obstacle_ptr,
+                             obstacles_container, dynamic_env);
           }
         });
   } else {
@@ -225,20 +238,25 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
         continue;
       }
 
-      EvaluateObstacle(obstacle, obstacles_container, dynamic_env);
+      EvaluateObstacle(adc_trajectory_container, obstacle,
+                       obstacles_container, dynamic_env);
     }
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
-                                        ObstaclesContainer* obstacles_container,
-                                        std::vector<Obstacle*> dynamic_env) {
+void EvaluatorManager::EvaluateObstacle(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container,
+    std::vector<Obstacle*> dynamic_env) {
   Evaluator* evaluator = nullptr;
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
       if (obstacle->IsCaution() && !obstacle->IsSlow()) {
-        if (obstacle->IsNearJunction()) {
+        if (obstacle->IsInteractiveObstacle()) {
+          evaluator = GetEvaluator(interaction_evaluator_);
+        } else if (obstacle->IsNearJunction()) {
           evaluator = GetEvaluator(vehicle_in_junction_caution_evaluator_);
         } else if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(vehicle_on_lane_caution_evaluator_);
@@ -247,13 +265,25 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
         }
         CHECK_NOTNULL(evaluator);
         // Evaluate and break if success
-        if (evaluator->Evaluate(obstacle, obstacles_container)) {
-          break;
+        if (evaluator->GetName() == "JOINTLY_PREDICTION_PLANNING_EVALUATOR") {
+          if (evaluator->Evaluate(adc_trajectory_container,
+                                  obstacle, obstacles_container)) {
+            break;
+          } else {
+            AERROR << "Obstacle: " << obstacle->id()
+                  << " interaction evaluator failed,"
+                  << " downgrade to normal level!";
+          }
         } else {
-          AERROR << "Obstacle: " << obstacle->id()
-                 << " caution evaluator failed, downgrade to normal level!";
+          if (evaluator->Evaluate(obstacle, obstacles_container)) {
+            break;
+          } else {
+            AERROR << "Obstacle: " << obstacle->id()
+                  << " caution evaluator failed, downgrade to normal level!";
+          }
         }
       }
+
       // if obstacle is not caution or caution_evaluator run failed
       if (obstacle->HasJunctionFeatureWithExits() &&
           !obstacle->IsCloseToJunctionExit()) {
@@ -306,7 +336,9 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
 void EvaluatorManager::EvaluateObstacle(
     Obstacle* obstacle, ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
-  EvaluateObstacle(obstacle, obstacles_container, dummy_dynamic_env);
+  ADCTrajectoryContainer* adc_trajectory_container = nullptr;
+  EvaluateObstacle(adc_trajectory_container, obstacle,
+                   obstacles_container, dummy_dynamic_env);
 }
 
 void EvaluatorManager::BuildObstacleIdHistoryMap(
@@ -320,8 +352,7 @@ void EvaluatorManager::BuildObstacleIdHistoryMap(
     if (obstacle == nullptr || obstacle->history_size() == 0) {
       continue;
     }
-    size_t num_frames =
-        std::min(max_num_frame, obstacle->history_size());
+    size_t num_frames = std::min(max_num_frame, obstacle->history_size());
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
       Feature feature;
@@ -330,6 +361,9 @@ void EvaluatorManager::BuildObstacleIdHistoryMap(
       feature.set_type(obstacle_feature.type());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
+      feature.mutable_interactive_tag()->CopyFrom(
+          obstacle_feature.interactive_tag());
+
       if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
         feature.mutable_polygon_point()->CopyFrom(
             obstacle_feature.polygon_point());
@@ -398,14 +432,24 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       break;
     }
     case ObstacleConf::JUNCTION_MAP_EVALUATOR: {
-      evaluator_ptr.reset(new JunctionMapEvaluator());
+      evaluator_ptr.reset(new JunctionMapEvaluator(semantic_map_.get()));
       break;
     }
     case ObstacleConf::SEMANTIC_LSTM_EVALUATOR: {
-      evaluator_ptr.reset(new SemanticLSTMEvaluator());
+      evaluator_ptr.reset(new SemanticLSTMEvaluator(semantic_map_.get()));
       break;
     }
-    default: { break; }
+    case ObstacleConf::JOINTLY_PREDICTION_PLANNING_EVALUATOR: {
+      evaluator_ptr.reset(new JointlyPredictionPlanningEvaluator());
+      break;
+    }
+    case ObstacleConf::VECTORNET_EVALUATOR: {
+      evaluator_ptr.reset(new VectornetEvaluator());
+      break;
+    }
+    default: {
+      break;
+    }
   }
   return evaluator_ptr;
 }

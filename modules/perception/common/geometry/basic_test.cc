@@ -16,7 +16,7 @@
 #include "modules/perception/common/geometry/basic.h"
 
 #include "gtest/gtest.h"
-
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/common.h"
 
@@ -236,12 +236,14 @@ TEST(GeometryCommonTest, calculate_bbox_size_center_2d_xy) {
   Eigen::Vector3f direction(1.0, 0.0, 0.0);
   CalculateBBoxSizeCenter2DXY<PointCloud<PointF>>(cloud, direction, &size,
                                                   &center);
-  EXPECT_NEAR(size(0), 30.f, std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(size(1), 25.f, std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(size(2), 20.f, std::numeric_limits<float>::epsilon());
-  EXPECT_NEAR(center(0), 5.0, DBL_EPSILON);
-  EXPECT_NEAR(center(1), 2.5, DBL_EPSILON);
-  EXPECT_NEAR(center(2), -5.0, DBL_EPSILON);
+  constexpr float kFloatEpsilon = std::numeric_limits<float>::epsilon();
+  EXPECT_NEAR(size(0), 30.f, kFloatEpsilon);
+  EXPECT_NEAR(size(1), 25.f, kFloatEpsilon);
+  EXPECT_NEAR(size(2), 20.f, kFloatEpsilon);
+  constexpr double kDoubleEpsilon = std::numeric_limits<double>::epsilon();
+  EXPECT_NEAR(center(0), 5.0, kDoubleEpsilon);
+  EXPECT_NEAR(center(1), 2.5, kDoubleEpsilon);
+  EXPECT_NEAR(center(2), -5.0, kDoubleEpsilon);
 }
 
 TEST(GeometryCommonTest, calculate_most_consistent_bbox_direction) {
@@ -345,10 +347,10 @@ TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary) {
   EXPECT_NEAR(distance, 0.f, std::numeric_limits<float>::epsilon());
 }
 
-TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary_list) {
+TEST(GeometryCommonTest, calculate_dist_and_dir_to_boundary_lists) {
   Eigen::Vector3f pt(0.0, 0.0, 0.0);
   PointCloud<PointF> left, right;
-  std::vector<PointCloud<PointF>> left_list, right_list;
+  apollo::common::EigenVector<PointCloud<PointF>> left_list, right_list;
   base::PointF temp;
   temp.x = 10.f;
   temp.y = 0.f;

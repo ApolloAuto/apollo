@@ -14,16 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "absl/strings/match.h"
 #include "gflags/gflags.h"
 
-#include "absl/strings/match.h"
+#include "modules/map/proto/map.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/proto/map.pb.h"
 
 /**
  * A map tool to generate a downsampled map to be displayed by dreamview
@@ -70,7 +71,7 @@ static void DownsampleCurve(Curve* curve) {
     *line_segment->add_point() = downsampled_points[index];
   }
   size_t new_size = line_segment->point_size();
-  CHECK_GT(new_size, 1);
+  CHECK_GT(new_size, 1U);
 
   AINFO << "Lane curve downsampled from " << points.size() << " points to "
         << new_size << " points.";

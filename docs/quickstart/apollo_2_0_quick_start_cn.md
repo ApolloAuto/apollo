@@ -1,6 +1,6 @@
 # Apollo 2.0 快速入门指南
 
-这个快速入门指南专注于Apollo 2.0新功能的介绍。对于Apollo的一般概念，请参考 [Apollo 1.0 快速入门指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start_cn.md)和[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide_cn.md)。
+这个快速入门指南专注于Apollo 2.0新功能的介绍。对于Apollo的一般概念，请参考 [Apollo 1.0 快速入门指南](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start_cn.md)和[Apollo软件安装指南](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/apollo_software_installation_guide_cn.md)。
 
 # 上车测试
 
@@ -25,7 +25,7 @@
     ![](images/dreamview_setup.png)
 
     跳转到*Module Controller*页面，检查所有的软硬件都已正常工作。
- 
+
      ![](images/dreamview_module_controller.png)
 
 6. 谨慎启动自动驾驶模式

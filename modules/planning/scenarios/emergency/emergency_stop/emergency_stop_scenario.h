@@ -38,9 +38,9 @@ struct EmergencyStopContext {
 
 class EmergencyStopScenario : public Scenario {
  public:
-  EmergencyStopScenario(
-      const ScenarioConfig& config, const ScenarioContext* context,
-      const std::shared_ptr<DependencyInjector>& injector)
+  EmergencyStopScenario(const ScenarioConfig& config,
+                        const ScenarioContext* context,
+                        const std::shared_ptr<DependencyInjector>& injector)
       : Scenario(config, context, injector) {}
 
   void Init() override;

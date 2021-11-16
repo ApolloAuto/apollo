@@ -32,8 +32,8 @@ import time
 import gflags
 import glog
 
-from cyber_py3 import cyber
-from cyber_py3 import record
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import record
 from modules.drivers.gnss.proto.gnss_pb2 import RawData
 
 

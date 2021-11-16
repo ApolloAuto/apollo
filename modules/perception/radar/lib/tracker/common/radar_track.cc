@@ -40,13 +40,7 @@ RadarTrack::RadarTrack(const base::ObjectPtr& obs, const double timestamp) {
   is_dead_ = false;
 
   // Or use register class instead.
-  if (s_chosen_filter_ == "AdaptiveKalmanFilter") {
-    filter_ = std::shared_ptr<BaseFilter>(new AdaptiveKalmanFilter());
-  } else {
-    // default
-    filter_ = std::shared_ptr<BaseFilter>(new AdaptiveKalmanFilter());
-  }
-
+  filter_.reset(new AdaptiveKalmanFilter);
   filter_->Init(*obs);
 }
 
@@ -65,7 +59,7 @@ void RadarTrack::UpdataObsRadar(const base::ObjectPtr& obs_radar,
     Eigen::Matrix4d covariance_matrix = filter_->GetCovarianceMatrix();
     obs_->center_uncertainty(0) = static_cast<float>(covariance_matrix(0, 0));
     obs_->center_uncertainty(1) = static_cast<float>(covariance_matrix(1, 1));
-    obs_->velocity_uncertainty(1) = static_cast<float>(covariance_matrix(2, 2));
+    obs_->velocity_uncertainty(0) = static_cast<float>(covariance_matrix(2, 2));
     obs_->velocity_uncertainty(1) = static_cast<float>(covariance_matrix(3, 3));
   }
   tracking_time_ += time_diff;

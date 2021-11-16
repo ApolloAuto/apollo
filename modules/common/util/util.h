@@ -31,10 +31,10 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/configs/config_gflags.h"
 
 /**
  * @namespace apollo::common::util

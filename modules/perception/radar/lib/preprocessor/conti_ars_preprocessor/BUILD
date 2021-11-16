@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,11 +18,10 @@ cc_library(
     srcs = ["conti_ars_preprocessor.cc"],
     hdrs = ["conti_ars_preprocessor.h"],
     deps = [
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/registerer",
-        "//modules/perception/lib/utils",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/interface:base_preprocessor",
         "@eigen",

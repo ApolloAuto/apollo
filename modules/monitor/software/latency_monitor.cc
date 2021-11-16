@@ -24,6 +24,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
@@ -133,7 +134,7 @@ void LatencyMonitor::UpdateStat(
     if (end_time > begin_time) {
       freq_map_[module_name] =
           records->latency_records().size() /
-          absl::ToDoubleSeconds(absl::Nanoseconds(end_time - begin_time));
+          apollo::cyber::Time(end_time - begin_time).ToSecond();
     }
   }
 }

@@ -19,17 +19,17 @@
 #include <utility>
 
 #include "cyber/common/file.h"
-#include "modules/common/time/time_util.h"
+#include "modules/common/util/perf_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
+#include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
@@ -99,7 +99,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     return false;
   }
 
-  bool state = DstTypeFusion::Init() && DstExistanceFusion::Init() &&
+  bool state = DstTypeFusion::Init() && DstExistenceFusion::Init() &&
                PbfTracker::InitParams();
 
   return state;
@@ -128,16 +128,11 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
     }
 
     bool is_publish_sensor = this->IsPublishSensor(sensor_frame);
-    if (is_publish_sensor) {
-      started_ = true;
-    }
 
-    if (started_) {
-      AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
-            << ", obj_cnt : " << sensor_frame->objects.size() << ", "
-            << GLOG_TIMESTAMP(sensor_frame->timestamp);
-      sensor_data_manager->AddSensorMeasurements(sensor_frame);
-    }
+    AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
+          << ", obj_cnt : " << sensor_frame->objects.size() << ", "
+          << FORMAT_TIMESTAMP(sensor_frame->timestamp);
+    sensor_data_manager->AddSensorMeasurements(sensor_frame);
 
     if (!is_publish_sensor) {
       return true;
@@ -166,16 +161,7 @@ std::string ProbabilisticFusion::Name() const { return "ProbabilisticFusion"; }
 bool ProbabilisticFusion::IsPublishSensor(
     const base::FrameConstPtr& sensor_frame) const {
   std::string sensor_id = sensor_frame->sensor_info.name;
-  return sensor_id == main_sensor_;
-  // const std::vector<std::string>& pub_sensors =
-  //   params_.publish_sensor_ids;
-  // const auto& itr = std::find(
-  //   pub_sensors.begin(), pub_sensors.end(), sensor_id);
-  // if (itr != pub_sensors.end()) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
+  return main_sensor_ == sensor_id;
 }
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
@@ -184,43 +170,42 @@ void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
         << frame->GetForegroundObjects().size()
         << ", background_object_number: "
         << frame->GetBackgroundObjects().size()
-        << ", timestamp: " << GLOG_TIMESTAMP(frame->GetTimestamp());
+        << ", timestamp: " << FORMAT_TIMESTAMP(frame->GetTimestamp());
   this->FuseForegroundTrack(frame);
   this->FusebackgroundTrack(frame);
   this->RemoveLostTrack();
 }
 
 void ProbabilisticFusion::FuseForegroundTrack(const SensorFramePtr& frame) {
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   std::string indicator = "fusion_" + frame->GetSensorId();
 
   AssociationOptions options;
   AssociationResult association_result;
   matcher_->Associate(options, frame, scenes_, &association_result);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "association");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "association");
 
   const std::vector<TrackMeasurmentPair>& assignments =
       association_result.assignments;
   this->UpdateAssignedTracks(frame, assignments);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_assigned_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_assigned_track");
 
   const std::vector<size_t>& unassigned_track_inds =
       association_result.unassigned_tracks;
   this->UpdateUnassignedTracks(frame, unassigned_track_inds);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator,
-                                           "update_unassigned_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_unassigned_track");
 
   const std::vector<size_t>& unassigned_obj_inds =
       association_result.unassigned_measurements;
   this->CreateNewTracks(frame, unassigned_obj_inds);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(indicator, "create_track");
+  PERF_BLOCK_END_WITH_INDICATOR(indicator, "create_track");
 }
 
 void ProbabilisticFusion::UpdateAssignedTracks(
     const SensorFramePtr& frame,
     const std::vector<TrackMeasurmentPair>& assignments) {
   // Attention: match_distance should be used
-  // in ExistanceFusion to calculate existence score.
+  // in ExistenceFusion to calculate existence score.
   // We set match_distance to zero if track and object are matched,
   // which only has a small difference compared with actural match_distance
   TrackerOptions options;
@@ -237,7 +222,7 @@ void ProbabilisticFusion::UpdateUnassignedTracks(
     const SensorFramePtr& frame,
     const std::vector<size_t>& unassigned_track_inds) {
   // Attention: match_distance(min_match_distance) should be used
-  // in ExistanceFusion to calculate toic score.
+  // in ExistenceFusion to calculate toic score.
   // Due to it hasn't been used(mainly for front radar object pub in
   // gatekeeper),
   // we do not set match_distance temporarily.
@@ -353,7 +338,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
     }
   }
   AINFO << "Remove " << foreground_tracks.size() - foreground_track_count
-        << " foreground tracks";
+        << " foreground tracks. " << foreground_track_count << " tracks left.";
   foreground_tracks.resize(foreground_track_count);
   trackers_.resize(foreground_track_count);
 
@@ -401,7 +386,7 @@ void ProbabilisticFusion::CollectFusedObjects(
 
   AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
         << ", bg_obj_cnt = " << bg_obj_num
-        << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
+        << ", timestamp = " << FORMAT_TIMESTAMP(timestamp);
 }
 
 void ProbabilisticFusion::CollectObjectsByTrack(
@@ -442,7 +427,7 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   obj->tracking_time = track->GetTrackingPeriod();
   fused_objects->emplace_back(obj);
   ADEBUG << "fusion_reporting..." << obj->track_id << "@"
-         << GLOG_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
+         << FORMAT_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
          << obj->center(0) << "," << obj->center(1) << ","
          << obj->center_uncertainty(0, 0) << ","
          << obj->center_uncertainty(0, 1) << ","

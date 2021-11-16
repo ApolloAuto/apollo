@@ -22,7 +22,7 @@ import sys
 import urllib3
 from configparser import ConfigParser
 from modules.data.proto.static_info_pb2 import VehicleInfo
-import common.proto_utils as proto_utils
+import modules.tools.common.proto_utils as proto_utils
 
 
 def update():

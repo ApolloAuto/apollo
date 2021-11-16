@@ -34,7 +34,7 @@ class PathOptimizer : public Task {
  public:
   explicit PathOptimizer(const TaskConfig &config);
   PathOptimizer(const TaskConfig &config,
-                const std::shared_ptr<DependencyInjector>& injector);
+                const std::shared_ptr<DependencyInjector> &injector);
   virtual ~PathOptimizer() = default;
   apollo::common::Status Execute(
       Frame *frame, ReferenceLineInfo *reference_line_info) override;

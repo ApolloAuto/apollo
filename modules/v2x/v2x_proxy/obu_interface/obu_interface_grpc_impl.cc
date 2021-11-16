@@ -13,64 +13,61 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 /**
  * @file obu_interface_grpc_impl.cc
  * @brief define v2x proxy module and onboard unit interface grpc impl class
  */
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
 
+#include <memory>
 #include <string>
 #include <utility>
+
+#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace v2x {
 
-using apollo::perception::PerceptionObstacles;
+using ::apollo::v2x::CarStatus;
+using ::apollo::v2x::obu::ObuRsi;
+using ::apollo::v2x::obu::ObuTrafficLight;
+using grpc::Server;
 using grpc::ServerBuilder;
+using grpc::ServerContext;
 
-ObuInterFaceGrpcImpl::ObuInterFaceGrpcImpl() {
+ObuInterFaceGrpcImpl::ObuInterFaceGrpcImpl()
+    : grpc_client_(new GrpcClientImpl(grpc::CreateChannel(
+          FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port,
+          grpc::InsecureChannelCredentials()))) {
   AINFO << "ObuInterFaceGrpcImpl Start Construct.";
-  grpc_client_ = std::make_shared<GrpcClientImpl>(
-      grpc::CreateChannel(FLAGS_grpc_client_host + ":" + FLAGS_grpc_client_port,
-                          grpc::InsecureChannelCredentials()));
-  grpc_client_init_flag_ = grpc_client_->InitFlag();
-  bool res_client = InitialClient();
-  ACHECK(res_client) << "ObuInterFaceGrpcImpl grpc client initial failed";
-  grpc_server_ = std::make_shared<GrpcServerImpl>();
-  grpc_server_init_flag_ = grpc_server_->InitFlag();
-  bool res_server = InitialServer();
-  ACHECK(res_server) << "ObuInterFaceGrpcImpl grpc server initial failed";
+  cli_init_ = grpc_client_->InitFlag();
+  grpc_server_.reset(new GrpcServerImpl());
+  srv_init_ = grpc_server_->InitFlag();
+  CHECK(InitialClient());
+  CHECK(InitialServer());
   init_succ_ = true;
 }
 
 ObuInterFaceGrpcImpl::~ObuInterFaceGrpcImpl() {
-  // if (server_ != nullptr) {
-  //     server_->Shutdown();
-  // }
-  if (thread_ptr_ == nullptr) {
-    AINFO << "close obu interface success";
-    return;
-  }
   {
     std::unique_lock<std::mutex> lck(mutex_);
     exit_flag_ = true;
   }
   condition_.notify_all();
-  thread_ptr_->join();
+  if (!!thread_grpc_ && thread_grpc_->joinable()) {
+    thread_grpc_->join();
+  }
   AINFO << "close obu interface success";
 }
 
-bool ObuInterFaceGrpcImpl::InitialClient() { return grpc_client_init_flag_; }
+bool ObuInterFaceGrpcImpl::InitialClient() { return cli_init_; }
 
 bool ObuInterFaceGrpcImpl::InitialServer() {
-  if (!grpc_server_init_flag_) {
+  if (!srv_init_) {
     return false;
   }
-
-  thread_ptr_.reset(
-      new std::thread(&ObuInterFaceGrpcImpl::ThreadRunServer, this));
-  return (thread_ptr_ != nullptr);
+  thread_grpc_.reset(new std::thread([this]() { this->ThreadRunServer(); }));
+  return thread_grpc_ != nullptr;
 }
 
 void ObuInterFaceGrpcImpl::ThreadRunServer() {
@@ -92,27 +89,25 @@ void ObuInterFaceGrpcImpl::ThreadRunServer() {
   AINFO << "ObuInterFaceGrpcImpl grpc server has listening on : "
         << server_address << " time used : " << time_used.count();
   condition_.wait(lck, [&]() { return exit_flag_; });
-  // server_->Wait();
-  // cyber::Spin();
-}
-
-void ObuInterFaceGrpcImpl::GetV2xObstaclesFromObu(
-    const std::shared_ptr<PerceptionObstacles> &msg) {
-  grpc_server_->GetMsgFromGrpc(msg);
 }
 
 void ObuInterFaceGrpcImpl::GetV2xTrafficLightFromObu(
-    const std::shared_ptr<IntersectionTrafficLightData> &msg) {
+    std::shared_ptr<ObuTrafficLight> *msg) {
   grpc_server_->GetMsgFromGrpc(msg);
 }
+
+void ObuInterFaceGrpcImpl::GetV2xObstaclesFromObu(
+    std::shared_ptr<::apollo::v2x::V2XObstacles> *msg) {
+  grpc_server_->GetMsgFromGrpc(msg);
+}
+
+void ObuInterFaceGrpcImpl::GetV2xRsiFromObu(std::shared_ptr<ObuRsi> *msg) {
+  grpc_server_->GetMsgFromGrpc(msg);
+}
+
 void ObuInterFaceGrpcImpl::SendCarStatusToObu(
     const std::shared_ptr<CarStatus> &msg) {
   grpc_client_->SendMsgToGrpc(msg);
 }
-void ObuInterFaceGrpcImpl::SendObstaclesToObu(
-    const std::shared_ptr<PerceptionObstacles> &msg) {
-  grpc_client_->SendMsgToGrpc(msg);
-}
-
 }  // namespace v2x
 }  // namespace apollo

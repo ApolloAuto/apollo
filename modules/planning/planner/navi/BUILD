@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,9 +10,9 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
+        "//cyber/time:clock",
+        "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
-        "//modules/common/time",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -23,7 +24,7 @@ cc_library(
         "//modules/planning/navi/decider:navi_path_decider",
         "//modules/planning/navi/decider:navi_speed_decider",
         "//modules/planning/planner",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "@com_github_gflags_gflags//:gflags",
@@ -35,10 +36,11 @@ cc_test(
     size = "small",
     srcs = ["navi_planner_test.cc"],
     data = ["//modules/planning:planning_testdata"],
+    linkopts = ["-lgomp"],
     deps = [
         ":navi_planner",
         "//cyber/common:log",
-        "//modules/common/time",
+        "//cyber/time:clock",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],

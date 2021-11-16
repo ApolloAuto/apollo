@@ -19,13 +19,11 @@
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/time/time.h"
-
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/message_util.h"
 
 namespace {
 

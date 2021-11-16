@@ -12,9 +12,9 @@ stage_config: {
   task_config: {
     task_type: LEARNING_MODEL_INFERENCE_TASK
     learning_model_inference_task_config {
-      model_type: CNN
-      cpu_model_file: "/apollo/modules/planning/data/model/cpu_test_model_cnn.pt"
-      gpu_model_file: "/apollo/modules/planning/data/model/gpu_test_model_cnn.pt"
+      model_type: CNN_LSTM
+      cpu_model_file: "/apollo/modules/planning/data/model/cpu_test_model_cnn_lstm.pt"
+      gpu_model_file: "/apollo/modules/planning/data/model/gpu_test_model_cnn_lstm.pt"
       use_cuda: true
     }
   }

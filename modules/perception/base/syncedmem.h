@@ -70,7 +70,7 @@ namespace perception {
 namespace base {
 
 inline void PerceptionMallocHost(void** ptr, size_t size, bool use_cuda) {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   if (use_cuda) {
     BASE_CUDA_CHECK(cudaMallocHost(ptr, size));
     return;
@@ -81,7 +81,7 @@ inline void PerceptionMallocHost(void** ptr, size_t size, bool use_cuda) {
 }
 
 inline void PerceptionFreeHost(void* ptr, bool use_cuda) {
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   if (use_cuda) {
     BASE_CUDA_CHECK(cudaFreeHost(ptr));
     return;
@@ -119,7 +119,7 @@ class SyncedMemory {
   void set_head_cpu() { set_head(HEAD_AT_CPU); }
   size_t size() { return size_; }
 
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   void async_gpu_push(const cudaStream_t& stream);
 #endif
 

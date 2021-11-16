@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>audio</name>
+        <dag_conf>/apollo/modules/audio/dag/audio.dag</dag_conf>
+        <process_name>audio</process_name>
+    </module>
+</cyber>

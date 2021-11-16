@@ -23,8 +23,8 @@
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
-#include "modules/perception/camera/lib/traffic_light/detector/detection/detection.pb.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
+#include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
 #include "modules/perception/inference/inference.h"
 
 namespace apollo {

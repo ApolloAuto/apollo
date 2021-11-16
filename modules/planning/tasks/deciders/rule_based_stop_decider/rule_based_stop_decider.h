@@ -26,9 +26,8 @@ namespace planning {
 
 class RuleBasedStopDecider : public Decider {
  public:
-  explicit RuleBasedStopDecider(
-      const TaskConfig& config,
-      const std::shared_ptr<DependencyInjector>& injector);
+  RuleBasedStopDecider(const TaskConfig& config,
+                       const std::shared_ptr<DependencyInjector>& injector);
 
  private:
   apollo::common::Status Process(

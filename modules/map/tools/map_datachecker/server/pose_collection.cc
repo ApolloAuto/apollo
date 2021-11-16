@@ -18,7 +18,7 @@
 namespace apollo {
 namespace hdmap {
 
-PoseCollection::PoseCollection(std::shared_ptr<JSonConf> sp_conf) {
+PoseCollection::PoseCollection(std::shared_ptr<JsonConf> sp_conf) {
   sp_conf_ = sp_conf;
   Reset();
 }

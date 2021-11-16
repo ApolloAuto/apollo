@@ -35,7 +35,7 @@ using apollo::cyber::proto::Header;
 using apollo::cyber::proto::SectionType;
 using apollo::cyber::proto::SingleIndex;
 
-RecordFileWriter::RecordFileWriter() {}
+RecordFileWriter::RecordFileWriter() : is_writing_(false) {}
 
 RecordFileWriter::~RecordFileWriter() { Close(); }
 
@@ -66,7 +66,13 @@ bool RecordFileWriter::Open(const std::string& path) {
 void RecordFileWriter::Close() {
   if (is_writing_) {
     // wait for the flush operation that may exist now
-    while (!chunk_flush_->empty()) {
+    while (1) {
+      {
+        std::unique_lock<std::mutex> flush_lock(flush_mutex_);
+        if (chunk_flush_->empty()) {
+          break;
+        }
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -78,7 +84,13 @@ void RecordFileWriter::Close() {
     }
 
     // wait for the last flush operation
-    while (!chunk_flush_->empty()) {
+    while (1) {
+      {
+        std::unique_lock<std::mutex> flush_lock(flush_mutex_);
+        if (chunk_flush_->empty()) {
+          break;
+        }
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 

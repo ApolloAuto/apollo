@@ -20,9 +20,9 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -33,7 +33,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
-using apollo::common::time::Clock;
+using apollo::cyber::Time;
 
 constexpr double GRA_ACC = 9.8;
 
@@ -87,13 +87,9 @@ void LonController::CloseLogFile() {
     }
   }
 }
-void LonController::Stop() {
-  CloseLogFile();
-}
+void LonController::Stop() { CloseLogFile(); }
 
-LonController::~LonController() {
-  CloseLogFile();
-}
+LonController::~LonController() { CloseLogFile(); }
 
 Status LonController::Init(std::shared_ptr<DependencyInjector> injector,
                            const ControlConf *control_conf) {
@@ -259,14 +255,14 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
-  if (std::isnan(slope_offset_compenstaion)) {
-    slope_offset_compenstaion = 0;
+  if (std::isnan(slope_offset_compensation)) {
+    slope_offset_compensation = 0;
   }
 
-  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+  debug->set_slope_offset_compensation(slope_offset_compensation);
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
@@ -363,7 +359,6 @@ Status LonController::ComputeControlCommand(
 
   if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
-      chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
@@ -379,9 +374,7 @@ Status LonController::Reset() {
   return Status::OK();
 }
 
-std::string LonController::Name() const {
-  return name_;
-}
+std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
@@ -405,7 +398,7 @@ void LonController::ComputeLongitudinalErrors(
       vehicle_state->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  double current_control_time = Clock::NowInSeconds();
+  double current_control_time = Time::Now().ToSecond();
   double preview_control_time = current_control_time + preview_time;
 
   TrajectoryPoint reference_point =

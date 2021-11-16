@@ -1,6 +1,28 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libracobit_radar_canbus_component.so",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "conf/*.conf",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
 
 cc_library(
     name = "racobit_radar_message_manager",
@@ -12,6 +34,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/proto:racobit_radar_cc_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
 )
@@ -41,7 +64,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_cc_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
 )

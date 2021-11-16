@@ -22,8 +22,8 @@
 
 #include <memory>
 
-#include "modules/third_party_perception/third_party_perception_base.h"
 #include "modules/drivers/proto/smartereye.pb.h"
+#include "modules/third_party_perception/third_party_perception_base.h"
 
 /**
  * @namespace apollo::third_party_perception
@@ -42,6 +42,7 @@ class ThirdPartyPerceptionSmartereye : public ThirdPartyPerception {
   void OnSmartereyeLanemark(const apollo::drivers::SmartereyeLanemark&);
   bool Process(
       apollo::perception::PerceptionObstacles* const response) override;
+
  private:
   apollo::perception::PerceptionObstacles eye_obstacles_;
   apollo::drivers::SmartereyeLanemark smartereye_lanemark_;

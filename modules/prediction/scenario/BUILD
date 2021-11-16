@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,6 +13,7 @@ cc_library(
     deps = [
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor",
+        "//modules/prediction/scenario/interaction_filter:interaction_filter",
         "//modules/prediction/scenario/prioritization:obstacles_prioritizer",
         "//modules/prediction/scenario/right_of_way",
     ],

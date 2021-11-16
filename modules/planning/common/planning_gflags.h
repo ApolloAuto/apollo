@@ -38,6 +38,7 @@ DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_valet_parking_config_file);
+DECLARE_string(scenario_deadend_turnaround_config_file);
 DECLARE_string(scenario_yield_sign_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
@@ -229,7 +230,6 @@ DECLARE_bool(use_s_curve_speed_smooth);
 DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 
-DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
@@ -268,8 +268,14 @@ DECLARE_bool(use_front_axe_center_in_path_planning);
 
 DECLARE_bool(use_road_boundary_from_map);
 
+DECLARE_double(threshold_distance_for_destination);
+
+DECLARE_double(buffer_in_routing);
+
+DECLARE_double(buffer_out_routing);
+
 // learning related
-DECLARE_int32(planning_learning_mode);
+DECLARE_bool(planning_offline_learning);
 DECLARE_string(planning_data_dir);
 DECLARE_string(planning_offline_bags);
 DECLARE_int32(learning_data_obstacle_history_time_sec);

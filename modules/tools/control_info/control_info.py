@@ -31,7 +31,7 @@ import tkinter.filedialog
 from matplotlib import patches
 from matplotlib import lines
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.planning.proto import planning_pb2
@@ -319,13 +319,13 @@ class ControlInfo(object):
         if event.key == 'q' or event.key == 'Q':
             plt.close('all')
         if event.key == 'a' or event.key == 'A':
-            self.longitutidinal()
+            self.longitudinal()
         if event.key == 'z' or event.key == 'Z':
             self.lateral()
 
 
 if __name__ == "__main__":
-    from cyber_py3.record import RecordReader
+    from cyber.python.cyber_py3.record import RecordReader
 
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')

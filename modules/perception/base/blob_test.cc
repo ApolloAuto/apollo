@@ -116,7 +116,7 @@ TEST(BlobTest, source_test) {
   blob_4d.Reshape({1, 3, 4, 5});
   blob_4d.set_cpu_data(cpu_data);
 
-#ifndef PERCEPTION_CPU_ONLY
+#if USE_GPU == 1
   blob_4d.Reshape({2, 3, 4, 5});
   float* gpu_data = nullptr;
   BASE_CUDA_CHECK(cudaMalloc(&gpu_data, blob_4d.count() * sizeof(float)));

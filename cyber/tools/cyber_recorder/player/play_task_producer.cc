@@ -17,6 +17,7 @@
 #include "cyber/tools/cyber_recorder/player/play_task_producer.h"
 
 #include <iostream>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "cyber/common/time_conversion.h"
@@ -40,7 +41,7 @@ PlayTaskProducer::PlayTaskProducer(const TaskBufferPtr& task_buffer,
       is_initialized_(false),
       is_stopped_(true),
       node_(nullptr),
-      earliest_begin_time_(UINT64_MAX),
+      earliest_begin_time_(std::numeric_limits<uint64_t>::max()),
       latest_end_time_(0),
       total_msg_num_(0) {}
 

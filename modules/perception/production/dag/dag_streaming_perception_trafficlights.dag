@@ -1,15 +1,7 @@
 module_config {
-  #module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component.so"
   module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_camera.so"
-#  components {
-#    comname : "TrafficLightsPerceptionComponent"
-#    comclass : "TrafficLightsPerceptionComponent"
-#    confpath : "conf/perception/camera/trafficlights_perception_component.config"
-#    sender : {
-#      outchannelnames : ["/perception/traffic_light_status","/perception/traffic_light_simulation"]
-#    }
-#  }
- components {
+
+  components {
     class_name : "TrafficLightsPerceptionComponent"
     config {
       name: "TrafficLightsComponent"
@@ -17,29 +9,4 @@ module_config {
       flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
     }
   }
-
-#  channels {
-#    channelname : "/apollo/sensor/camera/front_12mm"
-#    msgtype : "adu.common.sensor.Image"
-#  }
-#  channels {
-#    channelname : "/apollo/sensor/camera/front_6mm"
-#    msgtype : "adu.common.sensor.Image"
-#  }
-#  channels {
-#    channelname : "/sensor/camera/obstacle/image_wide"
-#    msgtype : "adu.common.sensor.Image"
-#  }
-#  channels {
-#    channelname : "/sensor/camera/obstacle/image_narrow"
-#    msgtype : "adu.common.sensor.Image"
-#  }
-#  channels {
-#    channelname : "/perception/traffic_light_status"
-#    msgtype : "adu.common.traffic_light.TrafficLightDetection"
-#  }
-#  channels {
-#    channelname : "/perception/traffic_light_simulation"
-#    msgtype : "adu.common.traffic_light.TrafficLightDetection"
-#  }
 }

@@ -32,29 +32,34 @@ class Ecustatus2516 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'description': 'Percentage of battery remaining (BMS
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
-  // 'BATTERY_REMAINING_CAPACITY', 'is_signed_var': False, 'physical_range':
-  // '[0|0]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
-  int battery_remaining_capacity(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  // config detail: {'bit': 0, 'description': 'Percentage of battery remaining
+  // (BMS status)', 'is_signed_var': False, 'len': 8, 'name': 'BATTERY_SOC',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|100]',
+  // 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
+  int battery_soc(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'description': 'Current battery voltage (BMS status)',
-  // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'BATTERY_VOLTAGE',
-  // 'is_signed_var': False, 'physical_range': '[0|80]', 'bit': 16, 'type':
-  // 'double', 'order': 'intel', 'physical_unit': 'V'}
+  // config detail: {'bit': 8, 'description': 'Battery full capacity (BMS
+  // status)', 'is_signed_var': False, 'len': 8, 'name': 'BATTERY_CAPACITY',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|100]',
+  // 'physical_unit': 'Ah', 'precision': 1.0, 'type': 'int'}
+  int battery_capacity(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 16, 'description': 'Current battery voltage (BMS
+  // status)', 'is_signed_var': False, 'len': 16, 'name': 'BATTERY_VOLTAGE',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|80]',
+  // 'physical_unit': 'V', 'precision': 0.1, 'type': 'double'}
   double battery_voltage(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'description': 'Current battery current (BMS status)',
-  // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'BATTERY_CURRENT',
-  // 'is_signed_var': True, 'physical_range': '[-60|60]', 'bit': 32, 'type':
-  // 'double', 'order': 'intel', 'physical_unit': 'A'}
+  // config detail: {'bit': 32, 'description': 'Current battery current (BMS
+  // status)', 'is_signed_var': True, 'len': 16, 'name': 'BATTERY_CURRENT',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[-60|60]',
+  // 'physical_unit': 'A', 'precision': 0.1, 'type': 'double'}
   double battery_current(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'description': 'Current battery temperature (BMS status)',
-  // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'BATTERY_TEMPERATURE',
-  // 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': '\xc2\xa1\xc3\x89'}
+  // config detail: {'bit': 48, 'description': 'Current battery temperature (BMS
+  // status)', 'is_signed_var': True, 'len': 16, 'name': 'BATTERY_TEMPERATURE',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[-40|110]',
+  // 'physical_unit': '℃', 'precision': 1.0, 'type': 'int'}
   int battery_temperature(const std::uint8_t* bytes,
                           const int32_t length) const;
 };

@@ -110,7 +110,8 @@ bool Obstacle::IsOnLane() const {
     return false;
   }
   for (const auto& curr_lane : latest_feature().lane().current_lane_feature()) {
-    if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING) {
+    if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING &&
+        curr_lane.lane_type() != hdmap::Lane::BIKING) {
       return false;
     }
   }
@@ -275,7 +276,7 @@ bool Obstacle::IsCloseToJunctionExit() const {
     AERROR << "No junction feature found";
     return false;
   }
-  CHECK_GT(history_size(), 0);
+  CHECK_GT(history_size(), 0U);
   const Feature& latest_feature = feature_history_.front();
   double position_x = latest_feature.position().x();
   double position_y = latest_feature.position().y();
@@ -1443,7 +1444,7 @@ void Obstacle::DiscardOutdatedHistory() {
 }
 
 void Obstacle::SetCaution() {
-  CHECK_GT(feature_history_.size(), 0);
+  CHECK_GT(feature_history_.size(), 0U);
   Feature* feature = mutable_latest_feature();
   feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
 }
@@ -1454,6 +1455,29 @@ bool Obstacle::IsCaution() const {
   }
   const Feature& feature = latest_feature();
   return feature.priority().priority() == ObstaclePriority::CAUTION;
+}
+
+void Obstacle::SetInteractiveTag() {
+  CHECK_GT(feature_history_.size(), 0U);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::INTERACTION);
+}
+
+void Obstacle::SetNonInteractiveTag() {
+  CHECK_GT(feature_history_.size(), 0U);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_interactive_tag()
+      ->set_interactive_tag(ObstacleInteractiveTag::NONINTERACTION);
+}
+
+bool Obstacle::IsInteractiveObstacle() const {
+  if (feature_history_.empty()) {
+    return false;
+  }
+  const Feature& feature = latest_feature();
+  return feature.interactive_tag().interactive_tag() ==
+                 ObstacleInteractiveTag::INTERACTION;
 }
 
 void Obstacle::SetEvaluatorType(

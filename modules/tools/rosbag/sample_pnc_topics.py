@@ -33,9 +33,9 @@ import sys
 
 import glog
 
-from cyber_py3 import cyber
-from cyber_py3.record import RecordReader
-from cyber_py3.record import RecordWriter
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3.record import RecordReader
+from cyber.python.cyber_py3.record import RecordWriter
 
 
 class SamplePNC(object):

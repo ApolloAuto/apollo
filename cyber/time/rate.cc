@@ -52,6 +52,7 @@
  *****************************************************************************/
 
 #include "cyber/time/rate.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -94,8 +95,7 @@ void Rate::Sleep() {
   if (sleep_time < Duration(0.0)) {
     AWARN << "Detect forward jumps in time";
     // if we've jumped forward in time, or the loop has taken more than a full
-    // extra
-    // cycle, reset our cycle
+    // extra cycle, reset our cycle
     if (actual_end > expected_end + expected_cycle_time_) {
       start_ = actual_end;
     }

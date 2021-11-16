@@ -24,9 +24,9 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from imu_speed import ImuSpeed
-from imu_speed_jerk import ImuSpeedJerk
-from record_reader import RecordItemReader
+from modules.tools.plot_planning.imu_speed import ImuSpeed
+from modules.tools.plot_planning.imu_speed_jerk import ImuSpeedJerk
+from modules.tools.plot_planning.record_reader import RecordItemReader
 
 
 def grid(data_list, shift):

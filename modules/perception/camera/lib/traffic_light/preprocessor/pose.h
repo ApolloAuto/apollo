@@ -20,6 +20,7 @@
 
 #include "Eigen/Core"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/image_8u.h"
 
 namespace apollo {
@@ -28,6 +29,9 @@ namespace camera {
 
 // @brief Car's Pose
 class CarPose {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  public:
   CarPose() = default;
   ~CarPose() = default;
@@ -47,7 +51,8 @@ class CarPose {
   double getTimestamp() const { return timestamp_; }
 
   Eigen::Matrix4d pose_;  // car(novatel) to world pose
-  std::map<std::string, Eigen::Matrix4d> c2w_poses_;  // camera to world poses
+  // camera to world poses
+  apollo::common::EigenMap<std::string, Eigen::Matrix4d> c2w_poses_;
   double timestamp_;
 
  private:

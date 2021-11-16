@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { MAP_SIZE } from "store/dimension";
+import { MAP_SIZE } from 'store/dimension';
 
 export default class WindowResizeControl extends React.PureComponent {
-    getMinimizingIcon() {
-        return (
+  getMinimizingIcon() {
+    return (
             <svg viewBox="0 0 20 20">
                 <defs>
                     <path d="M20 0L0 20h20V0z" id="a" />
@@ -15,11 +15,11 @@ export default class WindowResizeControl extends React.PureComponent {
                 <use xlinkHref="#b" fillOpacity="0" stroke="#006AFF" strokeWidth="2" />
                 <use xlinkHref="#c" fillOpacity="0" stroke="#006AFF" strokeWidth="2" />
             </svg>
-        );
-    }
+    );
+  }
 
-    getMaximizingIcon() {
-        return (
+  getMaximizingIcon() {
+    return (
             <svg viewBox="0 0 20 20">
                 <defs>
                     <path d="M20 0L0 20h20V0z" id="a" />
@@ -30,29 +30,29 @@ export default class WindowResizeControl extends React.PureComponent {
                 <use xlinkHref="#b" fillOpacity="0" stroke="#006AFF" strokeWidth="2" />
                 <use xlinkHref="#c" fillOpacity="0" stroke="#006AFF" strokeWidth="2" />
             </svg>
-        );
+    );
+  }
+
+  render() {
+    const { type, onClick } = this.props;
+
+    let icon = null;
+    switch (type) {
+      case MAP_SIZE.FULL:
+        icon = this.getMinimizingIcon();
+        break;
+      case MAP_SIZE.DEFAULT:
+        icon = this.getMaximizingIcon();
+        break;
+      default:
+        console.error('Unknown window size found:', type);
+        break;
     }
 
-    render() {
-        const { type, onClick } = this.props;
-
-        let icon = null;
-        switch (type) {
-            case MAP_SIZE.FULL:
-                icon = this.getMinimizingIcon();
-                break;
-            case MAP_SIZE.DEFAULT:
-                icon = this.getMaximizingIcon();
-                break;
-            default:
-                console.error('Unknown window size found:', type);
-                break;
-        }
-
-        return (
+    return (
             <div className="window-resize-control" onClick={onClick}>
                 {icon}
             </div>
-        );
-    }
+    );
+  }
 }

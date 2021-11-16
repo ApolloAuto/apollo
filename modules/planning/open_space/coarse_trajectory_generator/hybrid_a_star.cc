@@ -27,7 +27,7 @@ namespace planning {
 
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::time::Clock;
+using apollo::cyber::Clock;
 
 HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   planner_open_space_config_.CopyFrom(open_space_conf);
@@ -84,7 +84,7 @@ bool HybridAStar::RSPCheck(
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   CHECK_NOTNULL(node);
-  CHECK_GT(node->GetStepSize(), 0);
+  CHECK_GT(node->GetStepSize(), 0U);
 
   if (obstacles_linesegments_vec_.empty()) {
     return true;
@@ -428,7 +428,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // TODO(Jinyun): move to confs
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(10000.0, x_ref);
+  piecewise_jerk_problem.set_x_ref(10000.0, std::move(x_ref));
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
@@ -642,7 +642,6 @@ bool HybridAStar::Plan(
   close_set_.clear();
   open_pq_ = decltype(open_pq_)();
   final_node_ = nullptr;
-
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec;
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
@@ -656,7 +655,6 @@ bool HybridAStar::Plan(
     obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
   }
   obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
-
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
@@ -665,11 +663,11 @@ bool HybridAStar::Plan(
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   if (!ValidityCheck(start_node_)) {
-    ADEBUG << "start_node in collision with obstacles";
+    AERROR << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    ADEBUG << "end_node in collision with obstacles";
+    AERROR << "end_node in collision with obstacles";
     return false;
   }
   double map_time = Clock::NowInSeconds();
@@ -679,7 +677,6 @@ bool HybridAStar::Plan(
   // load open set, pq
   open_set_.emplace(start_node_->GetIndex(), start_node_);
   open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
-
   // Hybrid A* begins
   size_t explored_node_num = 0;
   double astar_start_time = Clock::NowInSeconds();

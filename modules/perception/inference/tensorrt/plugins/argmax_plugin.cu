@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <cfloat>
+#include <limits>
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 namespace apollo {
 namespace perception {
 namespace inference {
-__global__ void
-cmp(const int nthreads,
-    const float *in_data,
-    const int channels,
-    const int height,
-    const int width,
-    const bool out_max_val,
-    float *out_data) {
+__global__ void cmp(const int nthreads, const float *in_data,
+                    const int channels, const int height, const int width,
+                    const bool out_max_val, float *out_data,
+                    const float float_min) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < nthreads) {
     int w = idx % width;
@@ -39,7 +36,7 @@ cmp(const int nthreads,
       return;
     }
     int c_max = 0;
-    float v_max = FLT_MIN;
+    float v_max = float_min;
     for (int c = 0; c < channels; c++) {
       int in_idx = ((n * channels + c) * height + h) * width + w;
       if (v_max < in_data[in_idx]) {
@@ -55,21 +52,19 @@ cmp(const int nthreads,
     }
   }
 }
-int
-ArgMax1Plugin::enqueue(int batchSize,
-                       const void *const *inputs,
-                       void **outputs,
-                       void *workspace,
-                       cudaStream_t stream) {
+int ArgMax1Plugin::enqueue(int batchSize, const void *const *inputs,
+                           void **outputs, void *workspace,
+                           cudaStream_t stream) {
   const int thread_size = 512;
   int block_size =
-      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize
-          + thread_size - 1) / thread_size;
-  cmp << < block_size, thread_size >> >
-      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] *
-          batchSize, (const float *) inputs[0], input_dims_.d[0],
-          input_dims_.d[1], input_dims_.d[2], out_max_val_,
-          reinterpret_cast<float *>(outputs[0]));
+      (input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize +
+       thread_size - 1) /
+      thread_size;
+  cmp<<<block_size, thread_size>>>(
+      input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize,
+      (const float *)inputs[0], input_dims_.d[0], input_dims_.d[1],
+      input_dims_.d[2], out_max_val_, reinterpret_cast<float *>(outputs[0]),
+      float_min_);
   return 0;
 }
 

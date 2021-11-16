@@ -36,8 +36,10 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
-LearningModelInferenceTask::LearningModelInferenceTask(const TaskConfig& config)
-    : Task(config) {
+LearningModelInferenceTask::LearningModelInferenceTask(
+    const TaskConfig& config,
+    const std::shared_ptr<DependencyInjector>& injector)
+    : Task(config, injector) {
   ACHECK(config.has_learning_model_inference_task_config());
   trajectory_imitation_inference_ =
       std::make_unique<TrajectoryImitationLibtorchInference>(
@@ -54,25 +56,38 @@ Status LearningModelInferenceTask::Execute(
 
 Status LearningModelInferenceTask::Process(Frame* frame) {
   CHECK_NOTNULL(frame);
-
   const auto& config = config_.learning_model_inference_task_config();
+
+  if (!injector_->learning_based_data() ||
+      !injector_->learning_based_data()->GetLatestLearningDataFrame()) {
+    const std::string msg = "learning_data_frame empty";
+    AERROR << msg;
+    // hybrid model will use rule based planning when learning based data or
+    // learning data frame is empty
+    if (config.allow_empty_learning_based_data()) {
+      return Status::OK();
+    }
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
   LearningDataFrame learning_data_frame;
   learning_data_frame.CopyFrom(
-      frame->learning_based_data().learning_data_frame());
+      *(injector_->learning_based_data()->GetLatestLearningDataFrame()));
 
   ADEBUG << "LearningModelInferenceTask: frame_num["
          << learning_data_frame.frame_num() << "] adc_trajectory_point_size["
          << learning_data_frame.adc_trajectory_point_size() << "]";
-  // for (const auto& ob : learning_data_frame.obstacle()) {
-  //   AERROR << ob.DebugString();
-  // }
 
   if (learning_data_frame.adc_trajectory_point_size() <= 0) {
     const std::string msg =
         absl::StrCat("learning_data adc_trajectory_point empty. frame_num[",
                      learning_data_frame.frame_num(), "]");
     AERROR << msg;
+    // hybrid model will use rule based planning when learning model output is
+    // not ready
+    if (config.allow_empty_output_trajectory()) {
+      return Status::OK();
+    }
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
@@ -83,9 +98,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
           .timestamp_sec();
 
   ADEBUG << "start_point_timestamp_sec: " << start_point_timestamp_sec;
-  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
-  //   AERROR << "BEFORE: " << t.timestamp_sec();
-  // }
 
   TrajectoryEvaluator trajectory_evaluator;
 
@@ -93,10 +105,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   trajectory_evaluator.EvaluateADCTrajectory(start_point_timestamp_sec,
                                              config.trajectory_delta_t(),
                                              &learning_data_frame);
-
-  // for (const auto& t : learning_data_frame.adc_trajectory_point()) {
-  //   AERROR << "AFTER: " << t.timestamp_sec();
-  // }
 
   // evaluate obstacle trajectory
   trajectory_evaluator.EvaluateObstacleTrajectory(start_point_timestamp_sec,
@@ -136,11 +144,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  // for (const auto& t :
-  //    learning_data_frame.output().adc_future_trajectory_point()) {
-  //   AERROR << "FUTURE orig: " << t.trajectory_point().relative_time();
-  // }
-
   // evaluate adc future trajectory
   // TODO(all): move to conf
   constexpr double kADCFutureTrajectoryDeltaTime = 0.02;
@@ -158,10 +161,6 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
       learning_data_frame.adc_trajectory_point(last).trajectory_point());
   future_trajectory.insert(future_trajectory.begin(), tp);
 
-  // for (const auto& t : future_trajectory) {
-  //   AERROR << "FUTURE stitched: " << t.trajectory_point().relative_time();
-  // }
-
   std::vector<TrajectoryPointFeature> evaluated_future_trajectory;
   trajectory_evaluator.EvaluateADCFutureTrajectory(
       learning_data_frame.frame_num(), future_trajectory,
@@ -173,12 +172,9 @@ Status LearningModelInferenceTask::Process(Frame* frame) {
   ConvertADCFutureTrajectory(evaluated_future_trajectory,
                              &adc_future_trajectory);
   ADEBUG << "adc_future_trajectory_size: " << adc_future_trajectory.size();
-  // for (const auto& t : adc_future_trajectory) {
-  //   AERROR << "FUTURE After: " << t.relative_time();
-  // }
 
-  frame->mutable_learning_based_data()
-       ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
+  injector_->learning_based_data()
+      ->set_learning_data_adc_future_trajectory_points(adc_future_trajectory);
 
   return Status::OK();
 }

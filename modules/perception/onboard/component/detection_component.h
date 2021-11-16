@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -32,9 +33,8 @@ namespace onboard {
 
 class DetectionComponent : public cyber::Component<drivers::PointCloud> {
  public:
-  DetectionComponent() : detector_(nullptr) {}
-
-  ~DetectionComponent() = default;
+  DetectionComponent() = default;
+  virtual ~DetectionComponent() = default;
 
   bool Init() override;
   bool Proc(const std::shared_ptr<drivers::PointCloud>& message) override;
@@ -46,16 +46,16 @@ class DetectionComponent : public cyber::Component<drivers::PointCloud> {
       const std::shared_ptr<LidarFrameMessage>& out_message);
 
  private:
-  static std::mutex s_mutex_;
-  static uint32_t s_seq_num_;
+  static std::atomic<uint32_t> seq_num_;
   std::string sensor_name_;
+  std::string detector_name_;
   bool enable_hdmap_ = true;
   float lidar_query_tf_offset_ = 20.0f;
   std::string lidar2novatel_tf2_child_frame_id_;
   std::string output_channel_name_;
   base::SensorInfo sensor_info_;
   TransformWrapper lidar2world_trans_;
-  std::unique_ptr<lidar::LidarObstacleDetection> detector_;
+  std::unique_ptr<lidar::BaseLidarObstacleDetection> detector_;
   std::shared_ptr<apollo::cyber::Writer<LidarFrameMessage>> writer_;
 };
 

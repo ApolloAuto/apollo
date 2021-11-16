@@ -17,6 +17,7 @@
 #include "cyber/time/time.h"
 
 #include <iostream>
+
 #include "gtest/gtest.h"
 
 #include "cyber/time/duration.h"
@@ -70,7 +71,7 @@ TEST(TimeTest, is_zero) {
   Time time;
   EXPECT_TRUE(time.IsZero());
   EXPECT_FALSE(Time::MAX.IsZero());
-  EXPECT_FALSE(Time::MIN.IsZero());
+  EXPECT_TRUE(Time::MIN.IsZero());
 }
 
 }  // namespace cyber

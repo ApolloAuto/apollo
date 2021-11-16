@@ -26,9 +26,9 @@ import shutil
 import sys
 import time
 
-from cyber_py3 import cyber
-from cyber_py3 import record
-from common.message_manager import PbMessageManager
+from cyber.python.cyber_py3 import cyber
+from cyber.python.cyber_py3 import record
+from modules.tools.common.message_manager import PbMessageManager
 
 
 g_message_manager = PbMessageManager()

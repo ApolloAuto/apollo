@@ -61,7 +61,7 @@
 #include "pcl/point_types.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/timer.h"
+#include "modules/common/util/perf_util.h"
 
 namespace apollo {
 namespace localization {
@@ -70,6 +70,7 @@ namespace ndt {
 /**@brief Simple structure to hold a centroid, covarince and the number of
  * points in a leaf. */
 struct Leaf {
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Leaf()
       : nr_points_(0),
         mean_(Eigen::Vector3d::Zero()),
@@ -100,6 +101,9 @@ typedef const Leaf *LeafConstPtr;
  * data. */
 template <typename PointT>
 class VoxelGridCovariance {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
  protected:
   typedef pcl::PointCloud<PointT> PointCloud;
   typedef boost::shared_ptr<PointCloud> PointCloudPtr;
@@ -201,13 +205,13 @@ class VoxelGridCovariance {
    * structure */
   inline LeafConstPtr GetLeaf(Eigen::Vector3f *p) {
     // Generate index associated with p
-    int ijk0 = static_cast<int>((p->x - map_left_top_corner_(0)) *
+    int ijk0 = static_cast<int>((p->x() - map_left_top_corner_(0)) *
                                 inverse_leaf_size_[0]) -
                min_b_[0];
-    int ijk1 = static_cast<int>((p->y - map_left_top_corner_(1)) *
+    int ijk1 = static_cast<int>((p->y() - map_left_top_corner_(1)) *
                                 inverse_leaf_size_[1]) -
                min_b_[1];
-    int ijk2 = static_cast<int>((p->z - map_left_top_corner_(2)) *
+    int ijk2 = static_cast<int>((p->z() - map_left_top_corner_(2)) *
                                 inverse_leaf_size_[2]) -
                min_b_[2];
 

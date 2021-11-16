@@ -47,9 +47,11 @@ namespace record {
 class Recorder : public std::enable_shared_from_this<Recorder> {
  public:
   Recorder(const std::string& output, bool all_channels,
-           const std::vector<std::string>& channel_vec);
+           const std::vector<std::string>& white_channels,
+           const std::vector<std::string>& black_channels);
   Recorder(const std::string& output, bool all_channels,
-           const std::vector<std::string>& channel_vec,
+           const std::vector<std::string>& white_channels,
+           const std::vector<std::string>& black_channels,
            const proto::Header& header);
   ~Recorder();
   bool Start();
@@ -64,7 +66,8 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   Connection<const ChangeMsg&> change_conn_;
   std::string output_;
   bool all_channels_ = true;
-  std::vector<std::string> channel_vec_;
+  std::vector<std::string> white_channels_;
+  std::vector<std::string> black_channels_;
   proto::Header header_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;

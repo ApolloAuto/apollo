@@ -16,13 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-cd "${DIR}/.."
-
-source "${DIR}/apollo_base.sh"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+source "${TOP_DIR}/scripts/apollo_base.sh"
 
 # run function from apollo_base.sh
-# run command_name module_name
 run_customized_path drivers/gnss gnss "$@"

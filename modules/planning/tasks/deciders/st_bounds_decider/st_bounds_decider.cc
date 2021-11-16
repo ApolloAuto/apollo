@@ -55,13 +55,15 @@ Status STBoundsDecider::Process(Frame* const frame,
   // Sweep the t-axis, and determine the s-boundaries step by step.
   STBound regular_st_bound;
   STBound regular_vt_bound;
-  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound);
+  std::vector<std::pair<double, double>> st_guide_line;
+  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound,
+                                      &st_guide_line);
   if (!ret.ok()) {
     ADEBUG << "Cannot generate a regular ST-boundary.";
     return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
   }
   if (regular_st_bound.empty()) {
-    std::string msg = "Generated regular ST-boundary is empty.";
+    const std::string msg = "Generated regular ST-boundary is empty.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -78,7 +80,8 @@ Status STBoundsDecider::Process(Frame* const frame,
   STGraphDebug* st_graph_debug = reference_line_info->mutable_debug()
                                      ->mutable_planning_data()
                                      ->add_st_graph();
-  RecordSTGraphDebug(st_boundaries, regular_st_bound, st_graph_debug);
+  RecordSTGraphDebug(st_boundaries, regular_st_bound, st_guide_line,
+                     st_graph_debug);
 
   return Status::OK();
 }
@@ -101,7 +104,16 @@ void STBoundsDecider::InitSTBoundsDecider(
 
   // Initialize Guide-Line and Driving-Limits.
   static constexpr double desired_speed = 15.0;
-  st_guide_line_.Init(desired_speed);
+  // If the path_data optimization is guided from a reference path of a
+  // reference trajectory, use its reference speed profile to select the st
+  // bounds in LaneFollow Hybrid Mode
+  if (path_data.is_optimized_towards_trajectory_reference()) {
+    st_guide_line_.Init(desired_speed,
+                        injector_->learning_based_data()
+                            ->learning_data_adc_future_trajectory_points());
+  } else {
+    st_guide_line_.Init(desired_speed);
+  }
   static constexpr double max_acc = 2.5;
   static constexpr double max_dec = 5.0;
   static constexpr double max_v = desired_speed * 1.5;
@@ -212,8 +224,9 @@ Status STBoundsDecider::GenerateFallbackSTBound(STBound* const st_bound,
   return Status::OK();
 }
 
-Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
-                                               STBound* const vt_bound) {
+Status STBoundsDecider::GenerateRegularSTBound(
+    STBound* const st_bound, STBound* const vt_bound,
+    std::vector<std::pair<double, double>>* const st_guide_line) {
   // Initialize st-boundary.
   for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
        curr_t += kSTBoundsDeciderResolution) {
@@ -262,8 +275,9 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
     if (!available_choices.empty()) {
       ADEBUG << "One decision needs to be made among "
              << available_choices.size() << " choices.";
-      RankDecisions(st_guide_line_.GetGuideSFromT(t), driving_limits_bound,
-                    &available_choices);
+      double guide_line_s = st_guide_line_.GetGuideSFromT(t);
+      st_guide_line->emplace_back(t, guide_line_s);
+      RankDecisions(guide_line_s, driving_limits_bound, &available_choices);
       // Select the top decision.
       auto top_choice_s_range = available_choices.front().first;
       bool is_limited_by_upper_obs = false;
@@ -390,6 +404,7 @@ void STBoundsDecider::RankDecisions(
 
 void STBoundsDecider::RecordSTGraphDebug(
     const std::vector<STBoundary>& st_graph_data, const STBound& st_bound,
+    const std::vector<std::pair<double, double>>& st_guide_line,
     planning_internal::STGraphDebug* const st_graph_debug) {
   if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
@@ -440,6 +455,13 @@ void STBoundsDecider::RecordSTGraphDebug(
     point_debug->set_t(t);
     point_debug->set_s(s_upper);
     ADEBUG << "(" << t << ", " << s_upper << ")";
+  }
+
+  // Plot the used st_guide_line when generating the st_bounds
+  for (const auto& st_points : st_guide_line) {
+    auto* speed_point = st_graph_debug->add_speed_profile();
+    speed_point->set_t(st_points.first);
+    speed_point->set_s(st_points.second);
   }
 }
 

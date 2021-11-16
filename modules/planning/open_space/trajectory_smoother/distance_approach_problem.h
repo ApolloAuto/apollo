@@ -20,20 +20,22 @@
 
 #pragma once
 
+#include <vector>
+
 #include <coin/IpIpoptApplication.hpp>
 #include <coin/IpSolveStatistics.hpp>
-#include <vector>
 
 #include "Eigen/Dense"
 
-#include "modules/common/time/time.h"
+#include "modules/planning/proto/planning.pb.h"
+
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_relax_end_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_relax_end_slack_interface.h"
-#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {

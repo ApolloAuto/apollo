@@ -4,32 +4,24 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境
+ - 按照[教程](../quickstart/apollo_software_installation_guide.md)设置Docker环境
  - 从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位demo数据包（仅限美国地区），使用其中*apollo3.5*文件夹下的数据。
 
 ## 2. 编译apollo工程
 
-### 2.1 构建docker容器
-我们提供了一个叫做*dev-latest*的docker镜像，docker容器会将你本地的apollo工程挂载到 */apollo* 。
+### 2.1 启动并进入Apollo开发版Docker容器
+
 ```
 bash docker/scripts/dev_start.sh
-```
-### 2.2 进入docker容器
-```
 bash docker/scripts/dev_into.sh
 ```
-### 2.3 编译工程
+
+### 2.2 编译工程
 ```
-# To make sure you start clean
-bash apollo.sh clean
-# Build the full system
+# (Optional) To make sure you start clean
+bash apollo.sh clean -a
+
 bash apollo.sh build_opt
-```
-
-`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
-
-```
-bash apollo.sh build --local_resources 2048,1.0,1.0
 ```
 
 ## 3. 运行RTK模式定位
@@ -37,7 +29,7 @@ bash apollo.sh build --local_resources 2048,1.0,1.0
 cyber_launch start /apollo/modules/localization/launch/rtk_localization.launch
 ```
 
-在/apollo/data/log目录下，可以看到定位模块输出的相关log文件。 
+在/apollo/data/log目录下，可以看到定位模块输出的相关log文件。
 
  - localization.INFO : INFO级别的log信息
  - localization.WARNING : WARNING级别的log信息

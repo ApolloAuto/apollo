@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/fusion/common/dst_evidence.h"
+
 #include <boost/format.hpp>
 
-#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 
-#include "modules/perception/fusion/common/dst_evidence.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -27,14 +28,15 @@ namespace fusion {
 // elementary hypotheses
 enum { F111 = (1 << 0), FA18 = (1 << 1), P3C = (1 << 2) };
 // compound hypotheses
-enum { FAST = (F111 | FA18), UNKOWN = (F111 | FA18 | P3C) };
+enum { FAST = (F111 | FA18), UNKNOWN = (F111 | FA18 | P3C) };
 static const std::vector<uint64_t> fod_subsets = {F111, FA18, P3C, FAST,
-                                                  UNKOWN};
-static const std::map<uint64_t, std::string> hypo_names = {{F111, "F111"},
-                                                           {FA18, "FA18"},
-                                                           {P3C, "P3C"},
-                                                           {FAST, "FAST"},
-                                                           {UNKOWN, "UNKOWN"}};
+                                                  UNKNOWN};
+static const std::map<uint64_t, std::string> hypo_names = {
+    {F111, "F111"},
+    {FA18, "FA18"},
+    {P3C, "P3C"},
+    {FAST, "FAST"},
+    {UNKNOWN, "UNKNOWN"}};
 
 class DSTEvidenceTest : public ::testing::Test {
  public:
@@ -42,7 +44,7 @@ class DSTEvidenceTest : public ::testing::Test {
       : sensor1_dst_("test"), sensor2_dst_("test"), fused_dst_("test") {
     DstManager *dst_manager = DstManager::Instance();
     std::vector<std::string> fod_subset_names = {"F111", "FA18", "P3C", "FAST",
-                                                 "UNKOWN"};
+                                                 "UNKNOWN"};
     dst_manager->AddApp("test", fod_subsets, fod_subset_names);
     vec_equal_ = [](const std::vector<double> &vec,
                     const std::vector<double> &gt) {
@@ -70,7 +72,7 @@ class DSTEvidenceTest : public ::testing::Test {
   }
   void assign_dst_test() {
     std::map<uint64_t, double> dst_map = {
-        {F111, 0.3}, {FA18, 0.18}, {FAST, 0.42}, {UNKOWN, 0.1}};
+        {F111, 0.3}, {FA18, 0.18}, {FAST, 0.42}, {UNKNOWN, 0.1}};
     std::vector<double> dst_vec_gt = {0.3, 0.18, 0.00, 0.42, 0.1};
     Dst dst("test");
     dst.SetBba(dst_map);

@@ -23,10 +23,9 @@ import sys
 import gflags
 import matplotlib.pyplot as plt
 
-import debug_topo
+import modules.tools.routing.debug_topo as debug_topo
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
-import util
-
+import modules.tools.routing.util
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])

@@ -18,8 +18,8 @@
 #include <chrono>
 #include <string>
 
-#include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/common/trajectory_evaluator.h"
+#include "modules/planning/proto/learning_data.pb.h"
 
 namespace apollo {
 namespace planning {

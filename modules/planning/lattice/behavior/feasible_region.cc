@@ -20,6 +20,8 @@
 
 #include "modules/planning/lattice/behavior/feasible_region.h"
 
+#include <cmath>
+
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 

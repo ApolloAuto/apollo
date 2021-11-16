@@ -26,14 +26,34 @@ TEST(IdentityTest, testConstructFalse) {
   Identity it(false);
 
   EXPECT_EQ(it.HashValue(), static_cast<uint64_t>(0));
-  EXPECT_EQ(it.ToString(), "");
+  EXPECT_EQ(it.ToString(), "0");
 }
 
 TEST(IdentityTest, testConstructTrue) {
   Identity it(true);
 
   EXPECT_NE(it.HashValue(), static_cast<uint64_t>(0));
-  EXPECT_NE(it.ToString(), "");
+  EXPECT_NE(it.ToString(), "0");
+}
+
+TEST(IdentityTest, testIdentityEqual) {
+  Identity id1;
+  Identity id2;
+  Identity id3;
+  EXPECT_NE(id1, id2);
+  EXPECT_NE(id2, id3);
+  EXPECT_NE(id1, id3);
+  EXPECT_NE(id1.HashValue(), id3.HashValue());
+
+  id2 = id2;
+  EXPECT_NE(id2, id3);
+  id2 = id3;
+  EXPECT_EQ(id2, id3);
+
+  Identity id4(id1);
+  EXPECT_EQ(id1, id4);
+  EXPECT_EQ(id1.ToString(), id4.ToString());
+  EXPECT_EQ(id1.HashValue(), id4.HashValue());
 }
 
 TEST(IdentityTest, testOperatorEqual) {

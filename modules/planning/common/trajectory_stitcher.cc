@@ -22,6 +22,8 @@
 
 #include <algorithm>
 
+#include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/angle.h"
@@ -188,10 +190,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
            << ", longitudinal diff: " << lon_diff;
 
     if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold) {
-      std::string msg(
+      const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
-          "large. Replan is triggered. lat_diff = " +
-          std::to_string(lat_diff));
+          "large. Replan is triggered. lat_diff = ",
+          lat_diff);
       AERROR << msg;
       *replan_reason = msg;
       return ComputeReinitStitchingTrajectory(planning_cycle_time,
@@ -199,10 +201,10 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     }
 
     if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
-      std::string msg(
+      const std::string msg = absl::StrCat(
           "the distance between matched point and actual position is too "
-          "large. Replan is triggered. lon_diff = " +
-          std::to_string(lon_diff));
+          "large. Replan is triggered. lon_diff = ",
+          lon_diff);
       AERROR << msg;
       *replan_reason = msg;
       return ComputeReinitStitchingTrajectory(planning_cycle_time,

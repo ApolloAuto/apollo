@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "Eigen/Core"
-
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 

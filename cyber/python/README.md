@@ -1,53 +1,70 @@
-# Python Wrapper for Cyber RT
+# Cyber RT Python API : An Example
 
-## Usage
+This document is an example demonstrating how to use Cyber RT Python API
+to write your own Python3 programs. Please make sure you have built Apollo
+successfully.
 
-Make sure you have built Apollo successfully, which should also have added
-`/apollo/cyber/python` to the PYTHONPATH for you. Then in Python code:
+## Step 1: Write your own code.
 
-```python
+Save it as, say, `path/to/my_demo.py`.
+
+```python3
+#!/usr/bin/env python3
+
 import sys
 
-from cyber_py3 import cyber
+from cyber.python.cyber_py3 import cyber
 
 
 cyber.init()
 
 if not cyber.ok():
-    print('Well, something is wrong.')
+    print('Well, something went wrong.')
     sys.exit(1)
 
 # Do your job here.
 cyber.shutdown()
 ```
 
-Learn more usage from the [examples](cyber_py3/examples/) and
-[tests](cyber_py3/test/).
+## Step 2: Write Python rule for Bazel to build
 
-## Work with Python2?
+Edit `path/to/BUILD` file, add the followng section:
 
-Firstly, it's not recommended, as Python2 is deprecated since
-[Jan 1, 2020](https://pythonclock.org). We also deprioritized maintaining the
-Python2 Wrapper.
+```
+load("@rules_python//python:defs.bzl", "py_binary")
 
-Similar to the Python 3 wrapper, but just import things from the cyber_py
-module. Everything should work the same.
+# blablahblah...
 
-```python
-import sys
-
-from cyber_py import cyber
-
-
-cyber.init()
-
-if not cyber.ok():
-    print('Well, something is wrong.')
-    sys.exit(1)
-
-# Do your job here.
-cyber.shutdown()
+# Add your own section here
+py_binary(
+    name = "my_demo",
+    srcs = ["my_demo.py"],
+    deps = [
+        "//cyber/python/cyber_py3:cyber",
+    ],
+)
 ```
 
-Learn more usage from the [examples](cyber_py/examples/) and
-[tests](cyber_py/test/).
+**Note**: Like C++, Python code is also managed by Bazel starting from Apollo 6.0.
+Please refer to [How to Build and Run Python Apps in Apollo](../../docs/howto/how_to_build_and_run_python_app.md) for more on that.
+
+## Step 3: Build and run the demo program
+
+Now you can run the following commands to build and run the demo program.
+
+```
+bazel build //path/to:my_demo
+./bazel-bin/path/to/my_demo
+```
+
+Or simply run
+
+```
+bazel run //path/to:my_demo
+```
+
+## More Examples ...
+
+Learn more Cyber RT Python examples under the [examples](cyber_py3/examples/) and
+[tests](cyber_py3/test/) directory.
+

@@ -1,20 +1,43 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    targets = [
+        ":libimage_decompress.so",
+    ],
+    deps = [
+        "//cyber:install",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/*.txt",
+        "dag/*.dag",
+        "launch/*.launch",
+    ]),
+)
 
 cc_library(
     name = "image_decompress_lib",
     srcs = ["image_decompress.cc"],
     hdrs = ["image_decompress.h"],
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/drivers/tools/image_decompress/proto:decompress_proto",
+        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common/proto:header_cc_proto",
+        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/drivers/tools/image_decompress/proto:config_cc_proto",
+        "@opencv//:imgcodecs",
     ],
 )
 

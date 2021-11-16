@@ -35,7 +35,7 @@ enum class ChannelVerifyAgentState { IDLE, RUNNING };
 
 class ChannelVerifyAgent {
  public:
-  explicit ChannelVerifyAgent(std::shared_ptr<JSonConf> sp_conf);
+  explicit ChannelVerifyAgent(std::shared_ptr<JsonConf> sp_conf);
   grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
                                   ChannelVerifyRequest *request,
                                   ChannelVerifyResponse *response);
@@ -64,7 +64,7 @@ class ChannelVerifyAgent {
   std::mutex stop_mutex_;
   bool need_stop_;
   bool stopped_;
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<ChannelVerify> sp_channel_checker_ = nullptr;
   CheckedResult sp_check_result_ = nullptr;
   std::thread::id check_thread_id_;

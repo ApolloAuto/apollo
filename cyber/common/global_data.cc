@@ -21,7 +21,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <climits>
+
 #include <cstdlib>
 #include <functional>
 
@@ -38,18 +38,15 @@ AtomicHashMap<uint64_t, std::string, 256> GlobalData::service_id_map_;
 AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
 
 namespace {
-const char* empty_str_ = "";
-char* program_path() {
-  char* path = reinterpret_cast<char*>(malloc(PATH_MAX));
-  if (path != nullptr) {
-    auto len = readlink("/proc/self/exe", path, PATH_MAX);
-    if (len == -1) {
-      free(path);
-      return nullptr;
-    }
-    path[len] = '\0';
+const std::string& kEmptyString = "";
+std::string program_path() {
+  char path[PATH_MAX];
+  auto len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+  if (len == -1) {
+    return kEmptyString;
   }
-  return path;
+  path[len] = '\0';
+  return std::string(path);
 }
 }  // namespace
 
@@ -57,23 +54,16 @@ GlobalData::GlobalData() {
   InitHostInfo();
   ACHECK(InitConfig());
   process_id_ = getpid();
-  char* prog_path = program_path();
-  if (prog_path) {
+  auto prog_path = program_path();
+  if (!prog_path.empty()) {
     process_group_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
-    free(prog_path);
   } else {
     process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
-  is_reality_mode_ =
-      config_.run_mode_conf().run_mode() == proto::RunMode::MODE_REALITY;
 
-  const char* run_mode_val = ::getenv("CYBER_RUN_MODE");
-  if (run_mode_val != nullptr) {
-    std::string run_mode_str(run_mode_val);
-    if (run_mode_str == "simulation") {
-      is_reality_mode_ = false;
-    }
-  }
+  const auto& run_mode_conf = config_.run_mode_conf();
+  run_mode_ = run_mode_conf.run_mode();
+  clock_mode_ = run_mode_conf.clock_mode();
 }
 
 GlobalData::~GlobalData() {}
@@ -99,11 +89,19 @@ const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }
 
-void GlobalData::EnableSimulationMode() { is_reality_mode_ = false; }
+void GlobalData::EnableSimulationMode() {
+  run_mode_ = RunMode::MODE_SIMULATION;
+}
 
-void GlobalData::DisableSimulationMode() { is_reality_mode_ = true; }
+void GlobalData::DisableSimulationMode() { run_mode_ = RunMode::MODE_REALITY; }
 
-bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
+bool GlobalData::IsRealityMode() const {
+  return run_mode_ == RunMode::MODE_REALITY;
+}
+
+bool GlobalData::IsMockTimeMode() const {
+  return clock_mode_ == ClockMode::MODE_MOCK;
+}
 
 void GlobalData::InitHostInfo() {
   char host_name[1024];
@@ -187,7 +185,7 @@ std::string GlobalData::GetNodeById(uint64_t id) {
   if (node_id_map_.Get(id, &node_name)) {
     return *node_name;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterChannel(const std::string& channel) {
@@ -210,7 +208,7 @@ std::string GlobalData::GetChannelById(uint64_t id) {
   if (channel_id_map_.Get(id, &channel)) {
     return *channel;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterService(const std::string& service) {
@@ -233,7 +231,7 @@ std::string GlobalData::GetServiceById(uint64_t id) {
   if (service_id_map_.Get(id, &service)) {
     return *service;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
@@ -256,7 +254,7 @@ std::string GlobalData::GetTaskNameById(uint64_t id) {
   if (task_id_map_.Get(id, &task_name)) {
     return *task_name;
   }
-  return empty_str_;
+  return kEmptyString;
 }
 
 }  // namespace common

@@ -271,50 +271,8 @@ body {
         }
 
         .react-tabs {
-            &:not(:last-child) {
-                border-bottom: 2px solid #000000;
-            }
-
-            &__tab-list {
-                display: table;
-                width: 100%;
-                margin: 0px;
-                border-bottom: 1px solid #000000;
-                padding: 0;
-            }
-
-            &__tab {
-                display: table-cell;
-
-                position: relative;
-                border: 1px solid transparent;
-                border-bottom: none;
-                padding: 6px 12px;
-
-                background: #1D2226;
-                color: #999999;
-                list-style: none;
-                cursor: pointer;
-
-                &--selected {
-                    background: #2A3238;
-                    color: #FFFFFF;
-                }
-
-                span {
-                    color: #FFFFFF;
-                }
-            }
-
-            &__tab-panel {
-                display: none;
-
-                &--selected {
-                    display: block;
-                }
-            }
+            @extend .custom-react-tab;
         }
-
     }
 
     .SplitPane {
@@ -358,6 +316,7 @@ body {
     }
 }
 
+
 .offlineview {
     display: flex;
     flex-flow: column nowrap;
@@ -388,6 +347,60 @@ body {
 
         color: white;
     }
+
+    .default-routing-input {
+        z-index: 10;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #1D2226;
+        padding: 5px;
+
+        .name-label{
+            padding: 10px 0 10px 10px;
+        }
+
+        .start-cycle-checkbox {
+            display: inline-block;
+            padding-left: 20px;
+        }
+        
+        .name-input {
+            margin: 10px;
+            min-height: 20px;
+        }
+
+        .default-routing-input-btn{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        .input-button {
+            min-width: 100px;
+            display:inline-block;
+            margin:0 5px 5px 5px;
+            padding: 10px 10px;
+            border: 1px solid #383838;
+            background: #1D2226;
+            color: #FFFFFF;
+            vertical-align:middle;
+            text-align: center;
+
+            @include small-screen {
+                min-width: 125px;
+            }
+        }
+
+        .submit-button {
+            background: #000000;
+        }
+
+        .input-button:active {
+            background: #383838;
+        }
+        }
+    }
 }
 
 .hidden {
@@ -413,7 +426,7 @@ body {
         background: #1D2226;
 
         @include small-screen {
-            padding: 15px 5px 15px 15px;
+            padding: 12px 5px 15px 12px;
         }
 
         .card-header {
@@ -431,6 +444,23 @@ body {
                     font-size: 16px;
                 }
             }
+
+            .card-header-btn {
+                border: none;
+                border-bottom: 1px solid #999999;
+                padding: 10px 0px 10px 0px;
+                margin-right: 10px;
+                background: #1D2226;
+                color: #FFFFFF;
+                text-align: left;
+                white-space: nowrap;
+
+                font-size: 18px;
+
+                @include small-screen {
+                    font-size: 16px;
+                }
+            }
         }
 
         .card-content-row {
@@ -441,6 +471,21 @@ body {
             overflow-x: hidden;
             overflow-y: auto;
             height: 85%;
+
+            .cycle-input {
+                display: flex;
+                margin-left: auto;
+                justify-content: flex-start;
+                justify-content: space-between;
+
+                padding: 0px;
+                border: none;
+                background: #1D2226;
+
+                .cycle-input-item {
+                    margin: 10px;
+                }
+            }
         }
 
         .card-content-column {
@@ -537,7 +582,7 @@ body {
         }
     }
 
-    .poi-button {
+    .default-routing-button {
         min-width: 360px;
 
         @include small-screen {
@@ -700,6 +745,47 @@ body {
                 @include monitor-item-common-properties(calc(100% - 80px));
             }
         }
+    }
+
+    .battery-and-gears {
+        position: absolute;
+        width: 224px;
+        height: 35px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+
+        font-size: 14px;
+
+        .left-div {
+            position: absolute;
+            width: 116px;
+            height: 35px;
+        }
+
+        .right-div {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 105px;
+            height: 35px;
+        }
+
+        .text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+
+            float: right;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 14px;
+            color: #FFFFFF;
+        }
+    }
+
+    .electricity-status {
+        top: 287px;
+        background: rgba(0, 0, 0, 0.5);
     }
 
     .auto-meter {
@@ -1227,18 +1313,55 @@ body {
 
 .data-recorder {
     z-index: 10;
+
+    padding-left: 5px;
+
+    .react-tabs {
+        @extend .custom-react-tab;
+
+        height: 100%;
+
+        &__tab-panel {
+            box-sizing: border-box;
+            height: 100%;
+            padding: 10px 0px 5px 0px;
+
+            @include small-screen {
+                padding: 5px 0px 0px 0px;
+            }
+        }
+
+        ul.react-tabs__tab-list {
+            width: unset;
+        }
+
+        li.react-tabs__tab {
+            border-bottom: 1px solid #999999;
+            padding: 10px 35px;
+
+            &--selected {
+                border-bottom: 1px solid #FFFFFF;
+            }
+        }
+    }
+
     table {
         width: 100%;
         height: 100%;
-        min-width: 550px;
+        min-width: 860px;
+
+        @include small-screen {
+            min-width: 550px;
+        }
 
         tr, td {
             border: 2px solid #1D2226;
         }
 
         td:first-child {
-            width: 100px;
+            width: 110px;
             border: none;
+            padding-left: 15px;
 
             box-sizing: border-box;
             white-space: nowrap;
@@ -1271,14 +1394,13 @@ body {
                     background: #49a9ee;
                 }
             }
-
         }
 
         .drive-event-msg-row {
             width: 70%;
             height: 70%;
 
-            textarea {
+            textarea, input {
                 height: 100%;
                 width: 100%;
                 max-width: 500px;
@@ -1289,17 +1411,26 @@ body {
 
                 resize: none;
             }
+
+            input {
+                padding: 7px;
+            }
         }
 
         %drive-event-button {
+            min-width: 135px;
             margin-right: 5px;
             padding: 10px 35px;
-            border: none;
+            border: 1px solid #383838;
 
             background: #1D2226;
             color: #FFFFFF;
 
             cursor: pointer;
+
+            @include small-screen {
+                min-width: 125px;
+            }
         }
 
         .drive-event-type-button {
@@ -1491,4 +1622,196 @@ body {
 
         cursor: pointer;
     }
+}
+
+.notification-alert-center {
+    z-index: 10;
+    position: absolute;
+    max-width: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #B96E76;
+    padding: 7px 10px;
+
+    background-color: rgba(74, 5, 24, 0.5);
+
+    .icon {
+        position: relative;
+        height: 20px;
+        width: 20px;
+        padding-right: 5px;
+
+        @include small-screen {
+            height: 15px;
+            width: 15px;
+        }
+    }
+
+    .text {
+        position: relative;
+        padding-left: 5px;
+        color: rgb(185, 92, 118);
+
+        line-height: 150%;
+        font-size: 22px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+
+        @include small-screen {
+            font-size: 18px;
+        }
+    }
+
+    animation: blinker 1.5s linear infinite alternate;
+    animation-play-state: running;
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+}
+
+.custom-react-tab {
+    .react-tabs:not(:last-child) {
+        border-bottom: 2px solid #000000;
+    }
+
+    .react-tabs__tab-list {
+        display: table;
+        width: 100%;
+        margin: 0px;
+        border-bottom: 1px solid #000000;
+        padding: 0;
+    }
+
+    .react-tabs__tab {
+        display: table-cell;
+
+        position: relative;
+        border: 1px solid transparent;
+        border-bottom: none;
+        padding: 6px 12px;
+
+        background: #1D2226;
+        color: #999999;
+        list-style: none;
+        cursor: pointer;
+        font-size: 18px;
+
+        @include small-screen {
+            font-size: 16px;
+        }
+
+        &--selected {
+            background: #2A3238;
+            color: #FFFFFF;
+        }
+
+        span {
+            color: #FFFFFF;
+        }
+    }
+
+    .react-tabs__tab-panel {
+        display: none;
+
+        &--selected {
+            display: block;
+        }
+    }
+}
+
+.guide-text{
+    .pane-text {
+    font-size: 15px;
+    text-indent: 30px;
+    //padding:10px;
+    margin-bottom: 20px;
+    //display:block;
+    }
+
+    .pane-img {
+    //width:200px;
+    //height:100px;
+    //display:flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    //padding:15px;
+    max-width: 80%;
+    max-height: 40%;
+    }
+}
+
+.sensor-configuration-table{
+    //margin:20px;
+    .camera-message{
+        margin-left: 22px;
+        color: #D7466F;
+    }
+
+    .sensor-configuration-tr{
+        //padding:10px;
+	    margin-left: 20px;
+	    margin-top: 10px;
+        .main-sensor{
+            color:red;
+        }
+    }
+
+    .sensor-configuration-translation{
+        display:flex;
+        width:100%;
+        flex-flow:row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+
+        .sensor-configuration-xyz{
+            flex:1;
+            padding:5px 15px 0 0;
+            //padding-right:20px;
+        }
+    }
+}
+
+.preprocess-bar{
+     clear:left;
+    .preprocess-btn {
+        min-width: 40px;
+        margin-right: 5px;
+        padding: 10px 10px;//原来是35
+        border: 1px solid #383838;
+        background: #1D2226;
+        color: #FFFFFF;
+
+        cursor: pointer;
+
+        @include small-screen {
+            min-width: 40px;
+        }
+    }
+    .button-active {
+        color: #30A5FF;
+    }
+}
+
+.preprocess-console {
+    z-index: 10;
+    position: relative;
+    min-width: 230px;
+    margin: 0px;
+    border: none;
+    padding: 0px;
+
+    overflow: hidden;
+
+    .monitor-item {
+        @include monitor-item-common-properties(calc(100% - 82px));
+    }
+}
+
+.edit-tip{
+    background-color: #1D2226;
 }

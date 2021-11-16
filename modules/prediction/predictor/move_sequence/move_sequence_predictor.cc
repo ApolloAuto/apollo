@@ -41,7 +41,7 @@ bool MoveSequencePredictor::Predict(
   Clear();
 
   CHECK_NOTNULL(obstacle);
-  CHECK_GT(obstacle->history_size(), 0);
+  CHECK_GT(obstacle->history_size(), 0U);
 
   obstacle->SetPredictorType(predictor_type_);
 
@@ -285,7 +285,7 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
 double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
   // Sanity check.
-  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(obstacle.history_size(), 0U);
   CHECK_GT(lane_sequence.lane_segment_size(), 0);
   CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
 

@@ -16,11 +16,11 @@
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-// #include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -183,8 +183,10 @@ bool ObjectBuilder::LinePerturbation(PointFCloud* cloud) {
 void ObjectBuilder::GetMinMax3D(const PointFCloud& cloud,
                                 Eigen::Vector3f* min_pt,
                                 Eigen::Vector3f* max_pt) {
-  (*min_pt)[0] = (*min_pt)[1] = (*min_pt)[2] = FLT_MAX;
-  (*max_pt)[0] = (*max_pt)[1] = (*max_pt)[2] = -FLT_MAX;
+  (*min_pt)[0] = (*min_pt)[1] = (*min_pt)[2] =
+      std::numeric_limits<float>::max();
+  (*max_pt)[0] = (*max_pt)[1] = (*max_pt)[2] =
+      -std::numeric_limits<float>::max();
   for (size_t i = 0; i < cloud.size(); ++i) {
     if (std::isnan(cloud[i].x) || std::isnan(cloud[i].y) ||
         std::isnan(cloud[i].z)) {

@@ -16,12 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}/apollo_base.sh"
 
 # run function from apollo_base.sh
 # run command_name module_name
-run control  "$@"  --control_conf_file=modules/control/conf/navigation_lincoln.pb.txt \
- --use_navigation_mode=true
+run_module control "$@" --control_conf_file=modules/control/conf/navigation_lincoln.pb.txt \
+  --use_navigation_mode=true

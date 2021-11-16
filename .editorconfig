@@ -1,0 +1,20 @@
+# http://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+# like -i=2
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{sh,bash,bashrc}]
+shell_variant      = bash    # like -ln=bash
+binary_next_line   = true    # like -bn
+switch_case_indent = true    # like -ci
+space_redirects    = true    # like -sr
+
+# in case third party libraries need a Makefile.
+[Makefile]
+indent_style = tab

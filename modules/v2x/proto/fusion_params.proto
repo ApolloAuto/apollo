@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package apollo.v2x.ft.fusion;
+
+message KMParams {
+  optional double min_score = 1;
+}
+
+message Param {
+  optional double k = 1;
+  optional double b = 2;
+}
+
+message SingleCameraParam {
+  optional int32 camera_id = 1;
+  repeated Param param = 2;
+}
+enum ConfidenceLevel {
+  C90P = 0;
+  C95P = 1;
+  C975P = 2;
+  C99P = 3;
+}
+message ScoreParams {
+  optional double prob_scale = 1;
+  optional double max_match_distance = 2;
+  optional double min_score = 3;
+  optional bool use_mahalanobis_distance = 4 [default = false];
+  optional bool check_type = 5 [default = false];
+  optional ConfidenceLevel confidence_level = 6 [default = C975P];
+}
+
+message FusionParams {
+  repeated SingleCameraParam fusion_params= 1;
+  optional KMParams km_params = 2;
+  required ScoreParams score_params = 3;
+}

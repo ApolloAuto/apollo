@@ -3,13 +3,14 @@ syntax = "proto2";
 package apollo.perception.onboard;
 
 message FusionComponentConfig {
-  optional string fusion_method = 1;
-  optional string fusion_main_sensor = 2;
-  optional bool object_in_roi_check = 3;
-  optional double radius_for_roi_object_check = 4;
+  optional string fusion_name = 1 [default = "ObstacleMultiSensorFusion"];
+  optional string fusion_method = 2;
+  optional string fusion_main_sensor = 3;
+  optional bool object_in_roi_check = 4;
+  optional double radius_for_roi_object_check = 5;
 
-  optional string output_obstacles_channel_name = 5
-      [default = "/perception/obstacles"];
-  optional string output_viz_fused_content_channel_name = 6
+  optional string output_obstacles_channel_name = 6
+      [default = "/perception/vehicle/obstacles"];
+  optional string output_viz_fused_content_channel_name = 7
       [default = "/perception/inner/visualization/FusedObjects"];
 }

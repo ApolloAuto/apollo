@@ -16,8 +16,8 @@
 
 #pragma once
 
+#include <rtklib.h>
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-#include "modules/drivers/gnss/third_party/rtklib.h"
 
 namespace apollo {
 namespace drivers {

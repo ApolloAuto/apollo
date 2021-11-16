@@ -20,10 +20,9 @@
 #include <string>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/scenario_manager.h"
 

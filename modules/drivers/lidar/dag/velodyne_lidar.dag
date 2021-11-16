@@ -1,0 +1,38 @@
+# Define all coms in DAG streaming.
+module_config {                                             
+  module_library : "/apollo/bazel-bin/modules/drivers/lidar/liblidar_driver_component.so"
+  components {
+    class_name : "LidarDriverComponent"
+    config {
+      name : "lidar_driver"
+      config_file_path : "/apollo/modules/drivers/lidar/conf/lidar_config.pb.txt"
+      readers {channel: "/apollo/sensor/lidar/driver"}
+    }
+  }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/parser/libvelodyne_convert_component.so"
+
+    components {
+      class_name : "VelodyneConvertComponent"
+      config {
+        name : "velodyne_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_front_center_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/Scan"}
+      }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
+
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "velodyne_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/velodyne/conf/velodyne16_fusion_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/PointCloud2"}
+      }
+    }
+}

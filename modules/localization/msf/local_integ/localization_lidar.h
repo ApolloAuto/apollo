@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "cyber/common/log.h"
-#include "include/lidar_locator.h"
+#include "localization_msf/lidar_locator.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
@@ -114,6 +114,8 @@ class LocalizationLidar {
                  double* location_score);
 
   void GetLocalizationDistribution(Eigen::MatrixXd* distribution);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  protected:
   void ComposeMapNode(const Eigen::Vector3d& trans);

@@ -117,7 +117,10 @@ ErrorCode VehicleController::Update(const ControlCommand &control_command) {
         break;
       }
     }
-    SetDrivingMode(mode);
+    auto error_code = SetDrivingMode(mode);
+    if (error_code != ErrorCode::OK) {
+      AERROR << "Failed to set driving mode.";
+    }
   }
 
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||

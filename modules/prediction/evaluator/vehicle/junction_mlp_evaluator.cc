@@ -16,11 +16,11 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
-#include <omp.h>
-
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
+
+#include <omp.h>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -265,7 +265,7 @@ void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
   }
   const auto ego_position = ego_pose_obstacle_ptr->latest_feature().position();
   const auto ego_velocity = ego_pose_obstacle_ptr->latest_feature().velocity();
-  CHECK_GT(obstacle_ptr->history_size(), 0);
+  CHECK_GT(obstacle_ptr->history_size(), 0U);
   const Feature& obstacle_feature = obstacle_ptr->latest_feature();
   apollo::common::math::Vec2d ego_relative_position(
       ego_position.x() - obstacle_feature.position().x(),

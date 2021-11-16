@@ -339,7 +339,7 @@ bool ObstaclesContainer::IsMovable(
 double ObstaclesContainer::timestamp() const { return timestamp_; }
 
 SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput(
-    const size_t history_size, const absl::Time& frame_start_time) {
+    const size_t history_size, const apollo::cyber::Time& frame_start_time) {
   SubmoduleOutput container_output;
   for (int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle = GetObstacle(id);

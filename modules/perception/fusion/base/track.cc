@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/track.h"
 
+#include <limits>
+
 namespace apollo {
 namespace perception {
 namespace fusion {
@@ -95,7 +97,7 @@ SensorObjectConstPtr Track::GetLatestSensorObject(
 
 size_t Track::GenerateNewTrackId() {
   int ret_track_id = static_cast<int>(s_track_idx_);
-  if (s_track_idx_ == UINT_MAX) {
+  if (s_track_idx_ == std::numeric_limits<unsigned int>::max()) {
     s_track_idx_ = 1;
   } else {
     s_track_idx_++;

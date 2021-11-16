@@ -24,10 +24,10 @@
 #include <limits>
 #include <unordered_set>
 
-#include "boost/math/tools/minima.hpp"
-
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
+#include "boost/math/tools/minima.hpp"
+
 #include "cyber/common/log.h"
 #include "modules/common/math/angle.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
@@ -53,7 +53,8 @@ ReferenceLine::ReferenceLine(
     : reference_points_(reference_points),
       map_path_(std::move(std::vector<hdmap::MapPathPoint>(
           reference_points.begin(), reference_points.end()))) {
-  CHECK_EQ(map_path_.num_points(), reference_points_.size());
+  CHECK_EQ(static_cast<size_t>(map_path_.num_points()),
+           reference_points_.size());
 }
 
 ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
@@ -64,7 +65,8 @@ ReferenceLine::ReferenceLine(const MapPath& hdmap_path)
     reference_points_.emplace_back(
         hdmap::MapPathPoint(point, point.heading(), lane_waypoint), 0.0, 0.0);
   }
-  CHECK_EQ(map_path_.num_points(), reference_points_.size());
+  CHECK_EQ(static_cast<size_t>(map_path_.num_points()),
+           reference_points_.size());
 }
 
 bool ReferenceLine::Stitch(const ReferenceLine& other) {
@@ -336,7 +338,7 @@ double ReferenceLine::FindMinDistancePoint(const ReferencePoint& p0,
 
 ReferencePoint ReferenceLine::GetReferencePoint(const double x,
                                                 const double y) const {
-  CHECK_GE(reference_points_.size(), 0);
+  CHECK_GE(reference_points_.size(), 0U);
 
   auto func_distance_square = [](const ReferencePoint& point, const double x,
                                  const double y) {
@@ -497,7 +499,7 @@ bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
 }
 
 hdmap::Road::Type ReferenceLine::GetRoadType(const double s) const {
-  const hdmap::HDMap *hdmap = hdmap::HDMapUtil::BaseMapPtr();
+  const hdmap::HDMap* hdmap = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap);
 
   hdmap::Road::Type road_type = hdmap::Road::UNKNOWN;

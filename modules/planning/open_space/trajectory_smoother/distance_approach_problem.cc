@@ -23,6 +23,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/common/util/perf_util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -44,7 +46,7 @@ bool DistanceApproachProblem::Solve(
     Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
     Eigen::MatrixXd* dual_n_result) {
   // TODO(QiL) : evaluate whether need to new it everytime
-  auto t_start = cyber::Time::Now().ToSecond();
+  PERF_BLOCK_START();
 
   DistanceApproachInterface* ptop = nullptr;
 
@@ -61,14 +63,12 @@ bool DistanceApproachProblem::Solve(
         horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
         XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
         planner_open_space_config_);
-    // TODO(xiaoxq): Disable CUDA in planning temporarily.
-    // } else if (planner_open_space_config_.distance_approach_config()
-    //              .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
-    //   ptop = new DistanceApproachIPOPTCUDAInterface(
-    //       horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
-    //       last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
-    //       obstacles_A, obstacles_b, planner_open_space_config_);
-    // }
+  } else if (planner_open_space_config_.distance_approach_config()
+                 .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
+    ptop = new DistanceApproachIPOPTCUDAInterface(
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
+        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
+        planner_open_space_config_);
   } else if (planner_open_space_config_.distance_approach_config()
                  .distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_FIXED_DUAL) {
@@ -168,10 +168,7 @@ bool DistanceApproachProblem::Solve(
     ADEBUG << "*** The final value of the objective function is " << final_obj
            << '.';
 
-    auto t_end = cyber::Time::Now().ToSecond();
-
-    AINFO << "DistanceApproachProblem solving time in second : "
-          << t_end - t_start;
+    PERF_BLOCK_END("DistanceApproachProblemSolving");
   } else {
     /*
       return detailed failure information,

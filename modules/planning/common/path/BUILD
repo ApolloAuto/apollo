@@ -1,17 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
     name = "discretized_path",
     srcs = ["discretized_path.cc"],
     hdrs = ["discretized_path.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/proto:pnc_point_cc_proto",
     ],
 )
 
@@ -31,12 +31,10 @@ cc_library(
     name = "frenet_frame_path",
     srcs = ["frenet_frame_path.cc"],
     hdrs = ["frenet_frame_path.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planning_cc_proto",
     ],
 )
 
@@ -54,9 +52,7 @@ cc_library(
     name = "path_data",
     srcs = ["path_data.cc"],
     hdrs = ["path_data.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
+    copts = PLANNING_COPTS,
     deps = [
         ":discretized_path",
         ":frenet_frame_path",

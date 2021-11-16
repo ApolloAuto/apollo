@@ -18,6 +18,7 @@
 #define CYBER_SCHEDULER_SCHEDULER_H_
 
 #include <unistd.h>
+
 #include <atomic>
 #include <map>
 #include <memory>
@@ -27,6 +28,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/proto/choreography_conf.pb.h"
+
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/log.h"
@@ -34,7 +37,6 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/scheduler/common/mutex_wrapper.h"
 #include "cyber/scheduler/common/pin_thread.h"
 

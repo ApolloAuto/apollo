@@ -17,6 +17,7 @@
 #include "cyber/message/message_traits.h"
 
 #include <string>
+
 #include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"
@@ -34,10 +35,11 @@ class Message {
  public:
   std::string content;
 
-  int ByteSize() const { return static_cast<int>(content.size()); }
+  std::size_t ByteSizeLong() const { return content.size(); }
 
   bool SerializeToArray(void* data, int size) const {
-    if (data == nullptr || size < ByteSize()) {
+    if (data == nullptr || size < 0 ||
+        static_cast<size_t>(size) < ByteSizeLong()) {
       return false;
     }
 

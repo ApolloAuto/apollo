@@ -25,9 +25,10 @@
 #include <string>
 
 #include "absl/strings/str_cat.h"
-#include "cyber/common/file.h"
 #include "google/protobuf/message.h"
-#include "modules/common/time/time.h"
+
+#include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 
 /**
  * @namespace apollo::common::util
@@ -43,7 +44,7 @@ template <typename T, typename std::enable_if<
 static void FillHeader(const std::string& module_name, T* msg) {
   static std::atomic<uint64_t> sequence_num = {0};
   auto* header = msg->mutable_header();
-  double timestamp = apollo::common::time::Clock::NowInSeconds();
+  double timestamp = ::apollo::cyber::Clock::NowInSeconds();
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(

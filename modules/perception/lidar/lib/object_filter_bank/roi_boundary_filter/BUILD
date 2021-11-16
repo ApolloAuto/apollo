@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,7 +13,8 @@ cc_library(
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_object_filter",
-        "//modules/perception/proto:roi_boundary_filter_config_proto",
+        "//modules/perception/proto:roi_boundary_filter_config_cc_proto",
+        "@com_google_googletest//:gtest",
         "@eigen",
     ],
     alwayslink = True,

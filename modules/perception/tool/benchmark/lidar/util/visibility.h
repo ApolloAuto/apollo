@@ -28,7 +28,7 @@ enum class UpdateOperation { add = 0, remove = 1 };
 
 class Visibility {
  public:
-  explicit Visibility(float half_length, float half_width)
+  Visibility(float half_length, float half_width)
       : half_length_(half_length), half_width_(half_width) {}
   ~Visibility() = default;
 

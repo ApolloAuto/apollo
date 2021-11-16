@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <vector>
+
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 
 namespace apollo {
@@ -23,7 +24,7 @@ namespace inference {
 
 typedef int8_t int8;
 
-template<typename Dtype>
+template <typename Dtype>
 __global__ void Slice(const int nthreads, const Dtype *in_data,
                       const int num_slices, const int slice_size,
                       const int bottom_slice_axis, const int top_slice_axis,
@@ -33,17 +34,15 @@ __global__ void Slice(const int nthreads, const Dtype *in_data,
     const int total_slice_size = slice_size * top_slice_axis;
     const int slice_num = index / total_slice_size;
     const int slice_index = index % total_slice_size;
-    const int bottom_index = slice_index
-        + (slice_num * bottom_slice_axis + offset_slice_axis) * slice_size;
+    const int bottom_index =
+        slice_index +
+        (slice_num * bottom_slice_axis + offset_slice_axis) * slice_size;
     out_data[index] = in_data[bottom_index];
   }
 }
 
-int SLICEPlugin::enqueue(int batchSize,
-                         const void *const *inputs,
-                         void **outputs,
-                         void *workspace,
-                         cudaStream_t stream) {
+int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
+                         void **outputs, void *workspace, cudaStream_t stream) {
   int slice_size = 1;
   for (size_t index = axis_ + 1; index < input_dims_.nbDims; index++) {
     slice_size *= input_dims_.d[index];
@@ -61,10 +60,10 @@ int SLICEPlugin::enqueue(int batchSize,
     const int block_num = (nthreads + 511) / 512;
 
     Slice  // NOLINT_NEXT_LINE(whitespace/operators)
-        << < block_num, 512, 0, stream >> > (
-        nthreads, (const float *) (inputs[0]), num_slices, slice_size,
-            input_dims_.d[axis_], top_slice_axis,
-            offset_slice_axis,  reinterpret_cast<float *>(outputs[i]));
+        <<<block_num, 512, 0, stream>>>(
+            nthreads, (const float *)(inputs[0]), num_slices, slice_size,
+            input_dims_.d[axis_], top_slice_axis, offset_slice_axis,
+            reinterpret_cast<float *>(outputs[i]));
     offset_slice_axis += top_slice_axis;
   }
   return 1;

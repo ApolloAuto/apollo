@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"

@@ -18,7 +18,7 @@
 
 import argparse
 import matplotlib.pyplot as plt
-from libs.map import Map
+from modules.tools.mapshow.libs.map import Map
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

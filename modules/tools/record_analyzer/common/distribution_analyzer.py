@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-from .statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.common.statistical_analyzer import PrintColors
 
 
 class DistributionAnalyzer:

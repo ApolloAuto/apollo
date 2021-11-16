@@ -16,8 +16,8 @@
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 
 #include "cyber/common/file.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_tracking_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
@@ -43,21 +43,23 @@ bool LidarObstacleTracking::Init(
 
   LidarObstacleTrackingConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  multi_target_tracker_name_ = config.multi_target_tracker();
-  fusion_classifier_name_ = config.fusion_classifier();
 
-  multi_target_tracker_.reset(
-      BaseMultiTargetTrackerRegisterer::GetInstanceByName(
-          multi_target_tracker_name_));
-  CHECK_NOTNULL(multi_target_tracker_.get());
+  BaseMultiTargetTracker* multi_target_tracker =
+      BaseMultiTargetTrackerRegisterer::
+      GetInstanceByName(config.multi_target_tracker());
+  CHECK_NOTNULL(multi_target_tracker);
+  multi_target_tracker_.reset(multi_target_tracker);
   MultiTargetTrackerInitOptions tracker_init_options;
-  ACHECK(multi_target_tracker_->Init(tracker_init_options));
+  ACHECK(multi_target_tracker_->Init(tracker_init_options)) <<
+                              "lidar multi_target_tracker init error";
 
-  fusion_classifier_.reset(
-      BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name_));
-  CHECK_NOTNULL(fusion_classifier_.get());
+  BaseClassifier* fusion_classifier =
+      BaseClassifierRegisterer::GetInstanceByName(config.fusion_classifier());
+  CHECK_NOTNULL(fusion_classifier);
+  fusion_classifier_.reset(fusion_classifier);
   ClassifierInitOptions fusion_classifier_init_options;
-  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
+  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options)) <<
+                              "lidar classifier init error";
   return true;
 }
 
@@ -65,25 +67,27 @@ LidarProcessResult LidarObstacleTracking::Process(
     const LidarObstacleTrackingOptions& options, LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;
 
-  PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name);
+  PERF_FUNCTION_WITH_INDICATOR(sensor_name);
 
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   MultiTargetTrackerOptions tracker_options;
   if (!multi_target_tracker_->Track(tracker_options, frame)) {
     return LidarProcessResult(LidarErrorCode::TrackerError,
                               "Fail to track objects.");
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 
   ClassifierOptions fusion_classifier_options;
   if (!fusion_classifier_->Classify(fusion_classifier_options, frame)) {
     return LidarProcessResult(LidarErrorCode::ClassifierError,
                               "Fail to fuse object types.");
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "type_fusion");
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "type_fusion");
 
   return LidarProcessResult(LidarErrorCode::Succeed);
 }
+
+PERCEPTION_REGISTER_LIDAROBSTACLETRACKING(LidarObstacleTracking);
 
 }  // namespace lidar
 }  // namespace perception

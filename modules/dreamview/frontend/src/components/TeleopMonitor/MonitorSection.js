@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
 export default class MonitorSection extends React.PureComponent {
-    render() {
-        const { title, icon, children } = this.props;
+  render() {
+    const { title, icon, children } = this.props;
 
-        return (
+    return (
             <div className="section">
                 <div className="section-title">
                     <img height="20px" width="20px" src={icon} />
@@ -14,6 +14,6 @@ export default class MonitorSection extends React.PureComponent {
                     {children}
                 </div>
             </div>
-        );
-    }
+    );
+  }
 }

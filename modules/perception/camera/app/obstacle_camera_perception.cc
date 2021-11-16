@@ -20,13 +20,13 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/perf_util.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -308,14 +308,14 @@ bool ObstacleCameraPerception::GetCalibrationService(
 
 bool ObstacleCameraPerception::Perception(
     const CameraPerceptionOptions &options, CameraFrame *frame) {
-  PERCEPTION_PERF_FUNCTION();
+  PERF_FUNCTION();
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
   ObstacleDetectorOptions detector_options;
   ObstacleTransformerOptions transformer_options;
   ObstaclePostprocessorOptions obstacle_postprocessor_options;
   ObstacleTrackerOptions tracker_options;
   FeatureExtractorOptions extractor_options;
-  PERCEPTION_PERF_BLOCK_START();
+  PERF_BLOCK_START();
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
   if (frame->calibration_service == nullptr) {
@@ -329,27 +329,27 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to detect lane.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "LaneDetector");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "LaneDetector");
 
   if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 2D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "LanePostprocessor2D");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "LanePostprocessor2D");
 
   // Calibration service
   frame->calibration_service->Update(frame);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "CalibrationService");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "CalibrationService");
 
   if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 3D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "LanePostprocessor3D");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "LanePostprocessor3D");
 
   if (write_out_lane_file_) {
     std::string lane_file_path =
@@ -368,8 +368,7 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to predict.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "Predict");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(), "Predict");
 
   std::shared_ptr<BaseObstacleDetector> detector =
       name_detector_map_.at(frame->data_provider->sensor_name());
@@ -378,8 +377,7 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to detect.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "detect");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(), "detect");
 
   // Save all detections results as kitti format
   WriteDetections(
@@ -391,8 +389,8 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to extractor";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "external_feature");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "external_feature");
 
   // Save detection results with bbox, detection_feature
   WriteDetections(
@@ -409,15 +407,15 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to associate2d.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "Associate2D");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "Associate2D");
 
   if (!transformer_->Transform(transformer_options, frame)) {
     AERROR << "Failed to transform.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "Transform");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "Transform");
 
   // Obstacle postprocessor
   obstacle_postprocessor_options.do_refinement_with_calibration_service =
@@ -427,22 +425,21 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to post process obstacles.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "PostprocessObsacle");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "PostprocessObsacle");
 
   if (!tracker_->Associate3D(tracker_options, frame)) {
     AERROR << "Failed to Associate3D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "Associate3D");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "Associate3D");
 
   if (!tracker_->Track(tracker_options, frame)) {
     AERROR << "Failed to track.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
-                                           "Track");
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(), "Track");
 
   if (perception_param_.has_debug_param()) {
     if (perception_param_.debug_param().has_camera2world_out_file()) {

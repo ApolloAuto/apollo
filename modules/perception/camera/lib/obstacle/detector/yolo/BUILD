@@ -1,5 +1,6 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,9 +12,8 @@ cuda_library(
         ":object_maintainer",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
-        "//modules/prediction/proto:feature_proto",
-	"@cuda",
+        "//modules/perception/camera/proto:yolo_cc_proto",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -21,14 +21,13 @@ cc_library(
     name = "region_output",
     srcs = [
         "region_output.cc",
-        ":region_output_cuda",
     ],
     hdrs = ["region_output.h"],
     deps = [
+        ":object_maintainer",
+        ":region_output_cuda",
         "//cyber",
-        "//modules/perception/base",
-        "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
@@ -39,25 +38,27 @@ cc_library(
     deps = [
         ":region_output",
         "//cyber/common:file",
+        "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",
         "//modules/perception/camera/lib/feature_extractor/tfe:project_feature",
         "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
-        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/lib/utils",
     ],
+    alwayslink = True,
 )
 
 cc_library(
     name = "object_maintainer",
+    srcs = ["object_maintainer.cc"],
     hdrs = ["object_maintainer.h"],
     deps = [
+        "//cyber/common:file",
         "//modules/perception/base",
     ],
 )

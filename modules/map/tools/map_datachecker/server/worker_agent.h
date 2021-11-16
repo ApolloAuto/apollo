@@ -62,7 +62,7 @@ class MapDataCheckerAgent final
                                   LoopsVerifyResponse *response);
 
  private:
-  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<JsonConf> sp_conf_ = nullptr;
   std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent_ = nullptr;
   std::shared_ptr<ChannelVerifyAgent> sp_channel_checker_agent_ = nullptr;
   std::shared_ptr<STATIC_ALIGN_AGENT_TYPE> sp_static_align_agent_ = nullptr;

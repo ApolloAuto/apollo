@@ -1,0 +1,85 @@
+ARG DEV_IMAGE_IN=apolloauto/apollo:dev-x86_64-18.04-20210517_1712
+
+ARG BASE_IMAGE=nvidia/cuda:11.1-runtime-ubuntu18.04
+
+FROM ${DEV_IMAGE_IN} as devel
+FROM ${BASE_IMAGE}
+
+ARG GEOLOC=us
+ARG CUDA_LITE=11.1
+ARG CUDNN_VERSION=8.0.4.30
+ARG TENSORRT_VERSION=7.2.1
+
+ENV APOLLO_DIST=stable
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH /opt/apollo/sysroot/bin:$PATH
+
+COPY --from=devel /opt/apollo/rcfiles /opt/apollo/rcfiles/
+COPY --from=devel /opt/apollo/installers /opt/apollo/installers
+
+RUN if [ "${GEOLOC}" = "cn" ]; then \
+        cp -f /etc/apt/sources.list /etc/apt/sources.list.orig; \
+        cp -f /opt/apollo/rcfiles/sources.list.cn.x86_64 /etc/apt/sources.list; \
+    fi
+
+RUN M="${CUDNN_VERSION%%.*}" \
+    && PATCH="-1+cuda${CUDA_LITE}" \
+    && apt-get -y update \
+    && apt-get install -y --no-install-recommends \
+        libcudnn${M}="${CUDNN_VERSION}${PATCH}" \
+    && apt-mark hold libcudnn${M} \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "Delete static cuDNN libraries..." \
+    && find /usr/lib/$(uname -m)-linux-gnu -name "libcudnn_*.a" -delete -print
+
+ENV CUDNN_VERSION ${CUDNN_VERSION}
+
+RUN PATCH="-1+cuda${CUDA_LITE}" && apt-get -y update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        python3-dev \
+        libnvinfer7="${TENSORRT_VERSION}${PATCH}" \
+        libnvonnxparsers7="${TENSORRT_VERSION}${PATCH}" \
+        libnvparsers7="${TENSORRT_VERSION}${PATCH}" \
+        libnvinfer-plugin7="${TENSORRT_VERSION}${PATCH}" \
+    && apt-get -y clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /etc/apt/sources.list.d/nvidia-ml.list \
+    && rm -f /etc/apt/sources.list.d/cuda.list
+
+ENV TENSORRT_VERSION ${TENSORRT_VERSION}
+
+RUN ln -s -f /bin/true /usr/bin/chfn \
+    && echo "stage=runtime" > /etc/apollo.conf \
+    && bash /opt/apollo/installers/install_minimal_environment.sh ${GEOLOC}
+
+RUN bash /opt/apollo/installers/install_mkl.sh
+#RUN bash /opt/apollo/installers/install_node.sh
+RUN bash /opt/apollo/installers/install_python_modules.sh
+
+RUN python3 -m pip install --timeout 30 --no-cache-dir opencv-python
+
+# TODO(storypku): NodeJS
+COPY --from=devel /usr/local/fast-rtps  /usr/local/fast-rtps
+COPY --from=devel /usr/local/libtorch_gpu /usr/local/libtorch_gpu
+COPY --from=devel /usr/local/qt5 /usr/local/qt5
+COPY --from=devel /etc/ld.so.conf.d/qt.conf /etc/ld.so.conf.d/qt.conf
+COPY --from=devel /opt/apollo/pkgs /opt/apollo/pkgs
+COPY --from=devel /opt/apollo/sysroot/lib /opt/apollo/sysroot/lib
+#COPY --from=devel /opt/apollo/sysroot/bin /opt/apollo/sysroot/bin
+COPY --from=devel /etc/profile.d/apollo.sh /etc/profile.d/apollo.sh
+COPY --from=devel /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo.conf
+
+COPY syspkgs.txt /opt/apollo/syspkgs.txt
+RUN apt-get -y update \
+    && apt-get -y install --no-install-recommends \
+        silversearcher-ag \
+        $(cat /opt/apollo/syspkgs.txt) \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Restore
+RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
+RUN ldconfig
+
+ENV PYTHONPATH /apollo:$PYTHONPATH

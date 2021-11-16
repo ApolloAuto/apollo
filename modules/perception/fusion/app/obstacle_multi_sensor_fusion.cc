@@ -25,7 +25,9 @@ bool ObstacleMultiSensorFusion::Init(
     AINFO << "Already inited";
     return true;
   }
-  fusion_ = BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
+  BaseFusionSystem* fusion =
+          BaseFusionSystemRegisterer::GetInstanceByName(param.fusion_method);
+  fusion_.reset(fusion);
 
   FusionInitOptions init_options;
   init_options.main_sensor = param.main_sensor;
@@ -41,6 +43,8 @@ bool ObstacleMultiSensorFusion::Process(const base::FrameConstPtr& frame,
   FusionOptions options;
   return fusion_->Fuse(options, frame, objects);
 }
+
+PERCEPTION_REGISTER_MULTISENSORFUSION(ObstacleMultiSensorFusion);
 
 }  // namespace fusion
 }  // namespace perception

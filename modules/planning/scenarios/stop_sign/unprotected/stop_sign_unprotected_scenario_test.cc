@@ -20,10 +20,9 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
-#include "gtest/gtest.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -50,8 +49,7 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
 
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
-  scenario_.reset(new StopSignUnprotectedScenario(config, &context,
-                                                  injector));
+  scenario_.reset(new StopSignUnprotectedScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }
 

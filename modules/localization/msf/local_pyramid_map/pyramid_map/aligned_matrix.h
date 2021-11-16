@@ -88,7 +88,7 @@ AlignedMatrix<Scalar, aligned_len>::AlignedMatrix(
   }
   data_ = reinterpret_cast<Scalar*>(ptr);
 
-  for (unsigned int k = 0; k < rows_; k++) {
+  for (int k = 0; k < rows_; k++) {
     row_data_[k] = data_ + k * cols_;
   }
 
@@ -144,7 +144,7 @@ void AlignedMatrix<Scalar, aligned_len>::Init(int rows, int cols) {
   }
   data_ = reinterpret_cast<Scalar*>(ptr);
 
-  for (unsigned int k = 0; k < rows_; k++) {
+  for (int k = 0; k < rows_; k++) {
     row_data_[k] = data_ + k * cols_;
   }
 
@@ -218,7 +218,7 @@ operator=(const AlignedMatrix<Scalar, aligned_len>& matrix) {
   }
   data_ = reinterpret_cast<Scalar*>(ptr);
 
-  for (unsigned int k = 0; k < rows_; k++) {
+  for (int k = 0; k < rows_; k++) {
     row_data_[k] = data_ + k * cols_;
   }
 

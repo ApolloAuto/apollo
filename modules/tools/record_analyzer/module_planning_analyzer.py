@@ -21,18 +21,18 @@ import sys
 
 import numpy as np
 
-from common.distribution_analyzer import DistributionAnalyzer
-from common.error_code_analyzer import ErrorCodeAnalyzer
-from common.error_msg_analyzer import ErrorMsgAnalyzer
-from common.frechet_distance import frechet_distance
-from common.statistical_analyzer import PrintColors
-from common.statistical_analyzer import StatisticalAnalyzer
-from metrics.curvature import Curvature
-from metrics.frame_count import FrameCount
-from metrics.latency import Latency
-from metrics.lat_acceleration import LatAcceleration
-from metrics.lon_acceleration import LonAcceleration
-from metrics.reference_line import ReferenceLine
+from modules.tools.record_analyzer.common.distribution_analyzer import DistributionAnalyzer
+from modules.tools.record_analyzer.common.error_code_analyzer import ErrorCodeAnalyzer
+from modules.tools.record_analyzer.common.error_msg_analyzer import ErrorMsgAnalyzer
+from modules.tools.record_analyzer.common.frechet_distance import frechet_distance
+from modules.tools.record_analyzer.common.statistical_analyzer import PrintColors
+from modules.tools.record_analyzer.common.statistical_analyzer import StatisticalAnalyzer
+from modules.tools.record_analyzer.metrics.curvature import Curvature
+from modules.tools.record_analyzer.metrics.frame_count import FrameCount
+from modules.tools.record_analyzer.metrics.latency import Latency
+from modules.tools.record_analyzer.metrics.lat_acceleration import LatAcceleration
+from modules.tools.record_analyzer.metrics.lon_acceleration import LonAcceleration
+from modules.tools.record_analyzer.metrics.reference_line import ReferenceLine
 from modules.planning.proto import planning_pb2
 from shapely.geometry import LineString, Point
 

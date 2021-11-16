@@ -44,7 +44,7 @@ TEST(MapNdtTestSuite, matrix) {
       "/apollo/modules/localization/msf/local_map/test_data/ndt_map/map_data";
   EXPECT_TRUE(apollo::cyber::common::EnsureDirectory(map_base_folder));
 
-  std::vector<Eigen::Affine3d> pcd_poses;
+  ::apollo::common::EigenAffine3dVec pcd_poses;
   std::vector<double> time_stamps;
   std::vector<unsigned int> pcd_indices;
   velodyne::LoadPcdPoses(pose_files, &pcd_poses, &time_stamps, &pcd_indices);

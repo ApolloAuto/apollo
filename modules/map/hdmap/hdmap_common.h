@@ -38,6 +38,7 @@ limitations under the License.
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_rsu.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -84,6 +85,7 @@ class SpeedBumpInfo;
 class RoadInfo;
 class ParkingSpaceInfo;
 class PNCJunctionInfo;
+class RSUInfo;
 class HDMapImpl;
 
 struct LineBoundary {
@@ -134,6 +136,7 @@ using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
 using PolygonRoiPtr = std::shared_ptr<PolygonRoi>;
 using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
+using RSUInfoConstPtr = std::shared_ptr<const RSUInfo>;
 
 class LaneInfo {
  public:
@@ -512,6 +515,21 @@ struct JunctionBoundary {
 };
 
 using JunctionBoundaryPtr = std::shared_ptr<JunctionBoundary>;
+
+class RSUInfo {
+ public:
+  explicit RSUInfo(const RSU& rsu);
+
+  const Id& id() const {
+    return _rsu.id();
+  }
+  const RSU& rsu() const {
+    return _rsu;
+  }
+
+ private:
+  RSU _rsu;
+};
 
 }  // namespace hdmap
 }  // namespace apollo

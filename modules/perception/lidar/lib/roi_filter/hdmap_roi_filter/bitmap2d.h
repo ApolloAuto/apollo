@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include <boost/format.hpp>
 #include <vector>
 
+#include <boost/format.hpp>
 #include "Eigen/Core"
 
 namespace apollo {

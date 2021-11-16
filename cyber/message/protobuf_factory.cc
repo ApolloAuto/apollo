@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/message/protobuf_factory.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {

@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -8,6 +9,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "@eigen",
     ],
@@ -31,11 +33,12 @@ cc_library(
         ":type_fusion_interface",
         ":util",
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
-        "//modules/perception/proto:ccrf_type_fusion_config_proto",
+        "//modules/perception/proto:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -51,7 +54,7 @@ cc_library(
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//modules/perception/proto:fused_classifier_config_proto",
+        "//modules/perception/proto:fused_classifier_config_cc_proto",
     ],
     alwayslink = True,
 )

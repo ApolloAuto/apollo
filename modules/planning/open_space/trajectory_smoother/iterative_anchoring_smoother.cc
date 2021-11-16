@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <random>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -212,7 +213,7 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   // Sanity check
   CHECK_NOTNULL(point2d);
   CHECK_GT(xWS.cols(), 1);
-  CHECK_GT(point2d->size(), 3);
+  CHECK_GT(point2d->size(), 3U);
 
   // Set initial heading and bounds
   const double initial_heading = xWS(2, 0);
@@ -653,7 +654,8 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(), x_ref);
+  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(),
+                                   std::move(x_ref));
   piecewise_jerk_problem.set_weight_ddx(s_curve_config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(s_curve_config.jerk_weight());
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
@@ -796,7 +798,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
 
 double IterativeAnchoringSmoother::CalcHeadings(
     const DiscretizedPath& path_points, const size_t index) {
-  CHECK_GT(path_points.size(), 2);
+  CHECK_GT(path_points.size(), 2U);
   double dx = 0.0;
   double dy = 0.0;
   if (index == 0) {

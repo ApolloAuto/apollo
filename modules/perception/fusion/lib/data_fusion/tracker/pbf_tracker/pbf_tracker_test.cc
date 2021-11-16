@@ -14,16 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
+
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
-
-#define private public
-#define protected public
-#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
 namespace apollo {
 namespace perception {
@@ -73,10 +71,10 @@ TEST(PbfTrackerTest, test_initialize) {
   EXPECT_FALSE(tracker.InitMethods());
 
   PbfTracker::s_motion_fusion_method_ = "KalmanMotionFusion";
-  PbfTracker::s_existance_fusion_method_ = "unknown";
+  PbfTracker::s_existence_fusion_method_ = "unknown";
   EXPECT_FALSE(tracker.InitMethods());
 
-  PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";
+  PbfTracker::s_existence_fusion_method_ = "DstExistenceFusion";
   PbfTracker::s_shape_fusion_method_ = "unknown";
   EXPECT_FALSE(tracker.InitMethods());
 

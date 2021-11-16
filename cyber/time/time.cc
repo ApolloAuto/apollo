@@ -31,7 +31,7 @@ using std::chrono::steady_clock;
 using std::chrono::system_clock;
 
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
-const Time Time::MIN = Time(1);
+const Time Time::MIN = Time(0);
 
 Time::Time(uint64_t nanoseconds) { nanoseconds_ = nanoseconds; }
 
@@ -81,6 +81,10 @@ double Time::ToSecond() const {
 bool Time::IsZero() const { return nanoseconds_ == 0; }
 
 uint64_t Time::ToNanosecond() const { return nanoseconds_; }
+
+uint64_t Time::ToMicrosecond() const {
+  return static_cast<uint64_t>(nanoseconds_ / 1000.0);
+}
 
 std::string Time::ToString() const {
   auto nano = std::chrono::nanoseconds(nanoseconds_);

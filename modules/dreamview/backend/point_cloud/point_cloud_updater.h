@@ -20,10 +20,13 @@
 
 #pragma once
 
-#include <boost/thread/locks.hpp>
-#include <boost/thread/shared_mutex.hpp>
 #include <memory>
 #include <string>
+
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -32,8 +35,6 @@
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "pcl/point_cloud.h"
-#include "pcl/point_types.h"
 
 /**
  * @namespace apollo::dreamview
@@ -55,8 +56,8 @@ class PointCloudUpdater {
    * the server.
    * @param simulationworldupdater pointer
    */
-  explicit PointCloudUpdater(WebSocketHandler *websocket,
-                             SimulationWorldUpdater *sim_world_updater);
+  PointCloudUpdater(WebSocketHandler *websocket,
+                    SimulationWorldUpdater *sim_world_updater);
 
   ~PointCloudUpdater();
 

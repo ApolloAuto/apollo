@@ -17,9 +17,9 @@
 ###############################################################################
 
 
-from .vector2d import Vector2
-from .rotation2d import *
-from .util import segment_overlap
+from modules.tools.prediction.data_pipelines.common.vector2d import Vector2
+from modules.tools.prediction.data_pipelines.common.rotation2d import rotate_fast
+from modules.tools.prediction.data_pipelines.common.util import segment_overlap
 
 
 class BoundingRectangle:

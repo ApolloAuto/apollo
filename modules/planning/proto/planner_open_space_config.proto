@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "modules/planning/proto/fem_pos_deviation_smoother_config.proto";
+import "modules/planning/proto/math/fem_pos_deviation_smoother_config.proto";
 import "modules/planning/proto/task_config.proto";
 
 package apollo.planning;

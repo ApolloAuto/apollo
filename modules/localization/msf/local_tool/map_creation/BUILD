@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -5,19 +6,16 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "lossless_map_creator",
     srcs = ["lossless_map_creator.cc"],
-    linkopts = [
-        "-llz4",
-    ],
     linkstatic = 0,
     deps = [
-        "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
-        "//third_party:boost",
-        "@eigen",
+        "//cyber/common:file",
+        "//modules/localization/msf/common/io:common_io",
+        "//modules/localization/msf/common/util",
+        "//modules/localization/msf/local_pyramid_map/base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
+        "@boost",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -26,12 +24,10 @@ cc_binary(
     srcs = ["lossless_map_to_lossy_map.cc"],
     linkstatic = 0,
     deps = [
-        "//cyber",
-        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
-        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
-        "//third_party:boost",
-        "@eigen",
+        "//modules/localization/msf/local_pyramid_map/base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:pyramid_map_pool",
+        "@boost",
     ],
 )
 
@@ -41,7 +37,6 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
-        "@eigen",
     ],
 )
 

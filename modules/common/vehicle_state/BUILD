@@ -1,3 +1,4 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,7 +13,7 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",
         "//modules/common/status",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/localization/common:localization_common",
         "@eigen",
     ],
@@ -23,7 +24,7 @@ cc_test(
     size = "small",
     srcs = ["vehicle_state_provider_test.cc"],
     data = [
-        "//modules/canbus:canbus_testdata",
+        "//modules/canbus:test_data",
         "//modules/localization:localization_testdata",
     ],
     deps = [

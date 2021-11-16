@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
-#include <opencv2/opencv.hpp>
-
 #include <fstream>
 #include <memory>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
 #include "pcl/io/pcd_io.h"
@@ -75,7 +75,7 @@ void MsgExporter::ImageMessageHandler(
     const std::string& child_frame_id, const std::string& folder) {
   double timestamp = img_msg->measurement_time();
   // std::cout << "Receive image message from channel: " << channel <<
-  //    " at time: " << GLOG_TIMESTAMP(timestamp) << std::endl;
+  //    " at time: " << FORMAT_TIMESTAMP(timestamp) << std::endl;
   const unsigned char* data =
       reinterpret_cast<const unsigned char*>(img_msg->data().data());
   const unsigned char* range_data = nullptr;
@@ -99,7 +99,7 @@ void MsgExporter::PointCloudMessageHandler(
     const std::string& child_frame_id, const std::string& folder) {
   double timestamp = cloud_msg->measurement_time();
   // std::cout << "Receive point cloud message from channel: " << channel <<
-  //    " at time: " << GLOG_TIMESTAMP(timestamp) << std::endl;
+  //    " at time: " << FORMAT_TIMESTAMP(timestamp) << std::endl;
   pcl::PointCloud<PCLPointXYZIT> cloud;
   if (cloud_msg->point_size() > 0) {
     cloud.resize(cloud_msg->point_size());
@@ -191,7 +191,7 @@ bool MsgExporter::QueryPose(double timestamp, const std::string& frame_id,
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time, 0.05f,
                                  &err_string)) {
-    AERROR << "Can not find transform. "  //<< GLOG_TIMESTAMP(timestamp)
+    AERROR << "Can not find transform. "  //<< FORMAT_TIMESTAMP(timestamp)
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;
     return false;

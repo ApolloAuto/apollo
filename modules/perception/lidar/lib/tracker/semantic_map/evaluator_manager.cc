@@ -18,22 +18,22 @@
 
 #include <algorithm>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
 namespace perception {
 
 using apollo::perception::PerceptionObstacle;
-using apollo::prediction::ObstaclesContainer;
-using apollo::prediction::Obstacle;
-using apollo::prediction::SemanticLSTMEvaluator;
-using apollo::prediction::ObstacleHistory;
 using apollo::prediction::Feature;
-using apollo::prediction::SemanticMap;
+using apollo::prediction::Obstacle;
+using apollo::prediction::ObstacleHistory;
 using apollo::prediction::ObstaclePriority;
+using apollo::prediction::ObstaclesContainer;
+using apollo::prediction::SemanticLSTMEvaluator;
+using apollo::prediction::SemanticMap;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 
 bool IsTrainable(const Feature& feature) {
@@ -48,14 +48,15 @@ bool IsTrainable(const Feature& feature) {
 }
 
 void EvaluatorManager::Init() {
-    SemanticMap::Instance()->Init();
-    evaluator_.reset(new SemanticLSTMEvaluator());
-    AERROR << "Init SemanticMap instance.";
+  semantic_map_.reset(new SemanticMap());
+  semantic_map_->Init();
+  evaluator_.reset(new SemanticLSTMEvaluator(semantic_map_.get()));
+  AINFO << "Init SemanticMap instance.";
 }
 
 void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
   BuildObstacleIdHistoryMap(obstacles_container);
-  SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
+  semantic_map_->RunCurrFrame(obstacle_id_history_map_);
   AINFO << "starting evaluating objects in semantic map";
   std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
@@ -81,7 +82,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       break;
     }
     default:
-        break;
+      break;
   }
 }
 

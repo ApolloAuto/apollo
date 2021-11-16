@@ -26,12 +26,12 @@
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/submodules/submodule_output.h"
-#include "modules/prediction/common/junction_analyzer.h"
 
 namespace apollo {
 namespace prediction {
@@ -134,8 +134,8 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  SubmoduleOutput GetSubmoduleOutput(const size_t history_size,
-                                     const absl::Time& frame_start_time);
+  SubmoduleOutput GetSubmoduleOutput(
+      const size_t history_size, const apollo::cyber::Time& frame_start_time);
 
   /**
    * @brief Get current scenario
