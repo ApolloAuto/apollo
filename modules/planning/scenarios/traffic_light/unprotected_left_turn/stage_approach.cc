@@ -96,6 +96,8 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
            << "] color[" << signal_color << "]";
 
+    if (distance_adc_to_stop_line < 0)
+        return FinishStage(frame);
     // check on traffic light color and distance to stop line
     if (signal_color != TrafficLight::GREEN ||
         distance_adc_to_stop_line >=
