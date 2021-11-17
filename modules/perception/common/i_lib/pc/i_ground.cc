@@ -1241,13 +1241,25 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   assert(nr_points <= param_.nr_points_max);
   assert(nr_point_elements >= 3);
   // setup the fine voxel grid
+#ifdef __aarch64__
+  if (!vg_fine_->Set(point_cloud, nr_points, nr_point_elements)) {
+    return false;
+  }
+#else
   if (!vg_fine_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
+#endif
   // setup the coarse voxel grid
+#ifdef __aarch64__
+  if (!vg_coarse_->Set(point_cloud, nr_points, nr_point_elements)) {
+    return false;
+  }
+#else
   if (!vg_coarse_->SetS(point_cloud, nr_points, nr_point_elements)) {
     return false;
   }
+#endif
   // int nr_candis = 0;
   // int nr_valid_grid = 0;
   unsigned int r = 0;

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_x86_64")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,7 +8,7 @@ cc_library(
     name = "spatio_temporal_ground_detector",
     srcs = ["spatio_temporal_ground_detector.cc"],
     hdrs = ["spatio_temporal_ground_detector.h"],
-    copts = ["-msse4.1"],
+    copts = if_x86_64(["-msse4.1"]),
     deps = [
         "//cyber",
         "//modules/perception/base",

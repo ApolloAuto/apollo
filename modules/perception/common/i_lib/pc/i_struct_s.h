@@ -306,8 +306,10 @@ class VoxelGridXY {
            unsigned int nr_point_element);
 
   // sse2 version: only for float type input Data
+#ifndef __aarch64__
   bool SetS(const float *data, unsigned int nr_points,
             unsigned int nr_point_element);
+#endif
 
   bool Set(const T *data, unsigned int nr_points, unsigned int nr_point_element,
            unsigned int nr_voxel_x, unsigned int nr_voxel_y,
@@ -709,6 +711,7 @@ bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
   return (initialized_);
 }
 
+#ifndef __aarch64__
 template <typename T>
 bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
                           unsigned int nr_point_element) {
@@ -848,6 +851,7 @@ bool VoxelGridXY<T>::SetS(const float *data, unsigned int nr_points,
   initialized_ = true;
   return (initialized_);
 }
+#endif
 
 template <typename T>
 bool VoxelGridXY<T>::Set(const T *data, unsigned int nr_points,
