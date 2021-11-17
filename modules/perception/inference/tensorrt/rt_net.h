@@ -39,7 +39,7 @@ class SoftmaxPlugin;
 
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
 typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;
-typedef std::map<std::string, nvinfer1::DimsCHW> TensorDimsMap;
+typedef std::map<std::string, nvinfer1::Dims3> TensorDimsMap;
 typedef std::map<std::string, std::string> TensorModifyMap;
 
 const std::map<EltwiseParameter::EltwiseOp, nvinfer1::ElementWiseOperation>
@@ -220,6 +220,7 @@ class RTNet : public Inference {
   bool is_own_calibrator_ = true;
   std::string model_root_;
   nvinfer1::IBuilder *builder_ = nullptr;
+  nvinfer1::IBuilderConfig *config_ = nullptr;
   nvinfer1::INetworkDefinition *network_ = nullptr;
   std::vector<std::shared_ptr<float>> weights_mem_;
   BlobMap blobs_;

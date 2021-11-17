@@ -45,10 +45,10 @@ TEST(BatchStreamTest, test_init) {
         "modules/perception/inference/inference_test_data/tensorrt/bs_1x1x1x1");
     auto dims = batch_stream.getDims();
     batch_stream.reset(0);
-    EXPECT_EQ(1, dims.n());
-    EXPECT_EQ(1, dims.c());
-    EXPECT_EQ(1, dims.h());
-    EXPECT_EQ(1, dims.w());
+    EXPECT_EQ(1, dims.d[0]);
+    EXPECT_EQ(1, dims.d[1]);
+    EXPECT_EQ(1, dims.d[2]);
+    EXPECT_EQ(1, dims.d[3]);
   }
 }
 

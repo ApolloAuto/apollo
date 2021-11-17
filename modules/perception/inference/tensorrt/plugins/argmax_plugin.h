@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-class ArgMax1Plugin : public nvinfer1::IPlugin {
+class ArgMax1Plugin : public nvinfer1::IPluginV2 {
  public:
   ArgMax1Plugin(const ArgMaxParameter &argmax_param, nvinfer1::Dims in_dims)
       : float_min_(std::numeric_limits<float>::min()) {
@@ -34,7 +34,6 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
     CHECK_GT(input_dims_.nbDims, 0);
     for (int i = 0; i < in_dims.nbDims; i++) {
       input_dims_.d[i] = in_dims.d[i];
-      input_dims_.type[i] = in_dims.type[i];
     }
     axis_ = argmax_param.axis();
     out_max_val_ = argmax_param.out_max_val();
@@ -57,12 +56,12 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
    * this function is called by the implementations of INetworkDefinition and
    * IBuilder. In particular, it is called prior to any call to initialize().
    */
-  virtual int initialize() { return 0; }
-  virtual void terminate() {}
-  int getNbOutputs() const override { return 1; }
-  virtual nvinfer1::Dims getOutputDimensions(int index,
-                                             const nvinfer1::Dims *inputs,
-                                             int nbInputDims) {
+  int32_t initialize() noexcept override { return 0; }
+  void terminate() noexcept override {}
+  int32_t getNbOutputs() const noexcept override { return 1; }
+  nvinfer1::Dims getOutputDimensions(int32_t index,
+                                     const nvinfer1::Dims *inputs,
+                                     int32_t nbInputDims) noexcept override {
     input_dims_ = inputs[0];
     for (int i = 1; i < input_dims_.nbDims; i++) {
       output_dims_.d[i] = input_dims_.d[i];
@@ -70,29 +69,59 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
     return output_dims_;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
-                 int maxBatchSize) override {
+  void configureWithFormat(const nvinfer1::Dims *inputDims, int32_t nbInputs,
+                           const nvinfer1::Dims *outputDims, int32_t nbOutputs,
+                           nvinfer1::DataType type,
+                           nvinfer1::PluginFormat format,
+                           int32_t maxBatchSize) noexcept override {
     input_dims_ = inputDims[0];
     for (int i = 1; i < input_dims_.nbDims; i++) {
       output_dims_.d[i] = input_dims_.d[i];
     }
   }
 
-  size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
+  size_t getWorkspaceSize(int32_t maxBatchSize) const noexcept override {
+    return 0;
+  }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  int32_t enqueue(int32_t batchSize, const void *const *inputs,
+                  void *const *outputs, void *workspace,
+                  cudaStream_t stream) noexcept override;
 
-  size_t getSerializationSize() override { return 0; }
+  size_t getSerializationSize() const noexcept override { return 0; }
 
-  void serialize(void *buffer) override {
+  void serialize(void *buffer) const noexcept override {
     char *d = reinterpret_cast<char *>(buffer), *a = d;
     size_t size = getSerializationSize();
     CHECK_EQ(d, a + size);
   }
 
   virtual ~ArgMax1Plugin() {}
+
+  IPluginV2 *clone() const noexcept override {
+    return const_cast<ArgMax1Plugin *>(this);
+  }
+
+  void destroy() noexcept override {}
+
+  const nvinfer1::AsciiChar *getPluginNamespace() const noexcept override {
+    return "apollo::perception::inference";
+  }
+
+  const nvinfer1::AsciiChar *getPluginType() const noexcept override {
+    return "default";
+  }
+
+  const nvinfer1::AsciiChar *getPluginVersion() const noexcept override {
+    return "1.0";
+  }
+
+  void setPluginNamespace(const nvinfer1::AsciiChar *) noexcept override {}
+
+  bool supportsFormat(nvinfer1::DataType,
+                      nvinfer1::PluginFormat) const noexcept override {
+    return true;
+  }
 
  private:
   bool out_max_val_;

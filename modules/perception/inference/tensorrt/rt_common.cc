@@ -24,9 +24,9 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
-                              const nvinfer1::DimsCHW &inputDims) {
-  nvinfer1::DimsCHW outDims = inputDims;
+nvinfer1::Dims3 ReshapeDims(const nvinfer1::Dims3 &dims,
+                              const nvinfer1::Dims3 &inputDims) {
+  nvinfer1::Dims3 outDims = inputDims;
   int count = inputDims.d[0] * inputDims.d[1] * inputDims.d[2];
   int constant = 1;
   int axis_inference = -1;
@@ -54,7 +54,7 @@ void ParseNetParam(const NetParameter &net_param,
     if (tensorrt_layer_param.type() == "Input") {
       InputParameter input = tensorrt_layer_param.input_param();
       for (int j = 0; j < tensorrt_layer_param.top().size(); ++j) {
-        nvinfer1::DimsCHW dims{static_cast<int>(input.shape(j).dim(1)),
+        nvinfer1::Dims3 dims{static_cast<int>(input.shape(j).dim(1)),
                                static_cast<int>(input.shape(j).dim(2)),
                                static_cast<int>(input.shape(j).dim(3))};
         auto name = tensorrt_layer_param.top(j);

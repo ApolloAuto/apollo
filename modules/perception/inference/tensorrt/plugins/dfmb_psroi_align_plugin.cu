@@ -140,9 +140,10 @@ __global__ void DFMBPSROIAlignForward(
   }
 }
 
-int DFMBPSROIAlignPlugin::enqueue(int batchSize, const void *const *inputs,
-                                  void **outputs, void *workspace,
-                                  cudaStream_t stream) {
+int32_t DFMBPSROIAlignPlugin::enqueue(int32_t batchSize,
+                                      const void *const *inputs,
+                                      void *const *outputs, void *workspace,
+                                      cudaStream_t stream) noexcept {
   const float *bottom_data = reinterpret_cast<const float *>(inputs[0]);
   const float *bottom_rois = reinterpret_cast<const float *>(inputs[1]);
   const float *bottom_trans =

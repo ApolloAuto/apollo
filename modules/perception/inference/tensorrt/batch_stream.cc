@@ -33,11 +33,11 @@ BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
     int d[4];
     int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
     CHECK_EQ(fs, 4);
-    mDims = nvinfer1::DimsNCHW{d[0], d[1], d[2], d[3]};
+    mDims = nvinfer1::Dims4{d[0], d[1], d[2], d[3]};
     fclose(file);
-    mImageSize = mDims.c() * mDims.h() * mDims.w();
+    mImageSize = mDims.d[1] * mDims.d[2] * mDims.d[3];
     mBatch.resize(mBatchSize * mImageSize, 0);
-    mFileBatch.resize(mDims.n() * mImageSize, 0);
+    mFileBatch.resize(mDims.d[0] * mImageSize, 0);
     reset(0);
   }
 }
@@ -48,7 +48,7 @@ void BatchStream::reset(int firstBatch) {
   if (mPath != "") {
     mBatchCount = 0;
     mFileCount = 0;
-    mFileBatchPos = mDims.n();
+    mFileBatchPos = mDims.d[0];
     skip(firstBatch);
   }
 }
@@ -61,15 +61,15 @@ bool BatchStream::next() {
   for (int csize = 1, batchPos = 0; batchPos < mBatchSize;
        batchPos += csize, mFileBatchPos += csize) {
     CHECK_GT(mFileBatchPos, 0);
-    CHECK_LE(mFileBatchPos, mDims.n());
+    CHECK_LE(mFileBatchPos, mDims.d[0]);
     // mMaxBatches > number of batches in the files
-    if (mFileBatchPos == mDims.n() && !update()) {
+    if (mFileBatchPos == mDims.d[0] && !update()) {
       return false;
     }
 
     // copy the smaller of: elements left to fulfill the request,
     // or elements left in the file buffer.
-    csize = std::min(mBatchSize - batchPos, mDims.n() - mFileBatchPos);
+    csize = std::min(mBatchSize - batchPos, mDims.d[0] - mFileBatchPos);
     std::copy_n(getFileBatch() + mFileBatchPos * mImageSize, csize * mImageSize,
                 getBatch() + batchPos * mImageSize);
   }
@@ -78,9 +78,9 @@ bool BatchStream::next() {
 }
 
 void BatchStream::skip(int skipCount) {
-  if (mBatchSize >= mDims.n() && mBatchSize % mDims.n() == 0 &&
-      mFileBatchPos == mDims.n()) {
-    mFileCount += skipCount * mBatchSize / mDims.n();
+  if (mBatchSize >= mDims.d[0] && mBatchSize % mDims.d[0] == 0 &&
+      mFileBatchPos == mDims.d[0]) {
+    mFileCount += skipCount * mBatchSize / mDims.d[0];
     return;
   }
 
@@ -101,12 +101,12 @@ bool BatchStream::update() {
   int d[4];
   int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
   CHECK_EQ(fs, 4);
-  ACHECK(mDims.n() == d[0] && mDims.c() == d[1] && mDims.h() == d[2] &&
-         mDims.w() == d[3]);
+  ACHECK(mDims.d[0] == d[0] && mDims.d[1] == d[1] && mDims.d[2] == d[2] &&
+         mDims.d[3] == d[3]);
 
   size_t readInputCount =
-      fread(getFileBatch(), sizeof(float), mDims.n() * mImageSize, file);
-  CHECK_EQ(readInputCount, size_t(mDims.n() * mImageSize));
+      fread(getFileBatch(), sizeof(float), mDims.d[0] * mImageSize, file);
+  CHECK_EQ(readInputCount, size_t(mDims.d[0] * mImageSize));
   fclose(file);
   mFileBatchPos = 0;
   return true;

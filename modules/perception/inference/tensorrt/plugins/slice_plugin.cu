@@ -41,8 +41,9 @@ __global__ void Slice(const int nthreads, const Dtype *in_data,
   }
 }
 
-int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
-                         void **outputs, void *workspace, cudaStream_t stream) {
+int32_t SLICEPlugin::enqueue(int32_t batchSize, const void *const *inputs,
+                             void *const *outputs, void *workspace,
+                             cudaStream_t stream) noexcept {
   int slice_size = 1;
   for (size_t index = axis_ + 1; index < input_dims_.nbDims; index++) {
     slice_size *= input_dims_.d[index];

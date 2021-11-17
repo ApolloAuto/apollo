@@ -25,8 +25,8 @@ Int8EntropyCalibrator::Int8EntropyCalibrator(
     const apollo::perception::inference::BatchStream &stream, int first_batch,
     bool read_cache, std::string network)
     : stream_(stream), read_cache_(read_cache), network_(network) {
-  DimsNCHW dims = stream_.getDims();
-  input_count_ = stream_.getBatchSize() * dims.c() * dims.h() * dims.w();
+  Dims4 dims = stream_.getDims();
+  input_count_ = stream_.getBatchSize() * dims.d[1] * dims.d[2] * dims.d[3];
   cudaMalloc(&device_input_, input_count_ * sizeof(float));
   stream_.reset(first_batch);
 }
@@ -38,7 +38,7 @@ Int8EntropyCalibrator::~Int8EntropyCalibrator() {
 }
 
 bool Int8EntropyCalibrator::getBatch(void *bindings[], const char *names[],
-                                     int nbBindings) {
+                                     int nbBindings) noexcept {
   if (!stream_.next()) {
     return false;
   }
@@ -49,7 +49,8 @@ bool Int8EntropyCalibrator::getBatch(void *bindings[], const char *names[],
   return true;
 }
 
-const void *Int8EntropyCalibrator::readCalibrationCache(size_t &length) {
+const void *Int8EntropyCalibrator::readCalibrationCache(
+    size_t &length) noexcept {
   calibration_cache_.clear();
   std::ifstream input(
       apollo::perception::inference::locateFile(network_, "CalibrationTable"),
@@ -65,7 +66,7 @@ const void *Int8EntropyCalibrator::readCalibrationCache(size_t &length) {
 }
 
 void Int8EntropyCalibrator::writeCalibrationCache(const void *cache,
-                                                  size_t length) {
+                                                  size_t length) noexcept {
   std::ofstream output(
       apollo::perception::inference::locateFile(network_, "CalibrationTable"),
       std::ios::binary);

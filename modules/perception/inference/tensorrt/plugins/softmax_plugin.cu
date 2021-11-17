@@ -22,9 +22,9 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
-                           void **outputs, void *workspace,
-                           cudaStream_t stream) {
+int32_t SoftmaxPlugin::enqueue(int32_t batch_size, const void *const *inputs,
+                               void *const *outputs, void *workspace,
+                               cudaStream_t stream) noexcept {
   const float *in_data = reinterpret_cast<const float *>(inputs[0]);
   float *out_data = reinterpret_cast<float *>(outputs[0]);
   int w = 1;

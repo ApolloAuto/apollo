@@ -35,10 +35,10 @@ namespace inference {
 
 typedef std::map<std::string, std::vector<nvinfer1::Weights>> WeightMap;
 typedef std::map<std::string, nvinfer1::ITensor *> TensorMap;
-typedef std::map<std::string, nvinfer1::DimsCHW> TensorDimsMap;
+typedef std::map<std::string, nvinfer1::Dims3> TensorDimsMap;
 
-nvinfer1::DimsCHW ReshapeDims(const nvinfer1::DimsCHW &dims,
-                              const nvinfer1::DimsCHW &inputDims);
+nvinfer1::Dims3 ReshapeDims(const nvinfer1::Dims3 &dims,
+                            const nvinfer1::Dims3 &inputDims);
 void ParseNetParam(const NetParameter &net_param,
                    TensorDimsMap *tensor_dims_map,
                    std::map<std::string, std::string> *tensor_modify_map,
@@ -59,10 +59,10 @@ struct ConvParam {
 
 bool ParserConvParam(const ConvolutionParameter &conv, ConvParam *param);
 
-inline nvinfer1::DimsCHW getCHW(const nvinfer1::Dims &d) {
+inline nvinfer1::Dims3 getCHW(const nvinfer1::Dims &d) {
   assert(d.nbDims >= 3);
-  return nvinfer1::DimsCHW(d.d[d.nbDims - 3], d.d[d.nbDims - 2],
-                           d.d[d.nbDims - 1]);
+  return nvinfer1::Dims3(d.d[d.nbDims - 3], d.d[d.nbDims - 2],
+                         d.d[d.nbDims - 1]);
 }
 
 }  // namespace inference
