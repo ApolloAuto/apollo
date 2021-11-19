@@ -38,9 +38,7 @@ bool FusionComponent::Init() {
   // to load component configs
   fusion_name_ = comp_config.fusion_name();
   fusion_method_ = comp_config.fusion_method();
-  for (int i = 0; i < comp_config.fusion_main_sensors_size(); ++i) {
-    fusion_main_sensors_.push_back(comp_config.fusion_main_sensors(i));
-  }
+  fusion_main_sensor_ = comp_config.fusion_main_sensor();
   object_in_roi_check_ = comp_config.object_in_roi_check();
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
@@ -61,23 +59,21 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
                                                        PerceptionObstacles);
   std::shared_ptr<SensorFrameMessage> viz_message(new (std::nothrow)
                                                       SensorFrameMessage);
-
-  // TODO(convert sensor id)
-  const auto& itr = std::find(fusion_main_sensors_.begin(),
-                              fusion_main_sensors_.end(), message->sensor_id_);
-  if (itr == fusion_main_sensors_.end()) {
-    AINFO << "Fusion receives message from " << message->sensor_id_
-          << " which is not in main sensors. Skip sending.";
-    return true;
-  }
-
   bool status = InternalProc(message, out_message, viz_message);
   if (status) {
-    writer_->Write(out_message);
-    AINFO << "Send fusion processing output message.";
-    // send msg for visualization
-    if (FLAGS_obs_enable_visualization) {
-      inner_writer_->Write(viz_message);
+    // TODO(conver sensor id)
+    if (message->sensor_id_ != fusion_main_sensor_) {
+      AINFO << "Fusion receive from " << message->sensor_id_ << "not from "
+            << fusion_main_sensor_ << ". Skip send.";
+    } else {
+      // Send("/apollo/perception/obstacles", out_message);
+      writer_->Write(out_message);
+      AINFO << "Send fusion processing output message.";
+      // send msg for visualization
+      if (FLAGS_obs_enable_visualization) {
+        // Send("/apollo/perception/inner/PrefusedObjects", viz_message);
+        inner_writer_->Write(viz_message);
+      }
     }
   }
   return status;
@@ -89,7 +85,7 @@ bool FusionComponent::InitAlgorithmPlugin() {
   CHECK_NOTNULL(fusion);
   fusion_.reset(fusion);
   fusion::ObstacleMultiSensorFusionParam param;
-  param.main_sensors = fusion_main_sensors_;
+  param.main_sensor = fusion_main_sensor_;
   param.fusion_method = fusion_method_;
   ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
@@ -137,6 +133,10 @@ bool FusionComponent::InternalProc(
     return false;
   }
   PERF_BLOCK_END_WITH_INDICATOR("fusion_process", in_message->sensor_id_);
+
+  if (in_message->sensor_id_ != fusion_main_sensor_) {
+    return true;
+  }
 
   Eigen::Matrix4d sensor2world_pose =
       in_message->frame_->sensor2world_pose.matrix();

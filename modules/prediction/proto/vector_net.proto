@@ -16,9 +16,14 @@ message CarPosition {
   optional double x = 1;
   optional double y = 2;
   optional double phi = 3;
+  optional string id = 4;
 }
 
 message VectorNetFeature {
   optional CarPosition car_position = 1;
   repeated Polyline polyline = 2;
+}
+
+message WorldCoord {
+  repeated CarPosition pose = 1;
 }

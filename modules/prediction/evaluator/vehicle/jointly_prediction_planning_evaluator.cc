@@ -44,6 +44,118 @@ JointlyPredictionPlanningEvaluator::JointlyPredictionPlanningEvaluator()
 
 void JointlyPredictionPlanningEvaluator::Clear() {}
 
+bool JointlyPredictionPlanningEvaluator::VectornetProcessObstaclePosition(
+      Obstacle* obstacle_ptr,
+      ObstaclesContainer* obstacles_container,
+      torch::Tensor* ptr_target_obs_pos,
+      torch::Tensor* ptr_target_obs_pos_step,
+      torch::Tensor* ptr_vector_mask,
+      torch::Tensor* ptr_all_obstacle_pos,
+      torch::Tensor* ptr_all_obs_p_id,
+      torch::Tensor* ptr_obs_length) {
+  // obs data vector
+  // Extract features of pos_history
+  std::vector<std::pair<double, double>> target_pos_history(20, {0.0, 0.0});
+  std::vector<std::pair<double, double>> all_obs_length;
+  std::vector<std::vector<std::pair<double, double>>> all_obs_pos_history;
+
+  if (!ExtractObstaclesHistory(obstacle_ptr, obstacles_container,
+                               &target_pos_history, &all_obs_length,
+                               &all_obs_pos_history, ptr_vector_mask)) {
+    AERROR << "Obstacle [" << obstacle_ptr->id()
+           << "] failed to extract obstacle history";
+    return false;
+  }
+
+  for (int j = 0; j < 20; ++j) {
+    ptr_target_obs_pos->index_put_({19 - j, 0}, target_pos_history[j].first);
+    ptr_target_obs_pos->index_put_({19 - j, 1}, target_pos_history[j].second);
+    if (j == 19 || (j > 0 && target_pos_history[j + 1].first == 0.0)) {
+      break;
+    }
+    ptr_target_obs_pos_step->index_put_(
+        {19 - j, 0},
+        target_pos_history[j].first - target_pos_history[j + 1].first);
+    ptr_target_obs_pos_step->index_put_(
+        {19 - j, 1},
+        target_pos_history[j].second - target_pos_history[j + 1].second);
+  }
+
+  int obs_num =
+      obstacles_container->curr_frame_considered_obstacle_ids().size();
+  for (int i = 0; i < obs_num; ++i) {
+    std::vector<double> obs_p_id{std::numeric_limits<float>::max(),
+                              std::numeric_limits<float>::max()};
+    for (int j = 0; j < 20; ++j) {
+      // Process obs pid
+      if (obs_p_id[0] > all_obs_pos_history[i][j].first) {
+        obs_p_id[0] = all_obs_pos_history[i][j].first;
+      }
+      if (obs_p_id[1] > all_obs_pos_history[i][j].second) {
+        obs_p_id[1] = all_obs_pos_history[i][j].second;
+      }
+      // Process obs pos history
+      ptr_all_obstacle_pos->index_put_(
+          {i, 19 - j, 0},
+          all_obs_pos_history[i][j].first);
+      ptr_all_obstacle_pos->index_put_(
+          {i, 19 - j, 1},
+          all_obs_pos_history[i][j].second);
+    }
+
+    ptr_all_obs_p_id->index_put_({i, 0}, obs_p_id[0]);
+    ptr_all_obs_p_id->index_put_({i, 1}, obs_p_id[1]);
+  }
+
+  for (int i = 0; i < obs_num; ++i) {
+    ptr_obs_length->index_put_({i, 0}, all_obs_length[i].first);
+    ptr_obs_length->index_put_({i, 1}, all_obs_length[i].second);
+  }
+
+  return true;
+}
+
+bool JointlyPredictionPlanningEvaluator::VectornetProcessMapData(
+      FeatureVector* map_feature,
+      PidVector* map_p_id,
+      const int obs_num,
+      torch::Tensor* ptr_map_data,
+      torch::Tensor* ptr_all_map_p_id,
+      torch::Tensor* ptr_vector_mask) {
+  int map_polyline_num = map_feature->size();
+
+  for (int i = 0; i < map_polyline_num && obs_num + i < 450; ++i) {
+    size_t one_polyline_vector_size = map_feature->at(i).size();
+    if (one_polyline_vector_size < 50) {
+      ptr_vector_mask->index_put_({obs_num + i,
+                                   torch::indexing::Slice(
+                                       one_polyline_vector_size,
+                                       torch::indexing::None)},
+                                  1);
+    }
+  }
+
+  auto opts = torch::TensorOptions().dtype(torch::kDouble);
+
+  for (int i = 0; i < map_polyline_num && i + obs_num < 450; ++i) {
+    ptr_all_map_p_id->index_put_({i}, torch::from_blob(map_p_id->at(i).data(),
+                                                       {2},
+                                                       opts));
+
+    int one_polyline_vector_size = map_feature->at(i).size();
+    for (int j = 0; j < one_polyline_vector_size && j < 50; ++j) {
+      ptr_map_data->index_put_({i, j},
+                               torch::from_blob(map_feature->at(i)[j].data(),
+                                                {9},
+                                                opts));
+    }
+  }
+  *ptr_map_data = ptr_map_data->toType(at::kFloat);
+  *ptr_all_map_p_id = ptr_all_map_p_id->toType(at::kFloat);
+
+  return true;
+}
+
 bool JointlyPredictionPlanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                      ObstaclesContainer* obstacles_container) {
   const ADCTrajectoryContainer* adc_trajectory_container;
@@ -74,17 +186,34 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
     return false;
   }
 
-  // obs data vector
-  // Extract features of pos_history
-  std::vector<std::pair<double, double>> target_pos_history(20, {0.0, 0.0});
-  std::vector<std::pair<double, double>> all_obs_length;
-  std::vector<std::vector<std::pair<double, double>>> all_obs_pos_history;
-  if (!ExtractObstaclesHistory(obstacle_ptr, obstacles_container,
-                               &target_pos_history, &all_obs_length,
-                               &all_obs_pos_history)) {
-    ADEBUG << "Obstacle [" << id << "] failed to extract obstacle history";
+  int obs_num =
+      obstacles_container->curr_frame_considered_obstacle_ids().size();
+
+  auto start_time_obs = std::chrono::system_clock::now();
+
+  torch::Tensor target_obstacle_pos = torch::zeros({20, 2});
+  torch::Tensor target_obstacle_pos_step = torch::zeros({20, 2});
+  torch::Tensor vector_mask = torch::zeros({450, 50});
+  torch::Tensor all_obstacle_pos = torch::zeros({obs_num, 20, 2});
+  torch::Tensor all_obs_p_id = torch::zeros({obs_num, 2});
+  torch::Tensor obs_length_tmp = torch::zeros({obs_num, 2});
+
+  if (!VectornetProcessObstaclePosition(obstacle_ptr,
+                                       obstacles_container,
+                                       &target_obstacle_pos,
+                                       &target_obstacle_pos_step,
+                                       &vector_mask,
+                                       &all_obstacle_pos,
+                                       &all_obs_p_id,
+                                       &obs_length_tmp)) {
+    AERROR << "Obstacle [" << id << "] processing obstacle position fails.";
     return false;
   }
+
+  auto end_time_obs = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff_obs = end_time_obs - start_time_obs;
+  ADEBUG << "obstacle vectors used time: " << diff_obs.count() * 1000 << " ms.";
+
 
   // Query the map data vector
   FeatureVector map_feature;
@@ -106,91 +235,28 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   std::chrono::duration<double> diff_query = end_time_query - start_time_query;
   ADEBUG << "vectors query used time: " << diff_query.count() * 1000 << " ms.";
 
-  // Process all obs pos_history & obs pid
-  auto start_time_data_prep = std::chrono::system_clock::now();
-  int obs_num =
-      obstacles_container->curr_frame_considered_obstacle_ids().size();
-  torch::Tensor target_obstacle_pos = torch::zeros({20, 2});
-  torch::Tensor target_obstacle_pos_step = torch::zeros({20, 2});
-  torch::Tensor all_obstacle_pos = torch::zeros({obs_num, 20, 2});
-  torch::Tensor all_obs_p_id = torch::zeros({obs_num, 2});
-  for (int i = 0; i < obs_num; ++i) {
-    std::vector<double> obs_p_id{std::numeric_limits<float>::max(),
-                              std::numeric_limits<float>::max()};
-    for (int j = 0; j < 20; ++j) {
-      // Process obs pid
-      if (obs_p_id[0] > std::abs(all_obs_pos_history[i][j].first)) {
-        obs_p_id[0] = std::abs(all_obs_pos_history[i][j].first);
-        all_obs_p_id[i][0] = obs_p_id[0];
-      }
-      if (obs_p_id[1] > std::abs(all_obs_pos_history[i][j].second)) {
-        obs_p_id[1] = std::abs(all_obs_pos_history[i][j].second);
-        all_obs_p_id[i][1] = obs_p_id[1];
-      }
-      // Process obs pos history
-      target_obstacle_pos[19 - j][0] = target_pos_history[j].first;
-      target_obstacle_pos[19 - j][1] = target_pos_history[j].second;
-      all_obstacle_pos[i][19 - j][0] = all_obs_pos_history[i][j].first;
-      all_obstacle_pos[i][19 - j][1] = all_obs_pos_history[i][j].second;
-      if (j == 19 || (j > 0 && target_pos_history[j].first == 0.0)) {
-        break;
-      }
-      target_obstacle_pos_step[19 - j][0] =
-          target_pos_history[j].first - target_pos_history[j + 1].first;
-      target_obstacle_pos_step[19 - j][1] =
-          target_pos_history[j].second - target_pos_history[j + 1].second;
-    }
-  }
-
-  // Process mask
-  // process v_mask for obs
-  torch::Tensor vector_mask = torch::zeros({450, 50});
-  int obs_count = 0;
-  for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-    Obstacle* obstacle = obstacles_container->GetObstacle(id);
-    int obs_his_size =
-        (obstacle->history_size() <= 20) ? obstacle->history_size() : 20;
-    if (obs_his_size > 0) {
-      vector_mask.index_put_({obs_count,
-          torch::indexing::Slice(torch::indexing::None,
-                                -(obs_his_size))}, 1);
-    } else {
-      vector_mask.index_put_({obs_count, torch::indexing::Slice()}, 1);
-    }
-    ++obs_count;
-  }
-
   // process map data & map p id & v_mask for map polyline
   int map_polyline_num = map_feature.size();
   int data_length =
       ((obs_num + map_polyline_num) < 450) ? (obs_num + map_polyline_num) : 450;
-  for (int i = obs_num; i < data_length; ++i) {
-    int one_polyline_vector_size = map_feature[i].size();
-    int one_polyline_vector_num = std::abs(one_polyline_vector_size);
-    if (one_polyline_vector_size < 0) {
-      vector_mask.index_put_({i, torch::indexing::Slice()}, 1);
-      continue;
-    }
-    if (one_polyline_vector_num < 50) {
-      vector_mask.index_put_({i, torch::indexing::Slice(one_polyline_vector_num,
-                                                        torch::indexing::None)},
-                             1);
-    }
-  }
-  torch::Tensor map_data = torch::zeros({map_polyline_num, 50, 9});
-  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
-  for (int i = 0; i < map_polyline_num && i < 450; ++i) {
-    all_map_p_id[i][0] = map_p_id[i][0];
-    all_map_p_id[i][1] = map_p_id[i][1];
-    int one_polyline_vector_size = map_feature[i].size();
-    if (one_polyline_vector_size < 0) {
-      continue;
-    }
-    int one_polyline_vector_num = std::abs(one_polyline_vector_size);
-    for (int j = 0; j < one_polyline_vector_num && j < 50; ++j) {
-      map_data.index_put_({i, j},
-                          torch::from_blob(map_feature[i][j].data(), {9}));
-    }
+
+  // Process input tensor
+  auto start_time_data_prep = std::chrono::system_clock::now();
+  int map_polyline_num_valid =
+      ((obs_num + map_polyline_num) < 450) ? map_polyline_num : (450 - obs_num);
+  map_polyline_num_valid =
+      map_polyline_num_valid > 0 ? map_polyline_num_valid : 0;
+  torch::Tensor map_data = torch::zeros({map_polyline_num_valid, 50, 9});
+  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num_valid, 2});
+
+  if (!VectornetProcessMapData(&map_feature,
+                               &map_p_id,
+                               obs_num,
+                               &map_data,
+                               &all_map_p_id,
+                               &vector_mask)) {
+    AERROR << "Obstacle [" << id << "] processing map data fails.";
+    return false;
   }
 
   // process p mask
@@ -211,11 +277,6 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
                                torch::indexing::Slice()})},
       2);
   // Add obs length
-  torch::Tensor obs_length_tmp = torch::zeros({obs_num, 2});
-  for (int i = 0; i < obs_num; ++i) {
-    obs_length_tmp[i][0] = all_obs_length[i].first;
-    obs_length_tmp[i][1] = all_obs_length[i].second;
-  }
   torch::Tensor obs_length = obs_length_tmp.unsqueeze(1).repeat({1, 19, 1});
   // Add obs attribute
   torch::Tensor obs_attr_agent =
@@ -225,8 +286,10 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
         {(obs_num - 1), 19, 1});
   torch::Tensor obs_attr = torch::cat({obs_attr_agent, obs_attr_other}, 0);
   // ADD obs id
+  // add 500 to avoid same id as in map_info
   torch::Tensor obs_id =
-      torch::arange(0, obs_num).unsqueeze(1).repeat({1, 19}).unsqueeze(2);
+      torch::arange(500, obs_num + 500).unsqueeze(1).repeat(
+        {1, 19}).unsqueeze(2);
   // Process obs data
   torch::Tensor obs_data_with_len = torch::cat({obs_pos_data, obs_length}, 2);
   torch::Tensor obs_data_with_attr =
@@ -251,7 +314,7 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   }
 
   // Empty rand mask as placeholder
-  torch::Tensor rand_mask = torch::zeros({0});
+  auto rand_mask = torch::zeros({450}).toType(at::kBool);
   // Change mask type to bool
   auto bool_vector_mask = vector_mask.toType(at::kBool);
   auto bool_polyline_mask = polyline_mask.toType(at::kBool);
@@ -261,6 +324,11 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   torch::Tensor adc_trajectory = torch::zeros({1, 30, 6});
   const auto& adc_traj = adc_trajectory_container->adc_trajectory();
   size_t adc_traj_points_num = adc_traj.trajectory_point().size();
+  if (adc_traj_points_num < 1) {
+    AERROR << "adc_traj points num is " << adc_traj_points_num
+           << " adc traj points are not enough";
+    return false;
+  }
   std::vector<TrajectoryPoint> adc_traj_points;
   // ADC trajectory info as model input needs to match with
   // the predicted obstalce's timestamp.
@@ -276,7 +344,7 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   }
   if (!ExtractADCTrajectory(&adc_traj_points,
       obstacle_ptr, &adc_traj_curr_pos)) {
-    ADEBUG << "Failed to extract adc trajectory";
+    AERROR << "Failed to extract adc trajectory";
     return false;
   }
   size_t traj_points_num = adc_traj_points.size();
@@ -338,7 +406,8 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
   auto end_time_inference = std::chrono::system_clock::now();
   std::chrono::duration<double> diff_inference =
       end_time_inference - start_time_inference;
-  ADEBUG << "vectornet inference used time: " << diff_inference.count() * 1000
+  ADEBUG << "vectornet-interaction inference used time: "
+         << diff_inference.count() * 1000
          << " ms.";
 
   // Get the trajectory
@@ -360,7 +429,7 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
 
     double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
-    Vec2d rotated_offset = offset.rotate(heading);
+    Vec2d rotated_offset = offset.rotate(heading - (M_PI / 2));
     double point_x = pos_x + rotated_offset.x();
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
@@ -395,27 +464,26 @@ bool JointlyPredictionPlanningEvaluator::ExtractObstaclesHistory(
     Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
     std::vector<std::pair<double, double>>* target_pos_history,
     std::vector<std::pair<double, double>>* all_obs_length,
-    std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history) {
+    std::vector<std::vector<std::pair<double, double>>>* all_obs_pos_history,
+    torch::Tensor* vector_mask) {
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
   double obs_curr_heading = obs_curr_feature.velocity_heading();
   std::pair<double, double> obs_curr_pos = std::make_pair(
       obs_curr_feature.position().x(), obs_curr_feature.position().y());
   // Extract target obstacle history
-  std::vector<std::pair<double, double>> tar_pos_his(20, {0.0, 0.0});
   for (std::size_t i = 0; i < obstacle_ptr->history_size() && i < 20; ++i) {
     const Feature& target_feature = obstacle_ptr->feature(i);
     if (!target_feature.IsInitialized()) {
       break;
     }
-    tar_pos_his[i] =
-        WorldCoordToObjCoord(std::make_pair(target_feature.position().x(),
+    target_pos_history->at(i) =
+        WorldCoordToObjCoordNorth(std::make_pair(target_feature.position().x(),
                                             target_feature.position().y()),
                              obs_curr_pos, obs_curr_heading);
   }
   all_obs_length->emplace_back(
       std::make_pair(obs_curr_feature.length(), obs_curr_feature.width()));
-  all_obs_pos_history->emplace_back(tar_pos_his);
-  target_pos_history = &tar_pos_his;
+  all_obs_pos_history->emplace_back(*target_pos_history);
 
   // Extract other obstacles & convert pos to traget obstacle relative coord
   std::vector<std::pair<double, double>> pos_history(20, {0.0, 0.0});
@@ -429,12 +497,25 @@ bool JointlyPredictionPlanningEvaluator::ExtractObstaclesHistory(
     all_obs_length->emplace_back(std::make_pair(
         other_obs_curr_feature.length(), other_obs_curr_feature.width()));
 
-    for (std::size_t i = 0; i < obstacle->history_size() && i < 20; ++i) {
+    size_t obs_his_size = obstacle->history_size();
+    obs_his_size = obs_his_size <= 20 ? obs_his_size : 20;
+    int cur_idx = all_obs_pos_history->size();
+    if (obs_his_size > 1) {
+      vector_mask->index_put_({cur_idx,
+                              torch::indexing::Slice(torch::indexing::None,
+                                                     -(obs_his_size - 1))}, 1);
+    } else {
+      vector_mask->index_put_({cur_idx,
+                              torch::indexing::Slice(torch::indexing::None,
+                              -1)}, 1);
+    }
+
+    for (size_t i = 0; i < obs_his_size; ++i) {
       const Feature& feature = obstacle->feature(i);
       if (!feature.IsInitialized()) {
         break;
       }
-      pos_history[i] = WorldCoordToObjCoord(
+      pos_history[i] = WorldCoordToObjCoordNorth(
           std::make_pair(feature.position().x(), feature.position().y()),
           obs_curr_pos, obs_curr_heading);
     }
@@ -458,7 +539,7 @@ bool JointlyPredictionPlanningEvaluator::ExtractADCTrajectory(
       adc_traj_curr_pos->at(i) =
           adc_traj_curr_pos->at(adc_traj_points_num - 1);
     } else {
-      adc_traj_curr_pos->at(i) = WorldCoordToObjCoord(
+      adc_traj_curr_pos->at(i) = WorldCoordToObjCoordNorth(
           std::make_pair(trajectory_points->at(i).path_point().x(),
           trajectory_points->at(i).path_point().y()),
           obs_curr_pos, obs_curr_heading);
@@ -480,16 +561,15 @@ void JointlyPredictionPlanningEvaluator::LoadModel() {
   torch::set_num_threads(1);
 
   // Fake intput for the first frame
-  torch::Tensor target_obstacle_pos = torch::zeros({1, 20, 2});
-  torch::Tensor target_obstacle_pos_step = torch::zeros({1, 20, 2});
-  torch::Tensor vector_data = torch::zeros({1, 450, 50, 9});
+  torch::Tensor target_obstacle_pos = torch::randn({1, 20, 2});
+  torch::Tensor target_obstacle_pos_step = torch::randn({1, 20, 2});
+  torch::Tensor vector_data = torch::randn({1, 450, 50, 9});
   torch::Tensor vector_mask = torch::randn({1, 450, 50}) > 0.9;
   torch::Tensor polyline_mask = torch::randn({1, 450}) > 0.9;
-  torch::Tensor rand_mask = torch::zeros({0});
-  torch::Tensor polyline_id = torch::zeros({1, 450, 2});
+  torch::Tensor rand_mask = torch::zeros({1, 450});
+  torch::Tensor polyline_id = torch::randn({1, 450, 2});
   torch::Tensor adc_trajectory = torch::zeros({1, 30, 6});
   std::vector<torch::jit::IValue> torch_inputs;
-
   auto X_value = c10::ivalue::Tuple::create(
       {std::move(target_obstacle_pos.to(device_)),
        std::move(target_obstacle_pos_step.to(device_)),

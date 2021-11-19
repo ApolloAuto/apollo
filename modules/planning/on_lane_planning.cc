@@ -472,12 +472,14 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
 
   // reference line recovery only one frame
-  bool complete_dead_end =
-    frame_.get()->open_space_info().destination_reached();
+  // bool complete_dead_end =
+  //   frame_.get()->open_space_info().destination_reached();
+  // AERROR << "complete_dead_end is: " << complete_dead_end;
+  /*
   if (complete_dead_end) {
     reference_line_provider_->Start();
     wait_flag_ = true;
-  }
+  }*/
   const uint32_t n = frame_->SequenceNum();
   injector_->frame_history()->Add(n, std::move(frame_));
 }

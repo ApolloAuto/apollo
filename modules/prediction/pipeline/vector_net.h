@@ -19,6 +19,7 @@
 #include <deque>
 #include <map>
 #include <vector>
+#include <string>
 
 #include "modules/prediction/proto/vector_net.pb.h"
 #include "modules/common/math/linear_interpolation.h"
@@ -63,6 +64,9 @@ class VectorNet {
 
   bool offline_query(const double obstacle_x, const double obstacle_y,
                      const double obstacle_phi);
+
+  bool offline_query(const double obstacle_x, const double obstacle_y,
+                     const double obstacle_phi, const std::string file_name);
 
  private:
   // TODO(Yiqun): 1.Left/Right boundary 2.Ordinal Encoding

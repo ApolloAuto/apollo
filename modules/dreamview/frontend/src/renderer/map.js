@@ -561,7 +561,7 @@ export default class Map {
   }
 
   changeSelectedParkingSpaceColor(index, color = 0xff0000) {
-    this.data['parkingSpace'][index].drewObjects.forEach(mesh => {
+    this.data.parkingSpace[index].drewObjects.forEach(mesh => {
       changeMaterial(mesh, color);
     });
   }
@@ -572,13 +572,13 @@ export default class Map {
     if (_.isEmpty(overlapId)) {
       return null;
     }
-    const laneIndex = _.findIndex(this.data['lane'], item => {
+    const laneIndex = _.findIndex(this.data.lane, item => {
       return _.findIndex(item.overlapId, { 'id': overlapId[0].id }) !== -1;
     });
     if (laneIndex === -1) {
       return null;
     }
-    const lane = this.data['lane'][laneIndex];
+    const lane = this.data.lane[laneIndex];
     const points = this.getPointsFromLane(lane, coordinates);
     return {
       centerLine: points,
@@ -628,13 +628,13 @@ export default class Map {
   }
 
   findFixedDistancePointOnLane(distance, laneId, coordinates, backward = true) {
-    const laneIndex = _.findIndex(this.data['lane'], item => {
+    const laneIndex = _.findIndex(this.data.lane, item => {
       return _.isEqual(item.id, laneId[0]);
     });
     if (laneIndex === -1) {
       return null;
     }
-    const lane = this.data['lane'][laneIndex];
+    const lane = this.data.lane[laneIndex];
     let totalLength = distance;
     if (lane.length >= totalLength) {
       const centerLine = _.get(lane, 'centralCurve.segment');
@@ -674,7 +674,7 @@ export default class Map {
       };
     }
   }
-  //onSegment
+  // onSegment
   findFixedDistancePointOnSegment(distance, segmentPoints, coordinates, backward = true) {
     let points = _.get(segmentPoints, 'lineSegment.point');
     if (_.isEmpty(points) || points.length < 2) {
@@ -748,7 +748,7 @@ export default class Map {
     if (_.isEmpty(basedLane)) {
       return null;
     }
-    const centerLine = basedLane['centerLine'];
+    const centerLine = basedLane.centerLine;
     let result = [];
     const laneCenterLineEndPoint = centerLine[centerLine.length - 1];
     let intersectionPoint = null;
@@ -782,18 +782,18 @@ export default class Map {
         // equal x situation
         if (intersectionPoint.y < mid01.y) {
           if (mid01.y < mid23.y) {
-            //01->23
+            // 01->23
             orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
           } else {
-            //23->01
+            // 23->01
             orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
           }
         } else {
           if (mid01.y < mid23.y) {
-            //23->01
+            // 23->01
             orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
           } else {
-            //01->23
+            // 01->23
             orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
           }
         }
@@ -802,21 +802,20 @@ export default class Map {
           if (mid01.x < mid23.x) {
             orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
           } else {
-            //32 -> 01
+            // 32 -> 01
             orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
           }
         } else {
           if (mid01.x < mid23.x) {
-            //32->01
+            // 32->01
             orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
           } else {
-            //01->32
+            // 01->32
             orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
           }
         }
       }
       result = order1[orderIndex];
-      //到这个地方平行已经完成--
     } else {
       const mid12 = {
         x: (border[2].x + border[1].x) / 2,
@@ -831,36 +830,36 @@ export default class Map {
         || mid12.x === mid03.x) {
         if (intersectionPoint.y < mid12.y) {
           if (mid12.y < mid03.y) {
-            //12->03
+            // 12->03
             orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
           } else {
-            //03->12
+            // 03->12
             orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
           }
         } else {
           if (mid12.y < mid03.y) {
-            //03->12
+            // 03->12
             orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
           } else {
-            //12->03
+            // 12->03
             orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
           }
         }
       } else {
         if (intersectionPoint.x < mid12.x) {
           if (mid12.x < mid03.x) {
-            //12->03
+            // 12->03
             orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
           } else {
-            //03 -> 12
+            // 03 -> 12
             orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
           }
         } else {
           if (mid12.x < mid03.x) {
-            //03->12
+            // 03->12
             orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
           } else {
-            //12->03
+            // 12->03
             orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
           }
         }
@@ -1106,7 +1105,7 @@ export default class Map {
         laneGroup1[0].predecessorId, _.last(laneGroup1).successorId, lanes[i],
       );
       if (relation1) {
-        (relation1 > 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
+        (relation1 === 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
       } else {
         if (_.isEmpty(laneGroup2)) {
           laneGroup2.push(lanes[i]);
@@ -1141,7 +1140,7 @@ export default class Map {
     // Ideally, there are some points outside of junction.
     deadJunctionInfo.in = deadJunctionInfo.in[0];
     deadJunctionInfo.out = deadJunctionInfo.out[0];
-    const laneDistanceThreshold = 20;
+    const laneDistanceThreshold = 100;
     deadJunctionInfo.inEndPoint = getLaneLastPoint(deadJunctionInfo.in);
     deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.inEndPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
@@ -1158,7 +1157,11 @@ export default class Map {
     if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
       return null;
     }
-    deadJunctionInfo.routingPoint = routingPointInfo[0];
+    const offsetRoutingPoint = coordinates.applyOffset(
+      { x: routingPointInfo[0].x, y: routingPointInfo[0].y },
+      true
+    );
+    deadJunctionInfo.routingPoint = offsetRoutingPoint;
     deadJunctionInfo.deadJunctionPoints = deadJunction.polygon.point;
     deadJunctionInfo.outLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.outStartPoint, deadJunctionInfo.out, laneDistanceThreshold, 'successorId');

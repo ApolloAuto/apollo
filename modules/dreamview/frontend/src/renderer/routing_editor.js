@@ -5,6 +5,7 @@ import routingPointPin from 'assets/images/routing/pin.png';
 import WS from 'store/websocket';
 import { drawImage } from 'utils/draw';
 import { IsPointInRectangle } from 'utils/misc';
+import _ from 'lodash';
 
 const minDefaultRoutingPointsNum = 1;
 
@@ -41,8 +42,8 @@ export default class RoutingEditor {
     this.pointId = 0;
   }
 
-  addRoutingPoint(point, coordinates, scene, offset = true) {
-    const offsetPoint = offset ? coordinates.applyOffset({ x: point.x, y: point.y }) : point;
+  addRoutingPoint(point, coordinates, scene) {
+    const offsetPoint = coordinates.applyOffset({ x: point.x, y: point.y });
     const selectedParkingSpaceIndex = this.isPointInParkingSpace(offsetPoint);
     if (selectedParkingSpaceIndex !== -1) {
       this.parkingSpaceInfo[selectedParkingSpaceIndex].selectedCounts++;
@@ -53,9 +54,7 @@ export default class RoutingEditor {
     this.pointId += 1;
     this.routePoints.push(pointMesh);
     scene.add(pointMesh);
-    if (offset) {
-      WS.checkRoutingPoint(point);
-    }
+    WS.checkRoutingPoint(point);
     return selectedParkingSpaceIndex;
   }
 
@@ -70,9 +69,9 @@ export default class RoutingEditor {
       if (_.isEmpty(extraInfo)) {
         return false;
       }
-      const offsetPoints = item.polygon.point.map(point => {
-        return coordinates.applyOffset({ x: point.x, y: point.y });
-      });
+      const offsetPoints = item.polygon.point.map(point =>
+        coordinates.applyOffset({ x: point.x, y: point.y })
+      );
       const adjustPoints = extraInfo.order.map(number => {
         return offsetPoints[number];
       });
@@ -183,7 +182,7 @@ export default class RoutingEditor {
         return coordinates.applyOffset(object.position, true);
       }) : routingPoints.map((point) => {
         point.z = 0;
-        return coordinates.applyOffset(point, true);
+        return _.pick(point, ['x', 'y', 'z']);
       });
     if (points.length === 3 && !_.isEmpty(this.deadJunctionInfo)) {
       const deadJunctionIdx = this.determinDeadEndJunctionRequest(points);
@@ -210,7 +209,7 @@ export default class RoutingEditor {
     carOffsetPosition, carHeading, coordinates) {
     const points = cycleRoutingPoints.map((point) => {
       point.z = 0;
-      return coordinates.applyOffset(point, true);
+      return _.pick(point, ['x', 'y', 'z']);
     });
     const start = coordinates.applyOffset(carOffsetPosition, true);
     const start_heading = carHeading;
@@ -220,15 +219,16 @@ export default class RoutingEditor {
     return true;
   }
 
-  addDefaultRouting(routingName) {
+  addDefaultRouting(routingName, coordinates) {
     if (this.routePoints.length < minDefaultRoutingPointsNum) {
       alert(`Please provide at least ${minDefaultRoutingPointsNum} end point.`);
       return false;
     }
 
-    const points = this.routePoints.map((object) => {
-      return object.position;
-    });
+    const points = this.routePoints.map(object =>
+      coordinates.applyOffset(object.position, true)
+      // the coordinates of default routing are consistent with poi
+    );
     WS.saveDefaultRouting(routingName, points);
   }
 

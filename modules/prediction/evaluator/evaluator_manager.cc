@@ -361,6 +361,9 @@ void EvaluatorManager::BuildObstacleIdHistoryMap(
       feature.set_type(obstacle_feature.type());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
+      feature.mutable_interactive_tag()->CopyFrom(
+          obstacle_feature.interactive_tag());
+
       if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
         feature.mutable_polygon_point()->CopyFrom(
             obstacle_feature.polygon_point());

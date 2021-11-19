@@ -34,9 +34,10 @@ std::atomic<uint32_t> DetectionComponent::seq_num_{0};
 bool DetectionComponent::Init() {
   LidarDetectionComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
+    AERROR << "Get config failed";
     return false;
   }
-  ADEBUG << "Lidar Component Configs: " << comp_config.DebugString();
+  AINFO << "Lidar Component Configs: " << comp_config.DebugString();
   output_channel_name_ = comp_config.output_channel_name();
   sensor_name_ = comp_config.sensor_name();
   detector_name_ = comp_config.detector_name();

@@ -88,6 +88,10 @@ DEFINE_string(perception_obstacles_topic_name,
 // VectorNet
 DEFINE_string(prediction_target_file, "/apollo/data/train/test.pb.txt",
               "VectorNet target pb file name");
+DEFINE_string(world_coordinate_file, "/apollo/data/world_coord.bin",
+              "VectorNet world coordinate file name");
+DEFINE_string(prediction_target_dir, "/apollo/data/train/",
+              "VectorNet target dir");
 DEFINE_double(obstacle_x, 0.0, "obstacle position x");
 DEFINE_double(obstacle_y, 0.0, "obstacle position y");
 DEFINE_double(obstacle_phi, 0.0, "obstacle heading phi");

@@ -188,7 +188,7 @@ DEFINE_double(threshold_distance_for_destination, 0.01,
 
 DEFINE_double(buffer_in_routing, 0.0, "buffer for select in lane for boundary");
 
-DEFINE_double(buffer_out_routing, 2.0,
+DEFINE_double(buffer_out_routing, -7.0,
               "buffer for select out lane for boundary");
 // planning trajectory output time density control
 DEFINE_double(

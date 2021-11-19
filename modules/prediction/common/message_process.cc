@@ -175,7 +175,9 @@ void MessageProcess::ContainerProcess(
   obstacles_prioritizer.AssignCautionLevel();
 
   // Add interactive tag
-  interaction_filter.AssignInteractiveTag();
+  if (FLAGS_enable_interactive_tag) {
+    interaction_filter.AssignInteractiveTag();
+  }
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze(container_manager.get());
@@ -221,6 +223,15 @@ void MessageProcess::OnPerception(
       obstacle_ptr->mutable_latest_feature()->set_adc_timestamp(
           ptr_ego_trajectory_container->adc_trajectory()
           .header().timestamp_sec());
+
+      // ego pose_container
+      auto ptr_ego_pose = container_manager->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
+      CHECK_NOTNULL(ptr_ego_pose);
+
+      // adc localization
+      obstacle_ptr->mutable_latest_feature()->mutable_adc_localization()->
+        CopyFrom(*ptr_ego_pose->ToPerceptionObstacle());
 
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";

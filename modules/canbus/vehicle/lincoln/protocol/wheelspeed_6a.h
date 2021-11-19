@@ -23,7 +23,9 @@
 
 #include <sys/time.h>
 
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -114,6 +116,8 @@ class Wheelspeed6a : public ::apollo::drivers::canbus::ProtocolData<
 
   double parse_two_frames(const std::uint8_t low_byte,
                           const std::uint8_t high_byte) const;
+
+  WheelSpeed::WheelSpeedType wheel_direction_convert(double wheel_speed) const;
 };
 
 }  // namespace lincoln

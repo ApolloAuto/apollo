@@ -102,6 +102,14 @@ bool DeadEndTurnAroundScenario::IsTransferable(
   const PointENU& dead_end_point,
   const double dead_end_start_range) {
   std::string target_dead_end_id;
+  const auto& routing_type =
+      frame.local_view().routing->routing_request().dead_end_info().
+      dead_end_routing_type();
+  if (routing_type != routing::ROUTING_IN &&
+      routing_type != routing::ROUTING_OUT) {
+    ADEBUG << "falied to get dead end routing task";
+    return false;
+  }
   // vaild check
   const hdmap::HDMap* base_map_ptr = hdmap::HDMapUtil::BaseMapPtr();
   std::vector<JunctionInfoConstPtr> junctions;
@@ -172,6 +180,8 @@ bool DeadEndTurnAroundScenario::CheckDistanceToDeadEnd(
     JunctionInfoConstPtr* junction) {
   const Vec2d& car_position = {vehicle_state.x(), vehicle_state.y()};
   auto junction_polygon = (*junction)->polygon();
+  AERROR << "dead_end_start_range is: " << dead_end_start_range;
+  AERROR << "car dis is: " << std::abs(junction_polygon.DistanceTo(car_position));
   return std::abs(junction_polygon.DistanceTo(car_position)) <
          dead_end_start_range;
 }
