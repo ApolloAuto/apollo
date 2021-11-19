@@ -668,9 +668,9 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
     } else {
       // send N gear to protect idle
       if (!last_frame->open_space_info().open_space_provider_success()) {
-        current_gear_status->gear_shift_position = canbus::Chassis::GEAR_NEUTRAL;
+        current_gear_status->gear_shift_position =
+        canbus::Chassis::GEAR_NEUTRAL;
       }
-      
       GenerateGearShiftTrajectory(current_gear_status->gear_shift_position,
                                   gear_switch_idle_time_trajectory);
       current_gear_status->gear_shift_period_time =
