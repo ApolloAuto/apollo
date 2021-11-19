@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -333,7 +334,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                         distance_to_vehicle2);
   theta_to_vehicle = std::min(theta_to_vehicle,
                      std::abs(vehicle_state.heading()));
- if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
+  if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
                                 .open_space_trajectory_optimizer_config()
                                 .planner_open_space_config()
                                 .is_near_destination_threshold() &&
