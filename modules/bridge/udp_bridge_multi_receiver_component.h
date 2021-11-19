@@ -43,7 +43,7 @@ namespace bridge {
 class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
  public:
   UDPBridgeMultiReceiverComponent();
-  ~UDPBridgeMultiReceiverComponent();
+  ~UDPBridgeMultiReceiverComponent() = default;
 
   bool Init() override;
   std::string Name() const { return FLAGS_bridge_module_name; }
@@ -67,6 +67,8 @@ class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
   std::mutex mutex_;
   std::vector<std::shared_ptr<ProtoDiserializedBufBase>> proto_list_;
 };
+
+CYBER_REGISTER_COMPONENT(UDPBridgeMultiReceiverComponent)
 
 }  // namespace bridge
 }  // namespace apollo
