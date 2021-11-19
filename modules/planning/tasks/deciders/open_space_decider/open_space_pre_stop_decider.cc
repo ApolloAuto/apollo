@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,16 @@
 
 namespace apollo {
 namespace planning {
-
+using apollo::common::PointENU;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
+using apollo::common::math::Polygon2d;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
+using apollo::routing::RoutingRequest;
 
 OpenSpacePreStopDecider::OpenSpacePreStopDecider(
     const TaskConfig& config,
@@ -70,6 +74,14 @@ Status OpenSpacePreStopDecider::Process(
       }
       SetPullOverStopFence(target_s, frame, reference_line_info);
       break;
+    case OpenSpacePreStopDeciderConfig::DEAD_END_PRE_STOP:
+      if (!CheckDeadEndPreStop(frame, reference_line_info, &target_s)) {
+        const std::string msg = "Checking dead end pre stop fails";
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+      SetDeadEndStopFence(target_s, frame, reference_line_info);
+      break;
     default:
       const std::string msg = "This stop type not implemented";
       AERROR << msg;
@@ -97,6 +109,10 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
 bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
     double* target_s) {
+  const auto &routing_request =
+      frame->local_view().routing->routing_request();
+  auto corner_point =
+      routing_request.parking_info().corner_point();
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();
@@ -122,6 +138,10 @@ bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
           target_parking_spot_ptr->polygon().points().at(0);
       Vec2d right_bottom_point =
           target_parking_spot_ptr->polygon().points().at(1);
+      left_bottom_point.set_x(corner_point.point().at(0).x());
+      left_bottom_point.set_y(corner_point.point().at(0).y());
+      right_bottom_point.set_x(corner_point.point().at(1).x());
+      right_bottom_point.set_y(corner_point.point().at(1).y());
       double left_bottom_point_s = 0.0;
       double left_bottom_point_l = 0.0;
       double right_bottom_point_s = 0.0;
@@ -141,6 +161,105 @@ bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
   }
   *target_s = target_area_center_s;
   return true;
+}
+
+bool OpenSpacePreStopDecider::SelectTargetDeadEndJunction(
+    std::vector<JunctionInfoConstPtr>* junctions,
+    const apollo::common::PointENU& dead_end_point,
+    JunctionInfoConstPtr* target_junction) {
+  // warning: the car only be the one junction
+  size_t junction_num = junctions->size();
+  if (junction_num <= 0) {
+    ADEBUG << "No junctions frim map";
+    return false;
+  }
+  Vec2d target_point = {dead_end_point.x(), dead_end_point.y()};
+  for (size_t i = 0; i < junction_num; ++i) {
+    if (junctions->at(i)->junction().type() == 5) {
+      Polygon2d polygon = junctions->at(i)->polygon();
+      if (polygon.IsPointIn(target_point)) {
+        *target_junction = junctions->at(i);
+        ADEBUG << "car in the junction";
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      ADEBUG << "No dead end junction";
+      return false;
+    }
+  }
+  return true;
+}
+
+bool OpenSpacePreStopDecider::CheckDeadEndPreStop(
+  Frame* const frame,
+  ReferenceLineInfo* const reference_line_info,
+  double* target_s) {
+  const auto& routing_type = frame->local_view().
+    routing->routing_request().dead_end_info().dead_end_routing_type();
+  size_t waypoint_num =
+    frame->local_view().routing->routing_request().waypoint().size();
+  if (routing_type == routing::ROUTING_IN) {
+    dead_end_point_ = frame->local_view().routing->routing_request().
+                    waypoint().at(waypoint_num - 1).pose();
+  } else if (routing_type == routing::ROUTING_OUT) {
+    dead_end_point_ = frame->local_view().routing->routing_request().
+                    waypoint().at(0).pose();
+  }
+  const hdmap::HDMap* base_map_ptr = HDMapUtil::BaseMapPtr();
+  std::vector<JunctionInfoConstPtr> junctions;
+  JunctionInfoConstPtr junction;
+  if (base_map_ptr->GetJunctions(dead_end_point_, 1.0, &junctions) != 0) {
+    ADEBUG << "Fail to get junctions from sim_map.";
+    return false;
+  }
+  if (junctions.size() <= 0) {
+    ADEBUG << "No junctions from map";
+    return false;
+  }
+  if (!SelectTargetDeadEndJunction(&junctions, dead_end_point_, &junction)) {
+    ADEBUG << "Target Dead End not found";
+    return false;
+  }
+  // compute the x value of dead end
+  auto points = junction->polygon().points();
+  const auto& nearby_path =
+      reference_line_info->reference_line().map_path();
+  Vec2d first_point = points.front();
+  // the last point's s value may be unsuitable
+  Vec2d last_point = points.back();
+  double first_point_s = 0.0;
+  double first_point_l = 0.0;
+  double last_point_s = 0.0;
+  double last_point_l = 0.0;
+  nearby_path.GetNearestPoint(first_point, &first_point_s,
+                              &first_point_l);
+  nearby_path.GetNearestPoint(last_point, &last_point_s,
+                              &last_point_l);
+  double center_s = (first_point_s + last_point_s) / 2.0;
+  *target_s = center_s;
+  return true;
+}
+
+void OpenSpacePreStopDecider::SetDeadEndStopFence(
+    const double target_s, Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  double stop_line_s = 0.0;
+  double stop_distance_to_target =
+      open_space_pre_stop_decider_config_.stop_distance_to_target();
+  CHECK_GE(stop_distance_to_target, 1.0e-8);
+  // get the stop point s
+  stop_line_s = target_s - stop_distance_to_target;
+  // set stop fence
+  const std::string stop_wall_id = OPEN_SPACE_STOP_ID;
+  std::vector<std::string> wait_for_obstacles;
+  frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
+      stop_line_s);
+  util::BuildStopDecision(stop_wall_id, stop_line_s, 0.0,
+                          StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
+                          wait_for_obstacles, "OpenSpacePreStopDecider", frame,
+                          reference_line_info);
 }
 
 void OpenSpacePreStopDecider::SetParkingSpotStopFence(

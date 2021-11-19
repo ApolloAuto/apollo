@@ -199,7 +199,6 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       FLAGS_trajectory_stitching_preserved_length, true,
       last_publishable_trajectory_.get(), &replan_reason);
 
-  injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
@@ -213,6 +212,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
+
+  injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
 
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());

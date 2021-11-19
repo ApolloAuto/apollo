@@ -30,4 +30,5 @@ message TrafficLight {
       [default = "/apollo/v2x/traffic_light"];
   optional double v2x_sync_interval_seconds = 18 [default = 0.1];
   optional int32 max_v2x_msg_buff_size = 19 [default = 50];
+  optional string tl_preprocessor_name = 20 [default = "TLPreprocessor"];
 }

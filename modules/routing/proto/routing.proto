@@ -6,11 +6,16 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/error_code.proto";
 import "modules/map/proto/map_parking_space.proto";
+import "modules/map/proto/map_geometry.proto";
 
 message LaneWaypoint {
   optional string id = 1;
   optional double s = 2;
   optional apollo.common.PointENU pose = 3;
+  // When the developer selects a point on the dreamview route editing
+  // the direction can be specified by dragging the mouse
+  // dreamview calculates the heading based on this to support construct lane way point with heading
+  optional double heading = 4;
 }
 
 message LaneSegment {
@@ -19,9 +24,30 @@ message LaneSegment {
   optional double end_s = 3;
 }
 
+enum ParkingSpaceType {
+  VERTICAL_PLOT = 0;
+  PARALLEL_PARKING = 1;
+}
+
+enum DeadEndRoutingType {
+  ROUTING_OTHER = 0;
+  ROUTING_IN = 1;
+  ROUTING_OUT = 2;
+}
+
 message ParkingInfo {
   optional string parking_space_id = 1;
   optional apollo.common.PointENU parking_point = 2;
+  optional ParkingSpaceType parking_space_type = 3;
+  // The four corner points are in order.
+  optional apollo.hdmap.Polygon corner_point = 4;
+}
+
+message DeadEndInfo {
+  // dead end in/out routing
+  optional DeadEndRoutingType dead_end_routing_type = 1;
+  // traget point from the out routing's start point
+  optional apollo.common.PointENU target_point = 2;
 }
 
 message RoutingRequest {
@@ -34,6 +60,7 @@ message RoutingRequest {
   optional bool broadcast = 5 [default = true];
   optional apollo.hdmap.ParkingSpace parking_space = 6 [deprecated = true];
   optional ParkingInfo parking_info = 7;
+  optional DeadEndInfo dead_end_info = 8;
 }
 
 message Measurement {

@@ -13,7 +13,7 @@ obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE
   priority_type: CAUTION
-  evaluator_type: SEMANTIC_LSTM_EVALUATOR
+  evaluator_type: VECTORNET_EVALUATOR
   predictor_type: EXTRAPOLATION_PREDICTOR
 }
 obstacle_conf {
@@ -27,7 +27,7 @@ obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: IN_JUNCTION
   priority_type: CAUTION
-  evaluator_type: SEMANTIC_LSTM_EVALUATOR
+  evaluator_type: VECTORNET_EVALUATOR
   predictor_type: EXTRAPOLATION_PREDICTOR
 }
 obstacle_conf {
@@ -69,4 +69,10 @@ obstacle_conf {
   obstacle_type: UNKNOWN
   obstacle_status: OFF_LANE
   predictor_type: FREE_MOVE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  interactive_tag: INTERACTION
+  evaluator_type: JOINTLY_PREDICTION_PLANNING_EVALUATOR
+  predictor_type: EXTRAPOLATION_PREDICTOR
 }

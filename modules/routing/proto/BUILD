@@ -43,6 +43,7 @@ proto_library(
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
         "//modules/map/proto:map_parking_space_proto",
+        "//modules/map/proto:map_geometry_proto",
     ],
 )
 
@@ -54,6 +55,7 @@ py_proto_library(
         "//modules/common/proto:geometry_py_pb2",
         "//modules/common/proto:header_py_pb2",
         "//modules/map/proto:map_parking_space_py_pb2",
+        "//modules/map/proto:map_geometry_py_pb2",
     ],
 )
 
@@ -96,28 +98,5 @@ py_proto_library(
     deps = [
         ":topo_graph_proto",
         "//modules/map/proto:map_geometry_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "default_routing_cc_proto",
-    deps = [
-        ":default_routing_proto",
-    ],
-)
-
-proto_library(
-    name = "default_routing_proto",
-    srcs = ["default_routing.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "default_routing_py_pb2",
-    deps = [
-        ":default_routing_proto",
-        "//modules/common/proto:geometry_py_pb2",
     ],
 )

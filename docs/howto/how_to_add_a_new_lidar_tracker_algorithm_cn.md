@@ -1,5 +1,13 @@
 # 如何添加新的lidar匹配算法
 
+Perception中的lidar数据流如下：
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+
+本篇文档所介绍的lidar检测算法位于图中的Recognition Component中。当前Recognition Component的架构如下：
+![lidar recognition](images/lidar_recognition.png)
+
+从以上结构中可以清楚地看到lidar匹配算法是位于Recognition Component的 `base_lidar_obstacle_tracking` 中的抽象成员类 `base_multi_target_tracker` 的派生类。下面将详细介绍如何基于当前结构添加新的lidar匹配算法。
+
 Apollo默认的lidar匹配算法为MlfEngine，它可以轻松更改或替换为不同的算法。本篇文档将介绍如何引入新的lidar匹配算法，添加新算法的步骤如下：
 
 1. 定义一个继承基类 `base_multi_target_tracker` 的类
@@ -11,7 +19,7 @@ Apollo默认的lidar匹配算法为MlfEngine，它可以轻松更改或替换为
 
 ## 定义一个继承基类 `base_multi_target_tracker` 的类
 
-所有的lidar匹配算法都必须继承基类`base_multi_target_tracker`，它定义了一组接口。 以下是匹配算法继承基类的示例:
+所有的lidar匹配算法都必须继承基类 `base_multi_target_tracker`，它定义了一组接口。 以下是匹配算法继承基类的示例:
 
 ```c++
 namespace apollo {
@@ -35,6 +43,48 @@ class NewLidarTracker : public BaseMultiTargetTracker {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
+```
+
+基类 `base_multi_target_tracker` 已定义好各虚函数签名，接口信息如下：
+
+```c++
+struct MultiTargetTrackerInitOptions {};
+
+struct MultiTargetTrackerOptions {};
+
+struct LidarFrame {
+  // point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointF>> cloud;
+  // world point cloud
+  std::shared_ptr<base::AttributePointCloud<base::PointD>> world_cloud;
+  // timestamp
+  double timestamp = 0.0;
+  // lidar to world pose
+  Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
+  // lidar to world pose
+  Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
+  // hdmap struct
+  std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
+  // segmented objects
+  std::vector<std::shared_ptr<base::Object>> segmented_objects;
+  // tracked objects
+  std::vector<std::shared_ptr<base::Object>> tracked_objects;
+  // point cloud roi indices
+  base::PointIndices roi_indices;
+  // point cloud non ground indices
+  base::PointIndices non_ground_indices;
+  // secondary segmentor indices
+  base::PointIndices secondary_indices;
+  // sensor info
+  base::SensorInfo sensor_info;
+  // reserve string
+  std::string reserve;
+
+  void Reset();
+
+  void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
+                        const std::vector<uint32_t> &indices);
+};
 ```
 
 ## 实现新类 `NewLidarTracker`
@@ -64,7 +114,7 @@ std::string NewLidarTracker::Name() const {
     */
 }
 
-PERCEPTION_REGISTER_MULTITARGET_TRACKER(MlfEngine); //注册新的lidar_tracker
+PERCEPTION_REGISTER_MULTITARGET_TRACKER(NewLidarTracker); //注册新的lidar_tracker
 
 }  // namespace lidar
 }  // namespace perception
@@ -117,6 +167,6 @@ PERCEPTION_REGISTER_MULTITARGET_TRACKER(MlfEngine); //注册新的lidar_tracker
 
 ## 更新 lidar_obstacle_tracking.conf
 
-要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 值字段改为 "NewLidarTracker"
+要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 字段值改为 "NewLidarTracker"
 
 在完成以上步骤后，您的新lidar匹配算法便可在Apollo系统中生效。

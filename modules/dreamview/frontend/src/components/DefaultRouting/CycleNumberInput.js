@@ -33,9 +33,9 @@ export default class CycleNumberInput extends React.Component {
         alert('please input a valid cycle number');
       }
       else if (!routeEditingManager.checkCycleRoutingAvailable()) {
-        alert(`Please set the default routing reasonably, the distance from the car position
-         to the end point should exceed ${routeEditingManager.defaultRoutingDistanceThreshold}, 
-         otherwise it will not be able to form a closed loop.`);
+        alert(`Please set the default routing reasonably,the distance from the car position
+          to the end point should exceed ${routeEditingManager.defaultRoutingDistanceThreshold},
+          otherwise it will not be able to form a closed loop.`);
       }
       else {
         routeEditingManager.sendCycleRoutingRequest(cycleNumber);

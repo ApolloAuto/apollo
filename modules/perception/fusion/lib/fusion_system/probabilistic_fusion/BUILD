@@ -25,6 +25,7 @@ cc_library(
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
         "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
         "//modules/perception/fusion/lib/interface",
+        "//modules/perception/fusion/lib/interface:base_fusion_system",
         "//modules/perception/lib/thread",
         "//modules/perception/proto:probabilistic_fusion_config_cc_proto",
         "@eigen",

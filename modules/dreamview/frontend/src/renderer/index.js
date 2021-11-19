@@ -325,18 +325,21 @@ class Renderer {
     }
   }
 
-  addDefaultEndPoint(points, offset = true) {
+  addDefaultEndPoint(points) {
     for (let i = 0; i < points.length; i++) {
-      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, offset);
+      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
     }
   }
 
   addDefaultRouting(routingName) {
-    return this.routingEditor.addDefaultRouting(routingName);
+    return this.routingEditor.addDefaultRouting(routingName, this.coordinates);
   }
 
   removeInvalidRoutingPoint(pointId, error) {
-    this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
+    const index = this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
+    if (index !== -1) {
+      this.map.changeSelectedParkingSpaceColor(index, 0xDAA520);
+    }
   }
 
   setParkingInfo(info) {
@@ -344,11 +347,19 @@ class Renderer {
   }
 
   removeAllRoutingPoints() {
-    this.routingEditor.removeAllRoutePoints(this.scene);
+    const indexArr = this.routingEditor.removeAllRoutePoints(this.scene);
+    if (!_.isEmpty(indexArr)) {
+      indexArr.forEach(item => {
+        this.map.changeSelectedParkingSpaceColor(item, 0xDAA520);
+      });
+    }
   }
 
   removeLastRoutingPoint() {
-    this.routingEditor.removeLastRoutingPoint(this.scene);
+    const index = this.routingEditor.removeLastRoutingPoint(this.scene);
+    if (index !== -1) {
+      this.map.changeSelectedParkingSpaceColor(index, 0xDAA520);
+    }
   }
 
   sendRoutingRequest(points = []) {
@@ -378,7 +389,11 @@ class Renderer {
     }
 
     const point = this.getGeolocation(event);
-    this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
+    const selectedParkingSpaceIndex =
+            this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
+    if (selectedParkingSpaceIndex !== -1) {
+      this.map.changeSelectedParkingSpaceColor(selectedParkingSpaceIndex);
+    }
   }
 
   // Render one frame. This supports the main draw/render loop.
@@ -480,7 +495,15 @@ class Renderer {
     if (removeOldMap) {
       this.map.removeAllElements(this.scene);
     }
-    this.map.appendMapData(newData, this.coordinates, this.scene);
+    const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
+    if (newData.parkingSpace && !_.isEmpty(extraInfo[0])) {
+      this.routingEditor.setParkingSpaceInfo(
+        newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
+      );
+    }
+    if (!_.isEmpty(extraInfo[1])) {
+      this.routingEditor.setDeadJunctionInfo(extraInfo[1]);
+    }
   }
 
   updatePointCloud(pointCloud) {

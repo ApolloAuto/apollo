@@ -10,6 +10,7 @@ cc_library(
     hdrs = ["open_space_roi_decider.h"],
     copts = PLANNING_COPTS,
     deps = [
+        "//modules/dreamview/backend/map:map_service",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/tasks/deciders:decider_base",

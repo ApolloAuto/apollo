@@ -70,6 +70,7 @@ using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
 using apollo::planning_internal::PlanningData;
+using apollo::prediction::ObstacleInteractiveTag;
 using apollo::prediction::ObstaclePriority;
 using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
@@ -545,8 +546,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
 
   auto_driving_car->set_disengage_type(DeduceDisengageType(chassis));
 
-  auto_driving_car->set_battery_percentage(
-    chassis.battery_soc_percentage());
+  auto_driving_car->set_battery_percentage(chassis.battery_soc_percentage());
   auto_driving_car->set_gear_location(chassis.gear_location());
 }
 
@@ -1142,6 +1142,11 @@ void SimulationWorldService::UpdateSimulationWorld(
     // Add prediction priority
     if (obstacle.has_priority()) {
       world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
+    }
+
+    // Add prediction interactive tag
+    if (obstacle.has_interactive_tag()) {
+      world_obj.mutable_interactive_tag()->CopyFrom(obstacle.interactive_tag());
     }
 
     world_obj.set_timestamp_sec(

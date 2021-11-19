@@ -43,7 +43,7 @@ ProbabilisticFusion::ProbabilisticFusion() {}
 ProbabilisticFusion::~ProbabilisticFusion() {}
 
 bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
-  main_sensors_ = init_options.main_sensors;
+  main_sensor_ = init_options.main_sensor;
 
   BaseInitOptions options;
   if (!GetFusionInitOptions("ProbabilisticFusion", &options)) {
@@ -128,16 +128,11 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
     }
 
     bool is_publish_sensor = this->IsPublishSensor(sensor_frame);
-    if (is_publish_sensor) {
-      started_ = true;
-    }
 
-    if (started_) {
-      AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
-            << ", obj_cnt : " << sensor_frame->objects.size() << ", "
-            << FORMAT_TIMESTAMP(sensor_frame->timestamp);
-      sensor_data_manager->AddSensorMeasurements(sensor_frame);
-    }
+    AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
+          << ", obj_cnt : " << sensor_frame->objects.size() << ", "
+          << FORMAT_TIMESTAMP(sensor_frame->timestamp);
+    sensor_data_manager->AddSensorMeasurements(sensor_frame);
 
     if (!is_publish_sensor) {
       return true;
@@ -166,13 +161,7 @@ std::string ProbabilisticFusion::Name() const { return "ProbabilisticFusion"; }
 bool ProbabilisticFusion::IsPublishSensor(
     const base::FrameConstPtr& sensor_frame) const {
   std::string sensor_id = sensor_frame->sensor_info.name;
-  const auto& itr = std::find(
-      main_sensors_.begin(), main_sensors_.end(), sensor_id);
-  if (itr != main_sensors_.end()) {
-    return true;
-  } else {
-    return false;
-  }
+  return main_sensor_ == sensor_id;
 }
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
