@@ -37,9 +37,11 @@ common::Status DeadEndRoutingManager::Init(
 
   routing::RoutingRequest temp_out_routing_request = routing_request_out_;
   routing_request_out_.clear_waypoint();
-  apollo::routing::LaneWaypoint *waypoint_first = routing_request_out_.add_waypoint();
+  apollo::routing::LaneWaypoint *waypoint_first =
+  routing_request_out_.add_waypoint();
   waypoint_first->CopyFrom(temp_out_routing_request.waypoint().at(0));
-  apollo::routing::LaneWaypoint *waypoint_second = routing_request_out_.add_waypoint();
+  apollo::routing::LaneWaypoint *waypoint_second =
+  routing_request_out_.add_waypoint();
   waypoint_second->CopyFrom(temp_out_routing_request.waypoint().at(2));
 
   return common::Status::OK();
