@@ -354,7 +354,7 @@ bool MapService::GetNearestLaneWithHeading(const double x, const double y,
   PointENU point;
   point.set_x(x);
   point.set_y(y);
-  static constexpr double kSearchRadius = 1.0;
+  static constexpr double kSearchRadius = 3.0;
   static constexpr double kMaxHeadingDiff = 1.0;
   if (!MapReady() || HDMap()->GetNearestLaneWithHeading(
                          point, kSearchRadius, heading, kMaxHeadingDiff,
