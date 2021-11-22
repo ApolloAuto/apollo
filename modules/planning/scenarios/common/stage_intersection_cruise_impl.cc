@@ -85,7 +85,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
       return true;
     }
 
-    static constexpr double kIntersectionPassDist = 20.0;  // unit: m
+    static constexpr double kIntersectionPassDist = 40.0;  // unit: m
     const double adc_back_edge_s =
         reference_line_info.AdcSlBoundary().start_s();
     const double distance_adc_pass_traffic_sign =
