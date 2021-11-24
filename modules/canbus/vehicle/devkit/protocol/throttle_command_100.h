@@ -36,6 +36,11 @@ class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
+  // config detail: {'bit': 47, 'is_signed_var': False, 'len': 10, 'name':
+  // 'Speed_Target', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|10.23]', 'physical_unit': 'm/s', 'precision': 0.01, 'type': 'double'}
+  Throttlecommand100* set_speed_target(double speed_target);
+
   // config detail: {'name': 'Throttle_Acc', 'offset': 0.0, 'precision': 0.01,
   // 'len': 10, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit': 15,
   // 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
@@ -61,6 +66,11 @@ class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
       Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
 
  private:
+  // config detail: {'bit': 47, 'is_signed_var': False, 'len': 10, 'name':
+  // 'Speed_Target', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|10.23]', 'physical_unit': 'm/s', 'precision': 0.01, 'type': 'double'}
+  void set_p_speed_target(uint8_t* data, double speed_target);
+
   // config detail: {'name': 'Throttle_Acc', 'offset': 0.0, 'precision': 0.01,
   // 'len': 10, 'is_signed_var': False, 'physical_range': '[0|10]', 'bit': 15,
   // 'type': 'double', 'order': 'motorola', 'physical_unit': 'm/s^2'}
@@ -87,6 +97,7 @@ class Throttlecommand100 : public ::apollo::drivers::canbus::ProtocolData<
       Throttle_command_100::Throttle_en_ctrlType throttle_en_ctrl);
 
  private:
+  double speed_target_;
   double throttle_acc_;
   int checksum_100_;
   double throttle_pedal_target_;

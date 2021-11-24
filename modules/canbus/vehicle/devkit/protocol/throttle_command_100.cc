@@ -36,6 +36,7 @@ uint32_t Throttlecommand100::GetPeriod() const {
 }
 
 void Throttlecommand100::UpdateData(uint8_t* data) {
+  set_p_speed_target(data, speed_target_);
   set_p_throttle_acc(data, throttle_acc_);
   set_p_throttle_pedal_target(data, throttle_pedal_target_);
   set_p_throttle_en_ctrl(data, throttle_en_ctrl_);
@@ -50,6 +51,30 @@ void Throttlecommand100::Reset() {
   checksum_100_ = 0;
   throttle_pedal_target_ = 0.0;
   throttle_en_ctrl_ = Throttle_command_100::THROTTLE_EN_CTRL_DISABLE;
+}
+
+Throttlecommand100* Throttlecommand100::set_speed_target(double speed_target) {
+  speed_target_ = speed_target;
+  return this;
+}
+
+// config detail: {'bit': 47, 'is_signed_var': False, 'len': 10, 'name':
+// 'Speed_Target', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|10.23]', 'physical_unit': 'm/s', 'precision': 0.01, 'type': 'double'}
+void Throttlecommand100::set_p_speed_target(uint8_t* data,
+                                            double speed_target) {
+  speed_target = ProtocolData::BoundedValue(0.0, 10.23, speed_target);
+  int x = speed_target / 0.010000;
+  uint8_t t = 0;
+
+  t = x & 0x3;
+  Byte to_set0(data + 6);
+  to_set0.set_value(t, 6, 4);
+  x >>= 2;
+
+  t = x & 0xFF;
+  Byte to_set1(data + 5);
+  to_set1.set_value(t, 0, 8);
 }
 
 Throttlecommand100* Throttlecommand100::set_throttle_acc(double throttle_acc) {

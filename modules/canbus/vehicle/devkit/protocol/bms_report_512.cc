@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
 
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -35,8 +36,11 @@ void Bmsreport512::Parse(const std::uint8_t* bytes, int32_t length,
       battery_current(bytes, length));
   chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_voltage(
       battery_voltage(bytes, length));
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_soc(
-      battery_soc(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_bms_report_512()
+      ->set_battery_soc_percentage(battery_soc_percentage(bytes, length));
+  chassis->mutable_devkit()->mutable_bms_report_512()->set_is_battery_soc_low(
+      battery_soc_percentage(bytes, length) <= 15);
 }
 
 // config detail: {'bit': 23, 'description': 'Battery Total Current',
@@ -76,10 +80,11 @@ double Bmsreport512::battery_voltage(const std::uint8_t* bytes,
 }
 
 // config detail: {'bit': 39, 'description': 'Battery Soc percentage',
-// 'is_signed_var': False, 'len': 8, 'name': 'battery_soc', 'offset': 0.0,
-// 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
+// 'is_signed_var': False, 'len': 8, 'name': 'battery_soc_percentage', 'offset':
+// 0.0, 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
 // 'precision': 1.0, 'type': 'int'}
-int Bmsreport512::battery_soc(const std::uint8_t* bytes, int32_t length) const {
+int Bmsreport512::battery_soc_percentage(const std::uint8_t* bytes,
+                                         int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 

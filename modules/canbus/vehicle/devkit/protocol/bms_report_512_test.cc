@@ -44,7 +44,7 @@ TEST_F(Bmsreport512Test, General) {
 
   EXPECT_EQ(cd.devkit().bms_report_512().battery_current(), -3174.1);
   EXPECT_EQ(cd.devkit().bms_report_512().battery_voltage(), 2.56);
-  EXPECT_EQ(cd.devkit().bms_report_512().battery_soc(), 82);
+  EXPECT_EQ(cd.devkit().bms_report_512().battery_soc_percentage(), 82);
 }
 
 }  // namespace devkit
