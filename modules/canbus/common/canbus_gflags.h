@@ -43,3 +43,6 @@ DECLARE_int32(control_cmd_pending_queue_size);
 
 // enable forward Ultrasonic AEB
 DECLARE_bool(enable_aeb);
+
+// enable vin
+DECLARE_bool(enable_vin);

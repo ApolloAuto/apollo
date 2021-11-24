@@ -20,6 +20,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -104,11 +105,20 @@ ErrorCode ChController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_mode_command_116_ = dynamic_cast<Vehiclemodecommand116*>(
+      message_manager_->GetMutableProtocolDataById(Vehiclemodecommand116::ID));
+  if (vehicle_mode_command_116_ == nullptr) {
+    AERROR << "Vehiclemodecommand116 does not exist in the ChMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
   can_sender_->AddMessage(Brakecommand111::ID, brake_command_111_, false);
   can_sender_->AddMessage(Gearcommand114::ID, gear_command_114_, false);
   can_sender_->AddMessage(Steercommand112::ID, steer_command_112_, false);
   can_sender_->AddMessage(Throttlecommand110::ID, throttle_command_110_, false);
   can_sender_->AddMessage(Turnsignalcommand113::ID, turnsignal_command_113_,
+                          false);
+  can_sender_->AddMessage(Vehiclemodecommand116::ID, vehicle_mode_command_116_,
                           false);
 
   // need sleep to ensure all messages received
@@ -227,33 +237,62 @@ Chassis ChController::chassis() {
   } else {
     chassis_.set_steering_percentage(0);
   }
-
-  // 26
+  // 12
   if (chassis_error_mask_) {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
-
+  // 13 battery soc
+  if (chassis_detail.ch().has_ecu_status_2_516() &&
+      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.ch().ecu_status_2_516().battery_soc());
+  }
+  // 14
   if (chassis_detail.has_surround()) {
     chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
   }
-
-  // give engage_advice based on error_code and canbus feedback
-  if (!chassis_error_mask_ && (chassis_.throttle_percentage() == 0.0)) {
+  // 15 give engage_advice based on error_code and battery low soc warn
+  if (!chassis_error_mask_ && (chassis_.battery_soc_percentage() > 15.0)) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, throttle percentage is not zero!");
+        "Battery soc percentage is lower than 15%, please charge it quickly!");
   }
 
-  // 27 battery soc
-  if (chassis_detail.ch().has_ecu_status_2_516() &&
-      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
-    chassis_.set_battery_soc_percentage(
-        chassis_detail.ch().ecu_status_2_516().battery_soc());
+  // 16 set vin
+  // like LSBN12345678... is prased as vin01(L),vin02(S),vin03(B),...
+  char n[18];
+  memset(&n, '\0', sizeof(n));
+  if (chassis_detail.ch().has_vin_resp1_51b()) {
+    Vin_resp1_51b vin_51b = chassis_detail.ch().vin_resp1_51b();
+    n[0] = vin_51b.vin01();
+    n[1] = vin_51b.vin02();
+    n[2] = vin_51b.vin03();
+    n[3] = vin_51b.vin04();
+    n[4] = vin_51b.vin05();
+    n[5] = vin_51b.vin06();
+    n[6] = vin_51b.vin07();
+    n[7] = vin_51b.vin08();
   }
+  if (chassis_detail.ch().has_vin_resp2_51c()) {
+    Vin_resp2_51c vin_51c = chassis_detail.ch().vin_resp2_51c();
+    n[8] = vin_51c.vin09();
+    n[9] = vin_51c.vin10();
+    n[10] = vin_51c.vin11();
+    n[11] = vin_51c.vin12();
+    n[12] = vin_51c.vin13();
+    n[13] = vin_51c.vin14();
+    n[14] = vin_51c.vin15();
+    n[15] = vin_51c.vin16();
+  }
+  if (chassis_detail.ch().has_vin_resp3_51d()) {
+    Vin_resp3_51d vin_51d = chassis_detail.ch().vin_resp3_51d();
+    n[16] = vin_51d.vin17();
+  }
+  chassis_.mutable_vehicle_id()->set_vin(n);
 
   return chassis_;
 }
@@ -275,7 +314,13 @@ ErrorCode ChController::EnableAutoMode() {
       Throttle_command_110::THROTTLE_PEDAL_EN_CTRL_ENABLE);
   steer_command_112_->set_steer_angle_en_ctrl(
       Steer_command_112::STEER_ANGLE_EN_CTRL_ENABLE);
-  AINFO << "\n\n\n set enable \n\n\n";
+  AINFO << "set enable";
+  // get VIN
+  if (FLAGS_enable_vin) {
+    vehicle_mode_command_116_->set_vin_req_cmd(
+        Vehicle_mode_command_116::VIN_REQ_CMD_VIN_REQ_DISABLE);
+    AINFO << "get VIN";
+  }
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -380,7 +425,7 @@ void ChController::Acceleration(double acc) {}
 // ch default, -23 ~ 23, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// angle:-99.99~0.00~99.99, unit:, left:+, right:-
 void ChController::Steer(double angle) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_STEER_ONLY)) {

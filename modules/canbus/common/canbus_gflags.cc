@@ -49,3 +49,6 @@ DEFINE_int32(control_cmd_pending_queue_size, 10,
 
 // enable forward Ultrasonic AEB
 DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");
+
+// enable vin
+DEFINE_bool(enable_vin, true, "Enable vin from vehicle");

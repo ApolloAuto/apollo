@@ -36,34 +36,34 @@ class Brakecommand111 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'description': 'brake pedal enable bit(Command)', 'enum':
-  // {0: 'BRAKE_PEDAL_EN_CTRL_DISABLE', 1: 'BRAKE_PEDAL_EN_CTRL_ENABLE'},
-  // 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_EN_CTRL', 'is_signed_var':
-  // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-  // 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'brake pedal enable bit(Command)',
+  // 'enum': {0: 'BRAKE_PEDAL_EN_CTRL_DISABLE', 1:
+  // 'BRAKE_PEDAL_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'BRAKE_PEDAL_EN_CTRL', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Brakecommand111* set_brake_pedal_en_ctrl(
       Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
 
-  // config detail: {'description': 'Percentage of brake pedal(Command)',
-  // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_CMD',
-  // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': '%'}
+  // config detail: {'bit': 8, 'description': 'Percentage of brake
+  // pedal(Command)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'BRAKE_PEDAL_CMD', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
   Brakecommand111* set_brake_pedal_cmd(int brake_pedal_cmd);
 
  private:
-  // config detail: {'description': 'brake pedal enable bit(Command)', 'enum':
-  // {0: 'BRAKE_PEDAL_EN_CTRL_DISABLE', 1: 'BRAKE_PEDAL_EN_CTRL_ENABLE'},
-  // 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_EN_CTRL', 'is_signed_var':
-  // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-  // 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'brake pedal enable bit(Command)',
+  // 'enum': {0: 'BRAKE_PEDAL_EN_CTRL_DISABLE', 1:
+  // 'BRAKE_PEDAL_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'BRAKE_PEDAL_EN_CTRL', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   void set_p_brake_pedal_en_ctrl(
       uint8_t* data,
       Brake_command_111::Brake_pedal_en_ctrlType brake_pedal_en_ctrl);
 
-  // config detail: {'description': 'Percentage of brake pedal(Command)',
-  // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'BRAKE_PEDAL_CMD',
-  // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': '%'}
+  // config detail: {'bit': 8, 'description': 'Percentage of brake
+  // pedal(Command)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'BRAKE_PEDAL_CMD', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
   void set_p_brake_pedal_cmd(uint8_t* data, int brake_pedal_cmd);
 
  private:
