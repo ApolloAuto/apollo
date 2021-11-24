@@ -22,14 +22,16 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
 #include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+#include "modules/canbus/vehicle/devkit/protocol/vehicle_mode_command_105.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace canbus {
@@ -125,6 +127,7 @@ class DevkitController final : public VehicleController {
   Parkcommand104* park_command_104_ = nullptr;
   Steeringcommand102* steering_command_102_ = nullptr;
   Throttlecommand100* throttle_command_100_ = nullptr;
+  Vehiclemodecommand105* vehicle_mode_command_105_ = nullptr;
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;

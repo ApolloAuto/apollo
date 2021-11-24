@@ -45,7 +45,7 @@ TEST_F(Vcureport505Test, General) {
   EXPECT_EQ(cd.devkit().vcu_report_505().vehicle_mode_state(), 1);
   EXPECT_EQ(cd.devkit().vcu_report_505().frontcrash_state(), 1);
   EXPECT_EQ(cd.devkit().vcu_report_505().backcrash_state(), 0);
-  EXPECT_EQ(cd.devkit().vcu_report_505().aeb_state(), 0);
+  EXPECT_EQ(cd.devkit().vcu_report_505().aeb_brake_state(), 0);
   EXPECT_EQ(cd.devkit().vcu_report_505().acc(), 1.12);
   EXPECT_EQ(cd.devkit().vcu_report_505().speed(), 0.258);
 }
