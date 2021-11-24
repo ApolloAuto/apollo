@@ -33,6 +33,9 @@ void Steeringreport502::Parse(const std::uint8_t* bytes, int32_t length,
                               ChassisDetail* chassis) const {
   chassis->mutable_devkit()
       ->mutable_steering_report_502()
+      ->set_steer_angle_rear_actual(steer_angle_rear_actual(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_steering_report_502()
       ->set_steer_angle_spd_actual(steer_angle_spd_actual(bytes, length));
   chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_flt2(
       steer_flt2(bytes, length));
@@ -47,13 +50,31 @@ void Steeringreport502::Parse(const std::uint8_t* bytes, int32_t length,
       steer_en_state(bytes, length) == 1);
 }
 
-// config detail: {'bit': 55, 'is_signed_var': False, 'len': 8, 'name':
+// config detail: {'bit': 47, 'is_signed_var': False, 'len': 16, 'name':
+// 'steer_angle_rear_actual', 'offset': -500.0, 'order': 'motorola',
+// 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
+// 'type': 'int'}
+int Steeringreport502::steer_angle_rear_actual(const std::uint8_t* bytes,
+                                               int32_t length) const {
+  Byte t0(bytes + 5);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 6);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  int ret = x + -500.000000;
+  return ret;
+}
+
+// config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
 // 'steer_angle_spd_actual', 'offset': 0.0, 'order': 'motorola',
 // 'physical_range': '[0|0]', 'physical_unit': 'deg/s', 'precision': 1.0,
 // 'type': 'int'}
 int Steeringreport502::steer_angle_spd_actual(const std::uint8_t* bytes,
                                               int32_t length) const {
-  Byte t0(bytes + 6);
+  Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
