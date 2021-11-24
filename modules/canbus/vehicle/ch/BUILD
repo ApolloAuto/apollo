@@ -37,6 +37,7 @@ cc_library(
     copts = CANBUS_COPTS,
     deps = [
         ":ch_message_manager",
+        "//modules/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",

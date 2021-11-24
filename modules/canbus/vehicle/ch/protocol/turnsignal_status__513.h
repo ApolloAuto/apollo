@@ -32,11 +32,12 @@ class Turnsignalstatus513 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'description': 'Lighting control(Status)', 'enum': {0:
-  // 'TURN_SIGNAL_STS_NONE', 1: 'TURN_SIGNAL_STS_LEFT', 2:
-  // 'TURN_SIGNAL_STS_RIGHT'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'TURN_SIGNAL_STS', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
-  // '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'Lighting control(Status)',
+  // 'enum': {0: 'TURN_SIGNAL_STS_NONE', 1: 'TURN_SIGNAL_STS_LEFT', 2:
+  // 'TURN_SIGNAL_STS_RIGHT', 3: 'TURN_SIGNAL_STS_HAZARD_WARNING_LAMPSTS_ON'},
+  // 'is_signed_var': False, 'len': 8, 'name': 'TURN_SIGNAL_STS', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
+  // 'precision': 1.0, 'type': 'enum'}
   Turnsignal_status__513::Turn_signal_stsType turn_signal_sts(
       const std::uint8_t* bytes, const int32_t length) const;
 };

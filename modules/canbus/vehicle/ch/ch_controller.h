@@ -27,11 +27,11 @@
 #include "modules/control/proto/control_cmd.pb.h"
 
 #include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
-#include "modules/canbus/vehicle/ch/protocol/control_command_115.h"
 #include "modules/canbus/vehicle/ch/protocol/gear_command_114.h"
 #include "modules/canbus/vehicle/ch/protocol/steer_command_112.h"
 #include "modules/canbus/vehicle/ch/protocol/throttle_command_110.h"
 #include "modules/canbus/vehicle/ch/protocol/turnsignal_command_113.h"
+#include "modules/canbus/vehicle/ch/protocol/vehicle_mode_command_116.h"
 
 namespace apollo {
 namespace canbus {
@@ -85,6 +85,8 @@ class ChController final : public VehicleController {
   // gas:0.00~99.99 unit:
   void Throttle(double throttle) override;
 
+  // drive with acceleration/deceleration
+  // acc:-7.0~5.0 unit:m/s^2
   void Acceleration(double acc) override;
 
   // steering with old angle speed
@@ -117,11 +119,11 @@ class ChController final : public VehicleController {
  private:
   // control protocol
   Brakecommand111* brake_command_111_ = nullptr;
-  Controlcommand115* control_command_115_ = nullptr;
   Gearcommand114* gear_command_114_ = nullptr;
   Steercommand112* steer_command_112_ = nullptr;
   Throttlecommand110* throttle_command_110_ = nullptr;
   Turnsignalcommand113* turnsignal_command_113_ = nullptr;
+  Vehiclemodecommand116* vehicle_mode_command_116_ = nullptr;
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;

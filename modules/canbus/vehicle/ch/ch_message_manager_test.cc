@@ -18,7 +18,6 @@
 #include "gtest/gtest.h"
 #include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
 #include "modules/canbus/vehicle/ch/protocol/brake_status__511.h"
-#include "modules/canbus/vehicle/ch/protocol/control_command_115.h"
 #include "modules/canbus/vehicle/ch/protocol/ecu_status_1_515.h"
 #include "modules/canbus/vehicle/ch/protocol/ecu_status_2_516.h"
 #include "modules/canbus/vehicle/ch/protocol/ecu_status_3_517.h"
@@ -56,14 +55,6 @@ TEST_F(ChMessageManagerTest, Brakestatus511) {
       manager.GetMutableProtocolDataById(Brakestatus511::ID);
   EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brakestatus511 *>(pd)->ID, Brakestatus511::ID);
-}
-
-TEST_F(ChMessageManagerTest, Controlcommand115) {
-  ChMessageManager manager;
-  ProtocolData<ChassisDetail> *pd =
-      manager.GetMutableProtocolDataById(Controlcommand115::ID);
-  EXPECT_NE(pd, nullptr);
-  EXPECT_EQ(static_cast<Controlcommand115 *>(pd)->ID, Controlcommand115::ID);
 }
 
 TEST_F(ChMessageManagerTest, Ecustatus1515) {

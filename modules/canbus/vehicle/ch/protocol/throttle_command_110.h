@@ -36,36 +36,36 @@ class Throttlecommand110 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'description': 'throttle pedal enable bit(Command)',
-  // 'enum': {0: 'THROTTLE_PEDAL_EN_CTRL_DISABLE', 1:
-  // 'THROTTLE_PEDAL_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'THROTTLE_PEDAL_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'throttle pedal enable
+  // bit(Command)', 'enum': {0: 'THROTTLE_PEDAL_EN_CTRL_DISABLE', 1:
+  // 'THROTTLE_PEDAL_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'THROTTLE_PEDAL_EN_CTRL', 'offset': 0.0, 'order': 'intel',
+  // 'physical_range': '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
   Throttlecommand110* set_throttle_pedal_en_ctrl(
       Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl);
 
-  // config detail: {'description': 'Percentage of throttle pedal(Command)',
-  // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'THROTTLE_PEDAL_CMD',
-  // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': '%'}
+  // config detail: {'bit': 8, 'description': 'Percentage of throttle
+  // pedal(Command)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'THROTTLE_PEDAL_CMD', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
   Throttlecommand110* set_throttle_pedal_cmd(int throttle_pedal_cmd);
 
  private:
-  // config detail: {'description': 'throttle pedal enable bit(Command)',
-  // 'enum': {0: 'THROTTLE_PEDAL_EN_CTRL_DISABLE', 1:
-  // 'THROTTLE_PEDAL_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'THROTTLE_PEDAL_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'throttle pedal enable
+  // bit(Command)', 'enum': {0: 'THROTTLE_PEDAL_EN_CTRL_DISABLE', 1:
+  // 'THROTTLE_PEDAL_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'THROTTLE_PEDAL_EN_CTRL', 'offset': 0.0, 'order': 'intel',
+  // 'physical_range': '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
   void set_p_throttle_pedal_en_ctrl(
       uint8_t* data,
       Throttle_command_110::Throttle_pedal_en_ctrlType throttle_pedal_en_ctrl);
 
-  // config detail: {'description': 'Percentage of throttle pedal(Command)',
-  // 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'THROTTLE_PEDAL_CMD',
-  // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': '%'}
+  // config detail: {'bit': 8, 'description': 'Percentage of throttle
+  // pedal(Command)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'THROTTLE_PEDAL_CMD', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|100]', 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
   void set_p_throttle_pedal_cmd(uint8_t* data, int throttle_pedal_cmd);
 
  private:
