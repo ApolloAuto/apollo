@@ -14,7 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/turnsignal_status__513.h"
+#include "modules/canbus/vehicle/ch/protocol/vin_resp3_51d.h"
+
+#include "glog/logging.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
@@ -25,29 +27,24 @@ namespace ch {
 
 using ::apollo::drivers::canbus::Byte;
 
-Turnsignalstatus513::Turnsignalstatus513() {}
-const int32_t Turnsignalstatus513::ID = 0x513;
+Vinresp351d::Vinresp351d() {}
+const int32_t Vinresp351d::ID = 0x51D;
 
-void Turnsignalstatus513::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_turnsignal_status__513()->set_turn_signal_sts(
-      turn_signal_sts(bytes, length));
+void Vinresp351d::Parse(const std::uint8_t* bytes, int32_t length,
+                        ChassisDetail* chassis) const {
+  chassis->mutable_ch()->mutable_vin_resp3_51d()->set_vin17(
+      vin17(bytes, length));
 }
 
-// config detail: {'bit': 0, 'description': 'Lighting control(Status)', 'enum':
-// {0: 'TURN_SIGNAL_STS_NONE', 1: 'TURN_SIGNAL_STS_LEFT', 2:
-// 'TURN_SIGNAL_STS_RIGHT', 3: 'TURN_SIGNAL_STS_HAZARD_WARNING_LAMPSTS_ON'},
-// 'is_signed_var': False, 'len': 8, 'name': 'turn_signal_sts', 'offset': 0.0,
-// 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
-// 'precision': 1.0, 'type': 'enum'}
-Turnsignal_status__513::Turn_signal_stsType
-Turnsignalstatus513::turn_signal_sts(const std::uint8_t* bytes,
-                                     int32_t length) const {
+// config detail: {'bit': 0, 'description': 'VIN Response', 'is_signed_var':
+// False, 'len': 8, 'name': 'vin17', 'offset': 0.0, 'order': 'intel',
+// 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
+// 'int'}
+int Vinresp351d::vin17(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Turnsignal_status__513::Turn_signal_stsType ret =
-      static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);
+  int ret = x;
   return ret;
 }
 }  // namespace ch

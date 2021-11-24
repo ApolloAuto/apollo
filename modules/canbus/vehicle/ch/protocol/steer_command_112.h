@@ -36,36 +36,34 @@ class Steercommand112 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'description': 'steering angle enable bit(Command)',
-  // 'enum': {0: 'STEER_ANGLE_EN_CTRL_DISABLE', 1:
-  // 'STEER_ANGLE_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'STEER_ANGLE_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'steering angle enable
+  // bit(Command)', 'enum': {0: 'STEER_ANGLE_EN_CTRL_DISABLE', 1:
+  // 'STEER_ANGLE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'STEER_ANGLE_EN_CTRL', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Steercommand112* set_steer_angle_en_ctrl(
       Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
 
-  // config detail: {'description': 'Current steering angle(Command)', 'offset':
-  // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_CMD',
-  // 'is_signed_var': True, 'physical_range': '[-0.524|0.524]', 'bit': 8,
-  // 'type': 'double', 'order': 'intel', 'physical_unit': 'radian'}
+  // config detail: {'bit': 8, 'description': 'Current steering angle(Command)',
+  // 'is_signed_var': True, 'len': 16, 'name': 'STEER_ANGLE_CMD', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[-0.524|0.524]', 'physical_unit':
+  // 'radian', 'precision': 0.001, 'type': 'double'}
   Steercommand112* set_steer_angle_cmd(double steer_angle_cmd);
 
  private:
-  // config detail: {'description': 'steering angle enable bit(Command)',
-  // 'enum': {0: 'STEER_ANGLE_EN_CTRL_DISABLE', 1:
-  // 'STEER_ANGLE_EN_CTRL_ENABLE'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'STEER_ANGLE_EN_CTRL', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'steering angle enable
+  // bit(Command)', 'enum': {0: 'STEER_ANGLE_EN_CTRL_DISABLE', 1:
+  // 'STEER_ANGLE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'STEER_ANGLE_EN_CTRL', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   void set_p_steer_angle_en_ctrl(
       uint8_t* data,
       Steer_command_112::Steer_angle_en_ctrlType steer_angle_en_ctrl);
 
-  // config detail: {'description': 'Current steering angle(Command)', 'offset':
-  // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_CMD',
-  // 'is_signed_var': True, 'physical_range': '[-0.524|0.524]', 'bit': 8,
-  // 'type': 'double', 'order': 'intel', 'physical_unit': 'radian'}
+  // config detail: {'bit': 8, 'description': 'Current steering angle(Command)',
+  // 'is_signed_var': True, 'len': 16, 'name': 'STEER_ANGLE_CMD', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[-0.524|0.524]', 'physical_unit':
+  // 'radian', 'precision': 0.001, 'type': 'double'}
   void set_p_steer_angle_cmd(uint8_t* data, double steer_angle_cmd);
 
  private:

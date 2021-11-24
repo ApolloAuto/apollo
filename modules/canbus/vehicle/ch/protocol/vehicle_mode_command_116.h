@@ -17,18 +17,19 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Gearcommand114 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+class Vehiclemodecommand116 : public ::apollo::drivers::canbus::ProtocolData<
+                                  ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
-  Gearcommand114();
+  Vehiclemodecommand116();
 
   uint32_t GetPeriod() const override;
 
@@ -36,23 +37,25 @@ class Gearcommand114 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'bit': 0, 'description': 'PRND control(Command)', 'enum':
-  // {1: 'GEAR_CMD_PARK', 2: 'GEAR_CMD_REVERSE', 3: 'GEAR_CMD_NEUTRAL', 4:
-  // 'GEAR_CMD_DRIVE'}, 'is_signed_var': False, 'len': 8, 'name': 'GEAR_CMD',
-  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[1|4]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  Gearcommand114* set_gear_cmd(Gear_command_114::Gear_cmdType gear_cmd);
+  // config detail: {'bit': 0, 'description': 'Request VIN(Command)', 'enum':
+  // {0: 'VIN_REQ_CMD_VIN_REQ_DISABLE', 1: 'VIN_REQ_CMD_VIN_REQ_ENABLE'},
+  // 'is_signed_var': False, 'len': 1, 'name': 'VIN_REQ_CMD', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[0|1]', 'physical_unit': '',
+  // 'precision': 1.0, 'type': 'enum'}
+  Vehiclemodecommand116* set_vin_req_cmd(
+      Vehicle_mode_command_116::Vin_req_cmdType vin_req_cmd);
 
  private:
-  // config detail: {'bit': 0, 'description': 'PRND control(Command)', 'enum':
-  // {1: 'GEAR_CMD_PARK', 2: 'GEAR_CMD_REVERSE', 3: 'GEAR_CMD_NEUTRAL', 4:
-  // 'GEAR_CMD_DRIVE'}, 'is_signed_var': False, 'len': 8, 'name': 'GEAR_CMD',
-  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[1|4]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-  void set_p_gear_cmd(uint8_t* data, Gear_command_114::Gear_cmdType gear_cmd);
+  // config detail: {'bit': 0, 'description': 'Request VIN(Command)', 'enum':
+  // {0: 'VIN_REQ_CMD_VIN_REQ_DISABLE', 1: 'VIN_REQ_CMD_VIN_REQ_ENABLE'},
+  // 'is_signed_var': False, 'len': 1, 'name': 'VIN_REQ_CMD', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[0|1]', 'physical_unit': '',
+  // 'precision': 1.0, 'type': 'enum'}
+  void set_p_vin_req_cmd(uint8_t* data,
+                         Vehicle_mode_command_116::Vin_req_cmdType vin_req_cmd);
 
  private:
-  Gear_command_114::Gear_cmdType gear_cmd_;
+  Vehicle_mode_command_116::Vin_req_cmdType vin_req_cmd_;
 };
 
 }  // namespace ch

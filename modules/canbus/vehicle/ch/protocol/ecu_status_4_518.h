@@ -17,76 +17,77 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace ch {
 
-class Ecustatus3517 : public ::apollo::drivers::canbus::ProtocolData<
+class Ecustatus4518 : public ::apollo::drivers::canbus::ProtocolData<
                           ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
-  Ecustatus3517();
+  Ecustatus4518();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 0, 'description': 'Ultrasonic detection distance 1
+  // config detail: {'bit': 0, 'description': 'Ultrasonic detection distance 9
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_1', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_9', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_1(const std::uint8_t* bytes,
+  double ultrasound_dist_9(const std::uint8_t* bytes,
                            const int32_t length) const;
 
-  // config detail: {'bit': 8, 'description': 'Ultrasonic detection distance 2
+  // config detail: {'bit': 8, 'description': 'Ultrasonic detection distance 10
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_2', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_10', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_2(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_10(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 16, 'description': 'Ultrasonic detection distance 3
+  // config detail: {'bit': 16, 'description': 'Ultrasonic detection distance 11
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_3', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_11', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_3(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_11(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 24, 'description': 'Ultrasonic detection distance 4
+  // config detail: {'bit': 24, 'description': 'Ultrasonic detection distance 12
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_4', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_12', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_4(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_12(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 32, 'description': 'Ultrasonic detection distance 5
+  // config detail: {'bit': 32, 'description': 'Ultrasonic detection distance 13
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_5', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_13', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_5(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_13(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 40, 'description': 'Ultrasonic detection distance 6
+  // config detail: {'bit': 40, 'description': 'Ultrasonic detection distance 14
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_6', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_14', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_6(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_14(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 48, 'description': 'Ultrasonic detection distance 7
+  // config detail: {'bit': 48, 'description': 'Ultrasonic detection distance 15
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_7', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_15', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_7(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_15(const std::uint8_t* bytes,
+                            const int32_t length) const;
 
-  // config detail: {'bit': 56, 'description': 'Ultrasonic detection distance 8
+  // config detail: {'bit': 56, 'description': 'Ultrasonic detection distance 16
   // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_8', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // 'ULTRASOUND_DIST_16', 'offset': 0.0, 'order': 'intel', 'physical_range':
   // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
-  double ultrasound_dist_8(const std::uint8_t* bytes,
-                           const int32_t length) const;
+  double ultrasound_dist_16(const std::uint8_t* bytes,
+                            const int32_t length) const;
 };
 
 }  // namespace ch

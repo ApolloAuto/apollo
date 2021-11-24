@@ -32,32 +32,32 @@ class Steerstatus512 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'description': 'steering angle enable bit(Status)', 'enum':
-  // {0: 'STEER_ANGLE_EN_STS_DISABLE', 1: 'STEER_ANGLE_EN_STS_ENABLE', 2:
-  // 'STEER_ANGLE_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
-  // 'STEER_ANGLE_EN_STS', 'is_signed_var': False, 'offset': 0.0,
-  // 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-  // 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'steering angle enable
+  // bit(Status)', 'enum': {0: 'STEER_ANGLE_EN_STS_DISABLE', 1:
+  // 'STEER_ANGLE_EN_STS_ENABLE', 2: 'STEER_ANGLE_EN_STS_TAKEOVER'},
+  // 'is_signed_var': False, 'len': 8, 'name': 'STEER_ANGLE_EN_STS', 'offset':
+  // 0.0, 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
+  // 'precision': 1.0, 'type': 'enum'}
   Steer_status__512::Steer_angle_en_stsType steer_angle_en_sts(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'description': 'Current steering angle(Status)', 'offset':
-  // 0.0, 'precision': 0.001, 'len': 16, 'name': 'STEER_ANGLE_STS',
-  // 'is_signed_var': True, 'physical_range': '[-0.524|0.524]', 'bit': 8,
-  // 'type': 'double', 'order': 'intel', 'physical_unit': 'radian'}
+  // config detail: {'bit': 8, 'description': 'Current steering angle(Status)',
+  // 'is_signed_var': True, 'len': 16, 'name': 'STEER_ANGLE_STS', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[-0.524|0.524]', 'physical_unit':
+  // 'radian', 'precision': 0.001, 'type': 'double'}
   double steer_angle_sts(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'name': 'STEER_ERR', 'enum': {0: 'STEER_ERR_NOERR', 1:
-  // 'STEER_ERR_STEER_MOTOR_ERR'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
-  // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 24, 'type': 'enum',
-  // 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 24, 'enum': {0: 'STEER_ERR_NOERR', 1:
+  // 'STEER_ERR_STEER_MOTOR_ERR'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'STEER_ERR', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|1]',
+  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Steer_status__512::Steer_errType steer_err(const std::uint8_t* bytes,
                                              const int32_t length) const;
 
-  // config detail: {'name': 'SENSOR_ERR', 'enum': {0: 'SENSOR_ERR_NOERR', 1:
-  // 'SENSOR_ERR_STEER_SENSOR_ERR'}, 'precision': 1.0, 'len': 8,
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit':
-  // 32, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 32, 'enum': {0: 'SENSOR_ERR_NOERR', 1:
+  // 'SENSOR_ERR_STEER_SENSOR_ERR'}, 'is_signed_var': False, 'len': 8, 'name':
+  // 'SENSOR_ERR', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|1]',
+  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Steer_status__512::Sensor_errType sensor_err(const std::uint8_t* bytes,
                                                const int32_t length) const;
 };

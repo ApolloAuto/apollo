@@ -43,12 +43,12 @@ void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
       throttle_pedal_en_sts(bytes, length) == 1);
 }
 
-// config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':
-// {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE', 2:
-// 'THROTTLE_PEDAL_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
-// 'throttle_pedal_en_sts', 'is_signed_var': False, 'offset': 0.0,
-// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
-// 'physical_unit': ''}
+// config detail: {'bit': 0, 'description': 'throttle pedal enable bit(Status)',
+// 'enum': {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1:
+// 'THROTTLE_PEDAL_EN_STS_ENABLE', 2: 'THROTTLE_PEDAL_EN_STS_TAKEOVER'},
+// 'is_signed_var': False, 'len': 8, 'name': 'throttle_pedal_en_sts', 'offset':
+// 0.0, 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
+// 'precision': 1.0, 'type': 'enum'}
 Throttle_status__510::Throttle_pedal_en_stsType
 Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
                                          int32_t length) const {
@@ -60,10 +60,10 @@ Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Percentage of throttle pedal(Status)',
-// 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'throttle_pedal_sts',
-// 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 8, 'type': 'int',
-// 'order': 'intel', 'physical_unit': '%'}
+// config detail: {'bit': 8, 'description': 'Percentage of throttle
+// pedal(Status)', 'is_signed_var': False, 'len': 8, 'name':
+// 'throttle_pedal_sts', 'offset': 0.0, 'order': 'intel', 'physical_range':
+// '[0|100]', 'physical_unit': '%', 'precision': 1.0, 'type': 'int'}
 int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes,
                                           int32_t length) const {
   Byte t0(bytes + 1);
@@ -73,11 +73,10 @@ int Throttlestatus510::throttle_pedal_sts(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'drive_motor_err', 'enum': {0:
-// 'DRIVE_MOTOR_ERR_NOERR', 1: 'DRIVE_MOTOR_ERR_DRV_MOTOR_ERR'},
-// 'precision': 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0,
-// 'physical_range': '[0|1]', 'bit': 16, 'type': 'enum', 'order': 'intel',
-// 'physical_unit': ''}
+// config detail: {'bit': 16, 'enum': {0: 'DRIVE_MOTOR_ERR_NOERR', 1:
+// 'DRIVE_MOTOR_ERR_DRV_MOTOR_ERR'}, 'is_signed_var': False, 'len': 8, 'name':
+// 'drive_motor_err', 'offset': 0.0, 'order': 'intel', 'physical_range':
+// '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
 Throttle_status__510::Drive_motor_errType Throttlestatus510::drive_motor_err(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
@@ -88,10 +87,10 @@ Throttle_status__510::Drive_motor_errType Throttlestatus510::drive_motor_err(
   return ret;
 }
 
-// config detail: {'name': 'battery_bms_err', 'enum': {0:
-// 'BATTERY_BMS_ERR_NOERR', 1: 'BATTERY_BMS_ERR_BATTERY_ERR'}, 'precision': 1.0,
-// 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
-// 'bit': 24, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+// config detail: {'bit': 24, 'enum': {0: 'BATTERY_BMS_ERR_NOERR', 1:
+// 'BATTERY_BMS_ERR_BATTERY_ERR'}, 'is_signed_var': False, 'len': 8, 'name':
+// 'battery_bms_err', 'offset': 0.0, 'order': 'intel', 'physical_range':
+// '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
 Throttle_status__510::Battery_bms_errType Throttlestatus510::battery_bms_err(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 3);

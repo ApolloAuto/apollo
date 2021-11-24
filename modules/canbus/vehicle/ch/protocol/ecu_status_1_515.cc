@@ -42,10 +42,10 @@ void Ecustatus1515::Parse(const std::uint8_t* bytes, int32_t length,
       chassis_err(bytes, length));
 }
 
-// config detail: {'description': 'Current speed (Steering status)', 'offset':
-// 0.0, 'precision': 0.01, 'len': 16, 'name': 'speed', 'is_signed_var': True,
-// 'physical_range': '[0|0]', 'bit': 0, 'type': 'double', 'order': 'intel',
-// 'physical_unit': 'm/s'}
+// config detail: {'bit': 0, 'description': 'Current speed (Steering status)',
+// 'is_signed_var': True, 'len': 16, 'name': 'speed', 'offset': 0.0, 'order':
+// 'intel', 'physical_range': '[-327.68|327.67]', 'physical_unit': 'm/s',
+// 'precision': 0.01, 'type': 'double'}
 double Ecustatus1515::speed(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
@@ -62,10 +62,10 @@ double Ecustatus1515::speed(const std::uint8_t* bytes, int32_t length) const {
   return ret;
 }
 
-// config detail: {'description': 'Current acceleration (Steering status)',
-// 'offset': 0.0, 'precision': 0.001, 'len': 16, 'name': 'acc_speed',
-// 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 16, 'type':
-// 'double', 'order': 'intel', 'physical_unit': 'm/s^2'}
+// config detail: {'bit': 16, 'description': 'Current acceleration (Steering
+// status)', 'is_signed_var': True, 'len': 16, 'name': 'acc_speed', 'offset':
+// 0.0, 'order': 'intel', 'physical_range': '[0|0]', 'physical_unit': 'm/s^2',
+// 'precision': 0.001, 'type': 'double'}
 double Ecustatus1515::acc_speed(const std::uint8_t* bytes,
                                 int32_t length) const {
   Byte t0(bytes + 3);
@@ -83,11 +83,11 @@ double Ecustatus1515::acc_speed(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Current Auto-mode state (Chassis status)',
-// 'enum': {0: 'CTRL_STS_OUT_OF_CONTROL', 1: 'CTRL_STS_UNDER_CONTROL'},
-// 'precision': 1.0, 'len': 8, 'name': 'ctrl_sts', 'is_signed_var': False,
-// 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 32, 'type': 'enum', 'order':
-// 'intel', 'physical_unit': ''}
+// config detail: {'bit': 32, 'description': 'Current Auto-mode state (Chassis
+// status)', 'enum': {0: 'CTRL_STS_OUT_OF_CONTROL', 1:
+// 'CTRL_STS_UNDER_CONTROL'}, 'is_signed_var': False, 'len': 8, 'name':
+// 'ctrl_sts', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|1]',
+// 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
 Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
@@ -98,10 +98,10 @@ Ecu_status_1_515::Ctrl_stsType Ecustatus1515::ctrl_sts(
   return ret;
 }
 
-// config detail: {'description': 'Current chassis state (Chassis status)',
-// 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'chassis_sts',
-// 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 40, 'type':
-// 'int', 'order': 'intel', 'physical_unit': ''}
+// config detail: {'bit': 40, 'description': 'Current chassis state (Chassis
+// status)', 'is_signed_var': False, 'len': 8, 'name': 'chassis_sts', 'offset':
+// 0.0, 'order': 'intel', 'physical_range': '[0|255]', 'physical_unit': '',
+// 'precision': 1.0, 'type': 'int'}
 int Ecustatus1515::chassis_sts(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 5);
@@ -111,10 +111,10 @@ int Ecustatus1515::chassis_sts(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Chassis error code (Chassis status)',
-// 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'chassis_err',
-// 'is_signed_var': False, 'physical_range': '[0|65535]', 'bit': 48, 'type':
-// 'int', 'order': 'intel', 'physical_unit': ''}
+// config detail: {'bit': 48, 'description': 'Chassis error code (Chassis
+// status)', 'is_signed_var': False, 'len': 16, 'name': 'chassis_err', 'offset':
+// 0.0, 'order': 'intel', 'physical_range': '[0|65535]', 'physical_unit': '',
+// 'precision': 1.0, 'type': 'int'}
 int Ecustatus1515::chassis_err(const std::uint8_t* bytes,
                                int32_t length) const {
   Byte t0(bytes + 7);
