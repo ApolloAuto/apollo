@@ -58,6 +58,7 @@ install(
     deps = [
         ":pb_canbus",
         "//cyber:install",
+        "//modules/canbus/tools:install",
     ],
 )
 
