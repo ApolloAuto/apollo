@@ -515,7 +515,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 
   bool traffic_light_scenario = false;
   bool red_light = false;
-
+  bool left_turn_signal = false;
+  const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
   // note: need iterate all lights to check no RED/YELLOW/UNKNOWN
   for (const auto& traffic_light_overlap : next_traffic_lights) {
     const double adc_distance_to_traffic_light =
@@ -538,7 +539,15 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s << "] color["
            << signal_color << "]";
-
+    apollo::hdmap::Id signal_id;
+    signal_id.set_id(traffic_light_overlap.object_id);
+    auto signal = hdmap_ptr->GetSignalById(signal_id)->signal();
+    for (auto subsignal : signal.subsignal()) {
+      if (subsignal.type() == apollo::hdmap::Subsignal::ARROW_LEFT) {
+        left_turn_signal = true;
+        break;
+      }
+    }
     if (signal_color != perception::TrafficLight::GREEN) {
       red_light = true;
       break;
@@ -565,7 +574,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
           scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_unprotected_right_turn_scenario = true;
       }
-    } else if (left_turn) {
+    } else if (left_turn && !left_turn_signal) {
       // check TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
