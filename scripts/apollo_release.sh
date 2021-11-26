@@ -209,6 +209,14 @@ function main() {
         return
     fi
 
+    DIRS=("${PREFIX_DIR}/data/log" "${PREFIX_DIR}/data/bag" "${PREFIX_DIR}/data/core")
+
+    for dir in ${DIRS[@]}; do
+        if [[ ! -d "${dir}" ]]; then
+          mkdir -p "${dir}"
+        fi
+    done
+
     if [[ "${RESOLVE_DEPS}" -gt 0 ]]; then
         info "Resolve runtime library dependencies and generate APT packages list..."
         generate_apt_pkgs
