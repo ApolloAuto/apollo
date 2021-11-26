@@ -289,8 +289,8 @@ bool VectornetEvaluator::Evaluate(Obstacle* obstacle_ptr,
     vector_data = torch::cat({data_tmp, data_zeros}, 0);
     polyline_id = torch::cat({p_id_tmp, p_id_zeros}, 0);
   } else {
-    vector_data = data_tmp;
-    polyline_id = p_id_tmp;
+    vector_data = data_tmp.index({torch::indexing::Slice(0, 450)});
+    polyline_id = p_id_tmp.index({torch::indexing::Slice(0, 450)});
   }
 
   // Empty rand mask as placeholder
@@ -426,6 +426,7 @@ bool VectornetEvaluator::ExtractObstaclesHistory(
     size_t obs_his_size = obstacle->history_size();
     obs_his_size = obs_his_size <= 20 ? obs_his_size : 20;
     int cur_idx = all_obs_pos_history->size();
+    // if cur_dix >= 450, index_put_ discards it automatically.
     if (obs_his_size > 1) {
       vector_mask->index_put_({cur_idx,
                                torch::indexing::Slice(torch::indexing::None,

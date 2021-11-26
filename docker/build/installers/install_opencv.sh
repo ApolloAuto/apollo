@@ -70,9 +70,9 @@ download_if_not_cached "${PKG_OCV}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_OCV}
 
 # https://stackoverflow.com/questions/12427928/configure-and-build-opencv-to-custom-ffmpeg-install
-export LD_LIBRARY_PATH=${SYSROOT_DIR}/lib
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${SYSROOT_DIR}/lib/pkgconfig
-export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:${SYSROOT_DIR}/lib
+# export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SYSROOT_DIR}/lib
+# export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${SYSROOT_DIR}/lib/pkgconfig
+# export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:${SYSROOT_DIR}/lib
 
 # libgtk-3-dev libtbb2 libtbb-dev
 # -DWITH_GTK=ON -DWITH_TBB=ON
@@ -135,9 +135,9 @@ pushd "opencv-${VERSION}"
             -DBUILD_PROTOBUF=OFF \
             -DPROTOBUF_UPDATE_FILES=ON \
             -DINSTALL_C_EXAMPLES=OFF \
+            -DWITH_QT=OFF \
             -DWITH_GTK=ON \
             -DWITH_GTK_2_X=ON \
-            -DWITH_QT=ON \
             -DWITH_IPP=OFF \
             -DWITH_ITT=OFF \
             -DWITH_TBB=OFF \
@@ -184,4 +184,5 @@ if [[ -n "${CLEAN_DEPS}" ]]; then
         libx264-dev \
         libgtk2.0-dev \
         libopenni-dev
+    apt_get_update_and_install libgtk2.0-0
 fi
