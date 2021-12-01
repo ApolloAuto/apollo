@@ -251,6 +251,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   // pull over scenarios
   // Because path reference might also make the end_state != 0
   // we have to exclude this condition here
+  // kStartPulloverDistance the distance start to improve weight to end state
+  // TODO(tianjiao): add this parameter to config file
+  const double kStartPulloverDistance = 30;
   if (end_state[0] != 0 && !is_valid_path_reference) {
     std::vector<double> x_ref(kNumKnots, end_state[0]);
     const auto& pull_over_type = injector_->planning_context()
@@ -258,7 +261,10 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                      .pull_over()
                                      .pull_over_type();
     const double weight_x_ref =
-        pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ? 200.0 : 10.0;
+        pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ||
+                lat_boundaries.size() * delta_s < kStartPulloverDistance
+            ? 2000.0
+            : 10.0;
     piecewise_jerk_problem.set_x_ref(weight_x_ref, std::move(x_ref));
   }
   // use path reference as a optimization cost function

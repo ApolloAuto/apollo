@@ -21,8 +21,9 @@
 #include <memory>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
@@ -791,8 +792,19 @@ void PathAssessmentDecider::RecordDebugInfo(
   auto* ptr_optimized_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
   ptr_optimized_path->set_name(debug_name);
+  auto label = path_data.path_label();
   ptr_optimized_path->mutable_path_point()->CopyFrom(
       {path_points.begin(), path_points.end()});
+  auto* planning_data_ptr =
+      reference_line_info->mutable_debug()->mutable_planning_data();
+  for (int i = 0; i < planning_data_ptr->path_size(); i++) {
+    auto path = planning_data_ptr->mutable_path(i);
+    if (path->name().find(label) != std::string::npos) {
+      std::string path_name = path->name();
+      auto pos = path_name.find(label);
+      path->set_name(path_name.erase(pos, label.size()));
+    }
+  }
 }
 
 int ContainsOutOnReverseLane(
