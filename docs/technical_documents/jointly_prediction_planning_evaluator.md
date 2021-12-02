@@ -1,16 +1,10 @@
-# Jointly VectorNet-TNT-Interaction Evaluator
-
-# Introduction
+# Inter-TNT (Jointly VectorNet-TNT-Interaction) Evaluator
 
 The prediction module comprises 4 main functionalities: Container, Scenario, Evaluator and Predictor.
 
-An Evaluator predicts paths and speeds for any given obstacles. An evaluator evaluates a path(lane sequence) with a probability by the given model stored in prediction/data/.
+An Evaluator predicts trajectories and speeds for surrounding obstacles of autonomous vehicle. An evaluator evaluates a path(lane sequence) with a probability by the given model stored in prediction/data/.
 
-In Apollo 7.0, a new model named Jointly VectorNet-TNT-Interaction Evaluator is
-used to generate short term trajectory points. This model uses VectorNet as
-encoder and TNT as decoder, in which the planning information of ADC is inserted
-at the end. For scenarios at junction, the obstacle trajectory prediction by the
-new model is more accurate according to the results of our experiments and road tests.
+In Apollo 7.0, a new model named Inter-TNT is introduced to generate short-term trajectories. This model applys VectorNet as encoder and TNT as decoder, and latest planning trajectory of autonomous vehicle is used to interact with surrounding obstacles. Compared with the prediction model based on semantic map released in Apollo 6.0, the performance is increased by more than 20% in terms of minADE and minFDE, and the inference time is reduced from 15 ms to 10 ms. 
 
 ![Diagram](images/interaction_model_fig_1.png)
 
@@ -30,33 +24,37 @@ Please refer [interaction filter](https://github.com/ApolloAuto/apollo/tree/mast
     void AssignInteractiveTag();
     ```
 
-# Algorithm Detail
-## Structure
+# Network Architecture
+The network architecutre of the proposed "Inter-TNT" is illustrated as below. The entire network is composed of three modules: an vectorized encoder, a target-driven decoder, and an interaction module. The vectorized trajectories of obstacles and autonomous vehicle (AV), along with HD maps, are first fed into the vectorized encoder to extract features. The target-driven decoder takes the extracted features as input and generate multi-modal trajectories for each obstacle. The main contribution of the proposed network is introducing an interaction mechanism which could measure the interaction between obstacles and autonomous vehicle by re-weighting confidences of multi-modal trajectories. 
+
 ![Diagram](images/VectorNet-TNT-Interaction.png)
 
 ## Encoder
-Basically, the encoder is mainly using an [VectorNet](https://arxiv.org/abs/2005.04259). The ADC trajectory and all obstacle trajectories in the form of coordinate points are transformed into polylines. For each polyline, vectors are connected sequentially, where it contains start point, end point, obstacle length and some other attributes of vector. All points are transformed in the coordinate of the ADC, with North as the direction and (0, 0) as the position for ADC at time 0.
+Basically, the encoder is mainly using an [VectorNet](https://arxiv.org/abs/2005.04259). 
 
-After that, map information is extracted from HDMap files. As structures of lane/road/junction/crosswalk are depicted in points in HDMap, they are also processed as polylines whose vectors contain the types of traffic elements. In order to speed up calculation in Network, only information in ROI is taken into consideration.
+### Representation
+The trajectories of AV all obstacles are represented as polylines in the form of sequential coordinate points. For each polyline, it contains start point, end point, obstacle length and some other attributes of vector. All points are transformed to the AV coordinate with North as the y-axis and (0, 0) as the position for ADC at time 0.
 
-A Subgraph is used to deal with each polyline and the feature of polyline is acquired. After that, the polyline features are inputted into a Global Graph, which is a GNN Network substantially.
+After that, map elements are extracted from HDMap files. As elements of lane/road/junction/crosswalk are depicted in points in HD map, they are conveniently processed as polylines. 
 
-The encoding feature is gained after encoding of VectorNet. For more information in detail, please find the References.
+### VectorNet
+The polyline features are first extracted from a subgraph network and further fed into a globalgraph network (GCN) to encode contextual information.
 
 ## Decoder
-The structure of Decoder is a [TNT model](https://arxiv.org/abs/2008.08294).
+Our decoder implementation mainly follows the [TNT](https://arxiv.org/abs/2008.08294) paper. There are three steps in TNT. For more details, please refer to the original paper. 
 
-There are three parts in TNT.
-1)Target Prediction. N points around the ADC is grid-sampled and M points are selected as target points. These target points are used as the final points of prediction trajectories in the next step.
-2)Motion Estimation. With VectorNet feature and target points, a prediction trajectory is generated for each selected target point. To train more efficiently, a teaching method using true trajectory is also used in this step.
-3)Scoring and Selection. A score is calculated for each motion trajectory in the second step, which is used to select final trajectories.
+### Target Prediction
+For each obstacle, N points around the AV are uniformly sampled and M points are selected as target points. These target points are considered to be the potential final points of the predicted trajectories.
 
-## Interactive Planning
-After three steps in TNT, K predicted trajectories are assumed to be outputted. There is a latest planning trajectory with the same form, with which the distance of position and velocity can be calculated, named as (cost1, cost2) respectively. Meanwhile, weights of (cost1, cost2) are also outputted by VectorNet, outputting the final cost by multiplication.
+### Motion Estimation
+After selecting the potential target points, M trajectories are generated for each obstacle with its corresponding feature from encoder as input. 
 
-Note we can also find a cost with the truth obstacle trajectory and ADC planning, thus producing the true value of cost. That's how the loss is calculated in this step.
+### Scoring and Selection
+Finally, a scoring and selection module is performed to generate likelihood scores of the M trajectories for each obstacle, and select a final set of trajectory predictions by likelihood scores. 
 
+## Interaction with Planning Trajectory
+After TNT decoder, K predicted trajectories for each obstacle are generated. In order to measure the interaction between AV and obstacles, we calculate the postion and velocity differences between the latest planning trajectory and predicted obstacle trajectories. Note that we can also calculate a cost between the ground truth obstacle trajectory and AV planning trajectory, thus producing the true costs. That's how the loss is calculated in this step.
 
 # References
 1. Gao, Jiyang, et al. "Vectornet: Encoding hd maps and agent dynamics from vectorized representation." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020.
-2.Zhao, Hang, et al. "Tnt: Target-driven trajectory prediction." arXiv preprint arXiv:2008.08294 (2020).
+2. Zhao, Hang, et al. "Tnt: Target-driven trajectory prediction." arXiv preprint arXiv:2008.08294 (2020).
