@@ -4,7 +4,7 @@ The prediction module comprises 4 main functionalities: Container, Scenario, Eva
 
 An Evaluator predicts trajectories and speeds for surrounding obstacles of autonomous vehicle. An evaluator evaluates a path(lane sequence) with a probability by the given model stored in prediction/data/.
 
-In Apollo 7.0, a new model named Inter-TNT is introduced to generate short-term trajectories. This model applys VectorNet as encoder and TNT as decoder, and latest planning trajectory of autonomous vehicle is used to interact with surrounding obstacles. Compared with the prediction model based on semantic map released in Apollo 6.0, the performance is increased by more than 20% in terms of minADE and minFDE, and the inference time is reduced from 15 ms to 10 ms. 
+In Apollo 7.0, a new model named Inter-TNT is introduced to generate short-term trajectories. This model applies VectorNet as encoder and TNT as decoder, and latest planning trajectory of autonomous vehicle is used to interact with surrounding obstacles. Compared with the prediction model based on semantic map released in Apollo 6.0, the performance is increased by more than 20% in terms of minADE and minFDE, and the inference time is reduced from 15 ms to 10 ms. 
 
 ![Diagram](images/interaction_model_fig_1.png)
 
@@ -25,7 +25,7 @@ Please refer [interaction filter](https://github.com/ApolloAuto/apollo/tree/mast
     ```
 
 # Network Architecture
-The network architecutre of the proposed "Inter-TNT" is illustrated as below. The entire network is composed of three modules: an vectorized encoder, a target-driven decoder, and an interaction module. The vectorized trajectories of obstacles and autonomous vehicle (AV), along with HD maps, are first fed into the vectorized encoder to extract features. The target-driven decoder takes the extracted features as input and generate multi-modal trajectories for each obstacle. The main contribution of the proposed network is introducing an interaction mechanism which could measure the interaction between obstacles and autonomous vehicle by re-weighting confidences of multi-modal trajectories. 
+The network architecture of the proposed "Inter-TNT" is illustrated as below. The entire network is composed of three modules: an vectorized encoder, a target-driven decoder, and an interaction module. The vectorized trajectories of obstacles and autonomous vehicle (AV), along with HD maps, are first fed into the vectorized encoder to extract features. The target-driven decoder takes the extracted features as input and generate multi-modal trajectories for each obstacle. The main contribution of the proposed network is introducing an interaction mechanism which could measure the interaction between obstacles and autonomous vehicle by re-weighting confidences of multi-modal trajectories. 
 
 ![Diagram](images/VectorNet-TNT-Interaction.png)
 
@@ -53,7 +53,7 @@ After selecting the potential target points, M trajectories are generated for ea
 Finally, a scoring and selection module is performed to generate likelihood scores of the M trajectories for each obstacle, and select a final set of trajectory predictions by likelihood scores. 
 
 ## Interaction with Planning Trajectory
-After TNT decoder, K predicted trajectories for each obstacle are generated. In order to measure the interaction between AV and obstacles, we calculate the postion and velocity differences between the latest planning trajectory and predicted obstacle trajectories. Note that we can also calculate a cost between the ground truth obstacle trajectory and AV planning trajectory, thus producing the true costs. That's how the loss is calculated in this step.
+After TNT decoder, K predicted trajectories for each obstacle are generated. In order to measure the interaction between AV and obstacles, we calculate the position and velocity differences between the latest planning trajectory and predicted obstacle trajectories. Note that we can also calculate a cost between the ground truth obstacle trajectory and AV planning trajectory, thus producing the true costs. That's how the loss is calculated in this step.
 
 # References
 1. Gao, Jiyang, et al. "Vectornet: Encoding hd maps and agent dynamics from vectorized representation." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2020.
