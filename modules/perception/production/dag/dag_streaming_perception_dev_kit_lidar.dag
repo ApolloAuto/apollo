@@ -1,0 +1,39 @@
+module_config {
+  module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_lidar.so"
+
+ components {
+    class_name : "SegmentationComponent"
+    config {
+      name: "Velodyne128Segmentation"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_segmentation_conf.pb.txt"
+      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+      readers {
+          channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
+        }
+    }
+  }
+
+  components {
+    class_name : "RecognitionComponent"
+    config {
+      name: "RecognitionComponent"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/recognition_conf.pb.txt"
+      readers {
+          channel: "/perception/inner/SegmentationObjects"
+        }
+    }
+  }
+
+
+  components {
+    class_name: "FusionComponent"
+    config {
+      name: "SensorFusion"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+      readers {
+          channel: "/perception/inner/PrefusedObjects"
+        }
+    }
+  }
+
+}

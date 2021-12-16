@@ -16,3 +16,5 @@
 --use_sim_time=false
 
 --use_cyber_time=true
+
+--map_dir=/apollo/modules/map/data/sunnyvale_with_two_offices

@@ -3,12 +3,12 @@ input_camera_channel_names : "/apollo/sensor/camera/front_6mm/image,/apollo/sens
 timestamp_offset : 0.0
 camera_obstacle_perception_conf_dir : "/apollo/modules/perception/production/conf/perception/camera"
 camera_obstacle_perception_conf_file : "obstacle.pt"
-frame_capacity : 20
+frame_capacity : 15
 image_channel_num : 3
 enable_undistortion : false
 enable_visualization : false
 output_final_obstacles : true
-output_obstacles_channel_name : "/perception/obstacles"
+output_obstacles_channel_name : "/apollo/perception/obstacles"
 camera_perception_viz_message_channel_name : "/perception/inner/camera_viz_msg"
 prefused_channel_name : "/perception/inner/PrefusedObjects"
 default_camera_pitch : 0.0
@@ -25,3 +25,4 @@ visual_camera : "front_6mm"
 write_visual_img : false
 enable_cipv : false
 debug_level : 0
+lidar_type_name : "velodyne16"
