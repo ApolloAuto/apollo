@@ -143,7 +143,7 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 
 ![](docs/demo_guide/images/Apollo_6_0.png)
 
-[**Apollo 7.0:**]
+**Apollo 7.0:**
 
 Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabilities for Apollo Perception and Prediction modules. Apollo Studio is introduced in this version, combining with Data Pipeline, to provide a one-stop online development platform to better serve Apollo developers. Apollo 7.0 also publishes the PnC reinforcement learning model training and simulation evaluation service based on previous simulation service.
 
