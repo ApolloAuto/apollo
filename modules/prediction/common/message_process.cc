@@ -175,7 +175,9 @@ void MessageProcess::ContainerProcess(
   obstacles_prioritizer.AssignCautionLevel();
 
   // Add interactive tag
-  interaction_filter.AssignInteractiveTag();
+  if (FLAGS_enable_interactive_tag) {
+    interaction_filter.AssignInteractiveTag();
+  }
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze(container_manager.get());

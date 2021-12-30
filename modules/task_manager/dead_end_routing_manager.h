@@ -57,7 +57,7 @@ class DeadEndRoutingManager {
  private:
   int cycle_ = 0;
   bool routing_in_flag_ = true;
-  bool routing_out_flag_ = true;
+  bool routing_out_flag_ = false;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   routing::RoutingRequest routing_request_in_;
   routing::RoutingRequest routing_request_out_;

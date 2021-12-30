@@ -180,6 +180,9 @@ bool DeadEndTurnAroundScenario::CheckDistanceToDeadEnd(
     JunctionInfoConstPtr* junction) {
   const Vec2d& car_position = {vehicle_state.x(), vehicle_state.y()};
   auto junction_polygon = (*junction)->polygon();
+  AERROR << "dead_end_start_range is: " << dead_end_start_range;
+  AERROR << "car dis is: " <<
+  std::abs(junction_polygon.DistanceTo(car_position));
   return std::abs(junction_polygon.DistanceTo(car_position)) <
          dead_end_start_range;
 }

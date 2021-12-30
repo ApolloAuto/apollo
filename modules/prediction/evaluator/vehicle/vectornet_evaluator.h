@@ -61,9 +61,8 @@ class VectornetEvaluator : public Evaluator {
                                     torch::Tensor* ptr_target_obs_pos,
                                     torch::Tensor* ptr_target_obs_pos_step,
                                     torch::Tensor* ptr_vector_mask,
-                                    torch::Tensor* ptr_all_obstacle_pos,
-                                    torch::Tensor* ptr_all_obs_p_id,
-                                    torch::Tensor* ptr_obs_length);
+                                    torch::Tensor* ptr_obstacle_data,
+                                    torch::Tensor* ptr_all_obs_p_id);
 
   /**
   * @brief Process map data to vector

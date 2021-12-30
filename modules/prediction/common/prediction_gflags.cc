@@ -351,6 +351,8 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
             "Whether to use bell curve for the cost function or not.");
 
 // interaction predictor
+DEFINE_bool(enable_interactive_tag, true,
+            "Whether to set interactive tag for obstacles.");
 DEFINE_double(collision_cost_time_resolution, 1.0,
               "The time resolution used to compute the collision cost");
 DEFINE_double(longitudinal_acceleration_cost_weight, 0.2,

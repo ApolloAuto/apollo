@@ -139,7 +139,7 @@ function determine_prev_image_timestamp() {
             fi
         elif [[ "${stage}" == "runtime" ]]; then
             if [[ "${dist}" == "stable" ]]; then
-                result="20210517_1712"
+                result="20210914_1336"
             fi
         fi
     else # aarch64
@@ -400,7 +400,7 @@ function docker_build_run() {
     fi
 
     set -x
-    docker build ${extra_args} -t "${IMAGE_OUT}" \
+    docker build --network=host ${extra_args} -t "${IMAGE_OUT}" \
             ${build_args} \
             -f "${DOCKERFILE}" \
             "${context}"

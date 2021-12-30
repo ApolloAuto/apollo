@@ -1105,7 +1105,7 @@ export default class Map {
         laneGroup1[0].predecessorId, _.last(laneGroup1).successorId, lanes[i],
       );
       if (relation1) {
-        (relation1 > 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
+        (relation1 === 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
       } else {
         if (_.isEmpty(laneGroup2)) {
           laneGroup2.push(lanes[i]);
@@ -1157,7 +1157,11 @@ export default class Map {
     if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
       return null;
     }
-    deadJunctionInfo.routingPoint = routingPointInfo[0];
+    const offsetRoutingPoint = coordinates.applyOffset(
+      { x: routingPointInfo[0].x, y: routingPointInfo[0].y },
+      true
+    );
+    deadJunctionInfo.routingPoint = offsetRoutingPoint;
     deadJunctionInfo.deadJunctionPoints = deadJunction.polygon.point;
     deadJunctionInfo.outLaneIds = this.getRangeLaneIds(
       deadJunctionInfo.outStartPoint, deadJunctionInfo.out, laneDistanceThreshold, 'successorId');

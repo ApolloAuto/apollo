@@ -242,8 +242,12 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
 
   // Process input tensor
   auto start_time_data_prep = std::chrono::system_clock::now();
-  torch::Tensor map_data = torch::zeros({map_polyline_num, 50, 9});
-  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num, 2});
+  int map_polyline_num_valid =
+      ((obs_num + map_polyline_num) < 450) ? map_polyline_num : (450 - obs_num);
+  map_polyline_num_valid =
+      map_polyline_num_valid > 0 ? map_polyline_num_valid : 0;
+  torch::Tensor map_data = torch::zeros({map_polyline_num_valid, 50, 9});
+  torch::Tensor all_map_p_id = torch::zeros({map_polyline_num_valid, 2});
 
   if (!VectornetProcessMapData(&map_feature,
                                &map_p_id,
@@ -425,7 +429,7 @@ bool JointlyPredictionPlanningEvaluator::Evaluate(
 
     double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
-    Vec2d rotated_offset = offset.rotate(heading);
+    Vec2d rotated_offset = offset.rotate(heading - (M_PI / 2));
     double point_x = pos_x + rotated_offset.x();
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
@@ -473,7 +477,7 @@ bool JointlyPredictionPlanningEvaluator::ExtractObstaclesHistory(
       break;
     }
     target_pos_history->at(i) =
-        WorldCoordToObjCoord(std::make_pair(target_feature.position().x(),
+        WorldCoordToObjCoordNorth(std::make_pair(target_feature.position().x(),
                                             target_feature.position().y()),
                              obs_curr_pos, obs_curr_heading);
   }
@@ -511,7 +515,7 @@ bool JointlyPredictionPlanningEvaluator::ExtractObstaclesHistory(
       if (!feature.IsInitialized()) {
         break;
       }
-      pos_history[i] = WorldCoordToObjCoord(
+      pos_history[i] = WorldCoordToObjCoordNorth(
           std::make_pair(feature.position().x(), feature.position().y()),
           obs_curr_pos, obs_curr_heading);
     }
@@ -535,7 +539,7 @@ bool JointlyPredictionPlanningEvaluator::ExtractADCTrajectory(
       adc_traj_curr_pos->at(i) =
           adc_traj_curr_pos->at(adc_traj_points_num - 1);
     } else {
-      adc_traj_curr_pos->at(i) = WorldCoordToObjCoord(
+      adc_traj_curr_pos->at(i) = WorldCoordToObjCoordNorth(
           std::make_pair(trajectory_points->at(i).path_point().x(),
           trajectory_points->at(i).path_point().y()),
           obs_curr_pos, obs_curr_heading);
