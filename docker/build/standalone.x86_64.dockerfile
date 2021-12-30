@@ -27,3 +27,14 @@ COPY --from=apollo_faster_rcnn_volume \
 COPY --from=apollo_smoke_volume \
     /apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector \
     /apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector
+
+RUN mkdir -p /apollo/bazel-bin \
+    && ln -s /apollo/cyber /apollo/bazel-bin/cyber \
+    && ln -s /apollo/modules /apollo/bazel-bin/modules
+
+WORKDIR /apollo
+RUN ln -sf /apollo/modules/map/data /apollo/modules/dreamview/frontend/dist/assets/map_data
+RUN touch __init__.py && \
+    for DIR in $(find cyber modules -type d); do \
+      touch $DIR/__init__.py; \
+    done
