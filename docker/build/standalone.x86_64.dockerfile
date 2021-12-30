@@ -35,6 +35,7 @@ RUN mkdir -p /apollo/bazel-bin \
     && ln -s /apollo/modules /apollo/bazel-bin/modules
 
 WORKDIR /apollo
+RUN ln -sf /apollo/modules/map/data /apollo/modules/dreamview/frontend/dist/assets/map_data
 RUN touch __init__.py && \
     for DIR in $(find cyber modules -type d); do \
       touch $DIR/__init__.py; \
