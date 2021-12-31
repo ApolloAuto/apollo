@@ -304,6 +304,8 @@ Chassis LexusController::chassis() {
   return chassis_;
 }
 
+bool LexusController::VerifyID() { return true; }
+
 void LexusController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();

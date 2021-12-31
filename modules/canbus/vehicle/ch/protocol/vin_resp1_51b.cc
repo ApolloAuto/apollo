@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/ch/protocol/vin_resp1_51b.h"
 
+#include <string>
+
 #include "glog/logging.h"
 
 #include "modules/drivers/canbus/common/byte.h"
@@ -54,11 +56,13 @@ void Vinresp151b::Parse(const std::uint8_t* bytes, int32_t length,
 // False, 'len': 8, 'name': 'vin08', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin08(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin08(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -66,11 +70,13 @@ int Vinresp151b::vin08(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin07', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin07(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin07(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -78,11 +84,13 @@ int Vinresp151b::vin07(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin06', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin06(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin06(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -90,11 +98,13 @@ int Vinresp151b::vin06(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin05', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin05(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin05(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -102,11 +112,13 @@ int Vinresp151b::vin05(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin04', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin04(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin04(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -114,11 +126,13 @@ int Vinresp151b::vin04(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin03', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin03(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin03(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -126,11 +140,13 @@ int Vinresp151b::vin03(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin02', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin02(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin02(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 
@@ -138,11 +154,13 @@ int Vinresp151b::vin02(const std::uint8_t* bytes, int32_t length) const {
 // False, 'len': 8, 'name': 'vin01', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp151b::vin01(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp151b::vin01(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 }  // namespace ch

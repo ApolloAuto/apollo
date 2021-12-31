@@ -40,7 +40,7 @@ void Gearcommand114::UpdateData(uint8_t* data) {
 
 void Gearcommand114::Reset() {
   // TODO(All) :  you should check this manually
-  gear_cmd_ = Gear_command_114::GEAR_CMD_PARK;
+  gear_cmd_ = Gear_command_114::GEAR_CMD_NEUTRAL;
 }
 
 Gearcommand114* Gearcommand114::set_gear_cmd(

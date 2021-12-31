@@ -48,7 +48,8 @@ class Bmsreport512 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'len': 8, 'name': 'Battery_Soc', 'offset': 0.0,
   // 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
   // 'precision': 1.0, 'type': 'int'}
-  int battery_soc_percentage(const std::uint8_t* bytes, const int32_t length) const;
+  int battery_soc_percentage(const std::uint8_t* bytes,
+                             const int32_t length) const;
 };
 
 }  // namespace devkit

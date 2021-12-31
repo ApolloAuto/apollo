@@ -78,8 +78,8 @@ Steeringcommand102* Steeringcommand102::set_steer_angle_target(
 
 // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
 // 'Steer_ANGLE_Target', 'offset': -500.0, 'order': 'motorola',
-// 'physical_range': '[-500|500]''right -, left +', 'physical_unit': 'deg', 'precision': 1.0,
-// 'type': 'int'}
+// 'physical_range': '[-500|500]''right -, left +', 'physical_unit': 'deg',
+// 'precision': 1.0, 'type': 'int'}
 void Steeringcommand102::set_p_steer_angle_target(uint8_t* data,
                                                   int steer_angle_target) {
   steer_angle_target =

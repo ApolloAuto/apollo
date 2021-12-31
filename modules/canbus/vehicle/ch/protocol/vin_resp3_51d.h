@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -37,7 +39,7 @@ class Vinresp351d : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'len': 8, 'name': 'VIN17', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin17(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin17(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

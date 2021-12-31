@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string>
+
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
 
 #include "modules/common/proto/vehicle_signal.pb.h"
@@ -296,7 +298,8 @@ Chassis DevkitController::chassis() {
     chassis_.mutable_surround()->set_sonar01(0);
   }
   // 17 set vin
-  // like LSBN12345678... is prased as vin00(L),vin01(S),vin02(B),...
+  // vin set 17 bits, like LSBN1234567890123 is prased as
+  // vin17(L),vin16(S),vin15(B),......,vin03(1),vin02(2),vin01(3)
   std::string vin = "";
   if (chassis_detail.devkit().has_vin_resp1_514()) {
     Vin_resp1_514 vin_resp1_514 = chassis_detail.devkit().vin_resp1_514();
@@ -323,12 +326,22 @@ Chassis DevkitController::chassis() {
   if (chassis_detail.devkit().has_vin_resp3_516()) {
     Vin_resp3_516 vin_resp3_516 = chassis_detail.devkit().vin_resp3_516();
     vin += vin_resp3_516.vin16();
-    vin += vin_resp3_516.vin17();
   }
-
+  std::reverse(vin.begin(), vin.end());
   chassis_.mutable_vehicle_id()->set_vin(vin);
 
   return chassis_;
+}
+
+bool DevkitController::VerifyID() {
+  if (!CheckVin()) {
+    AERROR << "Failed to get the vin.";
+    GetVin();
+    return false;
+  } else {
+    ResetVin();
+    return true;
+  }
 }
 
 void DevkitController::Emergency() {
@@ -470,7 +483,7 @@ void DevkitController::Throttle(double pedal) {
 // throttle/brake pedal drive with acceleration/deceleration acc:-7.0 ~ 5.0,
 // unit:m/s^2
 void DevkitController::Acceleration(double acc) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE ||
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
@@ -555,6 +568,32 @@ void DevkitController::SetTurningSignal(const ControlCommand& command) {
     vehicle_mode_command_105_->set_turn_light_ctrl(
         Vehicle_mode_command_105::TURN_LIGHT_CTRL_TURNLAMP_OFF);
   }
+}
+
+bool DevkitController::CheckVin() {
+  if (chassis_.vehicle_id().vin().size() == 17) {
+    AINFO << "Vin check success! Vehicel vin is "
+          << chassis_.vehicle_id().vin();
+    return true;
+  } else {
+    AINFO << "Vin check failed! Current vin size is "
+          << chassis_.vehicle_id().vin().size();
+    return false;
+  }
+}
+
+void DevkitController::GetVin() {
+  vehicle_mode_command_105_->set_vin_req(
+      Vehicle_mode_command_105::VIN_REQ_VIN_REQ_ENABLE);
+  AINFO << "Get vin";
+  can_sender_->Update();
+}
+
+void DevkitController::ResetVin() {
+  vehicle_mode_command_105_->set_vin_req(
+      Vehicle_mode_command_105::VIN_REQ_VIN_REQ_DISABLE);
+  AINFO << "Reset vin";
+  can_sender_->Update();
 }
 
 void DevkitController::ResetProtocol() {
