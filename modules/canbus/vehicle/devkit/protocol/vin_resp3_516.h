@@ -16,7 +16,10 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -32,8 +35,8 @@ class Vinresp3516 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name': 'vin17',
-  // 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|255]',
+  // config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name':
+  // 'vin17', 'offset': 0.0, 'order': 'motorola', 'physical_range': '[0|255]',
   // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   std::string vin17(const std::uint8_t* bytes, const int32_t length) const;
 

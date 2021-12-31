@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -37,49 +39,49 @@ class Vinresp251c : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'len': 8, 'name': 'VIN16', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin16(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin16(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 48, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN15', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin15(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin15(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 40, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN14', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin14(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin14(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 32, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN13', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin13(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin13(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 24, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN12', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin12(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin12(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 16, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN11', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin11(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin11(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 8, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN10', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin10(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin10(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'bit': 0, 'description': 'VIN Response', 'is_signed_var':
   // False, 'len': 8, 'name': 'VIN09', 'offset': 0.0, 'order': 'intel',
   // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'int'}
-  int vin09(const std::uint8_t* bytes, const int32_t length) const;
+  std::string vin09(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

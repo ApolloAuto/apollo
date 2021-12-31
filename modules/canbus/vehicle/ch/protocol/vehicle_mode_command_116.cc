@@ -31,7 +31,7 @@ Vehiclemodecommand116::Vehiclemodecommand116() { Reset(); }
 
 uint32_t Vehiclemodecommand116::GetPeriod() const {
   // TODO(All) :  modify every protocol's period manually
-  static const uint32_t PERIOD = 20 * 1000;
+  static const uint32_t PERIOD = 500 * 1000;
   return PERIOD;
 }
 
@@ -41,7 +41,7 @@ void Vehiclemodecommand116::UpdateData(uint8_t* data) {
 
 void Vehiclemodecommand116::Reset() {
   // TODO(All) :  you should check this manually
-  vin_req_cmd_ = Vehicle_mode_command_116::VIN_REQ_CMD_VIN_REQ_ENABLE;
+  vin_req_cmd_ = Vehicle_mode_command_116::VIN_REQ_CMD_VIN_REQ_DISABLE;
 }
 
 Vehiclemodecommand116* Vehiclemodecommand116::set_vin_req_cmd(

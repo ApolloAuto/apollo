@@ -258,6 +258,8 @@ Chassis ZhongyunController::chassis() {
   return chassis_;
 }
 
+bool ZhongyunController::VerifyID() { return true; }
+
 void ZhongyunController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();

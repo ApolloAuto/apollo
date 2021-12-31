@@ -390,6 +390,8 @@ Chassis Ge3Controller::chassis() {
   return chassis_;
 }
 
+bool Ge3Controller::VerifyID() { return true; }
+
 void Ge3Controller::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();
