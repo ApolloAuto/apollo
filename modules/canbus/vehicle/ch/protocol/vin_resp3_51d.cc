@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/ch/protocol/vin_resp3_51d.h"
 
+#include <string>
+
 #include "glog/logging.h"
 
 #include "modules/drivers/canbus/common/byte.h"
@@ -40,11 +42,13 @@ void Vinresp351d::Parse(const std::uint8_t* bytes, int32_t length,
 // False, 'len': 8, 'name': 'vin17', 'offset': 0.0, 'order': 'intel',
 // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
 // 'int'}
-int Vinresp351d::vin17(const std::uint8_t* bytes, int32_t length) const {
+std::string Vinresp351d::vin17(const std::uint8_t* bytes,
+                               int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  std::string ret = "";
+  ret += x;
   return ret;
 }
 }  // namespace ch

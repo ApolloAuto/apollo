@@ -109,8 +109,13 @@ class DevkitController final : public VehicleController {
   void SetTurningSignal(
       const ::apollo::control::ControlCommand& command) override;
 
+  // response vid
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
+  bool CheckVin();
+  void GetVin();
+  void ResetVin();
 
  private:
   void SecurityDogThreadFunc();

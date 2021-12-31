@@ -8,16 +8,16 @@ message Throttle_command_100 {
     THROTTLE_EN_CTRL_DISABLE = 0;
     THROTTLE_EN_CTRL_ENABLE = 1;
   }
-  // [m/s] [0|10.23]
-  optional double speed_target = 1;
   // [m/s^2] [0|10]
-  optional double throttle_acc = 2;
+  optional double throttle_acc = 1;
   // [] [0|255]
-  optional int32 checksum_100 = 3;
+  optional int32 checksum_100 = 2;
   // [%] [0|100]
-  optional double throttle_pedal_target = 4;
+  optional double throttle_pedal_target = 3;
   // [] [0|1]
-  optional Throttle_en_ctrlType throttle_en_ctrl = 5;
+  optional Throttle_en_ctrlType throttle_en_ctrl = 4;
+  // [m/s] [0|10.23]
+  optional double speed_target = 5;
 }
 
 message Brake_command_101 {
@@ -30,16 +30,16 @@ message Brake_command_101 {
     BRAKE_EN_CTRL_DISABLE = 0;
     BRAKE_EN_CTRL_ENABLE = 1;
   }
-  // [] [0|0]
-  optional Aeb_en_ctrlType aeb_en_ctrl = 1;
   // [m/s^2] [0|10]
-  optional double brake_dec = 2;
+  optional double brake_dec = 1;
   // [] [0|255]
-  optional int32 checksum_101 = 3;
+  optional int32 checksum_101 = 2;
   // [%] [0|100]
-  optional double brake_pedal_target = 4;
+  optional double brake_pedal_target = 3;
   // [] [0|1]
-  optional Brake_en_ctrlType brake_en_ctrl = 5;
+  optional Brake_en_ctrlType brake_en_ctrl = 4;
+  // [] [0|0]
+  optional Aeb_en_ctrlType aeb_en_ctrl = 5;
 }
 
 message Steering_command_102 {
@@ -199,18 +199,18 @@ message Steering_report_502 {
     STEER_EN_STATE_TAKEOVER = 2;
     STEER_EN_STATE_STANDBY = 3;
   }
-  // [deg] [-500|500]
-  optional int32 steer_angle_rear_actual = 1;
   // [deg/s] [0|0]
-  optional int32 steer_angle_spd_actual = 2;
+  optional int32 steer_angle_spd_actual = 1;
   // Steer system communication fault [] [0|255]
-  optional Steer_flt2Type steer_flt2 = 3;
+  optional Steer_flt2Type steer_flt2 = 2;
   // Steer system hardware fault [] [0|255]
-  optional Steer_flt1Type steer_flt1 = 4;
+  optional Steer_flt1Type steer_flt1 = 3;
   // [] [0|2]
-  optional Steer_en_stateType steer_en_state = 5;
+  optional Steer_en_stateType steer_en_state = 4;
   // [deg] [-500|500]
-  optional int32 steer_angle_actual = 6;
+  optional int32 steer_angle_actual = 5;
+  // [deg] [-500|500]
+  optional int32 steer_angle_rear_actual = 6;
 }
 
 message Gear_report_503 {
@@ -403,50 +403,48 @@ message Bms_report_512 {
 
 message Vin_resp1_514 {
 // Report Message
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin07 = 1;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin06 = 2;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin05 = 3;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin04 = 4;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin03 = 5;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin02 = 6;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin01 = 7;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin00 = 8;
 }
 
 message Vin_resp2_515 {
 // Report Message
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin15 = 1;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin14 = 2;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin13 = 3;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin12 = 4;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin11 = 5;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin10 = 6;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin09 = 7;
-  // [] [0|255] TO ASCII
+  // [] [0|255] to char
   optional string vin08 = 8;
 }
 
 message Vin_resp3_516 {
 // Report Message
-  // [] [0|255] TO ASCII
-  optional string vin17 = 1;
-  // [] [0|255] TO ASCII
-  optional string vin16 = 2;
+  // [] [0|255] to char
+  optional string vin16 = 1;
 }
 
 message Devkit {
@@ -455,20 +453,20 @@ message Devkit {
   optional Steering_command_102 steering_command_102 = 3; // control message
   optional Gear_command_103 gear_command_103 = 4; // control message
   optional Park_command_104 park_command_104 = 5; // control message
-  optional Vehicle_mode_command_105 vehicle_mode_command_105 = 6; // control message
-  optional Throttle_report_500 throttle_report_500 = 7; // report message
-  optional Brake_report_501 brake_report_501 = 8; // report message
-  optional Steering_report_502 steering_report_502 = 9; // report message
-  optional Gear_report_503 gear_report_503 = 10; // report message
-  optional Park_report_504 park_report_504 = 11; // report message
-  optional Vcu_report_505 vcu_report_505 = 12; // report message
-  optional Wheelspeed_report_506 wheelspeed_report_506 = 13; // report message
-  optional Ultr_sensor_1_507 ultr_sensor_1_507 = 14; // report message
-  optional Ultr_sensor_2_508 ultr_sensor_2_508 = 15; // report message
-  optional Ultr_sensor_3_509 ultr_sensor_3_509 = 16; // report message
-  optional Ultr_sensor_4_510 ultr_sensor_4_510 = 17; // report message
-  optional Ultr_sensor_5_511 ultr_sensor_5_511 = 18; // report message
-  optional Bms_report_512 bms_report_512 = 19; // report message
+  optional Throttle_report_500 throttle_report_500 = 6; // report message
+  optional Brake_report_501 brake_report_501 = 7; // report message
+  optional Steering_report_502 steering_report_502 = 8; // report message
+  optional Gear_report_503 gear_report_503 = 9; // report message
+  optional Park_report_504 park_report_504 = 10; // report message
+  optional Vcu_report_505 vcu_report_505 = 11; // report message
+  optional Wheelspeed_report_506 wheelspeed_report_506 = 12; // report message
+  optional Ultr_sensor_1_507 ultr_sensor_1_507 = 13; // report message
+  optional Ultr_sensor_2_508 ultr_sensor_2_508 = 14; // report message
+  optional Ultr_sensor_3_509 ultr_sensor_3_509 = 15; // report message
+  optional Ultr_sensor_4_510 ultr_sensor_4_510 = 16; // report message
+  optional Ultr_sensor_5_511 ultr_sensor_5_511 = 17; // report message
+  optional Bms_report_512 bms_report_512 = 18; // report message
+  optional Vehicle_mode_command_105 vehicle_mode_command_105 = 19; // control message
   optional Vin_resp1_514 vin_resp1_514 = 20; // report message
   optional Vin_resp2_515 vin_resp2_515 = 21; // report message
   optional Vin_resp3_516 vin_resp3_516 = 22; // report message

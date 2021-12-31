@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
-
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {

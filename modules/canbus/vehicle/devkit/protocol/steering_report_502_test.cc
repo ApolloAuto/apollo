@@ -43,11 +43,12 @@ TEST_F(Steeringreport502Test, General) {
   EXPECT_EQ(data[6], 0b00000100);
   EXPECT_EQ(data[7], 0b00000101);
 
-  EXPECT_EQ(cd.devkit().steering_report_502().steer_angle_spd_actual(), 4);
+  EXPECT_EQ(cd.devkit().steering_report_502().steer_angle_spd_actual(), 5);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_flt2(), 1);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_flt1(), 1);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_en_state(), 0);
   EXPECT_EQ(cd.devkit().steering_report_502().steer_angle_actual(), 4650);
+  EXPECT_EQ(cd.devkit().steering_report_502().steer_angle_rear_actual(), 272);
 }
 
 }  // namespace devkit
