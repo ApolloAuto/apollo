@@ -448,11 +448,36 @@ void ChController::Steer(double angle, double angle_spd) {
 
 void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {}
+void ChController::SetBeam(const ControlCommand& command) {
+  // Set low beam
+  if (command.signal().low_beam()) {
+    turnsignal_command_113_->set_low_beam_cmd(
+        Turnsignal_command_113::LOW_BEAM_CMD_ON);
+  } else {
+    turnsignal_command_113_->set_low_beam_cmd(
+        Turnsignal_command_113::LOW_BEAM_CMD_OFF);
+  }
+}
 
 void ChController::SetHorn(const ControlCommand& command) {}
 
-void ChController::SetTurningSignal(const ControlCommand& command) {}
+void ChController::SetTurningSignal(const ControlCommand& command) {
+  // Set Turn Signal
+  auto signal = command.signal().turn_signal();
+  if (signal == common::VehicleSignal::TURN_LEFT) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_LEFT);
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_RIGHT);
+  } else if (signal == common::VehicleSignal::TURN_HAZARD_WARNING) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS);
+  } else {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_NONE);
+  }
+}
 
 bool ChController::VerifyID() {
   if (!CheckVin()) {

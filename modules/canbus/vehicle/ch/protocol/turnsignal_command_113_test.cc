@@ -31,7 +31,7 @@ TEST_F(Turnsignalcommand113Test, simple) {
   uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
   turnsignalcommand.UpdateData(data);
   EXPECT_EQ(data[0], 0b00000000);
-  EXPECT_EQ(data[1], 0b01100010);
+  EXPECT_EQ(data[1], 0b01100000);
   EXPECT_EQ(data[2], 0b01100011);
   EXPECT_EQ(data[3], 0b01100100);
   EXPECT_EQ(data[4], 0b01100101);
