@@ -7,6 +7,7 @@ message VehicleSignal {
     TURN_NONE = 0;
     TURN_LEFT = 1;
     TURN_RIGHT = 2;
+    TURN_HAZARD_WARNING = 3;
   };
   optional TurnSignal turn_signal = 1;
   // lights enable command

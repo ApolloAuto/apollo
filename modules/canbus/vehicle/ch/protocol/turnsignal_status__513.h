@@ -40,6 +40,14 @@ class Turnsignalstatus513 : public ::apollo::drivers::canbus::ProtocolData<
   // 'precision': 1.0, 'type': 'enum'}
   Turnsignal_status__513::Turn_signal_stsType turn_signal_sts(
       const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 8, 'description': 'Lighting control(Status)',
+  // 'enum': {0: 'LOW_BEAM_STS_ON', 1: 'LOW_BEAM_STS_OFF'}, 'is_signed_var':
+  // False, 'len': 2, 'name': 'LOW_BEAM_STS', 'offset': 0.0, 'order': 'intel',
+  // 'physical_range': '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
+  Turnsignal_status__513::Low_beam_stsType low_beam_sts(
+      const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

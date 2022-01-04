@@ -36,6 +36,14 @@ class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
+  // config detail: {'bit': 8, 'description': 'Lighting control(Command)',
+  // 'enum': {0: 'LOW_BEAM_CMD_OFF', 1: 'LOW_BEAM_CMD_ON'}, 'is_signed_var':
+  // False, 'len': 2, 'name': 'LOW_BEAM_CMD', 'offset': 0.0, 'order': 'intel',
+  // 'physical_range': '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
+  Turnsignalcommand113* set_low_beam_cmd(
+      Turnsignal_command_113::Low_beam_cmdType low_beam_cmd);
+
   // config detail: {'bit': 0, 'description': 'Lighting control(Command)',
   // 'enum': {0: 'TURN_SIGNAL_CMD_NONE', 1: 'TURN_SIGNAL_CMD_LEFT', 2:
   // 'TURN_SIGNAL_CMD_RIGHT', 3: 'TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS'},
@@ -46,6 +54,14 @@ class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
       Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd);
 
  private:
+  // config detail: {'bit': 8, 'description': 'Lighting control(Command)',
+  // 'enum': {0: 'LOW_BEAM_CMD_OFF', 1: 'LOW_BEAM_CMD_ON'}, 'is_signed_var':
+  // False, 'len': 2, 'name': 'LOW_BEAM_CMD', 'offset': 0.0, 'order': 'intel',
+  // 'physical_range': '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type':
+  // 'enum'}
+  void set_p_low_beam_cmd(
+      uint8_t* data, Turnsignal_command_113::Low_beam_cmdType low_beam_cmd);
+
   // config detail: {'bit': 0, 'description': 'Lighting control(Command)',
   // 'enum': {0: 'TURN_SIGNAL_CMD_NONE', 1: 'TURN_SIGNAL_CMD_LEFT', 2:
   // 'TURN_SIGNAL_CMD_RIGHT', 3: 'TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS'},
@@ -58,6 +74,7 @@ class Turnsignalcommand113 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Turnsignal_command_113::Turn_signal_cmdType turn_signal_cmd_;
+  Turnsignal_command_113::Low_beam_cmdType low_beam_cmd_;
 };
 
 }  // namespace ch
