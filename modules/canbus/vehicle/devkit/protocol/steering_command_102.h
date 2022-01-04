@@ -50,9 +50,10 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   Steeringcommand102* set_steer_angle_target(int steer_angle_target);
 
   // config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Steer_ANGLE_SPD', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-  // '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0, 'type': 'int'}
-  Steeringcommand102* set_steer_angle_spd(int steer_angle_spd);
+  // 'Steer_ANGLE_SPD_Target', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0,
+  // 'type': 'int'}
+  Steeringcommand102* set_steer_angle_spd_target(int steer_angle_spd_target);
 
   // config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
   // 'CheckSum_102', 'offset': 0.0, 'order': 'motorola', 'physical_range':
@@ -74,9 +75,10 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_steer_angle_target(uint8_t* data, int steer_angle_target);
 
   // config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Steer_ANGLE_SPD', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-  // '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0, 'type': 'int'}
-  void set_p_steer_angle_spd(uint8_t* data, int steer_angle_spd);
+  // 'Steer_ANGLE_SPD_Target', 'offset': 0.0, 'order': 'motorola',
+  // 'physical_range': '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0,
+  // 'type': 'int'}
+  void set_p_steer_angle_spd_target(uint8_t* data, int steer_angle_spd_target);
 
   // config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
   // 'CheckSum_102', 'offset': 0.0, 'order': 'motorola', 'physical_range':
@@ -86,7 +88,7 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
  private:
   Steering_command_102::Steer_en_ctrlType steer_en_ctrl_;
   int steer_angle_target_;
-  int steer_angle_spd_;
+  int steer_angle_spd_target_;
   int checksum_102_;
 };
 

@@ -36,11 +36,13 @@ uint32_t Vehiclemodecommand105::GetPeriod() const {
 }
 
 void Vehiclemodecommand105::UpdateData(uint8_t* data) {
-  set_p_checksum_105(data, checksum_105_);
   set_p_turn_light_ctrl(data, turn_light_ctrl_);
   set_p_vin_req(data, vin_req_);
   set_p_drive_mode_ctrl(data, drive_mode_ctrl_);
   set_p_steer_mode_ctrl(data, steer_mode_ctrl_);
+  checksum_105_ =
+    data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+  set_p_checksum_105(data, checksum_105_);
 }
 
 void Vehiclemodecommand105::Reset() {
