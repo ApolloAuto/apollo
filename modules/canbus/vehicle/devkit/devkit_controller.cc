@@ -367,8 +367,9 @@ ErrorCode DevkitController::EnableAutoMode() {
   if (FLAGS_enable_aeb) {
     brake_command_101_->set_aeb_en_ctrl(
         Brake_command_101::AEB_EN_CTRL_ENABLE_AEB);
-    AINFO << "Set AEB";
+    AINFO << "Set AEB enable";
   }
+
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -506,7 +507,7 @@ void DevkitController::Steer(double angle) {
 
   if (!emergency_brake) {
     steering_command_102_->set_steer_angle_target(real_angle)
-        ->set_steer_angle_spd(250);
+        ->set_steer_angle_target(250);
   }
 }
 
@@ -524,7 +525,7 @@ void DevkitController::Steer(double angle, double angle_spd) {
 
   if (!emergency_brake) {
     steering_command_102_->set_steer_angle_target(real_angle)
-        ->set_steer_angle_spd(250);
+        ->set_steer_angle_target(250);
   }
 }
 

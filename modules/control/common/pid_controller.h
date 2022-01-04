@@ -54,7 +54,7 @@ class PIDController {
    * @brief reset variables for pid controller
    */
   void Reset();
-  
+
   /**
    * @brief reset integral for pid controller
    */
