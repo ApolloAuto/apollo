@@ -40,19 +40,25 @@ message Steer_command_112 {
 }
 
 message Turnsignal_command_113 {
-  // Control Message
+// Control Message
+  enum Low_beam_cmdType {
+    LOW_BEAM_CMD_OFF = 0;
+    LOW_BEAM_CMD_ON = 1;
+  }
   enum Turn_signal_cmdType {
     TURN_SIGNAL_CMD_NONE = 0;
     TURN_SIGNAL_CMD_LEFT = 1;
     TURN_SIGNAL_CMD_RIGHT = 2;
     TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS = 3;
   }
-  // Lighting control(Command) [] [0|2]
+  // Lighting control(Command) [] [0|3]
   optional Turn_signal_cmdType turn_signal_cmd = 1;
+  // Lighting control(Command) [] [0|1]
+  optional Low_beam_cmdType low_beam_cmd = 2;
 }
 
 message Gear_command_114 {
-  // Control Message
+// Control Message
   enum Gear_cmdType {
     GEAR_CMD_PARK = 1;
     GEAR_CMD_REVERSE = 2;
@@ -184,15 +190,21 @@ message Steer_status__512 {
 }
 
 message Turnsignal_status__513 {
-  // Report Message
+// Report Message
+  enum Low_beam_stsType {
+    LOW_BEAM_STS_ON = 0;
+    LOW_BEAM_STS_OFF = 1;
+  }
   enum Turn_signal_stsType {
     TURN_SIGNAL_STS_NONE = 0;
     TURN_SIGNAL_STS_LEFT = 1;
     TURN_SIGNAL_STS_RIGHT = 2;
     TURN_SIGNAL_STS_HAZARD_WARNING_LAMPSTS_ON = 3;
   }
-  // Lighting control(Status) [] [0|2]
+  // Lighting control(Status) [] [0|3]
   optional Turn_signal_stsType turn_signal_sts = 1;
+  // Lighting control(Status) [] [0|1]
+  optional Low_beam_stsType low_beam_sts = 2;
 }
 
 message Gear_status_514 {
@@ -237,7 +249,7 @@ message Ecu_status_2_516 {
   optional double battery_current = 4;
   // Current battery temperature (BMS status) [℃] [-40|110]
   optional int32 battery_temperature = 5;
-  // Battery Low Soc Warning
+  // Battery Low Soc Warn [] [0|1]
   optional bool is_battery_soc_low = 6;
 }
 
