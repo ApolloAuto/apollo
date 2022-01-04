@@ -290,12 +290,55 @@ Chassis DevkitController::chassis() {
         "Battery soc percentage is lower than 15%, please charge it quickly!");
   }
   // 16 sonor list
-  if (chassis_detail.devkit().has_ultr_sensor_3_509() &&
-      chassis_detail.devkit().has_ultr_sensor_5_511()) {
+  // to do(ALL):check your vehicle type, confirm your sonar position because of
+  // every vhechle has different sonars assembly.
+  // 08 09 10 11
+  if (chassis_detail.devkit().has_ultr_sensor_1_507()) {
+    chassis_.mutable_surround()->set_sonar08(
+        chassis_detail.devkit().ultr_sensor_1_507().uiuss8_tof_direct());
+    chassis_.mutable_surround()->set_sonar09(
+        chassis_detail.devkit().ultr_sensor_1_507().uiuss9_tof_direct());
+    chassis_.mutable_surround()->set_sonar10(
+        chassis_detail.devkit().ultr_sensor_1_507().uiuss10_tof_direct());
+    chassis_.mutable_surround()->set_sonar11(
+        chassis_detail.devkit().ultr_sensor_1_507().uiuss11_tof_direct());
+  } else {
+    chassis_.mutable_surround()->set_sonar08(0);
+    chassis_.mutable_surround()->set_sonar09(0);
+    chassis_.mutable_surround()->set_sonar10(0);
+    chassis_.mutable_surround()->set_sonar11(0);
+  }
+  // 2 3 4 5
+  if (chassis_detail.devkit().has_ultr_sensor_3_509()) {
+    chassis_.mutable_surround()->set_sonar02(
+        chassis_detail.devkit().ultr_sensor_3_509().uiuss2_tof_direct());
+    chassis_.mutable_surround()->set_sonar03(
+        chassis_detail.devkit().ultr_sensor_3_509().uiuss3_tof_direct());
+    chassis_.mutable_surround()->set_sonar04(
+        chassis_detail.devkit().ultr_sensor_3_509().uiuss4_tof_direct());
+    chassis_.mutable_surround()->set_sonar05(
+        chassis_detail.devkit().ultr_sensor_3_509().uiuss5_tof_direct());
+  } else {
+    chassis_.mutable_surround()->set_sonar02(0);
+    chassis_.mutable_surround()->set_sonar03(0);
+    chassis_.mutable_surround()->set_sonar04(0);
+    chassis_.mutable_surround()->set_sonar05(0);
+  }
+  // 0 1 6 7
+  if (chassis_detail.devkit().has_ultr_sensor_5_511()) {
+    chassis_.mutable_surround()->set_sonar00(
+        chassis_detail.devkit().ultr_sensor_5_511().uiuss0_tof_direct());
     chassis_.mutable_surround()->set_sonar01(
         chassis_detail.devkit().ultr_sensor_5_511().uiuss1_tof_direct());
+    chassis_.mutable_surround()->set_sonar06(
+        chassis_detail.devkit().ultr_sensor_5_511().uiuss6_tof_direct());
+    chassis_.mutable_surround()->set_sonar07(
+        chassis_detail.devkit().ultr_sensor_5_511().uiuss7_tof_direct());
   } else {
+    chassis_.mutable_surround()->set_sonar00(0);
     chassis_.mutable_surround()->set_sonar01(0);
+    chassis_.mutable_surround()->set_sonar06(0);
+    chassis_.mutable_surround()->set_sonar07(0);
   }
   // 17 set vin
   // vin set 17 bits, like LSBN1234567890123 is prased as
@@ -565,6 +608,9 @@ void DevkitController::SetTurningSignal(const ControlCommand& command) {
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     vehicle_mode_command_105_->set_turn_light_ctrl(
         Vehicle_mode_command_105::TURN_LIGHT_CTRL_RIGHT_TURNLAMP_ON);
+  } else if (signal == common::VehicleSignal::TURN_HAZARD_WARNING) {
+    vehicle_mode_command_105_->set_turn_light_ctrl(
+        Vehicle_mode_command_105::TURN_LIGHT_CTRL_HAZARD_WARNING_LAMPSTS_ON);
   } else {
     vehicle_mode_command_105_->set_turn_light_ctrl(
         Vehicle_mode_command_105::TURN_LIGHT_CTRL_TURNLAMP_OFF);
