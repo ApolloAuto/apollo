@@ -12,6 +12,7 @@ import "modules/canbus/proto/transit.proto";
 import "modules/canbus/proto/wey.proto";
 import "modules/canbus/proto/zhongyun.proto";
 import "modules/canbus/proto/neolix_edu.proto";
+import "modules/canbus/proto/hunter2.proto";
 
 message ChassisDetail {
   enum Type {
@@ -44,6 +45,8 @@ message ChassisDetail {
   optional Ch ch = 24;
   optional Devkit devkit = 25;
   optional Neolix_edu neolix_edu = 26;
+  optional Hunter2 hunter2 = 27;
+
   // Reserve fields for other vehicles
   optional apollo.common.VehicleID vehicle_id = 101;
 }
