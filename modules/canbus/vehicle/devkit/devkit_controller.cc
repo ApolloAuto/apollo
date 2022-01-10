@@ -550,7 +550,7 @@ void DevkitController::Steer(double angle) {
 
   if (!emergency_brake) {
     steering_command_102_->set_steer_angle_target(real_angle)
-        ->set_steer_angle_target(250);
+        ->set_steer_angle_spd_target(250);
   }
 }
 
@@ -568,7 +568,7 @@ void DevkitController::Steer(double angle, double angle_spd) {
 
   if (!emergency_brake) {
     steering_command_102_->set_steer_angle_target(real_angle)
-        ->set_steer_angle_target(250);
+        ->set_steer_angle_spd_target(angle_spd);
   }
 }
 
