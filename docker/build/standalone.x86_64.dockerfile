@@ -1,6 +1,6 @@
 ARG DOCKER_REPO=apolloauto/apollo
 ARG TARGET_ARCH=x86_64
-ARG IMAGE_VERSION=18.04-20210517_1712
+ARG IMAGE_VERSION=18.04-20210914_1336
 ARG BASE_IMAGE=${DOCKER_REPO}:runtime-${TARGET_ARCH}-${IMAGE_VERSION}
 
 FROM ${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest as apollo_audio_volume
@@ -35,6 +35,7 @@ RUN mkdir -p /apollo/bazel-bin \
     && ln -s /apollo/modules /apollo/bazel-bin/modules
 
 WORKDIR /apollo
+RUN ln -sf /apollo/modules/map/data /apollo/modules/dreamview/frontend/dist/assets/map_data
 RUN touch __init__.py && \
     for DIR in $(find cyber modules -type d); do \
       touch $DIR/__init__.py; \
