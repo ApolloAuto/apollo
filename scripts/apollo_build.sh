@@ -19,6 +19,7 @@
 set -e
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+DIST_DIR='/apollo/.cache/distdir'
 source "${TOP_DIR}/scripts/apollo_base.sh"
 
 ARCH="$(uname -m)"
@@ -225,7 +226,7 @@ function format_bazel_targets() {
 
 function run_bazel_build() {
   if ${USE_ESD_CAN}; then
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --distdir=${DIST_DIR} --define USE_ESD_CAN=${USE_ESD_CAN}"
   fi
 
   CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
@@ -250,12 +251,21 @@ function run_bazel_build() {
   local job_args="--jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
+function prepare_bazel_build() {
 
+  if [ ! -d ${DIST_DIR} ]; then
+    mkdir DIST_DIR
+    wget https://apollo-system.cdn.bcebos.com/archive/bazel_deps/bazel-dependencies-5.0.0.tar.gz
+    tar -zxvf bazel-dependencies-5.0.0.tar.gz --strip-components 1 -C DIST_DIR
+  fi
+
+}
 function main() {
   if ! "${APOLLO_IN_DOCKER}"; then
     error "The build operation must be run from within docker container"
     exit 1
   fi
+  prepare_bazel_build
   parse_cmdline_arguments "$@"
   determine_cpu_or_gpu_build
 
