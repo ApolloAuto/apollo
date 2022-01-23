@@ -1,0 +1,85 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/wato/libwato_component.so"
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_front_6mm"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
+      }
+    }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_front_12mm"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
+      }
+    }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_front_fisheye"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
+      }
+    }
+
+    # components {
+    #   class_name : "CameraComponent"
+    #   config {
+    #     name : "camera_left_front"
+    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_front.pb.txt"
+    #   }
+    # }
+
+    # components {
+    #   class_name : "CameraComponent"
+    #   config {
+    #     name : "camera_left_rear"
+    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_rear.pb.txt"
+    #   }
+    # }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_left_fisheye"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_fisheye.pb.txt"
+      }
+    }
+
+    # components {
+    #   class_name : "CameraComponent"
+    #   config {
+    #     name : "camera_right_front"
+    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_front.pb.txt"
+    #   }
+    # }
+
+    # components {
+    #   class_name : "CameraComponent"
+    #   config {
+    #     name : "camera_right_rear"
+    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_rear.pb.txt"
+    #   }
+    # }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_right_fisheye"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_fisheye.pb.txt"
+      }
+    }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_rear_6mm"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_rear_6mm.pb.txt"
+      }
+    }
+}
+
