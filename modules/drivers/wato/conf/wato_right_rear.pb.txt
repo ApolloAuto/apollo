@@ -1,6 +1,6 @@
 
-camera_dev: "/dev/camera/lanemark"
-frame_id: "camera_lanemark"
+wato_dev: "/dev/wato/right_rear"
+frame_id: "wato_right_rear"
 pixel_format: "yuyv"
 io_method: IO_METHOD_MMAP
 width: 1920
@@ -21,12 +21,12 @@ white_balance: 4000
 bytes_per_pixel: 2
 trigger_internal: 0
 trigger_fps: 20
-channel_name: "/apollo/sensor/camera/obstacle/front_6mm"
+channel_name: "/apollo/sensor/wato/right_rear/image"
 device_wait_ms: 2000
 spin_rate: 200
 output_type: RGB
 
 compress_conf {
-    output_channel: "/apollo/sensor/camera/obstacle/front_6mm/compressed"
+    output_channel: "/apollo/sensor/wato/right_rear/image/compressed"
     image_pool_size: 100
 }

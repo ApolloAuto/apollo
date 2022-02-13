@@ -16,35 +16,50 @@
 
 #pragma once
 
+#include <atomic>
+#include <future>
 #include <memory>
+#include <vector>
 
-#include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
 #include "modules/drivers/wato/proto/config.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
+
+#include "modules/drivers/wato/usb_cam.h"
 
 namespace apollo {
 namespace drivers {
 namespace wato {
 
 using apollo::cyber::Component;
+using apollo::cyber::Reader;
 using apollo::cyber::Writer;
-using apollo::cyber::base::CCObjectPool;
 using apollo::drivers::Image;
 using apollo::drivers::wato::config::Config;
 
-class CompressComponent : public Component<Image> {
+class CameraComponent : public Component<> {
  public:
   bool Init() override;
-  bool Proc(const std::shared_ptr<Image>& image) override;
+  ~CameraComponent();
 
  private:
-  std::shared_ptr<CCObjectPool<CompressedImage>> image_pool_;
-  std::shared_ptr<Writer<CompressedImage>> writer_ = nullptr;
-  Config config_;
+  void run();
+
+  std::shared_ptr<Writer<Image>> writer_ = nullptr;
+  std::unique_ptr<UsbCam> wato_device_;
+  std::shared_ptr<Config> wato_config_;
+  CameraImagePtr raw_image_ = nullptr;
+  std::vector<std::shared_ptr<Image>> pb_image_buffer_;
+  uint32_t spin_rate_ = 200;
+  uint32_t device_wait_ = 2000;
+  int index_ = 0;
+  int buffer_size_ = 16;
+  const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+  std::future<void> async_result_;
+  std::atomic<bool> running_ = {false};
 };
 
-CYBER_REGISTER_COMPONENT(CompressComponent)
+CYBER_REGISTER_COMPONENT(CameraComponent)
 }  // namespace wato
 }  // namespace drivers
 }  // namespace apollo

@@ -5,17 +5,18 @@ module_config {
     components {
       class_name : "CameraComponent"
       config {
-        name : "camera_front_6mm"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
+        name : "wato_front_6mm"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_front_6mm.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
-        name : "camera_front_6mm_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_6mm.pb.txt"
+        name : "wato_front_6mm_compress"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_front_6mm.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/front_6mm/image"
+          channel: "/apollo/sensor/wato/front_6mm/image"
           pending_queue_size: 10
         }
       }
@@ -24,150 +25,18 @@ module_config {
     components {
       class_name : "CameraComponent"
       config {
-        name : "camera_front_12mm"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
+        name : "wato_front_12mm"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_front_12mm.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
-        name : "camera_front_12mm_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_12mm.pb.txt"
+        name : "wato_front_12mm_compress"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_front_12mm.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/front_12mm/image"
-          pending_queue_size: 10
-        }
-      }
-    }
-
-#    components {
-#      class_name : "CameraComponent"
-#      config {
-#        name : "camera_front_fisheye"
-#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-#      }
-#    }
-#    components {
-#      class_name : "CompressComponent"
-#      config {
-#        name : "camera_front_fisheye_compress"
-#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-#        readers {
-#          channel: "/apollo/sensor/camera/front_fisheye/image"
-#          pending_queue_size: 10
-#        }
-#      }
-#    }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_left_front"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_front.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_left_front_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_front.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/left_front/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_left_rear"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_rear.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_left_rear_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_rear.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/left_rear/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    components {
-      class_name : "CameraComponent"
-      config {
-        name : "camera_left_fisheye"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_fisheye.pb.txt"
-      }
-    }
-    components {
-      class_name : "CompressComponent"
-      config {
-        name : "camera_left_fisheye_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_left_fisheye.pb.txt"
-        readers {
-          channel: "/apollo/sensor/camera/left_fisheye/image"
-          pending_queue_size: 10
-        }
-      }
-    }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_right_front"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_front.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_right_front_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_front.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/right_front/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_right_rear"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_rear.pb.txt"
-    #   }
-    # }
-    # components {
-    #   class_name : "CompressComponent"
-    #   config {
-    #     name : "camera_right_rear_compress"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_rear.pb.txt"
-    #     readers {
-    #       channel: "/apollo/sensor/camera/right_rear/image"
-    #       pending_queue_size: 10
-    #     }
-    #   }
-    # }
-
-    components {
-      class_name : "CameraComponent"
-      config {
-        name : "camera_right_fisheye"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_fisheye.pb.txt"
-      }
-    }
-    components {
-      class_name : "CompressComponent"
-      config {
-        name : "camera_right_fisheye_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_right_fisheye.pb.txt"
-        readers {
-          channel: "/apollo/sensor/camera/right_fisheye/image"
+          channel: "/apollo/sensor/wato/front_12mm/image"
           pending_queue_size: 10
         }
       }
@@ -176,20 +45,60 @@ module_config {
     components {
       class_name : "CameraComponent"
       config {
-        name : "camera_rear_6mm"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_rear_6mm.pb.txt"
+        name : "wato_left_fisheye"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_left_fisheye.pb.txt"
       }
     }
+
     components {
       class_name : "CompressComponent"
       config {
-        name : "camera_rear_6mm_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_rear_6mm.pb.txt"
+        name : "wato_left_fisheye_compress"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_left_fisheye.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/rear_6mm/image"
+          channel: "/apollo/sensor/wato/left_fisheye/image"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "wato_right_fisheye"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_right_fisheye.pb.txt"
+      }
+    }
+
+    components {
+      class_name : "CompressComponent"
+      config {
+        name : "wato_right_fisheye_compress"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_right_fisheye.pb.txt"
+        readers {
+          channel: "/apollo/sensor/wato/right_fisheye/image"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "wato_rear_6mm"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_rear_6mm.pb.txt"
+      }
+    }
+
+    components {
+      class_name : "CompressComponent"
+      config {
+        name : "wato_rear_6mm_compress"
+        config_file_path : "/apollo/modules/drivers/wato/conf/wato_rear_6mm.pb.txt"
+        readers {
+          channel: "/apollo/sensor/wato/rear_6mm/image"
           pending_queue_size: 10
         }
       }
     }
 }
-

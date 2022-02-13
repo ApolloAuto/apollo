@@ -1,6 +1,6 @@
 
-camera_dev: "/dev/camera/right_front"
-frame_id: "camera_right_front"
+wato_dev: "/dev/wato/left_rear"
+frame_id: "wato_left_rear"
 pixel_format: "yuyv"
 io_method: IO_METHOD_MMAP
 width: 1920
@@ -21,12 +21,12 @@ white_balance: 4000
 bytes_per_pixel: 2
 trigger_internal: 0
 trigger_fps: 20
-channel_name: "/apollo/sensor/camera/right_front/image"
+channel_name: "/apollo/sensor/wato/left_rear/image"
 device_wait_ms: 2000
 spin_rate: 200
 output_type: RGB
 
 compress_conf {
-    output_channel: "/apollo/sensor/camera/right_front/image/compressed"
+    output_channel: "/apollo/sensor/wato/left_rear/image/compressed"
     image_pool_size: 100
 }

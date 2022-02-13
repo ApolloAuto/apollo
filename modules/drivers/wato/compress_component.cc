@@ -25,14 +25,14 @@
 
 namespace apollo {
 namespace drivers {
-namespace camera {
+namespace wato {
 
 bool CompressComponent::Init() {
   if (!GetProtoConfig(&config_)) {
     AERROR << "Parse config file failed: " << ConfigFilePath();
     return false;
   }
-  AINFO << "WATO config: \n" << config_.DebugString();
+  AINFO << "Camera config: \n" << config_.DebugString();
   try {
     image_pool_.reset(new CCObjectPool<CompressedImage>(
         config_.compress_conf().image_pool_size()));
@@ -57,7 +57,7 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
 
   std::vector<int> params;
   params.resize(3, 0);
-  params[0] = CV_IMWRITE_JPEG_QUALITY;
+  params[0] = cv::IMWRITE_JPEG_QUALITY;
   params[1] = 95;
 
   try {
@@ -79,6 +79,6 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
   return true;
 }
 
-}  // namespace camera
+}  // namespace wato
 }  // namespace drivers
 }  // namespace apollo

@@ -4,7 +4,7 @@ project(usb_cam)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS image_transport roscpp std_msgs std_srvs sensor_msgs camera_info_manager cv_bridge)
+find_package(catkin REQUIRED COMPONENTS image_transport roscpp std_msgs std_srvs sensor_msgs wato_info_manager cv_bridge)
 
 #find_package(CUDA REQUIRED)
 find_package(Boost 1.54  REQUIRED COMPONENTS system thread)
@@ -46,7 +46,7 @@ include_directories(include
   ${swscale_INCLUDE_DIRS}
 )
 
-# Build the USB camera library
+# Build the USB wato library
 add_library(${PROJECT_NAME} src/usb_cam.cpp)
 target_link_libraries(${PROJECT_NAME}
     yaml-cpp
@@ -58,7 +58,7 @@ target_link_libraries(${PROJECT_NAME}
     ${catkin_LIBRARIES}
     )
 
-## Build the USB camera nodelet
+## Build the USB wato nodelet
 add_library(${PROJECT_NAME}_nodelet nodes/usb_cam_nodelet.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
     ${PROJECT_NAME}
@@ -70,7 +70,7 @@ target_link_libraries(${PROJECT_NAME}_nodelet
   ${catkin_LIBRARIES}
 )
 
-## Declare USB camera cpp executable
+## Declare USB wato cpp executable
 add_executable(${PROJECT_NAME}_node nodes/usb_cam_node.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}
