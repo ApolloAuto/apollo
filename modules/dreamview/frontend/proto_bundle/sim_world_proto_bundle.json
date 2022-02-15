@@ -1410,7 +1410,8 @@
                   "values": {
                     "TURN_NONE": 0,
                     "TURN_LEFT": 1,
-                    "TURN_RIGHT": 2
+                    "TURN_RIGHT": 2,
+                    "TURN_HAZARD_WARNING": 3
                   }
                 }
               }
@@ -4204,20 +4205,6 @@
                   "options": {
                     "default": 0.2
                   }
-                },
-                "extendRightXBuffer": {
-                  "type": "double",
-                  "id": 16,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "extendLeftXBuffer": {
-                  "type": "double",
-                  "id": 17,
-                  "options": {
-                    "default": 0
-                  }
                 }
               },
               "nested": {
@@ -4861,6 +4848,13 @@
                   "id": 9,
                   "options": {
                     "default": 10
+                  }
+                },
+                "trajKappaContraintRatio": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.7
                   }
                 },
                 "gridAStarXyResolution": {
@@ -5533,6 +5527,10 @@
                 "rssInfo": {
                   "type": "RSSInfo",
                   "id": 100
+                },
+                "completeParking": {
+                  "type": "bool",
+                  "id": 25
                 }
               },
               "nested": {

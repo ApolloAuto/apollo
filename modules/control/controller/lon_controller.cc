@@ -22,6 +22,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
@@ -263,7 +264,7 @@ Status LonController::ComputeControlCommand(
     station_pid_controller_.Reset_integral();
   }
 
-  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
   if (std::isnan(slope_offset_compensation)) {
