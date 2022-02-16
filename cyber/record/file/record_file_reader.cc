@@ -45,7 +45,12 @@ bool RecordFileReader::Open(const std::string& path) {
   return true;
 }
 
-void RecordFileReader::Close() { close(fd_); }
+void RecordFileReader::Close() {
+  if (fd_ >= 0) {
+    close(fd_);
+    fd_ = -1;
+  }
+}
 
 bool RecordFileReader::Reset() {
   if (!SetPosition(sizeof(struct Section) + HEADER_LENGTH)) {
@@ -140,6 +145,10 @@ bool RecordFileReader::SkipSection(int64_t size) {
     return false;
   }
   return true;
+}
+
+RecordFileReader::~RecordFileReader() {
+  Close();
 }
 
 }  // namespace record
