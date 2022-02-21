@@ -1,3 +1,22 @@
+# Release 7.0
+
+Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabilities for Apollo Perception and Prediction modules. Apollo Studio is introduced in this version, combining with Data Pipeline, to provide a one-stop online development platform to better serve Apollo developers. Apollo 7.0 also publishes the PnC reinforcement learning model training and simulation evaluation service based on previous simulation service.
+
+## Major Features and Improvements
+* Brand New Deep Learning Models
+    * Mask-Pillars obstacle detection model based on PointPillars
+    * Inter-TNT prediction model based on interactive prediction & planning evaluator
+    * Camera obstacle detection model based on SMOKE
+* Apollo Studio Services
+    * Practice environment service
+    * Vehicle management service
+* PnC Reinforcement Learning Services
+    * Smart training and evaluation close-loop service
+    * Extension Interface
+* Upgraded Perception Module Code Structure
+
+**[Note]** All models and methodologies included in Apollo 7.0 are for research purposes only. Productized and commercial uses of these models are **NOT** encouraged, and it is at your own risk. Please be cautious to try Apollo 7.0 with enough safety protection mechanism. Your feedback is highly appreciated for us to continuously improve the models.
+
 # Release 6.0
 
 Apollo 6.0 incorporates new deep learning models to enhance the capabilities for certain Apollo modules. This version works seamlessly with new additions of data pipeline services to better serve Apollo developers. Apollo 6.0 is also the first version to integrate certain features as a demonstration of our continuous exploration and experimentation efforts towards driverless technology.
