@@ -14,11 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"
+#include "modules/perception/base/common.h"
 
 #include <algorithm>
 #include <fstream>
-
-#include <cuda_runtime_api.h>
 
 namespace nvinfer1 {
 Int8EntropyCalibrator::Int8EntropyCalibrator(

@@ -16,7 +16,6 @@
 
 #include "modules/perception/inference/onnx/onnx_obstacle_detector.h"
 
-#include <cuda_runtime_api.h>
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -24,17 +23,6 @@ namespace perception {
 namespace inference {
 
 using apollo::perception::base::Blob;
-
-#define GPU_CHECK(ans) \
-  { GPUAssert((ans), __FILE__, __LINE__); }
-inline void GPUAssert(cudaError_t code, const char* file, int line,
-                      bool abort = true) {
-  if (code != cudaSuccess) {
-    fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file,
-            line);
-    if (abort) exit(code);
-  }
-}
 
 OnnxObstacleDetector::OnnxObstacleDetector(
   const std::string &model_file,
