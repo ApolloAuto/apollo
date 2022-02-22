@@ -15,6 +15,9 @@
  *****************************************************************************/
 
 #include <vector>
+#if GPU_PLATFORM == AMD
+  #include <array>
+#endif
 
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"
 
@@ -36,10 +39,19 @@ int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
   int c_stride = h * h_stride;
   int n_stride = c * c_stride;
 
+#if GPU_PLATFORM == NVIDIA
   cudnnSetTensor4dDescriptorEx(input_desc_, CUDNN_DATA_FLOAT, n, c, h, w,
                                n_stride, c_stride, h_stride, w_stride);
   cudnnSetTensor4dDescriptorEx(output_desc_, CUDNN_DATA_FLOAT, n, c, h, w,
                                n_stride, c_stride, h_stride, w_stride);
+#elif GPU_PLATFORM == AMD
+  std::array<int, 4> dimsA = {{n, c, h, w}};
+  std::array<int, 4> stridesA = {{n_stride, c_stride, h_stride, w_stride}};
+  miopenSetTensorDescriptor(input_desc_, CUDNN_DATA_FLOAT, 4, dimsA.data(),
+                            stridesA.data());
+  miopenSetTensorDescriptor(output_desc_, CUDNN_DATA_FLOAT, 4, dimsA.data(),
+                            stridesA.data());
+#endif
 
   float a = 1.0;
   float b = 0.0;
