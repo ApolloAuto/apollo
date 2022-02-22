@@ -35,7 +35,6 @@
   #define cudnnDestroyTensorDescriptor miopenDestroyTensorDescriptor
   #define cudnnHandle_t miopenHandle_t
   #define cudnnSetStream miopenSetStream
-  #define cudnnSoftmaxForward miopenSoftmaxForward
   #define cudnnTensorDescriptor_t miopenTensorDescriptor_t
 #endif
 
