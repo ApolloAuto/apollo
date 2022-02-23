@@ -25,7 +25,7 @@
 #if GPU_PLATFORM == NVIDIA
   #include <cudnn.h>
 #elif GPU_PLATFORM == AMD
-  #include <miopen.h>
+  #include <miopen/miopen.h>
   #define CUDNN_DATA_FLOAT miopenFloat
   #define CUDNN_SOFTMAX_ACCURATE MIOPEN_SOFTMAX_ACCURATE
   #define CUDNN_SOFTMAX_MODE_CHANNEL MIOPEN_SOFTMAX_MODE_CHANNEL
