@@ -53,4 +53,5 @@ message Config {
     optional uint32 image_pool_size = 2 [default = 20];
   }
   optional CompressConfig compress_conf = 27;
+  optional bool hardware_trigger = 28 [default = true];
 }
