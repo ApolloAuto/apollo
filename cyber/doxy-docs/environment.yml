@@ -1,8 +1,0 @@
-name: CyberRT
-
-channels:
-  - conda-forge
-
-dependencies:
-  - breathe
-  - recommonmark
