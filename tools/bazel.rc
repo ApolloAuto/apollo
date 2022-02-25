@@ -63,6 +63,8 @@ build:gpu --cxxopt="-DAMD=1"
 
 # GPU platform
 build:amd --define USE_GPU=true
+build:amd --define=using_rocm=true
+build:amd --repo_env NEED_ROCM=1
 build:amd --cxxopt="-DUSE_GPU=1"
 build:amd --cxxopt="-DNVIDIA=0"
 build:amd --cxxopt="-DAMD=1"
