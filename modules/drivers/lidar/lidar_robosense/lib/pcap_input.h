@@ -15,12 +15,14 @@
  *****************************************************************************/
 
 #pragma once
-#include <cstdio>
-#include <unistd.h>
+
+// #include <time.h>
+// #include <unistd.h>
 #include <string>
 #include <pcap.h>
-#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
+
 #include "modules/drivers/lidar/lidar_robosense/lib/input.h"
+
 namespace apollo {
 namespace drivers {
 namespace robosense {
@@ -48,6 +50,7 @@ class PcapInput : public Input {
   double repeat_delay_;
   double packet_rate_;
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

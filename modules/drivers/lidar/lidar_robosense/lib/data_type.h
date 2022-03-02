@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 #pragma once
-#include <stdint.h>
 
 #include <limits>
 #include <memory>
 #include <vector>
+
 namespace apollo {
 namespace drivers {
 namespace robosense {
@@ -196,7 +196,9 @@ struct NMEATime {
   uint16_t msec;
   uint16_t usec;
 };
+
 typedef std::shared_ptr<NMEATime> NMEATimePtr;
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

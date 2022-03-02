@@ -15,12 +15,14 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <errno.h>
 #include <stdint.h>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+
 #include "boost/format.hpp"
 #include "modules/drivers/lidar/lidar_robosense/lib/calibration.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/const_variables.h"
@@ -123,56 +125,6 @@ class RobosenseParser {
   void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
                               uint16_t rotation, float rotation_resolution);
 };  // class RobosenseParser
-
-class Robosense16Parser : public RobosenseParser {
- public:
-  explicit Robosense16Parser(
-      const apollo::drivers::suteng::SutengConfig& config);
-  ~Robosense16Parser() {}
-
-  void generate_pointcloud(
-      const std::shared_ptr<apollo::drivers::suteng::SutengScan const>&
-          scan_msg,
-      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
-  void order(const std::shared_ptr<apollo::drivers::PointCloud>& cloud);
-  uint32_t GetPointSize() override;
-  void setup() override;
-  void init_setup();
-
- private:
-  uint64_t get_timestamp(double base_time, float time_offset,
-                         uint16_t laser_block_id);
-
-  void unpack_robosense(
-      const apollo::drivers::suteng::SutengPacket& pkt,
-      const std::shared_ptr<apollo::drivers::PointCloud>& cloud,
-      uint32_t* index);
-
-  // Previous suteng packet time stamp. (offset to the top hour)
-  double previous_packet_stamp_;
-  uint64_t gps_base_usec_;  // full time
-  std::map<uint32_t, uint32_t> order_map_;
-  uint32_t getOrderIndex(uint32_t index);
-  void init_orderindex();
-  RslidarPic pic;
-
-  // sutegn
-  int temp_packet_num = 0;
-  float temper = 31.f;
-
-  static bool pkt_start;
-  static uint64_t base_stamp;
-
-  uint64_t first_pkt_stamp;
-  uint64_t final_pkt_stamp;
-  uint64_t last_pkt_stamp = 0;
-};  // class Robosense32Parser
-
-class RobosenseParserFactory {
- public:
-  static RobosenseParser* create_parser(
-      const apollo::drivers::suteng::SutengConfig& config);
-};
 
 }  // namespace robosense
 }  // namespace drivers

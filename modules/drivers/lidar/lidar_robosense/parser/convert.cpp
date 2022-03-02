@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
 
+#include <memory>
 #include <pcl/common/time.h>
 
-#include <memory>
-
 #include "cyber/cyber.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser_factory.h"
 
 namespace apollo {
 namespace drivers {

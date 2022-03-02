@@ -13,37 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser_factory.h"
 
-#pragma once
-
-#include <memory>
-
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "cyber/cyber.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense16_parser.h"
 #include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-// convert suteng data to pointcloud and republish
-class Convert {
- public:
-  explicit Convert(const apollo::drivers::suteng::SutengConfig& robo_config);
-  ~Convert();
-
-  void convert_robosense_to_pointcloud(
-      const std::shared_ptr<apollo::drivers::suteng::SutengScan const>&
-          scan_msg,
-      const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
-
-  bool Init();
-  uint32_t GetPointSize();
-
- private:
-  RobosenseParser* parser_;
-  apollo::drivers::suteng::SutengConfig config_;
-};
+RobosenseParser* RobosenseParserFactory::create_parser(
+    const apollo::drivers::suteng::SutengConfig& config) {
+  if (config.model() == apollo::drivers::suteng::VLP16) {
+    return new Robosense16Parser(config);
+  } else {
+    AERROR << " invalid model, must be VLP16";
+    return nullptr;
+  }
+}
 
 }  // namespace robosense
 }  // namespace drivers

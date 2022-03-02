@@ -30,20 +30,20 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::PointENU;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
-using apollo::common::PointENU;
+using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::routing::LaneWaypoint;
 using apollo::routing::ParkingSpaceType;
 using apollo::routing::RoutingRequest;
-using apollo::routing::LaneWaypoint;
 
 OpenSpaceRoiDecider::OpenSpaceRoiDecider(
     const TaskConfig &config,
@@ -56,7 +56,7 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(
   injector->vehicle_state();
   temp_state_.set_x(injector->vehicle_state()->x());
   temp_state_.set_y(injector->vehicle_state()->y());
-  AINFO<<config_.DebugString();
+  AINFO << config_.DebugString();
 }
 
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
@@ -108,19 +108,26 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   } else if (roi_type == OpenSpaceRoiDeciderConfig::DEAD_END) {
-    const auto& routing_type =
-      frame->local_view().routing->routing_request().dead_end_info().
-      dead_end_routing_type();
+    const auto &routing_type = frame->local_view()
+                                   .routing->routing_request()
+                                   .dead_end_info()
+                                   .dead_end_routing_type();
     size_t waypoint_num =
-      frame->local_view().routing->routing_request().waypoint().size();
+        frame->local_view().routing->routing_request().waypoint().size();
     if (routing_type == routing::ROUTING_IN) {
-      dead_end_point_ = frame->local_view().routing->routing_request().
-                      waypoint().at(waypoint_num - 1).pose();
+      dead_end_point_ = frame->local_view()
+                            .routing->routing_request()
+                            .waypoint()
+                            .at(waypoint_num - 1)
+                            .pose();
     } else if (routing_type == routing::ROUTING_OUT) {
-      dead_end_point_ = frame->local_view().routing->routing_request().
-                      waypoint().at(0).pose();
+      dead_end_point_ = frame->local_view()
+                            .routing->routing_request()
+                            .waypoint()
+                            .at(0)
+                            .pose();
     }
-    const hdmap::HDMap* base_map_ptr = HDMapUtil::BaseMapPtr();
+    const hdmap::HDMap *base_map_ptr = HDMapUtil::BaseMapPtr();
     std::vector<JunctionInfoConstPtr> junctions;
     JunctionInfoConstPtr junction;
     if (base_map_ptr->GetJunctions(dead_end_point_, 1.0, &junctions) != 0) {
@@ -145,8 +152,8 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     }
     SetDeadEndOrigin(frame, dead_end_vertices);
     SetDeadEndPose(frame, dead_end_vertices);
-    if (!GetDeadEndBoundary(frame, dead_end_vertices,
-                            nearby_path, &roi_boundary)) {
+    if (!GetDeadEndBoundary(frame, dead_end_vertices, nearby_path,
+                            &roi_boundary)) {
       const std::string msg = "Fail to get dead end boundary";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -207,9 +214,9 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 }
 
 bool OpenSpaceRoiDecider::SelectTargetDeadEndJunction(
-    std::vector<JunctionInfoConstPtr>* junctions,
-    const apollo::common::PointENU& dead_end_point,
-    JunctionInfoConstPtr* target_junction) {
+    std::vector<JunctionInfoConstPtr> *junctions,
+    const apollo::common::PointENU &dead_end_point,
+    JunctionInfoConstPtr *target_junction) {
   // warning: the car only be the one junction
   size_t junction_num = junctions->size();
   if (junction_num <= 0) {
@@ -281,17 +288,16 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
 }
 
 void OpenSpaceRoiDecider::SetDeadEndOrigin(
-  Frame* const frame,
-  const std::vector<Vec2d> &dead_end_vertices) {
+    Frame *const frame, const std::vector<Vec2d> &dead_end_vertices) {
   auto last_point = dead_end_vertices.back();
   auto first_point = dead_end_vertices.front();
   Vec2d heading_vec = last_point - first_point;
   // set origin point
   frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
-  frame->mutable_open_space_info()->
-    mutable_origin_point()->set_x(first_point.x());
-  frame->mutable_open_space_info()->
-    mutable_origin_point()->set_y(first_point.y());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_x(
+      first_point.x());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_y(
+      first_point.y());
 }
 
 void OpenSpaceRoiDecider::SetOrigin(
@@ -307,15 +313,15 @@ void OpenSpaceRoiDecider::SetOrigin(
 }
 
 void OpenSpaceRoiDecider::SetDeadEndPose(
-  Frame* const frame,
-  const std::vector<Vec2d> &dead_end_vertices) {
+    Frame *const frame, const std::vector<Vec2d> &dead_end_vertices) {
   // the target point should be in the adjacent lanes based the map,
   // curret map is rectangle, vertice is  anti-clockwise
   auto *end_pose =
       frame->mutable_open_space_info()->mutable_open_space_end_pose();
-  const auto& target_point =
-      frame->local_view().routing->routing_request().
-      dead_end_info().target_point();
+  const auto &target_point = frame->local_view()
+                                 .routing->routing_request()
+                                 .dead_end_info()
+                                 .target_point();
   Vec2d end_point = {target_point.x(), target_point.y()};
   // coordinate transfer
   const auto &origin_point = frame->open_space_info().origin_point();
@@ -338,8 +344,7 @@ void OpenSpaceRoiDecider::SetDeadEndPose(
 
 void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices) {
-  const auto &routing_request =
-        frame->local_view().routing->routing_request();
+  const auto &routing_request = frame->local_view().routing->routing_request();
   auto plot_type = routing_request.parking_info().parking_space_type();
   auto left_top = vertices[0];
   auto left_down = vertices[1];
@@ -407,7 +412,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     parking_spot_heading = (left_down - right_down).Angle();
     end_y = (left_top.y() + left_down.y()) / 2.0;
     end_x = left_top.x() + vehicle_params_.back_edge_to_center() +
-      parllel_park_end_x_buffer;
+            parllel_park_end_x_buffer;
   }
   auto *end_pose =
       frame->mutable_open_space_info()->mutable_open_space_end_pose();
@@ -823,43 +828,39 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
 
 // only one lane one lane has one segment
 void OpenSpaceRoiDecider::GetInLaneEndPoint(LaneInfoConstPtr lane_info,
-                                           PointENU* left_boundary_point,
-                                           PointENU* right_boundary_point) {
-  const auto& left_boundary_segment =
-    lane_info->lane().left_boundary().curve().segment();
-  const auto& right_boundary_segment =
-    lane_info->lane().right_boundary().curve().segment();
+                                            PointENU *left_boundary_point,
+                                            PointENU *right_boundary_point) {
+  const auto &left_boundary_segment =
+      lane_info->lane().left_boundary().curve().segment();
+  const auto &right_boundary_segment =
+      lane_info->lane().right_boundary().curve().segment();
   size_t lane_points_num = left_boundary_segment[0].line_segment().point_size();
   *left_boundary_point =
-    left_boundary_segment[0].line_segment().point(lane_points_num - 1);
+      left_boundary_segment[0].line_segment().point(lane_points_num - 1);
   *right_boundary_point =
-    right_boundary_segment[0].line_segment().point(lane_points_num - 1);
+      right_boundary_segment[0].line_segment().point(lane_points_num - 1);
 }
 
-void OpenSpaceRoiDecider::GetOutLaneStartPoint(
-  LaneInfoConstPtr lane_info,
-  PointENU* left_boundary_point,
-  PointENU* right_boundary_point) {
-  const auto& left_boundary_segment =
-    lane_info->lane().left_boundary().curve().segment();
-  const auto& right_boundary_segment =
-    lane_info->lane().right_boundary().curve().segment();
-  *left_boundary_point =
-    left_boundary_segment[0].line_segment().point(0);
-  *right_boundary_point =
-    right_boundary_segment[0].line_segment().point(0);
+void OpenSpaceRoiDecider::GetOutLaneStartPoint(LaneInfoConstPtr lane_info,
+                                               PointENU *left_boundary_point,
+                                               PointENU *right_boundary_point) {
+  const auto &left_boundary_segment =
+      lane_info->lane().left_boundary().curve().segment();
+  const auto &right_boundary_segment =
+      lane_info->lane().right_boundary().curve().segment();
+  *left_boundary_point = left_boundary_segment[0].line_segment().point(0);
+  *right_boundary_point = right_boundary_segment[0].line_segment().point(0);
 }
 
-void OpenSpaceRoiDecider::GetInLaneBoundaryPoints(LaneInfoConstPtr lane_info,
-                        const hdmap::Path &nearby_path,
-                        std::vector<PointENU>* In_left_boundary_points,
-                        std::vector<PointENU>* In_right_boundary_points) {
-  const auto& left_boundary_segment =
-    lane_info->lane().left_boundary().curve().segment();
-  const auto& right_boundary_segment =
-    lane_info->lane().right_boundary().curve().segment();
-  size_t lane_points_num =
-    left_boundary_segment[0].line_segment().point_size();
+void OpenSpaceRoiDecider::GetInLaneBoundaryPoints(
+    LaneInfoConstPtr lane_info, const hdmap::Path &nearby_path,
+    std::vector<PointENU> *In_left_boundary_points,
+    std::vector<PointENU> *In_right_boundary_points) {
+  const auto &left_boundary_segment =
+      lane_info->lane().left_boundary().curve().segment();
+  const auto &right_boundary_segment =
+      lane_info->lane().right_boundary().curve().segment();
+  size_t lane_points_num = left_boundary_segment[0].line_segment().point_size();
   int temp_record_left = 0;
   int temp_record_right = 0;
   double left_point_s = 0.0;
@@ -872,20 +873,17 @@ void OpenSpaceRoiDecider::GetInLaneBoundaryPoints(LaneInfoConstPtr lane_info,
   Vec2d car_position = {temp_state_.x(), temp_state_.y()};
   lane_info->GetProjection(car_position, &car_s, &car_l);
   for (size_t i = 0; i < lane_points_num; ++i) {
-    PointENU left_point = left_boundary_segment[0].
-                          line_segment().point().at(i);
-    PointENU right_point = right_boundary_segment[0].
-                           line_segment().point().at(i);
+    PointENU left_point = left_boundary_segment[0].line_segment().point().at(i);
+    PointENU right_point =
+        right_boundary_segment[0].line_segment().point().at(i);
     left_points.push_back(left_point);
     right_points.push_back(right_point);
-    Vec2d left_point_v = {left_boundary_segment[0].
-                        line_segment().point().at(i).x(),
-                        left_boundary_segment[0].
-                        line_segment().point().at(i).y()};
-    Vec2d right_point_v = {right_boundary_segment[0].
-                         line_segment().point().at(i).x(),
-                         right_boundary_segment[0].
-                         line_segment().point().at(i).y()};
+    Vec2d left_point_v = {
+        left_boundary_segment[0].line_segment().point().at(i).x(),
+        left_boundary_segment[0].line_segment().point().at(i).y()};
+    Vec2d right_point_v = {
+        right_boundary_segment[0].line_segment().point().at(i).x(),
+        right_boundary_segment[0].line_segment().point().at(i).y()};
     lane_info->GetProjection(left_point_v, &left_point_s, &left_point_l);
     lane_info->GetProjection(right_point_v, &right_point_s, &right_point_l);
     if (left_point_s > car_s) {
@@ -912,16 +910,14 @@ void OpenSpaceRoiDecider::GetInLaneBoundaryPoints(LaneInfoConstPtr lane_info,
 }
 
 void OpenSpaceRoiDecider::GetOutLaneBoundaryPoints(
-  LaneInfoConstPtr lane_info,
-  const hdmap::Path &nearby_path,
-  std::vector<PointENU>* Out_left_boundary_points,
-  std::vector<PointENU>* Out_right_boundary_points) {
-  const auto& left_boundary_segment =
-    lane_info->lane().left_boundary().curve().segment();
-  const auto& right_boundary_segment =
-    lane_info->lane().right_boundary().curve().segment();
-  size_t lane_points_num =
-    left_boundary_segment[0].line_segment().point_size();
+    LaneInfoConstPtr lane_info, const hdmap::Path &nearby_path,
+    std::vector<PointENU> *Out_left_boundary_points,
+    std::vector<PointENU> *Out_right_boundary_points) {
+  const auto &left_boundary_segment =
+      lane_info->lane().left_boundary().curve().segment();
+  const auto &right_boundary_segment =
+      lane_info->lane().right_boundary().curve().segment();
+  size_t lane_points_num = left_boundary_segment[0].line_segment().point_size();
   int temp_record_left = 0;
   int temp_record_right = 0;
   double left_point_s = 0.0;
@@ -935,20 +931,17 @@ void OpenSpaceRoiDecider::GetOutLaneBoundaryPoints(
                            routing_target_point_.y()};
   lane_info->GetProjection(target_position, &target_point_s, &target_point_l);
   for (size_t i = 0; i < lane_points_num; ++i) {
-    PointENU left_point = left_boundary_segment[0].
-                          line_segment().point().at(i);
-    PointENU right_point = right_boundary_segment[0].
-                           line_segment().point().at(i);
+    PointENU left_point = left_boundary_segment[0].line_segment().point().at(i);
+    PointENU right_point =
+        right_boundary_segment[0].line_segment().point().at(i);
     left_points.push_back(left_point);
     right_points.push_back(right_point);
-    Vec2d left_point_v = {left_boundary_segment[0].
-                          line_segment().point().at(i).x(),
-                          left_boundary_segment[0].
-                          line_segment().point().at(i).y()};
-    Vec2d right_point_v = {right_boundary_segment[0].
-                           line_segment().point().at(i).x(),
-                           right_boundary_segment[0].
-                           line_segment().point().at(i).y()};
+    Vec2d left_point_v = {
+        left_boundary_segment[0].line_segment().point().at(i).x(),
+        left_boundary_segment[0].line_segment().point().at(i).y()};
+    Vec2d right_point_v = {
+        right_boundary_segment[0].line_segment().point().at(i).x(),
+        right_boundary_segment[0].line_segment().point().at(i).y()};
     lane_info->GetProjection(left_point_v, &left_point_s, &left_point_l);
     lane_info->GetProjection(right_point_v, &right_point_s, &right_point_l);
     if (left_point_s < target_point_s) {
@@ -975,33 +968,36 @@ void OpenSpaceRoiDecider::GetOutLaneBoundaryPoints(
 }
 
 bool OpenSpaceRoiDecider::GetDeadEndBoundary(
-  Frame* const frame, const std::vector<Vec2d> &dead_end_vertices,
-  const hdmap::Path &nearby_path,
-  std::vector<std::vector<common::math::Vec2d>> *const roi_deadend_boundary) {
+    Frame *const frame, const std::vector<Vec2d> &dead_end_vertices,
+    const hdmap::Path &nearby_path,
+    std::vector<std::vector<common::math::Vec2d>> *const roi_deadend_boundary) {
   size_t waypoint_num =
-    frame->local_view().routing->routing_request().waypoint().size();
-  routing_target_point_ = frame->local_view().routing->
-    routing_request().dead_end_info().target_point();
+      frame->local_view().routing->routing_request().waypoint().size();
+  routing_target_point_ = frame->local_view()
+                              .routing->routing_request()
+                              .dead_end_info()
+                              .target_point();
   if (routing_in_flag_) {
-    routing_end_point_ = frame->local_view().routing->routing_request().
-                         waypoint().at(waypoint_num - 1).pose();
+    routing_end_point_ = frame->local_view()
+                             .routing->routing_request()
+                             .waypoint()
+                             .at(waypoint_num - 1)
+                             .pose();
     routing_in_flag_ = false;
   }
   double nearest_s = 0.0;
   double nearest_l = 0.0;
   LaneInfoConstPtr start_nearest_lane;
   PointENU left_end_point, right_end_point;
-  hdmap_->GetNearestLane(routing_end_point_,
-    &start_nearest_lane, &nearest_s, &nearest_l);
+  hdmap_->GetNearestLane(routing_end_point_, &start_nearest_lane, &nearest_s,
+                         &nearest_l);
   GetInLaneEndPoint(start_nearest_lane, &left_end_point, &right_end_point);
 
   LaneInfoConstPtr end_nearest_lane;
   PointENU left_start_point, right_start_point;
-  hdmap_->GetNearestLane(routing_target_point_,
-    &end_nearest_lane, &nearest_s, &nearest_l);
-  GetOutLaneStartPoint(end_nearest_lane,
-                       &left_start_point,
-                       &right_start_point);
+  hdmap_->GetNearestLane(routing_target_point_, &end_nearest_lane, &nearest_s,
+                         &nearest_l);
+  GetOutLaneStartPoint(end_nearest_lane, &left_start_point, &right_start_point);
 
   LaneInfoConstPtr car_lane;
   PointENU car_pose;
@@ -1010,28 +1006,23 @@ bool OpenSpaceRoiDecider::GetDeadEndBoundary(
   hdmap_->GetNearestLane(car_pose, &car_lane, &nearest_s, &nearest_l);
   std::vector<PointENU> In_left_boundary_points;
   std::vector<PointENU> In_right_boundary_points;
-  GetInLaneBoundaryPoints(car_lane, nearby_path,
-                          &In_left_boundary_points,
+  GetInLaneBoundaryPoints(car_lane, nearby_path, &In_left_boundary_points,
                           &In_right_boundary_points);
 
   LaneInfoConstPtr target_lane;
   double out_routing_x = routing_target_point_.x() + FLAGS_buffer_out_routing;
   routing_target_point_.set_x(out_routing_x);
-  hdmap_->GetNearestLane(routing_target_point_,
-                         &target_lane,
-                         &nearest_s,
+  hdmap_->GetNearestLane(routing_target_point_, &target_lane, &nearest_s,
                          &nearest_l);
   std::vector<PointENU> Out_left_boundary_points;
   std::vector<PointENU> Out_right_boundary_points;
-  GetOutLaneBoundaryPoints(target_lane,
-                           nearby_path,
-                           &Out_left_boundary_points,
+  GetOutLaneBoundaryPoints(target_lane, nearby_path, &Out_left_boundary_points,
                            &Out_right_boundary_points);
 
   std::vector<Vec2d> point_boundary;
   for (size_t i = 0; i < In_right_boundary_points.size(); ++i) {
-    point_boundary.push_back({In_right_boundary_points[i].x(),
-                              In_right_boundary_points[i].y()});
+    point_boundary.push_back(
+        {In_right_boundary_points[i].x(), In_right_boundary_points[i].y()});
   }
   point_boundary.push_back({right_end_point.x(), right_end_point.y()});
   for (size_t i = 0; i < dead_end_vertices.size(); ++i) {
@@ -1039,21 +1030,21 @@ bool OpenSpaceRoiDecider::GetDeadEndBoundary(
   }
   point_boundary.push_back({right_start_point.x(), right_start_point.y()});
   for (size_t i = 0; i < Out_right_boundary_points.size(); ++i) {
-    point_boundary.push_back({Out_right_boundary_points[i].x(),
-                              Out_right_boundary_points[i].y()});
+    point_boundary.push_back(
+        {Out_right_boundary_points[i].x(), Out_right_boundary_points[i].y()});
   }
   for (size_t i = 0; i < Out_left_boundary_points.size(); ++i) {
-    point_boundary.push_back({Out_left_boundary_points[i].x(),
-                              Out_left_boundary_points[i].y()});
+    point_boundary.push_back(
+        {Out_left_boundary_points[i].x(), Out_left_boundary_points[i].y()});
   }
   point_boundary.push_back({left_start_point.x(), left_start_point.y()});
   point_boundary.push_back({left_end_point.x(), left_end_point.y()});
   for (size_t i = 0; i < In_left_boundary_points.size(); ++i) {
-    point_boundary.push_back({In_left_boundary_points[i].x(),
-                              In_left_boundary_points[i].y()});
+    point_boundary.push_back(
+        {In_left_boundary_points[i].x(), In_left_boundary_points[i].y()});
   }
-  point_boundary.push_back({In_right_boundary_points[0].x(),
-                            In_right_boundary_points[0].y()});
+  point_boundary.push_back(
+      {In_right_boundary_points[0].x(), In_right_boundary_points[0].y()});
   const auto &origin_point = frame->open_space_info().origin_point();
   const auto &origin_heading = frame->open_space_info().origin_heading();
   for (size_t i = 0; i < point_boundary.size(); ++i) {
@@ -1062,8 +1053,7 @@ bool OpenSpaceRoiDecider::GetDeadEndBoundary(
   }
   // construct LineSegment
   for (size_t i = 0; i < point_boundary.size(); ++i) {
-    std::vector<Vec2d> segment{point_boundary[i],
-                               point_boundary[i + 1]};
+    std::vector<Vec2d> segment{point_boundary[i], point_boundary[i + 1]};
     roi_deadend_boundary->push_back(segment);
   }
   // Fuse line segments into convex contraints
@@ -1612,9 +1602,8 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
 }
 
 bool OpenSpaceRoiDecider::GetDeadEndSpot(
-  Frame *const frame,
-  JunctionInfoConstPtr* junction,
-  std::vector<Vec2d>* dead_end_vertices) {
+    Frame *const frame, JunctionInfoConstPtr *junction,
+    std::vector<Vec2d> *dead_end_vertices) {
   if (frame == nullptr) {
     ADEBUG << "Invalid frame, fail to GetDeadEndSpotFromMap from frame. ";
     return false;
@@ -1629,8 +1618,7 @@ bool OpenSpaceRoiDecider::GetDeadEndSpot(
 bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
                                          std::array<Vec2d, 4> *vertices,
                                          Path *nearby_path) {
-  const auto &routing_request =
-        frame->local_view().routing->routing_request();
+  const auto &routing_request = frame->local_view().routing->routing_request();
   auto plot_type = routing_request.parking_info().parking_space_type();
   if (frame == nullptr) {
     AERROR << "Invalid frame, fail to GetParkingSpotFromMap from frame. ";
@@ -1669,7 +1657,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
       return false;
     }
     std::vector<routing::LaneSegment> lane_segments;
-    GetAllLaneSegments(*(frame->local_view().routing), lane_segments);
+    GetAllLaneSegments(*(frame->local_view().routing), &lane_segments);
     bool has_found_nearest_lane = false;
     size_t nearest_lane_index = 0;
     for (auto id : overlap_ids) {
@@ -1751,9 +1739,9 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
           auto succeed_lane_id = next_lane->lane().successor_id(j);
           auto succeed_lane = hdmap_->GetLaneById(succeed_lane_id);
           LaneSegment succeed_lanesegment =
-            LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
-                        succeed_lane->accumulate_s().back());
-            segments_vector.push_back(succeed_lanesegment);
+              LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
+                          succeed_lane->accumulate_s().back());
+          segments_vector.push_back(succeed_lanesegment);
         }
       }
       *nearby_path = Path(segments_vector);
@@ -1788,9 +1776,8 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
   Vec2d right_top = target_parking_spot->polygon().points().at(2);
   if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
     const auto &routing_request =
-      frame->local_view().routing->routing_request();
-    auto corner_point =
-        routing_request.parking_info().corner_point();
+        frame->local_view().routing->routing_request();
+    auto corner_point = routing_request.parking_info().corner_point();
     left_top.set_x(corner_point.point().at(3).x());
     left_top.set_y(corner_point.point().at(3).y());
     left_down.set_x(corner_point.point().at(0).x());
@@ -1883,13 +1870,10 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
 }
 
 bool OpenSpaceRoiDecider::CheckDistanceToParkingSpot(
-    Frame *const frame,
-    const hdmap::Path &nearby_path,
+    Frame *const frame, const hdmap::Path &nearby_path,
     const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot) {
-  const auto &routing_request =
-      frame->local_view().routing->routing_request();
-  auto corner_point =
-      routing_request.parking_info().corner_point();
+  const auto &routing_request = frame->local_view().routing->routing_request();
+  auto corner_point = routing_request.parking_info().corner_point();
   Vec2d left_bottom_point = target_parking_spot->polygon().points().at(0);
   Vec2d right_bottom_point = target_parking_spot->polygon().points().at(1);
   left_bottom_point.set_x(corner_point.point().at(0).x());
@@ -2239,12 +2223,12 @@ void OpenSpaceRoiDecider::GetParkSpotFromMap(
 
 void OpenSpaceRoiDecider::GetAllLaneSegments(
     const routing::RoutingResponse &routing_response,
-    std::vector<routing::LaneSegment> &routing_segments) {
-  routing_segments.clear();
+    std::vector<routing::LaneSegment> *routing_segments) {
+  routing_segments->clear();
   for (const auto &road : routing_response.road()) {
     for (const auto &passage : road.passage()) {
       for (const auto &segment : passage.segment()) {
-        routing_segments.emplace_back(segment);
+        routing_segments->emplace_back(segment);
       }
     }
   }

@@ -18,6 +18,8 @@
  * @file
  */
 
+#include <limits>
+
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
@@ -37,7 +39,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       std::make_unique<GridSearch>(planner_open_space_config_);
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
-  max_steer_angle_ = vehicle_param_.max_steer_angle() / 
+  max_steer_angle_ = vehicle_param_.max_steer_angle() /
                      vehicle_param_.steer_ratio() *
                      planner_open_space_config_.warm_start_config()
                          .traj_kappa_contraint_ratio();

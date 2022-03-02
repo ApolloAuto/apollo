@@ -16,33 +16,18 @@
 
 #pragma once
 
-#include <memory>
-
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-// convert suteng data to pointcloud and republish
-class Convert {
+class RobosenseParser;
+
+class RobosenseParserFactory {
  public:
-  explicit Convert(const apollo::drivers::suteng::SutengConfig& robo_config);
-  ~Convert();
-
-  void convert_robosense_to_pointcloud(
-      const std::shared_ptr<apollo::drivers::suteng::SutengScan const>&
-          scan_msg,
-      const std::shared_ptr<apollo::drivers::PointCloud>& point_cloud);
-
-  bool Init();
-  uint32_t GetPointSize();
-
- private:
-  RobosenseParser* parser_;
-  apollo::drivers::suteng::SutengConfig config_;
+  static RobosenseParser* create_parser(
+      const apollo::drivers::suteng::SutengConfig& config);
 };
 
 }  // namespace robosense

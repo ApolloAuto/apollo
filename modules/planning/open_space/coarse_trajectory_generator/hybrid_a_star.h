@@ -28,10 +28,11 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/time/clock.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/obstacle.h"
@@ -39,7 +40,6 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -107,16 +107,16 @@ class HybridAStar {
   double heu_rs_gear_switch_penalty_ = 0.0;
   double heu_rs_steer_penalty_ = 0.0;
   double heu_rs_steer_change_penalty_ = 0.0;
-  double acc_weight_= 0.0;
-  double jerk_weight_= 0.0;
-  double kappa_penalty_weight_= 0.0;
-  double ref_s_weight_= 0.0;
-  double ref_v_weight_=0.0;
-  double max_forward_v_= 0.0;
-  double max_reverse_v_= 0.0;
-  double max_forward_acc_= 0.0;
-  double max_reverse_acc_= 0.0;
-  double max_acc_jerk_= 0.0;
+  double acc_weight_ = 0.0;
+  double jerk_weight_ = 0.0;
+  double kappa_penalty_weight_ = 0.0;
+  double ref_s_weight_ = 0.0;
+  double ref_v_weight_ = 0.0;
+  double max_forward_v_ = 0.0;
+  double max_reverse_v_ = 0.0;
+  double max_forward_acc_ = 0.0;
+  double max_reverse_acc_ = 0.0;
+  double max_acc_jerk_ = 0.0;
   std::vector<double> XYbounds_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;

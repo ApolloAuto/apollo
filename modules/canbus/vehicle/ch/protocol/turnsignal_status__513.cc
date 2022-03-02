@@ -30,7 +30,6 @@ const int32_t Turnsignalstatus513::ID = 0x513;
 
 void Turnsignalstatus513::Parse(const std::uint8_t* bytes, int32_t length,
                                 ChassisDetail* chassis) const {
-
   chassis->mutable_ch()->mutable_turnsignal_status__513()->set_turn_signal_sts(
       turn_signal_sts(bytes, length));
   chassis->mutable_ch()->mutable_turnsignal_status__513()->set_low_beam_sts(

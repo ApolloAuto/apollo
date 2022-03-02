@@ -450,7 +450,8 @@ bool MapService::ConstructLaneWayPointWithLaneId(
     return false;
   }
 
-  // Limit s with max value of the length of the lane, or not the laneWayPoint may be invalid.
+  // Limit s with max value of the length of the lane, or not the laneWayPoint
+  // may be invalid.
   if (s > lane->lane().length()) {
     s = lane->lane().length();
   }
@@ -493,8 +494,8 @@ bool MapService::CheckRoutingPointLaneId(
          idsArr.end();
 }
 
-bool MapService::CheckRoutingPointWithHeading(
-  const double x, const double y, const double heading) const {
+bool MapService::CheckRoutingPointWithHeading(const double x, const double y,
+                                              const double heading) const {
   double s, l;
   LaneInfoConstPtr lane;
   if (!GetNearestLaneWithHeading(x, y, &lane, &s, &l, heading)) {
@@ -505,7 +506,6 @@ bool MapService::CheckRoutingPointWithHeading(
   }
   return true;
 }
-
 
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
   if (lane->lane().type() != Lane::CITY_DRIVING) {

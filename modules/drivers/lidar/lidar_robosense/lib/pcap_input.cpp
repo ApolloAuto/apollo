@@ -16,17 +16,7 @@
 
 #include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <poll.h>
-#include <sys/file.h>
-#include <sys/socket.h>
-#include <time.h>
-#include <unistd.h>
-
-#include <string>
-
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "cyber/cyber.h"
 
 namespace apollo {

@@ -696,7 +696,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
 
   // Search for a feasible location for pull-over.
   const double pull_over_space_length =
-      VehicleConfigHelper::GetConfig().vehicle_param().length() * kPulloverLonSearchCoeff +
+      VehicleConfigHelper::GetConfig().vehicle_param().length() *
+          kPulloverLonSearchCoeff +
       FLAGS_obstacle_lon_start_buffer + FLAGS_obstacle_lon_end_buffer;
   const double pull_over_space_width =
       (kPulloverLatSearchCoeff - 1.0) *

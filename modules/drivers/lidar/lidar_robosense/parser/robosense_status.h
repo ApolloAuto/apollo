@@ -15,15 +15,17 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <cmath>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include "cyber/cyber.h"
+
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {

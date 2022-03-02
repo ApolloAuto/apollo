@@ -26,17 +26,17 @@
 #include <vector>
 
 #include "Eigen/Dense"
-#include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/map/proto/map_id.pb.h"
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/proto/map_id.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
@@ -55,39 +55,37 @@ class OpenSpaceRoiDecider : public Decider {
 
  private:
   static bool SelectTargetDeadEndJunction(
-        std::vector<hdmap::JunctionInfoConstPtr>* junctions,
-        const apollo::common::PointENU& dead_end_point,
-        hdmap::JunctionInfoConstPtr* target_junction);
-  bool GetDeadEndSpot(Frame *const frame,
-                      hdmap::JunctionInfoConstPtr* junction,
-                      std::vector<common::math::Vec2d>* dead_end_vertices);
+      std::vector<hdmap::JunctionInfoConstPtr> *junctions,
+      const apollo::common::PointENU &dead_end_point,
+      hdmap::JunctionInfoConstPtr *target_junction);
+  bool GetDeadEndSpot(Frame *const frame, hdmap::JunctionInfoConstPtr *junction,
+                      std::vector<common::math::Vec2d> *dead_end_vertices);
   void SetDeadEndOrigin(
-      Frame* const frame,
+      Frame *const frame,
       const std::vector<common::math::Vec2d> &dead_end_vertices);
   void SetDeadEndPose(
-      Frame* const frame,
+      Frame *const frame,
       const std::vector<common::math::Vec2d> &dead_end_vertices);
   bool GetDeadEndBoundary(
-    Frame* const frame,
-    const std::vector<common::math::Vec2d> &dead_end_vertices,
-    const hdmap::Path &nearby_path,
-    std::vector<std::vector<common::math::Vec2d>> *const roi_deadend_boundary);
+      Frame *const frame,
+      const std::vector<common::math::Vec2d> &dead_end_vertices,
+      const hdmap::Path &nearby_path,
+      std::vector<std::vector<common::math::Vec2d>>
+          *const roi_deadend_boundary);
   void GetInLaneEndPoint(hdmap::LaneInfoConstPtr laneinfo,
-                         common::PointENU* left_end_point,
-                         common::PointENU* right_end_point);
+                         common::PointENU *left_end_point,
+                         common::PointENU *right_end_point);
   void GetOutLaneStartPoint(hdmap::LaneInfoConstPtr laneinfo,
-                            common::PointENU* left_start_point,
-                            common::PointENU* right_start_point);
+                            common::PointENU *left_start_point,
+                            common::PointENU *right_start_point);
   void GetInLaneBoundaryPoints(
-    hdmap::LaneInfoConstPtr lane_info,
-    const hdmap::Path &nearby_path,
-    std::vector<common::PointENU>* In_left_boundary_points,
-    std::vector<common::PointENU>* In_right_boundary_points);
+      hdmap::LaneInfoConstPtr lane_info, const hdmap::Path &nearby_path,
+      std::vector<common::PointENU> *In_left_boundary_points,
+      std::vector<common::PointENU> *In_right_boundary_points);
   void GetOutLaneBoundaryPoints(
-    hdmap::LaneInfoConstPtr lane_info,
-    const hdmap::Path &nearby_path,
-    std::vector<common::PointENU>* Out_left_boundary_points,
-    std::vector<common::PointENU>* Out_right_boundary_points);
+      hdmap::LaneInfoConstPtr lane_info, const hdmap::Path &nearby_path,
+      std::vector<common::PointENU> *Out_left_boundary_points,
+      std::vector<common::PointENU> *Out_right_boundary_points);
   // @brief generate the path by vehicle location and return the target parking
   // spot on that path
   bool GetParkingSpot(Frame *const frame,
@@ -182,8 +180,7 @@ class OpenSpaceRoiDecider : public Decider {
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
-      Frame *const frame,
-      const hdmap::Path &nearby_path,
+      Frame *const frame, const hdmap::Path &nearby_path,
       const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot);
 
   // @brief Helper function for fuse line segments into convex vertices set
@@ -239,7 +236,7 @@ class OpenSpaceRoiDecider : public Decider {
    * @param routing_segments The output vector of lane segments.
    */
   void GetAllLaneSegments(const routing::RoutingResponse &routing_response,
-                          std::vector<routing::LaneSegment> &routing_segments);
+                          std::vector<routing::LaneSegment> *routing_segments);
 
  private:
   // @brief parking_spot_id from routing
