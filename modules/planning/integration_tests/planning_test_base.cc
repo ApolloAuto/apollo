@@ -16,15 +16,15 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -243,8 +243,7 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
     bool load_success =
         cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     TrimPlanning(&golden_result, no_trajectory_point);
-    if (!load_success ||
-        !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
+    if (!load_success || !IsTrajectoryEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
       int fd = mkstemp(tmp_fname);
       if (fd < 0) {
@@ -310,6 +309,72 @@ TrafficRuleConfig* PlanningTestBase::GetTrafficRuleConfig(
     }
   }
   return nullptr;
+}
+
+int count = 1;
+bool PlanningTestBase::IsTrajectoryEqual(const ADCTrajectory& traj1,
+                                         const ADCTrajectory& traj2) const {
+  static const int kPrecision = 2;
+  if (traj1.GetTypeName() != traj1.GetTypeName()) {
+    return false;
+  }
+
+  std::string traj1_string = traj1.DebugString();
+  std::string traj2_string = traj2.DebugString();
+  std::string trimed_traj1 = TrimFloat(traj1_string, kPrecision);
+  std::string trimed_traj2 = TrimFloat(traj2_string, kPrecision);
+
+  return (trimed_traj1 == trimed_traj2);
+}
+
+std::string PlanningTestBase::TrimFloat(const std::string& str,
+                                        int precision) const {
+  std::string output;
+  int line_start_pos = 0;
+  std::string line = "";
+  while (-1 != line_start_pos) {
+    line = GetOneLine(str, &line_start_pos);
+    output += TrimFloatOfOneLine(line, precision) + '\n';
+  }
+  return output;
+}
+
+std::string PlanningTestBase::GetOneLine(const std::string& str,
+                                         int* start_pos) const {
+  int end_pos = str.find('\n', *start_pos);
+  std::string result = str.substr(*start_pos, end_pos - *start_pos);
+  if (end_pos < 0) {
+    *start_pos = end_pos;
+  } else {
+    *start_pos = end_pos + 1;
+  }
+  return result;
+}
+
+std::string PlanningTestBase::TrimFloatOfOneLine(const std::string& str,
+                                                 int precision) const {
+  static const std::string kFloatPatternString = "[-+]?([0-9]?\\.[0-9]+)";
+  static const std::regex kFloatRegex(kFloatPatternString);
+
+  int trim_pos = 0;
+  int trimed_float_end_pos = 0;
+  // The length to be extended of the float after '.'.
+  const int kExtendLength = precision + 1;
+  std::string result;
+  for (std::sregex_iterator it(str.begin(), str.end(), kFloatRegex), end_it;
+       it != end_it; ++it) {
+    const std::string& float_string = it->str();
+    int float_start_pos = str.find(float_string, trim_pos);
+    result += str.substr(trim_pos, float_start_pos - trim_pos);
+    trim_pos = float_start_pos;
+    trimed_float_end_pos = float_string.find('.') + kExtendLength;
+    result += str.substr(trim_pos, trimed_float_end_pos);
+    trim_pos += float_string.size();
+  }
+  if ("" == result) {
+    result = str;
+  }
+  return result;
 }
 
 }  // namespace planning

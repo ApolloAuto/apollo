@@ -84,7 +84,7 @@ TEST_F(PncMapTest, GetNearestPointFromRouting) {
   state.set_x(587174.662136);
   state.set_y(4140933.06302);  // the lane heading at this spot is about 0.9 PI
   state.set_heading(0.0);
-  EXPECT_FALSE(pnc_map_->GetNearestPointFromRouting(state, &waypoint));
+  EXPECT_TRUE(pnc_map_->GetNearestPointFromRouting(state, &waypoint));
   state.set_heading(M_PI);
   EXPECT_TRUE(pnc_map_->GetNearestPointFromRouting(state, &waypoint));
   ASSERT_TRUE(waypoint.lane != nullptr);

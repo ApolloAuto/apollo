@@ -99,6 +99,16 @@ class PlanningTestBase : public ::testing::Test {
   LocalView local_view_;
   PlanningConfig config_;
   std::shared_ptr<DependencyInjector> injector_;
+
+ private:
+  bool IsTrajectoryEqual(const ADCTrajectory& traj1,
+                         const ADCTrajectory& traj2) const;
+
+  std::string TrimFloat(const std::string& str, int precision = 2) const;
+
+  std::string GetOneLine(const std::string& str, int* start_pos) const;
+
+  std::string TrimFloatOfOneLine(const std::string& str, int precision) const;
 };
 
 }  // namespace planning
