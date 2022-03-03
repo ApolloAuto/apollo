@@ -404,13 +404,13 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
             park_go_routing["point"] = point_list;
             park_go_routing_list.push_back(park_go_routing);
           }
-        } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR,
-              "Failed to load park go "
-              "routing. Please make sure the "
-              "file exists at " +
-                  ParkGoRoutingFile());
+        //  } else {
+        //   sim_world_service_.PublishMonitorMessage(
+        //       MonitorMessageItem::ERROR,
+        //       "Failed to load park go "
+        //       "routing. Please make sure the "
+        //       "file exists at " +
+        //           ParkGoRoutingFile());
         }
         response["parkAndGoRoutings"] = park_go_routing_list;
         websocket_->SendData(conn, response.dump());
