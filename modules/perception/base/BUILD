@@ -112,6 +112,7 @@ cc_library(
     hdrs = ["common.h"],
     deps = [
         "@local_config_cuda//cuda:cudart",
+        "@rocm//:rocm_headers",
     ],
 )
 

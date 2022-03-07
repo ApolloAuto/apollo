@@ -35,6 +35,7 @@ load("//third_party/yaml_cpp:workspace.bzl", yaml_cpp = "repo")
 # load("//third_party/glew:workspace.bzl", glew = "repo")
 
 load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
+load("//third_party/gpus/rocm:workspace.bzl", rocm = "repo")
 load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
@@ -77,7 +78,7 @@ def initialize_third_party():
     tinyxml2()
     uuid()
     yaml_cpp()
-
+    rocm()
 # Define all external repositories required by
 def apollo_repositories():
     cuda_configure(name = "local_config_cuda")
