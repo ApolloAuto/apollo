@@ -35,6 +35,7 @@
   #define cudnnDestroyTensorDescriptor miopenDestroyTensorDescriptor
   #define cudnnHandle_t miopenHandle_t
   #define cudnnSetStream miopenSetStream
+  #define cudnnSetTensor4dDescriptorEx miopenSet4dTensorDescriptorEx
   #define cudnnTensorDescriptor_t miopenTensorDescriptor_t
 #endif
 
