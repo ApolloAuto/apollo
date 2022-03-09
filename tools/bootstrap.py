@@ -1001,9 +1001,15 @@ def main():
     setup_common_dirs(environ_cp)
     setup_python(environ_cp)
 
-    environ_cp['TF_NEED_CUDA'] = '1'
-    # build:gpu --config=using_cuda
-    write_to_bazelrc('build:gpu --config=cuda')
+    is_need_hip = environ_cp.get('TF_NEED_HIP')
+    if not is_need_hip:
+        environ_cp['TF_NEED_CUDA'] = '1'
+        # build:gpu --config=using_cuda
+        write_to_bazelrc('build:gpu --config=cuda')
+    else:
+        environ_cp['TF_NEED_CUDA'] = '0'
+        # build:gpu --config=using_hip
+        write_to_bazelrc('build:gpu --config=hip')
 
     if _APOLLO_DOCKER_STAGE == "dev":
         environ_cp['TF_NEED_TENSORRT'] = '1'
