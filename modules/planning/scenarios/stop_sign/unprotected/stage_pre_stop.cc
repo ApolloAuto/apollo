@@ -164,6 +164,14 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
            << "]";
     return -1;
   }
+  if (!obstacle_lane->IsOnLane(
+            common::util::PointFactory::ToVec2d(perception_obstacle.position()))) {
+      ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+      << obstacle_type_name<< "]: is off road. "
+      << point.DebugString() << "; heading[" << perception_obstacle.theta()
+      << "]";
+      return -1;  
+  }
 
   // check obstacle is on an associate lane guarded by stop sign
   std::string obstable_lane_id = obstacle_lane.get()->id().id();
