@@ -3,29 +3,20 @@
 `cuda_configure` depends on the following environment variables:
 
   * `TF_NEED_CUDA`: Whether to enable building with CUDA.
-  * `TF_NEED_HIP`: Whether to enable building with HIP (overrides TF_NEED_CUDA).
   * `GCC_HOST_COMPILER_PATH`: The GCC host compiler path
   * `TF_CUDA_CLANG`: Whether to use clang as a cuda compiler.
   * `CLANG_CUDA_COMPILER_PATH`: The clang compiler path that will be used for
     both host and device code compilation if TF_CUDA_CLANG is 1.
-  * `TF_HIP_CLANG`: Whether to use clang as a HIP compiler (will be a default path).
-  * `CLANG_HIP_COMPILER_PATH`: The clang compiler path that will be used for
-    both host and device code compilation if TF_HIP_CLANG is 1.
   * `TF_SYSROOT`: The sysroot to use when compiling.
   * `TF_CUDA_PATHS`: The base paths to look for CUDA and cuDNN. Default is
     `/usr/local/cuda,usr/`.
   * `CUDA_TOOLKIT_PATH` (deprecated): The path to the CUDA toolkit. Default is
     `/usr/local/cuda`.
-  * `HIP_PATH` (deprecated): The path to the HIP SDK. Default is
-    `/opt/rocm/hip`.
   * `TF_CUDA_VERSION`: The version of the CUDA toolkit. If this is blank, then
     use the system default.
- * `TF_CUDNN_VERSION`: The version of the cuDNN library.
+  * `TF_CUDNN_VERSION`: The version of the cuDNN library.
   * `CUDNN_INSTALL_PATH` (deprecated): The path to the cuDNN library. Default is
     `/usr/local/cuda`.
-  * `TF_MIOPEN_VERSION`: The version of the MIOpen library.
-  * `MIOPEN_INSTALL_PATH` (deprecated): The path to the MIOpen library. Default is
-    `/opt/rocm/miopen`.
   * `TF_CUDA_COMPUTE_CAPABILITIES`: The CUDA compute capabilities. Default is
     `5.2,6.0`
   * `PYTHON_BIN_PATH`: The python binary path
@@ -49,10 +40,8 @@ load(
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
 _GCC_HOST_COMPILER_PREFIX = "GCC_HOST_COMPILER_PREFIX"
 _CLANG_CUDA_COMPILER_PATH = "CLANG_CUDA_COMPILER_PATH"
-_CLANG_HIP_COMPILER_PATH = "CLANG_HIP_COMPILER_PATH"
 _TF_SYSROOT = "TF_SYSROOT"
 _CUDA_TOOLKIT_PATH = "CUDA_TOOLKIT_PATH"
-_HIP_PATH = "HIP_PATH"
 _TF_CUDA_VERSION = "TF_CUDA_VERSION"
 _TF_CUDNN_VERSION = "TF_CUDNN_VERSION"
 _CUDNN_INSTALL_PATH = "CUDNN_INSTALL_PATH"
@@ -110,10 +99,7 @@ def find_cc(repository_ctx):
     """Find the C++ compiler."""
     if _use_cuda_clang(repository_ctx):
         target_cc_name = "clang"
-        if _use_hip_clang(repository_ctx):
-            cc_path_envvar = _CLANG_CUDA_COMPILER_PATH
-        else:
-            cc_path_envvar = _CLANG_HIP_COMPILER_PATH
+        cc_path_envvar = _CLANG_CUDA_COMPILER_PATH
     else:
         target_cc_name = "gcc"
         cc_path_envvar = _GCC_HOST_COMPILER_PATH
@@ -251,10 +237,6 @@ def _cuda_include_path(repository_ctx, cuda_config):
 def enable_cuda(repository_ctx):
     """Returns whether to build with CUDA support."""
     return int(get_host_environ(repository_ctx, "TF_NEED_CUDA", False))
-
-def enable_hip(repository_ctx):
-    """Returns whether to build with HIP support."""
-    return int(get_host_environ(repository_ctx, "TF_NEED_HIP", False))
 
 def matches_version(environ_version, detected_version):
     """Checks whether the user-specified version matches the detected version.
@@ -803,9 +785,6 @@ def _flag_enabled(repository_ctx, flag_name):
 def _use_cuda_clang(repository_ctx):
     return _flag_enabled(repository_ctx, "TF_CUDA_CLANG")
 
-def _use_hip_clang(repository_ctx):
-    return _flag_enabled(repository_ctx, "TF_HIP_CLANG")
-
 def _tf_sysroot(repository_ctx):
     return get_host_environ(repository_ctx, _TF_SYSROOT, "")
 
@@ -846,7 +825,6 @@ def _create_local_cuda_repository(repository_ctx):
     tpl_paths = {filename: _tpl_path(repository_ctx, filename) for filename in [
         "cuda:build_defs.bzl",
         "crosstool:clang/bin/crosstool_wrapper_driver_is_not_gcc",
-        "crosstool:clang/bin/crosstool_wrapper_driver_is_clang_for_hip",
         "crosstool:BUILD",
         "crosstool:cc_toolchain_config.bzl",
         "cuda:cuda_config.h",
@@ -1243,7 +1221,6 @@ def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
 
 def _cuda_autoconf_impl(repository_ctx):
     """Implementation of the cuda_autoconf repository rule."""
-    # TODO(emankov): add the branch for enable_hip overriding enable_cuda
     if not enable_cuda(repository_ctx):
         _create_dummy_repository(repository_ctx)
     elif get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
@@ -1263,13 +1240,9 @@ _ENVIRONS = [
     _GCC_HOST_COMPILER_PATH,
     _GCC_HOST_COMPILER_PREFIX,
     _CLANG_CUDA_COMPILER_PATH,
-    _CLANG_HIP_COMPILER_PATH,
     "TF_NEED_CUDA",
-    "TF_NEED_HIP",
     "TF_CUDA_CLANG",
-    "TF_HIP_CLANG",
     _CUDA_TOOLKIT_PATH,
-    _HIP_PATH,
     _CUDNN_INSTALL_PATH,
     _TF_CUDA_VERSION,
     _TF_CUDNN_VERSION,
