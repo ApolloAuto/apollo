@@ -9,6 +9,18 @@ def if_gpu(if_true, if_false = []):
         "//conditions:default": if_false,
     })
 
+def if_nvidia_gpu(if_true, if_false = []):
+    return select({
+        "//tools/platform:use_nvidia_gpu": if_true,
+        "//conditions:default": if_true,
+    })
+
+def if_amd_gpu(if_true, if_false = []):
+    return select({
+        "//tools/platform:use_amd_gpu": if_true,
+        "//conditions:default": if_false,
+    })
+
 def copts_if_gpu():
     return if_gpu(["-DUSE_GPU=1"], ["-DUSE_GPU=0"])
 
