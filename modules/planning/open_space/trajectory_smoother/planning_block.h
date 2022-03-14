@@ -16,7 +16,11 @@
 
 #pragma once
 
-#include <cuda_runtime.h>
+#if GPU_PLATFORM == NVIDIA
+  #include <cuda_runtime.h>
+#elif GPU_PLATFORM == AMD
+  #include <hip/hip_runtime.h>
+#endif
 
 namespace apollo {
 namespace planning {
