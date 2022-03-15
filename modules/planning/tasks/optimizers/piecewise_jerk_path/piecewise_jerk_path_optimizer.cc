@@ -303,8 +303,8 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   const double axis_distance = veh_param.wheel_base();
   const double max_yaw_rate =
       veh_param.max_steer_angle_rate() / veh_param.steer_ratio() / 2.0;
-  const double jerk_bound = EstimateJerkBoundary(std::fmax(init_state.first[1], 1.0),
-                                                 axis_distance, max_yaw_rate);
+  const double jerk_bound = EstimateJerkBoundary(
+      std::fmax(init_state.first[1], 1.0), axis_distance, max_yaw_rate);
   piecewise_jerk_problem.set_dddx_bound(jerk_bound);
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
