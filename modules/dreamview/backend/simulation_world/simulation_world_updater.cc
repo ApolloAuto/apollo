@@ -494,8 +494,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           response["routingType"] = json["routingType"];
           websocket_->SendData(conn, response.dump());
         } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to add a routing.");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
+                                                   "Failed to add a routing.");
         }
       });
 
@@ -700,11 +700,19 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
       return false;
     }
   } else {
-    if (!map_service_->ConstructLaneWayPoint(end["x"], end["y"],
-                                             routing_request->add_waypoint())) {
-      AERROR << "Failed to prepare a routing request:"
-             << " cannot locate end point on map.";
-      return false;
+    if (ContainsKey(end, "heading")) {
+      if (!map_service_->ConstructLaneWayPointWithHeading(
+              end["x"], end["y"], end["heading"],
+              routing_request->add_waypoint())) {
+        AERROR << "Failed to construct end lane way point on map:" << end;
+        return false;
+      }
+    } else {
+      if (!map_service_->ConstructLaneWayPoint(
+              end["x"], end["y"], routing_request->add_waypoint())) {
+        AERROR << "Failed to construct end lane way point on map:" << end;
+        return false;
+      }
     }
   }
 
@@ -744,10 +752,10 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 Json SimulationWorldUpdater::GetConstructRoutingRequestJson(
     const nlohmann::json &start, const nlohmann::json &end) {
-      Json result;
-      result["start"] = start;
-      result["end"] = end;
-      return result;
+  Json result;
+  result["start"] = start;
+  result["end"] = end;
+  return result;
 }
 
 bool SimulationWorldUpdater::ConstructParkingRoutingTask(
@@ -802,8 +810,8 @@ bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void SimulationWorldUpdater::Start() {
-  timer_.reset(new cyber::Timer(
-      kSimWorldTimeIntervalMs, [this]() { this->OnTimer(); }, false));
+  timer_.reset(new cyber::Timer(kSimWorldTimeIntervalMs,
+                                [this]() { this->OnTimer(); }, false));
   timer_->Start();
 }
 
