@@ -89,7 +89,10 @@ function fail() {
 
 function determine_gpu_use_target() {
   local arch="$(uname -m)"
+  local gpu_platform="UNKNOWN"
   local use_gpu=0
+  local nv=0
+  local amd=0
 
   if [[ "${arch}" == "aarch64" ]]; then
     if lsmod | grep -q nvgpu; then
@@ -98,16 +101,41 @@ function determine_gpu_use_target() {
       fi
     fi
   else ## x86_64 mode
-    # Check the existence of nvidia-smi
+    # Check the existence of nvidia-smi and rocm-smi
     if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-      warning "nvidia-smi not found. CPU will be used."
+      nv=1
+      warning "No nvidia-smi found."
     elif [[ -z "$(nvidia-smi)" ]]; then
-      warning "No GPU device found. CPU will be used."
-    else
+      nv=2
+      warning "No NVIDIA GPU device found."
+    fi
+    if [[ ! -x "$(command -v rocm-smi)" ]]; then
+      amd=1
+      warning "No rocm-smi found."
+    elif [[ -z "$(rocm-smi)" ]]; then
+      amd=2
+      warning "No AMD GPU device found."
+    fi
+    if (( $nv == 0 )); then
       use_gpu=1
+      gpu_platform="NVIDIA"
+      info "NVIDIA GPU device found."
+    elif (( $amd == 0 )); then
+      use_gpu=1
+      gpu_platform="AMD"
+    else
+      gpu_platform="UNKNOWN"
+      warning "No any GPU device found."
+    fi
+    if (( $amd == 0 )); then
+      info "AMD GPU device found."
+    fi
+    if (( $nv == 0)) && (( $amd == 0 )); then
+      info "NVIDIA GPU device is chosen for the build."
     fi
   fi
   export USE_GPU_TARGET="${use_gpu}"
+  export GPU_PLATFORM="${gpu_platform}"
 }
 
 function file_ext() {

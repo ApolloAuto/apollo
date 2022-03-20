@@ -85,7 +85,7 @@ function apollo_env_setup() {
         info "${TAB}DOCKER_IMG: ${DOCKER_IMG##*:}"
     fi
     info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
-    info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
+    info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET} GPU_PLATFORM=${GPU_PLATFORM}"
 
     if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
         source "${TOP_DIR}/cyber/setup.bash"

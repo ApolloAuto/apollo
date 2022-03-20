@@ -43,17 +43,30 @@ DOCKER_RUN_CMD="docker run"
 USE_GPU_HOST=0
 
 function determine_gpu_use_host() {
+    local nv=0
+    local amd=0
     if [[ "${HOST_ARCH}" == "aarch64" ]]; then
         if lsmod | grep -q "^nvgpu"; then
             USE_GPU_HOST=1
         fi
     elif [[ "${HOST_ARCH}" == "x86_64" ]]; then
         if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-            warning "No nvidia-smi found. CPU will be used"
+            nv=1
+            warning "No nvidia-smi found."
         elif [[ -z "$(nvidia-smi)" ]]; then
-            warning "No GPU device found. CPU will be used."
-        else
+            nv=2
+            warning "No NVIDIA GPU device found."
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+            amd=1
+            warning "No rocm-smi found."
+        elif [[ -z "$(rocm-smi)" ]]; then
+            amd=2
+            warning "No AMD GPU device found."
+        fi
+        if (( $nv == 0)) && (( $amd == 0 )); then
             USE_GPU_HOST=1
+            warning "No any GPU device found. CPU will be used instead."
         fi
     else
         error "Unsupported CPU architecture: ${HOST_ARCH}"
