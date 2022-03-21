@@ -50,6 +50,7 @@ cc_library(
         "//modules/canbus/vehicle/gem:gem_vehicle_factory",
         "//modules/canbus/vehicle/lexus:lexus_vehicle_factory",
         "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
+        "//modules/canbus/vehicle/minibus:minibus_vehicle_factory",
         "//modules/canbus/vehicle/neolix_edu:neolix_edu_vehicle_factory",
         "//modules/canbus/vehicle/transit:transit_vehicle_factory",
         "//modules/canbus/vehicle/wey:wey_vehicle_factory",
