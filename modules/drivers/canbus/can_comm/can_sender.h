@@ -93,6 +93,12 @@ class SenderMessage {
   void Update();
 
   /**
+   * @brief Always update the protocol data. But the updating process depends on
+   *        the real type of protocol data which inherites ProtocolData.
+   */
+  void Update_Heartbeat();
+
+  /**
    * @brief Get the CAN frame to send.
    * @return The CAN frame to send.
    */
@@ -171,6 +177,11 @@ class CanSender {
    */
   void Update();
 
+  /*
+   * @brief Update the heartbeat protocol data based the types.
+   */
+  void Update_Heartbeat();
+
   /**
    * @brief Stop the CAN sender.
    */
@@ -248,6 +259,18 @@ void SenderMessage<SensorType>::Update() {
     return;
   }
   protocol_data_->UpdateData(can_frame_to_update_.data);
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  can_frame_to_send_ = can_frame_to_update_;
+}
+
+template <typename SensorType>
+void SenderMessage<SensorType>::Update_Heartbeat() {
+  if (protocol_data_ == nullptr) {
+    AERROR << "Attention: ProtocolData is nullptr!";
+    return;
+  }
+  protocol_data_->UpdateData_Heartbeat(can_frame_to_update_.data);
 
   std::lock_guard<std::mutex> lock(mutex_);
   can_frame_to_send_ = can_frame_to_update_;
@@ -363,6 +386,14 @@ common::ErrorCode CanSender<SensorType>::Start() {
   thread_.reset(new std::thread([this] { PowerSendThreadFunc(); }));
 
   return common::ErrorCode::OK;
+}
+
+// cansender -> Update_Heartbeat()
+template <typename SensorType>
+void CanSender<SensorType>::Update_Heartbeat() {
+  for (auto &message : send_messages_) {
+    message.Update_Heartbeat();
+  }
 }
 
 template <typename SensorType>
