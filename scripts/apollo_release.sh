@@ -123,7 +123,7 @@ function generate_solibs() {
     SYSLIB_DIRS=(
         /usr/local/fast-rtps/lib
         /usr/local/libtorch_cpu/lib
-        /usr/local/libtorch_gpu/lib
+        /usr/local/libtorch_gpu/nvidia/lib
         ${APOLLO_SYSROOT_DIR}/lib
     )
 

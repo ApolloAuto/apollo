@@ -57,6 +57,9 @@ ok "Successfully installed libtorch_cpu ${VERSION}"
 
 ##============================================================##
 # libtorch_gpu
+mkdir /usr/local/libtorch_gpu
+
+# libtorch_gpu/nvidia 
 if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
     VERSION="1.7.0-2"
     CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
@@ -71,7 +74,7 @@ DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
 download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
 tar xzf "${PKG_NAME}"
-mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu
+mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu/nvidia
 
 # Cleanup
 rm -f "${PKG_NAME}"
