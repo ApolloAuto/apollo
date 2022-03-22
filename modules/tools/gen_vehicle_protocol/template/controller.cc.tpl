@@ -49,6 +49,8 @@ ErrorCode %(car_type_cap)sController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -311,7 +313,8 @@ void %(car_type_cap)sController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
+  // const double real_angle =
+  //     vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   // reverse sign
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
@@ -328,7 +331,8 @@ void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
     return;
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   const double real_angle_spd = ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
       vehicle_params_.min_steer_angle_rate(), vehicle_params_.max_steer_angle_rate(),
       vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
