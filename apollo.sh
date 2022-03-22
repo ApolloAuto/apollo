@@ -123,7 +123,11 @@ function _usage() {
     ${BLUE}build_opt [module]${NO_COLOR}: run optimized build.
     ${BLUE}build_cpu [module]${NO_COLOR}: build in CPU mode. Equivalent to 'bazel build --config=cpu'
     ${BLUE}build_gpu [module]${NO_COLOR}: run build in GPU mode. Equivalent to 'bazel build --config=gpu'
+    ${BLUE}build_nvidia [module]${NO_COLOR}: run build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=gpu --config=nvidia'
+    ${BLUE}build_amd [module]${NO_COLOR}: run build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=gpu --config=amd'
     ${BLUE}build_opt_gpu [module]${NO_COLOR}: optimized build in GPU mode. Equivalent to 'bazel build --config=opt --config=gpu'
+    ${BLUE}build_opt_nvidia [module]${NO_COLOR}: optimized build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=opt --config=gpu --config=nvidia'
+    ${BLUE}build_opt_amd [module]${NO_COLOR}: optimized build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=opt --config=gpu --config=amd'
     ${BLUE}test [module]${NO_COLOR}: run unittest for cyber (module='cyber') or modules/<module>. If unspecified, test all.
     ${BLUE}coverage [module]${NO_COLOR}: run coverage test for cyber (module='cyber') or modules/<module>. If unspecified, coverage all.
     ${BLUE}lint${NO_COLOR}: run code style check
@@ -183,8 +187,20 @@ function main() {
         build_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=gpu "$@"
             ;;
+        build_nvidia)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=gpu --config=nvidia "$@"
+            ;;
+        build_amd)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=gpu --config=amd "$@"
+            ;;
         build_opt_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "$@"
+            ;;
+        build_opt_nvidia)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu --config=nvidia "$@"
+            ;;
+        build_opt_amd)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu --config=amd "$@"
             ;;
         build_prof)
             env ${APOLLO_ENV} bash "${build_sh}" --config=prof "$@"
