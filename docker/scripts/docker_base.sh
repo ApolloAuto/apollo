@@ -64,8 +64,10 @@ function determine_gpu_use_host() {
             amd=2
             warning "No AMD GPU device found."
         fi
-        if (( $nv == 0)) && (( $amd == 0 )); then
+        if (( $nv == 0)) || (( $amd == 0 )); then
             USE_GPU_HOST=1
+        else
+            USE_GPU_HOST=0
             warning "No any GPU device found. CPU will be used instead."
         fi
     else
