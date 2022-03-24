@@ -117,6 +117,16 @@ modules {
     }
   }
 }
+modules {
+  key: "Sim Obstacle"
+  value: {
+    start_command: "nohup /apollo/modules/dreamview/sim_obstacle &"
+    stop_command: "pkill -9 -f \"sim_obstacle\" "
+     process_monitor_config {
+      command_keywords: "sim_obstacle"
+    }
+  }
+}
 monitored_components {
   key: "Recorder"
   value: {
