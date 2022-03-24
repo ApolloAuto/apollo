@@ -110,6 +110,7 @@ class HermesCanClient : public CanClient {
   bool is_init_ = false;
   bcan_hdl_t dev_handler_;
   CANCardParameter::CANChannelId port_;
+  CANCardParameter::HERMES_BAUDRATE baudrate_;
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
   bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
 };
