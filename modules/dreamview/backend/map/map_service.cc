@@ -508,11 +508,11 @@ bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
   // Start from origin to find a lane from the map.
   double s, l;
   LaneInfoConstPtr lane;
-  if (!GetNearestLane(0.0, 0.0, &lane, &s, &l)) {
+  if (!GetNearestLane(754091.9, 2563972.46, &lane, &s, &l)) {
     return false;
   }
 
-  *start_point = lane->GetSmoothPoint(0.0);
+  *start_point = lane->GetSmoothPoint(s);
   return true;
 }
 
