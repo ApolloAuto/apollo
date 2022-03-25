@@ -63,6 +63,71 @@ class Ecustatus1515 : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|65535]',
   // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   int chassis_err(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 48, 'description': 'Chassis error code (Chassis
+  // status)', 'enum': {0: 'CHASSIS_ADS_ERR_NOMAL', 1:
+  // 'CHASSIS_ADS_ERR_ADS_CAN_LOST', 2: 'CHASSIS_ADS_ERR_ADS_CAN_RECOVERY'},
+  // 'is_signed_var': False, 'len': 2, 'name': 'CHASSIS_ADS_ERR', 'offset': 0.0,
+  // 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
+  // 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_ads_errType chassis_ads_err(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 50, 'enum': {0: 'CHASSIS_BMS_CAN_NORMAL', 1:
+  // 'CHASSIS_BMS_CAN_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_BMS_CAN', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_bms_canType chassis_bms_can(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 51, 'enum': {0: 'CHASSIS_EHB_CAN_NORMAL', 1:
+  // 'CHASSIS_EHB_CAN_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_EHB_CAN', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_ehb_canType chassis_ehb_can(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 52, 'enum': {0: 'CHASSIS_EHB_ERR_NORMAL', 1:
+  // 'CHASSIS_EHB_ERR_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_EHB_ERR', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_ehb_errType chassis_ehb_err(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 53, 'enum': {0: 'CHASSIS_EPS_CAN_NORMAL', 1:
+  // 'CHASSIS_EPS_CAN_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_EPS_CAN', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_eps_canType chassis_eps_can(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 54, 'enum': {0: 'CHASSIS_EPS_ERR_NORMAL', 1:
+  // 'CHASSIS_EPS_ERR_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_EPS_ERR', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_eps_errType chassis_eps_err(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 55, 'enum': {0: 'CHASSIS_HW_LOST_NORMAL', 1:
+  // 'CHASSIS_HW_LOST_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_HW_Lost', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_hw_lostType chassis_hw_lost(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 56, 'enum': {0: 'CHASSIS_MCU_CAN_NORMAL', 1:
+  // 'CHASSIS_MCU_CAN_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_MCU_CAN', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_mcu_canType chassis_mcu_can(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'bit': 57, 'enum': {0: 'CHASSIS_MCU_ERR_NORMAL', 1:
+  // 'CHASSIS_MCU_ERR_ERROR'}, 'is_signed_var': False, 'len': 1, 'name':
+  // 'CHASSIS_MCU_ERR', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Ecu_status_1_515::Chassis_mcu_errType chassis_mcu_err(
+      const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace ch

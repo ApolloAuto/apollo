@@ -225,6 +225,43 @@ message Ecu_status_1_515 {
     CTRL_STS_OUT_OF_CONTROL = 0;
     CTRL_STS_UNDER_CONTROL = 1;
   }
+  enum Chassis_mcu_errType {
+    CHASSIS_MCU_ERR_NORMAL = 0;
+    CHASSIS_MCU_ERR_ERROR = 1;
+  }
+  enum Chassis_mcu_canType {
+    CHASSIS_MCU_CAN_NORMAL = 0;
+    CHASSIS_MCU_CAN_ERROR = 1;
+  }
+  enum Chassis_hw_lostType {
+    CHASSIS_HW_LOST_NORMAL = 0;
+    CHASSIS_HW_LOST_ERROR = 1;
+  }
+  enum Chassis_eps_errType {
+    CHASSIS_EPS_ERR_NORMAL = 0;
+    CHASSIS_EPS_ERR_ERROR = 1;
+  }
+  enum Chassis_eps_canType {
+    CHASSIS_EPS_CAN_NORMAL = 0;
+    CHASSIS_EPS_CAN_ERROR = 1;
+  }
+  enum Chassis_ehb_errType {
+    CHASSIS_EHB_ERR_NORMAL = 0;
+    CHASSIS_EHB_ERR_ERROR = 1;
+  }
+  enum Chassis_ehb_canType {
+    CHASSIS_EHB_CAN_NORMAL = 0;
+    CHASSIS_EHB_CAN_ERROR = 1;
+  }
+  enum Chassis_bms_canType {
+    CHASSIS_BMS_CAN_NORMAL = 0;
+    CHASSIS_BMS_CAN_ERROR = 1;
+  }
+  enum Chassis_ads_errType {
+    CHASSIS_ADS_ERR_NORMAL = 0;
+    CHASSIS_ADS_ERR_ADS_CAN_LOST = 1;
+    CHASSIS_ADS_ERR_ADS_CAN_RECOVERY = 2;
+  }
   // Current speed (Steering status) [m/s] [-327.68|327.67]
   optional double speed = 1;
   // Current acceleration (Steering status) [m/s^2] [0|0]
@@ -235,6 +272,24 @@ message Ecu_status_1_515 {
   optional int32 chassis_sts = 4;
   // Chassis error code (Chassis status) [] [0|65535]
   optional int32 chassis_err = 5;
+  // [] [0|1]
+  optional Chassis_mcu_errType chassis_mcu_err = 6;
+  // [] [0|1]
+  optional Chassis_mcu_canType chassis_mcu_can = 7;
+  // [] [0|1]
+  optional Chassis_hw_lostType chassis_hw_lost = 8;
+  // [] [0|1]
+  optional Chassis_eps_errType chassis_eps_err = 9;
+  // [] [0|1]
+  optional Chassis_eps_canType chassis_eps_can = 10;
+  // [] [0|1]
+  optional Chassis_ehb_errType chassis_ehb_err = 11;
+  // [] [0|1]
+  optional Chassis_ehb_canType chassis_ehb_can = 12;
+  // [] [0|1]
+  optional Chassis_bms_canType chassis_bms_can = 13;
+  // Chassis error code (Chassis status) [] [0|2]
+  optional Chassis_ads_errType chassis_ads_err = 14;
 }
 
 message Ecu_status_2_516 {
