@@ -535,7 +535,7 @@ void DevkitController::Acceleration(double acc) {
   // None
 }
 
-// devkit default, -30 ~ 00, left:+, right:-
+// devkit default, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with default angle speed, 25-250 (default:250)
 // angle:-99.99~0.00~99.99, unit:, left:+, right:-
@@ -556,7 +556,7 @@ void DevkitController::Steer(double angle) {
 
 // steering with new angle speed
 // angle:-99.99~0.00~99.99, unit:, left:+, right:-
-// angle_spd:25~250, unit:deg/s
+// angle_spd:25~250(default:250), unit:deg/s
 void DevkitController::Steer(double angle, double angle_spd) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
@@ -568,7 +568,7 @@ void DevkitController::Steer(double angle, double angle_spd) {
 
   if (!emergency_brake) {
     steering_command_102_->set_steer_angle_target(real_angle)
-        ->set_steer_angle_spd_target(angle_spd);
+        ->set_steer_angle_spd_target(250);
   }
 }
 
