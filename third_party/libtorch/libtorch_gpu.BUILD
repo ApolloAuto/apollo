@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 
 cc_library(
-  name = "libtorch_gpu",
+   name = "libtorch_gpu",
    deps = [
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
@@ -31,4 +31,3 @@ cc_library(
         "@local_config_cuda//cuda:cudart",
     ],
 )
-
