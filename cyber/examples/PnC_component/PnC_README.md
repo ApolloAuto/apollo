@@ -1,3 +1,12 @@
+# PnC模块
+## 输入
+* traffic_light
+* routing
+* pad
+* relative_map
+* story_telling
+## 输出
+* 给底盘的控制指令（油门/刹车，转向）
 # Planning模块
 ## Planning中采用的为消息触发，消息触发的上游消息，定义在Component中Proc()函数的入参
 1. Reader:
@@ -152,3 +161,6 @@ class FrameHistory : public IndexedQueue<uint32_t, Frame> {
 Pnc_map即规划控制地图，在Plannning中属于独立的一块功能，其主要目的在于将Routing给到的原始地图车道信息转换成规划可以用的ReferenceLine信息。实现Pnc_map的功能分为两步：
 1. 处理Routing结果，将routing数据处理并存储在map相关的数据结构中，供后续使用
 2. 根据routing结果及当前车辆位置，计算可行驶的passage信息，并转换成RouteSegments结构
+
+拿到Pnc_map的结果之后，下一步就要对原始的地图中心线Map_Path信息进行平滑
+
