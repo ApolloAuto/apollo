@@ -25,6 +25,10 @@ cc_library(
         ":ultr_sensor_4_510",
         ":ultr_sensor_5_511",
         ":vcu_report_505",
+        ":vehicle_mode_command_105",
+        ":vin_resp1_514",
+        ":vin_resp2_515",
+        ":vin_resp3_516",
         ":wheelspeed_report_506",
     ],
 )
@@ -400,6 +404,54 @@ cc_test(
     deps = [
         "//modules/canbus/vehicle/devkit/protocol:canbus_devkit_protocol",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "vehicle_mode_command_105",
+    srcs = ["vehicle_mode_command_105.cc"],
+    hdrs = ["vehicle_mode_command_105.h"],
+    copts = CANBUS_COPTS,
+    deps = [
+        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
+    ],
+)
+
+cc_library(
+    name = "vin_resp1_514",
+    srcs = ["vin_resp1_514.cc"],
+    hdrs = ["vin_resp1_514.h"],
+    copts = CANBUS_COPTS,
+    deps = [
+        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
+    ],
+)
+
+cc_library(
+    name = "vin_resp2_515",
+    srcs = ["vin_resp2_515.cc"],
+    hdrs = ["vin_resp2_515.h"],
+    copts = CANBUS_COPTS,
+    deps = [
+        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
+    ],
+)
+
+cc_library(
+    name = "vin_resp3_516",
+    srcs = ["vin_resp3_516.cc"],
+    hdrs = ["vin_resp3_516.h"],
+    copts = CANBUS_COPTS,
+    deps = [
+        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 

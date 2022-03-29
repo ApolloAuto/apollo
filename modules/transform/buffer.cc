@@ -17,6 +17,7 @@
 #include "modules/transform/buffer.h"
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/cyber.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -26,6 +27,7 @@ using Clock = ::apollo::cyber::Clock;
 
 namespace {
 constexpr float kSecondToNanoFactor = 1e9f;
+constexpr uint64_t kMilliToNanoFactor = 1e6;
 }  // namespace
 
 namespace apollo {
@@ -205,8 +207,12 @@ bool Buffer::canTransform(const std::string& target_frame,
     if (retval) {
       return true;
     } else {
+      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+        break;
+      }
+      const int sleep_time_ms = 3;
       AWARN << "BufferCore::canTransform failed: " << *errstr;
-      std::this_thread::sleep_for(std::chrono::milliseconds(3));
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
     }
   }
   *errstr = *errstr + ":timeout";
@@ -233,8 +239,13 @@ bool Buffer::canTransform(const std::string& target_frame,
     if (retval) {
       return true;
     } else {
+      const int sleep_time_ms = 3;
       AWARN << "BufferCore::canTransform failed: " << *errstr;
-      std::this_thread::sleep_for(std::chrono::milliseconds(3));
+      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
+      if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+        Clock::SetNow(Time(Clock::Now().ToNanosecond() +
+                           sleep_time_ms * kMilliToNanoFactor));
+      }
     }
   }
   *errstr = *errstr + ":timeout";

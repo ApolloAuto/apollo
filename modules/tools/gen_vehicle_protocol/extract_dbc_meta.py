@@ -23,7 +23,8 @@ import sys
 import yaml
 
 
-MAX_CAN_ID = 4096000000  # 2048
+MAX_CAN_ID = 4096000000  # include can extended ID
+STANDARD_CAN_ID = 2048
 
 
 def extract_var_info(items):
@@ -87,6 +88,8 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if int(items[1]) > MAX_CAN_ID:
                     continue
                 protocol["id"] = "%x" % int(items[1])
+                if int(items[1]) > STANDARD_CAN_ID:
+                    protocol["id"] = gen_can_id_extended(protocol["id"])
                 protocol["name"] = "%s_%s" % (p_name, protocol["id"])
                 protocol["sender"] = items[4]
                 if protocol["id"] in black_list:
@@ -115,6 +118,8 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 protocol_id = "%x" % int(items[2])
                 if int(items[2]) > MAX_CAN_ID:
                     continue
+                if int(items[2]) > STANDARD_CAN_ID:
+                    protocol_id = gen_can_id_extended(protocol_id)
                 for var in protocols[protocol_id]["vars"]:
                     if var["name"] == items[3]:
                         var["description"] = items[4][:-1]
@@ -123,6 +128,8 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 protocol_id = "%x" % int(items[1])
                 if int(items[1]) > MAX_CAN_ID:
                     continue
+                if int(items[1]) > STANDARD_CAN_ID:
+                    protocol_id = gen_can_id_extended(protocol_id)
                 for var in protocols[protocol_id]["vars"]:
                     if var["name"] == items[2]:
                         var["type"] = "enum"
@@ -159,6 +166,15 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         print("Control protocols: %d" % control_protocol_num)
         print("Report protocols: %d" % report_protocol_num)
         return True
+
+def gen_can_id_extended(str):
+    """
+        id string:
+    """
+    int_id = int(str, 16)
+    int_id &= 0x1FFFFFFF
+    str = hex(int_id).replace('0x', '')
+    return str
 
 
 if __name__ == "__main__":

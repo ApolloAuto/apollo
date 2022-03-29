@@ -267,6 +267,8 @@ Chassis Neolix_eduController::chassis() {
   return chassis_;
 }
 
+bool Neolix_eduController::VerifyID() { return true; }
+
 void Neolix_eduController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();

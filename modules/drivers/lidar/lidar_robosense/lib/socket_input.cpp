@@ -25,6 +25,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+#include "cyber/cyber.h"
+
 namespace apollo {
 namespace drivers {
 namespace robosense {

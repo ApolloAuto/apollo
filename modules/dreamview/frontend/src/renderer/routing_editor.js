@@ -20,6 +20,7 @@ export default class RoutingEditor {
     this.inEditingMode = false;
     this.pointId = 0;
     this.parkingSpaceInfo = [];
+    this.deadJunctionInfo = [];
     this.arrows = [];
   }
 
@@ -102,16 +103,16 @@ export default class RoutingEditor {
     this.parkingInfo = info;
   }
 
-  setParkingSpaceInfo(parkingSpaceInfo, extraInformation, coordinates,scene) {
+  setParkingSpaceInfo(parkingSpaceInfo, extraInformation, coordinates, scene) {
     this.parkingSpaceInfo = parkingSpaceInfo;
     this.parkingSpaceInfo.forEach((item, index) => {
       const extraInfo = extraInformation[index];
       if (_.isEmpty(extraInfo)) {
         return false;
       }
-      const offsetPoints = item.polygon.point.map(point => {
-        return coordinates.applyOffset({ x: point.x, y: point.y });
-      });
+      const offsetPoints = item.polygon.point.map(point =>
+        coordinates.applyOffset({ x: point.x, y: point.y })
+      );
       const adjustPoints = extraInfo.order.map(number => {
         return offsetPoints[number];
       });
@@ -198,6 +199,8 @@ export default class RoutingEditor {
   sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
     // point from routingPoints no need to apply offset
     // parking routing request vs common routing request
+    // add dead end junction routing request when select three points
+    // and the second point is in dead end junction.
     if (this.routePoints.length === 0 && routingPoints.length === 0) {
       alert('Please provide at least an end point.');
       return false;
@@ -230,7 +233,7 @@ export default class RoutingEditor {
       const cornerPoints = parkingRequestPoints.slice(-4);
       const parkingInfo = {
         parkingSpaceId: _.get(id, 'id'),
-        parkingPoint: coordinates.applyOffset(lastPoint.position,true),
+        parkingPoint: coordinates.applyOffset(lastPoint.position, true),
         parkingSpaceType: type,
       };
       WS.sendParkingRequest(
@@ -318,5 +321,15 @@ export default class RoutingEditor {
         IsPointInRectangle(item.polygon.point, offsetPoint));
     }
     return index;
+  }
+
+  determinDeadEndJunctionRequest(offsetPoints) {
+    const index = _.findIndex(this.deadJunctionInfo, deadJunction =>
+      IsPointInRectangle(deadJunction.deadJunctionPoints, offsetPoints[1]));
+    return index;
+  }
+
+  setDeadJunctionInfo(deadJunctionInfos) {
+    this.deadJunctionInfo = deadJunctionInfos;
   }
 }

@@ -34,7 +34,7 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
     : config_(config) {
   // Load config
   config_ = config;
-  AINFO<<config_.DebugString();
+  AINFO << config_.DebugString();
   // Initialize hybrid astar class pointer
   warm_start_.reset(new HybridAStar(config.planner_open_space_config()));
 
@@ -201,7 +201,6 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                 init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
                 &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
                 &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
-                  
           AERROR << "Smoother fail at " << i
                  << "th trajectory with index starts from 0";
           AERROR << i << "th trajectory size is " << xWS_vec[i].cols();
@@ -236,7 +235,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
              << xWS_vec[i].cols() << "; post-smoothing size is "
              << state_result_ds_vec[i].cols();
     }
-      
+
     // Retrive the trajectory in one piece
     CombineTrajectories(xWS_vec, uWS_vec, state_result_ds_vec,
                         control_result_ds_vec, time_result_ds_vec,
@@ -244,7 +243,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                         dual_n_result_ds_vec, &xWS, &uWS, &state_result_ds,
                         &control_result_ds, &time_result_ds, &l_warm_up,
                         &n_warm_up, &dual_l_result_ds, &dual_n_result_ds);
-    
+
   } else {
     LoadHybridAstarResultInEigen(&result, &xWS, &uWS);
 
@@ -554,8 +553,8 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
   Eigen::MatrixXd xF(4, 1);
   xF << xWS(0, horizon), xWS(1, horizon), xWS(2, horizon), xWS(3, horizon);
   UseWarmStartAsResult(xWS, uWS, *l_warm_up, *n_warm_up, state_result_ds,
-                           control_result_ds, time_result_ds, dual_l_result_ds,
-                           dual_n_result_ds);
+                       control_result_ds, time_result_ds, dual_l_result_ds,
+                       dual_n_result_ds);
   return true;
   // load vehicle configuration
   const common::VehicleParam& vehicle_param_ =

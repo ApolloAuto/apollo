@@ -90,7 +90,7 @@ cc_library(
     hdrs = ["on_lane_planning.h"],
     copts = [
         "-fopenmp",
-        "-DMODULE_NAME=\\\"planning\\\""
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":planning_base",

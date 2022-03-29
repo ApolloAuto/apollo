@@ -21,6 +21,7 @@
 #include <string>
 #include <thread>
 
+#include "cyber/cyber.h"
 #include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
 
 namespace apollo {

@@ -29,7 +29,7 @@ const int32_t Gearcommand114::ID = 0x114;
 Gearcommand114::Gearcommand114() { Reset(); }
 
 uint32_t Gearcommand114::GetPeriod() const {
-  // modify every protocol's period manually
+  // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -39,7 +39,7 @@ void Gearcommand114::UpdateData(uint8_t* data) {
 }
 
 void Gearcommand114::Reset() {
-  // you should check this manually
+  // TODO(All) :  you should check this manually
   gear_cmd_ = Gear_command_114::GEAR_CMD_NEUTRAL;
 }
 
@@ -49,17 +49,17 @@ Gearcommand114* Gearcommand114::set_gear_cmd(
   return this;
 }
 
-// config detail: {'description': 'PRND control(Command)', 'enum': {1:
+// config detail: {'bit': 0, 'description': 'PRND control(Command)', 'enum': {1:
 // 'GEAR_CMD_PARK', 2: 'GEAR_CMD_REVERSE', 3: 'GEAR_CMD_NEUTRAL', 4:
-// 'GEAR_CMD_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_CMD',
-// 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
-// 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+// 'GEAR_CMD_DRIVE'}, 'is_signed_var': False, 'len': 8, 'name': 'GEAR_CMD',
+// 'offset': 0.0, 'order': 'intel', 'physical_range': '[1|4]', 'physical_unit':
+// '', 'precision': 1.0, 'type': 'enum'}
 void Gearcommand114::set_p_gear_cmd(uint8_t* data,
                                     Gear_command_114::Gear_cmdType gear_cmd) {
   int x = gear_cmd;
 
   Byte to_set(data + 0);
-  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
+  to_set.set_value(x, 0, 8);
 }
 
 }  // namespace ch

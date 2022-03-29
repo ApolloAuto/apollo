@@ -16,7 +16,6 @@
 #include "modules/task_manager/task_manager_component.h"
 
 #include "modules/task_manager/proto/task_manager_config.pb.h"
-
 #include "cyber/time/rate.h"
 
 namespace apollo {
@@ -27,6 +26,7 @@ using apollo::cyber::Rate;
 using apollo::localization::LocalizationEstimate;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
+using apollo::planning::ADCTrajectory;
 
 bool TaskManagerComponent::Init() {
   TaskManagerConfig task_manager_conf;
@@ -68,9 +68,9 @@ bool TaskManagerComponent::Init() {
 }
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
-  task_name_ = task->task_name();
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING) {
+      task->task_type() != PARKING_ROUTING &&
+      task->task_type() != DEAD_END_ROUTING) {
     AERROR << "Task type is not cycle_routing or parking_routing.";
     return false;
   }
@@ -135,6 +135,20 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
          }
       AERROR << "plot verification failed, please select suitable plot!";
       return false;
+    }
+  } else if (task->task_type() == DEAD_END_ROUTING) {
+    dead_end_routing_manager_ = std::make_shared<DeadEndRoutingManager>();
+    dead_end_routing_manager_->Init(task->dead_end_routing_task());
+    routing_request_ = task->dead_end_routing_task().routing_request_in();
+    Rate rate(1.0);
+    while (dead_end_routing_manager_->GetNumber() > 0) {
+      if (dead_end_routing_manager_->GetNewRouting(localization_.pose(),
+                                                   &routing_request_)) {
+        common::util::FillHeader(node_->Name(), &routing_request_);
+        request_writer_->Write(routing_request_);
+        rate.Sleep();
+      }
+    rate.Sleep();
     }
   }
   return true;

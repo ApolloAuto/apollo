@@ -319,7 +319,7 @@ class ControlInfo(object):
         if event.key == 'q' or event.key == 'Q':
             plt.close('all')
         if event.key == 'a' or event.key == 'A':
-            self.longitutidinal()
+            self.longitudinal()
         if event.key == 'z' or event.key == 'Z':
             self.lateral()
 

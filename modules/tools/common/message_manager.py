@@ -40,7 +40,7 @@ class MessageType:
         self.msg_type = msg_type
 
     def instance(self):
-        return self.__msg_type()
+        return self.msg_type()
 
     def parse_file(self, filename):
         value = self.instance()

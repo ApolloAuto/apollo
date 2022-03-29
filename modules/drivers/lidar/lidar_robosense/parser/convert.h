@@ -15,11 +15,12 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <memory>
 
-#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
 
 namespace apollo {
 namespace drivers {

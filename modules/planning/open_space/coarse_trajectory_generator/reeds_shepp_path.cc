@@ -462,7 +462,7 @@ bool ReedShepp::CCCC(const double x, const double y, const double phi,
 bool ReedShepp::CCSC(const double x, const double y, const double phi,
                      std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRSL1_param;
-  LRLRn(x, y, phi, &LRSL1_param);
+  LRSL(x, y, phi, &LRSL1_param);
   double LRSL1_lengths[4] = {LRSL1_param.t, -0.5 * M_PI, -LRSL1_param.u,
                              LRSL1_param.v};
   char LRSL1_types[] = "LRSL";
@@ -473,7 +473,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL2_param;
-  LRLRn(-x, y, -phi, &LRSL2_param);
+  LRSL(-x, y, -phi, &LRSL2_param);
   double LRSL2_lengths[4] = {-LRSL2_param.t, 0.5 * M_PI, -LRSL2_param.u,
                              -LRSL2_param.v};
   char LRSL2_types[] = "LRSL";
@@ -484,7 +484,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL3_param;
-  LRLRn(x, -y, -phi, &LRSL3_param);
+  LRSL(x, -y, -phi, &LRSL3_param);
   double LRSL3_lengths[4] = {LRSL3_param.t, -0.5 * M_PI, LRSL3_param.u,
                              LRSL3_param.v};
   char LRSL3_types[] = "RLSR";
@@ -495,7 +495,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL4_param;
-  LRLRn(-x, -y, phi, &LRSL4_param);
+  LRSL(-x, -y, phi, &LRSL4_param);
   double LRSL4_lengths[4] = {-LRSL4_param.t, -0.5 * M_PI, -LRSL4_param.u,
                              -LRSL4_param.v};
   char LRSL4_types[] = "RLSR";
@@ -506,7 +506,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR1_param;
-  LRLRp(x, y, phi, &LRSR1_param);
+  LRSR(x, y, phi, &LRSR1_param);
   double LRSR1_lengths[4] = {LRSR1_param.t, -0.5 * M_PI, LRSR1_param.u,
                              LRSR1_param.v};
   char LRSR1_types[] = "LRSR";
@@ -517,7 +517,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR2_param;
-  LRLRp(-x, y, -phi, &LRSR2_param);
+  LRSR(-x, y, -phi, &LRSR2_param);
   double LRSR2_lengths[4] = {-LRSR2_param.t, 0.5 * M_PI, -LRSR2_param.u,
                              -LRSR2_param.v};
   char LRSR2_types[] = "LRSR";
@@ -528,7 +528,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR3_param;
-  LRLRp(x, -y, -phi, &LRSR3_param);
+  LRSR(x, -y, -phi, &LRSR3_param);
   double LRSR3_lengths[4] = {LRSR3_param.t, -0.5 * M_PI, LRSR3_param.u,
                              LRSR3_param.v};
   char LRSR3_types[] = "RLSL";
@@ -539,7 +539,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR4_param;
-  LRLRp(-x, -y, phi, &LRSR4_param);
+  LRSR(-x, -y, phi, &LRSR4_param);
   double LRSR4_lengths[4] = {-LRSR4_param.t, 0.5 * M_PI, -LRSR4_param.u,
                              -LRSR4_param.v};
   char LRSR4_types[] = "RLSL";
@@ -554,7 +554,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   double yb = x * std::sin(phi) - y * std::cos(phi);
 
   RSPParam LRSL5_param;
-  LRLRn(xb, yb, phi, &LRSL5_param);
+  LRSL(xb, yb, phi, &LRSL5_param);
   double LRSL5_lengths[4] = {LRSL5_param.v, LRSL5_param.u, -0.5 * M_PI,
                              LRSL5_param.t};
   char LRSL5_types[] = "LSRL";
@@ -565,7 +565,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL6_param;
-  LRLRn(-xb, yb, -phi, &LRSL6_param);
+  LRSL(-xb, yb, -phi, &LRSL6_param);
   double LRSL6_lengths[4] = {-LRSL6_param.v, -LRSL6_param.u, 0.5 * M_PI,
                              -LRSL6_param.t};
   char LRSL6_types[] = "LSRL";
@@ -576,7 +576,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL7_param;
-  LRLRn(xb, -yb, -phi, &LRSL7_param);
+  LRSL(xb, -yb, -phi, &LRSL7_param);
   double LRSL7_lengths[4] = {LRSL7_param.v, LRSL7_param.u, -0.5 * M_PI,
                              LRSL7_param.t};
   char LRSL7_types[] = "RSLR";
@@ -587,7 +587,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSL8_param;
-  LRLRn(-xb, -yb, phi, &LRSL8_param);
+  LRSL(-xb, -yb, phi, &LRSL8_param);
   double LRSL8_lengths[4] = {-LRSL8_param.v, -LRSL8_param.u, 0.5 * M_PI,
                              -LRSL8_param.t};
   char LRSL8_types[] = "RSLR";
@@ -598,7 +598,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR5_param;
-  LRLRp(xb, yb, phi, &LRSR5_param);
+  LRSR(xb, yb, phi, &LRSR5_param);
   double LRSR5_lengths[4] = {LRSR5_param.v, LRSR5_param.u, -0.5 * M_PI,
                              LRSR5_param.t};
   char LRSR5_types[] = "RSRL";
@@ -609,7 +609,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR6_param;
-  LRLRp(-xb, yb, -phi, &LRSR6_param);
+  LRSR(-xb, yb, -phi, &LRSR6_param);
   double LRSR6_lengths[4] = {-LRSR6_param.v, -LRSR6_param.u, 0.5 * M_PI,
                              -LRSR6_param.t};
   char LRSR6_types[] = "RSRL";
@@ -620,7 +620,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR7_param;
-  LRLRp(xb, -yb, -phi, &LRSR7_param);
+  LRSR(xb, -yb, -phi, &LRSR7_param);
   double LRSR7_lengths[4] = {LRSR7_param.v, LRSR7_param.u, -0.5 * M_PI,
                              LRSR7_param.t};
   char LRSR7_types[] = "LSLR";
@@ -631,7 +631,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
   }
 
   RSPParam LRSR8_param;
-  LRLRp(-xb, -yb, phi, &LRSR8_param);
+  LRSR(-xb, -yb, phi, &LRSR8_param);
   double LRSR8_lengths[4] = {-LRSR8_param.v, -LRSR8_param.u, 0.5 * M_PI,
                              -LRSR8_param.t};
   char LRSR8_types[] = "LSLR";

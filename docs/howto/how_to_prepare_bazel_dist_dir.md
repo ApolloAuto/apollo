@@ -1,7 +1,7 @@
 # How to Prepare Bazel Distribution Directory
 
-This document describes the steps to prepare Bazel distribution directory (See
-[Ref](https://docs.bazel.build/versions/master/guide.html#distribution-files-directories).)
+This document describes the steps to prepare Bazel
+[distribution directory](https://docs.bazel.build/versions/master/guide.html#distribution-files-directories)
 for Apollo.
 
 ## Introduction

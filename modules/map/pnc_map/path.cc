@@ -679,7 +679,7 @@ InterpolatedIndex Path::GetLaneIndexFromS(double s) const {
 std::vector<hdmap::LaneSegment> Path::GetLaneSegments(
     const double start_s, const double end_s) const {
   std::vector<hdmap::LaneSegment> lanes;
-  if (start_s + kMathEpsilon < end_s) {
+  if (start_s + kMathEpsilon > end_s) {
     return lanes;
   }
   auto start_index = GetLaneIndexFromS(start_s);

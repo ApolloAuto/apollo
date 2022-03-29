@@ -70,8 +70,8 @@
  
  - 根据自身情况，修改rules文件，摄像头的rules文件示例如下所示(这里只包含了两个摄像头的规则文件，如需用到3个摄像头，可参照格式自行添加)：
 	```
-	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", MODE="0666", SYMLINK+="camera/front_6mm", OWNER="apollo", GROUP="apollo"
-	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-2:1.0", MODE="0666", SYMLINK+="camera/front_12mm", OWNER="apollo", GROUP="apollo"
+	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", ATTR{index}=="0", MODE="0666", SYMLINK+="camera/front_6mm", OWNER="apollo", GROUP="apollo"
+	SUBSYSTEM=="video4linux", SUBSYSTEMS=="usb", KERNELS=="2-2:1.0", ATTR{index}=="0", MODE="0666", SYMLINK+="camera/front_12mm", OWNER="apollo", GROUP="apollo"
 	```
 其中，第一条代表连接到USB端口号为`2-1:1.0`的摄像头对应的软链接文件为`camera/front_6mm`；第二条代表连接到USB端口号为`2-2:1.0`的摄像头对应的软链接文件为`camera/front_12mm`。
 
@@ -92,7 +92,10 @@
  
 ### 摄像头的启动
 #### 1. 检查摄像头是否被系统识别  
-在摄像头与工控机正常连接的基础上，执行`ls /dev/video*`指令，查看摄像头是否被识别， 如果摄像头设备已经被识别，则会显示以`video`开头的设备名称，否则的话，请检查摄像头与工控机的连线是否可靠。
+- 在摄像头与工控机正常连接的基础上，执行`ls /dev/video*`指令，查看摄像头是否被识别， 如果摄像头设备已经被识别，则会显示以`video`开头的设备名称，否则的话，请检查摄像头与工控机的连线是否可靠。
+- 在linux系统终端中输入`cheese`命令，打卡cheese工具查看图像是否正常输出。注意设置正确的相机分辨率。在屏幕左上角选择`cheese->preferences->webcam`来设置分辨率。开发套件相机默认的分辨率为1920*1080
+
+	![camera_integration_cheese](images/camera_integration_cheese.png)
 
 
 #### 2. 检查是否存在摄像头软连接文件

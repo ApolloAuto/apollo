@@ -20,11 +20,11 @@
 #include <string>
 #include <vector>
 
+#include "modules/routing/proto/routing_config.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/core/navigator.h"
-#include "modules/routing/proto/routing_config.pb.h"
 
 namespace apollo {
 namespace routing {
@@ -83,7 +83,7 @@ class Routing {
    * spot.
    */
   void GetAllOverlapObjectIds(const hdmap::Id &parking_spot_id,
-                              std::vector<std::string> &lane_ids) const;
+                              std::vector<std::string> *lane_ids) const;
 
  private:
   std::unique_ptr<Navigator> navigator_ptr_;

@@ -1,4 +1,5 @@
 import polyval from 'compute-polynomial';
+import _ from 'lodash';
 
 export function copyProperty(toObj, fromObj) {
   for (const property in fromObj) {
@@ -108,7 +109,7 @@ export function pointOnVectorRight(p, p1, p2) {
 }
 
 export function directionVectorCrossProduct(p1, p2, abs = false) {
-  //p1 X p2
+  // p1 X p2
   let crossProduct = p1.x * p2.y - p1.y * p2.x;
   if (abs) {
     crossProduct = Math.abs(crossProduct);
@@ -150,14 +151,14 @@ export function getPointDistance(p1, p2) {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
 }
 
-export function directionSameWithVector(p0, p1,vector) {
+export function directionSameWithVector(p0, p1, vector) {
   return directionVectorDotProduct(vector, {
     x: p1.x - p0.x,
     y: p1.y - p0.y,
   }) > 0;
 }
 
-function getPointInFrontOf(points, p,vector) {
+function getPointInFrontOf(points, p, vector) {
   return _.findIndex(points, point =>
     directionVectorDotProduct({
       x: point.x - p.x,
@@ -166,15 +167,15 @@ function getPointInFrontOf(points, p,vector) {
 }
 
 function getPointBehind(points, p, vector) {
-  return  _.findLastIndex(points, point =>
+  return _.findLastIndex(points, point =>
     directionVectorDotProduct({
       x: p.x - point.x,
       y: p.y - point.y
     }, vector) > 0);
 }
 
-export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector) {
-  let index = getPointInFrontOf(points, p, vector);
+export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector = null) {
+  let index = _.isEmpty(vector) ? 0 : getPointInFrontOf(points, p, vector);
   if (index !== -1) {
     while (index <= points.length - 1) {
       if (getPointDistance(p, points[index]) >= threshold) {
@@ -186,8 +187,8 @@ export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector
   return index;
 }
 
-export function getBehindPointIndexDistanceApart(threshold, points, p, vector) {
-  let index = getPointBehind(points, p, vector);
+export function getBehindPointIndexDistanceApart(threshold, points, p, vector = null) {
+  let index = _.isEmpty(vector) ? points.length - 1 : getPointBehind(points, p, vector);
   if (index !== -1) {
     while (index >= 0) {
       if (getPointDistance(p, points[index]) >= threshold) {
@@ -197,4 +198,62 @@ export function getBehindPointIndexDistanceApart(threshold, points, p, vector) {
     }
   }
   return index;
+}
+
+// -1 means succeed push(last)
+// 1 means predecessor unshift(first)
+// 0 means no relation
+export function determineTheRelationBetweenLanes(predecessorId, successorId, lane) {
+  const laneId = lane.id;
+  if (!_.isEmpty(successorId) && _.isEqual(successorId[0], laneId)) {
+    return -1;
+  }
+  if (!_.isEmpty(predecessorId) && _.isEqual(predecessorId[0], laneId)) {
+    return 1;
+  }
+  return 0;
+}
+
+export function getLaneArrayFirstAndLastPoint(lane1, lane2) {
+  const first = getLaneFirstPoint(lane1);
+  const last = getLaneLastPoint(lane2);
+  if (_.isEmpty(first) || _.isEmpty(last)) {
+    return null;
+  }
+  return [first, last];
+}
+
+export function getLaneFirstAndLastPoint(lane) {
+  const first = getLaneFirstPoint(lane);
+  const last = getLaneLastPoint(lane);
+  if (_.isEmpty(first) || _.isEmpty(last)) {
+    return null;
+  }
+  return [first, last];
+}
+
+// return true if lane complete in
+export function isLaneCompleteInRectangle(points, lanePoint) {
+  if (_.isEmpty(lanePoint)) {
+    return null;
+  }
+  const firstIn = IsPointInRectangle(points, lanePoint[0]);
+  const lastIn = IsPointInRectangle(points, lanePoint[1]);
+  if (firstIn && lastIn) {
+    return true;
+  }
+  return false;
+}
+
+export function determinLaneDirection(laneEndPoint, point) {
+  return (getPointDistance(laneEndPoint[0], point) > getPointDistance(laneEndPoint[1], point))
+    ? 'in' : 'out';
+}
+
+export function getLaneLastPoint(lane) {
+  return _.last(_.get(_.last(_.get(lane, 'centralCurve.segment')), 'lineSegment.point'));
+}
+
+export function getLaneFirstPoint(lane) {
+  return _.get(lane, 'centralCurve.segment.0.lineSegment.point.0');
 }

@@ -188,6 +188,8 @@ bool PointCloudPreprocessor::TransformCloud(
   return true;
 }
 
+PERCEPTION_REGISTER_POINTCLOUDPREPROCESSOR(PointCloudPreprocessor);
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

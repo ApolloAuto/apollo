@@ -18,7 +18,7 @@
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 source "${CURR_DIR}/docker_base.sh"
 
-VERSION_X86_64="cyber-x86_64-18.04-20210202_1105"
+VERSION_X86_64="cyber-x86_64-18.04-20210315_1535"
 TESTING_VERSION_X86_64="cyber-x86_64-18.04-testing-20210108_1510"
 
 #L4T

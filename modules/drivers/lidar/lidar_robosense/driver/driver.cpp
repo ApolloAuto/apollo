@@ -23,6 +23,8 @@
 #include <memory>
 #include <string>
 
+#include "cyber/cyber.h"
+
 namespace apollo {
 namespace drivers {
 namespace robosense {

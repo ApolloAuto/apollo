@@ -81,3 +81,5 @@ RUN apt-get -y update \
 # Restore
 RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
 RUN ldconfig
+
+ENV PYTHONPATH /apollo:$PYTHONPATH

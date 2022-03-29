@@ -303,6 +303,10 @@
                   "type": "apollo.prediction.ObstaclePriority",
                   "id": 33
                 },
+                "interactiveTag": {
+                  "type": "apollo.prediction.ObstacleInteractiveTag",
+                  "id": 40
+                },
                 "source": {
                   "type": "apollo.perception.PerceptionObstacle.Source",
                   "id": 36,
@@ -1406,7 +1410,8 @@
                   "values": {
                     "TURN_NONE": 0,
                     "TURN_LEFT": 1,
-                    "TURN_RIGHT": 2
+                    "TURN_RIGHT": 2,
+                    "TURN_HAZARD_WARNING": 3
                   }
                 }
               }
@@ -4097,7 +4102,8 @@
                     "NOT_DEFINED": 0,
                     "PARKING": 1,
                     "PULL_OVER": 2,
-                    "NARROW_STREET_U_TURN": 3
+                    "NARROW_STREET_U_TURN": 3,
+                    "DEAD_END_PRE_STOP": 4
                   }
                 }
               }
@@ -4208,7 +4214,8 @@
                     "PARKING": 1,
                     "PULL_OVER": 2,
                     "PARK_AND_GO": 3,
-                    "NARROW_STREET_U_TURN": 4
+                    "NARROW_STREET_U_TURN": 4,
+                    "DEAD_END": 5
                   }
                 }
               }
@@ -4843,6 +4850,13 @@
                     "default": 10
                   }
                 },
+                "trajKappaContraintRatio": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.7
+                  }
+                },
                 "gridAStarXyResolution": {
                   "type": "double",
                   "id": 15,
@@ -5368,6 +5382,16 @@
                 }
               }
             },
+            "JucType": {
+              "values": {
+                "UNKNOWN": 0,
+                "IN_ROAD": 1,
+                "CROSS_ROAD": 2,
+                "FORK_ROAD": 3,
+                "MAIN_SIDE": 4,
+                "DEAD_END": 5
+              }
+            },
             "RSSInfo": {
               "fields": {
                 "isRssSafe": {
@@ -5422,19 +5446,13 @@
                   "type": "double",
                   "id": 3
                 },
-                "trajectoryPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.TrajectoryPoint",
-                  "id": 12
-                },
                 "estop": {
                   "type": "EStop",
                   "id": 6
                 },
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 13
+                "debug": {
+                  "type": "apollo.planning_internal.Debug",
+                  "id": 8
                 },
                 "isReplan": {
                   "type": "bool",
@@ -5443,13 +5461,19 @@
                     "default": false
                   }
                 },
-                "replanReason": {
-                  "type": "string",
-                  "id": 22
-                },
                 "gear": {
                   "type": "apollo.canbus.Chassis.GearPosition",
                   "id": 10
+                },
+                "trajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 12
+                },
+                "pathPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.PathPoint",
+                  "id": 13
                 },
                 "decision": {
                   "type": "apollo.planning.DecisionResult",
@@ -5462,10 +5486,6 @@
                 "routingHeader": {
                   "type": "apollo.common.Header",
                   "id": 16
-                },
-                "debug": {
-                  "type": "apollo.planning_internal.Debug",
-                  "id": 8
                 },
                 "rightOfWayStatus": {
                   "type": "RightOfWayStatus",
@@ -5491,10 +5511,18 @@
                     "default": "UNKNOWN"
                   }
                 },
+                "replanReason": {
+                  "type": "string",
+                  "id": 22
+                },
                 "targetLaneId": {
                   "rule": "repeated",
                   "type": "apollo.hdmap.Id",
                   "id": 23
+                },
+                "carInDeadEnd": {
+                  "type": "bool",
+                  "id": 24
                 },
                 "rssInfo": {
                   "type": "RSSInfo",
@@ -6103,6 +6131,24 @@
                 }
               }
             },
+            "ScenarioDeadEndTurnAroundConfig": {
+              "fields": {
+                "deadEndStartRange": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
             "ScenarioYieldSignConfig": {
               "fields": {
                 "startYieldSignScenarioDistance": {
@@ -6152,7 +6198,8 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "trafficLightUnprotectedRightTurnConfig",
                     "valetParkingConfig",
-                    "yieldSignConfig"
+                    "yieldSignConfig",
+                    "deadendTurnaroundConfig"
                   ]
                 }
               },
@@ -6217,6 +6264,10 @@
                   "type": "ScenarioYieldSignConfig",
                   "id": 15
                 },
+                "deadendTurnaroundConfig": {
+                  "type": "ScenarioDeadEndTurnAroundConfig",
+                  "id": 18
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
@@ -6248,7 +6299,8 @@
                     "EMERGENCY_STOP": 12,
                     "NARROW_STREET_U_TURN": 13,
                     "PARK_AND_GO": 14,
-                    "LEARNING_MODEL_SAMPLE": 15
+                    "LEARNING_MODEL_SAMPLE": 15,
+                    "DEADEND_TURNAROUND": 16
                   }
                 },
                 "StageType": {
@@ -6279,6 +6331,8 @@
                     "EMERGENCY_STOP_STANDBY": 611,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 700,
                     "VALET_PARKING_PARKING": 701,
+                    "DEADEND_TURNAROUND_APPROACHING_TURNING_POINT": 1100,
+                    "DEADEND_TURNAROUND_TURNING": 1101,
                     "PARK_AND_GO_CHECK": 800,
                     "PARK_AND_GO_CRUISE": 801,
                     "PARK_AND_GO_ADJUST": 802,
@@ -10496,6 +10550,13 @@
                 "PARALLEL_PARKING": 1
               }
             },
+            "DeadEndRoutingType": {
+              "values": {
+                "ROUTING_OTHER": 0,
+                "ROUTING_IN": 1,
+                "ROUTING_OUT": 2
+              }
+            },
             "ParkingInfo": {
               "fields": {
                 "parkingSpaceId": {
@@ -10513,6 +10574,18 @@
                 "cornerPoint": {
                   "type": "apollo.hdmap.Polygon",
                   "id": 4
+                }
+              }
+            },
+            "DeadEndInfo": {
+              "fields": {
+                "deadEndRoutingType": {
+                  "type": "DeadEndRoutingType",
+                  "id": 1
+                },
+                "targetPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 2
                 }
               }
             },
@@ -10554,6 +10627,10 @@
                 "parkingInfo": {
                   "type": "ParkingInfo",
                   "id": 7
+                },
+                "deadEndInfo": {
+                  "type": "DeadEndInfo",
+                  "id": 8
                 }
               }
             },
@@ -10885,6 +10962,22 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 4
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "IN_ROAD": 1,
+                    "CROSS_ROAD": 2,
+                    "FORK_ROAD": 3,
+                    "MAIN_SIDE": 4,
+                    "DEAD_END": 5
+                  }
                 }
               }
             },
@@ -11825,6 +11918,25 @@
                 }
               }
             },
+            "ObstacleInteractiveTag": {
+              "fields": {
+                "interactiveTag": {
+                  "type": "InteractiveTag",
+                  "id": 37,
+                  "options": {
+                    "default": "NONINTERACTION"
+                  }
+                }
+              },
+              "nested": {
+                "InteractiveTag": {
+                  "values": {
+                    "INTERACTION": 1,
+                    "NONINTERACTION": 2
+                  }
+                }
+              }
+            },
             "Trajectory": {
               "fields": {
                 "probability": {
@@ -11971,6 +12083,10 @@
                   "type": "ObstaclePriority",
                   "id": 25
                 },
+                "interactiveTag": {
+                  "type": "ObstacleInteractiveTag",
+                  "id": 37
+                },
                 "isNearJunction": {
                   "type": "bool",
                   "id": 29,
@@ -11997,6 +12113,14 @@
                   "rule": "repeated",
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 34
+                },
+                "adcTimestamp": {
+                  "type": "double",
+                  "id": 38
+                },
+                "adcLocalization": {
+                  "type": "apollo.perception.PerceptionObstacle",
+                  "id": 39
                 },
                 "surroundingLaneId": {
                   "rule": "repeated",
@@ -12475,6 +12599,10 @@
                 "priority": {
                   "type": "ObstaclePriority",
                   "id": 6
+                },
+                "interactiveTag": {
+                  "type": "ObstacleInteractiveTag",
+                  "id": 9
                 },
                 "isStatic": {
                   "type": "bool",

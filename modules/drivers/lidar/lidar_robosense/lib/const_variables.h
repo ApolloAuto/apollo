@@ -96,6 +96,7 @@ const float INTENSITY_CAL[7][32] = {
      6.25,  9.584, 8.288, 14.93, 6.861, 0,     0,     0,     0,     0,     0,
      0,     0,     0,     0,     0,     0,     0,     0,     0,     0}};
 // suteng end
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

@@ -65,11 +65,11 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   return perception_param.gpu_id();
 }
 
-bool SetCameraHeight(const std::string &sensor_name,
-                     const std::string &params_dir,
-                     const std::string &lidar_sensor_name,
-                     float default_camera_height,
-                     float *camera_height) {
+static bool SetCameraHeight(const std::string &sensor_name,
+                            const std::string &params_dir,
+                            const std::string &lidar_sensor_name,
+                            float default_camera_height,
+                            float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
   try {
@@ -99,8 +99,8 @@ bool SetCameraHeight(const std::string &sensor_name,
 }
 
 // @description: load camera extrinsics from yaml file
-bool LoadExtrinsics(const std::string &yaml_file,
-                    Eigen::Matrix4d *camera_extrinsic) {
+static bool LoadExtrinsics(const std::string &yaml_file,
+                           Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " does not exist!";
     return false;
@@ -153,10 +153,10 @@ bool LoadExtrinsics(const std::string &yaml_file,
 }
 
 // @description: get project matrix
-bool GetProjectMatrix(
-    const std::vector<std::string> &camera_names,
-    const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
+static bool GetProjectMatrix(
+      const std::vector<std::string> &camera_names,
+      const EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+      const EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   // TODO(techoe): This condition should be removed.
   if (camera_names.size() != 2) {
@@ -248,9 +248,12 @@ bool FusionCameraDetectionComponent::Init() {
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
   if (enable_cipv_) {
-    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level_);
+    camera::BaseCipv* cipv = camera::BaseCipvRegisterer::
+        GetInstanceByName(cipv_name_);
+    CHECK_NOTNULL(cipv);
+    cipv_.reset(cipv);
+    ACHECK(cipv_->Init(homography_im2car_, cipv_init_options_))
+               << "camera cipv init error";
   }
 
   if (enable_visualization_) {
@@ -393,20 +396,23 @@ int FusionCameraDetectionComponent::InitConfig() {
   ts_diff_ = fusion_camera_detection_param.ts_diff();
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
 
-  min_laneline_length_for_cipv_ = static_cast<float>(
+  cipv_init_options_.min_laneline_length_for_cipv = static_cast<float>(
       fusion_camera_detection_param.min_laneline_length_for_cipv());
-  average_lane_width_in_meter_ = static_cast<float>(
+  cipv_init_options_.average_lane_width_in_meter = static_cast<float>(
       fusion_camera_detection_param.average_lane_width_in_meter());
-  max_vehicle_width_in_meter_ = static_cast<float>(
+  cipv_init_options_.max_vehicle_width_in_meter = static_cast<float>(
       fusion_camera_detection_param.max_vehicle_width_in_meter());
-  average_frame_rate_ =
+  cipv_init_options_.average_frame_rate =
       static_cast<float>(fusion_camera_detection_param.average_frame_rate());
 
-  image_based_cipv_ =
+  cipv_init_options_.image_based_cipv =
       static_cast<float>(fusion_camera_detection_param.image_based_cipv());
 
-  debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
+  cipv_init_options_.debug_level =
+      static_cast<int>(fusion_camera_detection_param.debug_level());
   enable_cipv_ = fusion_camera_detection_param.enable_cipv();
+
+  cipv_name_ = fusion_camera_detection_param.cipv();
 
   std::string format_str = R"(
       FusionCameraDetectionComponent InitConfig success
@@ -767,7 +773,7 @@ int FusionCameraDetectionComponent::InternalProc(
 
   //  Determine CIPV
   if (enable_cipv_) {
-    CipvOptions cipv_options;
+    camera::CipvOptions cipv_options;
     if (motion_buffer_ != nullptr) {
       if (motion_buffer_->size() == 0) {
         AWARN << "motion_buffer_ is empty";
@@ -779,16 +785,8 @@ int FusionCameraDetectionComponent::InternalProc(
       }
       ADEBUG << "[CIPV] velocity " << cipv_options.velocity
              << ", yaw rate: " << cipv_options.yaw_rate;
-      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options, world2camera,
-                          &camera_frame.tracked_objects);
 
-      // Get Drop points
-      if (motion_buffer_->size() > 0) {
-        cipv_.CollectDrops(motion_buffer_, world2camera,
-                           &camera_frame.tracked_objects);
-      } else {
-        AWARN << "motion_buffer is empty";
-      }
+      cipv_->Process(&camera_frame, cipv_options, world2camera, motion_buffer_);
     }
   }
 

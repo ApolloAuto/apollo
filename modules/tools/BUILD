@@ -11,8 +11,7 @@ install(
         "//modules/tools/create_map:py_files",
         "//modules/tools/map_gen:py_files",
         "//modules/tools/record_play:py_files",
-        "//modules/tools/sensor_calibration:config",
-        "//modules/tools/sensor_calibration:py_files",
+        "//modules/tools/sensor_calibration:runtime_files",
         "//modules/tools/vehicle_calibration:runtime_files",
     ],
     rename = {

@@ -21,15 +21,12 @@ cc_library(
     name = "region_output",
     srcs = [
         "region_output.cc",
-        ":region_output_cuda",
     ],
     hdrs = ["region_output.h"],
     deps = [
         ":object_maintainer",
+        ":region_output_cuda",
         "//cyber",
-        "//modules/perception/base",
-        "//modules/perception/camera/common",
-        "//modules/perception/camera/proto:yolo_cc_proto",
         "@local_config_cuda//cuda:cudart",
     ],
 )
@@ -53,6 +50,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
     ],
+    alwayslink = True,
 )
 
 cc_library(

@@ -279,14 +279,16 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
 
     if (std::abs(traj[time_match_index].path_point().s() -
-                 traj.at(current_trajectory_point_index).path_point().s()) < 2)
+                 traj.at(current_trajectory_point_index).path_point().s()) <
+        2) {
       current_trajectory_point_index = time_match_index;
-    else {
+    } else {
       last_index_ = current_trajectory_point_index;
       last_time_ = now_time;
     }
-  } else
+  } else {
     last_index_ = -1;
+  }
   auto* mutable_trajectory =
       open_space_info_ptr->mutable_stitched_trajectory_result();
   AdjustRelativeTimeAndS(open_space_info.partitioned_trajectories(),
@@ -692,6 +694,11 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
       current_gear_status->gear_shift_period_finished = true;
       current_gear_status->gear_shift_period_started = true;
     } else {
+      // send N gear to protect idle
+      if (!last_frame->open_space_info().open_space_provider_success()) {
+        current_gear_status->gear_shift_position =
+            canbus::Chassis::GEAR_NEUTRAL;
+      }
       GenerateGearShiftTrajectory(current_gear_status->gear_shift_position,
                                   gear_switch_idle_time_trajectory);
       current_gear_status->gear_shift_period_time =

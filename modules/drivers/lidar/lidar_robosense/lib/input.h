@@ -15,13 +15,16 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
-#include <cstdio>
-#include <unistd.h>
 
-#include "cyber/cyber.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+
+namespace apollo {
+namespace drivers {
+namespace suteng {
+class SutengPacket;
+}
+}  // namespace drivers
+}  // namespace apollo
 
 namespace apollo {
 namespace drivers {
@@ -62,6 +65,7 @@ class Input {
   bool exract_nmea_time_from_packet(const NMEATimePtr& nmea_time,
                                     const uint8_t* bytes);
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

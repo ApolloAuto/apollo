@@ -41,11 +41,11 @@ modules/tools/ota/vehicle_info.pb.txt
 docker/build/syspkgs.txt
 
 # Localization
-modules/localization/msf/local_map/test_data/ndt_map/map_data/
+modules/localization/msf/local_map/test_data/ndt_map/map_data
 
 # Doxygen
-cyber/doxy-docs/build/
-cyber/doxy-docs/xml/
+cyber/doxy-docs/build
+cyber/doxy-docs/xml
 
 # Esd can lib
 third_party/can_card_library/esd_can/include
@@ -54,15 +54,11 @@ third_party/can_card_library/esd_can/lib
 # Map data files
 modules/map/data
 
-#dockerfile tarballs
-docker/build/archive/
-
 # python proto
 *_pb2.py
 
 # calibration files
-modules/calibration/data/
-/output
+modules/calibration/data
 
 # Data bag
 docs/demo_guide/*.bag

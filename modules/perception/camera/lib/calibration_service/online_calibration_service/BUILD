@@ -12,6 +12,7 @@ cc_library(
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
     ],
+    alwayslink = True,
 )
 
 cpplint()

@@ -636,13 +636,7 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
           .delta_t();
 
   const double total_t = 2 * path_length / max_reverse_acc * 10;
-
-  if (total_t + delta_t >= delta_t * std::numeric_limits<size_t>::max()) {
-    AERROR << "Number of knots overflow. total_t: " << total_t
-           << ", delta_t: " << delta_t;
-    return false;
-  }
-
+  ADEBUG << "total_t is : " << total_t;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(

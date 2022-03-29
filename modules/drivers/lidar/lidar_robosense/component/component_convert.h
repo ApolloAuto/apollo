@@ -21,10 +21,10 @@
 #include <thread>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-#include "cyber/cyber.h"
-#include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
+#include "cyber/cyber.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/convert.h"
 
 namespace apollo {
 namespace drivers {
@@ -108,6 +108,7 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
 };
 
 CYBER_REGISTER_COMPONENT(CompRoboConvert);
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

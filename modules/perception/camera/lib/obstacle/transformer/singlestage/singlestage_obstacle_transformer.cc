@@ -250,7 +250,7 @@ float SingleStageObstacleTransformer::CenterPointFromBbox(const float *bbox,
     return false;
   }
 
-  float f = k_mat[4] / 2;
+  float f = (k_mat[0] + k_mat[4]) / 2;
   float depth = f * hwl[0] * common::IRec(height_bbox);
 
   // Compensate from the nearest vertical edge to center

@@ -32,11 +32,11 @@ class Gearstatus514 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'description': 'PRND control(Status)', 'enum': {1:
-  // 'GEAR_STS_PARK', 2: 'GEAR_STS_REVERSE', 3: 'GEAR_STS_NEUTRAL', 4:
-  // 'GEAR_STS_DRIVE'}, 'precision': 1.0, 'len': 8, 'name': 'GEAR_STS',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[1|4]', 'bit': 0,
-  // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // config detail: {'bit': 0, 'description': 'PRND control(Status)', 'enum':
+  // {1: 'GEAR_STS_PARK', 2: 'GEAR_STS_REVERSE', 3: 'GEAR_STS_NEUTRAL', 4:
+  // 'GEAR_STS_DRIVE'}, 'is_signed_var': False, 'len': 8, 'name': 'GEAR_STS',
+  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[1|4]',
+  // 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Gear_status_514::Gear_stsType gear_sts(const std::uint8_t* bytes,
                                          const int32_t length) const;
 };

@@ -300,10 +300,10 @@ default_task_config: {
           delta_t: 0.2
         }
         delta_t: 0.5
-        is_near_destination_threshold: 0.1
+        is_near_destination_threshold: 1
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
-        is_near_destination_theta_threshold: 0.05
+        is_near_destination_theta_threshold: 0.1
       }
     }
   }
@@ -356,6 +356,7 @@ default_task_config: {
   path_bounds_decider_config {
     is_lane_borrowing: false
     is_pull_over: false
+    is_extend_lane_bounds_to_include_adc: false
     pull_over_destination_to_adc_buffer: 25.0
     pull_over_destination_to_pathend_buffer: 4.0
     pull_over_road_edge_buffer: 0.15
@@ -365,7 +366,7 @@ default_task_config: {
 default_task_config: {
   task_type: PATH_LANE_BORROW_DECIDER
   path_lane_borrow_decider_config {
-    allow_lane_borrowing: false
+    allow_lane_borrowing: true
   }
 }
 default_task_config: {

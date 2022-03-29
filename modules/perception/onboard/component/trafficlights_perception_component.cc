@@ -163,6 +163,8 @@ int TrafficLightsPerceptionComponent::InitConfig() {
       traffic_light_param.image_sys_ts_diff_threshold();
   preprocessor_init_options_.sync_interval_seconds =
       static_cast<float>(traffic_light_param.sync_interval_seconds());
+  tl_preprocessor_name_ = traffic_light_param.tl_preprocessor_name();
+
   camera_perception_init_options_.root_dir =
       traffic_light_param.camera_traffic_light_perception_conf_dir();
   camera_perception_init_options_.conf_file =
@@ -184,11 +186,11 @@ int TrafficLightsPerceptionComponent::InitConfig() {
 
 int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   // init preprocessor
-  preprocessor_.reset(new camera::TLPreprocessor);
-  if (!preprocessor_) {
-    AERROR << "TrafficLightsPerceptionComponent new preprocessor failed";
-    return cyber::FAIL;
-  }
+  camera::BaseTLPreprocessor* preprocessor =
+            camera::BaseTLPreprocessorRegisterer::
+            GetInstanceByName(tl_preprocessor_name_);
+  CHECK_NOTNULL(preprocessor);
+  preprocessor_.reset(preprocessor);
 
   preprocessor_init_options_.camera_names = camera_names_;
   if (!preprocessor_->Init(preprocessor_init_options_)) {

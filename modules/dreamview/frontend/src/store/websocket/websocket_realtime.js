@@ -463,7 +463,7 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  sendParkingRequest(start,waypoint,end, parkingInfo, laneWidth,cornerPoints,id, start_heading) {
+  sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, id, start_heading) {
     const request = {
       type: 'SendParkingRoutingRequest',
       start,
@@ -479,6 +479,26 @@ export default class RealtimeWebSocketEndpoint {
     if (id) {
       request.end.id = id;
     }
+    this.websocket.send(JSON.stringify(request));
+  }
+
+  sendDeadEndJunctionRoutingRequest(
+    start1, end1, start2, end2, inLaneIds, outLaneIds, routingPoint,
+  ) {
+    const request = {
+      type: 'SendDeadEndJunctionRoutingRequest',
+      start1,
+      end1,
+      start2,
+      end2,
+      inLaneIds,
+      outLaneIds,
+      routingPoint,
+    };
+    // construct lane way point with lane id for end1 start2
+    // are intersection point may get error lane id
+    request.end1.id = inLaneIds[0];
+    request.start2.id = outLaneIds[0];
     this.websocket.send(JSON.stringify(request));
   }
 }

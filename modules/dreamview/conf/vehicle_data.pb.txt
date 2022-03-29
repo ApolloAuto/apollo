@@ -11,6 +11,10 @@ data_files {
   dest_path: "/apollo/modules/canbus/conf"
 }
 data_files {
+  source_path: "canbus_dag"
+  dest_path: "/apollo/modules/canbus/dag"
+}
+data_files {
   source_path: "dreamview_conf/data_collection_table.pb.txt"
   dest_path: "/apollo/modules/dreamview/conf/data_collection_table.pb.txt"
 }
@@ -28,7 +32,7 @@ data_files {
 }
 data_files {
   source_path: "novatel_localization_extrinsics.yaml"
-  dest_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+  dest_path: "/apollo/modules/localization/msf/params"
 }
 data_files {
   source_path: "velodyne_params"
@@ -203,8 +207,8 @@ data_files {
   dest_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
 }
 data_files {
-  source_path: "perception_conf/velodyne16_segmentation_conf.pb.txt"
-  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
+  source_path: "perception_conf/velodyne16_detection_conf.pb.txt"
+  dest_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_detection_conf.pb.txt"
 }
 data_files {
   source_path: "perception_conf/recognition_conf.pb.txt"
@@ -213,4 +217,8 @@ data_files {
 data_files {
   source_path: "perception_conf/mlf_engine.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
+}
+data_files {
+  source_path: "perception_conf/lidar_obstacle_detection.conf"
+  dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline/velodyne16/lidar_obstacle_detection.conf"
 }

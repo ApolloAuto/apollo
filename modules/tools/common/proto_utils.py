@@ -41,10 +41,10 @@ def get_pb_from_bin_file(filename, pb_value):
 def get_pb_from_file(filename, pb_value):
     """Get a proto from given file by trying binary mode and text mode."""
     try:
-        return get_pb_from_bin_file(filename, pb_value)
+        return get_pb_from_text_file(filename, pb_value)        
     except:
         try:
-            return get_pb_from_text_file(filename, pb_value)
+            return get_pb_from_bin_file(filename, pb_value)
         except:
             print('Error: Cannot parse %s as binary or text proto' % filename)
     return None

@@ -38,7 +38,7 @@ class MlfEngine : public BaseMultiTargetTracker {
 
  public:
   MlfEngine() = default;
-  ~MlfEngine() = default;
+  virtual ~MlfEngine() = default;
 
   bool Init(const MultiTargetTrackerInitOptions& options =
                 MultiTargetTrackerInitOptions()) override;

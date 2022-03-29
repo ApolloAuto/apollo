@@ -43,20 +43,23 @@ bool LidarObstacleTracking::Init(
 
   LidarObstacleTrackingConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  multi_target_tracker_name_ = config.multi_target_tracker();
-  fusion_classifier_name_ = config.fusion_classifier();
 
-  multi_target_tracker_ = BaseMultiTargetTrackerRegisterer::GetInstanceByName(
-      multi_target_tracker_name_);
-  CHECK_NOTNULL(multi_target_tracker_);
+  BaseMultiTargetTracker* multi_target_tracker =
+      BaseMultiTargetTrackerRegisterer::
+      GetInstanceByName(config.multi_target_tracker());
+  CHECK_NOTNULL(multi_target_tracker);
+  multi_target_tracker_.reset(multi_target_tracker);
   MultiTargetTrackerInitOptions tracker_init_options;
-  ACHECK(multi_target_tracker_->Init(tracker_init_options));
+  ACHECK(multi_target_tracker_->Init(tracker_init_options)) <<
+                              "lidar multi_target_tracker init error";
 
-  fusion_classifier_ =
-      BaseClassifierRegisterer::GetInstanceByName(fusion_classifier_name_);
-  CHECK_NOTNULL(fusion_classifier_);
+  BaseClassifier* fusion_classifier =
+      BaseClassifierRegisterer::GetInstanceByName(config.fusion_classifier());
+  CHECK_NOTNULL(fusion_classifier);
+  fusion_classifier_.reset(fusion_classifier);
   ClassifierInitOptions fusion_classifier_init_options;
-  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options));
+  ACHECK(fusion_classifier_->Init(fusion_classifier_init_options)) <<
+                              "lidar classifier init error";
   return true;
 }
 
@@ -83,6 +86,8 @@ LidarProcessResult LidarObstacleTracking::Process(
 
   return LidarProcessResult(LidarErrorCode::Succeed);
 }
+
+PERCEPTION_REGISTER_LIDAROBSTACLETRACKING(LidarObstacleTracking);
 
 }  // namespace lidar
 }  // namespace perception

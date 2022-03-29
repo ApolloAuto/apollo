@@ -60,7 +60,7 @@ bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   int poll_result =
       config_.use_sensor_sync() ? PollStandardSync(scan) : PollStandard(scan);
 
-  if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
+  if (poll_result == SOCKET_TIMEOUT || poll_result == RECEIVE_FAIL) {
     return false;  // poll again
   }
 

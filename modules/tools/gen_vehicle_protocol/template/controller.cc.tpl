@@ -21,7 +21,7 @@
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/time/time.h"
+#include "cyber/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -49,6 +49,8 @@ ErrorCode %(car_type_cap)sController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -260,13 +262,10 @@ void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
   */
 }
 
-// brake with new acceleration
-// acceleration:0.00~99.99, unit:
-// acceleration:0.0 ~ 7.0, unit:m/s^2
-// acceleration_spd:60 ~ 100, suggest: 90
-// -> pedal
+// brake with pedal
+// pedal:0.00~99.99 unit:
 void %(car_type_cap)sController::Brake(double pedal) {
-  // double real_value = params_.max_acc() * acceleration / 100;
+  // double real_value = vehicle_params_.max_acceleration() * acceleration / 100;
   // TODO(All) :  Update brake value based on mode
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
@@ -278,8 +277,8 @@ void %(car_type_cap)sController::Brake(double pedal) {
   */
 }
 
-// drive with old acceleration
-// gas:0.00~99.99 unit:
+// drive with pedal
+// pedal:0.00~99.99 unit:
 void %(car_type_cap)sController::Throttle(double pedal) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
@@ -291,7 +290,7 @@ void %(car_type_cap)sController::Throttle(double pedal) {
   */
 }
 
-// confirm the car is driven by acceleration command or throttle/brake pedal
+// confirm the car is driven by acceleration command or drive/brake pedal
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void %(car_type_cap)sController::Acceleration(double acc) {
@@ -304,17 +303,18 @@ void %(car_type_cap)sController::Acceleration(double acc) {
   */
 }
 
-// %(car_type_lower)s default, -470 ~ 470, left:+, right:-
+// %(car_type_lower)s default, +470 ~ -470, left:+, right:-
 // need to be compatible with control module, so reverse
-// steering with old angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// steering with angle
+// angle:-99.99~0.00~99.99, unit:, left:+, right:-
 void %(car_type_cap)sController::Steer(double angle) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  // const double real_angle =
+  //     vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   // reverse sign
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
@@ -322,7 +322,7 @@ void %(car_type_cap)sController::Steer(double angle) {
 }
 
 // steering with new angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// angle:-99.99~0.00~99.99, unit:, left:+, right:-
 // angle_spd:0.00~99.99, unit:deg/s
 void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
@@ -331,10 +331,11 @@ void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
     return;
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
+  const double real_angle =
+      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle_spd = ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      vehicle_params_.min_steer_angle_rate(), vehicle_params_.max_steer_angle_rate(),
+      vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
   */
@@ -370,9 +371,9 @@ void %(car_type_cap)sController::SetTurningSignal(const ControlCommand& command)
   // Set Turn Signal
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   auto signal = command.signal().turn_signal();
-  if (signal == Signal::TURN_LEFT) {
+  if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_68_->set_turn_left();
-  } else if (signal == Signal::TURN_RIGHT) {
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     turnsignal_68_->set_turn_right();
   } else {
     turnsignal_68_->set_turn_none();
@@ -407,7 +408,7 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    start = ::apollo::cyber::Time::Now().ToMicrosecond();
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -445,7 +446,7 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

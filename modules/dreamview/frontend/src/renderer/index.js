@@ -115,7 +115,7 @@ class Renderer {
     this.viewAngle = PARAMETERS.camera.viewAngle;
     this.viewDistance = (
       PARAMETERS.camera.laneWidth
-            * PARAMETERS.camera.laneWidthToViewDistanceRatio);
+      * PARAMETERS.camera.laneWidthToViewDistanceRatio);
     this.camera = new THREE.PerspectiveCamera(
       PARAMETERS.camera[this.options.cameraAngle].fov,
       width / height,
@@ -222,9 +222,9 @@ class Renderer {
     switch (pov) {
       case 'Default':
         let deltaX = (this.viewDistance * Math.cos(target.rotation.y)
-                * Math.cos(this.viewAngle));
+          * Math.cos(this.viewAngle));
         let deltaY = (this.viewDistance * Math.sin(target.rotation.y)
-                * Math.cos(this.viewAngle));
+          * Math.cos(this.viewAngle));
         let deltaZ = this.viewDistance * Math.sin(this.viewAngle);
 
         this.camera.position.x = target.position.x - deltaX;
@@ -241,9 +241,9 @@ class Renderer {
         break;
       case 'Near':
         deltaX = (this.viewDistance * 0.5 * Math.cos(target.rotation.y)
-                    * Math.cos(this.viewAngle));
+          * Math.cos(this.viewAngle));
         deltaY = (this.viewDistance * 0.5 * Math.sin(target.rotation.y)
-                    * Math.cos(this.viewAngle));
+          * Math.cos(this.viewAngle));
         deltaZ = this.viewDistance * 0.5 * Math.sin(this.viewAngle);
 
         this.camera.position.x = target.position.x - deltaX;
@@ -260,7 +260,7 @@ class Renderer {
         break;
       case 'Overhead':
         deltaY = (this.viewDistance * 0.5 * Math.sin(target.rotation.y)
-                    * Math.cos(this.viewAngle));
+          * Math.cos(this.viewAngle));
         deltaZ = this.viewDistance * 2 * Math.sin(this.viewAngle);
 
         this.camera.position.x = target.position.x;
@@ -387,15 +387,15 @@ class Renderer {
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
-    return this.routingEditor.sendCycleRoutingRequest
-    (defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+    return this.routingEditor.sendCycleRoutingRequest(
+      defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
 
   sendParkGoRoutingRequest(points, parkTime) {
-    return this.routingEditor.sendParkGoRoutingRequest
-    (points, parkTime, this.adc.mesh.position,
+    return this.routingEditor.sendParkGoRoutingRequest(
+      points, parkTime, this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
@@ -540,8 +540,13 @@ class Renderer {
       this.map.removeAllElements(this.scene);
     }
     const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData['parkingSpace'] && !_.isEmpty(extraInfo)) {
-      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], extraInfo, this.coordinates,this.scene);
+    if (newData.parkingSpace && !_.isEmpty(extraInfo[0])) {
+      this.routingEditor.setParkingSpaceInfo(
+        newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
+      );
+    }
+    if (!_.isEmpty(extraInfo[1])) {
+      this.routingEditor.setDeadJunctionInfo(extraInfo[1]);
     }
   }
 
@@ -554,17 +559,17 @@ class Renderer {
 
   updateMapIndex(hash, elementIds, radius) {
     if (!this.routingEditor.isInEditingMode()
-            || PARAMETERS.routingEditor.radiusOfMapRequest === radius) {
+      || PARAMETERS.routingEditor.radiusOfMapRequest === radius) {
       this.map.updateIndex(hash, elementIds, this.scene);
     }
   }
 
   isMobileDevice() {
     return navigator.userAgent.match(/Android/i)
-            || navigator.userAgent.match(/webOS/i)
-            || navigator.userAgent.match(/iPhone/i)
-            || navigator.userAgent.match(/iPad/i)
-            || navigator.userAgent.match(/iPod/i);
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i);
   }
 
   getGeolocation(event) {

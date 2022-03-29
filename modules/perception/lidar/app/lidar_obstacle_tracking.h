@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/common/lidar_error_code.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 
@@ -26,32 +27,22 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct LidarObstacleTrackingInitOptions {
-  std::string sensor_name = "velodyne64";
-};
-
-struct LidarObstacleTrackingOptions {
-  std::string sensor_name;
-};
-
-class LidarObstacleTracking {
+class LidarObstacleTracking : public BaseLidarObstacleTracking {
  public:
   LidarObstacleTracking() = default;
-  ~LidarObstacleTracking() = default;
+  virtual ~LidarObstacleTracking() = default;
 
   bool Init(const LidarObstacleTrackingInitOptions& options =
-                LidarObstacleTrackingInitOptions());
+                LidarObstacleTrackingInitOptions()) override;
 
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
-                             LidarFrame* frame);
+                             LidarFrame* frame) override;
 
-  std::string Name() const { return "LidarObstacleTracking"; }
+  std::string Name() const override { return "LidarObstacleTracking"; }
 
  private:
-  BaseMultiTargetTracker* multi_target_tracker_;
-  BaseClassifier* fusion_classifier_;
-  std::string multi_target_tracker_name_;
-  std::string fusion_classifier_name_;
+  std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;
+  std::shared_ptr<BaseClassifier> fusion_classifier_;
 };  // class LidarObstacleTracking
 
 }  // namespace lidar

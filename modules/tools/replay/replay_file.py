@@ -37,7 +37,7 @@ g_message_manager = PbMessageManager()
 def topic_publisher(topic, filename, period):
     """publisher"""
     cyber.init()
-    node = cyber.Node("replay_file")
+    node = cyber.Node(topic)
     meta_msg = None
     msg = None
     if not topic:

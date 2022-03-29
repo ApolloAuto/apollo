@@ -364,6 +364,7 @@ cc_library(
     name = "trajectory_stitcher",
     srcs = ["trajectory_stitcher.cc"],
     hdrs = ["trajectory_stitcher.h"],
+    copts = PLANNING_COPTS,
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_cc_proto",

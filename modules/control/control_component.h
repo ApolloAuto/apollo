@@ -80,6 +80,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::Status CheckInput(LocalView *local_view);
   common::Status CheckTimestamp(const LocalView &local_view);
   common::Status CheckPad();
+  void ResetAndProduceZeroControlCommand(ControlCommand *control_command);
 
  private:
   apollo::cyber::Time init_time_;

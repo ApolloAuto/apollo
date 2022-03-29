@@ -19,9 +19,9 @@
 #include <string>
 #include <thread>
 
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -92,6 +92,7 @@ class CompRoboDriver : public Component<> {
 };
 
 CYBER_REGISTER_COMPONENT(CompRoboDriver);
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,57 +15,52 @@
  *****************************************************************************/
 #pragma once
 
-#include <memory>
 #include <string>
+#include <memory>
 
-#include "Eigen/Dense"
-
-#include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lidar/lib/detection/lidar_point_pillars/point_pillars_detection.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_obstacle_detection.h"
+#include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/lidar/lib/map_manager/map_manager.h"
+#include "modules/perception/lidar/lib/object_builder/object_builder.h"
+#include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct LidarObstacleDetectionInitOptions {
-  std::string sensor_name = "velodyne64";
-};
-
-struct LidarObstacleDetectionOptions {
-  std::string sensor_name;
-  Eigen::Affine3d sensor2novatel_extrinsics;
-
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-} EIGEN_ALIGN16;
-
-class LidarObstacleDetection {
+class LidarObstacleDetection : public BaseLidarObstacleDetection{
  public:
   LidarObstacleDetection() = default;
-  ~LidarObstacleDetection() = default;
+  virtual ~LidarObstacleDetection() = default;
 
   bool Init(const LidarObstacleDetectionInitOptions& options =
-                LidarObstacleDetectionInitOptions());
+                LidarObstacleDetectionInitOptions()) override;
 
   LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,
       const std::shared_ptr<apollo::drivers::PointCloud const>& message,
-      LidarFrame* frame);
+      LidarFrame* frame) override;
 
   LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
-                             LidarFrame* frame);
+                             LidarFrame* frame) override;
 
-  std::string Name() const { return "LidarObstacleDetection"; }
+  std::string Name() const override { return "LidarObstacleDetection"; }
 
  private:
   LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,
                                    LidarFrame* frame);
 
  private:
-  PointCloudPreprocessor cloud_preprocessor_;
-  std::unique_ptr<PointPillarsDetection> detector_;
+  std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
+  std::shared_ptr<BaseLidarDetector> detector_;
+  MapManager map_manager_;
+  ObjectBuilder builder_;
+  ObjectFilterBank filter_bank_;
   // params
-  std::string detector_name_;
+  bool use_map_manager_ = true;
+  bool use_object_filter_bank_ = true;
+  bool use_object_builder_ = true;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

@@ -125,7 +125,7 @@ lon_controller_conf {
   ts: 0.01
   brake_minimum_action: 0.0
   throttle_minimum_action: 0.0
-  speed_controller_input_limit: 0.8
+  speed_controller_input_limit: 2.0
   station_error_limit: 2.0
   preview_window: 20.0
   standstill_acceleration: -0.3
@@ -163,7 +163,7 @@ lon_controller_conf {
   reverse_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.5
-    kp: 0.8
+    kp: 2.0
     ki: 0.3
     kd: 0.0
   }

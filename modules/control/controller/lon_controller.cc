@@ -19,9 +19,10 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
-#include "cyber/time/time.h"
 #include "cyber/time/clock.h"
+#include "cyber/time/time.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
@@ -258,20 +259,19 @@ Status LonController::ComputeControlCommand(
         speed_leadlag_controller_.InnerstateSaturationStatus());
   }
 
-  if(chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL)
-  {
+  if (chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
   }
-  
-  double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
+
+  double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
-  if (std::isnan(slope_offset_compenstaion)) {
-    slope_offset_compenstaion = 0;
+  if (std::isnan(slope_offset_compensation)) {
+    slope_offset_compensation = 0;
   }
 
-  debug->set_slope_offset_compensation(slope_offset_compenstaion);
+  debug->set_slope_offset_compensation(slope_offset_compensation);
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
@@ -279,22 +279,22 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
-  if((trajectory_message_->trajectory_type() ==
-       apollo::planning::ADCTrajectory::UNKNOWN) && 
-       std::abs(cmd->steering_target()-chassis->steering_percentage())>20){
-    acceleration_cmd =0;
+  if ((trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::UNKNOWN) &&
+      std::abs(cmd->steering_target() - chassis->steering_percentage()) > 20) {
+    acceleration_cmd = 0;
     ADEBUG << "Steering not reached";
     debug->set_is_full_stop(true);
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
-  }  
+  }
 
   // At near-stop stage, replace the brake control command with the standstill
   // acceleration if the former is even softer than the latter
   if (((trajectory_message_->trajectory_type() ==
-       apollo::planning::ADCTrajectory::NORMAL)||
+        apollo::planning::ADCTrajectory::NORMAL) ||
        (trajectory_message_->trajectory_type() ==
-       apollo::planning::ADCTrajectory::SPEED_FALLBACK)) &&
+        apollo::planning::ADCTrajectory::SPEED_FALLBACK)) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
             control_conf_->max_acceleration_when_stopped() &&
         std::fabs(debug->preview_speed_reference()) <=
@@ -382,7 +382,6 @@ Status LonController::ComputeControlCommand(
 
   if (std::fabs(injector_->vehicle_state()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
-      chassis->gear_location() == trajectory_message_->gear() ||
       chassis->gear_location() == canbus::Chassis::GEAR_NEUTRAL) {
     cmd->set_gear_location(trajectory_message_->gear());
   } else {
@@ -422,7 +421,7 @@ void LonController::ComputeLongitudinalErrors(
       vehicle_state->linear_velocity(), matched_point, &s_matched,
       &s_dot_matched, &d_matched, &d_dot_matched);
 
-  //double current_control_time = Time::Now().ToSecond();
+  // double current_control_time = Time::Now().ToSecond();
   double current_control_time = ::apollo::cyber::Clock::NowInSeconds();
   double preview_control_time = current_control_time + preview_time;
 

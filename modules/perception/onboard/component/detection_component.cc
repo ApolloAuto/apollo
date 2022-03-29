@@ -34,16 +34,18 @@ std::atomic<uint32_t> DetectionComponent::seq_num_{0};
 bool DetectionComponent::Init() {
   LidarDetectionComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
+    AERROR << "Get config failed";
     return false;
   }
-  ADEBUG << "Lidar Component Configs: " << comp_config.DebugString();
+  AINFO << "Lidar Component Configs: " << comp_config.DebugString();
   output_channel_name_ = comp_config.output_channel_name();
   sensor_name_ = comp_config.sensor_name();
+  detector_name_ = comp_config.detector_name();
   lidar2novatel_tf2_child_frame_id_ =
       comp_config.lidar2novatel_tf2_child_frame_id();
   lidar_query_tf_offset_ =
       static_cast<float>(comp_config.lidar_query_tf_offset());
-  //  enable_hdmap_ = comp_config.enable_hdmap();
+  enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
   if (!InitAlgorithmPlugin()) {
@@ -74,21 +76,17 @@ bool DetectionComponent::InitAlgorithmPlugin() {
   ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
                                                           &sensor_info_));
 
-  detector_.reset(new lidar::LidarObstacleDetection);
-  if (detector_ == nullptr) {
-    AERROR << "sensor_name_ "
-           << "Failed to get detection instance";
-    return false;
-  }
+  lidar::BaseLidarObstacleDetection* detector =
+      lidar::BaseLidarObstacleDetectionRegisterer::
+      GetInstanceByName(detector_name_);
+  CHECK_NOTNULL(detector);
+  detector_.reset(detector);
   lidar::LidarObstacleDetectionInitOptions init_options;
   init_options.sensor_name = sensor_name_;
-  //  init_options.enable_hdmap_input =
-  //      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
-  if (!detector_->Init(init_options)) {
-    AINFO << "sensor_name_ "
-          << "Failed to init detection.";
-    return false;
-  }
+  init_options.enable_hdmap_input =
+      FLAGS_obs_enable_hdmap_input && enable_hdmap_;
+  ACHECK(detector_->Init(init_options)) <<
+                            "lidar obstacle detection init error";
 
   lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);
   return true;
@@ -118,17 +116,18 @@ bool DetectionComponent::InternalProc(
   frame->sensor_info = sensor_info_;
 
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
+  Eigen::Affine3d pose_novatel = Eigen::Affine3d::Identity();
   const double lidar_query_tf_timestamp =
       timestamp - lidar_query_tf_offset_ * 0.001;
-  if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
-                                               &pose)) {
+  if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp, &pose,
+                                               &pose_novatel)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
-    AERROR << "Failed to get pose at time: "
-           << FORMAT_TIMESTAMP(lidar_query_tf_timestamp);
+    AERROR << "Failed to get pose at time: " << lidar_query_tf_timestamp;
     return false;
   }
 
   frame->lidar2world_pose = pose;
+  frame->novatel2world_pose = pose_novatel;
 
   lidar::LidarObstacleDetectionOptions detect_opts;
   detect_opts.sensor_name = sensor_name_;

@@ -10,3 +10,6 @@ Refer these documents as a guide to all other relevant documents for the version
 - [Apollo 2.5](apollo_2.5_technical_tutorial.md)
 - [Navigation Mode in Apollo 2.5 中文版](navigation_mode_tutorial_cn.md)
 - [Apollo Best Coding Practice](apollo_best_coding_practice.md)
+- [Introduction to Apollo Release Build](intro_to_apollo_release_build.md)
+- [Introduction to Apollo Release Build 中文版](intro_to_apollo_release_build_cn.md)
+

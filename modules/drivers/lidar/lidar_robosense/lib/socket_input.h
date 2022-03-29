@@ -15,9 +15,7 @@
  *****************************************************************************/
 
 #pragma once
-#include <cstdio>
-#include <unistd.h>
-#include <pcap.h>
+
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/input.h"
 
@@ -42,6 +40,7 @@ class SocketInput : public Input {
   int port_;
   bool input_available(int timeout);
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

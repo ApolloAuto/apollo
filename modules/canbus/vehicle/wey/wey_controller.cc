@@ -407,6 +407,8 @@ Chassis WeyController::chassis() {
   return chassis_;
 }
 
+bool WeyController::VerifyID() { return true; }
+
 void WeyController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();

@@ -15,14 +15,16 @@
  *****************************************************************************/
 
 #pragma once
+
 #include <memory>
 #include <string>
+#include <thread>
 
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/socket_input.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
-#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,13 +33,16 @@ namespace robosense {
 class RobosenseDriver {
  public:
   RobosenseDriver();
+
   virtual ~RobosenseDriver() {}
 
   virtual bool poll(
       const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan) {
     return true;
   }
+
   virtual void init() = 0;
+
   uint64_t start_time() { return start_time_; }
 
  protected:
@@ -49,13 +54,17 @@ class RobosenseDriver {
   uint64_t basetime_;
   uint32_t last_gps_time_;
   uint64_t start_time_;
+  uint64_t last_count_;
+
   int poll_standard(
       const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+
   int poll_sync_count(
       const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan,
       bool main_frame);
-  uint64_t last_count_;
+
   bool set_base_time();
+
   void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
                                     uint64_t* basetime,
                                     bool use_gps_time = false);
@@ -66,11 +75,15 @@ class RobosenseDriver {
 
 class Robosense16Driver : public RobosenseDriver {
  public:
-  Robosense16Driver(const apollo::drivers::suteng::SutengConfig& robo_config);
+  explicit Robosense16Driver(
+      const apollo::drivers::suteng::SutengConfig& robo_config);
+
   ~Robosense16Driver();
 
   void init();
+
   bool poll(const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+
   void poll_positioning_packet();
 
  private:
@@ -84,6 +97,7 @@ class RobosenseDriverFactory {
   static RobosenseDriver* create_driver(
       const apollo::drivers::suteng::SutengConfig& robo_config);
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

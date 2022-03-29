@@ -10,8 +10,6 @@ FROM ${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-la
 
 FROM ${BASE_IMAGE}
 
-ENV PYTHONPATH /apollo:$PYTHONPATH
-
 COPY output /apollo
 
 COPY --from=apollo_audio_volume \
