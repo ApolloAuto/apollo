@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message StatsGroup {
+  optional double max = 1;
+  optional double min = 2 [default = 1e10];
+  optional double sum = 3;
+  optional double avg = 4;
+  optional int32 num = 5;
+};
+
+message PlanningStats {
+  optional StatsGroup total_path_length = 1;
+  optional StatsGroup total_path_time = 2;
+  // linear velocity
+  optional StatsGroup v = 3;
+  // acceleration
+  optional StatsGroup a = 4;
+  optional StatsGroup kappa = 5;
+  optional StatsGroup dkappa = 6;
+}

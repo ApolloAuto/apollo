@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message StopPoint {
+  optional double s = 1;
+  enum Type {
+    HARD = 0;
+    SOFT = 1;
+  }
+  optional Type type = 2 [default = HARD];
+}
+
+message PlanningTarget {
+  optional StopPoint stop_point = 1;
+  optional double cruise_speed = 2;
+}

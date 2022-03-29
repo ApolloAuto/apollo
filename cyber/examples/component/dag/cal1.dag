@@ -1,0 +1,12 @@
+module_config{
+    module_library : "/apollo/bazel-bin/cyber/examples/component/cal1/cal1.so"
+    components {
+        class_name : "cal1"
+        config {
+            name : "common"
+            readers {
+                channel: "/carstatus/speed1"
+            }
+        }
+    }
+}

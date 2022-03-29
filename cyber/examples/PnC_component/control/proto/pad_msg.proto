@@ -1,0 +1,22 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/common/proto/header.proto";
+import "modules/canbus/proto/chassis.proto";
+
+enum DrivingAction {
+  STOP = 0;
+  START = 1;
+  RESET = 2;
+};
+
+message PadMessage {
+  // control mode, set mode according to low level definition
+  optional apollo.common.Header header = 1;
+
+  // send driving mode to drive
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 2;
+
+  // action in the driving_mode
+  optional DrivingAction action = 3;
+}

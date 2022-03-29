@@ -1,0 +1,126 @@
+header {
+  timestamp_sec: 1515787931.3446462
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    stop {
+      reason_code: STOP_REASON_STOP_SIGN
+      reason: "stop by SS_1017"
+      stop_point {
+        x: 586395.27298821311
+        y: 4140150.4145827373
+      }
+      stop_heading: -1.5434982628389444
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+    decision {
+      id: "SS_1017"
+      perception_id: -911148558
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_STOP_SIGN
+          distance_s: -1
+          stop_point {
+            x: 586395.27298821311
+            y: 4140150.4145827373
+            z: 0
+          }
+          stop_heading: -1.5434982628389444
+        }
+      }
+    }
+  }
+  vehicle_signal {
+    turn_signal: TURN_LEFT
+  }
+}
+routing_header {
+  timestamp_sec: 1522096299.304265
+  module_name: "routing"
+  sequence_num: 1
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "2972_1_-1"
+}
+lane_id {
+  id: "2974_1_-1"
+}
+lane_id {
+  id: "2975_1_-1"
+}
+lane_id {
+  id: "11181_1_-1"
+}
+lane_id {
+  id: "11180_1_-1"
+}
+lane_id {
+  id: "812_1_-1"
+}
+lane_id {
+  id: "204_1_-1"
+}
+lane_id {
+  id: "11042_1_-1"
+}
+lane_id {
+  id: "11041_1_-1"
+}
+lane_id {
+  id: "1697a_1_-1"
+}
+lane_id {
+  id: "368_1_-1"
+}
+lane_id {
+  id: "449_1_-1"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+trajectory_type: NORMAL
+replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "2972_1_-1"
+}
+target_lane_id {
+  id: "2974_1_-1"
+}
+target_lane_id {
+  id: "2975_1_-1"
+}
+target_lane_id {
+  id: "11181_1_-1"
+}
+target_lane_id {
+  id: "11180_1_-1"
+}
+target_lane_id {
+  id: "812_1_-1"
+}
+target_lane_id {
+  id: "204_1_-1"
+}
+target_lane_id {
+  id: "11042_1_-1"
+}
+target_lane_id {
+  id: "11041_1_-1"
+}
+target_lane_id {
+  id: "1697a_1_-1"
+}
+target_lane_id {
+  id: "368_1_-1"
+}
+target_lane_id {
+  id: "449_1_-1"
+}

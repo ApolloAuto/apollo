@@ -27,7 +27,7 @@ message Projection {
 message Header {
   optional bytes version = 1;
   optional bytes date = 2;
-  optional Projection projection = 3;
+  optional Projection projection = 3; //坐标系转换
   optional bytes district = 4;
   optional bytes generation = 5;
   optional bytes rev_major = 6;
@@ -42,16 +42,16 @@ message Header {
 message Map {
   optional Header header = 1;
 
-  repeated Crosswalk crosswalk = 2;
-  repeated Junction junction = 3;
-  repeated Lane lane = 4;
-  repeated StopSign stop_sign = 5;
-  repeated Signal signal = 6;
-  repeated YieldSign yield = 7;
-  repeated Overlap overlap = 8;
-  repeated ClearArea clear_area = 9;
-  repeated SpeedBump speed_bump = 10;
-  repeated Road road = 11;
+  repeated Crosswalk crosswalk = 2;  //人行道
+  repeated Junction junction = 3;  //路口区域
+  repeated Lane lane = 4;  //车道
+  repeated StopSign stop_sign = 5;  //停止线
+  repeated Signal signal = 6;  //信号灯
+  repeated YieldSign yield = 7;  //让路标志
+  repeated Overlap overlap = 8;  //重叠区域
+  repeated ClearArea clear_area = 9;  //禁停区域
+  repeated SpeedBump speed_bump = 10; //减速带
+  repeated Road road = 11;  //道路
   repeated ParkingSpace parking_space = 12;
   repeated PNCJunction pnc_junction = 13;
   repeated RSU rsu = 14;

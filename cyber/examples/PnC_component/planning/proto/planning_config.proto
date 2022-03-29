@@ -1,0 +1,397 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/proto/open_space_task_config.proto";
+import "modules/planning/proto/task_config.proto";
+
+// Planning's configuration is based on the following architecture
+// * Scenario has one more multiple stages
+// * a stage has one or more
+// tasks are shared among all scenarios and stages.
+message TaskConfig {
+  enum TaskType {
+    // deciders
+    CREEP_DECIDER = 1;
+    LANE_CHANGE_DECIDER = 2;
+    NAVI_OBSTACLE_DECIDER = 3;
+    NAVI_PATH_DECIDER = 4;
+    NAVI_SPEED_DECIDER = 5;
+    OPEN_SPACE_FALLBACK_DECIDER = 6;
+    OPEN_SPACE_PRE_STOP_DECIDER = 7;
+    OPEN_SPACE_ROI_DECIDER = 8;
+    PATH_ASSESSMENT_DECIDER = 9;
+    PATH_BOUNDS_DECIDER = 10;
+    PATH_DECIDER = 11;
+    PATH_LANE_BORROW_DECIDER = 12;
+    PATH_REFERENCE_DECIDER = 13;
+    PATH_REUSE_DECIDER = 14;
+    RSS_DECIDER = 15;
+    RULE_BASED_STOP_DECIDER = 16;
+    SPEED_BOUNDS_PRIORI_DECIDER = 17;
+    SPEED_BOUNDS_FINAL_DECIDER = 18;
+    SPEED_DECIDER = 19;
+    ST_BOUNDS_DECIDER = 20;
+    // optimizers
+    OPEN_SPACE_TRAJECTORY_PARTITION = 21;
+    OPEN_SPACE_TRAJECTORY_PROVIDER = 22;
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 23;
+    PIECEWISE_JERK_PATH_OPTIMIZER = 24;
+    PIECEWISE_JERK_SPEED_OPTIMIZER = 25;
+    SPEED_HEURISTIC_OPTIMIZER = 26;
+    // other tasks
+    LEARNING_MODEL_INFERENCE_TASK = 27;
+    LEARNING_MODEL_INFERENCE_TRAJECTORY_TASK = 28;
+  };
+
+  optional TaskType task_type = 1;
+  oneof task_config {
+    // deciders
+    CreepDeciderConfig creep_decider_config = 2;
+    LaneChangeDeciderConfig lane_change_decider_config = 3;
+    OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 4;
+    OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 5;
+    OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 6;
+    PathAssessmentDeciderConfig path_assessment_decider_config = 7;
+    PathBoundsDeciderConfig path_bounds_decider_config = 8;
+    PathDeciderConfig path_decider_config = 9;
+    PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 10;
+    PathReferenceDeciderConfig path_reference_decider_config = 11;
+    PathReuseDeciderConfig path_reuse_decider_config = 12;
+    RuleBasedStopDeciderConfig rule_based_stop_decider_config = 13;
+    SpeedBoundsDeciderConfig speed_bounds_decider_config = 14;
+    STBoundsDeciderConfig st_bounds_decider_config = 15;
+    // optimizers
+    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config =
+        16;
+    OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config =
+        17;
+    PiecewiseJerkNonlinearSpeedOptimizerConfig
+        piecewise_jerk_nonlinear_speed_optimizer_config = 18;
+    PiecewiseJerkPathOptimizerConfig piecewise_jerk_path_optimizer_config = 19;
+    PiecewiseJerkSpeedOptimizerConfig piecewise_jerk_speed_optimizer_config =
+        20;
+    SpeedHeuristicOptimizerConfig speed_heuristic_optimizer_config = 21;
+    // other tasks
+    LearningModelInferenceTaskConfig learning_model_inference_task_config = 22;
+    LearningModelInferenceTrajectoryTaskConfig
+        learning_model_inference_trajectory_task_config = 23;
+  }
+}
+
+message ScenarioBareIntersectionUnprotectedConfig {
+  optional double start_bare_intersection_scenario_distance = 1
+      [default = 25.0];  // meter
+  // explicit stop while waiting
+  optional bool enable_explicit_stop = 2 [default = false];
+  optional double min_pass_s_distance = 3 [default = 3.0];       // meter
+  optional double approach_cruise_speed = 4 [default = 6.7056];  // m/s (15 mph)
+  optional double stop_distance = 5 [default = 0.5];             // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];           // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];         // sec
+}
+
+message ScenarioEmergencyPullOverConfig {
+  optional double max_stop_deceleration = 1 [default = 3.0];
+  optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
+  optional double target_slow_down_speed = 3 [default = 2.5];       // m/s
+  optional double stop_distance = 4 [default = 1.5];                // meter
+}
+
+message ScenarioEmergencyStopConfig {
+  optional double max_stop_deceleration = 1 [default = 6.0];
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
+message ScenarioLaneFollowConfig {}
+
+message ScenarioLearningModelSampleConfig {}
+
+message ScenarioNarrowStreetUTurnConfig {}
+
+message ScenarioParkAndGoConfig {
+  optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
+  optional double heading_buffer = 2 [default = 0.5];         // rad
+  optional double min_dist_to_dest = 3 [default = 25.0];      // meter
+  optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
+}
+
+message ScenarioPullOverConfig {
+  optional double start_pull_over_scenario_distance = 1
+      [default = 50.0];                                                // meter
+  optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
+  // keep the same value as pull_over_destination_to_adc_buffer in
+  // PathBoundsDeciderConfig
+  optional double max_distance_stop_search = 3 [default = 25.0];  // meter
+  optional double max_s_error_to_end_point = 4 [default = 0.2];
+  optional double max_l_error_to_end_point = 5 [default = 0.5];
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
+  optional double max_distance_error_to_end_point = 7 [default = 0.2];
+  optional double pass_destination_threshold = 8 [default = 10.0];
+  optional double max_valid_stop_distance = 9 [default = 1.0];
+  optional double s_distance_to_stop_for_open_space_parking = 10
+      [default = 7.0];
+}
+
+message ScenarioStopSignUnprotectedConfig {
+  optional double start_stop_sign_scenario_distance = 1
+      [default = 5.0];  // meter
+  optional double watch_vehicle_max_valid_stop_distance = 2
+      [default = 5.0];                                          // meter
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  optional float stop_duration_sec = 4 [default = 1.0];         // sec
+  optional double min_pass_s_distance = 5 [default = 3.0];      // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];          // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];        // sec
+}
+
+message ScenarioTrafficLightProtectedConfig {
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];                                          // meter
+  optional double max_valid_stop_distance = 2 [default = 2.0];  // meter
+  optional double min_pass_s_distance = 3 [default = 3.0];      // meter
+}
+
+message ScenarioTrafficLightUnprotectedLeftTurnConfig {
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];                                          // meter
+  optional double approach_cruise_speed = 2 [default = 2.78];   // m/s (10km/h)
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  optional double min_pass_s_distance = 4 [default = 3.0];      // meter
+  optional float creep_timeout_sec = 5 [default = 10.0];        // sec
+  optional double max_adc_speed_before_creep = 6
+      [default = 5.56];  // m/s (20m/h)
+}
+
+message ScenarioTrafficLightUnprotectedRightTurnConfig {
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];  // meter
+  optional bool enable_right_turn_on_red = 2 [default = false];
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  optional double min_pass_s_distance = 4 [default = 3.0];      // meter
+  optional float red_light_right_turn_stop_duration_sec = 5
+      [default = 3.0];                                             // sec
+  optional float creep_timeout_sec = 6 [default = 10.0];           // sec
+  optional double max_adc_speed_before_creep = 7 [default = 3.0];  // m/s
+}
+
+message ScenarioValetParkingConfig {
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+  optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+}
+
+message ScenarioDeadEndTurnAroundConfig {
+  optional double dead_end_start_range = 1 [default = 20.0];
+  optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+}
+
+message ScenarioYieldSignConfig {
+  optional double start_yield_sign_scenario_distance = 1
+      [default = 10.0];                                         // meter
+  optional double max_valid_stop_distance = 2 [default = 4.5];  // meter
+  optional double min_pass_s_distance = 3 [default = 3.0];      // meter
+  optional float creep_timeout_sec = 4 [default = 10.0];        // sec
+}
+
+// scenario configs
+message ScenarioConfig {
+  enum ScenarioType {
+    LANE_FOLLOW = 0;  // default scenario
+
+    // intersection involved
+    BARE_INTERSECTION_UNPROTECTED = 2;
+    STOP_SIGN_PROTECTED = 3;
+    STOP_SIGN_UNPROTECTED = 4;
+    TRAFFIC_LIGHT_PROTECTED = 5;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN = 6;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN = 7;
+    YIELD_SIGN = 8;
+
+    // parking
+    PULL_OVER = 9;
+    VALET_PARKING = 10;
+
+    EMERGENCY_PULL_OVER = 11;
+    EMERGENCY_STOP = 12;
+
+    // misc
+    NARROW_STREET_U_TURN = 13;
+    PARK_AND_GO = 14;
+
+    // learning model sample
+    LEARNING_MODEL_SAMPLE = 15;
+    // turn around
+    DEADEND_TURNAROUND = 16;
+  }
+
+  // StageType is a superset of stages from all scenarios.
+  // It is created to keep different scenarios have uniform config interface
+  enum StageType {
+    NO_STAGE = 0;
+
+    LANE_FOLLOW_DEFAULT_STAGE = 1;
+
+    // bare_intersection_unprotected scenario
+    BARE_INTERSECTION_UNPROTECTED_APPROACH = 200;
+    BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE = 201;
+
+    // stop_sign_unprotected scenario
+    STOP_SIGN_UNPROTECTED_PRE_STOP = 300;
+    STOP_SIGN_UNPROTECTED_STOP = 301;
+    STOP_SIGN_UNPROTECTED_CREEP = 302;
+    STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE = 303;
+
+    // traffic_light_protected scenario
+    TRAFFIC_LIGHT_PROTECTED_APPROACH = 400;
+    TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE = 401;
+
+    // traffic_light_unprotected_left_turn scenario
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH = 410;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP = 411;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE = 412;
+
+    // traffic_light_unprotected_right_turn scenario
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 420;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 421;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 422;
+
+    // pull_over scenario
+    PULL_OVER_APPROACH = 500;
+    PULL_OVER_RETRY_APPROACH_PARKING = 501;
+    PULL_OVER_RETRY_PARKING = 502;
+
+    // emergency_pull_over scenario
+    EMERGENCY_PULL_OVER_SLOW_DOWN = 600;
+    EMERGENCY_PULL_OVER_APPROACH = 601;
+    EMERGENCY_PULL_OVER_STANDBY = 602;
+
+    // emergency_pull_over scenario
+    EMERGENCY_STOP_APPROACH = 610;
+    EMERGENCY_STOP_STANDBY = 611;
+
+    // valet parking scenario
+    VALET_PARKING_APPROACHING_PARKING_SPOT = 700;
+    VALET_PARKING_PARKING = 701;
+    
+    // turning around scenario
+    DEADEND_TURNAROUND_APPROACHING_TURNING_POINT = 1100;
+    DEADEND_TURNAROUND_TURNING = 1101;
+
+    // park_and_go scenario
+    PARK_AND_GO_CHECK = 800;
+    PARK_AND_GO_CRUISE = 801;
+    PARK_AND_GO_ADJUST = 802;
+    PARK_AND_GO_PRE_CRUISE = 803;
+
+    // yield_sign scenario
+    YIELD_SIGN_APPROACH = 900;
+    YIELD_SIGN_CREEP = 901;
+
+    // learning_model_sample scenario
+    LEARNING_MODEL_RUN = 1000;
+  };
+
+  message StageConfig {
+    optional StageType stage_type = 1;
+    optional bool enabled = 2 [default = true];
+    // an ordered list of tasks that are used at runtime.
+    // the order determines the runtime order of the tasks.
+    repeated TaskConfig.TaskType task_type = 3;
+    // an unordered task configurations
+    repeated TaskConfig task_config = 4;
+  }
+
+  optional ScenarioType scenario_type = 1;
+  oneof scenario_config {
+    ScenarioLaneFollowConfig lane_follow_config = 2;
+    ScenarioBareIntersectionUnprotectedConfig
+        bare_intersection_unprotected_config = 3;
+    ScenarioEmergencyPullOverConfig emergency_pull_over_config = 4;
+    ScenarioEmergencyStopConfig emergency_stop_config = 5;
+    ScenarioLearningModelSampleConfig learning_model_sample_config = 6;
+    ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 7;
+    ScenarioParkAndGoConfig park_and_go_config = 8;
+    ScenarioPullOverConfig pull_over_config = 9;
+    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 10;
+    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 11;
+    ScenarioTrafficLightUnprotectedLeftTurnConfig
+        traffic_light_unprotected_left_turn_config = 12;
+    ScenarioTrafficLightUnprotectedRightTurnConfig
+        traffic_light_unprotected_right_turn_config = 13;
+    ScenarioValetParkingConfig valet_parking_config = 14;
+    ScenarioYieldSignConfig yield_sign_config = 15;
+    ScenarioDeadEndTurnAroundConfig deadend_turnaround_config = 18;
+  }
+  // a list of stages that are used at runtime.  The first one is default stage.
+  repeated StageType stage_type = 16;
+  // an unordered list of stage configs.
+  repeated StageConfig stage_config = 17;
+}
+
+message PlannerPublicRoadConfig {}
+
+message PlannerNaviConfig {
+  repeated TaskConfig.TaskType task = 1;
+  optional NaviPathDeciderConfig navi_path_decider_config = 2;
+  optional NaviSpeedDeciderConfig navi_speed_decider_config = 3;
+  optional NaviObstacleDeciderConfig navi_obstacle_decider_config = 4;
+}
+
+enum PlannerType {
+  RTK = 0;
+  PUBLIC_ROAD = 1;  // public road planner
+  NAVI = 2;         // navigation planner
+  LATTICE = 3;      // lattice planner
+}
+
+message RtkPlanningConfig {
+  optional PlannerType planner_type = 1;
+}
+
+message StandardPlanningConfig {
+  repeated PlannerType planner_type = 1;  // supported planners
+  optional PlannerPublicRoadConfig planner_public_road_config = 2;
+}
+
+message NavigationPlanningConfig {
+  repeated PlannerType planner_type = 1;  // supported planners
+  optional PlannerNaviConfig planner_navi_config = 4;
+}
+
+message TopicConfig {
+  optional string chassis_topic = 1;
+  optional string hmi_status_topic = 2;
+  optional string localization_topic = 3;
+  optional string planning_pad_topic = 4;
+  optional string planning_trajectory_topic = 5;
+  optional string prediction_topic = 6;
+  optional string relative_map_topic = 7;
+  optional string routing_request_topic = 8;
+  optional string routing_response_topic = 9;
+  optional string story_telling_topic = 10;
+  optional string traffic_light_detection_topic = 11;
+  optional string planning_learning_data_topic = 12;
+}
+
+message PlanningConfig {
+  enum PlanningLearningMode {
+    NO_LEARNING = 0;
+    E2E = 1;
+    HYBRID = 2;
+    RL_TEST = 3;
+    E2E_TEST = 4;
+    HYBRID_TEST = 5;
+  }
+
+  optional TopicConfig topic_config = 1;
+  optional PlanningLearningMode learning_mode = 2;
+  oneof planning_config {
+    RtkPlanningConfig rtk_planning_config = 3;
+    StandardPlanningConfig standard_planning_config = 4;
+    NavigationPlanningConfig navigation_planning_config = 5;
+  }
+
+  // default task config, it will be used if there is no scenario-specific
+  // task config.
+  repeated TaskConfig default_task_config = 6;
+}

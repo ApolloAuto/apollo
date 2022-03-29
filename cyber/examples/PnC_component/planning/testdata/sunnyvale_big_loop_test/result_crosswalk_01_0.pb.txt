@@ -1,0 +1,125 @@
+header {
+  timestamp_sec: 1517275942.8603506
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    stop {
+      reason_code: STOP_REASON_CROSSWALK
+      reason: "stop by CW_2832"
+      stop_point {
+        x: 586261.32841311616
+        y: 4141304.5687306495
+      }
+      stop_heading: -1.7966564290127005
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+    decision {
+      id: "CW_2832"
+      perception_id: -1198750198
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_CROSSWALK
+          distance_s: -1
+          stop_point {
+            x: 586261.32841311616
+            y: 4141304.5687306495
+            z: 0
+          }
+          stop_heading: -1.7966564290127005
+          wait_for_obstacle: "11720"
+        }
+      }
+    }
+    decision {
+      id: "TL_2516"
+      perception_id: -191858794
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_SIGNAL
+          distance_s: -1
+          stop_point {
+            x: 586261.31446336233
+            y: 4141304.5065256646
+            z: 0
+          }
+          stop_heading: -1.7928850222566806
+        }
+      }
+    }
+  }
+  vehicle_signal {
+    turn_signal: TURN_LEFT
+  }
+}
+routing_header {
+  timestamp_sec: 1522099749.8459234
+  module_name: "routing"
+  sequence_num: 887
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "188_1_-1"
+}
+lane_id {
+  id: "2726_1_-1"
+}
+lane_id {
+  id: "382_1_-1"
+}
+lane_id {
+  id: "10898_1_-1"
+}
+lane_id {
+  id: "300_1_-1"
+}
+lane_id {
+  id: "10771_1_-1"
+}
+lane_id {
+  id: "201_1_-1"
+}
+lane_id {
+  id: "2811_1_-1"
+}
+lane_id {
+  id: "2813_1_-1"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+trajectory_type: SPEED_FALLBACK
+replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "188_1_-1"
+}
+target_lane_id {
+  id: "2726_1_-1"
+}
+target_lane_id {
+  id: "382_1_-1"
+}
+target_lane_id {
+  id: "10898_1_-1"
+}
+target_lane_id {
+  id: "300_1_-1"
+}
+target_lane_id {
+  id: "10771_1_-1"
+}
+target_lane_id {
+  id: "201_1_-1"
+}
+target_lane_id {
+  id: "2811_1_-1"
+}
+target_lane_id {
+  id: "2813_1_-1"
+}

@@ -1,0 +1,159 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/common/proto/geometry.proto";
+import "modules/planning/proto/planning_config.proto";
+import "modules/routing/proto/routing.proto";
+
+/*
+  This file defines the data types that represents the internal state of the
+  planning module.
+  It will not be refreshed in each planning cycle.
+*/
+
+message BareIntersectionStatus {
+  optional string current_pnc_junction_overlap_id = 1;
+  optional string done_pnc_junction_overlap_id = 2;
+  optional uint32 clear_counter = 3;
+}
+
+message ChangeLaneStatus {
+  enum Status {
+    IN_CHANGE_LANE = 1;        // during change lane state
+    CHANGE_LANE_FAILED = 2;    // change lane failed
+    CHANGE_LANE_FINISHED = 3;  // change lane finished
+  }
+  optional Status status = 1;
+  // the id of the route segment that the vehicle is driving on
+  optional string path_id = 2;
+  // the time stamp when the state started.
+  optional double timestamp = 3;
+  // the starting position only after which lane-change can happen.
+  optional bool exist_lane_change_start_position = 4 [default = false];
+  optional apollo.common.Point3D lane_change_start_position = 5;
+  // the last time stamp when the lane-change planning succeed.
+  optional double last_succeed_timestamp = 6;
+  // if the current path and speed planning on the lane-change
+  // reference-line succeed.
+  optional bool is_current_opt_succeed = 7 [default = false];
+  // denotes if the surrounding area is clear for ego vehicle to
+  // change lane at this moment.
+  optional bool is_clear_to_change_lane = 8 [default = false];
+}
+
+message CreepDeciderStatus {
+  optional uint32 creep_clear_counter = 1;
+}
+
+message StopTime {
+  optional string obstacle_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  optional double stop_timestamp_sec = 2;
+}
+
+message CrosswalkStatus {
+  optional string crosswalk_id = 1;
+  // the timestamp when start stopping for the crosswalk
+  repeated StopTime stop_time = 2;
+  repeated string finished_crosswalk = 3;
+}
+
+message DestinationStatus {
+  optional bool has_passed_destination = 1 [default = false];
+}
+
+message EmergencyStopStatus {
+  optional apollo.common.PointENU stop_fence_point = 1;
+}
+
+message OpenSpaceStatus {
+  repeated string partitioned_trajectories_index_history = 1;
+  optional bool position_init = 2 [default = false];
+}
+
+message ParkAndGoStatus {
+  optional apollo.common.PointENU adc_init_position = 1;
+  optional double adc_init_heading = 2;
+  optional bool in_check_stage = 3;
+  optional apollo.common.PointENU adc_adjust_end_pose = 4;
+}
+
+message PathDeciderStatus {
+  enum LaneBorrowDirection {
+    LEFT_BORROW = 1;   // borrow left neighbor lane
+    RIGHT_BORROW = 2;  // borrow right neighbor lane
+  }
+  optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
+  optional int32 able_to_use_self_lane_counter = 2 [default = 0];
+  optional bool is_in_path_lane_borrow_scenario = 3 [default = false];
+  optional string front_static_obstacle_id = 4 [default = ""];
+  repeated LaneBorrowDirection decided_side_pass_direction = 5;
+}
+
+message PullOverStatus {
+  enum PullOverType {
+    PULL_OVER = 1;            // pull-over upon destination arrival
+    EMERGENCY_PULL_OVER = 2;  // emergency pull-over
+  }
+  optional PullOverType pull_over_type = 1;
+  optional bool plan_pull_over_path = 2 [default = false];
+  optional apollo.common.PointENU position = 3;
+  optional double theta = 4;
+  optional double length_front = 5;
+  optional double length_back = 6;
+  optional double width_left = 7;
+  optional double width_right = 8;
+}
+
+message ReroutingStatus {
+  optional double last_rerouting_time = 1;
+  optional bool need_rerouting = 2 [default = false];
+  optional apollo.routing.RoutingRequest routing_request = 3;
+}
+
+message SpeedDeciderStatus {
+  repeated StopTime pedestrian_stop_time = 1;
+}
+
+message ScenarioStatus {
+  optional ScenarioConfig.ScenarioType scenario_type = 1;
+  optional ScenarioConfig.StageType stage_type = 2;
+}
+
+message StopSignStatus {
+  optional string current_stop_sign_overlap_id = 1;
+  optional string done_stop_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
+}
+
+message TrafficLightStatus {
+  repeated string current_traffic_light_overlap_id = 1;
+  repeated string done_traffic_light_overlap_id = 2;
+}
+
+message YieldSignStatus {
+  repeated string current_yield_sign_overlap_id = 1;
+  repeated string done_yield_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
+}
+
+// note: please keep this one as minimal as possible. do NOT pollute it.
+message PlanningStatus {
+  optional BareIntersectionStatus bare_intersection = 1;
+  optional ChangeLaneStatus change_lane = 2;
+  optional CreepDeciderStatus creep_decider = 3;
+  optional CrosswalkStatus crosswalk = 4;
+  optional DestinationStatus destination = 5;
+  optional EmergencyStopStatus emergency_stop = 6;
+  optional OpenSpaceStatus open_space = 7;
+  optional ParkAndGoStatus park_and_go = 8;
+  optional PathDeciderStatus path_decider = 9;
+  optional PullOverStatus pull_over = 10;
+  optional ReroutingStatus rerouting = 11;
+  optional ScenarioStatus scenario = 12;
+  optional SpeedDeciderStatus speed_decider = 13;
+  optional StopSignStatus stop_sign = 14;
+  optional TrafficLightStatus traffic_light = 15;
+  optional YieldSignStatus yield_sign = 16;
+}

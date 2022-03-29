@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/control/proto/calibration_table.proto";
+import "modules/control/proto/leadlag_conf.proto";
+import "modules/control/proto/pid_conf.proto";
+
+message FilterConf {
+  optional int32 cutoff_freq = 1;
+}
+
+// controller param
+message LonControllerConf {
+  optional double ts = 1;  // longitudinal controller sampling time
+  optional double brake_minimum_action = 2;
+  optional double throttle_minimum_action = 3;
+  optional double speed_controller_input_limit = 4;
+  optional double station_error_limit = 5;
+  optional double preview_window = 6;
+  optional double standstill_acceleration = 7;
+
+  optional PidConf station_pid_conf = 8;
+  optional PidConf low_speed_pid_conf = 9;
+  optional PidConf high_speed_pid_conf = 10;
+  optional double switch_speed = 11;  // low/high speed controller switch speed
+  optional PidConf reverse_station_pid_conf = 12;
+  optional PidConf reverse_speed_pid_conf = 13;
+  optional FilterConf pitch_angle_filter_conf = 14;
+  optional LeadlagConf reverse_station_leadlag_conf = 15;
+  optional LeadlagConf reverse_speed_leadlag_conf = 16;
+
+  optional calibrationtable.ControlCalibrationTable calibration_table = 17;
+
+  optional bool enable_reverse_leadlag_compensation = 18 [default = false];
+
+  // low/high speed switch transition-window
+  optional double switch_speed_window = 19 [default = 0.0];
+}

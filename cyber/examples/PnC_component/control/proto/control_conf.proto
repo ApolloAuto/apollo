@@ -1,0 +1,66 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/control/proto/pad_msg.proto";
+import "modules/control/proto/lat_controller_conf.proto";
+import "modules/control/proto/lon_controller_conf.proto";
+import "modules/control/proto/mpc_controller_conf.proto";
+
+message ControlConf {
+  enum ControllerType {
+    LAT_CONTROLLER = 0;
+    LON_CONTROLLER = 1;
+    MPC_CONTROLLER = 2;
+  };
+
+  // configs from gflags
+  optional double control_test_duration = 1 [default = -1];
+  optional bool enable_csv_debug = 2 [default = false];
+  optional bool enable_speed_station_preview = 3 [default = false];
+  optional bool is_control_test_mode = 4 [default = false];
+  optional bool use_preview_speed_for_table = 5 [default = false];
+  optional bool enable_input_timestamp_check = 6 [default = false];
+  optional int32 max_localization_miss_num = 7 [default = 20];
+  optional int32 max_chassis_miss_num = 8 [default = 20];
+  optional int32 max_planning_miss_num = 9 [default = 20];
+  optional double max_acceleration_when_stopped = 10 [default = 0.01];
+  optional double steer_angle_rate = 11 [default = 100];
+  optional bool enable_gain_scheduler = 12 [default = true];
+  optional bool set_steer_limit = 13 [default = true];
+  optional bool enable_slope_offset = 14 [default = false];
+  optional double lock_steer_speed = 15 [default = 0.081];
+  optional bool enable_navigation_mode_error_filter = 16 [default = false];
+  optional bool enable_navigation_mode_position_update = 17 [default = true];
+  optional bool enable_persistent_estop = 18 [default = true];
+
+  // original config
+  optional double control_period = 19;
+  optional double max_planning_interval_sec = 20;
+  optional double max_planning_delay_threshold = 21;
+  // 0 - manual; 1 - auto_drive; 2 - speed_only; 3 - steer_only
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 22;
+  // 0: stop, at first should stop, then receive pad msg to start
+  optional apollo.control.DrivingAction action = 23;
+  optional double soft_estop_brake = 24;
+  repeated ControllerType active_controllers = 25;
+  optional int32 max_steering_percentage_allowed = 26;
+  optional double max_status_interval_sec = 27;
+
+  optional apollo.control.LatControllerConf lat_controller_conf = 28;
+  optional apollo.control.LonControllerConf lon_controller_conf = 29;
+
+  optional double trajectory_period = 30;
+  optional double chassis_period = 31;
+  optional double localization_period = 32;
+
+  optional double minimum_speed_resolution = 33;
+
+  optional apollo.control.MPCControllerConf mpc_controller_conf = 34;
+
+  optional double query_relative_time = 35;
+  optional double minimum_speed_protection = 36;
+
+  optional double max_path_remain_when_stopped = 37 [default = 0.3];
+}

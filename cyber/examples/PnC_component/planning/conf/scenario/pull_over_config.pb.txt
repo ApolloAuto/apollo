@@ -1,0 +1,176 @@
+scenario_type: PULL_OVER
+pull_over_config: {
+  start_pull_over_scenario_distance: 50.0
+  pull_over_min_distance_buffer: 10.0
+  max_distance_stop_search: 25.0
+  max_s_error_to_end_point: 0.5
+  max_l_error_to_end_point: 1.0
+  max_theta_error_to_end_point: 0.2
+  pass_destination_threshold: 15.0
+  max_distance_error_to_end_point: 0.2
+}
+
+stage_type: PULL_OVER_APPROACH
+stage_type: PULL_OVER_RETRY_PARKING
+
+stage_config: {
+  stage_type: PULL_OVER_APPROACH
+  enabled: true
+  # task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_type: RSS_DECIDER
+
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+    path_bounds_decider_config {
+      is_lane_borrowing: false
+      is_pull_over: true
+      pull_over_destination_to_adc_buffer: 25.0
+      pull_over_destination_to_pathend_buffer: 4.0
+      pull_over_road_edge_buffer: 0.15
+      pull_over_approach_lon_distance_adjust_factor: 1.6
+    }
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_HEURISTIC_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: RSS_DECIDER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}
+
+stage_config: {
+  stage_type: PULL_OVER_RETRY_APPROACH_PARKING
+  enabled: true
+  task_type: OPEN_SPACE_PRE_STOP_DECIDER
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  task_config: {
+    task_type: OPEN_SPACE_PRE_STOP_DECIDER
+    open_space_pre_stop_decider_config {
+      stop_type: PULL_OVER
+      rightaway_stop_distance: 1.0
+    }
+  }
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_HEURISTIC_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}
+
+stage_config: {
+  stage_type: PULL_OVER_RETRY_PARKING
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: PULL_OVER
+      perception_obstacle_buffer: 0.5
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+    open_space_trajectory_partition_config {
+      heading_offset_to_midpoint: 0.79
+      lateral_offset_to_midpoint: 0.5
+      longitudinal_offset_to_midpoint: 0.2
+      vehicle_box_iou_threshold_to_midpoint: 0.8
+      linear_velocity_threshold_on_ego: 0.2
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}

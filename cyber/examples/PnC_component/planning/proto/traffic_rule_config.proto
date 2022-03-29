@@ -1,0 +1,109 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message BacksideVehicleConfig {
+  // a vehicle is considered within current lane if it is behind the ADC and its
+  // lateral difference is less than this number.
+  optional double backside_lane_width = 1 [default = 4.0];
+}
+
+message CrosswalkConfig {
+  // stop distance from stop line of crosswalk
+  optional double stop_distance = 1 [default = 1.0];  // meter
+  // max deceleration
+  optional double max_stop_deceleration = 2 [default = 4.0];
+  // min s_distance for adc to be considered have passed crosswalk
+  // (stop_line_end_s)
+  optional double min_pass_s_distance = 3 [default = 1.0];  // meter
+  // max distance(m) to the stop line to be considered as a valid stop
+  optional double max_valid_stop_distance = 4 [default = 3.0];  // meter
+  // expand s_distance for pedestrian/bicycle detection
+  optional double expand_s_distance = 5 [default = 2.0];  // meter
+  // strict stop rule within this l_distance
+  optional double stop_strict_l_distance = 6 [default = 4.0];  // meter
+  // loose stop rule beyond this l_distance
+  optional double stop_loose_l_distance = 7 [default = 5.0];  // meter
+  // stop timeout for bicycles/pedestrians which are not moving
+  optional double stop_timeout = 8 [default = 10.0];  // second
+}
+
+message DestinationConfig {
+  // stop distance from destination line
+  optional double stop_distance = 1 [default = 0.5];  // meter
+}
+
+message KeepClearConfig {
+  // min s_distance to be considered have passed keep_clear (stop_line_end_s)
+  optional bool enable_keep_clear_zone = 1 [default = true];
+  optional bool enable_junction = 2 [default = true];
+  optional double min_pass_s_distance = 3 [default = 2.0];  // meter
+  // tolerance distance to align pnc_junction boundary with stop_line of traffic
+  // sign(s)
+  optional double align_with_traffic_sign_tolerance = 4
+      [default = 4.5];  // meter
+}
+
+message ReferenceLineEndConfig {
+  // stop distance from reference line end
+  optional double stop_distance = 1 [default = 0.5];  // meter
+  optional double min_reference_line_remain_length = 2 [default = 50.0];
+}
+
+message ReroutingConfig {
+  // should not rerouting more frequent than this number
+  optional double cooldown_time = 1 [default = 3.0];           // seconds
+  optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
+}
+
+message StopSignConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the stop sign
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
+message TrafficLightConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the traffic light
+  optional double stop_distance = 2 [default = 1.0];  // meter
+  // max deceleration
+  optional double max_stop_deceleration = 3 [default = 4.0];
+}
+
+message YieldSignConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the yield sign
+  optional double stop_distance = 2 [default = 1.0];         // meter
+  optional double start_watch_distance = 3 [default = 2.0];  // meter
+}
+
+message TrafficRuleConfig {
+  enum RuleId {
+    BACKSIDE_VEHICLE = 1;
+    CROSSWALK = 2;
+    DESTINATION = 3;
+    KEEP_CLEAR = 4;
+    REFERENCE_LINE_END = 5;
+    REROUTING = 6;
+    STOP_SIGN = 7;
+    TRAFFIC_LIGHT = 8;
+    YIELD_SIGN = 9;
+  }
+  optional RuleId rule_id = 1;
+  optional bool enabled = 2;
+  oneof config {
+    BacksideVehicleConfig backside_vehicle = 3;
+    CrosswalkConfig crosswalk = 4;
+    DestinationConfig destination = 5;
+    KeepClearConfig keep_clear = 6;
+    ReferenceLineEndConfig reference_line_end = 7;
+    ReroutingConfig rerouting = 8;
+    StopSignConfig stop_sign = 9;
+    TrafficLightConfig traffic_light = 10;
+    YieldSignConfig yield_sign = 11;
+  }
+}
+
+message TrafficRuleConfigs {
+  repeated TrafficRuleConfig config = 1;
+}

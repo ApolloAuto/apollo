@@ -1,0 +1,353 @@
+header {
+  timestamp_sec: 1502920656.46
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
+  status {
+    error_code: PLANNING_ERROR
+    msg: "Failed to create reference line"
+  }
+}
+gear: GEAR_DRIVE
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.1
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.2
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.30000000000000004
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.4
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.5
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.6
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.7
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.79999999999999993
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.89999999999999991
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 0.99999999999999989
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.0999999999999999
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.2
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.3
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.4000000000000001
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.5000000000000002
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.6000000000000003
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.7000000000000004
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.8000000000000005
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 1.9000000000000006
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.0000000000000004
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.1000000000000005
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.2000000000000006
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.3000000000000007
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.4000000000000008
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.5000000000000009
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.600000000000001
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.7000000000000011
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.8000000000000012
+}
+trajectory_point {
+  path_point {
+    x: 586368
+    y: 4140790
+    theta: 1.28665083367
+    s: 0
+  }
+  v: 0
+  a: 0
+  relative_time: 2.9000000000000012
+}
+decision {
+  main_decision {
+    not_ready {
+      reason: "PLANNING_ERROR: Failed to create reference line"
+    }
+  }
+}
+routing_header {
+  timestamp_sec: 1234.5
+  module_name: "routing"
+  sequence_num: 1
+}

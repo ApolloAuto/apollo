@@ -1,0 +1,250 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/header.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
+import "modules/control/proto/input_debug.proto";
+import "modules/control/proto/pad_msg.proto";
+
+enum TurnSignal {
+  TURN_NONE = 0;
+  TURN_LEFT = 1;
+  TURN_RIGHT = 2;
+}
+
+message LatencyStats {
+  optional double total_time_ms = 1;
+  repeated double controller_time_ms = 2;
+  optional bool total_time_exceeded = 3;
+}
+
+// next id : 27
+message ControlCommand {
+  optional apollo.common.Header header = 1;
+  // target throttle in percentage [0, 100]
+  optional double throttle = 3;
+
+  // target brake in percentage [0, 100]
+  optional double brake = 4;
+
+  // target non-directional steering rate, in percentage of full scale per
+  // second [0, 100]
+  optional double steering_rate = 6;
+
+  // target steering angle, in percentage of full scale [-100, 100]
+  optional double steering_target = 7;
+
+  // parking brake engage. true: engaged
+  optional bool parking_brake = 8;
+
+  // target speed, in m/s
+  optional double speed = 9;
+
+  // target acceleration in m`s^-2
+  optional double acceleration = 10;
+
+  // model reset
+  optional bool reset_model = 16 [deprecated = true];
+  // engine on/off, true: engine on
+  optional bool engine_on_off = 17;
+  // completion percentage of trajectory planned in last cycle
+  optional double trajectory_fraction = 18;
+  optional apollo.canbus.Chassis.DrivingMode driving_mode = 19
+      [deprecated = true];
+  optional apollo.canbus.Chassis.GearPosition gear_location = 20;
+
+  optional Debug debug = 22;
+  optional apollo.common.VehicleSignal signal = 23;
+  optional LatencyStats latency_stats = 24;
+  optional PadMessage pad_msg = 25;
+  optional apollo.common.EngageAdvice engage_advice = 26;
+  optional bool is_in_safe_mode = 27 [default = false];
+
+  // deprecated fields
+  optional bool left_turn = 13 [deprecated = true];
+  optional bool right_turn = 14 [deprecated = true];
+  optional bool high_beam = 11 [deprecated = true];
+  optional bool low_beam = 12 [deprecated = true];
+  optional bool horn = 15 [deprecated = true];
+  optional TurnSignal turnsignal = 21 [deprecated = true];
+}
+
+message SimpleLongitudinalDebug {
+  optional double station_reference = 1;
+  optional double station_error = 2;
+  optional double station_error_limited = 3;
+  optional double preview_station_error = 4;
+  optional double speed_reference = 5;
+  optional double speed_error = 6;
+  optional double speed_controller_input_limited = 7;
+  optional double preview_speed_reference = 8;
+  optional double preview_speed_error = 9;
+  optional double preview_acceleration_reference = 10;
+  optional double acceleration_cmd_closeloop = 11;
+  optional double acceleration_cmd = 12;
+  optional double acceleration_lookup = 13;
+  optional double speed_lookup = 14;
+  optional double calibration_value = 15;
+  optional double throttle_cmd = 16;
+  optional double brake_cmd = 17;
+  optional bool is_full_stop = 18;
+  optional double slope_offset_compensation = 19;
+  optional double current_station = 20;
+  optional double path_remain = 21;
+  optional int32 pid_saturation_status = 22;
+  optional int32 leadlag_saturation_status = 23;
+  optional double speed_offset = 24;
+  optional double current_speed = 25;
+  optional double acceleration_reference = 26;
+  optional double current_acceleration = 27;
+  optional double acceleration_error = 28;
+  optional double jerk_reference = 29;
+  optional double current_jerk = 30;
+  optional double jerk_error = 31;
+  optional apollo.common.TrajectoryPoint current_matched_point = 32;
+  optional apollo.common.TrajectoryPoint current_reference_point = 33;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 34;
+}
+
+message SimpleLateralDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 18;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 19;
+
+  optional double ref_heading_rate = 20;
+  optional double heading_rate = 21;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 22;
+  optional double heading_acceleration = 23;
+  optional double heading_error_acceleration = 24;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 25;
+  optional double heading_jerk = 26;
+  optional double heading_error_jerk = 27;
+
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
+  optional double lateral_error_feedback = 28;
+  optional double heading_error_feedback = 29;
+
+  // current planning target point
+  optional apollo.common.TrajectoryPoint current_target_point = 30;
+
+  // Augmented feedback control term in addition to LQR control
+  optional double steer_angle_feedback_augment = 31;
+
+  // Mrac control status and feedback states for steer control
+  optional MracDebug steer_mrac_debug = 32;
+  optional bool steer_mrac_enable_status = 33;
+}
+
+message SimpleMPCDebug {
+  optional double lateral_error = 1;
+  optional double ref_heading = 2;
+  optional double heading = 3;
+  optional double heading_error = 4;
+  optional double heading_error_rate = 5;
+  optional double lateral_error_rate = 6;
+  optional double curvature = 7;
+  optional double steer_angle = 8;
+  optional double steer_angle_feedforward = 9;
+  optional double steer_angle_lateral_contribution = 10;
+  optional double steer_angle_lateral_rate_contribution = 11;
+  optional double steer_angle_heading_contribution = 12;
+  optional double steer_angle_heading_rate_contribution = 13;
+  optional double steer_angle_feedback = 14;
+  optional double steering_position = 15;
+  optional double ref_speed = 16;
+  optional double steer_angle_limited = 17;
+  optional double station_reference = 18;
+  optional double station_error = 19;
+  optional double speed_reference = 20;
+  optional double speed_error = 21;
+  optional double acceleration_reference = 22;
+  optional bool is_full_stop = 23;
+  optional double station_feedback = 24;
+  optional double speed_feedback = 25;
+  optional double acceleration_cmd_closeloop = 26;
+  optional double acceleration_cmd = 27;
+  optional double acceleration_lookup = 28;
+  optional double speed_lookup = 29;
+  optional double calibration_value = 30;
+  optional double steer_unconstrained_control_diff = 31;
+  optional double steer_angle_feedforward_compensation = 32;
+  repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 35;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 36;
+
+  optional double ref_heading_rate = 37;
+  optional double heading_rate = 38;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 39;
+  optional double heading_acceleration = 40;
+  optional double heading_error_acceleration = 41;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 42;
+  optional double heading_jerk = 43;
+  optional double heading_error_jerk = 44;
+
+  optional double acceleration_feedback = 45;
+  optional double acceleration_error = 46;
+  optional double jerk_reference = 47;
+  optional double jerk_feedback = 48;
+  optional double jerk_error = 49;
+}
+
+message MracDebug {
+  optional int32 mrac_model_order = 1;
+  repeated double mrac_reference_state = 2;
+  repeated double mrac_state_error = 3;
+  optional MracAdaptiveGain mrac_adaptive_gain = 4;
+  optional int32 mrac_reference_saturation_status = 5;
+  optional int32 mrac_control_saturation_status = 6;
+}
+
+message MracAdaptiveGain {
+  repeated double state_adaptive_gain = 1;
+  repeated double input_adaptive_gain = 2;
+  repeated double nonlinear_adaptive_gain = 3;
+}
+
+message Debug {
+  optional SimpleLongitudinalDebug simple_lon_debug = 1;
+  optional SimpleLateralDebug simple_lat_debug = 2;
+  optional InputDebug input_debug = 3;
+  optional SimpleMPCDebug simple_mpc_debug = 4;
+}

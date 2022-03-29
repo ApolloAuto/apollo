@@ -1,0 +1,218 @@
+header {
+  timestamp_sec: 1509646355.91
+  module_name: "planning"
+}
+gear: GEAR_DRIVE
+trajectory_point {
+  path_point {
+    x: 0.0
+    y: -0.23828125
+    theta: 0.0
+    s: 0.0
+  }
+  v: 10.0
+  relative_time: 0.0
+}
+trajectory_point {
+  path_point {
+    x: 1.0
+    y: -0.266731698453
+    theta: -0.0284427759821
+    s: 1.00040463214
+  }
+  v: 10.0
+  relative_time: 0.100040463214
+}
+trajectory_point {
+  path_point {
+    x: 2.0
+    y: -0.29633991575
+    theta: -0.0290211826352
+    s: 2.00084285939
+  }
+  v: 10.0
+  relative_time: 0.200084285939
+}
+trajectory_point {
+  path_point {
+    x: 3.0
+    y: -0.326987303551
+    theta: -0.0295600716642
+    s: 3.00131238035
+  }
+  v: 10.0
+  relative_time: 0.300131238035
+}
+trajectory_point {
+  path_point {
+    x: 4.0
+    y: -0.358555263511
+    theta: -0.0300594464965
+    s: 4.00181052433
+  }
+  v: 10.0
+  relative_time: 0.400181052433
+}
+trajectory_point {
+  path_point {
+    x: 5.0
+    y: -0.390925197291
+    theta: -0.03051931041
+    s: 5.00233429347
+  }
+  v: 10.0
+  relative_time: 0.500233429347
+}
+trajectory_point {
+  path_point {
+    x: 6.0
+    y: -0.423978506547
+    theta: -0.0309396665106
+    s: 6.00288040497
+  }
+  v: 10.0
+  relative_time: 0.600288040497
+}
+trajectory_point {
+  path_point {
+    x: 7.0
+    y: -0.457596592938
+    theta: -0.0313205177101
+    s: 7.00344533327
+  }
+  v: 10.0
+  relative_time: 0.700344533327
+}
+trajectory_point {
+  path_point {
+    x: 8.0
+    y: -0.491660858123
+    theta: -0.0316618667071
+    s: 8.00402535214
+  }
+  v: 10.0
+  relative_time: 0.800402535214
+}
+trajectory_point {
+  path_point {
+    x: 9.0
+    y: -0.526052703758
+    theta: -0.0319637159687
+    s: 9.00461657689
+  }
+  v: 10.0
+  relative_time: 0.900461657689
+}
+trajectory_point {
+  path_point {
+    x: 10.0
+    y: -0.560653531502
+    theta: -0.0322260677148
+    s: 10.0052150065
+  }
+  v: 10.0
+  relative_time: 1.00052150065
+}
+trajectory_point {
+  path_point {
+    x: 11.0
+    y: -0.595344743013
+    theta: -0.032448923904
+    s: 11.0058165656
+  }
+  v: 10.0
+  relative_time: 1.10058165656
+}
+trajectory_point {
+  path_point {
+    x: 12.0
+    y: -0.63000773995
+    theta: -0.0326322862215
+    s: 12.0064171469
+  }
+  v: 10.0
+  relative_time: 1.20064171469
+}
+trajectory_point {
+  path_point {
+    x: 13.0
+    y: -0.66452392397
+    theta: -0.0327761560683
+    s: 13.0070126531
+  }
+  v: 10.0
+  relative_time: 1.30070126531
+}
+trajectory_point {
+  path_point {
+    x: 14.0
+    y: -0.698774696731
+    theta: -0.0328805345532
+    s: 14.0075990389
+  }
+  v: 10.0
+  relative_time: 1.40075990389
+}
+trajectory_point {
+  path_point {
+    x: 15.0
+    y: -0.732641459891
+    theta: -0.0329454224854
+    s: 15.0081723534
+  }
+  v: 10.0
+  relative_time: 1.50081723534
+}
+trajectory_point {
+  path_point {
+    x: 16.0
+    y: -0.766005615109
+    theta: -0.0329708203706
+    s: 16.008728782
+  }
+  v: 10.0
+  relative_time: 1.6008728782
+}
+trajectory_point {
+  path_point {
+    x: 17.0
+    y: -0.798748564043
+    theta: -0.0329567284067
+    s: 17.0092646888
+  }
+  v: 10.0
+  relative_time: 1.70092646888
+}
+trajectory_point {
+  path_point {
+    x: 18.0
+    y: -0.83075170835
+    theta: -0.0329031464839
+    s: 18.0097766583
+  }
+  v: 10.0
+  relative_time: 1.80097766583
+}
+trajectory_point {
+  path_point {
+    x: 19.0
+    y: -0.861896449689
+    theta: -0.0328100741845
+    s: 19.0102615382
+  }
+  v: 10.0
+  relative_time: 1.90102615382
+}
+trajectory_point {
+  path_point {
+    x: 20.0
+    y: -0.892064189717
+    theta: -0.0326775107856
+    s: 20.010716481
+  }
+  v: 10.0
+  relative_time: 2.0010716481
+}
+latency_stats {
+  total_time_ms: 0.0588893890381
+}

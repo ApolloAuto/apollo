@@ -1,0 +1,37 @@
+header {
+  timestamp_sec: 1518648377.318433
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    cruise {
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+  }
+  vehicle_signal {
+    turn_signal: TURN_NONE
+  }
+}
+routing_header {
+  timestamp_sec: 1522102330.936367
+  module_name: "routing"
+  sequence_num: 1621
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "3143_1_-2"
+}
+engage_advice {
+  advice: KEEP_ENGAGED
+}
+trajectory_type: NORMAL
+replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "3143_1_-1"
+}

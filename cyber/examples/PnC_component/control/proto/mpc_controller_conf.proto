@@ -1,0 +1,44 @@
+syntax = "proto2";
+
+package apollo.control;
+
+import "modules/control/proto/calibration_table.proto";
+
+import "modules/control/proto/gain_scheduler_conf.proto";
+
+// model predictive control param
+message MPCControllerConf {
+  optional double ts = 1;      // sample time (dt) 0.01 sec, configurable
+  optional double cf = 2;      // corner stiffness front: N/rad
+  optional double cr = 3;      // corner stiffness rear: N/rad
+  optional int32 mass_fl = 4;  // mass forward left
+  optional int32 mass_fr = 5;  // mass forward right
+  optional int32 mass_rl = 6;  // mass rear left
+  optional int32 mass_rr = 7;  // mass rear right
+  optional double eps = 8;     // converge threshold
+
+  // output variable (control state) weight matrix
+  // (lateral_error, lateral_error_rate, heading_error, heading_error_rate,
+  //  station_error, speed_error)
+  repeated double matrix_q = 9;
+
+  // manipulated variable weight matrix
+  // (steer, acceleration)
+  repeated double matrix_r = 10;
+
+  optional int32 cutoff_freq = 11;              // cutoff frequency
+  optional int32 mean_filter_window_size = 12;  // window size of mean filter
+  // for a normal car, it should be in range[16, 18]
+  optional int32 max_iteration = 13;  // maximum iteration for lqr solve
+  optional double max_lateral_acceleration = 14;  // limit aggressive steering
+  optional double standstill_acceleration = 15;
+  optional double brake_minimum_action = 16;
+  optional double throttle_minimum_action = 17;
+  optional apollo.control.GainScheduler lat_err_gain_scheduler = 18;
+  optional apollo.control.GainScheduler heading_err_gain_scheduler = 19;
+  optional apollo.control.GainScheduler steer_weight_gain_scheduler = 20;
+  optional apollo.control.GainScheduler feedforwardterm_gain_scheduler = 21;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 22;
+  optional bool enable_mpc_feedforward_compensation = 23 [default = false];
+  optional double unconstrained_control_diff_limit = 24;
+}

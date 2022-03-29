@@ -1,0 +1,15 @@
+max_constraint_interval : 5.0
+longitudinal_boundary_bound : 2.0
+max_lateral_boundary_bound : 0.5
+min_lateral_boundary_bound : 0.1
+num_of_total_points : 500
+curb_shift : 0.2
+lateral_buffer : 0.2
+
+qp_spline {
+  spline_order: 5
+  max_spline_length : 25.0
+  regularization_weight : 1.0e-5
+  second_derivative_weight : 200.0
+  third_derivative_weight : 1000.0
+}

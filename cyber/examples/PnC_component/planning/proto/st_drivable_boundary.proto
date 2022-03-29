@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message STDrivableBoundaryInstance {
+  optional double t = 1;
+  optional double s_lower = 2;
+  optional double s_upper = 3;
+  optional double v_obs_lower = 4;
+  optional double v_obs_upper = 5;
+}
+
+message STDrivableBoundary {
+  repeated STDrivableBoundaryInstance st_boundary = 1;
+}

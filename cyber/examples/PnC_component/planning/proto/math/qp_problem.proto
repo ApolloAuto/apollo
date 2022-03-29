@@ -1,0 +1,34 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+// create the quadratic programming proto
+// 1/2 x^T Q x + c^T x
+// w.r.t
+// A x = b
+// C x >= d
+// specified input: input_marker
+// as well as optimal solution optimal param
+
+message QuadraticProgrammingProblem {
+  optional int32 param_size = 1;            // specified parameter size
+  optional QPMatrix quadratic_matrix = 2;   // Q matrix
+  repeated double bias = 3;                 // c
+  optional QPMatrix equality_matrix = 4;    // A matrix
+  repeated double equality_value = 5;       // b vector
+  optional QPMatrix inequality_matrix = 6;  // C matrix
+  repeated double inequality_value = 7;     // d vector
+  repeated double input_marker = 8;         // marker for the specified matrix
+  repeated double optimal_param = 9;        // optimal result
+};
+
+message QPMatrix {
+  optional int32 row_size = 1;
+  optional int32 col_size = 2;
+  // element with element(col_size * r + c)
+  repeated double element = 3;
+}
+
+message QuadraticProgrammingProblemSet {
+  repeated QuadraticProgrammingProblem problem = 1;  // QPProblem
+}

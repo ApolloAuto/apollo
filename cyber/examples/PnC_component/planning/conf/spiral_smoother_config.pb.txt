@@ -1,0 +1,19 @@
+max_constraint_interval : 5.0
+longitudinal_boundary_bound : 2.0
+max_lateral_boundary_bound : 0.5
+min_lateral_boundary_bound : 0.1
+resolution : 0.02
+curb_shift : 0.2
+lateral_buffer : 0.2
+
+spiral {
+  max_deviation: 0.05
+  piecewise_length : 10.0
+  max_iteration : 500
+  opt_tol : 1.0e-6
+  opt_acceptable_tol : 1e-4
+  opt_acceptable_iteration : 15
+  weight_curve_length : 1.0
+  weight_kappa : 1.0
+  weight_dkappa : 100.0
+}

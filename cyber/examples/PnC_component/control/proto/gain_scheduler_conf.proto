@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message GainScheduler {
+  repeated GainSchedulerInfo scheduler = 1;
+}
+
+message GainSchedulerInfo {
+  optional double speed = 1;  // m/s
+  optional double ratio = 2;
+}

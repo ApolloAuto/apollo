@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message PidConf {
+  optional bool integrator_enable = 1;
+  optional double integrator_saturation_level = 2;
+  optional double kp = 3;
+  optional double ki = 4;
+  optional double kd = 5;
+  optional double kaw = 6 [default = 0.0];
+  optional double output_saturation_level = 7;
+}

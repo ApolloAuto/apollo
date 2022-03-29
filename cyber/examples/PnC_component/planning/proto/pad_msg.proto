@@ -1,0 +1,21 @@
+syntax = "proto2";
+package apollo.planning;
+
+import "modules/common/proto/header.proto";
+
+enum DrivingAction {
+  NONE = 100;
+  FOLLOW = 0;
+  CHANGE_LEFT = 1;
+  CHANGE_RIGHT = 2;
+  PULL_OVER = 3;
+  STOP = 4;
+  RESUME_CRUISE = 5;
+};
+
+message PadMessage {
+  optional apollo.common.Header header = 1;
+
+  // driving action
+  optional DrivingAction action = 2;
+}

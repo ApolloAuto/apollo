@@ -1,0 +1,29 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 0
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 0
+brake_percentage: 0
+steering_percentage: 0
+steering_torque_nm: 0
+parking_brake: false
+driving_mode: COMPLETE_MANUAL
+error_code: NO_ERROR
+gear_location: GEAR_NONE
+header {
+  timestamp_sec: 1516822636.4989891
+  module_name: "chassis"
+  sequence_num: 62066
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}
+chassis_gps {
+  gps_valid: false
+}
+engage_advice {
+  advice: DISALLOW_ENGAGE
+  reason: "CANBUS not ready, firmware error or emergency button pressed!"
+}

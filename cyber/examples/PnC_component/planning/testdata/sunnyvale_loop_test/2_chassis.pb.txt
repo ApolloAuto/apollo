@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 2.7111111
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.031663
+brake_percentage: 23.480583
+steering_percentage: -11.893617
+steering_torque_nm: -1.625
+parking_brake: false
+driving_mode: COMPLETE_MANUAL
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1504137801.1602917
+  module_name: "chassis"
+  sequence_num: 8582
+}
+signal {
+  turn_signal: TURN_RIGHT
+  horn: false
+}

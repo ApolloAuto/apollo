@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 1123.5
+speed_mps: 2.68611121178
+odometer_m: 0.0
+fuel_range_m: 0
+throttle_percentage: 15.1171131134
+brake_percentage: 24.196231842
+steering_percentage: 0.297872334719
+steering_torque_nm: 0.1875
+parking_brake: false
+left_turn_signal: false
+right_turn_signal: false
+horn: false
+driving_mode: EMERGENCY_MODE
+error_code: MANUAL_INTERVENTION
+gear_location: GEAR_DRIVE
+steering_timestamp: 1495243551.75
+header {
+  timestamp_sec: 1495243551.77
+  module_name: "chassis"
+  sequence_num: 32294
+}

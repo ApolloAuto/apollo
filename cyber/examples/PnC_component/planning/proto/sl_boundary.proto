@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/common/proto/pnc_point.proto";
+
+/////////////////////////////////////////////////////////////////
+// The start_s and end_s are longitudinal values.
+// start_s <= end_s.
+//
+//              end_s
+//                ^
+//                |
+//          S  direction
+//                |
+//            start_s
+//
+// The start_l and end_l are lateral values.
+// start_l <= end_l. Left side of the reference line is positive,
+// and right side of the reference line is negative.
+//  end_l  <-----L direction---- start_l
+/////////////////////////////////////////////////////////////////
+
+message SLBoundary {
+  optional double start_s = 1;
+  optional double end_s = 2;
+  optional double start_l = 3;
+  optional double end_l = 4;
+  repeated apollo.common.SLPoint boundary_point = 5;
+}

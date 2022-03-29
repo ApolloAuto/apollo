@@ -1,0 +1,127 @@
+scenario_type: BARE_INTERSECTION_UNPROTECTED
+bare_intersection_unprotected_config: {
+  start_bare_intersection_scenario_distance: 25.0
+  enable_explicit_stop: false
+  min_pass_s_distance: 3.0
+  approach_cruise_speed: 6.7056  # 15 mph
+  stop_distance: 0.5
+  stop_timeout_sec: 8.0
+  creep_timeout_sec: 10.0
+}
+stage_type: BARE_INTERSECTION_UNPROTECTED_APPROACH
+stage_type: BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE
+
+stage_config: {
+  stage_type: BARE_INTERSECTION_UNPROTECTED_APPROACH
+  enabled: true
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_HEURISTIC_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}
+
+stage_config: {
+  stage_type: BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE
+  enabled: true
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
+  task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
+  task_type: ST_BOUNDS_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  task_type: SPEED_HEURISTIC_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
+  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  task_config: {
+    task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_HEURISTIC_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: ST_BOUNDS_DECIDER
+  }
+}

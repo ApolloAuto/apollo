@@ -1,0 +1,62 @@
+syntax = "proto2";
+
+package apollo.planning.autotuning;
+// general features before extracting specific model input features for
+// auto-tuning
+
+message PathPointwiseFeature {
+  message ObstacleFeature {
+    optional double lateral_distance = 1;
+  }
+  message BoundRelatedFeature {
+    optional double bound_distance = 1;
+    enum CrossableLevel {
+      CROSS_FREE = 0;
+      CROSS_ABLE = 1;
+      CROSS_FORBIDDEN = 2;
+    }
+    optional CrossableLevel crossable_level = 2;
+  }
+  optional double l = 1;
+  optional double dl = 2;
+  optional double ddl = 3;
+  optional double kappa = 4;
+  repeated ObstacleFeature obstacle_info = 5;
+  optional BoundRelatedFeature left_bound_feature = 6;
+  optional BoundRelatedFeature right_bound_feature = 7;
+}
+
+message SpeedPointwiseFeature {
+  message ObstacleFeature {
+    optional double longitudinal_distance = 1;
+    optional double obstacle_speed = 2;
+    optional double lateral_distance = 3 [default = 10.0];
+    optional double probability = 4;
+    optional double relative_v = 5;
+  }
+  optional double s = 1 [default = 0.0];
+  optional double t = 2 [default = 0.0];
+  optional double v = 3 [default = 0.0];
+  optional double speed_limit = 4 [default = 0.0];
+  optional double acc = 5 [default = 0.0];
+  optional double jerk = 6 [default = 0.0];
+  repeated ObstacleFeature follow_obs_feature = 7;
+  repeated ObstacleFeature overtake_obs_feature = 8;
+  repeated ObstacleFeature nudge_obs_feature = 9;
+  repeated ObstacleFeature stop_obs_feature = 10;
+  optional int32 collision_times = 11 [default = 0];
+  repeated ObstacleFeature virtual_obs_feature = 12;
+  optional double lateral_acc = 13 [default = 0.0];
+  optional double path_curvature_abs = 14 [default = 0.0];
+  repeated ObstacleFeature sidepass_front_obs_feature = 15;
+  repeated ObstacleFeature sidepass_rear_obs_feature = 16;
+}
+
+message TrajectoryPointwiseFeature {
+  optional PathPointwiseFeature path_input_feature = 1;
+  optional SpeedPointwiseFeature speed_input_feature = 2;
+}
+
+message TrajectoryFeature {
+  repeated TrajectoryPointwiseFeature point_feature = 1;
+}

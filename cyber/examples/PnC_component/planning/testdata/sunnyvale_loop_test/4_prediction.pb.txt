@@ -1,0 +1,70 @@
+header {
+  timestamp_sec: 1505164963.42
+  module_name: "prediction"
+  sequence_num: 15051
+}
+prediction_obstacle {
+  perception_obstacle {
+    id: 1651
+    position {
+      x: 587317.696467
+      y: 4141161.71316
+      z: -32.2480892554
+    }
+    theta: -1.82183249897
+    velocity {
+      x: 0
+      y: 0
+      z: 0.0
+    }
+    length: 2.4471654892
+    width: 1.65730500221
+    height: 1.93149280548
+    polygon_point {
+      x: 587318.180055
+      y: 4141162.84912
+      z: -32.2365329104
+    }
+    polygon_point {
+      x: 587318.722962
+      y: 4141162.34821
+      z: -32.2145497091
+    }
+    polygon_point {
+      x: 587318.638401
+      y: 4141162.07099
+      z: -32.2119113108
+    }
+    polygon_point {
+      x: 587317.636327
+      y: 4141160.52003
+      z: -32.2102403111
+    }
+    polygon_point {
+      x: 587317.402785
+      y: 4141160.505
+      z: -32.2157630991
+    }
+    polygon_point {
+      x: 587316.941018
+      y: 4141162.10251
+      z: -32.2544524995
+    }
+    polygon_point {
+      x: 587317.207517
+      y: 4141162.65923
+      z: -32.2573585666
+    }
+    polygon_point {
+      x: 587317.965921
+      y: 4141162.8687
+      z: -32.2421659291
+    }
+    tracking_time: 325.447105169
+    type: UNKNOWN
+    timestamp: 0.0
+  }
+  timestamp: 1505164963.42
+  predicted_period: 3.0
+}
+perception_error_code: OK

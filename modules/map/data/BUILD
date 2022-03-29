@@ -39,3 +39,10 @@ filegroup(
         "borregas_ave/**",
     ])
 )
+
+filegroup(
+    name = "apollo_road",
+    srcs = glob([
+        "apollo_road/**",
+    ])
+)

@@ -1,0 +1,85 @@
+header {
+  timestamp_sec: 1517713744.0523663
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    cruise {
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+  }
+  vehicle_signal {
+    turn_signal: TURN_LEFT
+  }
+}
+routing_header {
+  timestamp_sec: 1522102176.3444228
+  module_name: "routing"
+  sequence_num: 1578
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "150_1_-1"
+}
+lane_id {
+  id: "149_1_-1"
+}
+lane_id {
+  id: "1954_1_-1"
+}
+lane_id {
+  id: "1965a_1_-1"
+}
+lane_id {
+  id: "71_1_-1"
+}
+lane_id {
+  id: "2448_1_-1"
+}
+lane_id {
+  id: "66_1_-1"
+}
+lane_id {
+  id: "1948_1_-1"
+}
+lane_id {
+  id: "1949_1_-1"
+}
+engage_advice {
+  advice: KEEP_ENGAGED
+}
+trajectory_type: NORMAL
+replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "150_1_-1"
+}
+target_lane_id {
+  id: "149_1_-1"
+}
+target_lane_id {
+  id: "1954_1_-1"
+}
+target_lane_id {
+  id: "1965a_1_-1"
+}
+target_lane_id {
+  id: "71_1_-1"
+}
+target_lane_id {
+  id: "2448_1_-1"
+}
+target_lane_id {
+  id: "66_1_-1"
+}
+target_lane_id {
+  id: "1948_1_-1"
+}
+target_lane_id {
+  id: "1949_1_-1"
+}

@@ -1,0 +1,22 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 5.45
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.336843
+brake_percentage: 21.664759
+steering_percentage: -1.4893616
+steering_torque_nm: -0.6875
+parking_brake: false
+driving_mode: COMPLETE_AUTO_DRIVE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1505249480.0773075
+  module_name: "chassis"
+  sequence_num: 93986
+}
+signal {
+  turn_signal: TURN_NONE
+  horn: false
+}

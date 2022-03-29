@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
   // init cyber framework
   apollo::cyber::Init(argv[0]);
   // create talker node
+  //std::shared_ptr<apollo::cyber::Node> talker_node(apollo::cyber::CreateNode("talker"));
   auto talker_node = apollo::cyber::CreateNode("talker");
   // create talker
   auto talker = talker_node->CreateWriter<Chatter>("channel/chatter");

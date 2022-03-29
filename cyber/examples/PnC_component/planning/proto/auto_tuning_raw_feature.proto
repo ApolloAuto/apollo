@@ -1,0 +1,76 @@
+syntax = "proto2";
+
+package apollo.planning.autotuning;
+
+import "modules/common/proto/pnc_point.proto";
+
+message PathPointRawFeature {
+  optional apollo.common.PathPoint cartesian_coord = 1;
+  optional apollo.common.FrenetFramePoint frenet_coord = 2;
+}
+
+message SpeedPointRawFeature {
+  message ObjectDecisionFeature {
+    // obstacle id
+    optional int32 id = 1;
+    // relative to eog, s_obs - s_host [m]
+    optional double relative_s = 2;
+    // relative to ego, l_obs - l_host [m]
+    optional double relative_l = 3;
+    // relative to ego, v_obs - v_host [m/s]
+    optional double relative_v = 4;
+    // speed [m / s]
+    optional double speed = 5;
+  }
+
+  optional double s = 1;            // [m]
+  optional double t = 2;            // [s]
+  optional double v = 3;            // [m/s]
+  optional double a = 4;            // [m/s^2]
+  optional double j = 5;            // [m/s^3]
+  optional double speed_limit = 6;  // speed limit with curvature adj [m/s]
+
+  repeated ObjectDecisionFeature follow = 10;
+  repeated ObjectDecisionFeature overtake = 11;
+  repeated ObjectDecisionFeature virtual_decision = 13;
+  repeated ObjectDecisionFeature stop = 14;
+  repeated ObjectDecisionFeature collision = 15;
+  repeated ObjectDecisionFeature nudge = 12;
+  repeated ObjectDecisionFeature sidepass_front = 16;
+  repeated ObjectDecisionFeature sidepass_rear = 17;
+  repeated ObjectDecisionFeature keep_clear = 18;
+}
+
+// caputuring the obstacle raw distance information from surrounding environment
+// based on ST graph
+message ObstacleSTRawData {
+  message STPointPair {
+    optional double s_lower = 1;
+    optional double s_upper = 2;
+    optional double t = 3;
+    optional double l = 4 [default = 10.0];  // filled when nudging
+  }
+
+  message ObstacleSTData {
+    optional int32 id = 1;
+    optional double speed = 2;
+    optional bool is_virtual = 3;
+    optional double probability = 4;
+    repeated STPointPair polygon = 8;
+    repeated STPointPair distribution = 9;
+  }
+
+  repeated ObstacleSTData obstacle_st_data = 1;
+  repeated ObstacleSTData obstacle_st_nudge = 2;
+  repeated ObstacleSTData obstacle_st_sidepass = 3;
+}
+
+message TrajectoryPointRawFeature {
+  optional PathPointRawFeature path_feature = 1;
+  optional SpeedPointRawFeature speed_feature = 2;
+}
+
+message TrajectoryRawFeature {
+  repeated TrajectoryPointRawFeature point_feature = 1;
+  optional ObstacleSTRawData st_raw_data = 2;
+}
