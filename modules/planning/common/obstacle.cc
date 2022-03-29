@@ -316,7 +316,7 @@ void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
                                             const double adc_start_s) {
   const auto& adc_param =
       VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
-  const double adc_width = adc_param.width();
+  const double half_adc_width = adc_param.width() / 2;
   if (is_static_ || trajectory_.trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
     double start_s = sl_boundary_.start_s();
@@ -324,7 +324,7 @@ void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
     if (end_s - start_s < kStBoundaryDeltaS) {
       end_s = start_s + kStBoundaryDeltaS;
     }
-    if (!reference_line.IsBlockRoad(perception_bounding_box_, adc_width)) {
+    if (!reference_line.IsBlockRoad(perception_bounding_box_, half_adc_width)) {
       return;
     }
     point_pairs.emplace_back(STPoint(start_s - adc_start_s, 0.0),
