@@ -26,6 +26,8 @@ ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
 USE_GPU=-1
+use_nvidia=-1
+use_amd=-1
 
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
@@ -136,9 +138,20 @@ function _chk_n_set_gpu_arg() {
     use_gpu=0
   elif [ "${arg}" = "gpu" ]; then
     use_gpu=1
-  else
-    # Do nothing
-    return 0
+  fi
+  if [ "${arg}" = "nvidia" ]; then
+    use_gpu=1
+    use_nvidia=1
+  fi
+  if [ "${arg}" = "amd" ]; then
+    use_gpu=1
+    use_amd=1
+  fi
+
+  if (( $use_nvidia == 1)) && (( $use_amd == 1 )); then
+    error "Mixed use of '--config=amd' and '--config=nvidia':" \
+      "please specify only one GPU target. Exiting..."
+    exit 1
   fi
 
   if [[ "${USE_GPU}" -lt 0 || "${USE_GPU}" = "${use_gpu}" ]]; then
