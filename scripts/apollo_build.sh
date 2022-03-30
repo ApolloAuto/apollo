@@ -252,11 +252,10 @@ function run_bazel_build() {
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 function prepare_bazel_build() {
-
-  if [ ! -d ${DIST_DIR} ]; then
-    mkdir DIST_DIR
-    wget https://apollo-system.cdn.bcebos.com/archive/bazel_deps/bazel-dependencies-5.0.0.tar.gz
-    tar -zxvf bazel-dependencies-5.0.0.tar.gz --strip-components 1 -C DIST_DIR
+  if [  "$(ls -A $DIST_DIR)"  ]; then
+    wget https://apollo-system.bj.bcebos.com/archive/bazel_deps/bazel-dependencies-5.0.0.tar.gz
+    tar -zxvf bazel-dependencies-5.0.0.tar.gz --strip-components 1 -C ${DIST_DIR}
+    rm bazel-dependencies-5.0.0.tar.gz
   fi
 
 }
