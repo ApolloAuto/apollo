@@ -259,7 +259,7 @@ options:
     default: false
 
 routingEditor:
-  radiusOfMapRequest: 2000.0 # meters
+  radiusOfMapRequest: 8000.0 # meters
 
 navigation:
   # possible options: BaiduMap or GoogleMap

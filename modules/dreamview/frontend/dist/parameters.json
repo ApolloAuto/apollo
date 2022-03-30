@@ -331,7 +331,7 @@
 		}
 	},
 	"routingEditor": {
-		"radiusOfMapRequest": 2000
+		"radiusOfMapRequest": 8000
 	},
 	"navigation": {
 		"map": "BaiduMap",
