@@ -58,7 +58,13 @@ http_archive(
         "https://github.com/grpc/grpc/archive/v1.30.0.tar.gz",
     ],
 )
-
+http_archive(
+    name = "zlib",
+    build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+    sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
+    strip_prefix = "zlib-1.2.11",
+    urls = ["https://github.com/madler/zlib/archive/v1.2.11.tar.gz"],
+)
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
