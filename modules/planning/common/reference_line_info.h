@@ -236,7 +236,8 @@ class ReferenceLineInfo {
 
   int GetPnCJunction(const double s,
                      hdmap::PathOverlap* pnc_junction_overlap) const;
-
+    int GetJunction(const double s,
+                     hdmap::PathOverlap* junction_overlap) const;
   std::vector<common::SLPoint> GetAllStopDecisionSLPoint() const;
 
   void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);

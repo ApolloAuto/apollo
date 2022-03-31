@@ -998,6 +998,22 @@ int ReferenceLineInfo::GetPnCJunction(
   return 0;
 }
 
+int ReferenceLineInfo::GetJunction(
+    const double s, hdmap::PathOverlap* junction_overlap) const {
+  CHECK_NOTNULL(junction_overlap);
+  const std::vector<hdmap::PathOverlap>& junction_overlaps =
+      reference_line_.map_path().junction_overlaps();
+
+  static constexpr double kError = 1.0;  // meter
+  for (const auto& overlap : junction_overlaps) {
+    if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
+      *junction_overlap = overlap;
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void ReferenceLineInfo::SetBlockingObstacle(
     const std::string& blocking_obstacle_id) {
   blocking_obstacle_ = path_decision_.Find(blocking_obstacle_id);
