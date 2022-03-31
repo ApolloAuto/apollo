@@ -47,7 +47,7 @@ bool CheckTrafficLightOnReferenceLine(
     const ReferenceLineInfo& reference_line_info,
     const std::string& traffic_light_overlap_id);
 
-bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
+bool CheckInsideJunction(const ReferenceLineInfo& reference_line_info);
 
 void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files);
