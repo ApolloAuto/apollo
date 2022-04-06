@@ -41,6 +41,8 @@ function geo_specific_config() {
 
 DOCKER_RUN_CMD="docker run"
 USE_GPU_HOST=0
+USE_AMD_GPU=0
+USE_NVIDIA_GPU=0
 
 function determine_gpu_use_host() {
     local nv=0
@@ -56,6 +58,8 @@ function determine_gpu_use_host() {
         elif [[ -z "$(nvidia-smi)" ]]; then
             nv=2
             warning "No NVIDIA GPU device found."
+        else
+            USE_NVIDIA_GPU=1
         fi
         if [[ ! -x "$(command -v rocm-smi)" ]]; then
             amd=1
@@ -63,6 +67,8 @@ function determine_gpu_use_host() {
         elif [[ -z "$(rocm-smi)" ]]; then
             amd=2
             warning "No AMD GPU device found."
+        else
+            USE_AMD_GPU=1
         fi
         if (( $nv == 0)) || (( $amd == 0 )); then
             USE_GPU_HOST=1
@@ -88,6 +94,8 @@ function determine_gpu_use_host() {
             fi
         elif [[ -x "$(which nvidia-docker)" ]]; then
             DOCKER_RUN_CMD="nvidia-docker run"
+        elif (( $amd == 0 )); then
+            DOCKER_RUN_CMD="docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install latest Docker" \

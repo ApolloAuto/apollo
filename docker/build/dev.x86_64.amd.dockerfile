@@ -10,7 +10,7 @@ ARG INSTALL_MODE
 # Comment this line if nothing in the `installers` dir got changed.
 # We can use installers shipped with CyberRT Docker image.
 COPY installers /opt/apollo/installers
-
+COPY rcfiles /opt/apollo/rcfiles
 RUN bash /opt/apollo/installers/install_geo_adjustment.sh ${GEOLOC}
 
 RUN bash /opt/apollo/installers/install_modules_base.sh
