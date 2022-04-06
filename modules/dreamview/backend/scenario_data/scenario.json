@@ -9,7 +9,7 @@
     "map_id": "6b6ce49f1809b513825ef23f",
     "number": 1,
     "scenario": {
-        "map_dir": "modules/map/data/xuni",
+        "map_dir": "modules/map/data/apollo_map",
         "start": {
             "x": 754093.9319841558,
             "y": 2564096.298685176

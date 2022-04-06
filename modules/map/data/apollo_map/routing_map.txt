@@ -27306,18 +27306,6 @@ edge {
   direction_type: RIGHT
 }
 edge {
-  from_lane_id: "453342009dup1_1_-1"
-  to_lane_id: "451089019dup1_1_-1"
-  cost: 0
-  direction_type: FORWARD
-}
-edge {
-  from_lane_id: "453342009dup1_1_-1"
-  to_lane_id: "453342020a_1_-1"
-  cost: 0
-  direction_type: FORWARD
-}
-edge {
   from_lane_id: "451089028_1_-3"
   to_lane_id: "453342002_1_-3"
   cost: 0
