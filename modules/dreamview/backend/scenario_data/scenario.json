@@ -9,7 +9,7 @@
     "map_id": "6b6ce49f1809b513825ef23f",
     "number": 1,
     "scenario": {
-        "map_dir": "modules/map/data/xuni",
+        "map_dir": "modules/map/data/apollo_map",
         "start": {
             "x": 754093.9319841558,
             "y": 2564096.298685176
@@ -76,20 +76,6 @@
                 "start_position": {
                     "x": 751339.1940014467,
                     "y": 2563971.279498798,
-                    "speed": 0
-                },
-                "tracked_point": []
-            },
-            {
-                "id": "1125",
-                "type": 0,
-                "width": 4,
-                "height": 1.5,
-                "length": 12,
-                "motiontype": 0,
-                "start_position": {
-                    "x": 752663.4065985013,
-                    "y": 2563978.87839722,
                     "speed": 0
                 },
                 "tracked_point": []
@@ -617,11 +603,11 @@
                     "y": 2563961.3516306914
                 },
                 "initial_state": {
-                    "color": 1
+                    "color": 3
                 },
                 "state_group": [
                     {
-                        "color": 1,
+                        "color": 3,
                         "keep_time": 50
                     },
                     {
@@ -639,11 +625,11 @@
                     "y": 2563961.76295565
                 },
                 "initial_state": {
-                    "color": 1
+                    "color": 3
                 },
                 "state_group": [
                     {
-                        "color": 1,
+                        "color": 3,
                         "keep_time": 30
                     },
                     {
