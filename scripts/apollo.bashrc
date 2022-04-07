@@ -309,7 +309,7 @@ function setup_gpu_support() {
     dev="gpu"
   fi
 
-  local torch_path="/usr/local/libtorch_${dev}/lib"
+  local torch_path="/usr/local/libtorch_${dev}/nvidia/lib"
   if [ -d "${torch_path}" ]; then
     # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
     pathprepend ${torch_path} LD_LIBRARY_PATH
