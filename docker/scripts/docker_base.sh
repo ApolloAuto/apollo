@@ -76,7 +76,7 @@ function determine_gpu_use_host() {
     fi
 
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
+    if (( $USE_NVIDIA_GPU == 1 )); then
         if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
@@ -88,14 +88,14 @@ function determine_gpu_use_host() {
             fi
         elif [[ -x "$(which nvidia-docker)" ]]; then
             DOCKER_RUN_CMD="nvidia-docker run"
-        elif (( $USE_AMD_GPU == 1 )); then
-            DOCKER_RUN_CMD="docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
         else
             USE_GPU_HOST=0
             warning "Cannot access GPU from within container. Please install latest Docker" \
                 "and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
+    elif (( $USE_AMD_GPU == 1 )); then
+        DOCKER_RUN_CMD="docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
     fi
 }
 
