@@ -33,9 +33,9 @@ TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
 
-ROCM_DOCKER_REPO="rocm/dev-ubuntu-18.04"
+APOLLO_MIRROR_REPO="luxoftavnefedov/apollo_mirror"
 VERSION_ROCM_VANILA="5.0-complete"
-VERSION_ROCM_X86_64="dev-x86_64-amd-18.04"
+VERSION_ROCM_X86_64="dev-x86_64-amd-18.04-20220412_2344"
 TESTING_VERSION_ROCM_X86_64="dev-x86_64-amd-18.04-testing"
 
 FAST_MODE="no"
@@ -163,8 +163,8 @@ function determine_dev_image() {
     if [[ -z "${version}" ]]; then
         if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
             if [[ ${USE_AMD_GPU} == 1 ]]; then
-                docker_repo="${ROCM_DOCKER_REPO}"
-                version="${VERSION_ROCM_VANILA}"
+                docker_repo="${APOLLO_MIRROR_REPO}"
+                version="${VERSION_ROCM_X86_64}"
             elif (($USE_NVIDIA_GPU == 1)) || (($USE_GPU_HOST == 0)); then
                 if [[ "${CUSTOM_DIST}" == "testing" ]]; then
                     version="${TESTING_VERSION_X86_64}"
