@@ -31,6 +31,7 @@ use_amd=-1
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
+APOLLO_OUTSIDE_DOCKER=0
 
 function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then
@@ -201,6 +202,12 @@ function parse_cmdline_arguments() {
         known_options="${known_options} ${opt} ${optarg}"
         _chk_n_set_gpu_arg "${optarg}"
         ;;
+      -o)
+        ((++pos))
+        optarg="${!pos}"
+        known_options="${known_options} ${opt}"
+        APOLLO_OUTSIDE_DOCKER=1
+        ;;
       -c)
         ((++pos))
         optarg="${!pos}"
@@ -276,11 +283,17 @@ function run_bazel_build() {
 }
 
 function main() {
-  if ! "${APOLLO_IN_DOCKER}"; then
+  parse_cmdline_arguments "$@"
+  if [ "${APOLLO_OUTSIDE_DOCKER}" -eq 1 ]; then
+    warning "Assembling outside the docker can cause errors,"
+    warning "  we recommend using a ready-made container."
+    warning "Make sure that all dependencies are installed,"
+    warning "  if errors, try running <apollo_path>/docker/build/installers/install.sh"
+  elif ! "${APOLLO_IN_DOCKER}"; then
     error "The build operation must be run from within docker container"
+    error "Use -o flag to force build"
     exit 1
   fi
-  parse_cmdline_arguments "$@"
   determine_cpu_or_gpu_build
 
   run_bazel_build
