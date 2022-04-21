@@ -31,7 +31,7 @@ message ScoreParams {
 }
 
 message FusionParams {
-  repeated SingleCameraParam fusion_params= 1;
+  repeated SingleCameraParam fusion_params = 1;
   optional KMParams km_params = 2;
   required ScoreParams score_params = 3;
 }

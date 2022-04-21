@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,9 @@ DECLARE_string(grpc_server_host);
 DECLARE_string(grpc_client_port);
 DECLARE_string(grpc_server_port);
 DECLARE_string(grpc_debug_server_port);
-
+DECLARE_string(obu_host_ip);
+DECLARE_string(obu_host_port);
+DECLARE_string(local_host_port);
 // Other Flags
 DECLARE_int64(x2v_traffic_light_timer_frequency);
 DECLARE_int64(v2x_car_status_timer_frequency);
@@ -46,6 +48,6 @@ DECLARE_int64(spat_period);
 DECLARE_double(check_time);
 DECLARE_int64(rsu_whitelist_period);
 DECLARE_string(rsu_whitelist_name);
-
+DECLARE_string(v2x_config_file);
 }  // namespace v2x
 }  // namespace apollo
