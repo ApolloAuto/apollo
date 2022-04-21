@@ -255,7 +255,7 @@ function prepare_bazel_build() {
   if [  "$(ls -A $DIST_DIR)"  ]; then
     wget https://apollo-system.bj.bcebos.com/archive/bazel_deps/bazel-dependencies-5.0.0.tar.gz
     if [ $? -ne 0 ]; then
-        echo "fetch bos file failed"
+        echo "fetch bos file failed and retry other region bos"
         wget https://dreamland-backup.su.bcebos.com/apollo-system/bazel-dependencies-5.0.0.tar.gz
     else
         echo "fetch bos file  succeed"
