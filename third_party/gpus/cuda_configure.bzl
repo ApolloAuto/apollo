@@ -48,6 +48,7 @@ _CUDNN_INSTALL_PATH = "CUDNN_INSTALL_PATH"
 _TF_CUDA_COMPUTE_CAPABILITIES = "TF_CUDA_COMPUTE_CAPABILITIES"
 _TF_CUDA_CONFIG_REPO = "TF_CUDA_CONFIG_REPO"
 _PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
+_GPU_PLATFORM = "GPU_PLATFORM"
 
 def to_list_of_strings(elements):
     """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
@@ -1221,6 +1222,10 @@ def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
 
 def _cuda_autoconf_impl(repository_ctx):
     """Implementation of the cuda_autoconf repository rule."""
+    if get_host_environ(repository_ctx, _GPU_PLATFORM) != "NVIDIA":
+        repository_ctx.file("crosstool/error_gpu_disabled.bzl", _DUMMY_CROSSTOOL_BZL_FILE)
+        repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
+        return
     if not enable_cuda(repository_ctx):
         _create_dummy_repository(repository_ctx)
     elif get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
@@ -1250,6 +1255,7 @@ _ENVIRONS = [
     "NVVMIR_LIBRARY_DIR",
     _PYTHON_BIN_PATH,
     "TF_CUDA_PATHS",
+    _GPU_PLATFORM,
 ]
 
 # Note(storypku): Uncomment the following rule iff "--experimental_repo_remote_exec"
