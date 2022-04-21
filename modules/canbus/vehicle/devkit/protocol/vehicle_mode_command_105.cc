@@ -35,13 +35,31 @@ uint32_t Vehiclemodecommand105::GetPeriod() const {
   return PERIOD;
 }
 
+void Vehiclemodecommand105::Parse(const std::uint8_t* bytes, int32_t length,
+                           ChassisDetail* chassis) const {
+  chassis->mutable_devkit()
+      ->mutable_vehicle_mode_command_105()
+      ->set_turn_light_ctrl(turn_light_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_vehicle_mode_command_105()->set_vin_req(
+      vin_req(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_vehicle_mode_command_105()
+      ->set_drive_mode_ctrl(drive_mode_ctrl(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_vehicle_mode_command_105()
+      ->set_steer_mode_ctrl(steer_mode_ctrl(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_vehicle_mode_command_105()
+      ->set_checksum_105(checksum_105(bytes, length));
+}
+
 void Vehiclemodecommand105::UpdateData(uint8_t* data) {
   set_p_turn_light_ctrl(data, turn_light_ctrl_);
   set_p_vin_req(data, vin_req_);
   set_p_drive_mode_ctrl(data, drive_mode_ctrl_);
   set_p_steer_mode_ctrl(data, steer_mode_ctrl_);
   checksum_105_ =
-    data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
+      data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_checksum_105(data, checksum_105_);
 }
 
@@ -151,6 +169,58 @@ void Vehiclemodecommand105::set_p_steer_mode_ctrl(
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 3);
+}
+
+Vehicle_mode_command_105::Turn_light_ctrlType
+Vehiclemodecommand105::turn_light_ctrl(const std::uint8_t* bytes,
+                                       int32_t length) const {
+  Byte t0(bytes + 2);
+  int32_t x = t0.get_byte(0, 2);
+
+  Vehicle_mode_command_105::Turn_light_ctrlType ret =
+      static_cast<Vehicle_mode_command_105::Turn_light_ctrlType>(x);
+  return ret;
+}
+
+Vehicle_mode_command_105::Vin_reqType Vehiclemodecommand105::vin_req(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 1);
+
+  Vehicle_mode_command_105::Vin_reqType ret =
+      static_cast<Vehicle_mode_command_105::Vin_reqType>(x);
+  return ret;
+}
+
+Vehicle_mode_command_105::Drive_mode_ctrlType
+Vehiclemodecommand105::drive_mode_ctrl(const std::uint8_t* bytes,
+                                       int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 3);
+
+  Vehicle_mode_command_105::Drive_mode_ctrlType ret =
+      static_cast<Vehicle_mode_command_105::Drive_mode_ctrlType>(x);
+  return ret;
+}
+
+Vehicle_mode_command_105::Steer_mode_ctrlType
+Vehiclemodecommand105::steer_mode_ctrl(const std::uint8_t* bytes,
+                                       int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 3);
+
+  Vehicle_mode_command_105::Steer_mode_ctrlType ret =
+      static_cast<Vehicle_mode_command_105::Steer_mode_ctrlType>(x);
+  return ret;
+}
+
+int Vehiclemodecommand105::checksum_105(const std::uint8_t* bytes,
+                                 int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

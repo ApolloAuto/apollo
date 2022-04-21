@@ -35,6 +35,20 @@ uint32_t Steeringcommand102::GetPeriod() const {
   return PERIOD;
 }
 
+void Steeringcommand102::Parse(const std::uint8_t* bytes, int32_t length,
+                               ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_steering_command_102()->set_steer_en_ctrl(
+      steer_en_ctrl(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_steering_command_102()
+      ->set_steer_angle_target(steer_angle_target(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_steering_command_102()
+      ->set_steer_angle_spd_target(steer_angle_spd_target(bytes, length));
+  chassis->mutable_devkit()->mutable_steering_command_102()->set_checksum_102(
+      checksum_102(bytes, length));
+}
+
 void Steeringcommand102::UpdateData(uint8_t* data) {
   set_p_steer_en_ctrl(data, steer_en_ctrl_);
   set_p_steer_angle_target(data, steer_angle_target_);
@@ -131,6 +145,48 @@ void Steeringcommand102::set_p_checksum_102(uint8_t* data, int checksum_102) {
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
+}
+
+Steering_command_102::Steer_en_ctrlType Steeringcommand102::steer_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Steering_command_102::Steer_en_ctrlType ret =
+      static_cast<Steering_command_102::Steer_en_ctrlType>(x);
+  return ret;
+}
+
+double Steeringcommand102::steer_angle_target(const std::uint8_t* bytes,
+                                              int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 4);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 1 + -500.000000;
+  return ret;
+}
+
+double Steeringcommand102::steer_angle_spd_target(const std::uint8_t* bytes,
+                                                  int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 8);
+
+  double ret = x * 1;
+  return ret;
+}
+
+int Steeringcommand102::checksum_102(const std::uint8_t* bytes,
+                                     int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

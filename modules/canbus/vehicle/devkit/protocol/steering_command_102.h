@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -31,6 +32,9 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   Steeringcommand102();
 
   uint32_t GetPeriod() const override;
+
+  void Parse(const std::uint8_t* bytes, int32_t length,
+             ChassisDetail* chassis) const override;
 
   void UpdateData(uint8_t* data) override;
 
@@ -84,6 +88,18 @@ class Steeringcommand102 : public ::apollo::drivers::canbus::ProtocolData<
   // 'CheckSum_102', 'offset': 0.0, 'order': 'motorola', 'physical_range':
   // '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   void set_p_checksum_102(uint8_t* data, int checksum_102);
+
+  // report the command
+  Steering_command_102::Steer_en_ctrlType steer_en_ctrl(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  double steer_angle_target(const std::uint8_t* bytes,
+                            const int32_t length) const;
+
+  double steer_angle_spd_target(const std::uint8_t* bytes,
+                                const int32_t length) const;
+
+  int checksum_102(const std::uint8_t* bytes, const int32_t length) const;
 
  private:
   Steering_command_102::Steer_en_ctrlType steer_en_ctrl_;

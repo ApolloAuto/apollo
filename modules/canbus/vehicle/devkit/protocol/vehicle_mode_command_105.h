@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -31,6 +32,9 @@ class Vehiclemodecommand105 : public ::apollo::drivers::canbus::ProtocolData<
   Vehiclemodecommand105();
 
   uint32_t GetPeriod() const override;
+
+  void Parse(const std::uint8_t* bytes, int32_t length,
+             ChassisDetail* chassis) const override;
 
   void UpdateData(uint8_t* data) override;
 
@@ -115,6 +119,21 @@ class Vehiclemodecommand105 : public ::apollo::drivers::canbus::ProtocolData<
   void set_p_steer_mode_ctrl(
       uint8_t* data,
       Vehicle_mode_command_105::Steer_mode_ctrlType steer_mode_ctrl);
+
+  // report the command
+  Vehicle_mode_command_105::Turn_light_ctrlType turn_light_ctrl(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  Vehicle_mode_command_105::Vin_reqType vin_req(const std::uint8_t* bytes,
+                                                const int32_t length) const;
+
+  Vehicle_mode_command_105::Drive_mode_ctrlType drive_mode_ctrl(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  Vehicle_mode_command_105::Steer_mode_ctrlType steer_mode_ctrl(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  int checksum_105(const std::uint8_t* bytes, const int32_t length) const;
 
  private:
   int checksum_105_;

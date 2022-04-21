@@ -216,6 +216,18 @@ Chassis DevkitController::chassis() {
   } else {
     chassis_.set_throttle_percentage(0);
   }
+  // throttle sender cmd
+  if (chassis_detail.devkit().has_throttle_command_100() &&
+      chassis_detail.devkit()
+          .throttle_command_100()
+          .has_throttle_pedal_target()) {
+    chassis_.set_throttle_percentage_cmd(
+        static_cast<float>(chassis_detail.devkit()
+                               .throttle_command_100()
+                               .throttle_pedal_target()));
+  } else {
+    chassis_.set_throttle_percentage(0);
+  }
   // 10 brake
   if (chassis_detail.devkit().has_brake_report_501() &&
       chassis_detail.devkit().brake_report_501().has_brake_pedal_actual()) {
@@ -223,6 +235,14 @@ Chassis DevkitController::chassis() {
         chassis_detail.devkit().brake_report_501().brake_pedal_actual()));
   } else {
     chassis_.set_brake_percentage(0);
+  }
+  // brake sender cmd
+  if (chassis_detail.devkit().has_brake_command_101() &&
+      chassis_detail.devkit().brake_command_101().has_brake_pedal_target()) {
+    chassis_.set_brake_percentage_cmd(static_cast<float>(
+        chassis_detail.devkit().brake_command_101().brake_pedal_target()));
+  } else {
+    chassis_.set_brake_percentage_cmd(0);
   }
   // 23, previously 11 gear
   if (chassis_detail.devkit().has_gear_report_503() &&
@@ -261,6 +281,14 @@ Chassis DevkitController::chassis() {
         100.0 / vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
+  }
+  // steering sender cmd
+  if (chassis_detail.devkit().has_steering_command_102() &&
+      chassis_detail.devkit().steering_command_102().has_steer_angle_target()) {
+    chassis_.set_steering_percentage_cmd(static_cast<float>(
+        chassis_detail.devkit().steering_command_102().steer_angle_target()));
+  } else {
+    chassis_.set_steering_percentage_cmd(0);
   }
   // 13 parking brake
   if (chassis_detail.devkit().has_park_report_504() &&

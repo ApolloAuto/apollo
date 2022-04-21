@@ -15,7 +15,11 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+
+#include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -32,6 +36,22 @@ uint32_t Throttlecommand100::GetPeriod() const {
   // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
+}
+
+void Throttlecommand100::Parse(const std::uint8_t* bytes, int32_t length,
+                               ChassisDetail* chassis) const {
+  chassis->mutable_devkit()
+      ->mutable_throttle_command_100()
+      ->set_throttle_en_ctrl(throttle_en_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_throttle_command_100()->set_throttle_acc(
+      throttle_acc(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_throttle_command_100()
+      ->set_throttle_pedal_target(throttle_pedal_target(bytes, length));
+  chassis->mutable_devkit()->mutable_throttle_command_100()->set_speed_target(
+      speed_target(bytes, length));
+  chassis->mutable_devkit()->mutable_throttle_command_100()->set_checksum_100(
+      checksum_100(bytes, length));
 }
 
 void Throttlecommand100::UpdateData(uint8_t* data) {
@@ -160,6 +180,67 @@ void Throttlecommand100::set_p_checksum_100(uint8_t* data, int checksum_100) {
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
+}
+
+Throttle_command_100::Throttle_en_ctrlType Throttlecommand100::throttle_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Throttle_command_100::Throttle_en_ctrlType ret =
+      static_cast<Throttle_command_100::Throttle_en_ctrlType>(x);
+  return ret;
+}
+
+double Throttlecommand100::throttle_acc(const std::uint8_t* bytes,
+                                        int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 2);
+  int32_t t = t1.get_byte(6, 2);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.01;
+  return ret;
+}
+
+double Throttlecommand100::throttle_pedal_target(const std::uint8_t* bytes,
+                                                 int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 4);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.100000;
+  return ret;
+}
+
+double Throttlecommand100::speed_target(const std::uint8_t* bytes,
+                                        int32_t length) const {
+  Byte t0(bytes + 5);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 6);
+  int32_t t = t1.get_byte(6, 2);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.100000;
+  return ret;
+}
+
+int Throttlecommand100::checksum_100(const std::uint8_t* bytes,
+                                        int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

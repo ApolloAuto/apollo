@@ -32,6 +32,9 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
 
   uint32_t GetPeriod() const override;
 
+  void Parse(const std::uint8_t* bytes, int32_t length,
+             ChassisDetail* chassis) const override;
+
   void UpdateData(uint8_t* data) override;
 
   void Reset() override;
@@ -74,6 +77,15 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
   // 'order': 'motorola', 'physical_unit': ''}
   void set_p_park_en_ctrl(uint8_t* data,
                           Park_command_104::Park_en_ctrlType park_en_ctrl);
+
+  // report the command
+  Park_command_104::Park_targetType park_target(const std::uint8_t* bytes,
+                                                const int32_t length) const;
+
+  Park_command_104::Park_en_ctrlType park_en_ctrl(const std::uint8_t* bytes,
+                                                  const int32_t length) const;
+
+  int checksum_104(const std::uint8_t* bytes, const int32_t length) const;
 
  private:
   int checksum_104_;

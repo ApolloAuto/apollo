@@ -80,8 +80,8 @@ bool CanbusComponent::Init() {
   }
   AINFO << "The can receiver is successfully initialized.";
 
-  if (can_sender_.Init(can_client_.get(), canbus_conf_.enable_sender_log()) !=
-      ErrorCode::OK) {
+  if (can_sender_.Init(can_client_.get(), message_manager_.get(),
+                       canbus_conf_.enable_sender_log()) != ErrorCode::OK) {
     AERROR << "Failed to init can sender.";
     return false;
   }
