@@ -25,6 +25,9 @@ ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
 USE_GPU=-1
+
+use_cpu=-1
+use_gpu=-1
 use_nvidia=-1
 use_amd=-1
 
@@ -140,21 +143,23 @@ function determine_build_targets() {
 
 function _chk_n_set_gpu_arg() {
   local arg="$1"
-  local use_gpu=-1
   if [ "${arg}" = "cpu" ]; then
-    use_gpu=0
+    use_cpu=1
   elif [ "${arg}" = "gpu" ]; then
     use_gpu=1
-  fi
-  if [ "${arg}" = "nvidia" ]; then
-    use_gpu=1
+  elif [ "${arg}" = "nvidia" ]; then
     use_nvidia=1
-  fi
-  if [ "${arg}" = "amd" ]; then
-    use_gpu=1
+  elif [ "${arg}" = "amd" ]; then
     use_amd=1
+  else
+    return 0
   fi
 
+  if (( $use_cpu == 1)) && (( $use_gpu == 1 )); then
+    error "Mixed use of '--config=cpu' and '--config=gpu' may" \
+      "lead to unexpected behavior. Exiting..."
+    exit 1
+  fi
   if (( $use_nvidia == 1)) && (( $use_amd == 1 )); then
     error "Mixed use of '--config=amd' and '--config=nvidia':" \
       "please specify only one GPU target. Exiting..."
@@ -172,14 +177,8 @@ function _chk_n_set_gpu_arg() {
       "To compile for AMD GPU target AMD GPU device should be installed. Exiting..."
     exit 1
   fi
-  if [[ "${USE_GPU}" -lt 0 || "${USE_GPU}" = "${use_gpu}" ]]; then
-    USE_GPU="${use_gpu}"
-    return 0
-  fi
 
-  error "Mixed use of '--config=cpu' and '--config=gpu' may" \
-    "lead to unexpected behavior. Exiting..."
-  exit 1
+  return 0
 }
 
 function parse_cmdline_arguments() {
@@ -227,17 +226,29 @@ function parse_cmdline_arguments() {
 }
 
 function determine_cpu_or_gpu_build() {
-  if [ "${USE_GPU}" -lt 0 ]; then
-    if [ "${USE_GPU_TARGET}" -eq 0 ]; then
+  USE_GPU="${USE_GPU_TARGET}"
+  if [ "${USE_GPU_TARGET}" -eq 0 ]; then
+    if [ "${use_gpu}" -eq 1 ]; then
+      error "Can't compile for GPU: no GPU found. Exiting ..."
+      exit 1
+    elif [ "${use_cpu}" -lt 0 ]; then
       CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
-    else
-      CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
     fi
-    # USE_GPU unset, defaults to USE_GPU_TARGET
-    USE_GPU="${USE_GPU_TARGET}"
-  elif [ "${USE_GPU}" -gt "${USE_GPU_TARGET}" ]; then
-    warning "USE_GPU=${USE_GPU} without GPU can't compile. Exiting ..."
-    exit 1
+    USE_GPU="0"
+  else
+    if [ "${use_cpu}" -eq 1 ]; then
+      USE_GPU="0"
+    else
+      USE_GPU="1"
+      if [ "${use_gpu}" -lt 0 ]; then
+        CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
+      fi
+      if [ "${use_amd}" -lt 0 ] && [ "$GPU_PLATFORM" == "AMD" ]; then
+        CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --config=amd"
+      elif [ "${use_nvidia}" -lt 0 ] && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+        CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --config=nvidia"
+      fi
+    fi
   fi
 
   if [ "${USE_GPU}" -eq 1 ]; then
