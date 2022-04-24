@@ -33,7 +33,7 @@ cyber_launch start cyber/examples/common_component_example/common.launch
 Or
 
 ```
-mainbooard -d cyber/examples/common_component_example/common.dag
+mainboard -d cyber/examples/common_component_example/common.dag
 ```
 
 ### Start the writer nodes

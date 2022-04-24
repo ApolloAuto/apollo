@@ -512,12 +512,12 @@ void CruiseMLPEvaluator::SetLaneFeatureValues(
 
   // If the lane points are not sufficient, apply a linear extrapolation.
   std::size_t size = feature_values->size();
-  while (size >= 10 && size < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
-    double relative_l_new = 2 * feature_values->operator[](size - 5) -
-                            feature_values->operator[](size - 10);
-    double relative_s_new = 2 * feature_values->operator[](size - 4) -
-                            feature_values->operator[](size - 9);
-    double relative_ang_new = feature_values->operator[](size - 3);
+  while (size >= 8 && size < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
+    double relative_l_new = 2 * feature_values->operator[](size - 4) -
+                            feature_values->operator[](size - 8);
+    double relative_s_new = 2 * feature_values->operator[](size - 3) -
+                            feature_values->operator[](size - 7);
+    double relative_ang_new = feature_values->operator[](size - 2);
 
     feature_values->push_back(relative_l_new);
     feature_values->push_back(relative_s_new);
