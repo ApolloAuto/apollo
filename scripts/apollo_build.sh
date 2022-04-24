@@ -160,18 +160,28 @@ function _chk_n_set_gpu_arg() {
       "lead to unexpected behavior. Exiting..."
     exit 1
   fi
+  if (( $use_cpu == 1)) && (( $use_nvidia == 1 )); then
+    error "Mixed use of '--config=cpu' and '--config=nvidia' may" \
+      "lead to unexpected behavior. Exiting..."
+    exit 1
+  fi
+  if (( $use_cpu == 1)) && (( $use_amd == 1 )); then
+    error "Mixed use of '--config=cpu' and '--config=amd' may" \
+      "lead to unexpected behavior. Exiting..."
+    exit 1
+  fi
   if (( $use_nvidia == 1)) && (( $use_amd == 1 )); then
     error "Mixed use of '--config=amd' and '--config=nvidia':" \
       "please specify only one GPU target. Exiting..."
     exit 1
   fi
-  if (( $use_nvidia == 1)) && [ "$GPU_PLATFORM" == "AMD" ]; then
+  if (( $use_nvidia == 1)) && (( $use_amd == 0)) && [ "$GPU_PLATFORM" == "AMD" ]; then
     error "Cross-compilation for NVIDIA GPU target is not supported on AMD GPU device':" \
       "please specify AMD or skip its specification to compile for AMD GPU target."\
       "To compile for NVIDIA GPU target NVIDIA GPU device should be installed. Exiting..."
     exit 1
   fi
-  if (( $use_amd == 1)) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+  if (( $use_amd == 1)) && (( $use_nvidia == 0)) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
     error "Cross-compilation for AMD GPU target is not supported on NVIDIA GPU device':" \
       "please specify NVIDIA or skip its specification to compile for NVIDIA GPU target."\
       "To compile for AMD GPU target AMD GPU device should be installed. Exiting..."
