@@ -156,35 +156,35 @@ function _chk_n_set_gpu_arg() {
   fi
 
   if (( $use_cpu == 1)) && (( $use_gpu == 1 )); then
-    error "Mixed use of '--config=cpu' and '--config=gpu' may" \
-      "lead to unexpected behavior. Exiting..."
+    error "${RED}Mixed use of '--config=cpu' and '--config=gpu' may" \
+      "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
   if (( $use_cpu == 1)) && (( $use_nvidia == 1 )); then
-    error "Mixed use of '--config=cpu' and '--config=nvidia' may" \
-      "lead to unexpected behavior. Exiting..."
+    error "${RED}Mixed use of '--config=cpu' and '--config=nvidia' may" \
+      "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
   if (( $use_cpu == 1)) && (( $use_amd == 1 )); then
-    error "Mixed use of '--config=cpu' and '--config=amd' may" \
-      "lead to unexpected behavior. Exiting..."
+    error "${RED}Mixed use of '--config=cpu' and '--config=amd' may" \
+      "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
   if (( $use_nvidia == 1)) && (( $use_amd == 1 )); then
-    error "Mixed use of '--config=amd' and '--config=nvidia':" \
-      "please specify only one GPU target. Exiting..."
+    error "${RED}Mixed use of '--config=amd' and '--config=nvidia':" \
+      "please specify only one GPU target. Exiting...${NO_COLOR}"
     exit 1
   fi
   if (( $use_nvidia == 1)) && (( $use_amd == -1)) && [ "$GPU_PLATFORM" == "AMD" ]; then
-    error "Cross-compilation for NVIDIA GPU target is not supported on AMD GPU device':" \
+    error "${RED}Cross-compilation for NVIDIA GPU target is not supported on AMD GPU device':" \
       "please specify AMD or skip its specification to compile for AMD GPU target."\
-      "To compile for NVIDIA GPU target NVIDIA GPU device should be installed. Exiting..."
+      "To compile for NVIDIA GPU target NVIDIA GPU device should be installed. Exiting...${NO_COLOR}"
     exit 1
   fi
   if (( $use_amd == 1)) && (( $use_nvidia == -1)) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
-    error "Cross-compilation for AMD GPU target is not supported on NVIDIA GPU device':" \
+    error "${RED}Cross-compilation for AMD GPU target is not supported on NVIDIA GPU device':" \
       "please specify NVIDIA or skip its specification to compile for NVIDIA GPU target."\
-      "To compile for AMD GPU target AMD GPU device should be installed. Exiting..."
+      "To compile for AMD GPU target AMD GPU device should be installed. Exiting...${NO_COLOR}"
     exit 1
   fi
 
@@ -262,9 +262,9 @@ function determine_cpu_or_gpu_build() {
   fi
 
   if [ "${USE_GPU}" -eq 1 ]; then
-    ok "Running GPU build on ${ARCH} platform."
+    ok "Running ${GREEN}${GPU_PLATFORM} GPU${NO_COLOR} build on ${GREEN}${ARCH}${NO_COLOR} platform."
   else
-    ok "Running CPU build on ${ARCH} platform."
+    ok "Running ${GREEN}CPU${NO_COLOR} build on ${GREEN}${ARCH}${NO_COLOR} platform."
   fi
 }
 
@@ -294,7 +294,12 @@ function run_bazel_build() {
   local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
 
   info "Build Overview: "
-  info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
+  info "${TAB}USE_GPU:       ${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
+  if [ "${USE_GPU}" -eq 1 ]; then
+    info "${TAB}GPU arch:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+  else
+    info "${TAB}CPU arch:      ${GREEN}${ARCH}${NO_COLOR}"
+  fi
   info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
