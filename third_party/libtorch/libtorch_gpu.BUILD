@@ -15,11 +15,11 @@ cc_library(
 cc_library(
     name = "libtorch_nvidia",
     includes = [
-        "nvidia/include",
-        "nvidia/include/torch/csrc/api/include",
+        ".",
+        "torch/csrc/api/include",
     ],
     linkopts = [
-        "-L/usr/local/libtorch_gpu/nvidia/lib",
+        "-L/usr/local/libtorch_gpu/lib",
         "-lc10",
         "-lc10_cuda", 
         "-ltorch",
