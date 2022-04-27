@@ -16,7 +16,12 @@
 
 #include "modules/perception/inference/libtorch/torch_det.h"
 
+#if GPU_PLATFORM == NVIDIA
 #include <c10/cuda/CUDACachingAllocator.h>
+#elif GPU_PLATFORM == AMD
+#include <c10/hip/HIPCachingAllocator.h>
+#define c10::cuda::CUDACachingAllocator::emptyCache c10::hip::HIPCachingAllocator::emptyCache
+#endif
 
 #include "cyber/common/log.h"
 
