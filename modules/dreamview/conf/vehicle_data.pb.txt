@@ -222,3 +222,7 @@ data_files {
   source_path: "perception_conf/lidar_obstacle_detection.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline/velodyne16/lidar_obstacle_detection.conf"
 }
+data_files {
+  source_path: "v2x_conf"
+  dest_path: "/apollo/modules/v2x/conf/"
+}
