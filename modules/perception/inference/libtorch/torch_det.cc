@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/perception/inference/libtorch/torch_det.h"
+#include "modules/perception/inference/inference.h"
 
-#include <c10/cuda/CUDACachingAllocator.h>
 
 #include "cyber/common/log.h"
 

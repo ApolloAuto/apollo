@@ -29,6 +29,7 @@ cc_library(
     deps = [
         "//modules/perception/base:blob",
         "@boost",
+        "//third_party:libtorch",
     ],
 )
 

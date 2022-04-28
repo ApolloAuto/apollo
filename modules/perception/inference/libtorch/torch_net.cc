@@ -15,8 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/inference/libtorch/torch_net.h"
-
-#include <c10/cuda/CUDACachingAllocator.h>
+#include "modules/perception/inference/inference.h"
 
 #include "cyber/common/log.h"
 
