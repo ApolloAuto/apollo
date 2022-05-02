@@ -2,7 +2,7 @@
 
 `rocm_configure` depends on the following environment variables:
 
-  * `TF_NEED_HIP`: Whether to enable building with HIP.
+  * `TF_NEED_ROCM`: Whether to enable building with HIP.
   * `GCC_HOST_COMPILER_PATH`: The GCC host compiler path
   * `TF_HIP_CLANG`: Whether to use clang as a HIP compiler (will be a default path).
   * `CLANG_HIP_COMPILER_PATH`: The clang compiler path that will be used for
@@ -37,6 +37,7 @@ _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
 _GCC_HOST_COMPILER_PREFIX = "GCC_HOST_COMPILER_PREFIX"
 _CLANG_HIP_COMPILER_PATH = "CLANG_HIP_COMPILER_PATH"
 _TF_SYSROOT = "TF_SYSROOT"
+_TF_NEED_ROCM = "TF_NEED_ROCM"
 _HIP_PATH = "HIP_PATH"
 _TF_HIP_VERSION = "TF_HIP_VERSION"
 _TF_MIOPEN_VERSION = "TF_MIOPEN_VERSION"
@@ -145,9 +146,9 @@ def auto_configure_fail(msg):
 
 # END cc_configure common functions.
 
-def enable_hip(repository_ctx):
+def enable_rocm(repository_ctx):
     """Returns whether to build with HIP support."""
-    return int(get_host_environ(repository_ctx, "TF_NEED_HIP", False))
+    return int(get_host_environ(repository_ctx, _TF_NEED_ROCM, False))
 
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
@@ -237,7 +238,7 @@ def _rocm_autoconf_impl(repository_ctx):
         repository_ctx.file("crosstool/error_gpu_disabled.bzl", _DUMMY_CROSSTOOL_BZL_FILE)
         repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
         return
-    if not enable_hip(repository_ctx):
+    if not enable_rocm(repository_ctx):
         _create_dummy_repository(repository_ctx)
     elif get_host_environ(repository_ctx, _TF_ROCM_CONFIG_REPO) != None:
         _create_remote_rocm_repository(
@@ -251,7 +252,7 @@ _ENVIRONS = [
     _GCC_HOST_COMPILER_PATH,
     _GCC_HOST_COMPILER_PREFIX,
     _CLANG_HIP_COMPILER_PATH,
-    "TF_NEED_HIP",
+    _TF_NEED_ROCM,
     "TF_HIP_CLANG",
     _HIP_PATH,
     _MIOPEN_INSTALL_PATH,

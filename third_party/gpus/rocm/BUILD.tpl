@@ -4,9 +4,9 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 package(default_visibility = ["//visibility:public"])
 
 config_setting(
-    name = "using_clang",
+    name = "using_hipcc",
     values = {
-        "define": "using_hip_clang=true",
+        "define": "using_rocm_hipcc=true",
     },
 )
 
@@ -51,14 +51,15 @@ rocm_header_library(
 )
 
 cc_library(
-    name = "hip",
-    srcs = ["lib/libamdhip64.so"],
-    data = ["lib/libamdhip64.so"],
-    includes = [
-        "include/",
-    ],
-    linkstatic = 1,
+    name = "rocm",
     visibility = ["//visibility:public"],
+    deps = [
+        ":rocm_headers",
+        ":hip",
+        ":rocblas",
+        ":hipblas",
+        ":miopen",
+    ],
 )
 
 cc_library(

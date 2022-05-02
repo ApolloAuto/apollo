@@ -93,6 +93,8 @@ function determine_gpu_use_target() {
   local use_gpu=0
   local nv=0
   local amd=0
+  local need_cuda=0
+  local need_rocm=0
 
   if [[ "${arch}" == "aarch64" ]]; then
     if lsmod | grep -q nvgpu; then
@@ -118,10 +120,12 @@ function determine_gpu_use_target() {
     fi
     if (( $nv == 0 )); then
       use_gpu=1
+      need_cuda=1
       gpu_platform="NVIDIA"
       info "NVIDIA GPU device found."
     elif (( $amd == 0 )); then
       use_gpu=1
+      need_rocm=1
       gpu_platform="AMD"
     else
       gpu_platform="UNKNOWN"
@@ -134,6 +138,8 @@ function determine_gpu_use_target() {
       info "NVIDIA GPU device is chosen for the build."
     fi
   fi
+  export TF_NEED_CUDA="${need_cuda}"
+  export TF_NEED_ROCM="${need_rocm}"
   export USE_GPU_TARGET="${use_gpu}"
   export GPU_PLATFORM="${gpu_platform}"
 }

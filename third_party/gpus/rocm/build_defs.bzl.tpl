@@ -1,14 +1,14 @@
-# Macros for building HIP code.
-def if_hip(if_true, if_false = []):
-    """Shorthand for select()'ing on whether we're building with HIP.
+# Macros for building ROCm code.
+def if_rocm(if_true, if_false = []):
+    """Shorthand for select()'ing on whether we're building with ROCm.
 
     Returns a select statement which evaluates to if_true if we're building
     with ROCm enabled. Otherwise, the select statement evaluates to if_false.
 
     """
     return select({
-        "@local_config_rocm//rocm:using_clang": if_true,
-        "//conditions:default": if_false,
+        "@local_config_rocm//rocm:using_hipcc": if_true,
+        "//conditions:default": if_false
     })
 
 def if_hip_clang_opt(if_true, if_false = []):
