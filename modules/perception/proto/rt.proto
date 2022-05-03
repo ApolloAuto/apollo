@@ -475,7 +475,7 @@ message ResizeParameter {
     CUBIC = 4;
     LANCZOS4 = 5;
   }
-  // interpolation for for resizing
+  // interpolation for resizing
   repeated Interp_mode interp_mode = 7;
 }
 

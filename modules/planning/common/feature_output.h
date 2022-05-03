@@ -47,7 +47,7 @@ class FeatureOutput {
   static bool Ready();
 
   /**
-   * @brief Insert a a frame of learning data
+   * @brief Insert a frame of learning data
    * @param A feature in proto
    */
   static void InsertLearningDataFrame(
