@@ -4,7 +4,7 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-#TODO(storypku): split opencv into seperate components to speed up build
+#TODO(storypku): split opencv into separate components to speed up build
 # e.g., opencv_imgproc/opencv_highgui/...
 
 cc_library(
