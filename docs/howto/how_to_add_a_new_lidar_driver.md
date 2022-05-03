@@ -132,7 +132,7 @@ CYBER_REGISTER_COMPONENT(ParserComponent)
 
 #### 5. Motion compensation for pointcloud
 
-Motion compensation is optional depends on lidar hardware design. E.g. if the the pointcloud information from lidar already have the motion error included, then no compensator needed as extra steps. Otherwise, you need your own compensator. However, if each cloud point in your lidar's output carries its own timestamp information, you can probably reuse the current compensator without any changes.
+Motion compensation is optional depends on lidar hardware design. E.g. if the pointcloud information from lidar already have the motion error included, then no compensator needed as extra steps. Otherwise, you need your own compensator. However, if each cloud point in your lidar's output carries its own timestamp information, you can probably reuse the current compensator without any changes.
 
 #### 6. Configure the dag file
 

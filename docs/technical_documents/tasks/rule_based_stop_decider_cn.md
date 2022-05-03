@@ -64,7 +64,7 @@ apollo::common::Status RuleBasedStopDecider::Process(
 
 # 相关算法解析
 
-对上图总流程的的每个部分拆分开分析。
+对上图总流程的每个部分拆分开分析。
 
 - Stop on side pass
 

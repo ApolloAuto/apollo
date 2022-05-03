@@ -153,7 +153,7 @@ path_demo_2.5.bag.txt
 in_dev_docker:/apollo/modules/tools/navigator$bash smooth.sh path_demo_2.5.bag.txt 200
 ```
 
-平滑后的的数据在
+平滑后的数据在
 
 ```bash
 in_dev_docker:/apollo/modules/tools/navigator$path_demo_2.5.bag.txt.smoothed

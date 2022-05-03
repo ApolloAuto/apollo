@@ -13,7 +13,7 @@ Apollo 开发容器内自行完成对整个项目的编译构建才能运行 Apo
 装」支持，如`make install`.
 
 为解决这一问题，我们借鉴了[Drake](https://github.com/RobotLocomotion/drake) 项目
-中的「安装」实现，，利用 Starlark 语言，实现了 适用于 Apollo 的 Bazel「安装」扩
+中的「安装」实现，利用 Starlark 语言，实现了 适用于 Apollo 的 Bazel「安装」扩
 展，支持 Apollo 中二进制程序、共享库、资源文件（配置、数据、DAG 文件等）以及文档
 的安装。
 
