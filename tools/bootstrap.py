@@ -38,6 +38,8 @@ import re
 import subprocess
 import sys
 
+from distutils.util import (strtobool)
+
 # pylint: disable=g-import-not-at-top
 try:
     from shutil import which
@@ -934,8 +936,10 @@ def setup_cuda_family_config(environ_cp):
         setup_cuda_family_config_interactively(environ_cp)
 
 
-def set_other_build_config():
-    build_text = """
+def set_other_build_config(environ_cp):
+    build_text = ""
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        build_text = """
 # This config refers to building with CUDA available.
 build:using_cuda --define=using_cuda=true
 build:using_cuda --action_env TF_NEED_CUDA=1
@@ -944,6 +948,19 @@ build:using_cuda --crosstool_top=@local_config_cuda//crosstool:toolchain
 # This config refers to building CUDA with nvcc.
 build:cuda --config=using_cuda
 build:cuda --define=using_cuda_nvcc=true
+
+build:tensorrt --action_env TF_NEED_TENSORRT=1
+"""
+    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        build_text = """
+# This config refers to building with ROCm available.
+build:using_rocm --define=using_rocm=true
+build:using_rocm --action_env TF_NEED_ROCM=1
+build:using_rocm --crosstool_top=@local_config_rocm//crosstool:toolchain
+
+# This config refers to building ROCm with hipcc.
+build:rocm --config=using_rocm
+build:rocm --define=using_rocm_hipcc=true
 
 build:tensorrt --action_env TF_NEED_TENSORRT=1
 """
@@ -1001,33 +1018,31 @@ def main():
     setup_common_dirs(environ_cp)
     setup_python(environ_cp)
 
-    is_need_hip = environ_cp.get('TF_NEED_HIP')
-    if not is_need_hip:
-        environ_cp['TF_NEED_CUDA'] = '1'
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
         # build:gpu --config=using_cuda
         write_to_bazelrc('build:gpu --config=cuda')
-    else:
-        environ_cp['TF_NEED_CUDA'] = '0'
-        # build:gpu --config=using_hip
-        write_to_bazelrc('build:gpu --config=hip')
+    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        # build:gpu --config=using_rocm
+        write_to_bazelrc('build:gpu --config=rocm')
 
     if _APOLLO_DOCKER_STAGE == "dev":
         environ_cp['TF_NEED_TENSORRT'] = '1'
         write_to_bazelrc('build:gpu --config=tensorrt')
 
     write_blank_line_to_bazelrc()
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        setup_cuda_family_config(environ_cp)
+        set_cuda_compute_capabilities(environ_cp)
 
-    setup_cuda_family_config(environ_cp)
-
-    set_cuda_compute_capabilities(environ_cp)
     if not _APOLLO_INSIDE_DOCKER and 'LD_LIBRARY_PATH' in environ_cp:
         write_action_env_to_bazelrc('LD_LIBRARY_PATH',
                                     environ_cp.get('LD_LIBRARY_PATH'))
 
     # Set up which gcc nvcc should use as the host compiler
     set_gcc_host_compiler_path(environ_cp)
-    set_other_cuda_vars(environ_cp)
-    set_other_build_config()
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        set_other_cuda_vars(environ_cp)
+    set_other_build_config(environ_cp)
 
 
 if __name__ == '__main__':
