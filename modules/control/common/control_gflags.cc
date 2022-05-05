@@ -116,3 +116,7 @@ DEFINE_bool(
 
 DEFINE_bool(use_control_submodules, false,
             "use control submodules instead of controller agent");
+
+DEFINE_bool(
+    use_acceleration_lookup_limit, false,
+    "use acceleration lookup limit within vehicle max acceleration for D-KIT");

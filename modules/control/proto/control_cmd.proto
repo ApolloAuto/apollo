@@ -107,6 +107,7 @@ message SimpleLongitudinalDebug {
   optional apollo.common.TrajectoryPoint current_matched_point = 32;
   optional apollo.common.TrajectoryPoint current_reference_point = 33;
   optional apollo.common.TrajectoryPoint preview_reference_point = 34;
+  optional double acceleration_lookup_limit = 35;
 }
 
 message SimpleLateralDebug {
