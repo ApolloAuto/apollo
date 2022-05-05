@@ -16,6 +16,7 @@
 #include "modules/planning/planning_component.h"
 
 #include "cyber/common/file.h"
+#include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::cyber::ComponentBase;
+using apollo::cyber::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
@@ -185,12 +187,12 @@ bool PlanningComponent::Proc(
     return true;
   }
 
+  auto start_time = Clock::NowInSeconds();
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
   // modify trajectory relative time due to the timestamp change in header
-  auto start_time = adc_trajectory_pb.header().timestamp_sec();
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
