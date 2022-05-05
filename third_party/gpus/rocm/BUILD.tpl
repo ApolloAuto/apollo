@@ -82,6 +82,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "migraphx",
+    includes = [
+        "./migraphx/include",
+    ],
+    linkopts = [
+        "-L/opt/rocm/migraphx/lib",
+        "-lmigraphx_gpu",
+        "-lmigraphx_onnx", 
+        "-lmigraphx_ref",
+        "-lmigraphx_tf",
+        "-lmigraphx_c",
+        "-lmigraphx",
+    ],
+    linkstatic = 1,
+)
+
 bzl_library(
     name = "build_defs_bzl",
     srcs = ["build_defs.bzl"],
