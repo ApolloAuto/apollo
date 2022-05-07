@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@ DEFINE_string(grpc_server_host, "127.0.0.1", "grpc server host ip");
 DEFINE_string(grpc_client_port, "50100", "grpc client port");
 DEFINE_string(grpc_server_port, "50101", "grpc server port");
 DEFINE_string(grpc_debug_server_port, "50102", "grpc server debug port");
-
+DEFINE_string(obu_host_ip, "192.168.1.142", "obu host ip");
+DEFINE_string(obu_host_port, "1234", "obu host listen port");
+DEFINE_string(local_host_port, "1234", "localhost listen port");
 // Other Flags
 DEFINE_int64(x2v_traffic_light_timer_frequency, 10,
              "x2v traffic_light timer frequency");
@@ -50,6 +52,8 @@ DEFINE_int64(rsu_whitelist_period, 3 * 1000,
              "get whitelist period in ms");  // 3s
 DEFINE_string(rsu_whitelist_name, "/apollo/modules/v2x/conf/rsu_whitelist.txt",
               "file name for RSU whitelist");
+DEFINE_string(v2x_config_file, "/apollo/modules/v2x/conf/v2x_config.pb.txt",
+              "v2x config file");
 
 }  // namespace v2x
 }  // namespace apollo

@@ -117,6 +117,16 @@ modules {
     }
   }
 }
+modules {
+  key: "v2x"
+  value: {
+    start_command: "nohup /apollo/modules/v2x/v2x_proxy/app/v2x --flagfile=/apollo/modules/v2x/conf/v2x.conf &"
+    stop_command: "pkill -f \"v2x --flagfile\""
+    process_monitor_config {
+      command_keywords: "v2x --flagfile"
+    }
+  }
+}
 monitored_components {
   key: "Recorder"
   value: {
