@@ -33,9 +33,6 @@ class Soc18ffeb97 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 32, 'is_signed_var': False, 'len': 8, 'name': 'SOC',
-  // 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|0]',
-  // 'physical_unit': '', 'precision': 0.4, 'type': 'double'}
   double soc(const std::uint8_t* bytes, const int32_t length) const;
 };
 

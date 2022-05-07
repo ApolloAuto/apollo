@@ -40,86 +40,36 @@ class Controllerpedalcmd18ff84a9
 
   void Reset() override;
 
-  // config detail: {'bit': 56, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Check', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|0]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   Controllerpedalcmd18ff84a9* set_pedal_check(int pedal_check);
 
-  // config detail: {'bit': 48, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_HeartBeat', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   Controllerpedalcmd18ff84a9* set_pedal_heartbeat(int pedal_heartbeat);
 
-  // config detail: {'bit': 24, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Break', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|100]', 'physical_unit': '%', 'precision': 0.4, 'type': 'double'}
   Controllerpedalcmd18ff84a9* set_pedal_break(double pedal_break);
 
-  // config detail: {'bit': 22, 'is_signed_var': False, 'len': 2, 'name':
-  // 'Brake_Select', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|0]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   Controllerpedalcmd18ff84a9* set_brake_select(int brake_select);
 
-  // config detail: {'bit': 16, 'enum': {0: 'PEDAL_GEAR_INVALID', 1:
-  // 'PEDAL_GEAR_R', 2: 'PEDAL_GEAR_N', 3: 'PEDAL_GEAR_D'}, 'is_signed_var':
-  // False, 'len': 4, 'name': 'Pedal_Gear', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'enum'}
   Controllerpedalcmd18ff84a9* set_pedal_gear(
       Controller_pedal_cmd_18ff84a9::Pedal_gearType pedal_gear);
 
-  // config detail: {'bit': 8, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Throttle', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|100]', 'physical_unit': '%', 'precision': 0.4, 'type': 'double'}
   Controllerpedalcmd18ff84a9* set_pedal_throttle(double pedal_throttle);
 
-  // config detail: {'bit': 0, 'enum': {0: 'PEDAL_CTRL_REQUEST_OFF', 1:
-  // 'PEDAL_CTRL_REQUEST_ON', 2: 'PEDAL_CTRL_REQUEST_DEFAULT', 3:
-  // 'PEDAL_CTRL_REQUEST_INVALIT'}, 'is_signed_var': False, 'len': 2, 'name':
-  // 'Pedal_Ctrl_Request', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Controllerpedalcmd18ff84a9* set_pedal_ctrl_request(
       Controller_pedal_cmd_18ff84a9::Pedal_ctrl_requestType pedal_ctrl_request);
 
  private:
-  // config detail: {'bit': 56, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Check', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|0]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   void set_p_pedal_check(uint8_t* data, int pedal_check);
 
-  // config detail: {'bit': 48, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_HeartBeat', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   void set_p_pedal_heartbeat(uint8_t* data, int pedal_heartbeat);
 
-  // config detail: {'bit': 24, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Break', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|100]', 'physical_unit': '%', 'precision': 0.4, 'type': 'double'}
   void set_p_pedal_break(uint8_t* data, double pedal_break);
 
-  // config detail: {'bit': 22, 'is_signed_var': False, 'len': 2, 'name':
-  // 'Brake_Select', 'offset': 0.0, 'order': 'intel', 'physical_range': '[0|0]',
-  // 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
   void set_p_brake_select(uint8_t* data, int brake_select);
 
-  // config detail: {'bit': 16, 'enum': {0: 'PEDAL_GEAR_INVALID', 1:
-  // 'PEDAL_GEAR_R', 2: 'PEDAL_GEAR_N', 3: 'PEDAL_GEAR_D'}, 'is_signed_var':
-  // False, 'len': 4, 'name': 'Pedal_Gear', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'enum'}
   void set_p_pedal_gear(
       uint8_t* data, Controller_pedal_cmd_18ff84a9::Pedal_gearType pedal_gear);
 
-  // config detail: {'bit': 8, 'is_signed_var': False, 'len': 8, 'name':
-  // 'Pedal_Throttle', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|100]', 'physical_unit': '%', 'precision': 0.4, 'type': 'double'}
   void set_p_pedal_throttle(uint8_t* data, double pedal_throttle);
 
-  // config detail: {'bit': 0, 'enum': {0: 'PEDAL_CTRL_REQUEST_OFF', 1:
-  // 'PEDAL_CTRL_REQUEST_ON', 2: 'PEDAL_CTRL_REQUEST_DEFAULT', 3:
-  // 'PEDAL_CTRL_REQUEST_INVALIT'}, 'is_signed_var': False, 'len': 2, 'name':
-  // 'Pedal_Ctrl_Request', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   void set_p_pedal_ctrl_request(
       uint8_t* data,
       Controller_pedal_cmd_18ff84a9::Pedal_ctrl_requestType pedal_ctrl_request);

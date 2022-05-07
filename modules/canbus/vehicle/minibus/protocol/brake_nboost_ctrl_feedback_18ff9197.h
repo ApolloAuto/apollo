@@ -34,9 +34,6 @@ class Brakenboostctrlfeedback18ff9197
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 16, 'is_signed_var': False, 'len': 16, 'name':
-  // 'AEB_BrkPelPosDes', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|100]', 'physical_unit': '', 'precision': 0.01, 'type': 'double'}
   double aeb_brkpelposdes(const std::uint8_t* bytes,
                           const int32_t length) const;
 };

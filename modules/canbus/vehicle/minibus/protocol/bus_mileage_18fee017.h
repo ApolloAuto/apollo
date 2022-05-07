@@ -33,15 +33,9 @@ class Busmileage18fee017 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 32, 'is_signed_var': False, 'len': 32, 'name':
-  // 'BUS_Mileage_Long', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': 'Km', 'precision': 0.125, 'type': 'double'}
   double bus_mileage_long(const std::uint8_t* bytes,
                           const int32_t length) const;
 
-  // config detail: {'bit': 0, 'is_signed_var': False, 'len': 32, 'name':
-  // 'BUS_Mileage_Short', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': 'Km', 'precision': 0.125, 'type': 'double'}
   double bus_mileage_short(const std::uint8_t* bytes,
                            const int32_t length) const;
 };

@@ -38,35 +38,17 @@ class Controllerparking18ff8ca9
 
   void Reset() override;
 
-  // config detail: {'bit': 4, 'enum': {0: 'CP_EPB_ENABLE_NO_REQUEST', 1:
-  // 'CP_EPB_ENABLE_EPB_RELEASE', 2: 'CP_EPB_ENABLE_EPB_TRIGGER'},
-  // 'is_signed_var': False, 'len': 4, 'name': 'CP_EPB_Enable', 'offset': 0.0,
-  // 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
-  // 'precision': 1.0, 'type': 'enum'}
   Controllerparking18ff8ca9* set_cp_epb_enable(
       Controller_parking_18ff8ca9::Cp_epb_enableType cp_epb_enable);
 
-  // config detail: {'bit': 0, 'enum': {0: 'CP_PARK_ACTIVE_NO_ACTIVE', 1:
-  // 'CP_PARK_ACTIVE_ACTIVE'}, 'is_signed_var': False, 'len': 4, 'name':
-  // 'CP_Park_ACTIVE', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Controllerparking18ff8ca9* set_cp_park_active(
       Controller_parking_18ff8ca9::Cp_park_activeType cp_park_active);
 
  private:
-  // config detail: {'bit': 4, 'enum': {0: 'CP_EPB_ENABLE_NO_REQUEST', 1:
-  // 'CP_EPB_ENABLE_EPB_RELEASE', 2: 'CP_EPB_ENABLE_EPB_TRIGGER'},
-  // 'is_signed_var': False, 'len': 4, 'name': 'CP_EPB_Enable', 'offset': 0.0,
-  // 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
-  // 'precision': 1.0, 'type': 'enum'}
   void set_p_cp_epb_enable(
       uint8_t* data,
       Controller_parking_18ff8ca9::Cp_epb_enableType cp_epb_enable);
 
-  // config detail: {'bit': 0, 'enum': {0: 'CP_PARK_ACTIVE_NO_ACTIVE', 1:
-  // 'CP_PARK_ACTIVE_ACTIVE'}, 'is_signed_var': False, 'len': 4, 'name':
-  // 'CP_Park_ACTIVE', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   void set_p_cp_park_active(
       uint8_t* data,
       Controller_parking_18ff8ca9::Cp_park_activeType cp_park_active);

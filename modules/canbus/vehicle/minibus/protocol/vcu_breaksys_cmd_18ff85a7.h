@@ -33,30 +33,15 @@ class Vcubreaksyscmd18ff85a7 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 23, 'is_signed_var': False, 'len': 1, 'name':
-  // 'VCU_Brk_AutoParking_Request', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'bool'}
   bool vcu_brk_autoparking_request(const std::uint8_t* bytes,
                                    const int32_t length) const;
 
-  // config detail: {'bit': 22, 'is_signed_var': False, 'len': 1, 'name':
-  // 'VCU_Brk_Initivate_Enable', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'bool'}
   bool vcu_brk_initivate_enable(const std::uint8_t* bytes,
                                 const int32_t length) const;
 
-  // config detail: {'bit': 8, 'is_signed_var': False, 'len': 8, 'name':
-  // 'VCU_Brk_Right_Pressure', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|25.5]', 'physical_unit': 'MPa', 'precision': 0.1,
-  // 'type': 'double'}
   double vcu_brk_right_pressure(const std::uint8_t* bytes,
                                 const int32_t length) const;
 
-  // config detail: {'bit': 0, 'is_signed_var': False, 'len': 8, 'name':
-  // 'VCU_Brk_Left_Pressure', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|25.5]', 'physical_unit': 'MPa', 'precision': 0.1, 'type': 'double'}
   double vcu_brk_left_pressure(const std::uint8_t* bytes,
                                const int32_t length) const;
 };

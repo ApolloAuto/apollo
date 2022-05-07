@@ -34,10 +34,6 @@ class Busvehiclespeedmsgcfe6c17
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 48, 'is_signed_var': False, 'len': 16, 'name':
-  // 'BUS_Vehicle_Speed', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': 'Km/h', 'precision': 0.00390625, 'type':
-  // 'double'}
   double bus_vehicle_speed(const std::uint8_t* bytes,
                            const int32_t length) const;
 };

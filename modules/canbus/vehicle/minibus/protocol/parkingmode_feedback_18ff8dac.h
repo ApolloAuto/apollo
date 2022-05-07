@@ -34,18 +34,9 @@ class Parkingmodefeedback18ff8dac
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 4, 'enum': {0: 'PMF_CURRENT_STATUS_EPB_RELEASE', 1:
-  // 'PMF_CURRENT_STATUS_EPB_TRIGGER', 2: 'PMF_CURRENT_STATUS_EPB_ACTION'},
-  // 'is_signed_var': False, 'len': 4, 'name': 'PMF_Current_Status', 'offset':
-  // 0.0, 'order': 'intel', 'physical_range': '[0|0]', 'physical_unit': '',
-  // 'precision': 1.0, 'type': 'enum'}
   Parkingmode_feedback_18ff8dac::Pmf_current_statusType pmf_current_status(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 0, 'enum': {0: 'PMF_EPB_ONOFF_OFF', 1:
-  // 'PMF_EPB_ONOFF_ON'}, 'is_signed_var': False, 'len': 4, 'name':
-  // 'PMF_EPB_OnOff', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Parkingmode_feedback_18ff8dac::Pmf_epb_onoffType pmf_epb_onoff(
       const std::uint8_t* bytes, const int32_t length) const;
 };

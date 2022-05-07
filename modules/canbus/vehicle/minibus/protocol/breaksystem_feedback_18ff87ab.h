@@ -34,63 +34,30 @@ class Breaksystemfeedback18ff87ab
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 16, 'is_signed_var': False, 'len': 8, 'name':
-  // 'BRK_FB_SystemDefault', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|25.5]', 'physical_unit': '', 'precision': 0.1, 'type': 'double'}
   double brk_fb_systemdefault(const std::uint8_t* bytes,
                               const int32_t length) const;
 
-  // config detail: {'bit': 48, 'is_signed_var': False, 'len': 8, 'name':
-  // 'EPB_FB_Main_BrkPressure', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 0.1, 'type':
-  // 'double'}
   double epb_fb_main_brkpressure(const std::uint8_t* bytes,
                                  const int32_t length) const;
 
-  // config detail: {'bit': 40, 'is_signed_var': False, 'len': 8, 'name':
-  // 'EPB_FB_Right_BrkPressure_Setvaul', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 0.1, 'type':
-  // 'double'}
   double epb_fb_right_brkpressure_setvaul(const std::uint8_t* bytes,
                                           const int32_t length) const;
 
-  // config detail: {'bit': 32, 'is_signed_var': False, 'len': 8, 'name':
-  // 'EPB_FB_Left_BrkPressure_Setvaule', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 0.1, 'type':
-  // 'double'}
   double epb_fb_left_brkpressure_setvaule(const std::uint8_t* bytes,
                                           const int32_t length) const;
 
-  // config detail: {'bit': 31, 'is_signed_var': False, 'len': 1, 'name':
-  // 'BRK_FB_EPB_Feedback', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'bool'}
   bool brk_fb_epb_feedback(const std::uint8_t* bytes,
                            const int32_t length) const;
 
-  // config detail: {'bit': 30, 'is_signed_var': False, 'len': 1, 'name':
-  // 'BEK_FB_Break_Enable', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'bool'}
   bool bek_fb_break_enable(const std::uint8_t* bytes,
                            const int32_t length) const;
 
-  // config detail: {'bit': 29, 'is_signed_var': False, 'len': 1, 'name':
-  // 'BRK_FB_OverHot_Warning', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'bool'}
   bool brk_fb_overhot_warning(const std::uint8_t* bytes,
                               const int32_t length) const;
 
-  // config detail: {'bit': 8, 'is_signed_var': True, 'len': 8, 'name':
-  // 'BRK_FB_Right_BreakPressure', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[-12.8|12.7]', 'physical_unit': '', 'precision': 0.1,
-  // 'type': 'double'}
   double brk_fb_right_breakpressure(const std::uint8_t* bytes,
                                     const int32_t length) const;
 
-  // config detail: {'bit': 0, 'is_signed_var': False, 'len': 8, 'name':
-  // 'BRK_FB_Left_BreakPressure', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|25.5]', 'physical_unit': '', 'precision': 0.1,
-  // 'type': 'double'}
   double brk_fb_left_breakpressure(const std::uint8_t* bytes,
                                    const int32_t length) const;
 };

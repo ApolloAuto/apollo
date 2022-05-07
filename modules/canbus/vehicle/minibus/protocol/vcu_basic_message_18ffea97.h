@@ -33,69 +33,31 @@ class Vcubasicmessage18ffea97 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 62, 'is_signed_var': False, 'len': 1, 'name':
-  // 'VCU_Basic_Onebit', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'bool'}
   bool vcu_basic_onebit(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 61, 'is_signed_var': False, 'len': 1, 'name':
-  // 'VCU_Basic_HP_Halt', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'bool'}
   bool vcu_basic_hp_halt(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 59, 'is_signed_var': True, 'len': 2, 'name':
-  // 'VCU_Basic_GeatDefault_Code', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_geatdefault_code(const std::uint8_t* bytes,
                                  const int32_t length) const;
 
-  // config detail: {'bit': 56, 'is_signed_var': False, 'len': 3, 'name':
-  // 'VCU_Basic_SysDefault_Level', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_sysdefault_level(const std::uint8_t* bytes,
                                  const int32_t length) const;
 
-  // config detail: {'bit': 48, 'is_signed_var': True, 'len': 8, 'name':
-  // 'VCU_Basic_MotoController_Tempreture', 'offset': -40.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_motocontroller_tempreture(const std::uint8_t* bytes,
                                           const int32_t length) const;
 
-  // config detail: {'bit': 40, 'is_signed_var': True, 'len': 8, 'name':
-  // 'VCU_Basic_Motor_Tempreture', 'offset': -40.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_motor_tempreture(const std::uint8_t* bytes,
                                  const int32_t length) const;
 
-  // config detail: {'bit': 37, 'is_signed_var': False, 'len': 3, 'name':
-  // 'VCU_Basic_Charge_Status', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_charge_status(const std::uint8_t* bytes,
                               const int32_t length) const;
 
-  // config detail: {'bit': 34, 'is_signed_var': False, 'len': 3, 'name':
-  // 'VCU_Basic_Real_HighVoltage_Sta', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type':
-  // 'int'}
   int vcu_basic_real_highvoltage_sta(const std::uint8_t* bytes,
                                      const int32_t length) const;
 
-  // config detail: {'bit': 32, 'enum': {0: 'VCU_BASIC_REAL_GEAR_INVALID', 1:
-  // 'VCU_BASIC_REAL_GEAR_R', 2: 'VCU_BASIC_REAL_GEAR_N', 3:
-  // 'VCU_BASIC_REAL_GEAR_D'}, 'is_signed_var': False, 'len': 2, 'name':
-  // 'VCU_Basic_Real_Gear', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Vcu_basic_message_18ffea97::Vcu_basic_real_gearType vcu_basic_real_gear(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 0, 'is_signed_var': False, 'len': 16, 'name':
-  // 'VCU_Basic_Motor_Speed', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': 'rpm', 'precision': 0.5, 'type': 'double'}
   double vcu_basic_motor_speed(const std::uint8_t* bytes,
                                const int32_t length) const;
 };

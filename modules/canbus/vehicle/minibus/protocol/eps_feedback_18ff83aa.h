@@ -33,38 +33,17 @@ class Epsfeedback18ff83aa : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 56, 'enum': {0: 'EPS_VCU_STATUS_READY', 1:
-  // 'EPS_VCU_STATUS_AUTO_DRIVE_MODE', 2: 'EPS_VCU_STATUS_SPEED_MODE', 3:
-  // 'EPS_VCU_STATUS_NULL', 4: 'EPS_VCU_STATUS_MANUAL_MODE', 5:
-  // 'EPS_VCU_STATUS_MANUAL_INTERVENTION_MODE', 6: 'EPS_VCU_STATUS_WARNING', 7:
-  // 'EPS_VCU_STATUS_ERROR'}, 'is_signed_var': False, 'len': 4, 'name':
-  // 'EPS_VCU_Status', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
   Eps_feedback_18ff83aa::Eps_vcu_statusType eps_vcu_status(
       const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 48, 'is_signed_var': False, 'len': 8, 'name':
-  // 'EPS_Target_Steering_Velocity', 'offset': 0.0, 'order': 'intel',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 10.0, 'type':
-  // 'double'}
   double eps_target_steering_velocity(const std::uint8_t* bytes,
                                       const int32_t length) const;
 
-  // config detail: {'bit': 39, 'is_signed_var': False, 'len': 16, 'name':
-  // 'EPS_Real_Angle', 'offset': -870.0, 'order': 'motorola', 'physical_range':
-  // '[-870|870]', 'physical_unit': '', 'precision': 0.1, 'type': 'double'}
   double eps_real_angle(const std::uint8_t* bytes, const int32_t length) const;
 
-  // config detail: {'bit': 23, 'is_signed_var': False, 'len': 16, 'name':
-  // 'EPS_Targit_Angle', 'offset': -870.0, 'order': 'motorola',
-  // 'physical_range': '[0|0]', 'physical_unit': '', 'precision': 0.1, 'type':
-  // 'double'}
   double eps_targit_angle(const std::uint8_t* bytes,
                           const int32_t length) const;
 
-  // config detail: {'bit': 8, 'is_signed_var': False, 'len': 8, 'name':
-  // 'EPS_Wheel_Torque', 'offset': -8.96, 'order': 'intel', 'physical_range':
-  // '[0|8.96]', 'physical_unit': 'Nm', 'precision': 0.07, 'type': 'double'}
   double eps_wheel_torque(const std::uint8_t* bytes,
                           const int32_t length) const;
 };

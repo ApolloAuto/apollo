@@ -33,9 +33,6 @@ class Busbatterymeg18fa1017 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 0, 'is_signed_var': False, 'len': 16, 'name':
-  // 'BUS_Battery_Voltage', 'offset': 0.0, 'order': 'intel', 'physical_range':
-  // '[0|0]', 'physical_unit': '', 'precision': 0.05, 'type': 'double'}
   double bus_battery_voltage(const std::uint8_t* bytes,
                              const int32_t length) const;
 };
