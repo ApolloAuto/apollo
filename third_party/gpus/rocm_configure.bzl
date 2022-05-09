@@ -28,8 +28,9 @@ load(
     "get_host_environ",
     "get_python_bin",
     "raw_exec",
-    "read_dir",
     "realpath",
+    "to_list_of_strings",
+    "flag_enabled",
     "which",
 )
 
@@ -45,20 +46,6 @@ _MIOPEN_INSTALL_PATH = "MIOPEN_INSTALL_PATH"
 _TF_ROCM_CONFIG_REPO = "TF_ROCM_CONFIG_REPO"
 _PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
 _GPU_PLATFORM = "GPU_PLATFORM"
-
-def to_list_of_strings(elements):
-    """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
-
-    This is to be used to put a list of strings into the bzl file templates
-    so it gets interpreted as list of strings in Starlark.
-
-    Args:
-      elements: list of string elements
-
-    Returns:
-      single string of elements wrapped in quotes separated by a comma."""
-    quoted_strings = ["\"" + element + "\"" for element in elements]
-    return ", ".join(quoted_strings)
 
 def verify_build_defines(params):
     """Verify all variables that crosstool/BUILD.tpl expects are substituted.
@@ -89,11 +76,8 @@ def verify_build_defines(params):
             ".",
         )
 
-def _flag_enabled(repository_ctx, flag_name):
-    return get_host_environ(repository_ctx, flag_name) == "1"
-
 def _use_hip_clang(repository_ctx):
-    return _flag_enabled(repository_ctx, "TF_HIP_CLANG")
+    return flag_enabled(repository_ctx, "TF_HIP_CLANG")
 
 def find_cc(repository_ctx):
     """Find the C++ compiler."""

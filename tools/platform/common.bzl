@@ -315,3 +315,20 @@ def make_copy_dir_rule(repository_ctx, name, src_dir, out_dir, exceptions = None
     ],
     cmd = \"""cp -rLf "%s/." "%s/" %s\""",
 )""" % (name, "\n".join(outs), src_dir, out_dir, post_cmd)
+
+def to_list_of_strings(elements):
+    """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
+
+    This is to be used to put a list of strings into the bzl file templates
+    so it gets interpreted as list of strings in Starlark.
+
+    Args:
+      elements: list of string elements
+
+    Returns:
+      single string of elements wrapped in quotes separated by a comma."""
+    quoted_strings = ["\"" + element + "\"" for element in elements]
+    return ", ".join(quoted_strings)
+
+def flag_enabled(repository_ctx, flag_name):
+    return get_host_environ(repository_ctx, flag_name) == "1"
