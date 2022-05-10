@@ -16,6 +16,7 @@
   * `MIOPEN_INSTALL_PATH` (deprecated): The path to the MIOpen library. Default is
     `/opt/rocm/miopen`.
   * `PYTHON_BIN_PATH`: The python binary path
+  * `TF_ROCM_AMDGPU_TARGETS`: The AMDGPU targets.
 """
 
 load(
@@ -43,6 +44,7 @@ _HIP_PATH = "HIP_PATH"
 _TF_HIP_VERSION = "TF_HIP_VERSION"
 _TF_MIOPEN_VERSION = "TF_MIOPEN_VERSION"
 _MIOPEN_INSTALL_PATH = "MIOPEN_INSTALL_PATH"
+_TF_ROCM_AMDGPU_TARGETS = "TF_ROCM_AMDGPU_TARGETS"
 _TF_ROCM_CONFIG_REPO = "TF_ROCM_CONFIG_REPO"
 _PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
 _GPU_PLATFORM = "GPU_PLATFORM"
@@ -134,6 +136,22 @@ def enable_rocm(repository_ctx):
     """Returns whether to build with HIP support."""
     return int(get_host_environ(repository_ctx, _TF_NEED_ROCM, False))
 
+def _amdgpu_targets(repository_ctx, rocm_toolkit_path, bash_bin):
+    """Returns a list of strings representing AMDGPU targets."""
+    amdgpu_targets_str = get_host_environ(repository_ctx, _TF_ROCM_AMDGPU_TARGETS)
+    if not amdgpu_targets_str:
+        cmd = "%s/bin/rocm_agent_enumerator" % rocm_toolkit_path
+        result = execute(repository_ctx, [bash_bin, "-c", cmd])
+        targets = [target for target in result.stdout.strip().split("\n") if target != "gfx000"]
+        targets = {x: None for x in targets}
+        targets = list(targets.keys())
+        amdgpu_targets_str = ",".join(targets)
+    amdgpu_targets = amdgpu_targets_str.split(",")
+    for amdgpu_target in amdgpu_targets:
+        if amdgpu_target[:3] != "gfx":
+            auto_configure_fail("Invalid AMDGPU target: %s" % amdgpu_target)
+    return amdgpu_targets
+
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
     # Set up build_defs.bzl file for rocm/
@@ -153,6 +171,11 @@ def _create_local_rocm_repository(repository_ctx):
         {},
         tpl_labelname
     )
+
+    find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
+
+    bash_bin = get_bash_bin(repository_ctx)
+    rocm_config = _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script)
 
 def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with ROCm."""
@@ -202,6 +225,34 @@ def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
         substitutions,
     )
 
+def _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script):
+    """Detects and returns information about the ROCm installation on the system.
+
+    Args:
+      repository_ctx: The repository context.
+      bash_bin: the path to the path interpreter
+
+    Returns:
+      A struct containing the following fields:
+        rocm_toolkit_path: The ROCm toolkit installation directory.
+        amdgpu_targets: A list of the system's AMDGPU targets.
+        rocm_version_number: The version of ROCm on the system.
+        miopen_version_number: The version of MIOpen on the system.
+        hipruntime_version_number: The version of HIP Runtime on the system.
+    """
+    config = find_rocm_config(repository_ctx, find_rocm_config_script)
+    rocm_toolkit_path = config["rocm_toolkit_path"]
+    rocm_version_number = config["rocm_version_number"]
+    miopen_version_number = config["miopen_version_number"]
+    hipruntime_version_number = config["hipruntime_version_number"]
+    return struct(
+        amdgpu_targets = _amdgpu_targets(repository_ctx, rocm_toolkit_path, bash_bin),
+        rocm_toolkit_path = rocm_toolkit_path,
+        rocm_version_number = rocm_version_number,
+        miopen_version_number = miopen_version_number,
+        hipruntime_version_number = hipruntime_version_number,
+    )
+
 _DUMMY_CROSSTOOL_BZL_FILE = """
 def error_gpu_disabled():
   fail("ERROR: Building with --config=hip but Apollo is not configured " +
@@ -236,6 +287,29 @@ def _create_dummy_repository(repository_ctx):
     )
     repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
 
+def _exec_find_rocm_config(repository_ctx, script_path):
+    python_bin = get_python_bin(repository_ctx)
+    compressed_contents = repository_ctx.read(script_path)
+    decompress_and_execute_cmd = (
+        "from zlib import decompress;" +
+        "from base64 import b64decode;" +
+        "from os import system;" +
+        "script = decompress(b64decode('%s'));" % compressed_contents +
+        "f = open('script.py', 'wb');" +
+        "f.write(script);" +
+        "f.close();" +
+        "system('\"%s\" script.py');" % (python_bin)
+    )
+    return execute(repository_ctx, [python_bin, "-c", decompress_and_execute_cmd])
+
+def find_rocm_config(repository_ctx, script_path):
+    """Returns ROCm config dictionary from running find_rocm_config.py"""
+    exec_result = _exec_find_rocm_config(repository_ctx, script_path)
+    if exec_result.return_code:
+        auto_configure_fail("Failed to run find_rocm_config.py: %s" % err_out(exec_result))
+    # Parse the dict from stdout.
+    return dict([tuple(x.split(": ")) for x in exec_result.stdout.splitlines()])
+
 def _rocm_autoconf_impl(repository_ctx):
     """Implementation of the rocm_autoconf repository rule."""
     if get_host_environ(repository_ctx, _GPU_PLATFORM) != "AMD":
@@ -264,6 +338,7 @@ _ENVIRONS = [
     _TF_MIOPEN_VERSION,
     _PYTHON_BIN_PATH,
     _GPU_PLATFORM,
+    _TF_ROCM_AMDGPU_TARGETS,
 ]
 
 rocm_configure = repository_rule(
