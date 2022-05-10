@@ -27,7 +27,7 @@ def if_hip_clang_opt(if_true, if_false = []):
 
 def hip_default_copts():
     """Default options for all HIP compilations."""
-    return if_hip([
+    return if_rocm([
         "-x", "hip"
     ])
     + if_hip_clang_opt(

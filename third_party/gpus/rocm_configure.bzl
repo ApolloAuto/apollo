@@ -136,6 +136,23 @@ def enable_rocm(repository_ctx):
 
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
+    # Set up build_defs.bzl file for rocm/
+    tpl_labelname = "rocm:build_defs.bzl"
+    _tpl(
+        repository_ctx,
+        tpl_labelname,
+        {},
+        tpl_labelname
+    )
+
+    # Set up BUILD file for rocm/
+    tpl_labelname = "rocm:BUILD"
+    _tpl(
+        repository_ctx,
+        tpl_labelname,
+        {},
+        tpl_labelname
+    )
 
 def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with ROCm."""
@@ -173,8 +190,11 @@ def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
         {},
     )
 
+def _tpl_path(repository_ctx, filename):
+    return repository_ctx.path(Label("//third_party/gpus/%s.tpl" % filename))
+
 def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
-    if not out:
+    if not out == None:
         out = tpl.replace(":", "/")
     repository_ctx.template(
         out,
