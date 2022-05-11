@@ -51,7 +51,7 @@ Note:
 
 > The `--loop` option enables record to keep playing in a loop playback mode.
 
-## Open <http://127.0.0.1:8888> in your favorate browser (e.g. Chrome) to access Apollo Dreamview
+## Open <http://127.0.0.1:8888> in your favorite browser (e.g. Chrome) to access Apollo Dreamview
 
 The following screen should be shown to you and the car in Dreamview now moves around!
 
