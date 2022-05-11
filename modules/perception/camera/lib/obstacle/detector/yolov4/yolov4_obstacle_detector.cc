@@ -251,8 +251,8 @@ void Yolov4ObstacleDetector::InitYoloBlob(const yolo::NetworkParam &net_param) {
 
 bool Yolov4ObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   gpu_id_ = options.gpu_id;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ = options.base_camera_model;
   ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";

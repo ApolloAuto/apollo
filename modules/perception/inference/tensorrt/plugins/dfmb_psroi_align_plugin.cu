@@ -151,9 +151,9 @@ int DFMBPSROIAlignPlugin::enqueue(int batchSize, const void *const *inputs,
   int channels_each_class =
       no_trans_ ? output_channel_ : output_channel_ / num_classes_;
 
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMemsetAsync(top_data, 0, output_size_ * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaDeviceSynchronize());
+  BASE_GPU_CHECK(cudaDeviceSynchronize());
 
   int block_size = (output_size_ - 1) / thread_size_ + 1;
   DFMBPSROIAlignForward<<<block_size, thread_size_, 0, stream>>>(
