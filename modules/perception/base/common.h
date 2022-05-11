@@ -71,7 +71,7 @@ namespace base {
 
 #if USE_GPU == 1
 
-#define BASE_CUDA_CHECK(condition) \
+#define BASE_GPU_CHECK(condition) \
   { apollo::perception::base::GPUAssert((condition), __FILE__, __LINE__); }
 
 inline void GPUAssert(cudaError_t code, const char *file, int line,

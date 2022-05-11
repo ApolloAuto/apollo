@@ -759,7 +759,7 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     AINFO << "must use gpu mode";
     return false;
   }
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
   // stream will only be destoried for gpu_id_ >= 0
   cudaStreamCreate(&stream_);
 
@@ -865,7 +865,7 @@ RTNet::~RTNet() {
     delete calibrator_;
   }
   if (gpu_id_ >= 0) {
-    BASE_CUDA_CHECK(cudaStreamDestroy(stream_));
+    BASE_GPU_CHECK(cudaStreamDestroy(stream_));
     network_->destroy();
     builder_->destroy();
     context_->destroy();
@@ -876,8 +876,8 @@ RTNet::~RTNet() {
 }
 
 void RTNet::Infer() {
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamSynchronize(stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamSynchronize(stream_));
   for (auto name : input_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
@@ -897,7 +897,7 @@ void RTNet::Infer() {
     }
   }
   context_->enqueue(max_batch_size_, &buffers_[0], stream_, nullptr);
-  BASE_CUDA_CHECK(cudaStreamSynchronize(stream_));
+  BASE_GPU_CHECK(cudaStreamSynchronize(stream_));
 
   for (auto name : output_names_) {
     auto blob = get_blob(name);

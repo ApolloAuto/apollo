@@ -35,9 +35,9 @@ class FeatureGenerator {
   FeatureGenerator() {
 #if USE_GPU == 1
     pc_gpu_size_ = kMaxPointCloudGPUSize;
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
+    BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
                                pc_gpu_size_ * sizeof(base::PointF)));
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_),
+    BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_),
                                pc_gpu_size_ * sizeof(int)));
 #endif
   }
