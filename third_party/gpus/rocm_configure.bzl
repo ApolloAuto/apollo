@@ -277,9 +277,70 @@ load("//crosstool:error_gpu_disabled.bzl", "error_gpu_disabled")
 error_gpu_disabled()
 """
 
+# TODO(emankov): Bring into compliance with lib_name from cuda_configure.bzl and then move it to /gpus/common.bzl
+def lib_name(base_name, version = None, static = False):
+    """Constructs the platform-specific name of a library.
+
+      Args:
+        base_name: The name of the library, such as "cudart"
+        version: The version of the library.
+        static: True the library is static or False if it is a shared object.
+
+      Returns:
+        The platform-specific name of the library.
+      """
+    version = "" if not version else "." + version
+    if static:
+        return "lib%s.a" % base_name
+    return "lib%s.so%s" % (base_name, version)
+
 def _create_dummy_repository(repository_ctx):
+    # Set up build_defs.bzl file for rocm/
+    tpl_labelname = "rocm:build_defs.bzl"
+    _tpl(
+        repository_ctx,
+        tpl_labelname,
+        {
+            "%{rocm_is_configured}": "False",
+            "%{rocm_extra_copts}": "[]",
+            "%{rocm_gpu_architectures}": "[]",
+            "%{rocm_version_number}": "0",
+        },
+        tpl_labelname
+    )
+
+    # Set up BUILD file for rocm/
+    tpl_labelname = "rocm:BUILD"
+    _tpl(
+        repository_ctx,
+        tpl_labelname,
+        {
+            "%{hip_lib}": lib_name("hip"),
+            "%{hipblas_lib}": lib_name("hipblas"),
+            "%{miopen_lib}": lib_name("miopen"),
+            "%{copy_rules}": "",
+            "%{rocm_headers}": "",
+        },
+        tpl_labelname
+    )
+
+    # Create dummy files for the ROCm toolkit since they are still required by
+    # tensorflow/core/platform/default/build_config:rocm.
+    repository_ctx.file("rocm/hip/include/hip/hip_runtime.h", "")
+
+    # Set up rocm_config.h, which is used by
+    # tensorflow/stream_executor/dso_loader.cc.
+    # _tpl(
+    #     repository_ctx,
+    #     "rocm:rocm_config.h",
+    #     {
+    #         "%{rocm_toolkit_path}": _DEFAULT_ROCM_TOOLKIT_PATH,
+    #     },
+    #     "rocm/rocm/rocm_config.h",
+    # )
+
     # If rocm_configure is not configured to build with GPU support, and the user
-    # attempts to build with --config=hip, add a dummy build rule to intercept
+    # attempts to build with --config=rocm, add a dummy build rule to intercept
     # this and fail with an actionable error message.
     repository_ctx.file(
         "crosstool/error_gpu_disabled.bzl",
@@ -312,10 +373,6 @@ def find_rocm_config(repository_ctx, script_path):
 
 def _rocm_autoconf_impl(repository_ctx):
     """Implementation of the rocm_autoconf repository rule."""
-    if get_host_environ(repository_ctx, _GPU_PLATFORM) != "AMD":
-        repository_ctx.file("crosstool/error_gpu_disabled.bzl", _DUMMY_CROSSTOOL_BZL_FILE)
-        repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
-        return
     if not enable_rocm(repository_ctx):
         _create_dummy_repository(repository_ctx)
     elif get_host_environ(repository_ctx, _TF_ROCM_CONFIG_REPO) != None:

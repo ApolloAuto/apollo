@@ -1,5 +1,6 @@
-load(":build_defs.bzl", "rocm_header_library")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+licenses(["restricted"])  # MPL2, portions GPL v3, LGPL v3, BSD-like
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,35 +20,42 @@ config_setting(
     },
 )
 
-rocm_header_library(
+# TODO(emankov): Uncomment rocm/rocm_config.h after setting it up in rocm_configure.bzl
+cc_library(
     name = "rocm_headers",
     hdrs = [
-        "rocm/rocm_config.h",
-        ":rocm-include"
+#       "rocm/rocm_config.h",
+        %{rocm_headers}
     ],
-    include_prefix = "third_party/gpus",
     includes = [
         ".",
         "rocm/include",
     ],
+    visibility = ["//visibility:public"],
 )
 
-rocm_header_library(
-    name = "hipblas_headers",
-    hdrs = [":hipblas-include"],
-    include_prefix = "third_party/gpus/hipblas",
-    strip_include_prefix = "hipblas/include",
-    deps = [":rocm_headers"],
-    includes = ["hipblas/include"],
+cc_library(
+    name = "hip",
+    srcs = ["rocm/lib/%{hip_lib}"],
+    data = ["rocm/lib/%{hip_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
 )
 
-rocm_header_library(
-    name = "miopen_header",
-    hdrs = [":miopen-include"],
-    include_prefix = "third_party/gpus/miopen",
-    strip_include_prefix = "miopen/include",
-    deps = [":rocm_headers"],
-    includes = ["miopen/include"],
+cc_library(
+    name = "miopen",
+    srcs = ["rocm/lib/%{miopen_lib}"],
+    data = ["rocm/lib/%{miopen_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -56,54 +64,26 @@ cc_library(
     deps = [
         ":rocm_headers",
         ":hip",
-        ":rocblas",
         ":hipblas",
         ":miopen",
     ],
 )
 
-cc_library(
-    name = "miopen",
-    srcs = ["lib/libMIOpen.so"],
-    data = ["lib/libMIOpen.so"],
-    includes = [
-        "include/",
-    ],
-    linkstatic = 1,
-    visibility = ["//visibility:public"],
+bzl_library(
+    name = "build_defs_bzl",
+    srcs = ["build_defs.bzl"],
 )
 
 cc_library(
     name = "hipblas",
-    srcs = ["lib/libhipblas.so"],
-    data = ["lib/libhipblas.so"],
-    includes = [
-        "include/",
-    ],
+    srcs = ["rocm/lib/%{hipblas_lib}"],
+    data = ["rocm/lib/%{hipblas_lib}"],
 )
 
-cc_library(
-    name = "migraphx",
-    includes = [
-        "./migraphx/include",
-    ],
-    linkopts = [
-        "-L/opt/rocm/migraphx/lib",
-        "-lmigraphx_gpu",
-        "-lmigraphx_onnx", 
-        "-lmigraphx_ref",
-        "-lmigraphx_tf",
-        "-lmigraphx_c",
-        "-lmigraphx",
-    ],
-    linkstatic = 1,
-)
-
-bzl_library(
-    name = "build_defs_bzl",
-    srcs = ["build_defs.bzl"],
-    deps = [
-        "@bazel_skylib//lib:selects",
+filegroup(
+    name = "rocm_root",
+    srcs = [
+        "rocm/bin/clang-offload-bundler",
     ],
 )
 
