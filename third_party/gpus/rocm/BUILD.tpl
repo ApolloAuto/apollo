@@ -80,6 +80,23 @@ cc_library(
     data = ["rocm/lib/%{hipblas_lib}"],
 )
 
+cc_library(
+    name = "rpp",
+    includes = [
+        "./rpp/include",
+    ],
+    linkopts = [
+        "-L/opt/rocm/rpp/lib",
+        "-lamd_rpp",
+    ],
+)
+
+bzl_library(
+    name = "build_defs_bzl",
+    srcs = ["build_defs.bzl"],
+    deps = [
+        "@bazel_skylib//lib:selects",
+
 filegroup(
     name = "rocm_root",
     srcs = [
