@@ -1,4 +1,5 @@
 # Macros for building CUDA code.
+# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def if_cuda(if_true, if_false = []):
     """Shorthand for select()'ing on whether we're building with CUDA.
 
@@ -12,6 +13,7 @@ def if_cuda(if_true, if_false = []):
         "//conditions:default": if_false,
     })
 
+# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def if_cuda_clang(if_true, if_false = []):
    """Shorthand for select()'ing on wheteher we're building with cuda-clang.
 
@@ -24,6 +26,7 @@ def if_cuda_clang(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
+# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def if_cuda_clang_opt(if_true, if_false = []):
    """Shorthand for select()'ing on wheteher we're building with cuda-clang
    in opt mode.
@@ -38,6 +41,7 @@ def if_cuda_clang_opt(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
+# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 # TODO(storypku): revisit the APOLLO_CUDA macro
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
@@ -98,6 +102,7 @@ def cuda_header_library(
         **kwargs
     )
 
+# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def cuda_library(copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
     native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
