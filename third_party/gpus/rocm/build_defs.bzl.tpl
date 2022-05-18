@@ -1,15 +1,5 @@
 # Macros for building ROCm code.
 
-def hip_default_copts():
-    """Default options for all HIP compilations."""
-    return if_rocm([
-        "-x", "hip"
-    ])
-    + if_hip_clang_opt(
-        # Some important HIP optimizations are only enabled at O3.
-        ["-O3"]
-    )
-
 def rocm_header_library(
         name,
         hdrs,

@@ -1,3 +1,5 @@
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_default_copts")
+
 def if_cuda(if_true, if_false = []):
     return select({
         "@local_config_cuda//cuda:using_nvcc": if_true,
@@ -29,20 +31,16 @@ def if_rocm_clang_opt(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
-# TODO(emankov): Don't forget to add %{cuda_extra_copts} and %{rocm_extra_copts} after setting them in the corresponding _create_***_repository() functions
-def gpu_default_copts():
-    return if_cuda([
-        "-x", "cuda",
-        "-DAPOLLO_CUDA=1",
-        "-Xcuda-fatbinary=--compress-all",
-        "--no-cuda-include-ptx=all"
-    ]) + if_cuda_clang_opt(
-        ["-O3"]
-    ) + if_rocm(
+def rocm_default_copts():
+    return if_rocm(
         ["-x", "hip"]
-    ) + if_rocm_clang_opt(
+    )
+    + if_rocm_clang_opt(
         ["-O3"]
     )
+
+def gpu_default_copts():
+    return cuda_default_copts() + rocm_default_copts()
 
 def gpu_library(copts = [], **kwargs):
     native.cc_library(copts = gpu_default_copts() + copts, **kwargs)
