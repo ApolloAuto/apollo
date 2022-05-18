@@ -99,6 +99,17 @@ cc_library(
     linkstatic = 1,
 )
 
+cc_library(
+    name = "rpp",
+    includes = [
+        "./rpp/include",
+    ],
+    linkopts = [
+        "-L/opt/rocm/rpp/lib",
+        "-lamd_rpp",
+    ],
+)
+
 bzl_library(
     name = "build_defs_bzl",
     srcs = ["build_defs.bzl"],
