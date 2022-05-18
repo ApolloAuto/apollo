@@ -184,7 +184,7 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
   BASE_CUDA_CHECK(cudaMemcpyAsync(dev_anchor_widths, anchor_widths_,
                                   num_anchor_per_point_ * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
-  block_size = (anchors_size - 1) / thread_size_ + 1;
+  block_size = (num_anchor - 1) / thread_size_ + 1;
   generate_anchors_kernel<<<block_size, thread_size_, 0, stream>>>(
       height_, width_, heat_map_a_, num_anchor_per_point_, dev_anchor_heights,
       dev_anchor_widths, anchors);
