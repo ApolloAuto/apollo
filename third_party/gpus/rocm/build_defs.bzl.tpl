@@ -1,29 +1,4 @@
 # Macros for building ROCm code.
-def if_rocm(if_true, if_false = []):
-    """Shorthand for select()'ing on whether we're building with ROCm.
-
-    Returns a select statement which evaluates to if_true if we're building
-    with ROCm enabled. Otherwise, the select statement evaluates to if_false.
-
-    """
-    return select({
-        "@local_config_rocm//rocm:using_hipcc": if_true,
-        "//conditions:default": if_false
-    })
-
-def if_hip_clang_opt(if_true, if_false = []):
-   """Shorthand for select()'ing on wheteher we're building with hip-clang
-   in opt mode.
-
-    Returns a select statement which evaluates to if_true if we're building
-    with hip-clang in opt mode. Otherwise, the select statement evaluates to
-    if_false.
-
-   """
-   return select({
-       "@local_config_rocm//rocm:using_clang_opt": if_true,
-       "//conditions:default": if_false
-   })
 
 def hip_default_copts():
     """Default options for all HIP compilations."""
@@ -63,7 +38,3 @@ def rocm_header_library(
         deps = deps + [":%s_virtual" % name],
         **kwargs
     )
-
-def rocm_library(copts = [], **kwargs):
-    """Wrapper over cc_library which adds default HIP options."""
-    native.cc_library(copts = hip_default_copts() + copts, **kwargs)
