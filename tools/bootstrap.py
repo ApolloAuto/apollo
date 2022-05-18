@@ -51,6 +51,7 @@ _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
 _DEFAULT_TENSORRT_VERSION = '7'
 _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.7,5.2,6.0,6.1,7.0,7.2,7.5'
+_DEFAULT_ROCM_COMPUTE_CAPABILITIES = 'gfx900,gfx906'
 _DEFAULT_PYTHON_LIB_PATH = '/usr/lib/python3/dist-packages'
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 3
@@ -732,6 +733,31 @@ def get_native_cuda_compute_capabilities(environ_cp):
     return output
 
 
+def get_native_rocm_compute_capabilities(environ_cp):
+    """Get native rocm compute capabilities.
+
+    Args:
+      environ_cp: copy of the os.environ.
+
+    Returns:
+      string of native rocm compute capabilities , separated by comma.
+      (e.g. "gfx000,gfx906")
+    """
+    device_query_bin = os.path.join(
+        environ_cp.get('ROCM_TOOLKIT_PATH'), 'bin/rocm_agent_enumerator')
+    if os.path.isfile(device_query_bin) and os.access(device_query_bin,
+                                                      os.X_OK):
+        try:
+            output = run_shell(device_query_bin).split('\n')
+
+            output = ','.join(output)
+        except subprocess.CalledProcessError:
+            output = ''
+    else:
+        output = ''
+    return output
+
+
 def set_cuda_compute_capabilities(environ_cp):
     """Set TF_CUDA_COMPUTE_CAPABILITIES."""
     if not _INTERACTIVE_MODE:
@@ -802,6 +828,21 @@ def set_cuda_compute_capabilities(environ_cp):
                                 tf_cuda_compute_capabilities)
 
 
+def set_rocm_compute_capabilities(environ_cp):
+    """Set TF_ROCM_COMPUTE_CAPABILITIES."""
+    native_rocm_compute_capabilities = get_native_rocm_compute_capabilities(
+        environ_cp)
+    if native_rocm_compute_capabilities:
+        tf_rocm_compute_capabilities = native_rocm_compute_capabilities
+    else:
+        tf_rocm_compute_capabilities = _DEFAULT_ROCM_COMPUTE_CAPABILITIES
+    # Set TF_ROCM_COMPUTE_CAPABILITIES
+    environ_cp['TF_ROCM_COMPUTE_CAPABILITIES'] = tf_rocm_compute_capabilities
+    write_action_env_to_bazelrc('TF_ROCM_COMPUTE_CAPABILITIES',
+                                tf_rocm_compute_capabilities)
+    return
+
+
 def set_other_cuda_vars(environ_cp):
     """Set other CUDA related variables."""
     # If CUDA is enabled, always use GPU during build and test.
@@ -857,6 +898,48 @@ def validate_cuda_config(environ_cp):
     print('\n')
 
     environ_cp['CUDA_TOOLKIT_PATH'] = config['cuda_toolkit_path']
+    return True
+
+
+def validate_rocm_config(environ_cp):
+    """Run find_rocm_config.py and return r_toolkit_path, or None."""
+
+    find_rocm_script = os.path.join(
+        _APOLLO_ROOT_DIR,
+        'third_party/gpus/find_rocm_config.py')
+    proc = subprocess.Popen(
+        [environ_cp['PYTHON_BIN_PATH'], find_rocm_script],
+        stdout=subprocess.PIPE,
+        env=environ_cp)
+
+    if proc.wait():
+        # Errors from find_rocm_config.py were sent to stderr.
+        print('Asking for detailed ROCM configuration...\n')
+        return False
+
+    config = dict(
+        tuple(line.decode('ascii').rstrip().split(': '))
+        for line in proc.stdout)
+
+    print('Found ROCM %s in:' % config['rocm_version_number'])
+    print('    %s' % config['rocm_toolkit_path'])
+    print('    %s' % config['rocm_header_path'])
+
+    print('Found hip %s in:' % config['hipruntime_version_number'])
+    print('    %s' % config['hipruntime_library_dir'])
+    print('    %s' % config['hipruntime_include_dir'])
+
+    print('Found hipblas %s in:' % config['hipblas_version_number'])
+    print('    %s' % config['hipblas_library_dir'])
+    print('    %s' % config['hipblas_include_dir'])
+
+    print('Found miopen %s in:' % config['miopen_version_number'])
+    print('    %s' % config['miopen_library_dir'])
+    print('    %s' % config['miopen_include_dir'])
+
+    print('\n')
+
+    environ_cp['ROCM_TOOLKIT_PATH'] = config['rocm_toolkit_path']
     return True
 
 
@@ -936,10 +1019,30 @@ def setup_cuda_family_config(environ_cp):
         setup_cuda_family_config_interactively(environ_cp)
 
 
-def set_other_build_config(environ_cp):
-    build_text = ""
-    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
-        build_text = """
+def setup_rocm_family_config(environ_cp):
+    """Setup ROCm/hip/hipblas/miopen action env."""
+    if not validate_rocm_config(environ_cp):
+        print("Cannot validate_rocm_config non-interactively. Aborting ...")
+        sys.exit(1)
+
+    rocm_env_names = [
+        'TF_ROCM_VERSION',
+        'TF_HIPBLAS_VERSION',
+        'TF_HIP_VERSION',
+        'TF_MIOPEN_VERSION',
+        # Items below are for backwards compatibility
+        'ROCM_TOOLKIT_PATH',
+        'HIP_INSTALL_PATH',
+        'HIPBLAS_INSTALL_PATH',
+        'MIOPEN_INSTALL_PATH'
+    ]
+    for name in rocm_env_names:
+        if name in environ_cp:
+            write_action_env_to_bazelrc(name, environ_cp[name])
+
+
+def set_other_build_cuda_config(environ_cp):
+    build_text = """
 # This config refers to building with CUDA available.
 build:using_cuda --define=using_cuda=true
 build:using_cuda --action_env TF_NEED_CUDA=1
@@ -951,8 +1054,12 @@ build:cuda --define=using_cuda_nvcc=true
 
 build:tensorrt --action_env TF_NEED_TENSORRT=1
 """
-    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
-        build_text = """
+    with open(_APOLLO_BAZELRC, 'a') as f:
+        f.write(build_text)
+
+
+def set_other_build_rocm_config(environ_cp):
+    build_text = """
 # This config refers to building with ROCm available.
 build:using_rocm --define=using_rocm=true
 build:using_rocm --action_env TF_NEED_ROCM=1
@@ -967,7 +1074,10 @@ build:tensorrt --action_env TF_NEED_TENSORRT=1
     with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(build_text)
 
-    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
+
+def set_tensorrt_config(environ_cp):
+    global _APOLLO_DOCKER_STAGE
+
 
 
 def main():
@@ -1019,10 +1129,8 @@ def main():
     setup_python(environ_cp)
 
     if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
-        # build:gpu --config=using_cuda
         write_to_bazelrc('build:gpu --config=cuda')
     if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
-        # build:gpu --config=using_rocm
         write_to_bazelrc('build:gpu --config=rocm')
 
     if _APOLLO_DOCKER_STAGE == "dev":
@@ -1030,19 +1138,23 @@ def main():
         write_to_bazelrc('build:gpu --config=tensorrt')
 
     write_blank_line_to_bazelrc()
+    set_gcc_host_compiler_path(environ_cp)
+    write_blank_line_to_bazelrc()
+
     if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
         setup_cuda_family_config(environ_cp)
         set_cuda_compute_capabilities(environ_cp)
+        set_other_cuda_vars(environ_cp)
+        set_other_build_cuda_config(environ_cp)
+    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        setup_rocm_family_config(environ_cp)
+        set_rocm_compute_capabilities(environ_cp)
+        set_other_build_rocm_config(environ_cp)
 
+    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
     if not _APOLLO_INSIDE_DOCKER and 'LD_LIBRARY_PATH' in environ_cp:
         write_action_env_to_bazelrc('LD_LIBRARY_PATH',
                                     environ_cp.get('LD_LIBRARY_PATH'))
-
-    # Set up which gcc nvcc should use as the host compiler
-    set_gcc_host_compiler_path(environ_cp)
-    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
-        set_other_cuda_vars(environ_cp)
-    set_other_build_config(environ_cp)
 
 
 if __name__ == '__main__':
