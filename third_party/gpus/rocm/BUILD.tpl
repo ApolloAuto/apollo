@@ -69,11 +69,6 @@ cc_library(
     ],
 )
 
-bzl_library(
-    name = "build_defs_bzl",
-    srcs = ["build_defs.bzl"],
-)
-
 cc_library(
     name = "hipblas",
     srcs = ["rocm/lib/%{hipblas_lib}"],
@@ -96,6 +91,8 @@ bzl_library(
     srcs = ["build_defs.bzl"],
     deps = [
         "@bazel_skylib//lib:selects",
+    ],
+)
 
 filegroup(
     name = "rocm_root",
