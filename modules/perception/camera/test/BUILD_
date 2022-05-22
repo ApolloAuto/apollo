@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -418,8 +419,11 @@ cc_test(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+    ]),
 )
 
 # TODO(private)
@@ -498,7 +502,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
-        "@local_config_cuda//cuda",
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cuda",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@local_config_tensorrt//:tensorrt",
         "@opencv",
     ],
@@ -547,7 +555,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
-        "@local_config_cuda//cuda:cudart",
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cuda",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@local_config_tensorrt//:tensorrt",
         "@opencv",
     ],

@@ -1,18 +1,21 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cuda_library(
+gpu_library(
     name = "inference_cuda_util_cuda_lib",
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
         "@boost",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(
@@ -26,7 +29,7 @@ cc_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "inference_util_cuda_lib",
     srcs = ["util.cu"],
     hdrs = ["util.h"],
@@ -34,8 +37,11 @@ cuda_library(
         "//cyber",
         "//modules/perception/base",
         "@eigen",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(
@@ -56,7 +62,7 @@ cc_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "inference_resize_cuda_lib",
     srcs = ["resize.cu"],
     hdrs = ["resize.h"],
@@ -66,9 +72,13 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hipblas",
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(
@@ -82,7 +92,7 @@ cc_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "inference_gemm_cuda_lib",
     srcs = ["gemm.cu"],
     hdrs = ["gemm.h"],
@@ -92,8 +102,11 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(
