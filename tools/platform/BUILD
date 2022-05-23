@@ -6,9 +6,6 @@ config_setting(
     name = "use_gpu",
     define_values = {
         "USE_GPU": "true",
-        "NVIDIA": "0",
-        "AMD": "1",
-        "GPU_PLATFORM": "NVIDIA",
     },
 )
 

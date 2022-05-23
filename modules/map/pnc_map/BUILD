@@ -18,8 +18,6 @@ gpu_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
-        "@local_config_rocm//rocm:rocm_headers",
-        "@local_config_rocm//rocm:hipblas",
     ]),
 )
 
@@ -40,8 +38,8 @@ cc_test(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hipblas",
-        "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hip",
     ]),
 )
 

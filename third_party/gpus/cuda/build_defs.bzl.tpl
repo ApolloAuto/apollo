@@ -1,17 +1,4 @@
 # Macros for building CUDA code.
-# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
-def if_cuda(if_true, if_false = []):
-    """Shorthand for select()'ing on whether we're building with CUDA.
-
-    Returns a select statement which evaluates to if_true if we're building
-    with CUDA enabled.  Otherwise, the select statement evaluates to if_false.
-
-    """
-    return select({
-        "@local_config_cuda//cuda:using_nvcc": if_true,
-        "@local_config_cuda//cuda:using_clang": if_true,
-        "//conditions:default": if_false,
-    })
 
 # TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def if_cuda_clang(if_true, if_false = []):
@@ -41,16 +28,15 @@ def if_cuda_clang_opt(if_true, if_false = []):
        "//conditions:default": if_false
    })
 
-# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 # TODO(storypku): revisit the APOLLO_CUDA macro
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
-    return if_cuda([
+    return [
         "-x", "cuda",
         "-DAPOLLO_CUDA=1",
         "-Xcuda-fatbinary=--compress-all",
         "--no-cuda-include-ptx=all"
-    ] + %{cuda_extra_copts}) + if_cuda_clang_opt(
+    ] + %{cuda_extra_copts} + if_cuda_clang_opt(
         # Some important CUDA optimizations are only enabled at O3.
         ["-O3"]
     )
@@ -101,8 +87,3 @@ def cuda_header_library(
         deps = deps + [":%s_virtual" % name],
         **kwargs
     )
-
-# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
-def cuda_library(copts = [], **kwargs):
-    """Wrapper over cc_library which adds default CUDA options."""
-    native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
