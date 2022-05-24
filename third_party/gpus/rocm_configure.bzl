@@ -33,6 +33,8 @@ load(
     "to_list_of_strings",
     "flag_enabled",
     "which",
+    "make_copy_dir_rule",
+    "make_copy_files_rule",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -154,6 +156,19 @@ def _amdgpu_targets(repository_ctx, rocm_toolkit_path, bash_bin):
 
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
+    find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
+
+    bash_bin = get_bash_bin(repository_ctx)
+    rocm_config = _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script)
+
+    rocm_lib_srcs = [rocm_config.config["hipruntime_library_dir"] + "/" + lib_name("amdhip64"),
+                     rocm_config.config["miopen_library_dir"] + "/" + lib_name("MIOpen"),
+                     rocm_config.config["hipblas_library_dir"] + "/" + lib_name("hipblas")]
+    rocm_lib_outs = ["rocm/lib/" + lib_name("amdhip64"),
+                     "rocm/lib/" + lib_name("MIOpen"),
+                     "rocm/lib/" + lib_name("hipblas")]
+    clang_offload_bundler_path = rocm_config.rocm_toolkit_path + "/llvm/bin/clang-offload-bundler"
+
     # Set up build_defs.bzl file for rocm/
     tpl_labelname = "rocm:build_defs.bzl"
     _tpl(
@@ -165,17 +180,59 @@ def _create_local_rocm_repository(repository_ctx):
 
     # Set up BUILD file for rocm/
     tpl_labelname = "rocm:BUILD"
+
+    # Copy header and library files to execroot.
+    copy_rules = [
+        make_copy_dir_rule(
+            repository_ctx,
+            name = "rocm-include",
+            src_dir = rocm_config.config["rocm_header_path"],
+            out_dir = "rocm/include",
+            exceptions = ["gtest", "gmock"],
+        ),
+        make_copy_dir_rule(
+            repository_ctx,
+            name = "miopen-include",
+            src_dir =  rocm_config.rocm_toolkit_path + "/miopen/include",
+            out_dir = "rocm/include/miopen",
+        ),
+        make_copy_dir_rule(
+            repository_ctx,
+            name = "hipblas-include",
+            src_dir = rocm_config.rocm_toolkit_path + "/hipblas/include",
+            out_dir = "rocm/include/hipblas",
+        ),
+        make_copy_files_rule(
+            repository_ctx,
+            name = "rocm-lib",
+            srcs = rocm_lib_srcs,
+            outs = rocm_lib_outs,
+        ),
+        make_copy_files_rule(
+            repository_ctx,
+            name = "rocm-bin",
+            srcs = [
+                clang_offload_bundler_path,
+            ],
+            outs = [
+                "rocm/bin/" + "clang-offload-bundler",
+            ],
+        )
+    ]
+
+    repository_dict = {
+        "%{hip_lib}": lib_name("amdhip64"),
+        "%{hipblas_lib}": lib_name("hipblas"),
+        "%{miopen_lib}": lib_name("MIOpen"),
+        "%{copy_rules}": "\n".join(copy_rules),
+        "%{rocm_headers}": ('":rocm-include"')
+    }
     _tpl(
         repository_ctx,
         tpl_labelname,
-        {},
+        repository_dict,
         tpl_labelname
     )
-
-    find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
-
-    bash_bin = get_bash_bin(repository_ctx)
-    rocm_config = _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script)
 
 def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with ROCm."""
@@ -251,6 +308,7 @@ def _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script):
         rocm_version_number = rocm_version_number,
         miopen_version_number = miopen_version_number,
         hipruntime_version_number = hipruntime_version_number,
+        config = config
     )
 
 _DUMMY_CROSSTOOL_BZL_FILE = """
