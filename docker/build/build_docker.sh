@@ -196,7 +196,7 @@ function determine_images_in_out_x86_64() {
     fi
 
     local base_nvidia_image="${APOLLO_REPO}:cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}-${arch}"
-    local base_amd_image="rocm/dev-ubuntu-18.04:5.0-complete"
+    local base_amd_image="rocm/dev-ubuntu-18.04:5.1.1-complete"
     if [[ "${stage}" == "base" ]]; then
         if [[ "${TARGET_GPU}" == "nvidia" ]]; then
             IMAGE_IN="nvidia/cuda:${CUDA_LITE}-devel-ubuntu${UBUNTU_LTS}"
