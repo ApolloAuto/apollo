@@ -97,6 +97,7 @@ __global__ void DFMBPSROIAlignForward(
     int gw = floor((Dtype)pw * group_width / pooled_width);
     gh = min(max(gh, 0), group_height - 1);
     gw = min(max(gw, 0), group_width - 1);
+    int c = (ctop * group_height + gh) * group_width + gw;
 
     const Dtype *offset_bottom_data =
         bottom_data + (roi_batch_ind * channels) * height * width;
@@ -108,7 +109,6 @@ __global__ void DFMBPSROIAlignForward(
         if (w <= -1 || w >= width || h <= -1 || h >= height) {
           continue;
         }
-        int c = (ctop * group_height + gh) * group_width + gw;
         int x1 = floor(w);
         int x2 = ceil(w);
         int y1 = floor(h);
