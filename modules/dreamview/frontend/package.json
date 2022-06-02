@@ -28,7 +28,7 @@
         "mobx": "^3.1.10",
         "mobx-react": "^4.1.8",
         "proj4": "^2.4.4",
-        "protobufjs": "^6.8.4",
+        "protobufjs": "^6.11.3",
         "react": "~16.3.0",
         "react-dom": "~16.3.0",
         "react-loadable": "^5.3.1",
