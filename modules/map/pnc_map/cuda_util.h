@@ -30,6 +30,7 @@
   #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
   #define cudaSuccess hipSuccess
   #define CUBLAS_STATUS_SUCCESS HIPBLAS_STATUS_SUCCESS
+  #define cublasCreate hipblasCreate
   #define cublasHandle_t hipblasHandle_t
   #define cublasIdamin hipblasIdamin
   #define cublasStatus_t hipblasStatus_t

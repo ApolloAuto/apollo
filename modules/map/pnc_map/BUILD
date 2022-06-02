@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_library", "gpu_test", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,10 +18,12 @@ gpu_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hipblas",
     ]),
 )
 
-cc_test(
+gpu_test(
     name = "cuda_util_test",
     size = "small",
     srcs = [
