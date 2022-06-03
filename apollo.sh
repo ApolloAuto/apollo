@@ -69,7 +69,7 @@ function apollo_env_setup() {
     check_architecture_support
     check_platform_support
     check_minimal_memory_requirement
-    determine_gpu_use_target
+    setup_gpu_support
     determine_esdcan_use
 
     APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
@@ -94,9 +94,7 @@ function apollo_env_setup() {
         mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
     fi
 
-    if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
-        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
-    fi
+    env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
 }
 
 #TODO(all): Update node modules
@@ -153,12 +151,20 @@ function _check_command() {
     python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
 }
 
+function check_config_cpu() {
+    if [[ $* == *--config?cpu* ]] ; then
+        export USE_GPU_TARGET="0"
+    fi
+}
+
+
 function main() {
     if [ "$#" -eq 0 ]; then
         _usage
         exit 0
     fi
 
+    check_config_cpu "$@"
     apollo_env_setup
 
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"

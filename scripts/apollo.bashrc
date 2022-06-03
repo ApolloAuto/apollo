@@ -95,48 +95,49 @@ function determine_gpu_use_target() {
   local amd=0
   local need_cuda=0
   local need_rocm=0
-
-  if [[ "${arch}" == "aarch64" ]]; then
-    if lsmod | grep -q nvgpu; then
-      if ldconfig -p | grep -q cudart; then
-        use_gpu=1
+  if [[ "$USE_GPU_TARGET" != "0" ]]; then
+      if [[ "${arch}" == "aarch64" ]]; then
+        if lsmod | grep -q nvgpu; then
+          if ldconfig -p | grep -q cudart; then
+            use_gpu=1
+          fi
+        fi
+      else ## x86_64 mode
+        # Check the existence of nvidia-smi and rocm-smi
+        if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+          nv=1
+          warning "No nvidia-smi found."
+        elif [[ -z "$(nvidia-smi)" ]]; then
+          nv=2
+          warning "No NVIDIA GPU device found."
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+          amd=1
+          warning "No rocm-smi found."
+        elif [[ -z "$(rocm-smi)" ]]; then
+          amd=2
+          warning "No AMD GPU device found."
+        fi
+        if (( $nv == 0 )); then
+          use_gpu=1
+          need_cuda=1
+          gpu_platform="NVIDIA"
+          info "NVIDIA GPU device found."
+        elif (( $amd == 0 )); then
+          use_gpu=1
+          need_rocm=1
+          gpu_platform="AMD"
+        else
+          gpu_platform="UNKNOWN"
+          warning "No any GPU device found."
+        fi
+        if (( $amd == 0 )); then
+          info "AMD GPU device found."
+        fi
+        if (( $nv == 0)) && (( $amd == 0 )); then
+          info "NVIDIA GPU device is chosen for the build."
+        fi
       fi
-    fi
-  else ## x86_64 mode
-    # Check the existence of nvidia-smi and rocm-smi
-    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-      nv=1
-      warning "No nvidia-smi found."
-    elif [[ -z "$(nvidia-smi)" ]]; then
-      nv=2
-      warning "No NVIDIA GPU device found."
-    fi
-    if [[ ! -x "$(command -v rocm-smi)" ]]; then
-      amd=1
-      warning "No rocm-smi found."
-    elif [[ -z "$(rocm-smi)" ]]; then
-      amd=2
-      warning "No AMD GPU device found."
-    fi
-    if (( $nv == 0 )); then
-      use_gpu=1
-      need_cuda=1
-      gpu_platform="NVIDIA"
-      info "NVIDIA GPU device found."
-    elif (( $amd == 0 )); then
-      use_gpu=1
-      need_rocm=1
-      gpu_platform="AMD"
-    else
-      gpu_platform="UNKNOWN"
-      warning "No any GPU device found."
-    fi
-    if (( $amd == 0 )); then
-      info "AMD GPU device found."
-    fi
-    if (( $nv == 0)) && (( $amd == 0 )); then
-      info "NVIDIA GPU device is chosen for the build."
-    fi
   fi
   export TF_NEED_CUDA="${need_cuda}"
   export TF_NEED_ROCM="${need_rocm}"
@@ -309,7 +310,6 @@ function setup_gpu_support() {
 
   determine_gpu_use_target
 
-  # TODO(infra): revisit this for CPU builds on GPU capable machines
   local dev="cpu"
   if [ "${USE_GPU_TARGET}" -gt 0 ]; then
     dev="gpu"
@@ -321,7 +321,3 @@ function setup_gpu_support() {
     pathprepend ${torch_path} LD_LIBRARY_PATH
   fi
 }
-
-if ${APOLLO_IN_DOCKER} ; then
-    setup_gpu_support
-fi
