@@ -17,7 +17,7 @@
 """Crosstool wrapper for compiling CUDA programs.
 
 SYNOPSIS:
-  crosstool_wrapper_is_not_gcc [options passed in by cc_library()
+  crosstool_wrapper_driver_is_not_gcc [options passed in by cc_library()
                                 or cc_binary() rule]
 
 DESCRIPTION:

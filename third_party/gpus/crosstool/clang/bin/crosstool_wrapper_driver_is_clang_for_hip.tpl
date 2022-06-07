@@ -1,35 +1,17 @@
-#!/usr/bin/env python3
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
-"""Crosstool wrapper for compiling HIP programs.
+#!/usr/bin/env python
+"""Crosstool wrapper for compiling ROCm programs.
 
 SYNOPSIS:
-  crosstool_wrapper_is_clang_for_hip [options passed in by cc_library()
+  crosstool_wrapper_driver_is_clang_for_hip [options passed in by cc_library()
                                 or cc_binary() rule]
 
 DESCRIPTION:
   This script is expected to be called by the cc_library() or cc_binary() bazel
   rules. When the option "-x hip" is present in the list of arguments passed
-  to this script, it invokes the clang HIP compiler. Most arguments are passed
-  as is as a string to --compiler-options of clang.
+  to this script, it invokes the hipcc compiler. Most arguments are passed
+  as is as a string to --compiler-options of hipcc. When "-x hip" is not
+  present, this wrapper invokes gcc with the input arguments as is.
 """
-
-from __future__ import print_function
-
-__author__ = 'keveman@google.com (Manjunath Kudlur), evgeny.mankov@gmail.com (Evgeny Mankov)'
 
 from argparse import ArgumentParser
 import os
@@ -37,15 +19,18 @@ import subprocess
 import re
 import sys
 import pipes
+import base64
 
-# Template values set by cuda_autoconf.
+# Template values set by rocm_configure.bzl.
 CPU_COMPILER = ('%{cpu_compiler}')
-GCC_HOST_COMPILER_PATH = ('%{gcc_host_compiler_path}')
 
-NVCC_PATH = '%{nvcc_path}'
-HIP_PATH = '%{hip_path}'
-PREFIX_DIR = os.path.dirname(GCC_HOST_COMPILER_PATH)
-HIP_VERSION = '%{hip_version}'
+HIPCC_PATH = '%{hipcc_path}'
+HIPCC_ENV = '%{hipcc_env}'
+HIP_RUNTIME_PATH = '%{hip_runtime_path}'
+HIP_RUNTIME_LIBRARY = '%{hip_runtime_library}'
+ROCR_RUNTIME_PATH = '%{rocr_runtime_path}'
+ROCR_RUNTIME_LIBRARY = '%{rocr_runtime_library}'
+VERBOSE = '1'
 
 def Log(s):
   print('gpus/crosstool: {0}'.format(s))
@@ -56,7 +41,7 @@ def GetOptionValue(argv, option):
 
   Args:
     argv: A list of strings, possibly the argv passed to main().
-    option: The option whose value to extract, with the leading '-'.
+    option: The option whose value to extract, without the leading '-'.
 
   Returns:
     A list of values, either directly following the option,
@@ -65,8 +50,7 @@ def GetOptionValue(argv, option):
   """
 
   parser = ArgumentParser()
-  parser.add_argument(option, nargs='*', action='append')
-  option = option.lstrip('-').replace('-', '_')
+  parser.add_argument('-' + option, nargs='*', action='append')
   args, _ = parser.parse_known_args(argv)
   if not args or not vars(args)[option]:
     return []
@@ -81,7 +65,7 @@ def GetHostCompilerOptions(argv):
     argv: A list of strings, possibly the argv passed to main().
 
   Returns:
-    The string that can be used as the --compiler-options to clang.
+    The string that can be used as the --compiler-options to hipcc.
   """
 
   parser = ArgumentParser()
@@ -90,7 +74,6 @@ def GetHostCompilerOptions(argv):
   parser.add_argument('--sysroot', nargs=1)
   parser.add_argument('-g', nargs='*', action='append')
   parser.add_argument('-fno-canonical-system-headers', action='store_true')
-  parser.add_argument('-no-canonical-prefixes', action='store_true')
 
   args, _ = parser.parse_known_args(argv)
 
@@ -102,43 +85,12 @@ def GetHostCompilerOptions(argv):
     opts += ' -iquote ' + ' -iquote '.join(sum(args.iquote, []))
   if args.g:
     opts += ' -g' + ' -g'.join(sum(args.g, []))
-  if args.fno_canonical_system_headers:
-    opts += ' -fno-canonical-system-headers'
-  if args.no_canonical_prefixes:
-    opts += ' -no-canonical-prefixes'
+  #if args.fno_canonical_system_headers:
+  #  opts += ' -fno-canonical-system-headers'
   if args.sysroot:
     opts += ' --sysroot ' + args.sysroot[0]
 
   return opts
-
-def _update_options(clang_options):
-  if HIP_VERSION in ("5.0.0",):
-    return clang_options
-
-  update_options = { "relaxed-constexpr" : "expt-relaxed-constexpr" }
-  return [ update_options[opt] if opt in update_options else opt
-                    for opt in clang_options ]
-
-# TODO(emankov): Rewrite to GetClangOptions
-def GetNvccOptions(argv):
-  """Collect the -clang_options values from argv.
-
-  Args:
-    argv: A list of strings, possibly the argv passed to main().
-
-  Returns:
-    The string that can be passed directly to clang.
-  """
-
-  parser = ArgumentParser()
-  parser.add_argument('-clang_options', nargs='*', action='append')
-
-  args, _ = parser.parse_known_args(argv)
-
-  if args.clang_options:
-    options = _update_options(sum(args.clang_options, []))
-    return ' '.join(['--'+a for a in options])
-  return ''
 
 def system(cmd):
   """Invokes cmd with os.system().
@@ -156,45 +108,37 @@ def system(cmd):
   else:
     return -os.WTERMSIG(retv)
 
-# TODO(emankov): Rewrite to InvokeClang
-def InvokeNvcc(argv, log=False):
-  """Call clang with arguments assembled from argv.
+
+def InvokeHipcc(argv, log=False):
+  """Call hipcc with arguments assembled from argv.
 
   Args:
     argv: A list of strings, possibly the argv passed to main().
     log: True if logging is requested.
 
   Returns:
-    The return value of calling system('clang ' + args)
+    The return value of calling os.system('hipcc ' + args)
   """
 
   host_compiler_options = GetHostCompilerOptions(argv)
-  clang_compiler_options = GetNvccOptions(argv)
-  opt_option = GetOptionValue(argv, '-O')
-  m_options = GetOptionValue(argv, '-m')
+  opt_option = GetOptionValue(argv, 'O')
+  m_options = GetOptionValue(argv, 'm')
   m_options = ''.join([' -m' + m for m in m_options if m in ['32', '64']])
-  include_options = GetOptionValue(argv, '-I')
-  out_file = GetOptionValue(argv, '-o')
-  depfiles = GetOptionValue(argv, '-MF')
-  defines = GetOptionValue(argv, '-D')
+  include_options = GetOptionValue(argv, 'I')
+  out_file = GetOptionValue(argv, 'o')
+  depfiles = GetOptionValue(argv, 'MF')
+  defines = GetOptionValue(argv, 'D')
   defines = ''.join([' -D' + define for define in defines])
-  undefines = GetOptionValue(argv, '-U')
+  undefines = GetOptionValue(argv, 'U')
   undefines = ''.join([' -U' + define for define in undefines])
-  std_options = GetOptionValue(argv, '-std')
-  clang_allowed_std_options = ["c++03", "c++11", "c++14", "c++17"]
+  std_options = GetOptionValue(argv, 'std')
+  hipcc_allowed_std_options = ["c++11", "c++14"]
   std_options = ''.join([' -std=' + define
-      for define in std_options if define in clang_allowed_std_options][-1:])
-  fatbin_options = ''.join([' --fatbin-options=' + option
-      for option in GetOptionValue(argv, '-Xcuda-fatbinary')])
+      for define in std_options if define in hipcc_allowed_std_options])
 
   # The list of source files get passed after the -c option. I don't know of
   # any other reliable way to just get the list of source files to be compiled.
-  src_files = GetOptionValue(argv, '-c')
-
-  # Pass -w through from host to clang, but don't do anything fancier with
-  # warnings-related flags, since they're not necessarily the same across
-  # compilers.
-  warning_options = ' -w' if '-w' in argv else ''
+  src_files = GetOptionValue(argv, 'c')
 
   if len(src_files) == 0:
     return 1
@@ -211,74 +155,109 @@ def InvokeNvcc(argv, log=False):
   # Unfortunately, there are other options that have -c prefix too.
   # So allowing only those look like C/C++ files.
   src_files = [f for f in src_files if
-               re.search('\.cpp$|\.cc$|\.c$|\.cxx$|\.cu$|\.C$', f)]
+               re.search('\.cpp$|\.cc$|\.c$|\.cxx$|\.C$|\.cu$', f)]
   srcs = ' '.join(src_files)
   out = ' -o ' + out_file[0]
 
-  nvccopts = '-D_FORCE_INLINES '
-  for capability in GetOptionValue(argv, "--cuda-gpu-arch"):
-    capability = capability[len('sm_'):]
-    nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s\" ' % (capability,
-                                                               capability)
-  for capability in GetOptionValue(argv, '--cuda-include-ptx'):
-    capability = capability[len('sm_'):]
-    nvccopts += r'-gencode=arch=compute_%s,\"code=compute_%s\" ' % (capability,
-                                                                    capability)
-  nvccopts += clang_compiler_options
-  nvccopts += undefines
-  nvccopts += defines
-  nvccopts += std_options
-  nvccopts += m_options
-  nvccopts += warning_options
-  nvccopts += fatbin_options
+  hipccopts = ' -v'
+  # In hip-clang environment, we need to make sure that hip header is included
+  # before some standard math header like <complex> is included in any source.
+  # Otherwise, we get build error.
+  # Also we need to retain warning about uninitialised shared variable as
+  # warning only, even when -Werror option is specified.
+  hipccopts += ' --include=hip/hip_runtime.h '
+  # Use -fno-gpu-rdc by default for early GPU kernel finalization
+  # This flag would trigger GPU kernels be generated at compile time, instead
+  # of link time. This allows the default host compiler (gcc) be used as the
+  # linker for TensorFlow on ROCm platform.
+  hipccopts += ' -fno-gpu-rdc '
+  hipccopts += ' -fcuda-flush-denormals-to-zero '
+  hipccopts += undefines
+  hipccopts += defines
+  hipccopts += std_options
+  hipccopts += m_options
 
   if depfiles:
     # Generate the dependency file
     depfile = depfiles[0]
-    cmd = (NVCC_PATH + ' ' + nvccopts +
-           ' --compiler-options "' + host_compiler_options + '"' +
-           ' --compiler-bindir=' + GCC_HOST_COMPILER_PATH +
-           ' -I .' +
-           ' -x cu ' + opt + includes + ' ' + srcs + ' -M -o ' + depfile)
+    cmd = (HIPCC_PATH + ' ' + hipccopts +
+           host_compiler_options +
+           ' -I .' + includes + ' ' + srcs + ' -M -o ' + depfile)
+    cmd = HIPCC_ENV.replace(';', ' ') + ' ' + cmd
     if log: Log(cmd)
-    exit_status = system(cmd)
+    if VERBOSE: print(cmd)
+    exit_status = os.system(cmd)
     if exit_status != 0:
       return exit_status
 
-  cmd = (NVCC_PATH + ' ' + nvccopts +
-         ' --compiler-options "' + host_compiler_options + ' -fPIC"' +
-         ' --compiler-bindir=' + GCC_HOST_COMPILER_PATH +
-         ' -I .' +
-         ' -x cu ' + opt + includes + ' -c ' + srcs + out)
+  cmd = (HIPCC_PATH + ' ' + hipccopts +
+         host_compiler_options + ' -fPIC' +
+         ' -I .' + opt + includes + ' -c ' + srcs + out)
 
-  # TODO(zhengxq): for some reason, 'gcc' needs this help to find 'as'.
-  # Need to investigate and fix.
-  cmd = 'PATH=' + PREFIX_DIR + ':$PATH ' + cmd
+  cmd = HIPCC_ENV.replace(';', ' ') + ' '\
+        + cmd
   if log: Log(cmd)
+  if VERBOSE: print(cmd)
+
   return system(cmd)
 
+
 def main():
-  parser = ArgumentParser()
+  # ignore PWD env var
+  os.environ['PWD']=''
+
+  parser = ArgumentParser(fromfile_prefix_chars='@')
   parser.add_argument('-x', nargs=1)
-  parser.add_argument('--hip_log', action='store_true')
+  parser.add_argument('--rocm_log', action='store_true')
+  parser.add_argument('-pass-exit-codes', action='store_true')
   args, leftover = parser.parse_known_args(sys.argv[1:])
 
+  if VERBOSE: print('PWD=' + os.getcwd())
+  if VERBOSE: print('HIPCC_ENV=' + HIPCC_ENV)
+
   if args.x and args.x[0] == 'hip':
-    if args.hip_log: Log('-x hip')
+    # compilation for GPU objects
+    if args.rocm_log: Log('-x hip')
     leftover = [pipes.quote(s) for s in leftover]
-    # ToDo: Implement InvokeClang instead of InvokeNvcc
-    # if args.hip_log: Log('using clang')
-    # return InvokeNvcc(leftover, log=args.hip_log)
+    if args.rocm_log: Log('using hipcc')
+    return InvokeHipcc(leftover, log=args.rocm_log)
 
-  # Strip our flags before passing through to the CPU compiler for files which
-  # are not -x hip. We can't just pass 'leftover' because it also strips -x.
-  # We not only want to pass -x to the CPU compiler, but also keep it in its
-  # relative location in the argv list (the compiler is actually sensitive to
-  # this).
-  cpu_compiler_flags = [flag for flag in sys.argv[1:]
-                             if not flag.startswith(('--hip_log'))]
+  elif args.pass_exit_codes:
+    # link
+    # with hipcc compiler invoked with -fno-gpu-rdc by default now, it's ok to
+    # use host compiler as linker, but we have to link with HCC/HIP runtime.
+    # Such restriction would be revised further as the bazel script get
+    # improved to fine tune dependencies to ROCm libraries.
+    gpu_linker_flags = [flag for flag in sys.argv[1:]
+                               if not flag.startswith(('--rocm_log'))]
 
-  return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
+    gpu_linker_flags.append('-L' + ROCR_RUNTIME_PATH)
+    gpu_linker_flags.append('-Wl,-rpath=' + ROCR_RUNTIME_PATH)
+    gpu_linker_flags.append('-l' + ROCR_RUNTIME_LIBRARY)
+    gpu_linker_flags.append('-L' + HIP_RUNTIME_PATH)
+    gpu_linker_flags.append('-Wl,-rpath=' + HIP_RUNTIME_PATH)
+    gpu_linker_flags.append('-l' + HIP_RUNTIME_LIBRARY)
+    gpu_linker_flags.append("-lrt")
+    gpu_linker_flags.append("-lstdc++")
+
+    if VERBOSE: print(' '.join([CPU_COMPILER] + gpu_linker_flags))
+    return subprocess.call([CPU_COMPILER] + gpu_linker_flags)
+
+  else:
+    # compilation for host objects
+
+    # Strip our flags before passing through to the CPU compiler for files which
+    # are not -x rocm. We can't just pass 'leftover' because it also strips -x.
+    # We not only want to pass -x to the CPU compiler, but also keep it in its
+    # relative location in the argv list (the compiler is actually sensitive to
+    # this).
+    cpu_compiler_flags = [flag for flag in sys.argv[1:]
+                               if not flag.startswith(('--rocm_log'))]
+
+    # XXX: SE codes need to be built with gcc, but need this macro defined
+    cpu_compiler_flags.append("-D__HIP_PLATFORM_HCC__")
+    if VERBOSE: print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
+    return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
 
 if __name__ == '__main__':
   sys.exit(main())
