@@ -1,5 +1,13 @@
 # Macros for building CUDA code.
 
+# TODO(emankov): Avoid duplicating of `if_cuda` in gpus/common.bzl
+def if_cuda(if_true, if_false = []):
+    return select({
+        "@local_config_cuda//cuda:using_nvcc": if_true,
+        "@local_config_cuda//cuda:using_clang": if_true,
+        "//conditions:default": if_false,
+    })
+
 # TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
 def if_cuda_clang(if_true, if_false = []):
    """Shorthand for select()'ing on wheteher we're building with cuda-clang.
@@ -31,12 +39,14 @@ def if_cuda_clang_opt(if_true, if_false = []):
 # TODO(storypku): revisit the APOLLO_CUDA macro
 def cuda_default_copts():
     """Default options for all CUDA compilations."""
-    return [
+    return if_cuda([
         "-x", "cuda",
         "-DAPOLLO_CUDA=1",
         "-Xcuda-fatbinary=--compress-all",
         "--no-cuda-include-ptx=all"
-    ] + %{cuda_extra_copts} + if_cuda_clang_opt(
+    ])
+    + if_cuda([%{cuda_extra_copts}])
+    + if_cuda_clang_opt(
         # Some important CUDA optimizations are only enabled at O3.
         ["-O3"]
     )
