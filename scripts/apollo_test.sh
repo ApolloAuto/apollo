@@ -86,19 +86,19 @@ function determine_disabled_targets() {
 
   for component in $@; do
     case "${component}" in
-      drivers)
+      drivers*)
         _determine_drivers_disabled
         ;;
-      localization)
+      localization*)
         _determine_localization_disabled
         ;;
-      perception)
+      perception*)
         _determine_perception_disabled
         ;;
-      planning)
+      planning*)
         _determine_planning_disabled
         ;;
-      map)
+      map*)
         _determine_map_disabled
         ;;
     esac
