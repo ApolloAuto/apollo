@@ -18,7 +18,13 @@
 #include <vector>
 
 #if USE_GPU == 1
-#include <npp.h>
+#if GPU_PLATFORM == NVIDIA
+    #include <nppi.h>
+  #elif GPU_PLATFORM == AMD
+    #include <rppi.h>
+    #define NppiSize RppiSize
+    #define Npp32f Rpp32f
+  #endif
 #endif
 
 #include "Eigen/Dense"

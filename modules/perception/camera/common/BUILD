@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -31,9 +32,14 @@ cc_library(
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
-        "@npp",
-    ],
+
+    ] + if_cuda([
+        "@npp"
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rpp"
+    ]),
 )
+
 
 cc_library(
     name = "global_config",
