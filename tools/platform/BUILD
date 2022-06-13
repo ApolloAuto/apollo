@@ -13,8 +13,8 @@ config_setting(
     name = "use_nvidia_gpu",
     define_values = {
         "USE_GPU": "true",
-        "NVIDIA": "0",
-        "AMD": "1",
+        "NVIDIA": "1",
+        "AMD": "0",
         "GPU_PLATFORM": "NVIDIA",
     },
 )

@@ -69,12 +69,16 @@ build:gpu --cxxopt="-DAMD=1"
 # GPU platform
 build:amd --define USE_GPU=true
 build:amd --define GPU_PLATFORM=AMD
+build:amd --define NVIDIA=0
+build:amd --define AMD=1
 build:amd --cxxopt="-DUSE_GPU=1"
 build:amd --cxxopt="-DNVIDIA=0"
 build:amd --cxxopt="-DAMD=1"
 build:amd --cxxopt="-DGPU_PLATFORM=AMD"
 build:nvidia --define USE_GPU=true
 build:nvidia --define GPU_PLATFORM=NVIDIA
+build:nvidia --define NVIDIA=1
+build:nvidia --define AMD=0
 build:nvidia --cxxopt="-DUSE_GPU=1"
 build:nvidia --cxxopt="-DNVIDIA=0"
 build:nvidia --cxxopt="-DAMD=1"
