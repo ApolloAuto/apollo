@@ -186,23 +186,36 @@ function _chk_n_set_gpu_arg() {
 
 function parse_cmdline_arguments() {
   local known_options=""
+  local bazel_option=""
   local remained_args=""
+  local bazel=0
 
   for ((pos = 1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
     local opt="${!pos}"
     local optarg
-
+    local known_bazel_opt=0
+    if (( ${bazel} == 1 )); then
+      ((++bazel))
+    fi
     case "${opt}" in
+      --bazel)
+        ((++pos))
+        bazel_option="${!pos}"
+        bazel=1
+        ((--pos))
+        ;;
       --config=*)
         optarg="${opt#*=}"
         known_options="${known_options} ${opt}"
         _chk_n_set_gpu_arg "${optarg}"
+        known_bazel_opt=1
         ;;
       --config)
         ((++pos))
         optarg="${!pos}"
         known_options="${known_options} ${opt} ${optarg}"
         _chk_n_set_gpu_arg "${optarg}"
+        known_bazel_opt=1
         ;;
       -c)
         ((++pos))
@@ -210,10 +223,20 @@ function parse_cmdline_arguments() {
         known_options="${known_options} ${opt} ${optarg}"
         ;;
       *)
-        remained_args="${remained_args} ${opt}"
+        if (( ${bazel} == 0 )); then
+          remained_args="${remained_args} ${opt}"
+        elif (( ${bazel} == 2 )); then
+          if (( ${known_bazel_opt} == 0 )); then
+            known_options="${known_options} ${bazel_option}"
+          fi
+          bazel=0
+        fi
         ;;
     esac
   done
+  if (( ${bazel} == 1 )); then
+    warning "Bazel option is not specified. Skipping..."
+  fi
   # Strip leading whitespaces
   known_options="$(echo "${known_options}" | sed -e 's/^[[:space:]]*//')"
   remained_args="$(echo "${remained_args}" | sed -e 's/^[[:space:]]*//')"
