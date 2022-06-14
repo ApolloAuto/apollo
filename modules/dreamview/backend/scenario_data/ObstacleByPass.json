@@ -1,0 +1,70 @@
+{
+    "_id": "61f4e61c42f1fbc2170bf27f",
+    "author_name": "cuikaixin",
+    "category": "private",
+    "create_time": "Sat Jan 29 2022 07:00:44 GMT+0000 (Coordinated Universal Time)",
+    "description_en_tokens": [
+        "障碍物借道绕行"
+    ],
+    "map_id": "6b6ce49f1809b513825ef23f",
+    "number": 2,
+    "scenario": {
+        "map_dir": "modules/map/data/apollo_map",
+        "start": {
+            "x": 752363.6379164549,
+            "y": 2566015.686556915,
+            "heading": 3.1193740877516696
+        },
+        "end": {
+            "x": 751971.2707690485,
+            "y": 2566017.780092542
+        },
+        "simulator_time": 50,
+        "deselect_default_metric": [
+            "Checkpoint"
+        ],
+        "base_grade_config_file": "grading_system/conf/grading_metrics_default.conf",
+        "agent": [
+            {
+                "id": "2719",
+                "type": 0,
+                "width": 2,
+                "height": 1.5,
+                "length": 5,
+                "motiontype": 0,
+                "start_position": {
+                    "x": 752219.4912895357,
+                    "y": 2566012.029177079,
+                    "speed": 0,
+                    "heading": 3.135820745431548
+                },
+                "tracked_point": []
+            },
+            {
+                "id": "7983",
+                "type": 0,
+                "width": 2,
+                "height": 1.5,
+                "length": 5,
+                "motiontype": 0,
+                "start_position": {
+                    "x": 752141.948075618,
+                    "y": 2566016.399567125,
+                    "speed": 0,
+                    "heading": 3.141592653589793
+                },
+                "tracked_point": []
+            }
+        ],
+        "start_velocity": 5,
+        "start_acceleration": 3,
+        "drive_action_config": []
+    },
+    "tags": [
+        "Straight Road",
+        "Traveling straight in a through lane",
+        "Motor Vehicle"
+    ],
+    "time": "Fri Feb 25 2022 10:52:30 GMT+0000 (Coordinated Universal Time)",
+    "type": "worldsim"
+}

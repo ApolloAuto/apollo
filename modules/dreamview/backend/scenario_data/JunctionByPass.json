@@ -1,0 +1,78 @@
+{
+    "_id": "61f63845bc76bd206fbdd9ea",
+    "author_name": "cuikaixin",
+    "category": "private",
+    "create_time": "Sun Jan 30 2022 07:03:33 GMT+0000 (Coordinated Universal Time)",
+    "description_en": "主车在十字路口左转过程中，左转道被占用，主车需要绕行左转。",
+    "description_en_tokens": [
+        "十字路口左转"
+    ],
+    "map_id": "6b6ce49f1809b513825ef23f",
+    "number": 10,
+    "scenario": {
+        "map_dir": "modules/map/data/apollo_map",
+        "start": {
+            "x": 752582.668471107,
+            "y": 2563965.103685793,
+            "heading": 0.013917637025529245
+        },
+        "end": {
+            "x": 752668.7705814505,
+            "y": 2564079.585318375
+        },
+        "simulator_time": 100,
+        "deselect_default_metric": [
+            "Checkpoint"
+        ],
+        "base_grade_config_file": "grading_system/conf/grading_metrics_default.conf",
+        "agent": [
+            {
+                "id": "5773",
+                "type": 0,
+                "width": 4,
+                "height": 1.68,
+                "length": 11,
+                "motiontype": 0,
+                "start_position": {
+                    "x": 752663.0413495003,
+                    "y": 2563976.6257610093,
+                    "speed": 0,
+                    "heading": 1.5827141101815627
+                },
+                "tracked_point": []
+            }
+        ],
+        "traffic_lights": [
+            {
+                "id": "451089195",
+                "location": {
+                    "x": 752689.0592168552,
+                    "y": 2563966.921875672
+                },
+                "initial_state": {
+                    "color": 1
+                },
+                "state_group": [
+                    {
+                        "color": 1,
+                        "keep_time": 20
+                    },
+                    {
+                        "color": 3,
+                        "keep_time": 80
+                    }
+                ],
+                "trigger_type": 1,
+                "trigger_value": 100
+            }
+        ],
+        "drive_action_config": []
+    },
+    "tags": [
+        "Four-Way Intersection",
+        "Left turn at an intersection",
+        "Motor Vehicle"
+    ],
+    "time": "Tue Mar 01 2022 05:33:55 GMT+0000 (Coordinated Universal Time)",
+    "type": "worldsim"
+}

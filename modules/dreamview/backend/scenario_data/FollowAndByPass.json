@@ -1,0 +1,77 @@
+{
+    "_id": "6218827e0789a11ff611ef1d",
+    "author_name": "cuikaixin",
+    "category": "private",
+    "create_time": "Fri Feb 25 2022 07:17:18 GMT+0000 (Coordinated Universal Time)",
+    "description_en_tokens": [
+        "跟车行驶"
+    ],
+    "map_id": "6b6ce49f1809b513825ef23f",
+    "number": 5,
+    "scenario": {
+        "map_dir": "modules/map/data/apollo_map",
+        "start": {
+            "x": 754106.9263578454,
+            "y": 2565101.1376065603,
+            "heading": 1.5610028342180187
+        },
+        "end": {
+            "x": 754062.9878183362,
+            "y": 2565617.9650038327
+        },
+        "simulator_time": 100,
+        "deselect_default_metric": [
+            "Checkpoint"
+        ],
+        "base_grade_config_file": "grading_system/conf/grading_metrics_default.conf",
+        "agent": [
+            {
+                "trigger_type": 0,
+                "width": 2,
+                "length": 5,
+                "height": 1.5,
+                "start_time": 0,
+                "motiontype": 2,
+                "start_distance": 40,
+                "type": 0,
+                "id": "4485",
+                "start_position": {
+                    "x": 754107.6196142321,
+                    "y": 2565139.8627029574,
+                    "speed": 10
+                },
+                "tracked_point": [
+                    {
+                        "x": 754108.0662551394,
+                        "y": 2565194.678103036,
+                        "speed": 10
+                    },
+                    {
+                        "x": 754109.5502274592,
+                        "y": 2565288.038912573,
+                        "speed": 10
+                    },
+                    {
+                        "x": 754108.346680831,
+                        "y": 2565330.53858143,
+                        "speed": 2.8
+                    },
+                    {
+                        "x": 754105.5073802342,
+                        "y": 2565373.433474039,
+                        "speed": 2.8
+                    }
+                ]
+            }
+        ],
+        "start_velocity": 9,
+        "drive_action_config": []
+    },
+    "tags": [
+        "Straight Road",
+        "Traveling straight in a through lane",
+        "Motor Vehicle"
+    ],
+    "time": "Thu Mar 17 2022 02:53:14 GMT+0000 (Coordinated Universal Time)",
+    "type": "worldsim"
+}

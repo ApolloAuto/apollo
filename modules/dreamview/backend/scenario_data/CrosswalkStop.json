@@ -1,0 +1,70 @@
+{
+    "_id": "61f4db4142f1fb4b960bf27c",
+    "author_name": "cuikaixin",
+    "category": "private",
+    "create_time": "Sat Jan 29 2022 06:14:25 GMT+0000 (Coordinated Universal Time)",
+    "description_en": "主车向前行驶，前方遇到有人通过人行道，主车需要停止在人行道前0.3m～0.5m内停车，如果行人未离开人行道至少避让行人5s",
+    "description_en_tokens": [
+        "人行道刹车避让"
+    ],
+    "map_id": "6b6ce49f1809b513825ef23f",
+    "number": 1,
+    "scenario": {
+        "map_dir": "modules/map/data/apollo_map",
+        "start": {
+            "x": 750988.1928776653,
+            "y": 2565885.04350981,
+            "heading": -1.8103873177850582
+        },
+        "end": {
+            "x": 750980.042884248,
+            "y": 2565751.5652750265
+        },
+        "simulator_time": 100,
+        "deselect_default_metric": [
+            "Checkpoint"
+        ],
+        "base_grade_config_file": "grading_system/conf/grading_metrics_default.conf",
+        "agent": [
+            {
+                "trigger_type": 0,
+                "width": 0.5,
+                "length": 0.5,
+                "height": 1.68,
+                "motiontype": 2,
+                "start_distance": 50,
+                "type": 2,
+                "id": "8839",
+                "start_position": {
+                    "x": 750989.7130660944,
+                    "y": 2565809.942373768,
+                    "speed": 1,
+                    "heading": -3.139479409254801
+                },
+                "tracked_point": [
+                    {
+                        "x": 750985.2503020645,
+                        "y": 2565809.9373140675,
+                        "speed": 0.3
+                    },
+                    {
+                        "x": 750965.2018708264,
+                        "y": 2565809.8842758858,
+                        "speed": 0.3
+                    }
+                ]
+            }
+        ],
+        "start_velocity": 2,
+        "start_acceleration": 2,
+        "drive_action_config": []
+    },
+    "tags": [
+        "Straight Road",
+        "Traveling straight in a through lane",
+        "Pedestrian",
+        "nudge static obstacle"
+    ],
+    "time": "Wed Apr 13 2022 10:50:09 GMT+0000 (Coordinated Universal Time)",
+    "type": "worldsim"
+}

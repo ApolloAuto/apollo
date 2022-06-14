@@ -1,0 +1,86 @@
+{
+    "_id": "61f62bdcbc76bdd2b4bdd9e8",
+    "author_name": "cuikaixin",
+    "category": "private",
+    "create_time": "Sun Jan 30 2022 06:10:36 GMT+0000 (Coordinated Universal Time)",
+    "description_en": "主车在十字路口场遇到红灯时，进入左转待转区等待。",
+    "description_en_tokens": [
+        "左转待转"
+    ],
+    "map_id": "6b6ce49f1809b513825ef23f",
+    "number": 8,
+    "scenario": {
+        "map_dir": "modules/map/data/apollo_map",
+        "start": {
+            "x": 750969.5103769143,
+            "y": 2564064.4245335707,
+            "heading": -1.5471786717824307
+        },
+        "end": {
+            "x": 751064.7077860243,
+            "y": 2563971.416643226
+        },
+        "simulator_time": 200,
+        "deselect_default_metric": [
+            "Checkpoint"
+        ],
+        "base_grade_config_file": "grading_system/conf/grading_metrics_default.conf",
+        "traffic_lights": [
+            {
+                "id": "451089193",
+                "location": {
+                    "x": 750968.9286069399,
+                    "y": 2563961.3516306914
+                },
+                "initial_state": {
+                    "color": 1
+                },
+                "state_group": [
+                    {
+                        "color": 1,
+                        "keep_time": 20
+                    },
+                    {
+                        "color": 3,
+                        "keep_time": 20
+                    },
+                    {
+                        "color": 1,
+                        "keep_time": 60
+                    }
+                ],
+                "trigger_type": 1,
+                "trigger_value": 100
+            },
+            {
+                "id": "451089192",
+                "location": {
+                    "x": 750962.6927006887,
+                    "y": 2563961.76295565
+                },
+                "initial_state": {
+                    "color": 1
+                },
+                "state_group": [
+                    {
+                        "color": 1,
+                        "keep_time": 40
+                    },
+                    {
+                        "color": 3,
+                        "keep_time": 40
+                    }
+                ],
+                "trigger_type": 1,
+                "trigger_value": 100
+            }
+        ],
+        "drive_action_config": []
+    },
+    "tags": [
+        "Four-Way Intersection",
+        "Left turn at an intersection"
+    ],
+    "time": "Thu Mar 17 2022 03:33:36 GMT+0000 (Coordinated Universal Time)",
+    "type": "worldsim"
+}
