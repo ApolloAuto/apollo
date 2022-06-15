@@ -29,44 +29,16 @@ COVERAGE_DAT="${BAZEL_OUT}/_coverage/_coverage_report.dat"
 # Note(storypku): branch coverage seems not work when running bazel coverage
 # GENHTML_OPTIONS="--rc genhtml_branch_coverage=1 --highlight --legend"
 
-function run_bazel_coverage() {
-  if ${USE_ESD_CAN}; then
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
-  fi
-  CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
-
-  local test_targets
-  test_targets="$(determine_targets ${SHORTHAND_TARGETS})"
-
-  local disabled_targets
-  disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
-
-  # Note(storypku): Workaround for "/usr/bin/bazel: Argument list too long"
-  ## bazel coverage ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${test_targets} ${disabled_targets})
-  local formatted_targets="$(format_bazel_targets ${test_targets} ${disabled_targets})"
-
-  info "Coverage Overview: "
-  info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
-  info "${TAB}Coverage Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
-  info "${TAB}Coverage Targets: ${GREEN}${test_targets}${NO_COLOR}"
-  info "${TAB}Disabled: ${YELLOW}${disabled_targets}${NO_COLOR}"
-
-  local count="$(($(nproc) / 2))"
-  local job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
-  bazel coverage ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
-}
-
 function main() {
+  parse_cmdline_arguments "$@"
   if ! "${APOLLO_IN_DOCKER}"; then
     error "Coverage test must be run from within the docker container"
     exit 1
   fi
-
-  parse_cmdline_arguments "$@"
   determine_cpu_or_gpu "coverage"
-  run_bazel_coverage $@
+  run_bazel "Coverage" $@
   genhtml "${COVERAGE_DAT}" --output-directory "${COVERAGE_HTML}"
-  success "Done bazel coverage for ${SHORTHAND_TARGETS:-Apollo}. "
+  success "Done bazel coverage for ${SHORTHAND_TARGETS:-Apollo}"
   info "Coverage report was generated under ${COVERAGE_HTML}"
 }
 

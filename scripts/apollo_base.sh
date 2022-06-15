@@ -636,3 +636,40 @@ function determine_cpu_or_gpu() {
     ok "Running ${GREEN}CPU${NO_COLOR} $1 on ${GREEN}${ARCH}${NO_COLOR} platform."
   fi
 }
+
+function run_bazel() {
+  if ${USE_ESD_CAN}; then
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
+  fi
+
+  CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
+
+  local build_targets
+  build_targets="$(determine_targets ${SHORTHAND_TARGETS})"
+
+  local disabled_targets
+  disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
+  disabled_targets="$(echo ${disabled_targets} | xargs)"
+
+  # Note(storypku): Workaround for in case "/usr/bin/bazel: Argument list too long"
+  # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
+  local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
+
+  info "$1 Overview: "
+  info "${TAB}USE_GPU:       ${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
+  if [ "${USE_GPU}" -eq 1 ]; then
+    info "${TAB}GPU arch:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+  else
+    info "${TAB}CPU arch:      ${GREEN}${ARCH}${NO_COLOR}"
+  fi
+  info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
+  info "${TAB}$1 Targets: ${GREEN}${build_targets}${NO_COLOR}"
+  info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
+
+  local count=$(nproc);
+  if [ "$1" == "Coverage" ]; then
+    count="$(($(nproc) / 2))"
+  fi
+  job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
+}
