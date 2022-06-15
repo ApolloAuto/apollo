@@ -5,8 +5,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "libtorch",
     deps = select({
-        "//tools/platform:use_gpu": [
-            "@libtorch_gpu",
+        "//tools/platform:use_nvidia_gpu": [
+            "@libtorch_gpu_cuda",
+        ],
+        "//tools/platform:use_amd_gpu": [
+            "@libtorch_gpu_rocm",
         ],
         "//conditions:default": [
             "@libtorch_cpu",
