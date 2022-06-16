@@ -24,11 +24,6 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function main() {
   parse_cmdline_arguments "$@"
-  if ! "${APOLLO_IN_DOCKER}"; then
-    error "This test operation must be run from within docker container"
-    exit 1
-  fi
-  determine_cpu_or_gpu "tests"
   run_bazel "Test"
   success "Done testing ${SHORTHAND_TARGETS:-Apollo}. Enjoy!"
 }

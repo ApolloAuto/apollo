@@ -31,12 +31,7 @@ COVERAGE_DAT="${BAZEL_OUT}/_coverage/_coverage_report.dat"
 
 function main() {
   parse_cmdline_arguments "$@"
-  if ! "${APOLLO_IN_DOCKER}"; then
-    error "Coverage test must be run from within the docker container"
-    exit 1
-  fi
-  determine_cpu_or_gpu "coverage"
-  run_bazel "Coverage" $@
+  run_bazel "Coverage" "$@"
   genhtml "${COVERAGE_DAT}" --output-directory "${COVERAGE_HTML}"
   success "Done bazel coverage for ${SHORTHAND_TARGETS:-Apollo}"
   info "Coverage report was generated under ${COVERAGE_HTML}"

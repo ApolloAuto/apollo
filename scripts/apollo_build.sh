@@ -23,17 +23,6 @@ source "${TOP_DIR}/scripts/apollo_base.sh"
 
 function main() {
   parse_cmdline_arguments "$@"
-  if [ "${APOLLO_OUTSIDE_DOCKER}" -eq 1 ]; then
-    warning "Assembling outside the docker can cause errors,"
-    warning "  we recommend using a ready-made container."
-    warning "Make sure that all dependencies are installed,"
-    warning "  if errors, try running <apollo_path>/docker/build/installers/install.sh"
-  elif ! "${APOLLO_IN_DOCKER}"; then
-    error "The build operation must be run from within docker container"
-    error "Use -o flag to force build"
-    exit 1
-  fi
-  determine_cpu_or_gpu "build"
   run_bazel "Build"
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"

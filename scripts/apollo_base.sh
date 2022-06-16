@@ -382,33 +382,33 @@ function _chk_n_set_gpu_arg() {
     return 0
   fi
 
-  if (( $use_cpu == 1)) && (( $use_gpu == 1 )); then
+  if (( $use_cpu == 1 )) && (( $use_gpu == 1 )); then
     error "${RED}Mixed use of '--config=cpu' and '--config=gpu' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_cpu == 1)) && (( $use_nvidia == 1 )); then
+  if (( $use_cpu == 1 )) && (( $use_nvidia == 1 )); then
     error "${RED}Mixed use of '--config=cpu' and '--config=nvidia' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_cpu == 1)) && (( $use_amd == 1 )); then
+  if (( $use_cpu == 1 )) && (( $use_amd == 1 )); then
     error "${RED}Mixed use of '--config=cpu' and '--config=amd' may" \
       "lead to unexpected behavior. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_nvidia == 1)) && (( $use_amd == 1 )); then
+  if (( $use_nvidia == 1 )) && (( $use_amd == 1 )); then
     error "${RED}Mixed use of '--config=amd' and '--config=nvidia':" \
       "please specify only one GPU target. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_nvidia == 1)) && (( $use_amd == -1)) && [ "$GPU_PLATFORM" == "AMD" ]; then
+  if (( $use_nvidia == 1 )) && (( $use_amd == -1 )) && [ "$GPU_PLATFORM" == "AMD" ]; then
     error "${RED}Cross-compilation for NVIDIA GPU target is not supported on AMD GPU device':" \
       "please specify AMD or skip its specification to compile for AMD GPU target."\
       "To compile for NVIDIA GPU target NVIDIA GPU device should be installed. Exiting...${NO_COLOR}"
     exit 1
   fi
-  if (( $use_amd == 1)) && (( $use_nvidia == -1)) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+  if (( $use_amd == 1 )) && (( $use_nvidia == -1 )) && [ "$GPU_PLATFORM" == "NVIDIA" ]; then
     error "${RED}Cross-compilation for AMD GPU target is not supported on NVIDIA GPU device':" \
       "please specify NVIDIA or skip its specification to compile for NVIDIA GPU target."\
       "To compile for AMD GPU target AMD GPU device should be installed. Exiting...${NO_COLOR}"
@@ -638,38 +638,55 @@ function determine_cpu_or_gpu() {
 }
 
 function run_bazel() {
+  if [ "${APOLLO_OUTSIDE_DOCKER}" -eq 1 ]; then
+    warning "Assembling outside the docker can cause errors,"
+    warning "  we recommend using a ready-made container."
+    warning "Make sure that all dependencies are installed,"
+    warning "  if errors, try running <apollo_path>/docker/build/installers/install.sh"
+  elif ! "${APOLLO_IN_DOCKER}"; then
+    error "The build operation must be run from within docker container"
+    error "Use -o flag to force build"
+    exit 1
+  fi
+
+  determine_cpu_or_gpu "${1,,}"
+
   if ${USE_ESD_CAN}; then
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
   fi
 
   CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
 
-  local build_targets
-  build_targets="$(determine_targets ${SHORTHAND_TARGETS})"
+  local build_targets="$(determine_targets ${SHORTHAND_TARGETS})"
 
-  local disabled_targets
-  disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
+  local disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
   disabled_targets="$(echo ${disabled_targets} | xargs)"
 
   # Note(storypku): Workaround for in case "/usr/bin/bazel: Argument list too long"
   # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
   local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
 
-  info "$1 Overview: "
-  info "${TAB}USE_GPU:       ${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
-  if [ "${USE_GPU}" -eq 1 ]; then
-    info "${TAB}GPU arch:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
-  else
-    info "${TAB}CPU arch:      ${GREEN}${ARCH}${NO_COLOR}"
-  fi
-  info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
-  info "${TAB}$1 Targets: ${GREEN}${build_targets}${NO_COLOR}"
-  info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
-
-  local count=$(nproc);
+  local sp=""
+  local spaces=""
+  local count=$(nproc)
   if [ "$1" == "Coverage" ]; then
     count="$(($(nproc) / 2))"
+    spaces="   "
+  elif [ "$1" == "Test" ]; then
+    sp=" "
   fi
+
+  info "$1 Overview: "
+  info "${TAB}USE_GPU:       ${spaces}${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
+  if [ "${USE_GPU}" -eq 1 ]; then
+    info "${TAB}GPU arch:      ${spaces}${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+  else
+    info "${TAB}CPU arch:      ${spaces}${GREEN}${ARCH}${NO_COLOR}"
+  fi
+  info "${TAB}Bazel Options: ${spaces}${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
+  info "${TAB}$1 Targets: ${sp}${GREEN}${build_targets}${NO_COLOR}"
+  info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
+
   job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
