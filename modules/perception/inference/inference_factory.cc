@@ -20,6 +20,8 @@
 #include "modules/perception/inference/libtorch/torch_net.h"
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
+//wxt comment
+//#include "modules/perception/inference/paddle/paddle_inference.h"
 
 namespace apollo {
 namespace perception {
