@@ -94,8 +94,11 @@ elif [[ "${USE_AMD_GPU}" -eq 1 ]]; then
 
     tar xzf "${PKG_NAME}"
     mv "${PKG_NAME%.tar.gz}/libtorch" /usr/local/libtorch_gpu/
+    mv "${PKG_NAME%.tar.gz}/libtorch_deps/libamdhip64.so.4" /opt/rocm/hip/lib/
+    mv "${PKG_NAME%.tar.gz}/libtorch_deps/libmagma.so" /opt/apollo/sysroot/lib/
     mv "${PKG_NAME%.tar.gz}/libtorch_deps/"* /usr/local/lib/
     rm -r "${PKG_NAME%.tar.gz}"
+    ldconfig
 fi
 
 # Cleanup
