@@ -120,7 +120,7 @@ bool UndistortionHandler::Handle(const base::Image8U &src_img,
           src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
           d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
           dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);;
+          remap_mode);
       #elif GPU_PLATFORM == AMD
     // TODO(B1tway): Add necesssary RPP code
       #endif
