@@ -65,6 +65,10 @@ DECLARE_string(mask_backbone_torch_file);
 DECLARE_string(mask_fpn_torch_file);
 DECLARE_string(mask_bbox_head_torch_file);
 
+// lidar_center_point
+DECLARE_string(center_point_model_file);
+DECLARE_string(center_point_params_file);
+
 // emergency detection onnx
 DECLARE_string(onnx_obstacle_detector_model);
 DECLARE_string(onnx_test_input_path);

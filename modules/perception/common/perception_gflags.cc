@@ -115,6 +115,15 @@ DEFINE_string(mask_bbox_head_torch_file,
               "models/detection/mask_pillars/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
 
+// lidar_center_point
+DEFINE_string(center_point_model_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/center_point/centerpoint.pdmodel",
+              "The path of center point model file.");
+DEFINE_string(center_point_params_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/center_point/centerpoint.pdiparams",
+              "The path of center point params file.");
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
               "/apollo/modules/perception/camera"
@@ -141,7 +150,6 @@ DEFINE_string(torch_detector_model,
               "The torch model file for emergency detection");
 
 // lidar sensor name
-DEFINE_string(lidar_sensor_name, "velodyne128",
-              "lidar sensor name");
+DEFINE_string(lidar_sensor_name, "velodyne128", "lidar sensor name");
 }  // namespace perception
 }  // namespace apollo
