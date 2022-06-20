@@ -17,16 +17,6 @@
 
 #include <vector>
 
-#if USE_GPU == 1
-#if GPU_PLATFORM == NVIDIA
-    #include <nppi.h>
-  #elif GPU_PLATFORM == AMD
-    #include <rppi.h>
-    #define NppiSize RppiSize
-    #define Npp32f Rpp32f
-  #endif
-#endif
-
 #include "Eigen/Dense"
 
 #include "cyber/common/log.h"
@@ -110,18 +100,30 @@ bool UndistortionHandler::Handle(const base::Image8U &src_img,
   int d_map_step = static_cast<int>(d_mapx_.shape(1) * sizeof(float));
   switch (src_img.channels()) {
     case 1:
-      status = nppiRemap_8u_C1R(
+      #if GPU_PLATFORM == NVIDIA
+        status = nppiRemap_8u_C1R(
           src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
           d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
           dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
           remap_mode);
+      #elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP code
+      (void) remap_mode;
+      (void) image_size;
+      (void) d_map_step;
+      (void) remap_roi;
+      #endif
       break;
     case 3:
-      status = nppiRemap_8u_C3R(
+      #if GPU_PLATFORM == NVIDIA
+        status = nppiRemap_8u_C3R(
           src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
           d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
           dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);
+          remap_mode);;
+      #elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP code
+      #endif
       break;
     default:
       AERROR << "Invalid number of channels: " << src_img.channels();

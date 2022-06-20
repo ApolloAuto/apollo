@@ -15,16 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/camera/common/data_provider.h"
 
-#if USE_GPU == 1
-  #if GPU_PLATFORM == NVIDIA
-    #include <nppi.h>
-  #elif GPU_PLATFORM == AMD
-    #include <rppi.h>
-    #define NppiSize RppiSize
-    #define Npp32f Rpp32f
-  #endif
-#endif
-
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -249,7 +239,8 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
                     blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
     #elif GPU_PLATFORM == AMD
       // TODO(B1tway): Add necesssary RPP API
-    #endif  
+      (void) roi
+    #endif
   } else {
     #if GPU_PLATFORM == NVIDIA
       nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
@@ -312,6 +303,8 @@ bool DataProvider::to_gray_image() {
                                roi, coeffs);
       #elif GPU_PLATFORM == AMD
         // TODO(B1tway): Add necesssary RPP API
+        (void) roi;
+        (void) coeffs;
       #endif
       gray_ready_ = true;
     } else if (rgb_ready_) {
@@ -346,6 +339,8 @@ bool DataProvider::to_rgb_image() {
                               order);
       #elif GPU_PLATFORM == AMD
         // TODO(B1tway): Add necesssary RPP API
+        (void) roi;
+        (void) order;
       #endif
       rgb_ready_ = true;
     } else if (gray_ready_) {
@@ -377,6 +372,8 @@ bool DataProvider::to_bgr_image() {
                               order);
       #elif GPU_PLATFORM == AMD
         // TODO(B1tway): Add necesssary RPP API
+        (void) roi;
+        (void) order;
       #endif
       bgr_ready_ = true;
     } else if (gray_ready_) {

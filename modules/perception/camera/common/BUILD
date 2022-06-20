@@ -40,7 +40,6 @@ cc_library(
     ]),
 )
 
-
 cc_library(
     name = "global_config",
     hdrs = ["global_config.h"],

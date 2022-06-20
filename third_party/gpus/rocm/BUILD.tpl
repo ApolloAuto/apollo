@@ -78,7 +78,8 @@ cc_library(
 cc_library(
     name = "rpp",
     includes = [
-        "./rpp/include",
+        ".",
+        "rocm/include",
     ],
     linkopts = [
         "-L/opt/rocm/rpp/lib",
