@@ -96,34 +96,34 @@ bool UndistortionHandler::Handle(const base::Image8U &src_img,
   image_size.height = height_;
   NppiRect remap_roi = {0, 0, width_, height_};
 
-  NppStatus status;
+  NppStatus status = NPP_SUCCESS;
   int d_map_step = static_cast<int>(d_mapx_.shape(1) * sizeof(float));
   switch (src_img.channels()) {
     case 1:
-      #if GPU_PLATFORM == NVIDIA
-        status = nppiRemap_8u_C1R(
-          src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
-          d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
-          dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);
-      #elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP code
+#if GPU_PLATFORM == NVIDIA
+      status = nppiRemap_8u_C1R(
+        src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
+        d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
+        dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
+        remap_mode);
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP code
       (void) remap_mode;
       (void) image_size;
       (void) d_map_step;
       (void) remap_roi;
-      #endif
+#endif
       break;
     case 3:
-      #if GPU_PLATFORM == NVIDIA
-        status = nppiRemap_8u_C3R(
-          src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
-          d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
-          dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);
-      #elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP code
-      #endif
+#if GPU_PLATFORM == NVIDIA
+      status = nppiRemap_8u_C3R(
+        src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
+        d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
+        dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
+        remap_mode);
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP code
+#endif
       break;
     default:
       AERROR << "Invalid number of channels: " << src_img.channels();

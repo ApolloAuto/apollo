@@ -32,7 +32,6 @@ cc_library(
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
-
     ] + if_cuda([
         "@npp"
     ]) + if_rocm([
