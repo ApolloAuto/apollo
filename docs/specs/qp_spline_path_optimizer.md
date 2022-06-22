@@ -18,25 +18,25 @@ Split the path into **n** segments. each segment trajectory is defined by a poly
 
 Each segment ***i*** has accumulated distance $d_i$ along reference line. The trajectory for the segment is defined as a polynomial of degree five by default.
 
-```
+
 $$
 l = f_i(s)
   = a_{i0} + a_{i1} \cdot s + a_{i2} \cdot s^2 + a_{i3} \cdot s^3 + a_{i4} \cdot s^4 + a_{i5} \cdot s^5        (0 \leq s \leq d_{i})
 $$
-```
+
 
 ### 1.4  Define objective function of optimization for each segment
 
-```
+
 $$
 cost = \sum_{i=1}^{n} \Big( w_1 \cdot \int\limits_{0}^{d_i} (f_i')^2(s) ds + w_2 \cdot \int\limits_{0}^{d_i} (f_i'')^2(s) ds + w_3 \cdot \int\limits_{0}^{d_i} (f_i^{\prime\prime\prime})^2(s) ds \Big)
 $$
-```
+
 
 ### 1.5  Convert the cost function to QP formulation
 
 QP formulation:
-```
+
 $$
 \begin{aligned}
 minimize  & \frac{1}{2}  \cdot x^T \cdot H \cdot x  + f^T \cdot x \\
@@ -45,30 +45,30 @@ s.t. \qquad & LB \leq x \leq UB \\
       & Ax \geq b
 \end{aligned}
 $$
-```
+
 Below is the example for converting the cost function into the QP formulation. 
-```
+
 $$
 f_i(s) ＝
 \begin{vmatrix} 1 & s & s^2 & s^3 & s^4 & s^5 \end{vmatrix}
 \cdot
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
-```
+
 
 And
-```
+
 $$
 f_i'(s) =
 \begin{vmatrix} 0 & 1 & 2s & 3s^2 & 4s^3 & 5s^4 \end{vmatrix}
 \cdot
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}   
 $$
-```
+
 
 
 And 
-```
+
 $$
 f_i'(s)^2 =
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5}  \end{vmatrix} 
@@ -79,9 +79,9 @@ f_i'(s)^2 =
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix}
 $$
-```
+
 then we have,
-```
+
 $$
 \int\limits_{0}^{d_i} f_i'(s)^2 ds ＝
 \int\limits_{0}^{d_i}
@@ -93,11 +93,11 @@ $$
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}  \end{vmatrix} ds
 $$
-```
+
 
 
 extract the const outside the integration, we have,
-```
+
 $$
 \int\limits_{0}^{d_i} f'(s)^2 ds ＝
 \begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
@@ -123,11 +123,11 @@ $$
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
-```
+
 
 Finally, we have
 
-```
+
 $$
 \int\limits_{0}^{d_i} 
 f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5} \end{vmatrix} 
@@ -142,7 +142,7 @@ f'_i(s)^2 ds =\begin{vmatrix} a_{i0} & a_{i1} & a_{i2} & a_{i3} & a_{i4} & a_{i5
 \cdot 
 \begin{vmatrix} a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix}
 $$
-```
+
 
 Please notice that we got a 6 x 6 matrix to represent the derivative cost of 5th order spline.
 
@@ -159,38 +159,38 @@ Similar deduction can also be used to calculate the cost of second and third ord
 Assume that the first point is ($s_0$, $l_0$), ($s_0$, $l'_0$) and ($s_0$, $l''_0$), where $l_0$ , $l'_0$ and $l''_0$ is the lateral offset and its first and second derivatives on the init point of planned path, and are calculated from $f_i(s)$, $f'_i(s)$, and $f_i(s)''$.  
 
 Convert those constraints into QP equality constraints, using: 
-```
+
 $$
 A_{eq}x = b_{eq}
 $$
-```
+
 Below are the steps of conversion.
-```
+
 $$
 f_i(s_0) = 
 \begin{vmatrix} 1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5}\end{vmatrix} = l_0
 $$
-```
+
 And
-```
+
 $$
 f'_i(s_0) = 
 \begin{vmatrix} 0& 1 & 2s_0 & 3s_0^2 & 4s_0^3 &5 s_0^4 \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l'_0
 $$
-```
+
 And 
-```
+
 $$
 f''_i(s_0) = 
 \begin{vmatrix} 0&0& 2 & 3\times2s_0 & 4\times3s_0^2 & 5\times4s_0^3  \end{vmatrix} 
 \cdot 
 \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} = l''_0
 $$
-```
+
 where i is the index of the segment that contains the $s_0$.
 
 ### 2.2  The end point constraints
@@ -200,7 +200,7 @@ Similar to the init point, the end point $(s_e, l_e)$ is known and should produc
 
 Combine the init point and end point, and show the equality constraint as: 
 
-```
+
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
@@ -212,8 +212,7 @@ $$
  \end{vmatrix} 
  \cdot 
  \begin{vmatrix}  a_{i0} \\ a_{i1} \\ a_{i2} \\ a_{i3} \\ a_{i4} \\ a_{i5} \end{vmatrix} 
- = 
- \begin{vmatrix}
+ =  \begin{vmatrix}
  l_0\\
  l'_0\\
  l''_0\\
@@ -222,18 +221,18 @@ $$
  l''_e\\
  \end{vmatrix}
 $$
-```
+
 
 ### 2.3  Joint smoothness  constraints
 
 This constraint is designed to smooth the spline joint.  Assume two segments $seg_k$ and $seg_{k+1}$ are connected, and the accumulated **s** of segment $seg_k$ is $s_k$. Calculate the constraint equation as: 
-```
+
 $$
 f_k(s_k) = f_{k+1} (s_0)
 $$
-```
+
 Below are the steps of the calculation.
-```
+
 $$
 \begin{vmatrix} 
  1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 \\
@@ -242,8 +241,7 @@ $$
  \begin{vmatrix} 
  a_{k0} \\ a_{k1} \\ a_{k2} \\ a_{k3} \\ a_{k4} \\ a_{k5} 
  \end{vmatrix} 
- = 
-\begin{vmatrix} 
+ = \begin{vmatrix} 
  1 & s_{0} & s_{0}^2 & s_{0}^3 & s_{0}^4&s_{0}^5 \\
  \end{vmatrix} 
  \cdot 
@@ -251,9 +249,9 @@ $$
  a_{k+1,0} \\ a_{k+1,1} \\ a_{k+1,2} \\ a_{k+1,3} \\ a_{k+1,4} \\ a_{k+1,5} 
  \end{vmatrix}
 $$
-```
+
 Then
-```
+
 $$
 \begin{vmatrix} 
  1 & s_k & s_k^2 & s_k^3 & s_k^4&s_k^5 &  -1 & -s_{0} & -s_{0}^2 & -s_{0}^3 & -s_{0}^4&-s_{0}^5\\
@@ -264,11 +262,11 @@ $$
  \end{vmatrix} 
  = 0
 $$
-```
+
 Use $s_0$ = 0 in the equation.
 
 Similarly calculate the equality constraints for: 
-```
+
 $$
 f'_k(s_k) = f'_{k+1} (s_0)
 \\
@@ -276,18 +274,18 @@ f''_k(s_k) = f''_{k+1} (s_0)
 \\
 f'''_k(s_k) = f'''_{k+1} (s_0)
 $$
-```
+
 
 ### 2.4  Sampled points for boundary constraint
 
 Evenly sample **m** points along the path, and check the obstacle boundary at those points.  Convert the constraint into QP inequality constraints, using:
-```
+
 $$
 Ax \geq b
 $$
-```
+
 First find the lower boundary $l_{lb,j}$ at those points $(s_j, l_j)$ and  $j\in[0, m]$ based on the road width and surrounding obstacles. Calculate the inequality constraints as:
-```
+
 $$
 \begin{vmatrix} 
  1 & s_0 & s_0^2 & s_0^3 & s_0^4&s_0^5 \\
@@ -303,11 +301,11 @@ $$
  l_{lb,m}\\
  \end{vmatrix}
 $$
-```
+
 
 
 Similarly, for the upper boundary $l_{ub,j}$, calculate the inequality constraints as: 
-```
+
 $$
 \begin{vmatrix} 
  -1 & -s_0 & -s_0^2 & -s_0^3 & -s_0^4&-s_0^5 \\
@@ -326,5 +324,5 @@ $$
  l_{ub,m}\\
  \end{vmatrix}
 $$
-```
+
 
