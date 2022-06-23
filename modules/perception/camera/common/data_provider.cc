@@ -205,17 +205,17 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   int temp_step = temp_uint8_.count(2) * sizeof(uint8_t);
   int blob_step = blob->count(2) * sizeof(float);
   if (channels == 1) {
-    #if GPU_PLATFORM == NVIDIA
-      nppiConvert_8u32f_C1R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
-    #elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-    #endif
+#if GPU_PLATFORM == NVIDIA
+    nppiConvert_8u32f_C1R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
+#elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP API
+#endif
   } else {
-    #if GPU_PLATFORM == NVIDIA
-      nppiConvert_8u32f_C3R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
-    #elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-    #endif
+#if GPU_PLATFORM == NVIDIA
+    nppiConvert_8u32f_C3R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
+#elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP API
+#endif
   }
   return true;
 }
@@ -233,24 +233,23 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   roi.width = image.cols();
   blob->Reshape({1, roi.height, roi.width, image.channels()});
   if (image.channels() == 1) {
-    #if GPU_PLATFORM == NVIDIA
-      nppiCopy_8u_C1R(image.gpu_data(), image.width_step(),
+#if GPU_PLATFORM == NVIDIA
+    nppiCopy_8u_C1R(image.gpu_data(), image.width_step(),
                     blob->mutable_gpu_data(),
                     blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
-    #elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-      (void) roi
-    #endif
+#elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP API
+    (void) roi;
+#endif
   } else {
-    #if GPU_PLATFORM == NVIDIA
-      nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
+#if GPU_PLATFORM == NVIDIA
+    nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
                     blob->mutable_gpu_data(),
                     blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
-    #elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-    #endif
+#elif GPU_PLATFORM == AMD
+    // TODO(B1tway): Add necesssary RPP API
+#endif
   }
-
   return true;
 }
 
@@ -297,25 +296,26 @@ bool DataProvider::to_gray_image() {
     roi.width = src_width_;
     if (bgr_ready_) {
       Npp32f coeffs[] = {0.114f, 0.587f, 0.299f};
-      #if GPU_PLATFORM == NVIDIA
-        nppiColorToGray_8u_C3C1R(bgr_->gpu_data(), bgr_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiColorToGray_8u_C3C1R(bgr_->gpu_data(), bgr_->width_step(),
                                gray_->mutable_gpu_data(), gray_->width_step(),
                                roi, coeffs);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-        (void) roi;
-        (void) coeffs;
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+      (void) roi;
+      (void) coeffs;
+#endif
       gray_ready_ = true;
     } else if (rgb_ready_) {
       Npp32f coeffs[] = {0.299f, 0.587f, 0.114f};
-      #if GPU_PLATFORM == NVIDIA
-        nppiColorToGray_8u_C3C1R(rgb_->gpu_data(), rgb_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiColorToGray_8u_C3C1R(rgb_->gpu_data(), rgb_->width_step(),
                                gray_->mutable_gpu_data(), gray_->width_step(),
                                roi, coeffs);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+      (void)coeffs;
+#endif
       gray_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -333,23 +333,23 @@ bool DataProvider::to_rgb_image() {
     if (bgr_ready_) {
       // BGR2RGB takes less than 0.010ms on K2200
       const int order[] = {2, 1, 0};
-      #if GPU_PLATFORM == NVIDIA
-        nppiSwapChannels_8u_C3R(bgr_->gpu_data(), bgr_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiSwapChannels_8u_C3R(bgr_->gpu_data(), bgr_->width_step(),
                               rgb_->mutable_gpu_data(), rgb_->width_step(), roi,
                               order);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-        (void) roi;
-        (void) order;
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+      (void) roi;
+      (void) order;
+#endif
       rgb_ready_ = true;
     } else if (gray_ready_) {
-      #if GPU_PLATFORM == NVIDIA
-        nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
                        rgb_->mutable_gpu_data(), rgb_->width_step(), roi);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+#endif
       rgb_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -366,23 +366,23 @@ bool DataProvider::to_bgr_image() {
     roi.width = src_width_;
     if (rgb_ready_) {
       const int order[] = {2, 1, 0};
-      #if GPU_PLATFORM == NVIDIA
-        nppiSwapChannels_8u_C3R(rgb_->gpu_data(), rgb_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiSwapChannels_8u_C3R(rgb_->gpu_data(), rgb_->width_step(),
                               bgr_->mutable_gpu_data(), bgr_->width_step(), roi,
                               order);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-        (void) roi;
-        (void) order;
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+      (void) roi;
+      (void) order;
+#endif
       bgr_ready_ = true;
     } else if (gray_ready_) {
-      #if GPU_PLATFORM == NVIDIA
-        nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
+#if GPU_PLATFORM == NVIDIA
+      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
                        bgr_->mutable_gpu_data(), bgr_->width_step(), roi);
-      #elif GPU_PLATFORM == AMD
-        // TODO(B1tway): Add necesssary RPP API
-      #endif
+#elif GPU_PLATFORM == AMD
+      // TODO(B1tway): Add necesssary RPP API
+#endif
       bgr_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";

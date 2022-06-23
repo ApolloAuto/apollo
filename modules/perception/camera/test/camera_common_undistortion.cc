@@ -14,19 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/test/camera_common_undistortion.h"
-
-#if GPU_PLATFORM == NVIDIA
-    #include <npp.h>
-#elif GPU_PLATFORM == AMD
-    #include <rpp.h>
-    #define NppiSize RppiSize
-    #define Npp32f Rpp32f
-    #define NppiInterpolationMode RpptInterpolationType
-    #define NPPI_INTER_LINEAR RpptInterpolationType::BILINEAR
-    #define NppiRect RppiRect
-    #define NppStatus RppStatus
-    #define NPP_SUCCESS RPP_SUCCESS
-#endif
+#include "modules/perception/camera/common/undistortion_handler.h"
 
 #include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
@@ -116,27 +104,25 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
   if (!_inited) {
     return -1;
   }
-
   BASE_GPU_CHECK(cudaMemcpy(_d_rgb, src, _in_size, cudaMemcpyHostToDevice));
-  
-    NppiSize Remapsize;
-    NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
-    Remapsize.width = _width;
-    Remapsize.height = _height;
-    NppiRect RemapRect = {0, 0, _width, _height};
-  #if GPU_PLATFORM == NVIDIA
-    NppStatus eStatusNPP =
-        nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
-                        _d_mapx, (_width * static_cast<int>(sizeof(float))),
-                        _d_mapy, (_width * static_cast<int>(sizeof(float))),
-                        _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
-  #elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP code
-  #endif
-    if (eStatusNPP != NPP_SUCCESS) {
-      std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
-      return static_cast<int>(eStatusNPP);
-    }
+  NppiSize Remapsize;
+  NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
+  Remapsize.width = _width;
+  Remapsize.height = _height;
+  NppiRect RemapRect = {0, 0, _width, _height};
+  NppStatus eStatusNPP = NPP_SUCCESS;
+#if GPU_PLATFORM == NVIDIA
+  eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
+                                _d_mapx, (_width * static_cast<int>(sizeof(float))),
+                                _d_mapy, (_width * static_cast<int>(sizeof(float))),
+                                _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
+#elif GPU_PLATFORM == AMD
+  // TODO(B1tway): Add necesssary RPP code
+#endif
+  if (eStatusNPP != NPP_SUCCESS) {
+    std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
+    return static_cast<int>(eStatusNPP);
+  }
   BASE_GPU_CHECK(cudaMemcpy(dst, _d_dst, _out_size, cudaMemcpyDeviceToHost));
   return 0;
 }
