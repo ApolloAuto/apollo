@@ -508,6 +508,8 @@ function _determine_drivers_disabled() {
 function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
+  elif [ "$GPU_PLATFORM" == "AMD" ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/inference/tensorrt/..."
   fi
 }
 
