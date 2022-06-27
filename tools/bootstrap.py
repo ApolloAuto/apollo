@@ -50,6 +50,7 @@ except ImportError:
 _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
 _DEFAULT_TENSORRT_VERSION = '7'
+_DEFAULT_MIGRAPHX_VERSION = '2'
 _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.7,5.2,6.0,6.1,7.0,7.2,7.5'
 _DEFAULT_ROCM_COMPUTE_CAPABILITIES = 'gfx900,gfx906'
 _DEFAULT_PYTHON_LIB_PATH = '/usr/lib/python3/dist-packages'
@@ -695,6 +696,21 @@ def set_tensorrt_version(environ_cp):
     environ_cp['TF_TENSORRT_VERSION'] = tf_tensorrt_version
 
 
+def set_migraphx_version(environ_cp):
+    """Set TF_MIGRAPHX_VERSION."""
+    if not int(environ_cp.get('TF_NEED_MIGRAPHX', False)):
+        return
+
+    ask_migraphx_version = (
+        'Please specify the MIGraphX version you want to use. '
+        '[Leave empty to default to MIGraphX %s]: '
+    ) % _DEFAULT_MIGRAPHX_VERSION
+    tf_migraphx_version = get_from_env_or_user_or_default(
+        environ_cp, 'TF_MIGRAPHX_VERSION', ask_migraphx_version,
+        _DEFAULT_MIGRAPHX_VERSION)
+    environ_cp['TF_MIGRAPHX_VERSION'] = tf_migraphx_version
+
+
 def set_nccl_version(environ_cp):
     """Set TF_NCCL_VERSION."""
     if 'TF_NCCL_VERSION' in environ_cp:
@@ -937,6 +953,10 @@ def validate_rocm_config(environ_cp):
     print('    %s' % config['miopen_library_dir'])
     print('    %s' % config['miopen_include_dir'])
 
+    print('Found MIGraphX %s in:' % config['migraphx_version_number'])
+    print('    %s' % config['migraphx_library_dir'])
+    print('    %s' % config['migraphx_include_dir'])
+
     print('\n')
 
     environ_cp['ROCM_TOOLKIT_PATH'] = config['rocm_toolkit_path']
@@ -1035,6 +1055,7 @@ def setup_rocm_family_config(environ_cp):
         'HIP_INSTALL_PATH',
         'HIPBLAS_INSTALL_PATH',
         'MIOPEN_INSTALL_PATH'
+        'MIGRAPHX_INSTALL_PATH'
     ]
     for name in rocm_env_names:
         if name in environ_cp:
@@ -1069,7 +1090,7 @@ build:using_rocm --crosstool_top=@local_config_rocm//crosstool:toolchain
 build:rocm --config=using_rocm
 build:rocm --define=using_rocm_hipcc=true
 
-build:tensorrt --action_env TF_NEED_TENSORRT=1
+build:migraphx --action_env TF_NEED_MIGRAPHX=1
 """
     with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(build_text)
@@ -1134,8 +1155,12 @@ def main():
         write_to_bazelrc('build:gpu --config=rocm')
 
     if _APOLLO_DOCKER_STAGE == "dev":
-        environ_cp['TF_NEED_TENSORRT'] = '1'
-        write_to_bazelrc('build:gpu --config=tensorrt')
+        if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+            environ_cp['TF_NEED_TENSORRT'] = '1'
+            write_to_bazelrc('build:gpu --config=tensorrt')
+        if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+            environ_cp['TF_NEED_MIGRAPHX'] = '1'
+            write_to_bazelrc('build:gpu --config=migraphx')
 
     write_blank_line_to_bazelrc()
     set_gcc_host_compiler_path(environ_cp)
