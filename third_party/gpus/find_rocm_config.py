@@ -267,6 +267,32 @@ def _find_miopen_config(rocm_install_path, required_version=''):
 
   return miopen_config
 
+def _find_migraphx_config(rocm_install_path, required_version=''):
+
+  def migraphx_version_numbers(version_file):
+    if not os.path.exists(version_file):
+      raise ConfigError(
+          'MIGraphX version file "{}" not found'.format(version_file))
+    major = _get_header_version(version_file, "MIGRAPHX_VERSION_MAJOR")
+    minor = _get_header_version(version_file, "MIGRAPHX_VERSION_MINOR")
+    patch = 0
+    return _get_composite_version_number(major, minor, patch)
+
+  header_path, header_version = _find_header([rocm_install_path],
+                                              "migraphx/include/migraphx/version.h",
+                                              required_version,
+                                              migraphx_version_numbers,
+                                              _header_paths)
+  library_path = _find_library([rocm_install_path], "migraphx",
+                               required_version, _library_paths)
+  library_path = _get_path_if_link(library_path)
+  migraphx_config = {
+      "migraphx_version_number": header_version,
+      "migraphx_include_dir": os.path.dirname(header_path),
+      "migraphx_library_dir": os.path.dirname(library_path)
+  }
+
+  return migraphx_config
 
 def _find_hipblas_config(rocm_install_path, required_version=''):
 
@@ -309,6 +335,7 @@ def find_rocm_config():
   result.update(_find_rocm_config(rocm_install_path, os.environ.get("TF_ROCM_VERSION", "")))
   result.update(_find_hipruntime_config(rocm_install_path, os.environ.get("TF_HIP_VERSION", "")))
   result.update(_find_miopen_config(rocm_install_path, os.environ.get("TF_MIOPEN_VERSION", "")))
+  result.update(_find_migraphx_config(rocm_install_path, os.environ.get("TF_MIGRAPHX_VERSION", "")))
   result.update(_find_hipblas_config(rocm_install_path, os.environ.get("TF_HIPBLAS_VERSION", "")))
 
   return result
