@@ -51,6 +51,9 @@ class HMIWorker {
   void Start();
   void Stop();
 
+  // Reload Vehicles
+  void ReloadVehicles();
+
   // HMI action trigger.
   bool Trigger(const HMIAction action);
   bool Trigger(const HMIAction action, const std::string& value);
@@ -110,7 +113,7 @@ class HMIWorker {
   void ResetComponentStatusTimer();
   void UpdateComponentStatus();
 
-  const HMIConfig config_;
+  HMIConfig config_;
 
   // HMI status maintenance.
   HMIStatus status_;

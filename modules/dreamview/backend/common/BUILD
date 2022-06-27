@@ -12,4 +12,14 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "curl_request",
+    srcs = ["curl_request.cc"],
+    hdrs = ["curl_request.h"],
+    deps = [
+        "//cyber",
+        "@boost",
+    ],
+)
+
 cpplint()

@@ -91,11 +91,21 @@ Status Dreamview::Init() {
       new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
+  login_callback_.reset(new LoginCallbackHandler());
+  account_ws_.reset(new WebSocketHandler("Account"));
+  account_updater_.reset(
+      new AccountUpdater(account_ws_.get(), login_callback_.get()));
+  configuration_ws_.reset(new WebSocketHandler("Configuration"));
+  configurator_.reset(new Configurator(configuration_ws_.get()));
+
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addWebSocketHandler("/camera", *camera_ws_);
+  server_->addWebSocketHandler("/account", *account_ws_);
+  server_->addWebSocketHandler("/config", *configuration_ws_);
   server_->addHandler("/image", *image_);
+  server_->addHandler("/login_callback", *login_callback_);
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
   teleop_.reset(new TeleopService(teleop_ws_.get()));
@@ -108,6 +118,8 @@ Status Dreamview::Start() {
   sim_world_updater_->Start();
   point_cloud_updater_->Start();
   hmi_->Start();
+  configurator_->Start();
+  account_updater_->Start();
   perception_camera_updater_->Start();
 #if WITH_TELEOP == 1
   teleop_->Start();

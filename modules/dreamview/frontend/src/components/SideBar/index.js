@@ -11,6 +11,7 @@ import ModuleControllerIcon from 'assets/images/sidebar/module_controller.png';
 import LayerMenuIcon from 'assets/images/sidebar/layer_menu.png';
 import RouteEditingIcon from 'assets/images/sidebar/route_editing.png';
 import DataRecorderIcon from 'assets/images/sidebar/data_recorder.png';
+import ConfigurationIcon from 'assets/images/sidebar/configuration.png';
 
 const sidebarIconMapping = {
   showTasks: TasksIcon,
@@ -18,6 +19,7 @@ const sidebarIconMapping = {
   showMenu: LayerMenuIcon,
   showRouteEditingBar: RouteEditingIcon,
   showDataRecorder: DataRecorderIcon,
+  showConfiguration: ConfigurationIcon,
 };
 
 const sidebarLabelMapping = {
@@ -27,13 +29,13 @@ const sidebarLabelMapping = {
   showRouteEditingBar: 'Route Editing',
   showDataRecorder: 'Data Recorder',
   showPOI: 'Default Routing',
+  showConfiguration: 'Config',
 };
 
 @inject('store') @observer
 export default class SideBar extends React.Component {
   render() {
     const { options, enableHMIButtonsOnly, hmi } = this.props.store;
-
     const hotkeys = _.invert(HOTKEYS_CONFIG);
     const settings = {};
     const optionNames = [...options.mainSideBarOptions, ...options.secondarySideBarOptions];
@@ -62,6 +64,7 @@ export default class SideBar extends React.Component {
                     <SideBarButton type="main" {...settings.showMenu} />
                     <SideBarButton type="main" {...settings.showRouteEditingBar} />
                     <SideBarButton type="main" {...settings.showDataRecorder} />
+                    <SideBarButton type="main" {...settings.showConfiguration} />
                 </div>
                 <div className="sub-button-panel">
                     <SideBarButton

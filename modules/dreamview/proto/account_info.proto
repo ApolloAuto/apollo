@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message VehicleInfo {
+  optional uint64 id = 1;
+  optional uint32 vtype = 2;
+  optional string vin = 3;
+}
+
+message VehicleProfile {
+  optional uint64 id = 1;
+  optional string name = 2;
+  optional uint64 vehicle_id = 3;
+  optional uint32 vehicle_type = 4;
+  optional string vehicle_in = 5;
+  optional uint64 revision_id = 6;
+  optional string revision_digest = 7;
+}
+
+message AccountInfo {
+  optional uint64 id = 1;
+  optional string username = 2;
+  repeated VehicleInfo vehicles = 3;
+  repeated VehicleProfile profiles = 4;
+}

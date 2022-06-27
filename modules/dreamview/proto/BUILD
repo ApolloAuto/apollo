@@ -6,6 +6,27 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "account_info_cc_proto",
+    deps = [
+        ":account_info_proto",
+    ],
+)
+
+proto_library(
+    name = "account_info_proto",
+    srcs = ["account_info.proto"],
+    deps = [
+    ],
+)
+
+py_proto_library(
+    name = "account_info_py_pb2",
+    deps = [
+        ":account_info_proto",
+    ],
+)
+
+cc_proto_library(
     name = "data_collection_table_cc_proto",
     deps = [
         ":data_collection_table_proto",
@@ -44,6 +65,27 @@ py_proto_library(
     deps = [
         ":chart_proto",
         "//modules/common/proto:geometry_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "configuration_profile_status_cc_proto",
+    deps = [
+        ":configuration_profile_status_proto",
+    ],
+)
+
+proto_library(
+    name = "configuration_profile_status_proto",
+    srcs = ["configuration_profile_status.proto"],
+    deps = [
+    ],
+)
+
+py_proto_library(
+    name = "configuration_profile_status_py_pb2",
+    deps = [
+        ":configuration_profile_status_proto",
     ],
 )
 

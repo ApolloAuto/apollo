@@ -1,8 +1,10 @@
-import OfflinePlaybackWebSocketEndpoint from 'store/websocket/websocket_offline';
-import RealtimeWebSocketEndpoint from 'store/websocket/websocket_realtime';
-import MapDataWebSocketEndpoint from 'store/websocket/websocket_map';
-import PointCloudWebSocketEndpoint from 'store/websocket/websocket_point_cloud';
+import AccountWebSocketEndpoint from 'store/websocket/websocket_account';
 import CameraDataWebSocketEndpoint from 'store/websocket/websocket_camera';
+import ConfigurationWebSocketEndpoint from 'store/websocket/websocket_configuration';
+import MapDataWebSocketEndpoint from 'store/websocket/websocket_map';
+import OfflinePlaybackWebSocketEndpoint from 'store/websocket/websocket_offline';
+import PointCloudWebSocketEndpoint from 'store/websocket/websocket_point_cloud';
+import RealtimeWebSocketEndpoint from 'store/websocket/websocket_realtime';
 import TeleopWebSocketEndpoint from 'store/websocket/websocket_teleop';
 
 // Returns the websocket server address based on the web server address.
@@ -32,6 +34,12 @@ function deduceWebsocketServerAddr(type) {
     case 'teleop':
       path = 'teleop';
       break;
+    case 'account':
+      path = 'account';
+      break;
+    case 'config':
+      path = 'config';
+      break;
   }
   return `${protocol}://${link.hostname}:${port}/${path}`;
 }
@@ -53,9 +61,16 @@ export const CAMERA_WS = new CameraDataWebSocketEndpoint(cameraServerAddr);
 const WS = OFFLINE_PLAYBACK
   ? new OfflinePlaybackWebSocketEndpoint(simWorldServerAddr)
   : new RealtimeWebSocketEndpoint(simWorldServerAddr);
+window.WS = WS;
 
 WS.setPointCloudWS(POINT_CLOUD_WS);
 export default WS;
 
 const teleopServerAddr = deduceWebsocketServerAddr('teleop');
 export const TELEOP_WS = new TeleopWebSocketEndpoint(teleopServerAddr);
+
+const accountServerAddr = deduceWebsocketServerAddr('account');
+export const ACCOUNT_WS = new AccountWebSocketEndpoint(accountServerAddr);
+
+const configServerAddr = deduceWebsocketServerAddr('config');
+export const CONFIGURATION_WS = new ConfigurationWebSocketEndpoint(configServerAddr);

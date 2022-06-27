@@ -15,7 +15,7 @@ export default class HMI {
 
   @observable currentMode = 'none';
 
-  vehicles = [];
+  @observable vehicles = [];
 
   @observable currentVehicle = 'none';
 

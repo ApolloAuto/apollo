@@ -1,0 +1,45 @@
+@use "sass:math";
+
+.layout-flex {
+    display: flex;
+    &.flex-v-center {
+        align-items: center;
+    }
+    @mixin flex-percent($span, $total) {
+        $percent: percentage($span / $total);
+        .flex-span#{$span} {
+            flex: 0 0 $percent;
+        }
+    }
+    $columns: (2, 3, 5, 7, 8, 10, 12, 20);
+    @each $column in $columns {
+        &.flex-columns#{$column} {
+            @for $span from 1 through $column {
+                @include flex-percent($span, $column);
+            }
+        }
+    }
+}
+.layout-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+    @mixin grid-column-span($span) {
+        .grid-column-span#{$span} {
+            grid-column: span #{$span};
+        }
+    }
+    $spans: (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+    @each $span in $spans {
+        @include grid-column-span($span);
+    }
+    $columns: (2, 3, 5, 12, 20);
+    @each $column in $columns {
+        &.grid-columns#{$column} {
+            grid-template-columns: repeat($column, 1fr);
+        }
+    }
+    @for $span from 1 through 20 {
+        @include grid-column-span($span);
+    }
+}

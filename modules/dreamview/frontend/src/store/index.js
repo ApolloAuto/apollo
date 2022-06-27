@@ -14,6 +14,8 @@ import RouteEditingManager from 'store/route_editing_manager';
 import StoryTellers from 'store/story_tellers';
 import Teleop from 'store/teleop';
 import TrafficSignal from 'store/traffic_signal';
+import AccountInfo from 'store/account';
+import ConfigProfileStatus from 'store/config_profile_status';
 
 class DreamviewStore {
     // Mutable States
@@ -22,6 +24,10 @@ class DreamviewStore {
     @observable isInitialized = false;
 
     @observable hmi = new HMI();
+
+    @observable account = new AccountInfo();
+
+    @observable configStatus = new ConfigProfileStatus();
 
     @observable planningData = new PlanningData();
 
@@ -56,6 +62,26 @@ class DreamviewStore {
     @observable newDisengagementReminder = false;
 
     @observable offlineViewErrorMsg = null;
+
+    // dreamview mode
+    // TODO: fully support
+    mode = 'normal';
+
+    @action setNormalMode() {
+      this.mode = 'normal';
+    }
+
+    @action setInsertMode() {
+      this.mode = 'insert';
+    }
+
+    @action setVisualMode() {
+      this.mode = 'visual';
+    }
+
+    @action setCommandMode() {
+      this.mode = 'command';
+    }
 
     @computed get enableHMIButtonsOnly() {
       return !this.isInitialized;

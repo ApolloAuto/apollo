@@ -54,6 +54,16 @@ self.addEventListener('message', (event) => {
         message = JSON.parse(data);
       }
       break;
+    case 'account':
+      if (typeof data === 'string') {
+        message = JSON.parse(data);
+      }
+      break;
+    case 'config':
+      if (typeof data === 'string') {
+        message = JSON.parse(data);
+      }
+      break;
     default:
       console.error('Unknown data source found:', event.data.source);
       break;

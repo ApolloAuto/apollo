@@ -481,4 +481,10 @@ export default class RealtimeWebSocketEndpoint {
     }
     this.websocket.send(JSON.stringify(request));
   }
+
+  reloadVehicles() {
+    this.websocket.send(JSON.stringify({
+      type: 'ReloadVehicles'
+    }));
+  }
 }

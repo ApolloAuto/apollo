@@ -1,0 +1,31 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message ConfigurationProfile {
+  enum Status {
+    UNKNOWN = 0;
+    CLEAN = 1;
+    ERROR = 2;
+    DRAFT = 3;
+    SYNCING = 4;
+    DOWNLOADING = 5;
+    UPLOADING = 6;
+    RESETING = 7;
+  }
+  optional uint64 id = 1;
+  optional string name = 2;
+  optional uint64 vehicle_id = 3;
+  optional uint32 vehicle_type = 4;
+  optional string vehicle_in = 5;
+  optional uint64 revision_id = 6;
+  optional string revision_digest = 7;
+  optional Status status = 21;
+  optional bool is_local = 22 [default = true];
+  optional bool is_synced = 23 [default = false];
+}
+
+message ConfigurationProfileStatus {
+  optional string vehicle_in = 1;
+  repeated ConfigurationProfile profiles = 2;
+}

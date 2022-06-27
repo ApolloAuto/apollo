@@ -190,6 +190,11 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["app"]
         }),
+        new HtmlWebpackPlugin({
+            filename: "login_success.html",
+            template: "./login_success.hbs",
+            chunks: []
+        }),
         new FaviconsWebpackPlugin({
             logo: "./favicon.png",
             cache: true,

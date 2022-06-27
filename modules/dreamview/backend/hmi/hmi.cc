@@ -210,6 +210,12 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         hmi_worker_->VehicleCalibrationPreprocess();
       });
+  websocket_->RegisterMessageHandler(
+      "ReloadVehicles",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        AINFO << "Reloading Vehicles";
+        hmi_worker_->ReloadVehicles();
+      });
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {

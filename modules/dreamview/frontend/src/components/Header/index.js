@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'components/common/Image';
 import logoApollo from 'assets/images/logo_apollo.png';
 import HMIControls from 'components/Header/HMIControls';
+import Login from 'components/Header/Login';
 
 export default class Header extends React.Component {
   render() {
@@ -10,6 +11,7 @@ export default class Header extends React.Component {
             <header className="header">
                 <Image image={logoApollo} className="apollo-logo" />
                 {!OFFLINE_PLAYBACK && <HMIControls />}
+                <Login />
             </header>
     );
   }

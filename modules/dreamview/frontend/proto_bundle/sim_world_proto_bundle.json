@@ -4843,6 +4843,13 @@
                     "default": 10
                   }
                 },
+                "trajKappaContraintRatio": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.7
+                  }
+                },
                 "gridAStarXyResolution": {
                   "type": "double",
                   "id": 15,

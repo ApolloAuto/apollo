@@ -1,5 +1,6 @@
 @import "media-queries";
 @import "common";
+@import "layout";
 
 $min-main-view-width: 600;
 $side-bar-width: ('small': 80, 'large': 90);
@@ -220,6 +221,27 @@ body {
     .header-button-active {
         color: #30A5FF;
     }
+
+    .header-nav-logout {
+        height: 40px;
+        min-width: 125px;
+        text-align: center;
+    }
+
+    .header-nav-logout p{
+        top: 15ps;
+    }
+
+    .header-nav-logout-sublist {
+        color: #fff;
+        display: none;
+    }
+
+    .header-nav-logout:hover .header-nav-logout-sublist {
+        display: block;
+        text-decoration: none;
+        margin-top: 10px;
+    }
 }
 
 .pane-container {
@@ -365,7 +387,7 @@ body {
             display: inline-block;
             padding-left: 20px;
         }
-        
+
         .name-input {
             margin: 10px;
             min-height: 20px;
@@ -1465,6 +1487,69 @@ body {
             padding: 0px;
             border: none;
             background: #1D2226;
+        }
+    }
+}
+
+.configuration {
+    z-index: 10;
+
+    padding-left: 5px;
+
+    .react-tabs {
+        @extend .custom-react-tab;
+
+        height: 100%;
+
+        &__tab-panel {
+            box-sizing: border-box;
+            height: 100%;
+            padding: 10px 0px 5px 0px;
+
+            @include small-screen {
+                padding: 5px 0px 0px 0px;
+            }
+        }
+
+        ul.react-tabs__tab-list {
+            width: unset;
+        }
+
+        li.react-tabs__tab {
+            border-bottom: 1px solid #999999;
+            padding: 10px 35px;
+
+            &--selected {
+                border-bottom: 1px solid #FFFFFF;
+            }
+        }
+    }
+    .vin {
+        width: 50%;
+        padding: 0px 0px 0px 5px;
+        label {
+          min-height: 40px;
+        }
+    }
+    .vehicle {
+        &:hover {
+            background: #2A3238;
+        }
+        width: 50%;
+        padding: 0px 0px 0px 5px;
+        .status {
+            background: #000000;
+            padding: 10px;
+        }
+        &>*:last-child {
+            margin-left: auto;
+        }
+    }
+    .guide {
+        padding: 0px 0px 0px 5px;
+        a.apollo-studio {
+            color: #8bb3ff;
+            text-decoration: none;
         }
     }
 }

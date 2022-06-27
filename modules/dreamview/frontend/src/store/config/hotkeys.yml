@@ -7,3 +7,4 @@
 7: showPOI
 v: cameraAngle
 p: showPNCMonitor
+',': showConfiguration

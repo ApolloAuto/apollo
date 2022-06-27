@@ -217,6 +217,30 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
   return mode;
 }
 
+void HMIWorker::ReloadVehicles() {
+  AINFO << "load config";
+  HMIConfig config = LoadConfig();
+  std::string msg;
+  AINFO << "serialize new config";
+  config.SerializeToString(&msg);
+
+  WLock wlock(status_mutex_);
+  AINFO << "parse new config";
+  config_.ParseFromString(msg);
+  AINFO << "init status";
+  // status_.clear_modes();
+  // status_.clear_maps();
+  AINFO << "clear vehicles";
+  status_.clear_vehicles();
+  // InitStatus();
+  // Populate vehicles and current_vehicle.
+  AINFO << "reload vehicles";
+  for (const auto& vehicle : config_.vehicles()) {
+    status_.add_vehicles(vehicle.first);
+  }
+  status_changed_ = true;
+}
+
 void HMIWorker::InitStatus() {
   static constexpr char kDockerImageEnv[] = "DOCKER_IMG";
   status_.set_docker_image(cyber::common::GetEnv(kDockerImageEnv));

@@ -120,6 +120,9 @@
 		"showDataRecorder": {
 			"default": false
 		},
+		"showConfiguration": {
+			"default": false
+		},
 		"showPNCMonitor": {
 			"default": false
 		},

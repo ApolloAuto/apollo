@@ -6,6 +6,7 @@ import ModuleController from 'components/ModuleController';
 import Menu from 'components/SideBar/Menu';
 import DefaultRouting from 'components/DefaultRouting';
 import Tasks from 'components/Tasks';
+import Configuration from 'components/Configuration';
 
 @inject('store') @observer
 export default class ToolView extends React.Component {
@@ -30,6 +31,9 @@ export default class ToolView extends React.Component {
                     <DataRecorder
                         newDisengagementReminder={newDisengagementReminder}
                     />
+                )}
+                {options.showConfiguration && (
+                    <Configuration />
                 )}
             </div>
     );
