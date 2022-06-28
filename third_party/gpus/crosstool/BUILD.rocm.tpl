@@ -1,7 +1,7 @@
 # This file is expanded from a template by rocm_configure.bzl
 # Update rocm_configure.bzl#verify_build_defines when adding new variables.
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config")
+load(":hipcc_cc_toolchain_config.bzl", "cc_toolchain_config")
 
 licenses(["restricted"])
 
@@ -80,7 +80,6 @@ cc_toolchain_config(
         "-fdata-sections",
     ],
     dbg_compile_flags = ["-g"],
-    cxx_flags = ["-std=c++14"],
     link_flags = [
         "-fuse-ld=gold",
         "-Wl,-no-as-needed",

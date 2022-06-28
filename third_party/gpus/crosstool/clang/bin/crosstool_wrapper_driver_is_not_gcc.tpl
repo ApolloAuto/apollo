@@ -215,7 +215,7 @@ def InvokeNvcc(argv, log=False):
   srcs = ' '.join(src_files)
   out = ' -o ' + out_file[0]
 
-  nvccopts = '-D_FORCE_INLINES '
+  nvccopts = '-v -D_FORCE_INLINES '
   for capability in GetOptionValue(argv, "--cuda-gpu-arch"):
     capability = capability[len('sm_'):]
     nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s\" ' % (capability,

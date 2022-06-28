@@ -631,7 +631,7 @@ def _create_local_rocm_repository(repository_ctx):
     # No templating of cc_toolchain_config - use attributes and templatize the
     # BUILD file.
     repository_ctx.template(
-        "crosstool/cc_toolchain_config.bzl",
+        "crosstool/hipcc_cc_toolchain_config.bzl",
         tpl_paths["crosstool:hipcc_cc_toolchain_config.bzl"],
     )
 
