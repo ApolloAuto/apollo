@@ -59,6 +59,104 @@ cc_library(
 )
 
 cc_library(
+    name = "migraphx_lib",
+    srcs = ["rocm/lib/%{migraphx_lib}"],
+    data = ["rocm/lib/%{migraphx_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_c_lib",
+    srcs = ["rocm/lib/%{migraphx_c_lib}"],
+    data = ["rocm/lib/%{migraphx_c_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_tf_lib",
+    srcs = ["rocm/lib/%{migraphx_tf_lib}"],
+    data = ["rocm/lib/%{migraphx_tf_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_device_lib",
+    srcs = ["rocm/lib/%{migraphx_device_lib}"],
+    data = ["rocm/lib/%{migraphx_device_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_gpu_lib",
+    srcs = ["rocm/lib/%{migraphx_gpu_lib}"],
+    data = ["rocm/lib/%{migraphx_gpu_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_ref_lib",
+    srcs = ["rocm/lib/%{migraphx_ref_lib}"],
+    data = ["rocm/lib/%{migraphx_ref_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx_lib_onnx",
+    srcs = ["rocm/lib/%{migraphx_onnx_lib}"],
+    data = ["rocm/lib/%{migraphx_onnx_lib}"],
+    includes = [
+        ".",
+        "rocm/include",
+    ],
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "migraphx",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":migraphx_lib",
+        ":migraphx_c_lib",
+        ":migraphx_tf_lib",
+        ":migraphx_device_lib",
+        ":migraphx_gpu_lib",
+        ":migraphx_ref_lib",
+        ":migraphx_lib_onnx",
+    ],
+)
+
+cc_library(
     name = "rocm",
     visibility = ["//visibility:public"],
     deps = [
@@ -66,6 +164,7 @@ cc_library(
         ":hip",
         ":hipblas",
         ":miopen",
+        ":migraphx",
     ],
 )
 
