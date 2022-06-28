@@ -61,23 +61,14 @@ build:optimize --host_copt=-march=native
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures
 build:gpu --define USE_GPU=true
-build:gpu --define GPU_PLATFORM=NVIDIA
 build:gpu --cxxopt="-DUSE_GPU=1"
 build:gpu --cxxopt="-DNVIDIA=0"
 build:gpu --cxxopt="-DAMD=1"
 
 # GPU platform
-build:amd --define USE_GPU=true
 build:amd --define GPU_PLATFORM=AMD
-build:amd --cxxopt="-DUSE_GPU=1"
-build:amd --cxxopt="-DNVIDIA=0"
-build:amd --cxxopt="-DAMD=1"
 build:amd --cxxopt="-DGPU_PLATFORM=AMD"
-build:nvidia --define USE_GPU=true
 build:nvidia --define GPU_PLATFORM=NVIDIA
-build:nvidia --cxxopt="-DUSE_GPU=1"
-build:nvidia --cxxopt="-DNVIDIA=0"
-build:nvidia --cxxopt="-DAMD=1"
 build:nvidia --cxxopt="-DGPU_PLATFORM=NVIDIA"
 
 # Build with profiling
