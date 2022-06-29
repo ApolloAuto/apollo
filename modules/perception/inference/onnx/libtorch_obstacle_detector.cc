@@ -85,7 +85,7 @@ bool ObstacleDetector::Init(const std::map<std::string,
     AWARN << "Require grad";
   }
 
-  c10::cuda::CUDACachingAllocator::emptyCache();
+  emptyCache();
   return true;
 }
 

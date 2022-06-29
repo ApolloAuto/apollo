@@ -26,10 +26,11 @@
 #include "modules/perception/base/blob.h"
 
 #if GPU_PLATFORM == NVIDIA
-#include <c10/cuda/CUDACachingAllocator.h>
+  #include <c10/cuda/CUDACachingAllocator.h>
+  using namespace c10::cuda::CUDACachingAllocator;
 #elif GPU_PLATFORM == AMD
-#include <c10/hip/HIPCachingAllocator.h>
-#define c10::cuda::CUDACachingAllocator::emptyCache c10::hip::HIPCachingAllocator::emptyCache
+  #include <c10/hip/HIPCachingAllocator.h>
+  using namespace c10::hip::HIPCachingAllocator;
 #endif
 
 namespace apollo {
