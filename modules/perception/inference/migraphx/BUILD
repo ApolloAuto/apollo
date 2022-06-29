@@ -1,0 +1,53 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "mi_common",
+    srcs = ["mi_common.cc"],
+    hdrs = ["mi_common.h"],
+    deps = [
+        "//cyber",
+        "//modules/perception/base:common",
+        "//modules/perception/proto:rt_cc_proto",
+        "@com_google_absl//absl/strings",
+        "@local_config_rocm//rocm:migraphx",
+        "@local_config_rocm//rocm:rocm_headers",
+    ],
+)
+
+cc_library(
+    name = "mi_utils",
+    srcs = ["mi_utils.cc"],
+    hdrs = ["mi_utils.h"],
+    data = [
+        "//modules/perception/inference:inference_test_data",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/proto:rt_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "mi_net",
+    srcs = ["mi_net.cc"],
+    hdrs = [
+        "mi_common.h",
+        "mi_utils.h",
+        "mi_net.h",
+    ],
+    deps = [
+        ":mi_common",
+        ":mi_utils",
+        "//cyber",
+        "//modules/perception/base",
+        "//modules/perception/inference:inference_lib",
+        "//modules/perception/inference/migraphx/plugins:perception_inference_migraphx_plugins",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cpplint()
