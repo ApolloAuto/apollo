@@ -510,6 +510,8 @@ function _determine_perception_disabled() {
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
   elif [ "$GPU_PLATFORM" == "AMD" ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/inference/tensorrt/..."
+  elif [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/inference/migraphx/..."
   fi
 }
 
