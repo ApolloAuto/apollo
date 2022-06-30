@@ -19,7 +19,11 @@
 #include "modules/perception/inference/libtorch/torch_det.h"
 #include "modules/perception/inference/libtorch/torch_net.h"
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
+#if GPU_PLATFORM == NVIDIA
+  #include "modules/perception/inference/tensorrt/rt_net.h"
+#elif GPU_PLATFORM == AMD
+  #include "modules/perception/inference/migraphx/mi_net.h"
+#endif
 
 namespace apollo {
 namespace perception {
@@ -31,6 +35,7 @@ Inference *CreateInferenceByName(const std::string &name,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
+#if GPU_PLATFORM == NVIDIA
   if (name == "RTNet") {
     return new RTNet(proto_file, weight_file, outputs, inputs);
   } else if (name == "RTNetInt8") {
@@ -42,6 +47,14 @@ Inference *CreateInferenceByName(const std::string &name,
   } else if (name == "Obstacle") {
     return new ObstacleDetector(proto_file, weight_file, outputs, inputs);
   }
+#elif GPU_PLATFORM == AMD
+  if (name == "RTNet") {
+    return new MINet(proto_file, weight_file, outputs, inputs);
+  } else if (name == "RTNetInt8") {
+    // int8 calibration not supported yet
+    return new MINet(proto_file, weight_file, outputs, inputs);
+  }
+#endif
   return nullptr;
 }
 
