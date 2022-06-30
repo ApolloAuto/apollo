@@ -460,7 +460,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
                      std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRSL1_param;
   LRSL(x, y, phi, &LRSL1_param);
-  double LRSL1_lengths[4] = {LRSL1_param.t, -0.5 * M_PI, -LRSL1_param.u,
+  double LRSL1_lengths[4] = {LRSL1_param.t, -0.5 * M_PI, LRSL1_param.u,
                              LRSL1_param.v};
   char LRSL1_types[] = "LRSL";
   if (LRSL1_param.flag &&
@@ -493,7 +493,7 @@ bool ReedShepp::CCSC(const double x, const double y, const double phi,
 
   RSPParam LRSL4_param;
   LRSL(-x, -y, phi, &LRSL4_param);
-  double LRSL4_lengths[4] = {-LRSL4_param.t, -0.5 * M_PI, -LRSL4_param.u,
+  double LRSL4_lengths[4] = {-LRSL4_param.t, 0.5 * M_PI, -LRSL4_param.u,
                              -LRSL4_param.v};
   char LRSL4_types[] = "RLSR";
   if (LRSL4_param.flag &&

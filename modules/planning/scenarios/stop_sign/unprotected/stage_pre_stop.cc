@@ -23,13 +23,14 @@
 #include <algorithm>
 #include <utility>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
@@ -162,6 +163,13 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
            << "]: Failed to find nearest lane from map for position: "
            << point.DebugString() << "; heading[" << perception_obstacle.theta()
            << "]";
+    return -1;
+  }
+  if (!obstacle_lane->IsOnLane(common::util::PointFactory::ToVec2d(
+          perception_obstacle.position()))) {
+    ADEBUG << "obstacle_id[" << perception_obstacle_id << "] type["
+           << obstacle_type_name << "]: is off road. " << point.DebugString()
+           << "; heading[" << perception_obstacle.theta() << "]";
     return -1;
   }
 
