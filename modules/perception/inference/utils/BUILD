@@ -15,6 +15,8 @@ gpu_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hipblas",
     ]),
 )
 
@@ -23,9 +25,13 @@ cc_library(
     srcs = [":inference_cuda_util_cuda_lib"],
     hdrs = ["cuda_util.h"],
     linkstatic = 1,
-    deps = [
+    deps =
+        if_cuda([
         "@local_config_tensorrt//:tensorrt",
-        "@opencv//:imgcodecs",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
+        "@opencv//:imgcodecs"
     ],
 )
 
@@ -57,7 +63,11 @@ cc_library(
         "//modules/perception/base:box",
         "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@opencv//:imgcodecs",
     ],
 )
@@ -86,8 +96,12 @@ cc_library(
     srcs = [":inference_resize_cuda_lib"],
     hdrs = ["resize.h"],
     linkstatic = 1,
-    deps = [
+    deps =
+        if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@opencv//:imgcodecs",
     ],
 )
@@ -114,8 +128,12 @@ cc_library(
     srcs = [":inference_gemm_cuda_lib"],
     hdrs = ["gemm.h"],
     linkstatic = 1,
-    deps = [
+    deps =
+        if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@opencv//:imgcodecs",
     ],
 )
@@ -139,7 +157,11 @@ cc_library(
     hdrs = ["binary_data.h"],
     deps = [
         "//modules/perception/base:blob",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]) + [
         "@opencv//:imgcodecs",
     ],
 )
