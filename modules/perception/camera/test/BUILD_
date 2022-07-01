@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_test", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -411,7 +411,7 @@ cc_test(
     ],
 )
 
-cc_test(
+gpu_test(
     name = "camera_lib_obstacle_tracker_omt_frame_list_test",
     size = "small",
     srcs = ["camera_lib_obstacle_tracker_omt_frame_list_test.cc"],
@@ -492,7 +492,7 @@ cc_test(
     ],
 )
 
-cc_test(
+gpu_test(
     name = "camera_lib_traffic_light_detector_crop_test",
     size = "small",
     srcs = ["camera_lib_traffic_light_detector_crop_test.cc"],
@@ -543,7 +543,7 @@ cc_test(
 #        "@local_config_tensorrt//:tensorrt",
 #    ],
 #)
-cc_test(
+gpu_test(
     name = "camera_lib_traffic_light_detector_select_test",
     size = "small",
     srcs = ["camera_lib_traffic_light_detector_select_test.cc"],

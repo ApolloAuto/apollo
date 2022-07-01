@@ -20,7 +20,7 @@ gpu_library(
     ]),
 )
 
-cc_library(
+gpu_library(
     name = "smoke_region_output",
     srcs = [
         "region_output.cc",

@@ -1,12 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_library", "gpu_test", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-cc_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins",
     srcs = [
         ":dfmb_psroi_align_plugin",
@@ -177,7 +177,7 @@ cc_test(
     ],
 )
 
-cc_test(
+gpu_test(
     name = "argmax_plugin_test",
     size = "small",
     srcs = ["argmax_plugin_test.cc"],
