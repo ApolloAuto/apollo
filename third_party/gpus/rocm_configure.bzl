@@ -454,14 +454,31 @@ def _create_dummy_repository(repository_ctx):
 
     # Set up rocm_config.h, which is used by
     # tensorflow/stream_executor/dso_loader.cc.
-    # _tpl(
-    #     repository_ctx,
-    #     "rocm:rocm_config.h",
-    #     {
-    #         "%{rocm_toolkit_path}": _DEFAULT_ROCM_TOOLKIT_PATH,
-    #     },
-    #     "rocm/rocm/rocm_config.h",
-    # )
+    _tpl(
+        repository_ctx,
+        "rocm:rocm_config.h",
+        {
+            "%{rocm_amdgpu_targets}": "",
+            "%{rocm_toolkit_path}": "",
+            "%{rocm_version_number}": "",
+            "%{miopen_version_number}": "",
+            "%{migraphx_version_number}": "",
+            "%{hipruntime_version_number}": "",
+            "%{hipblas_version_number}": "",
+        },
+        "rocm/rocm/rocm_config.h",
+    )
+
+    # Set up cuda_config.py, which is used by gen_build_info to provide
+    # static build environment info to the API
+    _tpl(
+        repository_ctx,
+        "rocm:rocm_config.py",
+        {
+            "%{rocm_config}": str({}),
+        },
+        "rocm/rocm/rocm_config.py",
+    )
 
     # If rocm_configure is not configured to build with GPU support, and the user
     # attempts to build with --config=rocm, add a dummy build rule to intercept
@@ -486,8 +503,8 @@ def _create_local_rocm_repository(repository_ctx):
         "crosstool:BUILD.rocm",
         "crosstool:hipcc_cc_toolchain_config.bzl",
         "crosstool:clang/bin/crosstool_wrapper_driver_is_clang_for_hip",
-#        "rocm:rocm_config.h",
-#        "rocm:rocm_config.py",
+        "rocm:rocm_config.h",
+        "rocm:rocm_config.py",
     ]}
 
     find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
@@ -653,20 +670,40 @@ def _create_local_rocm_repository(repository_ctx):
 
     # Set up rocm_config.h, which is used by
     # tensorflow/stream_executor/dso_loader.cc.
-    # repository_ctx.template(
-    #     "rocm/rocm/rocm_config.h",
-    #     tpl_paths["rocm:rocm_config.h"],
-    #     {
-    #         "%{rocm_amdgpu_targets}": ",".join(
-    #             ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
-    #         ),
-    #         "%{rocm_toolkit_path}": rocm_config.rocm_toolkit_path,
-    #         "%{rocm_version_number}": rocm_config.rocm_version_number,
-    #         "%{miopen_version_number}": rocm_config.miopen_version_number,
-    #         "%{migraphx_version_number}": rocm_config.migraphx_version_number,
-    #         "%{hipruntime_version_number}": rocm_config.hipruntime_version_number,
-    #     },
-    # )
+    repository_ctx.template(
+       "rocm/rocm/rocm_config.h",
+       tpl_paths["rocm:rocm_config.h"],
+       {
+           "%{rocm_amdgpu_targets}": ",".join(
+               ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
+           ),
+           "%{rocm_toolkit_path}": rocm_config.rocm_toolkit_path,
+           "%{rocm_version_number}": rocm_config.rocm_version_number,
+           "%{miopen_version_number}": rocm_config.miopen_version_number,
+           "%{migraphx_version_number}": rocm_config.migraphx_version_number,
+           "%{hipruntime_version_number}": rocm_config.hipruntime_version_number,
+           "%{hipblas_version_number}": rocm_config.config["hipblas_version_number"],
+       },
+    )
+
+    # Set up rocm_config.py, which is used by gen_build_info to provide
+    # static build environment info to the API
+    repository_ctx.template(
+        "rocm/rocm/rocm_config.py",
+        tpl_paths["rocm:rocm_config.py"],
+        {
+            "%{rocm_config}": str(
+            {
+                "rocm_version": rocm_config.rocm_version_number,
+                "hip_version": rocm_config.hipruntime_version_number,
+                "rocm_amdgpu_targets": ",".join(
+                    ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
+                ),
+                "cpu_compiler": str(cc),
+            }
+            ),
+        },
+    )
 
 def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with ROCm."""

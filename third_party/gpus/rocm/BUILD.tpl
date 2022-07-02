@@ -20,11 +20,10 @@ config_setting(
     },
 )
 
-# TODO(emankov): Uncomment rocm/rocm_config.h after setting it up in rocm_configure.bzl
 cc_library(
     name = "rocm_headers",
     hdrs = [
-#       "rocm/rocm_config.h",
+        "rocm/rocm_config.h",
         %{rocm_headers}
     ],
     includes = [
@@ -199,6 +198,11 @@ filegroup(
     srcs = [
         "rocm/bin/clang-offload-bundler",
     ],
+)
+
+py_library(
+    name = "rocm_config_py",
+    srcs = ["rocm/rocm_config.py"]
 )
 
 %{copy_rules}
