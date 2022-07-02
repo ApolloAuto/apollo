@@ -20,7 +20,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "inference_cuda_util_lib",
     srcs = [":inference_cuda_util_cuda_lib"],
     hdrs = ["cuda_util.h"],
@@ -50,7 +50,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "inference_util_lib",
     srcs = [
         "util.cc",
@@ -91,7 +91,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "inference_resize_lib",
     srcs = [":inference_resize_cuda_lib"],
     hdrs = ["resize.h"],
@@ -123,7 +123,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "inference_gemm_lib",
     srcs = [":inference_gemm_cuda_lib"],
     hdrs = ["gemm.h"],
@@ -151,7 +151,7 @@ cc_test(
     ],
 )
 
-gpu_library(
+cc_library(
     name = "inference_binary_data_lib",
     srcs = ["binary_data.cc"],
     hdrs = ["binary_data.h"],

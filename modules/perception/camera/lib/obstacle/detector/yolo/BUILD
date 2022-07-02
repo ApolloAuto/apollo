@@ -20,7 +20,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "region_output",
     srcs = [
         "region_output.cc",

@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "gpu_test", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -42,7 +42,7 @@ cc_library(
     ],
 )
 
-gpu_library(
+cc_library(
     name = "blob",
     srcs = ["blob.cc"],
     hdrs = ["blob.h"],
@@ -58,7 +58,7 @@ gpu_library(
     ]),
 )
 
-gpu_test(
+cc_test(
     name = "blob_test",
     size = "small",
     srcs = ["blob_test.cc"],
@@ -114,7 +114,7 @@ cc_test(
     ],
 )
 
-gpu_library(
+cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
@@ -125,7 +125,7 @@ gpu_library(
     ]),
 )
 
-gpu_test(
+cc_test(
     name = "common_test",
     size = "small",
     srcs = ["common_test.cc"],
@@ -371,7 +371,7 @@ cc_test(
     ],
 )
 
-gpu_library(
+cc_library(
     name = "syncedmem",
     srcs = ["syncedmem.cc"],
     hdrs = ["syncedmem.h"],
@@ -385,7 +385,7 @@ gpu_library(
     ]),
 )
 
-gpu_test(
+cc_test(
     name = "syncedmem_test",
     size = "small",
     srcs = ["syncedmem_test.cc"],
