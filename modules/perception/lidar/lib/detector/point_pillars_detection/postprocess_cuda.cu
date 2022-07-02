@@ -34,6 +34,7 @@
 #include <thrust/device_ptr.h>
 #include <thrust/host_vector.h>
 #include <thrust/sort.h>
+#include <thrust/sequence.h>
 
 // headers in local files
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/postprocess_cuda.h"
