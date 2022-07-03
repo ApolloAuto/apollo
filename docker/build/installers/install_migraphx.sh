@@ -42,8 +42,8 @@ wget --load-cookies /tmp/cookies.txt \
 tar xzf "${PKG_NAME}"
 mv "${PKG_NAME%.tar.gz}" /opt/rocm/migraphx
 
-cp -rLf "/opt/rocm/migraphx/include/." "/opt/rocm/include/"
-cp -rLf "/opt/rocm/migraphx/lib/." "/opt/rocm/lib/"
+cp -rLfs "/opt/rocm/migraphx/include/." "/opt/rocm/include/"
+cp -rLfs "/opt/rocm/migraphx/lib/." "/opt/rocm/lib/"
 
 # Cleanup
 rm -f "${PKG_NAME}"
