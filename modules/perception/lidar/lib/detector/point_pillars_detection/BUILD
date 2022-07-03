@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["params.h"],
 )
 
-gpu_library(
+cc_library(
     name = "point_pillars",
     srcs = [
         "point_pillars.cc",
@@ -31,11 +31,11 @@ gpu_library(
         "//third_party:libtorch",
     ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
+        "@local_config_tensorrt//:tensorrt",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
-    ]) + [
-        "@local_config_tensorrt//:tensorrt",
-    ],
+        "@local_config_rocm//rocm:migraphx",
+    ]),
     alwayslink = True,
 )
 
@@ -129,6 +129,7 @@ gpu_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:rocm_headers",
     ]),
 )
 
