@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-cc_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins",
     srcs = [
         ":dfmb_psroi_align_plugin",

@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 

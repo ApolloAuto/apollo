@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["params.h"],
 )
 
-cc_library(
+gpu_library(
     name = "point_pillars",
     srcs = [
         "point_pillars.cc",
