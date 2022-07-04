@@ -949,6 +949,10 @@ def validate_rocm_config(environ_cp):
     print('    %s' % config['hipblas_library_dir'])
     print('    %s' % config['hipblas_include_dir'])
 
+    print('Found rocblas %s in:' % config['rocblas_version_number'])
+    print('    %s' % config['rocblas_library_dir'])
+    print('    %s' % config['rocblas_include_dir'])
+
     print('Found miopen %s in:' % config['miopen_version_number'])
     print('    %s' % config['miopen_library_dir'])
     print('    %s' % config['miopen_include_dir'])
@@ -1040,7 +1044,7 @@ def setup_cuda_family_config(environ_cp):
 
 
 def setup_rocm_family_config(environ_cp):
-    """Setup ROCm/hip/hipblas/miopen action env."""
+    """Setup ROCm/hip/hipblas/rocblas/miopen action env."""
     if not validate_rocm_config(environ_cp):
         print("Cannot validate_rocm_config non-interactively. Aborting ...")
         sys.exit(1)
@@ -1048,12 +1052,14 @@ def setup_rocm_family_config(environ_cp):
     rocm_env_names = [
         'TF_ROCM_VERSION',
         'TF_HIPBLAS_VERSION',
+        'TF_ROCBLAS_VERSION',
         'TF_HIP_VERSION',
         'TF_MIOPEN_VERSION',
         # Items below are for backwards compatibility
         'ROCM_TOOLKIT_PATH',
         'HIP_INSTALL_PATH',
         'HIPBLAS_INSTALL_PATH',
+        'ROCBLAS_INSTALL_PATH',
         'MIOPEN_INSTALL_PATH'
         'MIGRAPHX_INSTALL_PATH'
     ]
