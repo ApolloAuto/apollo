@@ -171,6 +171,7 @@ void SpeedBoundsDecider::RecordSTGraphDebug(
     return;
   }
 
+  st_graph_debug->set_name(Name());
   for (const auto &boundary : st_graph_data.st_boundaries()) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary->id());
