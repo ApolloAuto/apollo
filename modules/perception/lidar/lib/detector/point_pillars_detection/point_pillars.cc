@@ -478,6 +478,8 @@ void PointPillars::InitTRT() {
   if (pfe_context_ == nullptr || rpn_context_ == nullptr) {
     AERROR << "Failed to create TensorRT Execution Context.";
   }
+#elif GPU_PLATFORM == AMD
+  assert(0 && "PointPillars::InitTRT() is not implemented yet");
 #endif
 }
 
@@ -515,6 +517,8 @@ void PointPillars::OnnxToTRTModel(
   network->destroy();
   config->destroy();
   builder->destroy();
+#elif GPU_PLATFORM == AMD
+  assert(0 && "PointPillars::OnnxToTRTModel is not implemented yet");
 #endif
 }
 
