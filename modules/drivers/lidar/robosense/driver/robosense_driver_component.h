@@ -31,18 +31,7 @@ using apollo::cyber::Component;
 class RobosenseComponent : public Component<> {
  public:
   ~RobosenseComponent() {}
-  bool Init() override {
-    if (!GetProtoConfig(&conf_)) {
-      AERROR << "load config error, file:" << config_file_path_;
-      return false;
-    }
-    driver_.reset(new RobosenseDriver(node_, conf_));
-    if (!driver_->Init()) {
-      AERROR << "driver init error";
-      return false;
-    }
-    return true;
-  }
+  bool Init() override;
 
  private:
   std::shared_ptr<RobosenseDriver> driver_;
