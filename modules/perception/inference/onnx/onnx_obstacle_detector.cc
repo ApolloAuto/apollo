@@ -45,6 +45,7 @@ OnnxObstacleDetector::~OnnxObstacleDetector() {}
 void OnnxObstacleDetector::OnnxToTRTModel(
     const std::string& model_file,  // name of the onnx model
     nvinfer1::ICudaEngine** engine_ptr) {
+#if GPU_PLATFORM == NVIDIA
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
   kBatchSize = 1;
 
@@ -76,6 +77,9 @@ void OnnxObstacleDetector::OnnxToTRTModel(
   network->destroy();
   config->destroy();
   builder->destroy();
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::OnnxToTRTModel() is not implemented yet");
+#endif
 }
 
 void OnnxObstacleDetector::inference() {
@@ -92,6 +96,7 @@ bool OnnxObstacleDetector::Init(const std::map<std::string,
   }
 
   // create execution context from the engine
+#if GPU_PLATFORM == NVIDIA
   context_ = engine_->createExecutionContext();
   if (context_ == nullptr) {
     AERROR << "Fail to create Exceution Context";
@@ -110,6 +115,9 @@ bool OnnxObstacleDetector::Init(const std::map<std::string,
       blobs_.emplace(name, blob);
     }
   }
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::Init() is not implemented yet");
+#endif
   return true;
 }
 
