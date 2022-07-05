@@ -42,8 +42,8 @@ pushd rpp
     make -j$(nproc)
     make install
 popd
-cp -rLf "/opt/rocm/rpp/include/." "/opt/rocm/include/"
-cp -rLf "/opt/rocm/rpp/lib/." "/opt/rocm/lib/"
+cp -rLfs "/opt/rocm/rpp/include/." "/opt/rocm/include/"
+cp -rLfs "/opt/rocm/rpp/lib/." "/opt/rocm/lib/"
 
 rm -fr rpp
 ok "Successfully installed RPP"
