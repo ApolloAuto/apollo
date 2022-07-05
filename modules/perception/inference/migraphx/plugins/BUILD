@@ -1,6 +1,7 @@
+# AMD only, excluded for NVIDIA
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "gpu_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,15 +20,10 @@ cc_library(
     ]),
     linkstatic = True,
     deps = [
-    ] + if_cuda([
-        "@local_config_cuda//cuda:cublas",
-        "@local_config_cuda//cuda:cudart",
-        "@local_config_cuda//cuda:cudnn",
-    ]) + if_rocm([
         "@local_config_rocm//rocm:hipblas",
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
-    ]),
+    ],
 )
 
 gpu_library(
@@ -40,12 +36,9 @@ gpu_library(
     alwayslink = True,
     deps = [
         "//modules/perception/base:common",
-    ] + if_cuda([
-        "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
-    ]),
+    ],
 )
 
 cc_library(
@@ -62,12 +55,9 @@ cc_library(
 #         ":kernels_cuda",
 #         "//cyber/common:log",
 #         "//modules/perception/inference/migraphx:mi_common",
-#     ] + if_cuda([
-#         "@local_config_cuda//cuda:cudart",
-#     ]) + if_rocm([
 #         "@local_config_rocm//rocm:hip",
-        # "@local_config_rocm//rocm:rocm_headers",
-#     ])
+#         "@local_config_rocm//rocm:rocm_headers",
+#     ],
 # )
 
 gpu_library(
@@ -78,12 +68,9 @@ gpu_library(
         ":plugin",
         ":kernels_cuda",
         "//modules/perception/inference/migraphx:mi_common",
-    ] + if_cuda([
-        "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
-    ])
+    ],
 )
 
 # gpu_library(
@@ -94,12 +81,9 @@ gpu_library(
 #         ":plugin",
 #         ":kernels_cuda",
 #         "//modules/perception/inference/migraphx:mi_common",
-#     ] + if_cuda([
-#         "@local_config_cuda//cuda:cudart",
-#     ]) + if_rocm([
 #         "@local_config_rocm//rocm:hip",
-        # "@local_config_rocm//rocm:rocm_headers",
-#     ]),
+#         "@local_config_rocm//rocm:rocm_headers",
+#     ],
 # )
 
 cpplint()
