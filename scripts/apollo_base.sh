@@ -680,7 +680,7 @@ function run_bazel() {
     sp=" "
   fi
 
-  info "$1 Overview: "
+  info "${BLUE}$1 Overview:${NO_COLOR}"
   info "${TAB}USE_GPU:       ${spaces}${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
   if [ "${USE_GPU}" -eq 1 ]; then
     info "${TAB}GPU arch:      ${spaces}${GREEN}${GPU_PLATFORM}${NO_COLOR}"

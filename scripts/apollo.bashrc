@@ -38,7 +38,7 @@ source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
 
 BOLD='\033[1m'
 RED='\033[0;31m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34;48m'
 GREEN='\033[32m'
 WHITE='\033[34m'
 YELLOW='\033[33m'

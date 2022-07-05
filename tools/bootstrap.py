@@ -67,6 +67,9 @@ _APOLLO_DOCKER_STAGE = "dev"
 
 _INTERACTIVE_MODE = True
 
+class color:
+    GREEN = '\033[32m'
+    NO_COLOR = '\033[0m'
 
 class UserInputError(Exception):
     pass
@@ -893,25 +896,23 @@ def validate_cuda_config(environ_cp):
         tuple(line.decode('ascii').rstrip().split(': '))
         for line in proc.stdout)
 
-    print('Found CUDA %s in:' % config['cuda_version'])
+    print(('Found ' + color.GREEN + 'CUDA %s' + color.NO_COLOR + ' in:') % config['cuda_version'])
     print('    %s' % config['cuda_library_dir'])
     print('    %s' % config['cuda_include_dir'])
 
-    print('Found cuDNN %s in:' % config['cudnn_version'])
+    print(('Found ' + color.GREEN + 'cuDNN %s' + color.NO_COLOR + ' in:') % config['cudnn_version'])
     print('    %s' % config['cudnn_library_dir'])
     print('    %s' % config['cudnn_include_dir'])
 
     if 'tensorrt_version' in config:
-        print('Found TensorRT %s in:' % config['tensorrt_version'])
+        print(('Found ' + color.GREEN + 'TensorRT %s' + color.NO_COLOR + ' in:') % config['tensorrt_version'])
         print('    %s' % config['tensorrt_library_dir'])
         print('    %s' % config['tensorrt_include_dir'])
 
     if config.get('nccl_version', None):
-        print('Found NCCL %s in:' % config['nccl_version'])
+        print(('Found ' + color.GREEN + 'NCCL %s' + color.NO_COLOR + ' in:') % config['nccl_version'])
         print('    %s' % config['nccl_library_dir'])
         print('    %s' % config['nccl_include_dir'])
-
-    print('\n')
 
     environ_cp['CUDA_TOOLKIT_PATH'] = config['cuda_toolkit_path']
     return True
@@ -937,31 +938,29 @@ def validate_rocm_config(environ_cp):
         tuple(line.decode('ascii').rstrip().split(': '))
         for line in proc.stdout)
 
-    print('Found ROCM %s in:' % config['rocm_version_number'])
+    print(('Found ' + color.GREEN + 'ROCm %s' + color.NO_COLOR + ' in:') % config['rocm_version_number'])
     print('    %s' % config['rocm_toolkit_path'])
     print('    %s' % config['rocm_header_path'])
 
-    print('Found hip %s in:' % config['hipruntime_version_number'])
+    print(('Found ' + color.GREEN + 'HIP %s' + color.NO_COLOR + ' in:') % config['hipruntime_version_number'])
     print('    %s' % config['hipruntime_library_dir'])
     print('    %s' % config['hipruntime_include_dir'])
 
-    print('Found hipblas %s in:' % config['hipblas_version_number'])
+    print(('Found ' + color.GREEN + 'hipBLAS' + color.NO_COLOR + ' %s in:') % config['hipblas_version_number'])
     print('    %s' % config['hipblas_library_dir'])
     print('    %s' % config['hipblas_include_dir'])
 
-    print('Found rocblas %s in:' % config['rocblas_version_number'])
+    print(('Found ' + color.GREEN + 'rocBLAS %s' + color.NO_COLOR + ' in:') % config['rocblas_version_number'])
     print('    %s' % config['rocblas_library_dir'])
     print('    %s' % config['rocblas_include_dir'])
 
-    print('Found miopen %s in:' % config['miopen_version_number'])
+    print(('Found ' + color.GREEN + 'MIOpen %s' + color.NO_COLOR + ' in:') % config['miopen_version_number'])
     print('    %s' % config['miopen_library_dir'])
     print('    %s' % config['miopen_include_dir'])
 
-    print('Found MIGraphX %s in:' % config['migraphx_version_number'])
+    print(('Found ' + color.GREEN + 'MIGraphX %s' + color.NO_COLOR + ' in:') % config['migraphx_version_number'])
     print('    %s' % config['migraphx_library_dir'])
     print('    %s' % config['migraphx_include_dir'])
-
-    print('\n')
 
     environ_cp['ROCM_TOOLKIT_PATH'] = config['rocm_toolkit_path']
     return True
@@ -1104,7 +1103,6 @@ build:migraphx --action_env TF_NEED_MIGRAPHX=1
 
 def set_tensorrt_config(environ_cp):
     global _APOLLO_DOCKER_STAGE
-
 
 
 def main():
