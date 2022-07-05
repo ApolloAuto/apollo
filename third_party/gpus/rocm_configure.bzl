@@ -314,6 +314,7 @@ def _find_libs(repository_ctx, rocm_config, hipfft_or_rocfft, bash_bin):
         for name, path in [
             ("amdhip64", rocm_config.rocm_toolkit_path + "/hip"),
             ("hipblas", rocm_config.rocm_toolkit_path + "/hipblas"),
+            ("rocblas", rocm_config.rocm_toolkit_path + "/rocblas"),
             ("MIOpen", rocm_config.rocm_toolkit_path + "/miopen"),
             ("migraphx", rocm_config.rocm_toolkit_path + "/migraphx"),
         ]
@@ -434,6 +435,7 @@ def _create_dummy_repository(repository_ctx):
         {
             "%{hip_lib}": lib_name("hip"),
             "%{hipblas_lib}": lib_name("hipblas"),
+            "%{rocblas_lib}": lib_name("rocblas"),
             "%{miopen_lib}": lib_name("miopen"),
             "%{migraphx_lib}": lib_name("migraphx"),
             "%{migraphx_c_lib}": lib_name("migraphx_c"),
@@ -465,6 +467,7 @@ def _create_dummy_repository(repository_ctx):
             "%{migraphx_version_number}": "",
             "%{hipruntime_version_number}": "",
             "%{hipblas_version_number}": "",
+            "%{rocblas_version_number}": "",
         },
         "rocm/rocm/rocm_config.h",
     )
@@ -521,7 +524,8 @@ def _create_local_rocm_repository(repository_ctx):
                      rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_gpu"),
                      rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_ref"),
                      rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_onnx"),
-                     rocm_config.config["hipblas_library_dir"] + "/" + lib_name("hipblas")]
+                     rocm_config.config["hipblas_library_dir"] + "/" + lib_name("hipblas"),
+                     rocm_config.config["rocblas_library_dir"] + "/" + lib_name("rocblas")]
     rocm_lib_outs = ["rocm/lib/" + lib_name("amdhip64"),
                      "rocm/lib/" + lib_name("MIOpen"),
                      "rocm/lib/" + lib_name("migraphx"),
@@ -531,7 +535,8 @@ def _create_local_rocm_repository(repository_ctx):
                      "rocm/lib/" + lib_name("migraphx_gpu"),
                      "rocm/lib/" + lib_name("migraphx_ref"),
                      "rocm/lib/" + lib_name("migraphx_onnx"),
-                     "rocm/lib/" + lib_name("hipblas")]
+                     "rocm/lib/" + lib_name("hipblas"),
+                     "rocm/lib/" + lib_name("rocblas")]
     clang_offload_bundler_path = rocm_config.rocm_toolkit_path + "/llvm/bin/clang-offload-bundler"
 
     # Copy header and library files to execroot.
@@ -582,6 +587,7 @@ def _create_local_rocm_repository(repository_ctx):
     repository_dict = {
         "%{hip_lib}": lib_name("amdhip64"),
         "%{hipblas_lib}": lib_name("hipblas"),
+        "%{rocblas_lib}": lib_name("rocblas"),
         "%{miopen_lib}": lib_name("MIOpen"),
         "%{migraphx_lib}": lib_name("migraphx"),
         "%{migraphx_c_lib}": lib_name("migraphx_c"),

@@ -53,6 +53,9 @@ cc_library(
         ".",
         "rocm/include",
     ],
+    deps = [
+        ":rocblas",
+    ],
     linkstatic = 1,
     visibility = ["//visibility:public"],
 )
@@ -171,6 +174,12 @@ cc_library(
     name = "hipblas",
     srcs = ["rocm/lib/%{hipblas_lib}"],
     data = ["rocm/lib/%{hipblas_lib}"],
+)
+
+cc_library(
+    name = "rocblas",
+    srcs = ["rocm/lib/%{rocblas_lib}"],
+    data = ["rocm/lib/%{rocblas_lib}"],
 )
 
 cc_library(
