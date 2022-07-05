@@ -17,7 +17,11 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
+    ] + if_cuda([
         "//modules/perception/inference/tensorrt:rt_net",
+    ]) + if_rocm([
+        "//modules/perception/inference/migraphx:mi_net",
+    ]) + [
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
