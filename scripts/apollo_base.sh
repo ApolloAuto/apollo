@@ -499,8 +499,7 @@ fi
 function _determine_drivers_disabled() {
   if ! ${USE_ESD_CAN}; then
     warning "ESD CAN library supplied by ESD Electronics doesn't exist."
-    warning "If you need ESD CAN, please refer to:"
-    warning "  third_party/can_card_library/esd_can/README.md"
+    warning "If you need ESD CAN, please refer to third_party/can_card_library/esd_can/README.md"
     DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
   fi
 }
@@ -680,7 +679,7 @@ function run_bazel() {
     sp=" "
   fi
 
-  info "$1 Overview: "
+  info "${BLUE}$1 Overview:${NO_COLOR}"
   info "${TAB}USE_GPU:       ${spaces}${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
   if [ "${USE_GPU}" -eq 1 ]; then
     info "${TAB}GPU arch:      ${spaces}${GREEN}${GPU_PLATFORM}${NO_COLOR}"

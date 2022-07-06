@@ -72,20 +72,22 @@ function apollo_env_setup() {
     setup_gpu_support
     determine_esdcan_use
 
-    APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
+    APOLLO_ENV="STAGE=${STAGE}"
     APOLLO_ENV="${APOLLO_ENV} USE_ESD_CAN=${USE_ESD_CAN}"
     # Add more here ...
 
-    info "Apollo Environment Settings:"
-    info "${TAB}APOLLO_ROOT_DIR: ${APOLLO_ROOT_DIR}"
-    info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
-    info "${TAB}APOLLO_IN_DOCKER: ${APOLLO_IN_DOCKER}"
-    info "${TAB}APOLLO_VERSION: ${APOLLO_VERSION}"
+    info "${BLUE}Apollo Environment Settings:${NO_COLOR}"
+    info "${TAB}APOLLO_ROOT_DIR:  ${GREEN}${APOLLO_ROOT_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_CACHE_DIR: ${GREEN}${APOLLO_CACHE_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_IN_DOCKER: ${GREEN}${APOLLO_IN_DOCKER}${NO_COLOR}"
+    info "${TAB}APOLLO_VERSION:   ${GREEN}${APOLLO_VERSION}${NO_COLOR}"
     if "${APOLLO_IN_DOCKER}"; then
-        info "${TAB}DOCKER_IMG: ${DOCKER_IMG##*:}"
+        info "${TAB}DOCKER_IMG:       ${GREEN}${DOCKER_IMG##*:}${NO_COLOR}"
     fi
-    info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
-    info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET} GPU_PLATFORM=${GPU_PLATFORM}"
+    info "${TAB}APOLLO_ENV:       ${GREEN}${APOLLO_ENV}${NO_COLOR}"
+    info "${TAB}USE_GPU_HOST:     ${GREEN}${USE_GPU_HOST}${NO_COLOR}"
+    info "${TAB}USE_GPU_TARGET:   ${GREEN}${USE_GPU_TARGET}${NO_COLOR}"
+    info "${TAB}GPU_PLATFORM:     ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
 
     if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
         source "${TOP_DIR}/cyber/setup.bash"
