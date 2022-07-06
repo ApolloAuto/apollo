@@ -18,6 +18,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "mi_common_test",
+    size = "small",
+    srcs = ["mi_common_test.cc"],
+    deps = [
+        ":mi_common",
+        "@com_google_googletest//:gtest_main",
+        "@local_config_rocm//rocm:miopen",
+    ],
+)
+
 cc_library(
     name = "mi_utils",
     srcs = ["mi_utils.cc"],
@@ -28,6 +39,16 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "mi_utils_test",
+    size = "small",
+    srcs = ["mi_utils_test.cc"],
+    deps = [
+        ":mi_utils",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,6 +69,20 @@ cc_library(
         "//modules/perception/inference/migraphx/plugins:perception_inference_migraphx_plugins",
         "@com_google_protobuf//:protobuf",
     ],
+)
+
+cc_test(
+    name = "mi_net_test",
+    size = "small",
+    srcs = ["mi_net_test.cc"],
+    data = [
+        "//modules/perception/inference:inference_test_data",
+    ],
+    deps = [
+        ":mi_net",
+        "@com_google_googletest//:gtest_main",
+        "@local_config_rocm//rocm:miopen",
+    ]
 )
 
 cpplint()
