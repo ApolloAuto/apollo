@@ -44,6 +44,3 @@ def gpu_default_copts():
 
 def gpu_library(copts = [], **kwargs):
     native.cc_library(copts = gpu_default_copts() + copts, **kwargs)
-
-def gpu_test(copts = [], **kwargs):
-    native.cc_test(copts = gpu_default_copts() + copts, **kwargs)
