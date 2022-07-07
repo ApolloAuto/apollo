@@ -321,3 +321,9 @@ function setup_gpu_support() {
     pathprepend ${torch_path} LD_LIBRARY_PATH
   fi
 }
+
+if ${APOLLO_IN_DOCKER} ; then
+  if [ -z "${USE_GPU_TARGET}" ]; then # checking if this function has already been called
+      setup_gpu_support
+  fi
+fi
