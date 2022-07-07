@@ -1,7 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_gpu", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
