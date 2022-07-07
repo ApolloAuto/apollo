@@ -1,29 +1,3 @@
-def if_gpu(if_true, if_false = []):
-    """Shorthand for select()'ing on whether we're building with gpu enabled
-    Returns a select statement which evaluates to if_true if we're building
-    with use_gpu enabled. Otherwise, the select statement evaluates to
-    if_false.
-    """
-    return select({
-        "//tools/platform:use_gpu": if_true,
-        "//conditions:default": if_false,
-    })
-
-def if_nvidia_gpu(if_true, if_false = []):
-    return select({
-        "//tools/platform:use_nvidia_gpu": if_true,
-        "//conditions:default": if_true,
-    })
-
-def if_amd_gpu(if_true, if_false = []):
-    return select({
-        "//tools/platform:use_amd_gpu": if_true,
-        "//conditions:default": if_false,
-    })
-
-def copts_if_gpu():
-    return if_gpu(["-DUSE_GPU=1"], ["-DUSE_GPU=0"])
-
 def if_teleop(if_true, if_false = []):
     return select({
         "//tools/platform:with_teleop": if_true,
