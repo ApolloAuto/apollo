@@ -27,10 +27,10 @@
 
 #if GPU_PLATFORM == NVIDIA
   #include <c10/cuda/CUDACachingAllocator.h>
-  using namespace c10::cuda::CUDACachingAllocator;
+  using c10::cuda::CUDACachingAllocator::emptyCache;
 #elif GPU_PLATFORM == AMD
   #include <c10/hip/HIPCachingAllocator.h>
-  using namespace c10::hip::HIPCachingAllocator;
+  using c10::hip::HIPCachingAllocator::emptyCache;
 #endif
 
 namespace apollo {
