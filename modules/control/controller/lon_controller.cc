@@ -22,6 +22,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
