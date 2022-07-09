@@ -18,8 +18,6 @@
 
 #include <vector>
 
-#include <migraphx/argument.hpp>
-
 #include "modules/perception/inference/migraphx/mi_common.h"
 #include "modules/perception/inference/migraphx/plugins/plugin.h"
 
@@ -30,92 +28,6 @@ namespace inference {
 // TODO(chenjiahao): complete member functions
 class RCNNProposalPlugin : public nvinfer1::IPlugin {
  public:
-  RCNNProposalPlugin() {}
-  template <class T, class F>
-  static auto reflect(T &self, F f) {
-    return migraphx::pack(
-        // f(self.thread_size_, "thread_size_"),
-        f(self.refine_out_of_map_bbox_, "refine_out_of_map_bbox_"),
-        f(self.regress_agnostic_, "regress_agnostic_"),
-        f(self.rpn_proposal_output_score_, "rpn_proposal_output_score_"),
-        f(self.bbox_mean_, "bbox_mean_"), f(self.bbox_std_, "bbox_std_"),
-        f(self.min_size_h_, "min_size_h_"), f(self.min_size_w_, "min_size_w_"),
-        f(self.threshold_objectness_, "threshold_objectness_"),
-        f(self.overlap_ratio_, "overlap_ratio_"),
-        f(self.num_class_, "num_class_"), f(self.num_rois_, "num_rois_"),
-        f(self.max_candidate_n_, "max_candidate_n_"),
-        f(self.min_size_mode_, "min_size_mode_"), f(self.top_n_, "top_n_"),
-        f(self.out_channel_, "out_channel_"),
-        f(self.acc_box_num_, "acc_box_num_"),
-        f(self.thresholds_, "thresholds_"));
-  }
-
-  friend std::ostream &operator<<(std::ostream &ss,
-                                  const RCNNProposalPlugin &d) {
-    ss << "{ refine_out_of_map_bbox_: " << d.refine_out_of_map_bbox_
-       << ", regress_agnostic_: " << d.regress_agnostic_
-       << ", rpn_proposal_output_score_: "
-       << d.rpn_proposal_output_score_
-       // << ", bbox_mean_: " d.<< bbox_mean_
-       // << ", bbox_std_: " d.<< bbox_std_
-       << ", min_size_h_: " << d.min_size_h_
-       << ", min_size_w_: " << d.min_size_w_
-       << ", threshold_objectness_: " << d.threshold_objectness_
-       << ", overlap_ratio_: " << d.overlap_ratio_
-       << ", num_class_: " << d.num_class_ << ", num_rois_: " << d.num_rois_
-       << ", max_candidate_n_: " << d.max_candidate_n_
-       << ", min_size_mode_: " << d.min_size_mode_ << ", top_n_: " << d.top_n_
-       << ", out_channel_: " << d.out_channel_ << ", acc_box_num_: "
-       << d.acc_box_num_
-       // << ", thresholds_: " << d.thresholds_
-       << " }";
-    return ss;
-  }
-
-  friend bool operator==(const RCNNProposalPlugin &lhs,
-                         const RCNNProposalPlugin &rhs) {
-    return lhs.refine_out_of_map_bbox_ == rhs.refine_out_of_map_bbox_ &&
-           lhs.regress_agnostic_ == rhs.regress_agnostic_ &&
-           lhs.rpn_proposal_output_score_ == rhs.rpn_proposal_output_score_ &&
-           lhs.bbox_mean_ == rhs.bbox_mean_ && lhs.bbox_std_ == rhs.bbox_std_ &&
-           lhs.min_size_h_ == rhs.min_size_h_ &&
-           lhs.min_size_w_ == rhs.min_size_w_ &&
-           lhs.threshold_objectness_ == rhs.threshold_objectness_ &&
-           lhs.overlap_ratio_ == rhs.overlap_ratio_ &&
-           lhs.num_class_ == rhs.num_class_ && lhs.num_rois_ == rhs.num_rois_ &&
-           lhs.max_candidate_n_ == rhs.max_candidate_n_ &&
-           lhs.min_size_mode_ == rhs.min_size_mode_ &&
-           lhs.top_n_ == rhs.top_n_ && lhs.out_channel_ == rhs.out_channel_ &&
-           lhs.acc_box_num_ == rhs.acc_box_num_ &&
-           lhs.thresholds_ == rhs.thresholds_;
-  }
-
-  RCNNProposalPlugin &operator=(const RCNNProposalPlugin &other) {
-    if (this == &other) {
-      return *this;
-    }
-
-    this->refine_out_of_map_bbox_ = other.refine_out_of_map_bbox_;
-    this->regress_agnostic_ = other.regress_agnostic_;
-    this->rpn_proposal_output_score_ = other.rpn_proposal_output_score_;
-    this->bbox_mean_ = other.bbox_mean_;
-    this->bbox_std_ = other.bbox_std_;
-    this->min_size_h_ = other.min_size_h_;
-    this->min_size_w_ = other.min_size_w_;
-    this->threshold_objectness_ = other.threshold_objectness_;
-    this->overlap_ratio_ = other.overlap_ratio_;
-    this->num_class_ = other.num_class_;
-    this->num_rois_ = other.num_rois_;
-    this->max_candidate_n_ = other.max_candidate_n_;
-    this->min_size_mode_ = other.min_size_mode_;
-    this->top_n_ = other.top_n_;
-    this->out_channel_ = other.out_channel_;
-    this->acc_box_num_ = other.acc_box_num_;
-    this->thresholds_ = other.thresholds_;
-
-    return *this;
-  }
-
   RCNNProposalPlugin(
       const BBoxRegParameter &bbox_reg_param,
       const DetectionOutputSSDParameter &detection_output_ssd_param,
@@ -189,20 +101,8 @@ class RCNNProposalPlugin : public nvinfer1::IPlugin {
   bool regress_agnostic_ = false;
   bool rpn_proposal_output_score_ = true;
 
-  // float bbox_mean_[4];
-  // float bbox_std_[4];
-  std::vector<float> bbox_mean_ = {
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-  };
-  std::vector<float> bbox_std_ = {
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-  };
+  float bbox_mean_[4];
+  float bbox_std_[4];
   float min_size_h_;
   float min_size_w_;
   float threshold_objectness_;

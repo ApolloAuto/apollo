@@ -163,9 +163,9 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
       cudaMalloc(reinterpret_cast<void **>(&dev_bbox_std), 4 * sizeof(float)));
   BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&norm_bbox_pred),
                              bbox_pred_size * sizeof(float)));
-  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_mean, bbox_mean_.data(), 4 * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_mean, bbox_mean_, 4 * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
-  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_std, bbox_std_.data(), 4 * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_std, bbox_std_, 4 * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
   BASE_GPU_CHECK(cudaMemcpyAsync(norm_bbox_pred, bbox_pred,
                                   bbox_pred_size * sizeof(float),

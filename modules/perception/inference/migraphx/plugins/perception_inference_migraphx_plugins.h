@@ -6,47 +6,83 @@
 #include <migraphx/argument.hpp>
 #include <migraphx/gpu/context.hpp>
 
+#include "modules/perception/inference/migraphx/plugins/dfmb_psroi_align_plugin.h"
 #include "modules/perception/inference/migraphx/plugins/rcnn_proposal_plugin.h"
+#include "modules/perception/inference/migraphx/plugins/rpn_proposal_ssd_plugin.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
-struct rcnn_proposal_op {
-  std::shared_ptr<RCNNProposalPlugin> rcnn_proposal_plugin;
-
+struct dfmb_psroi_align_op {
+  size_t batch_size;
+  std::function<std::shared_ptr<DFMBPSROIAlignPlugin>()> get_plugin{};
   template <class Self, class F>
   static auto reflect(Self& self, F f) {
-    return migraphx::pack(
-        f(*self.rcnn_proposal_plugin, "rcnn_proposal_plugin"));
+    return migraphx::pack(f(self.batch_size, "batch_size"));
+  }
+
+  std::string name() const { return "dfmb_psroi_align"; }
+
+  migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
+    migraphx::check_shapes{inputs, *this}.standard();
+
+    CHECK_EQ(static_cast<int>(batch_size), 1);
+
+    auto plugin = get_plugin();
+    auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+
+    return migraphx::shape{
+        migraphx::shape::float_type,
+        {out_dims.d[0], out_dims.d[1], out_dims.d[2], out_dims.d[3]}};
+  }
+
+  migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
+                             std::vector<migraphx::argument> args) const {
+    CHECK_GE(static_cast<int>(args.size()), 3);
+    bool no_trans = args.size() < 4;  // 2 imputs + output
+
+    auto bottom_data = args[0];
+    auto bottom_rois = args[1];
+    auto bottom_trans = no_trans ? migraphx::argument{} : args[2];
+    auto top_data = no_trans ? args[2] : args[3];
+
+    std::vector<const void*> inputs_data{
+        bottom_data.data(), bottom_rois.data(),
+        no_trans ? nullptr : bottom_trans.data()};
+
+    std::vector<void*> outputs_data{top_data.data()};
+
+    auto& ctx = migraphx::any_cast<migraphx::gpu::context>(gctx);
+
+    auto plugin = get_plugin();
+    plugin->enqueue(batch_size, inputs_data.data(), outputs_data.data(),
+                    nullptr /*workspace*/, ctx.get_stream().get());
+    return top_data;
+  }
+
+  int output_alias(const std::vector<migraphx::shape>& shapes) const {
+    return shapes.size() - 1;
+  }
+};
+
+struct rcnn_proposal_op {
+  size_t batch_size;
+  std::function<std::shared_ptr<RCNNProposalPlugin>()> get_plugin{};
+  template <class Self, class F>
+  static auto reflect(Self& self, F f) {
+    return migraphx::pack(f(self.batch_size, "batch_size"));
   }
 
   std::string name() const { return "rcnn_proposal"; }
 
   migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
-    std::vector<nvinfer1::Dims> input_dims;
-    size_t batch_size;
+    migraphx::check_shapes{inputs, *this}.has(5).standard();
 
-    for (size_t i = 0; i < inputs.size(); i++) {
-      auto lens = inputs[i].lens();
-      nvinfer1::Dims dims;
+    CHECK_EQ(inputs[3].lens()[0], batch_size);  // im_info
 
-      // nvinver1::Dims does not include batch size
-      if (i == 3) {
-        batch_size = lens[0];
-        lens.erase(lens.begin());
-      }
-
-      for (size_t j = 0; j < lens.size(); j++) {
-        dims.d[j] = lens[j];
-      }
-      dims.nbDims = lens.size();
-
-      input_dims.push_back(dims);
-    }
-
-    auto out_dims =
-        rcnn_proposal_plugin->getOutputDimensions(0, input_dims.data(), input_dims.size());
+    auto plugin = get_plugin();
+    auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
 
     return migraphx::shape{migraphx::shape::float_type,
                            {out_dims.d[0] * batch_size, out_dims.d[1],
@@ -60,20 +96,62 @@ struct rcnn_proposal_op {
 
     std::vector<void*> outputs_data{args[4].data()};
 
-    // nvinver1::Dims does not include batch size
-    auto im_info_shape = args[3].get_shape();
-    auto im_info_dims = im_info_shape.lens();
-    size_t batch_size = im_info_dims[0];
-
     auto& ctx = migraphx::any_cast<migraphx::gpu::context>(gctx);
 
-    rcnn_proposal_plugin->enqueue(batch_size, inputs_data.data(),
-                                  outputs_data.data(), nullptr /*workspace*/,
-                                  ctx.get_stream().get());
+    auto plugin = get_plugin();
+    plugin->enqueue(batch_size, inputs_data.data(), outputs_data.data(),
+                    nullptr /*workspace*/, ctx.get_stream().get());
     return args[4];
   }
 
-  int output_alias(const std::vector<migraphx::shape>&) const { return 4; }
+  int output_alias(const std::vector<migraphx::shape>& shapes) const {
+    return shapes.size() - 1;
+  }
+};
+
+struct rpn_proposal_ssd_op {
+  size_t batch_size;
+  std::function<std::shared_ptr<RPNProposalSSDPlugin>()> get_plugin{};
+  template <class Self, class F>
+  static auto reflect(Self& self, F f) {
+    return migraphx::pack(f(self.batch_size, "batch_size"));
+  }
+
+  std::string name() const { return "rpn_proposal_ssd"; }
+
+  migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
+    migraphx::check_shapes{inputs, *this}.has(4).standard();
+
+    CHECK_EQ(inputs[0].lens()[0], batch_size);  // rpn_cls_prob_reshape
+    CHECK_EQ(inputs[1].lens()[0], batch_size);  // rpn_bbox_pred
+    CHECK_EQ(inputs[2].lens()[0], batch_size);  // im_info
+
+    auto plugin = get_plugin();
+    auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+
+    return migraphx::shape{migraphx::shape::float_type,
+                           {out_dims.d[0] * batch_size, out_dims.d[1],
+                            out_dims.d[2], out_dims.d[3]}};
+  }
+
+  migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
+                             std::vector<migraphx::argument> args) const {
+    std::vector<const void*> inputs_data{args[0].data(), args[1].data(),
+                                         args[2].data()};
+
+    std::vector<void*> outputs_data{args[3].data()};
+
+    auto& ctx = migraphx::any_cast<migraphx::gpu::context>(gctx);
+
+    auto plugin = get_plugin();
+    plugin->enqueue(batch_size, inputs_data.data(), outputs_data.data(),
+                    nullptr /*workspace*/, ctx.get_stream().get());
+    return args[3];
+  }
+
+  int output_alias(const std::vector<migraphx::shape>& shapes) const {
+    return shapes.size() - 1;
+  }
 };
 
 }  // namespace inference

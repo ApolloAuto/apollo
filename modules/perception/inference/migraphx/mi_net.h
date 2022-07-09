@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #pragma once
 
 #include <map>
@@ -42,6 +58,8 @@ struct Weights {
 };
 
 typedef migraphx::instruction_ref Tensor;
+typedef migraphx::shape Shape;
+typedef migraphx::operation Operation;
 typedef std::map<std::string, std::vector<Weights>> WeightMap;
 typedef std::map<std::string, Tensor> TensorMap;
 typedef std::map<std::string, std::vector<int>> TensorDimsMap;
@@ -63,6 +81,9 @@ class MINet : public Inference {
   MINet(const std::string &net_file, const std::string &model_file,
         const std::vector<std::string> &outputs,
         const std::vector<std::string> &inputs);
+  MINet(const std::string &net_file, const std::string &model_file,
+        const std::vector<std::string> &outputs,
+        const std::vector<std::string> &inputs, const std::string &model_root);
 
   virtual ~MINet();
 
@@ -74,7 +95,7 @@ class MINet : public Inference {
       const std::string &name) override;
 
  protected:
-  bool addInput(const TensorDimsMap &tensor_dims_map,
+  bool addInput(TensorDimsMap &tensor_dims_map,
                 const std::map<std::string, std::vector<int>> &shapes,
                 TensorMap *tensor_map);
 
@@ -175,13 +196,14 @@ class MINet : public Inference {
                               migraphx::module *net, TensorMap *tensor_map,
                               TensorModifyMap *tensor_modify_map);
 
+  bool checkInt8(const std::string &gpu_name);
+
   void mergeBN(int index, LayerParameter *layer_param);
   Weights loadLayerWeights(const float *data, size_t size);
   Weights loadLayerWeights(float data, size_t size);
 
   bool loadWeights(const std::string &model_file, WeightMap *weight_map);
-  void init_blob(std::vector<std::string> &names,
-                 std::map<std::string, migraphx::shape> &shapes);
+  void init_blob(std::map<std::string, Tensor> &tensors);
 
  private:
   std::vector<std::shared_ptr<DFMBPSROIAlignPlugin>> dfmb_psroi_align_plugins_;
@@ -190,10 +212,11 @@ class MINet : public Inference {
 
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;
-  std::map<std::string, migraphx::shape> output_shapes_;
-  std::map<std::string, migraphx::shape> input_shapes_;
+  std::map<std::string, Tensor> outputs_;
+  std::map<std::string, Tensor> inputs_;
   std::map<std::string, std::string> tensor_modify_map_;
-  std::vector<std::string> output_ordered_;
+  std::map<std::string, std::string> input_param_map_;
+  std::map<std::string, std::string> output_param_map_;
 
   migraphx::module *network_;
   migraphx::program program_;

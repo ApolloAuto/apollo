@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "modules/perception/inference/migraphx/mi_common.h"
-
 namespace nvinfer1 {
 
 #define TRT_DEPRECATED
