@@ -148,9 +148,9 @@ Chassis WeyController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  // if (driving_mode() == Chassis::EMERGENCY_MODE) {
+  //   set_chassis_error_code(Chassis::NO_ERROR);
+  // }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -401,8 +401,6 @@ Chassis WeyController::chassis() {
   } else {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, epb is not released or firmware error!");
   }
   return chassis_;
 }
@@ -437,7 +435,8 @@ ErrorCode WeyController::EnableAutoMode() {
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
-    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode. Please check the "
+              "emergency button or chassis.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
@@ -733,6 +732,7 @@ void WeyController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -746,6 +746,7 @@ void WeyController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -759,6 +760,7 @@ void WeyController::SecurityDogThreadFunc() {
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
+      can_sender_->Update();
     }
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};

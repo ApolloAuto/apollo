@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
 #include "modules/canbus/vehicle/ch/ch_controller.h"
+
+#include <string>
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
@@ -162,9 +162,9 @@ Chassis ChController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  // if (driving_mode() == Chassis::EMERGENCY_MODE) {
+  //   set_chassis_error_code(Chassis::NO_ERROR);
+  // }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -319,7 +319,8 @@ ErrorCode ChController::EnableAutoMode() {
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
-    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode. Please check the "
+              "emergency button or chassis.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
@@ -533,10 +534,11 @@ bool ChController::CheckChassisError() {
         ch.steer_status__512().steer_err()) {
       return true;
     }
-    if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
-        ch.steer_status__512().sensor_err()) {
-      return true;
-    }
+    // cancel the sensor err check because of discarding the steer sensor
+    // if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
+    //     ch.steer_status__512().sensor_err()) {
+    //   return false;
+    // }
   }
   // drive error
   if (ch.has_throttle_status__510()) {
@@ -544,10 +546,12 @@ bool ChController::CheckChassisError() {
         ch.throttle_status__510().drive_motor_err()) {
       return true;
     }
-    if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
-        ch.throttle_status__510().battery_bms_err()) {
-      return true;
-    }
+    // cancel the battery err check bacause of always causing this error block
+    // the vehicle use
+    // if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
+    //     ch.throttle_status__510().battery_bms_err()) {
+    //   return false;
+    // }
   }
   // brake error
   if (ch.has_brake_status__511()) {
@@ -587,6 +591,7 @@ void ChController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -600,6 +605,7 @@ void ChController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -613,6 +619,7 @@ void ChController::SecurityDogThreadFunc() {
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
+      can_sender_->Update();
     }
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
