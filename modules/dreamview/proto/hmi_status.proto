@@ -5,6 +5,18 @@ package apollo.dreamview;
 import "modules/common/proto/header.proto";
 import "modules/monitor/proto/system_status.proto";
 
+message ScenarioInfo{
+  optional string scenario_id = 1;
+  optional string scenario_name = 2;
+  optional string map_name = 3;
+}
+
+message ScenarioSet{
+  // id 是key
+  optional string scenario_set_name = 1;
+  repeated ScenarioInfo scenarios = 2;
+}
+
 message HMIStatus {
   optional apollo.common.Header header = 1;
 
@@ -30,4 +42,7 @@ message HMIStatus {
   optional string passenger_msg = 12;
   // {component_name: status}
   map<string, apollo.monitor.ComponentStatus> other_components = 13;
+  map<string, ScenarioSet> scenario_set = 15;
+  optional string current_scenario_set_id = 16 [default = ""];
+  optional string current_scenario_id = 17 [default = ""];
 }

@@ -268,6 +268,8 @@ void SimControl::Stop() {
   if (enabled_) {
     sim_control_timer_->Stop();
     sim_prediction_timer_->Stop();
+    // kill sim obstacle
+    std::system(FLAGS_sim_obstacle_stop_command.data());
     enabled_ = false;
   }
 }

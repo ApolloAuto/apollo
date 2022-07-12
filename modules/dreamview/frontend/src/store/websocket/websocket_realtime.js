@@ -44,6 +44,7 @@ export default class RealtimeWebSocketEndpoint {
       switch (message.type) {
         case 'HMIStatus':
           STORE.hmi.updateStatus(message.data);
+          STORE.studioConnector.updateLocalScenarioInfo(message.data);
           RENDERER.updateGroundImage(STORE.hmi.currentMap);
           break;
         case 'VehicleParam':
@@ -319,6 +320,45 @@ export default class RealtimeWebSocketEndpoint {
       type: 'HMIAction',
       action: 'CHANGE_VEHICLE',
       value: vehicle,
+    }));
+  }
+
+  loadLoocalScenarioSets() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'LOAD_SCENARIOS',
+    }));
+  }
+
+  /**
+   *
+   * @param scenarioId string
+   */
+  changeScenario(scenarioId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_SCENARIO',
+      value: scenarioId,
+    }));
+  }
+
+  /**
+   *
+   * @param scenarioSetId string
+   */
+  changeScenarioSet(scenarioSetId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_SCENARIO_SET',
+      value: scenarioSetId,
+    }));
+  }
+
+  deleteScenarioSet(scenarioSetId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'DELETE_SCENARIO_SET',
+      value: scenarioSetId,
     }));
   }
 

@@ -234,5 +234,9 @@ void HMI::SendStatus(WebSocketHandler::Connection* conn) {
   websocket_->SendData(conn, status_json.dump());
 }
 
+bool HMI::UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name){
+  return hmi_worker_->UpdateScenarioSetToStatus(scenario_set_id, scenario_set_name);
+}
+
 }  // namespace dreamview
 }  // namespace apollo

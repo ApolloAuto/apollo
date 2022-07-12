@@ -1,6 +1,7 @@
 import { observable, computed, action } from 'mobx';
 
 import HMI from 'store/hmi';
+import StudioConnector from 'store/studio_connector';
 import CameraData from 'store/camera_data';
 import ControlData from 'store/control_data';
 import Dimension from 'store/dimension';
@@ -20,6 +21,8 @@ class DreamviewStore {
     @observable timestamp = 0;
 
     @observable isInitialized = false;
+
+    @observable studioConnector = new StudioConnector();
 
     @observable hmi = new HMI();
 

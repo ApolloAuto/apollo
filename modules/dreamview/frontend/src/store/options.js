@@ -26,6 +26,7 @@ export default class Options {
         'showMenu',
         'showRouteEditingBar',
         'showDataRecorder',
+        'showProfile',
       ];
       this.secondarySideBarOptions = ['showPOI'];
 
@@ -62,7 +63,8 @@ export default class Options {
                || this.showModuleController
                || this.showMenu
                || this.showPOI
-               || this.showDataRecorder;
+               || this.showDataRecorder
+               || this.showProfile;
     }
 
     @computed get showGeo() {
@@ -142,9 +144,12 @@ export default class Options {
         return false;
       }
 
-      if (option === 'showTasks'
-            || option === 'showModuleController'
-      ) {
+      // enable the side bar button as follows.
+      if ([
+        'showTasks',
+        'showModuleController',
+        'showProfile'
+      ].includes(option)) {
         return false;
       } if (option === 'showRouteEditingBar') {
         return enableHMIButtonsOnly || inNavigationMode;

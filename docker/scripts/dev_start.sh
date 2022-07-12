@@ -198,6 +198,10 @@ function setup_devices_and_mount_local_volumes() {
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
+
+    [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
+    volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"
+
     local teleop="${APOLLO_ROOT_DIR}/../apollo-teleop"
     if [ -d "${teleop}" ]; then
         volumes="-v ${teleop}:/apollo/modules/teleop ${volumes}"
