@@ -64,7 +64,7 @@ gpu_library(
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
-    ])
+    ]),
 )
 
 gpu_library(
@@ -80,7 +80,7 @@ gpu_library(
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:rocm_headers",
-    ])
+    ]),
 )
 
 gpu_library(

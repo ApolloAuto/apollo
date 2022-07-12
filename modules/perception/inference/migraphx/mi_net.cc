@@ -48,7 +48,6 @@
 std::string LoggingParseFunction(const char *func, const char *pretty_func) {
   std::string fname{func};
   if (fname != "operator()") return fname;
-  // lambda
   const std::string pf{pretty_func};
   const std::string pf_tail{pf.substr(0, pf.find_first_of('('))};
   return pf_tail.substr(1 + pf_tail.find_last_of(':'));
@@ -80,8 +79,6 @@ void MINet::ConstructMap(const LayerParameter &layer_param,
 
     if (std::find(output_names_.begin(), output_names_.end(), top_name) !=
         output_names_.end()) {
-      // Genius MIGraphX developers decided to use this names to provide custom
-      // buffers for output parameters
       const auto out_param_name =
           "main:#output_" + std::to_string(outputs_.size());
       const Tensor out_param =
@@ -130,7 +127,6 @@ void MINet::addConvLayer(const LayerParameter &layer_param,
                       {"group", param.group}});
   Tensor out = net->add_instruction(conv, input, filter);
 
-  // add bias
   if (weights.size() > 1) {
     const Shape out_shape = out->get_shape();
     const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
@@ -146,7 +142,6 @@ void MINet::addConvLayer(const LayerParameter &layer_param,
     out = net->add_instruction(migraphx::make_op("add"), out, broadcasted_bias);
   }
 
-  //(*weight_map).erase(layer_param.name().c_str());
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
 
@@ -183,7 +178,6 @@ void MINet::addDeconvLayer(const LayerParameter &layer_param,
 
   Tensor out = net->add_instruction(deconv, input, filter);
 
-  // add bias
   if (weights.size() > 1) {
     const Shape out_shape = out->get_shape();
     const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
@@ -275,20 +269,6 @@ void MINet::addPoolingLayer(const LayerParameter &layer_param,
   const std::string pool_mode =
       (params.pool() == PoolingParameter_PoolMethod_AVE) ? "average" : "max";
 
-  // TODO: check this
-  // nvinfer1::PaddingMode padding_mode =
-  // nvinfer1::PaddingMode::kCAFFE_ROUND_UP; if (pool.has_round_mode()) {
-  //   switch (static_cast<int>(pool.round_mode())) {
-  //     case 0:
-  //       padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_UP;
-  //       break;
-  //     case 1:
-  //       padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_DOWN;
-  //       break;
-  //     default:
-  //       padding_mode = nvinfer1::PaddingMode::kCAFFE_ROUND_UP;
-  //   }
-  // }
   ACHECK(modify_pool_param(&params));
 
   const Operation pooling = migraphx::make_op(
@@ -297,10 +277,6 @@ void MINet::addPoolingLayer(const LayerParameter &layer_param,
                   {"stride", {params.stride_h(), params.stride_w()}},
                   {"lengths", {params.kernel_h(), params.kernel_w()}}});
   const Tensor out = net->add_instruction(pooling, inputs[0]);
-
-  // TODO: check this
-  // unlike other frameworks, caffe use inclusive counting for padded
-  // averaging poolLayer->setAverageCountExcludesPadding(false);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -387,7 +363,6 @@ void MINet::addInnerproductLayer(const LayerParameter &layer_param,
 
   Tensor out = net->add_instruction(conv, input, filter);
 
-  // add bias
   if (weights.size() > 1) {
     const Shape out_shape = out->get_shape();
     const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
@@ -526,11 +501,9 @@ void MINet::addArgmaxLayer(const LayerParameter &layer_param,
                            migraphx::module *net, TensorMap *tensor_map,
                            TensorModifyMap *tensor_modify_map) {
   const auto params = layer_param.argmax_param();
-  // TODO: default caffe argmax axis (By default ArgMaxLayer maximizes over the
-  // flattened trailing dimensions)
   const size_t axis = params.axis();
 
-  // TODO: Caffe also defines out_max_val and top_k argmax parameters, but they
+  // TODO(B1tway): Caffe also defines out_max_val and top_k argmax parameters, but they
   // are not supported yet
   ACHECK(!(params.has_out_max_val() || params.has_top_k()));
 
@@ -974,7 +947,7 @@ void MINet::init_blob(std::map<std::string, Tensor> &tensor_map) {
 }
 
 bool MINet::Init(const std::map<std::string, std::vector<int>> &shapes) {
-  // TODO: add cpu support
+  // TODO(B1tway): add cpu support
   if (gpu_id_ < 0) {
     AINFO << "must use gpu mode";
     return false;

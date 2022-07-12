@@ -21,9 +21,9 @@
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
 
 #if GPU_PLATFORM == NVIDIA
-#include "modules/perception/inference/tensorrt/rt_net.h"
+  #include "modules/perception/inference/tensorrt/rt_net.h"
 #elif GPU_PLATFORM == AMD
-#include "modules/perception/inference/migraphx/mi_net.h"
+  #include "modules/perception/inference/migraphx/mi_net.h"
 #endif
 namespace apollo {
 namespace perception {
@@ -44,6 +44,8 @@ Inference *CreateInferenceByName(const std::string &name,
   if (name == "RTNet") {
     return new MINet(proto_file, weight_file, outputs, inputs);
   } else if (name == "RTNetInt8") {
+    // TODO(B1tway) Add quantization int8 support for RTNetInt8. 
+    // RTNetInt8 on MIGraphX currently works with fp32. 
     return new MINet(proto_file, weight_file, outputs, inputs);
 #endif
   } else if (name == "TorchDet") {
