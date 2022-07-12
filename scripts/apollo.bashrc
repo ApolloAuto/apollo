@@ -25,6 +25,8 @@ if [ -f /.dockerenv ]; then
   APOLLO_ROOT_DIR="/apollo"
 fi
 
+export APOLLO_CONFIG_HOME="${APOLLO_CONFIG_HOME:=$HOME/.apollo}"
+
 export APOLLO_ROOT_DIR="${APOLLO_ROOT_DIR}"
 export APOLLO_IN_DOCKER="${APOLLO_IN_DOCKER}"
 export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"

@@ -113,3 +113,6 @@
 * YAML-cpp
     MIT License
     https://github.com/jbeder/yaml-cpp/blob/master/LICENSE
+* openssl
+    Apache License 2.0
+    https://github.com/openssl/openssl/blob/master/LICENSE.txt

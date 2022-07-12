@@ -50,15 +50,20 @@ using google::protobuf::util::MessageToJsonString;
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
     WebSocketHandler *camera_ws, SimControl *sim_control,
+    WebSocketHandler *plugin_ws,
     const MapService *map_service,
-    PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
+    PerceptionCameraUpdater *perception_camera_updater,
+    PluginManager* plugin_manager,
+    bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
       map_ws_(map_ws),
       camera_ws_(camera_ws),
+      plugin_ws_(plugin_ws),
       sim_control_(sim_control),
-      perception_camera_updater_(perception_camera_updater) {
+      perception_camera_updater_(perception_camera_updater),
+      plugin_manager_(plugin_manager) {
   RegisterMessageHandlers();
 }
 
@@ -455,6 +460,27 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         std::string to_send;
         perception_camera_updater_->GetUpdate(&to_send);
         camera_ws_->SendBinaryData(conn, to_send, true);
+      });
+
+  // todo: 修改websocket函数 注册统一注册
+  plugin_ws_->RegisterMessageHandler(
+      "PluginRequest",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // 第一步:检测插件是否可用的？有无必要？正常channel通信感觉也不检查通信module。
+        // todo: 添加分发逻辑
+        if(!plugin_manager_->IsEnabled()){
+          return;
+        }
+        // 检查应该有的字段
+        // 先把JSON转成proto
+        auto iter = json.find("data");
+        if(iter == json.end()){
+          AERROR<<"Failed to get plugin msg!";
+          return;
+        }
+        if(!plugin_manager_->SendMsgToPlugin(iter->dump())){
+           AERROR<<"Failed to send msg to plugin";
+        }
       });
 }
 

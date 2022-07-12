@@ -69,6 +69,7 @@ cc_library(
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/perception_camera_updater",
         "//modules/dreamview/backend/sim_control",
+        "//modules/dreamview/backend/plugins:plugin_manager",
         "//modules/routing/proto:poi_cc_proto",
         "//modules/task_manager/proto:task_manager_cc_proto",
         "@boost",

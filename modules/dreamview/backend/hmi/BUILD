@@ -85,6 +85,7 @@ cc_library(
         "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
         "//modules/dreamview/backend/fuel_monitor:preprocess_monitor",
         "//modules/dreamview/proto:hmi_config_cc_proto",
+        "//modules/dreamview/proto:scenario_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/localization/proto:localization_cc_proto",

@@ -84,6 +84,9 @@ class HMIWorker {
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
+  bool UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name);
+  void GetScenarioSetPath(const std::string& scenario_set_id, std::string& scenario_set_path);
+
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
   static HMIMode LoadMode(const std::string& mode_config_path);
@@ -96,16 +99,24 @@ class HMIWorker {
   // Start / reset current mode.
   void SetupMode() const;
   void ResetMode() const;
+  bool ResetSimObstacle(const std::string& scenario_set_id, const std::string& scenario_id);
 
   // Change current mode, launch, map, vehicle and driving mode.
   void ChangeMode(const std::string& mode_name);
-  void ChangeMap(const std::string& map_name);
+  bool ChangeMap(const std::string& map_name);
   void ChangeVehicle(const std::string& vehicle_name);
+  void ChangeScenarioSet(const std::string& scenario_set_id);
+  void DeleteScenarioSet(const std::string& scenario_set_id);
+  void ChangeScenario(const std::string& scenario_id);
+  bool LoadScenarios();
+  void GetScenarioResourcePath(std::string& scenario_resource_path);
+  bool UpdateScenarioSet(const std::string& scenario_set_id, const std::string& scenario_set_name,ScenarioSet& new_scenario_set);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
 
   // Start / stop a module.
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
+  bool StopModuleByCommand(const std::string& stop_command) const;
 
   void ResetComponentStatusTimer();
   void UpdateComponentStatus();

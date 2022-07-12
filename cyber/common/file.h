@@ -104,6 +104,17 @@ bool GetProtoFromFile(const std::string &file_name,
                       google::protobuf::Message *message);
 
 /**
+ * @brief Parses the content of the json file specified by the file_name as ascii
+ *        representation of protobufs, and merges the parsed content to the
+ *        proto.
+ * @param file_name The name of the file to parse whose content.
+ * @param message The proto to carry the parsed content in the specified file.
+ * @return If the action is successful.
+ */
+bool GetProtoFromJsonFile(const std::string &file_name,
+                           google::protobuf::Message *message);
+
+/**
  * @brief Get file content as string.
  * @param file_name The name of the file to read content.
  * @param content The file content.

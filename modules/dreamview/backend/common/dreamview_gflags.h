@@ -71,3 +71,15 @@ DECLARE_string(lidar_calibration_mode);
 DECLARE_string(camera_calibration_mode);
 
 DECLARE_double(parking_routing_distance_threshold);
+
+DECLARE_string(plugin_path);
+
+DECLARE_string(plugin_config_file_name_suffix);
+
+DECLARE_string(plugin_channel_prefix);
+
+DECLARE_string(resource_scenario_path);
+
+DECLARE_string(sim_obstacle_stop_command);
+
+DECLARE_string(sim_obstacle_path);

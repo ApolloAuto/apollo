@@ -22,6 +22,9 @@
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+namespace {
+std::map<std::string, int> function_map = {{"UpdateScenarioSetToStatus", 0}};
+}
 
 namespace apollo {
 namespace dreamview {
@@ -76,25 +79,29 @@ Status Dreamview::Init() {
   map_ws_.reset(new WebSocketHandler("Map"));
   point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
   camera_ws_.reset(new WebSocketHandler("Camera"));
+  plugin_ws_.reset(new WebSocketHandler("Plugin"));
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
-
+  
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
+  plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
-      map_service_.get(), perception_camera_updater_.get(),
+      plugin_ws_.get(), map_service_.get(), perception_camera_updater_.get(),
+      plugin_manager_.get(),
       FLAGS_routing_from_file));
   point_cloud_updater_.reset(
       new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
-  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addWebSocketHandler("/camera", *camera_ws_);
+  server_->addWebSocketHandler("/plugin",*plugin_ws_);
   server_->addHandler("/image", *image_);
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
@@ -109,6 +116,10 @@ Status Dreamview::Start() {
   point_cloud_updater_->Start();
   hmi_->Start();
   perception_camera_updater_->Start();
+  plugin_manager_->Start([this](const std::string& function_name,
+                            const nlohmann::json& param_json) -> bool {
+    return PluginCallbackHMI(function_name, param_json);
+  });
 #if WITH_TELEOP == 1
   teleop_->Start();
 #endif
@@ -121,6 +132,33 @@ void Dreamview::Stop() {
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();
+  plugin_manager_->Stop();
+}
+
+bool Dreamview::PluginCallbackHMI(const std::string& function_name,
+                                  const nlohmann::json& param_json) {
+  if (function_map.find(function_name) == function_map.end()) {
+    AERROR << "Donnot support this callback";
+    return false;
+  }
+  bool callback_res = false;
+  switch(function_map[function_name]) {
+    case 0: {
+      // 解析结果
+      if (param_json.contains("scenario_set_id") &&
+          param_json.contains("scenario_set_name")) {
+        const std::string scenario_set_id = param_json["scenario_set_id"];
+        const std::string scenario_set_name = param_json["scenario_set_name"];
+        if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
+          callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
+                                                         scenario_set_name);
+        }
+      }
+    } break;
+    default:
+      break;
+  }
+  return callback_res;
 }
 
 }  // namespace dreamview
