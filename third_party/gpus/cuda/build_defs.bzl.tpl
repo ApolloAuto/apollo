@@ -1,53 +1,7 @@
 # Macros for building CUDA code.
 
-# TODO(emankov): Avoid duplicating of `if_cuda` in gpus/common.bzl
-def if_cuda(if_true, if_false = []):
-    return select({
-        "@local_config_cuda//cuda:using_nvcc": if_true,
-        "@local_config_cuda//cuda:using_clang": if_true,
-        "//conditions:default": if_false,
-    })
-
-# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
-def if_cuda_clang(if_true, if_false = []):
-   """Shorthand for select()'ing on wheteher we're building with cuda-clang.
-
-    Returns a select statement which evaluates to if_true if we're building
-    with cuda-clang.  Otherwise, the select statement evaluates to if_false.
-
-   """
-   return select({
-       "@local_config_cuda//cuda:using_clang": if_true,
-       "//conditions:default": if_false
-   })
-
-# TODO(emankov): Remove the function after switching to use of gpu_library() from /gpus/common.bzl
-def if_cuda_clang_opt(if_true, if_false = []):
-   """Shorthand for select()'ing on wheteher we're building with cuda-clang
-   in opt mode.
-
-    Returns a select statement which evaluates to if_true if we're building
-    with cuda-clang in opt mode. Otherwise, the select statement evaluates to
-    if_false.
-
-   """
-   return select({
-       "@local_config_cuda//cuda:using_clang_opt": if_true,
-       "//conditions:default": if_false
-   })
-
-def cuda_default_copts():
-    """Default options for all CUDA compilations."""
-    return if_cuda([
-        "-x", "cuda",
-        "-Xcuda-fatbinary=--compress-all",
-        "--no-cuda-include-ptx=all"
-    ])
-    + if_cuda([%{cuda_extra_copts}])
-    + if_cuda_clang_opt(
-        # Some important CUDA optimizations are only enabled at O3.
-        ["-O3"]
-    )
+def cuda_extra_copts():
+    return %{cuda_extra_copts}
 
 def cuda_is_configured():
     """Returns true if CUDA was enabled during the configure process."""

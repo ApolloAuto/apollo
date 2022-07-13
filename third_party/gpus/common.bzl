@@ -1,4 +1,4 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_default_copts")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_extra_copts")
 
 def if_gpu(if_true, if_false = []):
     """Shorthand for select()'ing on whether we're building with gpu enabled
@@ -47,6 +47,19 @@ def rocm_default_copts():
         ["-x", "hip"]
     )
     + if_rocm_clang_opt(
+        ["-O3"]
+    )
+
+def cuda_default_copts():
+    """Default options for all CUDA compilations."""
+    return if_cuda([
+        "-x", "cuda",
+        "-Xcuda-fatbinary=--compress-all",
+        "--no-cuda-include-ptx=all"
+    ])
+    + if_cuda([cuda_extra_copts()])
+    + if_cuda_clang_opt(
+        # Some important CUDA optimizations are only enabled at O3.
         ["-O3"]
     )
 
