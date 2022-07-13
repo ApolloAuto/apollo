@@ -35,6 +35,7 @@ from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2
 from modules.localization.proto import localization_pb2
 
+APOLLO_ROOT = "/apollo"
 
 class RtkRecord(object):
     """
@@ -192,7 +193,7 @@ def main(argv):
         os.makedirs(log_dir)
 
     Logger.config(
-        log_file=log_dir + "rtk_recorder.log",
+        log_file=os.path.join(APOLLO_ROOT, 'data/log/rtk_recorder.log'),
         use_stdout=True,
         log_level=logging.DEBUG)
     print("runtime log is in %s%s" % (log_dir, "rtk_recorder.log"))
