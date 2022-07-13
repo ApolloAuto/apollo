@@ -254,8 +254,11 @@ def main():
     cpu_compiler_flags = [flag for flag in sys.argv[1:]
                                if not flag.startswith(('--rocm_log'))]
 
-    # XXX: SE codes need to be built with gcc, but need this macro defined
-    cpu_compiler_flags.append("-D__HIP_PLATFORM_HCC__")
+    # SE codes need to be built with gcc, but need this macro defined.
+    # From ROCm HIP's hip_common.h:
+    # // Auto enable __HIP_PLATFORM_AMD__ if compiling on AMD platform
+    # // Other compiler (GCC,ICC,etc) need to set one of these macros explicitly
+    cpu_compiler_flags.append("-D__HIP_PLATFORM_AMD__")
     if VERBOSE: print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
     return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
 

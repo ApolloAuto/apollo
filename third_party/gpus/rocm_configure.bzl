@@ -472,7 +472,7 @@ def _create_dummy_repository(repository_ctx):
         "rocm/rocm/rocm_config.h",
     )
 
-    # Set up cuda_config.py, which is used by gen_build_info to provide
+    # Set up rocm_config.py, which is used by gen_build_info to provide
     # static build environment info to the API
     _tpl(
         repository_ctx,
@@ -632,7 +632,7 @@ def _create_local_rocm_repository(repository_ctx):
 
     rocm_defines["%{unfiltered_compile_flags}"] = to_list_of_strings([
         "-DTENSORFLOW_USE_ROCM=1",
-        "-D__HIP_PLATFORM_HCC__",
+        "-D__HIP_PLATFORM_AMD__",
         "-DEIGEN_USE_HIP",
     ])
 
