@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+message laneAttributes {
+  optional uint32 laneId = 1;
+  optional uint32 direction = 2;
+}
+
+message SignalPhase {
+  optional uint32 phaseId = 1;
+  optional uint32 waitTime = 2;
+  optional uint32 ledStatus = 3;
+  optional uint32 lightId = 4;
+}
+
+message Spat {
+  optional uint32 spatAlarmType = 1;
+  optional uint32 priority = 2;
+  repeated int64 advisorySpeed = 3;
+  optional double signalLatitude = 4;
+  optional double signal_longitude = 5;
+  optional string mapNum = 6;
+  optional uint32 laneId = 7;
+  optional uint32 direction = 8;
+  optional uint32 tscNum = 9;
+  repeated SignalPhase signalPhase = 10;
+  repeated laneAttributes laneAttributes = 11;
+  optional uint32 nodeId = 12;
+}

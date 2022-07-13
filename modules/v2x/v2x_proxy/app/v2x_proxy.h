@@ -29,6 +29,7 @@
 
 #include "cyber/cyber.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/v2x/v2x_proxy/app/proxy.h"
 #include "modules/v2x/v2x_proxy/app/utils.h"
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
 #include "modules/v2x/v2x_proxy/os_interface/os_interface.h"
@@ -38,7 +39,7 @@ namespace apollo {
 namespace v2x {
 bool IsRushHour();
 
-class V2xProxy {
+class V2xProxy : public Proxy {
  private:
   std::shared_ptr<InternalData> internal_ = nullptr;
   std::string hdmap_junction_id_ = kUnknownJunctionId;
@@ -52,8 +53,6 @@ class V2xProxy {
   explicit V2xProxy(std::shared_ptr<::apollo::hdmap::HDMap> hdmap = nullptr);
 
   ~V2xProxy();
-
-  bool InitFlag();
 
   void stop() {
     exit_ = true;
@@ -92,7 +91,6 @@ class V2xProxy {
 
   std::shared_ptr<::apollo::hdmap::HDMap> hdmap_;
 
-  bool init_flag_ = false;
   bool init_heading_ = false;
   double heading_ = 0.0001;
   bool u_turn_ = false;

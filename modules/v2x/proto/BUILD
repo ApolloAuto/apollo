@@ -315,3 +315,62 @@ py_proto_library(
         ":v2x_traffic_light_policy_proto",
     ],
 )
+
+cc_proto_library(
+    name = "spat_data_cc_proto",
+    deps = [
+        ":spat_data_proto",
+    ],
+)
+
+proto_library(
+    name = "spat_data_proto",
+    srcs = ["spat_data.proto"],
+    deps = [
+    ],
+)
+
+py_proto_library(
+    name = "spat_data_py_pb2",
+    deps = [
+        ":spat_data_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "hik_message_cc_proto",
+    deps = [
+        ":hik_message_proto",
+    ],
+)
+
+proto_library(
+    name = "hik_message_proto",
+    srcs = ["hik_message.proto"],
+)
+
+py_proto_library(
+    name = "hik_message_py_pb2",
+    deps = [
+        ":hik_message_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "v2x_config_cc_proto",
+    deps = [
+        ":v2x_config_proto",
+    ],
+)
+
+proto_library(
+    name = "v2x_config_proto",
+    srcs = ["v2x_config.proto"],
+)
+
+py_proto_library(
+    name = "v2x_config_py_pb2",
+    deps = [
+        ":v2x_config_proto",
+    ],
+)

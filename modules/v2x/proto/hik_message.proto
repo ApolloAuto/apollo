@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+message OBULocalization {
+  optional double latitude = 1;
+  optional double longitude = 2;
+  optional double heading = 3;
+  optional int64 timestamp = 4;
+  optional double speed = 5;
+}
+
+message OBUCarID {
+  optional string carNum = 1;
+  optional int64 carType = 2;
+}
+
+message VehicleData {
+  optional double VehicleSpeed = 1;
+  optional double SteerWheelAngle = 2;
+  optional double BrakePedalPosition = 3;
+  optional int64 Gear = 4;
+  optional int32 ParkingBrake = 5;
+  optional int32 Turnsignal = 6;
+  optional int32 HazardLight = 7;
+  optional int32 driverModel = 8;
+  optional int32 EmergencyParking = 9;
+}

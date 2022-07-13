@@ -112,8 +112,6 @@ bool V2xProxy::GetRsuListFromFile(const std::string &filename,
   return !whitelist->empty();
 }
 
-bool V2xProxy::InitFlag() { return init_flag_; }
-
 void V2xProxy::RecvOsPlanning() {
   auto adc_trajectory = std::make_shared<::apollo::planning::ADCTrajectory>();
   auto res_light =

@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.v2x;
+
+message V2xConfig {
+  enum V2xType {
+    HIK = 0;
+    GRPC = 1;
+  };
+  optional V2xType v2x_device = 1 [default = HIK];
+}

@@ -218,3 +218,7 @@ data_files {
   source_path: "perception_conf/mlf_engine.conf"
   dest_path: "/apollo/modules/perception/production/data/perception/lidar/models/multi_lidar_fusion/mlf_engine.conf"
 }
+data_files {
+  source_path: "v2x_conf"
+  dest_path: "/apollo/modules/v2x/conf"
+}
