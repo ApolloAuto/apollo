@@ -19,7 +19,6 @@
 #include "modules/perception/inference/libtorch/torch_det.h"
 #include "modules/perception/inference/libtorch/torch_net.h"
 #include "modules/perception/inference/onnx/libtorch_obstacle_detector.h"
-
 #if GPU_PLATFORM == NVIDIA
   #include "modules/perception/inference/tensorrt/rt_net.h"
 #elif GPU_PLATFORM == AMD
@@ -35,17 +34,18 @@ Inference *CreateInferenceByName(const std::string &name,
                                  const std::vector<std::string> &outputs,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
-#if GPU_PLATFORM == NVIDIA
   if (name == "RTNet") {
+#if GPU_PLATFORM == NVIDIA
     return new RTNet(proto_file, weight_file, outputs, inputs);
+#elif GPU_PLATFORM == AMD
+    return new MINet(proto_file, weight_file, outputs, inputs);
+#endif
   } else if (name == "RTNetInt8") {
+#if GPU_PLATFORM == NVIDIA
     return new RTNet(proto_file, weight_file, outputs, inputs, model_root);
 #elif GPU_PLATFORM == AMD
-  if (name == "RTNet") {
-    return new MINet(proto_file, weight_file, outputs, inputs);
-  } else if (name == "RTNetInt8") {
-    // TODO(B1tway) Add quantization int8 support for RTNetInt8. 
-    // RTNetInt8 on MIGraphX currently works with fp32. 
+    // TODO(B1tway) Add quantization int8 support for RTNetInt8.
+    // RTNetInt8 on MIGraphX currently works with fp32.
     return new MINet(proto_file, weight_file, outputs, inputs);
 #endif
   } else if (name == "TorchDet") {
