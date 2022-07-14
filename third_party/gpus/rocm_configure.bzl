@@ -10,7 +10,6 @@
 
 load(
     "//tools/platform:common.bzl",
-    "config_repo_label",
     "err_out",
     "execute",
     "files_exist",
@@ -21,7 +20,6 @@ load(
     "raw_exec",
     "realpath",
     "to_list_of_strings",
-    "flag_enabled",
     "which",
     "make_copy_dir_rule",
     "make_copy_files_rule",
@@ -243,7 +241,6 @@ def _crosstool_verbose(repository_ctx):
     """
     return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
 
-# TODO(emankov): Bring into compliance with lib_name from cuda_configure.bzl and then move it to /gpus/common.bzl
 def lib_name(lib, version = "", static = False):
     """Constructs the name of a library on Linux.
 
@@ -621,7 +618,7 @@ def _create_local_rocm_repository(repository_ctx):
 
     rocm_defines["%{host_compiler_prefix}"] = host_compiler_prefix
 
-    rocm_defines["%{linker_bin_path}"] = rocm_config.rocm_toolkit_path + "/hcc/compiler/bin"
+    rocm_defines["%{linker_bin_path}"] = host_compiler_prefix
 
     # For gcc, do not canonicalize system header paths; some versions of gcc
     # pick the shortest possible path for system includes when creating the
@@ -733,15 +730,6 @@ _ENVIRONS = [
     _ROCM_TOOLKIT_PATH,
     _TF_ROCM_AMDGPU_TARGETS,
 ]
-
-# remote_rocm_configure = repository_rule(
-#     implementation = _create_local_rocm_repository,
-#     environ = _ENVIRONS,
-#     remotable = True,
-#     attrs = {
-#         "environ": attr.string_dict(),
-#     },
-# )
 
 rocm_configure = repository_rule(
     implementation = _rocm_autoconf_impl,

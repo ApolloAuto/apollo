@@ -85,8 +85,6 @@ def GetHostCompilerOptions(argv):
     opts += ' -iquote ' + ' -iquote '.join(sum(args.iquote, []))
   if args.g:
     opts += ' -g' + ' -g'.join(sum(args.g, []))
-  #if args.fno_canonical_system_headers:
-  #  opts += ' -fno-canonical-system-headers'
   if args.sysroot:
     opts += ' --sysroot ' + args.sysroot[0]
 
@@ -136,8 +134,7 @@ def InvokeHipcc(argv, log=False):
   std_options = ''.join([' -std=' + define
       for define in std_options if define in hipcc_allowed_std_options])
 
-  # The list of source files get passed after the -c option. I don't know of
-  # any other reliable way to just get the list of source files to be compiled.
+  # The list of source files get passed after the -c option.
   src_files = GetOptionValue(argv, 'c')
 
   if len(src_files) == 0:
@@ -160,17 +157,20 @@ def InvokeHipcc(argv, log=False):
   out = ' -o ' + out_file[0]
 
   hipccopts = ' -v'
-  # In hip-clang environment, we need to make sure that hip header is included
-  # before some standard math header like <complex> is included in any source.
-  # Otherwise, we get build error.
-  # Also we need to retain warning about uninitialised shared variable as
-  # warning only, even when -Werror option is specified.
+
+  # We need to make sure that the hip header is included in the sources before
+  # any standard math header like <complex>. Otherwise, we get a build error.
+  # Also we need to retain warnings about uninitialised shared variables as
+  # 'warning only', even if the '-Werror' option is specified.
   hipccopts += ' --include=hip/hip_runtime.h '
-  # Use -fno-gpu-rdc by default for early GPU kernel finalization
-  # This flag would trigger GPU kernels be generated at compile time, instead
-  # of link time. This allows the default host compiler (gcc) be used as the
-  # linker for TensorFlow on ROCm platform.
+
+  # Use '-fno-gpu-rdc' by default for early GPU kernel finalization.
+  # This flag will trigger GPU kernels to be generated at compile time instead
+  # of link time. This allows the default host compiler (gcc) to be used as the
+  # linker for TensorFlow on the ROCm platform.
   hipccopts += ' -fno-gpu-rdc '
+
+  # TODO(emankov): [ROCm 5.3] Replace with '-fgpu-flush-denormals-to-zero'
   hipccopts += ' -fcuda-flush-denormals-to-zero '
   hipccopts += undefines
   hipccopts += defines
@@ -203,7 +203,7 @@ def InvokeHipcc(argv, log=False):
 
 
 def main():
-  # ignore PWD env var
+  # Ignore PWD env var
   os.environ['PWD']=''
 
   parser = ArgumentParser(fromfile_prefix_chars='@')
@@ -213,24 +213,22 @@ def main():
   args, leftover = parser.parse_known_args(sys.argv[1:])
 
   if VERBOSE: print('PWD=' + os.getcwd())
-  if VERBOSE: print('HIPCC_ENV=' + HIPCC_ENV)
 
   if args.x and args.x[0] == 'hip':
-    # compilation for GPU objects
+    if VERBOSE: print('HIPCC=' + HIPCC_ENV)
+    # Compilation of GPU objects
     if args.rocm_log: Log('-x hip')
     leftover = [pipes.quote(s) for s in leftover]
     if args.rocm_log: Log('using hipcc')
     return InvokeHipcc(leftover, log=args.rocm_log)
 
   elif args.pass_exit_codes:
-    # link
-    # with hipcc compiler invoked with -fno-gpu-rdc by default now, it's ok to
-    # use host compiler as linker, but we have to link with HCC/HIP runtime.
-    # Such restriction would be revised further as the bazel script get
-    # improved to fine tune dependencies to ROCm libraries.
+    if VERBOSE: print('GCC=' + HIPCC_ENV)
+    # Link with hipcc compiler invoked with '-fno-gpu-rdc' by default.
+    # Host compiler can be used as a linker,
+    # but HIP runtime libraries should be specified.
     gpu_linker_flags = [flag for flag in sys.argv[1:]
                                if not flag.startswith(('--rocm_log'))]
-
     gpu_linker_flags.append('-L' + ROCR_RUNTIME_PATH)
     gpu_linker_flags.append('-Wl,-rpath=' + ROCR_RUNTIME_PATH)
     gpu_linker_flags.append('-l' + ROCR_RUNTIME_LIBRARY)
@@ -239,25 +237,22 @@ def main():
     gpu_linker_flags.append('-l' + HIP_RUNTIME_LIBRARY)
     gpu_linker_flags.append("-lrt")
     gpu_linker_flags.append("-lstdc++")
-
     if VERBOSE: print(' '.join([CPU_COMPILER] + gpu_linker_flags))
     return subprocess.call([CPU_COMPILER] + gpu_linker_flags)
 
   else:
-    # compilation for host objects
-
-    # Strip our flags before passing through to the CPU compiler for files which
-    # are not -x rocm. We can't just pass 'leftover' because it also strips -x.
-    # We not only want to pass -x to the CPU compiler, but also keep it in its
-    # relative location in the argv list (the compiler is actually sensitive to
-    # this).
+    # Compilation of host objects
+    # Strip flags before passing through to the CPU compiler for files which
+    # are not '-x hip'. We can't just pass 'leftover' because it also strips -x.
+    # We not only want to pass -x to the CPU compiler but also to keep it in its
+    # relative location in the argv list (the compiler is sensitive to this).
     cpu_compiler_flags = [flag for flag in sys.argv[1:]
                                if not flag.startswith(('--rocm_log'))]
 
     # SE codes need to be built with gcc, but need this macro defined.
     # From ROCm HIP's hip_common.h:
-    # // Auto enable __HIP_PLATFORM_AMD__ if compiling on AMD platform
-    # // Other compiler (GCC,ICC,etc) need to set one of these macros explicitly
+    #   Auto enable __HIP_PLATFORM_AMD__ if compiling on AMD platform
+    #   Other compiler (GCC,ICC,etc) need to set one of these macros explicitly
     cpu_compiler_flags.append("-D__HIP_PLATFORM_AMD__")
     if VERBOSE: print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
     return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
