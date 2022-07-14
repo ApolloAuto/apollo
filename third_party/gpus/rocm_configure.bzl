@@ -499,14 +499,13 @@ def _create_local_rocm_repository(repository_ctx):
 
     tpl_paths = {labelname: _tpl_path(repository_ctx, labelname) for labelname in [
         "rocm:build_defs.bzl",
-        "rocm:BUILD",
         "crosstool:BUILD.rocm",
         "crosstool:hipcc_cc_toolchain_config.bzl",
         "crosstool:clang/bin/crosstool_wrapper_driver_is_clang_for_hip",
         "rocm:rocm_config.h",
         "rocm:rocm_config.py",
     ]}
-
+    tpl_paths["rocm:BUILD"] = _tpl_path(repository_ctx, "rocm:BUILD")
     find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
 
     bash_bin = get_bash_bin(repository_ctx)
@@ -604,6 +603,13 @@ def _create_local_rocm_repository(repository_ctx):
         tpl_labelname,
         repository_dict,
         tpl_labelname
+    )
+
+    repository_ctx.template(
+        "rocm/build_defs.bzl",
+        tpl_paths["rocm:build_defs.bzl"],
+        {
+        },
     )
 
     # Set up crosstool/
