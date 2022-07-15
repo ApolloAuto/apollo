@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <thrust/sort.h>
+#include <thrust/sequence.h>
 
 #include "modules/perception/inference/migraphx/plugins/kernels.h"
 #include "modules/perception/inference/migraphx/plugins/rpn_proposal_ssd_plugin.h"

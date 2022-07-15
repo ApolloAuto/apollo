@@ -1,3 +1,19 @@
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 #include "modules/perception/inference/migraphx/mi_net.h"
 
 #include <algorithm>
@@ -11,10 +27,24 @@
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/migraphx/plugins/perception_inference_migraphx_plugins.h"
-#include "modules/perception/inference/migraphx/plugins/rcnn_proposal_plugin.h"
 
-#define WORKARUND_SYNCED_BLOBS
+#define PRINT_DEBUG 1
 
+#define DEBUG_GET_FN_NAME() \
+  (LoggingParseFunction(__func__, __PRETTY_FUNCTION__))
+
+#if PRINT_DEBUG
+#define DEBUG_LOG(...)                                              \
+  {                                                                 \
+    AINFO << "INFO [" << DEBUG_GET_FN_NAME() << "] " << __VA_ARGS__ \
+          << std::endl;                                             \
+  }
+#else
+#define DEBUG_LOG(...) \
+  {}
+#endif
+
+/// Expected to be invoked with __func__ and __PRETTY_FUNCTION__.
 std::string LoggingParseFunction(const char *func, const char *pretty_func) {
   std::string fname{func};
   if (fname != "operator()") return fname;
@@ -22,12 +52,6 @@ std::string LoggingParseFunction(const char *func, const char *pretty_func) {
   const std::string pf_tail{pf.substr(0, pf.find_first_of('('))};
   return pf_tail.substr(1 + pf_tail.find_last_of(':'));
 }
-
-#define DEBUG_GET_FN_NAME() \
-  (LoggingParseFunction(__func__, __PRETTY_FUNCTION__))
-
-#define DEBUG_LOG(...) \
-  AINFO << "INFO [" << DEBUG_GET_FN_NAME() << "] " << __VA_ARGS__ << std::endl
 
 namespace apollo {
 namespace perception {
@@ -51,13 +75,23 @@ void MINet::ConstructMap(const LayerParameter &layer_param,
           std::pair<std::string, std::string>(top_name, top_name));
     }
 
-    DEBUG_LOG(top_name << ", " << outputs[i]->get_shape());
-    tensor_map->insert(std::pair<std::string, Tensor>(top_name, outputs[i]));
+    const Tensor layer_out = outputs[i];
 
     if (std::find(output_names_.begin(), output_names_.end(), top_name) !=
         output_names_.end()) {
-      output_ordered_.push_back(top_name);
+      const auto out_param_name =
+          "main:#output_" + std::to_string(outputs_.size());
+      const Tensor out_param =
+          network_->add_parameter(out_param_name, layer_out->get_shape());
+      const Tensor out = network_->add_instruction(
+          migraphx::make_op("hip::copy"), layer_out, out_param);
+
+      output_param_map_[top_name] = out_param_name;
+      outputs_[top_name] = out;
     }
+
+    DEBUG_LOG(top_name << ", " << layer_out->get_shape());
+    tensor_map->insert(std::pair<std::string, Tensor>(top_name, layer_out));
   }
 }
 
@@ -65,54 +99,47 @@ void MINet::addConvLayer(const LayerParameter &layer_param,
                          Tensor const *inputs, WeightMap *weight_map,
                          migraphx::module *net, TensorMap *tensor_map,
                          TensorModifyMap *tensor_modify_map) {
-  ConvolutionParameter conv = layer_param.convolution_param();
+  const ConvolutionParameter conv_param = layer_param.convolution_param();
   ConvParam param;
 
-  ACHECK(ParserConvParam(conv, &param));
+  ACHECK(ParserConvParam(conv_param, &param));
 
   const auto input = inputs[0];
-  const auto input_shape = input->get_shape();
+  const auto data_shape = input->get_shape();
 
-  const size_t K = conv.num_output();
-  const size_t C = input_shape.lens()[1];
+  const size_t K = conv_param.num_output();
+  const size_t C = data_shape.lens()[1] / param.group;
   const size_t R = param.kernel_h;
   const size_t S = param.kernel_w;
 
-  auto op = migraphx::make_op("convolution",
-                              {{"padding", {param.padding_h, param.padding_w}},
-                               {"stride", {param.stride_h, param.stride_w}},
-                               {"dilation", {param.dilation, param.dilation}},
-                               {"group", param.group}});
-
-  // TODO: check this
-  // convLayer->setPaddingMode(nvinfer1::PaddingMode::kCAFFE_ROUND_DOWN);
-
   const auto weights = (*weight_map)[layer_param.name().c_str()];
+  const Shape filter_shape{Shape::float_type, {K, C, R, S}};
 
-  const migraphx::shape filter_shape{migraphx::shape::float_type, {K, C, R, S}};
   CHECK_EQ(weights[0].bytes(), filter_shape.bytes());
 
   const Tensor filter =
       net->add_literal(migraphx::literal(filter_shape, weights[0].data()));
 
-  Tensor out = net->add_instruction(op, input, filter);
+  const Operation conv = migraphx::make_op(
+      "convolution", {{"padding", {param.padding_h, param.padding_w}},
+                      {"stride", {param.stride_h, param.stride_w}},
+                      {"dilation", {param.dilation, param.dilation}},
+                      {"group", param.group}});
+  Tensor out = net->add_instruction(conv, input, filter);
 
   if (weights.size() > 1) {
-    const auto out_shape = out->get_shape();
-    const migraphx::shape bias_shape{migraphx::shape::float_type,
-                                     {out_shape.lens()[1]}};
+    const Shape out_shape = out->get_shape();
+    const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
 
     CHECK_EQ(weights[1].bytes(), bias_shape.bytes());
 
+    const Operation broadcast = migraphx::make_op(
+        "broadcast", {{"axis", 1}, {"out_lens", out_shape.lens()}});
     const Tensor bias =
         net->add_literal(migraphx::literal(bias_shape, weights[1].data()));
+    const Tensor broadcasted_bias = net->add_instruction(broadcast, bias);
 
-    const Tensor broadcast = net->add_instruction(
-        migraphx::make_op("broadcast",
-                          {{"axis", 1}, {"out_lens", out_shape.lens()}}),
-        bias);
-
-    out = net->add_instruction(migraphx::make_op("add"), out, broadcast);
+    out = net->add_instruction(migraphx::make_op("add"), out, broadcasted_bias);
   }
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -122,51 +149,48 @@ void MINet::addDeconvLayer(const LayerParameter &layer_param,
                            Tensor const *inputs, WeightMap *weight_map,
                            migraphx::module *net, TensorMap *tensor_map,
                            TensorModifyMap *tensor_modify_map) {
-  ConvolutionParameter conv = layer_param.convolution_param();
+  const ConvolutionParameter conv = layer_param.convolution_param();
   ConvParam param;
 
   ACHECK(ParserConvParam(conv, &param));
 
   const auto input = inputs[0];
-  const auto input_shape = input->get_shape();
+  const auto data_shape = input->get_shape();
 
-  const size_t K = input_shape.lens()[1];
+  const size_t K = data_shape.lens()[1] / param.group;
   const size_t C = conv.num_output();
   const size_t R = param.kernel_h;
   const size_t S = param.kernel_w;
 
-  const auto op = migraphx::make_op(
-      "deconvolution", {{"padding", {param.padding_h, param.padding_w}},
-                        {"stride", {param.stride_h, param.stride_w}},
-                        {"dilation", {param.dilation, param.dilation}},
-                        {"group", param.group}});
-
   const auto weights = (*weight_map)[layer_param.name().c_str()];
 
-  const migraphx::shape filter_shape{migraphx::shape::float_type, {K, C, R, S}};
+  const Shape filter_shape{Shape::float_type, {K, C, R, S}};
   CHECK_EQ(weights[0].bytes(), filter_shape.bytes());
 
   const Tensor filter =
       net->add_literal(migraphx::literal(filter_shape, weights[0].data()));
 
-  Tensor out = net->add_instruction(op, input, filter);
+  const Operation deconv = migraphx::make_op(
+      "deconvolution", {{"padding", {param.padding_h, param.padding_w}},
+                        {"stride", {param.stride_h, param.stride_w}},
+                        {"dilation", {param.dilation, param.dilation}},
+                        {"group", param.group}});
+
+  Tensor out = net->add_instruction(deconv, input, filter);
 
   if (weights.size() > 1) {
-    const auto out_shape = out->get_shape();
-    const migraphx::shape bias_shape{migraphx::shape::float_type,
-                                     {out_shape.lens()[1]}};
+    const Shape out_shape = out->get_shape();
+    const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
 
     CHECK_EQ(weights[1].bytes(), bias_shape.bytes());
 
+    const Operation broadcast = migraphx::make_op(
+        "broadcast", {{"axis", 1}, {"out_lens", out_shape.lens()}});
     const Tensor bias =
         net->add_literal(migraphx::literal(bias_shape, weights[1].data()));
+    const Tensor broadcasted_bias = net->add_instruction(broadcast, bias);
 
-    const Tensor broadcast = net->add_instruction(
-        migraphx::make_op("broadcast",
-                          {{"axis", 1}, {"out_lens", out_shape.lens()}}),
-        bias);
-
-    out = net->add_instruction(migraphx::make_op("add"), out, broadcast);
+    out = net->add_instruction(migraphx::make_op("add"), out, broadcasted_bias);
   }
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -180,9 +204,9 @@ void MINet::addActiveLayer(const LayerParameter &layer_param,
 
   if (layer_param.type() == "ReLU" &&
       layer_param.relu_param().negative_slope() > 0.0f) {
-    const auto op = migraphx::make_op(
+    const Operation leaky_relu = migraphx::make_op(
         "leaky_relu", {{"alpha", layer_param.relu_param().negative_slope()}});
-    const auto out = net->add_instruction(op, input);
+    const Tensor out = net->add_instruction(leaky_relu, input);
 
     ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
   } else {
@@ -194,8 +218,8 @@ void MINet::addActiveLayer(const LayerParameter &layer_param,
       activation_type = pair->second;
     }
 
-    const auto op = migraphx::make_op(activation_type);
-    const auto out = net->add_instruction(op, input);
+    const Operation activation = migraphx::make_op(activation_type);
+    const Tensor out = net->add_instruction(activation, input);
 
     ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
   }
@@ -205,7 +229,7 @@ void MINet::addConcatLayer(const LayerParameter &layer_param,
                            Tensor const *inputs, int nbInputs,
                            migraphx::module *net, TensorMap *tensor_map,
                            TensorModifyMap *tensor_modify_map) {
-  ConcatParameter params = layer_param.concat_param();
+  const ConcatParameter params = layer_param.concat_param();
   // default caffe concat axis is 1
   const size_t axis = params.has_axis() ? params.axis() : 1;
 
@@ -214,10 +238,10 @@ void MINet::addConcatLayer(const LayerParameter &layer_param,
   Tensor out = inputs[0];
 
   for (int i = 1; i < nbInputs; i++) {
-    const auto input_first = out;
-    const auto input_second = inputs[i];
-    const auto first_shape = input_first->get_shape();
-    const auto second_shape = input_second->get_shape();
+    const Tensor input_first = out;
+    const Tensor input_second = inputs[i];
+    const Shape first_shape = input_first->get_shape();
+    const Shape second_shape = input_second->get_shape();
 
     CHECK_EQ(first_shape.lens().size(), second_shape.lens().size());
     for (size_t j = 0; j < first_shape.lens().size(); j++) {
@@ -225,8 +249,8 @@ void MINet::addConcatLayer(const LayerParameter &layer_param,
       CHECK_EQ(first_shape.lens()[j], second_shape.lens()[j]);
     }
 
-    const auto op = migraphx::make_op("concat", {{"axis", axis}});
-    out = net->add_instruction(op, input_first, input_second);
+    const Operation concat = migraphx::make_op("concat", {{"axis", axis}});
+    out = net->add_instruction(concat, input_first, input_second);
   }
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -247,12 +271,12 @@ void MINet::addPoolingLayer(const LayerParameter &layer_param,
 
   ACHECK(modify_pool_param(&params));
 
-  const auto op = migraphx::make_op(
+  const Operation pooling = migraphx::make_op(
       "pooling", {{"mode", pool_mode},
                   {"padding", {params.pad_h(), params.pad_w()}},
                   {"stride", {params.stride_h(), params.stride_w()}},
                   {"lengths", {params.kernel_h(), params.kernel_w()}}});
-  const auto out = net->add_instruction(op, inputs[0]);
+  const Tensor out = net->add_instruction(pooling, inputs[0]);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -261,43 +285,46 @@ void MINet::addSliceLayer(const LayerParameter &layer_param,
                           Tensor const *inputs, int nbInputs,
                           migraphx::module *net, TensorMap *tensor_map,
                           TensorModifyMap *tensor_modify_map) {
-  const auto param = layer_param.slice_param();
-  const int axis = param.axis();
+  const SliceParameter param = layer_param.slice_param();
+  // default caffe concat axis is 1
+  const size_t axis = param.has_axis() ? param.axis() : 1;
 
   const auto input = inputs[0];
   const auto input_shape = input->get_shape();
 
   CHECK_GT(param.slice_point_size(), 0);
-  CHECK_GT(static_cast<int>(input_shape.lens().size()), axis);
+  CHECK_GT(input_shape.lens().size(), axis);
 
-  std::vector<migraphx::operation> ops;
+  std::vector<Operation> ops;
 
   for (int i = 0; i < param.slice_point_size(); i++) {
-    const auto slice_point = param.slice_point(i);
+    const size_t slice_point = param.slice_point(i);
 
     if (i == 0) {
       ops.push_back(migraphx::make_op(
           "slice",
           {{"axes", {axis}}, {"starts", {0}}, {"ends", {slice_point}}}));
     } else {
-      const auto slice_point_prev = param.slice_point(i - 1);
+      const size_t slice_point_prev = param.slice_point(i - 1);
       ops.push_back(migraphx::make_op("slice", {{"axes", {axis}},
                                                 {"starts", {slice_point_prev}},
                                                 {"ends", {slice_point}}}));
     }
   }
 
-  const auto slice_point = param.slice_point(param.slice_point_size() - 1);
-  const auto axis_size = input_shape.lens()[axis];
+  const size_t last_slice_point =
+      param.slice_point(param.slice_point_size() - 1);
+  const size_t axis_size = input_shape.lens()[axis];
 
-  ops.push_back(migraphx::make_op(
-      "slice",
-      {{"axes", {axis}}, {"starts", {slice_point}}, {"ends", {axis_size}}}));
+  ops.push_back(migraphx::make_op("slice", {{"axes", {axis}},
+                                            {"starts", {last_slice_point}},
+                                            {"ends", {axis_size}}}));
 
   std::vector<Tensor> outputs;
   for (auto &op : ops) {
-    DEBUG_LOG(op);
-    const auto out = net->add_instruction(op, input);
+    Tensor out = net->add_instruction(op, input);
+    // keep standard NCHW layout
+    out = net->add_instruction(migraphx::make_op("contiguous"), out);
     outputs.push_back(out);
   }
 
@@ -309,62 +336,46 @@ void MINet::addInnerproductLayer(const LayerParameter &layer_param,
                                  migraphx::module *net, TensorMap *tensor_map,
                                  TensorModifyMap *tensor_modify_map) {
   InnerProductParameter params = layer_param.inner_product_param();
+  const size_t num_outputs = params.num_output();
 
-  const auto num_outputs = params.num_output();
-
-  const Tensor input = inputs[0];
+  const auto input = inputs[0];
   const auto input_shape = input->get_shape();
   const auto input_lens = input_shape.lens();
+
+  // Add FullyConnected layer as convolution
+  const size_t K = num_outputs;
+  const size_t C = input_lens[1];
+  const size_t R = input_lens[2];
+  const size_t S = input_lens[3];
+
+  const Operation conv = migraphx::make_op("convolution", {{"padding", {0, 0}},
+                                                           {"stride", {1, 1}},
+                                                           {"dilation", {1, 1}},
+                                                           {"group", 1}});
+
   const auto weights = (*weight_map)[layer_param.name().c_str()];
+  const Shape filter_shape{Shape::float_type, {K, C, R, S}};
 
-  CHECK_GE(input_lens.size(), static_cast<size_t>(2));
+  CHECK_EQ(weights[0].bytes(), filter_shape.bytes());
 
-  // Input tensor should be transformed to 2d tensor
-  // Example: [N,C,H,W] --> [N,(C*H*W)]
-  size_t reshaped_dim = 1;
-  for (auto it = ++input_lens.begin(); it != input_lens.end(); it++) {
-    reshaped_dim *= *it;
-  }
+  const Tensor filter =
+      net->add_literal(migraphx::literal(filter_shape, weights[0].data()));
 
-  const auto input_new_dims = {input_lens[0], reshaped_dim};
-  const migraphx::shape input_new_shape{migraphx::shape::float_type,
-                                        input_new_dims};
-
-  const auto input_reshape_op =
-      migraphx::make_op("reshape", {{"dims", input_new_dims}});
-  const Tensor input_reshaped = net->add_instruction(input_reshape_op, input);
-
-  const migraphx::shape weight_shape{migraphx::shape::float_type,
-                                     {num_outputs, input_new_shape.lens()[1]}};
-
-  CHECK_EQ(weights[0].bytes(), weight_shape.bytes());
-
-  const Tensor weight =
-      net->add_literal(migraphx::literal(weight_shape, weights[0].data()));
-
-  const auto transpose_op =
-      migraphx::make_op("transpose", {{"permutation", {1, 0}}});
-  const Tensor transpose_b = net->add_instruction(transpose_op, weight);
-
-  Tensor out = net->add_instruction(migraphx::make_op("dot"), input_reshaped,
-                                    transpose_b);
+  Tensor out = net->add_instruction(conv, input, filter);
 
   if (weights.size() > 1) {
-    const auto out_shape = out->get_shape();
-    const migraphx::shape bias_shape{migraphx::shape::float_type,
-                                     {out_shape.lens()[1]}};
+    const Shape out_shape = out->get_shape();
+    const Shape bias_shape{Shape::float_type, {out_shape.lens()[1]}};
 
     CHECK_EQ(weights[1].bytes(), bias_shape.bytes());
 
+    const Operation broadcast = migraphx::make_op(
+        "broadcast", {{"axis", 1}, {"out_lens", out_shape.lens()}});
     const Tensor bias =
         net->add_literal(migraphx::literal(bias_shape, weights[1].data()));
+    const Tensor broadcasted_bias = net->add_instruction(broadcast, bias);
 
-    const Tensor broadcast = net->add_instruction(
-        migraphx::make_op("broadcast",
-                          {{"axis", 1}, {"out_lens", out_shape.lens()}}),
-        bias);
-
-    out = net->add_instruction(migraphx::make_op("add"), out, broadcast);
+    out = net->add_instruction(migraphx::make_op("add"), out, broadcasted_bias);
   }
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -392,28 +403,25 @@ void MINet::addScaleLayer(const LayerParameter &layer_param,
     for (size_t i = 0; i < lw.size(); i++) {
       weights.push_back(lw[i]);
     }
-
   }
-
-  const migraphx::shape param_shape{migraphx::shape::float_type, {C}};
 
   static const std::vector<std::string> scale_ops = {"mul", "add", "pow"};
   CHECK_LE(weights.size(), scale_ops.size());
 
   Tensor out = input;
+  const Shape param_shape{Shape::float_type, {C}};
 
   for (size_t i = 0; i < weights.size(); i++) {
     CHECK_EQ(weights[i].bytes(), param_shape.bytes());
 
+    const Operation broadcast = migraphx::make_op(
+        "broadcast", {{"axis", 1}, {"out_lens", input_shape.lens()}});
     const Tensor param =
         net->add_literal(migraphx::literal(param_shape, weights[i].data()));
+    const Tensor broadcasted_param = net->add_instruction(broadcast, param);
 
-    const Tensor broadcast = net->add_instruction(
-        migraphx::make_op("broadcast",
-                          {{"axis", 1}, {"out_lens", input_shape.lens()}}),
-        param);
-
-    out = net->add_instruction(migraphx::make_op(scale_ops[i]), out, broadcast);
+    out = net->add_instruction(migraphx::make_op(scale_ops[i]), out,
+                               broadcasted_param);
   }
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -423,14 +431,11 @@ void MINet::addBatchnormLayer(const LayerParameter &layer_param,
                               Tensor const *inputs, WeightMap *weight_map,
                               migraphx::module *net, TensorMap *tensor_map,
                               TensorModifyMap *tensor_modify_map) {
-  BatchNormParameter params = layer_param.batch_norm_param();
   const auto input = inputs[0];
   const auto input_shape = input->get_shape();
+  const Shape params_shape{input_shape.type(), {input_shape.lens()[1]}};
 
   const auto weights = (*weight_map)[layer_param.name().c_str()];
-
-  const migraphx::shape params_shape{input_shape.type(),
-                                     {input_shape.lens()[1]}};
 
   CHECK_EQ(weights[0].bytes(), params_shape.bytes());
   CHECK_EQ(weights[1].bytes(), params_shape.bytes());
@@ -440,15 +445,16 @@ void MINet::addBatchnormLayer(const LayerParameter &layer_param,
   const Tensor scale =
       net->add_literal(migraphx::literal(params_shape, weights[1].data()));
 
-  const auto broadcast = migraphx::make_op(
+  const Operation broadcast = migraphx::make_op(
       "broadcast", {{"axis", 1}, {"out_lens", input_shape.lens()}});
 
   const Tensor scale_broadcast = net->add_instruction(broadcast, scale);
-  Tensor out =
+  const Tensor mul_out =
       net->add_instruction(migraphx::make_op("mul"), input, scale_broadcast);
 
   const Tensor shift_broadcast = net->add_instruction(broadcast, shift);
-  out = net->add_instruction(migraphx::make_op("add"), out, shift_broadcast);
+  const Tensor out =
+      net->add_instruction(migraphx::make_op("add"), mul_out, shift_broadcast);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -457,7 +463,7 @@ void MINet::addSoftmaxLayer(const LayerParameter &layer_param,
                             Tensor const *inputs, int nbInputs,
                             migraphx::module *net, TensorMap *tensor_map,
                             TensorModifyMap *tensor_modify_map) {
-  const auto params = layer_param.softmax_param();
+  const SoftmaxParameter params = layer_param.softmax_param();
   // default caffe softmax axis is 1
   const size_t axis = params.has_axis() ? params.axis() : 1;
 
@@ -466,8 +472,8 @@ void MINet::addSoftmaxLayer(const LayerParameter &layer_param,
 
   CHECK_GT(input_shape.lens().size(), axis);
 
-  const auto op = migraphx::make_op("softmax", {{"axis", axis}});
-  const auto out = net->add_instruction(op, input);
+  const Operation softmax = migraphx::make_op("softmax", {{"axis", axis}});
+  const Tensor out = net->add_instruction(softmax, input);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -484,8 +490,8 @@ void MINet::addEltwiseLayer(const LayerParameter &layer_param,
     eltwise_op = pair->second;
   }
 
-  const auto op = migraphx::make_op(eltwise_op);
-  const auto out = net->add_instruction(op, inputs[0], inputs[1]);
+  const Operation eltwise = migraphx::make_op(eltwise_op);
+  const Tensor out = net->add_instruction(eltwise, inputs[0], inputs[1]);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -495,21 +501,19 @@ void MINet::addArgmaxLayer(const LayerParameter &layer_param,
                            migraphx::module *net, TensorMap *tensor_map,
                            TensorModifyMap *tensor_modify_map) {
   const auto params = layer_param.argmax_param();
-  // TODO: default caffe argmax axis (By default ArgMaxLayer maximizes over the
-  // flattened trailing dimensions)
   const size_t axis = params.axis();
 
-  // TODO: Caffe also defines out_max_val and top_k argmax parameters, but they
+  // TODO(B1tway): Caffe also defines out_max_val and top_k argmax parameters, but they
   // are not supported yet
   ACHECK(!(params.has_out_max_val() || params.has_top_k()));
 
-  const auto input = inputs[0];
-  const auto input_shape = input->get_shape();
+  const Tensor input = inputs[0];
+  const Shape input_shape = input->get_shape();
 
   CHECK_GT(input_shape.lens().size(), axis);
 
-  const auto op = migraphx::make_op("argmax", {{"axis", axis}});
-  const auto out = net->add_instruction(op, input);
+  const Operation argmax = migraphx::make_op("argmax", {{"axis", axis}});
+  const Tensor out = net->add_instruction(argmax, input);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -532,11 +536,13 @@ void MINet::addPermuteLayer(const LayerParameter &layer_param,
     order.push_back(dim);
   }
 
-  const auto op = migraphx::make_op("transpose", {{"permutation", order}});
-  auto out = net->add_instruction(op, inputs[0]);
+  const Operation transpose =
+      migraphx::make_op("transpose", {{"permutation", order}});
+  const Tensor transposed_out = net->add_instruction(transpose, inputs[0]);
 
   // keep standard NCHW layout
-  out = net->add_instruction(migraphx::make_op("contiguous"), out);
+  const Tensor out =
+      net->add_instruction(migraphx::make_op("contiguous"), transposed_out);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -556,6 +562,18 @@ void MINet::addReshapeLayer(const LayerParameter &layer_param,
   for (int i = 1; i < params.shape().dim_size(); i++) {
     auto dim_param = params.shape().dim(i);
 
+    // clang-format off
+
+    // For compatibility with tensorrt inference
+    // Ref: https://docs.nvidia.com/deeplearning/tensorrt/api/c_api/classnvinfer1_1_1_i_shuffle_layer.html#a25e06ac9792d66ec3a2df58e48052f71
+    // According to nvidia docs:
+    //    Two special values can be used as dimensions.
+    //    Value 0 copies the corresponding dimension from input. This special value can be used more than once in the dimensions. If number of reshape dimensions is less than input, 0s are resolved by aligning the most significant dimensions of input.
+    //    Value -1 infers that particular dimension by looking at input and rest of the reshape dimensions. Note that only a maximum of one dimension is permitted to be specified as -1.
+    //    The product of the new dimensions must be equal to the product of the old.
+    //    If a second input had been used to create this layer, that input is reset to null by this method.
+
+    // clang-format on
     int64_t new_dim = -1;
     if (dim_param == 0) {
       new_dim = input_lens[i];
@@ -567,8 +585,8 @@ void MINet::addReshapeLayer(const LayerParameter &layer_param,
     new_shape.push_back(new_dim);
   }
 
-  const auto op = migraphx::make_op("reshape", {{"dims", new_shape}});
-  const auto out = net->add_instruction(op, inputs[0]);
+  const Operation reshape = migraphx::make_op("reshape", {{"dims", new_shape}});
+  const Tensor out = net->add_instruction(reshape, inputs[0]);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -589,7 +607,7 @@ void MINet::addSilenceLayer(const LayerParameter &layer_param,
 
   for (int i = 0; i < layer_param.bottom_size(); i++) {
     const auto name = layer_param.bottom(i);
-    const auto tensor = tensor_map->at(tensor_modify_map_[name]);
+    const Tensor tensor = tensor_map->at(tensor_modify_map_[name]);
     net->remove_instruction(tensor);
   }
 }
@@ -597,22 +615,73 @@ void MINet::addSilenceLayer(const LayerParameter &layer_param,
 void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
                                    Tensor const *inputs, int nbInputs,
                                    migraphx::module *net, TensorMap *tensor_map,
-                                   TensorModifyMap *tensor_modify_map) {}
+                                   TensorModifyMap *tensor_modify_map) {
+  std::shared_ptr<DFMBPSROIAlignPlugin> plugin;
+  std::vector<nvinfer1::Dims> input_dims;
+
+  CHECK_GE(nbInputs, 2);
+  CHECK_LE(nbInputs, 3);
+  CHECK_EQ(max_batch_size_, 1);
+
+  for (int i = 0; i < nbInputs; ++i) {
+    auto input_lens = inputs[i]->get_shape().lens();
+    nvinfer1::Dims dims;
+
+    // remove batch size for compatibility with nvinfer1::Dims
+    if (i == 0 || i == 2) {
+      input_lens.erase(input_lens.begin());
+    }
+
+    for (size_t j = 0; j < input_lens.size(); j++) {
+      dims.d[j] = input_lens[j];
+    }
+
+    dims.nbDims = input_lens.size();
+    input_dims.push_back(dims);
+  }
+
+  plugin.reset(new DFMBPSROIAlignPlugin(layer_param.dfmb_psroi_pooling_param(),
+                                        input_dims.data(), nbInputs));
+  dfmb_psroi_align_plugins_.push_back(plugin);
+
+  // output dims without batchsize
+  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Shape out_shape{Shape::float_type,
+                  {out_dims.d[0], out_dims.d[1], out_dims.d[2], out_dims.d[3]}};
+
+  const Tensor allocated_out = net->add_instruction(migraphx::make_op(
+      "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
+
+  Tensor out;
+  bool no_trans = nbInputs < 3;
+
+  if (no_trans) {
+    out = net->add_instruction(
+        dfmb_psroi_align_op{max_batch_size_, [plugin]() { return plugin; }},
+        inputs[0], inputs[1], allocated_out);
+  } else {
+    out = net->add_instruction(
+        dfmb_psroi_align_op{max_batch_size_, [plugin]() { return plugin; }},
+        inputs[0], inputs[1], inputs[2], allocated_out);
+  }
+
+  ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
+}
 
 void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
                                  Tensor const *inputs, int nbInputs,
                                  migraphx::module *net, TensorMap *tensor_map,
                                  TensorModifyMap *tensor_modify_map) {
-  std::shared_ptr<RCNNProposalPlugin> rcnn_proposal_plugin;
-  std::vector<migraphx::shape> input_shapes;
+  std::shared_ptr<RCNNProposalPlugin> plugin;
   std::vector<nvinfer1::Dims> input_dims;
 
+  CHECK_EQ(nbInputs, 4);
+
   for (int i = 0; i < nbInputs; ++i) {
-    auto input_shape = inputs[i]->get_shape();
-    auto input_lens = input_shape.lens();
+    auto input_lens = inputs[i]->get_shape().lens();
     nvinfer1::Dims dims;
 
-    // remove batch size from im_info for compatibility with nvinfer1::Dims
+    // remove batch size for compatibility with nvinfer1::Dims
     if (i == 3) {
       input_lens.erase(input_lens.begin());
     }
@@ -620,24 +689,28 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
     for (size_t j = 0; j < input_lens.size(); j++) {
       dims.d[j] = input_lens[j];
     }
+
     dims.nbDims = input_lens.size();
-
     input_dims.push_back(dims);
-    input_shapes.push_back(input_shape);
   }
-  rcnn_proposal_plugin.reset(new RCNNProposalPlugin(
-      layer_param.bbox_reg_param(), layer_param.detection_output_ssd_param(),
-      input_dims.data()));
-  rcnn_proposal_plugins_.push_back(rcnn_proposal_plugin);
 
-  const auto op = rcnn_proposal_op{rcnn_proposal_plugin};
-  const auto out_shape = op.compute_shape(input_shapes);
+  plugin.reset(new RCNNProposalPlugin(layer_param.bbox_reg_param(),
+                                      layer_param.detection_output_ssd_param(),
+                                      input_dims.data()));
+  rcnn_proposal_plugins_.push_back(plugin);
 
-  const Tensor buf =
-      net->add_instruction(migraphx::gpu::hip_allocate{out_shape});
+  // output dims without batchsize
+  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Shape out_shape{Shape::float_type,
+                  {max_batch_size_ * out_dims.d[0], out_dims.d[1],
+                   out_dims.d[2], out_dims.d[3]}};
 
-  const Tensor out =
-      net->add_instruction(op, inputs[0], inputs[1], inputs[2], inputs[3], buf);
+  const Tensor allocated_out = net->add_instruction(migraphx::make_op(
+      "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
+
+  const Tensor out = net->add_instruction(
+      rcnn_proposal_op{max_batch_size_, [plugin]() { return plugin; }},
+      inputs[0], inputs[1], inputs[2], inputs[3], allocated_out);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
 }
@@ -645,7 +718,49 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
 void MINet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
                                    Tensor const *inputs, int nbInputs,
                                    migraphx::module *net, TensorMap *tensor_map,
-                                   TensorModifyMap *tensor_modify_map) {}
+                                   TensorModifyMap *tensor_modify_map) {
+  std::shared_ptr<RPNProposalSSDPlugin> plugin;
+  std::vector<nvinfer1::Dims> input_dims;
+
+  CHECK_EQ(nbInputs, 3);
+
+  for (int i = 0; i < nbInputs; ++i) {
+    auto input_lens = inputs[i]->get_shape().lens();
+    nvinfer1::Dims dims;
+
+    // remove batch size for compatibility with nvinfer1::Dims
+    if (i == 0 || i == 1 || i == 2) {
+      input_lens.erase(input_lens.begin());
+    }
+
+    for (size_t j = 0; j < input_lens.size(); j++) {
+      dims.d[j] = input_lens[j];
+    }
+
+    dims.nbDims = input_lens.size();
+    input_dims.push_back(dims);
+  }
+
+  plugin.reset(new RPNProposalSSDPlugin(
+      layer_param.bbox_reg_param(), layer_param.detection_output_ssd_param(),
+      input_dims.data()));
+  rpn_proposal_ssd_plugins_.push_back(plugin);
+
+  // output dims without batchsize
+  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Shape out_shape{Shape::float_type,
+                  {max_batch_size_ * out_dims.d[0], out_dims.d[1],
+                   out_dims.d[2], out_dims.d[3]}};
+
+  const Tensor allocated_out = net->add_instruction(migraphx::make_op(
+      "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
+
+  const Tensor out = net->add_instruction(
+      rpn_proposal_ssd_op{max_batch_size_, [plugin]() { return plugin; }},
+      inputs[0], inputs[1], inputs[2], allocated_out);
+
+  ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
+}
 
 void MINet::addLayer(const LayerParameter &layer_param, Tensor const *inputs,
                      int nbInputs, WeightMap *weight_map, migraphx::module *net,
@@ -725,6 +840,7 @@ bool MINet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
   for (int i = 0; i < net.layer_size(); i++) {
     std::vector<Weights> lw;
     for (int j = 0; j < net.layer(i).blobs_size(); j++) {
+      // val memory will be released when deconstructor is called
       auto blob = &(net.layer(i).blobs(j));
       CHECK_EQ(blob->double_data_size(), 0);
       CHECK_EQ(blob->double_diff_size(), 0);
@@ -733,15 +849,6 @@ bool MINet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
       if (net.layer(i).type() == "BatchNorm") {
         mergeBN(j, net.mutable_layer(i));
       }
-
-#if 1
-      std::stringstream ss;
-      ss << "Weights " << net.layer(i).name() << ": ";
-      for (int k = 0; k < 10 && k < blob->data_size(); k++) {
-        ss << blob->data().data()[k] << ", ";
-      }
-      DEBUG_LOG(ss.str());
-#endif
 
       auto wt = loadLayerWeights(blob->data().data(), blob->data_size());
       lw.push_back(wt);
@@ -811,10 +918,20 @@ MINet::MINet(const std::string &net_file, const std::string &model_file,
   loadNetParams(net_file, net_param_.get());
 }
 
-void MINet::init_blob(std::vector<std::string> &names,
-                      std::map<std::string, migraphx::shape> &shapes) {
-  for (auto name : names) {
-    auto shape = shapes[tensor_modify_map_[name]];
+MINet::MINet(const std::string &net_file, const std::string &model_file,
+             const std::vector<std::string> &outputs,
+             const std::vector<std::string> &inputs,
+             const std::string &model_root)
+    : output_names_(outputs), input_names_(inputs), model_root_(model_root) {
+  loadWeights(model_file, &weight_map_);
+  net_param_.reset(new NetParameter);
+  loadNetParams(net_file, net_param_.get());
+}
+
+void MINet::init_blob(std::map<std::string, Tensor> &tensor_map) {
+  for (const auto &p : tensor_map) {
+    auto name = p.first;
+    auto shape = p.second->get_shape();
 
     cudaMalloc(&buffers_[name], shape.bytes());
 
@@ -826,15 +943,11 @@ void MINet::init_blob(std::vector<std::string> &names,
     blob.reset(new apollo::perception::base::Blob<float>(dims));
     blob->set_gpu_data(reinterpret_cast<float *>(buffers_[name]));
     blobs_.insert(std::make_pair(name, blob));
-
-#ifdef WORKARUND_SYNCED_BLOBS
-    blob->mutable_cpu_data();
-#endif
   }
 }
 
 bool MINet::Init(const std::map<std::string, std::vector<int>> &shapes) {
-  // TODO: add cpu support
+  // TODO(B1tway): add cpu support
   if (gpu_id_ < 0) {
     AINFO << "must use gpu mode";
     return false;
@@ -843,12 +956,19 @@ bool MINet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   auto target = migraphx::target(migraphx::gpu::target{});
   network_ = program_.get_main_module();
 
+  cudaDeviceProp prop;
+  cudaGetDeviceProperties(&prop, gpu_id_);
+  checkInt8(prop.name);
+
   parse_with_api(shapes);
+
   program_.compile(target);
 
-  auto output_shapes = program_.get_output_shapes();
-
+#if PRINT_DEBUG
   {
+    const auto output_shapes = program_.get_output_shapes();
+    CHECK_EQ(outputs_.size(), output_shapes.size());
+
     std::stringstream ss;
     const auto shapes = program_.get_parameter_shapes();
     ss << "Parameter shapes: ";
@@ -861,33 +981,41 @@ bool MINet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     }
     DEBUG_LOG(ss.str());
   }
+#endif
 
-  CHECK_EQ(output_ordered_.size(), output_shapes.size());
-
-  for (uint32_t i = 0; i < output_shapes.size(); i++) {
-    output_shapes_[output_ordered_[i]] = output_shapes[i];
-  }
-
-  init_blob(input_names_, input_shapes_);
-  init_blob(output_ordered_, output_shapes_);
+  init_blob(inputs_);
+  init_blob(outputs_);
   return true;
 }
 
-bool MINet::addInput(const TensorDimsMap &tensor_dims_map,
+bool MINet::checkInt8(const std::string &gpu_name) {
+  AWARN << "MIGraphX Inference Not Supports Int8 Mode. Use FP32 Mode.";
+  return false;
+}
+
+bool MINet::addInput(TensorDimsMap &tensor_dims_map,
                      const std::map<std::string, std::vector<int>> &shapes,
                      TensorMap *tensor_map) {
   CHECK_GT(net_param_->layer_size(), 0);
-  input_names_.clear();
 
-  for (auto dims_pair : tensor_dims_map) {
-    migraphx::shape shape{migraphx::shape::float_type, dims_pair.second};
-    const auto name = dims_pair.first;
+  for (auto &dims_pair : tensor_dims_map) {
+    if (shapes.find(dims_pair.first) != shapes.end()) {
+      auto shape = shapes.at(dims_pair.first);
+      if (shape.size() == dims_pair.second.size()) {
+        max_batch_size_ = std::max(max_batch_size_, shape[0]);
+        for (size_t i = 0; i < dims_pair.second.size(); i++) {
+          dims_pair.second[i] = shape[i];
+        }
+      }
+    }
+    const Shape shape{Shape::float_type, dims_pair.second};
+    const std::string name = dims_pair.first;
+    const Tensor input = network_->add_parameter(name, shape);
 
-    auto input = network_->add_parameter(name, shape);
     tensor_map->insert(std::make_pair(name, input));
 
-    input_names_.push_back(name);
-    input_shapes_[name] = shape;
+    input_param_map_[name] = name;
+    inputs_[name] = input;
   }
 
   return true;
@@ -911,12 +1039,11 @@ void MINet::parse_with_api(
              &weight_map_, network_, &tensor_map, &tensor_modify_map_);
   }
 
-  std::vector<Tensor> output;
-  for (auto it = output_ordered_.begin(); it != output_ordered_.end(); it++) {
-    output.push_back(tensor_map[tensor_modify_map_[*it]]);
-  }
+  std::vector<Tensor> outputs;
+  std::transform(outputs_.begin(), outputs_.end(), std::back_inserter(outputs),
+                 [](auto &p) { return p.second; });
 
-  network_->add_return(output);
+  network_->add_return(outputs);
 }
 
 MINet::~MINet() {
@@ -931,51 +1058,35 @@ void MINet::Infer() {
   migraphx::gpu::set_device(gpu_id_);
   migraphx::gpu::gpu_sync();
 
-  for (auto name : input_names_) {
+  for (auto pair : input_param_map_) {
+    const auto name = pair.first;
+    const auto param_name = pair.second;
+    const auto tensor = inputs_[name];
     auto blob = get_blob(name);
     if (blob != nullptr) {
       auto input_ptr = blob->mutable_gpu_data();
-      parameter_map_[name] = migraphx::argument(input_shapes_[name], input_ptr);
+      auto input_shape = tensor->get_shape();
+      parameter_map_[param_name] = migraphx::argument(input_shape, input_ptr);
     }
   }
 
-  for (auto &name : output_ordered_) {
+  for (auto pair : output_param_map_) {
+    const auto name = pair.first;
+    const auto param_name = pair.second;
+    const auto tensor = outputs_[name];
     auto blob = get_blob(name);
     if (blob != nullptr) {
-      const auto migraphx_output_num =
-          std::find(output_ordered_.begin(), output_ordered_.end(), name) -
-          output_ordered_.begin();
-      const std::string migraph_out_name =
-          "main:#output_" + std::to_string(migraphx_output_num);
-
       auto out_ptr = blob->mutable_gpu_data();
-      parameter_map_[migraph_out_name] =
-          migraphx::argument(output_shapes_[name], out_ptr);
+      auto out_shape = tensor->get_shape();
+      parameter_map_[param_name] = migraphx::argument(out_shape, out_ptr);
     }
   }
 
+  // Ensure input and output buffers are ready for inference
   migraphx::gpu::gpu_sync();
 
   auto output = program_.eval(parameter_map_);
-  CHECK_EQ(output.size(), output_shapes_.size());
-
-  for (size_t i = 0; i < output.size(); i++) {
-    auto out = output[i];
-    const auto out_shape = out.get_shape();
-    const auto out_name = output_ordered_[i];
-
-    CHECK_EQ(out_shape, output_shapes_[out_name]);
-
-#ifdef WORKARUND_SYNCED_BLOBS
-    out = migraphx::gpu::from_gpu(out);
-    const auto out_ptr = reinterpret_cast<float *>(out.data());
-
-    auto blob = get_blob(out_name);
-    auto blob_ptr = blob->mutable_cpu_data();
-
-    std::memcpy(blob_ptr, out_ptr, out_shape.bytes());
-#endif
-  }
+  CHECK_EQ(output.size(), outputs_.size());
 }
 
 std::shared_ptr<apollo::perception::base::Blob<float>> MINet::get_blob(

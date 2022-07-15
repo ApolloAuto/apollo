@@ -18,6 +18,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/migraphx/mi_common.h"
+#include "modules/perception/inference/migraphx/plugins/plugin.h"
 
 namespace apollo {
 namespace perception {

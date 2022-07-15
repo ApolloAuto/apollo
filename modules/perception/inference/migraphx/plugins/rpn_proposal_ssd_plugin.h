@@ -28,7 +28,7 @@ namespace inference {
 // TODO(chenjiahao): complete member functions
 // Custom layer for RPNProposalSSD operation, i.e.
 // anchor generation and nms filtering
-class RPNProposalSSDPlugin : public IPlugin {
+class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
  public:
   RPNProposalSSDPlugin(
       const BBoxRegParameter &bbox_reg_param,
