@@ -17,14 +17,17 @@ ENV PATH /opt/apollo/sysroot/bin:$PATH
 COPY --from=devel /opt/apollo/rcfiles /opt/apollo/rcfiles/
 COPY --from=devel /opt/apollo/installers /opt/apollo/installers
 
+RUN cp -f /etc/apt/sources.list /etc/apt/sources.list.orig \
+    && cp -f /opt/apollo/rcfiles/sources.list.aliyun /etc/apt/sources.list
+
 RUN if [ "${GEOLOC}" = "cn" ]; then \
         cp -f /etc/apt/sources.list /etc/apt/sources.list.orig; \
-        cp -f /opt/apollo/rcfiles/sources.list.cn.x86_64 /etc/apt/sources.list; \
+        cp -f /opt/apollo/rcfiles/sources.list.aliyun /etc/apt/sources.list; \
     fi
 
 RUN M="${CUDNN_VERSION%%.*}" \
     && PATCH="-1+cuda${CUDA_LITE}" \
-    && apt-get -y update \
+    && apt-get -y update --allow-insecure-repositories \
     && apt-get install -y --no-install-recommends \
         libcudnn${M}="${CUDNN_VERSION}${PATCH}" \
     && apt-mark hold libcudnn${M} \
@@ -34,7 +37,7 @@ RUN M="${CUDNN_VERSION%%.*}" \
 
 ENV CUDNN_VERSION ${CUDNN_VERSION}
 
-RUN PATCH="-1+cuda${CUDA_LITE}" && apt-get -y update \
+RUN PATCH="-1+cuda${CUDA_LITE}" && apt-get -y update --allow-insecure-repositories \
     && apt-get install -y --no-install-recommends \
         build-essential \
         python3-dev \
@@ -71,7 +74,9 @@ COPY --from=devel /etc/profile.d/apollo.sh /etc/profile.d/apollo.sh
 COPY --from=devel /etc/ld.so.conf.d/apollo.conf /etc/ld.so.conf.d/apollo.conf
 
 COPY syspkgs.txt /opt/apollo/syspkgs.txt
-RUN apt-get -y update \
+RUN cp -f /etc/apt/sources.list /etc/apt/sources.list.orig \
+    && cp -f /opt/apollo/rcfiles/sources.list.aliyun /etc/apt/sources.list
+RUN apt-get -y update --allow-insecure-repositories \
     && apt-get -y install --no-install-recommends \
         silversearcher-ag \
         $(cat /opt/apollo/syspkgs.txt) \

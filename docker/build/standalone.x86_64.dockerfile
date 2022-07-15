@@ -40,3 +40,14 @@ RUN touch __init__.py && \
     for DIR in $(find cyber modules -type d); do \
       touch $DIR/__init__.py; \
     done
+
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+       apt-get -y install sudo dialog apt-utils
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN sudo apt update \
+    && sudo apt -y install --no-install-recommends python3-tk \
+    && sudo -H python3 -m pip install xlsxwriter \
+    && sudo -H python3 -m pip install websocket-client
