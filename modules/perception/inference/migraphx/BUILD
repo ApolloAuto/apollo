@@ -73,7 +73,7 @@ cc_library(
 
 cc_test(
     name = "mi_net_test",
-    size = "small",
+    size = "medium",
     srcs = ["mi_net_test.cc"],
     data = [
         "//modules/perception/inference:inference_test_data",
