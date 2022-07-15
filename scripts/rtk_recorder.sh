@@ -27,9 +27,13 @@ function setup() {
 }
 
 function start() {
-  TIME="$(date +%F_%H_%M)"
+  TIME="$(date +%F_%H_%M_%S)"
   if [ -f ${TOP_DIR}/data/log/garage.csv ]; then
     cp ${TOP_DIR}/data/log/garage.csv ${TOP_DIR}/data/log/garage-${TIME}.csv
+  fi
+
+  if [ -f ${TOP_DIR}/data/log/rtk_recorder.log ]; then
+    mv ${TOP_DIR}/data/log/rtk_recorder.log ${TOP_DIR}/data/log/rtk_recorder-${TIME}.log
   fi
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"

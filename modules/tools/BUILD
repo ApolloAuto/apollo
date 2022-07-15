@@ -17,6 +17,8 @@ install(
     ],
     rename = {
         "modules/tools/sensor_calibration/extract_data.py": "extract_data",
+        "modules/tools/sensor_calibration/odom_publisher.py": "odom_publisher",
+        "modules/tools/sensor_calibration/ins_stat_publisher.py": "ins_stat_publisher",
         "modules/tools/record_play/rtk_recorder.py": "rtk_recorder",
         "modules/tools/record_play/rtk_player.py": "rtk_player",
         "modules/tools/vehicle_calibration/preprocess.py": "preprocess",

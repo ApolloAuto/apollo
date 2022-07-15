@@ -9,6 +9,7 @@ install(
     ],
     deps = [
         "//modules/v2x/fusion/apps:install",
+        "//modules/v2x/v2x_proxy/app:v2x_binary",
     ],
 )
 

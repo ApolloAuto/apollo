@@ -27,6 +27,11 @@ function setup() {
 }
 
 function start() {
+  TIME="$(date +%F_%H_%M_%S)"
+  if [ -f ${TOP_DIR}/data/log/rtk_player.log ]; then
+    mv ${TOP_DIR}/data/log/rtk_player.log ${TOP_DIR}/data/log/rtk_player-${TIME}.log
+  fi
+
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_player" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
     pkill -SIGKILL -f rtk_player
