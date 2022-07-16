@@ -30,7 +30,7 @@ HIP_RUNTIME_PATH = '%{hip_runtime_path}'
 HIP_RUNTIME_LIBRARY = '%{hip_runtime_library}'
 ROCR_RUNTIME_PATH = '%{rocr_runtime_path}'
 ROCR_RUNTIME_LIBRARY = '%{rocr_runtime_library}'
-VERBOSE = '1'
+VERBOSE = %{crosstool_verbose}
 
 def Log(s):
   print('gpus/crosstool: {0}'.format(s))
@@ -163,7 +163,7 @@ def InvokeHipcc(argv, log=False):
   # 'warning only', even if the '-Werror' option is specified.
   hipccopts = '--include=hip/hip_runtime.h'
 
-  hipccopts += ' -v'
+  if VERBOSE: hipccopts += ' -v'
 
   # Use '-fno-gpu-rdc' by default for early GPU kernel finalization.
   # This flag will trigger GPU kernels to be generated at compile time instead
@@ -186,7 +186,9 @@ def InvokeHipcc(argv, log=False):
            ' -I .' + includes + ' ' + srcs + ' -M -o ' + depfile)
     cmd = HIPCC_ENV.replace(';', ' ') + ' ' + cmd
     if log: Log(cmd)
-    if VERBOSE: print(cmd)
+    if VERBOSE:
+      print('  HIPCC=' + HIPCC_ENV)
+      print(cmd)
     exit_status = os.system(cmd)
     if exit_status != 0:
       return exit_status
@@ -198,7 +200,9 @@ def InvokeHipcc(argv, log=False):
   cmd = HIPCC_ENV.replace(';', ' ') + ' '\
         + cmd
   if log: Log(cmd)
-  if VERBOSE: print(cmd)
+  if VERBOSE:
+    print('  HIPCC=' + HIPCC_ENV)
+    print(cmd)
 
   return system(cmd)
 
@@ -216,7 +220,6 @@ def main():
   if VERBOSE: print('PWD=' + os.getcwd())
 
   if args.x and args.x[0] == 'hip':
-    if VERBOSE: print('HIPCC=' + HIPCC_ENV)
     # Compilation of GPU objects
     if args.rocm_log: Log('-x hip')
     leftover = [pipes.quote(s) for s in leftover]
@@ -224,7 +227,6 @@ def main():
     return InvokeHipcc(leftover, log=args.rocm_log)
 
   elif args.pass_exit_codes:
-    if VERBOSE: print('GCC=' + HIPCC_ENV)
     # Link with hipcc compiler invoked with '-fno-gpu-rdc' by default.
     # Host compiler can be used as a linker,
     # but HIP runtime libraries should be specified.
@@ -238,7 +240,9 @@ def main():
     gpu_linker_flags.append('-l' + HIP_RUNTIME_LIBRARY)
     gpu_linker_flags.append("-lrt")
     gpu_linker_flags.append("-lstdc++")
-    if VERBOSE: print(' '.join([CPU_COMPILER] + gpu_linker_flags))
+    if VERBOSE:
+      print('  LD=')
+      print(' '.join([CPU_COMPILER] + gpu_linker_flags))
     return subprocess.call([CPU_COMPILER] + gpu_linker_flags)
 
   else:
@@ -255,7 +259,9 @@ def main():
     #   Auto enable __HIP_PLATFORM_AMD__ if compiling on AMD platform
     #   Other compiler (GCC,ICC,etc) need to set one of these macros explicitly
     cpu_compiler_flags.append("-D__HIP_PLATFORM_AMD__")
-    if VERBOSE: print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
+    if VERBOSE:
+      print('  GCC=')
+      print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
     return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
 
 if __name__ == '__main__':
