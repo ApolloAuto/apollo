@@ -41,7 +41,7 @@ def GetOptionValue(argv, option):
 
   Args:
     argv: A list of strings, possibly the argv passed to main().
-    option: The option whose value to extract, without the leading '-'.
+    option: The option whose value to extract, with the leading '-'.
 
   Returns:
     A list of values, either directly following the option,
@@ -50,7 +50,8 @@ def GetOptionValue(argv, option):
   """
 
   parser = ArgumentParser()
-  parser.add_argument('-' + option, nargs='*', action='append')
+  parser.add_argument(option, nargs='*', action='append')
+  option = option.lstrip('-').replace('-', '_')
   args, _ = parser.parse_known_args(argv)
   if not args or not vars(args)[option]:
     return []
@@ -119,23 +120,23 @@ def InvokeHipcc(argv, log=False):
   """
 
   host_compiler_options = GetHostCompilerOptions(argv)
-  opt_option = GetOptionValue(argv, 'O')
-  m_options = GetOptionValue(argv, 'm')
+  opt_option = GetOptionValue(argv, '-O')
+  m_options = GetOptionValue(argv, '-m')
   m_options = ''.join([' -m' + m for m in m_options if m in ['32', '64']])
-  include_options = GetOptionValue(argv, 'I')
-  out_file = GetOptionValue(argv, 'o')
-  depfiles = GetOptionValue(argv, 'MF')
-  defines = GetOptionValue(argv, 'D')
+  include_options = GetOptionValue(argv, '-I')
+  out_file = GetOptionValue(argv, '-o')
+  depfiles = GetOptionValue(argv, '-MF')
+  defines = GetOptionValue(argv, '-D')
   defines = ''.join([' -D' + define for define in defines])
-  undefines = GetOptionValue(argv, 'U')
+  undefines = GetOptionValue(argv, '-U')
   undefines = ''.join([' -U' + define for define in undefines])
-  std_options = GetOptionValue(argv, 'std')
+  std_options = GetOptionValue(argv, '-std')
   hipcc_allowed_std_options = ["c++11", "c++14"]
   std_options = ''.join([' -std=' + define
       for define in std_options if define in hipcc_allowed_std_options])
 
   # The list of source files get passed after the -c option.
-  src_files = GetOptionValue(argv, 'c')
+  src_files = GetOptionValue(argv, '-c')
 
   if len(src_files) == 0:
     return 1
@@ -156,22 +157,22 @@ def InvokeHipcc(argv, log=False):
   srcs = ' '.join(src_files)
   out = ' -o ' + out_file[0]
 
-  hipccopts = ' -v'
-
   # We need to make sure that the hip header is included in the sources before
   # any standard math header like <complex>. Otherwise, we get a build error.
   # Also we need to retain warnings about uninitialised shared variables as
   # 'warning only', even if the '-Werror' option is specified.
-  hipccopts += ' --include=hip/hip_runtime.h '
+  hipccopts = '--include=hip/hip_runtime.h'
+
+  hipccopts += ' -v'
 
   # Use '-fno-gpu-rdc' by default for early GPU kernel finalization.
   # This flag will trigger GPU kernels to be generated at compile time instead
   # of link time. This allows the default host compiler (gcc) to be used as the
   # linker for TensorFlow on the ROCm platform.
-  hipccopts += ' -fno-gpu-rdc '
+  hipccopts += ' -fno-gpu-rdc'
 
   # TODO(emankov): [ROCm 5.3] Replace with '-fgpu-flush-denormals-to-zero'
-  hipccopts += ' -fcuda-flush-denormals-to-zero '
+  hipccopts += ' -fcuda-flush-denormals-to-zero'
   hipccopts += undefines
   hipccopts += defines
   hipccopts += std_options
