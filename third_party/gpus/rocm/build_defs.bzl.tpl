@@ -1,5 +1,8 @@
 # Macros for building ROCm code.
 
+def rocm_extra_copts():
+    return %{rocm_extra_copts}
+
 def rocm_header_library(
         name,
         hdrs,

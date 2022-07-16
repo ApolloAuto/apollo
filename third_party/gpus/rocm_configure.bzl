@@ -490,9 +490,10 @@ def _create_dummy_repository(repository_ctx):
     repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
 
 def _compute_rocm_extra_copts(repository_ctx, amdgpu_targets):
-    amdgpu_target_flags = ["--amdgpu-target=" +
-                           amdgpu_target for amdgpu_target in amdgpu_targets]
-    return str(amdgpu_target_flags)
+    copts = []
+    for amdgpu_target in amdgpu_targets:
+        copts.append("--offload-arch=%s" % amdgpu_target)
+    return str(copts)
 
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
@@ -609,6 +610,10 @@ def _create_local_rocm_repository(repository_ctx):
         "rocm/build_defs.bzl",
         tpl_paths["rocm:build_defs.bzl"],
         {
+            "%{rocm_extra_copts}": _compute_rocm_extra_copts(
+                repository_ctx,
+                rocm_config.amdgpu_targets,
+            ),
         },
     )
 

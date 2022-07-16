@@ -165,6 +165,9 @@ def InvokeHipcc(argv, log=False):
 
   if VERBOSE: hipccopts += ' -v'
 
+  for offload in GetOptionValue(argv, '--offload-arch'):
+    hipccopts += ''.join([' --offload-arch=' + offload])
+
   # Use '-fno-gpu-rdc' by default for early GPU kernel finalization.
   # This flag will trigger GPU kernels to be generated at compile time instead
   # of link time. This allows the default host compiler (gcc) to be used as the
@@ -197,8 +200,7 @@ def InvokeHipcc(argv, log=False):
          host_compiler_options + ' -fPIC' +
          ' -I .' + opt + includes + ' -c ' + srcs + out)
 
-  cmd = HIPCC_ENV.replace(';', ' ') + ' '\
-        + cmd
+  cmd = HIPCC_ENV.replace(';', ' ') + ' ' + cmd
   if log: Log(cmd)
   if VERBOSE:
     print('  HIPCC=' + HIPCC_ENV)
