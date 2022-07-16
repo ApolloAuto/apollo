@@ -2,12 +2,19 @@ layer{
   type: "Input"
   name: "input"
   top: "img"
+  top: "im_info"
   input_param{
     shape {
       dim: 1
       dim: 256
       dim: 256
       dim: 3
+    }
+    shape {
+      dim: 1
+      dim: 6
+      dim: 1
+      dim: 1
     }
   }
 }
@@ -2199,8 +2206,430 @@ layer {
   type: "Softmax"
   name:"rpn_cls_prob"
   bottom: "rpn_cls_score_reshape"
-  top: "network_debug"
+  top: "rpn_cls_prob"
   softmax_param {
     axis: 1
+  }
+}
+layer {
+  type: 'Reshape'
+  name: 'rpn_cls_prob_reshape'
+  bottom: 'rpn_cls_prob'
+  top: 'rpn_cls_prob_reshape'
+  reshape_param { shape { dim: 0 dim: 30 dim: -1 dim: 0 } }
+}
+layer{
+  name: "conv_new"
+  type: "Deconvolution"
+  bottom: "res5c"
+  top: "conv_new"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  convolution_param {
+    num_output: 128
+    kernel_size: 4
+    pad: 1
+    stride: 2
+    dilation: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "conv_new_relu"
+  bottom: "conv_new"
+  top: "conv_new"
+}
+layer{
+  name: "conv_left_kx1"
+  type: "Convolution"
+  bottom: "conv_new"
+  top: "conv_left_kx1"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  convolution_param {
+    num_output: 128
+    kernel_h: 9
+    kernel_w: 1
+    pad_h: 4
+    pad_w: 0
+    stride_h: 1
+    stride_w: 1
+    dilation: 1
+    dilation: 1
+    weight_filler {
+      type: "msra"
+      std: 0.010000
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "conv_left_kx1_relu"
+  bottom: "conv_left_kx1"
+  top: "conv_left_kx1"
+}
+layer{
+  name: "conv_left_1xk"
+  type: "Convolution"
+  bottom: "conv_left_kx1"
+  top: "conv_left_1xk"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  convolution_param {
+    num_output: 490
+    kernel_h: 1
+    kernel_w: 9
+    pad_h: 0
+    pad_w: 4
+    stride_h: 1
+    stride_w: 1
+    dilation: 1
+    dilation: 1
+    weight_filler {
+      type: "msra"
+      std: 0.010000
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "conv_left_1xk_relu"
+  bottom: "conv_left_1xk"
+  top: "conv_left_1xk"
+}
+layer{
+  name: "conv_right_1xk"
+  type: "Convolution"
+  bottom: "conv_new"
+  top: "conv_right_1xk"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  convolution_param {
+    num_output: 128
+    kernel_h: 1
+    kernel_w: 9
+    pad_h: 0
+    pad_w: 4
+    stride_h: 1
+    stride_w: 1
+    dilation: 1
+    dilation: 1
+    weight_filler {
+      type: "msra"
+      std: 0.010000
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "conv_right_1xk_relu"
+  bottom: "conv_right_1xk"
+  top: "conv_right_1xk"
+}
+layer{
+  name: "conv_right_kx1"
+  type: "Convolution"
+  bottom: "conv_right_1xk"
+  top: "conv_right_kx1"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  convolution_param {
+    num_output: 490
+    kernel_h: 9
+    kernel_w: 1
+    pad_h: 4
+    pad_w: 0
+    stride_h: 1
+    stride_w: 1
+    dilation: 1
+    dilation: 1
+    weight_filler {
+      type: "msra"
+      std: 0.010000
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "conv_right_kx1_relu"
+  bottom: "conv_right_kx1"
+  top: "conv_right_kx1"
+}
+layer{
+  type: "Eltwise"
+  name: "ft_add_left_right"
+  bottom: "conv_left_1xk"
+  bottom: "conv_right_kx1"
+  top: "ft_add_left_right"
+  eltwise_param{
+    operation: SUM
+  }
+}
+layer {
+  type: 'RPNProposalSSD'
+  name: 'proposal'
+  bottom: 'rpn_cls_prob_reshape'
+  bottom: 'rpn_bbox_pred'
+  bottom: 'im_info'
+  top: 'rois'
+  bbox_reg_param {
+    bbox_mean: 0.000437
+    bbox_mean: 0.002586
+    bbox_mean: -0.123953
+    bbox_mean: -0.081469
+    bbox_std: 0.126770
+    bbox_std: 0.095741
+    bbox_std: 0.317300
+    bbox_std: 0.281042
+  }
+  detection_output_ssd_param {
+    heat_map_a: 8
+    min_size_h: 6.160560
+    min_size_w: 6.160560
+    min_size_mode: HEIGHT_OR_WIDTH
+    threshold_objectness: 0.200000
+    gen_anchor_param {
+      anchor_width: 9.232984
+      anchor_height: 27.726680
+      anchor_width: 16.000000
+      anchor_height: 16.000000
+      anchor_width: 27.712813
+      anchor_height: 9.237604
+      anchor_width: 18.465969
+      anchor_height: 55.453359
+      anchor_width: 32.000000
+      anchor_height: 32.000000
+      anchor_width: 55.425626
+      anchor_height: 18.475209
+      anchor_width: 36.931937
+      anchor_height: 110.906719
+      anchor_width: 64.000000
+      anchor_height: 64.000000
+      anchor_width: 110.851252
+      anchor_height: 36.950417
+      anchor_width: 73.863875
+      anchor_height: 221.813438
+      anchor_width: 128.000000
+      anchor_height: 128.000000
+      anchor_width: 221.702503
+      anchor_height: 73.900834
+      anchor_width: 147.727750
+      anchor_height: 443.626876
+      anchor_width: 256.000000
+      anchor_height: 256.000000
+      anchor_width: 443.405007
+      anchor_height: 147.801669
+    }
+    refine_out_of_map_bbox: true
+    nms_param {
+      overlap_ratio: 0.700000
+      top_n: 300
+      max_candidate_n: 3000
+      use_soft_nms: false
+      voting: false
+      vote_iou: 0.700000
+    }
+  }
+}
+layer {
+  type: 'DFMBPSROIAlign'
+  name: 'psroi_rois'
+  bottom: 'ft_add_left_right'
+  bottom: 'rois'
+  top: 'psroi_rois'
+  dfmb_psroi_pooling_param {
+    heat_map_a: 8
+    output_dim: 10
+    group_height: 7
+    group_width: 7
+    pooled_height: 7
+    pooled_width: 7
+    pad_ratio: 0.000000
+    sample_per_part: 4
+  }
+}
+layer{
+  type: "InnerProduct"
+  name: "inner_rois"
+  bottom: "psroi_rois"
+  top: "inner_rois"
+  param{
+    name: "weight2d_inner_rois"
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    name: "bias2d_inner_rois"
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "msra"
+      value: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "ReLU"
+  name: "inner_rois_relu"
+  bottom: "inner_rois"
+  top: "inner_rois"
+}
+layer{
+  type: "InnerProduct"
+  name: "inner_cls_score_rois"
+  bottom: "inner_rois"
+  top: "cls_score"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  inner_product_param {
+    num_output: 4
+    weight_filler {
+      type: "msra"
+      value: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer{
+  type: "InnerProduct"
+  name: "inner_bbox_pred_rois"
+  bottom: "inner_rois"
+  top: "bbox_pred"
+  param{
+    lr_mult: 1.000000
+    decay_mult: 1.000000
+  }
+  param {
+    lr_mult: 2.000000
+    decay_mult: 0.000000
+  }
+  inner_product_param {
+    num_output: 16
+    weight_filler {
+      type: "msra"
+      value: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.000000
+    }
+  }
+}
+layer {
+  type: "Softmax"
+  name:"cls_score_softmax"
+  bottom: "cls_score"
+  top: "cls_score_softmax"
+  softmax_param {
+    axis: 2 # if use CaffeNet, change to 1
+  }
+}
+layer {
+  type: 'RCNNProposal'
+  name: 'rcnn_proposal'
+  bottom: 'cls_score_softmax'
+  bottom: 'bbox_pred'
+  bottom: 'rois'
+  bottom: 'im_info'
+  top: 'bboxes'
+  bbox_reg_param {
+    bbox_mean: 0.000000
+    bbox_mean: 0.000000
+    bbox_mean: 0.000000
+    bbox_mean: 0.000000
+    bbox_std: 0.100000
+    bbox_std: 0.100000
+    bbox_std: 0.200000
+    bbox_std: 0.200000
+  }
+  detection_output_ssd_param {
+    num_class: 3
+    rpn_proposal_output_score: true
+    regress_agnostic: false
+    min_size_h: 8.800800
+    min_size_w: 8.800800
+    min_size_mode: HEIGHT_OR_WIDTH
+    threshold_objectness: 0.100000
+    threshold: 0.100000
+    threshold: 0.100000
+    threshold: 0.100000
+    refine_out_of_map_bbox: true
+    nms_param {
+      overlap_ratio: 0.500000
+      top_n: 5
+      max_candidate_n: 300
+      use_soft_nms: false
+      voting: false
+      vote_iou: 0.600000
+    }
   }
 }
