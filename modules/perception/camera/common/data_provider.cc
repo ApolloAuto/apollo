@@ -16,6 +16,7 @@
 #include "modules/perception/camera/common/data_provider.h"
 
 #include "cyber/common/log.h"
+#include "modules/perception/camera/common/image_data_operations.h"
 
 namespace apollo {
 namespace perception {
@@ -227,29 +228,7 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   if (!GetImage(options, &image)) {
     return false;
   }
-
-  NppiSize roi;
-  roi.height = image.rows();
-  roi.width = image.cols();
-  blob->Reshape({1, roi.height, roi.width, image.channels()});
-  if (image.channels() == 1) {
-#if GPU_PLATFORM == NVIDIA
-    nppiCopy_8u_C1R(image.gpu_data(), image.width_step(),
-                    blob->mutable_gpu_data(),
-                    blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
-#elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP API
-    (void) roi;
-#endif
-  } else {
-#if GPU_PLATFORM == NVIDIA
-    nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
-                    blob->mutable_gpu_data(),
-                    blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
-#elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP API
-#endif
-  }
+  imageToBlob(image, blob);
   return true;
 }
 
@@ -291,31 +270,13 @@ bool DataProvider::GetImage(const DataProvider::ImageOptions &options,
 
 bool DataProvider::to_gray_image() {
   if (!gray_ready_) {
-    NppiSize roi;
-    roi.height = src_height_;
-    roi.width = src_width_;
     if (bgr_ready_) {
-      Npp32f coeffs[] = {0.114f, 0.587f, 0.299f};
-#if GPU_PLATFORM == NVIDIA
-      nppiColorToGray_8u_C3C1R(bgr_->gpu_data(), bgr_->width_step(),
-                               gray_->mutable_gpu_data(), gray_->width_step(),
-                               roi, coeffs);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-      (void) roi;
-      (void) coeffs;
-#endif
+      float coeffs[] = {0.114f, 0.587f, 0.299f};
+      imageToGray(bgr_, gray_, src_width_, src_height_, coeffs);
       gray_ready_ = true;
     } else if (rgb_ready_) {
-      Npp32f coeffs[] = {0.299f, 0.587f, 0.114f};
-#if GPU_PLATFORM == NVIDIA
-      nppiColorToGray_8u_C3C1R(rgb_->gpu_data(), rgb_->width_step(),
-                               gray_->mutable_gpu_data(), gray_->width_step(),
-                               roi, coeffs);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-      (void)coeffs;
-#endif
+      float coeffs[] = {0.299f, 0.587f, 0.114f};
+      imageToGray(bgr_, gray_, src_width_, src_height_, coeffs);
       gray_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -327,29 +288,13 @@ bool DataProvider::to_gray_image() {
 
 bool DataProvider::to_rgb_image() {
   if (!rgb_ready_) {
-    NppiSize roi;
-    roi.height = src_height_;
-    roi.width = src_width_;
     if (bgr_ready_) {
       // BGR2RGB takes less than 0.010ms on K2200
       const int order[] = {2, 1, 0};
-#if GPU_PLATFORM == NVIDIA
-      nppiSwapChannels_8u_C3R(bgr_->gpu_data(), bgr_->width_step(),
-                              rgb_->mutable_gpu_data(), rgb_->width_step(), roi,
-                              order);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-      (void) roi;
-      (void) order;
-#endif
+      swapImageChannels(bgr_, rgb_, src_width_, src_height_, order);
       rgb_ready_ = true;
     } else if (gray_ready_) {
-#if GPU_PLATFORM == NVIDIA
-      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
-                       rgb_->mutable_gpu_data(), rgb_->width_step(), roi);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-#endif
+      dupImageChannels(gray_, rgb_, src_width_, src_height_);
       rgb_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -361,28 +306,12 @@ bool DataProvider::to_rgb_image() {
 
 bool DataProvider::to_bgr_image() {
   if (!bgr_ready_) {
-    NppiSize roi;
-    roi.height = src_height_;
-    roi.width = src_width_;
     if (rgb_ready_) {
       const int order[] = {2, 1, 0};
-#if GPU_PLATFORM == NVIDIA
-      nppiSwapChannels_8u_C3R(rgb_->gpu_data(), rgb_->width_step(),
-                              bgr_->mutable_gpu_data(), bgr_->width_step(), roi,
-                              order);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-      (void) roi;
-      (void) order;
-#endif
+      swapImageChannels(bgr_, rgb_, src_width_, src_height_, order);
       bgr_ready_ = true;
     } else if (gray_ready_) {
-#if GPU_PLATFORM == NVIDIA
-      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
-                       bgr_->mutable_gpu_data(), bgr_->width_step(), roi);
-#elif GPU_PLATFORM == AMD
-      // TODO(B1tway): Add necesssary RPP API
-#endif
+      dupImageChannels(gray_, bgr_, src_width_, src_height_);
       bgr_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";

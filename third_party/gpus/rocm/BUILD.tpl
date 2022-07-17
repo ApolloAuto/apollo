@@ -192,6 +192,10 @@ cc_library(
         "-L/opt/rocm/rpp/lib",
         "-lamd_rpp",
     ],
+    defines = [
+        "GPU_SUPPORT",
+        "RPP_BACKEND_HIP",
+    ],
 )
 
 bzl_library(
