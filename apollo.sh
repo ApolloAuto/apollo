@@ -88,7 +88,6 @@ function apollo_env_setup() {
     info "${TAB}USE_GPU_HOST:      ${GREEN}${USE_GPU_HOST}${NO_COLOR}"
     info "${TAB}USE_GPU_TARGET:    ${GREEN}${USE_GPU_TARGET}${NO_COLOR}"
     info "${TAB}GPU_PLATFORM:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
-    info "${TAB}CROSSTOOL_VERBOSE: ${GREEN}${CROSSTOOL_VERBOSE}${NO_COLOR}"
 
     if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
         source "${TOP_DIR}/cyber/setup.bash"
