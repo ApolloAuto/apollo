@@ -48,6 +48,7 @@ NVCC_PATH = '%{nvcc_path}'
 PREFIX_DIR = os.path.dirname(GCC_HOST_COMPILER_PATH)
 NVCC_VERSION = '%{cuda_version}'
 VERBOSE = %{crosstool_verbose}
+NVCC_VERBOSE = %{nvcc_verbose}
 
 def Log(s):
   print('gpus/crosstool: {0}'.format(s))
@@ -216,7 +217,10 @@ def InvokeNvcc(argv, log=False):
   srcs = ' '.join(src_files)
   out = ' -o ' + out_file[0]
 
-  nvccopts = '-v -D_FORCE_INLINES '
+  nvccopts = '-D_FORCE_INLINES '
+  if VERBOSE or NVCC_VERBOSE:
+    nvccopts += '-v '
+
   for capability in GetOptionValue(argv, "--cuda-gpu-arch"):
     capability = capability[len('sm_'):]
     nvccopts += r'-gencode=arch=compute_%s,\"code=sm_%s\" ' % (capability,
@@ -242,7 +246,7 @@ def InvokeNvcc(argv, log=False):
            ' -I .' +
            ' -x cu ' + opt + includes + ' ' + srcs + ' -M -o ' + depfile)
     if log: Log(cmd)
-    if VERBOSE:
+    if VERBOSE or NVCC_VERBOSE:
       print('  NVCC=')
       print(cmd)
     exit_status = system(cmd)
@@ -259,7 +263,7 @@ def InvokeNvcc(argv, log=False):
   # Need to investigate and fix.
   cmd = 'PATH=' + PREFIX_DIR + ':$PATH ' + cmd
   if log: Log(cmd)
-  if VERBOSE:
+  if VERBOSE or NVCC_VERBOSE:
     print('  NVCC=')
     print(cmd)
   return system(cmd)
