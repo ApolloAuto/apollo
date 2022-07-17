@@ -317,6 +317,17 @@ def _crosstool_verbose(repository_ctx):
     """
     return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
 
+def _nvcc_verbose(repository_ctx):
+    """Returns the environment variable value NVCC_VERBOSE.
+
+    Args:
+        repository_ctx: The repository context.
+
+    Returns:
+        A string containing value of environment variable NVCC_VERBOSE.
+    """
+    return get_host_environ(repository_ctx, "NVCC_VERBOSE", "0")
+
 def lib_name(base_name, cpu_value, version = None, static = False):
     """Constructs the platform-specific name of a library.
 
@@ -1056,6 +1067,7 @@ def _create_local_cuda_repository(repository_ctx):
             "%{nvcc_path}": nvcc_path,
             "%{gcc_host_compiler_path}": str(cc),
             "%{crosstool_verbose}": _crosstool_verbose(repository_ctx),
+            "%{nvcc_verbose}": _nvcc_verbose(repository_ctx),
         }
         repository_ctx.template(
             "crosstool/clang/bin/crosstool_wrapper_driver_is_not_gcc",
