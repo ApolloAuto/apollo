@@ -29,6 +29,10 @@ CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
 
+: ${CROSSTOOL_VERBOSE:=0}
+: ${NVCC_VERBOSE:=0}
+: ${HIPCC_VERBOSE:=0}
+
 : ${USE_ESD_CAN:=false}
 USE_GPU=-1
 
@@ -669,20 +673,26 @@ function run_bazel() {
   # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
   local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
 
-  local sp=""
-  local spaces=""
+  local sp="    "
+  local spaces="    "
   local count=$(nproc)
   if [ "$1" == "Coverage" ]; then
     count="$(($(nproc) / 2))"
-    spaces="   "
+    spaces="       "
   elif [ "$1" == "Test" ]; then
-    sp=" "
+    sp="     "
   fi
 
   info "${BLUE}$1 Overview:${NO_COLOR}"
   info "${TAB}USE_GPU:       ${spaces}${GREEN}${USE_GPU}${NO_COLOR}  [ 0 for CPU, 1 for GPU ]"
   if [ "${USE_GPU}" -eq 1 ]; then
     info "${TAB}GPU arch:      ${spaces}${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+    info "${TAB}CROSSTOOL_VERBOSE: ${GREEN}${CROSSTOOL_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for verbose]"
+    if [ "$GPU_PLATFORM" == "AMD" ]; then
+        info "${TAB}HIPCC_VERBOSE: ${spaces}${GREEN}${HIPCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for cmd, 2 for env, 4 for args, 3,5,6,7 for combinations of 1,2,4]"
+    elif [ "$GPU_PLATFORM" == "NVIDIA" ]; then
+        info "${TAB}NVCC_VERBOSE:  ${spaces}${GREEN}${NVCC_VERBOSE}${NO_COLOR}  [ 0 for no verbose, 1 for verbose]"
+    fi
   else
     info "${TAB}CPU arch:      ${spaces}${GREEN}${ARCH}${NO_COLOR}"
   fi
