@@ -31,6 +31,7 @@ cc_library(
     hdrs = ["data_provider.h"],
     deps = [
         ":undistortion_handler",
+        ":image_data_operations",
         "//modules/perception/base",
     ] + if_cuda([
         "@npp"
@@ -87,10 +88,24 @@ cc_library(
     srcs = ["undistortion_handler.cc"],
     hdrs = ["undistortion_handler.h"],
     deps = [
+        ":image_data_operations",
         "//modules/perception/base",
         "//modules/perception/base:blob",
         "//modules/perception/common/sensor_manager",
     ],
+)
+
+cc_library(
+    name = "image_data_operations",
+    srcs = ["image_data_operations.cc"],
+    hdrs = ["image_data_operations.h"],
+    deps = [
+        "//modules/perception/base",
+    ] + if_cuda([
+        "@npp"
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rpp"
+    ]),
 )
 
 cc_library(

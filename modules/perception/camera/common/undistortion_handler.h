@@ -22,21 +22,6 @@
 #include "modules/perception/base/image.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
-#if GPU_PLATFORM == NVIDIA
-  #include <npp.h>
-  #include <nppi.h>
-#elif GPU_PLATFORM == AMD
-  #include <rpp.h>
-  #include <rppi.h>
-  #define NppiSize RppiSize
-  #define Npp32f Rpp32f
-  #define NppiInterpolationMode RpptInterpolationType
-  #define NPPI_INTER_LINEAR RpptInterpolationType::BILINEAR
-  #define NppiRect RppiRect
-  #define NppStatus RppStatus
-  #define NPP_SUCCESS RPP_SUCCESS
-#endif
-
 namespace apollo {
 namespace perception {
 namespace camera {
