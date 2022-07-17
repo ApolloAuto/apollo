@@ -22,14 +22,14 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool imageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob);
-bool imageToGray(const base::Image8UPtr &src, base::Image8UPtr &dst,
+bool imageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob);
+bool imageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
                  const int src_width, const int src_height,
                  const float coeffs[3]);
-bool swapImageChannels(const base::Image8UPtr &src, base::Image8UPtr &dst,
+bool swapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                        const int src_width, const int src_height,
                        const int order[3]);
-bool dupImageChannels(const base::Image8UPtr &src, base::Image8UPtr &dst,
+bool dupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                       const int src_width, const int src_height);
 
 bool imageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
