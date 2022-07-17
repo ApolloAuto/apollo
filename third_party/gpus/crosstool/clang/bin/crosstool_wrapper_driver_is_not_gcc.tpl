@@ -47,6 +47,7 @@ GCC_HOST_COMPILER_PATH = ('%{gcc_host_compiler_path}')
 NVCC_PATH = '%{nvcc_path}'
 PREFIX_DIR = os.path.dirname(GCC_HOST_COMPILER_PATH)
 NVCC_VERSION = '%{cuda_version}'
+VERBOSE = %{crosstool_verbose}
 
 def Log(s):
   print('gpus/crosstool: {0}'.format(s))
@@ -241,6 +242,9 @@ def InvokeNvcc(argv, log=False):
            ' -I .' +
            ' -x cu ' + opt + includes + ' ' + srcs + ' -M -o ' + depfile)
     if log: Log(cmd)
+    if VERBOSE:
+      print('  NVCC=')
+      print(cmd)
     exit_status = system(cmd)
     if exit_status != 0:
       return exit_status
@@ -255,6 +259,9 @@ def InvokeNvcc(argv, log=False):
   # Need to investigate and fix.
   cmd = 'PATH=' + PREFIX_DIR + ':$PATH ' + cmd
   if log: Log(cmd)
+  if VERBOSE:
+    print('  NVCC=')
+    print(cmd)
   return system(cmd)
 
 
@@ -278,6 +285,9 @@ def main():
   cpu_compiler_flags = [flag for flag in sys.argv[1:]
                              if not flag.startswith(('--cuda_log'))]
 
+  if VERBOSE:
+    print('  GCC=')
+    print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
   return subprocess.call([CPU_COMPILER] + cpu_compiler_flags)
 
 if __name__ == '__main__':
