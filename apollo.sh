@@ -77,17 +77,18 @@ function apollo_env_setup() {
     # Add more here ...
 
     info "${BLUE}Apollo Environment Settings:${NO_COLOR}"
-    info "${TAB}APOLLO_ROOT_DIR:  ${GREEN}${APOLLO_ROOT_DIR}${NO_COLOR}"
-    info "${TAB}APOLLO_CACHE_DIR: ${GREEN}${APOLLO_CACHE_DIR}${NO_COLOR}"
-    info "${TAB}APOLLO_IN_DOCKER: ${GREEN}${APOLLO_IN_DOCKER}${NO_COLOR}"
-    info "${TAB}APOLLO_VERSION:   ${GREEN}${APOLLO_VERSION}${NO_COLOR}"
+    info "${TAB}APOLLO_ROOT_DIR:   ${GREEN}${APOLLO_ROOT_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_CACHE_DIR:  ${GREEN}${APOLLO_CACHE_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_IN_DOCKER:  ${GREEN}${APOLLO_IN_DOCKER}${NO_COLOR}"
+    info "${TAB}APOLLO_VERSION:    ${GREEN}${APOLLO_VERSION}${NO_COLOR}"
     if "${APOLLO_IN_DOCKER}"; then
-        info "${TAB}DOCKER_IMG:       ${GREEN}${DOCKER_IMG##*:}${NO_COLOR}"
+        info "${TAB}DOCKER_IMG:        ${GREEN}${DOCKER_IMG##*:}${NO_COLOR}"
     fi
-    info "${TAB}APOLLO_ENV:       ${GREEN}${APOLLO_ENV}${NO_COLOR}"
-    info "${TAB}USE_GPU_HOST:     ${GREEN}${USE_GPU_HOST}${NO_COLOR}"
-    info "${TAB}USE_GPU_TARGET:   ${GREEN}${USE_GPU_TARGET}${NO_COLOR}"
-    info "${TAB}GPU_PLATFORM:     ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+    info "${TAB}APOLLO_ENV:        ${GREEN}${APOLLO_ENV}${NO_COLOR}"
+    info "${TAB}USE_GPU_HOST:      ${GREEN}${USE_GPU_HOST}${NO_COLOR}"
+    info "${TAB}USE_GPU_TARGET:    ${GREEN}${USE_GPU_TARGET}${NO_COLOR}"
+    info "${TAB}GPU_PLATFORM:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
+    info "${TAB}CROSSTOOL_VERBOSE: ${GREEN}${CROSSTOOL_VERBOSE}${NO_COLOR}"
 
     if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
         source "${TOP_DIR}/cyber/setup.bash"

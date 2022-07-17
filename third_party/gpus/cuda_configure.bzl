@@ -306,6 +306,17 @@ def compute_capabilities(repository_ctx):
 
     return capabilities
 
+def _crosstool_verbose(repository_ctx):
+    """Returns the environment variable value CROSSTOOL_VERBOSE.
+
+    Args:
+        repository_ctx: The repository context.
+
+    Returns:
+        A string containing value of environment variable CROSSTOOL_VERBOSE.
+    """
+    return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
+
 def lib_name(base_name, cpu_value, version = None, static = False):
     """Constructs the platform-specific name of a library.
 
@@ -1044,6 +1055,7 @@ def _create_local_cuda_repository(repository_ctx):
             "%{cuda_version}": cuda_config.cuda_version,
             "%{nvcc_path}": nvcc_path,
             "%{gcc_host_compiler_path}": str(cc),
+            "%{crosstool_verbose}": _crosstool_verbose(repository_ctx),
         }
         repository_ctx.template(
             "crosstool/clang/bin/crosstool_wrapper_driver_is_not_gcc",
