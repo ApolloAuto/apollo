@@ -14,7 +14,6 @@ cc_binary(
         "module_controller.h",
     ],
     linkopts = ["-pthread"],
-    linkstatic = False,
     deps = [
         "//cyber:cyber_core",
         "//cyber/proto:dag_conf_cc_proto",

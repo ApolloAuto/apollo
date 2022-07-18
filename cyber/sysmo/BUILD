@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_sysmo_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_test(
     name = "sysmo_test",
     size = "small",

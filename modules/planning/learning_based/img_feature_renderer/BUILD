@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["birdview_img_feature_renderer.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//cyber/common",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",

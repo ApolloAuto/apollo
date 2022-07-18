@@ -49,7 +49,7 @@ cc_library(
         ":common",
         ":syncedmem",
         "//cyber",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@local_config_cuda//cuda:cuda_headers",
     ],
 )

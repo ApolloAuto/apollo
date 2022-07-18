@@ -22,8 +22,7 @@ cc_binary(
     name = "map_tool",
     srcs = ["map_tool.cc"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_cc_proto",
@@ -46,8 +45,7 @@ cc_binary(
     name = "refresh_default_end_way_point",
     srcs = ["refresh_default_end_way_point.cc"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/proto:poi_cc_proto",
         "//modules/routing/proto:routing_cc_proto",
@@ -58,15 +56,14 @@ cc_binary(
     name = "sim_map_generator",
     srcs = ["sim_map_generator.cc"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/util:points_downsampler",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_cc_proto",
         "@com_github_gflags_gflags//:gflags",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -74,8 +71,7 @@ cc_binary(
     name = "proto_map_generator",
     srcs = ["proto_map_generator.cc"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_cc_proto",
@@ -87,8 +83,7 @@ cc_binary(
     name = "bin_map_generator",
     srcs = ["bin_map_generator.cc"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/proto:map_cc_proto",
         "@com_github_gflags_gflags//:gflags",

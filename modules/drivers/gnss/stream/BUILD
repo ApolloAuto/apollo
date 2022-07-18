@@ -48,7 +48,7 @@ cc_library(
         "//modules/drivers/gnss/proto:heading_cc_proto",
         "//modules/drivers/gnss/proto:imu_cc_proto",
         "//modules/drivers/gnss/util:gnss_util",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

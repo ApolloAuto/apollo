@@ -15,7 +15,7 @@ cc_binary(
     deps = [
         "//modules/prediction/common:message_process",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -27,7 +27,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/math:linear_interpolation",
         "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",

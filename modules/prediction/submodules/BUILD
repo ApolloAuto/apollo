@@ -24,7 +24,6 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_cc_proto",
         "//modules/perception/proto:perception_obstacle_cc_proto",
@@ -49,7 +48,6 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_cc_proto",
         "//modules/common/util:message_util",

@@ -14,7 +14,7 @@ cc_library(
     deps = [
         ":coordinate_convert_tool",
         ":proto_organizer",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/hdmap/adapter/xml_parser",
     ],
 )
@@ -35,12 +35,12 @@ cc_library(
     srcs = ["proto_organizer.cc"],
     hdrs = ["proto_organizer.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/map/hdmap/adapter/xml_parser:common_define",
         "//modules/map/proto:map_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

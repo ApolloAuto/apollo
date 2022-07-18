@@ -17,7 +17,7 @@ cc_library(
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
         ":dual_variable_warm_start_slack_osqp_interface",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util:perf_util",
     ],
 )
@@ -104,7 +104,7 @@ cc_library(
         ":distance_approach_ipopt_interface",
         ":distance_approach_ipopt_relax_end_interface",
         ":distance_approach_ipopt_relax_end_slack_interface",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_cc_proto",
@@ -120,7 +120,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -142,7 +142,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -164,7 +164,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -186,7 +186,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -208,7 +208,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -230,7 +230,7 @@ cc_library(
     ],
     copts = PLANNING_FOPENMP,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
@@ -278,7 +278,7 @@ cc_test(
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_interface",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -291,7 +291,7 @@ cc_test(
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_ipopt_cuda_interface",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )
@@ -304,7 +304,7 @@ cc_test(
     linkopts = ["-lgomp"],
     deps = [
         ":distance_approach_problem",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
 )

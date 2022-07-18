@@ -8,7 +8,7 @@ cc_library(
     srcs = ["vehicle_state_provider.cc"],
     hdrs = ["vehicle_state_provider.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",

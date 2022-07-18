@@ -8,8 +8,7 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        "//cyber/common:log",
-        "//cyber/common:types",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:geometry",
@@ -22,10 +21,7 @@ cc_library(
     name = "future",
     hdrs = ["future.h"],
     deps = [
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/types:optional",
-        "@com_google_absl//absl/utility",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -65,7 +61,7 @@ cc_library(
     hdrs = ["string_util.h"],
     deps = [
         ":future",
-        "@com_google_absl//absl/strings:str_format",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -73,9 +69,8 @@ cc_library(
     name = "message_util",
     hdrs = ["message_util.h"],
     deps = [
-        "//cyber/common:file",
-        "//cyber/time:clock",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "@com_google_absl//:absl",
         "@com_google_protobuf//:protobuf",
     ],
 )
@@ -108,7 +103,7 @@ cc_library(
     name = "time_util",
     hdrs = ["time_util.h"],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
     ],
 )
 
@@ -134,7 +129,7 @@ cc_library(
     name = "factory",
     hdrs = ["factory.h"],
     deps = [
-        "//cyber/common",
+        "//cyber",
     ],
 )
 
@@ -162,7 +157,7 @@ cc_library(
     name = "points_downsampler",
     hdrs = ["points_downsampler.h"],
     deps = [
-        "//cyber/common",
+        "//cyber",
         "//modules/common/math:geometry",
     ],
 )
@@ -182,7 +177,7 @@ cc_library(
     srcs = ["json_util.cc"],
     hdrs = ["json_util.h"],
     deps = [
-        "//cyber/common",
+        "//cyber",
         "@com_github_nlohmann_json//:json",
         "@com_google_protobuf//:protobuf",
     ],
@@ -210,10 +205,8 @@ cc_library(
     srcs = ["perf_util.cc"],
     hdrs = ["perf_util.h"],
     deps = [
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "//cyber/time",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "@com_google_absl//:absl",
     ],
 )
 

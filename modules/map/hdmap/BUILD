@@ -20,8 +20,7 @@ cc_library(
     ],
     copts = MAP_COPTS,
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
@@ -29,7 +28,7 @@ cc_library(
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_cc_proto",
         "//modules/map/relative_map/proto:navigation_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@com_github_google_glog//:glog",
     ],
 )
@@ -41,10 +40,10 @@ cc_library(
     copts = MAP_COPTS,
     deps = [
         ":hdmap",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/map/relative_map/proto:navigation_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -69,7 +68,7 @@ cc_test(
     ],
     deps = [
         ":hdmap",
-        "//cyber/common:file",
+        "//cyber",
         "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],

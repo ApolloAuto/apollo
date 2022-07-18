@@ -31,8 +31,7 @@ cc_library(
         "protocol_data.h",
     ],
     deps = [
-        "//cyber/common:log",
-        "//cyber/time",
+        "//cyber",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/drivers/canbus/common:canbus_common",
     ],

@@ -32,8 +32,7 @@ cc_library(
     hdrs = ["monitor_manager.h"],
     copts = MONITOR_COPTS,
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",

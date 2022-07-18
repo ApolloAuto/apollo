@@ -40,8 +40,8 @@ cc_library(
     hdrs = ["vec2d.h"],
     linkopts = ["-lm"],
     deps = [
-        "//cyber/common:log",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -63,9 +63,9 @@ cc_library(
     linkopts = ["-lm"],
     deps = [
         ":math_utils",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util:string_util",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@osqp",
     ],
 )
@@ -119,7 +119,7 @@ cc_library(
     srcs = ["matrix_operations.cc"],
     hdrs = ["matrix_operations.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -139,7 +139,7 @@ cc_library(
     name = "kalman_filter",
     hdrs = ["kalman_filter.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -165,7 +165,7 @@ cc_library(
     srcs = ["mpc_osqp.cc"],
     hdrs = ["mpc_osqp.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "@eigen",
         "@osqp",
     ],
@@ -205,7 +205,7 @@ cc_library(
     srcs = ["integral.cc"],
     hdrs = ["integral.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
     ],
 )
 
@@ -214,7 +214,7 @@ cc_library(
     srcs = ["linear_quadratic_regulator.cc"],
     hdrs = ["linear_quadratic_regulator.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -225,7 +225,7 @@ cc_library(
     hdrs = ["cartesian_frenet_conversion.h"],
     deps = [
         ":geometry",
-        "//cyber/common:log",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -234,7 +234,7 @@ cc_library(
     name = "hermite_spline",
     hdrs = ["hermite_spline.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
     ],
 )
 
@@ -244,7 +244,7 @@ cc_test(
     srcs = ["mpc_osqp_test.cc"],
     deps = [
         ":mpc_osqp",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -265,7 +265,7 @@ cc_test(
     srcs = ["linear_interpolation_test.cc"],
     deps = [
         ":linear_interpolation",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
         "@eigen",
     ],

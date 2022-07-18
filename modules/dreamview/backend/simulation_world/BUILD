@@ -37,7 +37,7 @@ cc_library(
         "//modules/storytelling/proto:story_cc_proto",
         "//modules/task_manager/proto:task_manager_cc_proto",
         "@com_github_nlohmann_json//:json",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_io_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_library(
     name = "io",
     deps = [
@@ -11,6 +18,7 @@ cc_library(
         ":poller",
         ":session",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -63,6 +71,7 @@ cc_library(
         ":poll_handler",
         "//cyber/common:log",
     ],
+    alwayslink = True,
 )
 
 cc_binary(

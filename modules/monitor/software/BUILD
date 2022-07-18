@@ -26,11 +26,11 @@ cc_library(
     copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
-        "//cyber/service_discovery:node_manager",
+        "//cyber",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -41,12 +41,12 @@ cc_library(
     copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/drivers/proto:sensor_image_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_library(
         "//modules/perception/proto:perception_obstacle_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
         "//modules/prediction/proto:prediction_obstacle_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -109,7 +109,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

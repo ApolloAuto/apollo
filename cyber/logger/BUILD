@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_logger_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_library(
     name = "logger",
     srcs = ["logger.cc"],
@@ -11,6 +18,7 @@ cc_library(
         "//cyber/common",
         "//cyber/logger:log_file_object",
     ],
+    alwayslink =True,
 )
 
 cc_test(

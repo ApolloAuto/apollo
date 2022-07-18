@@ -8,7 +8,7 @@ cc_library(
     srcs = ["denseline_lane_detector.cc"],
     hdrs = ["denseline_lane_detector.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",

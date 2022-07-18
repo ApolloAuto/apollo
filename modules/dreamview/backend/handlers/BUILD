@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["websocket_handler.h"],
     copts = DREAMVIEW_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util:map_util",
         "@civetweb//:civetweb++",
         "@com_github_nlohmann_json//:json",

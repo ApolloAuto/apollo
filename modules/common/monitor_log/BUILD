@@ -8,7 +8,7 @@ cc_library(
     deps = [
         ":monitor_log_buffer",
         ":monitor_logger",
-        "//cyber/common:log",
+        "//cyber",
     ],
 )
 
@@ -20,7 +20,7 @@ cc_library(
         "//cyber",
         "//modules/common/monitor_log/proto:monitor_log_cc_proto",
         "//modules/common/util:message_util",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

@@ -38,7 +38,7 @@ cc_library(
     deps = [
         ":dp_st_cost",
         ":st_graph_point",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/proto:geometry_cc_proto",

@@ -53,7 +53,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@opencv//:imgcodecs",
         "@opencv//:imgproc",
         "@opencv//:highgui",

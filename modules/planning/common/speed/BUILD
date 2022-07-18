@@ -21,7 +21,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":st_point",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_cc_proto",
         "@com_google_googletest//:gtest",
@@ -35,7 +35,7 @@ cc_test(
     copts = PLANNING_COPTS,
     deps = [
         ":st_boundary",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

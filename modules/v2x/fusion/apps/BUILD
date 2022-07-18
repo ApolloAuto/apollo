@@ -19,7 +19,7 @@ cc_library(
         "-DMODULE_NAME=\\\"v2x_fusion\\\"",
     ],
     deps = [
-        "//cyber/component",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/v2x/fusion/apps/common:trans_tools",
         "//modules/v2x/fusion/configs:ft_config_manager",

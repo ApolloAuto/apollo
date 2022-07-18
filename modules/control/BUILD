@@ -11,7 +11,6 @@ cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",

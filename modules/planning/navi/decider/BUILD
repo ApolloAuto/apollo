@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["navi_task.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -29,7 +29,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
@@ -56,7 +56,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",
@@ -77,7 +77,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":navi_task",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/math:path_matcher",

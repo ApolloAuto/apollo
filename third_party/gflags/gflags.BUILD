@@ -6,10 +6,10 @@ package(default_visibility = ["//visibility:public"])
 
 
 cc_library(
-    name = "glog",
+    name = "gflags",
     includes = ["."],
     linkopts = [
         "-L/usr/local/lib/",
-        "-lglog",
+        "-lgflags",
     ],
 )

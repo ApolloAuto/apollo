@@ -32,6 +32,7 @@ install(
     deps = [
         "//cyber/examples/common_component_example:install",
         "//cyber/examples/timer_component_example:install",
+        "//cyber/examples/proto:cyber_examples_proto_hdrs",
     ],
 )
 

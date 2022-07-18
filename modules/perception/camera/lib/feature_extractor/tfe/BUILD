@@ -8,7 +8,7 @@ cc_library(
     srcs = ["external_feature_extractor.cc"],
     hdrs = ["external_feature_extractor.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/interface",
@@ -24,7 +24,7 @@ cc_library(
     srcs = ["project_feature.cc"],
     hdrs = ["project_feature.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/interface",
@@ -39,7 +39,7 @@ cc_library(
     srcs = ["tracking_feat_extractor.cc"],
     hdrs = ["tracking_feat_extractor.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",

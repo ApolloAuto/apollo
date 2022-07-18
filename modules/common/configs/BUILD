@@ -24,8 +24,7 @@ cc_library(
     ],
     deps = [
         ":config_gflags",
-        "//cyber/common:file",
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_cc_proto",

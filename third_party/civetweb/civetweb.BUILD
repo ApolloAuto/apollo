@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 
 licenses(["notice"])
 
@@ -26,19 +26,42 @@ cc_library(
         "-ldl",
     ],
     visibility = ["//visibility:public"],
+    alwayslink = True,
 )
 
-# The C++ wrapper for civetweb.
-cc_library(
-    name = "civetweb++",
+cc_binary(
+    name = "libcivetweb++.so",
     srcs = [
         "src/CivetServer.cpp",
-    ],
-    hdrs = [
         "include/CivetServer.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":civetweb",
     ],
+    linkshared = True,
+    linkstatic = True,
+)
+
+# The C++ wrapper for civetweb.
+cc_library(
+    name = "civetweb++",
+    srcs = [
+        "libcivetweb++.so",
+    ],
+    hdrs = [
+        "include/CivetServer.h",
+    ],
+    includes = [
+        "include",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "civetweb_hdrs",
+    srcs = glob([
+        "include/*.h",
+    ]),
+    visibility = ["//visibility:public"],
 )

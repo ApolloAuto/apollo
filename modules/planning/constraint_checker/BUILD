@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["constraint_checker.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
@@ -24,7 +24,7 @@ cc_library(
     hdrs = ["constraint_checker1d.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
@@ -38,7 +38,7 @@ cc_library(
     hdrs = ["collision_checker.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math:geometry",
         "//modules/common/math:path_matcher",

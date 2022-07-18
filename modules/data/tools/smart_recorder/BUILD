@@ -20,8 +20,7 @@ cc_library(
     deps = [
         ":channel_pool",
         ":record_processor",
-        "//cyber/record:record_reader",
-        "//cyber/record:record_viewer",
+        "//cyber",
     ],
 )
 
@@ -33,9 +32,6 @@ cc_library(
         ":channel_pool",
         ":record_processor",
         "//cyber",
-        "//cyber/record:record_file_reader",
-        "//cyber/record:record_reader",
-        "//cyber/record:record_viewer",
         "//cyber/tools/cyber_recorder:recorder",
         "//modules/data/tools/smart_recorder/proto:smart_recorder_status_cc_proto",
         "//modules/monitor/common:monitor_manager",
@@ -54,8 +50,7 @@ cc_library(
         ":regular_interval_trigger",
         ":small_topics_trigger",
         ":swerve_trigger",
-        "//cyber/common:file",
-        "//cyber/record:record_writer",
+        "//cyber",
         "//modules/common/util",
     ],
 )
@@ -141,7 +136,7 @@ cc_library(
     hdrs = ["trigger_base.h"],
     deps = [
         ":interval_pool",
-        "//cyber/record:record_message",
+        "//cyber",
         "//modules/data/tools/smart_recorder/proto:smart_recorder_triggers_cc_proto",
     ],
 )
@@ -151,9 +146,8 @@ cc_library(
     srcs = ["interval_pool.cc"],
     hdrs = ["interval_pool.h"],
     deps = [
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -162,7 +156,7 @@ cc_library(
     srcs = ["channel_pool.cc"],
     hdrs = ["channel_pool.h"],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
     ],
 )

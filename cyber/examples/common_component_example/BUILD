@@ -7,7 +7,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "libcommon_component_example.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":common_component_example_lib"],
 )
 
@@ -16,6 +16,7 @@ cc_library(
     srcs = ["common_component_example.cc"],
     hdrs = ["common_component_example.h"],
     visibility = ["//visibility:private"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",

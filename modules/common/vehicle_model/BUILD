@@ -9,7 +9,7 @@ cc_library(
     srcs = ["vehicle_model.cc"],
     hdrs = ["vehicle_model.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_model/proto:vehicle_model_config_cc_proto",

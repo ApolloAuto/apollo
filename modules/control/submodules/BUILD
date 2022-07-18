@@ -29,7 +29,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
@@ -62,7 +61,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
@@ -98,7 +96,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -128,7 +125,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",

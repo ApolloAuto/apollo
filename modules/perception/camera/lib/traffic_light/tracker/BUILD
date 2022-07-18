@@ -8,7 +8,7 @@ cc_library(
     srcs = ["semantic_decision.cc"],
     hdrs = ["semantic_decision.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
     ],

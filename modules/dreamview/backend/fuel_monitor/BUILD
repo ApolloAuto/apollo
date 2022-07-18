@@ -66,7 +66,7 @@ cc_library(
         "//modules/dreamview/proto:preprocess_table_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_nlohmann_json//:json",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -86,8 +86,7 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
-        "//cyber/common:log",
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/common/util:future",
         "@boost",
     ],

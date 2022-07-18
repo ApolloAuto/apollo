@@ -37,7 +37,7 @@ cc_library(
     hdrs = ["yolo_obstacle_detector.h"],
     deps = [
         ":region_output",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -58,7 +58,7 @@ cc_library(
     srcs = ["object_maintainer.cc"],
     hdrs = ["object_maintainer.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
     ],
 )

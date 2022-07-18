@@ -11,7 +11,7 @@ cuda_library(
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math:geometry",
         "@local_config_cuda//cuda:cudart",
     ],

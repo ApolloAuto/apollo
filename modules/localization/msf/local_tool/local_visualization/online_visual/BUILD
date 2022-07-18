@@ -10,7 +10,6 @@ cc_library(
     hdrs = ["online_visualizer_component.h"],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/proto:geometry_cc_proto",

@@ -2,13 +2,43 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools:cc_so_proto_rules.bzl", "cc_so_proto_library")
+load("//tools/install:install.bzl", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_proto_library(
+
+install_files(
+    name = "cyber_proto_hdrs",
+    dest = "cyber/include/proto",
+    files = [
+        ":topology_change_cc_proto_hdrs",
+        ":dag_conf_cc_proto_hdrs",
+        ":proto_desc_cc_proto_hdrs",
+        ":choreography_conf_cc_proto_hdrs",
+        ":component_conf_cc_proto_hdrs",
+        ":cyber_conf_cc_proto_hdrs",
+        ":perf_conf_cc_proto_hdrs",
+        ":classic_conf_cc_proto_hdrs",
+        ":parameter_cc_proto_hdrs",
+        ":unit_test_cc_proto_hdrs",
+        ":scheduler_conf_cc_proto_hdrs",
+        ":transport_conf_cc_proto_hdrs",
+        ":qos_profile_cc_proto_hdrs",
+        ":record_cc_proto_hdrs",
+        ":run_mode_conf_cc_proto_hdrs",
+        ":role_attributes_cc_proto_hdrs",
+        ":clock_cc_proto_hdrs",
+    ],
+)
+
+cc_so_proto_library(
     name = "topology_change_cc_proto",
-    deps = [
+    srcs = [
         ":topology_change_proto",
+    ],
+    deps = [
+        ":role_attributes_cc_proto",
     ],
 )
 
@@ -28,10 +58,13 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "dag_conf_cc_proto",
-    deps = [
+    srcs = [
         ":dag_conf_proto",
+    ],
+    deps = [
+        ":component_conf_cc_proto"
     ],
 )
 
@@ -51,9 +84,9 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "proto_desc_cc_proto",
-    deps = [
+    srcs = [
         ":proto_desc_proto",
     ],
 )
@@ -69,9 +102,9 @@ py_proto_library(
         ":proto_desc_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "choreography_conf_cc_proto",
-    deps = [
+    srcs = [
         ":choreography_conf_proto",
     ],
 )
@@ -87,9 +120,9 @@ py_proto_library(
         ":choreography_conf_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "record_cc_proto",
-    deps = [
+    srcs = [
         ":record_proto",
     ],
 )
@@ -105,10 +138,13 @@ py_proto_library(
         ":record_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "component_conf_cc_proto",
-    deps = [
+    srcs = [
         ":component_conf_proto",
+    ],
+    deps = [
+        ":qos_profile_cc_proto"
     ],
 )
 
@@ -128,10 +164,16 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "cyber_conf_cc_proto",
-    deps = [
+    srcs = [
         ":cyber_conf_proto",
+    ],
+    deps = [
+        ":scheduler_conf_cc_proto",
+        ":transport_conf_cc_proto",
+        ":run_mode_conf_cc_proto",
+        ":perf_conf_cc_proto",
     ],
 )
 
@@ -157,9 +199,9 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "perf_conf_cc_proto",
-    deps = [
+    srcs = [
         ":perf_conf_proto",
     ],
 )
@@ -175,9 +217,9 @@ py_proto_library(
         ":perf_conf_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "classic_conf_cc_proto",
-    deps = [
+    srcs = [
         ":classic_conf_proto",
     ],
 )
@@ -193,9 +235,9 @@ py_proto_library(
         ":classic_conf_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "parameter_cc_proto",
-    deps = [
+    srcs = [
         ":parameter_proto",
     ],
 )
@@ -211,9 +253,9 @@ py_proto_library(
         ":parameter_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "unit_test_cc_proto",
-    deps = [
+    srcs = [
         ":unit_test_proto",
     ],
 )
@@ -229,10 +271,14 @@ py_proto_library(
         ":unit_test_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "scheduler_conf_cc_proto",
-    deps = [
+    srcs = [
         ":scheduler_conf_proto",
+    ],
+    deps = [
+        ":classic_conf_cc_proto",
+        ":choreography_conf_cc_proto",
     ],
 )
 
@@ -254,9 +300,9 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "transport_conf_cc_proto",
-    deps = [
+    srcs = [
         ":transport_conf_proto",
     ],
 )
@@ -272,9 +318,9 @@ py_proto_library(
         ":transport_conf_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "qos_profile_cc_proto",
-    deps = [
+    srcs = [
         ":qos_profile_proto",
     ],
 )
@@ -290,9 +336,9 @@ py_proto_library(
         ":qos_profile_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "run_mode_conf_cc_proto",
-    deps = [
+    srcs = [
         ":run_mode_conf_proto",
     ],
 )
@@ -308,10 +354,13 @@ py_proto_library(
         ":run_mode_conf_proto",
     ],
 )
-cc_proto_library(
+cc_so_proto_library(
     name = "role_attributes_cc_proto",
-    deps = [
+    srcs = [
         ":role_attributes_proto",
+    ],
+    deps = [
+        ":qos_profile_cc_proto",
     ],
 )
 
@@ -331,9 +380,9 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
+cc_so_proto_library(
     name = "clock_cc_proto",
-    deps = [
+    srcs = [
         ":clock_proto",
     ],
 )

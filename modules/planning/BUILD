@@ -92,7 +92,7 @@ cc_library(
     ],
     deps = [
         ":planning_base",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
     ],
 )

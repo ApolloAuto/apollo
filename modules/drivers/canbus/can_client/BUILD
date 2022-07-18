@@ -37,7 +37,7 @@ cc_binary(
     name = "can_client_tool",
     srcs = ["can_client_tool.cc"],
     deps = [
-        "//cyber/time",
+        "//cyber",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
         "@com_github_gflags_gflags//:gflags",

@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["rtk_replay_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util",
         "//modules/common/util:factory",
@@ -20,7 +20,7 @@ cc_library(
         "//modules/planning/proto:planning_cc_proto",
         "//modules/planning/proto:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )
@@ -33,7 +33,7 @@ cc_test(
     linkopts = ["-lgomp"],
     deps = [
         ":rtk_planner",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],

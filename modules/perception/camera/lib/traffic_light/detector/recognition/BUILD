@@ -25,7 +25,7 @@ cc_library(
     hdrs = ["recognition.h"],
     deps = [
         ":classify",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",
     ],

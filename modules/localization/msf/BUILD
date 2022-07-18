@@ -19,7 +19,6 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/monitor_log",
@@ -67,7 +66,7 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",

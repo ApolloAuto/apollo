@@ -35,7 +35,7 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
         "//modules/map/pnc_map",
         "//modules/planning/common:planning_gflags",

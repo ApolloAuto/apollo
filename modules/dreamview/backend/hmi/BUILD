@@ -16,7 +16,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/util:string_util",
         "//modules/dreamview/proto:hmi_config_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":hmi_worker",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
@@ -90,7 +90,7 @@ cc_library(
         "//modules/localization/proto:localization_cc_proto",
         "//modules/monitor/proto:system_status_cc_proto",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

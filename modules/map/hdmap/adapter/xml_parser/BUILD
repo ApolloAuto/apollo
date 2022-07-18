@@ -20,7 +20,7 @@ cc_library(
     name = "common_define",
     hdrs = ["common_define.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/proto:map_cc_proto",
     ],
 )
@@ -34,7 +34,7 @@ cc_library(
         ":status",
         ":util_xml_parser",
         "//modules/map/hdmap/adapter:coordinate_convert_tool",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@tinyxml2",
     ],
 )
@@ -117,7 +117,7 @@ cc_library(
     deps = [
         ":common_define",
         ":status",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/map/hdmap/adapter:coordinate_convert_tool",
         "@tinyxml2",
     ],

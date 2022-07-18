@@ -28,7 +28,7 @@ cc_library(
     copts = ROUTING_COPTS,
     deps = [
         ":routing",
-        "//cyber/time:clock",
+        "//cyber",
     ],
 )
 

@@ -11,7 +11,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/planning/tuning:autotuning_feature_builder",
     ],

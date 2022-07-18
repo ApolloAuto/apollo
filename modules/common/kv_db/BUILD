@@ -8,11 +8,11 @@ cc_library(
     srcs = ["kv_db.cc"],
     hdrs = ["kv_db.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/util",
         "//modules/common/util:future",
         "@com_github_gflags_gflags//:gflags",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@sqlite3",
     ],
 )

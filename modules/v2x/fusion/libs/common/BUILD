@@ -12,7 +12,7 @@ cc_library(
         "//modules/perception/base:base_type",
         "//modules/perception/base:box",
         "//modules/perception/base:object",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

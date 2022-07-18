@@ -23,7 +23,6 @@ cc_library(
     deps = [
         ":controller_interface",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
@@ -49,7 +48,7 @@ cc_library(
         "//modules/control/proto:mpc_controller_conf_cc_proto",
         "//modules/control/proto:mrac_conf_cc_proto",
         "//modules/control/proto:pad_msg_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )
@@ -82,7 +81,7 @@ cc_library(
         "//modules/control/proto:mrac_conf_cc_proto",
         "//modules/control/proto:pad_msg_cc_proto",
         "//modules/localization/common:localization_common",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -94,7 +93,6 @@ cc_library(
     deps = [
         ":controller_interface",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters:digital_filter",
         "//modules/common/filters:digital_filter_coefficients",
@@ -119,7 +117,7 @@ cc_library(
         "//modules/control/proto:mpc_controller_conf_cc_proto",
         "//modules/control/proto:mrac_conf_cc_proto",
         "//modules/control/proto:pad_msg_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )
@@ -148,7 +146,6 @@ cc_library(
         ":lon_controller",
         ":mpc_controller",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util:factory",
         "//modules/control/common:dependency_injector",
         "//modules/control/proto:control_cmd_cc_proto",
@@ -166,7 +163,6 @@ cc_test(
     deps = [
         ":lon_controller",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
@@ -185,7 +181,6 @@ cc_test(
     deps = [
         ":lat_controller",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
@@ -203,7 +198,6 @@ cc_test(
     deps = [
         ":mpc_controller",
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",

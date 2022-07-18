@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["lattice_trajectory1d.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/math/curve1d",
     ],
 )
@@ -123,7 +123,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":lateral_qp_optimizer",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math:matrix_operations",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",

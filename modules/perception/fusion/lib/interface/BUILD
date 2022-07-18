@@ -15,7 +15,7 @@ cc_library(
         "base_type_fusion.h",
     ],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/perception/fusion/base:base_forward_declaration",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/lib/registerer",
@@ -26,7 +26,7 @@ cc_library(
     name = "base_multisensor_fusion",
     hdrs = ["base_multisensor_fusion.h"],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/perception/fusion/base",
         "//modules/perception/lib/registerer",
     ],
@@ -36,7 +36,7 @@ cc_library(
     name = "base_fusion_system",
     hdrs = ["base_fusion_system.h"],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/perception/base:frame",
         "//modules/perception/fusion/base",
         "//modules/perception/lib/registerer",

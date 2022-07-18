@@ -17,7 +17,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_cc_proto",
@@ -50,7 +49,6 @@ cc_test(
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",
         "@com_google_googletest//:gtest_main",

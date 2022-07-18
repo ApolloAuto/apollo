@@ -41,7 +41,7 @@ cc_library(
     deps = [
         ":smoke_region_output",
         "//modules/perception/camera/lib/obstacle/detector/yolo:region_output",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -61,7 +61,7 @@ cc_library(
     srcs = ["object_maintainer.cc"],
     hdrs = ["object_maintainer.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
     ],
 )

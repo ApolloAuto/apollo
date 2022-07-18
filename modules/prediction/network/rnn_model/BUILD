@@ -8,8 +8,7 @@ cc_library(
     srcs = ["rnn_model.cc"],
     hdrs = ["rnn_model.h"],
     deps = [
-        "//cyber/base:macros",
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/prediction/network:net_model",
     ],
 )
@@ -22,7 +21,7 @@ cc_test(
         "//modules/prediction:prediction_data",
     ],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/prediction/network/rnn_model",
         "@com_google_googletest//:gtest_main",
     ],

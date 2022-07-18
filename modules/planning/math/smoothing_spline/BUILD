@@ -42,7 +42,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_1d",
-        "//cyber/common:log",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -55,8 +55,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber/common:log",
-        "//cyber/common:macros",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -215,7 +214,7 @@ cc_test(
     srcs = ["spline_1d_constraint_test.cc"],
     deps = [
         ":spline_1d_constraint",
-        "//cyber/common",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -20,8 +20,7 @@ cc_library(
     hdrs = ["lane_follow_stage.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/util",
@@ -54,8 +53,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":lane_follow_stage",
-        "//cyber/common:log",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/util",

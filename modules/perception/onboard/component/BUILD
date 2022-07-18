@@ -44,7 +44,6 @@ cc_library(
     copts = PERCEPTION_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/math",
         "//modules/common/proto:error_code_cc_proto",
         "//modules/common/proto:geometry_cc_proto",
@@ -125,7 +124,7 @@ cc_library(
     hdrs = ["detection_component.h"],
     deps = [
         ":lidar_inner_component_messages",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util:string_util",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/registerer",
@@ -153,7 +152,7 @@ cc_library(
     srcs = ["fusion_component.cc"],
     hdrs = ["fusion_component.h"],
     deps = [
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
@@ -183,7 +182,7 @@ cc_library(
         "radar_detection_component.h",
     ],
     deps = [
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",
@@ -226,7 +225,7 @@ cc_library(
     ],
     deps = [
         ":lidar_inner_component_messages",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util:perf_util",
         "//modules/perception/base",
         "//modules/perception/common/sensor_manager",

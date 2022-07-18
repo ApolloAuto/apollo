@@ -18,7 +18,7 @@ cc_library(
     srcs = ["mlf_engine.cc"],
     hdrs = ["mlf_engine.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -36,7 +36,7 @@ cc_library(
     srcs = ["mlf_motion_filter.cc"],
     hdrs = ["mlf_motion_filter.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
@@ -63,7 +63,7 @@ cc_library(
     srcs = ["mlf_motion_refiner.cc"],
     hdrs = ["mlf_motion_refiner.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -77,7 +77,7 @@ cc_library(
     srcs = ["mlf_shape_filter.cc"],
     hdrs = ["mlf_shape_filter.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/common/geometry:convex_hull_2d",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_object_util",
@@ -92,7 +92,7 @@ cc_library(
     srcs = ["mlf_track_object_distance.cc"],
     hdrs = ["mlf_track_object_distance.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -107,7 +107,7 @@ cc_library(
     srcs = ["mlf_track_object_matcher.cc"],
     hdrs = ["mlf_track_object_matcher.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
@@ -124,7 +124,7 @@ cc_library(
     srcs = ["mlf_tracker.cc"],
     hdrs = ["mlf_tracker.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",

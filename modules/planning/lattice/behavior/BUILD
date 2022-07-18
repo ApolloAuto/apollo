@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["feasible_region.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/planning/common:planning_gflags",
     ],
@@ -22,7 +22,7 @@ cc_library(
     hdrs = ["path_time_graph.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:path_matcher",
         "//modules/common/proto:pnc_point_cc_proto",

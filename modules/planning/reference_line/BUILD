@@ -16,7 +16,7 @@ cc_library(
     ],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util:map_util",
@@ -24,7 +24,7 @@ cc_library(
         "//modules/map/pnc_map:path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -150,7 +150,7 @@ cc_library(
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",

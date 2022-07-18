@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["public_road_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/util",

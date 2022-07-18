@@ -113,7 +113,7 @@ cc_library(
     hdrs = ["planning_context.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common",
+        "//cyber",
         "//modules/planning/common/path:path_data",
         "//modules/planning/proto:planning_status_cc_proto",
         "@eigen",
@@ -152,7 +152,7 @@ cc_library(
         ":path_decision",
         ":planning_gflags",
         ":st_graph_data",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/util:point_factory",
@@ -235,7 +235,7 @@ cc_library(
         ":obstacle",
         ":open_space_info",
         ":reference_line_info",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -274,7 +274,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":planning_gflags",
-        "//cyber/common",
+        "//cyber",
         "//modules/planning/proto:decision_cc_proto",
         "//modules/planning/proto:planning_cc_proto",
         "@eigen",
@@ -318,7 +318,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":obstacle",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/math:geometry",
@@ -353,7 +353,7 @@ cc_library(
         ":planning_gflags",
         ":speed_limit",
         ":st_graph_data",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_cc_proto",
         "@eigen",
@@ -366,13 +366,13 @@ cc_library(
     hdrs = ["trajectory_stitcher.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/proto:pnc_point_cc_proto",
         "//modules/common/vehicle_model",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -381,7 +381,7 @@ cc_library(
     srcs = ["open_space_info.cc"],
     hdrs = ["open_space_info.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap:hdmap_util",
@@ -425,8 +425,7 @@ cc_test(
     srcs = ["st_graph_data_test.cc"],
     deps = [
         ":st_graph_data",
-        "//cyber/common:log",
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],
@@ -469,7 +468,7 @@ cc_library(
         "//modules/routing/proto:routing_cc_proto",
         "//modules/storytelling/proto:story_cc_proto",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -506,7 +505,7 @@ cc_library(
     hdrs = ["learning_based_data.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common",
+        "//cyber",
         "//modules/planning/proto:learning_data_cc_proto",
     ],
 )

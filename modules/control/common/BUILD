@@ -50,7 +50,7 @@ cc_library(
     hdrs = ["leadlag_controller.h"],
     copts = CONTROL_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/control/proto:leadlag_conf_cc_proto",
     ],
 )
@@ -67,7 +67,7 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/control/proto:mrac_conf_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )
@@ -78,7 +78,7 @@ cc_library(
     hdrs = ["pid_controller.h"],
     copts = CONTROL_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/control/proto:pid_conf_cc_proto",
     ],
 )
@@ -114,7 +114,7 @@ cc_library(
     copts = CONTROL_COPTS,
     deps = [
         ":control_gflags",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",
         "//modules/common/proto:pnc_point_cc_proto",
@@ -191,7 +191,7 @@ cc_test(
     data = ["//modules/control:test_data"],
     deps = [
         ":leadlag_controller",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/proto:drive_state_cc_proto",
@@ -243,7 +243,7 @@ cc_test(
     data = ["//modules/control:test_data"],
     deps = [
         ":pid_controller",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/proto:drive_state_cc_proto",
@@ -324,7 +324,7 @@ cc_test(
     srcs = ["trajectory_analyzer_test.cc"],
     deps = [
         ":trajectory_analyzer",
-        "//cyber/time:clock",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

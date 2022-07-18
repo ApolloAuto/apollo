@@ -205,8 +205,7 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         ":semantic_map",
-        "//cyber/common:file",
-        "//cyber/proto:record_cc_proto",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
@@ -222,8 +221,7 @@ cc_library(
     hdrs = ["prediction_thread_pool.h"],
     copts = PREDICTION_COPTS,
     deps = [
-        "//cyber/base",
-        "//cyber/common",
+        "//cyber",
     ],
 )
 
@@ -244,7 +242,7 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         ":prediction_gflags",
-        "//cyber/common",
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/prediction/container:container_manager",

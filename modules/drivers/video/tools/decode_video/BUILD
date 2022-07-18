@@ -20,7 +20,7 @@ cc_library(
     deps = [
         ":h265_decoder",
         "//modules/common/util",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -29,7 +29,7 @@ cc_library(
     srcs = ["h265_decoder.cc"],
     hdrs = ["h265_decoder.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "@ffmpeg//:avcodec",
     ],
 )

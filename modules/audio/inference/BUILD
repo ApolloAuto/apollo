@@ -32,7 +32,7 @@ cc_library(
     srcs = ["siren_detection.cc"],
     hdrs = ["siren_detection.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/audio/common:audio_gflags",
         "//third_party:libtorch",
     ],

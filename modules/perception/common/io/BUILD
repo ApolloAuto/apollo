@@ -15,7 +15,7 @@ cc_library(
         "//modules/perception/common/geometry:basic",
         "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )
