@@ -19,7 +19,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool nppImageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob) {
+bool nppImageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob) {
   NppStatus status;
   NppiSize roi;
   roi.height = image.rows();
@@ -40,7 +40,7 @@ bool nppImageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob) {
   return true;
 }
 
-bool nppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool nppImageToGray(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                     const int src_width, const int src_height,
                     const float coeffs[3]) {
   NppStatus status;
@@ -56,7 +56,8 @@ bool nppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
   return true;
 }
 
-bool nppSwapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool nppSwapImageChannels(const base::Image8UPtr &src,
+                          const base::Image8UPtr &dst,
                           const int src_width, const int src_height,
                           const int order[3]) {
   NppStatus status;
@@ -72,7 +73,8 @@ bool nppSwapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
   return true;
 }
 
-bool nppDupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool nppDupImageChannels(const base::Image8UPtr &src,
+                         const base::Image8UPtr &dst,
                          const int src_width, const int src_height) {
   NppStatus status;
   NppiSize roi;

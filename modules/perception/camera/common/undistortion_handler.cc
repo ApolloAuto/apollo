@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include <vector>
+
 #include "modules/perception/camera/common/undistortion_handler.h"
 #include "modules/perception/camera/common/image_data_operations.h"
-
-#include <vector>
 
 #include "Eigen/Dense"
 
