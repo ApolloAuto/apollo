@@ -205,20 +205,16 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   float *blob_ptr = blob->mutable_gpu_data();
   int temp_step = temp_uint8_.count(2) * sizeof(uint8_t);
   int blob_step = blob->count(2) * sizeof(float);
+#if GPU_PLATFORM == NVIDIA
   if (channels == 1) {
-#if GPU_PLATFORM == NVIDIA
     nppiConvert_8u32f_C1R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
-#elif GPU_PLATFORM == AMD
-    // TODO(B1tway): Add necesssary RPP API
-#endif
   } else {
-#if GPU_PLATFORM == NVIDIA
     nppiConvert_8u32f_C3R(temp_ptr, temp_step, blob_ptr, blob_step, roi);
+  }
 #elif GPU_PLATFORM == AMD
     // TODO(B1tway): Add necesssary RPP API
 #endif
-  }
-  return true;
+   return true;
 }
 #endif
 
