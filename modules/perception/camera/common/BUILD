@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -95,7 +95,7 @@ cc_library(
     ],
 )
 
-cc_library(
+gpu_library(
     name = "image_data_operations",
     srcs = ["image_data_operations.cc"],
     hdrs = ["image_data_operations.h"],

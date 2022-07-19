@@ -138,6 +138,22 @@ bool nppImageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
 
 #elif GPU_PLATFORM == AMD
 
+template <typename T>
+struct image2D {
+  unsigned char *data;
+  size_t width_step;
+  __device__ image2D(const T *data_pointer, size_t width_step)
+      : width_step(width_step) {
+    data = reinterpret_cast<unsigned char *>(const_cast<T *>(data_pointer));
+  }
+  inline __device__ T &operator()(const size_t i, const size_t j) {
+    return *(reinterpret_cast<T *>(data + width_step * j + i * sizeof(T)));
+  }
+  inline __device__ const T &operator()(const size_t i, const size_t j) const {
+    return *(reinterpret_cast<T *>(data + width_step * j + i * sizeof(T)));
+  }
+};
+
 void rppInitDescriptor(RpptDescPtr &descPtr, int width, int height,
                        int channels, int width_step) {
   descPtr->dataType = RpptDataType::U8;
@@ -252,19 +268,162 @@ bool rppSwapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
   return true;
 }
 
+__global__ void duplicate_kernel(const unsigned char *src,
+                                 size_t src_width_step, uchar3 *dst,
+                                 size_t dst_width_step, int width, int height) {
+  const size_t i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
+  const size_t j = hipBlockDim_y * hipBlockIdx_y + hipThreadIdx_y;
+  image2D<unsigned char> src_img{src, src_width_step};
+  image2D<uchar3> dst_img{dst, dst_width_step};
+
+  if (i < width && j < height) {
+    unsigned char value = src_img(i, j);
+    dst_img(i, j).x = value;
+    dst_img(i, j).y = value;
+    dst_img(i, j).z = value;
+  }
+}
+
 bool rppDupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                          const int src_width, const int src_height) {
-  // TODO(B1tway) add a temporary implementation for Duplicate
-  assert(0 && "Duplicate API has not yet been implemented in RPP");
-  return false;
+  const int THREADS_PER_BLOCK_X = 32;
+  const int THREADS_PER_BLOCK_Y = 32;
+
+  dim3 threadsPerBlock(THREADS_PER_BLOCK_X, THREADS_PER_BLOCK_Y);
+  dim3 blocks((src_width + threadsPerBlock.x - 1) / threadsPerBlock.x,
+              (src_height + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+  hipLaunchKernelGGL(duplicate_kernel, blocks, threadsPerBlock, 0, 0,
+                     src->gpu_data(), src->width_step(),
+                     reinterpret_cast<uchar3 *>(dst->mutable_gpu_data()), dst->width_step(), src_width,
+                     src_height);
+
+  hipError_t error = hipGetLastError();
+  if (error != hipSuccess) {
+    return false;
+  }
+  return true;
 }
+
+__global__ void remap_pln1_kernel(const unsigned char *src,
+                                  size_t src_width_step, unsigned char *dst,
+                                  size_t dst_width_step, const float *mapx,
+                                  const float *mapy, int width, int height) {
+  const size_t i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
+  const size_t j = hipBlockDim_y * hipBlockIdx_y + hipThreadIdx_y;
+  image2D<unsigned char> src_img{src, src_width_step};
+  image2D<unsigned char> dst_img{dst, dst_width_step};
+  if (i < width && j < height) {
+    float x_coor = mapx[j * width + i];
+    float y_coor = mapy[j * width + i];
+
+    int X = trunc(x_coor);
+    int Y = trunc(y_coor);
+    float x_frac = x_coor - X;
+    float y_frac = y_coor - Y;
+
+    if (0 <= X && X < width && 0 <= Y && Y < height) {
+      // uchar p[2][2];
+      int X1 = (X < width - 1) ? X + 1 : X;
+      int Y1 = (Y < height - 1) ? Y + 1 : Y;
+
+      unsigned char pixel00 = src_img(X, Y);
+      unsigned char pixel01 = src_img(X1, Y);
+      unsigned char pixel10 = src_img(X, Y1);
+      unsigned char pixel11 = src_img(X1, Y1);
+      // bilinear interpolation
+      unsigned char interpolated;
+      interpolated =
+          (pixel00 * (1 - x_frac) + pixel01 * x_frac) * (1 - y_frac) +
+          (pixel10 * (1 - x_frac) + pixel11 * x_frac) * y_frac;
+      dst_img(i, j) = interpolated;
+    }
+  }
+}
+
+__global__ void remap_pkd3_kernel(const uchar3 *src, size_t src_width_step,
+                                  uchar3 *dst, size_t dst_width_step,
+                                  const float *mapx, const float *mapy,
+                                  int width, int height) {
+  const size_t i = hipBlockDim_x * hipBlockIdx_x + hipThreadIdx_x;
+  const size_t j = hipBlockDim_y * hipBlockIdx_y + hipThreadIdx_y;
+
+  image2D<uchar3> src_img{src, src_width_step};
+  image2D<uchar3> dst_img{dst, dst_width_step};
+
+  if (i < width && j < height) {
+    float x_coor = mapx[j * width + i];
+    float y_coor = mapy[j * width + i];
+
+    int X = trunc(x_coor);
+    int Y = trunc(y_coor);
+    float x_frac = x_coor - X;
+    float y_frac = y_coor - Y;
+
+    if (0 <= X && X < width && 0 <= Y && Y < height) {
+      // uchar3 p[2][2];
+      int X1 = (X < width - 1) ? X + 1 : X;
+      int Y1 = (Y < height - 1) ? Y + 1 : Y;
+
+      uchar3 pixel00 = src_img(X, Y);
+      uchar3 pixel01 = src_img(X1, Y);
+      uchar3 pixel10 = src_img(X, Y1);
+      uchar3 pixel11 = src_img(X1, Y1);
+      // bilinear interpolation
+      uchar3 interpolated;
+      interpolated.x =
+          (pixel00.x * (1 - x_frac) + pixel01.x * x_frac) * (1 - y_frac) +
+          (pixel10.x * (1 - x_frac) + pixel11.x * x_frac) * y_frac;
+      interpolated.y =
+          (pixel00.y * (1 - x_frac) + pixel01.y * x_frac) * (1 - y_frac) +
+          (pixel10.y * (1 - x_frac) + pixel11.y * x_frac) * y_frac;
+      interpolated.z =
+          (pixel00.z * (1 - x_frac) + pixel01.z * x_frac) * (1 - y_frac) +
+          (pixel10.z * (1 - x_frac) + pixel11.z * x_frac) * y_frac;
+
+      dst_img(i, j) = interpolated;
+    }
+  }
+}
+
 bool rppImageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
                    const int src_width, const int src_height,
                    const base::Blob<float> &map_x,
                    const base::Blob<float> &map_y) {
-  // TODO(B1tway) add a temporary implementation for Remap
-  assert(0 && "Remap API has not yet been implemented in RPP");
-  return false;
+  const int THREADS_PER_BLOCK_X = 32;
+  const int THREADS_PER_BLOCK_Y = 32;
+
+  dim3 threadsPerBlock(THREADS_PER_BLOCK_X, THREADS_PER_BLOCK_Y);
+  dim3 blocks((src_width + threadsPerBlock.x - 1) / threadsPerBlock.x,
+              (src_height + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+  switch (src_img.channels()) {
+    case 1:
+      hipLaunchKernelGGL(remap_pln1_kernel, blocks, threadsPerBlock, 0, 0,
+                         src_img.gpu_data(), src_img.width_step(),
+                         dst_img->mutable_gpu_data(), dst_img->width_step(),
+                         map_x.gpu_data(), map_y.gpu_data(), src_width,
+                         src_height);
+      break;
+    case 3:
+      hipLaunchKernelGGL(
+          remap_pkd3_kernel, blocks, threadsPerBlock, 0, 0,
+          reinterpret_cast<const uchar3 *>(src_img.gpu_data()),
+          src_img.width_step(),
+          reinterpret_cast<uchar3 *>(dst_img->mutable_gpu_data()),
+          dst_img->width_step(), map_x.gpu_data(), map_y.gpu_data(), src_width,
+          src_height);
+      break;
+    default:
+      AERROR << "Invalid number of channels: " << src_img.channels();
+      return false;
+  }
+
+  hipError_t error = hipGetLastError();
+  if (error != hipSuccess) {
+    return false;
+  }
+  return true;
 }
 
 #endif
