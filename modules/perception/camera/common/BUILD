@@ -98,7 +98,13 @@ cc_library(
 gpu_library(
     name = "image_data_operations",
     srcs = ["image_data_operations.cc"],
-    hdrs = ["image_data_operations.h"],
+    hdrs = [
+        "image_data_operations.h"
+    ] + if_cuda([
+        "image_data_operations_npp.h"
+    ]) + if_rocm([
+        "image_data_operations_rpp.h"
+    ]),
     deps = [
         "//modules/perception/base",
     ] + if_cuda([
