@@ -19,6 +19,9 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+const uint32_t THREADS_PER_BLOCK_X = 32;
+const uint32_t THREADS_PER_BLOCK_Y = 32;
+
 template <typename T>
 struct image2D {
   unsigned char *data;
@@ -35,71 +38,74 @@ struct image2D {
   }
 };
 
-void rppInitDescriptor(RpptDescPtr &descPtr, int width, int height,
+bool rppInitDescriptor(RpptDescPtr &descPtr, int width, int height,
                        int channels, int width_step) {
   descPtr->dataType = RpptDataType::U8;
   descPtr->numDims = 4;
   descPtr->offsetInBytes = 0;
-
   descPtr->n = 1;
   descPtr->h = height;
   descPtr->w = width;
   descPtr->c = channels;
-
-  assert(channels == 1 || channels == 3);
-  if (channels == 1) {
-    descPtr->layout = RpptLayout::NCHW;
-    descPtr->strides.wStride = 1;
-    descPtr->strides.hStride = width_step;
-    descPtr->strides.cStride = descPtr->strides.hStride * descPtr->h;
-    descPtr->strides.nStride =
-        descPtr->strides.hStride * descPtr->h * descPtr->c;
+  switch (channels) {
+    case 1:
+      descPtr->layout = RpptLayout::NCHW;
+      descPtr->strides.wStride = 1;
+      descPtr->strides.hStride = width_step;
+      descPtr->strides.cStride = descPtr->strides.hStride * descPtr->h;
+      descPtr->strides.nStride =
+          descPtr->strides.hStride * descPtr->h * descPtr->c;
+      break;
+    case 3:
+      descPtr->layout = RpptLayout::NHWC;
+      descPtr->strides.cStride = 1;
+      descPtr->strides.wStride = descPtr->c;
+      descPtr->strides.hStride = width_step;
+      descPtr->strides.nStride = descPtr->strides.hStride * descPtr->h;
+      break;
+    default:
+      AERROR << "Invalid number of channels: " << channels
+             << "; only 1 and 3 are supported.";
+      return false;
   }
-  if (channels == 3) {
-    descPtr->layout = RpptLayout::NHWC;
-    descPtr->strides.cStride = 1;
-    descPtr->strides.wStride = descPtr->c;
-    descPtr->strides.hStride = width_step;
-    descPtr->strides.nStride = descPtr->strides.hStride * descPtr->h;
-  }
+  return true;
 }
 
 bool rppImageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob) {
-  RppStatus status;
   RpptDesc srcDesc, dstDesc;
-  RpptDescPtr srcDescPtr, dstDescPtr;
-  srcDescPtr = &srcDesc;
-  dstDescPtr = &dstDesc;
+  RpptDescPtr srcDescPtr = &srcDesc, dstDescPtr = &dstDesc;
 
   blob->Reshape({1, image.rows(), image.cols(), image.channels()});
 
-  rppInitDescriptor(srcDescPtr, image.cols(), image.rows(), image.channels(),
-                    image.width_step());
-  rppInitDescriptor(dstDescPtr, image.cols(), image.rows(), image.channels(),
-                    blob->count(2) * static_cast<int>(sizeof(uint8_t)));
+  if (!rppInitDescriptor(srcDescPtr, image.cols(), image.rows(),
+                         image.channels(), image.width_step()))
+    return false;
+  if (!rppInitDescriptor(dstDescPtr, image.cols(), image.rows(), image.channels(),
+                         blob->count(2) * static_cast<int>(sizeof(uint8_t))))
+    return false;
 
   rppHandle_t handle;
   rppCreateWithBatchSize(&handle, 1);
-  status = rppt_copy_gpu(image.mutable_gpu_data(), srcDescPtr,
-                         blob->mutable_gpu_data(), dstDescPtr, handle);
-  if (status != RPP_SUCCESS) {
+  RppStatus status = rppt_copy_gpu(image.mutable_gpu_data(), srcDescPtr,
+                    blob->mutable_gpu_data(), dstDescPtr, handle);
+  if (status != RPP_SUCCESS)
     return false;
-  }
   return true;
-};
+}
 
 bool rppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
                     const int src_width, const int src_height,
                     const float coeffs[3]) {
-  RppStatus status;
-
+  RppStatus status = RPP_SUCCESS;
   RpptDesc srcDesc, dstDesc;
-  RpptDescPtr srcDescPtr, dstDescPtr;
-  srcDescPtr = &srcDesc;
-  dstDescPtr = &dstDesc;
+  RpptDescPtr srcDescPtr = &srcDesc, dstDescPtr = &dstDesc;
 
-  rppInitDescriptor(srcDescPtr, src_width, src_height, 3, src->width_step());
-  rppInitDescriptor(dstDescPtr, src_width, src_height, 3, dst->width_step());
+  if (!rppInitDescriptor(srcDescPtr, src_width, src_height, 3,
+                         src->width_step()))
+    return false;
+  if (!rppInitDescriptor(dstDescPtr, src_width, src_height, 3,
+                         dst->width_step()))
+    return false;
 
   rppHandle_t handle;
   rppCreateWithBatchSize(&handle, 1);
@@ -119,33 +125,33 @@ bool rppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
                                          dst->mutable_gpu_data(), dstDescPtr,
                                          RpptSubpixelLayout::RGBtype, handle);
   }
-  if (status != RPP_SUCCESS) {
+  if (status != RPP_SUCCESS)
     return false;
-  }
   return true;
 }
 
 bool rppSwapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                           const int src_width, const int src_height,
                           const int order[3]) {
-  RppStatus status;
   RpptDesc srcDesc, dstDesc;
-  RpptDescPtr srcDescPtr, dstDescPtr;
-  srcDescPtr = &srcDesc;
-  dstDescPtr = &dstDesc;
+  RpptDescPtr srcDescPtr = &srcDesc, dstDescPtr = &dstDesc;
 
-  rppInitDescriptor(srcDescPtr, src_width, src_height, 3, src->width_step());
-  rppInitDescriptor(dstDescPtr, src_width, src_height, 3, dst->width_step());
+  if (!rppInitDescriptor(srcDescPtr, src_width, src_height, 3,
+                         src->width_step()))
+    return false;
+  if (!rppInitDescriptor(dstDescPtr, src_width, src_height, 3,
+                         dst->width_step()))
+    return false;
 
   rppHandle_t handle;
   rppCreateWithBatchSize(&handle, 1);
   assert(order[0] == 2 && order[1] == 1 && order[2] == 0 &&
          "The order in rppt_swap_channels is hardcoded");
-  status = rppt_swap_channels_gpu(src->mutable_gpu_data(), srcDescPtr,
-                                  dst->mutable_gpu_data(), dstDescPtr, handle);
-  if (status != RPP_SUCCESS) {
+  RppStatus status =
+      rppt_swap_channels_gpu(src->mutable_gpu_data(), srcDescPtr,
+                             dst->mutable_gpu_data(), dstDescPtr, handle);
+  if (status != RPP_SUCCESS)
     return false;
-  }
   return true;
 }
 
@@ -167,9 +173,6 @@ __global__ void duplicate_kernel(const unsigned char *src,
 
 bool rppDupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                          const int src_width, const int src_height) {
-  const int THREADS_PER_BLOCK_X = 32;
-  const int THREADS_PER_BLOCK_Y = 32;
-
   dim3 threadsPerBlock(THREADS_PER_BLOCK_X, THREADS_PER_BLOCK_Y);
   dim3 blocks((src_width + threadsPerBlock.x - 1) / threadsPerBlock.x,
               (src_height + threadsPerBlock.y - 1) / threadsPerBlock.y);
@@ -179,10 +182,8 @@ bool rppDupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
                      reinterpret_cast<uchar3 *>(dst->mutable_gpu_data()),
                      dst->width_step(), src_width, src_height);
 
-  hipError_t error = hipGetLastError();
-  if (error != hipSuccess) {
+  if (hipSuccess != hipGetLastError())
     return false;
-  }
   return true;
 }
 
@@ -213,8 +214,7 @@ __global__ void remap_pln1_kernel(const unsigned char *src,
       unsigned char pixel10 = src_img(X, Y1);
       unsigned char pixel11 = src_img(X1, Y1);
       // bilinear interpolation
-      unsigned char interpolated;
-      interpolated =
+      unsigned char interpolated =
           (pixel00 * (1 - x_frac) + pixel01 * x_frac) * (1 - y_frac) +
           (pixel10 * (1 - x_frac) + pixel11 * x_frac) * y_frac;
       dst_img(i, j) = interpolated;
@@ -271,9 +271,6 @@ bool rppImageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
                    const int src_width, const int src_height,
                    const base::Blob<float> &map_x,
                    const base::Blob<float> &map_y) {
-  const int THREADS_PER_BLOCK_X = 32;
-  const int THREADS_PER_BLOCK_Y = 32;
-
   dim3 threadsPerBlock(THREADS_PER_BLOCK_X, THREADS_PER_BLOCK_Y);
   dim3 blocks((src_width + threadsPerBlock.x - 1) / threadsPerBlock.x,
               (src_height + threadsPerBlock.y - 1) / threadsPerBlock.y);
@@ -296,14 +293,12 @@ bool rppImageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
           src_height);
       break;
     default:
-      AERROR << "Invalid number of channels: " << src_img.channels();
+      AERROR << "Invalid number of channels: " << src_img.channels()
+             << "; only 1 and 3 are supported.";
       return false;
   }
-
-  hipError_t error = hipGetLastError();
-  if (error != hipSuccess) {
+  if (hipSuccess != hipGetLastError())
     return false;
-  }
   return true;
 }
 
