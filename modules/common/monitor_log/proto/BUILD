@@ -16,7 +16,7 @@ proto_library(
     name = "monitor_log_proto",
     srcs = ["monitor_log.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -24,6 +24,7 @@ py_proto_library(
     name = "monitor_log_py_pb2",
     deps = [
         ":monitor_log_proto",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
     ],
 )
+

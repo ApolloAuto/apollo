@@ -11,7 +11,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/prediction/proto:scenario_cc_proto",
+        "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
     ],
 )
 

@@ -28,7 +28,7 @@ namespace emergency_stop {
 class StageStandbyTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::EMERGENCY_STOP_STANDBY);
+    config_.set_stage_type(StageType::EMERGENCY_STOP_STANDBY);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,7 +41,7 @@ TEST_F(StageStandbyTest, Init) {
   EmergencyStopStageStandby emergency_stop_stage_standby(config_, injector_);
   EXPECT_EQ(
       emergency_stop_stage_standby.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_STANDBY));
+      StageType_Name(StageType::EMERGENCY_STOP_STANDBY));
 }
 
 }  // namespace emergency_stop

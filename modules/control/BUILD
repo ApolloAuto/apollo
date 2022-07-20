@@ -11,23 +11,23 @@ cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
         "//modules/common/util",
         "//modules/control/common",
         "//modules/control/controller",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/control/proto:control_conf_cc_proto",
-        "//modules/control/proto:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
         "//modules/control/proto:preprocessor_cc_proto",
         "//modules/control/submodules:lat_lon_controller_submodule_lib",
         "//modules/control/submodules:mpc_controller_submodule_lib",
         "//modules/control/submodules:postprocessor_submodule_lib",
         "//modules/control/submodules:preprocessor_submodule_lib",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -46,7 +46,7 @@ cc_library(
 cc_binary(
     name = "libcontrol_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":control_component_lib"],
 )
 
@@ -67,7 +67,7 @@ install_files(
     name = "pb_control",
     dest = "modules/control",
     files = [
-        "//modules/control/proto:pad_msg_py_pb2",
+        "//modules/common_msgs/control_msgs:pad_msg_py_pb2",
     ],
 )
 

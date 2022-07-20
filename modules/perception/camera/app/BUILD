@@ -22,7 +22,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -53,7 +53,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -83,7 +83,7 @@ cc_library(
     hdrs = ["traffic_light_camera_perception.h"],
     deps = [
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -103,7 +103,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -127,7 +127,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/perception/base",
         "//modules/perception/camera/common:lane_object",
         "//modules/perception/camera/lib/interface",

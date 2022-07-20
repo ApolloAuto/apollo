@@ -72,7 +72,7 @@ cc_library(
         "base_map_cache.h",
     ],
     deps = [
-        "//modules/common/util:lru_cache",
+        "//modules/common/util:util_tool",
     ],
 )
 

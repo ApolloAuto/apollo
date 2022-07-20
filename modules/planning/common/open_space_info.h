@@ -25,7 +25,7 @@
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -33,13 +33,13 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/proto/map_id.pb.h"
+#include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {

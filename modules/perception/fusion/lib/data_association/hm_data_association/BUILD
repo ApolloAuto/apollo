@@ -34,7 +34,7 @@ cc_library(
     name = "projection_cache",
     hdrs = ["projection_cache.h"],
     deps = [
-        "//modules/common/math:math_utils",
+        "//modules/common/math",
     ],
 )
 

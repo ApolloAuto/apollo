@@ -28,7 +28,7 @@ import sys
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import record
-from modules.drivers.proto.sensor_image_pb2 import CompressedImage
+from modules.common_msgs.sensor_msgs.sensor_image_pb2 import CompressedImage
 
 
 def parse_data(channelname, msg, out_folder):

@@ -1,0 +1,161 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message Lka_768 {
+  optional int32 lane_type = 1;
+  optional int32 quality = 2;
+  optional int32 model_degree = 3;
+  optional double position = 4;
+  optional double curvature = 5;
+  optional double curvature_derivative = 6;
+  optional double width_right_marking = 7;
+}
+
+message Num_76b {
+  optional int32 num_of_next_lane_mark_reported = 1;
+}
+
+message Aftermarket_669 {
+  optional int32 lane_conf_left = 1;
+  optional bool ldw_availability_left = 2;
+  optional int32 lane_type_left = 3;
+  optional double distance_to_lane_l = 4;
+  optional int32 lane_conf_right = 5;
+  optional bool ldw_availability_right = 6;
+  optional int32 lane_type_right = 7;
+  optional double distance_to_lane_r = 8;
+}
+
+message Lka_769 {
+  optional double heading_angle = 1;
+  optional double view_range = 2;
+  optional bool view_range_availability = 3;
+}
+
+message Reference_76a {
+  optional double ref_point_1_position = 1;
+  optional double ref_point_1_distance = 2;
+  optional bool ref_point_1_validity = 3;
+  optional double ref_point_2_position = 4;
+  optional double ref_point_2_distance = 5;
+  optional bool ref_point_2_validity = 6;
+}
+
+message Details_738 {
+  optional int32 num_obstacles = 1;
+  optional int32 timestamp = 2;
+  optional int32 application_version = 3;
+  optional int32 active_version_number_section = 4;
+  optional bool left_close_rang_cut_in = 5;
+  optional bool right_close_rang_cut_in = 6;
+  optional int32 go = 7;
+  optional int32 protocol_version = 8;
+  optional bool close_car = 9;
+  optional int32 failsafe = 10;
+  optional int32 reserved_10 = 11;
+}
+
+message Next_76c {
+  optional int32 lane_type = 1;
+  optional int32 quality = 2;
+  optional int32 model_degree = 3;
+  optional double position = 4;
+  optional double curvature = 5;
+  optional double curvature_derivative = 6;
+  optional double lane_mark_width = 7;
+}
+
+message Details_737 {
+  optional double lane_curvature = 1;
+  optional double lane_heading = 2;
+  optional bool ca_construction_area = 3;
+  optional bool right_ldw_availability = 4;
+  optional bool left_ldw_availability = 5;
+  optional bool reserved_1 = 6;
+  optional double yaw_angle = 7;
+  optional double pitch_angle = 8;
+}
+
+message Lka_767 {
+  optional double heading_angle = 1;
+  optional double view_range = 2;
+  optional bool view_range_availability = 3;
+}
+
+message Lka_766 {
+  optional int32 lane_type = 1;
+  optional int32 quality = 2;
+  optional int32 model_degree = 3;
+  optional double position = 4;
+  optional double curvature = 5;
+  optional double curvature_derivative = 6;
+  optional double width_left_marking = 7;
+}
+
+message Next_76d {
+  optional double heading_angle = 1;
+  optional double view_range = 2;
+  optional bool view_range_availability = 3;
+}
+
+message Details_739 {
+  optional int32 obstacle_id = 1;
+  optional double obstacle_pos_x = 2;
+  optional int32 reseved_2 = 3;
+  optional double obstacle_pos_y = 4;
+  optional int32 blinker_info = 5;
+  optional int32 cut_in_and_out = 6;
+  optional double obstacle_rel_vel_x = 7;
+  optional int32 obstacle_type = 8;
+  optional bool reserved_3 = 9;
+  optional int32 obstacle_status = 10;
+  optional bool obstacle_brake_lights = 11;
+  optional int32 reserved_4 = 12;
+  optional int32 obstacle_valid = 13;
+}
+
+message Details_73a {
+  optional double obstacle_length = 1;
+  optional double obstacle_width = 2;
+  optional int32 obstacle_age = 3;
+  optional int32 obstacle_lane = 4;
+  optional bool cipv_flag = 5;
+  optional bool reserved_5 = 6;
+  optional double radar_pos_x = 7;
+  optional double radar_vel_x = 8;
+  optional int32 radar_match_confidence = 9;
+  optional bool reserved_6 = 10;
+  optional int32 matched_radar_id = 11;
+  optional bool reserved_7 = 12;
+}
+
+message Details_73b {
+  optional double obstacle_angle_rate = 1;
+  optional double obstacle_scale_change = 2;
+  optional double object_accel_x = 3;
+  optional int32 reserved_8 = 4;
+  optional bool obstacle_replaced = 5;
+  optional int32 reserved_9 = 6;
+  optional double obstacle_angle = 7;
+}
+
+message Mobileye {
+  optional apollo.common.Header header = 1;
+  optional Aftermarket_669 aftermarket_669 = 2;
+  optional Details_737 details_737 = 3;
+  optional Details_738 details_738 = 4;
+  repeated Details_739 details_739 = 5;
+  repeated Details_73a details_73a = 6;
+  repeated Details_73b details_73b = 7;
+  optional Lka_766 lka_766 = 8;
+  optional Lka_767 lka_767 = 9;
+  optional Lka_768 lka_768 = 10;
+  optional Lka_769 lka_769 = 11;
+  optional Reference_76a reference_76a = 12;
+  optional Num_76b num_76b = 13;
+  repeated Next_76c next_76c = 14;
+  repeated Next_76d next_76d = 15;
+}

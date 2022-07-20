@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/planning/tuning:autotuning_feature_builder",
     ],
 )

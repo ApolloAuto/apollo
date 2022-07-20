@@ -16,8 +16,9 @@ proto_library(
     name = "vehicle_config_proto",
     srcs = ["vehicle_config.proto"],
     deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+        "//modules/common_msgs/basic_msgs:vehicle_id_proto",
     ],
 )
 
@@ -25,7 +26,9 @@ py_proto_library(
     name = "vehicle_config_py_pb2",
     deps = [
         ":vehicle_config_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        "//modules/common_msgs/basic_msgs:vehicle_id_py_pb2",
     ],
 )
+

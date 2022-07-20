@@ -11,6 +11,7 @@ cc_library(
     srcs = ["canbus_component.cc"],
     hdrs = ["canbus_component.h"],
     copts = CANBUS_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/canbus/common:canbus_common",
@@ -22,7 +23,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/guardian/proto:guardian_cc_proto",
+        "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -41,7 +42,7 @@ cc_test(
 cc_binary(
     name = "libcanbus_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":canbus_component_lib",
     ],
@@ -65,7 +66,7 @@ install_files(
     name = "pb_canbus",
     dest = "modules/canbus",
     files = [
-        "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
     ],
 )
 

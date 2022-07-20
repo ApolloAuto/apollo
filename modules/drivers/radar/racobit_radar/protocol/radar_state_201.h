@@ -17,15 +17,13 @@
 #pragma once
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/racobit_radar.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
-using ::apollo::drivers::racobit_radar::OutputType;
-using ::apollo::drivers::racobit_radar::RcsThreshold;
 
 class RadarState201
     : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
@@ -40,9 +38,11 @@ class RadarState201
 
   int radar_power(const std::uint8_t* bytes, int32_t length) const;
 
-  OutputType output_type(const std::uint8_t* bytes, int32_t length) const;
+  RacobitRadarState_201::OutputType output_type(
+      const std::uint8_t* bytes, int32_t length) const;
 
-  RcsThreshold rcs_threshold(const std::uint8_t* bytes, int32_t length) const;
+  RacobitRadarState_201::RcsThreshold rcs_threshold(
+      const std::uint8_t* bytes, int32_t length) const;
 
   bool send_quality(const std::uint8_t* bytes, int32_t length) const;
 

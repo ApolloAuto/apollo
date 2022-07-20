@@ -79,7 +79,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:offline_features_cc_proto",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
     ],
 )
 
@@ -103,7 +103,7 @@ cc_library(
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_system_gflags",
-        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/common_msgs/prediction_msgs:lane_graph_cc_proto",
     ],
 )
 
@@ -134,7 +134,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/common_msgs/prediction_msgs:lane_graph_cc_proto",
     ],
 )
 
@@ -158,7 +158,7 @@ cc_library(
     hdrs = ["environment_features.h"],
     deps = [
         "//cyber",
-        "//modules/common/proto:geometry_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
     ],
 )
 
@@ -179,7 +179,7 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         ":prediction_map",
-        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/common_msgs/prediction_msgs:feature_cc_proto",
     ],
 )
 
@@ -211,7 +211,7 @@ cc_library(
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:offline_features_cc_proto",
         "//modules/prediction/scenario:scenario_manager",
-        "//modules/prediction/util:data_extraction",
+        "//modules/common/util:util_tool",
     ],
 )
 
@@ -247,7 +247,7 @@ cc_library(
         "//modules/common/util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/common_msgs/prediction_msgs:feature_cc_proto",
         "@opencv//:highgui",
         "@opencv//:imgcodecs",
     ],

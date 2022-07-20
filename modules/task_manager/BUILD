@@ -15,9 +15,9 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/dreamview/backend/map:map_service",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/task_manager/common:task_manager_gflags",
-        "//modules/task_manager/proto:task_manager_cc_proto",
+        "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
     ],
 )
 
@@ -32,7 +32,7 @@ cc_library(
         "//modules/dreamview/backend/map:map_service",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/task_manager/common:task_manager_gflags",
-        "//modules/task_manager/proto:task_manager_cc_proto",
+        "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
     ],
 )
@@ -49,7 +49,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/dreamview/backend/map:map_service",
         "//modules/task_manager/common:task_manager_gflags",
-        "//modules/task_manager/proto:task_manager_cc_proto",
+        "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
     ],
 )
@@ -65,7 +65,7 @@ cc_library(
         ":dead_end_routing_manager_lib",
         "//cyber",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

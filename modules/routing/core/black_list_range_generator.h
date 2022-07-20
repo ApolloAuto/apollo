@@ -20,7 +20,7 @@
 
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_range_manager.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace routing {

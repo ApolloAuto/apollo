@@ -20,9 +20,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/common/util:factory",
+        "//modules/common/util:util_tool",
         "//modules/planning/common/util:common_lib",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/tasks/deciders/creep_decider",

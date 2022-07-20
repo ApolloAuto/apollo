@@ -18,7 +18,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/transform:buffer",
         "@eigen",
     ],

@@ -35,7 +35,7 @@ using apollo::hdmap::Path;
 using apollo::hdmap::PathOverlap;
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     ValetParkingScenario::s_stage_factory_;
@@ -61,13 +61,13 @@ void ValetParkingScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT,
+      StageType::VALET_PARKING_APPROACHING_PARKING_SPOT,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StageApproachingParkingSpot(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::VALET_PARKING_PARKING,
+      StageType::VALET_PARKING_PARKING,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StageParking(config, injector);

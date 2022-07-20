@@ -17,7 +17,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/lidar/velodyne/driver",
     ],
 )
@@ -38,9 +38,9 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/lidar/common/driver_factory:driver_base",
-        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:config_cc_proto",
         "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
     ],
 )

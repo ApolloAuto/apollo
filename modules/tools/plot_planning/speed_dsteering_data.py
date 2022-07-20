@@ -20,7 +20,7 @@ import sys
 from modules.tools.plot_planning.record_reader import RecordItemReader
 import matplotlib.pyplot as plt
 from cyber.python.cyber_py3.record import RecordReader
-from modules.canbus.proto import chassis_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
 
 
 class SpeedDsteeringData:

@@ -36,7 +36,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:lidar_driver_factory",
-        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:config_cc_proto",
     ],
 )
 

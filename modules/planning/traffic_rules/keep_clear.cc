@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -163,10 +163,10 @@ bool KeepClear::IsCreeping(const double pnc_junction_start_s,
   // while creeping, no need create keep clear obstacle
   const auto& stage_type =
       injector_->planning_context()->planning_status().scenario().stage_type();
-  if (stage_type != ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP &&
+  if (stage_type != StageType::STOP_SIGN_UNPROTECTED_CREEP &&
       stage_type !=
-          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP &&
-      stage_type != ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP) {
+          StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP &&
+      stage_type != StageType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP) {
     return false;
   }
 

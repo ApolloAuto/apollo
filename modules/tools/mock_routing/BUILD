@@ -8,6 +8,6 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/routing/proto:routing_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
     ],
 )

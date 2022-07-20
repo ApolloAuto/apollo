@@ -499,9 +499,9 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
   }
   auto scenario_type = msg->debug().planning_data().scenario().scenario_type();
 
-  bool pulled_over = scenario_type == ScenarioConfig::PULL_OVER;
+  bool pulled_over = scenario_type == ScenarioType::PULL_OVER;
   bool autonomy_resumed = scenario_type == ScenarioConfig::PARK_AND_GO;
-  bool e_stopped = scenario_type == ScenarioConfig::EMERGENCY_PULL_OVER;
+  bool e_stopped = scenario_type == ScenarioType::EMERGENCY_PULL_OVER;
 
   bool sendPullOver = false;
   bool sendStop = false;

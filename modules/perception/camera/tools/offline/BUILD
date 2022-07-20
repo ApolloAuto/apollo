@@ -13,7 +13,7 @@ cc_library(
     ],
     deps = [
         ":transform_server",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
         "//modules/perception/proto:motion_service_cc_proto",

@@ -29,8 +29,8 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/routing/proto/poi.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
+#include "modules/common_msgs/routing_msgs/poi.pb.h"
+#include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

@@ -32,8 +32,8 @@
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/localization_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization_status.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
 

@@ -71,10 +71,6 @@ DECLARE_double(change_lane_min_length);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
-// parameters for trajectory stitching and reinit planning starting point.
-DECLARE_double(replan_lateral_distance_threshold);
-DECLARE_double(replan_longitudinal_distance_threshold);
-
 // parameter for reference line
 DECLARE_bool(enable_reference_line_provider_thread);
 DECLARE_double(default_reference_line_width);

@@ -9,7 +9,7 @@ py_binary(
     srcs = ["audiosaver.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
         "//modules/drivers/microphone/proto:audio_py_pb2",
         "//modules/drivers/microphone/proto:microphone_config_py_pb2",
     ],
@@ -28,9 +28,10 @@ cc_binary(
         "//cyber",
         "//modules/audio/common:audio_gflags",
         "//modules/audio/common:message_process",
-        "//modules/audio/proto:audio_event_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/audio/proto:audio_conf_cc_proto",
+        "//modules/common_msgs/audio_msgs:audio_event_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "@boost",
     ],
 )

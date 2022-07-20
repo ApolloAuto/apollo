@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.localization;
 
-import "modules/drivers/gnss/proto/gnss_raw_observation.proto";
+import "modules/common_msgs/sensor_msgs/gnss_raw_observation.proto";
 
 // Define a rover' direction cosine to an observed satellite under WGS-84
 message SatDirCosine {

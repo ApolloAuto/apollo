@@ -20,7 +20,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"

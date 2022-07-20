@@ -27,7 +27,7 @@
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/ultrasonic_radar.pb.h"
 
 #include "modules/drivers/canbus/sensor_gflags.h"
 

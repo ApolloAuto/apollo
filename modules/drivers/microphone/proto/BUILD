@@ -16,8 +16,8 @@ proto_library(
     name = "audio_proto",
     srcs = ["audio.proto"],
     deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
         ":microphone_config_proto",
-        "//modules/common/proto:header_proto",
     ],
 )
 
@@ -25,8 +25,8 @@ py_proto_library(
     name = "audio_py_pb2",
     deps = [
         ":audio_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
         ":microphone_config_py_pb2",
-        "//modules/common/proto:header_py_pb2",
     ],
 )
 

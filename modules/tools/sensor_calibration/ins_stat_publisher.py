@@ -27,7 +27,7 @@ import time
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 
-from modules.drivers.gnss.proto import ins_pb2
+from modules.common_msgs.sensor_msgs import ins_pb2
 
 
 class InsStat(object):

@@ -43,11 +43,10 @@ cc_library(
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
-        "//modules/common/adapters:adapter_gflags",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common/monitor_log",
         "//modules/common/util",
-        "//modules/planning/proto:planning_cc_proto",
-        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -56,6 +55,7 @@ cc_library(
     srcs = ["udp_bridge_sender_component.cc"],
     hdrs = ["udp_bridge_sender_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
     ],
@@ -66,6 +66,7 @@ cc_library(
     srcs = ["udp_bridge_receiver_component.cc"],
     hdrs = ["udp_bridge_receiver_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
         "//modules/bridge/common:udp_listener",
@@ -77,6 +78,7 @@ cc_library(
     srcs = ["udp_bridge_multi_receiver_component.cc"],
     hdrs = ["udp_bridge_multi_receiver_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
         "//modules/bridge/common:udp_listener",
@@ -86,21 +88,21 @@ cc_library(
 cc_binary(
     name = "libudp_bridge_sender_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_sender"],
 )
 
 cc_binary(
     name = "libudp_bridge_receiver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_receiver"],
 )
 
 cc_binary(
     name = "libudp_bridge_multi_receiver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_multi_receiver"],
 )
 

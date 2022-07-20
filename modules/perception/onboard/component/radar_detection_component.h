@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "cyber/component/component.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"

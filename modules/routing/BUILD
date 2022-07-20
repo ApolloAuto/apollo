@@ -14,7 +14,7 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
-        "//modules/common/util:point_factory",
+        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/core",
         "//modules/routing/proto:routing_config_cc_proto",
@@ -35,7 +35,7 @@ cc_library(
 cc_binary(
     name = "librouting_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":routing_component_lib"],
 )
 
@@ -68,7 +68,7 @@ install_files(
     name = "pb_routing",
     dest = "modules/routing",
     files = [
-        "//modules/routing/proto:routing_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
     ],
 )
 

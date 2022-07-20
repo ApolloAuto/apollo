@@ -24,7 +24,7 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         "//cyber",
-        "//modules/common/util:string_util",
+        "//modules/common/util:util_tool",
         "@com_google_absl//:absl",
     ],
 )
@@ -50,7 +50,7 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         "//cyber",
-        "//modules/common/util:string_util",
+        "//modules/common/util:util_tool",
         "@com_google_absl//:absl",
     ],
 )

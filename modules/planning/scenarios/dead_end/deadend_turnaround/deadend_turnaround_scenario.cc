@@ -39,7 +39,7 @@ using apollo::common::math::Polygon2d;
 using apollo::common::math::LineSegment2d;
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     DeadEndTurnAroundScenario::s_stage_factory_;
@@ -62,13 +62,13 @@ void DeadEndTurnAroundScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT,
+      StageType::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StageApproachingTurningPoint(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::DEADEND_TURNAROUND_TURNING,
+      StageType::DEADEND_TURNAROUND_TURNING,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StageTurning(config, injector);

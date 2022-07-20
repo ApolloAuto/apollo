@@ -1,10 +1,11 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "math",
+cc_binary(
+    name = "libmath.so",
+    linkshared = True,
+    linkstatic = True,
     deps = [
         ":angle",
         ":cartesian_frenet_conversion",
@@ -16,17 +17,37 @@ cc_library(
         ":kalman_filter",
         ":linear_interpolation",
         ":lqr",
+        ":matrix_operations",
         ":mpc_osqp",
+        ":path_matcher",
         ":quaternion",
         ":search",
         ":sin_table",
+        "//modules/common/math/qp_solver",
     ],
+)
+
+cc_library(
+    name = "math",
+    srcs = ["libmath.so"],
+    hdrs = glob(["*.h"]),
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
+        "//modules/common/util:util_tool",
+        "@com_google_absl//:absl",
+        "@eigen",
+        "@osqp",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "math_utils",
     srcs = ["math_utils.cc"],
     hdrs = ["math_utils.h"],
+    alwayslink = True,
     linkopts = ["-lm"],
     deps = [
         ":vec2d",
@@ -38,6 +59,7 @@ cc_library(
     name = "vec2d",
     srcs = ["vec2d.cc"],
     hdrs = ["vec2d.h"],
+    alwayslink = True,
     linkopts = ["-lm"],
     deps = [
         "//cyber",
@@ -60,11 +82,12 @@ cc_library(
         "line_segment2d.h",
         "polygon2d.h",
     ],
+    alwayslink = True,
     linkopts = ["-lm"],
     deps = [
         ":math_utils",
         "//cyber",
-        "//modules/common/util:string_util",
+        "//modules/common/util:util_tool",
         "@com_google_absl//:absl",
         "@osqp",
     ],
@@ -74,12 +97,14 @@ cc_library(
     name = "sin_table",
     srcs = ["sin_table.cc"],
     hdrs = ["sin_table.h"],
+    alwayslink = True,
 )
 
 cc_library(
     name = "angle",
     srcs = ["angle.cc"],
     hdrs = ["angle.h"],
+    alwayslink = True,
     deps = [
         ":sin_table",
     ],
@@ -88,6 +113,7 @@ cc_library(
 cc_library(
     name = "euler_angles_zxy",
     hdrs = ["euler_angles_zxy.h"],
+    alwayslink = True,
     deps = [
         ":geometry",
         "@eigen",
@@ -97,10 +123,11 @@ cc_library(
 cc_library(
     name = "quaternion",
     hdrs = ["quaternion.h"],
+    alwayslink = True,
     deps = [
         ":euler_angles_zxy",
         ":geometry",
-        "//modules/common/proto:geometry_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
         "@eigen",
     ],
 )
@@ -108,6 +135,7 @@ cc_library(
 cc_library(
     name = "curve_fitting",
     hdrs = ["curve_fitting.h"],
+    alwayslink = True,
     deps = [
         ":matrix_operations",
         "@eigen",
@@ -118,6 +146,7 @@ cc_library(
     name = "matrix_operations",
     srcs = ["matrix_operations.cc"],
     hdrs = ["matrix_operations.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "@eigen",
@@ -138,9 +167,10 @@ cc_test(
 cc_library(
     name = "kalman_filter",
     hdrs = ["kalman_filter.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/common/math:matrix_operations",
+        ":matrix_operations",
         "@eigen",
     ],
 )
@@ -148,6 +178,7 @@ cc_library(
 cc_library(
     name = "factorial",
     hdrs = ["factorial.h"],
+    alwayslink = True,
 )
 
 cc_library(
@@ -155,15 +186,17 @@ cc_library(
     srcs = ["path_matcher.cc"],
     hdrs = ["path_matcher.h"],
     deps = [
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_cc_proto",
+        ":linear_interpolation",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
     name = "mpc_osqp",
     srcs = ["mpc_osqp.cc"],
     hdrs = ["mpc_osqp.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "@eigen",
@@ -188,15 +221,17 @@ cc_library(
     name = "search",
     srcs = ["search.cc"],
     hdrs = ["search.h"],
+    alwayslink = True,
 )
 
 cc_library(
     name = "linear_interpolation",
     srcs = ["linear_interpolation.cc"],
     hdrs = ["linear_interpolation.h"],
+    alwayslink = True,
     deps = [
         ":geometry",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
     ],
 )
 
@@ -204,6 +239,7 @@ cc_library(
     name = "integral",
     srcs = ["integral.cc"],
     hdrs = ["integral.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
     ],
@@ -213,6 +249,7 @@ cc_library(
     name = "lqr",
     srcs = ["linear_quadratic_regulator.cc"],
     hdrs = ["linear_quadratic_regulator.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "@eigen",
@@ -223,6 +260,7 @@ cc_library(
     name = "cartesian_frenet_conversion",
     srcs = ["cartesian_frenet_conversion.cc"],
     hdrs = ["cartesian_frenet_conversion.h"],
+    alwayslink = True,
     deps = [
         ":geometry",
         "//cyber",
@@ -233,6 +271,7 @@ cc_library(
 cc_library(
     name = "hermite_spline",
     hdrs = ["hermite_spline.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
     ],

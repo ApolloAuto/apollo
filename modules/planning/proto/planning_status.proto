@@ -2,9 +2,10 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/common/proto/geometry.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
 import "modules/planning/proto/planning_config.proto";
-import "modules/routing/proto/routing.proto";
+import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/planning_msgs/scenario_type.proto";
 
 /*
   This file defines the data types that represents the internal state of the
@@ -117,8 +118,8 @@ message SpeedDeciderStatus {
 }
 
 message ScenarioStatus {
-  optional ScenarioConfig.ScenarioType scenario_type = 1;
-  optional ScenarioConfig.StageType stage_type = 2;
+  optional ScenarioType scenario_type = 1;
+  optional StageType stage_type = 2;
 }
 
 message StopSignStatus {

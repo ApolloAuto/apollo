@@ -33,9 +33,9 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "//modules/drivers/tools/image_decompress/proto:config_cc_proto",
         "@opencv//:imgcodecs",
     ],

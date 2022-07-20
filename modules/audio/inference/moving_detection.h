@@ -18,7 +18,7 @@
 #include <vector>
 #include <complex>
 
-#include "modules/audio/proto/audio.pb.h"
+#include "modules/common_msgs/audio_msgs/audio.pb.h"
 
 namespace apollo {
 namespace audio {

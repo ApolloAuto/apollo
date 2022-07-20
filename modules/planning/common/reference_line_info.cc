@@ -30,7 +30,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -890,7 +890,7 @@ void ReferenceLineInfo::ExportEngageAdvice(
   } else if (!is_on_reference_line_) {
     const auto& scenario_type =
         planning_context->planning_status().scenario().scenario_type();
-    if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
+    if (scenario_type == ScenarioType::PARK_AND_GO || IsChangeLanePath()) {
       // note: when is_on_reference_line_ is FALSE
       //   (1) always engage while in PARK_AND_GO scenario
       //   (2) engage when "ChangeLanePath" is picked as Drivable ref line

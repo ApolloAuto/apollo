@@ -30,7 +30,7 @@ namespace park_and_go {
 class ParkAndGoStageAdjustTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_ADJUST);
+    config_.set_stage_type(StageType::PARK_AND_GO_ADJUST);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,7 +42,7 @@ class ParkAndGoStageAdjustTest : public ::testing::Test {
 TEST_F(ParkAndGoStageAdjustTest, Init) {
   ParkAndGoStageAdjust park_and_go_stage_adjust(config_, injector_);
   EXPECT_EQ(park_and_go_stage_adjust.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_ADJUST));
+            StageType_Name(StageType::PARK_AND_GO_ADJUST));
 }
 
 }  // namespace park_and_go

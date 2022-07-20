@@ -13,7 +13,7 @@ py_library(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
-        "//modules/drivers/proto:sensor_image_py_pb2",
+        "//modules/common_msgs/sensor_msgs:sensor_image_py_pb2",
     ],
 )
 
@@ -23,7 +23,7 @@ py_library(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
-        "//modules/drivers/proto:pointcloud_py_pb2",
+        "//modules/common_msgs/sensor_msgs:pointcloud_py_pb2",
     ],
 )
 
@@ -33,7 +33,7 @@ py_library(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
-        "//modules/drivers/proto:conti_radar_py_pb2",
+        "//modules/common_msgs/sensor_msgs:conti_radar_py_pb2",
     ],
 )
 

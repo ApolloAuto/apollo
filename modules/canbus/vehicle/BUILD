@@ -12,11 +12,11 @@ cc_library(
     copts = CANBUS_COPTS,
     deps = [
         "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
@@ -30,7 +30,7 @@ cc_library(
     hdrs = ["abstract_vehicle_factory.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -54,7 +54,7 @@ cc_library(
         "//modules/canbus/vehicle/transit:transit_vehicle_factory",
         "//modules/canbus/vehicle/wey:wey_vehicle_factory",
         "//modules/canbus/vehicle/zhongyun:zhongyun_vehicle_factory",
-        "//modules/common/util:factory",
+        "//modules/common/util:util_tool",
     ],
 )
 

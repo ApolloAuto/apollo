@@ -25,7 +25,7 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/vehicle_struct.h"
-// #include "modules/prediction/proto/feature.pb.h"
+// #include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 namespace apollo {
 namespace perception {

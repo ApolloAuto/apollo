@@ -20,7 +20,7 @@ Convert a base map from txt to bin format
 """
 
 import argparse
-from modules.map.proto.map_pb2 import Map
+from modules.common_msgs.map_msgs.map_pb2 import Map
 from google.protobuf import text_format
 
 

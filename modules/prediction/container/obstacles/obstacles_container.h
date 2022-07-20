@@ -30,7 +30,7 @@
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/prediction/submodules/submodule_output.h"
 
 namespace apollo {

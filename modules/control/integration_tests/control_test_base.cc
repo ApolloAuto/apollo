@@ -22,7 +22,7 @@
 #include "google/protobuf/text_format.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/dependency_injector.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");

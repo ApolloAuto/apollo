@@ -21,7 +21,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/proto/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "opencv2/opencv.hpp"
 
 namespace apollo {

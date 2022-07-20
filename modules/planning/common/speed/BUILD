@@ -23,7 +23,7 @@ cc_library(
         ":st_point",
         "//cyber",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -47,13 +47,12 @@ cc_library(
     deps = [
         ":st_point",
         "//modules/common/math",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/util",
-        "//modules/common/util:point_factory",
-        "//modules/common/util:string_util",
+        "//modules/common/util:util_tool",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

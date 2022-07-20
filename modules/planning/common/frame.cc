@@ -37,7 +37,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +49,7 @@ using apollo::common::math::Polygon2d;
 using apollo::cyber::Clock;
 using apollo::prediction::PredictionObstacles;
 
-DrivingAction Frame::pad_msg_driving_action_ = DrivingAction::NONE;
+PadMessage::DrivingAction Frame::pad_msg_driving_action_ = PadMessage::NONE;
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_frame_history_num) {}
@@ -515,7 +515,7 @@ void Frame::ReadPadMsgDrivingAction() {
 }
 
 void Frame::ResetPadMsgDrivingAction() {
-  pad_msg_driving_action_ = DrivingAction::NONE;
+  pad_msg_driving_action_ = PadMessage::NONE;
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {

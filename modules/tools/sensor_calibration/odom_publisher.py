@@ -27,13 +27,13 @@ import time
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 
-from modules.localization.proto import localization_pb2
-from modules.localization.proto import gps_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
+from modules.common_msgs.localization_msgs import gps_pb2
 
 class OdomPublisher(object):
     def __init__(self, node):
         self.localization = localization_pb2.LocalizationEstimate()
-        self.gps_odom_pub = node.create_writer('/apollo/sensor/gnss/odometry', gps_pb2.Gps) 
+        self.gps_odom_pub = node.create_writer('/apollo/sensor/gnss/odometry', gps_pb2.Gps)
         self.sequence_num = 0
         self.terminating = False
         self.position_x = 0
@@ -43,7 +43,7 @@ class OdomPublisher(object):
         self.orientation_y = 0
         self.orientation_z = 0
         self.orientation_w = 0
-        self.linear_velocity_x = 0 
+        self.linear_velocity_x = 0
         self.linear_velocity_y = 0
         self.linear_velocity_z = 0
 

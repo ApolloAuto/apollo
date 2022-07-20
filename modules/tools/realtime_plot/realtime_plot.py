@@ -27,9 +27,9 @@ import numpy as np
 
 from cyber.python.cyber_py3 import cyber
 from modules.tools.realtime_plot.item import Item
-from modules.canbus.proto.chassis_pb2 import Chassis
-from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.planning.proto.planning_pb2 import ADCTrajectory
+from modules.common_msgs.chassis_msgs.chassis_pb2 import Chassis
+from modules.common_msgs.localization_msgs.localization_pb2 import LocalizationEstimate
+from modules.common_msgs.planning_msgs.planning_pb2 import ADCTrajectory
 from modules.tools.realtime_plot.stitem import Stitem
 from modules.tools.realtime_plot.xyitem import Xyitem
 import modules.tools.common.proto_utils as proto_utils

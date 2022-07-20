@@ -22,7 +22,7 @@
 
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/third_party_perception/third_party_perception_base.h"
 #include "modules/third_party_perception/third_party_perception_mobileye.h"
 #include "modules/third_party_perception/third_party_perception_smartereye.h"

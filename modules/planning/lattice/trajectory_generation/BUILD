@@ -57,7 +57,7 @@ cc_library(
     hdrs = ["trajectory_evaluator.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//modules/common/math:path_matcher",
+        "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/constraint_checker:constraint_checker1d",
@@ -87,8 +87,7 @@ cc_library(
     srcs = ["trajectory_combiner.cc"],
     hdrs = ["trajectory_combiner.h"],
     deps = [
-        "//modules/common/math:cartesian_frenet_conversion",
-        "//modules/common/math:path_matcher",
+        "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/math/curve1d",
@@ -124,7 +123,7 @@ cc_library(
     deps = [
         ":lateral_qp_optimizer",
         "//cyber",
-        "//modules/common/math:matrix_operations",
+        "//modules/common/math",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",

@@ -13,13 +13,13 @@ cc_library(
     copts = GUARDIAN_COPTS,
     deps = [
         "//cyber",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
-        "//modules/control/proto:control_cmd_cc_proto",
-        "//modules/guardian/proto:guardian_cc_proto",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
         "//modules/guardian/proto:guardian_conf_cc_proto",
-        "//modules/monitor/proto:system_status_cc_proto",
+        "//modules/common_msgs/monitor_msgs:system_status_cc_proto",
     ],
 )
 

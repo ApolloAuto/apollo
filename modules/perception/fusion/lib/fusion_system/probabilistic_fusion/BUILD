@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/graph",

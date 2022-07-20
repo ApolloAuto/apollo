@@ -11,7 +11,7 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/util:map_util",
+        "//modules/common/util:util_tool",
         "@civetweb//:civetweb++",
         "@com_github_nlohmann_json//:json",
     ],
@@ -26,7 +26,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "@civetweb//:civetweb++",
         "@opencv//:imgcodecs",
     ],

@@ -20,7 +20,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//cyber",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
     ],
 )

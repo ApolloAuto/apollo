@@ -25,7 +25,6 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

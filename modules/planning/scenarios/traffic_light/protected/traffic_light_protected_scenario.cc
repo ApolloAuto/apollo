@@ -74,7 +74,7 @@ void TrafficLightProtectedScenario::Init() {
 }
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     TrafficLightProtectedScenario::s_stage_factory_;
@@ -84,13 +84,13 @@ void TrafficLightProtectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH,
+      StageType::TRAFFIC_LIGHT_PROTECTED_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightProtectedStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
+      StageType::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightProtectedStageIntersectionCruise(config,

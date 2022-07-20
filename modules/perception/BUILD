@@ -29,14 +29,14 @@ install_files(
         "//modules/perception/proto:fused_classifier_config_py_pb2",
         "//modules/perception/proto:map_manager_config_py_pb2",
         "//modules/perception/proto:motion_service_py_pb2",
-        "//modules/perception/proto:perception_camera_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_camera_py_pb2",
         "//modules/perception/proto:perception_config_schema_py_pb2",
-        "//modules/perception/proto:perception_lane_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_lane_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
         "//modules/perception/proto:perception_ultrasonic_py_pb2",
         "//modules/perception/proto:roi_boundary_filter_config_py_pb2",
         "//modules/perception/proto:tracker_config_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_py_pb2",
     ],
 )
 

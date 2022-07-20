@@ -109,7 +109,7 @@ cc_library(
 #    deps = [
 #        ":camera_common_io_util",
 #        ":camera_common_undistortion",
-#        "//modules/common/util:perf_util",
+#        "//modules/common/util:util_tool",
 #        "//modules/perception/camera/common:undistortion_handler",
 #        "//modules/perception/inference:inference_factory",
 #        "//modules/perception/inference/operators:perception_inference_operators",

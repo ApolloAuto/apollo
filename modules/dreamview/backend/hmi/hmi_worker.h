@@ -24,14 +24,14 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
-#include "modules/audio/proto/audio_event.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/proto/drive_event.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/common_msgs/audio_msgs/audio_event.pb.h"
+#include "modules/common_msgs/basic_msgs/drive_event.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 
 #include "cyber/cyber.h"
 #include "cyber/time/time.h"

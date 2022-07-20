@@ -18,7 +18,6 @@ cc_library(
     hdrs = ["audio_info.h"],
     deps = [
         ":audio_gflags",
-        "//modules/audio/proto:audio_cc_proto",
         "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/drivers/microphone/proto:microphone_config_cc_proto",
     ],
@@ -33,10 +32,7 @@ cc_library(
         "//modules/audio/inference:direction_detection",
         "//modules/audio/inference:moving_detection",
         "//modules/audio/inference:siren_detection",
-        "//modules/audio/proto:audio_cc_proto",
-        "//modules/audio/proto:audio_conf_cc_proto",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
+        "//modules/common_msgs/audio_msgs:audio_cc_proto",
         "//modules/drivers/microphone/proto:audio_cc_proto",
     ],
 )

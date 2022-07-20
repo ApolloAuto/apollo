@@ -1,12 +1,28 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "libvehicle_model.so",
+    srcs = [
+        "vehicle_model.cc",
+        "vehicle_model.h",
+    ],
+    linkshared = True,
+    linkstatic = True,
+    deps = [
+        "//cyber",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_model/proto:vehicle_model_config_cc_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+    ],
+)
 
 cc_library(
     name = "vehicle_model",
-    srcs = ["vehicle_model.cc"],
+    srcs = ["libvehicle_model.so"],
     hdrs = ["vehicle_model.h"],
     deps = [
         "//cyber",
@@ -15,6 +31,7 @@ cc_library(
         "//modules/common/vehicle_model/proto:vehicle_model_config_cc_proto",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(
@@ -26,6 +43,7 @@ cc_test(
     ],
     deps = [
         ":vehicle_model",
+        "//cyber",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "@com_google_googletest//:gtest_main",
     ],
@@ -48,6 +66,7 @@ install(
     data = [
         ":vehicle_model_config_data",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cpplint()

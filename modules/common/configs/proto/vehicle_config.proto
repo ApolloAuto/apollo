@@ -2,8 +2,9 @@ syntax = "proto2";
 
 package apollo.common;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/vehicle_id.proto";
 
 message Transform {
   optional bytes source_frame = 1;  // Also known as "frame_id."
@@ -36,12 +37,6 @@ enum VehicleBrand {
   CH = 7;
   DKIT = 8;
   NEOLIX = 9;
-}
-
-message VehicleID {
-  optional string vin = 1;
-  optional string plate = 2;
-  optional string other_unique_id = 3;
 }
 
 message LatencyParam {

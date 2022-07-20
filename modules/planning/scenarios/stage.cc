@@ -50,7 +50,7 @@ Stage::Stage(const ScenarioConfig::StageConfig& config,
       ->mutable_scenario()
       ->set_stage_type(stage_type());
 
-  name_ = ScenarioConfig::StageType_Name(config_.stage_type());
+  name_ = StageType_Name(config_.stage_type());
   next_stage_ = config_.stage_type();
   std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
       config_map;
@@ -213,7 +213,7 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
 }
 
 Stage::StageStatus Stage::FinishScenario() {
-  next_stage_ = ScenarioConfig::NO_STAGE;
+  next_stage_ = StageType::NO_STAGE;
   return Stage::FINISHED;
 }
 

@@ -45,7 +45,7 @@ cc_library(
         "//cyber",
         "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lib/registerer",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/perception/lidar/common:lidar_frame",
         "@eigen",
     ],
@@ -68,7 +68,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/lib/registerer",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/perception/lidar/common:lidar_frame",
     ],
 )

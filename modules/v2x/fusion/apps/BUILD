@@ -32,7 +32,7 @@ cc_library(
 cc_binary(
     name = "libv2x_fusion_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":v2x_fusion_component_lib"],
 )
 

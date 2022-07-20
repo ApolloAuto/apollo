@@ -25,9 +25,9 @@
 #include "modules/audio/common/audio_gflags.h"
 #include "modules/audio/common/message_process.h"
 #include "modules/audio/proto/audio_conf.pb.h"
-#include "modules/audio/proto/audio_event.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/audio_msgs/audio_event.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace audio {

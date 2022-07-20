@@ -6,37 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "static_info_cc_proto",
-    deps = [
-        ":static_info_proto",
-    ],
-)
-
-proto_library(
-    name = "static_info_proto",
-    srcs = ["static_info.proto"],
-    deps = [
-        "//modules/canbus/proto:canbus_conf_proto",
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/control/proto:control_conf_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "static_info_py_pb2",
-    deps = [
-        ":static_info_proto",
-        "//modules/canbus/proto:canbus_conf_py_pb2",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
-        "//modules/control/proto:control_conf_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
     name = "frame_cc_proto",
     deps = [
         ":frame_proto",
@@ -54,3 +23,34 @@ py_proto_library(
         ":frame_proto",
     ],
 )
+cc_proto_library(
+    name = "static_info_cc_proto",
+    deps = [
+        ":static_info_proto",
+    ],
+)
+
+proto_library(
+    name = "static_info_proto",
+    srcs = ["static_info.proto"],
+    deps = [
+        "//modules/canbus/proto:canbus_conf_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/control/proto:control_conf_proto",
+        "//modules/common_msgs/routing_msgs:routing_proto",
+    ],
+)
+
+py_proto_library(
+    name = "static_info_py_pb2",
+    deps = [
+        ":static_info_proto",
+        "//modules/canbus/proto:canbus_conf_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/control/proto:control_conf_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
+    ],
+)
+

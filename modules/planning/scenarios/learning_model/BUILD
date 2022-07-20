@@ -26,12 +26,9 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/proto:pnc_point_cc_proto",
-        "//modules/common/status",
-        "//modules/common/util:factory",
-        "//modules/planning/reference_line",
+        "//modules/common/util:util_tool",
         "//modules/planning/scenarios:scenario",
-        "@eigen",
+        "//modules/planning/common:frame",
     ] + if_gpu(
         ["@libtorch_gpu"],
         ["@libtorch_cpu"],

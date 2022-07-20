@@ -23,7 +23,7 @@ cc_library(
     hdrs = ["pose.h"],
     deps = [
         "//cyber",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
     ],
 )

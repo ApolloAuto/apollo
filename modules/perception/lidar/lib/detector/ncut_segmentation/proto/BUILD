@@ -23,7 +23,6 @@ py_proto_library(
         ":ncut_param_proto",
     ],
 )
-
 cc_proto_library(
     name = "ncut_config_cc_proto",
     deps = [

@@ -9,9 +9,9 @@ cc_binary(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:pad_msg_cc_proto",
+        "//modules/common_msgs/planning_msgs:pad_msg_cc_proto",
         "//modules/planning/proto:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],

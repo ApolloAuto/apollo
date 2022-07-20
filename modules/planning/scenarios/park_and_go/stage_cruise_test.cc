@@ -34,7 +34,7 @@ namespace park_and_go {
 class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CRUISE);
+    config_.set_stage_type(StageType::PARK_AND_GO_CRUISE);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -46,7 +46,7 @@ class ParkAndGoStageCruiseTest : public ::testing::Test {
 TEST_F(ParkAndGoStageCruiseTest, Init) {
   ParkAndGoStageCruise park_and_go_stage_cruise(config_, injector_);
   EXPECT_EQ(park_and_go_stage_cruise.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_CRUISE));
+            StageType_Name(StageType::PARK_AND_GO_CRUISE));
 }
 
 }  // namespace park_and_go

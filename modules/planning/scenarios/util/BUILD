@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/util:map_util",
+        "//modules/common/util:util_tool",
         "//modules/planning/common:planning_common",
     ],
 )

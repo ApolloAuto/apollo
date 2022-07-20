@@ -21,7 +21,7 @@
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -40,7 +40,7 @@ using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     YieldSignScenario::s_stage_factory_;
@@ -88,13 +88,13 @@ void YieldSignScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::YIELD_SIGN_APPROACH,
+      StageType::YIELD_SIGN_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new YieldSignStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::YIELD_SIGN_CREEP,
+      StageType::YIELD_SIGN_CREEP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new YieldSignStageCreep(config, injector);

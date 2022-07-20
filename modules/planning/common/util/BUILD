@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
@@ -16,8 +17,7 @@ cc_library(
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_cc_proto",
-        "//modules/routing",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

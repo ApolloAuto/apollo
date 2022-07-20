@@ -23,7 +23,7 @@
 
 #include <sys/time.h>
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**

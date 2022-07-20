@@ -80,6 +80,7 @@ cc_library(
         ":spline_1d",
         ":spline_1d_constraint",
         ":spline_1d_kernel",
+        # "//modules/common/math",
         "//modules/common/math/qp_solver",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto/math:qp_problem_cc_proto",
@@ -93,8 +94,9 @@ cc_library(
     hdrs = ["osqp_spline_1d_solver.h"],
     deps = [
         ":spline_1d_solver",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
+        "//modules/common/math",
+        "//modules/common/math/qp_solver",
+        "//modules/planning/common:planning_gflags",
         "@osqp",
     ],
 )
@@ -137,8 +139,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_2d",
-        "//modules/common/math:angle",
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "@eigen",
     ],
 )
@@ -150,7 +151,7 @@ cc_library(
     deps = [
         ":spline_2d",
         ":spline_seg_kernel",
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "@eigen",
     ],
 )
@@ -165,8 +166,7 @@ cc_library(
         ":spline_2d",
         ":spline_2d_constraint",
         ":spline_2d_kernel",
-        "//modules/common/math:geometry",
-        "//modules/common/math:matrix_operations",
+        # "//modules/common/math",
         "//modules/common/math/qp_solver",
         "//modules/planning/common:planning_gflags",
         "@eigen",
@@ -180,7 +180,9 @@ cc_library(
     hdrs = ["osqp_spline_2d_solver.h"],
     deps = [
         ":spline_2d_solver",
-        "//modules/common/math:matrix_operations",
+        ":spline_2d",
+        "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
         "@com_google_googletest//:gtest",
         "@osqp",
     ],

@@ -4,10 +4,14 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "buffer",
-    srcs = ["buffer.cc"],
-    hdrs = ["buffer.h"],
+cc_binary(
+    name = "libbuffer.so",
+    srcs = [
+        "buffer.cc",
+        "buffer.h",
+    ],
+    linkshared = True,
+    linkstatic = True,
     deps = [
         ":buffer_interface",
         "//cyber",
@@ -18,21 +22,53 @@ cc_library(
 )
 
 cc_library(
+    name = "buffer",
+    srcs = ["libbuffer.so"],
+    hdrs = [
+        "buffer.h",
+        "buffer_interface.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//third_party/tf2",
+        "@com_google_absl//:absl",
+    ],
+)
+
+cc_library(
     name = "buffer_interface",
     hdrs = ["buffer_interface.h"],
     deps = [
-        "//modules/transform/proto:transform_cc_proto",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+cc_binary(
+    name = "libtransform_broadcaster.so",
+    srcs = [
+        "transform_broadcaster.cc",
+        "transform_broadcaster.h"
+    ],
+    linkshared = True,
+    linkstatic = True,
+    deps = [
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
     ],
 )
 
 cc_library(
     name = "transform_broadcaster",
-    srcs = ["transform_broadcaster.cc"],
+    srcs = ["libtransform_broadcaster.so"],
     hdrs = ["transform_broadcaster.h"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/transform/proto:transform_cc_proto",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
     ],
 )
 
@@ -41,12 +77,13 @@ cc_library(
     srcs = ["static_transform_component.cc"],
     hdrs = ["static_transform_component.h"],
     copts = ['-DMODULE_NAME=\\"static_transform\\"'],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/transform/proto:static_transform_conf_cc_proto",
-        "//modules/transform/proto:transform_cc_proto",
+        "//modules/common_msgs/transform_msgs:transform_cc_proto",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
@@ -64,7 +101,7 @@ cc_test(
 cc_binary(
     name = "libstatic_transform_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":static_transform_component_lib"],
 )
 

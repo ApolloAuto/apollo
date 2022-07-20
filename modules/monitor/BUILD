@@ -9,7 +9,7 @@ MONITOR_COPTS = ['-DMODULE_NAME=\\"monitor\\"']
 cc_binary(
     name = "libmonitor.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":monitor_lib",
     ],
@@ -23,7 +23,7 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/hardware:esdcan_monitor",
         "//modules/monitor/hardware:gps_monitor",
@@ -39,6 +39,7 @@ cc_library(
         "//modules/monitor/software:recorder_monitor",
         "//modules/monitor/software:summary_monitor",
     ],
+    alwayslink = True,
 )
 
 filegroup(

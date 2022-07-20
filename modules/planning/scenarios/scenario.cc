@@ -30,7 +30,7 @@ namespace scenario {
 Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context,
                    const std::shared_ptr<DependencyInjector>& injector)
     : config_(config), scenario_context_(context), injector_(injector) {
-  name_ = ScenarioConfig::ScenarioType_Name(config.scenario_type());
+  name_ = ScenarioType_Name(config.scenario_type());
 }
 
 bool Scenario::LoadConfig(const std::string& config_file,
@@ -54,11 +54,11 @@ void Scenario::Init() {
   for (int i = 0; i < config_.stage_type_size(); ++i) {
     auto stage_type = config_.stage_type(i);
     ACHECK(common::util::ContainsKey(stage_config_map_, stage_type))
-        << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
+        << "stage type : " << StageType_Name(stage_type)
         << " has no config";
   }
   ADEBUG << "init stage "
-         << ScenarioConfig::StageType_Name(config_.stage_type(0));
+         << StageType_Name(config_.stage_type(0));
   current_stage_ =
       CreateStage(*stage_config_map_[config_.stage_type(0)], injector_);
 }
@@ -69,7 +69,7 @@ Scenario::ScenarioStatus Scenario::Process(
     AWARN << "Current stage is a null pointer.";
     return STATUS_UNKNOWN;
   }
-  if (current_stage_->stage_type() == ScenarioConfig::NO_STAGE) {
+  if (current_stage_->stage_type() == StageType::NO_STAGE) {
     scenario_status_ = STATUS_DONE;
     return scenario_status_;
   }
@@ -88,8 +88,8 @@ Scenario::ScenarioStatus Scenario::Process(
       auto next_stage = current_stage_->NextStage();
       if (next_stage != current_stage_->stage_type()) {
         AINFO << "switch stage from " << current_stage_->Name() << " to "
-              << ScenarioConfig::StageType_Name(next_stage);
-        if (next_stage == ScenarioConfig::NO_STAGE) {
+              << StageType_Name(next_stage);
+        if (next_stage == StageType::NO_STAGE) {
           scenario_status_ = STATUS_DONE;
           return scenario_status_;
         }
@@ -105,7 +105,7 @@ Scenario::ScenarioStatus Scenario::Process(
         }
       }
       if (current_stage_ != nullptr &&
-          current_stage_->stage_type() != ScenarioConfig::NO_STAGE) {
+          current_stage_->stage_type() != StageType::NO_STAGE) {
         scenario_status_ = STATUS_PROCESSING;
       } else {
         scenario_status_ = STATUS_DONE;

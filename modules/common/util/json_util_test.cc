@@ -19,7 +19,7 @@
 #include "gmock/gmock.h"
 #include "google/protobuf/util/json_util.h"
 #include "gtest/gtest.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 namespace apollo {
 namespace common {

@@ -23,8 +23,8 @@
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -79,7 +79,7 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
 }
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     TrafficLightUnprotectedRightTurnScenario::s_stage_factory_;
@@ -89,19 +89,19 @@ void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
+      StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightUnprotectedRightTurnStageStop(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
+      StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightUnprotectedRightTurnStageCreep(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
+      StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(

@@ -52,7 +52,7 @@ TEST_F(BareIntersectionUnprotectedScenarioTest, Init) {
   scenario_.reset(new BareIntersectionUnprotectedScenario(config, &context,
                                                           planning_context));
   EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::BARE_INTERSECTION_UNPROTECTED);
+            ScenarioType::BARE_INTERSECTION_UNPROTECTED);
 }
 
 }  // namespace bare_intersection

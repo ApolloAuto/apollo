@@ -24,11 +24,9 @@
 #include <string>
 #include <vector>
 
-#include "gflags/gflags.h"
-
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/routing/proto/routing.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"

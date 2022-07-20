@@ -20,7 +20,7 @@
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

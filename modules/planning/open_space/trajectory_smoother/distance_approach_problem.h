@@ -27,7 +27,7 @@
 
 #include "Eigen/Dense"
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"

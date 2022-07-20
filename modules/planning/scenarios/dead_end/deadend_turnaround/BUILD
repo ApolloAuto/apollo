@@ -19,7 +19,11 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/map_msgs:map_id_cc_proto",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
         "//modules/planning/scenarios:scenario",
     ],
 )

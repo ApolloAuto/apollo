@@ -29,7 +29,7 @@ import shutil
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3.record import RecordReader
-from modules.drivers.gnss.proto import gnss_pb2
+from modules.common_msgs.sensor_msgs import gnss_pb2
 
 
 g_args = None

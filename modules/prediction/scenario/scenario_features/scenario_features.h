@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "modules/prediction/proto/scenario.pb.h"
+#include "modules/common_msgs/prediction_msgs/scenario.pb.h"
 
 namespace apollo {
 namespace prediction {

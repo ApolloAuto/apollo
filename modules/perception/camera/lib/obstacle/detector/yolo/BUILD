@@ -38,7 +38,7 @@ cc_library(
     deps = [
         ":region_output",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",

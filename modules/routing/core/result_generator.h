@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 #include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/topo_range_manager.h"

@@ -44,7 +44,7 @@ cc_library(
     copts = MICROPHONE_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/microphone:respeaker",
         "//modules/drivers/microphone/proto:audio_cc_proto",
         "//modules/drivers/microphone/proto:microphone_config_cc_proto",

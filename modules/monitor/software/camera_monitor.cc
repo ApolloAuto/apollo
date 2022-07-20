@@ -23,7 +23,7 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

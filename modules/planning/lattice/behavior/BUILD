@@ -11,7 +11,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/planning/common:planning_gflags",
     ],
 )
@@ -23,9 +23,8 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/math:path_matcher",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/math",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
@@ -41,10 +40,9 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/math",
-        "//modules/common/math:path_matcher",
         "//modules/planning/common:obstacle",
         "//modules/planning/proto:lattice_structure_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

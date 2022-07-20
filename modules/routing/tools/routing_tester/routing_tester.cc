@@ -19,7 +19,7 @@
 #include "cyber/time/rate.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 DEFINE_bool(enable_remove_lane_id, true,
             "True to remove lane id in routing request");

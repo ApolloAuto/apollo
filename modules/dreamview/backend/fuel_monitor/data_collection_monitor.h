@@ -31,7 +31,7 @@
 
 #include "nlohmann/json.hpp"
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/dreamview/proto/data_collection_table.pb.h"
 
 #include "cyber/cyber.h"

@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.localization;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/localization_msgs/pose.proto";
+
+message Gps {
+  optional apollo.common.Header header = 1;
+
+  // Localization message: from GPS or localization
+  optional apollo.localization.Pose localization = 2;
+}

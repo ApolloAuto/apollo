@@ -36,7 +36,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",

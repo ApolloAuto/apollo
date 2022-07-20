@@ -6,56 +6,25 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "poi_cc_proto",
+    name = "topo_graph_cc_proto",
     deps = [
-        ":poi_proto",
+        ":topo_graph_proto",
     ],
 )
 
 proto_library(
-    name = "poi_proto",
-    srcs = ["poi.proto"],
+    name = "topo_graph_proto",
+    srcs = ["topo_graph.proto"],
     deps = [
-        ":routing_proto",
+        "//modules/common_msgs/map_msgs:map_geometry_proto",
     ],
 )
 
 py_proto_library(
-    name = "poi_py_pb2",
+    name = "topo_graph_py_pb2",
     deps = [
-        ":poi_proto",
-        ":routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "routing_cc_proto",
-    deps = [
-        ":routing_proto",
-    ],
-)
-
-proto_library(
-    name = "routing_proto",
-    srcs = ["routing.proto"],
-    deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/map/proto:map_parking_space_proto",
-        "//modules/map/proto:map_geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "routing_py_pb2",
-    deps = [
-        ":routing_proto",
-        "//modules/common/proto:error_code_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/map/proto:map_parking_space_py_pb2",
-        "//modules/map/proto:map_geometry_py_pb2",
+        ":topo_graph_proto",
+        "//modules/common_msgs/map_msgs:map_geometry_py_pb2",
     ],
 )
 
@@ -75,28 +44,5 @@ py_proto_library(
     name = "routing_config_py_pb2",
     deps = [
         ":routing_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "topo_graph_cc_proto",
-    deps = [
-        ":topo_graph_proto",
-    ],
-)
-
-proto_library(
-    name = "topo_graph_proto",
-    srcs = ["topo_graph.proto"],
-    deps = [
-        "//modules/map/proto:map_geometry_proto",
-    ],
-)
-
-py_proto_library(
-    name = "topo_graph_py_pb2",
-    deps = [
-        ":topo_graph_proto",
-        "//modules/map/proto:map_geometry_py_pb2",
     ],
 )

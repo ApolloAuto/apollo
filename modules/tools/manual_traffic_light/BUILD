@@ -10,10 +10,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:color",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
     ],
 )
 

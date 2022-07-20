@@ -22,7 +22,7 @@
 #include "opencv2/opencv.hpp"
 
 #include "cyber/common/macros.h"
-#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 namespace apollo {
 namespace prediction {

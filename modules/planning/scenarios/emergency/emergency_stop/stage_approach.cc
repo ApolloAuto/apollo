@@ -122,7 +122,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
 }
 
 Stage::StageStatus EmergencyStopStageApproach::FinishStage() {
-  next_stage_ = ScenarioConfig::EMERGENCY_STOP_STANDBY;
+  next_stage_ = StageType::EMERGENCY_STOP_STANDBY;
   return Stage::FINISHED;
 }
 

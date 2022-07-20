@@ -33,7 +33,7 @@ cc_library(
         ":record_processor",
         "//cyber",
         "//cyber/tools/cyber_recorder:recorder",
-        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_cc_proto",
+        "//modules/common_msgs/monitor_msgs:smart_recorder_status_cc_proto",
         "//modules/monitor/common:monitor_manager",
     ],
 )
@@ -71,7 +71,7 @@ cc_library(
     deps = [
         ":trigger_base",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:drive_event_cc_proto",
+        "//modules/common_msgs/basic_msgs:drive_event_cc_proto",
     ],
 )
 
@@ -81,9 +81,9 @@ cc_library(
     hdrs = ["emergency_mode_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 
@@ -93,9 +93,9 @@ cc_library(
     hdrs = ["hard_brake_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 
@@ -115,9 +115,9 @@ cc_library(
     hdrs = ["swerve_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 

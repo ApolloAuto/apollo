@@ -36,7 +36,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/proto/map_id.pb.h"
+#include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"

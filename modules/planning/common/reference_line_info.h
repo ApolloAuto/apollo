@@ -28,8 +28,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/drive_state.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/drive_state.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -42,7 +42,7 @@
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace planning {

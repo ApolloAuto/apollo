@@ -6,6 +6,33 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "detection3d_cc_proto",
+    deps = [
+        ":detection3d_proto",
+    ],
+)
+
+proto_library(
+    name = "detection3d_proto",
+    srcs = ["detection3d.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+        ":detection2d_proto",
+    ],
+)
+
+py_proto_library(
+    name = "detection3d_py_pb2",
+    deps = [
+        ":detection3d_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        ":detection2d_py_pb2",
+    ],
+)
+
+cc_proto_library(
     name = "detection3darray_cc_proto",
     deps = [
         ":detection3darray_proto",
@@ -16,17 +43,17 @@ proto_library(
     name = "detection3darray_proto",
     srcs = ["detection3darray.proto"],
     deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
         ":detection3d_proto",
-        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "detection3darray_py_pb2",
     deps = [
-        ":detection3d_py_pb2",
         ":detection3darray_proto",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        ":detection3d_py_pb2",
     ],
 )
 
@@ -41,7 +68,7 @@ proto_library(
     name = "detection2d_proto",
     srcs = ["detection2d.proto"],
     deps = [
-        "//modules/common/proto:header_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -49,7 +76,7 @@ py_proto_library(
     name = "detection2d_py_pb2",
     deps = [
         ":detection2d_proto",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
     ],
 )
 
@@ -64,43 +91,17 @@ proto_library(
     name = "detection2darray_proto",
     srcs = ["detection2darray.proto"],
     deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
         ":detection2d_proto",
-        "//modules/common/proto:header_proto",
     ],
 )
 
 py_proto_library(
     name = "detection2darray_py_pb2",
     deps = [
-        ":detection2d_py_pb2",
         ":detection2darray_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "detection3d_cc_proto",
-    deps = [
-        ":detection3d_proto",
-    ],
-)
-
-proto_library(
-    name = "detection3d_proto",
-    srcs = ["detection3d.proto"],
-    deps = [
-        ":detection2d_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "detection3d_py_pb2",
-    deps = [
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
         ":detection2d_py_pb2",
-        ":detection3d_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
     ],
 )
+

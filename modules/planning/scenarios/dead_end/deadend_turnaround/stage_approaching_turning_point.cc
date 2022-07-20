@@ -43,7 +43,7 @@ Stage::StageStatus StageApproachingTurningPoint::Process(
   }
   // stage change
   if (CheckADCStop(*frame)) {
-    next_stage_ = ScenarioConfig::DEADEND_TURNAROUND_TURNING;
+    next_stage_ = StageType::DEADEND_TURNAROUND_TURNING;
     return Stage::FINISHED;
   }
 

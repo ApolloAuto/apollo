@@ -14,7 +14,10 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/audio/common:message_process",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/audio/proto:audio_conf_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common/util:util_tool",
     ],
     alwayslink = True,
 )
@@ -22,7 +25,7 @@ cc_library(
 cc_binary(
     name = "libaudio_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":audio_component_lib"],
 )
 

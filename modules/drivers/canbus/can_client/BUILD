@@ -11,7 +11,7 @@ cc_library(
     copts = copts_if_esd_can(),
     deps = [
         "//cyber",
-        "//modules/common/util:factory",
+        "//modules/common/util:util_tool",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_client/hermes_can:hermes_can_client",

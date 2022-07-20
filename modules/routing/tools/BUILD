@@ -7,7 +7,7 @@ cc_binary(
     name = "routing_dump",
     srcs = ["routing_dump.cc"],
     deps = [
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/routing",
     ],
 )

@@ -23,8 +23,8 @@
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -124,7 +124,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
   const double adc_speed = injector_->vehicle_state()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
     // skip creep
-    next_stage_ = ScenarioConfig ::
+    next_stage_ = StageType ::
         TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
   } else {
     // creep
@@ -143,7 +143,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
     }
 
     GetContext()->creep_start_time = Clock::NowInSeconds();
-    next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP;
+    next_stage_ = StageType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP;
   }
 
   // reset cruise_speed

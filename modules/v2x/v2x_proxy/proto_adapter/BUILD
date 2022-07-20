@@ -16,7 +16,7 @@ cc_library(
         "//modules/v2x/proto:v2x_obu_rsi_cc_proto",
         "//modules/v2x/proto:v2x_obu_traffic_light_cc_proto",
         "//modules/v2x/proto:v2x_rsi_cc_proto",
-        "//modules/v2x/proto:v2x_traffic_light_cc_proto",
+        "//modules/common_msgs/v2x_msgs:v2x_traffic_light_cc_proto",
         "@eigen",
     ],
 )

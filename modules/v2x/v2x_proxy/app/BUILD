@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["utils.h"],
     deps = [
         "//cyber",
-        "//modules/common/math:quaternion",
+        "//modules/common/math",
         "//modules/map/hdmap:hdmap_util",
         "//modules/v2x/v2x_proxy/obu_interface:obu_interface_grpc_impl",
         "//modules/v2x/v2x_proxy/os_interface",

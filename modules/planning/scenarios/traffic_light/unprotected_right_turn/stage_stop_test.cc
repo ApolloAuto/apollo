@@ -30,7 +30,7 @@ class TrafficLightUnprotectedRightTurnStageStopTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(
-        ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP);
+        StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -43,8 +43,8 @@ TEST_F(TrafficLightUnprotectedRightTurnStageStopTest, Init) {
   TrafficLightUnprotectedRightTurnStageStop
       traffic_light_unprotected_right_turn_stage_stop(config_, injector_);
   EXPECT_EQ(traffic_light_unprotected_right_turn_stage_stop.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP));
+            StageType_Name(
+                StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP));
 }
 
 }  // namespace traffic_light

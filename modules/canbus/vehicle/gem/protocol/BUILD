@@ -3,6 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "canbus_gem_protocol",
     srcs = [
@@ -69,9 +71,9 @@ cc_library(
         "wiper_rpt_91.h",
         "yaw_rate_rpt_81.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],

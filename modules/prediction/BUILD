@@ -22,8 +22,9 @@ cc_library(
         "//modules/prediction/submodules:evaluator_submodule_lib",
         "//modules/prediction/submodules:predictor_submodule_lib",
         "//modules/prediction/submodules:submodule_output",
-        "//modules/prediction/util:data_extraction",
+        "//modules/common/util:util_tool",
     ],
+    alwayslink = True,
 )
 
 cc_test(
@@ -46,7 +47,7 @@ cc_test(
 cc_binary(
     name = "libprediction_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":prediction_component_lib"],
 )
 

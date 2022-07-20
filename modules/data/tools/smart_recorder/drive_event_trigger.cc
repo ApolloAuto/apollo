@@ -18,7 +18,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/proto/drive_event.pb.h"
+#include "modules/common_msgs/basic_msgs/drive_event.pb.h"
 
 namespace apollo {
 namespace data {

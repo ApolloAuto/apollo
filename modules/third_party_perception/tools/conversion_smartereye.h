@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/drivers/proto/smartereye.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/sensor_msgs/smartereye.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 
 /**
  * @namespace apollo::third_party_perception::conversion_smartereye

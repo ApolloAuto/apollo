@@ -28,8 +28,8 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/util:point_factory",
+        "//modules/common/math",
+        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:prediction_system_gflags",
         "//modules/prediction/proto:vector_net_cc_proto",
