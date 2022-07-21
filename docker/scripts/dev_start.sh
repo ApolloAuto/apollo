@@ -52,6 +52,7 @@ DEFAULT_MAPS=(
     sunnyvale_loop
     sunnyvale_with_two_offices
     san_mateo
+    apollo_virutal_map
 )
 
 DEFAULT_TEST_MAPS=(

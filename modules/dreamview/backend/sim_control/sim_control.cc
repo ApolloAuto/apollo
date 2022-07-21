@@ -114,6 +114,24 @@ void SimControl::Init(double start_velocity,
   }
 }
 
+void SimControl::InitStartPoint(double x, double y, double start_velocity,
+                                double start_acceleration) {                             
+  TrajectoryPoint point;
+  // Use the scenario start point as start point,
+  start_point_from_localization_ = false;
+  point.mutable_path_point()->set_x(x);
+  point.mutable_path_point()->set_y(y);
+  // z use default 0
+  point.mutable_path_point()->set_z(0);
+  double theta = 0.0;
+  double s = 0.0;
+  map_service_->GetPoseWithRegardToLane(x, y, &theta, &s);
+  point.mutable_path_point()->set_theta(theta);
+  point.set_v(start_velocity);
+  point.set_a(start_acceleration);
+  SetStartPoint(point);
+}
+
 void SimControl::InitStartPoint(double start_velocity,
                                 double start_acceleration) {
   TrajectoryPoint point;
@@ -172,6 +190,12 @@ void SimControl::SetStartPoint(const TrajectoryPoint& start_point) {
 void SimControl::Reset() {
   std::lock_guard<std::mutex> lock(mutex_);
   InternalReset();
+}
+
+void SimControl::Restart(double x, double y){
+  Stop();
+  Start(x,y);
+  return;
 }
 
 void SimControl::InternalReset() {
@@ -255,6 +279,19 @@ void SimControl::Start() {
     Init(next_point_.has_v() ? next_point_.v() : 0.0,
          next_point_.has_a() ? next_point_.a() : 0.0);
 
+    InternalReset();
+    sim_control_timer_->Start();
+    sim_prediction_timer_->Start();
+    enabled_ = true;
+  }
+}
+
+void SimControl::Start(double x, double y) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (!enabled_) {
+    // Do not use localization info. use scenario start point to init start point.
+    InitStartPoint(x,y,0,0);
     InternalReset();
     sim_control_timer_->Start();
     sim_prediction_timer_->Start();

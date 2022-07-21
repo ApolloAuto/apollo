@@ -148,7 +148,8 @@ HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
   InitStatus();
 }
 
-void HMIWorker::Start() {
+void HMIWorker::Start(DvCallback callback_api) {
+  callback_api_ = callback_api;
   InitReadersAndWriters();
   RegisterStatusUpdateHandler(
       [this](const bool status_changed, HMIStatus* status) {
@@ -796,10 +797,12 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
     AERROR << "Failed to find sim obstacle";
     return false;
   }
-  bool res = StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
-  if (!res) {
-    AERROR << "Failed to stop sim obstacle";
-    return false;
+  // todo:check sim obstacle status
+  StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
+  std::string scenario_set_id;
+  {
+    RLock rlock(status_mutex_);
+    scenario_set_id = status_.current_scenario_set_id();
   }
   // 拼接新场景路径
   std::string scenario_set_path;
@@ -812,6 +815,9 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
   }
   // 获取场景相关地图信息
   std::string map_name = "";
+  double x;
+  double y;
+  bool need_to_change_map = true;
   {
     RLock rlock(status_mutex_);
     auto& scenario_set = status_.scenario_set();
@@ -822,6 +828,8 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
     for (auto& scenario : scenario_set.at(scenario_set_id).scenarios()) {
       if (scenario.scenario_id() == scenario_id) {
         map_name = scenario.map_name();
+        x = scenario.start_point().x();
+        y = scenario.start_point().y();
         break;
       }
     }
@@ -829,12 +837,26 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
       AERROR << "Failed to find scenario and get map dir!";
       return false;
     }
+    need_to_change_map = (status_.current_map() != map_name);
   }
   // 更换地图
+  if(need_to_change_map){
   if (!ChangeMap(map_name)) {
+    // change map 自带ResetMode
     AERROR << "Failed to change map!";
     return false;
   }
+  callback_api_("MapServiceReloadMap",{});
+  } else{
+    // 需要强制关闭模块 让用户打开
+    ResetMode();
+  }
+  // 更换地图之后需要重新初始化sim_control的初始点！！！
+  Json info;
+  info["x"] = x;
+  info["y"] = y;
+  // 调用sim_control的stop和sim_control的start 通过dv通信
+  callback_api_("SimControlRestart",info);
   // 启动sim obstacle
   const std::string start_command = "nohup " + absolute_path +
                                     " " + scenario_path + " &";
@@ -855,11 +877,9 @@ void HMIWorker::ChangeScenario(const std::string& scenario_id) {
     }
     if (scenario_id.empty()) {
       // stop sim obstacle
-      bool res = StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
-      if (!res) {
-        AERROR << "Cannot stop sim obstacle!";
-        return;
-      }
+      // todo： add check status
+      // directly think pkill successful
+      StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
     } else {
       auto scenario_set = status_.mutable_scenario_set();
       auto& scenario_set_id = status_.current_scenario_set_id();
@@ -920,12 +940,12 @@ bool HMIWorker::UpdateScenarioSet(const std::string& scenario_set_id,
   std::string scenario_set_directory_path;
   GetScenarioSetPath(scenario_set_id, scenario_set_directory_path);
   scenario_set_directory_path = scenario_set_directory_path + "/scenarios/";
-  if (!cyber::common::PathExists(scenario_set_directory_path)) {
-    AERROR << "Failed to find scenario_set!";
-    return false;
-  }
   // 逐路径添加
   new_scenario_set.set_scenario_set_name(scenario_set_name);
+  if (!cyber::common::PathExists(scenario_set_directory_path)) {
+    AERROR << "Scenario set has no scenarios!";
+    return true;
+  }
   // 遍历文件
   DIR* directory = opendir(scenario_set_directory_path.c_str());
   if (directory == nullptr) {
@@ -943,6 +963,12 @@ bool HMIWorker::UpdateScenarioSet(const std::string& scenario_set_id,
     if (!absl::EndsWith(file_name, ".json")) {
       continue;
     }
+    const int index = file_name.rfind(".json");
+    if(index == 0){
+      // name: ".json" is invalid.
+      continue;
+    }
+    const std::string scenario_id = file_name.substr(0, index);
     const std::string file_path = scenario_set_directory_path + file_name;
     // 解析Proto 获取结果
     // todo:add scenario proto
@@ -963,14 +989,21 @@ bool HMIWorker::UpdateScenarioSet(const std::string& scenario_set_id,
       AERROR << "Cannot get scenario map dir.";
       return false;
     }
+    if (!new_sim_ticket.scenario().has_start()) {
+      AERROR << "Cannot get scenario start_point.";
+      return false;
+    }
+    auto& scenario_start_point = new_sim_ticket.scenario().start();
+    if(!scenario_start_point.has_x() || !scenario_start_point.has_y()){
+      AERROR << "Scenario start_point is invalid!";
+      return false;
+    }
     std::string scenario_name = new_sim_ticket.description_en_tokens(0);
     for (int i = 1; i < new_sim_ticket.description_en_tokens_size(); i++) {
       scenario_name =
           scenario_name + "_" + new_sim_ticket.description_en_tokens(i);
     }
     ScenarioInfo* scenario_info = new_scenario_set.add_scenarios();
-    const int index = file_name.rfind(".json");
-    const std::string scenario_id = file_name.substr(0, index);
     scenario_info->set_scenario_id(scenario_id);
     scenario_info->set_scenario_name(scenario_name);
     // change scenario json map dir to map name
@@ -989,6 +1022,9 @@ bool HMIWorker::UpdateScenarioSet(const std::string& scenario_set_id,
     // replay engine use xx_xx like:apollo_map
     // dv need Apollo Map
     scenario_info->set_map_name(TitleCase(map_name));
+    auto start_point = scenario_info->mutable_start_point();
+    start_point->set_x(scenario_start_point.x());
+    start_point->set_y(scenario_start_point.y());
   }
   closedir(directory);
   return true;
@@ -1051,8 +1087,6 @@ bool HMIWorker::LoadScenarios() {
     scenario_set->clear();
     for (auto iter = scenario_sets.begin(); iter != scenario_sets.end();
          iter++) {
-      // AINFO<<"Scenario name:  "<<iter->first<<"    Scenarios size:
-      // "<<(iter->second).scenarios_size();
       (*scenario_set)[iter->first] = iter->second;
     }
     status_changed_ = true;
@@ -1090,14 +1124,16 @@ void HMIWorker::DeleteScenarioSet(const std::string& scenario_set_id) {
       AERROR << "Cannot find unknown scenario set!";
       return;
     }
+    // do not allowed remove changed current scenario set
+    if (scenario_set_id == status_.current_scenario_set_id()) {
+      AERROR << "Cannotdelete current scenario set!";
+      return;
+    }
   }
 
   {
     WLock wlock(status_mutex_);
     status_.mutable_scenario_set()->erase(scenario_set_id);
-    if (status_.current_scenario_set_id() == scenario_set_id) {
-      status_.set_current_scenario_set_id(scenario_set_id);
-    }
     status_changed_ = true;
   }
   return;

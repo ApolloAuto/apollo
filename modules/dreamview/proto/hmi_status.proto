@@ -4,11 +4,13 @@ package apollo.dreamview;
 
 import "modules/common/proto/header.proto";
 import "modules/monitor/proto/system_status.proto";
+import "modules/common/proto/geometry.proto";
 
 message ScenarioInfo{
   optional string scenario_id = 1;
   optional string scenario_name = 2;
   optional string map_name = 3;
+  optional apollo.common.Point2D start_point = 4;
 }
 
 message ScenarioSet{

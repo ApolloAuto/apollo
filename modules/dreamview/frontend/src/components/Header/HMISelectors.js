@@ -74,7 +74,7 @@ export default class HMISelectors extends React.Component {
                           label: scenario.scenarioName,
                         }))
                     }
-                    currentOption={currentScenarioId || 'none'}
+                    currentOption={currentScenarioId || ''}
                     onChange={(event) => {
                       WS.changeScenario(event.target.value);
                     }}

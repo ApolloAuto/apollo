@@ -54,6 +54,8 @@ class Dreamview {
  private:
   void TerminateProfilingMode();
   bool PluginCallbackHMI(const std::string& function_name, const nlohmann::json &param_json);
+  bool HMICallbackSimControl(const std::string& function_name,
+                             const nlohmann::json& param_json);
 
   std::unique_ptr<cyber::Timer> exit_timer_;
 

@@ -95,6 +95,7 @@ proto_library(
     deps = [
         "//modules/common/proto:header_proto",
         "//modules/monitor/proto:system_status_proto",
+        "//modules/common/proto:geometry_proto",
     ],
 )
 
@@ -104,6 +105,7 @@ py_proto_library(
         ":hmi_status_proto",
         "//modules/common/proto:header_py_pb2",
         "//modules/monitor/proto:system_status_py_pb2",
+        "//modules/common/proto:geometry_py_pb2",
     ],
 )
 
