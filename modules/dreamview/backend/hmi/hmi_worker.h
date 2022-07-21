@@ -24,6 +24,8 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 
+#include "nlohmann/json.hpp"
+
 #include "modules/audio/proto/audio_event.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
@@ -46,9 +48,12 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
+ 
+  using DvCallback = std::function<bool(const std::string &function_name,
+                                        const nlohmann::json &param_json)>;
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
-  void Start();
+  void Start(DvCallback callback_api);
   void Stop();
 
   // HMI action trigger.
@@ -146,6 +151,7 @@ class HMIWorker {
   std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
+  DvCallback callback_api_;
 };
 
 }  // namespace dreamview

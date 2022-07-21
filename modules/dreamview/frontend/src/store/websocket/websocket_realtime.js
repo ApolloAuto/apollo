@@ -352,6 +352,9 @@ export default class RealtimeWebSocketEndpoint {
       action: 'CHANGE_SCENARIO_SET',
       value: scenarioSetId,
     }));
+
+    // 切换场景集后，需要重新置空当前场景
+    this.changeScenario('');
   }
 
   deleteScenarioSet(scenarioSetId) {

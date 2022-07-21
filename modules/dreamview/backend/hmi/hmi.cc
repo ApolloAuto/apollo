@@ -49,7 +49,7 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
   }
 }
 
-void HMI::Start() { hmi_worker_->Start(); }
+void HMI::Start(DvCallback callback_api) { hmi_worker_->Start(callback_api); }
 
 void HMI::Stop() { hmi_worker_->Stop(); }
 

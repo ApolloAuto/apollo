@@ -92,6 +92,7 @@ cc_library(
         "//modules/monitor/proto:system_status_cc_proto",
         "@boost",
         "@com_google_absl//absl/strings",
+        "@com_github_nlohmann_json//:json",
     ],
 )
 

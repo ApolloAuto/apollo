@@ -23,7 +23,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
-std::map<std::string, int> function_map = {{"UpdateScenarioSetToStatus", 0}};
+std::map<std::string, int> plugin_function_map = {{"UpdateScenarioSetToStatus", 0}};
+std::map<std::string, int> hmi_function_map = {{"SimControlRestart", 0},{"MapServiceReloadMap", 1}};
 }
 
 namespace apollo {
@@ -114,7 +115,10 @@ Status Dreamview::Init() {
 Status Dreamview::Start() {
   sim_world_updater_->Start();
   point_cloud_updater_->Start();
-  hmi_->Start();
+  hmi_->Start([this](const std::string& function_name,
+                            const nlohmann::json& param_json) -> bool {
+    return HMICallbackSimControl(function_name, param_json);
+  });
   perception_camera_updater_->Start();
   plugin_manager_->Start([this](const std::string& function_name,
                             const nlohmann::json& param_json) -> bool {
@@ -135,14 +139,42 @@ void Dreamview::Stop() {
   plugin_manager_->Stop();
 }
 
-bool Dreamview::PluginCallbackHMI(const std::string& function_name,
+bool Dreamview::HMICallbackSimControl(const std::string& function_name,
                                   const nlohmann::json& param_json) {
-  if (function_map.find(function_name) == function_map.end()) {
+  if (hmi_function_map.find(function_name) == hmi_function_map.end()) {
     AERROR << "Donnot support this callback";
     return false;
   }
   bool callback_res = false;
-  switch(function_map[function_name]) {
+  switch(hmi_function_map[function_name]) {
+    case 0: {
+      // 解析结果
+      if (param_json.contains("x") &&
+          param_json.contains("y")) {
+        const double x = param_json["x"];
+        const double y = param_json["y"];
+        sim_control_->Restart(x,y);
+        callback_res = true;
+      }
+    } break;
+    case 1:{
+      map_service_->ReloadMap(true);
+      break;
+    }
+    default:
+      break;
+  }
+  return callback_res;
+}
+
+bool Dreamview::PluginCallbackHMI(const std::string& function_name,
+                                  const nlohmann::json& param_json) {
+  if (plugin_function_map.find(function_name) == plugin_function_map.end()) {
+    AERROR << "Donnot support this callback";
+    return false;
+  }
+  bool callback_res = false;
+  switch(plugin_function_map[function_name]) {
     case 0: {
       // 解析结果
       if (param_json.contains("scenario_set_id") &&

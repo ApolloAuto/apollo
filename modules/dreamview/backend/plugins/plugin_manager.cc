@@ -104,7 +104,7 @@ auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
         if (!ReceiveMsgFromPlugin(*msg)) {
           AERROR << "Failed to handle received msg from plugin";
         }
-        return nullptr;
+        return;
       });
   return reader;
 };
@@ -246,7 +246,6 @@ bool PluginManager::CheckPluginStatus(const string& plugin_name) {
     AERROR << "Failed to register this plugin, cann't check!";
     return false;
   }
-  // 校验plugin状态: 用的是process monitor的方法。。。
   // todo: 是否抽出来
   std::vector<string> running_processes;
   for (const auto& cmd_file : cyber::common::Glob("/proc/*/cmdline")) {
@@ -318,13 +317,9 @@ void PluginManager::RegisterDvSupportApi(const string& api_name,
 }
 
 void PluginManager::RegisterDvSupportApis() {
-  // register dv api here!
-  // demo: DvApi fetchData = fetch_;[fetch_是已经实现的函数，构造函数对象]
-  // demo: RegisterDvSupportApi("fetchData", fetchData);
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
 }
 
-// todo: 检查自己的函数，参数尽可能引用 看看是否合理
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
   // parse msg_name and look for related api
   if (!msg.has_name()) {
@@ -339,16 +334,12 @@ bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
       return false;
     }
   }
-  // 构造发送给前端的消息
   Json response = JsonUtil::ProtoToTypedJson("PluginMsg", msg);
   plugin_ws_->BroadcastData(response.dump());
-  // 发送给前端
   return true;
 }
 
 bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
-  // 获取type
-  // string 转json
   if (!msg.has_info()) {
     AERROR << "Failed to get data type!";
     return false;

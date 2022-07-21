@@ -32,7 +32,7 @@ export default class Selector extends React.Component {
             <option value={value} key={value}>{label}</option>
     ));
     this.entries.unshift(
-            <option key="none" value="none" disabled>
+            <option key="none" value="">
                 {`-- ${this.state.name} --`}
             </option>,
     );
