@@ -71,7 +71,7 @@ bool rppInitDescriptor(RpptDescPtr &descPtr, int width, int height,
   return true;
 }
 
-bool rppImageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob) {
+bool rppImageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob) {
   RpptDesc srcDesc, dstDesc;
   RpptDescPtr srcDescPtr = &srcDesc, dstDescPtr = &dstDesc;
 
@@ -86,14 +86,15 @@ bool rppImageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob) {
 
   rppHandle_t handle;
   rppCreateWithBatchSize(&handle, 1);
-  RppStatus status = rppt_copy_gpu(image.mutable_gpu_data(), srcDescPtr,
-                    blob->mutable_gpu_data(), dstDescPtr, handle);
+  RppStatus status =
+    rppt_copy_gpu((const_cast<base::Image8U &>(image)).mutable_gpu_data(),
+                  srcDescPtr, blob->mutable_gpu_data(), dstDescPtr, handle);
   if (status != RPP_SUCCESS)
     return false;
   return true;
 }
 
-bool rppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool rppImageToGray(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                     const int src_width, const int src_height,
                     const float coeffs[3]) {
   RppStatus status = RPP_SUCCESS;
@@ -130,7 +131,8 @@ bool rppImageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
   return true;
 }
 
-bool rppSwapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool rppSwapImageChannels(const base::Image8UPtr &src,
+                          const base::Image8UPtr &dst,
                           const int src_width, const int src_height,
                           const int order[3]) {
   RpptDesc srcDesc, dstDesc;
@@ -171,7 +173,8 @@ __global__ void duplicate_kernel(const unsigned char *src,
   }
 }
 
-bool rppDupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool rppDupImageChannels(const base::Image8UPtr &src,
+                         const base::Image8UPtr &dst,
                          const int src_width, const int src_height) {
   dim3 threadsPerBlock(THREADS_PER_BLOCK_X, THREADS_PER_BLOCK_Y);
   dim3 blocks((src_width + threadsPerBlock.x - 1) / threadsPerBlock.x,

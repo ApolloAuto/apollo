@@ -214,7 +214,7 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
 #elif GPU_PLATFORM == AMD
     // TODO(B1tway): Add necesssary RPP API
 #endif
-   return true;
+  return true;
 }
 #endif
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,27 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool imageToBlob(base::Image8U &image, base::Blob<uint8_t> *blob);
-bool imageToGray(base::Image8UPtr &src, base::Image8UPtr &dst,
+bool imageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob);
+
+bool imageToGray(const base::Image8UPtr &src,
+                 const base::Image8UPtr &dst,
                  const int src_width, const int src_height,
                  const float coeffs[3]);
-bool swapImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+
+bool swapImageChannels(const base::Image8UPtr &src,
+                       const base::Image8UPtr &dst,
                        const int src_width, const int src_height,
                        const int order[3]);
-bool dupImageChannels(base::Image8UPtr &src, base::Image8UPtr &dst,
+
+bool dupImageChannels(const base::Image8UPtr &src,
+                      const base::Image8UPtr &dst,
                       const int src_width, const int src_height);
 
 bool imageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
                 const int src_width, const int src_height,
-                const base::Blob<float> &map_x, const base::Blob<float> &map_y);
+                const base::Blob<float> &map_x,
+                const base::Blob<float> &map_y);
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
