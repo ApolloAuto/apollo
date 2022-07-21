@@ -115,6 +115,32 @@ DEFINE_string(mask_bbox_head_torch_file,
               "models/detection/mask_pillars/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
 
+// lidar_center_point
+DEFINE_string(center_point_model_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/center_point/centerpoint.pdmodel",
+              "The path of center point model file.");
+DEFINE_string(center_point_params_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/center_point/centerpoint.pdiparams",
+              "The path of center point params file.");
+DEFINE_bool(use_trt, true, "True if preprocess in CPU mode.");
+DEFINE_int32(trt_precision, 1,
+             "Precision type of tensorrt, 0: kFloat32, 1: kHalf");
+DEFINE_int32(
+    trt_use_static, 0,
+    "Whether to load the tensorrt graph optimization from a disk path");
+DEFINE_string(
+    trt_static_dir,
+    "/apollo/modules/perception/lidar/lib/detector/center_point_detection/",
+    "Path of a tensorrt graph optimization directory");
+DEFINE_int32(collect_shape_info, 1,
+             "Whether to collect dynamic shape before using tensorrt");
+DEFINE_string(dynamic_shape_file,
+              "/apollo/modules/perception/production/data/perception/lidar/"
+              "models/detection/center_point/collect_shape_info.pbtxt",
+              "Path of a dynamic shape file for tensorrt");
+
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
               "/apollo/modules/perception/camera"
@@ -141,7 +167,6 @@ DEFINE_string(torch_detector_model,
               "The torch model file for emergency detection");
 
 // lidar sensor name
-DEFINE_string(lidar_sensor_name, "velodyne128",
-              "lidar sensor name");
+DEFINE_string(lidar_sensor_name, "velodyne128", "lidar sensor name");
 }  // namespace perception
 }  // namespace apollo

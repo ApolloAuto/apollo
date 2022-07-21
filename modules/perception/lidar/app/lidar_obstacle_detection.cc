@@ -47,7 +47,8 @@ bool LidarObstacleDetection::Init(
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();
   use_object_builder_ = ("PointPillarsDetection" != config.detector() ||
-                         "MaskPillarsDetection" != config.detector());
+                         "MaskPillarsDetection" != config.detector()  ||
+                          "CenterPointDetection" != config.detector());
 
   use_map_manager_ = use_map_manager_ && options.enable_hdmap_input;
 
