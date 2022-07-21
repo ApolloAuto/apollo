@@ -83,3 +83,5 @@ DECLARE_string(resource_scenario_path);
 DECLARE_string(sim_obstacle_stop_command);
 
 DECLARE_string(sim_obstacle_path);
+
+DECLARE_string(gflag_command_arg);

@@ -784,9 +784,7 @@ bool HMIWorker::StopModuleByCommand(const std::string& stop_command) const {
   return true;
 }
 
-bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
-                                 const std::string& scenario_id) {
-  // sim obstacle 不一定开着 todo:注意这个地方会不会有问题
+bool HMIWorker::ResetSimObstacle(const std::string& scenario_id) {
   // 关闭sim obstacle
   // 检查sim obstacle是否存在
   const std::string absolute_path = cyber::common::GetEnv("HOME") + FLAGS_sim_obstacle_path;
@@ -846,18 +844,17 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
   }
   callback_api_("MapServiceReloadMap",{});
   } else{
-    // 需要强制关闭模块 让用户打开
+    // reset mode when change scenario
     ResetMode();
   }
-  // 更换地图之后需要重新初始化sim_control的初始点！！！
+  // change Map and init start point for scenario by sim control
   Json info;
   info["x"] = x;
   info["y"] = y;
-  // 调用sim_control的stop和sim_control的start 通过dv通信
   callback_api_("SimControlRestart",info);
   // 启动sim obstacle
   const std::string start_command = "nohup " + absolute_path +
-                                    " " + scenario_path + " &";
+                                    " " + scenario_path +FLAGS_gflag_command_arg+ " &";
   int ret = std::system(start_command.data());
   if (ret != 0) {
     AERROR << "Failed to start sim obstacle";
@@ -896,14 +893,17 @@ void HMIWorker::ChangeScenario(const std::string& scenario_id) {
         AERROR << "Cannot change to unknown scenario!";
         return;
       }
-      // restart sim obstacle
-      if (!ResetSimObstacle(scenario_set_id, scenario_id)) {
-        AERROR << "Cannot start sim obstacle by new scenario!";
-        return;
-      };
     }
   }
-
+  
+  // restart sim obstacle
+  // move sim obstacle position for rlock wlock together will result to dead lock
+  if (!scenario_id.empty()) {
+    if (!ResetSimObstacle(scenario_id)) {
+      AERROR << "Cannot start sim obstacle by new scenario!";
+      return;
+    };
+  }
   {
     WLock wlock(status_mutex_);
     status_.set_current_scenario_id(scenario_id);
