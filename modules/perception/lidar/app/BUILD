@@ -29,6 +29,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_lidar_obstacle_detection",
         "//modules/perception/lidar/lib/pointcloud_preprocessor:pointcloud_preprocessor",
         "//modules/perception/lidar/lib/detector/point_pillars_detection:point_pillars_detection",
+        "//modules/perception/lidar/lib/detector/center_point_detection:center_point_detection",
         "//modules/perception/lidar/lib/detector/cnn_segmentation:cnn_segmentation",
         "//modules/perception/lidar/lib/detector/mask_pillars_detection:mask_pillars_detection",
         "//modules/perception/lidar/lib/detector/ncut_segmentation:ncut_segmentation",
