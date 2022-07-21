@@ -52,6 +52,8 @@ RUN PATCH="-1+cuda${CUDA_LITE}" && apt-get -y update --allow-insecure-repositori
 
 ENV TENSORRT_VERSION ${TENSORRT_VERSION}
 
+COPY installers/install_minimal_environment.sh /opt/apollo/installers/install_minimal_environment.sh
+
 RUN ln -s -f /bin/true /usr/bin/chfn \
     && echo "stage=runtime" > /etc/apollo.conf \
     && bash /opt/apollo/installers/install_minimal_environment.sh ${GEOLOC}
@@ -84,5 +86,5 @@ RUN apt-get -y update --allow-insecure-repositories \
     && rm -rf /var/lib/apt/lists/*
 
 # Restore
-RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
+RUN bash /opt/apollo/installers/install_geo_adjustment.sh cn
 RUN ldconfig

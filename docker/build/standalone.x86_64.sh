@@ -4,12 +4,12 @@
 
 DOCKER_REPO=apolloauto/apollo
 TARGET_ARCH=x86_64
-IMAGE_VERSION=18.04-20220713_1336
+IMAGE_VERSION=18.04-$(date "+%Y%m%d_%H%M")
 DEV_IMAGE_VERSION=18.04-20210914_1336
 DEV_IMAGE=${DOCKER_REPO}:dev-${TARGET_ARCH}-${DEV_IMAGE_VERSION}
-RUNTIME_IMAGE=${DOCKER_REPO}:runtime-${TARGET_ARCH}-${IMAGE_VERSION}
-STANDALONE_IMAGE=${DOCKER_REPO}:standalone-${TARGET_ARCH}-${IMAGE_VERSION}
-STANDALONE_IMAGE_LATEST=${DOCKER_REPO}:standalone-${TARGET_ARCH}-18.04-6.1-latest
+RUNTIME_IMAGE=${DOCKER_REPO}:runtime-edu-${TARGET_ARCH}-${IMAGE_VERSION}
+STANDALONE_IMAGE=${DOCKER_REPO}:standalone-edu-${TARGET_ARCH}-${IMAGE_VERSION}
+STANDALONE_IMAGE_LATEST=${DOCKER_REPO}:standalone-edu-${TARGET_ARCH}-18.04-6.1-latest
 
 set -e
 
@@ -37,7 +37,7 @@ fi
 cp output/syspkgs.txt docker/build/
 docker build \
     --build-arg DEV_IMAGE_IN=${DEV_IMAGE} \
-    --build-arg GEOLOC=us \
+    --build-arg GEOLOC=cn \
     --build-arg CUDA_LITE=11.1 \
     --build-arg CUDNN_VERSION=8.0.4.30 \
     --build-arg TENSORRT_VERSION=7.2.1 \
@@ -57,6 +57,6 @@ docker build \
 docker tag ${STANDALONE_IMAGE} ${STANDALONE_IMAGE_LATEST}
 
 /bin/echo -e "Docker image with prebuilt files was built and tagged as ${STANDALONE_IMAGE}, you can start it with: \n\
-  bash docker/scripts/runtime_start.sh --standalone --local --tag standalone-${TARGET_ARCH}-${IMAGE_VERSION}\n\
+  bash docker/scripts/runtime_start.sh --standalone --local --tag ${STANDALONE_IMAGE}\n\
 and switch into it with:\n\
   bash docker/scripts/runtime_into_standalone.sh"

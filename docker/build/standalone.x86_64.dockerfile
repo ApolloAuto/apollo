@@ -1,7 +1,7 @@
 ARG DOCKER_REPO=apolloauto/apollo
 ARG TARGET_ARCH=x86_64
 ARG IMAGE_VERSION=18.04-20210914_1336
-ARG BASE_IMAGE=${DOCKER_REPO}:runtime-${TARGET_ARCH}-${IMAGE_VERSION}
+ARG BASE_IMAGE=${DOCKER_REPO}:runtime-edu-${TARGET_ARCH}-${IMAGE_VERSION}
 
 FROM ${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest as apollo_audio_volume
 FROM ${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest as apollo_yolov4_volume

@@ -317,7 +317,7 @@ function main() {
         exit 1
     fi
 
-    $RUNTIME_STANDALONE && RUNTIME_CONTAINER="apollo_runtime_standalone_$USER"
+    $RUNTIME_STANDALONE && RUNTIME_CONTAINER="apollo_runtime_standalone_edu_$USER"
 
     info "Check and remove existing Apollo Runtime container ..."
     remove_container_if_exists "${RUNTIME_CONTAINER}"

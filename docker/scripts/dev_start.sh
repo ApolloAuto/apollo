@@ -412,6 +412,11 @@ function main() {
         error "Failed to start docker container \"${DEV_CONTAINER}\" based on image: ${DEV_IMAGE}"
         exit 1
     fi
+
+    info "Change apt sources to aliyun"
+    docker exec -d -u root ${DEV_CONTAINER} cp /etc/apt/sources.list /etc/apt/sources.list.orig
+    docker exec -d -u root ${DEV_CONTAINER} cp /opt/apollo/rcfiles/sources.list.aliyun /etc/apt/sources.list
+
     set +x
 
     postrun_start_user "${DEV_CONTAINER}"

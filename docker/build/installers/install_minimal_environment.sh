@@ -31,7 +31,7 @@ ARCH="$(uname -m)"
 
 if [[ "${ARCH}" == "x86_64" ]]; then
     if [[ "${MY_GEO}" == "cn" ]]; then
-        cp -f "${RCFILES_DIR}/sources.list.cn.x86_64" /etc/apt/sources.list
+        cp -f "${RCFILES_DIR}/sources.list.aliyun" /etc/apt/sources.list
         # sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
     else
         sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list

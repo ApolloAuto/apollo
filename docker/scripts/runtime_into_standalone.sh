@@ -15,7 +15,7 @@
 # limitations under the License.
 ###############################################################################
 
-RUNTIME_CONTAINER="apollo_runtime_standalone_${USER}"
+RUNTIME_CONTAINER="apollo_runtime_standalone_edu_${USER}"
 
 xhost +local:root 1>/dev/null 2>&1
 
