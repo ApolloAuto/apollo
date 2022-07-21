@@ -126,3 +126,5 @@ DEFINE_string(resource_scenario_path,"/.apollo/resources/scenario_sets/","Scenar
 DEFINE_string(sim_obstacle_stop_command,"pkill -9 -f \"sim_obstacle\" ","Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,"/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle","sim obstacle binary placement.");
+
+DEFINE_string(gflag_command_arg," --flagfile=/apollo/modules/common/data/global_flagfile.txt","sim obstacle need use gflag!");

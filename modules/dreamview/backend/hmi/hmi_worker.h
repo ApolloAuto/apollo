@@ -104,7 +104,7 @@ class HMIWorker {
   // Start / reset current mode.
   void SetupMode() const;
   void ResetMode() const;
-  bool ResetSimObstacle(const std::string& scenario_set_id, const std::string& scenario_id);
+  bool ResetSimObstacle(const std::string& scenario_id);
 
   // Change current mode, launch, map, vehicle and driving mode.
   void ChangeMode(const std::string& mode_name);

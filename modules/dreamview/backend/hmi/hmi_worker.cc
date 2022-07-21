@@ -786,8 +786,7 @@ bool HMIWorker::StopModuleByCommand(const std::string& stop_command) const {
   return true;
 }
 
-bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
-                                 const std::string& scenario_id) {
+bool HMIWorker::ResetSimObstacle(const std::string& scenario_id) {
   // sim obstacle 不一定开着 todo:注意这个地方会不会有问题
   // 关闭sim obstacle
   // 检查sim obstacle是否存在
@@ -859,7 +858,8 @@ bool HMIWorker::ResetSimObstacle(const std::string& scenario_set_id,
   callback_api_("SimControlRestart",info);
   // 启动sim obstacle
   const std::string start_command = "nohup " + absolute_path +
-                                    " " + scenario_path + " &";
+                                    " " + scenario_path +FLAGS_gflag_command_arg+ " &";
+  AINFO<<"st:  "<<start_command;
   int ret = std::system(start_command.data());
   if (ret != 0) {
     AERROR << "Failed to start sim obstacle";
@@ -898,14 +898,17 @@ void HMIWorker::ChangeScenario(const std::string& scenario_id) {
         AERROR << "Cannot change to unknown scenario!";
         return;
       }
-      // restart sim obstacle
-      if (!ResetSimObstacle(scenario_set_id, scenario_id)) {
-        AERROR << "Cannot start sim obstacle by new scenario!";
-        return;
-      };
     }
   }
-
+  
+  // restart sim obstacle
+  // move sim obstacle position for rlock wlock together will result to dead lock
+  if (!scenario_id.empty()) {
+    if (!ResetSimObstacle(scenario_id)) {
+      AERROR << "Cannot start sim obstacle by new scenario!";
+      return;
+    };
+  }
   {
     WLock wlock(status_mutex_);
     status_.set_current_scenario_id(scenario_id);
