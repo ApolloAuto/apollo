@@ -41,7 +41,6 @@ cc_binary(
     srcs = ["paramserver.cc"],
     deps = [
         "//cyber",
-        "//cyber/parameter",
     ],
 )
 

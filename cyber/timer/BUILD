@@ -52,7 +52,6 @@ cc_test(
     srcs = ["timer_test.cc"],
     deps = [
         "//cyber:cyber_core",
-        "//cyber:init",
         "@com_google_googletest//:gtest_main",
     ],
 )

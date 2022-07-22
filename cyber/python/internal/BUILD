@@ -62,7 +62,6 @@ cc_library(
     deps = [
         "//cyber:cyber_core",
         "//cyber/message:py_message",
-        "//cyber/record",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],
