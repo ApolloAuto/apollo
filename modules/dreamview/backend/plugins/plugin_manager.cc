@@ -87,6 +87,7 @@ auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
     return nullptr;
   }
   const string channel_location = channel_conf.location();
+  // Plugin related channel name should follow the plugin specification
   if (channel_location.find(channel_prefix) != 0) {
     AERROR << "Plugin related channel should observe channel name conventions!";
     return nullptr;
@@ -119,7 +120,7 @@ auto PluginManager::InitPluginWriterAndMsg(ChannelConf& channel_conf,
     return nullptr;
   }
   const string channel_location = channel_conf.location();
-  // Determine whether the channel follows the plug-in specification
+  // Plugin related channel name should follow the plugin specification
   if (channel_location.find(channel_prefix) != 0) {
     AERROR << "Plugin related channel should observe channel name conventions!";
     return nullptr;
@@ -246,7 +247,7 @@ bool PluginManager::CheckPluginStatus(const string& plugin_name) {
     AERROR << "Failed to register this plugin, cann't check!";
     return false;
   }
-  // todo: 是否抽出来
+  // todo: Extract the logic for monitoring plugin status
   std::vector<string> running_processes;
   for (const auto& cmd_file : cyber::common::Glob("/proc/*/cmdline")) {
     // Get process command string.
@@ -321,7 +322,6 @@ void PluginManager::RegisterDvSupportApis() {
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
-  // parse msg_name and look for related api
   if (!msg.has_name()) {
     return false;
   }
