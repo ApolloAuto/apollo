@@ -21,6 +21,12 @@
 
 #include "yaml-cpp/yaml.h"
 
+#if GPU_PLATFORM == NVIDIA
+  #include <nppi.h>
+#elif GPU_PLATFORM == AMD
+  #include <rppi.h>
+#endif
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -105,24 +111,24 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
     return -1;
   }
   BASE_GPU_CHECK(cudaMemcpy(_d_rgb, src, _in_size, cudaMemcpyHostToDevice));
+#if GPU_PLATFORM == NVIDIA
   NppiSize Remapsize;
   NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
   Remapsize.width = _width;
   Remapsize.height = _height;
   NppiRect RemapRect = {0, 0, _width, _height};
   NppStatus eStatusNPP = NPP_SUCCESS;
-#if GPU_PLATFORM == NVIDIA
   eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
                                 _d_mapx, (_width * static_cast<int>(sizeof(float))),
                                 _d_mapy, (_width * static_cast<int>(sizeof(float))),
                                 _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
-#elif GPU_PLATFORM == AMD
-  // TODO(B1tway): Add necesssary RPP code
-#endif
   if (eStatusNPP != NPP_SUCCESS) {
     std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
     return static_cast<int>(eStatusNPP);
   }
+#elif GPU_PLATFORM == AMD
+  // TODO(B1tway): Add necesssary RPP code
+#endif
   BASE_GPU_CHECK(cudaMemcpy(dst, _d_dst, _out_size, cudaMemcpyDeviceToHost));
   return 0;
 }

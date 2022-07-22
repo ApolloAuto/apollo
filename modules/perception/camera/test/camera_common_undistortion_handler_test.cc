@@ -81,7 +81,7 @@ TEST(UndistortionHandlerTest, test_undistortion) {
     cv::Mat cv_gray = cv::imread(
         "/apollo/modules/perception/testdata/"
         "camera/common/img/origin.jpeg",
-        CV_LOAD_IMAGE_GRAYSCALE);
+        cv::ImreadModes::IMREAD_GRAYSCALE);
 
     base::Image8U bgr(cv_bgr.rows, cv_bgr.cols, base::Color::BGR);
     base::Image8U bgr_undistorted(cv_bgr.rows, cv_bgr.cols, base::Color::BGR);
@@ -139,7 +139,7 @@ TEST(UndistortionHandlerTest, test_verify) {
     }
 
     ImageGpuPreprocessHandler handler;
-    apollo::common::time timer;
+    apollo::common::util::Timer timer;
     timer.Start();
     err = handler.init(
         "/apollo/modules/perception/testdata/"
@@ -189,7 +189,7 @@ TEST(UndistortionHandlerTest, test_verify) {
              image.width_step());
     }
     UndistortionHandler handler;
-    lib::Timer timer;
+    apollo::common::util::Timer timer;
     timer.Start();
     EXPECT_TRUE(handler.Init("onsemi_obstacle", 0));
     timer.End("init UndistortionHandler");
