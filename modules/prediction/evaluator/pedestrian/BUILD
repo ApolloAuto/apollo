@@ -14,7 +14,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 

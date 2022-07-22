@@ -21,7 +21,7 @@ cc_binary(
     name = "inference_demo",
     srcs = ["inference_demo.cc"],
     deps = [
-        "//third_party:libtorch",
+        "//third_party/libtorch",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

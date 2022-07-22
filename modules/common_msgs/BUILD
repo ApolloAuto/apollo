@@ -6,7 +6,7 @@ package(
 
 install(
     name = "install",
-    data_dest = "3rd-protobuf",
+    data_dest = "common-msgs",
     data = [
         ":cyberfile.xml",
     ],
@@ -15,6 +15,6 @@ install(
 install_src_files(
     name = "install_src",
     src_dir = ["."],
-    dest = "3rd-protobuf/src",
+    dest = "common-msgs/src",
     filter = "*",
 )

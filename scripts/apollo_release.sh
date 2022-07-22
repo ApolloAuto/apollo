@@ -5,7 +5,7 @@ TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 export OPT_APOLLO="$(dirname "${APOLLO_SYSROOT_DIR}")"
-export PREFIX_DIR=/apollo/output
+export PREFIX_DIR=/opt/apollo/neo/packages/
 
 LIST_ONLY=0
 RESOLVE_DEPS=0
@@ -190,6 +190,10 @@ function run_install() {
     install_targets="$(determine_release_targets ${SHORTHAND_TARGETS})"
     bazel run ${BAZEL_OPTS} ${install_targets} \
         -- ${install_opts} "${PREFIX_DIR}"
+    
+    # install files copy from source code.
+    bazel run ${BAZEL_OPTS} //:install_src \
+        -- ${install_opts} "${PREFIX_DIR}"
 }
 
 function main() {
@@ -223,8 +227,8 @@ function main() {
         ok "Done. Packages list has been writen to ${PKGS_TXT}"
     fi
 
-    generate_py_packages
-    resolve_directory_path
+    # generate_py_packages
+    # resolve_directory_path
 }
 
 main "$@"

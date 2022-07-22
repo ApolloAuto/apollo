@@ -103,7 +103,7 @@ def _install_action(
 
     dest_replacements = (
         ("@WORKSPACE@", _workspace(ctx)),
-        ("@PACKAGE@", ctx.label.package),
+        ("@PACKAGE@", ctx.label.package.replace("/", "-")),
     )
     for old, new in dest_replacements:
         if old in dest:
@@ -270,6 +270,12 @@ def _install_runtime_actions(ctx, target):
 def _install_code(action):
     return "install(%r, %r)" % (action.src.short_path, action.dst)
 
+#------------------------------------------------------------------------------
+# Generate install code for an install_src action.
+def _install_src_code(action):
+    # print(action.src.short_path)
+    return "install_src(%r, %r, %r)" % (action.src.short_path, action.dst, action.filter)
+
 #BEGIN rules
 
 #------------------------------------------------------------------------------
@@ -379,7 +385,7 @@ _install_rule = rule(
         "targets": attr.label_list(),
         "archive_dest": attr.string(default = "lib"),
         "archive_strip_prefix": attr.string_list(),
-        "library_dest": attr.string(default = "@PACKAGE@"),
+        "library_dest": attr.string(default = "@PACKAGE@/lib"),
         "library_strip_prefix": attr.string_list(),
         "mangled_library_dest": attr.string(default = "lib"),
         "mangled_library_strip_prefix": attr.string_list(),
@@ -546,5 +552,75 @@ Args:
     rename: Mapping of install paths to alternate file names, used to rename
       files upon installation.
 """
+
+#------------------------------------------------------------------------------
+# Generate information to install files to specified destination.
+def _install_src_files_impl(ctx):
+    # Get path components.
+    dest = ctx.attr.dest
+    src_dir = ctx.attr.src_dir
+    filter = ctx.attr.filter
+
+    actions = []
+    for a in _depset_to_list(src_dir):
+        for b in _depset_to_list(a.files):
+            actions.append(struct(src = b, dst = dest, filter = filter))
+
+    # Collect install actions from dependencies.
+    for d in ctx.attr.deps:
+        actions += d[InstallInfo].install_actions
+
+    script_actions = []
+    for a in actions:
+        if not hasattr(a, "src"):
+            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
+        
+        if hasattr(a, "filter"):
+            script_actions.append(_install_src_code(a))
+
+
+    # Generate install script.
+    ctx.actions.expand_template(
+        template = ctx.executable.install_script_template,
+        output = ctx.outputs.executable,
+        substitutions = {"<<actions>>": "\n    ".join(script_actions)},
+    )
+
+    # Return actions.
+    files = ctx.runfiles(
+        files = [a.src for a in actions],
+    )
+    return [
+        InstallInfo(
+            install_actions = actions,
+            rename = {},
+        ),
+        DefaultInfo(runfiles = files),
+    ]
+
+_install_src_files_rule = rule(
+    # Update buildifier-tables.json when this changes.
+    attrs = {
+        "deps": attr.label_list(providers = [InstallInfo]),
+        "dest": attr.string(),
+        "src_dir": attr.label_list(allow_files = True),
+        "filter": attr.string(),
+        "install_script_template": attr.label(
+            allow_files = True,
+            executable = True,
+            cfg = "target",
+            default = Label("//tools/install:install_source.py.in"),
+        ),
+    },
+    executable = True,
+    implementation = _install_src_files_impl,
+)
+
+def install_src_files(tags = [], **kwargs):
+    # (The documentation for this function is immediately below.)
+    _install_src_files_rule(
+        tags = tags + ["install"],
+        **kwargs
+    )
 
 #END rules

@@ -1,6 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
+install(
+    name = "install",
+    library_dest = "common/lib",
+    data_dest = "common",
+    runtime_dest = "common/bin",
+    targets = [
+        ":libkv_db.so",
+        ":kv_db_tool",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "libkv_db.so",
@@ -11,7 +23,7 @@ cc_binary(
     linkshared = True,
     linkstatic = True,
     deps = [
-        "//cyber",
+        "//cyber:cyber",
         "//modules/common/util",
         "//modules/common/util:util_tool",
         "@com_github_gflags_gflags//:gflags",

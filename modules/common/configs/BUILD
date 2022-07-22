@@ -1,6 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
+install(
+    name = "install",
+    library_dest = "common/lib",
+    data_dest = "common",
+    targets = [
+        ":libconfig_gflags.so",
+        ":libvehicle_config_helper.so",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "libconfig_gflags.so",
