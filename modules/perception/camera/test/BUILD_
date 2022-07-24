@@ -98,31 +98,29 @@ cc_library(
     hdrs = ["camera_common_undistortion.h"],
     deps = [
         "//modules/perception/base",
-        "//third_party:boost",
+        "//modules/perception/camera/common:undistortion_handler",
+        "@boost",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-        "@opencv",
+     ],
+)
+
+cc_test(
+    name = "camera_common_undistortion_handler_test",
+    srcs = ["camera_common_undistortion_handler_test.cc"],
+    deps = [
+        ":camera_common_io_util",
+        ":camera_common_undistortion",
+        "//modules/common/util:perf_util",
+        "//modules/perception/camera/common:undistortion_handler",
+        "//modules/perception/inference:inference_factory",
+        "//modules/perception/inference/operators:perception_inference_operators",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_googletest//:gtest_main",
+        "@com_google_protobuf//:protobuf",
+        "@opencv//:calib3d",
     ],
 )
 
-#cc_test(
-#    name = "camera_common_undistortion_handler_test",
-#    srcs = ["camera_common_undistortion_handler_test.cc"],
-#    deps = [
-#        ":camera_common_io_util",
-#        ":camera_common_undistortion",
-#        "//modules/common/util:perf_util",
-#        "//modules/perception/camera/common:undistortion_handler",
-#        "//modules/perception/inference:inference_factory",
-#        "//modules/perception/inference/operators:perception_inference_operators",
-#        "//modules/perception/lib/utils:utils",
-#        "@caffe",
-#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
-#        "@com_google_googletest//:gtest_main",
-#        "@com_google_protobuf//:protobuf",
-#        "@opencv",
-#        "@local_config_tensorrt//:tensorrt",
-#    ],
-#)
 cc_test(
     name = "camera_common_util_test",
     size = "small",
