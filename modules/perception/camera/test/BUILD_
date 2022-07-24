@@ -611,8 +611,7 @@ cc_test(
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/common/io:io_util",
         "@com_google_googletest//:gtest_main",
-        "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+        "@opencv//:core",
     ],
 )
 
