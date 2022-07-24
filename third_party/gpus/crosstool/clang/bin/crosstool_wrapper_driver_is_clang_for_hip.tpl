@@ -174,8 +174,6 @@ def InvokeHipcc(argv, log=False):
   # linker for TensorFlow on the ROCm platform.
   hipccopts += ' -fno-gpu-rdc'
 
-  # TODO(emankov): [ROCm 5.3] Replace with '-fgpu-flush-denormals-to-zero'
-  hipccopts += ' -fcuda-flush-denormals-to-zero'
   hipccopts += undefines
   hipccopts += defines
   hipccopts += std_options
