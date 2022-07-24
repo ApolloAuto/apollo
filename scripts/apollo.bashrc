@@ -32,6 +32,8 @@ export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export TAB="    " # 4 spaces
 
+export GPU_SETUP_COMPLETED
+
 source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
 
 : ${VERBOSE:=yes}
@@ -304,26 +306,24 @@ function optarg_check_for_opt() {
 }
 
 function setup_gpu_support() {
-  if [ -e /usr/local/cuda/ ]; then
-    pathprepend /usr/local/cuda/bin
-  fi
-
-  determine_gpu_use_target
-
-  local dev="cpu"
-  if [ "${USE_GPU_TARGET}" -gt 0 ]; then
-    dev="gpu"
-  fi
-
-  local torch_path="/usr/local/libtorch_${dev}/lib"
-  if [ -d "${torch_path}" ]; then
-    # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
-    pathprepend ${torch_path} LD_LIBRARY_PATH
+  if [ -z "${GPU_SETUP_COMPLETED}" ]; then
+    GPU_SETUP_COMPLETED=1
+    if [ -e /usr/local/cuda/ ]; then
+      pathprepend /usr/local/cuda/bin
+    fi
+    determine_gpu_use_target
+    local dev="cpu"
+    if [ "${USE_GPU_TARGET}" -gt 0 ]; then
+      dev="gpu"
+    fi
+    local torch_path="/usr/local/libtorch_${dev}/lib"
+    if [ -d "${torch_path}" ]; then
+      # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
+      pathprepend ${torch_path} LD_LIBRARY_PATH
+    fi
   fi
 }
 
 if ${APOLLO_IN_DOCKER} ; then
-  if [ -z "${USE_GPU_TARGET}" ]; then # checking if this function has already been called
-      setup_gpu_support
-  fi
+  setup_gpu_support
 fi
