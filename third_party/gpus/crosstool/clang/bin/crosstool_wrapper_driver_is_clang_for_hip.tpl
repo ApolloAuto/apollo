@@ -179,11 +179,13 @@ def InvokeHipcc(argv, log=False):
   hipccopts += std_options
   hipccopts += m_options
 
+  hipccopts_override = ' -Xclang -Wno-deprecated-declarations'
+
   if depfiles:
     # Generate the dependency file
     depfile = depfiles[0]
     cmd = (HIPCC_PATH + ' ' + hipccopts +
-           host_compiler_options +
+           host_compiler_options + hipccopts_override +
            ' -I .' + includes + ' ' + srcs + ' -M -o ' + depfile)
     cmd = HIPCC_ENV.replace(';', ' ') + ' ' + cmd
     if log: Log(cmd)
@@ -195,7 +197,7 @@ def InvokeHipcc(argv, log=False):
       return exit_status
 
   cmd = (HIPCC_PATH + ' ' + hipccopts +
-         host_compiler_options + ' -fPIC' +
+         host_compiler_options + hipccopts_override + ' -fPIC' +
          ' -I .' + opt + includes + ' -c ' + srcs + out)
 
   cmd = HIPCC_ENV.replace(';', ' ') + ' ' + cmd
@@ -259,6 +261,7 @@ def main():
     #   Auto enable __HIP_PLATFORM_AMD__ if compiling on AMD platform
     #   Other compiler (GCC,ICC,etc) need to set one of these macros explicitly
     cpu_compiler_flags.append("-D__HIP_PLATFORM_AMD__")
+    cpu_compiler_flags.append("-Wno-deprecated-declarations")
     if VERBOSE:
       print('  GCC=')
       print(' '.join([CPU_COMPILER] + cpu_compiler_flags))
