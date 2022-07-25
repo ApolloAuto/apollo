@@ -108,36 +108,36 @@ function determine_gpu_use_target() {
         # Check the existence of nvidia-smi and rocm-smi
         if [[ ! -x "$(command -v nvidia-smi)" ]]; then
           nv=1
-          warning "No nvidia-smi found."
+          info ${YELLOW}"No nvidia-smi found."${NO_COLOR}
         elif [[ -z "$(nvidia-smi)" ]]; then
           nv=2
-          warning "No NVIDIA GPU device found."
+          info ${YELLOW}"No NVIDIA GPU device found."${NO_COLOR}
         fi
         if [[ ! -x "$(command -v rocm-smi)" ]]; then
           amd=1
-          warning "No rocm-smi found."
+          info ${YELLOW}"No rocm-smi found."${NO_COLOR}
         elif [[ -z "$(rocm-smi)" ]]; then
           amd=2
-          warning "No AMD GPU device found."
+          info ${YELLOW}"No AMD GPU device found."${NO_COLOR}
         fi
         if (( $nv == 0 )); then
           use_gpu=1
           need_cuda=1
           gpu_platform="NVIDIA"
-          info "NVIDIA GPU device found."
+          info ${GREEN}"NVIDIA GPU device found."${NO_COLOR}
         elif (( $amd == 0 )); then
           use_gpu=1
           need_rocm=1
           gpu_platform="AMD"
         else
           gpu_platform="UNKNOWN"
-          warning "No any GPU device found."
+          warning ${YELLOW}"No any GPU device found."${NO_COLOR}
         fi
         if (( $amd == 0 )); then
-          info "AMD GPU device found."
+          info ${GREEN}"AMD GPU device found."${NO_COLOR}
         fi
         if (( $nv == 0)) && (( $amd == 0 )); then
-          info "NVIDIA GPU device is chosen for the build."
+          info ${GREEN}"NVIDIA GPU device is chosen for the build."${NO_COLOR}
         fi
       fi
   fi
