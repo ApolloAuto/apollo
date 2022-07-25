@@ -391,6 +391,14 @@ message Ultr_sensor_5_511 {
 
 message Bms_report_512 {
 // Report Message
+  enum Battery_flt_lowtempType {
+    BATTERY_FLT_LOW_TEMP_NO_FAULT  = 0;
+    BATTERY_FLT_LOW_TEMP_FAULT = 1;
+  }
+  enum Battery_flt_overtempType {
+    BATTERY_FLT_OVER_TEMP_NO_FAULT  = 0;
+    BATTERY_FLT_OVER_TEMP_FAULT = 1;
+  }
   // Battery Total Current [A] [-3200|3200]
   optional double battery_current = 1;
   // Battery Total Voltage [V] [0|300]
@@ -399,6 +407,12 @@ message Bms_report_512 {
   optional int32 battery_soc_percentage = 3;
   // Battery Low Soc Warn
   optional bool is_battery_soc_low = 4;
+  // Battery inside temperature
+  optional double battery_inside_temperature = 5;
+  // Battery Below Low temp fault
+  optional Battery_flt_lowtempType battery_flt_low_temp = 6;
+  // Battery Over High Temp fault
+  optional Battery_flt_overtempType battery_flt_over_temp = 7;
 }
 
 message Vin_resp1_514 {

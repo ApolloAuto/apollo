@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
 #include "modules/canbus/vehicle/devkit/devkit_controller.h"
+
+#include <string>
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
@@ -691,6 +691,7 @@ bool DevkitController::CheckChassisError() {
   if (devkit.has_steering_report_502()) {
     if (Steering_report_502::STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT ==
         devkit.steering_report_502().steer_flt1()) {
+      AERROR_EVERY(100) << "Chassis has steer system fault.";
       return true;
     }
   }
@@ -698,6 +699,7 @@ bool DevkitController::CheckChassisError() {
   if (devkit.has_throttle_report_500()) {
     if (Throttle_report_500::THROTTLE_FLT1_DRIVE_SYSTEM_HARDWARE_FAULT ==
         devkit.throttle_report_500().throttle_flt1()) {
+      AERROR_EVERY(100) << "Chassis has drive system fault.";
       return true;
     }
   }
@@ -705,12 +707,31 @@ bool DevkitController::CheckChassisError() {
   if (devkit.has_brake_report_501()) {
     if (Brake_report_501::BRAKE_FLT1_BRAKE_SYSTEM_HARDWARE_FAULT ==
         devkit.brake_report_501().brake_flt1()) {
+      AERROR_EVERY(100) << "Chassis has brake system fault.";
       return true;
     }
   }
-  // brake fault
+  // battery soc low
   if (devkit.has_bms_report_512()) {
     if (devkit.bms_report_512().is_battery_soc_low()) {
+      AERROR_EVERY(100) << "Chassis battery has low soc, please charge.";
+      return true;
+    }
+  }
+  // battery over emperature fault
+  if (devkit.has_bms_report_512()) {
+    if (Bms_report_512::BATTERY_FLT_OVER_TEMP_FAULT ==
+        devkit.bms_report_512().battery_flt_over_temp()) {
+      AERROR_EVERY(100) << "Chassis battery has over temperature fault.";
+      return true;
+    }
+
+  }
+  // battery low temperature fault
+  if (devkit.has_bms_report_512()) {
+    if (Bms_report_512::BATTERY_FLT_LOW_TEMP_NO_FAULT ==
+        devkit.bms_report_512().battery_flt_low_temp()) {
+      AERROR_EVERY(100) << "Chassis battery has below low temperature fault.";
       return true;
     }
   }
