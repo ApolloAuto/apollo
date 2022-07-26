@@ -57,6 +57,6 @@ docker build \
 docker tag ${STANDALONE_IMAGE} ${STANDALONE_IMAGE_LATEST}
 
 /bin/echo -e "Docker image with prebuilt files was built and tagged as ${STANDALONE_IMAGE}, you can start it with: \n\
-  bash docker/scripts/runtime_start.sh --standalone --local --tag ${STANDALONE_IMAGE}\n\
+  bash docker/scripts/runtime_start.sh --standalone --local --tag standalone-edu-${TARGET_ARCH}-${IMAGE_VERSION}\n\
 and switch into it with:\n\
   bash docker/scripts/runtime_into_standalone.sh"
