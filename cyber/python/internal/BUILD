@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    library_dest = "cyber/lib",
     targets = [
         ":_cyber_wrapper.so",
         ":_cyber_record_wrapper.so",

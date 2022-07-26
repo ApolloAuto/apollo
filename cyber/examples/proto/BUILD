@@ -3,7 +3,7 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
 load("//tools:cc_so_proto_rules.bzl", "cc_so_proto_library")
-load("//tools/install:install.bzl", "install_files")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,6 +13,14 @@ install_files(
     dest = "cyber/include/proto",
     files = [
         ":examples_cc_proto_hdrs",
+    ],
+)
+
+install(
+    name = "cyber_examples_proto_so",
+    library_dest = "cyber/lib",
+    targets = [
+        ":libexamples_cc_proto.so",
     ],
 )
 

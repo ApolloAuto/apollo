@@ -22,6 +22,7 @@ cc_binary(
 
 install(
     name = "install",
+    runtime_dest = "cyber/bin",
     targets = [":mainboard"],
 )
 

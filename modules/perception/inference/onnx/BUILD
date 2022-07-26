@@ -27,7 +27,7 @@ cc_library(
         "//cyber",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 

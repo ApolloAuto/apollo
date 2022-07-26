@@ -21,7 +21,7 @@ cc_library(
         "//cyber",
         "//modules/common/math",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
     ],
@@ -34,7 +34,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/audio/common:audio_gflags",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 

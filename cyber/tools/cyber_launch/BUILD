@@ -15,7 +15,7 @@ py_binary(
 # Workaround for install support of Python not ready.
 install_files(
     name = "install",
-    dest = "bin",
+    dest = "cyber/bin",
     files = [
         ":cyber_launch.py",
     ],

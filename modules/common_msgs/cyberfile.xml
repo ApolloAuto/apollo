@@ -1,0 +1,19 @@
+<package format="2">
+  <name>common-msgs</name>
+  <version>local</version>
+  <description>
+    This module contains code that is not specific to any module but is useful for the functioning of Apollo.
+  </description>
+  
+  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module-wrapper</type>
+  <src url="https://github.com/ApolloAuto/apollo">//modules/common_msgs</src>
+
+  <depend>3rd-protobuf</depend>
+
+</package>

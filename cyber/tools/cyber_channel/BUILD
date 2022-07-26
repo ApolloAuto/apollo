@@ -17,7 +17,7 @@ py_binary(
 
 install_files(
     name = "install",
-    dest = "bin",
+    dest = "cyber/bin",
     files = [
         ":cyber_channel.py",
     ],

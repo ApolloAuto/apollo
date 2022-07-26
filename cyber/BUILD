@@ -1,18 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
-
-
-install_files(
-    name = "third_party_export_hdrs",
-    dest = "lib/include",
-    files = [
-        "@com_google_protobuf//:protobuf_hdrs",
-        "@civetweb//:civetweb_hdrs",
-    ],
-)
 
 cc_library(
     name = "cyber",
@@ -28,77 +18,47 @@ install(
         ":.release.bash",
         ":cyber_conf",
         "//cyber/python/cyber_py3:runtime_files",
+        ":cyberfile.xml",
+        "cyber.BUILD"
     ],
+    data_dest = "cyber",
+    targets = [
+        ":libcyber_core.so",
+    ],
+    library_dest = "cyber/lib",
     rename = {
         "cyber/.release.bash": "setup.bash",
     },
     deps = [
-        # todo:// move to third_party
-        ":third_party_export_hdrs",
-        "@ad_rss_lib//:ad_rss_export_hdrs",
-
-        ":pb_cyber",
-        ":cyber_export_hdrs",
+        "//cyber/proto:pb_cyber",
         "//cyber/proto:cyber_proto_hdrs",
+        "//cyber/proto:cyber_proto_so",
         "//cyber/mainboard:install",
         "//cyber/python/internal:install",
         "//cyber/tools:install",
     ],
 )
 
-install_files(
-    name = "cyber_export_hdrs",
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_cyber_src",
+        ":install_cyber_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_cyber_src",
+    src_dir = ["."],
+    dest = "cyber/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_cyber_hdrs",
+    src_dir = ["."],
     dest = "cyber/include",
-    files = [
-        ":cyber_hdrs",
-        "//cyber/component:cyber_component_hdrs",
-        "//cyber/base:cyber_base_hdrs",
-        "//cyber/blocker:cyber_blocker_hdrs",
-        "//cyber/class_loader:cyber_class_loader_hdrs",
-        "//cyber/class_loader/shared_library:cyber_class_loader_shared_library_hdrs",
-        "//cyber/class_loader/utility:cyber_class_loader_utility_hdrs",
-        "//cyber/common:cyber_common_hdrs",
-        "//cyber/croutine:cyber_croutine_hdrs",
-        "//cyber/data:cyber_data_hdrs",
-        "//cyber/event:cyber_event_hdrs",
-        "//cyber/io:cyber_io_hdrs",
-        "//cyber/logger:cyber_logger_hdrs",
-        "//cyber/message:cyber_message_hdrs",
-        "//cyber/node:cyber_node_hdrs",
-        "//cyber/parameter:cyber_parameter_hdrs",
-        "//cyber/scheduler:cyber_scheduler_hdrs",
-        "//cyber/service:cyber_service_hdrs",
-        "//cyber/service_discovery:cyber_service_discovery_hdrs",
-        "//cyber/service_discovery/communication:cyber_service_discovery_communication_hdrs",
-        "//cyber/sysmo:cyber_sysmo_hdrs",
-        "//cyber/task:cyber_task_hdrs",
-        "//cyber/time:cyber_time_hdrs",
-        "//cyber/timer:cyber_timer_hdrs",
-        "//cyber/transport:cyber_transport_hdrs",
-        "//cyber/transport/common:cyber_transport_common_hdrs",
-        "//cyber/transport/dispatcher:cyber_transport_dispatcher_hdrs",
-        "//cyber/transport/message:cyber_transport_message_hdrs",
-        "//cyber/transport/qos:cyber_transport_qos_hdrs",
-        "//cyber/transport/receiver:cyber_transport_receiver_hdrs",
-        "//cyber/transport/rtps:cyber_transport_rtps_hdrs",
-        "//cyber/transport/shm:cyber_transport_shm_hdrs",
-        "//cyber/transport/transmitter:cyber_transport_transmitter_hdrs",
-    ],
-)
-
-filegroup(
-    name = "cyber_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
-
-install_files(
-    name = "pb_cyber",
-    dest = "cyber",
-    files = [
-        "//cyber/proto:record_py_pb2",
-    ],
+    filter = "*.h",
 )
 
 cc_library(

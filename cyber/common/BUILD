@@ -3,13 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_common_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
-
 cc_library(
     name = "common",
     deps = [

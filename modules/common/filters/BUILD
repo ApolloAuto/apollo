@@ -1,5 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
+
+install(
+    name = "install",
+    library_dest = "common/lib",
+    data_dest = "common",
+    targets = [
+        ":libfilters.so",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 
 cc_binary(
@@ -30,7 +41,7 @@ cc_library(
     hdrs = ["digital_filter.h"],
     alwayslink = True,
     deps = [
-        "//cyber",
+        "//cyber:cyber",
     ],
 )
 
@@ -40,7 +51,7 @@ cc_library(
     hdrs = ["mean_filter.h"],
     alwayslink = True,
     deps = [
-        "//cyber",
+        "//cyber:cyber",
     ],
 )
 
@@ -50,7 +61,7 @@ cc_library(
     hdrs = ["digital_filter_coefficients.h"],
     alwayslink = True,
     deps = [
-        "//cyber",
+        "//cyber:cyber",
     ],
 )
 

@@ -2,6 +2,20 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
+install(
+    name = "install",
+    data_dest = "common/vehicle_model",
+    library_dest = "common/lib",
+    runtime_dest = "common/bin",
+    data = [
+        ":vehicle_model_config_data",
+    ],
+    targets = [
+        ":libvehicle_model.so",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 
 cc_binary(
     name = "libvehicle_model.so",
@@ -60,13 +74,4 @@ filegroup(
     name = "vehicle_model_config_data",
     srcs = ["conf/vehicle_model_config.pb.txt"],
 )
-
-install(
-    name = "install",
-    data = [
-        ":vehicle_model_config_data",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 cpplint()

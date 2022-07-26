@@ -3,7 +3,7 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
 load("//tools:cc_so_proto_rules.bzl", "cc_so_proto_library")
-load("//tools/install:install.bzl", "install_files")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -31,7 +31,37 @@ install_files(
         ":clock_cc_proto_hdrs",
     ],
 )
+install(
+    name = "cyber_proto_so",
+    library_dest = "cyber/lib",
+    targets = [
+        ":libtopology_change_cc_proto.so",
+        ":libdag_conf_cc_proto.so",
+        ":libproto_desc_cc_proto.so",
+        ":libchoreography_conf_cc_proto.so",
+        ":libcomponent_conf_cc_proto.so",
+        ":libcyber_conf_cc_proto.so",
+        ":libperf_conf_cc_proto.so",
+        ":libclassic_conf_cc_proto.so",
+        ":libparameter_cc_proto.so",
+        ":libunit_test_cc_proto.so",
+        ":libscheduler_conf_cc_proto.so",
+        ":libtransport_conf_cc_proto.so",
+        ":libqos_profile_cc_proto.so",
+        ":librecord_cc_proto.so",
+        ":librun_mode_conf_cc_proto.so",
+        ":librole_attributes_cc_proto.so",
+        ":libclock_cc_proto.so",
+    ],
+)
 
+install_files(
+    name = "pb_cyber",
+    dest = "cyber/proto",
+    files = [
+        ":record_py_pb2",
+    ],
+)
 cc_so_proto_library(
     name = "topology_change_cc_proto",
     srcs = [
