@@ -32,7 +32,8 @@ cc_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
-    ]),)
+    ]),
+)
 
 cc_test(
     name = "bare_intersection_unprotected_scenario_test",

@@ -71,7 +71,7 @@ cc_test(
     deps = [
         ":deadend_turnaround",
         "@com_google_googletest//:gtest_main",
-        ] + if_cuda([
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",

@@ -4,7 +4,7 @@ load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
-gpu_library(
+cc_library(
     name = "torch_net",
     srcs = ["torch_net.cc"],
     hdrs = ["torch_net.h"],
@@ -20,7 +20,7 @@ gpu_library(
     ]),
 )
 
-gpu_library(
+cc_library(
     name = "torch_det",
     srcs = ["torch_det.cc"],
     hdrs = ["torch_det.h"],
