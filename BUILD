@@ -13,6 +13,7 @@ install(
     name = "install",
     deps = [
         "//cyber:install",
+        "//tools:install",
         # "//cyber/examples:install",
         # "//docker/scripts:install",
         # "//docs:install",
@@ -40,6 +41,7 @@ install(
         # "//modules/transform:install",
         # "//modules/v2x:install",
         # "//scripts:install",
+        "//third_party/fastrtps:install",
         "//third_party/protobuf:install",
     ],
 )
@@ -48,8 +50,10 @@ install_src_files(
     name = "install_src",
     deps = [
         "//cyber:install_src",
+        "//tools:install_src",
         "//modules/common:install_src",
         "//modules/common_msgs:install_src",
+        "//third_party/fastrtps:install_src",
         "//third_party/protobuf:install_src",
     ],
 )

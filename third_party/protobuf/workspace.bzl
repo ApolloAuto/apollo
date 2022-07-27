@@ -15,8 +15,3 @@ def repo():
             "https://github.com/protocolbuffers/protobuf/archive/v3.14.0.tar.gz",
         ],
     )
-
-
-def init():
-    repo()
-    
