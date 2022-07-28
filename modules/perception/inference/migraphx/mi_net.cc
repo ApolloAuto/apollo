@@ -21,10 +21,7 @@
 #include <sstream>
 #include <utility>
 
-#include <half.hpp>
-
 #include "absl/strings/str_cat.h"
-
 #include "cyber/common/log.h"
 #include "modules/perception/inference/migraphx/plugins/perception_inference_migraphx_plugins.h"
 
