@@ -13,12 +13,15 @@ cc_test(
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
-        "@opencv",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:miopen",
+    ]) + [
+        "@opencv//:core",
     ],
 )
 
