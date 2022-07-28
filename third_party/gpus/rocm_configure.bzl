@@ -16,6 +16,7 @@ load(
     "get_bash_bin",
     "get_cpu_value",
     "get_host_environ",
+    "get_crosstool_verbose",
     "get_python_bin",
     "raw_exec",
     "realpath",
@@ -23,6 +24,8 @@ load(
     "which",
     "make_copy_dir_rule",
     "make_copy_files_rule",
+    "tpl_gpus_path",
+    "tpl_gpus",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -230,17 +233,6 @@ def _hipcc_env(repository_ctx):
             hipcc_env = (hipcc_env + " " + name + "=\"" + env_value + "\";")
     return hipcc_env.strip()
 
-def _crosstool_verbose(repository_ctx):
-    """Returns the environment variable value CROSSTOOL_VERBOSE.
-
-    Args:
-        repository_ctx: The repository context.
-
-    Returns:
-        A string containing value of environment variable CROSSTOOL_VERBOSE.
-    """
-    return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
-
 def lib_name(lib, version = "", static = False):
     """Constructs the name of a library on Linux.
 
@@ -373,18 +365,6 @@ def _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script):
         config = config
     )
 
-def _tpl_path(repository_ctx, filename):
-    return repository_ctx.path(Label("//third_party/gpus/%s.tpl" % filename))
-
-def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
-    if not out == None:
-        out = tpl.replace(":", "/")
-    repository_ctx.template(
-        out,
-        Label("//third_party/gpus/%s.tpl" % tpl),
-        substitutions,
-    )
-
 _DUMMY_CROSSTOOL_BZL_FILE = """
 def error_gpu_disabled():
   fail("ERROR: Building with --config=rocm but Apollo is not configured " +
@@ -411,24 +391,21 @@ error_gpu_disabled()
 
 def _create_dummy_repository(repository_ctx):
     # Set up build_defs.bzl file for rocm/
-    tpl_labelname = "rocm:build_defs.bzl"
-    _tpl(
+    tpl_gpus(
         repository_ctx,
-        tpl_labelname,
+        "rocm:build_defs.bzl",
         {
             "%{rocm_is_configured}": "False",
             "%{rocm_extra_copts}": "[]",
             "%{rocm_gpu_architectures}": "[]",
             "%{rocm_version_number}": "0",
         },
-        tpl_labelname
     )
 
     # Set up BUILD file for rocm/
-    tpl_labelname = "rocm:BUILD"
-    _tpl(
+    tpl_gpus(
         repository_ctx,
-        tpl_labelname,
+        "rocm:BUILD",
         {
             "%{hip_lib}": lib_name("hip"),
             "%{hipblas_lib}": lib_name("hipblas"),
@@ -444,7 +421,6 @@ def _create_dummy_repository(repository_ctx):
             "%{copy_rules}": "",
             "%{rocm_headers}": "",
         },
-        tpl_labelname
     )
 
     # Create dummy files for the ROCm toolkit since they are still required by
@@ -453,7 +429,7 @@ def _create_dummy_repository(repository_ctx):
 
     # Set up rocm_config.h, which is used by
     # tensorflow/stream_executor/dso_loader.cc.
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "rocm:rocm_config.h",
         {
@@ -471,7 +447,7 @@ def _create_dummy_repository(repository_ctx):
 
     # Set up rocm_config.py, which is used by gen_build_info to provide
     # static build environment info to the API
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "rocm:rocm_config.py",
         {
@@ -498,7 +474,7 @@ def _compute_rocm_extra_copts(repository_ctx, amdgpu_targets):
 def _create_local_rocm_repository(repository_ctx):
     """Creates the repository containing files set up to build with ROCm."""
 
-    tpl_paths = {labelname: _tpl_path(repository_ctx, labelname) for labelname in [
+    tpl_paths = {labelname: tpl_gpus_path(repository_ctx, labelname) for labelname in [
         "rocm:build_defs.bzl",
         "crosstool:BUILD.rocm",
         "crosstool:hipcc_cc_toolchain_config.bzl",
@@ -506,7 +482,7 @@ def _create_local_rocm_repository(repository_ctx):
         "rocm:rocm_config.h",
         "rocm:rocm_config.py",
     ]}
-    tpl_paths["rocm:BUILD"] = _tpl_path(repository_ctx, "rocm:BUILD")
+    tpl_paths["rocm:BUILD"] = tpl_gpus_path(repository_ctx, "rocm:BUILD")
     find_rocm_config_script = repository_ctx.path(Label("//third_party/gpus:find_rocm_config.py.gz.base64"))
 
     bash_bin = get_bash_bin(repository_ctx)
@@ -598,12 +574,10 @@ def _create_local_rocm_repository(repository_ctx):
     }
 
     # Set up BUILD file for rocm/
-    tpl_labelname = "rocm:BUILD"
-    _tpl(
+    tpl_gpus(
         repository_ctx,
-        tpl_labelname,
+        "rocm:BUILD",
         repository_dict,
-        tpl_labelname
     )
 
     repository_ctx.template(
@@ -677,7 +651,7 @@ def _create_local_rocm_repository(repository_ctx):
             "%{rocr_runtime_library}": "hsa-runtime64",
             "%{hip_runtime_path}": rocm_config.rocm_toolkit_path + "/hip/lib",
             "%{hip_runtime_library}": "amdhip64",
-            "%{crosstool_verbose}": _crosstool_verbose(repository_ctx),
+            "%{crosstool_verbose}": get_crosstool_verbose(repository_ctx),
             "%{gcc_host_compiler_path}": str(cc),
         },
     )
