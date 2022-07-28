@@ -1,3 +1,5 @@
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+
 package(
     default_visibility = ["//visibility:public"],
 )
@@ -11,4 +13,20 @@ cc_library(
             "@libtorch_cpu",
         ],
     }),
+)
+
+install(
+    name = "install",
+    data_dest = "3rd-libtorch-cpu",
+    data = [
+        ":cyberfile.xml",
+        ":3rd-libtorch-cpu.BUILD",
+    ],
+)
+
+install_src_files(
+    name = "install_src",
+    src_dir = ["."],
+    dest = "3rd-libtorch-cpu/src",
+    filter = "*",
 )
