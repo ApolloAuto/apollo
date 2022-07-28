@@ -1,4 +1,30 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
+load("@apollo//tools/install:install.bzl", "install", "install_files", "install_src_files")
+
+install(
+    name = "install",
+    targets = [
+        ":libad_rss.so",
+    ],
+    library_dest = "3rd-ad-rss-lib/lib",
+    deps = [
+        ":ad_rss_export_hdrs",
+    ],
+)
+install_files(
+    name = "ad_rss_export_hdrs",
+    dest = "3rd-ad-rss-lib/include/ad_rss",
+    files = glob([
+        "include/ad_rss/**/*.hpp",
+        "src/**/*.hpp",
+        "include/generated/ad_rss/**/*.hpp"
+    ]),
+    strip_prefix = [
+        "include/ad_rss",
+        "src",
+        "include/generated/ad_rss",
+    ]
+)
 
 package(
     default_visibility = ["//visibility:public"],
