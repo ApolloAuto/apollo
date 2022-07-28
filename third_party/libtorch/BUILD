@@ -19,9 +19,12 @@ install(
     name = "install",
     data_dest = "3rd-libtorch-cpu",
     data = [
-        ":cyberfile.xml",
+        ":cyberfile-cpu.xml",
         ":3rd-libtorch-cpu.BUILD",
     ],
+    rename = {
+        "3rd-libtorch-cpu/cyberfile-cpu.xml" : "cyberfile.xml",
+    },
 )
 
 install_src_files(

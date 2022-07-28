@@ -1,13 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-package(default_visibility = ["//visibility:public"])
-
 licenses(["notice"])
 
+package(default_visibility = ["//visibility:public"])
+
+
 cc_library(
-    name = "ipopt",
-    includes = ["."],
+    name = "gflags",
+    includes = ["include"],
     linkopts = [
-        "-lipopt",
+        "-lgflags",
     ],
+    strip_include_prefix = "include",
 )

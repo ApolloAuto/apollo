@@ -16,6 +16,6 @@ install(
 install_src_files(
     name = "install_src",
     src_dir = ["."],
-    dest = "3rd-gflafs/src",
+    dest = "3rd-gflags/src",
     filter = "*",
 )
