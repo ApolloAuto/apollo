@@ -12,6 +12,20 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>module</type>
-  <src url="https://github.com/ApolloAuto/apollo">//modules/common</src>
-
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/common</src_path>
+  
+  <depend expose="False">3rd-rule-python-dev</depend>
+  <depend expose="False">3rd-grpc-dev</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
+  <depend expose="False">3rd-bazel-skylib-dev</depend>
+  <depend expose="False">3rd-absl-dev</depend>
+  <depend expose="False">3rd-sqlite3-dev</depend>
+  <depend expose="False">3rd-rules-proto-dev</depend>
+  <depend expose="False">3rd-eigen3-dev</depend>
+  <depend expose="False">3rd-osqp-dev</depend>
+  <depend expose="False">3rd-boost-dev</depend>
+  <depend expose="False">3rd-gtest-dev</depend>
+  <depend type="binary" src_path="//cyber" version_eq="1.0.0.1" repo_name="cyber">cyber-dev</depend>
+  <depend expose="False">3rd-py-dev</depend>
+  <depend expose="False">3rd-nlohmann-json-dev</depend>
 </package>
