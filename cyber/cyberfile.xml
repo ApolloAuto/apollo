@@ -15,15 +15,18 @@
   <type>module</type>
   <src url="https://github.com/ApolloAuto/apollo">//cyber</src>
   
-  <depend>libncurses5-dev</depend>
-  <depend>libuuid1</depend>
-  <depend>python3</depend>
+  <depend so_names="ncurses" repo_name="ncurses5">libncurses5-dev</depend>
+  <depend so_names="uuid" repo_name="uuid">libuuid1</depend>
 
   <depend>3rd-protobuf-dev</depend>
-  <depend>3rd-fastrtps-dev</depend>
-  <depend>3rd-glog-dev</depend>
-  <depend>3rd-gflags-dev</depend>
-  <depend>common-dev</depend>
+  <depend repo_name="fastrtps" version_eq="1.0.0.1">3rd-fastrtps-dev</depend>
+  <depend repo_name="rules">3rd-rule-python-dev</depend>
+  <depend>3rd-grpc-dev</depend>
+  <depend>3rd-rules-proto-dev</depend>
+  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
+  <depend>3rd-bazel-skylib-dev</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
   <depend>common-msgs-dev</depend>
+  <depend>bazel-extend-tools-dev</depend>
 
 </package>

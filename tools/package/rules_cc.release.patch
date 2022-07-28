@@ -1,6 +1,6 @@
 --- cc/defs.bzl
 +++ cc/defs.bzl
-@@ -26,6 +26,103 @@ def _add_tags(attrs):
+@@ -26,6 +26,107 @@ def _add_tags(attrs):
          attrs["tags"] = [_MIGRATION_TAG]
      return attrs
  
@@ -29,7 +29,7 @@
 +      result.append(l_str.strip()[1:-1])
 +    return result
 +
-+def _replace_deps(deps_list, srcs_dict, workspace_deps):
++def _replace_deps(deps_list, srcs_dict, workspace_deps, ws_deps_added):
 +    need_remove = {}
 +    current_deps = {}
 +
@@ -45,9 +45,10 @@
 +        current_deps[deps_list[i]] = deps_list[i]
 +    
 +    new_deps = [] + deps_list
-+    for i in workspace_deps:
-+        if i not in current_deps:
-+            new_deps.append(i)
++    if not ws_deps_added:
++        for i in workspace_deps:
++            if i not in current_deps:
++                new_deps.append(i)
 +
 +    deps_map = {}
 +    for i in new_deps:
@@ -74,18 +75,21 @@
 +
 +    deps_list = []
 +    if type(deps) == "select":
++      ws_deps_added = False
 +      for group_str in str(deps).strip().split(" + "):
 +        if "select({" in group_str.strip():
 +          s_deps_dict = _select2dict(group_str.strip())
 +          # print(s_deps_dict)
 +          for k, v in s_deps_dict.items():
 +            if type(v) == "list":
-+              s_deps_dict[k] = _replace_deps(v, srcs_dict, workspace_deps)
++              s_deps_dict[k] = _replace_deps(v, srcs_dict, workspace_deps, ws_deps_added)
++              ws_deps_added = True
 +          deps_list.append(select(s_deps_dict))
 +        else:
 +          l_deps_str = group_str.strip()
 +          l_deps_list = _list_str2list(l_deps_str)
-+          deps_list.append(_replace_deps(l_deps_list, srcs_dict, workspace_deps))
++          deps_list.append(_replace_deps(l_deps_list, srcs_dict, workspace_deps, ws_deps_added))
++          ws_deps_added = True
 +
 +      n_deps = []
 +      for d in deps_list:
@@ -96,7 +100,7 @@
 +      
 +      return attrs
 +    elif type(deps) == "list":
-+      attrs["deps"] = _replace_deps(deps, srcs_dict, workspace_deps)
++      attrs["deps"] = _replace_deps(deps, srcs_dict, workspace_deps, False)
 +      return attrs
 +    else:
 +      return attrs
@@ -104,7 +108,25 @@
  def cc_binary(**attrs):
      """Bazel cc_binary rule.
  
-@@ -60,7 +157,7 @@ def cc_library(**attrs):
+@@ -36,7 +137,7 @@ def cc_binary(**attrs):
+     """
+ 
+     # buildifier: disable=native-cc
+-    native.cc_binary(**_add_tags(attrs))
++    native.cc_binary(**_add_tags(_process_apollo_deps(attrs)))
+ 
+ def cc_test(**attrs):
+     """Bazel cc_test rule.
+@@ -48,7 +149,7 @@ def cc_test(**attrs):
+     """
+ 
+     # buildifier: disable=native-cc
+-    native.cc_test(**_add_tags(attrs))
++    native.cc_test(**_add_tags(_process_apollo_deps(attrs)))
+ 
+ def cc_library(**attrs):
+     """Bazel cc_library rule.
+@@ -60,7 +161,7 @@ def cc_library(**attrs):
      """
  
      # buildifier: disable=native-cc

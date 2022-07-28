@@ -1,13 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
-load("//tools/install:install.bzl", "install", "install_files")
-
-install_files(
-    name = "ad_rss_export_hdrs",
-    dest = "lib/include/ad_rss_lib",
-    files = glob([
-        "include/**/*.hpp",
-        ]),
-)
 
 package(
     default_visibility = ["//visibility:public"],

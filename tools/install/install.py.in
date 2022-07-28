@@ -73,8 +73,13 @@ def rename_package_name(dest):
 
     # Local build package version is fiexed `local`
     pkg_name_with_ver = new_pkg_name + "/local"
+    new_dest = dest.replace(curr_pkg_name, pkg_name_with_ver, 1)
 
-    return dest.replace(curr_pkg_name, pkg_name_with_ver, 1)
+    # Install ${package_name}.BUILD to ${new_package_name}.BUILD
+    if dest == curr_pkg_name + "/" + curr_pkg_name + ".BUILD":
+        new_dest = new_pkg_name + "/local/" + new_pkg_name + ".BUILD"
+
+    return new_dest
 
 def is_relative_link(filepath):
     """Find if a file is a relative link.

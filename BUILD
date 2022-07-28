@@ -42,7 +42,10 @@ install(
         # "//modules/v2x:install",
         # "//scripts:install",
         "//third_party/fastrtps:install",
+        "//third_party/glog:install",
+        "//third_party/opencv:install",
         "//third_party/protobuf:install",
+        "//third_party/py:install",
     ],
 )
 
@@ -54,6 +57,9 @@ install_src_files(
         "//modules/common:install_src",
         "//modules/common_msgs:install_src",
         "//third_party/fastrtps:install_src",
+        "//third_party/glog:install_src",
+        "//third_party/opencv:install_src",
         "//third_party/protobuf:install_src",
+        "//third_party/py:install_src",
     ],
 )
