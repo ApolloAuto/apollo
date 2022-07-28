@@ -213,7 +213,7 @@ Apollo is provided under the [Apache-2.0 license](https://github.com/ApolloAuto/
 
 Apollo open source platform only has the source code for models, algorithms and processes, which will be integrated with cybersecurity defense strategy in the deployment for commercialization and productization.
 
-Please refer to the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
+Please refer to the Disclaimer of Apollo in [Apollo's official website](https://developer.apollo.auto/docs/disclaimer.html).
 
 ## Connect with us
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
