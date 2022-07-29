@@ -1,9 +1,23 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 PREPROCESS_SUB_COPTS = ["-DMODULE_NAME=\\\"preprocessor_submodule\\\""]
+
+install(
+    name = "install",
+    library_dest = "control/lib",
+    targets = [
+        ":control_module.so",
+        ":preprocessor_submodule.so",
+        ":mpc_controller_submodule.so",
+        ":lat_lon_controller_submodule.so",
+        ":postprocessor_submodule.so",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "control_module_lib",

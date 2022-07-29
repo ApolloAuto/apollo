@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "dreamview/lib",
+    targets = [":libmap_service.so"],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "libmap_service.so",

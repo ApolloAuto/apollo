@@ -1,11 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+
+install(
+    name = "install",
+    library_dest = "map/lib",
+    targets = [":libpnc_map.so"],
+    visibility = ["//visibility:public"],
+)
+
 cuda_library(
     name = "cuda_pnc_util",
     srcs = ["cuda_util.cu"],

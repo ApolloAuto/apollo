@@ -1,9 +1,21 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
+
+install(
+    name = "install",
+    library_dest = "dreamview/lib",
+    runtime_dest = "dreamview/bin",
+    targets = [
+        ":libhmi_worker.so",
+        ":vehicle_manager_main",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "vehicle_manager",

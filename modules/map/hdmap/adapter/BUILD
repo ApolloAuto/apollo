@@ -1,7 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
-
+install(
+    name = "install",
+    library_dest = "map/lib",
+    targets = [":libopendrive_adapter.so"],
+    visibility = ["//visibility:public"],
+)
 cc_binary(
     name = "libopendrive_adapter.so",
     srcs = [

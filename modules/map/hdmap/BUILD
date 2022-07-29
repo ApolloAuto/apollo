@@ -1,8 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-
+load("//tools/install:install.bzl", "install")
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
+install(
+    name = "install",
+    library_dest = "map/lib",
+    targets = [
+        ":libhdmap.so",
+        ":libhdmap_util.so"
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "libhdmap.so",

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -78,16 +78,51 @@ cc_binary(
 
 install(
     name = "install",
+    data_dest = "task_manager",
+    library_dest = "task_manager/lib",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        ":task_manager.BUILD",
     ],
     targets = [
         ":libtask_manager_component.so",
     ],
     deps = [
         "//cyber:install",
+        ":pb_hdrs",
     ],
 )
+
+install(
+    name = "pb_hdrs",
+    data_dest = "task_manager/include",
+    data = [
+        "//modules/task_manager/proto:task_manager_config_cc_proto",
+    ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_task_manager_src",
+        ":install_task_manager_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_task_manager_src",
+    src_dir = ["."],
+    dest = "task_manager/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_task_manager_hdrs",
+    src_dir = ["."],
+    dest = "task_manager/include",
+    filter = "*.h",
+) 
 
 filegroup(
     name = "runtime_data",

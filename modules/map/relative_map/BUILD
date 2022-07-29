@@ -8,6 +8,8 @@ MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
 install(
     name = "install",
+    data_dest = "map",
+    library_dest = "map/lib",
     data = [
         ":relative_map_conf",
         ":testdata",

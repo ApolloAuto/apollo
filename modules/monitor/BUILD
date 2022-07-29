@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -52,15 +52,41 @@ filegroup(
 
 install(
     name = "install",
+    library_dest = "monitor/lib",
+    data_dest = "monitor",
     targets = [
         ":libmonitor.so",
     ],
     data = [
-        ":runtime_data",
+       ":runtime_data",
+        ":cyberfile.xml",
+        ":monitor.BUILD",
     ],
     deps = [
         "//cyber:install",
     ],
 )
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_monitor_src",
+        ":install_monitor_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_monitor_src",
+    src_dir = ["."],
+    dest = "monitor/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_monitor_hdrs",
+    src_dir = ["."],
+    dest = "monitor/include",
+    filter = "*.h",
+) 
 
 cpplint()

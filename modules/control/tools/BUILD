@@ -1,7 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "control/bin",
+    targets = [
+        ":control_tester",
+        ":pad_terminal",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "control_tester",

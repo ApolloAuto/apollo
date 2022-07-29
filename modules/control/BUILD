@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -52,23 +52,71 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "control/lib",
+    data_dest = "control",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        "control.BUILD",
     ],
     targets = [
         ":libcontrol_component.so",
     ],
     deps = [
         ":pb_control",
+        ":pb_hdrs",
+        "//modules/control/submodules:install",
+        "//modules/control/tools:install",
+    ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "control/include",
+    data = [
+        "//modules/control/proto:calibration_table_cc_proto",
+        "//modules/control/proto:control_common_conf_cc_proto",
+        "//modules/control/proto:control_conf_cc_proto",
+        "//modules/control/proto:gain_scheduler_conf_cc_proto",
+        "//modules/control/proto:lat_controller_conf_cc_proto",
+        "//modules/control/proto:leadlag_conf_cc_proto",
+        "//modules/control/proto:local_view_cc_proto",
+        "//modules/control/proto:lon_controller_conf_cc_proto",
+        "//modules/control/proto:mpc_controller_conf_cc_proto",
+        "//modules/control/proto:mrac_conf_cc_proto",
+        "//modules/control/proto:pid_conf_cc_proto",
+        "//modules/control/proto:preprocessor_cc_proto",       
     ],
 )
 
 install_files(
     name = "pb_control",
-    dest = "modules/control",
+    dest = "control",
     files = [
         "//modules/common_msgs/control_msgs:pad_msg_py_pb2",
     ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_control_src",
+        ":install_control_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_control_src",
+    src_dir = ["."],
+    dest = "control/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_control_hdrs",
+    src_dir = ["."],
+    dest = "control/include",
+    filter = "*.h",
 )
 
 filegroup(
