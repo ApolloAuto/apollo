@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>third-wrapper</type>
-  <src url="https://github.com/ApolloAuto/apollo">//third_party/nlohmann_json</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/nlohmann_json</src_path>
   
 </package>

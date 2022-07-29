@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>module-wrapper</type>
-  <src url="https://github.com/ApolloAuto/apollo">//tools</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//tools</src_path>
   
 </package>

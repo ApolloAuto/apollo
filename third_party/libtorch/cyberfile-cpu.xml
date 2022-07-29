@@ -13,6 +13,6 @@
   <depend>3rd-py-dev</depend>
 
   <type>third-binary</type>
-  <src url="https://github.com/ApolloAuto/apollo">//third_party/libtorch</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/libtorch</src_path>
   
 </package>

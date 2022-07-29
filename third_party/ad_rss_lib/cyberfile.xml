@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>third-binary</type>
-  <src url="https://github.com/ApolloAuto/apollo">//third_party/ad_rss_lib</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/ad_rss_lib</src_path>
   
 </package>

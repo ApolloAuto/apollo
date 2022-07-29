@@ -12,8 +12,8 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>module-wrapper</type>
-  <src url="https://github.com/ApolloAuto/apollo">//modules/common_msgs</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/common_msgs</src_path>
 
-  <depend>3rd-protobuf</depend>
+  <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
 </package>

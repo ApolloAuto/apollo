@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>third-binary</type>
-  <src url="https://github.com/ApolloAuto/apollo">//third_party/opencv</src>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/opencv</src_path>
   
 </package>

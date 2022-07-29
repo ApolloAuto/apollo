@@ -6,7 +6,6 @@ licenses(["notice"])
 
 cc_library(
     name = "osqp",
-    include_prefix = "osqp",
     includes = [
         "include",
     ],
