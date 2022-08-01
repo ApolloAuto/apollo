@@ -44,7 +44,7 @@ cc_test(
     ],
 )
 
-gpu_library(
+cc_library(
     name = "inference_factory",
     srcs = ["inference_factory.cc"],
     hdrs = ["inference_factory.h"],
