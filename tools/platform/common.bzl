@@ -132,6 +132,17 @@ def get_host_environ(repository_ctx, name, default_value = None):
 
     return default_value
 
+def get_crosstool_verbose(repository_ctx):
+    """Returns the environment variable value CROSSTOOL_VERBOSE.
+
+    Args:
+        repository_ctx: The repository context.
+
+    Returns:
+        A string containing value of environment variable CROSSTOOL_VERBOSE.
+    """
+    return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
+
 def get_cpu_value(repository_ctx):
     """Returns the name of the host operating system.
 
@@ -332,3 +343,15 @@ def to_list_of_strings(elements):
 
 def flag_enabled(repository_ctx, flag_name):
     return get_host_environ(repository_ctx, flag_name) == "1"
+
+def tpl_gpus_path(repository_ctx, filename):
+    return repository_ctx.path(Label("//third_party/gpus/%s.tpl" % filename))
+
+def tpl_gpus(repository_ctx, tpl, substitutions = {}, out = None):
+    if not out:
+        out = tpl.replace(":", "/")
+    repository_ctx.template(
+        out,
+        Label("//third_party/gpus/%s.tpl" % tpl),
+        substitutions,
+    )

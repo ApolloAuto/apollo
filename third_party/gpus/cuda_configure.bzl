@@ -30,6 +30,7 @@ load(
     "get_bash_bin",
     "get_cpu_value",
     "get_host_environ",
+    "get_crosstool_verbose",
     "get_python_bin",
     "raw_exec",
     "read_dir",
@@ -39,6 +40,8 @@ load(
     "to_list_of_strings",
     "flag_enabled",
     "which",
+    "tpl_gpus_path",
+    "tpl_gpus",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -305,17 +308,6 @@ def compute_capabilities(repository_ctx):
             auto_configure_fail("Invalid compute capability: %s" % capability)
 
     return capabilities
-
-def _crosstool_verbose(repository_ctx):
-    """Returns the environment variable value CROSSTOOL_VERBOSE.
-
-    Args:
-        repository_ctx: The repository context.
-
-    Returns:
-        A string containing value of environment variable CROSSTOOL_VERBOSE.
-    """
-    return get_host_environ(repository_ctx, "CROSSTOOL_VERBOSE", "0")
 
 def _nvcc_verbose(repository_ctx):
     """Returns the environment variable value NVCC_VERBOSE.
@@ -596,15 +588,6 @@ def _get_cuda_config(repository_ctx, find_cuda_config_script):
         config = config,
     )
 
-def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
-    if not out:
-        out = tpl.replace(":", "/")
-    repository_ctx.template(
-        out,
-        Label("//third_party/gpus/%s.tpl" % tpl),
-        substitutions,
-    )
-
 def _file(repository_ctx, label):
     repository_ctx.template(
         label.replace(":", "/"),
@@ -641,7 +624,7 @@ def _create_dummy_repository(repository_ctx):
     cpu_value = get_cpu_value(repository_ctx)
 
     # Set up BUILD file for cuda/.
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:build_defs.bzl",
         {
@@ -650,7 +633,7 @@ def _create_dummy_repository(repository_ctx):
             "%{cuda_gpu_architectures}": "[]",
         },
     )
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:BUILD",
         {
@@ -704,7 +687,7 @@ filegroup(name="cudnn-include")
     repository_ctx.file("cuda/cuda/lib/%s" % lib_name("cusparse", cpu_value))
 
     # Set up cuda_config.h
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:cuda_config.h",
         {
@@ -723,7 +706,7 @@ filegroup(name="cudnn-include")
 
     # Set up cuda_config.py, which is used by gen_build_info to provide
     # static build environment info to the API
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:cuda_config.py",
         _py_tmpl_dict({}),
@@ -755,9 +738,6 @@ def _compute_cuda_extra_copts(repository_ctx, compute_capabilities):
 
     return str(copts)
 
-def _tpl_path(repository_ctx, filename):
-    return repository_ctx.path(Label("//third_party/gpus/%s.tpl" % filename))
-
 def _basename(repository_ctx, path_str):
     """Returns the basename of a path of type string.
 
@@ -779,7 +759,7 @@ def _create_local_cuda_repository(repository_ctx):
     # function to be restarted with all previous state being lost. This
     # can easily lead to a O(n^2) runtime in the number of labels.
     # See https://github.com/tensorflow/tensorflow/commit/62bd3534525a036f07d9851b3199d68212904778
-    tpl_paths = {filename: _tpl_path(repository_ctx, filename) for filename in [
+    tpl_paths = {filename: tpl_gpus_path(repository_ctx, filename) for filename in [
         "cuda:build_defs.bzl",
         "crosstool:clang/bin/crosstool_wrapper_driver_is_not_gcc",
         "crosstool:BUILD",
@@ -787,7 +767,7 @@ def _create_local_cuda_repository(repository_ctx):
         "cuda:cuda_config.h",
         "cuda:cuda_config.py",
     ]}
-    tpl_paths["cuda:BUILD"] = _tpl_path(repository_ctx, "cuda:BUILD")
+    tpl_paths["cuda:BUILD"] = tpl_gpus_path(repository_ctx, "cuda:BUILD")
     find_cuda_config_script = repository_ctx.path(Label("//third_party/gpus:find_cuda_config.py.gz.base64"))
 
     cuda_config = _get_cuda_config(repository_ctx, find_cuda_config_script)
@@ -1066,7 +1046,7 @@ def _create_local_cuda_repository(repository_ctx):
             "%{cuda_version}": cuda_config.cuda_version,
             "%{nvcc_path}": nvcc_path,
             "%{gcc_host_compiler_path}": str(cc),
-            "%{crosstool_verbose}": _crosstool_verbose(repository_ctx),
+            "%{crosstool_verbose}": get_crosstool_verbose(repository_ctx),
             "%{nvcc_verbose}": _nvcc_verbose(repository_ctx),
         }
         repository_ctx.template(
@@ -1128,7 +1108,7 @@ def _py_tmpl_dict(d):
 
 def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with CUDA."""
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:build_defs.bzl",
         {
