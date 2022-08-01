@@ -180,6 +180,7 @@ def InvokeHipcc(argv, log=False):
   hipccopts += m_options
 
   hipccopts_override = ' -Xclang -Wno-deprecated-declarations'
+  hipccopts_override += ' -fcolor-diagnostics'
 
   if depfiles:
     # Generate the dependency file
