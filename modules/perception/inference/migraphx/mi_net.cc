@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ void MINet::ConstructMap(const LayerParameter &layer_param,
                          TensorModifyMap *tensor_modify_map) {
   CHECK_EQ(outputs.size(), static_cast<size_t>(layer_param.top_size()));
 
-  for (int i = 0; i < layer_param.top_size(); i++) {
+  for (int i = 0; i < layer_param.top_size(); ++i) {
     std::string top_name = layer_param.top(i);
     TensorModifyMap::iterator it;
     it = tensor_modify_map->find(top_name);
@@ -234,14 +234,14 @@ void MINet::addConcatLayer(const LayerParameter &layer_param,
 
   Tensor out = inputs[0];
 
-  for (int i = 1; i < nbInputs; i++) {
+  for (int i = 1; i < nbInputs; ++i) {
     const Tensor input_first = out;
     const Tensor input_second = inputs[i];
     const Shape first_shape = input_first->get_shape();
     const Shape second_shape = input_second->get_shape();
 
     CHECK_EQ(first_shape.lens().size(), second_shape.lens().size());
-    for (size_t j = 0; j < first_shape.lens().size(); j++) {
+    for (size_t j = 0; j < first_shape.lens().size(); ++j) {
       if (j == axis) continue;
       CHECK_EQ(first_shape.lens()[j], second_shape.lens()[j]);
     }
@@ -294,7 +294,7 @@ void MINet::addSliceLayer(const LayerParameter &layer_param,
 
   std::vector<Operation> ops;
 
-  for (int i = 0; i < param.slice_point_size(); i++) {
+  for (int i = 0; i < param.slice_point_size(); ++i) {
     const size_t slice_point = param.slice_point(i);
 
     if (i == 0) {
@@ -397,7 +397,7 @@ void MINet::addScaleLayer(const LayerParameter &layer_param,
   } else {
     const auto lw = (*weight_map)[layer_param.name().c_str()];
 
-    for (size_t i = 0; i < lw.size(); i++) {
+    for (size_t i = 0; i < lw.size(); ++i) {
       weights.push_back(lw[i]);
     }
   }
@@ -408,7 +408,7 @@ void MINet::addScaleLayer(const LayerParameter &layer_param,
   Tensor out = input;
   const Shape param_shape{Shape::float_type, {C}};
 
-  for (size_t i = 0; i < weights.size(); i++) {
+  for (size_t i = 0; i < weights.size(); ++i) {
     CHECK_EQ(weights[i].bytes(), param_shape.bytes());
 
     const Operation broadcast = migraphx::make_op(
@@ -500,8 +500,8 @@ void MINet::addArgmaxLayer(const LayerParameter &layer_param,
   const auto params = layer_param.argmax_param();
   const size_t axis = params.axis();
 
-  // TODO(B1tway): Caffe also defines out_max_val and top_k argmax parameters, but they
-  // are not supported yet
+  // TODO(B1tway): Caffe also defines out_max_val and top_k argmax parameters,
+  // but they are not supported yet
   ACHECK(!(params.has_out_max_val() || params.has_top_k()));
 
   const Tensor input = inputs[0];
@@ -526,7 +526,7 @@ void MINet::addPermuteLayer(const LayerParameter &layer_param,
   CHECK_EQ(static_cast<size_t>(params.order_size()), input_shape.lens().size());
 
   std::vector<uint32_t> order;
-  for (int i = 0; i < params.order_size(); i++) {
+  for (int i = 0; i < params.order_size(); ++i) {
     const auto dim = params.order(i);
     CHECK_LT(dim, input_shape.lens().size());
 
@@ -554,30 +554,20 @@ void MINet::addReshapeLayer(const LayerParameter &layer_param,
 
   // For compatibility with tensorrt inference
   // skip batch size as it shouldn't be reshaped
-  std::vector<int64_t> new_shape{input_lens[0]};
+  std::vector<int64_t> new_shape { int64_t(input_lens[0]) };
 
-  for (int i = 1; i < params.shape().dim_size(); i++) {
+  for (int i = 1; i < params.shape().dim_size(); ++i) {
     auto dim_param = params.shape().dim(i);
 
-    // clang-format off
+    // For compatibility with tensorrt inference reffer to:
+    // void nvinfer1::IShuffleLayer::setReshapeDimensions()
+    // Ref: https://docs.nvidia.com/deeplearning/tensorrt/api/c_api
 
-    // For compatibility with tensorrt inference
-    // Ref: https://docs.nvidia.com/deeplearning/tensorrt/api/c_api/classnvinfer1_1_1_i_shuffle_layer.html#a25e06ac9792d66ec3a2df58e48052f71
-    // According to nvidia docs:
-    //    Two special values can be used as dimensions.
-    //    Value 0 copies the corresponding dimension from input. This special value can be used more than once in the dimensions. If number of reshape dimensions is less than input, 0s are resolved by aligning the most significant dimensions of input.
-    //    Value -1 infers that particular dimension by looking at input and rest of the reshape dimensions. Note that only a maximum of one dimension is permitted to be specified as -1.
-    //    The product of the new dimensions must be equal to the product of the old.
-    //    If a second input had been used to create this layer, that input is reset to null by this method.
-
-    // clang-format on
     int64_t new_dim = -1;
-    if (dim_param == 0) {
+    if (dim_param == 0)
       new_dim = input_lens[i];
-    }
-    if (dim_param > 0) {
+    else if (dim_param > 0)
       new_dim = dim_param;
-    }
 
     new_shape.push_back(new_dim);
   }
@@ -602,7 +592,7 @@ void MINet::addSilenceLayer(const LayerParameter &layer_param,
   // default caffe elemwise operation type is SUM
   std::string eltwise_op = "add";
 
-  for (int i = 0; i < layer_param.bottom_size(); i++) {
+  for (int i = 0; i < layer_param.bottom_size(); ++i) {
     const auto name = layer_param.bottom(i);
     const Tensor tensor = tensor_map->at(tensor_modify_map_[name]);
     net->remove_instruction(tensor);
@@ -629,7 +619,7 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
       input_lens.erase(input_lens.begin());
     }
 
-    for (size_t j = 0; j < input_lens.size(); j++) {
+    for (size_t j = 0; j < input_lens.size(); ++j) {
       dims.d[j] = input_lens[j];
     }
 
@@ -643,8 +633,15 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
 
   // output dims without batchsize
   nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
-  Shape out_shape{Shape::float_type,
-                  {out_dims.d[0], out_dims.d[1], out_dims.d[2], out_dims.d[3]}};
+  Shape out_shape {
+    Shape::float_type,
+    {
+      std::size_t(out_dims.d[0]),
+      std::size_t(out_dims.d[1]),
+      std::size_t(out_dims.d[2]),
+      std::size_t(out_dims.d[3])
+    }
+  };
 
   const Tensor allocated_out = net->add_instruction(migraphx::make_op(
       "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
@@ -654,11 +651,17 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
 
   if (no_trans) {
     out = net->add_instruction(
-        dfmb_psroi_align_op{max_batch_size_, [plugin]() { return plugin; }},
+        dfmb_psroi_align_op {
+          size_t(max_batch_size_),
+          [plugin]() { return plugin; }
+        },
         inputs[0], inputs[1], allocated_out);
   } else {
     out = net->add_instruction(
-        dfmb_psroi_align_op{max_batch_size_, [plugin]() { return plugin; }},
+        dfmb_psroi_align_op {
+          size_t(max_batch_size_),
+          [plugin]() { return plugin; }
+        },
         inputs[0], inputs[1], inputs[2], allocated_out);
   }
 
@@ -683,7 +686,7 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
       input_lens.erase(input_lens.begin());
     }
 
-    for (size_t j = 0; j < input_lens.size(); j++) {
+    for (size_t j = 0; j < input_lens.size(); ++j) {
       dims.d[j] = input_lens[j];
     }
 
@@ -698,15 +701,24 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
 
   // output dims without batchsize
   nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
-  Shape out_shape{Shape::float_type,
-                  {max_batch_size_ * out_dims.d[0], out_dims.d[1],
-                   out_dims.d[2], out_dims.d[3]}};
+  Shape out_shape {
+    Shape::float_type,
+    {
+      std::size_t(max_batch_size_*out_dims.d[0]),
+      std::size_t(out_dims.d[1]),
+      std::size_t(out_dims.d[2]),
+      std::size_t(out_dims.d[3])
+    }
+  };
 
   const Tensor allocated_out = net->add_instruction(migraphx::make_op(
       "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
 
   const Tensor out = net->add_instruction(
-      rcnn_proposal_op{max_batch_size_, [plugin]() { return plugin; }},
+      rcnn_proposal_op {
+        size_t(max_batch_size_),
+        [plugin]() { return plugin; }
+      },
       inputs[0], inputs[1], inputs[2], inputs[3], allocated_out);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -730,7 +742,7 @@ void MINet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
       input_lens.erase(input_lens.begin());
     }
 
-    for (size_t j = 0; j < input_lens.size(); j++) {
+    for (size_t j = 0; j < input_lens.size(); ++j) {
       dims.d[j] = input_lens[j];
     }
 
@@ -745,15 +757,23 @@ void MINet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
 
   // output dims without batchsize
   nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
-  Shape out_shape{Shape::float_type,
-                  {max_batch_size_ * out_dims.d[0], out_dims.d[1],
-                   out_dims.d[2], out_dims.d[3]}};
+  Shape out_shape {
+    Shape::float_type,
+    {
+      std::size_t(max_batch_size_*out_dims.d[0]),
+      std::size_t(out_dims.d[1]),
+      std::size_t(out_dims.d[2]),
+      std::size_t(out_dims.d[3])
+    }
+  };
 
   const Tensor allocated_out = net->add_instruction(migraphx::make_op(
       "hip::allocate", {{"shape", migraphx::to_value(out_shape)}}));
 
   const Tensor out = net->add_instruction(
-      rpn_proposal_ssd_op{max_batch_size_, [plugin]() { return plugin; }},
+      rpn_proposal_ssd_op {
+        size_t(max_batch_size_), [plugin]() { return plugin; }
+      },
       inputs[0], inputs[1], inputs[2], allocated_out);
 
   ConstructMap(layer_param, {out}, tensor_map, tensor_modify_map);
@@ -834,9 +854,9 @@ bool MINet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
     AFATAL << "open file " << model_file << " failed";
     return false;
   }
-  for (int i = 0; i < net.layer_size(); i++) {
+  for (int i = 0; i < net.layer_size(); ++i) {
     std::vector<Weights> lw;
-    for (int j = 0; j < net.layer(i).blobs_size(); j++) {
+    for (int j = 0; j < net.layer(i).blobs_size(); ++j) {
       // val memory will be released when deconstructor is called
       auto blob = &(net.layer(i).blobs(j));
       CHECK_EQ(blob->double_data_size(), 0);
@@ -868,14 +888,14 @@ void MINet::mergeBN(int index, LayerParameter *layer_param) {
   auto epsilon = layer_param->batch_norm_param().eps();
   if (index == 0) {
     const BlobProto *var = (layer_param->mutable_blobs(index + 1));
-    for (int k = 0; k < size; k++) {
+    for (int k = 0; k < size; ++k) {
       auto data = blob->data(k);
       blob->set_data(
           k, static_cast<float>(-data * scale_factor /
                                 sqrt(var->data(k) * scale_factor + epsilon)));
     }
   } else if (index == 1) {
-    for (int k = 0; k < size; k++) {
+    for (int k = 0; k < size; ++k) {
       blob->set_data(k, 1.0f / static_cast<float>(sqrt(
                                    blob->data(k) * scale_factor + epsilon)));
     }
@@ -886,7 +906,7 @@ Weights MINet::loadLayerWeights(const float *data, size_t size) {
   std::shared_ptr<float> val;
   val.reset(new float[size]);
 
-  for (size_t k = 0; k < size; k++) {
+  for (size_t k = 0; k < size; ++k) {
     val.get()[k] = data[k];
   }
 
@@ -898,7 +918,7 @@ Weights MINet::loadLayerWeights(float data, size_t size) {
   std::shared_ptr<float> val;
   val.reset(new float[size]);
 
-  for (size_t k = 0; k < size; k++) {
+  for (size_t k = 0; k < size; ++k) {
     val.get()[k] = data;
   }
 
@@ -1000,7 +1020,7 @@ bool MINet::addInput(TensorDimsMap &tensor_dims_map,
       auto shape = shapes.at(dims_pair.first);
       if (shape.size() == dims_pair.second.size()) {
         max_batch_size_ = std::max(max_batch_size_, shape[0]);
-        for (size_t i = 0; i < dims_pair.second.size(); i++) {
+        for (size_t i = 0; i < dims_pair.second.size(); ++i) {
           dims_pair.second[i] = shape[i];
         }
       }
@@ -1029,7 +1049,7 @@ void MINet::parse_with_api(
 
   for (auto layer_param : order) {
     std::vector<Tensor> inputs;
-    for (int j = 0; j < layer_param.bottom_size(); j++) {
+    for (int j = 0; j < layer_param.bottom_size(); ++j) {
       inputs.push_back(tensor_map[tensor_modify_map_[layer_param.bottom(j)]]);
     }
     addLayer(layer_param, inputs.data(), layer_param.bottom_size(),

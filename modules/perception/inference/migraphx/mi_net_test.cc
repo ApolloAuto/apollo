@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@
 namespace apollo {
 namespace perception {
 namespace inference {
+
+  const std::string mi =
+    "modules/perception/inference/inference_test_data/migraphx/";
 
 struct blob {
   size_t size;
@@ -68,7 +71,7 @@ class NetworkInferenceTests : public ::testing::TestWithParam<network_param> {
   void SetUp() override {
     CHECK_EQ(input_names.size(), input_shapes.size());
 
-    for (size_t i = 0; i < input_names.size(); i++) {
+    for (size_t i = 0; i < input_names.size(); ++i) {
       input_shapes_map[input_names[i]] = input_shapes[i];
       batchsize = std::max(batchsize, input_shapes[i][0]);
     }
@@ -120,7 +123,7 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
 
   net->Init(input_shapes_map);
 
-  for (size_t i = 0; i < input_names.size(); i++) {
+  for (size_t i = 0; i < input_names.size(); ++i) {
     auto input_blob = net->get_blob(input_names[i]);
 
     EXPECT_NE(input_blob.get(), nullptr);
@@ -132,7 +135,7 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
 
     std::stringstream ss;
     ss << "Input " << input_names[i] << ": ";
-    for (size_t k = 0; k < 10; k++) {
+    for (size_t k = 0; k < 10; ++k) {
       ss << input_ptr[k] << ", ";
     }
     AINFO << ss.str();
@@ -142,7 +145,7 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
   net->Infer();
   cudaDeviceSynchronize();
 
-  for (size_t i = 0; i < output_names.size(); i++) {
+  for (size_t i = 0; i < output_names.size(); ++i) {
     auto output_gd = output_data[i];
     auto output_gd_ptr = reinterpret_cast<float *>(output_gd.data.get());
 
@@ -155,7 +158,7 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
 
     size_t err_cnt = 0;
     std::stringstream ss;
-    for (auto i = 0; i < output_blob->count(); i++) {
+    for (auto i = 0; i < output_blob->count(); ++i) {
       EXPECT_NEAR(output_ptr[i], output_gd_ptr[i], 1e-1)
           << output_name << " out: " << output_ptr[i]
           << " expected: " << output_gd_ptr[i] << " idx: " << i
@@ -170,7 +173,7 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
 
 // clang-format off
 const network_param cnnseg_velodyne16{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne16/",
+    mi + "cnnseg/velodyne16/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -179,7 +182,7 @@ const network_param cnnseg_velodyne16{
     {{1, 6, 672, 672}}};
 
 const network_param cnnseg_velodyne16_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne16/",
+    mi + "cnnseg/velodyne16/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -188,7 +191,7 @@ const network_param cnnseg_velodyne16_bc4{
     {{4, 6, 672, 672}}};
 
 const network_param cnnseg_velodyne64{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne64/",
+    mi + "cnnseg/velodyne64/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -197,7 +200,7 @@ const network_param cnnseg_velodyne64{
     {{1, 6, 672, 672}}};
 
 const network_param cnnseg_velodyne64_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne64/",
+    mi + "cnnseg/velodyne64/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -206,7 +209,7 @@ const network_param cnnseg_velodyne64_bc4{
     {{4, 6, 672, 672}}};
 
 const network_param cnnseg_velodyne128{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne128/",
+    mi + "cnnseg/velodyne128/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -215,7 +218,7 @@ const network_param cnnseg_velodyne128{
     {{1, 4, 864, 864}}};
 
 const network_param cnnseg_velodyne128_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/cnnseg/velodyne128/",
+    mi + "cnnseg/velodyne128/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -224,14 +227,14 @@ const network_param cnnseg_velodyne128_bc4{
     {{4, 4, 864, 864}}};
 
 const network_param lane_detector_denseline{
-    "modules/perception/inference/inference_test_data/migraphx/lane_detector/denseline/",
+    mi + "lane_detector/denseline/",
     "deploy.prototxt",
     "deploy.caffemodel",   {"data"},
     {"conv_out"},
     {{1, 3, 640, 1536}}};
 
 const network_param lane_detector_denseline_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/lane_detector/denseline/",
+    mi + "lane_detector/denseline/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -239,7 +242,7 @@ const network_param lane_detector_denseline_bc4{
     {{4, 3, 640, 1536}}};
 
 const network_param lane_detector_darkSCNN{
-    "modules/perception/inference/inference_test_data/migraphx/lane_detector/darkSCNN/",
+    mi + "lane_detector/darkSCNN/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -247,7 +250,7 @@ const network_param lane_detector_darkSCNN{
     {{1, 3, 480, 640}}};
 
 const network_param lane_detector_darkSCNN_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/lane_detector/darkSCNN/",
+    mi + "lane_detector/darkSCNN/",
     "deploy.prototxt",
     "deploy.caffemodel",
     {"data"},
@@ -255,7 +258,7 @@ const network_param lane_detector_darkSCNN_bc4{
     {{4, 3, 480, 640}}};
 
 const network_param traffic_light_detection{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_detection/",
+    mi + "traffic_light_detection/",
     "deploy.prototxt",
     "baidu_iter_140000.caffemodel",
     {"img", "im_info"},
@@ -263,7 +266,7 @@ const network_param traffic_light_detection{
     {{1, 256, 256, 3}, {1, 6, 1, 1}}};
 
 const network_param traffic_light_recognition_vertical{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/vertical/",
+    mi + "traffic_light_recognition/vertical/",
     "deploy.prototxt",
     "baidu_iter_250000.caffemodel",
     {"data_org"},
@@ -271,7 +274,7 @@ const network_param traffic_light_recognition_vertical{
     {{1, 96, 32, 3}}};
 
 const network_param traffic_light_recognition_vertical_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/vertical/",
+    mi + "traffic_light_recognition/vertical/",
     "deploy.prototxt",
     "baidu_iter_250000.caffemodel",
     {"data_org"},
@@ -279,7 +282,7 @@ const network_param traffic_light_recognition_vertical_bc4{
     {{4, 96, 32, 3}}};
 
 const network_param traffic_light_recognition_quadrate{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/quadrate/",
+    mi + "traffic_light_recognition/quadrate/",
     "deploy.prototxt",
     "baidu_iter_200000.caffemodel",
     {"data_org"},
@@ -287,7 +290,7 @@ const network_param traffic_light_recognition_quadrate{
     {{1, 64, 64, 3}}};
 
 const network_param traffic_light_recognition_quadrate_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/quadrate/",
+    mi + "traffic_light_recognition/quadrate/",
     "deploy.prototxt",
     "baidu_iter_200000.caffemodel",
     {"data_org"},
@@ -295,7 +298,7 @@ const network_param traffic_light_recognition_quadrate_bc4{
     {{4, 64, 64, 3}}};
 
 const network_param traffic_light_recognition_horizontal{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/horizontal/",
+    mi + "traffic_light_recognition/horizontal/",
     "deploy.prototxt",
     "baidu_iter_200000.caffemodel",
     {"data_org"},
@@ -303,7 +306,7 @@ const network_param traffic_light_recognition_horizontal{
     {{1, 32, 96, 3}}};
 
 const network_param traffic_light_recognition_horizontal_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/traffic_light_recognition/horizontal/",
+    mi + "traffic_light_recognition/horizontal/",
     "deploy.prototxt",
     "baidu_iter_200000.caffemodel",
     {"data_org"},
@@ -311,7 +314,7 @@ const network_param traffic_light_recognition_horizontal_bc4{
     {{4, 32, 96, 3}}};
 
 const network_param yolo_obstacle_detector_3d_r4_half{
-    "modules/perception/inference/inference_test_data/migraphx/yolo_obstacle_detector/3d-r4-half/",
+    mi + "yolo_obstacle_detector/3d-r4-half/",
     "deploy.pt",
     "deploy.model",
     {"data"},
@@ -322,7 +325,7 @@ const network_param yolo_obstacle_detector_3d_r4_half{
     {{1, 800, 1440, 3}}};
 
 const network_param yolo_obstacle_detector_3d_r4_half_bc4{
-    "modules/perception/inference/inference_test_data/migraphx/yolo_obstacle_detector/3d-r4-half/",
+    mi + "yolo_obstacle_detector/3d-r4-half/",
     "deploy.pt",
     "deploy.model",
     {"data"},
@@ -333,25 +336,26 @@ const network_param yolo_obstacle_detector_3d_r4_half_bc4{
     {{4, 800, 1440, 3}}};
 
 INSTANTIATE_TEST_SUITE_P(MINet_TEST, NetworkInferenceTests,
-                         testing::Values(cnnseg_velodyne16,
-                                         cnnseg_velodyne16_bc4,
-                                         cnnseg_velodyne64,
-                                         cnnseg_velodyne64_bc4,
-                                         cnnseg_velodyne128,
-                                         cnnseg_velodyne128_bc4,
-                                         lane_detector_denseline,
-                                         lane_detector_denseline_bc4,
-                                         lane_detector_darkSCNN,
-                                         lane_detector_darkSCNN_bc4,
-                                         traffic_light_detection, // only batchsize 1 supported
-                                         traffic_light_recognition_vertical,
-                                         traffic_light_recognition_vertical_bc4,
-                                         traffic_light_recognition_quadrate,
-                                         traffic_light_recognition_quadrate_bc4,
-                                         traffic_light_recognition_horizontal,
-                                         traffic_light_recognition_horizontal_bc4,
-                                         yolo_obstacle_detector_3d_r4_half,
-                                         yolo_obstacle_detector_3d_r4_half_bc4));
+                      testing::Values(cnnseg_velodyne16,
+                                      cnnseg_velodyne16_bc4,
+                                      cnnseg_velodyne64,
+                                      cnnseg_velodyne64_bc4,
+                                      cnnseg_velodyne128,
+                                      cnnseg_velodyne128_bc4,
+                                      lane_detector_denseline,
+                                      lane_detector_denseline_bc4,
+                                      lane_detector_darkSCNN,
+                                      lane_detector_darkSCNN_bc4,
+                                      // only batchsize 1 supported
+                                      traffic_light_detection,
+                                      traffic_light_recognition_vertical,
+                                      traffic_light_recognition_vertical_bc4,
+                                      traffic_light_recognition_quadrate,
+                                      traffic_light_recognition_quadrate_bc4,
+                                      traffic_light_recognition_horizontal,
+                                      traffic_light_recognition_horizontal_bc4,
+                                      yolo_obstacle_detector_3d_r4_half,
+                                      yolo_obstacle_detector_3d_r4_half_bc4));
 // clang-format on
 
 }  // namespace inference

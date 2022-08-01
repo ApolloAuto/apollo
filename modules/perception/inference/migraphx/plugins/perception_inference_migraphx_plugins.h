@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include <migraphx/argument.hpp>
 #include <migraphx/gpu/context.hpp>
@@ -32,9 +33,15 @@ struct dfmb_psroi_align_op {
     auto plugin = get_plugin();
     auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
 
-    return migraphx::shape{
-        migraphx::shape::float_type,
-        {out_dims.d[0], out_dims.d[1], out_dims.d[2], out_dims.d[3]}};
+    return migraphx::shape {
+      migraphx::shape::float_type,
+      {
+        std::size_t(out_dims.d[0]),
+        std::size_t(out_dims.d[1]),
+        std::size_t(out_dims.d[2]),
+        std::size_t(out_dims.d[3])
+      }
+    };
   }
 
   migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
@@ -84,9 +91,15 @@ struct rcnn_proposal_op {
     auto plugin = get_plugin();
     auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
 
-    return migraphx::shape{migraphx::shape::float_type,
-                           {out_dims.d[0] * batch_size, out_dims.d[1],
-                            out_dims.d[2], out_dims.d[3]}};
+    return migraphx::shape {
+      migraphx::shape::float_type,
+      {
+        std::size_t(out_dims.d[0]*batch_size),
+        std::size_t(out_dims.d[1]),
+        std::size_t(out_dims.d[2]),
+        std::size_t(out_dims.d[3])
+      }
+    };
   }
 
   migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
@@ -129,9 +142,15 @@ struct rpn_proposal_ssd_op {
     auto plugin = get_plugin();
     auto out_dims = plugin->getOutputDimensions(0, nullptr, 0);
 
-    return migraphx::shape{migraphx::shape::float_type,
-                           {out_dims.d[0] * batch_size, out_dims.d[1],
-                            out_dims.d[2], out_dims.d[3]}};
+    return migraphx::shape {
+      migraphx::shape::float_type,
+      {
+        std::size_t(out_dims.d[0]*batch_size),
+        std::size_t(out_dims.d[1]),
+        std::size_t(out_dims.d[2]),
+        std::size_t(out_dims.d[3])
+      }
+    };
   }
 
   migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,

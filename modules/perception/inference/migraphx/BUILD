@@ -82,7 +82,7 @@ cc_test(
         ":mi_net",
         "@com_google_googletest//:gtest_main",
         "@local_config_rocm//rocm:miopen",
-    ]
+    ],
 )
 
 cpplint()
