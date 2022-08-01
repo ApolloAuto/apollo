@@ -1,12 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
+load("//third_party/gpus:common.bzl", "gpu_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-gpu_library(
+cc_library(
     name = "perception_inference_tensorrt_plugins",
     srcs = [
         ":dfmb_psroi_align_plugin",
@@ -23,15 +23,10 @@ gpu_library(
     ]),
     linkstatic = True,
     deps = [
-    ] + if_cuda([
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hipblas",
-        "@local_config_rocm//rocm:hip",
-        "@local_config_rocm//rocm:miopen",
-    ]),
+    ],
 )
 
 gpu_library(
@@ -44,11 +39,8 @@ gpu_library(
     alwayslink = True,
     deps = [
         "//modules/perception/base:common",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]),
+    ],
 )
 
 gpu_library(
@@ -59,11 +51,7 @@ gpu_library(
         ":kernels_cuda",
         "//cyber/common:log",
         "//modules/perception/inference/tensorrt:rt_common",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -75,11 +63,7 @@ gpu_library(
     deps = [
         ":kernels_cuda",
         "//modules/perception/inference/tensorrt:rt_common",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -91,11 +75,7 @@ gpu_library(
     deps = [
         ":kernels_cuda",
         "//modules/perception/inference/tensorrt:rt_common",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -107,11 +87,7 @@ gpu_library(
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -123,11 +99,7 @@ gpu_library(
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -139,11 +111,7 @@ gpu_library(
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -155,13 +123,8 @@ gpu_library(
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@eigen",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hip",
-        "@local_config_rocm//rocm:miopen",
-    ]) + [
         "@local_config_tensorrt//:tensorrt",
     ],
 )
@@ -185,11 +148,8 @@ cc_test(
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
         "@com_google_googletest//:gtest_main",
-    ] + if_cuda([
         "@local_config_cuda//cuda:cublas",
-    ]) + if_rocm([
-        "@local_config_rocm//rocm:hipblas",
-    ]),
+    ],
 )
 
 cpplint()
