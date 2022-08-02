@@ -80,7 +80,7 @@ cc_test(
     deps = [
         ":mi_net",
         "@com_google_googletest//:gtest_main",
-    ]
+    ],
 )
 
 cpplint()

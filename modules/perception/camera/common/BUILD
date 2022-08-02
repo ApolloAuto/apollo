@@ -135,6 +135,7 @@ cc_library(
         ":camera_ground_plane",
         ":data_provider",
         ":global_config",
+        ":image_data_operations",
         #        ":lane_object",
         ":math_functions",
         ":object_template_manager",
