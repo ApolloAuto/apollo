@@ -74,6 +74,7 @@ install_src_files(
         "//modules/dreamview:install_src",
         "//modules/map:install_src",
         "//modules/monitor:install_src",
+        "//modules/planning:install_src",
         "//modules/routing:install_src",
         "//modules/task_manager:install_src",
         "//modules/transform:install_src",

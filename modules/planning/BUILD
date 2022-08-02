@@ -168,6 +168,7 @@ install(
     data = [
         ":runtime_data",
         "cyberfile.xml",
+        "planning.BUILD",
     ],
     targets = [
         ":libplanning_component.so",
@@ -205,6 +206,28 @@ install_files(
         "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
         "//modules/planning/proto/math:qp_problem_py_pb2",
     ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_planning_src",
+        ":install_planning_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_planning_src",
+    src_dir = ["."],
+    dest = "planning/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_planning_hdrs",
+    src_dir = ["."],
+    dest = "planning/include",
+    filter = "*.h",
 )
 
 cpplint()
