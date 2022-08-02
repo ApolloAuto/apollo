@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -163,8 +163,11 @@ filegroup(
 
 install(
     name = "install",
+    data_dest = "planning",
+    library_dest = "planning/lib",
     data = [
         ":runtime_data",
+        "cyberfile.xml",
     ],
     targets = [
         ":libplanning_component.so",
@@ -177,7 +180,7 @@ install(
 
 install_files(
     name = "pb_planning",
-    dest = "modules/planning",
+    dest = "planning",
     files = [
         "//modules/planning/proto:auto_tuning_raw_feature_py_pb2",
         "//modules/common_msgs/planning_msgs:decision_py_pb2",

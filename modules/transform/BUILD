@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -107,11 +107,17 @@ cc_binary(
 
 install(
     name = "install",
+    data_dest = "transform",
+    library_dest = "transform/lib",
     data = [
         ":runtime_data",
+        "cyberfile.xml",
+        "transform.BUILD",
     ],
     targets = [
         ":libstatic_transform_component.so",
+        ":libbuffer.so",
+        ":libtransform_broadcaster.so",
     ],
 )
 
@@ -122,6 +128,28 @@ filegroup(
         "dag/*.dag",
         "launch/*.launch",
     ]),
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_transform_src",
+        ":install_transform_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_transform_src",
+    src_dir = ["."],
+    dest = "transform/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_transform_hdrs",
+    src_dir = ["."],
+    dest = "transform/include",
+    filter = "*.h",
 )
 
 cpplint()
