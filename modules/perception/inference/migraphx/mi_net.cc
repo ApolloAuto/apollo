@@ -945,8 +945,8 @@ MINet::MINet(const std::string &net_file, const std::string &model_file,
   loadNetParams(net_file, net_param_.get());
 }
 
-void MINet::init_blob(std::map<std::string, Tensor> &tensor_map) {
-  for (const auto &p : tensor_map) {
+void MINet::init_blob(std::map<std::string, Tensor> *tensor_map) {
+  for (const auto &p : *tensor_map) {
     auto name = p.first;
     auto shape = p.second->get_shape();
 
@@ -1000,8 +1000,8 @@ bool MINet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   }
 #endif
 
-  init_blob(inputs_);
-  init_blob(outputs_);
+  init_blob(&inputs_);
+  init_blob(&outputs_);
   return true;
 }
 
@@ -1010,12 +1010,12 @@ bool MINet::checkInt8(const std::string &gpu_name) {
   return false;
 }
 
-bool MINet::addInput(TensorDimsMap &tensor_dims_map,
+bool MINet::addInput(TensorDimsMap *tensor_dims_map,
                      const std::map<std::string, std::vector<int>> &shapes,
                      TensorMap *tensor_map) {
   CHECK_GT(net_param_->layer_size(), 0);
 
-  for (auto &dims_pair : tensor_dims_map) {
+  for (auto &dims_pair : *tensor_dims_map) {
     if (shapes.find(dims_pair.first) != shapes.end()) {
       auto shape = shapes.at(dims_pair.first);
       if (shape.size() == dims_pair.second.size()) {
@@ -1045,7 +1045,7 @@ void MINet::parse_with_api(
   TensorMap tensor_map;
   TensorDimsMap tensor_dims_map;
   ParseNetParam(*net_param_, &tensor_dims_map, &tensor_modify_map_, &order);
-  addInput(tensor_dims_map, shapes, &tensor_map);
+  addInput(&tensor_dims_map, shapes, &tensor_map);
 
   for (auto layer_param : order) {
     std::vector<Tensor> inputs;
