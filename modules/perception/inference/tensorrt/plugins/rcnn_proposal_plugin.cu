@@ -118,7 +118,6 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
   //   unknown_score, class1_score, class2_score, class3_score)
   float *result_boxes = reinterpret_cast<float *>(outputs[0]);
 
-  int cls_score_softmax_size = num_rois_ * 4;
   int bbox_pred_size = num_rois_ * 4 * 4;
   int output_size = batchSize * top_n_ * out_channel_;
 
@@ -135,7 +134,6 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
                                   cudaMemcpyDeviceToHost, stream));
   float origin_height = host_im_info[0];
   float origin_width = host_im_info[1];
-  float scale = host_im_info[2];
 
   int nthreads, block_size;
 
@@ -375,6 +373,8 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
   delete[] host_im_info;
   delete[] host_thresholds;
   delete[] batch_rois_nums;
+
+  return 0;
 }
 }  // namespace inference
 }  // namespace perception
