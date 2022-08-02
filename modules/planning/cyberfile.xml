@@ -28,7 +28,7 @@
   <depend repo_name="ad_rss_lib" lib_names="ad_rss">3rd-ad-rss-lib-dev</depend>
   <depend type="binary" src_path="//cyber" repo_name="cyber">cyber-dev</depend>
   <depend repo_name="common" lib_names="common">common-dev</depend>
-  <depend repo_name="map" lib_names="map">map-dev</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map-dev</depend>
   <depend>common-msgs-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
   <depend>3rd-mkl-dev</depend>

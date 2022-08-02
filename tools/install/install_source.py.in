@@ -91,6 +91,12 @@ def setup_cyberfiles():
             if os.path.exists(prefix + d + "/" + old_name + ".BUILD"):
                 os.rename(prefix + d + "/" + old_name + ".BUILD", prefix + d + "/" + new_name + ".BUILD")
 
+# def fix_configs_in_pkg():
+#     for d in os.listdir(prefix):
+#         dag_dir = prefix + d + "/local/dag"
+#         for c in os.listdir(dag_dir):
+            
+
 
 def install_src(src, dst, filter):
     dst = rename_package_name(dst)
