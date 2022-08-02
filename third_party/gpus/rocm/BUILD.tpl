@@ -155,6 +155,7 @@ cc_library(
         ":migraphx_gpu_lib",
         ":migraphx_ref_lib",
         ":migraphx_lib_onnx",
+        ":miopen",
     ],
 )
 

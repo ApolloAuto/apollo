@@ -69,9 +69,7 @@ cc_test(
     deps = [
         ":inference_factory",
         "@com_google_googletest//:gtest_main",
-    ] + if_rocm([
-        "@local_config_rocm//rocm:miopen",
-    ]),
+    ],
 )
 
 filegroup(

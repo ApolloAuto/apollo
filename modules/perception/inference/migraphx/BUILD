@@ -25,7 +25,6 @@ cc_test(
     deps = [
         ":mi_common",
         "@com_google_googletest//:gtest_main",
-        "@local_config_rocm//rocm:miopen",
     ],
 )
 
@@ -81,7 +80,6 @@ cc_test(
     deps = [
         ":mi_net",
         "@com_google_googletest//:gtest_main",
-        "@local_config_rocm//rocm:miopen",
     ],
 )
 
