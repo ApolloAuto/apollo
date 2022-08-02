@@ -95,7 +95,7 @@ class MINet : public Inference {
       const std::string &name) override;
 
  protected:
-  bool addInput(TensorDimsMap &tensor_dims_map,
+  bool addInput(TensorDimsMap *tensor_dims_map,
                 const std::map<std::string, std::vector<int>> &shapes,
                 TensorMap *tensor_map);
 
@@ -203,7 +203,7 @@ class MINet : public Inference {
   Weights loadLayerWeights(float data, size_t size);
 
   bool loadWeights(const std::string &model_file, WeightMap *weight_map);
-  void init_blob(std::map<std::string, Tensor> &tensors);
+  void init_blob(std::map<std::string, Tensor> *tensors);
 
  private:
   std::vector<std::shared_ptr<DFMBPSROIAlignPlugin>> dfmb_psroi_align_plugins_;
