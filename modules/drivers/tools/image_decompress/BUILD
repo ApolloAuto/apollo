@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],

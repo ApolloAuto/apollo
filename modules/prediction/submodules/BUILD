@@ -1,8 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
+
+install(
+    name = "install",
+    library_dest = "prediction/lib",
+    targets = [
+        ":evaluator_submodule.so",
+        ":predictor_submodule.so",
+        ":prediction_lego.so",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "submodule_output",

@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    runtime_dest = "tools/bin",
     targets = [
         ":cyber_visualizer",
     ],

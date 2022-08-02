@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -53,15 +53,58 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "prediction/lib",
+    data_dest = "prediction",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        ":prediction.BUILD",
     ],
     targets = [
         ":libprediction_component.so",
     ],
     deps = [
         "//cyber:install",
+        ":pb_hdrs",
+        "//modules/prediction/pipeline:install",
+        "//modules/prediction/submodules:install",
+        
     ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "prediction/include",
+    data = [
+        "//modules/prediction/proto:fnn_model_base_cc_proto",
+        "//modules/prediction/proto:fnn_vehicle_model_cc_proto",
+        "//modules/prediction/proto:network_layers_cc_proto",
+        "//modules/prediction/proto:network_model_cc_proto",
+        "//modules/prediction/proto:offline_features_cc_proto",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+        "//modules/prediction/proto:vector_net_cc_proto",
+    ],
+)
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_prediction_src",
+        ":install_prediction_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_prediction_src",
+    src_dir = ["."],
+    dest = "prediction/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_prediction_hdrs",
+    src_dir = ["."],
+    dest = "prediction/include",
+    filter = "*.h",
 )
 
 filegroup(

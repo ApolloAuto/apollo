@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "drivers/lib",
+    targets = [
+      ":libcanbus_common.so",
+    ],
+)
 
 cc_binary(
     name = "libcanbus_common.so",

@@ -8,6 +8,8 @@ HESAI_COPTS = ['-DMODULE_NAME=\\"hesai\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
