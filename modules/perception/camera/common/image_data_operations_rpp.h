@@ -104,7 +104,7 @@ bool rppImageToGray(const base::Image8UPtr &src, const base::Image8UPtr &dst,
   if (!rppInitDescriptor(srcDescPtr, src_width, src_height, 3,
                          src->width_step()))
     return false;
-  if (!rppInitDescriptor(dstDescPtr, src_width, src_height, 3,
+  if (!rppInitDescriptor(dstDescPtr, src_width, src_height, 1,
                          dst->width_step()))
     return false;
 

@@ -272,7 +272,7 @@ bool DataProvider::to_gray_image() {
       gray_ready_ = true;
     } else if (rgb_ready_) {
       float coeffs[] = {0.299f, 0.587f, 0.114f};
-      imageToGray(bgr_, gray_, src_width_, src_height_, coeffs);
+      imageToGray(rgb_, gray_, src_width_, src_height_, coeffs);
       gray_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -304,7 +304,7 @@ bool DataProvider::to_bgr_image() {
   if (!bgr_ready_) {
     if (rgb_ready_) {
       const int order[] = {2, 1, 0};
-      swapImageChannels(bgr_, rgb_, src_width_, src_height_, order);
+      swapImageChannels(rgb_, bgr_, src_width_, src_height_, order);
       bgr_ready_ = true;
     } else if (gray_ready_) {
       dupImageChannels(gray_, bgr_, src_width_, src_height_);
