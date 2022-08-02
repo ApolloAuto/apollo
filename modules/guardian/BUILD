@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -34,15 +34,50 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "guardian/lib",
+    data_dest = "guardian",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        ":guardian.BUILD",
     ],
     targets = [
         ":libguardian_component.so",
     ],
     deps = [
         "//cyber:install",
+        ":pb_hdrs",
     ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "guardian/include",
+    data = [
+        "//modules/guardian/proto:guardian_conf_cc_proto",
+    ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_guardian_src",
+        ":install_guardian_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_guardian_src",
+    src_dir = ["."],
+    dest = "guardian/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_guardian_hdrs",
+    src_dir = ["."],
+    dest = "guardian/include",
+    filter = "*.h",
 )
 
 filegroup(

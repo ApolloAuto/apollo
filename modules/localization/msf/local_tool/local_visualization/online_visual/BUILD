@@ -37,6 +37,7 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "localization/lib",
     targets = [
         ":online_visualizer_compenont.so",
     ],

@@ -76,6 +76,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib",
     targets = [
         ":libndt_localization_component.so",
     ],

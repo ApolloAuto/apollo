@@ -56,6 +56,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib",
     targets = [
         ":librtk_localization_component.so",
     ],
