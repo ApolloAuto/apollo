@@ -1,6 +1,6 @@
 --- cc/defs.bzl
 +++ cc/defs.bzl
-@@ -26,6 +26,107 @@ def _add_tags(attrs):
+@@ -26,6 +26,112 @@ def _add_tags(attrs):
          attrs["tags"] = [_MIGRATION_TAG]
      return attrs
  
@@ -58,6 +58,9 @@
 +    return new_deps
 +
 +def _process_apollo_deps(attrs):
++    # only do this action for targets in current WORKSPACE 
++    if native.repository_name() != "@":
++        return attrs
 +    if "deps" not in attrs or attrs["deps"] == None:
 +        return attrs
 +    deps = attrs["deps"]
@@ -69,6 +72,8 @@
 +
 +    srcs_dict = {}
 +    for s in src_replaces:
++        if "=" not in s:
++            continue
 +        replace_dep = s.split("=")[0]
 +        replace_value = s.split("=")[1]
 +        srcs_dict[replace_dep] = replace_value
@@ -108,7 +113,7 @@
  def cc_binary(**attrs):
      """Bazel cc_binary rule.
  
-@@ -36,7 +137,7 @@ def cc_binary(**attrs):
+@@ -36,7 +142,7 @@ def cc_binary(**attrs):
      """
  
      # buildifier: disable=native-cc
@@ -117,7 +122,7 @@
  
  def cc_test(**attrs):
      """Bazel cc_test rule.
-@@ -48,7 +149,7 @@ def cc_test(**attrs):
+@@ -48,7 +154,7 @@ def cc_test(**attrs):
      """
  
      # buildifier: disable=native-cc
@@ -126,7 +131,7 @@
  
  def cc_library(**attrs):
      """Bazel cc_library rule.
-@@ -60,7 +161,7 @@ def cc_library(**attrs):
+@@ -60,7 +166,7 @@ def cc_library(**attrs):
      """
  
      # buildifier: disable=native-cc
