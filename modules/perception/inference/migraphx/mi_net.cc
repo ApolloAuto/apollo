@@ -54,6 +54,20 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
+nvinfer1::Dims GetDims(std::vector<size_t> lens, bool remove_batch = true) {
+  nvinfer1::Dims dims;
+
+  // remove batch dimension for compatibility with nvinfer1::Dims
+  if (remove_batch) lens.erase(lens.begin());
+
+  dims.nbDims = lens.size();
+  for (size_t j = 0; j < lens.size(); j++) {
+    dims.d[j] = lens[j];
+  }
+
+  return dims;
+}
+
 void MINet::ConstructMap(const LayerParameter &layer_param,
                          std::vector<Tensor> outputs, TensorMap *tensor_map,
                          TensorModifyMap *tensor_modify_map) {
@@ -462,7 +476,12 @@ void MINet::addSoftmaxLayer(const LayerParameter &layer_param,
                             TensorModifyMap *tensor_modify_map) {
   const SoftmaxParameter params = layer_param.softmax_param();
   // default caffe softmax axis is 1
-  const size_t axis = params.has_axis() ? params.axis() : 1;
+  size_t axis = params.has_axis() ? params.axis() : 1;
+  // Workaround for baidu_iter_14000 model:
+  // Batch dimension is omitted in the DFMBPSROIAlign output; due to specifics
+  // of tensor definition in TensorRT it works correctly, but with MIGraphX,
+  // the tensor dimension needs to be reduced.
+  if (dfmb_psroi_align_plugins_.size() != 0) axis--;
 
   const auto input = inputs[0];
   const auto input_shape = input->get_shape();
@@ -612,19 +631,7 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
 
   for (int i = 0; i < nbInputs; ++i) {
     auto input_lens = inputs[i]->get_shape().lens();
-    nvinfer1::Dims dims;
-
-    // remove batch size for compatibility with nvinfer1::Dims
-    if (i == 0 || i == 2) {
-      input_lens.erase(input_lens.begin());
-    }
-
-    for (size_t j = 0; j < input_lens.size(); ++j) {
-      dims.d[j] = input_lens[j];
-    }
-
-    dims.nbDims = input_lens.size();
-    input_dims.push_back(dims);
+    input_dims.push_back(GetDims(input_lens));
   }
 
   plugin.reset(new DFMBPSROIAlignPlugin(layer_param.dfmb_psroi_pooling_param(),
@@ -679,19 +686,7 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
 
   for (int i = 0; i < nbInputs; ++i) {
     auto input_lens = inputs[i]->get_shape().lens();
-    nvinfer1::Dims dims;
-
-    // remove batch size for compatibility with nvinfer1::Dims
-    if (i == 3) {
-      input_lens.erase(input_lens.begin());
-    }
-
-    for (size_t j = 0; j < input_lens.size(); ++j) {
-      dims.d[j] = input_lens[j];
-    }
-
-    dims.nbDims = input_lens.size();
-    input_dims.push_back(dims);
+    input_dims.push_back(GetDims(input_lens, i == 2 || i == 3));
   }
 
   plugin.reset(new RCNNProposalPlugin(layer_param.bbox_reg_param(),
@@ -704,10 +699,10 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
   Shape out_shape {
     Shape::float_type,
     {
-      std::size_t(max_batch_size_*out_dims.d[0]),
+      std::size_t(max_batch_size_),
+      std::size_t(out_dims.d[0]),
       std::size_t(out_dims.d[1]),
-      std::size_t(out_dims.d[2]),
-      std::size_t(out_dims.d[3])
+      std::size_t(out_dims.d[2])
     }
   };
 
