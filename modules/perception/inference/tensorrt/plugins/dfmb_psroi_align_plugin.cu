@@ -100,8 +100,8 @@ __global__ void DFMBPSROIAlignForward(
 
     const Dtype *offset_bottom_data =
         bottom_data + (roi_batch_ind * channels) * height * width;
-    for (int ih = 0; ih < sample_per_part; ih++) {
-      for (int iw = 0; iw < sample_per_part; iw++) {
+    for (int ih = 0; ih < sample_per_part; ++ih) {
+      for (int iw = 0; iw < sample_per_part; ++iw) {
         Dtype w = wstart + (iw + 0.5) * sub_bin_size_w;
         Dtype h = hstart + (ih + 0.5) * sub_bin_size_h;
         // bilinear interpolation

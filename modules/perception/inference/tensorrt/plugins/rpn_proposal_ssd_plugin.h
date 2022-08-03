@@ -89,7 +89,7 @@ class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
   int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream) override;
+              void *workspace, cudaStream_t stream) override;
 
   size_t getSerializationSize() override { return 0; }
 
