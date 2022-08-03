@@ -2,7 +2,7 @@
   <name>drivers</name>
   <version>local</version>
   <description>
-     drivers-dev package.
+    Apollo drivers module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>

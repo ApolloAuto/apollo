@@ -2,7 +2,7 @@
   <name>guardian</name>
   <version>local</version>
   <description>
-     guardian-dev package.
+    Apollo guardian module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>

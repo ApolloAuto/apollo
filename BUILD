@@ -30,7 +30,7 @@ install(
         "//modules/localization:install",
         "//modules/map:install",
         "//modules/monitor:install",
-        # "//modules/perception:install",
+        "//modules/perception:install",
         # "//modules/planning:install",
         "//modules/prediction:install",
         "//modules/routing:install",

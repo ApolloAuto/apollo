@@ -1,7 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "perception/bin",
+    targets = [":offline_obstacle_pipeline"],
+)
 
 cc_library(
     name = "visualizer",

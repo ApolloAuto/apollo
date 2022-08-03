@@ -2,7 +2,7 @@
   <name>v2x</name>
   <version>local</version>
   <description>
-     v2x-dev package.
+    Apollo v2x module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>

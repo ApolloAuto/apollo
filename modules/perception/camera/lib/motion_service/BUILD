@@ -1,7 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "perception/lib",
+    targets = [":libmotion_service.so"],
+)
 
 cc_library(
     name = "motion_service_lib",

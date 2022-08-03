@@ -2,7 +2,7 @@
   <name>calibration</name>
   <version>local</version>
   <description>
-    calibration package.
+    Apollo calibration module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>

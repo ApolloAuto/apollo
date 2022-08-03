@@ -28,7 +28,7 @@ cc_library(
         ":scatter_cuda",
         "//cyber",
         "//modules/perception/common:perception_gflags",
-        "//third_party:libtorch",
+        "@libtorch_cpu",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
     ],
