@@ -32,7 +32,7 @@
   <depend>common-msgs-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
   <depend>3rd-mkl-dev</depend>
-  <depend repo_name="libtorch" lib_names="libtorch_cpu">3rd-libtorch-cpu-dev</depend>
+  <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu">3rd-libtorch-cpu-dev</depend>
   <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
   <depend expose="False">3rd-rules-python-dev</depend>

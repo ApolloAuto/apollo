@@ -175,7 +175,6 @@ install(
     ],
     deps = [
         ":pb_planning",
-        "//cyber:install",
     ],
 )
 
