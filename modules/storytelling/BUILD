@@ -59,7 +59,7 @@ install_src_files(
     name = "install_src",
     deps = [
         ":install_storytelling_src",
-        ":install_storytelling_src_hdrs"
+        ":install_storytelling_hdrs"
     ],
 )
 
