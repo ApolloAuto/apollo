@@ -78,8 +78,8 @@ cc_binary(
 
 install(
     name = "install",
-    data_dest = "task_manager",
-    library_dest = "task_manager/lib",
+    data_dest = "task-manager",
+    library_dest = "task-manager/lib",
     data = [
         ":runtime_data",
         ":cyberfile.xml",
@@ -96,7 +96,7 @@ install(
 
 install(
     name = "pb_hdrs",
-    data_dest = "task_manager/include",
+    data_dest = "task-manager/include",
     data = [
         "//modules/task_manager/proto:task_manager_config_cc_proto",
     ],
@@ -113,14 +113,14 @@ install_src_files(
 install_src_files(
     name = "install_task_manager_src",
     src_dir = ["."],
-    dest = "task_manager/src",
+    dest = "task-manager/src",
     filter = "*",
 )
 
 install_src_files(
     name = "install_task_manager_hdrs",
     src_dir = ["."],
-    dest = "task_manager/include",
+    dest = "task-manager/include",
     filter = "*.h",
 ) 
 

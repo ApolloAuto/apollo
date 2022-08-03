@@ -1,6 +1,6 @@
 # -*- python -*-
 # Adapted from RobotLocomotion/drake:tools/install/install.bzl
-load("//tools:common.bzl", "dirname", "join_paths", "output_path")
+load("//tools:common.bzl", "dirname", "join_paths", "output_path", "remove_prefix")
 
 InstallInfo = provider()
 
@@ -56,6 +56,11 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
     else:
         dest = join_paths(owner.package, input_file.basename)
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
+    # Possibly remove prefixes.
+    for p in strip_prefix:
+        dest = remove_prefix(dest, p)
+        if dest != None:
+            return dest
     return dest
 
 #------------------------------------------------------------------------------

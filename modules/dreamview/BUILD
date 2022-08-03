@@ -38,6 +38,7 @@ install(
     name = "install",
     library_dest = "dreamview/lib",
     data_dest = "dreamview",
+    runtime_dest = "dreamview/bin",
     data = [
         ":dreamview_conf",
         ":frontend",

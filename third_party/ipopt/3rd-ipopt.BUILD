@@ -6,8 +6,9 @@ licenses(["notice"])
 
 cc_library(
     name = "ipopt",
-    includes = ["."],
+    includes = ["include"],
     linkopts = [
         "-lipopt",
     ],
+    strip_include_prefix = "include",
 )

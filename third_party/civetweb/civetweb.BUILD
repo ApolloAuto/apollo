@@ -65,3 +65,10 @@ filegroup(
     ]),
     visibility = ["//visibility:public"],
 )
+filegroup(
+    name = "civetweb_libs",
+    srcs = [
+        ":libcivetweb++.so",
+    ],
+    visibility = ["//visibility:public"],
+)

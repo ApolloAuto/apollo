@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -163,21 +163,24 @@ filegroup(
 
 install(
     name = "install",
+    data_dest = "planning",
+    library_dest = "planning/lib",
     data = [
         ":runtime_data",
+        "cyberfile.xml",
+        "planning.BUILD",
     ],
     targets = [
         ":libplanning_component.so",
     ],
     deps = [
         ":pb_planning",
-        "//cyber:install",
     ],
 )
 
 install_files(
     name = "pb_planning",
-    dest = "modules/planning",
+    dest = "planning",
     files = [
         "//modules/planning/proto:auto_tuning_raw_feature_py_pb2",
         "//modules/common_msgs/planning_msgs:decision_py_pb2",
@@ -202,6 +205,28 @@ install_files(
         "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
         "//modules/planning/proto/math:qp_problem_py_pb2",
     ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_planning_src",
+        ":install_planning_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_planning_src",
+    src_dir = ["."],
+    dest = "planning/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_planning_hdrs",
+    src_dir = ["."],
+    dest = "planning/include",
+    filter = "*.h",
 )
 
 cpplint()

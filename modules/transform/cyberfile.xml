@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-libtorch-cpu</name>
+  <name>transform</name>
   <version>local</version>
   <description>
-    Apollo packaged libtorch-cpu Lib.
+    Apollo transform module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -10,9 +10,8 @@
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
-  <depend>3rd-py-dev</depend>
 
-  <type>third-binary</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/libtorch</src_path>
-  
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/transform</src_path>
+
 </package>

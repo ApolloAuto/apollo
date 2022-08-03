@@ -1,11 +1,11 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "map",
+    name = "transform",
     includes = ["include"],
-    hdrs = glob(["include/**/*.h"]),
+    hdrs = glob(["include/**/*"]),
     srcs = glob(["lib/**/*.so*"]),
-    include_prefix = "modules/map",
+    include_prefix = "modules/transform",
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )

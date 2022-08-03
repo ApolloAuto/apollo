@@ -32,7 +32,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
