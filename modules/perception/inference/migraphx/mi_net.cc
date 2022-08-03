@@ -481,7 +481,8 @@ void MINet::addSoftmaxLayer(const LayerParameter &layer_param,
   // Batch dimension is omitted in the DFMBPSROIAlign output; due to specifics
   // of tensor definition in TensorRT it works correctly, but with MIGraphX,
   // the tensor dimension needs to be reduced.
-  if (dfmb_psroi_align_plugins_.size() != 0) axis--;
+  if (dfmb_psroi_align_plugins_.size() != 0)
+    --axis;
 
   const auto input = inputs[0];
   const auto input_shape = input->get_shape();
