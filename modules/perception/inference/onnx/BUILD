@@ -18,6 +18,7 @@ cc_library(
         "@local_config_tensorrt//:tensorrt",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:migraphx",
     ]),
 )
 
