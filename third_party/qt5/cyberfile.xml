@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-py</name>
+  <name>3rd-qt5</name>
   <version>local</version>
   <description>
-    Apollo packaged py Lib.
+    Apollo packaged qt5 Lib.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>third-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/py</src_path>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/qt5</src_path>
   
 </package>

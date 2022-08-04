@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-py</name>
+  <name>3rd-yaml-cpp</name>
   <version>local</version>
   <description>
-    Apollo packaged py Lib.
+    Apollo packaged yaml-cpp Lib.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -11,7 +11,7 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
-  <type>third-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/py</src_path>
+  <type>third-binary</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/yaml_cpp</src_path>
   
 </package>

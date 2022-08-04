@@ -7,5 +7,5 @@ cc_library(
     ],
     srcs = glob(["lib/*.so*"]),
     hdrs = glob(["include/*.h"]),
-    visibility = ["//visibility:public"],
+    visibility = ["//visibility:public"], 
 )
