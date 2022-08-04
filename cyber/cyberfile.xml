@@ -27,7 +27,7 @@
   <depend repo_name="fastrtps">3rd-fastrtps-dev</depend>
   <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
-  <depend repo_name="common-msg" lib_names="common-msg-dev">common-msgs-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
 
 </package>

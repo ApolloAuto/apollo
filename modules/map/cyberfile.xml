@@ -19,7 +19,7 @@
 
   <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
-  <depend repo_name="common-msg" lib_names="common-msg-dev">common-msgs-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/map</src_path>
 
 </package>

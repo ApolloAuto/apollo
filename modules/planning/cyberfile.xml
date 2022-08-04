@@ -27,9 +27,9 @@
   <depend repo_name="adolc" so_names="adolc">libadolc-dev</depend>
   <depend repo_name="ad_rss_lib" lib_names="ad_rss">3rd-ad-rss-lib-dev</depend>
   <depend type="binary" src_path="//cyber" repo_name="cyber">cyber-dev</depend>
-  <depend repo_name="common" lib_names="common">common-dev</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
   <depend type="binary" repo_name="map" lib_names="map">map-dev</depend>
-  <depend repo_name="common-msg" lib_names="common-msg-dev">common-msgs-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
   <depend>3rd-mkl-dev</depend>
   <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu">3rd-libtorch-cpu-dev</depend>
