@@ -60,6 +60,7 @@ install(
         "//third_party/proj:install",
         "//third_party/protobuf:install",
         "//third_party/py:install",
+        "//third_party/gpus:install"
     ],
 )
 
@@ -96,5 +97,6 @@ install_src_files(
         "//third_party/proj:install_src",
         "//third_party/protobuf:install_src",
         "//third_party/py:install_src",
+        "//third_party/gpus:install_src"
     ],
 )

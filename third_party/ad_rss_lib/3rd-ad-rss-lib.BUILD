@@ -20,6 +20,7 @@ cc_library(
         "-Wconversion",
         "-Wsign-conversion",
     ],
+    strip_include_prefix = "include/ad_rss",
     includes = [
         "include",
     ],

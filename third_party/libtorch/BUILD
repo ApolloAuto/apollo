@@ -1,4 +1,5 @@
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -21,9 +22,11 @@ install(
     data = [
         ":cyberfile-cpu.xml",
         ":3rd-libtorch-cpu.BUILD",
+        ":3rd-libtorch.BUILD",
     ],
     rename = {
         "3rd-libtorch-cpu/cyberfile-cpu.xml" : "cyberfile.xml",
+        "3rd-libtorch-cpu/3rd-libtorch.BUILD" : "BUILD",
     },
 )
 

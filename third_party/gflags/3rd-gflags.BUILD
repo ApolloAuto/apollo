@@ -8,6 +8,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "gflags",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lgflags",
     ],

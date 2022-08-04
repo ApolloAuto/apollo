@@ -1,6 +1,6 @@
---- cc/defs.bzl
+--- cc/defs.bzl  
 +++ cc/defs.bzl
-@@ -26,6 +26,112 @@ def _add_tags(attrs):
+@@ -26,6 +26,143 @@ def _add_tags(attrs):
          attrs["tags"] = [_MIGRATION_TAG]
      return attrs
  
@@ -29,15 +29,31 @@
 +      result.append(l_str.strip()[1:-1])
 +    return result
 +
-+def _replace_deps(deps_list, srcs_dict, workspace_deps, ws_deps_added):
++def _replace_deps(deps_list, srcs_dict):
++
++    for i in range(len(deps_list)):
++        if "@" not in deps_list[i]:
++            continue
++        else:
++            if ":" in deps_list[i]:
++                continue
++            else:
++                lib_name = deps_list[i].replace("//", "").replace("@", "")
++                deps_list[i] = deps_list[i] + "//:" + lib_name
++  
 +    need_remove = {}
 +    current_deps = {}
 +
 +    for i in deps_list:
 +        for src in srcs_dict:
-+            if src in i:
-+                need_remove[i] = srcs_dict[src]
-+                break
++            if i.startswith(src):
++                if i == src:
++                    need_remove[i] = srcs_dict[src]
++                    break
++                else:
++                    if i[len(src)] == "/" or i[len(src)] == ":":
++                        need_remove[i] = srcs_dict[src]
++                        break
 +
 +    for i in range(len(deps_list)):
 +        if deps_list[i] in need_remove:
@@ -45,10 +61,6 @@
 +        current_deps[deps_list[i]] = deps_list[i]
 +    
 +    new_deps = [] + deps_list
-+    if not ws_deps_added:
-+        for i in workspace_deps:
-+            if i not in current_deps:
-+                new_deps.append(i)
 +
 +    deps_map = {}
 +    for i in new_deps:
@@ -56,6 +68,13 @@
 +    new_deps = [i for i in deps_map]
 +
 +    return new_deps
++
++def _get_workspace_deps(current_deps_dict, workspace_deps):
++    ws_deps = []
++    for dep in workspace_deps:
++        if dep not in current_deps_dict:
++            ws_deps.append(dep)
++    return ws_deps
 +
 +def _process_apollo_deps(attrs):
 +    # only do this action for targets in current WORKSPACE 
@@ -78,26 +97,34 @@
 +        replace_value = s.split("=")[1]
 +        srcs_dict[replace_dep] = replace_value
 +
-+    deps_list = []
++    current_deps_dict = {}
++    ret_deps_list = []
 +    if type(deps) == "select":
-+      ws_deps_added = False
 +      for group_str in str(deps).strip().split(" + "):
 +        if "select({" in group_str.strip():
 +          s_deps_dict = _select2dict(group_str.strip())
-+          # print(s_deps_dict)
 +          for k, v in s_deps_dict.items():
 +            if type(v) == "list":
-+              s_deps_dict[k] = _replace_deps(v, srcs_dict, workspace_deps, ws_deps_added)
-+              ws_deps_added = True
-+          deps_list.append(select(s_deps_dict))
++              s_deps_dict[k] = _replace_deps(v, srcs_dict)
++
++              for i in s_deps_dict[k]:
++                current_deps_dict[i] = i
++
++          ret_deps_list.append(select(s_deps_dict))
 +        else:
 +          l_deps_str = group_str.strip()
 +          l_deps_list = _list_str2list(l_deps_str)
-+          deps_list.append(_replace_deps(l_deps_list, srcs_dict, workspace_deps, ws_deps_added))
-+          ws_deps_added = True
++          ret_deps = _replace_deps(l_deps_list, srcs_dict)
++
++          for dep in ret_deps:
++            current_deps_dict[dep] = dep
++
++          ret_deps_list.append(ret_deps)
++      
++      ret_deps_list.append(_get_workspace_deps(current_deps_dict, workspace_deps))
 +
 +      n_deps = []
-+      for d in deps_list:
++      for d in ret_deps_list:
 +        n_deps += d
 +
 +      # print(n_deps)
@@ -105,7 +132,11 @@
 +      
 +      return attrs
 +    elif type(deps) == "list":
-+      attrs["deps"] = _replace_deps(deps, srcs_dict, workspace_deps, False)
++      replaced_deps = _replace_deps(deps, srcs_dict)
++      for dep in replaced_deps:
++        current_deps_dict[dep] = dep
++      ws_deps = _get_workspace_deps(current_deps_dict, workspace_deps)
++      attrs["deps"] = replaced_deps + ws_deps
 +      return attrs
 +    else:
 +      return attrs
@@ -113,7 +144,7 @@
  def cc_binary(**attrs):
      """Bazel cc_binary rule.
  
-@@ -36,7 +142,7 @@ def cc_binary(**attrs):
+@@ -36,7 +173,7 @@ def cc_binary(**attrs):
      """
  
      # buildifier: disable=native-cc
@@ -122,7 +153,7 @@
  
  def cc_test(**attrs):
      """Bazel cc_test rule.
-@@ -48,7 +154,7 @@ def cc_test(**attrs):
+@@ -48,7 +185,7 @@ def cc_test(**attrs):
      """
  
      # buildifier: disable=native-cc
@@ -131,7 +162,7 @@
  
  def cc_library(**attrs):
      """Bazel cc_library rule.
-@@ -60,7 +166,7 @@ def cc_library(**attrs):
+@@ -60,7 +197,7 @@ def cc_library(**attrs):
      """
  
      # buildifier: disable=native-cc
