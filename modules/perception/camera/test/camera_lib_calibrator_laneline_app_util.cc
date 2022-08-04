@@ -120,9 +120,9 @@ bool load_ref_camera_k_mat(const std::string &filename, float k_mat[9], int *w,
 void write_text_on_image(cv::Mat *image, float left, float top,
                          const char *text, const CvFont &font,
                          const cv::Scalar &color) {
-  IplImage ipl_img = *image;
-  cvPutText(&ipl_img, text, cvPoint(common::IRound(left), common::IRound(top)),
-            &font, color);
+  cv::putText(*image, text, cv::Point(common::IRound(left),
+              common::IRound(top)), font.font_face, font.hscale, font.color,
+              font.thickness, font.line_type);
 }
 
 // void add_noise_to_vector_radius(float *x, int n, float radius, bool set_seed)
