@@ -28,4 +28,5 @@
   <depend type="binary" src_path="//cyber" version_eq="1.0.0.1" repo_name="cyber">cyber-dev</depend>
   <depend expose="False">3rd-py-dev</depend>
   <depend repo_name="com_github_nlohmann_json" lib_names="single_json,json">3rd-nlohmann-json-dev</depend>
+  <depend repo_name="common-msg" lib_names="common-msg-dev">common-msgs-dev</depend>
 </package>

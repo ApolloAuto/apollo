@@ -5,6 +5,7 @@ cc_library(
     includes = [
         "include",
     ],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lfastrtps",
         "-lfastcdr",
@@ -12,3 +13,4 @@ cc_library(
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )
+

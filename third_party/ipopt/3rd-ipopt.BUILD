@@ -7,6 +7,7 @@ licenses(["notice"])
 cc_library(
     name = "ipopt",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lipopt",
     ],

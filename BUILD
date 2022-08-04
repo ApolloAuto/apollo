@@ -77,6 +77,7 @@ install(
         "//third_party/yaml_cpp:install",
         "//third_party/qt5:install",
         "//third_party/npp:install",
+        "//third_party/gpus:install"
     ],
 )
 
@@ -143,5 +144,6 @@ install_src_files(
         "//third_party/yaml_cpp:install_src",
         "//third_party/qt5:install_src",
         "//third_party/npp:install_src",
+        "//third_party/gpus:install_src"
     ],
 )

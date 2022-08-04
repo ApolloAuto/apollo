@@ -6,6 +6,7 @@ cc_library(
         "include",
     ],
     srcs = glob(["lib/*.so*"]),
-    hdrs = glob(["include/*.h"]),
-    visibility = ["//visibility:public"], 
+    hdrs = glob(["include/**/*"]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
 )

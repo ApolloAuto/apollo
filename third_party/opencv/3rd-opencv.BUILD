@@ -10,15 +10,18 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "core",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lopencv_core",
     ],
-    strip_include_prefix = "include/opencv4",
+    include_prefix = "opencv2",
+    strip_include_prefix = "include",
 )
 
 cc_library(
     name = "highgui",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lopencv_highgui",
     ],
@@ -27,24 +30,28 @@ cc_library(
         ":core",
         ":imgproc",
     ],
-    strip_include_prefix = "include/opencv4",
+    include_prefix = "opencv2",
+    strip_include_prefix = "include",
 )
 
 cc_library(
     name = "imgproc",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lopencv_imgproc",
     ],
     deps = [
         ":core",
     ],
-    strip_include_prefix = "include/opencv4",
+    include_prefix = "opencv2",
+    strip_include_prefix = "include",
 )
 
 cc_library(
     name = "imgcodecs",
     includes = ["include"],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-lopencv_imgcodecs",
     ],
@@ -52,5 +59,6 @@ cc_library(
         ":core",
         ":imgproc",
     ],
-    strip_include_prefix = "include/opencv4",
+    include_prefix = "opencv2",
+    strip_include_prefix = "include",
 )

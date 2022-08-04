@@ -214,7 +214,7 @@ def install(src, dst):
                 elif not pre_full_dst.startswith(os.path.join(prefix, "lib/")):
                     sys.stderr.write("Multiple installation rules found for {}."
                         .format(basename))
-                    sys.exit(1)
+                    #sys.exit(1)
                 else:
                     # remove it from lib/
                     os.remove(pre_full_dst)
