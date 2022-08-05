@@ -124,14 +124,15 @@ TEST_P(NetworkInferenceTests, InferenceFP32) {
   net->Init(input_shapes_map);
 
   for (size_t i = 0; i < input_names.size(); ++i) {
+    auto input_gd = input_data[i];
     auto input_blob = net->get_blob(input_names[i]);
 
     EXPECT_NE(input_blob.get(), nullptr);
-    EXPECT_EQ(input_blob->count(), input_data[i].size / sizeof(float));
+    EXPECT_EQ(input_blob->count(), input_gd.size / sizeof(float));
 
     auto input_ptr = input_blob->mutable_cpu_data();
 
-    std::memcpy(input_ptr, input_data[i].data.get(), input_data[i].size);
+    std::memcpy(input_ptr, input_gd.data.get(), input_gd.size);
 
     std::stringstream ss;
     ss << "Input " << input_names[i] << ": ";
@@ -262,8 +263,8 @@ const network_param traffic_light_detection{
     "deploy.prototxt",
     "baidu_iter_140000.caffemodel",
     {"img", "im_info"},
-    {"bbox_pred"},
-    {{1, 256, 256, 3}, {1, 6, 1, 1}}};
+    {"bboxes"},
+    {{1, 270, 270, 3}, {1, 6, 1, 1}}};
 
 const network_param traffic_light_recognition_vertical{
     mi + "traffic_light_recognition/vertical/",
