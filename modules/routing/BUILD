@@ -64,7 +64,6 @@ install(
     deps = [
         ":pb_routing",
         ":pb_hdrs",
-        "//cyber:install",
         "//modules/routing/topo_creator:install",
         "//modules/routing/tools/routing_tester:install",
         "//modules/routing/tools:install"

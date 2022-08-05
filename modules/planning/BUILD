@@ -36,6 +36,7 @@ cc_library(
     alwayslink = True,
 )
 
+
 cc_library(
     name = "planning_base",
     srcs = ["planning_base.cc"],
