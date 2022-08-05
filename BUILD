@@ -31,14 +31,14 @@ install(
         "//modules/map:install",
         "//modules/monitor:install",
         #"//modules/perception:install",
-        # "//modules/planning:install",
+        "//modules/planning:install",
         "//modules/prediction:install",
         "//modules/routing:install",
         "//modules/storytelling:install",
         "//modules/task_manager:install",
         "//modules/third_party_perception:install",
         "//modules/tools:install",
-        # "//modules/transform:install",
+        "//modules/transform:install",
         "//modules/v2x:install",
         # "//scripts:install",
         "//third_party/absl:install",
@@ -77,7 +77,8 @@ install(
         "//third_party/yaml_cpp:install",
         "//third_party/qt5:install",
         "//third_party/npp:install",
-        "//third_party/gpus:install"
+        "//third_party/gpus:install",
+        "//third_party/tf2:install",
     ],
 )
 
@@ -144,6 +145,7 @@ install_src_files(
         "//third_party/yaml_cpp:install_src",
         "//third_party/qt5:install_src",
         "//third_party/npp:install_src",
-        "//third_party/gpus:install_src"
+        "//third_party/gpus:install_src",
+        "//third_party/tf2:install_src",
     ],
 )

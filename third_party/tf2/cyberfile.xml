@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-yaml-cpp</name>
+  <name>3rd-tf2</name>
   <version>local</version>
   <description>
-    Apollo packaged yaml-cpp Lib.
+    Apollo packaged tf2 Lib.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -10,8 +10,9 @@
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend repo_name="boost">3rd-boost-dev</depend>
 
-  <type>third-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/yaml_cpp</src_path>
+  <type>third-binary</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/tf2</src_path>
   
 </package>

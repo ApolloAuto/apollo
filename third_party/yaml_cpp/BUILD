@@ -9,7 +9,6 @@ install(
     data_dest = "3rd-yaml-cpp",
     data = [
         ":cyberfile.xml",
-        ":3rd-yaml-cpp.BUILD",
     ],
 )
 
