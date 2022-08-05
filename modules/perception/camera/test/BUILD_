@@ -71,7 +71,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:migraphx",
+    ]) + [
         "@opencv//:core",
     ],
 )
@@ -88,7 +92,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:migraphx",
+    ]) + [
         "@opencv//:core",
     ],
 )
@@ -137,7 +145,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:migraphx",
+    ]) + [
         "@opencv//:core",
     ],
 )
@@ -153,7 +165,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:migraphx",
+    ]) + [
         "@opencv//:core",
     ],
 )
@@ -405,7 +421,9 @@ cc_test(
         "//modules/perception/inference/utils:inference_util_lib",
         "@com_google_googletest//:gtest_main",
         "@eigen",
-    ],
+    ] + if_rocm([
+        "@local_config_rocm//rocm:hipblas",
+    ]),
 )
 
 cc_test(
@@ -420,6 +438,7 @@ cc_test(
         "@local_config_cuda//cuda:cuda_headers",
     ]) + if_rocm([
         "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hipblas",
     ]),
 )
 
@@ -469,7 +488,9 @@ cc_test(
         "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "@com_google_googletest//:gtest_main",
-    ],
+    ] + if_rocm([
+        "@local_config_rocm//rocm:hipblas",
+    ]),
 )
 
 cc_test(
@@ -500,10 +521,11 @@ cc_test(
         "@com_google_protobuf//:protobuf",
     ] + if_cuda([
         "@local_config_cuda//cuda:cuda",
+        "@local_config_tensorrt//:tensorrt",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:migraphx",
     ]) + [
-        "@local_config_tensorrt//:tensorrt",
         "@opencv//:core",
     ],
 )
@@ -591,7 +613,11 @@ cc_test(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:migraphx",
+    ]) + [
         "@opencv//:core",
     ],
 )
