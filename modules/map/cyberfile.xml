@@ -10,6 +10,12 @@
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend expose="False">3rd-rules-python-dev</depend>
+  <depend expose="False">3rd-grpc-dev</depend>
+  <depend expose="False">3rd-bazel-skylib-dev</depend>  
+  <depend expose="False">3rd-rules-proto-dev</depend>
+  <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
+  <depend>common-msgs-dev</depend>
 
   <type>module</type>
   <depend expose="False">3rd-rules-python-dev</depend>

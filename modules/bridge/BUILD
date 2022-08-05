@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,6 +17,8 @@ filegroup(
 
 install(
     name = "install",
+    library_dest = "bridge/lib",
+    data_dest = "bridge",
     data = [
       ":runtime_data",
     ],
@@ -27,6 +29,14 @@ install(
     ],
     deps = [
         "//cyber:install",
+        "//modules/bridge/test:install",
+    ],
+)
+install(
+    name = "pb_hdrs",
+    data_dest = "bridge/include",
+    data = [
+        "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
     ],
 )
 
@@ -114,6 +124,27 @@ cc_test(
         ":udp_bridge_sender",
         "@com_google_googletest//:gtest_main",
     ],
+)
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_bridge_src",
+        ":install_bridge_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_bridge_src",
+    src_dir = ["."],
+    dest = "bridge/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_bridge_hdrs",
+    src_dir = ["."],
+    dest = "bridge/include",
+    filter = "*.h",
 )
 
 cpplint()

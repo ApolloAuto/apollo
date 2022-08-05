@@ -74,6 +74,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib",
     targets = [
         ":libmsf_localization_component.so",
     ],

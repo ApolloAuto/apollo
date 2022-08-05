@@ -1,7 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "canbus/bin",
+    targets = [
+        ":canbus_tester",
+        ":teleop",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "canbus_tester",

@@ -2,7 +2,7 @@
   <name>task-manager</name>
   <version>local</version>
   <description>
-    task_manager
+    Apollo task_manager module.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>

@@ -8,6 +8,8 @@ CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],

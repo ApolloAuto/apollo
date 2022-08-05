@@ -17,6 +17,8 @@ cc_binary(
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],

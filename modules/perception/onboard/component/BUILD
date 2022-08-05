@@ -15,6 +15,7 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "perception/lib",
     targets = [
         ":libperception_component_camera.so",
         ":libperception_component_lidar.so",

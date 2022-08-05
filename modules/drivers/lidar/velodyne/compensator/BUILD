@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "drivers/lib",
+    targets = [
+        ":libvelodyne_compensator_component.so",
+    ],
+)
 
 cc_binary(
     name = "libvelodyne_compensator_component.so",

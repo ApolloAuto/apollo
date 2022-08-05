@@ -1,8 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "audio/bin",
+    targets = [
+        ":audio_offline_processing",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 py_binary(
     name = "audiosaver",
