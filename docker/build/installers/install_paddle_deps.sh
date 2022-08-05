@@ -19,28 +19,14 @@
 # Fail on first error.
 set -e
 
-CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-. ${CURR_DIR}/installer_base.sh
+cd "$(dirname "${BASH_SOURCE[0]}")"
+. ./installer_base.sh
 
-TARGET_ARCH="$(uname -m)"
-
-apt-get -y update && \
-    apt-get -y install \
-    ncurses-dev \
-    libuuid1 \
-    uuid-dev
-
-info "Install protobuf ..."
-bash ${CURR_DIR}/install_protobuf.sh
-
-info "Install fast-rtps ..."
-bash ${CURR_DIR}/install_fast-rtps.sh
-
-# absl
-bash ${CURR_DIR}/install_abseil.sh
-
-# gflags and glog
-bash ${CURR_DIR}/install_gflags_glog.sh
+apt_get_update_and_install \
+    libsnappy-dev \
+    libleveldb-dev \
+    libffi-dev \
+    libssl-dev
 
 # Clean up cache to reduce layer size.
 apt-get clean && \
