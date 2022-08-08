@@ -7,7 +7,7 @@ cc_library(
         "include/tf2_msgs/**",
         "include/tf2/**",
     ]),
-    srcs = glob["lib/*.so"],
+    srcs = glob(["lib/*.so"]),
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )
