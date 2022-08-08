@@ -109,6 +109,7 @@ install(
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/common_msgs/transform_msgs:transform_cc_proto",
         "//modules/common_msgs/v2x_msgs:v2x_traffic_light_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
     ],
 )
 

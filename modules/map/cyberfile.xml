@@ -14,16 +14,14 @@
   <depend expose="False">3rd-grpc-dev</depend>
   <depend expose="False">3rd-bazel-skylib-dev</depend>  
   <depend expose="False">3rd-rules-proto-dev</depend>
-  <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
-  <depend>common-msgs-dev</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
 
   <type>module</type>
   <depend expose="False">3rd-rules-python-dev</depend>
   <depend expose="False">3rd-grpc-dev</depend>
   <depend expose="False">3rd-bazel-skylib-dev</depend>  
   <depend expose="False">3rd-rules-proto-dev</depend>
-
-  <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/map</src_path>

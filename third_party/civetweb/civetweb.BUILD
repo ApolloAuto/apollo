@@ -9,11 +9,11 @@ cc_library(
     srcs = [
         "src/civetweb.c",
     ],
-    hdrs = [
-        "include/civetweb.h",
-        "src/handle_form.inl",
-        "src/md5.inl",
-    ],
+    #hdrs = glob([
+    #    "include/*.h",
+    #    "src/*.inl",
+    #    #"src/md5.inl",
+    #]),
     copts = [
         "-DUSE_WEBSOCKET",
     ],
@@ -25,8 +25,28 @@ cc_library(
         "-lpthread",
         "-ldl",
     ],
+    deps = [
+        "h_headers",
+        "inl_headers"
+    ],
     visibility = ["//visibility:public"],
     alwayslink = True,
+)
+
+cc_library(
+    name = "h_headers",
+    hdrs = glob([
+        "include/*.h",
+    ]),
+    strip_include_prefix = "include",
+)
+
+cc_library(
+    name = "inl_headers",
+    hdrs = glob([
+        "src/*.inl",
+    ]),
+    strip_include_prefix = "src",
 )
 
 cc_binary(
@@ -49,11 +69,14 @@ cc_library(
     srcs = [
         "libcivetweb++.so",
     ],
-    hdrs = [
-        "include/CivetServer.h",
-    ],
+    #hdrs = glob([
+    #    "include/*.h",
+    #]),
     includes = [
         "include",
+    ],
+    deps = [
+        "h_headers",
     ],
     visibility = ["//visibility:public"],
 )

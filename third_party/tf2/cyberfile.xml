@@ -12,7 +12,7 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
   <depend repo_name="boost">3rd-boost-dev</depend>
 
-  <type>third-binary</type>
+  <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/tf2</src_path>
   
 </package>

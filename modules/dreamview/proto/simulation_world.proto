@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common_msgs/chassis_msgs/chassis.proto";
-import "modules/common/monitor_log/proto/monitor_log.proto";
+import "modules/common_msgs/monitor_msgs/monitor_log.proto";
 import "modules/common_msgs/basic_msgs/pnc_point.proto";
 import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
 import "modules/common_msgs/planning_msgs/planning_internal.proto";

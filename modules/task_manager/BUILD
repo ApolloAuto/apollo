@@ -83,7 +83,7 @@ install(
     data = [
         ":runtime_data",
         ":cyberfile.xml",
-        ":task_manager.BUILD",
+        ":task-manager.BUILD",
     ],
     targets = [
         ":libtask_manager_component.so",

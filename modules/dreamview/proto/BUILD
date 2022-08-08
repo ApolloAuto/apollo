@@ -125,7 +125,7 @@ proto_library(
     srcs = ["simulation_world.proto"],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_proto",
-        "//modules/common/monitor_log/proto:monitor_log_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_proto",
         "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
         "//modules/common_msgs/planning_msgs:planning_internal_proto",
@@ -139,7 +139,7 @@ py_proto_library(
     deps = [
         ":simulation_world_proto",
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
-        "//modules/common/monitor_log/proto:monitor_log_py_pb2",
+        "//modules/common_msgs/monitor_msgs:monitor_log_py_pb2",
         "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
         "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
         "//modules/common_msgs/planning_msgs:planning_internal_py_pb2",

@@ -29,7 +29,7 @@
 
 #include "gtest/gtest_prod.h"
 #include "modules/common/monitor_log/monitor_logger.h"
-#include "modules/common/monitor_log/proto/monitor_log.pb.h"
+#include "modules/common_msgs/monitor_msgs/monitor_log.pb.h"
 
 /**
  * @namespace apollo::common::monitor

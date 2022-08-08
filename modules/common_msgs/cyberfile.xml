@@ -14,6 +14,6 @@
   <type>module-wrapper</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/common_msgs</src_path>
 
-  <depend expose="False" lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
 </package>

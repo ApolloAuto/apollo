@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
   
 cc_library(
-    name = "common_msgs",
+    name = "common-msgs",
     includes = ["include"],
     hdrs = glob(
         [

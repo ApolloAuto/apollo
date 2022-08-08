@@ -33,7 +33,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
         "//modules/common/util:util_tool",
         "@com_google_googletest//:gtest",
         "@com_google_absl//:absl",
@@ -48,7 +48,7 @@ cc_library(
     alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
         "//modules/common/util:util_tool",
         "@com_google_absl//:absl",
     ],
@@ -62,7 +62,7 @@ cc_library(
     deps = [
         ":monitor_logger",
         "//cyber",
-        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
         "@com_google_googletest//:gtest",
     ],
 )

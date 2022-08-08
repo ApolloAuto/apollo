@@ -37,7 +37,7 @@ install(
         "//modules/common/adapters/proto:adapter_config_cc_proto",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/latency_recorder/proto:latency_record_cc_proto",
-        "//modules/common/monitor_log/proto:monitor_log_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
         "//modules/common/vehicle_model/proto:vehicle_model_config_cc_proto",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
     ],

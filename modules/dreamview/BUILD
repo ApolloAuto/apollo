@@ -48,7 +48,6 @@ install(
     targets = ["dreamview"],
     deps = [
         ":pb_dreamview",
-        "//cyber:install",
         ":pb_hdrs", 
         "//modules/dreamview/backend/common:install",
         "//modules/dreamview/backend/hmi:install",
