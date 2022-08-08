@@ -13,6 +13,16 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>module</type>
+  <depend type="binary" repo_name="cyber">cyber-dev</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl-dev</depend>
+  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
+  <depend type="binary" repo_name="dreamview" lib_names="dreamview">dreamview-dev</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/monitor</src_path>
 
 </package>

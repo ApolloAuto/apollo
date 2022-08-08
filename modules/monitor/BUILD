@@ -62,9 +62,6 @@ install(
         ":cyberfile.xml",
         ":monitor.BUILD",
     ],
-    deps = [
-        "//cyber:install",
-    ],
 )
 
 install_src_files(
