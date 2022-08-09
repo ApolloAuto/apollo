@@ -30,7 +30,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    max-width: 50%;
+    max-width: 60%;
     max-height: 80%;
     overflow: auto;
     background-color: #010c17;
@@ -76,9 +76,18 @@
     .application-guide-modal-content-body {
       font-size: 16px;
       line-height: 1.5;
+      padding-bottom: 20px;
 
       h6 {
         margin: 10px 0;
+      }
+
+      .font-bold {
+        font-weight: bold;
+      }
+
+      .font-EB {
+        color: #EB2E2D;
       }
 
       table {
@@ -115,6 +124,8 @@
     }
 
     .application-guide-modal-btn {
+      position: fixed;
+      bottom: 10%;
       margin: 0 auto;
       display: inline-block;
       letter-spacing: 1px;
