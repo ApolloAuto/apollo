@@ -4,7 +4,7 @@ cc_library(
     name = "cyber",
     includes = ["include"],
     hdrs = glob(["include/**/*"]),
-    srcs = glob(["lib/**/*.so*"]),
+    srcs = glob(["lib/**/lib*.so*"]),
     include_prefix = "cyber",
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],

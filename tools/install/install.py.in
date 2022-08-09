@@ -26,6 +26,8 @@ color = False
 prefix = None
 strip = True
 strip_tool = None
+install_lib = True
+fix_rpath = True
 
 dbg = False
 gpu = False
@@ -169,6 +171,10 @@ def copy_or_link(src, dst):
 def install(src, dst):
     global subdirs
     dst = rename_package_name(dst)
+
+    # Do not install files in ${prefx}/lib dir
+    if not install_lib and dst.startswith("lib/"):
+        return
     # In list-only mode, just display the filename, don't do any real work.
     if list_only:
         print(dst)
@@ -214,7 +220,8 @@ def install(src, dst):
                 elif not pre_full_dst.startswith(os.path.join(prefix, "lib/")):
                     sys.stderr.write("Multiple installation rules found for {}."
                         .format(basename))
-                    #sys.exit(1)
+                    # sys.exit(1)
+                    return
                 else:
                     # remove it from lib/
                     os.remove(pre_full_dst)
@@ -319,6 +326,7 @@ def main(args):
     global prefix
     global strip
     global strip_tool
+    global install_lib
 
     global dbg
     global gpu
@@ -343,6 +351,12 @@ def main(args):
         '--pre_clean', action='store_true', default=False,
         help='ensure clean install by removing `prefix` dir if it exists '
              'before installing')
+    parser.add_argument('--no_lib', dest='install_lib', action='store_false', default=True,
+                                help='do not install files in lib dir.')
+
+    parser.add_argument('--no_fix_rpath', dest='fix_rpath', action='store_false', default=True,
+                                help='do not fix the rpath of .so files.')
+
     parser.add_argument('--dbg', action='store_true', default=False,
                                 help='debug package with debugging symbols.')
     parser.add_argument('--gpu', action='store_true', default=False,
@@ -359,6 +373,8 @@ def main(args):
     strip = args.strip
     strip_tool = args.strip_tool
     pre_clean = args.pre_clean
+    install_lib = args.install_lib
+    fix_rpath = args.fix_rpath
 
     dbg = args.dbg
     gpu = args.gpu
@@ -404,7 +420,8 @@ def main(args):
     <<actions>>
 
     # Libraries paths may need to be updated in libraries and executables.
-    fix_rpaths_and_strip()
+    if fix_rpath:
+        fix_rpaths_and_strip()
 
 
 if __name__ == "__main__":

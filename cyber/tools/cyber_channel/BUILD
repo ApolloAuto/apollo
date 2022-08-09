@@ -22,6 +22,6 @@ install_files(
         ":cyber_channel.py",
     ],
     rename = {
-        "bin/cyber_channel.py": "cyber_channel",
+        "cyber/bin/cyber_channel.py": "cyber_channel",
     },
 )

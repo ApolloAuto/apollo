@@ -20,6 +20,6 @@ install_files(
         ":cyber_launch.py",
     ],
     rename = {
-        "bin/cyber_launch.py": "cyber_launch",
+        "cyber/bin/cyber_launch.py": "cyber_launch",
     },
 )
