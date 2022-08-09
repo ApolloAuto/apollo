@@ -19,6 +19,7 @@ cc_library(
         "//modules/routing/core",
         "//modules/routing/proto:routing_config_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -30,6 +31,7 @@ cc_library(
         ":routing",
         "//cyber",
     ],
+    alwayslink = True,
 )
 
 cc_binary(

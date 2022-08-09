@@ -19,6 +19,7 @@ cc_library(
         "//modules/task_manager/common:task_manager_gflags",
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -35,6 +36,7 @@ cc_library(
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -52,6 +54,7 @@ cc_library(
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -67,12 +70,13 @@ cc_library(
         "//modules/task_manager/proto:task_manager_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
     name = "libtask_manager_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":task_manager_component_lib"],
 )
 
