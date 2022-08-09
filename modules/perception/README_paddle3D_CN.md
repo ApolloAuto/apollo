@@ -1,5 +1,5 @@
 ## Apollo与Paddle3D
-- 我们鼓励开发者在Apollo平台上贡献或适配引入新的感知模型并进行迭代，为此我们与PaddlePaddle团队合作，在Apollo感知框架中添加了对Paddle Inference推理引擎的支持，并引入了Paddle3D，开发者可以方便的使用Paddle3D进行模型的开发和迭代，并方便的将感知模型移植到Apollo感知框架。
+- 在感知模块中，Apollo提供了众多的感知模型以满足开发者的需求，如基于Camera Detection的Smoke模型，基于Lidar Detection的PointPillars、MaskPillars等。我们鼓励开发者在Apollo平台上贡献或适配引入新的感知模型并进行迭代，为此我们与PaddlePaddle团队合作，在Apollo感知框架中添加了对Paddle Inference推理引擎的支持，并引入了Paddle3D，开发者可以方便的使用Paddle3D进行模型的开发和迭代，并方便的将感知模型移植到Apollo感知框架。
 ## Paddle3D简介
 - Paddle3D是飞桨官方开源的端到端深度学习3D感知套件，涵盖了许多前沿和经典的3D感知模型，支持多种模态和多种任务，可以助力开发者便捷地完成『自动驾驶』领域模型从训练到部署的全流程应用。Paddle3D的详细使用请参考[Paddle3D官网](https://github.com/PaddlePaddle/Paddle3D)。
 
