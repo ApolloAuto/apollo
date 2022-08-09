@@ -1,6 +1,6 @@
-import STORE from 'store';
-import RENDERER from 'renderer';
 import MAP_NAVIGATOR from 'components/Navigation/MapNavigator';
+import RENDERER from 'renderer';
+import STORE from 'store';
 import UTTERANCE from 'store/utterance';
 import Worker from 'utils/webworker.js';
 
@@ -57,9 +57,9 @@ export default class RealtimeWebSocketEndpoint {
           this.checkMessage(message);
 
           const isNewMode = (this.currentMode
-                                       && this.currentMode !== STORE.hmi.currentMode);
+            && this.currentMode !== STORE.hmi.currentMode);
           const isNavigationModeInvolved = (this.currentMode === 'Navigation'
-                                                    || STORE.hmi.currentMode === 'Navigation');
+            || STORE.hmi.currentMode === 'Navigation');
           this.currentMode = STORE.hmi.currentMode;
           if (STORE.hmi.shouldDisplayNavigationMap) {
             if (MAP_NAVIGATOR.isInitialized()) {
@@ -148,7 +148,7 @@ export default class RealtimeWebSocketEndpoint {
       const lossDuration = now - this.simWorldLastUpdateTimestamp;
       const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
       if (this.simWorldLastUpdateTimestamp !== 0
-                && lossDuration > 10000 && alertDuration > 2000) {
+        && lossDuration > 10000 && alertDuration > 2000) {
         const message = 'Connection to the server has been lost.';
         STORE.monitor.insert('FATAL', message, now);
         if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking()) {
@@ -463,7 +463,15 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  sendParkingRequest(start,waypoint,end, parkingInfo, laneWidth,cornerPoints,id, start_heading) {
+  sendParkingRequest(
+    start,
+    waypoint,
+    end,
+    parkingInfo,
+    laneWidth,
+    cornerPoints,
+    id,
+    start_heading) {
     const request = {
       type: 'SendParkingRoutingRequest',
       start,

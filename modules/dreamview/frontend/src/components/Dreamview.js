@@ -10,6 +10,7 @@ import SideBar from 'components/SideBar';
 
 import HOTKEYS_CONFIG from 'store/config/hotkeys.yml';
 import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS, ACCOUNT_WS, CONFIGURATION_WS } from 'store/websocket';
+import ApplicationGuideModal from './ApplicationGuideModal';
 
 @inject('store') @observer
 export default class Dreamview extends React.Component {
@@ -123,33 +124,39 @@ export default class Dreamview extends React.Component {
     const { dimension, options, hmi } = this.props.store;
 
     return (
-            <div>
-                <Header />
-                <div className="pane-container"
-                  onFocus={this.handleFocus}
-                  onBlur={this.handleBlur}
-                >
-                    <SplitPane
-                        split="vertical"
-                        size={dimension.pane.width}
-                        onChange={this.handleDrag}
-                        allowResize={options.showMonitor}
-                    >
-                        <div className="left-pane">
-                            <SideBar />
-                            <div className="dreamview-body">
-                                <MainView />
-                                <ToolView />
-                            </div>
-                        </div>
-                        <MonitorPanel
-                            hmi={hmi}
-                            viewName={options.monitorName}
-                            showVideo={options.showVideo}
-                        />
-                    </SplitPane>
-                </div>
+      <div>
+        <Header />
+        <div className="pane-container"
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+        >
+          <SplitPane
+            split="vertical"
+            size={dimension.pane.width}
+            onChange={this.handleDrag}
+            allowResize={options.showMonitor}
+          >
+            <div className="left-pane">
+              <SideBar />
+              <div className="dreamview-body">
+                <MainView />
+                <ToolView />
+              </div>
             </div>
+            <MonitorPanel
+              hmi={hmi}
+              viewName={options.monitorName}
+              showVideo={options.showVideo}
+            />
+          </SplitPane>
+        </div>
+        <MonitorPanel
+          hmi={hmi}
+          viewName={options.monitorName}
+          showVideo={options.showVideo}
+        />
+        <ApplicationGuideModal />
+      </div>
     );
   }
 }
