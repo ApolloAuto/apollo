@@ -23,5 +23,12 @@ cc_library(
     includes = [
         "include",
     ],
+    strip_include_prefix = "include",
+    deps = ["situation_hpp"],
+)
+
+cc_library(
+    name = "situation_hpp",
+    hdrs = glob(["include/ad_rss/situation/**/*.hpp"]),
     strip_include_prefix = "include/ad_rss",
 )
