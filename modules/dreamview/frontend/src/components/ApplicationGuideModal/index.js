@@ -95,6 +95,7 @@ class ApplicationGuideModal extends React.Component {
               <li>车辆安全操作注意事项</li>
             </ul> */}
             <p className="font-bold font-EB">
+              {/* eslint-disable-next-line max-len */}
               警告：D-KIT套件属于测试、实验性质的产品，主要用于教学，并非商业化运营产品（如robotaxi）。切勿依靠D-KIT套件的自动驾驶系统来保障人身安全。车辆使用者及安全员有责任时刻保持警觉，安全使用，并掌控车辆。
             </p>
             {/* <h6>一、自动驾驶模式下安全运行需满足的环境条件</h6>
