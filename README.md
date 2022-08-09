@@ -200,7 +200,9 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 * [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 
 * [FAQs](docs/FAQs/README.md)
+## About Paddle3D
 
+Paddle3D is an end-to-end 3D perception toolkit based on PaddlePaddle, covering a variety of mainstream and classical 3D perception models, supporting multimodel and multiple tasks, which can help developers to easily complete the whole process of Autonomous Driving domain models from training to deployment. Users can easily integrate the perception model trained by Paddle 3D into the Apollo perception framework. for more information about Paddle3D, please refer to [Paddle3D homepage](https://github.com/PaddlePaddle/Paddle3D).
 ## Questions
 
 You are welcome to submit questions and bug reports as [GitHub Issues](https://github.com/ApolloAuto/apollo/issues).
