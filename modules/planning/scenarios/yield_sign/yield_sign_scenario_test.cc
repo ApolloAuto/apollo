@@ -50,7 +50,7 @@ TEST_F(YieldSignScenarioTest, VerifyConf) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new YieldSignScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::YIELD_SIGN);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::YIELD_SIGN);
 }
 
 }  // namespace yield_sign

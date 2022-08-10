@@ -1,9 +1,23 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 PREPROCESS_SUB_COPTS = ["-DMODULE_NAME=\\\"preprocessor_submodule\\\""]
+
+install(
+    name = "install",
+    library_dest = "control/lib",
+    targets = [
+        ":control_module.so",
+        ":preprocessor_submodule.so",
+        ":mpc_controller_submodule.so",
+        ":lat_lon_controller_submodule.so",
+        ":postprocessor_submodule.so",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "control_module_lib",
@@ -29,8 +43,7 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -39,12 +52,12 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
         "//modules/control/common:dependency_injector",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/control/proto:control_common_conf_cc_proto",
-        "//modules/control/proto:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
         "//modules/control/proto:preprocessor_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 
@@ -62,8 +75,7 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -73,12 +85,12 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/controller",
         "//modules/control/proto:calibration_table_cc_proto",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/control/proto:control_conf_cc_proto",
-        "//modules/control/proto:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
         "//modules/control/proto:preprocessor_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
     alwayslink = True,
@@ -98,7 +110,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -128,7 +139,6 @@ cc_library(
     copts = PREPROCESS_SUB_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -138,12 +148,12 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/controller",
         "//modules/control/proto:calibration_table_cc_proto",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/control/proto:control_common_conf_cc_proto",
         "//modules/control/proto:control_conf_cc_proto",
-        "//modules/control/proto:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
         "//modules/control/proto:preprocessor_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
     alwayslink = True,

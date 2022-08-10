@@ -38,7 +38,7 @@ cc_library(
     hdrs = ["yolov4_obstacle_detector.h"],
     deps = [
         ":region_output",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         # "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",

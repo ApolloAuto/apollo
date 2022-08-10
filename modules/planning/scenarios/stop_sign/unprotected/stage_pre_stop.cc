@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
@@ -258,7 +258,7 @@ bool StopSignUnprotectedStagePreStop::CheckADCStop(
 
 Stage::StageStatus StopSignUnprotectedStagePreStop::FinishStage() {
   GetContext()->stop_start_time = Clock::NowInSeconds();
-  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
+  next_stage_ = StageType::STOP_SIGN_UNPROTECTED_STOP;
 
   return Stage::FINISHED;
 }

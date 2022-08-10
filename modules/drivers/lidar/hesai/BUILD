@@ -8,6 +8,8 @@ HESAI_COPTS = ['-DMODULE_NAME=\\"hesai\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -95,7 +97,7 @@ cc_library(
         "//cyber",
         "//modules/drivers/lidar/proto:hesai_cc_proto",
         "//modules/drivers/lidar/proto:hesai_config_cc_proto",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
     ],
 )
 

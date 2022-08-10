@@ -139,7 +139,10 @@ class ProcessWrapper(object):
         if self.process_type == 'binary':
             args_list = self.name.split()
         else:
-            args_list = [self.binary_path, '-d'] + self.dag_list
+            args_list = [self.binary_path]
+            for i in self.dag_list:
+                args_list.append('-d')
+                args_list.append(i)
             if len(self.name) != 0:
                 args_list.append('-p')
                 args_list.append(self.name)
@@ -339,7 +342,6 @@ def start(launch_file=''):
     dag_dict = {}
     root1 = tree.getroot()
     for module in root1.findall('module'):
-        dag_conf = module.find('dag_conf').text
         process_name = module.find('process_name').text
         process_type = module.find('type')
         if process_type is None:
@@ -350,9 +352,19 @@ def start(launch_file=''):
                 process_type = 'library'
             process_type = process_type.strip()
         if process_type != 'binary':
-            if dag_conf is None or not dag_conf.strip():
+            dag_list = []
+            for dag_conf in module.findall('dag_conf'):
+                if dag_conf.text is None:
+                    continue
+                dag = dag_conf.text.strip()
+                if len(dag) > 0:
+                    dag_list.append(dag)
+            if len(dag_list) == 0:
                 logger.error('Library dag conf is null')
                 continue
+            else:
+                total_dag_num += len(dag_list)
+
             if process_name is None:
                 process_name = 'mainboard_default_' + str(os.getpid())
             process_name = process_name.strip()
@@ -361,11 +373,9 @@ def start(launch_file=''):
             else:
                 dictionary[str(process_name)] = 1
             if str(process_name) not in dag_dict:
-                dag_dict[str(process_name)] = [str(dag_conf)]
+                dag_dict[str(process_name)] = dag_list
             else:
-                dag_dict[str(process_name)].append(str(dag_conf))
-            if dag_conf is not None:
-                total_dag_num += 1
+                dag_dict[str(process_name)].extend(dag_list)
 
     process_list = []
     root = tree.getroot()
@@ -394,8 +404,13 @@ def start(launch_file=''):
 
         if process_name is None:
             process_name = 'mainboard_default_' + str(os.getpid())
-        if dag_conf is None:
-            dag_conf = ''
+        dag_list = []
+        for dag_conf in module.findall('dag_conf'):
+            if dag_conf.text is None:
+                continue
+            dag = dag_conf.text.strip()
+            if len(dag) > 0:
+                dag_list.append(dag)
         if module_name is None:
             module_name = ''
         if exception_handler is None:
@@ -403,13 +418,12 @@ def start(launch_file=''):
         else:
             exception_handler = exception_handler.text
         module_name = module_name.strip()
-        dag_conf = dag_conf.strip()
         process_name = process_name.strip()
         sched_name = sched_name.strip()
         exception_handler = exception_handler.strip()
 
         logger.info('Load module [%s] %s: [%s] [%s] conf: [%s] exception_handler: [%s]' %
-                    (module_name, process_type, process_name, sched_name, dag_conf,
+                    (module_name, process_type, process_name, sched_name, ', '.join(dag_list),
                      exception_handler))
 
         if process_name not in process_list:

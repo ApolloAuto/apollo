@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,6 +11,7 @@ cc_library(
     srcs = ["canbus_component.cc"],
     hdrs = ["canbus_component.h"],
     copts = CANBUS_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/canbus/common:canbus_common",
@@ -22,7 +23,7 @@ cc_library(
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/guardian/proto:guardian_cc_proto",
+        "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -41,7 +42,7 @@ cc_test(
 cc_binary(
     name = "libcanbus_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":canbus_component_lib",
     ],
@@ -49,8 +50,12 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "canbus/lib",
+    data_dest = "canbus",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        ":canbus.BUILD",
     ],
     targets = [
         ":libcanbus_component.so",
@@ -58,14 +63,25 @@ install(
     deps = [
         ":pb_canbus",
         "//cyber:install",
+        ":pb_hdrs",
+        "//modules/canbus/tools:install",
+    ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "canbus/include",
+    data = [
+        "//modules/canbus/proto:canbus_conf_cc_proto",
+        "//modules/canbus/proto:vehicle_parameter_cc_proto",
     ],
 )
 
 install_files(
     name = "pb_canbus",
-    dest = "modules/canbus",
+    dest = "canbus",
     files = [
-        "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
     ],
 )
 
@@ -83,6 +99,28 @@ filegroup(
 filegroup(
     name = "test_data",
     srcs = glob(["testdata/**"]),
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_canbus_src",
+        ":install_canbus_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_canbus_src",
+    src_dir = ["."],
+    dest = "canbus/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_canbus_hdrs",
+    src_dir = ["."],
+    dest = "canbus/include",
+    filter = "*.h",
 )
 
 cpplint()

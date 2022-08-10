@@ -32,7 +32,7 @@ import sys
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import record
-from modules.drivers.proto.conti_radar_pb2 import ContiRadar
+from modules.common_msgs.sensor_msgs.conti_radar_pb2 import ContiRadar
 
 
 class RadarMessageConti408(object):

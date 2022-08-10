@@ -23,7 +23,7 @@
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
 #include "modules/v2x/proto/v2x_obu_traffic_light.pb.h"
 #include "modules/v2x/proto/v2x_rsi.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
+#include "modules/common_msgs/v2x_msgs/v2x_traffic_light.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"

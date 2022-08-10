@@ -11,7 +11,7 @@ cc_library(
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/perception/base",
         "//modules/perception/lib/registerer",
         "//modules/perception/lib/config_manager",

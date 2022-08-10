@@ -30,10 +30,10 @@
 
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/proto/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/localization/proto/pose.pb.h"
+#include "modules/common_msgs/localization_msgs/pose.pb.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
@@ -41,13 +41,13 @@
 #include "modules/planning/common/open_space_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/proto/pad_msg.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -178,7 +178,7 @@ class Frame {
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
-  const DrivingAction &GetPadMsgDrivingAction() const {
+  const PadMessage::DrivingAction &GetPadMsgDrivingAction() const {
     return pad_msg_driving_action_;
   }
 
@@ -212,7 +212,7 @@ class Frame {
   void ResetPadMsgDrivingAction();
 
  private:
-  static DrivingAction pad_msg_driving_action_;
+  static PadMessage::DrivingAction pad_msg_driving_action_;
   uint32_t sequence_num_ = 0;
   LocalView local_view_;
   const hdmap::HDMap *hdmap_ = nullptr;

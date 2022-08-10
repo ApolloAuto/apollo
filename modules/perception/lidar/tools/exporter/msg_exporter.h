@@ -22,8 +22,8 @@
 #include "Eigen/Dense"
 
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/perception/lidar/common/pcl_util.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/transform/buffer.h"

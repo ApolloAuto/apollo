@@ -26,11 +26,11 @@
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
-#include "modules/guardian/proto/guardian.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/guardian_msgs/guardian.pb.h"
 #include "modules/guardian/proto/guardian_conf.pb.h"
-#include "modules/monitor/proto/system_status.pb.h"
+#include "modules/common_msgs/monitor_msgs/system_status.pb.h"
 
 /**
  * @namespace apollo::guardian

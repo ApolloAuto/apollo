@@ -52,7 +52,7 @@ TEST_F(TrafficLightProtectedScenarioTest, Init) {
   scenario_.reset(
       new TrafficLightProtectedScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
+            ScenarioType::TRAFFIC_LIGHT_PROTECTED);
 }
 
 }  // namespace traffic_light

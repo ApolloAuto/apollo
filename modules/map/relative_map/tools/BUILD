@@ -1,9 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
+install(
+    name = "install",
+    runtime_dest = "map/bin",
+    targets = [
+        ":navigation_dummy",
+        ":navigator",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "navigation_dummy",

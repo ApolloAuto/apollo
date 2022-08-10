@@ -6,25 +6,52 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "pose_cc_proto",
+    name = "measure_cc_proto",
     deps = [
-        ":pose_proto",
+        ":measure_proto",
     ],
 )
 
 proto_library(
-    name = "pose_proto",
-    srcs = ["pose.proto"],
+    name = "measure_proto",
+    srcs = ["measure.proto"],
     deps = [
-        "//modules/common/proto:geometry_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
     ],
 )
 
 py_proto_library(
-    name = "pose_py_pb2",
+    name = "measure_py_pb2",
     deps = [
-        ":pose_proto",
-        "//modules/common/proto:geometry_py_pb2",
+        ":measure_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "sins_pva_cc_proto",
+    deps = [
+        ":sins_pva_proto",
+    ],
+)
+
+proto_library(
+    name = "sins_pva_proto",
+    srcs = ["sins_pva.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+    ],
+)
+
+py_proto_library(
+    name = "sins_pva_py_pb2",
+    deps = [
+        ":sins_pva_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
     ],
 )
 
@@ -39,7 +66,7 @@ proto_library(
     name = "gnss_pnt_result_proto",
     srcs = ["gnss_pnt_result.proto"],
     deps = [
-        "//modules/drivers/gnss/proto:gnss_raw_observation_proto",
+        "//modules/common_msgs/sensor_msgs:gnss_raw_observation_proto",
     ],
 )
 
@@ -47,101 +74,7 @@ py_proto_library(
     name = "gnss_pnt_result_py_pb2",
     deps = [
         ":gnss_pnt_result_proto",
-        "//modules/drivers/gnss/proto:gnss_raw_observation_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "localization_status_cc_proto",
-    deps = [
-        ":localization_status_proto",
-    ],
-)
-
-proto_library(
-    name = "localization_status_proto",
-    srcs = ["localization_status.proto"],
-)
-
-py_proto_library(
-    name = "localization_status_py_pb2",
-    deps = [
-        ":localization_status_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "localization_config_cc_proto",
-    deps = [
-        ":localization_config_proto",
-    ],
-)
-
-proto_library(
-    name = "localization_config_proto",
-    srcs = ["localization_config.proto"],
-)
-
-py_proto_library(
-    name = "localization_config_py_pb2",
-    deps = [
-        ":localization_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "imu_cc_proto",
-    deps = [
-        ":imu_proto",
-    ],
-)
-
-proto_library(
-    name = "imu_proto",
-    srcs = ["imu.proto"],
-    deps = [
-        ":pose_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "imu_py_pb2",
-    deps = [
-        ":imu_proto",
-        ":pose_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "localization_cc_proto",
-    deps = [
-        ":localization_proto",
-    ],
-)
-
-proto_library(
-    name = "localization_proto",
-    srcs = ["localization.proto"],
-    deps = [
-        ":localization_status_proto",
-        ":pose_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-py_proto_library(
-    name = "localization_py_pb2",
-    deps = [
-        ":localization_proto",
-        ":localization_status_py_pb2",
-        ":pose_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
+        "//modules/common_msgs/sensor_msgs:gnss_raw_observation_py_pb2",
     ],
 )
 
@@ -163,78 +96,21 @@ py_proto_library(
         ":rtk_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "gps_cc_proto",
+    name = "localization_config_cc_proto",
     deps = [
-        ":gps_proto",
+        ":localization_config_proto",
     ],
 )
 
 proto_library(
-    name = "gps_proto",
-    srcs = ["gps.proto"],
-    deps = [
-        ":pose_proto",
-        "//modules/common/proto:header_proto",
-    ],
+    name = "localization_config_proto",
+    srcs = ["localization_config.proto"],
 )
 
 py_proto_library(
-    name = "gps_py_pb2",
+    name = "localization_config_py_pb2",
     deps = [
-        ":gps_proto",
-        ":pose_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "measure_cc_proto",
-    deps = [
-        ":measure_proto",
-    ],
-)
-
-proto_library(
-    name = "measure_proto",
-    srcs = ["measure.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "measure_py_pb2",
-    deps = [
-        ":measure_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "sins_pva_cc_proto",
-    deps = [
-        ":sins_pva_proto",
-    ],
-)
-
-proto_library(
-    name = "sins_pva_proto",
-    srcs = ["sins_pva.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "sins_pva_py_pb2",
-    deps = [
-        ":sins_pva_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
+        ":localization_config_proto",
     ],
 )

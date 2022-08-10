@@ -7,7 +7,7 @@ py_binary(
     srcs = ["plot_control.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/control/proto:control_cmd_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
     ],
 )
 
@@ -16,7 +16,7 @@ py_binary(
     srcs = ["realtime_test.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )

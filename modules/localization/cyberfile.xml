@@ -1,0 +1,19 @@
+<package format="2">
+  <name>localization</name>
+  <version>local</version>
+  <description>
+    This module provides localization services. There are two ways in which localization is provided:
+    -  The RTK (Real Time Kinematic) based method which incorporates GPS and IMU (Inertial Measurement Unit) information
+    - The  multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
+  </description>
+  
+  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/localization</src_path>
+
+</package>

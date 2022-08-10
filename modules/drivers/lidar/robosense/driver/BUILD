@@ -35,11 +35,11 @@ cc_library(
         "//cyber",
         "//modules/common/util",
         "//modules/drivers/lidar/common/driver_factory:driver_base",
-        "//modules/drivers/lidar/proto:config_proto",
-        "//modules/drivers/lidar/proto:robosense_proto",
+        "//modules/drivers/lidar/proto:config_cc_proto",
+        "//modules/drivers/lidar/proto:robosense_cc_proto",
         "//modules/drivers/lidar/robosense:decoder_factory",
         "//modules/drivers/lidar/robosense/input",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
     ],
 )
 

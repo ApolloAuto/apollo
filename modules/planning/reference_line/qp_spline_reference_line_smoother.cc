@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"

@@ -21,11 +21,11 @@
 #include "Eigen/Geometry"
 
 #include "cyber/common/file.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
-#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 namespace apollo {
 namespace perception {

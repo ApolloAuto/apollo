@@ -18,7 +18,7 @@ cc_library(
     srcs = ["conti_ars_preprocessor.cc"],
     hdrs = ["conti_ars_preprocessor.h"],
     deps = [
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/registerer",

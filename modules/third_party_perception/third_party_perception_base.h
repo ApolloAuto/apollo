@@ -26,11 +26,11 @@
 
 #include "cyber/node/node.h"
 #include "cyber/node/reader.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/status/status.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 

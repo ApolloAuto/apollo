@@ -68,13 +68,13 @@ cc_library(
     hdrs = ["junction_mlp_evaluator.h"],
     copts = PREDICTION_FOPENMP_COPTS,
     deps = [
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 
@@ -106,7 +106,7 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 
@@ -120,7 +120,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 
@@ -150,7 +150,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 
@@ -163,7 +163,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 
@@ -177,7 +177,7 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
         "@eigen",
     ],
 )
@@ -193,7 +193,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//modules/prediction/pipeline:vector_net",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
         "@eigen",
     ],
 )
@@ -208,7 +208,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//modules/prediction/pipeline:vector_net",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
         "@eigen",
     ],
 )

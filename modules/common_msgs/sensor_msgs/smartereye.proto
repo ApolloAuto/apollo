@@ -1,0 +1,239 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum LdwVersions {
+  LDW_VERSION_C1 = 0;
+  LDW_VERSION_C2 = 1;
+  LDW_VERSION_FOUR_LANE_C2 = 2;
+}
+
+enum LdwLaneStyle {
+  LDW_LANE_STYLE_NONE_LANE = 0;
+  LDW_LANE_STYLE_PREDICT_LANE = 1;
+  LDW_LANE_STYLE_BROKEN_LANE = 2;
+  LDW_LANE_STYLE_SOLID_LANE = 3;
+  LDW_LANE_STYLE_DOUBLE_BROKEN_LANE = 4;
+  LDW_LANE_STYLE_DOUBLE_SOLID_LANE = 5;
+  LDW_LANE_STYLE_TRIPLE_LANE = 6;
+}
+
+enum LdwSteerStatus {
+  LDW_NORMAL_STEER = 0;
+  LDW_STEER_ON_LEFT__LANE = 1;
+  LDW_STEER_ON_RIGHT_LANE = 2;
+  LDW_STEER_WARNING_LEFT_ = 3;
+  LDW_STEER_WARNING_RIGHT = 4;
+}
+
+enum LdwSoftStatus {
+  LDW_SOFT_DETECTION = 0;
+  LDW_SOFT_SELF_LEARNING = 1;
+  LDW_SOFT_MANUAL_LEARNING_MODE0 = 2;
+  LDW_SOFT_MANUAL_LEARNING_MODE1 = 3;
+}
+
+enum LdwWarningGrade {
+  LDW_WARNING_LOW = 0;
+  LDW_WARNING_NORMAL = 1;
+  LDW_WARNING_HIGHT = 2;
+}
+
+message LdwLaneBoundary {
+  optional int32 degree = 1;
+  optional double c0_position = 2;
+  optional double c1_heading_angle = 3;
+  optional double c2_curvature = 4;
+  optional double c3_curvature_derivative = 5;
+}
+
+message LdwLane {
+  optional int32 width = 1;
+  optional int32 quality = 2;
+  optional LdwLaneStyle style = 3;
+  optional LdwLaneBoundary left_boundary = 4;
+  optional LdwLaneBoundary right_boundary = 5;
+}
+
+message LdwRoadway {
+  optional int32 width_0 = 1;
+  optional int32 width_1 = 2;
+  optional int32 width_2 = 3;
+  optional bool is_tracking = 4;
+  optional LdwLane left_lane = 5;
+  optional LdwLane right_lane = 6;
+  optional LdwLane adj_left_lane = 7;
+  optional LdwLane adj_right_lane = 8;
+}
+
+message LdwLensInfo {
+  optional float x_image_focal = 1;
+  optional float y_image_focal = 2;
+  optional float xratio_focal_pixel = 3;
+  optional float yratio_focal_pixel = 4;
+  optional float mountingheight = 5;
+  optional float mcosrx = 6;
+  optional float msinrx = 7;
+  optional float mcosry = 8;
+  optional float msinry = 9;
+}
+
+message LdwDataPacks {
+  optional LdwRoadway roadway = 1;
+  optional LdwSoftStatus softstatus = 2;
+  optional LdwSteerStatus steerstatus = 3;
+  optional LdwLensInfo lens = 4;
+}
+
+message OutputObstacle {
+  enum RecognitionType {
+    INVALID = 0;
+    VEHICLE = 1;
+    PEDESTRIAN = 2;
+    CHILD = 3;
+    BICYCLE = 4;
+    MOTO = 5;
+    TRUCK = 6;
+    BUS = 7;
+    OTHERS = 8;
+    ESTIMATED = 9;
+    CONTINUOUS = 10;
+  }
+
+  //(m/second) current frame self vehicle speed
+  optional float currentspeed = 1;
+  //(fps) frames per second
+  optional float framerate = 2;
+
+  // current obstacle corresponding tracking id in obstacle tracking buffer
+  optional uint32 trackid = 3;
+  // the track frame numbers of the obstacle, increments in 1 each frame until
+  // to the max record number, the actual number is (trackFrameNum + 1)
+  optional uint32 trackframenum = 4;
+  // classify obstacle for front collision, FC, 0: invalid or continuous
+  // obstacle, 1: nearest obstacle in warning area, 2: obstacle in waning area,
+  // 3: obstacle out of warning area
+  optional uint32 statelabel = 5;
+  // the obstacle class label: 0-invalid; 1-warning obstacle; 2-obstacles to be
+  // warned; 3-non warning obstacle; 4-left continuous obstacle; 5-right
+  // continuous obstacle; 6-estimated vanish obstacle; 7-valid obstacle
+  // original, the obstacle class label: 0-invalid; 1-car; 2-person;
+  // 3-continuous obstacle; 4-valid; 5-other
+  optional uint32 classlabel = 6;
+  // the continuous obstacle class label: 0-invalid; 1-left continuous obstacle;
+  // 2-right continuous obstacle
+  optional uint32 continuouslabel = 7;
+  //(0/1) 0: current fuzzy estimation is invalid; 1: current fuzzy estimation is
+  //valid
+  optional uint32 fuzzyestimationvalid = 8;
+  // the obstacle Type: INVALID=0,VEHICLE, PEDESTRIAN, ...
+  optional RecognitionType obstacletype = 9;
+
+  //(pixel) the average disparity of an obstacle with adding infDisp: avgDisp =
+  //BF_VALUE/avgDitance+infDis
+  optional float avgdisp = 10;
+  //(m) the average Z distance of single obstacle rectangle
+  optional float avgdistancez = 11;
+  //(m) the minimum Z distance of continuous obstacle
+  optional float neardistancez = 12;
+  //(m) the longest Z distance of continuous ob
+  optional float fardistancez = 13;
+  //(-+m) the left X for real 3D coordinate of the obstacle(the origin X is the
+  //center of car, right is positive)
+  optional float real3dleftx = 14;
+  //(-+m) the right X for real 3D coordinate of the obstacle(the origin X is the
+  //center of car, right is positive)
+  optional float real3drightx = 15;
+  //(-+m) the center X for real 3D coordinate of the obstacle(the origin X is
+  //the center of car, right is positive)
+  optional float real3dcenterx = 16;
+  //(-+m) the up Y for real 3D coordinate of the obstacle(the origin Y is the
+  //camera position, down is positive)
+  optional float real3dupy = 17;
+  //(-+m) the Low y for real 3D coordinate of the obstacle(the origin Y is the
+  //camera position, down is positive)
+  optional float real3dlowy = 18;
+
+  //(pixel) the X-axis of first point of rectangle, the first point :(x, y),
+  // left top point of single obstacle/near bottom point of continuous obstacle,
+  // full size pixel coordinate
+  optional uint32 firstpointx = 19;
+  //(pixel) the Y-axis of first point of rectangle, the first point :(x, y),
+  // left top point of single obstacle/near bottom point of continuous obstacle,
+  // full size pixel coordinate
+  optional uint32 firstpointy = 20;
+  //(pixel) the X-axis of second point of rectangle, the second point:(x+width,
+  //y),
+  // right top point of single obstacle/near top point of continuous obstacle,
+  // full size pixel coordinate
+  optional uint32 secondpointx = 21;
+  //(pixel) the Y-axis of second point of rectangle, the second point:(x+width,
+  //y), right top point of single obstacle/near top point of continuous
+  // obstacle, full size pixel coordinate
+  optional uint32 secondpointy = 22;
+  //(pixel) the X-axis of third point of rectangle, the third point :(x+width,
+  //y+height), right bottom point of single obstacle/far top point of continuous
+  // obstacle, full size pixel coordinate
+  optional uint32 thirdpointx = 23;
+  //(pixel) the Y-axis of third point of rectangle, the third point :(x+width,
+  //y+height), right bottom point of single obstacle/far top point of continuous
+  // obstacle, full size pixel coordinate
+  optional uint32 thirdpointy = 24;
+  //(pixel) the X-axis of fourth point of rectangle, the fourth
+  //point:(x,y+height), left bottom point of single obstacle/far bottom point of
+  // continuous obstacle, full size pixel coordinate
+  optional uint32 fourthpointx = 25;
+  //(pixel) the Y-axis of fourth point of rectangle, the fourth
+  //point:(x,y+height), left bottom point of single obstacle/far bottom point of
+  // continuous obstacle, full size pixel coordinate
+  optional uint32 fourthpointy = 26;
+
+  //(m) estimated relative distance in Z direction
+  optional float fuzzyrelativedistancez = 27;
+  //(m/second) estimated speed in Z direction of current obstacle
+  optional float fuzzyrelativespeedz = 28;
+  //(second) estimated collision time in Z direction
+  optional float fuzzycollisiontimez = 29;
+
+  //(0/1) estimated whether there is collision in X direction
+  optional uint32 fuzzycollisionx = 30;
+  //(m) estimated real 3D width of current obstacle
+  optional float fuzzy3dwidth = 31;
+  //(-+m) estimated real 3D position of obstacle center in X direction (the
+  //origin X is the center of car, right is positive)
+  optional float fuzzy3dcenterx = 32;
+  //(-+m) estimated real 3D position of obstacle left in X direction (the origin
+  //X is the center of car, right is positive)
+  optional float fuzzy3dleftx = 33;
+  //(-+m) estimated real 3D position of obstacle right in X direction (the
+  //origin X is the center of car, right is positive)
+  optional float fuzzy3drightx = 34;
+  //(m) estimated real 3D height of current obstacle
+  optional float fuzzy3dheight = 35;
+  //(-+m) estimated real 3D position of obstacle up in Y direction (the origin Y
+  //is the camera position, down is positive)
+  optional float fuzzy3dupy = 36;
+  //(-+m) estimated real 3D position of obstacle low in Y direction (the origin
+  //Y is the camera position, down is positive)
+  optional float fuzzy3dlowy = 37;
+
+  optional float fuzzyrelativespeedcenterx =
+      38;  //(m/second) estimated center speed in X direction of current
+           //obstacle
+  optional float fuzzyrelativespeedleftx =
+      39;  //(m/second) estimated left speed in X direction of current obstacle
+  optional float fuzzyrelativespeedrightx =
+      40;  //(m/second) estimated right speed in X direction of current obstacle
+}
+
+message SmartereyeObstacles {
+  optional apollo.common.Header header = 1;
+  optional int32 num_obstacles = 2;  // output obstacles num on one frame
+  map<uint32, OutputObstacle> output_obstacles = 3;  // An array of obstacles
+}
+
+message SmartereyeLanemark {
+  optional LdwDataPacks lane_road_data = 4;
+}

@@ -1,4 +1,30 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
+load("@apollo//tools/install:install.bzl", "install", "install_files", "install_src_files")
+
+install(
+    name = "install",
+    targets = [
+        ":libad_rss.so",
+    ],
+    library_dest = "3rd-ad-rss-lib/lib",
+    deps = [
+        ":ad_rss_export_hdrs",
+    ],
+)
+install_files(
+    name = "ad_rss_export_hdrs",
+    dest = "3rd-ad-rss-lib/include/ad_rss",
+    files = glob([
+        "include/ad_rss/**/*.hpp",
+        "src/**/*.hpp",
+        "include/generated/ad_rss/**/*.hpp"
+    ]),
+    strip_prefix = [
+        "include/ad_rss",
+        "src",
+        "include/generated/ad_rss",
+    ]
+)
 
 package(
     default_visibility = ["//visibility:public"],
@@ -6,8 +32,8 @@ package(
 
 licenses(["notice"])
 
-cc_library(
-    name = "ad_rss",
+cc_binary(
+    name = "libad_rss.so",
     srcs = [
         "src/generated/physics/Acceleration.cpp",
         "src/generated/physics/CoordinateSystemAxis.cpp",
@@ -37,7 +63,30 @@ cc_library(
         "src/situation/RSSSituation.cpp",
         "src/world/RssSituationCoordinateSystemConversion.cpp",
         "src/world/RssObjectPositionExtractor.cpp",
-    ] + glob(["src/**/*.hpp"]),
+    ] + glob(["src/**/*.hpp","include/**/*.hpp"]),
+    copts = [
+        "-fPIC",
+        "-std=c++11",
+        "-Werror",
+        "-Wall",
+        "-Wextra",
+        "-pedantic",
+        "-Wconversion",
+        "-Wsign-conversion",
+    ],
+    includes = [
+        "include",
+        "include/generated",
+        "src",
+        "tests/test_support",
+    ],
+    linkshared = True,
+)
+
+
+cc_library(
+    name = "ad_rss",
+    srcs = ["libad_rss.so"],
     hdrs = glob(["include/**/*.hpp"]),
     copts = [
         "-fPIC",
@@ -56,6 +105,7 @@ cc_library(
         "tests/test_support",
     ],
 )
+
 
 ################################################################################
 # Install section

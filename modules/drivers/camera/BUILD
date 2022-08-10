@@ -34,6 +34,8 @@ filegroup(
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
       ":runtime_data",
     ],
@@ -53,9 +55,9 @@ cc_library(
     deps = [
         ":camera",
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
     ],
 )
 
@@ -66,10 +68,10 @@ cc_library(
     copts = CAMERA_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
         "//modules/drivers/camera/proto:config_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "@opencv//:core",
         "@opencv//:highgui",
         "@opencv//:imgcodecs",

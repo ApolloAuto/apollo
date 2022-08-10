@@ -1,0 +1,12 @@
+--- bazel/grpc_build_system.bzl
++++ bazel/grpc_build_system.bzl
+@@ -56,7 +56,8 @@ def _get_external_deps(external_deps):
+         elif dep == "cronet_c_for_grpc":
+             ret += ["//third_party/objective_c/Cronet:cronet_c_for_grpc"]
+         elif dep.startswith("absl/"):
+-            ret += ["@com_google_absl//" + dep]
++            if "@com_google_absl//:absl" not in ret:
++                ret += ["@com_google_absl//:absl"]
+         else:
+             ret += ["//external:" + dep]
+     return ret

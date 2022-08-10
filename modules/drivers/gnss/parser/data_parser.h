@@ -26,15 +26,15 @@
 #include "modules/transform/transform_broadcaster.h"
 
 #include "modules/drivers/gnss/proto/config.pb.h"
-#include "modules/drivers/gnss/proto/gnss.pb.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
-#include "modules/drivers/gnss/proto/heading.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
+#include "modules/common_msgs/sensor_msgs/heading.pb.h"
+#include "modules/common_msgs/sensor_msgs/imu.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/localization_msgs/imu.pb.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 

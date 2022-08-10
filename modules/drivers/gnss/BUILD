@@ -20,19 +20,21 @@ cc_library(
     copts = GNSS_COPTS,
     deps = [
         "//cyber",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/monitor_log",
-        "//modules/common/proto:drive_state_cc_proto",
-        "//modules/common/proto:vehicle_signal_cc_proto",
+        "//modules/common_msgs/basic_msgs:drive_state_cc_proto",
+        "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/drivers/gnss/proto:gnss_status_cc_proto",
-        "//modules/drivers/gnss/proto:ins_cc_proto",
+        "//modules/common_msgs/sensor_msgs:ins_cc_proto",
         "//modules/drivers/gnss/stream:gnss_stream",
     ],
 )
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],

@@ -48,7 +48,7 @@ TEST_F(ValetParkingScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new ValetParkingScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::VALET_PARKING);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::VALET_PARKING);
 }
 
 }  // namespace valet_parking

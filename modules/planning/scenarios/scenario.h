@@ -54,7 +54,7 @@ class Scenario {
 
   virtual ~Scenario() = default;
 
-  ScenarioConfig::ScenarioType scenario_type() const {
+  ScenarioType scenario_type() const {
     return config_.scenario_type();
   }
 
@@ -80,9 +80,9 @@ class Scenario {
 
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
-  const ScenarioConfig::StageType GetStage() const {
+  const StageType GetStage() const {
     return current_stage_ ? current_stage_->stage_type()
-                          : ScenarioConfig::NO_STAGE;
+                          : StageType::NO_STAGE;
   }
 
   virtual void Init();
@@ -94,7 +94,7 @@ class Scenario {
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
   std::unique_ptr<Stage> current_stage_;
   ScenarioConfig config_;
-  std::unordered_map<ScenarioConfig::StageType,
+  std::unordered_map<StageType,
                      const ScenarioConfig::StageConfig*, std::hash<int>>
       stage_config_map_;
   const ScenarioContext* scenario_context_ = nullptr;

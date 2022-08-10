@@ -1,0 +1,109 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_id.proto";
+
+message LaneBoundaryType {
+  enum Type {
+    UNKNOWN = 0;
+    DOTTED_YELLOW = 1;
+    DOTTED_WHITE = 2;
+    SOLID_YELLOW = 3;
+    SOLID_WHITE = 4;
+    DOUBLE_YELLOW = 5;
+    CURB = 6;
+  };
+  // Offset relative to the starting point of boundary
+  optional double s = 1;
+  // support multiple types
+  repeated Type types = 2;
+}
+
+message LaneBoundary {
+  optional Curve curve = 1;
+
+  optional double length = 2;
+  // indicate whether the lane boundary exists in real world
+  optional bool virtual = 3;
+  // in ascending order of s
+  repeated LaneBoundaryType boundary_type = 4;
+}
+
+// Association between central point to closest boundary.
+message LaneSampleAssociation {
+  optional double s = 1;
+  optional double width = 2;
+}
+
+// A lane is part of a roadway, that is designated for use by a single line of
+// vehicles.
+// Most public roads (include highways) have more than two lanes.
+message Lane {
+  optional Id id = 1;
+
+  // Central lane as reference trajectory, not necessary to be the geometry
+  // central.
+  optional Curve central_curve = 2;
+
+  // Lane boundary curve.
+  optional LaneBoundary left_boundary = 3;
+  optional LaneBoundary right_boundary = 4;
+
+  // in meters.
+  optional double length = 5;
+
+  // Speed limit of the lane, in meters per second.
+  optional double speed_limit = 6;
+
+  repeated Id overlap_id = 7;
+
+  // All lanes can be driving into (or from).
+  repeated Id predecessor_id = 8;
+  repeated Id successor_id = 9;
+
+  // Neighbor lanes on the same direction.
+  repeated Id left_neighbor_forward_lane_id = 10;
+  repeated Id right_neighbor_forward_lane_id = 11;
+
+  enum LaneType {
+    NONE = 1;
+    CITY_DRIVING = 2;
+    BIKING = 3;
+    SIDEWALK = 4;
+    PARKING = 5;
+    SHOULDER = 6;
+  };
+  optional LaneType type = 12;
+
+  enum LaneTurn {
+    NO_TURN = 1;
+    LEFT_TURN = 2;
+    RIGHT_TURN = 3;
+    U_TURN = 4;
+  };
+  optional LaneTurn turn = 13;
+
+  repeated Id left_neighbor_reverse_lane_id = 14;
+  repeated Id right_neighbor_reverse_lane_id = 15;
+
+  optional Id junction_id = 16;
+
+  // Association between central point to closest boundary.
+  repeated LaneSampleAssociation left_sample = 17;
+  repeated LaneSampleAssociation right_sample = 18;
+
+  enum LaneDirection {
+    FORWARD = 1;
+    BACKWARD = 2;
+    BIDIRECTION = 3;
+  }
+  optional LaneDirection direction = 19;
+
+  // Association between central point to closest road boundary.
+  repeated LaneSampleAssociation left_road_sample = 20;
+  repeated LaneSampleAssociation right_road_sample = 21;
+
+  repeated Id self_reverse_lane_id = 22;
+}

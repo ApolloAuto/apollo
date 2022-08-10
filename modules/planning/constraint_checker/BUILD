@@ -10,8 +10,8 @@ cc_library(
     hdrs = ["constraint_checker.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//cyber",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
@@ -24,7 +24,7 @@ cc_library(
     hdrs = ["constraint_checker1d.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
@@ -38,16 +38,15 @@ cc_library(
     hdrs = ["collision_checker.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math:geometry",
-        "//modules/common/math:path_matcher",
+        "//modules/common/math",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/proto:st_drivable_boundary_cc_proto",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
     ],
 )
 

@@ -1,4 +1,4 @@
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -6,6 +6,7 @@ package(
 
 install(
     name = "install",
+    data_dest = "tools",
     data = [
         "//modules/tools/common:py_files",
         "//modules/tools/create_map:py_files",
@@ -13,6 +14,8 @@ install(
         "//modules/tools/record_play:py_files",
         "//modules/tools/sensor_calibration:runtime_files",
         "//modules/tools/vehicle_calibration:runtime_files",
+        ":cyberfile.xml",
+        ":tools.BUILD",
     ],
     rename = {
         "modules/tools/sensor_calibration/extract_data.py": "extract_data",
@@ -22,14 +25,50 @@ install(
     },
     deps = [
         ":pb_tools",
+        ":pb_hdrs",
         "//modules/tools/visualizer:install",
+        "//modules/tools/manual_traffic_light:install",
+        "//modules/tools/prediction/fake_prediction:install",
+    ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "tools/include",
+    data = [
+        "//modules/tools/navigator/dbmap/proto:dbmap_cc_proto",
+        "//modules/tools/prediction/data_pipelines/proto:cruise_model_cc_proto",
+        "//modules/tools/prediction/data_pipelines/proto:fnn_model_cc_proto",
+        "//modules/tools/sensor_calibration/proto:extractor_config_cc_proto",
     ],
 )
 
 install_files(
     name = "pb_tools",
-    dest = "modules/tools",
+    dest = "tools",
     files = [
         "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
     ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_tools_src",
+        ":install_tools_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_tools_src",
+    src_dir = ["."],
+    dest = "tools/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_tools_hdrs",
+    src_dir = ["."],
+    dest = "tools/include",
+    filter = "*.h",
 )

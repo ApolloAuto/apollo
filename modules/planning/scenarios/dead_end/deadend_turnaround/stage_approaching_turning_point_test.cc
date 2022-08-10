@@ -30,7 +30,7 @@ class StageApproachingTurningPointTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(
-        ScenarioConfig::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT);
+        StageType::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -43,8 +43,8 @@ TEST_F(StageApproachingTurningPointTest, Init) {
   StageApproachingTurningPoint stage_approaching_turning_point(config_,
                                                              injector_);
   EXPECT_EQ(stage_approaching_turning_point.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT));
+            StageType_Name(
+                StageType::DEADEND_TURNAROUND_APPROACHING_TURNING_POINT));
 }
 
 }  // namespace deadend_turnaround

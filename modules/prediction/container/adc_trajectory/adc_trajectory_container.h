@@ -26,10 +26,10 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/common_msgs/prediction_msgs/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

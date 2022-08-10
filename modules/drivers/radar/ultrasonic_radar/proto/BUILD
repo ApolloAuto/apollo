@@ -27,3 +27,4 @@ py_proto_library(
         "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
     ],
 )
+

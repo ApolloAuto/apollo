@@ -21,7 +21,7 @@
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -44,7 +44,7 @@ using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     StopSignUnprotectedScenario::s_stage_factory_;
@@ -89,25 +89,25 @@ void StopSignUnprotectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
+      StageType::STOP_SIGN_UNPROTECTED_PRE_STOP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StopSignUnprotectedStagePreStop(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
+      StageType::STOP_SIGN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StopSignUnprotectedStageStop(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
+      StageType::STOP_SIGN_UNPROTECTED_CREEP,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StopSignUnprotectedStageCreep(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
+      StageType::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new StopSignUnprotectedStageIntersectionCruise(config, injector);

@@ -21,7 +21,7 @@
 #include "cyber/cyber.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {

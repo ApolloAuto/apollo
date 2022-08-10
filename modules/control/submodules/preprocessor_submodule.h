@@ -22,17 +22,17 @@
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "cyber/component/timer_component.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/dependency_injector.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/control/proto/control_common_conf.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/control/proto/preprocessor.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace control {

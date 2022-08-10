@@ -20,10 +20,9 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 
-#include "cyber/proto/dag_conf.pb.h"
-#include "modules/monitor/proto/system_status.pb.h"
-
 #include "cyber/common/file.h"
+#include "cyber/proto/dag_conf.pb.h"
+#include "modules/common_msgs/monitor_msgs/system_status.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"

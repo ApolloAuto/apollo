@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "drivers/lib",
+    targets = [
+        ":libvelodyne_fusion_component.so",
+    ],
+)
 
 cc_binary(
     name = "libvelodyne_fusion_component.so",
@@ -18,7 +27,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/transform:buffer",
         "@eigen",
     ],

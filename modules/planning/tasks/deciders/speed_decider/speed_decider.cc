@@ -27,10 +27,10 @@
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/decision.pb.h"
+#include "modules/common_msgs/planning_msgs/decision.pb.h"
 #include "modules/planning/tasks/utils/st_gap_estimator.h"
 
 namespace apollo {

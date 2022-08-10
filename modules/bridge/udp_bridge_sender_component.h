@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"

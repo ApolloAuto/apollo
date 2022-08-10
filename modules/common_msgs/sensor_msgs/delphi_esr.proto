@@ -1,0 +1,771 @@
+syntax = "proto2";
+
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message Esr_status9_5e8 {
+  // Report Message
+  // [] [0|64]
+  optional int32 can_tx_path_id_acc_3 = 1;
+  // [] [0|64]
+  optional int32 can_tx_path_id_acc_2 = 2;
+  // [m] [-8|7.96875]
+  optional double can_tx_filtered_xohp_acc_cipv = 3;
+  // [] [0|64]
+  optional int32 can_tx_water_spray_target_id = 4;
+  // [] [0|0]
+  optional int32 can_tx_serial_num_3rd_byte = 5;
+  // [deg] [-64|63.875]
+  optional double can_tx_sideslip_angle = 6;
+  // [] [0|0]
+  optional int32 can_tx_avg_pwr_cwblkg = 7;
+}
+
+message Esr_status6_5e5 {
+  // Report Message
+  enum Can_tx_vertical_align_updatedType {
+    CAN_TX_VERTICAL_ALIGN_UPDATED_NOT_UPDATED = 0;
+    CAN_TX_VERTICAL_ALIGN_UPDATED_UPDATED = 1;
+  }
+  enum Can_tx_found_targetType {
+    CAN_TX_FOUND_TARGET_NOT_FOUND = 0;
+    CAN_TX_FOUND_TARGET_FOUND = 1;
+  }
+  enum Can_tx_factory_align_status_2Type {
+    CAN_TX_FACTORY_ALIGN_STATUS_2_OFF = 0;
+    CAN_TX_FACTORY_ALIGN_STATUS_2_BUSY = 1;
+    CAN_TX_FACTORY_ALIGN_STATUS_2_SUCCESS = 2;
+    CAN_TX_FACTORY_ALIGN_STATUS_2_FAIL_NO_TARGET = 3;
+    CAN_TX_FACTORY_ALIGN_STATUS_2_FAIL_DEV_TOO_LARGE = 4;
+    CAN_TX_FACTORY_ALIGN_STATUS_2_FAIL_VAR_TOO_LARGE = 5;
+  }
+  enum Can_tx_factory_align_status_1Type {
+    CAN_TX_FACTORY_ALIGN_STATUS_1_OFF = 0;
+    CAN_TX_FACTORY_ALIGN_STATUS_1_BUSY = 1;
+    CAN_TX_FACTORY_ALIGN_STATUS_1_SUCCESS = 2;
+    CAN_TX_FACTORY_ALIGN_STATUS_1_FAIL_NO_TARGET = 3;
+    CAN_TX_FACTORY_ALIGN_STATUS_1_FAIL_DEV_TOO_LARGE = 4;
+    CAN_TX_FACTORY_ALIGN_STATUS_1_FAIL_VAR_TOO_LARGE = 5;
+  }
+  enum Can_tx_recommend_unconvergeType {
+    CAN_TX_RECOMMEND_UNCONVERGE_NOT_RECOMMEND = 0;
+    CAN_TX_RECOMMEND_UNCONVERGE_RECOMMEND = 1;
+  }
+  enum Can_tx_system_power_modeType {
+    CAN_TX_SYSTEM_POWER_MODE_DSP_INIT = 0;
+    CAN_TX_SYSTEM_POWER_MODE_RADIATE_OFF = 1;
+    CAN_TX_SYSTEM_POWER_MODE_RADIATE_ON = 2;
+    CAN_TX_SYSTEM_POWER_MODE_DSP_SHUTDOWN = 3;
+    CAN_TX_SYSTEM_POWER_MODE_DSP_OFF = 4;
+    CAN_TX_SYSTEM_POWER_MODE_HOST_SHUTDOWN = 5;
+    CAN_TX_SYSTEM_POWER_MODE_TEST = 6;
+    CAN_TX_SYSTEM_POWER_MODE_7INVALID = 7;
+  }
+  // [] [0|0]
+  optional int32 can_tx_sw_version_dsp_3rd_byte = 1;
+  // [] [0|0]
+  optional Can_tx_vertical_align_updatedType can_tx_vertical_align_updated = 2;
+  // [] [-6|6]
+  optional double can_tx_vertical_misalignment = 3;
+  // [] [0|255]
+  optional int32 can_tx_serv_align_updates_done = 4;
+  // [] [0|0]
+  optional Can_tx_found_targetType can_tx_found_target = 5;
+  // [deg] [-5|5]
+  optional double can_tx_factory_misalignment = 6;
+  // [] [0|5]
+  optional Can_tx_factory_align_status_2Type can_tx_factory_align_status_2 = 7;
+  // [] [0|5]
+  optional Can_tx_factory_align_status_1Type can_tx_factory_align_status_1 = 8;
+  // [] [0|0]
+  optional Can_tx_recommend_unconvergeType can_tx_recommend_unconverge = 9;
+  // [] [0|0]
+  optional int32 can_tx_wave_diff_a2d = 10;
+  // [] [0|0]
+  optional Can_tx_system_power_modeType can_tx_system_power_mode = 11;
+  // [] [0|0]
+  optional int32 can_tx_supply_n5v_a2d = 12;
+  // [] [0|0]
+  optional int32 can_tx_supply_1p8v_a2d = 13;
+}
+
+message Esr_status5_5e4 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_supply_10v_a2d = 1;
+  // [] [0|0]
+  optional int32 can_tx_temp2_a2d = 2;
+  // [] [0|0]
+  optional int32 can_tx_temp1_a2d = 3;
+  // [] [0|0]
+  optional int32 can_tx_swbatt_a2d = 4;
+  // [] [0|0]
+  optional int32 can_tx_supply_5vdx_a2d = 5;
+  // [] [0|0]
+  optional int32 can_tx_supply_5va_a2d = 6;
+  // [] [0|0]
+  optional int32 can_tx_supply_3p3v_a2d = 7;
+  // [] [0|0]
+  optional int32 can_tx_ignp_a2d = 8;
+}
+
+message Esr_status3_4e2 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_sw_version_pld = 1;
+  // [] [0|0]
+  optional int32 can_tx_sw_version_host = 2;
+  // [] [0|0]
+  optional int32 can_tx_hw_version = 3;
+  // [] [0|0]
+  optional int32 can_tx_interface_version = 4;
+  // [] [0|0]
+  optional int32 can_tx_serial_num = 5;
+}
+
+message Esr_status4_4e3 {
+  // Report Message
+  enum Can_tx_truck_target_detType {
+    CAN_TX_TRUCK_TARGET_DET_NOT_DETECTED = 0;
+    CAN_TX_TRUCK_TARGET_DET_DETECTED = 1;
+  }
+  enum Can_tx_lr_only_grating_lobe_detType {
+    CAN_TX_LR_ONLY_GRATING_LOBE_DET_NOT_DETECTED = 0;
+    CAN_TX_LR_ONLY_GRATING_LOBE_DET_DETECTED = 1;
+  }
+  enum Can_tx_sidelobe_blockageType {
+    CAN_TX_SIDELOBE_BLOCKAGE_OFF = 0;
+    CAN_TX_SIDELOBE_BLOCKAGE_ON = 1;
+  }
+  enum Can_tx_partial_blockageType {
+    CAN_TX_PARTIAL_BLOCKAGE_NOT_BLOCKED = 0;
+    CAN_TX_PARTIAL_BLOCKAGE_BLOCKED = 1;
+  }
+  enum Can_tx_mr_lr_modeType {
+    CAN_TX_MR_LR_MODE_RESERVED = 0;
+    CAN_TX_MR_LR_MODE_OUTPUT_ONLY_MEDIUM_RANGE_TRACKS = 1;
+    CAN_TX_MR_LR_MODE_OUTPUT_ONLY_LONG_RANGE_TRACKS = 2;
+    CAN_TX_MR_LR_MODE_OUTPUT_ALL_MEDIUM_RANGE_AND_LONG = 3;
+  }
+  // [] [0|0]
+  optional Can_tx_truck_target_detType can_tx_truck_target_det = 1;
+  // [] [0|0]
+  optional Can_tx_lr_only_grating_lobe_detType can_tx_lr_only_grating_lobe_det =
+      2;
+  // [] [0|0]
+  optional Can_tx_sidelobe_blockageType can_tx_sidelobe_blockage = 3;
+  // [] [0|0]
+  optional Can_tx_partial_blockageType can_tx_partial_blockage = 4;
+  // [] [0|0]
+  optional int32 can_tx_path_id_acc_stat = 5;
+  // [] [0|3]
+  optional Can_tx_mr_lr_modeType can_tx_mr_lr_mode = 6;
+  // [] [-8|7.9375]
+  optional double can_tx_auto_align_angle = 7;
+  // [] [0|0]
+  optional int32 can_tx_rolling_count_3 = 8;
+  // [] [0|0]
+  optional int32 can_tx_path_id_fcw_stat = 9;
+  // [] [0|0]
+  optional int32 can_tx_path_id_fcw_move = 10;
+  // [] [0|0]
+  optional int32 can_tx_path_id_cmbb_stat = 11;
+  // [] [0|0]
+  optional int32 can_tx_path_id_cmbb_move = 12;
+  // [] [0|0]
+  optional int32 can_tx_path_id_acc = 13;
+}
+
+message Esr_trackmotionpower_540 {
+  // Report Message
+  // [] [0|1]
+  optional bool can_tx_track_rolling_count_2 = 1;
+  optional int32 can_tx_track_can_id_group = 2;
+  message Motionpower {
+    optional bool can_tx_track_moving = 1;
+    optional bool can_tx_track_moving_fast = 2;
+    optional bool can_tx_track_moving_slow = 3;
+    optional int32 can_tx_track_power = 4;
+  }
+  repeated Motionpower can_tx_track_motion_power = 3;
+}
+
+message Acm_inst_req_7e0 {
+  // Report Message
+  // [] [0|0]
+  optional int32 command_ctr = 1;
+  // [] [0|0]
+  optional int32 command_code = 2;
+  // [] [0|0]
+  optional int32 cc_word_2 = 3;
+  // [] [0|0]
+  optional int32 cc_word_1 = 4;
+  // [] [0|0]
+  optional int32 cc_byte_2 = 5;
+  // [] [0|0]
+  optional int32 cc_byte_1 = 6;
+}
+
+message Esr_track01_500 {
+  // Report Message
+  enum Can_tx_track_grouping_changedType {
+    CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGUNCHANGED = 0;
+    CAN_TX_TRACK_GROUPING_CHANGED_GROUPINGCHANGED = 1;
+  }
+  enum Can_tx_track_oncomingType {
+    CAN_TX_TRACK_ONCOMING_NOTONCOMING = 0;
+    CAN_TX_TRACK_ONCOMING_ONCOMING = 1;
+  }
+  enum Can_tx_track_bridge_objectType {
+    CAN_TX_TRACK_BRIDGE_OBJECT_NOT_BRIDGE = 0;
+    CAN_TX_TRACK_BRIDGE_OBJECT_BRIDGE = 1;
+  }
+  enum Can_tx_track_statusType {
+    CAN_TX_TRACK_STATUS_NO_TARGET = 0;
+    CAN_TX_TRACK_STATUS_NEW_TARGET = 1;
+    CAN_TX_TRACK_STATUS_NEW_UPDATED_TARGET = 2;
+    CAN_TX_TRACK_STATUS_UPDATED_TARGET = 3;
+    CAN_TX_TRACK_STATUS_COASTED_TARGET = 4;
+    CAN_TX_TRACK_STATUS_MERGED_TARGET = 5;
+    CAN_TX_TRACK_STATUS_INVALID_COASTED_TARGET = 6;
+    CAN_TX_TRACK_STATUS_NEW_COASTED_TARGET = 7;
+  }
+  enum Can_tx_track_med_range_modeType {
+    CAN_TX_TRACK_MED_RANGE_MODE_NO_MR_LR_UPDATE = 0;
+    CAN_TX_TRACK_MED_RANGE_MODE_MR_UPDATE_ONLY = 1;
+    CAN_TX_TRACK_MED_RANGE_MODE_LR_UPDATE_ONLY = 2;
+    CAN_TX_TRACK_MED_RANGE_MODE_BOTH_MR_LR_UPDATE = 3;
+  }
+  // [] [0|0]
+  optional Can_tx_track_grouping_changedType can_tx_track_grouping_changed = 1;
+  // [] [0|0]
+  optional Can_tx_track_oncomingType can_tx_track_oncoming = 2;
+  // [] [-8|7.75]
+  optional double can_tx_track_lat_rate = 3;
+  // [] [0|0]
+  optional Can_tx_track_bridge_objectType can_tx_track_bridge_object = 4;
+  // [m] [0|7.5]
+  optional double can_tx_track_width = 5;
+  // [] [0|7]
+  optional Can_tx_track_statusType can_tx_track_status = 6;
+  // [] [0|1]
+  optional bool can_tx_track_rolling_count = 7;
+  // [m/s] [-81.92|81.91]
+  optional double can_tx_track_range_rate = 8;
+  // [m/s/s] [-25.6|25.55]
+  optional double can_tx_track_range_accel = 9;
+  // [m] [0|204.7]
+  optional double can_tx_track_range = 10;
+  // [] [0|3]
+  optional Can_tx_track_med_range_modeType can_tx_track_med_range_mode = 11;
+  // [deg] [-51.2|51.1]
+  optional double can_tx_track_angle = 12;
+}
+
+message Esr_valid1_5d0 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_valid_lr_sn = 1;
+  // [m/s] [-128|127]
+  optional double can_tx_valid_lr_range_rate = 2;
+  // [m] [0|200]
+  optional double can_tx_valid_lr_range = 3;
+  // [dB] [-10|40]
+  optional int32 can_tx_valid_lr_power = 4;
+  // [deg] [-64|63.9375]
+  optional double can_tx_valid_lr_angle = 5;
+}
+
+message Esr_valid2_5d1 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_valid_mr_sn = 1;
+  // [m/s] [-128|127]
+  optional double can_tx_valid_mr_range_rate = 2;
+  // [m] [0|200]
+  optional double can_tx_valid_mr_range = 3;
+  // [dB] [-10|40]
+  optional int32 can_tx_valid_mr_power = 4;
+  // [deg] [-64|63.9375]
+  optional double can_tx_valid_mr_angle = 5;
+}
+
+message Acm_inst_resp_7e4 {
+  // Report Message
+  // [] [0|0]
+  optional int32 data_7 = 1;
+  // [] [0|0]
+  optional int32 data_6 = 2;
+  // [] [0|0]
+  optional int32 data_5 = 3;
+  // [] [0|0]
+  optional int32 data_4 = 4;
+  // [] [0|0]
+  optional int32 data_3 = 5;
+  // [] [0|0]
+  optional int32 rtn_cmd_counter = 6;
+  // [] [0|0]
+  optional int32 command_return_code = 7;
+  // [] [0|0]
+  optional int32 pid = 8;
+}
+
+message Vehicle2_4f1 {
+  // Report Message
+  enum Can_rx_mr_only_transmitType {
+    CAN_RX_MR_ONLY_TRANSMIT_OFF = 0;
+    CAN_RX_MR_ONLY_TRANSMIT_ON = 1;
+  }
+  enum Can_rx_lr_only_transmitType {
+    CAN_RX_LR_ONLY_TRANSMIT_OFF = 0;
+    CAN_RX_LR_ONLY_TRANSMIT_ON = 1;
+  }
+  enum Can_rx_clear_faultsType {
+    CAN_RX_CLEAR_FAULTS_OFF = 0;
+    CAN_RX_CLEAR_FAULTS_ON = 1;
+  }
+  enum Can_rx_use_angle_misalignmentType {
+    CAN_RX_USE_ANGLE_MISALIGNMENT_OFF = 0;
+    CAN_RX_USE_ANGLE_MISALIGNMENT_ON = 1;
+  }
+  enum Can_rx_turn_signal_statusType {
+    CAN_RX_TURN_SIGNAL_STATUS_OFF = 0;
+    CAN_RX_TURN_SIGNAL_STATUS_LEFT = 1;
+    CAN_RX_TURN_SIGNAL_STATUS_RIGHT = 2;
+    CAN_RX_TURN_SIGNAL_STATUS_INVALID_3 = 3;
+  }
+  enum Can_rx_blockage_disableType {
+    CAN_RX_BLOCKAGE_DISABLE_ENABLED = 0;
+    CAN_RX_BLOCKAGE_DISABLE_DISABLED = 1;
+  }
+  enum Can_rx_vehicle_speed_validityType {
+    CAN_RX_VEHICLE_SPEED_VALIDITY_INVALID = 0;
+    CAN_RX_VEHICLE_SPEED_VALIDITY_VALID = 1;
+  }
+  enum Can_rx_mmr_upside_downType {
+    CAN_RX_MMR_UPSIDE_DOWN_RIGHT_SIDE_UP = 0;
+    CAN_RX_MMR_UPSIDE_DOWN_UPSIDE_DOWN = 1;
+  }
+  enum Can_rx_wiper_statusType {
+    CAN_RX_WIPER_STATUS_OFF = 0;
+    CAN_RX_WIPER_STATUS_ON = 1;
+  }
+  enum Can_rx_raw_data_enableType {
+    CAN_RX_RAW_DATA_ENABLE_FILTERED = 0;
+    CAN_RX_RAW_DATA_ENABLE_RAW = 1;
+  }
+  enum Can_rx_radar_cmd_radiateType {
+    CAN_RX_RADAR_CMD_RADIATE_OFF = 0;
+    CAN_RX_RADAR_CMD_RADIATE_ON = 1;
+  }
+  enum Can_rx_grouping_modeType {
+    CAN_RX_GROUPING_MODE_NO_GROUPING = 0;
+    CAN_RX_GROUPING_MODE_GROUP_MOVING_ONLY = 1;
+    CAN_RX_GROUPING_MODE_GROUP_STATIONARY_ONLY = 2;
+    CAN_RX_GROUPING_MODE_GROUP_MOVING_STATIONARY = 3;
+  }
+  // [m] [-4000|3500]
+  optional double can_rx_volvo_short_track_roc = 1;
+  // [] [0|0]
+  optional Can_rx_mr_only_transmitType can_rx_mr_only_transmit = 2;
+  // [] [0|0]
+  optional Can_rx_lr_only_transmitType can_rx_lr_only_transmit = 3;
+  // [deg] [-32|31]
+  optional int32 can_rx_high_yaw_angle = 4;
+  // [] [0|0]
+  optional Can_rx_clear_faultsType can_rx_clear_faults = 5;
+  // [] [0|0]
+  optional Can_rx_use_angle_misalignmentType can_rx_use_angle_misalignment = 6;
+  // [] [0|0]
+  optional Can_rx_turn_signal_statusType can_rx_turn_signal_status = 7;
+  // [] [0|0]
+  optional Can_rx_blockage_disableType can_rx_blockage_disable = 8;
+  // [] [0|0]
+  optional Can_rx_vehicle_speed_validityType can_rx_vehicle_speed_validity = 9;
+  // [] [0|1]
+  optional Can_rx_mmr_upside_downType can_rx_mmr_upside_down = 10;
+  // [] [0|0]
+  optional Can_rx_wiper_statusType can_rx_wiper_status = 11;
+  // [] [0|0]
+  optional Can_rx_raw_data_enableType can_rx_raw_data_enable = 12;
+  // [] [0|0]
+  optional Can_rx_radar_cmd_radiateType can_rx_radar_cmd_radiate = 13;
+  // [] [0|3]
+  optional Can_rx_grouping_modeType can_rx_grouping_mode = 14;
+  // [] [1|64]
+  optional int32 can_rx_maximum_tracks = 15;
+  // (+) = to the right from driver's perspective [m] [-2|1.984375]
+  optional double can_rx_lateral_mounting_offset = 16;
+  // (+) = clockwise [deg] [-8|7.9375]
+  optional double can_rx_angle_misalignment = 17;
+  // [] [0|65535]
+  optional int32 can_rx_scan_index_ack = 18;
+}
+
+message Vehicle1_4f0 {
+  // Report Message
+  enum Can_rx_steering_angle_validityType {
+    CAN_RX_STEERING_ANGLE_VALIDITY_INVALID = 0;
+    CAN_RX_STEERING_ANGLE_VALIDITY_VALID = 1;
+  }
+  enum Can_rx_steering_angle_signType {
+    CAN_RX_STEERING_ANGLE_SIGN_COUNTERCLOCKWISE = 0;
+    CAN_RX_STEERING_ANGLE_SIGN_CLOCKWISE = 1;
+  }
+  enum Can_rx_steering_angle_rate_signType {
+    CAN_RX_STEERING_ANGLE_RATE_SIGN_COUNTERCLOCKWISE = 0;
+    CAN_RX_STEERING_ANGLE_RATE_SIGN_CLOCKWISE = 1;
+  }
+  enum Can_rx_yaw_rate_validityType {
+    CAN_RX_YAW_RATE_VALIDITY_INVALID = 0;
+    CAN_RX_YAW_RATE_VALIDITY_VALID = 1;
+  }
+  enum Can_rx_vehicle_speed_directionType {
+    CAN_RX_VEHICLE_SPEED_DIRECTION_FORWARD = 0;
+    CAN_RX_VEHICLE_SPEED_DIRECTION_REVERSE = 1;
+  }
+  // [] [0|0]
+  optional Can_rx_steering_angle_validityType can_rx_steering_angle_validity =
+      1;
+  // [deg/s] [0|2047]
+  optional int32 can_rx_steering_angle_rate = 2;
+  // [] [0|0]
+  optional Can_rx_steering_angle_signType can_rx_steering_angle_sign = 3;
+  // [] [0|0]
+  optional Can_rx_steering_angle_rate_signType can_rx_steering_angle_rate_sign =
+      4;
+  // [deg] [0|2047]
+  optional int32 can_rx_steering_angle = 5;
+  // [m] [-8192|8191]
+  optional int32 can_rx_radius_curvature = 6;
+  // [] [0|0]
+  optional Can_rx_yaw_rate_validityType can_rx_yaw_rate_validity = 7;
+  // [deg/s] [-128|127.9375]
+  optional double can_rx_yaw_rate = 8;
+  // [] [0|0]
+  optional Can_rx_vehicle_speed_directionType can_rx_vehicle_speed_direction =
+      9;
+  // [m/s] [0|127.9375]
+  optional double can_rx_vehicle_speed = 10;
+}
+
+message Esr_sim1_5c0 {
+  // Report Message
+  enum Can_rx_sim_track_idType {
+    CAN_RX_SIM_TRACK_ID_NO_TARGET = 0;
+    CAN_RX_SIM_TRACK_ID_TARGET_1 = 1;
+    CAN_RX_SIM_TRACK_ID_TARGET_2 = 2;
+  }
+  enum Can_rx_sim_statusType {
+    CAN_RX_SIM_STATUS_INVALID = 0;
+    CAN_RX_SIM_STATUS_NEW = 1;
+    CAN_RX_SIM_STATUS_UPDATED = 2;
+    CAN_RX_SIM_STATUS_COASTED = 3;
+  }
+  enum Can_rx_sim_functionType {
+    CAN_RX_SIM_FUNCTION_ACC = 0;
+    CAN_RX_SIM_FUNCTION_RI = 1;
+    CAN_RX_SIM_FUNCTION_FCW_MOVE = 2;
+    CAN_RX_SIM_FUNCTION_FCW_STAT = 3;
+    CAN_RX_SIM_FUNCTION_CMBB_MOVE = 4;
+    CAN_RX_SIM_FUNCTION_CMBB_STAT = 5;
+    CAN_RX_SIM_FUNCTION_ALL_MOVING_ACC_FCW_CMBB = 6;
+    CAN_RX_SIM_FUNCTION_ALL_STAT_RI_FCW_CMBB = 7;
+  }
+  // [] [0|0]
+  optional Can_rx_sim_track_idType can_rx_sim_track_id = 1;
+  // [] [0|0]
+  optional Can_rx_sim_statusType can_rx_sim_status = 2;
+  // [m/s] [-32|31.75]
+  optional double can_rx_sim_range_rate = 3;
+  // [m/s/s] [-32|31.75]
+  optional double can_rx_sim_range_accel = 4;
+  // [m] [0|0]
+  optional int32 can_rx_sim_range = 5;
+  // [m/s] [-32|31.75]
+  optional double can_rx_sim_lat_rate = 6;
+  // [m] [-32|31.75]
+  optional double can_rx_sim_lat_pos = 7;
+  // [] [0|0]
+  optional Can_rx_sim_functionType can_rx_sim_function = 8;
+  // [deg] [-64|63.5]
+  optional double can_rx_sim_angle = 9;
+}
+
+message Esr_status1_4e0 {
+  // Report Message
+  // [ms] [0|254]
+  optional double can_tx_dsp_timestamp = 1;
+  // [] [0|0]
+  optional bool can_tx_comm_error = 2;
+  // [deg/s] [-128|127.9375]
+  optional double can_tx_yaw_rate_calc = 3;
+  // [m/s] [0|127.9375]
+  optional double can_tx_vehicle_speed_calc = 4;
+  // [] [0|65535]
+  optional int32 can_tx_scan_index = 5;
+  // [] [0|0]
+  optional int32 can_tx_rolling_count_1 = 6;
+  // [m] [-8192|8191]
+  optional int32 can_tx_radius_curvature_calc = 7;
+}
+
+message Esr_status2_4e1 {
+  // Report Message
+  enum Can_tx_raw_data_modeType {
+    CAN_TX_RAW_DATA_MODE_FILTERED = 0;
+    CAN_TX_RAW_DATA_MODE_RAW = 1;
+  }
+  enum Can_tx_range_perf_errorType {
+    CAN_TX_RANGE_PERF_ERROR_NOT_BLOCKED = 0;
+    CAN_TX_RANGE_PERF_ERROR_BLOCKED = 1;
+  }
+  enum Can_tx_overheat_errorType {
+    CAN_TX_OVERHEAT_ERROR_NOT_OVERTEMP = 0;
+    CAN_TX_OVERHEAT_ERROR_OVERTEMP = 1;
+  }
+  enum Can_tx_internal_errorType {
+    CAN_TX_INTERNAL_ERROR_NOT_FAILED = 0;
+    CAN_TX_INTERNAL_ERROR_FAILED = 1;
+  }
+  enum Can_tx_grouping_modeType {
+    CAN_TX_GROUPING_MODE_NO_GROUPING = 0;
+    CAN_TX_GROUPING_MODE_GROUP_MOVING_ONLY = 1;
+    CAN_TX_GROUPING_MODE_GROUP_STATIONARY_ONLY = 2;
+    CAN_TX_GROUPING_MODE_GROUP_MOVING_STATIONARY = 3;
+  }
+  enum Can_tx_xcvr_operationalType {
+    CAN_TX_XCVR_OPERATIONAL_OFF = 0;
+    CAN_TX_XCVR_OPERATIONAL_ON = 1;
+  }
+  // [] [-16|15.875]
+  optional double can_tx_yaw_rate_bias = 1;
+  // [] [0.9375|1.060546875]
+  optional double can_tx_veh_spd_comp_factor = 2;
+  // [] [0|0]
+  optional int32 can_tx_sw_version_dsp = 3;
+  // [degC] [-128|127]
+  optional int32 can_tx_temperature = 4;
+  // [] [0|0]
+  optional Can_tx_raw_data_modeType can_tx_raw_data_mode = 5;
+  // [] [0|0]
+  optional Can_tx_range_perf_errorType can_tx_range_perf_error = 6;
+  // [] [0|0]
+  optional Can_tx_overheat_errorType can_tx_overheat_error = 7;
+  // [] [1|64]
+  optional int32 can_tx_maximum_tracks_ack = 8;
+  // [] [0|0]
+  optional Can_tx_internal_errorType can_tx_internal_error = 9;
+  // [] [0|0]
+  optional Can_tx_grouping_modeType can_tx_grouping_mode = 10;
+  // [] [0|0]
+  optional Can_tx_xcvr_operationalType can_tx_xcvr_operational = 11;
+  // [deg] [0|2047]
+  optional int32 can_tx_steering_angle_ack = 12;
+  // [] [0|0]
+  optional int32 can_tx_rolling_count_2 = 13;
+}
+
+message Esr_status8_5e7 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_history_fault_7 = 1;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_6 = 2;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_5 = 3;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_4 = 4;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_3 = 5;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_2 = 6;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_1 = 7;
+  // [] [0|0]
+  optional int32 can_tx_history_fault_0 = 8;
+}
+
+message Esr_status7_5e6 {
+  // Report Message
+  // [] [0|0]
+  optional int32 can_tx_active_fault_7 = 1;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_6 = 2;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_5 = 3;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_4 = 4;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_3 = 5;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_2 = 6;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_0 = 7;
+  // [] [0|0]
+  optional int32 can_tx_active_fault_1 = 8;
+}
+
+message Vehicle3_5f2 {
+  // Report Message
+  enum Can_rx_serv_align_typeType {
+    CAN_RX_SERV_ALIGN_TYPE_AUTO_OR_DEALER = 0;
+    CAN_RX_SERV_ALIGN_TYPE_VOLVO_SHORT_TRACK = 1;
+  }
+  enum Can_rx_serv_align_enableType {
+    CAN_RX_SERV_ALIGN_ENABLE_DISABLED = 0;
+    CAN_RX_SERV_ALIGN_ENABLE_ENABLED = 1;
+  }
+  enum Can_rx_auto_align_convergedType {
+    CAN_RX_AUTO_ALIGN_CONVERGED_NOT_CONVERGED = 0;
+    CAN_RX_AUTO_ALIGN_CONVERGED_CONVERGED = 1;
+  }
+  enum Can_rx_auto_align_disableType {
+    CAN_RX_AUTO_ALIGN_DISABLE_ENABLED = 0;
+    CAN_RX_AUTO_ALIGN_DISABLE_DISABLED = 1;
+  }
+  enum Can_rx_wheel_slipType {
+    CAN_RX_WHEEL_SLIP_NO_CONTROL = 0;
+    CAN_RX_WHEEL_SLIP_BRAKE_SLIP_CONTROL = 1;
+    CAN_RX_WHEEL_SLIP_TRACTION_SLIP_CONTROL = 2;
+    CAN_RX_WHEEL_SLIP_INVALID_3 = 3;
+  }
+  enum Can_rx_long_accel_validityType {
+    CAN_RX_LONG_ACCEL_VALIDITY_INVALID = 0;
+    CAN_RX_LONG_ACCEL_VALIDITY_VALID = 1;
+  }
+  enum Can_rx_lat_accel_validityType {
+    CAN_RX_LAT_ACCEL_VALIDITY_INVALID = 0;
+    CAN_RX_LAT_ACCEL_VALIDITY_VALID = 1;
+  }
+  // [] [0|0]
+  optional int32 can_rx_serv_align_updates_need = 1;
+  // [] [0|0]
+  optional Can_rx_serv_align_typeType can_rx_serv_align_type = 2;
+  // [] [0|0]
+  optional Can_rx_serv_align_enableType can_rx_serv_align_enable = 3;
+  // [] [250|2000]
+  optional double can_rx_aalign_avg_ctr_total = 4;
+  // [] [0|0]
+  optional Can_rx_auto_align_convergedType can_rx_auto_align_converged = 5;
+  // [] [0|0]
+  optional Can_rx_auto_align_disableType can_rx_auto_align_disable = 6;
+  // (+) = clockwise [deg] [-8|7.9375]
+  optional double can_rx_angle_mounting_offset = 7;
+  // [] [0|0]
+  optional Can_rx_wheel_slipType can_rx_wheel_slip = 8;
+  // [cm] [0|125]
+  optional int32 can_rx_radar_height = 9;
+  // [deg] [0|120]
+  optional int32 can_rx_radar_fov_mr = 10;
+  // [deg] [0|30]
+  optional int32 can_rx_radar_fov_lr = 11;
+  // [] [0|0]
+  optional Can_rx_long_accel_validityType can_rx_long_accel_validity = 12;
+  // [m/s/s] [-8|7.96875]
+  optional double can_rx_long_accel = 13;
+  // [] [0|0]
+  optional Can_rx_lat_accel_validityType can_rx_lat_accel_validity = 14;
+  // [] [-8|7.96875]
+  optional double can_rx_lat_accel = 15;
+}
+
+message Vehicle4_5f3 {
+  // Report Message
+  enum Can_rx_fac_align_cmd_2Type {
+    CAN_RX_FAC_ALIGN_CMD_2_OFF = 0;
+    CAN_RX_FAC_ALIGN_CMD_2_ON = 1;
+  }
+  enum Can_rx_fac_align_cmd_1Type {
+    CAN_RX_FAC_ALIGN_CMD_1_OFF = 0;
+    CAN_RX_FAC_ALIGN_CMD_1_ON = 1;
+  }
+  // [m] [2|10]
+  optional double can_rx_fac_tgt_range_r2m = 1;
+  // [m] [1|10]
+  optional double can_rx_fac_tgt_range_m2t = 2;
+  // [m] [2|10]
+  optional double can_rx_fac_tgt_range_1 = 3;
+  // [cm] [-100|100]
+  optional int32 can_rx_fac_tgt_mtg_space_ver = 4;
+  // [cm] [-100|100]
+  optional int32 can_rx_fac_tgt_mtg_space_hor = 5;
+  // [cm] [-100|100]
+  optional int32 can_rx_fac_tgt_mtg_offset = 6;
+  // [] [0|100]
+  optional int32 can_rx_fac_align_samp_req = 7;
+  // [] [0|100]
+  optional int32 can_rx_fac_align_max_nt = 8;
+  // [] [0|0]
+  optional Can_rx_fac_align_cmd_2Type can_rx_fac_align_cmd_2 = 9;
+  // [] [0|0]
+  optional Can_rx_fac_align_cmd_1Type can_rx_fac_align_cmd_1 = 10;
+}
+
+message Vehicle5_5f4 {
+  // Report Message
+  enum Can_rx_yaw_rate_bias_shiftType {
+    CAN_RX_YAW_RATE_BIAS_SHIFT_NO_DETECT = 0;
+    CAN_RX_YAW_RATE_BIAS_SHIFT_DETECT = 1;
+  }
+  // [] [0|0]
+  optional Can_rx_yaw_rate_bias_shiftType can_rx_yaw_rate_bias_shift = 1;
+  // [] [0|31.875]
+  optional double can_rx_steering_gear_ratio = 2;
+  // [cm] [200|710]
+  optional double can_rx_wheelbase = 3;
+  // [cm] [200|710]
+  optional double can_rx_distance_rear_axle = 4;
+  // [] [0|1.9921875]
+  optional double can_rx_cw_blockage_threshold = 5;
+  // [m] [-2|10]
+  optional double can_rx_funnel_offset_right = 6;
+  // [m] [-2|10]
+  optional double can_rx_funnel_offset_left = 7;
+  // [deg] [0|6]
+  optional double can_rx_beamwidth_vert = 8;
+  // [%] [-128|127]
+  optional int32 can_rx_oversteer_understeer = 9;
+}
+
+message Vehicle6_5f5 {
+  // Report Message
+  // [m] [-2|10]
+  optional double can_rx_inner_funnel_offset_right = 1;
+  // [m] [-2|10]
+  optional double can_rx_inner_funnel_offset_left = 2;
+  // [m] [0|255]
+  optional int32 can_volvo_fa_range_max_short = 3;
+  // [m/s] [0|20]
+  optional double can_volvo_fa_min_vspeed_short = 4;
+  // [deg] [0|10]
+  optional double can_volvo_fa_aalign_estimate = 5;
+}
+
+message DelphiESR {
+  optional apollo.common.Header header = 1;
+  optional Esr_status9_5e8 esr_status9_5e8 = 2;  // report message
+  optional Esr_status6_5e5 esr_status6_5e5 = 3;  // report message
+  optional Esr_status5_5e4 esr_status5_5e4 = 4;  // report message
+  optional Esr_status3_4e2 esr_status3_4e2 = 5;  // report message
+  optional Esr_status4_4e3 esr_status4_4e3 = 6;  // report message
+  repeated Esr_trackmotionpower_540 esr_trackmotionpower_540 =
+      7;                                              // report message
+  optional Acm_inst_req_7e0 acm_inst_req_7e0 = 8;     // report message
+  repeated Esr_track01_500 esr_track01_500 = 9;       // report message
+  optional Esr_valid1_5d0 esr_valid1_5d0 = 10;        // report message
+  optional Esr_valid2_5d1 esr_valid2_5d1 = 11;        // report message
+  optional Acm_inst_resp_7e4 acm_inst_resp_7e4 = 12;  // report message
+  optional Vehicle2_4f1 vehicle2_4f1 = 13;            // report message
+  optional Vehicle1_4f0 vehicle1_4f0 = 14;            // report message
+  optional Esr_sim1_5c0 esr_sim1_5c0 = 15;            // report message
+  optional Esr_status1_4e0 esr_status1_4e0 = 16;      // report message
+  optional Esr_status2_4e1 esr_status2_4e1 = 17;      // report message
+  optional Esr_status8_5e7 esr_status8_5e7 = 18;      // report message
+  optional Esr_status7_5e6 esr_status7_5e6 = 19;      // report message
+  optional Vehicle3_5f2 vehicle3_5f2 = 20;            // report message
+  optional Vehicle4_5f3 vehicle4_5f3 = 21;            // report message
+  optional Vehicle5_5f4 vehicle5_5f4 = 22;            // report message
+  optional Vehicle6_5f5 vehicle6_5f5 = 23;            // report message
+}

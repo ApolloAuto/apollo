@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_transport_transmitter_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_library(
   name = "transmitter",
   deps = [

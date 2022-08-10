@@ -17,9 +17,9 @@
 ###############################################################################
 
 import sys
-from modules.map.proto import map_pb2
-from modules.map.proto import map_signal_pb2
-from modules.map.proto import map_overlap_pb2
+from modules.common_msgs.map_msgs import map_pb2
+from modules.common_msgs.map_msgs import map_signal_pb2
+from modules.common_msgs.map_msgs import map_overlap_pb2
 from google.protobuf import text_format
 from shapely.geometry import LineString, Point
 

@@ -26,7 +26,7 @@
 #include "localization_msf/sins.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 
 /**
  * @namespace apollo::localization::msf

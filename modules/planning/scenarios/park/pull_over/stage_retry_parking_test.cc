@@ -29,7 +29,7 @@ namespace pull_over {
 class PullOverStageRetryParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PULL_OVER_RETRY_PARKING);
+    config_.set_stage_type(StageType::PULL_OVER_RETRY_PARKING);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,7 +42,7 @@ TEST_F(PullOverStageRetryParkingTest, Init) {
   PullOverStageRetryParking pull_over_stage_retry_parking(config_, injector_);
   EXPECT_EQ(
       pull_over_stage_retry_parking.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_RETRY_PARKING));
+      StageType_Name(StageType::PULL_OVER_RETRY_PARKING));
 }
 
 }  // namespace pull_over

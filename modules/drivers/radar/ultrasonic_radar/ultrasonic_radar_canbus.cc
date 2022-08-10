@@ -18,7 +18,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/util/util.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/ultrasonic_radar.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 /**

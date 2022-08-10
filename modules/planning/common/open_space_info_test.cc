@@ -21,8 +21,8 @@
 
 #include "gtest/gtest.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {

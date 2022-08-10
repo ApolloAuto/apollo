@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "modules/planning/common/planning_context.h"
 
@@ -60,7 +60,7 @@ Status PathReuseDecider::Process(Frame* const frame,
                                  ->planning_status()
                                  .scenario()
                                  .scenario_type();
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type != ScenarioType::LANE_FOLLOW) {
     ADEBUG << "skipping reusing path: not in LANE_FOLLOW scenario";
     reference_line_info->set_path_reusable(false);
     return Status::OK();

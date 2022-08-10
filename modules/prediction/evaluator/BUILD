@@ -30,7 +30,7 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
         "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction/pipeline:vector_net",
-        "//third_party:libtorch",
+        "//third_party/libtorch",
     ],
 )
 

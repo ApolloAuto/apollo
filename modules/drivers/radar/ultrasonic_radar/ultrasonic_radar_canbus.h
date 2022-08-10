@@ -38,7 +38,7 @@
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/ultrasonic_radar.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/proto/ultrasonic_radar_conf.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 

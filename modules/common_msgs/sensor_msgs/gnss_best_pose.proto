@@ -1,0 +1,99 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum SolutionStatus {
+  SOL_COMPUTED = 0;      // solution computed
+  INSUFFICIENT_OBS = 1;  // insufficient observations
+  NO_CONVERGENCE = 2;    // no convergence
+  SINGULARITY = 3;       // singularity at parameters matrix
+  COV_TRACE = 4;         // covariance trace exceeds maximum (trace > 1000 m)
+  TEST_DIST = 5;   // test distance exceeded (max of 3 rejections if distance >
+                   // 10 km)
+  COLD_START = 6;  // not yet converged from cold start
+  V_H_LIMIT = 7;   // height or velocity limits exceeded
+  VARIANCE = 8;    // variance exceeds limits
+  RESIDUALS = 9;   // residuals are too large
+  INTEGRITY_WARNING = 13;  // large residuals make position questionable
+  PENDING = 18;  // receiver computes its position and determines if the fixed
+                 // position is valid
+  INVALID_FIX = 19;   // the fixed position entered using the fix position
+                      // command is invalid
+  UNAUTHORIZED = 20;  // position type is unauthorized
+  INVALID_RATE =
+      22;  // selected logging rate is not supported for this solution type
+}
+
+enum SolutionType {
+  NONE = 0;
+  FIXEDPOS = 1;
+  FIXEDHEIGHT = 2;
+  FLOATCONV = 4;
+  WIDELANE = 5;
+  NARROWLANE = 6;
+  DOPPLER_VELOCITY = 8;
+  SINGLE = 16;
+  PSRDIFF = 17;
+  WAAS = 18;
+  PROPOGATED = 19;
+  OMNISTAR = 20;
+  L1_FLOAT = 32;
+  IONOFREE_FLOAT = 33;
+  NARROW_FLOAT = 34;
+  L1_INT = 48;
+  WIDE_INT = 49;
+  NARROW_INT = 50;
+  RTK_DIRECT_INS =
+      51;  // RTK filter is directly initialized from the INS filter.
+  INS_SBAS = 52;
+  INS_PSRSP = 53;
+  INS_PSRDIFF = 54;
+  INS_RTKFLOAT = 55;
+  INS_RTKFIXED = 56;
+  INS_OMNISTAR = 57;
+  INS_OMNISTAR_HP = 58;
+  INS_OMNISTAR_XP = 59;
+  OMNISTAR_HP = 64;
+  OMNISTAR_XP = 65;
+  PPP_CONVERGING = 68;
+  PPP = 69;
+  INS_PPP_CONVERGING = 73;
+  INS_PPP = 74;
+}
+
+enum DatumId {
+  // We only use WGS-84.
+  WGS84 = 61;
+}
+
+message GnssBestPose {
+  optional apollo.common.Header header = 1;
+  optional double measurement_time = 2;  // In seconds.
+  optional SolutionStatus sol_status = 3;
+  optional SolutionType sol_type = 4;
+  optional double latitude = 5;    // in degrees
+  optional double longitude = 6;   // in degrees
+  optional double height_msl = 7;  // height above mean sea level in meters
+  optional float undulation = 8;   // undulation = height_wgs84 - height_msl
+  optional DatumId datum_id = 9;   // datum id number
+  optional float latitude_std_dev = 10;   // latitude standard deviation (m)
+  optional float longitude_std_dev = 11;  // longitude standard deviation (m)
+  optional float height_std_dev = 12;     // height standard deviation (m)
+  optional bytes base_station_id = 13;    // base station id
+  optional float differential_age = 14;   // differential position age (sec)
+  optional float solution_age = 15;       // solution age (sec)
+  optional uint32 num_sats_tracked = 16;  // number of satellites tracked
+  // number of satellites used in solution
+  optional uint32 num_sats_in_solution = 17;
+  // number of L1/E1/B1 satellites used in solution
+  optional uint32 num_sats_l1 = 18;
+  // number of multi-frequency satellites used in solution
+  optional uint32 num_sats_multi = 19;
+  optional uint32 reserved = 20;  // reserved
+  // extended solution status - OEMV and greater only
+  optional uint32 extended_solution_status = 21;
+  optional uint32 galileo_beidou_used_mask = 22;
+  optional uint32 gps_glonass_used_mask = 23;
+}

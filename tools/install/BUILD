@@ -5,5 +5,6 @@ package(
 exports_files(
     [
         "install.py.in",
+        "install_source.py.in",
     ],
 )

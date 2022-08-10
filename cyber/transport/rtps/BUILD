@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_transport_rtps_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_library(
     name = "attributes_filler",
     srcs = ["attributes_filler.cc"],
@@ -20,7 +27,7 @@ cc_library(
     hdrs = ["underlay_message.h"],
     deps = [
         "//cyber/common:log",
-        "@fastcdr",
+        "@fastrtps",
     ],
 )
 
@@ -52,7 +59,6 @@ cc_library(
     hdrs = ["underlay_message_type.h"],
     deps = [
         ":underlay_message",
-        "@fastcdr",
         "@fastrtps",
     ],
 )
@@ -64,7 +70,7 @@ cc_test(
     deps = [
         "//cyber:cyber_core",
         "@com_google_googletest//:gtest_main",
-        "@fastcdr",
+        "@fastrtps",
     ],
 )
 

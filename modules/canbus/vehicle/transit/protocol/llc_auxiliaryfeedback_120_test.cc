@@ -17,7 +17,7 @@
 #include "modules/canbus/vehicle/transit/protocol/llc_auxiliaryfeedback_120.h"
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/transit.pb.h"
+#include "modules/common_msgs/chassis_msgs/transit.pb.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 

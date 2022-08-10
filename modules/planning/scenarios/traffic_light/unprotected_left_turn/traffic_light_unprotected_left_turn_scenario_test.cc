@@ -52,7 +52,7 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
   scenario_.reset(
       new TrafficLightUnprotectedLeftTurnScenario(config, &context, injector));
   EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
+            ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
 }
 
 }  // namespace traffic_light

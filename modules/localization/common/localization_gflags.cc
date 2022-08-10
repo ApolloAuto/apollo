@@ -28,8 +28,6 @@ DEFINE_string(localization_config_file,
 
 // features
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
-DEFINE_bool(enable_map_reference_unify, true,
-            "enable IMU data convert to map reference");
 DEFINE_bool(enable_watchdog, true, "enable watchdog");
 
 DEFINE_double(gps_time_delay_tolerance, 1.0,

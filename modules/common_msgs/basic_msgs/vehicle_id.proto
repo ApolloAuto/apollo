@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.common;
+
+message VehicleID {
+  optional string vin = 1;
+  optional string plate = 2;
+  optional string other_unique_id = 3;
+}

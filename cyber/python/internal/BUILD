@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    library_dest = "cyber/lib",
     targets = [
         ":_cyber_wrapper.so",
         ":_cyber_record_wrapper.so",
@@ -62,7 +63,6 @@ cc_library(
     deps = [
         "//cyber:cyber_core",
         "//cyber/message:py_message",
-        "//cyber/record",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
     ],

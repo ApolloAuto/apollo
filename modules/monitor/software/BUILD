@@ -26,11 +26,11 @@ cc_library(
     copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
-        "//cyber/service_discovery:node_manager",
+        "//cyber",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -41,12 +41,12 @@ cc_library(
     copts = MONITOR_COPTS,
     deps = [
         ":summary_monitor",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -59,19 +59,19 @@ cc_library(
         ":latency_monitor",
         ":summary_monitor",
         "//modules/common/latency_recorder/proto:latency_record_cc_proto",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
-        "//modules/control/proto:control_cmd_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
-        "//modules/drivers/proto:conti_radar_cc_proto",
-        "//modules/drivers/proto:pointcloud_cc_proto",
-        "//modules/localization/proto:pose_cc_proto",
-        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/common_msgs/sensor_msgs:conti_radar_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
+        "//modules/common_msgs/localization_msgs:pose_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
-        "@com_google_absl//absl/strings",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -83,7 +83,7 @@ cc_library(
     deps = [
         ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
     ],
@@ -109,7 +109,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -121,7 +121,7 @@ cc_library(
     deps = [
         ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_cc_proto",
+        "//modules/common_msgs/monitor_msgs:smart_recorder_status_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
     ],

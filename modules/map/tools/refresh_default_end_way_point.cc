@@ -27,8 +27,8 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/routing/proto/poi.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/poi.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace hdmap {

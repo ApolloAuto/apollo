@@ -30,7 +30,7 @@ namespace scenario {
 class StageIntersectionCruiseImpl {
  public:
   bool CheckDone(const Frame& frame,
-                 const ScenarioConfig::ScenarioType& scenario_type,
+                 const ScenarioType& scenario_type,
                  const ScenarioConfig::StageConfig& config,
                  const PlanningContext* context,
                  const bool right_of_way_status);

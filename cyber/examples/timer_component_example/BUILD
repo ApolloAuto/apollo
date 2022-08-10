@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "libtimer_component_example.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":timer_component_example_lib"],
 )
 
@@ -20,6 +20,7 @@ cc_library(
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",
     ],
+    alwayslink = True,
     visibility = ["//visibility:private"],
 )
 

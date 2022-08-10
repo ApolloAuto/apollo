@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.routing;
 
-import "modules/map/proto/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_geometry.proto";
 
 message CurvePoint {
   optional double s = 1;

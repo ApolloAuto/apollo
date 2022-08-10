@@ -17,7 +17,7 @@
 #include "absl/strings/match.h"
 #include "gflags/gflags.h"
 
-#include "modules/map/proto/map.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"

@@ -6,6 +6,8 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -29,12 +31,12 @@ cc_library(
     srcs = ["racobit_radar_message_manager.cc"],
     hdrs = ["racobit_radar_message_manager.h"],
     deps = [
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/proto:racobit_radar_cc_proto",
+        "//modules/common_msgs/sensor_msgs:racobit_radar_cc_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
 )

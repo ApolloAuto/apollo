@@ -8,7 +8,7 @@ cc_library(
     srcs = ["dst_type_fusion.cc"],
     hdrs = ["dst_type_fusion.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/fusion/base:base_init_options",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:sensor_data_manager",
@@ -18,7 +18,7 @@ cc_library(
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/config_manager",
         "//modules/perception/proto:dst_type_fusion_config_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 

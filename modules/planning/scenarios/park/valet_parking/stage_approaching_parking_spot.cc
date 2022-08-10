@@ -70,7 +70,7 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
       frame->open_space_info().pre_stop_rightaway_point();
 
   if (CheckADCStop(*frame)) {
-    next_stage_ = ScenarioConfig::VALET_PARKING_PARKING;
+    next_stage_ = StageType::VALET_PARKING_PARKING;
     return Stage::FINISHED;
   }
 

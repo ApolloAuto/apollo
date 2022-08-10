@@ -1,0 +1,61 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+
+// Solution from a Global Navigation Satellite System (GNSS) receiver without
+// fused with any IMU.
+message Gnss {
+  optional apollo.common.Header header = 1;
+
+  // The time of position measurement, seconds since the GPS epoch (Jan 6,
+  // 1980).
+  optional double measurement_time = 2;  // In seconds.
+
+  // When velocity is computed from differentiating successive position
+  // computations, a non-zero latency is incurred. The velocity refers to the
+  // time measurement_time - velocity_latency.
+  // When velocity is computed using instantaneous Doppler frequency, there is
+  // no latency. We should have velocity_latency = 0.
+  optional float velocity_latency = 3 [default = 0.0];  // In seconds.
+
+  // Position of the GNSS antenna phase center.
+  optional apollo.common.PointLLH position = 4;
+
+  // East/north/up in meters.
+  optional apollo.common.Point3D position_std_dev = 5;
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity = 6;
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity_std_dev = 7;
+
+  optional int32 num_sats = 8;  // Number of satellites in position solution.
+
+  // GNSS solution type.
+  enum Type {
+    // It is recommended not using the GNSS solution if solution type is INVALID
+    // or PROPAGATED.
+    INVALID = 0;     // Invalid solution due to insufficient observations,
+                     // integrity warning, etc.
+    PROPAGATED = 1;  // Propagated by a Kalman filter without new observations.
+
+    // It is recommended using the following types of solution.
+    SINGLE = 2;       // Standard GNSS solution without any corrections.
+    PSRDIFF = 3;      // Pseudorange differential solution, including WAAS/SBAS
+                      // solution.
+    PPP = 4;          // Precise Point Positioning (PPP) solution.
+    RTK_FLOAT = 5;    // Real Time Kinematic (RTK) float solution.
+    RTK_INTEGER = 6;  // RTK integer solution.
+  }
+  optional Type type = 9;
+  optional uint32 solution_status = 10;
+  optional uint32 position_type = 11;
+}
+
+// gnss raw data
+message RawData {
+  optional apollo.common.Header header = 1;
+  optional bytes data = 2;
+}

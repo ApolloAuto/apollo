@@ -1,7 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "perception/lib",
+    targets = [":libmotion_service.so"],
+)
 
 cc_library(
     name = "motion_service_lib",
@@ -10,10 +17,10 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
-        "//modules/drivers/proto:sensor_image_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/localization/proto:localization_status_cc_proto",
-        "//modules/localization/proto:pose_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_status_cc_proto",
+        "//modules/common_msgs/localization_msgs:pose_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface:base_init_options",
         "//modules/perception/camera/lib/motion",

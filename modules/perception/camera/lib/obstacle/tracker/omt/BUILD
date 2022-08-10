@@ -49,7 +49,7 @@ cc_library(
         ":frame_list",
         ":obstacle_reference",
         ":target",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/obstacle/tracker/common",

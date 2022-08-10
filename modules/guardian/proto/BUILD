@@ -23,28 +23,3 @@ py_proto_library(
         ":guardian_conf_proto",
     ],
 )
-
-cc_proto_library(
-    name = "guardian_cc_proto",
-    deps = [
-        ":guardian_proto",
-    ],
-)
-
-proto_library(
-    name = "guardian_proto",
-    srcs = ["guardian.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-        "//modules/control/proto:control_cmd_proto",
-    ],
-)
-
-py_proto_library(
-    name = "guardian_py_pb2",
-    deps = [
-        ":guardian_proto",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
-    ],
-)

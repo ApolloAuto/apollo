@@ -31,7 +31,7 @@ class TrafficLightUnprotectedLeftTurnStageApproachTest
  public:
   virtual void SetUp() {
     config_.set_stage_type(
-        ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH);
+        StageType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -44,8 +44,8 @@ TEST_F(TrafficLightUnprotectedLeftTurnStageApproachTest, Init) {
   TrafficLightUnprotectedLeftTurnStageApproach
       traffic_light_unprotected_left_turn_stage_approach(config_, injector_);
   EXPECT_EQ(traffic_light_unprotected_left_turn_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH));
+            StageType_Name(
+                StageType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH));
 }
 
 }  // namespace traffic_light

@@ -30,7 +30,7 @@ namespace valet_parking {
 class StageParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
+    config_.set_stage_type(StageType::VALET_PARKING_PARKING);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,8 +41,8 @@ class StageParkingTest : public ::testing::Test {
 
 TEST_F(StageParkingTest, Init) {
   StageParking stage_parking(config_, injector_);
-  EXPECT_EQ(stage_parking.Name(), ScenarioConfig::StageType_Name(
-                                      ScenarioConfig::VALET_PARKING_PARKING));
+  EXPECT_EQ(stage_parking.Name(), StageType_Name(
+                                      StageType::VALET_PARKING_PARKING));
 }
 
 }  // namespace valet_parking

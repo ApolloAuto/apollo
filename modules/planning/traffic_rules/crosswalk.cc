@@ -27,11 +27,11 @@
 #include <utility>
 
 #include "cyber/time/clock.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"

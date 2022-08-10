@@ -24,8 +24,8 @@
 #include "Eigen/Core"
 
 #include "cyber/component/component.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/lib/registerer/registerer.h"

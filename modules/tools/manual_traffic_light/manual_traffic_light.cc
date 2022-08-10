@@ -25,7 +25,7 @@
 #include "modules/common/util/message_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RED;

@@ -21,21 +21,20 @@
 #include <vector>
 
 #include "cyber/component/component.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/map/proto/map_geometry.pb.h"
-#include "modules/map/proto/map_signal.pb.h"
+#include "modules/common_msgs/map_msgs/map_geometry.pb.h"
+#include "modules/common_msgs/map_msgs/map_signal.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
+#include "modules/common_msgs/v2x_msgs/v2x_traffic_light.pb.h"
 #include "modules/perception/camera/app/traffic_light_camera_perception.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 #include "modules/perception/onboard/proto/trafficlights_perception_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/transform/buffer.h"
-
 #include "modules/v2x/common/v2x_proxy_gflags.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
 namespace apollo {
 namespace perception {

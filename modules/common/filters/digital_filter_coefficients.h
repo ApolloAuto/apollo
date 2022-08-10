@@ -23,8 +23,6 @@
 
 #include <vector>
 
-#include "cyber/common/log.h"
-
 /**
  * @namespace apollo::common
  * @brief apollo::common

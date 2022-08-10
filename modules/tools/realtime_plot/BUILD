@@ -15,9 +15,9 @@ py_binary(
         ":stitem",
         ":xyitem",
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )

@@ -8,6 +8,8 @@ ROBOSENSE_COPTS = ['-DMODULE_NAME=\\"robosense\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],

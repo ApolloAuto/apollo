@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
@@ -25,9 +26,12 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/common/util:math_util_lib",
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
-        "//third_party:libtorch",
+        #"//third_party/libtorch",
         "@opencv//:core",
-    ],
+    ] + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 cc_test(

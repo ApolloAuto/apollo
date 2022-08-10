@@ -25,7 +25,7 @@
 
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 namespace apollo {
 namespace prediction {

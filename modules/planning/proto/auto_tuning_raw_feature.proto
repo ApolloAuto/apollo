@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning.autotuning;
 
-import "modules/common/proto/pnc_point.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
 
 message PathPointRawFeature {
   optional apollo.common.PathPoint cartesian_coord = 1;

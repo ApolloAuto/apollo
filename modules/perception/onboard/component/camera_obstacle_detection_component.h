@@ -20,26 +20,25 @@
 #include <string>
 #include <vector>
 
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/perception/camera/app/proto/perception.pb.h"
-#include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
-#include "modules/perception/proto/motion_service.pb.h"
-#include "modules/perception/proto/perception_camera.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/component/component.h"
+#include "modules/common_msgs/perception_msgs/perception_camera.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/common/util/eigen_defs.h"
-#include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_detection_camera.h"
+#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
+#include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/proto/motion_service.pb.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;

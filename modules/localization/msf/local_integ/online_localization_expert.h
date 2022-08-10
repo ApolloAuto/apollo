@@ -17,10 +17,10 @@
 #pragma once
 
 #include "localization_msf/sins_struct.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/localization_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization_status.pb.h"
 
 /**
  * @namespace apollo::localization::msf

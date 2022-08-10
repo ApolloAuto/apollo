@@ -13,7 +13,7 @@ cc_library(
         "mask_pillars_detection.h",
     ],
     deps = [
-        "//cyber/common",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",

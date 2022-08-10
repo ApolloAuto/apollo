@@ -6,6 +6,8 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -36,7 +38,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:lidar_driver_factory",
-        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:config_cc_proto",
     ],
 )
 

@@ -30,14 +30,14 @@
 #include "cyber/cyber.h"
 #include "cyber/timer/timer.h"
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/guardian/proto/guardian.pb.h"
+#include "modules/common_msgs/guardian_msgs/guardian.pb.h"
 
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"

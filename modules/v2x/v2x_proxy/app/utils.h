@@ -27,8 +27,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/hdmap/hdmap.h"

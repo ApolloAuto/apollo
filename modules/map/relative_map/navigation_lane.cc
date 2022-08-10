@@ -30,7 +30,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
-#include "modules/map/proto/map_lane.pb.h"
+#include "modules/common_msgs/map_msgs/map_lane.pb.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {

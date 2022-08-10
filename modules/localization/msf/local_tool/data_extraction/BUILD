@@ -6,9 +6,10 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    runtime_dest = "modules/localization/msf/local_tool/data_extraction",
+    runtime_dest = "localization/bin",
     targets = [
         ":compare_poses",
+        ":cyber_record_parser",
     ],
 )
 
@@ -27,10 +28,10 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
-        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/localization/msf/common/io:common_io",
-        "//modules/localization/proto:gps_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:gps_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/localization/proto:measure_cc_proto",
         "@boost",
         "@eigen",

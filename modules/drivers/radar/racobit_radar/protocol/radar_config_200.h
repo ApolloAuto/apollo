@@ -16,17 +16,16 @@
 
 #pragma once
 
+#include "modules/common_msgs/sensor_msgs/racobit_radar.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/drivers/radar/racobit_radar/proto/racobit_radar_conf.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
-using apollo::drivers::racobit_radar::OutputType;
 using apollo::drivers::racobit_radar::RadarConf;
-using apollo::drivers::racobit_radar::RcsThreshold;
 
 class RadarConfig200
     : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {
@@ -64,14 +63,15 @@ class RadarConfig200
 
   RadarConfig200* set_max_distance(uint16_t data);
   RadarConfig200* set_sensor_id(uint8_t data);
-  RadarConfig200* set_output_type(OutputType type);
+  RadarConfig200* set_output_type(RacobitRadarState_201::OutputType type);
   RadarConfig200* set_radar_power(uint8_t data);
   RadarConfig200* set_ctrl_relay(uint8_t data);
   RadarConfig200* set_send_ext_info(uint8_t data);
   RadarConfig200* set_send_quality(uint8_t data);
   RadarConfig200* set_sort_index(uint8_t data);
   RadarConfig200* set_store_in_nvm(uint8_t data);
-  RadarConfig200* set_rcs_threshold(RcsThreshold rcs_theshold);
+  RadarConfig200* set_rcs_threshold(
+                      RacobitRadarState_201::RcsThreshold rcs_theshold);
   RadarConfig200* set_radar_conf(RadarConf radar_conf);
   RadarConf radar_conf();
 
@@ -88,14 +88,16 @@ class RadarConfig200
 
   void set_max_distance_p(uint8_t* data, uint16_t value);
   void set_sensor_id_p(uint8_t* data, uint8_t value);
-  void set_output_type_p(uint8_t* data, OutputType type);
+  void set_output_type_p(
+          uint8_t* data, RacobitRadarState_201::OutputType type);
   void set_radar_power_p(uint8_t* data, uint8_t value);
   void set_ctrl_relay_p(uint8_t* data, uint8_t value);
   void set_send_ext_info_p(uint8_t* data, uint8_t value);
   void set_send_quality_p(uint8_t* data, uint8_t value);
   void set_sort_index_p(uint8_t* data, uint8_t value);
   void set_store_in_nvm_p(uint8_t* data, uint8_t value);
-  void set_rcs_threshold_p(uint8_t* data, RcsThreshold rcs_theshold);
+  void set_rcs_threshold_p(
+          uint8_t* data, RacobitRadarState_201::RcsThreshold rcs_theshold);
 
  private:
   RadarConf radar_conf_;

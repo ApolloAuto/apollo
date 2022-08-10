@@ -3,6 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_croutine_hdrs",
+    srcs = glob([
+        "*.h",
+        "detail/*.h"
+    ]),
+)
+
 cc_library(
     name = "croutine",
     srcs = ["croutine.cc"],

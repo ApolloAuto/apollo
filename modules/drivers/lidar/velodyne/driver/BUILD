@@ -1,7 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+
+install(
+    name = "install",
+    library_dest = "drivers/lib",
+    targets = [
+        ":libvelodyne_driver_component.so",
+    ],
+)
 
 cc_binary(
     name = "libvelodyne_driver_component.so",
@@ -17,7 +27,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/lidar/velodyne/driver",
     ],
 )
@@ -38,9 +48,9 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/drivers/lidar/common/driver_factory:driver_base",
-        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:config_cc_proto",
         "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
     ],
 )

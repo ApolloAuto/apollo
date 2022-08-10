@@ -1,7 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "perception/bin",
+    targets = [":offline_obstacle_pipeline"],
+)
 
 cc_library(
     name = "visualizer",
@@ -13,7 +20,7 @@ cc_library(
     ],
     deps = [
         ":transform_server",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
         "//modules/perception/proto:motion_service_cc_proto",
@@ -53,7 +60,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@opencv//:imgcodecs",
         "@opencv//:imgproc",
         "@opencv//:highgui",

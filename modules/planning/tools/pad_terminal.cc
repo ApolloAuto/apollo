@@ -22,7 +22,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/pad_msg.pb.h"
+#include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace {
@@ -31,7 +31,6 @@ using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
 using apollo::cyber::Writer;
 using apollo::cyber::common::GetProtoFromFile;
-using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;
 using apollo::planning::PlanningConfig;
 
@@ -63,18 +62,18 @@ class PadTerminal {
 
   void send(int action) {
     PadMessage pad;
-    pad.set_action(DrivingAction(action));
-    if (action == DrivingAction::FOLLOW) {
+    pad.set_action(PadMessage::DrivingAction(action));
+    if (action == PadMessage::FOLLOW) {
       AINFO << "sending FOLLOW action command.";
-    } else if (action == DrivingAction::CHANGE_LEFT) {
+    } else if (action == PadMessage::CHANGE_LEFT) {
       AINFO << "sending CHANGE LEFT action command.";
-    } else if (action == DrivingAction::CHANGE_RIGHT) {
+    } else if (action == PadMessage::CHANGE_RIGHT) {
       AINFO << "sending CHANGE RIGHT action command.";
-    } else if (action == DrivingAction::PULL_OVER) {
+    } else if (action == PadMessage::PULL_OVER) {
       AINFO << "sending PULL OVER action command.";
-    } else if (action == DrivingAction::STOP) {
+    } else if (action == PadMessage::STOP) {
       AINFO << "sending STOP action command.";
-    } else if (action == DrivingAction::RESUME_CRUISE) {
+    } else if (action == PadMessage::RESUME_CRUISE) {
       AINFO << "sending RESUME CRUISE action command.";
     }
     apollo::common::util::FillHeader("terminal", &pad);
@@ -88,22 +87,22 @@ class PadTerminal {
     while (std::cin >> mode) {
       switch (mode) {
         case 0:
-          send(DrivingAction::FOLLOW);
+          send(PadMessage::FOLLOW);
           break;
         case 1:
-          send(DrivingAction::CHANGE_LEFT);
+          send(PadMessage::CHANGE_LEFT);
           break;
         case 2:
-          send(DrivingAction::CHANGE_RIGHT);
+          send(PadMessage::CHANGE_RIGHT);
           break;
         case 3:
-          send(DrivingAction::PULL_OVER);
+          send(PadMessage::PULL_OVER);
           break;
         case 4:
-          send(DrivingAction::STOP);
+          send(PadMessage::STOP);
           break;
         case 5:
-          send(DrivingAction::RESUME_CRUISE);
+          send(PadMessage::RESUME_CRUISE);
           break;
         case 10:
           should_exit = true;

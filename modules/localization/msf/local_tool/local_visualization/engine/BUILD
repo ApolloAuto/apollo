@@ -20,7 +20,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/localization/msf/common/io:common_io",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "@boost",

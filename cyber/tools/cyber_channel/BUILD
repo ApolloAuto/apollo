@@ -17,11 +17,11 @@ py_binary(
 
 install_files(
     name = "install",
-    dest = "bin",
+    dest = "cyber/bin",
     files = [
         ":cyber_channel.py",
     ],
     rename = {
-        "bin/cyber_channel.py": "cyber_channel",
+        "cyber/bin/cyber_channel.py": "cyber_channel",
     },
 )

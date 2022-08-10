@@ -39,7 +39,7 @@ cc_test(
         ":ndt_map",
         "//cyber",
         "//modules/localization/msf/common/io:common_io",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@com_google_googletest//:gtest_main",
     ],
 )

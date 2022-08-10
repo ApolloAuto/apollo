@@ -1,18 +1,27 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+
+install(
+    name = "install",
+    library_dest = "map/lib",
+    targets = [":libpnc_map.so"],
+    visibility = ["//visibility:public"],
+)
+
 cuda_library(
     name = "cuda_pnc_util",
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
-        "//cyber/common:log",
-        "//modules/common/math:geometry",
+        "//cyber",
+        "//modules/common/math",
         "@local_config_cuda//cuda:cudart",
     ],
 )
@@ -40,10 +49,13 @@ cc_library(
     hdrs = ["path.h"],
     copts = PLANNING_COPTS,
     deps = [
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
         "//modules/common/math",
-        "//modules/map/hdmap",
+        "//modules/common/util:util_tool",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/map/proto:map_lane_cc_proto",
+        "//modules/map/hdmap",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -53,30 +65,70 @@ cc_library(
     hdrs = ["route_segments.h"],
     copts = MAP_COPTS,
     deps = [
+        ":path",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common/util",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/map/hdmap",
-        "//modules/map/pnc_map:path",
-        "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_cc_proto",
     ],
 )
 
-cc_library(
-    name = "pnc_map",
-    srcs = ["pnc_map.cc"],
-    hdrs = ["pnc_map.h"],
+cc_binary(
+    name = "libpnc_map.so",
+    srcs = [
+        "pnc_map.cc",
+        "pnc_map.h",
+    ],
+    linkshared = True,
+    linkstatic = True,
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":path",
         ":route_segments",
-        "//modules/common/util:point_factory",
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_id_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/util:util_tool",
+        "//modules/common/util",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap",
-        "//modules/planning/common:planning_gflags",
-        "//modules/routing/common:routing_gflags",
+        "@com_google_absl//:absl",
         "@com_google_googletest//:gtest",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_library(
+    name = "pnc_map",
+    srcs = ["libpnc_map.so"],
+    hdrs = [
+        "path.h",
+        "pnc_map.h",
+        "route_segments.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/math",
+        "//modules/common/util:util_tool",
+        "//modules/common/util",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/hdmap",
+        "@com_google_absl//:absl",
+        "@com_google_googletest//:gtest",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 
@@ -94,7 +146,7 @@ cc_test(
     deps = [
         ":path",
         "//modules/common/util",
-        "//modules/routing/proto:routing_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

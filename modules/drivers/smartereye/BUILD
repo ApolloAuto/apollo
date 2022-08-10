@@ -8,6 +8,8 @@ CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -45,10 +47,10 @@ cc_library(
         ":smartereye_handler",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
-        "//modules/drivers/proto:smartereye_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
+        "//modules/common_msgs/sensor_msgs:smartereye_cc_proto",
         "//third_party/camera_library/smartereye",
     ],
 )
@@ -84,10 +86,10 @@ cc_library(
     copts = CAMERA_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
-        "//modules/drivers/proto:smartereye_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
+        "//modules/common_msgs/sensor_msgs:smartereye_cc_proto",
         "//modules/drivers/smartereye/proto:config_cc_proto",
         "@opencv//:highgui",
     ],

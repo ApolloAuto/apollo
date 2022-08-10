@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -34,12 +34,47 @@ cc_binary(
 
 install(
     name = "install",
+    library_dest = "storytelling/lib",
+    data_dest = "storytelling",
     data = [
         ":runtime_data",
+        ":cyberfile.xml",
+        ":storytelling.BUILD",
     ],
     targets = [
         ":libstorytelling_component.so",
+        ":pb_hdrs",
     ],
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "storytelling/include",
+    data = [
+        "//modules/storytelling/proto:storytelling_config_cc_proto",
+    ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_storytelling_src",
+        ":install_storytelling_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_storytelling_src",
+    src_dir = ["."],
+    dest = "storytelling/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_storytelling_hdrs",
+    src_dir = ["."],
+    dest = "storytelling/include",
+    filter = "*.h",
 )
 
 filegroup(

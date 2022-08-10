@@ -38,7 +38,7 @@ cc_library(
         "vin_resp3_393.h",
     ],
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],

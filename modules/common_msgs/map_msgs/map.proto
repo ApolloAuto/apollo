@@ -1,0 +1,58 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common_msgs/map_msgs/map_clear_area.proto";
+import "modules/common_msgs/map_msgs/map_crosswalk.proto";
+import "modules/common_msgs/map_msgs/map_junction.proto";
+import "modules/common_msgs/map_msgs/map_lane.proto";
+import "modules/common_msgs/map_msgs/map_overlap.proto";
+import "modules/common_msgs/map_msgs/map_parking_space.proto";
+import "modules/common_msgs/map_msgs/map_pnc_junction.proto";
+import "modules/common_msgs/map_msgs/map_road.proto";
+import "modules/common_msgs/map_msgs/map_rsu.proto";
+import "modules/common_msgs/map_msgs/map_signal.proto";
+import "modules/common_msgs/map_msgs/map_speed_bump.proto";
+import "modules/common_msgs/map_msgs/map_stop_sign.proto";
+import "modules/common_msgs/map_msgs/map_yield_sign.proto";
+
+// This message defines how we project the ellipsoidal Earth surface to a plane.
+message Projection {
+  // PROJ.4 setting:
+  // "+proj=tmerc +lat_0={origin.lat} +lon_0={origin.lon} +k={scale_factor}
+  // +ellps=WGS84 +no_defs"
+  optional string proj = 1;
+}
+
+message Header {
+  optional bytes version = 1;
+  optional bytes date = 2;
+  optional Projection projection = 3;
+  optional bytes district = 4;
+  optional bytes generation = 5;
+  optional bytes rev_major = 6;
+  optional bytes rev_minor = 7;
+  optional double left = 8;
+  optional double top = 9;
+  optional double right = 10;
+  optional double bottom = 11;
+  optional bytes vendor = 12;
+}
+
+message Map {
+  optional Header header = 1;
+
+  repeated Crosswalk crosswalk = 2;
+  repeated Junction junction = 3;
+  repeated Lane lane = 4;
+  repeated StopSign stop_sign = 5;
+  repeated Signal signal = 6;
+  repeated YieldSign yield = 7;
+  repeated Overlap overlap = 8;
+  repeated ClearArea clear_area = 9;
+  repeated SpeedBump speed_bump = 10;
+  repeated Road road = 11;
+  repeated ParkingSpace parking_space = 12;
+  repeated PNCJunction pnc_junction = 13;
+  repeated RSU rsu = 14;
+}

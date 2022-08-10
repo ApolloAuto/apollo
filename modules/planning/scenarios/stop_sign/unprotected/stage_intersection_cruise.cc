@@ -38,7 +38,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   }
 
   bool stage_done =
-      stage_impl_.CheckDone(*frame, ScenarioConfig::STOP_SIGN_UNPROTECTED,
+      stage_impl_.CheckDone(*frame, ScenarioType::STOP_SIGN_UNPROTECTED,
                             config_, injector_->planning_context(), false);
   if (stage_done) {
     return FinishStage();

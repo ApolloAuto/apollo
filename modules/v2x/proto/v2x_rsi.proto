@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.v2x;
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 message RsiPoint {
   optional double x = 1;  // in meters.

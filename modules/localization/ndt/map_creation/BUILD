@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,8 +16,16 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
+    ],
+)
+
+install(
+    name = "install",
+    runtime_dest = "localization/bin",
+    targets = [
+        ":ndt_map_creator",
     ],
 )
 

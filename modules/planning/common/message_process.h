@@ -29,17 +29,17 @@
 #include <utility>
 #include <vector>
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
-#include "modules/storytelling/proto/story.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
+#include "modules/common_msgs/storytelling_msgs/story.pb.h"
 
 namespace apollo {
 namespace planning {

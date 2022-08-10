@@ -22,7 +22,7 @@ cc_library(
         ":fuel_monitor",
         ":fuel_monitor_gflags",
         "//cyber",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/backend/common:dreamview_gflags",
@@ -43,7 +43,7 @@ cc_test(
     ],
     deps = [
         ":data_collection_monitor",
-        "//modules/common/util:json_util",
+        "//modules/common/util:util_tool",
         "@boost",
         "@com_google_googletest//:gtest_main",
     ],
@@ -58,7 +58,7 @@ cc_library(
         ":fuel_monitor",
         ":fuel_monitor_gflags",
         "//cyber",
-        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/backend/common:dreamview_gflags",
@@ -66,7 +66,7 @@ cc_library(
         "//modules/dreamview/proto:preprocess_table_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_nlohmann_json//:json",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -86,9 +86,8 @@ cc_library(
     copts = DREAMVIEW_COPTS,
     deps = [
         ":fuel_monitor",
-        "//cyber/common:log",
-        "//cyber/common:macros",
-        "//modules/common/util:future",
+        "//cyber",
+        "//modules/common/util:util_tool",
         "@boost",
     ],
 )

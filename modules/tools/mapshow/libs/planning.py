@@ -20,7 +20,7 @@ import threading
 
 import numpy as np
 
-from modules.planning.proto import planning_internal_pb2
+from modules.common_msgs.planning_msgs import planning_internal_pb2
 
 
 class Planning:

@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 
