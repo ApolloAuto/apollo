@@ -38,6 +38,8 @@ DECLARE_string(control_core_command_topic);
 DECLARE_string(pointcloud_topic);
 DECLARE_string(pointcloud_16_topic);
 DECLARE_string(pointcloud_16_raw_topic);
+DECLARE_string(pointcloud_16_front_left_raw_topic);
+DECLARE_string(pointcloud_16_front_right_raw_topic);
 DECLARE_string(pointcloud_16_front_up_topic);
 DECLARE_string(pointcloud_64_topic);
 DECLARE_string(pointcloud_128_topic);

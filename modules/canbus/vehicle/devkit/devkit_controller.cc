@@ -400,6 +400,30 @@ Chassis DevkitController::chassis() {
   }
   std::reverse(vin.begin(), vin.end());
   chassis_.mutable_vehicle_id()->set_vin(vin);
+  // 18 front bumper event
+  if (chassis_detail.devkit().has_vcu_report_505() &&
+      chassis_detail.devkit().vcu_report_505().has_frontcrash_state()) {
+    if (chassis_detail.devkit().vcu_report_505().frontcrash_state() ==
+        Vcu_report_505::FRONTCRASH_STATE_CRASH_EVENT) {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+  }
+  // 19 back bumper event
+  if (chassis_detail.devkit().has_vcu_report_505() &&
+      chassis_detail.devkit().vcu_report_505().has_backcrash_state()) {
+    if (chassis_detail.devkit().vcu_report_505().backcrash_state() ==
+        Vcu_report_505::BACKCRASH_STATE_CRASH_EVENT) {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+  }
 
   return chassis_;
 }
@@ -725,7 +749,6 @@ bool DevkitController::CheckChassisError() {
       AERROR_EVERY(100) << "Chassis battery has over temperature fault.";
       return true;
     }
-
   }
   // battery low temperature fault
   if (devkit.has_bms_report_512()) {

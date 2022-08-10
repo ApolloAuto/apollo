@@ -47,6 +47,7 @@ cc_library(
     srcs = ["record_processor.cc"],
     hdrs = ["record_processor.h"],
     deps = [
+        ":bumper_crash_trigger",
         ":drive_event_trigger",
         ":emergency_mode_trigger",
         ":hard_brake_trigger",
@@ -89,6 +90,17 @@ cc_library(
         "//modules/canbus/proto:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/control/proto:control_cmd_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "bumper_crash_trigger",
+    srcs = ["bumper_crash_trigger.cc"],
+    hdrs = ["bumper_crash_trigger.h"],
+    deps = [
+        ":trigger_base",
+        "//modules/canbus/proto:chassis_cc_proto",
+        "//modules/common/adapters:adapter_gflags",
     ],
 )
 

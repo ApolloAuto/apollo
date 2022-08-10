@@ -139,6 +139,13 @@ message Vcu_brake_report_47 {
     CONTROL_MODE_RESP_REMOTE_CONTROL = 3;
     CONTROL_MODE_RESP_EMERGENCY_BRAKE = 4;
   }
+  enum Vcu_ehb_brakeType {
+    VCU_EHB_NORMAL_BRAKE = 0;
+    VCU_EHB_BACKUP_REMOTE_BRAKE = 1;
+    VCU_EHB_EMERGENCY_BUTTON_BRAKE = 2;
+    VCU_EHB_ULTR_BRAKE = 3;
+    VCU_EHB_BUMPER_BRAKE = 4;
+  }
   // 0x0:disable;0x1:enable [] [0|0]
   optional bool brake_enable_resp = 1;
   // 0x0:Standby;0x1:auto drive;0x2:net drive;0x3:remote control;0x4:emergency
@@ -161,6 +168,8 @@ message Vcu_brake_report_47 {
   optional int32 vcu_brakerept_alivecounter = 9;
   // [] [0|0]
   optional int32 vcu_brakerept_checksum = 10;
+  // []
+  optional Vcu_ehb_brakeType vcu_ehb_brake_state = 11;
 }
 
 message Vcu_eps_report_57 {

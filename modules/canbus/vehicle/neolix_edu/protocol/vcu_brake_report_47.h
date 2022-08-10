@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -103,6 +104,15 @@ class Vcubrakereport47 : public ::apollo::drivers::canbus::ProtocolData<
   // ''}
   int vcu_brakerept_checksum(const std::uint8_t* bytes,
                              const int32_t length) const;
+
+  // config detail: {'bit': 32, 'description': 'the vcu brake was caused reason',
+  // 'enum': {0: 'VCU_EHB_NORMAL_BRAKE', 1: 'VCU_EHB_BACKUP_REMOTE_BRAKE',
+  // 2: 'VCU_EHB_EMERGENCY_BUTTON_BRAKE', 3: 'VCU_EHB_ULTR_BRAKE', 4:
+  // 'VCU_EHB_BUMPER_BRAKE'}, 'is_signed_var': False, 'len': 3, 'name':
+  // 'vcu_ehb_brake_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+  // '[0|4]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+  Vcu_brake_report_47::Vcu_ehb_brakeType vcu_ehb_brake_state(
+      const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

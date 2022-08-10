@@ -293,6 +293,31 @@ Chassis ChController::chassis() {
   std::reverse(vin.begin(), vin.end());
   chassis_.mutable_vehicle_id()->set_vin(vin);
 
+  // 16 front bumper event
+  if (chassis_detail.ch().has_brake_status__511() &&
+      chassis_detail.ch().brake_status__511().has_front_bump_env()) {
+    if (chassis_detail.ch().brake_status__511().front_bump_env() ==
+        Brake_status__511::FRONT_BUMP_ENV_FRONT_BUMPER_ENV) {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+  }
+  // 17 back bumper event
+  if (chassis_detail.ch().has_brake_status__511() &&
+      chassis_detail.ch().brake_status__511().has_back_bump_env()) {
+    if (chassis_detail.ch().brake_status__511().back_bump_env() ==
+        Brake_status__511::BACK_BUMP_ENV_BACK_BUMPER_ENV) {
+      chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_back_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_back_bumper_event(Chassis::BUMPER_INVALID);
+  }
+
   return chassis_;
 }
 

@@ -52,6 +52,12 @@ message Chassis {
     GEAR_NONE = 6;
   }
 
+  enum BumperEvent {
+    BUMPER_INVALID = 0;
+    BUMPER_NORMAL = 1;
+    BUMPER_PRESSED = 2;
+  }
+
   optional bool engine_started = 3;
 
   // Engine speed in RPM.
@@ -138,6 +144,10 @@ message Chassis {
   // Clockwise: negative
   // CountClockwise: positive
   optional float steering_percentage_cmd = 37 [default = nan];
+
+  optional BumperEvent front_bumper_event = 38;
+
+  optional BumperEvent back_bumper_event = 39;
 }
 
 message ChassisGPS {

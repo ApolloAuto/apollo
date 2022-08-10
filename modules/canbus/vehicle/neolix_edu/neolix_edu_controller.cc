@@ -252,7 +252,7 @@ Chassis Neolix_eduController::chassis() {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
 
-  // give engage_advice based on error_code and canbus feedback
+  // 10 give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
       (chassis_.throttle_percentage() == 0.0)) {
     chassis_.mutable_engage_advice()->set_advice(
@@ -260,6 +260,26 @@ Chassis Neolix_eduController::chassis() {
   } else {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+  }
+
+  // 11 bumper event
+  if (chassis_detail.neolix_edu().has_vcu_brake_report_47() &&
+      chassis_detail.neolix_edu()
+          .vcu_brake_report_47()
+          .has_vcu_ehb_brake_state()) {
+    if (chassis_detail.neolix_edu()
+            .vcu_brake_report_47()
+            .vcu_ehb_brake_state() ==
+        Vcu_brake_report_47::VCU_EHB_BUMPER_BRAKE) {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+      chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+      chassis_.set_back_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+    chassis_.set_back_bumper_event(Chassis::BUMPER_INVALID);
   }
 
   return chassis_;

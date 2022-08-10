@@ -87,6 +87,10 @@ bool IsRecordValid(const std::string& record_path) {
   return is_complete;
 }
 
+bool compare_string(const std::string& a, const std::string& b) {
+  return a > b;
+}
+
 }  // namespace
 
 RealtimeRecordProcessor::RealtimeRecordProcessor(
@@ -141,6 +145,9 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     AERROR << "base init failed";
     return false;
   }
+  scroll_time_ = trigger_conf.scroll_time();
+  record_files_.clear();
+  file_duration_map_.clear();
   return true;
 }
 
@@ -186,6 +193,63 @@ bool RealtimeRecordProcessor::Process() {
   return true;
 }
 
+void RealtimeRecordProcessor::ProcessRestoreRecord(
+    const std::string& record_path) {
+  // Get all the record files
+  std::string record_source_path = "";
+  record_source_path = record_path + "/";
+  std::vector<std::string> files =
+      cyber::common::ListSubPaths(record_source_path, DT_REG);
+  std::smatch result;
+  std::regex record_file_name_regex("[1-9][0-9]{13}\\.record\\.[0-9]{5}");
+  for (const auto& file : files) {
+    if (std::regex_match(file, result, record_file_name_regex)) {
+      if (std::find(record_files_.begin(), record_files_.end(), file) ==
+          record_files_.end()) {
+        record_files_.emplace_back(file);
+      }
+      double duration = GetDuration(record_source_path + file);
+      file_duration_map_[file] = duration;
+    }
+  }
+  // Sort the files in name order.
+  std::sort(record_files_.begin(), record_files_.end(), compare_string);
+  // Delete the overdue files.
+  double total_time = 0.0;
+  double file_duration = 0.0;
+  for (auto iter = record_files_.begin(); iter != record_files_.end();) {
+    file_duration = file_duration_map_[*iter];
+    if (total_time > scroll_time_) {
+      file_duration_map_.erase(*iter);
+      if (0 != std::remove((record_source_path + (*iter)).c_str())) {
+        AWARN << "Failed to delete file: " << *iter;
+      }
+      iter = record_files_.erase(iter);
+      if (record_files_.end() == iter) {
+        break;
+      }
+    } else {
+      ++iter;
+    }
+    total_time += file_duration;
+  }
+}
+
+double RealtimeRecordProcessor::GetDuration(const std::string& record_file) {
+  cyber::record::RecordFileReader file_reader;
+  if (!file_reader.Open(record_file)) {
+    AERROR << "open record file error. file: " << record_file;
+    return 0.0;
+  }
+
+  cyber::proto::Header hdr = file_reader.GetHeader();
+  auto begin_time_s = static_cast<double>(hdr.begin_time()) / 1e9;
+  auto end_time_s = static_cast<double>(hdr.end_time()) / 1e9;
+  auto duration_s = end_time_s - begin_time_s;
+  file_reader.Close();
+  return duration_s;
+}
+
 void RealtimeRecordProcessor::MonitorStatus() {
   int status_counter = 0;
   while (!cyber::IsShutdown()) {
@@ -195,6 +259,8 @@ void RealtimeRecordProcessor::MonitorStatus() {
     if (++status_counter % kPublishStatusFrequency == 0) {
       status_counter = 0;
       PublishStatus(RecordingState::RECORDING, "smart recorder recording");
+      // AINFO << "smart recorder recording status check every 3000ms a time.";
+      ProcessRestoreRecord(source_record_dir_);
     }
   }
   recorder_->Stop();
