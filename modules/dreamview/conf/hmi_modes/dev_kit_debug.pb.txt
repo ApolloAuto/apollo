@@ -162,7 +162,13 @@ monitored_components {
 monitored_components {
   key: "Localization"
   value: {
-    # Special LocalizationMonitor.
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/pose"
+    }
   }
 }
 # Disbale ESD-CAN for a while as in some cars we are using B-CAN.
