@@ -16,10 +16,9 @@
 
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 
-#include <csignal>
-
 #include <algorithm>
 #include <chrono>
+#include <csignal>
 #include <limits>
 #include <set>
 #include <sstream>
@@ -32,10 +31,9 @@
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_viewer.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/monitor/common/monitor_manager.h"
-
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 using Time = ::apollo::cyber::Time;
 
@@ -85,10 +83,6 @@ bool IsRecordValid(const std::string& record_path) {
   const bool is_complete = file_reader->GetHeader().is_complete();
   file_reader->Close();
   return is_complete;
-}
-
-bool compare_string(const std::string& a, const std::string& b) {
-  return a > b;
 }
 
 }  // namespace
@@ -213,7 +207,8 @@ void RealtimeRecordProcessor::ProcessRestoreRecord(
     }
   }
   // Sort the files in name order.
-  std::sort(record_files_.begin(), record_files_.end(), compare_string);
+  std::sort(record_files_.begin(), record_files_.end(),
+            [](std::string a, std::string b) { return a > b; });
   // Delete the overdue files.
   double total_time = 0.0;
   double file_duration = 0.0;
