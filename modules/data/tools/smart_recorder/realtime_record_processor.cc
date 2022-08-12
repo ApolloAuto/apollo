@@ -205,7 +205,7 @@ void RealtimeRecordProcessor::ProcessRestoreRecord(
   }
   // Sort the files in name order.
   std::sort(record_files_.begin(), record_files_.end(),
-            [](std::string a, std::string b) { return a < b; });
+            [](const std::string& a, const std::string& b) { return a < b; });
   // Delete the overdue files by num.
   if (record_files_.size() > reused_record_num_) {
     if (0 !=
