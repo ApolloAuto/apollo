@@ -13,6 +13,7 @@ install(
         ":docker_utils",
         ":map_generation",
         ":recorder",
+        ":smart_recorder",
         ":tools",
     ],
 )
@@ -75,5 +76,13 @@ filegroup(
         "apollo.bashrc",
         "apollo_base.sh",
         "common.bashrc",
+    ],
+)
+
+filegroup(
+    name = "smart_recorder",
+    srcs = [
+        "record_message.py",
+        "record_message.sh",
     ],
 )

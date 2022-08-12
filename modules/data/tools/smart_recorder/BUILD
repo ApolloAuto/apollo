@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,6 +11,14 @@ cc_binary(
         ":post_record_processor",
         ":realtime_record_processor",
         ":smart_recorder_gflags",
+    ],
+)
+
+install_files(
+    name = "smart_recorder_binary",
+    dest = "modules/data/tools/smart_recorder/",
+    files = [
+        ":smart_recorder",
     ],
 )
 
