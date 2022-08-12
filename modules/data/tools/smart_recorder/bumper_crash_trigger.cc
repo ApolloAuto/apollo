@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/data/tools/smart_recorder/bumper_crash_trigger.h"
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/data/tools/smart_recorder/bumper_crash_trigger.h"
 
 namespace apollo {
 namespace data {
 
 using apollo::canbus::Chassis;
 
-BumperCrashTrigger::BumperCrashTrigger() {
+BumperCrashTrigger::BumperCrashTrigger()
+    : previous_check_event_trigger_(false) {
   trigger_name_ = "BumperCrashTrigger";
 }
 
@@ -36,29 +38,24 @@ void BumperCrashTrigger::Pull(const cyber::record::RecordMessage& msg) {
     chassis_msg.ParseFromString(msg.content);
     bool is_front_bumper_trigger = false;
     bool is_back_bumper_trigger = false;
-    bool check_event_trigger = false;
 
     if (chassis_msg.has_front_bumper_event()) {
       if (chassis_msg.front_bumper_event() == canbus::Chassis::BUMPER_PRESSED) {
         is_front_bumper_trigger = true;
       }
     }
-    check_event_trigger = check_event_trigger || is_front_bumper_trigger;
-
     if (chassis_msg.has_back_bumper_event()) {
       if (chassis_msg.back_bumper_event() == canbus::Chassis::BUMPER_PRESSED) {
         is_back_bumper_trigger = true;
       }
     }
-    check_event_trigger = check_event_trigger || is_back_bumper_trigger;
+    bool check_event_trigger = is_front_bumper_trigger || is_back_bumper_trigger;
 
-    if (check_event_trigger) {
-      if (!(check_event_trigger && previous_check_event_trigger_)) {
-        AINFO << "Chassis has crash event.";
-        AINFO << "crash bumper trigger is pulled: " << msg.time << " - "
-              << msg.channel_name;
-        TriggerIt(msg.time);
-      }
+    if (check_event_trigger && (!previous_check_event_trigger_)) {
+      AINFO << "Chassis has crash event.";
+      AINFO << "crash bumper trigger is pulled: " << msg.time << " - "
+            << msg.channel_name;
+      TriggerIt(msg.time);
     }
     previous_check_event_trigger_ = check_event_trigger;
   }

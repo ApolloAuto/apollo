@@ -139,9 +139,8 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     AERROR << "base init failed";
     return false;
   }
-  scroll_time_ = trigger_conf.scroll_time();
+  reused_record_num_ = trigger_conf.reused_record_num();
   record_files_.clear();
-  file_duration_map_.clear();
   return true;
 }
 
@@ -202,47 +201,19 @@ void RealtimeRecordProcessor::ProcessRestoreRecord(
           record_files_.end()) {
         record_files_.emplace_back(file);
       }
-      double duration = GetDuration(record_source_path + file);
-      file_duration_map_[file] = duration;
     }
   }
   // Sort the files in name order.
   std::sort(record_files_.begin(), record_files_.end(),
-            [](std::string a, std::string b) { return a > b; });
-  // Delete the overdue files.
-  double total_time = 0.0;
-  double file_duration = 0.0;
-  for (auto iter = record_files_.begin(); iter != record_files_.end();) {
-    file_duration = file_duration_map_[*iter];
-    if (total_time > scroll_time_) {
-      file_duration_map_.erase(*iter);
-      if (0 != std::remove((record_source_path + (*iter)).c_str())) {
-        AWARN << "Failed to delete file: " << *iter;
-      }
-      iter = record_files_.erase(iter);
-      if (record_files_.end() == iter) {
-        break;
-      }
-    } else {
-      ++iter;
+            [](std::string a, std::string b) { return a < b; });
+  // Delete the overdue files by num.
+  if (record_files_.size() > reused_record_num_) {
+    if (0 !=
+        std::remove((record_source_path + (*record_files_.begin())).c_str())) {
+      AWARN << "Failed to delete file: " << *record_files_.begin();
     }
-    total_time += file_duration;
+    record_files_.erase(record_files_.begin());
   }
-}
-
-double RealtimeRecordProcessor::GetDuration(const std::string& record_file) {
-  cyber::record::RecordFileReader file_reader;
-  if (!file_reader.Open(record_file)) {
-    AERROR << "open record file error. file: " << record_file;
-    return 0.0;
-  }
-
-  cyber::proto::Header hdr = file_reader.GetHeader();
-  auto begin_time_s = static_cast<double>(hdr.begin_time()) / 1e9;
-  auto end_time_s = static_cast<double>(hdr.end_time()) / 1e9;
-  auto duration_s = end_time_s - begin_time_s;
-  file_reader.Close();
-  return duration_s;
 }
 
 void RealtimeRecordProcessor::MonitorStatus() {

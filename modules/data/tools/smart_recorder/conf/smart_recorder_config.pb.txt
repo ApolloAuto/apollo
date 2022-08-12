@@ -5,7 +5,7 @@ segment_setting {
 max_backward_time: 100
 min_restore_chunk: 10
 trigger_log_file_path: "/apollo/data/bag/smart_recorder/smart_recorder_triggers"
-scroll_time: 360
+reused_record_num: 7
 
 triggers {
   trigger_name: "DriveEventTrigger"
