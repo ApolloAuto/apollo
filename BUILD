@@ -22,6 +22,7 @@ install(
         "//modules/common:install",
         "//modules/contrib/cyber_bridge:install",
         "//modules/control:install",
+        "//modules/data:install",
         "//modules/dreamview:install",
         "//modules/drivers:install",
         "//modules/guardian:install",

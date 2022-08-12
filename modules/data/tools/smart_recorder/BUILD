@@ -14,12 +14,29 @@ cc_binary(
     ],
 )
 
+install(
+    name = "install",
+    data = [
+        ":runtime_data",
+    ],
+    deps = [
+        ":smart_recorder_binary",
+    ],
+)
+
 install_files(
     name = "smart_recorder_binary",
-    dest = "modules/data/tools/smart_recorder/",
+    dest = "modules/data/tools/smart_recorder",
     files = [
         ":smart_recorder",
     ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "conf/**",
+    ]),
 )
 
 cc_library(

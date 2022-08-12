@@ -19,6 +19,7 @@
 source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
 source "${APOLLO_ROOT_DIR}/cyber/setup.bash"
 
+
 # """
 # Save the full data into /apollo/data/bag/ReusedRecordsPool,
 # which will be cleared every time the smart recorder get started.
@@ -39,7 +40,7 @@ function start() {
   fi
 
   nohup ${RECORD_EXE} --source_records_dir=${REUSE_POOL_DIR} \
-    --restored_output_dir=${TASK_EXE_DIR} > ${LOG} 2>&1 &
+    --restored_output_dir=${TASK_EXE_DIR} < /dev/null > ${LOG} 2>&1 &
 }
 
 function stop() {
