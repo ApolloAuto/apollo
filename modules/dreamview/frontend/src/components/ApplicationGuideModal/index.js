@@ -105,6 +105,7 @@ class ApplicationGuideModal extends React.Component {
             <h6>一、车辆状态检查</h6>
             <ul>
               <li>
+                {/* eslint-disable-next-line max-len */}
                 使用车辆前，请检查车胎是否损坏、充气压力（正常胎压2.5-2.6kpa）是否合适以及胎纹内是否嵌入异物，请不要在胎压过低甚至轮胎漏气的情况下启动车辆进行任何作业，以免产生不必要的危险。
               </li>
               <li>使用车辆前，检查车辆底部是否有泄露液体或易燃物。</li>
@@ -239,7 +240,7 @@ class ApplicationGuideModal extends React.Component {
                     <ul>
                       <li>开机启动区域内卫星定位信号良好；</li>
                       <li>
-                        4G/5G通信信号稳定良好（网络延时低于150ms，上传文件速度>1MB/s，不能频繁断网）
+                        4G/5G通信信号稳定良好（网络延时低于150ms，上传文件速度&gt;1MB/s，不能频繁断网）
                       </li>
                     </ul>
                   </td>
