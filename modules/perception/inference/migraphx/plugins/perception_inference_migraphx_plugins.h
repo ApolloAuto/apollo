@@ -35,13 +35,14 @@ struct dfmb_psroi_align_op {
   size_t batch_size;
   std::function<std::shared_ptr<DFMBPSROIAlignPlugin>()> get_plugin{};
   template <class Self, class F>
-  static auto reflect(Self& self, F f) {
+  static auto reflect(Self& self, F f) {  // NOLINT
     return migraphx::pack(f(self.batch_size, "batch_size"));
   }
 
   std::string name() const { return "dfmb_psroi_align"; }
 
-  migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
+  migraphx::shape compute_shape(
+    const std::vector<migraphx::shape>& inputs) const {
     migraphx::check_shapes{inputs, *this}.standard();
 
     CHECK_EQ(static_cast<int>(batch_size), 1);
@@ -60,8 +61,9 @@ struct dfmb_psroi_align_op {
     };
   }
 
-  migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
-                             std::vector<migraphx::argument> args) const {
+  migraphx::argument compute(migraphx::context& gctx,  // NOLINT
+                          const migraphx::shape&,
+                          const std::vector<migraphx::argument>& args) const {
     CHECK_GE(static_cast<int>(args.size()), 3);
     bool no_trans = args.size() < 4;  // 2 imputs + output
 
@@ -93,13 +95,14 @@ struct rcnn_proposal_op {
   size_t batch_size;
   std::function<std::shared_ptr<RCNNProposalPlugin>()> get_plugin{};
   template <class Self, class F>
-  static auto reflect(Self& self, F f) {
+  static auto reflect(Self& self, F f) {  // NOLINT
     return migraphx::pack(f(self.batch_size, "batch_size"));
   }
 
   std::string name() const { return "rcnn_proposal"; }
 
-  migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
+  migraphx::shape compute_shape(
+    const std::vector<migraphx::shape>& inputs) const {
     migraphx::check_shapes{inputs, *this}.has(5).standard();
 
     CHECK_EQ(inputs[3].lens()[0], batch_size);  // im_info
@@ -118,8 +121,9 @@ struct rcnn_proposal_op {
     };
   }
 
-  migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
-                             std::vector<migraphx::argument> args) const {
+  migraphx::argument compute(migraphx::context& gctx,  // NOLINT
+                          const migraphx::shape&,
+                          const std::vector<migraphx::argument>& args) const {
     std::vector<const void*> inputs_data{args[0].data(), args[1].data(),
                                          args[2].data(), args[3].data()};
 
@@ -142,13 +146,14 @@ struct rpn_proposal_ssd_op {
   size_t batch_size;
   std::function<std::shared_ptr<RPNProposalSSDPlugin>()> get_plugin{};
   template <class Self, class F>
-  static auto reflect(Self& self, F f) {
+  static auto reflect(Self& self, F f) {  // NOLINT
     return migraphx::pack(f(self.batch_size, "batch_size"));
   }
 
   std::string name() const { return "rpn_proposal_ssd"; }
 
-  migraphx::shape compute_shape(std::vector<migraphx::shape> inputs) const {
+  migraphx::shape compute_shape(
+    const std::vector<migraphx::shape>& inputs) const {
     migraphx::check_shapes{inputs, *this}.has(4).standard();
 
     CHECK_EQ(inputs[0].lens()[0], batch_size);  // rpn_cls_prob_reshape
@@ -169,8 +174,9 @@ struct rpn_proposal_ssd_op {
     };
   }
 
-  migraphx::argument compute(migraphx::context& gctx, const migraphx::shape&,
-                             std::vector<migraphx::argument> args) const {
+  migraphx::argument compute(migraphx::context& gctx,  // NOLINT
+                          const migraphx::shape&,
+                          const std::vector<migraphx::argument>& args) const {
     std::vector<const void*> inputs_data{args[0].data(), args[1].data(),
                                          args[2].data()};
 
