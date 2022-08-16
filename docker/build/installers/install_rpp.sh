@@ -33,9 +33,15 @@ ldconfig
 rm "${PKG_NAME}"
 rm -fr "${PKG_NAME%.zip}"
 
-
 # install rpp
+RPP_DIR=rpp/.git
+if [ -d $RPP_DIR ]; then
+    rm -fr rpp
+fi
 git clone https://github.com/GPUOpen-ProfessionalCompute-Libraries/rpp
+cd rpp
+git reset --hard 27284078458fbfa685f11083315394f3a4cd952f
+cd ..
 pushd rpp
     mkdir -p build && cd build
     cmake -DBACKEND=HIP -DINCLUDE_LIST="/opt/apollo/sysroot/include" ..
