@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2019 The Apollo Authors. All Rights Reserved.
+# Copyright 2022 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,15 +23,26 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
+APOLLO_SYSROOT_INC="/opt/apollo/sysroot/include"
+
 # install half.hpp required dependency
-VERSION="2.2.0"
-PKG_NAME="half-${VERSION}.zip"
-wget https://sourceforge.net/projects/half/files/half/"${VERSION}"/"${PKG_NAME}"
-unzip "$PKG_NAME" -d "${PKG_NAME%.zip}"
-mv "${PKG_NAME%.zip}"/include/half.hpp /usr/local/include/
-ldconfig
-rm "${PKG_NAME}"
-rm -fr "${PKG_NAME%.zip}"
+HALF_HPP="half.hpp"
+DST_HALF_DIR="${APOLLO_SYSROOT_INC}/half"
+DST_HALF="${DST_HALF_DIR}/${HALF_HPP}"
+if [ ! -f "${DST_HALF}" ]; then
+    VERSION="2.2.0"
+    PKG_NAME="half-${VERSION}.zip"
+    wget https://sourceforge.net/projects/half/files/half/"${VERSION}"/"${PKG_NAME}"
+    unzip "$PKG_NAME" -d "${PKG_NAME%.zip}"
+    mkdir -p $DST_HALF_DIR
+    mv "${PKG_NAME%.zip}/include/${HALF_HPP}" $DST_HALF_DIR
+    ldconfig
+    rm "${PKG_NAME}"
+    rm -fr "${PKG_NAME%.zip}"
+    ok "Successfully installed half ${VERSION}"
+else
+    info "half is already installed here: ${DST_HALF}"
+fi
 
 # install rpp
 RPP_DIR=rpp/.git
@@ -40,11 +51,13 @@ if [ -d $RPP_DIR ]; then
 fi
 git clone https://github.com/GPUOpen-ProfessionalCompute-Libraries/rpp
 cd rpp
+info ""
 git reset --hard 27284078458fbfa685f11083315394f3a4cd952f
+info ""
 cd ..
 pushd rpp
     mkdir -p build && cd build
-    cmake -DBACKEND=HIP -DINCLUDE_LIST="/opt/apollo/sysroot/include" ..
+    cmake -DBACKEND=HIP -DCMAKE_CXX_FLAGS="-I${DST_HALF_DIR}" -DINCLUDE_LIST="${APOLLO_SYSROOT_INC}" ..
     make -j$(nproc)
     make install
 popd
