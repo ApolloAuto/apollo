@@ -120,7 +120,9 @@ void SimControl::InitStartPoint(double start_velocity,
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
   localization_reader_->Observe();
-  if (localization_reader_->Empty()) {
+  const auto& localization = localization_reader_->GetLatestObserved();
+  if (localization == nullptr ||
+      localization->header().module_name() == "SimControl") {
     start_point_from_localization_ = false;
     apollo::common::PointENU start_point;
     if (!map_service_->GetStartPoint(&start_point)) {
@@ -139,7 +141,6 @@ void SimControl::InitStartPoint(double start_velocity,
     point.set_a(start_acceleration);
   } else {
     start_point_from_localization_ = true;
-    const auto& localization = localization_reader_->GetLatestObserved();
     const auto& pose = localization->pose();
     point.mutable_path_point()->set_x(pose.position().x());
     point.mutable_path_point()->set_y(pose.position().y());
