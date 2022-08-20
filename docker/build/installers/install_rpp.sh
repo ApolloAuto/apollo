@@ -27,7 +27,7 @@ APOLLO_SYSROOT_INC="/opt/apollo/sysroot/include"
 
 # install half.hpp required dependency
 HALF_HPP="half.hpp"
-DST_HALF_DIR="${APOLLO_SYSROOT_INC}/half"
+DST_HALF_DIR="/usr/local/include"
 DST_HALF="${DST_HALF_DIR}/${HALF_HPP}"
 if [ ! -f "${DST_HALF}" ]; then
     VERSION="2.2.0"
