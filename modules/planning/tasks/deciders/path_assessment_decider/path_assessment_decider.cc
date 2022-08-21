@@ -70,8 +70,8 @@ Status PathAssessmentDecider::Process(
   // 1. Remove invalid path.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
-    // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
-    //                 reference_line_info);
+     RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
+                     reference_line_info);
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
@@ -124,8 +124,8 @@ Status PathAssessmentDecider::Process(
       ++cnt;
     }
 
-    // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
-    //                 reference_line_info);
+    //  RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
+    //                  reference_line_info);
     ADEBUG << "For " << curr_path_data.path_label() << ", "
            << "path length = " << curr_path_data.frenet_frame_path().size();
   }
@@ -790,7 +790,7 @@ void PathAssessmentDecider::RecordDebugInfo(
   const auto& path_points = path_data.discretized_path();
   auto* ptr_optimized_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_optimized_path->set_name(debug_name);
+  ptr_optimized_path->set_name(std::string("candidate_path_")+debug_name);
   ptr_optimized_path->mutable_path_point()->CopyFrom(
       {path_points.begin(), path_points.end()});
 }
