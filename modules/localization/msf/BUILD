@@ -52,7 +52,7 @@ cc_library(
 cc_binary(
     name = "libmsf_localization_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":msf_localization_component_lib"],
 )
 

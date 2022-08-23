@@ -23,6 +23,8 @@ install(
     data_dest = "localization",
     data = [
         ":runtime_data",
+        "cyberfile.xml",
+        "localization.BUILD",
     ],
     deps = [
         ":pb_localization",

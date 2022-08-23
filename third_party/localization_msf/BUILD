@@ -26,3 +26,19 @@ cc_library(
         "@platforms//cpu:aarch64": "aarch64/include",
     }),
 )
+
+
+install(
+    name = "install",
+    data_dest = "3rd-localization-msf",
+    data = [
+        "cyberfile.xml",
+    ],
+)
+
+install_src_files(
+    name = "install_src",
+    src_dir = ["."],
+    dest = "3rd-localization-msf/src",
+    filter = "*",
+)

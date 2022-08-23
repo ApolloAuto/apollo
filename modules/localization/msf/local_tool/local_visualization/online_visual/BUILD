@@ -31,7 +31,7 @@ cc_library(
 cc_binary(
     name = "online_visualizer_compenont.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":online_visualizer_component_lib"],
 )
 
