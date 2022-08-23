@@ -752,7 +752,7 @@ bool DevkitController::CheckChassisError() {
   }
   // battery low temperature fault
   if (devkit.has_bms_report_512()) {
-    if (Bms_report_512::BATTERY_FLT_LOW_TEMP_NO_FAULT ==
+    if (Bms_report_512::BATTERY_FLT_LOW_TEMP_FAULT ==
         devkit.bms_report_512().battery_flt_low_temp()) {
       AERROR_EVERY(100) << "Chassis battery has below low temperature fault.";
       return true;
