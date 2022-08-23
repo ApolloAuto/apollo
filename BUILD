@@ -80,6 +80,7 @@ install(
         "//third_party/npp:install",
         "//third_party/gpus:install",
         "//third_party/tf2:install",
+        "//third_party/localization_msf:install",
     ],
 )
 
@@ -149,5 +150,6 @@ install_src_files(
         "//third_party/npp:install_src",
         "//third_party/gpus:install_src",
         "//third_party/tf2:install_src",
+        "//third_party/localization_msf:install_src",
     ],
 )
