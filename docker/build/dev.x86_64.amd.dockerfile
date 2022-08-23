@@ -20,7 +20,6 @@ RUN bash /opt/apollo/installers/install_dreamview_deps.sh ${GEOLOC}
 RUN bash /opt/apollo/installers/install_contrib_deps.sh ${INSTALL_MODE}
 RUN bash /opt/apollo/installers/install_gpu_support.sh
 RUN bash /opt/apollo/installers/install_migraphx.sh
-RUN bash /opt/apollo/installers/install_rpp.sh
 RUN bash /opt/apollo/installers/install_release_deps.sh
 
 # RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
