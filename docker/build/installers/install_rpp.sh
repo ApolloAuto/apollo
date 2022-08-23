@@ -42,6 +42,7 @@ if [ ! -f "${DST_HALF}" ]; then
     ok "Successfully installed half ${VERSION}"
 else
     info "half is already installed here: ${DST_HALF}"
+    info "To reinstall half delete ${DST_HALF} first"
 fi
 
 # install rpp
@@ -49,20 +50,27 @@ RPP_DIR=rpp/.git
 if [ -d $RPP_DIR ]; then
     rm -fr rpp
 fi
-git clone https://github.com/GPUOpen-ProfessionalCompute-Libraries/rpp
-cd rpp
-info ""
-git reset --hard 27284078458fbfa685f11083315394f3a4cd952f
-info ""
-cd ..
-pushd rpp
-    mkdir -p build && cd build
-    cmake -DBACKEND=HIP -DCMAKE_CXX_FLAGS="-I${DST_HALF_DIR}" -DINCLUDE_LIST="${APOLLO_SYSROOT_INC}" ..
-    make -j$(nproc)
-    make install
-popd
-cp -rLfs "/opt/rocm/rpp/include/." "/opt/rocm/include/"
-cp -rLfs "/opt/rocm/rpp/lib/." "/opt/rocm/lib/"
-
-rm -fr rpp
-ok "Successfully installed RPP"
+RPP_SO="libamd_rpp.so"
+DST_RPP_DIR="/opt/rocm/rpp/lib"
+DST_RPP_SO="${DST_RPP_DIR}/${RPP_SO}"
+if [ ! -f "${DST_RPP_SO}" ]; then
+    git clone https://github.com/GPUOpen-ProfessionalCompute-Libraries/rpp
+    cd rpp
+    info ""
+    git reset --hard 27284078458fbfa685f11083315394f3a4cd952f
+    info ""
+    cd ..
+    pushd rpp
+        mkdir -p build && cd build
+        cmake -DBACKEND=HIP -DCMAKE_CXX_FLAGS="-I${DST_HALF_DIR}" -DINCLUDE_LIST="${APOLLO_SYSROOT_INC}" ..
+        make -j$(nproc)
+        make install
+    popd
+    cp -rLfs "/opt/rocm/rpp/include/." "/opt/rocm/include/"
+    cp -rLfs "/opt/rocm/rpp/lib/." "/opt/rocm/lib/"
+    rm -fr rpp
+    ok "Successfully installed RPP"
+else
+    info "RPP is already installed here: ${DST_RPP_DIR}"
+    info "To reinstall RPP delete ${DST_RPP_SO} first"
+fi
