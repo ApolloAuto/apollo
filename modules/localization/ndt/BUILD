@@ -17,6 +17,7 @@ cc_library(
         "ndt_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -76,7 +77,7 @@ cc_test(
 
 install(
     name = "install",
-    library_dest = "localization/lib",
+    library_dest = "localization/lib/ndt",
     targets = [
         ":libndt_localization_component.so",
     ],

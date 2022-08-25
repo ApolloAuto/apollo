@@ -9,6 +9,7 @@ install(
     targets = [
         ":libadapter_gflags.so",
     ],
+    deps = ["//modules/common/adapters/proto:install"],
     visibility = ["//visibility:public"],
 )
 

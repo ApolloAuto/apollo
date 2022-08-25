@@ -42,4 +42,16 @@ install_src_files(
     src_dir = ["."],
     dest = "3rd-localization-msf/src",
     filter = "*",
+    deps = [":install_src_lib"]
+)
+
+install_src_files(
+    name = "install_src_lib",
+    src_dir = if_x86_64([
+        "x86_64/lib",
+    ]) + if_aarch64([
+        "aarch64/lib",
+    ]),
+    dest = "3rd-localization-msf/lib",
+    filter = "*",
 )

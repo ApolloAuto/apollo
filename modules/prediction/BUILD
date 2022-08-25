@@ -64,7 +64,6 @@ install(
         ":libprediction_component.so",
     ],
     deps = [
-        "//cyber:install",
         ":pb_hdrs",
         "//modules/prediction/pipeline:install",
         "//modules/prediction/submodules:install",

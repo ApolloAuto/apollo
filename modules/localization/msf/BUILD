@@ -47,6 +47,7 @@ cc_library(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -74,7 +75,7 @@ cc_test(
 
 install(
     name = "install",
-    library_dest = "localization/lib",
+    library_dest = "localization/lib/msf",
     targets = [
         ":libmsf_localization_component.so",
     ],

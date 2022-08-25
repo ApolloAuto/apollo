@@ -2,6 +2,7 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,4 +23,14 @@ py_proto_library(
     deps = [
         ":adapter_config_proto",
     ],
+)
+
+
+install(
+    name = "install",
+    library_dest = "common/lib",
+    targets = [
+        ":adapter_config_cc_proto",
+    ],
+    visibility = ["//visibility:public"],
 )

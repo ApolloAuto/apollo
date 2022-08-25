@@ -27,6 +27,7 @@
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <depend type="binary" src_path="//cyber" repo_name="cyber">cyber-dev</depend>
   <depend type="binary" repo_name="transform" lib_names="transform">transform-dev</depend>
+  <depend expose="False">3rd-localization-msf-dev</depend>
 
 
   <depend expose="False">3rd-rules-python-dev</depend>

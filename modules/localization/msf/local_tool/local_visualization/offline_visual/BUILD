@@ -30,7 +30,7 @@ cc_library(
 cc_binary(
     name = "offline_local_visualizer",
     srcs = ["offline_local_visualizer_main.cc"],
-    linkstatic = 0,
+    linkstatic = True,
     deps = [
         ":offline_local_visualizer_lib",
         "@boost",

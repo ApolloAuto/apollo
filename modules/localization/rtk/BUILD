@@ -15,6 +15,7 @@ cc_library(
         "rtk_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/math",
@@ -56,7 +57,7 @@ cc_test(
 
 install(
     name = "install",
-    library_dest = "localization/lib",
+    library_dest = "localization/lib/rtk",
     targets = [
         ":librtk_localization_component.so",
     ],

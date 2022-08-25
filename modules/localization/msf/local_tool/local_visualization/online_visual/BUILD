@@ -26,6 +26,7 @@ cc_library(
         "@com_google_googletest//:gtest_main",
         "@local_config_pcl//:pcl",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -37,7 +38,7 @@ cc_binary(
 
 install(
     name = "install",
-    library_dest = "localization/lib",
+    library_dest = "localization/lib/msf/local_tool/local_visualization/online_visual",
     targets = [
         ":online_visualizer_compenont.so",
     ],
