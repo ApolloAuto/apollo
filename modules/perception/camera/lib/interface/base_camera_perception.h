@@ -33,7 +33,7 @@ struct CameraPerceptionInitOptions : public BaseInitOptions {
 
 struct CameraPerceptionOptions {};
 
-class BaseCameraPerception {
+class BaseCameraPerception : public Pipeline {
  public:
   BaseCameraPerception() = default;
   virtual ~BaseCameraPerception() = default;
@@ -42,10 +42,11 @@ class BaseCameraPerception {
   virtual bool Perception(const CameraPerceptionOptions &options,
                           CameraFrame *frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseCameraPerception(const BaseCameraPerception &) = delete;
-  BaseCameraPerception &operator=(const BaseCameraPerception &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseCameraPerception);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseCameraPerception);

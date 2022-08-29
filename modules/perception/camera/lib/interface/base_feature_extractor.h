@@ -43,7 +43,7 @@ struct FeatureExtractorInitOptions : public BaseInitOptions {
 struct FeatureExtractorOptions {
   bool normalized = true;
 };
-class BaseFeatureExtractor {
+class BaseFeatureExtractor : public Stage {
  public:
   BaseFeatureExtractor() = default;
   virtual ~BaseFeatureExtractor() = default;
@@ -52,6 +52,9 @@ class BaseFeatureExtractor {
   // @param [in/out]: objects with bounding boxes and feature vector.
   virtual bool Extract(const FeatureExtractorOptions &options,
                        CameraFrame *frame) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
   void set_roi(int x, int y, int w, int h) {

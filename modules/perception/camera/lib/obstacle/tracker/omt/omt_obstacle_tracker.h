@@ -64,7 +64,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   OMTObstacleTracker() : BaseObstacleTracker() {}
 
-  ~OMTObstacleTracker() override = default;
+  ~OMTObstacleTracker() = default;
 
   bool Init(const ObstacleTrackerInitOptions &options) override;
   // @brief: predict candidate obstales in the new image.
@@ -98,7 +98,15 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   bool Track(const ObstacleTrackerOptions &options,
              CameraFrame *frame) override;
 
-  std::string Name() const override;
+  // std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   float ScoreAppearance(const Target &target, TrackObjectPtr object);

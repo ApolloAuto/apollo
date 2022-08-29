@@ -38,13 +38,21 @@ struct FeatureExtractorLayer {
 };
 class TrackingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  TrackingFeatureExtractor() {}
-  ~TrackingFeatureExtractor() {}
+  TrackingFeatureExtractor() = default;
+  ~TrackingFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  std::string Name() const override { return "TrackingFeatureExtractor"; }
+  // std::string Name() const override { return "TrackingFeatureExtractor"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
   void init_roipooling(const FeatureExtractorInitOptions &init_options,

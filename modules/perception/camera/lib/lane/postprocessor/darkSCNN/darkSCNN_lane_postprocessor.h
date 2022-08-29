@@ -40,7 +40,7 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
  public:
   DarkSCNNLanePostprocessor() : BaseLanePostprocessor() {}
 
-  virtual ~DarkSCNNLanePostprocessor() {}
+  virtual ~DarkSCNNLanePostprocessor() = default;
 
   bool Init(const LanePostprocessorInitOptions& options =
                 LanePostprocessorInitOptions()) override;
@@ -66,6 +66,14 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
 
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   void ConvertImagePoint2Camera(CameraFrame* frame);

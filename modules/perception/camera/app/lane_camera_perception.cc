@@ -259,6 +259,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
   }
   return true;
 }
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

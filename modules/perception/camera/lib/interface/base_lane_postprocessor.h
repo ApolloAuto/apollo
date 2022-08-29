@@ -33,7 +33,7 @@ struct LanePostprocessorInitOptions : public BaseInitOptions {
 
 struct LanePostprocessorOptions {};
 
-class BaseLanePostprocessor {
+class BaseLanePostprocessor : public Stage {
  public:
   BaseLanePostprocessor() = default;
 
@@ -52,14 +52,15 @@ class BaseLanePostprocessor {
   virtual bool Process3D(const LanePostprocessorOptions& options,
                          CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual void SetIm2CarHomography(Eigen::Matrix3d homography_im2car) {
     // do nothing
   }
 
   virtual std::string Name() const = 0;
 
-  BaseLanePostprocessor(const BaseLanePostprocessor&) = delete;
-  BaseLanePostprocessor& operator=(const BaseLanePostprocessor&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLanePostprocessor);
 };  // class BaseLanePostprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BaseLanePostprocessor);

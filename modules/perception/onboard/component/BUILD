@@ -101,10 +101,10 @@ cc_library(
         '-DMODULE_NAME=\\"perception\\"',
     ],
     deps = [
-        ":detection_component",
-        ":fusion_component",
+        ":lidar_detection_component",
+        ":multi_sensor_fusion_component",
         ":radar_detection_component",
-        ":recognition_component",
+        ":lidar_tracking_component",
     ],
     alwayslink = True,
 )
@@ -122,9 +122,9 @@ cc_library(
 )
 
 cc_library(
-    name = "detection_component",
-    srcs = ["detection_component.cc"],
-    hdrs = ["detection_component.h"],
+    name = "lidar_detection_component",
+    srcs = ["lidar_detection_component.cc"],
+    hdrs = ["lidar_detection_component.h"],
     deps = [
         ":lidar_inner_component_messages",
         "//cyber",
@@ -151,9 +151,9 @@ cc_library(
 )
 
 cc_library(
-    name = "fusion_component",
-    srcs = ["fusion_component.cc"],
-    hdrs = ["fusion_component.h"],
+    name = "multi_sensor_fusion_component",
+    srcs = ["multi_sensor_fusion_component.cc"],
+    hdrs = ["multi_sensor_fusion_component.h"],
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
@@ -219,12 +219,12 @@ cc_library(
 )
 
 cc_library(
-    name = "recognition_component",
+    name = "lidar_tracking_component",
     srcs = [
-        "recognition_component.cc",
+        "lidar_tracking_component.cc",
     ],
     hdrs = [
-        "recognition_component.h",
+        "lidar_tracking_component.h",
     ],
     deps = [
         ":lidar_inner_component_messages",

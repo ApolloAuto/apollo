@@ -40,7 +40,15 @@ class DummyGroundDetector : public BaseGroundDetector {
   // label field of point cloud can be filled, optional,
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyGroundDetector"; }
+  // std::string Name() const override { return "DummyGroundDetector"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 };  // class DummyGroundDetector
 
 }  // namespace lidar

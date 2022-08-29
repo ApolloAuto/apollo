@@ -91,7 +91,7 @@ struct DstTypeFusionOptions {
 class DstTypeFusion : public BaseTypeFusion {
  public:
   explicit DstTypeFusion(TrackPtr track);
-  ~DstTypeFusion() {}
+  ~DstTypeFusion() = default;
 
   // @brief: init dst application and options_
   static bool Init();
@@ -128,6 +128,8 @@ class DstTypeFusion : public BaseTypeFusion {
   // static const char name_[];
   static DstMaps dst_maps_;
   static DstTypeFusionOptions options_;
+
+  DISALLOW_COPY_AND_ASSIGN(DstTypeFusion);
 };
 
 }  // namespace fusion

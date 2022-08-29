@@ -44,6 +44,25 @@ void extract_vector(const std::vector<T>& vec,
   }
 }
 
+bool HMTrackersObjectsAssociation::Init(const StageConfig& config) {
+  // Init(config.fused_classifier_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool HMTrackersObjectsAssociation::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  AssociationOptions options;
+  bool res = Associate(options, data_frame);
+
+  return res;
+}
+
 bool HMTrackersObjectsAssociation::Associate(
     const AssociationOptions& options, SensorFramePtr sensor_measurements,
     ScenePtr scene, AssociationResult* association_result) {

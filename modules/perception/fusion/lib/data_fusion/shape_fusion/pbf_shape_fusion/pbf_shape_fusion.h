@@ -28,9 +28,7 @@ namespace fusion {
 class PbfShapeFusion : public BaseShapeFusion {
  public:
   explicit PbfShapeFusion(TrackPtr track) : BaseShapeFusion(track) {}
-  virtual ~PbfShapeFusion() {}
-  PbfShapeFusion(const PbfShapeFusion&) = delete;
-  PbfShapeFusion& operator=(const PbfShapeFusion&) = delete;
+  virtual ~PbfShapeFusion() = default;
 
   bool Init() override;
 
@@ -53,6 +51,8 @@ class PbfShapeFusion : public BaseShapeFusion {
 
   static bool s_use_camera_3d_;
   static float s_camera_radar_time_diff_th_;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfShapeFusion);
 };
 
 }  // namespace fusion

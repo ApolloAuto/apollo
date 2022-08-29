@@ -26,12 +26,10 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseExistenceFusion {
+class BaseExistenceFusion : public Stage {
  public:
   explicit BaseExistenceFusion(TrackPtr track) : track_ref_(track) {}
-  virtual ~BaseExistenceFusion() {}
-  BaseExistenceFusion(const BaseExistenceFusion&) = delete;
-  BaseExistenceFusion& operator=(const BaseExistenceFusion&) = delete;
+  virtual ~BaseExistenceFusion() = default;
 
   static bool Init();
 
@@ -52,6 +50,8 @@ class BaseExistenceFusion {
 
  protected:
   TrackPtr track_ref_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseExistenceFusion);
 };
 
 }  // namespace fusion

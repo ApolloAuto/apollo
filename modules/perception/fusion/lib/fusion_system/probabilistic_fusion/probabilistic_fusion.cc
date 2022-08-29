@@ -38,9 +38,6 @@ namespace fusion {
 
 using cyber::common::GetAbsolutePath;
 
-ProbabilisticFusion::ProbabilisticFusion() {}
-
-ProbabilisticFusion::~ProbabilisticFusion() {}
 
 bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   main_sensor_ = init_options.main_sensor;
@@ -103,6 +100,17 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
                PbfTracker::InitParams();
 
   return state;
+}
+
+void ProbabilisticFusion::Init(const PipelineConfig& pipeline_config) {
+  Initialize(pipeline_config);
+}
+
+bool ProbabilisticFusion::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
 }
 
 bool ProbabilisticFusion::Fuse(const FusionOptions& options,

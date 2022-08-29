@@ -1,0 +1,137 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+// pipeline
+import "modules/perception/pipeline/proto/camera_detection_config.proto"
+import "modules/perception/pipeline/proto/lane_detection_config.proto"
+import "modules/perception/pipeline/proto/lidar_detection_config.proto"
+import "modules/perception/pipeline/proto/traffic_light_config.proto"
+// stage
+import "modules/perception/pipeline/proto/stage/map_manager_config.proto"
+import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto"
+import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto"
+import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto"
+// task
+import "modules/perception/pipeline/proto/task/roi_boundary_filter_config.proto"
+
+
+// task
+enum TaskType {
+  // filter
+  ROI_BOUNDARY_FILTER = 1;
+}
+
+message TaskConfig {
+  optional TaskType task_type = 1;
+  optional bool enabled = 2 [default = true];
+
+  reserved 3 to 9;
+
+  oneof task_config {
+    ROIBoundaryFilterConfig roi_boundary_filter_config = 10;
+  }
+}
+
+// stage
+enum StageType {
+  // preprocessors
+  // traffic light preprocessors
+  TL_PREPROCESSOR = 1;
+  // lidar preprocessors
+  POINTCLOUD_PREPROCESSOR = 2;
+  // radar preprocessors
+  CONTI_ARS_PREPROCESSOR = 3;
+
+  MAP_MANAGER = 4;
+
+
+  // detectors
+  // camera detectors
+  SMOKE_OBSTACLE_DETECTOR = 21;
+  YOLO_OBSTACLE_DETECTOR = 22;
+  YOLOV4_OBSTACLE_DETECTOR = 23;
+  // lane detectors
+  DARKSCNN_LANE_DETECTOR = 24;
+  DENSELINE_LANE_DETECTOR = 25;
+  // traffic light detectors
+  TRAFFIC_LIGHT_DETECTION = 26;
+  TRAFFIC_LIGHT_RECOGNITION = 27;
+  // lidar detectors
+  CNN_SEGMENTATION = 28;
+  MASK_PILLARS_DETECTION = 29;
+  NCUT_SEGMENTATION = 30;
+  POINT_PILLARS_DETECTION = 31;
+  // radar detectors
+  CONTI_ARS_DETECTOR = 32;
+
+  // post processors
+  // camera post processors
+  OBJ_POST_PROCESSOR = 100;
+  LOCATION_REFINER_OBSTACLE_POSTPROCESSOR = 101;
+  // lane post processors
+  DARKSCNN_LANE_POSTPROCESSOR = 102;
+  DENSELINE_LANE_POSTPROCESSOR = 103;
+  // lidar post processors
+  OBJECT_BUILDER = 104;
+  OBJECT_FILTER_BANK = 105;
+
+
+  // tracker
+  OMT_OBSTACLE_TRACKER = 120;
+  SEMANTIC_REVISER = 121;
+  MLF_TRACKER = 122;
+  CONTI_ARS_TRACKER = 123;
+  PBF_TRACKER = 124;
+  MLF_ENGINE = 125;
+
+  // classifier
+  FUSED_CLASSIFIER = 124;
+
+  HDMAP_RADAR_ROI_FILTER = 125;
+
+  HM_ASSOCIATION = 126;
+
+  PBF_GATEKEEPER = 127;
+}
+
+message StageConfig {
+  optional StageType stage_type = 1;
+  optional bool enabled = 2 [default = true];
+
+  repeated TaskType task_type = 3;
+  repeated TaskConfig task_config = 4;
+
+  reserved 5 to 9;
+
+  oneof stage_config {
+    PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
+    MapManagerConfig map_manager_config = 11;
+    ObjectFilterBankConfig object_filter_bank_config = 11;
+
+    MlfEngineConfig mlf_engine_config = 12;
+    FusedClassifierConfig fused_classifier_config = 13;
+
+    PbfTrackerConfig pbf_tracker_config = 14;
+  }
+}
+
+enum PipelineType {
+  LIDAR_DETECTION = 1;
+}
+
+// pipeline
+message PipelineConfig {
+  optional PipelineType pipeline_type = 1;
+  repeated StageType stage_type = 1;
+  repeated StageConfig stage_config = 2;
+
+  reserved 3 to 9;
+
+  oneof pipeline_config {
+    CameraDetectionConfig camera_detection_config = 10;
+    LidarDetectionConfig lidar_detection_config = 11;
+    TrafficLightConfig traffic_light_config = 12;
+    LaneDetectionConfig lane_detection_config = 13;
+  }
+}

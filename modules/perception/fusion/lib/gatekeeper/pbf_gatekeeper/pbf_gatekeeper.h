@@ -43,17 +43,22 @@ struct PbfGatekeeperParams {
 
 class PbfGatekeeper : public BaseGatekeeper {
  public:
-  PbfGatekeeper();
-  ~PbfGatekeeper();
-
-  PbfGatekeeper(const PbfGatekeeper&) = delete;
-  PbfGatekeeper& operator=(const PbfGatekeeper&) = delete;
+  PbfGatekeeper() = default;
+  ~PbfGatekeeper() = default;
 
   bool Init() override;
 
   bool AbleToPublish(const TrackPtr& track) override;
 
-  std::string Name() const override;
+  // std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   bool LidarAbleToPublish(const TrackPtr& track);
@@ -61,6 +66,8 @@ class PbfGatekeeper : public BaseGatekeeper {
   bool CameraAbleToPublish(const TrackPtr& track, bool is_night);
 
   PbfGatekeeperParams params_;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfGatekeeper);
 };
 
 }  // namespace fusion

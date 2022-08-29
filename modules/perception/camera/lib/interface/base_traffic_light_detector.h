@@ -34,7 +34,7 @@ struct TrafficLightDetectorInitOptions : public BaseInitOptions {
 
 struct TrafficLightDetectorOptions {};
 
-class BaseTrafficLightDetector {
+class BaseTrafficLightDetector : public Stage {
  public:
   BaseTrafficLightDetector() = default;
 
@@ -50,10 +50,11 @@ class BaseTrafficLightDetector {
   virtual bool Detect(const TrafficLightDetectorOptions& options,
                       CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseTrafficLightDetector(const BaseTrafficLightDetector&) = delete;
-  BaseTrafficLightDetector& operator=(const BaseTrafficLightDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseTrafficLightDetector);
 };  // class BaseTrafficLightDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseTrafficLightDetector);

@@ -49,6 +49,24 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
   return true;
 }
 
+bool MapManager::Init(const StageConfig& config) {
+  bool res = Initialize(config);
+  return res;
+}
+
+bool MapManager::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  MapManagerOptions options;
+  Update(options, data_frame->lidar_frame);
+
+  return res;
+}
+
 bool MapManager::Update(const MapManagerOptions& options, LidarFrame* frame) {
   if (!frame) {
     AINFO << "Frame is nullptr.";

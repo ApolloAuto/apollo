@@ -96,8 +96,7 @@ class BaseCalibrationService {
 
   virtual std::string Name() const = 0;
 
-  BaseCalibrationService(const BaseCalibrationService &) = delete;
-  BaseCalibrationService &operator=(const BaseCalibrationService &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseCalibrationService);
 };  // class BaseCalibrationService
 
 PERCEPTION_REGISTER_REGISTERER(BaseCalibrationService);

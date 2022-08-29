@@ -29,9 +29,9 @@ namespace camera {
 
 class LaneLineCalibrator : public BaseCalibrator {
  public:
-  LaneLineCalibrator() : BaseCalibrator() {}
+  LaneLineCalibrator() = default;
 
-  virtual ~LaneLineCalibrator() {}
+  virtual ~LaneLineCalibrator() = default;
 
   bool Init(
       const CalibratorInitOptions &options = CalibratorInitOptions()) override;

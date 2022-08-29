@@ -58,6 +58,24 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   return true;
 }
 
+bool ObjectFilterBank::Init(const StageConfig& config) {
+  Init(config.object_filter_bank_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool ObjectFilterBank::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // bool res = InnerProcess(data_frame);
+
+  ObjectFilterOptions options;
+  bool res = Filter(options, data_frame->lidar_frame);
+
+  return res;
+}
+
 bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
                               LidarFrame* frame) {
   size_t object_number = frame->segmented_objects.size();
@@ -69,6 +87,39 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
   AINFO << "Object filter bank, filtered objects size: from " << object_number
         << " to " << frame->segmented_objects.size();
   return true;
+}
+
+bool ObjectFilterBank::Init(const StageConfig& stage_config) {
+  enable_ = stage_config.enabled;
+
+  stage_config.object_filter_bank_config
+
+  filter_bank_.clear();
+  for (const auto& task_config : stage_config.task_config) {
+    const auto& name = task_config.task_type;
+    BaseObjectFilter* filter =
+        BaseObjectFilterRegisterer::GetInstanceByName(name);
+    if (filter == nullptr) {
+      AINFO << "Failed to find object filter: " << name << ", skipped";
+      continue;
+    }
+    if (!filter->Init(task_config)) {
+      AINFO << "Failed to init object filter: " << name << ", skipped";
+      continue;
+    }
+    filter_bank_.push_back(filter);
+    AINFO << "Filter bank add filter: " << name;
+  }
+
+  return true;
+}
+
+bool ObjectFilterBank::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+  ObjectFilterOptions object_filter_options;
+  bool res = Filter(object_filter_options, data_frame->lidar_frame);
+  return res;
 }
 
 }  // namespace lidar

@@ -41,9 +41,17 @@ class HdmapROIFilter : public BaseROIFilter {
 
   bool Init(const ROIFilterInitOptions& options) override;
 
-  std::string Name() const override { return "HdmapROIFilter"; }
+//   std::string Name() const override { return "HdmapROIFilter"; }
 
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   void TransformFrame(

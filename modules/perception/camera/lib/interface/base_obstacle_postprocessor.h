@@ -33,7 +33,7 @@ struct ObstaclePostprocessorOptions {
   bool do_refinement_with_calibration_service = true;
 };
 
-class BaseObstaclePostprocessor {
+class BaseObstaclePostprocessor : public Stage {
  public:
   BaseObstaclePostprocessor() = default;
 
@@ -49,11 +49,11 @@ class BaseObstaclePostprocessor {
   virtual bool Process(const ObstaclePostprocessorOptions& options,
                        CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseObstaclePostprocessor(const BaseObstaclePostprocessor&) = delete;
-  BaseObstaclePostprocessor& operator=(const BaseObstaclePostprocessor&) =
-      delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstaclePostprocessor);
 };  // class BaseObstaclePostprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstaclePostprocessor);

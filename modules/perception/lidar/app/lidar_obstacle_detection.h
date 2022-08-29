@@ -18,9 +18,9 @@
 #include <string>
 #include <memory>
 
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_obstacle_detection.h"
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
-#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
@@ -29,13 +29,15 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class LidarObstacleDetection : public BaseLidarObstacleDetection{
+class LidarObstacleDetection : public BaseLidarObstacleDetection {
  public:
   LidarObstacleDetection() = default;
   virtual ~LidarObstacleDetection() = default;
 
   bool Init(const LidarObstacleDetectionInitOptions& options =
                 LidarObstacleDetectionInitOptions()) override;
+
+  bool Init(const PipelineConfig& pipeline_config) override;
 
   LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,
@@ -45,22 +47,25 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection{
   LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
                              LidarFrame* frame) override;
 
-  std::string Name() const override { return "LidarObstacleDetection"; }
+  bool Process(DataFrame* data_frame) override;
+
+  const std::string& Name() const override { return "LidarObstacleDetection"; }
 
  private:
   LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,
                                    LidarFrame* frame);
 
  private:
-  std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
-  std::shared_ptr<BaseLidarDetector> detector_;
-  MapManager map_manager_;
-  ObjectBuilder builder_;
-  ObjectFilterBank filter_bank_;
+  // std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
+  // std::shared_ptr<BaseLidarDetector> detector_;
+  // MapManager map_manager_;
+  // ObjectBuilder builder_;
+  // ObjectFilterBank filter_bank_;
+
   // params
-  bool use_map_manager_ = true;
-  bool use_object_filter_bank_ = true;
-  bool use_object_builder_ = true;
+  // bool use_map_manager_ = true;
+  // bool use_object_filter_bank_ = true;
+  // bool use_object_builder_ = true;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

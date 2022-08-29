@@ -32,7 +32,7 @@ struct ObstacleTrackerInitOptions : public BaseInitOptions {
 
 struct ObstacleTrackerOptions {};
 
-class BaseObstacleTracker {
+class BaseObstacleTracker : public Stage {
  public:
   BaseObstacleTracker() = default;
 
@@ -72,10 +72,11 @@ class BaseObstacleTracker {
   virtual bool Track(const ObstacleTrackerOptions& options,
                      CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseObstacleTracker(const BaseObstacleTracker&) = delete;
-  BaseObstacleTracker& operator=(const BaseObstacleTracker&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstacleTracker);
 };  // class BaseObstacleTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleTracker);

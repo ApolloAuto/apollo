@@ -37,9 +37,9 @@ struct CameraStatus {
 
 class OnlineCalibrationService : public BaseCalibrationService {
  public:
-  OnlineCalibrationService() : BaseCalibrationService() {}
+  OnlineCalibrationService() = default;
 
-  virtual ~OnlineCalibrationService() {}
+  virtual ~OnlineCalibrationService() = default;
 
   bool Init(const CalibrationServiceInitOptions &options =
                 CalibrationServiceInitOptions()) override;

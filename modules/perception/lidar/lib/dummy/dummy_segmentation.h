@@ -40,7 +40,15 @@ class DummySegmentation : public BaseLidarDetector {
   // label field of point cloud can be filled, optional,
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummySegmentation"; }
+  // std::string Name() const override { return "DummySegmentation"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 };  // class DummySegmentation
 
 }  // namespace lidar

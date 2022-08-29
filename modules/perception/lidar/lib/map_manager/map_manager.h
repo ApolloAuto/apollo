@@ -31,7 +31,7 @@ struct MapManagerInitOptions {};
 
 struct MapManagerOptions {};
 
-class MapManager {
+class MapManager : public Stage {
  public:
   MapManager() = default;
 
@@ -48,7 +48,15 @@ class MapManager {
 
   bool QueryPose(Eigen::Affine3d* sensor2world_pose) const;
 
-  std::string Name() const { return "MapManager"; }
+  // std::string Name() const { return "MapManager"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   LidarFrame* cached_frame_ = nullptr;

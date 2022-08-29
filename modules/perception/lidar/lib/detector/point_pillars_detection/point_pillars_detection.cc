@@ -60,6 +60,25 @@ bool PointPillarsDetection::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
+bool PointPillarsDetection::Init(const StageConfig& config) {
+  Init(config.point_pillars_detection_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool PointPillarsDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  LidarDetectorOptions options;
+  bool res = Detect(options, data_frame->lidar_frame);
+
+  return res;
+}
+
 bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
                                    LidarFrame* frame) {
   // check input

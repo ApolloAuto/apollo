@@ -48,7 +48,15 @@ class CNNSegmentation : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "CNNSegmentation"; }
+//   std::string Name() const override { return "CNNSegmentation"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   bool GetConfigs(std::string* param_file, std::string* proto_file,

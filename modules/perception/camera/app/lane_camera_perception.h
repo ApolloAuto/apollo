@@ -41,8 +41,7 @@ class LaneCameraPerception : public BaseCameraPerception {
       : lane_detector_(nullptr),
         lane_postprocessor_(nullptr),
         calibration_service_(nullptr) {}
-  LaneCameraPerception(const LaneCameraPerception &) = delete;
-  LaneCameraPerception &operator=(const LaneCameraPerception &) = delete;
+
   ~LaneCameraPerception() = default;
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
@@ -73,6 +72,8 @@ class LaneCameraPerception : public BaseCameraPerception {
   bool write_out_calib_file_ = false;
   std::string out_lane_dir_;
   std::string out_calib_dir_;
+
+  DISALLOW_COPY_AND_ASSIGN(LaneCameraPerception);
 };
 
 }  // namespace camera

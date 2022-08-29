@@ -26,7 +26,7 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor() : BasePointCloudPreprocessor() {}
+  PointCloudPreprocessor() = default;
 
   virtual ~PointCloudPreprocessor() = default;
 
@@ -41,7 +41,15 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   bool Preprocess(const PointCloudPreprocessorOptions& options,
                   LidarFrame* frame) const override;
 
-  std::string Name() const override { return "PointCloudPreprocessor"; }
+  // std::string Name() const override { return "PointCloudPreprocessor"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   bool TransformCloud(const base::PointFCloudPtr& local_cloud,

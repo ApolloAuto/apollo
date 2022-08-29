@@ -27,14 +27,22 @@ namespace lidar {
 
 class ROIServiceFilter : public BaseROIFilter {
  public:
-  ROIServiceFilter() : BaseROIFilter() {}
+  ROIServiceFilter() = default;
   ~ROIServiceFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;
 
-  std::string Name() const override { return "ROIServiceFilter"; }
+  // std::string Name() const override { return "ROIServiceFilter"; }
 
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   ROIServicePtr roi_service_ = nullptr;

@@ -20,12 +20,13 @@
 
 #include "cyber/common/macros.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-class ObjectFilterBank {
+class ObjectFilterBank : public Stage {
  public:
   ObjectFilterBank() = default;
 
@@ -43,9 +44,17 @@ class ObjectFilterBank {
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame);
 
-  std::string Name() const { return "ObjectFilterBank"; }
+  // std::string Name() const { return "ObjectFilterBank"; }
 
   size_t Size() const { return filter_bank_.size(); }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   std::vector<BaseObjectFilter*> filter_bank_;

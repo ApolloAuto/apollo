@@ -34,12 +34,10 @@ struct FusionInitOptions {
 
 struct FusionOptions {};
 
-class BaseFusionSystem {
+class BaseFusionSystem : public Pipeline {
  public:
   BaseFusionSystem() = default;
   virtual ~BaseFusionSystem() = default;
-  BaseFusionSystem(const BaseFusionSystem&) = delete;
-  BaseFusionSystem& operator=(const BaseFusionSystem&) = delete;
 
   virtual bool Init(const FusionInitOptions& options) = 0;
 
@@ -55,6 +53,8 @@ class BaseFusionSystem {
 
  protected:
   std::string main_sensor_;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseFusionSystem);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);

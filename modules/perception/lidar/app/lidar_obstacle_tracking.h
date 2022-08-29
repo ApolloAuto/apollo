@@ -35,10 +35,14 @@ class LidarObstacleTracking : public BaseLidarObstacleTracking {
   bool Init(const LidarObstacleTrackingInitOptions& options =
                 LidarObstacleTrackingInitOptions()) override;
 
+  bool Init(const PipelineConfig& pipeline_config) override;
+
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
                              LidarFrame* frame) override;
 
-  std::string Name() const override { return "LidarObstacleTracking"; }
+  bool Process(DataFrame* data_frame) override;
+
+  const std::string& Name() const override { return "LidarObstacleTracking"; }
 
  private:
   std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;

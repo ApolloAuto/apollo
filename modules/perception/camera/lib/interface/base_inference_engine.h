@@ -30,7 +30,7 @@ struct InferenceEngineInitOptions : public BaseInitOptions {};
 
 struct InferenceEngineOptions {};
 
-class BaseInferenceEngine {
+class BaseInferenceEngine : public Stage {
  public:
   BaseInferenceEngine() = default;
 
@@ -45,10 +45,11 @@ class BaseInferenceEngine {
   virtual bool Infer(const InferenceEngineOptions& options,
                      CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseInferenceEngine(const BaseInferenceEngine&) = delete;
-  BaseInferenceEngine& operator=(const BaseInferenceEngine&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseInferenceEngine);
 };  // class BaseInferenceEngine
 
 PERCEPTION_REGISTER_REGISTERER(BaseInferenceEngine);

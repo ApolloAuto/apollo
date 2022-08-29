@@ -37,9 +37,6 @@ std::string PbfTracker::s_motion_fusion_method_ =  // NOLINT
     "KalmanMotionFusion";
 std::string PbfTracker::s_shape_fusion_method_ = "PbfShapeFusion";  // NOLINT
 
-PbfTracker::PbfTracker() {}
-
-PbfTracker::~PbfTracker() {}
 
 bool PbfTracker::InitParams() {
   BaseInitOptions options;
@@ -108,6 +105,25 @@ bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
   }
   motion_fusion_->Init();
   return true;
+}
+
+bool PbfTracker::Init(const StageConfig& config) {
+  Init(config.pbf_tracker_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool PbfTracker::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  TrackerOptions options;
+  bool res = UpdateWithMeasurement(options, data_frame->lidar_frame);
+
+  return res;
 }
 
 void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,

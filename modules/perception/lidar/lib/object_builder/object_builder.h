@@ -35,7 +35,7 @@ struct ObjectBuilderOptions {
   Eigen::Vector3d ref_center = Eigen::Vector3d(0, 0, 0);
 };
 
-class ObjectBuilder {
+class ObjectBuilder : public Stage {
  public:
   ObjectBuilder() = default;
   ~ObjectBuilder() = default;
@@ -50,7 +50,15 @@ class ObjectBuilder {
   // @param [in/out]: LidarFrame*.
   bool Build(const ObjectBuilderOptions& options, LidarFrame* frame);
 
-  std::string Name() const { return "ObjectBuilder"; }
+//   std::string Name() const { return "ObjectBuilder"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   // @brief: calculate 2d polygon.

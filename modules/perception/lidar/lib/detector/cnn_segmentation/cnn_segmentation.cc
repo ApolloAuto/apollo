@@ -146,6 +146,19 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
+bool CNNSegmentation::Init(const StageConfig& config) {
+  bool res = Initialize(config);
+  return res;
+}
+
+bool CNNSegmentation::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  bool res = InnerProcess(data_frame);
+  return res;
+}
+
 bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
   // init ground detector
   ground_detector_ = BaseGroundDetectorRegisterer::GetInstanceByName(

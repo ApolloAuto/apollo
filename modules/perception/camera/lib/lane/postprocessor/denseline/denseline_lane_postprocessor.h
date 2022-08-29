@@ -41,7 +41,7 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
  public:
   DenselineLanePostprocessor() : BaseLanePostprocessor() {}
 
-  virtual ~DenselineLanePostprocessor() {}
+  virtual ~DenselineLanePostprocessor() = default;
 
   bool Init(const LanePostprocessorInitOptions& options =
                 LanePostprocessorInitOptions()) override;
@@ -58,7 +58,7 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
   bool Process3D(const LanePostprocessorOptions& options,
                  CameraFrame* frame) override;
 
-  std::string Name() const override;
+//   std::string Name() const override;
 
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();
@@ -67,6 +67,14 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
                   int* lane_map_height,
                   std::vector<ConnectedComponent>* connected_components,
                   std::vector<ConnectedComponent>* select_connected_components);
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   void ConvertImagePoint2Camera(CameraFrame* frame);

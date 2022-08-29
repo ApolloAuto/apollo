@@ -1,0 +1,99 @@
+stage_type: PBF_TRACKER
+stage_type: HM_ASSOCIATION
+stage_type: PBF_GATEKEEPER
+
+stage_config: {
+  stage_type: PBF_TRACKER
+  enabled: true
+  task_type: DST_TYPE_FUSION
+  task_type: KALMAN_MOTION_FUSION
+  task_type: DST_EXISTENCE_FUSION
+  task_type: PBF_SHAPE_FUSION
+
+  task_config: {
+    task_type: DST_TYPE_FUSION
+    enabled: true
+
+  }
+
+  task_config: {
+    task_type: KALMAN_MOTION_FUSION
+    enabled: true
+
+  }
+
+  task_config: {
+    task_type: DST_EXISTENCE_FUSION
+    enabled: true
+
+  }
+
+  task_config: {
+    task_type: PBF_SHAPE_FUSION
+    enabled: true
+
+  }
+
+  pbf_tracker_config {
+    type_fusion_method: "DstTypeFusion"
+    motion_fusion_method: "KalmanMotionFusion"
+    shape_fusion_method: "PbfShapeFusion"
+    existence_fusion_method: "DstExistenceFusion"
+  }
+}
+
+stage_config: {
+  stage_type: HM_ASSOCIATION
+  enabled: true
+
+  hm_association_config {
+
+  }
+}
+
+stage_config: {
+  stage_type: PBF_GATEKEEPER
+  enabled: true
+  task_type:
+
+  task_config: {
+    task_type:
+    enabled: true
+
+  }
+
+  pbf_gatekeeper_config {
+    publish_if_has_lidar: true
+    publish_if_has_radar: true
+    publish_if_has_camera: true
+    use_camera_3d: true
+
+    min_radar_confident_distance: 40
+    max_radar_confident_angle: 20
+    min_camera_publish_distance: 50
+    invisible_period_threshold: 0.001
+    toic_threshold: 0.8
+
+    use_track_time_pub_strategy: true
+    pub_track_time_thresh: 3
+
+    existence_threshold: 0.7
+    radar_existence_threshold: 0.9
+  }
+}
+
+probabilistic_fusion_config: {
+  use_lidar: true
+  use_radar: true
+  use_camera: true
+  tracker_method: "PbfTracker"
+  data_association_method: "HMAssociation"
+  gate_keeper_method: "PbfGatekeeper"
+  prohibition_sensors: "radar_front"
+
+  max_lidar_invisible_period: 0.25
+  max_radar_invisible_period: 0.50
+  max_camera_invisible_period: 0.75
+
+  max_cached_frame_num: 50
+}

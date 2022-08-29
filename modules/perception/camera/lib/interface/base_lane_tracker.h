@@ -30,7 +30,7 @@ struct LaneTrackerInitOptions : public BaseInitOptions {};
 
 struct LaneTrackerOptions {};
 
-class BaseLaneTracker {
+class BaseLaneTracker : public Stage {
  public:
   BaseLaneTracker() = default;
 
@@ -45,10 +45,11 @@ class BaseLaneTracker {
   // 3D information of detected lanes should be refined.
   virtual bool Track(const LaneTrackerOptions& options, CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseLaneTracker(const BaseLaneTracker&) = delete;
-  BaseLaneTracker& operator=(const BaseLaneTracker&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLaneTracker);
 };  // class BaseLaneTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneTracker);

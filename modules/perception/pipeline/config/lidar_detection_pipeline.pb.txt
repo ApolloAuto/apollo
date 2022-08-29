@@ -1,0 +1,76 @@
+pipeline_type: LIDAR_DETECTION
+
+stage_type: POINTCLOUD_PREPROCESSOR
+stage_type: MAP_MANAGER
+stage_type: POINT_PILLARS_DETECTION
+stage_type: OBJECT_BUILDER
+stage_type: OBJECT_FILTER_BANK
+
+stage_config: {
+  stage_type: POINTCLOUD_PREPROCESSOR
+  enabled: true
+
+  pointcloud_preprocessor_config: {
+    filter_naninf_points: false
+    filter_nearby_box_points: false
+    box_forward_x: 2.0
+    box_backward_x: -2.0
+    box_forward_y: 2.0
+    box_backward_y: -2.0
+    filter_high_z_points: false
+    z_threshold: 5.0
+  }
+}
+
+stage_config: {
+  stage_type: MAP_MANAGER
+  enabled: true
+
+  map_manager_config: {
+
+  }
+}
+
+stage_config: {
+  stage_type: POINT_PILLARS_DETECTION
+  enabled: true
+
+  point_pillars_detection_config: {
+
+  }
+}
+
+stage_config: {
+  stage_type: OBJECT_BUILDER
+  enabled: true
+
+  object_builder_config: {
+
+  }
+}
+
+stage_config: {
+  stage_type: OBJECT_FILTER_BANK
+  enabled: true
+  task_type: ROI_BOUNDARY_FILTER
+
+  task_config: {
+    task_type: ROI_BOUNDARY_FILTER
+    enabled: true
+
+    roi_boundary_filter_config: {
+      distance_to_boundary_threshold: -1.0
+      confidence_threshold: 0.5
+      cross_roi_threshold: 0.6
+      inside_threshold: 1.0
+    }
+  }
+
+  object_filter_bank_config: {
+
+  }
+}
+
+lidar_detection_config: {
+
+}

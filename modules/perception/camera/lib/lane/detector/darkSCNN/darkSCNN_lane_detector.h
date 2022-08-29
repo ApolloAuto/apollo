@@ -53,7 +53,7 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
     num_lanes_ = 0;
   }
 
-  virtual ~DarkSCNNLaneDetector() {}
+  virtual ~DarkSCNNLaneDetector() = default;
 
   bool Init(const LaneDetectorInitOptions &options =
                 LaneDetectorInitOptions()) override;
@@ -64,7 +64,15 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
   // detected lanes should be filled, required,
   // 3D information of lane can be filled, optional.
   bool Detect(const LaneDetectorOptions &options, CameraFrame *frame) override;
-  std::string Name() const override;
+  // std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   std::shared_ptr<inference::Inference> cnnadapter_lane_ = nullptr;

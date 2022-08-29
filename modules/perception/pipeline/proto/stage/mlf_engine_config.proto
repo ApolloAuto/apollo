@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message MlfEngineConfig {
+  repeated string main_sensor = 1;
+  optional bool use_histogram_for_match = 2 [default = true];
+  optional uint32 histogram_bin_size = 3 [default = 10];
+  optional bool output_predict_objects = 4 [default = false];
+  optional double reserved_invisible_time = 5 [default = 0.2];
+  optional bool use_frame_timestamp = 6 [default = false];
+}

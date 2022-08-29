@@ -39,7 +39,7 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
     mean_[2] = 0;
   }
 
-  ~TrafficLightDetection() {}
+  ~TrafficLightDetection() = default;
 
   bool Init(const TrafficLightDetectorInitOptions &options) override;
 
@@ -57,13 +57,18 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
                 double iou_thresh = 0.6);
   bool Inference(std::vector<base::TrafficLightPtr> *lights,
                  DataProvider *data_provider);
-  std::string Name() const override;
+  // std::string Name() const override;
   const std::vector<base::TrafficLightPtr> &getDetectedBoxes() {
     return detected_bboxes_;
   }
 
-  TrafficLightDetection(const TrafficLightDetection &) = delete;
-  TrafficLightDetection &operator=(const TrafficLightDetection &) = delete;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   traffic_light::detection::DetectionParam detection_param_;
@@ -84,6 +89,8 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   std::vector<base::RectI> crop_box_list_;
   std::vector<float> resize_scale_list_;
   int gpu_id_ = 0;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightDetection);
 };  // class TrafficLightDetection
 
 }  // namespace camera

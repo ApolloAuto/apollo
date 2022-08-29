@@ -49,9 +49,7 @@ class ObstacleDetectionCamera : public BaseCameraPerception {
         lane_postprocessor_(nullptr),
         calibration_service_(nullptr),
         object_template_manager_(nullptr) {}
-  ObstacleDetectionCamera(const ObstacleDetectionCamera &) = delete;
-  ObstacleDetectionCamera &operator=(const ObstacleDetectionCamera &) =
-      delete;
+
   ~ObstacleDetectionCamera() = default;
   bool Init(const CameraPerceptionInitOptions &options) override;
   void SetCameraHeightAndPitch(
@@ -63,6 +61,9 @@ class ObstacleDetectionCamera : public BaseCameraPerception {
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
   std::string Name() const override { return "ObstacleDetectionCamera"; }
+
+ protected:
+  ObjectTemplateManager *object_template_manager_ = nullptr;
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
@@ -84,8 +85,7 @@ class ObstacleDetectionCamera : public BaseCameraPerception {
   std::string out_lane_dir_;
   std::string out_calib_dir_;
 
- protected:
-  ObjectTemplateManager *object_template_manager_ = nullptr;
+  DISALLOW_COPY_AND_ASSIGN(ObstacleDetectionCamera);
 };
 
 }  // namespace camera

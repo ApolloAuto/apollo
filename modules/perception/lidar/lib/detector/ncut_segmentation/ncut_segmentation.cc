@@ -126,6 +126,19 @@ bool NCutSegmentation::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
+bool NCutSegmentation::Init(const StageConfig& config) {
+  bool res = Initialize(config);
+  return res;
+}
+
+bool NCutSegmentation::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  bool res = InnerProcess(data_frame);
+  return res;
+}
+
 bool NCutSegmentation::Configure(std::string param_file) {
   NCutSegmentationParam seg_param_;
   // get cnnseg params

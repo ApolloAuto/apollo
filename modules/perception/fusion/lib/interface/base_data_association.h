@@ -40,12 +40,10 @@ struct AssociationResult {
   std::vector<double> measurement2track_dist;
 };
 
-class BaseDataAssociation {
+class BaseDataAssociation : public Stage {
  public:
-  BaseDataAssociation() {}
-  virtual ~BaseDataAssociation() {}
-  BaseDataAssociation(const BaseDataAssociation&) = delete;
-  BaseDataAssociation& operator=(const BaseDataAssociation&) = delete;
+  BaseDataAssociation() = default;
+  virtual ~BaseDataAssociation() = default;
 
   virtual bool Init() = 0;
 
@@ -59,6 +57,8 @@ class BaseDataAssociation {
                          AssociationResult* association_result) = 0;
 
   virtual std::string Name() const = 0;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseDataAssociation);
 };
 
 }  // namespace fusion

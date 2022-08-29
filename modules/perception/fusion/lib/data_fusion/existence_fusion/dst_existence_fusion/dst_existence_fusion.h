@@ -52,7 +52,7 @@ struct DstExistenceFusionOptions {
 class DstExistenceFusion : public BaseExistenceFusion {
  public:
   explicit DstExistenceFusion(TrackPtr track);
-  ~DstExistenceFusion() {}
+  ~DstExistenceFusion() = default;
 
   // @brief: add dst application
   static bool Init();
@@ -102,6 +102,8 @@ class DstExistenceFusion : public BaseExistenceFusion {
   static ExistenceDstMaps existence_dst_maps_;
   static ToicDstMaps toic_dst_maps_;
   static DstExistenceFusionOptions options_;
+
+  DISALLOW_COPY_AND_ASSIGN(DstExistenceFusion);
 };
 
 }  // namespace fusion

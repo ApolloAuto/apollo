@@ -48,12 +48,20 @@ class NCutSegmentation : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "NCutSegmentation"; }
+  // std::string Name() const override { return "NCutSegmentation"; }
 
   void ByPassROIService() {
     remove_roi_ = false;
     remove_ground_ = false;
   }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   bool Configure(std::string model_name);

@@ -32,11 +32,8 @@ namespace fusion {
 
 class PbfTracker : public BaseTracker {
  public:
-  PbfTracker();
-  virtual ~PbfTracker();
-
-  PbfTracker(const PbfTracker&) = delete;
-  PbfTracker& operator=(const PbfTracker&) = delete;
+  PbfTracker() = default;
+  virtual ~PbfTracker() = default;
 
   static bool InitParams();
 
@@ -51,7 +48,15 @@ class PbfTracker : public BaseTracker {
                                 double measurement_timestamp,
                                 double target_timestamp) override;
 
-  std::string Name() const override;
+  // std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
   bool InitMethods();
@@ -66,6 +71,8 @@ class PbfTracker : public BaseTracker {
   std::unique_ptr<BaseMotionFusion> motion_fusion_ = nullptr;
   std::unique_ptr<BaseExistenceFusion> existence_fusion_ = nullptr;
   std::unique_ptr<BaseShapeFusion> shape_fusion_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfTracker);
 };
 
 }  // namespace fusion

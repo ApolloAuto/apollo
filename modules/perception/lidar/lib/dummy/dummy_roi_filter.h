@@ -41,7 +41,15 @@ class DummyROIFilter : public BaseROIFilter {
   // label field of point cloud can be filled, optional
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyROIFilter"; }
+  // std::string Name() const override { return "DummyROIFilter"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 };  // class DummyROIFilter
 
 }  // namespace lidar

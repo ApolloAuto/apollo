@@ -26,12 +26,10 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseShapeFusion {
+class BaseShapeFusion : public Stage {
  public:
   explicit BaseShapeFusion(TrackPtr track) : track_ref_(track) {}
-  virtual ~BaseShapeFusion() {}
-  BaseShapeFusion(const BaseShapeFusion&) = delete;
-  BaseShapeFusion& operator=(const BaseShapeFusion&) = delete;
+  virtual ~BaseShapeFusion() = default;
 
   virtual bool Init() = 0;
 
@@ -49,6 +47,8 @@ class BaseShapeFusion {
 
  protected:
   TrackPtr track_ref_;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseShapeFusion);
 };
 
 }  // namespace fusion

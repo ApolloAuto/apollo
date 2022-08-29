@@ -30,7 +30,7 @@ struct LandmarkDetectorInitOptions : public BaseInitOptions {};
 
 struct LandmarkDetectorOptions {};
 
-class BaseLandmarkDetector {
+class BaseLandmarkDetector : public Stage {
  public:
   BaseLandmarkDetector() = default;
 
@@ -46,10 +46,11 @@ class BaseLandmarkDetector {
   virtual bool Detect(const LandmarkDetectorOptions& options,
                       CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseLandmarkDetector(const BaseLandmarkDetector&) = delete;
-  BaseLandmarkDetector& operator=(const BaseLandmarkDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLandmarkDetector);
 };  // class BaseLandmarkDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLandmarkDetector);

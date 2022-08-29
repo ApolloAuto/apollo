@@ -30,9 +30,9 @@ namespace camera {
 
 class TrafficLightRecognition : public BaseTrafficLightDetector {
  public:
-  TrafficLightRecognition() {}
+  TrafficLightRecognition() = default;
 
-  ~TrafficLightRecognition() {}
+  ~TrafficLightRecognition() = default;
 
   bool Init(const TrafficLightDetectorInitOptions& options) override;
 
@@ -43,16 +43,23 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   bool Detect(const TrafficLightDetectorOptions& options,
               CameraFrame* frame) override;
 
-  std::string Name() const override;
+  // std::string Name() const override;
 
-  explicit TrafficLightRecognition(const BaseTrafficLightDetector&) = delete;
-  TrafficLightRecognition& operator=(const BaseTrafficLightDetector&) = delete;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   std::shared_ptr<ClassifyBySimple> classify_vertical_;
   std::shared_ptr<ClassifyBySimple> classify_quadrate_;
   std::shared_ptr<ClassifyBySimple> classify_horizontal_;
   traffic_light::recognition::RecognizeBoxParam recognize_param_;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);
 };
 
 }  // namespace camera

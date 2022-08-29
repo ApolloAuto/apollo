@@ -104,6 +104,18 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
   return true;
 }
 
+bool ROIBoundaryFilter::Init(const TaskConfig& task_config) {
+  task_config.roi_boundary_filter_conf
+}
+
+bool ROIBoundaryFilter::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+  ObjectFilterOptions object_filter_options;
+  bool res = Filter(object_filter_options, data_frame->lidar_frame);
+  return res;
+}
+
 void ROIBoundaryFilter::BuildWorldPolygons(const ObjectFilterOptions& options,
                                            const LidarFrame& frame) {
   const Eigen::Affine3d& pose = frame.lidar2world_pose;

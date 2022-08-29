@@ -43,8 +43,8 @@ struct SemanticTable {
 
 class SemanticReviser : public BaseTrafficLightTracker {
  public:
-  SemanticReviser() {}
-  ~SemanticReviser() {}
+  SemanticReviser() = default;
+  ~SemanticReviser() = default;
 
   bool Init(const TrafficLightTrackerInitOptions &options =
                 TrafficLightTrackerInitOptions()) override;
@@ -61,10 +61,15 @@ class SemanticReviser : public BaseTrafficLightTracker {
   void ReviseLights(std::vector<base::TrafficLightPtr> *lights,
                     const std::vector<int> &light_ids, base::TLColor dst_color);
 
-  std::string Name() const override;
+  // std::string Name() const override;
 
-  explicit SemanticReviser(const BaseTrafficLightTracker &) = delete;
-  SemanticReviser &operator=(const BaseTrafficLightTracker &) = delete;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   traffic_light::tracker::SemanticReviseParam semantic_param_;
@@ -73,6 +78,8 @@ class SemanticReviser : public BaseTrafficLightTracker {
   float non_blink_threshold_s_ = 0.8f;
   int hysteretic_threshold_ = 1;
   std::vector<SemanticTable> history_semantic_;
+
+  DISALLOW_COPY_AND_ASSIGN(SemanticReviser);
 };
 
 }  // namespace camera

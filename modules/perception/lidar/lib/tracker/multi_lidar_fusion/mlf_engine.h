@@ -49,7 +49,15 @@ class MlfEngine : public BaseMultiTargetTracker {
   bool Track(const MultiTargetTrackerOptions& options,
              LidarFrame* frame) override;
 
-  std::string Name() const override { return "MlfEngine"; };
+//   std::string Name() const override { return "MlfEngine"; };
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
   // @brief: split foreground/background objects and attach to tracked objects

@@ -43,8 +43,6 @@ class TrackObjectDistance {
  public:
   TrackObjectDistance() = default;
   ~TrackObjectDistance() = default;
-  TrackObjectDistance(const TrackObjectDistance&) = delete;
-  TrackObjectDistance operator=(const TrackObjectDistance&) = delete;
 
   void set_distance_thresh(const float distance_thresh) {
     distance_thresh_ = distance_thresh;
@@ -191,6 +189,8 @@ class TrackObjectDistance {
   static double s_radar2radar_association_center_dist_threshold_;
   static size_t s_lidar2camera_projection_downsample_target_pts_num_;
   static size_t s_lidar2camera_projection_vertices_check_pts_num_;
+
+  DISALLOW_COPY_AND_ASSIGN(TrackObjectDistance);
 };  // class TrackObjectDistance
 
 }  // namespace fusion

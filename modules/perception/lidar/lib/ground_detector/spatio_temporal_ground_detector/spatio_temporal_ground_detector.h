@@ -47,6 +47,14 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
 
   std::string Name() const override { return "SpatioTemporalGroundDetector"; }
 
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override;
+
+  std::string Name() const override;
+
  private:
   common::PlaneFitGroundDetectorParam* param_ = nullptr;
   common::PlaneFitGroundDetector* pfdetector_ = nullptr;

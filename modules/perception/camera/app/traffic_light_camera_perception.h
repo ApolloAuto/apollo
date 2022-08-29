@@ -45,6 +45,8 @@ class TrafficLightCameraPerception : public BaseCameraPerception {
   std::shared_ptr<BaseTrafficLightDetector> recognizer_;
   std::shared_ptr<BaseTrafficLightTracker> tracker_;
   app::TrafficLightParam tl_param_;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightCameraPerception);
 };
 
 }  // namespace camera

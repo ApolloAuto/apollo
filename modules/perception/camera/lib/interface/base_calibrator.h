@@ -60,8 +60,7 @@ class BaseCalibrator {
 
   virtual std::string Name() const = 0;
 
-  BaseCalibrator(const BaseCalibrator &) = delete;
-  BaseCalibrator &operator=(const BaseCalibrator &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseCalibrator);
 };  // class BaseCalibrator
 
 PERCEPTION_REGISTER_REGISTERER(BaseCalibrator);

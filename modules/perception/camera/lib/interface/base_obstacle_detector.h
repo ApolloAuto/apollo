@@ -36,7 +36,7 @@ struct ObstacleDetectorInitOptions : public BaseInitOptions {
 
 struct ObstacleDetectorOptions {};
 
-class BaseObstacleDetector {
+class BaseObstacleDetector : public Stage {
  public:
   BaseObstacleDetector() = default;
 
@@ -53,10 +53,11 @@ class BaseObstacleDetector {
   virtual bool Detect(const ObstacleDetectorOptions &options,
                       CameraFrame *frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseObstacleDetector(const BaseObstacleDetector &) = delete;
-  BaseObstacleDetector &operator=(const BaseObstacleDetector &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstacleDetector);
 };  // class BaseObstacleDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleDetector);

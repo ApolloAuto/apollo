@@ -76,6 +76,25 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   return true;
 }
 
+bool MlfEngine::Init(const StageConfig& config) {
+  Init(config.mlf_engine_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool MlfEngine::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  MultiTargetTrackerOptions options;
+  bool res = Track(options, data_frame->lidar_frame);
+
+  return res;
+}
+
 bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
                       LidarFrame* frame) {
   // 0. modify objects timestamp if necessary

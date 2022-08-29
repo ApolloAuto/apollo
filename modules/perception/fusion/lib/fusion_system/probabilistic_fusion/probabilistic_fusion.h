@@ -41,11 +41,8 @@ struct FusionParams {
 
 class ProbabilisticFusion : public BaseFusionSystem {
  public:
-  ProbabilisticFusion();
-  ~ProbabilisticFusion();
-
-  ProbabilisticFusion(const ProbabilisticFusion&) = delete;
-  ProbabilisticFusion& operator=(const ProbabilisticFusion&) = delete;
+  ProbabilisticFusion() = default;
+  ~ProbabilisticFusion() = default;
 
   bool Init(const FusionInitOptions& init_options) override;
 
@@ -53,7 +50,13 @@ class ProbabilisticFusion : public BaseFusionSystem {
             const base::FrameConstPtr& sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 
-  std::string Name() const override;
+  // std::string Name() const override;
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  const std::string& Name() const override;
 
  private:
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
@@ -98,6 +101,8 @@ class ProbabilisticFusion : public BaseFusionSystem {
   std::unique_ptr<BaseGatekeeper> gate_keeper_;
 
   FusionParams params_;
+
+  DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
 
 }  // namespace fusion

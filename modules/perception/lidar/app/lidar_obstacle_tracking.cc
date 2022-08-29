@@ -63,6 +63,17 @@ bool LidarObstacleTracking::Init(
   return true;
 }
 
+void LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
+  Initialize(pipeline_config);
+}
+
+bool LidarObstacleDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
+}
+
 LidarProcessResult LidarObstacleTracking::Process(
     const LidarObstacleTrackingOptions& options, LidarFrame* frame) {
   const auto& sensor_name = options.sensor_name;

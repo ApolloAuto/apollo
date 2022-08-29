@@ -43,7 +43,15 @@ class MaskPillarsDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "MaskPillarsDetection"; }
+  // std::string Name() const override { return "MaskPillarsDetection"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,

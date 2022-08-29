@@ -42,7 +42,7 @@ struct LidarObstacleDetectionOptions {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-class BaseLidarObstacleDetection {
+class BaseLidarObstacleDetection : public Pipeline {
  public:
   BaseLidarObstacleDetection() = default;
   virtual ~BaseLidarObstacleDetection() = default;
@@ -60,7 +60,11 @@ class BaseLidarObstacleDetection {
       const LidarObstacleDetectionOptions& options,
       LidarFrame* frame) = 0;
 
-  virtual std::string Name() const = 0;
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual const std::string& Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseLidarObstacleDetection);

@@ -57,6 +57,25 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   return init_success;
 }
 
+bool FusedClassifier::Init(const StageConfig& config) {
+  Init(config.fused_classifier_config());
+  bool res = Initialize(config);
+  return res;
+}
+
+bool FusedClassifier::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  // todo(zero): change to task
+  // bool res = InnerProcess(data_frame);
+
+  ClassifierOptions options;
+  bool res = Classify(options, data_frame->lidar_frame);
+
+  return res;
+}
+
 bool FusedClassifier::Classify(const ClassifierOptions& options,
                                LidarFrame* frame) {
   if (frame == nullptr) {

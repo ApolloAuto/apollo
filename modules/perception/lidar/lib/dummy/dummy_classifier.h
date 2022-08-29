@@ -39,6 +39,14 @@ class DummyClassifier : public BaseClassifier {
   bool Classify(const ClassifierOptions& options, LidarFrame* frame) override;
 
   std::string Name() const override { return "DummyClassifier"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override;
+
+  std::string Name() const override;
 };  // class DummyClassifier
 
 }  // namespace lidar

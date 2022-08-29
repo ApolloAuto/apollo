@@ -51,7 +51,16 @@ class YoloObstacleDetector : public BaseObstacleDetector {
 
   bool Detect(const ObstacleDetectorOptions &options,
               CameraFrame *frame) override;
-  std::string Name() const override { return "YoloObstacleDetector"; }
+
+  // std::string Name() const override { return "YoloObstacleDetector"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
   void LoadInputShape(const yolo::ModelParam &model_param);

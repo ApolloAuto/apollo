@@ -34,7 +34,7 @@ struct LaneDetectorInitOptions : public BaseInitOptions {
 
 struct LaneDetectorOptions {};
 
-class BaseLaneDetector {
+class BaseLaneDetector : public Stage {
  public:
   BaseLaneDetector() = default;
 
@@ -51,10 +51,11 @@ class BaseLaneDetector {
   virtual bool Detect(const LaneDetectorOptions& options,
                       CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseLaneDetector(const BaseLaneDetector&) = delete;
-  BaseLaneDetector& operator=(const BaseLaneDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLaneDetector);
 };  // class BaseLaneDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneDetector);

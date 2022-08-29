@@ -28,11 +28,8 @@ namespace fusion {
 
 class HMTrackersObjectsAssociation : public BaseDataAssociation {
  public:
-  HMTrackersObjectsAssociation() {}
-  ~HMTrackersObjectsAssociation() {}
-  HMTrackersObjectsAssociation(const HMTrackersObjectsAssociation&) = delete;
-  HMTrackersObjectsAssociation& operator=(const HMTrackersObjectsAssociation&) =
-      delete;
+  HMTrackersObjectsAssociation() = default;
+  ~HMTrackersObjectsAssociation() = default;
 
   bool Init() override {
     track_object_distance_.set_distance_thresh(
@@ -44,7 +41,15 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
 
-  std::string Name() const override { return "HMTrackersObjectsAssociation"; }
+//   std::string Name() const override { return "HMTrackersObjectsAssociation"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  private:
   void ComputeAssociationDistanceMat(
@@ -97,6 +102,8 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
   static double s_match_distance_thresh_;
   static double s_match_distance_bound_;
   static double s_association_center_dist_threshold_;
+
+  DISALLOW_COPY_AND_ASSIGN(HMTrackersObjectsAssociation);
 };
 
 }  // namespace fusion

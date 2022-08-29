@@ -22,6 +22,8 @@
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
+#include "modules/perception/pipeline/pipeline.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -93,6 +95,17 @@ bool LidarObstacleDetection::Init(
   }
 
   return true;
+}
+
+void LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
+  Initialize(pipeline_config);
+}
+
+bool LidarObstacleDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
 }
 
 LidarProcessResult LidarObstacleDetection::Process(

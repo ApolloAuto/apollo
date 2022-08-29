@@ -29,12 +29,10 @@ struct TrackerOptions {
   double match_distance = 0.0;
 };
 
-class BaseTracker {
+class BaseTracker : public Stage {
  public:
-  BaseTracker() {}
-  virtual ~BaseTracker() {}
-  BaseTracker(const BaseTracker&) = delete;
-  BaseTracker& operator=(const BaseTracker&) = delete;
+  BaseTracker() = default;
+  virtual ~BaseTracker() = default;
 
   virtual bool Init(TrackPtr track, SensorObjectPtr measurement) = 0;
 
@@ -55,6 +53,8 @@ class BaseTracker {
 
  protected:
   TrackPtr track_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseTracker);
 };
 
 }  // namespace fusion

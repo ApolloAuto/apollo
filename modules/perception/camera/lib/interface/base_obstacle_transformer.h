@@ -35,7 +35,7 @@ struct ObstacleTransformerOptions {
   */
 };
 
-class BaseObstacleTransformer {
+class BaseObstacleTransformer : public Stage {
  public:
   BaseObstacleTransformer() = default;
 
@@ -51,10 +51,11 @@ class BaseObstacleTransformer {
   virtual bool Transform(const ObstacleTransformerOptions& options,
                          CameraFrame* frame) = 0;
 
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseObstacleTransformer(const BaseObstacleTransformer&) = delete;
-  BaseObstacleTransformer& operator=(const BaseObstacleTransformer&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstacleTransformer);
 };  // class BaseObstacleTransformer
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleTransformer);

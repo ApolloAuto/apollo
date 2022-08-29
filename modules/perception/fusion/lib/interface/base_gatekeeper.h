@@ -26,18 +26,18 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseGatekeeper {
+class BaseGatekeeper : public Stage {
  public:
-  BaseGatekeeper() {}
-  virtual ~BaseGatekeeper() {}
-  BaseGatekeeper(const BaseGatekeeper&) = delete;
-  BaseGatekeeper& operator=(const BaseGatekeeper&) = delete;
+  BaseGatekeeper() = default
+  virtual ~BaseGatekeeper() = default;
 
   virtual bool Init() = 0;
 
   virtual bool AbleToPublish(const TrackPtr& track) = 0;
 
   virtual std::string Name() const = 0;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseGatekeeper);
 };
 
 }  // namespace fusion
