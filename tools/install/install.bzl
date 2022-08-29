@@ -94,7 +94,9 @@ def _install_action(
         dests,
         strip_prefixes = [],
         rename = {},
-        warn_foreign = True):
+        warn_foreign = True,
+        py_runfiles = False,
+        py_runfiles_path = None):
     """Compute install action for a single file.
 
     This takes a single file artifact and returns the appropriate install
@@ -121,11 +123,16 @@ def _install_action(
         )
     else:
         strip_prefix = strip_prefixes
-
-    file_dest = join_paths(
-        dest,
-        _output_path(ctx, artifact, strip_prefix, warn_foreign),
-    )
+    if py_runfiles:
+        file_dest = join_paths(
+            dest,
+            py_runfiles_path
+        )
+    else:
+        file_dest = join_paths(
+            dest,
+            _output_path(ctx, artifact, strip_prefix, warn_foreign),
+        )
     file_dest = _rename(file_dest, rename)
 
     return struct(src = artifact, dst = file_dest)
@@ -251,14 +258,35 @@ def _install_cc_actions(ctx, target):
 # Compute install actions for a py_library or py_binary.
 # TODO(jamiesnape): Install native shared libraries that the target may use.
 def _install_py_actions(ctx, target):
-    return _install_actions(
+    actions = _install_actions(
         ctx,
         [target],
         ctx.attr.py_dest,
         ctx.attr.py_strip_prefix,
         rename = ctx.attr.rename,
     )
+    
+    runfile_actions = []
+    runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
+    runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
 
+    for f in _depset_to_list(target.default_runfiles.files):
+        runfile_actions.append(
+            _install_action(
+                ctx,
+                f,
+                runfiles_dest,
+                ctx.attr.py_strip_prefix,
+                ctx.attr.rename,
+                True,
+                True,
+                join_paths("%s" % ctx.workspace_name, f.short_path)
+            )
+        )
+
+    actions += runfile_actions
+    
+    return actions
 #------------------------------------------------------------------------------
 # Compute install actions for a script or an executable.
 def _install_runtime_actions(ctx, target):
