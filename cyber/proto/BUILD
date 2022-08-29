@@ -7,6 +7,10 @@ load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "runtime_files",
+    srcs = ["py_pb2.BUILD"]
+)
 
 install_files(
     name = "cyber_proto_hdrs",
@@ -60,8 +64,25 @@ install_files(
     dest = "cyber/proto",
     files = [
         ":record_py_pb2",
+        ":topology_change_py_pb2",
+        ":dag_conf_py_pb2",
+        ":proto_desc_py_pb2",
+        ":choreography_conf_py_pb2",
+        ":component_conf_py_pb2",
+        ":cyber_conf_py_pb2",
+        ":perf_conf_py_pb2",
+        ":classic_conf_py_pb2",
+        ":parameter_py_pb2",
+        ":unit_test_py_pb2",
+        ":scheduler_conf_py_pb2",
+        ":transport_conf_py_pb2",
+        ":qos_profile_py_pb2",
+        ":run_mode_conf_py_pb2",
+        ":role_attributes_py_pb2",
+        ":clock_py_pb2",
     ],
 )
+
 cc_so_proto_library(
     name = "topology_change_cc_proto",
     srcs = [
