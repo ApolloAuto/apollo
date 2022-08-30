@@ -51,6 +51,6 @@ py_proto_library(
         ":hmi_status_proto",
         "//modules/common_msgs/basic_msgs:header_py_pb2",
         "//modules/common_msgs/monitor_msgs:system_status_py_pb2",
-    ],  "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+    ],
 )
-
