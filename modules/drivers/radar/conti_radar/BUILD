@@ -44,6 +44,7 @@ cc_library(
     srcs = ["conti_radar_canbus_component.cc"],
     hdrs = ["conti_radar_canbus_component.h"],
     copts = ['-DMODULE_NAME=\\"conti_radar\\"'],
+    alwayslink = True,
     deps = [
         ":conti_radar_message_manager",
         "//cyber",
@@ -63,7 +64,7 @@ cc_library(
 cc_binary(
     name = "libconti_radar.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":conti_radar_canbus_lib"],
 )
 

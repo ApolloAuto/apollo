@@ -5,11 +5,9 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 
 cc_library(
-    name = "adv_plat",
-    hdrs = glob(["include/**/*"]),
-    linkopts = [
-        "-ladv_trigger",
-        "-ladv_bcan",
-    ],
+    name = "rtklib",
+    srcs = glob(["lib/*.so*"]),
+    hdrs = glob(["include/*.h"]),
     strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
 )

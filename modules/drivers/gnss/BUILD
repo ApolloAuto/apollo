@@ -9,7 +9,7 @@ GNSS_COPTS = ['-DMODULE_NAME=\\"gnss\\"']
 cc_binary(
     name = "libgnss_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":gnss_component_lib"],
 )
 
@@ -18,6 +18,7 @@ cc_library(
     srcs = ["gnss_component.cc"],
     hdrs = ["gnss_component.h"],
     copts = GNSS_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
@@ -40,9 +41,6 @@ install(
     ],
     targets = [
         ":libgnss_component.so",
-    ],
-    deps = [
-        "//cyber:install",
     ],
 )
 

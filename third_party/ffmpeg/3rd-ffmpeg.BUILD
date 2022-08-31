@@ -6,39 +6,40 @@ licenses(["notice"])
 
 cc_library(
     name = "avcodec",
-    includes = ["include"],
+    hdrs = glob(["include/libavcodec/*.h"]),
+    strip_include_prefix = "include",
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lavcodec",
     ],
-    strip_include_prefix = "include",
-
 )
 
 cc_library(
     name = "avformat",
-    includes = ["include"],
+    hdrs = glob(["include/libavformat/*.h"]),
+    strip_include_prefix = "include",
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lavformat",
     ],
-    strip_include_prefix = "include",
-
 )
 
 cc_library(
     name = "swscale",
-    includes = ["include"],
+    hdrs = glob(["include/libswscale/*.h"]),
+    strip_include_prefix = "include",
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lswscale",
     ],
-    strip_include_prefix = "include",
-
 )
 
 cc_library(
     name = "avutil",
-    includes = ["include"],
+    hdrs = glob(["include/libavutil/*.h"]),
+    strip_include_prefix = "include",
     linkopts = [
+        "-L/opt/apollo/sysroot/lib",
         "-lavutil",
     ],
-    strip_include_prefix = "include",
 )

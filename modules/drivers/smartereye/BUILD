@@ -30,7 +30,7 @@ filegroup(
 cc_binary(
     name = "libsmartereye_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":compress_component_lib",
         ":smartereye_component_lib",
@@ -41,6 +41,7 @@ cc_library(
     name = "smartereye_component_lib",
     srcs = ["smartereye_component.cc"],
     hdrs = ["smartereye_component.h"],
+    alwayslink = True,
     copts = CAMERA_COPTS,
     deps = [
         ":smartereye_device",
@@ -84,6 +85,7 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     copts = CAMERA_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
