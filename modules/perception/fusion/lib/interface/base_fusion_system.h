@@ -49,7 +49,13 @@ class BaseFusionSystem : public Pipeline {
                     const base::FrameConstPtr& sensor_frame,
                     std::vector<base::ObjectPtr>* fused_objects) = 0;
 
-  virtual std::string Name() const = 0;
+  // virtual std::string Name() const = 0;
+
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual const std::string& Name() const = 0;
 
  protected:
   std::string main_sensor_;

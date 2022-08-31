@@ -53,7 +53,7 @@ class BaseROIFilter : public Stage {
 
   virtual bool IsEnabled() = 0;
 
-  virtual std::string Name() const = 0;
+  virtual std::string& Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseROIFilter);

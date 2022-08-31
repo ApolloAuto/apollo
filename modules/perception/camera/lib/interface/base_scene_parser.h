@@ -45,9 +45,13 @@ class BaseSceneParser : public Stage {
   // semantic parsing mask should be filled, required,
   virtual bool Parse(const SceneParserOptions &options, CameraFrame *frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual std::string Name() const = 0;
+  virtual bool IsEnabled() = 0;
+
+  virtual std::string& Name() const = 0;
 
   DISALLOW_COPY_AND_ASSIGN(BaseSceneParser);
 };  // class BaseSceneParser

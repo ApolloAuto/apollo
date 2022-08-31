@@ -49,9 +49,13 @@ class BaseObstaclePostprocessor : public Stage {
   virtual bool Process(const ObstaclePostprocessorOptions& options,
                        CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual std::string Name() const = 0;
+  virtual bool IsEnabled() = 0;
+
+  virtual std::string& Name() const = 0;
 
   DISALLOW_COPY_AND_ASSIGN(BaseObstaclePostprocessor);
 };  // class BaseObstaclePostprocessor

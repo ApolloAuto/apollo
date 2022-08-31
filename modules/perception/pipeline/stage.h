@@ -39,7 +39,7 @@ class Stage {
 
   virtual bool IsEnabled() = 0;
 
-  virtual std::string Name() const = 0;
+  virtual std::string& Name() const = 0;
 
  protected:
   bool Initialize(const StageConfig& stage_config);

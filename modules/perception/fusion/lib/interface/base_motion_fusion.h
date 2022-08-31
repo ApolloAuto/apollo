@@ -43,7 +43,13 @@ class BaseMotionFusion : public Stage {
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
 
-  virtual std::string Name() const = 0;
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() = 0;
+
+  virtual std::string& Name() const = 0;
 
  protected:
   TrackPtr track_ref_;

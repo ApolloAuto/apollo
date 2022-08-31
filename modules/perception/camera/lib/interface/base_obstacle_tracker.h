@@ -72,9 +72,13 @@ class BaseObstacleTracker : public Stage {
   virtual bool Track(const ObstacleTrackerOptions& options,
                      CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual std::string Name() const = 0;
+  virtual bool IsEnabled() = 0;
+
+  virtual std::string& Name() const = 0;
 
   DISALLOW_COPY_AND_ASSIGN(BaseObstacleTracker);
 };  // class BaseObstacleTracker
