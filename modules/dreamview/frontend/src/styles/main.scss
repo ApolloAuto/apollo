@@ -160,6 +160,13 @@ body {
     }
 
     .selector {
+      &.scenario-set-selector {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
         select {
             display: block;
 
@@ -365,7 +372,7 @@ body {
             display: inline-block;
             padding-left: 20px;
         }
-        
+
         .name-input {
             margin: 10px;
             min-height: 20px;
@@ -424,6 +431,8 @@ body {
         margin-right: 1px;
         padding: 15px 10px 25px 20px;
         background: #1D2226;
+        font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+        color: #FFFFFF;
 
         @include small-screen {
             padding: 12px 5px 15px 12px;
@@ -1192,6 +1201,293 @@ body {
             }
         }
     }
+}
+
+.data-profile {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+
+  flex: 1;
+
+  z-index: 10;
+
+  &-card {
+    color: #fff;
+    min-width: 458px;
+    width: 458px;
+    max-width: 458px;
+    margin-right: 1px;
+    padding: 15px 10px 25px 20px;
+    background: #1D2226;
+
+    &_select {
+      position: relative;
+      padding-top: 10px;
+
+      select {
+        position: relative;
+        z-index: 200;
+        background: transparent;
+        border: none;
+        appearance: none;
+        padding-right: 32px;
+        text-align: right;
+      }
+      &:after {
+        content: "";
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 50%;
+        right: 10%;
+        transform: translateY(-50%);
+        border-style: solid;
+        border-width: 10px 5px 0 5px;
+        border-color: #ffffff transparent transparent transparent;
+      }
+    }
+
+    @include small-screen {
+      padding: 12px 5px 15px 12px;
+    }
+
+    .card-header {
+      width: 100%;
+      padding-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+
+      span {
+        width: 200px;
+        border-bottom: 1px solid #999999;
+        padding: 10px 10px 10px 0px;
+
+        font-size: 18px;
+
+        @include small-screen {
+          font-size: 16px;
+        }
+      }
+
+      .card-header-btn {
+        border: none;
+        border-bottom: 1px solid #999999;
+        padding: 10px 0px 10px 0px;
+        margin-right: 10px;
+        background: #1D2226;
+        color: #FFFFFF;
+        text-align: left;
+        white-space: nowrap;
+
+        font-size: 18px;
+
+        @include small-screen {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  // Left scene set display bar
+  &_scenario_set_column {
+    height: 85%;
+    overflow-y: auto;
+  }
+
+  &_profile_tabs_column {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+
+  &_no_certificate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &__icons {
+      width: 48px;
+    }
+
+    h6 {
+      margin-bottom: 12px;
+    }
+
+    p {
+      text-align: center;
+    }
+
+    button {
+      padding: 6px 10px;
+    }
+  }
+
+  &_invalid_certificate {
+    width: 100%;
+    height: 80px;
+    padding: 19px 24px;
+    background: rgba(255, 241, 229, 0.1);
+    display: flex;
+    &__icons {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      font-family: PingFangSC-Regular, serif;
+      font-size: 14px;
+
+      line-height: 14px;
+      font-weight: 400;
+      h6 {
+        color: #FF8B33;
+      }
+
+      p {
+        cursor: pointer;
+        font-size: 12px;
+        color: #2FA5FF;
+        line-height: 12px;
+        font-weight: 400;
+
+        img {
+          margin-left: 6px;
+          vertical-align: center;
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+  }
+
+  //Scene set list container
+  .scenario-set-list {
+    flex: 1;
+    &-item {
+      padding-right: 6px;
+      width: 100%;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &_name {
+        width: 144px;
+        max-width: 144px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &_status {
+        &_icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 8px;
+        }
+
+        &_updating {
+          @keyframes rotateIcon {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+
+          animation: rotateIcon 1s ease-in-out infinite;
+        }
+
+        &_downloaded {
+          color: #00B48F;
+        }
+
+        &_fail {
+          color: #F63E40;
+        }
+      }
+
+      &_button {
+        width: 104px;
+        height: 36px;
+        background: #303438;
+        border-radius: 8px;
+        line-height: 36px;
+        text-align: center;
+        cursor: pointer;
+
+        &:hover {
+          background: #616467;
+        }
+
+        &.scenario-set-list-item_button_placehold {
+          background: transparent;
+          cursor: default;
+
+          &:hover {
+            background: transparent;
+          }
+        }
+      }
+    }
+  }
+
+  //local Scene set list container
+  .local-scenario-set-list {
+    .ant-radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      .ant-radio-wrapper {
+        color: #fff;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &-item {
+      height: 44px;
+      margin-right: 37px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: #393E43;
+        border-radius: 6px;
+      }
+
+      &:not(.local-scenario-set-list-item_selected):hover {
+        .local-scenario-set-list-item_delete {
+          &_icon {
+            display: block;
+          }
+        }
+      }
+
+      &_delete {
+        width: 16px;
+        height: 16px;
+
+        &_icon {
+          cursor: pointer;
+          width: 100%;
+          height: 100%;
+          display: none;
+        }
+
+      }
+    }
+  }
 }
 
 .route-editing-bar {

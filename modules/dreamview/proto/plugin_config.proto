@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+// used for dreamview load plugin
+message ChannelConf{
+    optional string location = 1;
+    repeated string support_msg_name = 2;
+    // only reader use it
+    optional uint32 pending_queue_size = 3
+    [default = 1];  // used to define capacity of unprocessed messages
+}
+
+// Main message
+message PluginConfig {
+    optional string name = 1;
+    optional string launch_command = 2;
+    repeated ChannelConf reader_channel_conf = 3;
+    repeated ChannelConf writer_channel_conf = 4;
+    enum PluginType {
+        cyber_component = 0;
+        binary = 1;
+    }
+    optional PluginType plugin_type = 5;
+    // 参照process monitor监控进程的方式,写在插件里。之后考虑是否放入HMIStatus
+    repeated string process_command_keywords = 6;
+    optional string stop_command = 7;
+}

@@ -70,6 +70,7 @@ cc_library(
         "//modules/dreamview/backend/sim_control",
         "//modules/common_msgs/routing_msgs:poi_cc_proto",
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
+        "//modules/dreamview/backend/plugins:plugin_manager",
         "@boost",
     ],
 )

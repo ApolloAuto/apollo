@@ -97,6 +97,8 @@ options:
     default: false
   showDataRecorder:
     default: false
+  showProfile:
+    default: false
 
   # task panel options
   showPNCMonitor:

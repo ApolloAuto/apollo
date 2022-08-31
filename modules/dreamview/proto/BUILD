@@ -148,3 +148,65 @@ py_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "plugin_config_cc_proto",
+    deps = [
+        ":plugin_config_proto",
+    ],
+)
+
+proto_library(
+    name = "plugin_config_proto",
+    srcs = ["plugin_config.proto"],
+)
+
+py_proto_library(
+    name = "plugin_config_py_pb2",
+    deps = [
+        ":plugin_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dv_plugin_msg_cc_proto",
+    deps = [
+        ":dv_plugin_msg_proto",
+    ],
+)
+
+proto_library(
+    name = "dv_plugin_msg_proto",
+    srcs = ["dv_plugin_msg.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+py_proto_library(
+    name = "dv_plugin_msg_py_pb2",
+    deps = [
+        ":dv_plugin_msg_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "scenario_cc_proto",
+    deps = [
+        ":scenario_proto",
+    ],
+)
+
+proto_library(
+    name = "scenario_proto",
+    srcs = ["scenario.proto"],
+    deps = [
+        "//modules/simulation/proto:scenario_proto",
+    ],
+)
+
+py_proto_library(
+    name = "scenario_py_pb2",
+    deps = [
+        ":scenario_proto",
+    ],
+)

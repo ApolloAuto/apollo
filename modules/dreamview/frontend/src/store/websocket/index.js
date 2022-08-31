@@ -4,6 +4,7 @@ import MapDataWebSocketEndpoint from 'store/websocket/websocket_map';
 import PointCloudWebSocketEndpoint from 'store/websocket/websocket_point_cloud';
 import CameraDataWebSocketEndpoint from 'store/websocket/websocket_camera';
 import TeleopWebSocketEndpoint from 'store/websocket/websocket_teleop';
+import PluginWebSocketEndpoint from 'store/websocket/websocket_plugin';
 
 // Returns the websocket server address based on the web server address.
 // Follows the convention that the websocket is served on the same host/port
@@ -32,6 +33,9 @@ function deduceWebsocketServerAddr(type) {
     case 'teleop':
       path = 'teleop';
       break;
+    case 'plugin':
+      path = 'plugin';
+      break;
   }
   return `${protocol}://${link.hostname}:${port}/${path}`;
 }
@@ -49,6 +53,9 @@ export const POINT_CLOUD_WS = new PointCloudWebSocketEndpoint(pointCloudServerAd
 
 const cameraServerAddr = deduceWebsocketServerAddr('camera');
 export const CAMERA_WS = new CameraDataWebSocketEndpoint(cameraServerAddr);
+
+const pluginServerAddr = deduceWebsocketServerAddr('plugin');
+export const PLUGIN_WS = new PluginWebSocketEndpoint(pluginServerAddr);
 
 const WS = OFFLINE_PLAYBACK
   ? new OfflinePlaybackWebSocketEndpoint(simWorldServerAddr)

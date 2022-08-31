@@ -16,6 +16,10 @@ enum HMIAction {
   CHANGE_VEHICLE = 7;  // value = vehicle_name
   START_MODULE = 8;    // value = module_name
   STOP_MODULE = 9;     // value = module_name
+  CHANGE_SCENARIO = 10;     // value = scenario_id
+  CHANGE_SCENARIO_SET = 11;      // value = scenario_set_id
+  LOAD_SCENARIOS = 12; // 加载全部scenarios
+  DELETE_SCENARIO_SET = 13; // value = scenario_set_id
 }
 
 message HMIConfig {

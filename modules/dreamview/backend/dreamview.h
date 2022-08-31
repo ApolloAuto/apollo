@@ -31,6 +31,7 @@
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
+#include "modules/dreamview/backend/plugins/plugin_manager.h"
 #if WITH_TELEOP == 1
 #include "modules/dreamview/backend/teleop/teleop.h"
 #endif
@@ -52,6 +53,9 @@ class Dreamview {
 
  private:
   void TerminateProfilingMode();
+  bool PluginCallbackHMI(const std::string& function_name, const nlohmann::json &param_json);
+  bool HMICallbackSimControl(const std::string& function_name,
+                             const nlohmann::json& param_json);
 
   std::unique_ptr<cyber::Timer> exit_timer_;
 
@@ -63,10 +67,12 @@ class Dreamview {
   std::unique_ptr<WebSocketHandler> map_ws_;
   std::unique_ptr<WebSocketHandler> point_cloud_ws_;
   std::unique_ptr<WebSocketHandler> camera_ws_;
+  std::unique_ptr<WebSocketHandler> plugin_ws_;
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
   std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
+  std::unique_ptr<PluginManager> plugin_manager_;
 #if WITH_TELEOP == 1
   std::unique_ptr<TeleopService> teleop_;
   std::unique_ptr<WebSocketHandler> teleop_ws_;
