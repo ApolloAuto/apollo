@@ -3,6 +3,20 @@ workspace(name = "apollo")
 load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc",
+    strip_prefix = "rules_foreign_cc-0.8.0",
+    urls = [
+        "https://apollo-system.bj.bcebos.com/archive/6.0/rules_foreign_cc-0.8.0.tar.gz",
+        "https://github.com/bazelbuild/rules_foreign_cc/archive/0.8.0.tar.gz",
+    ],
+)
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+rules_foreign_cc_dependencies()
+
 apollo_repositories()
 
 http_archive(
@@ -74,8 +88,12 @@ http_archive(
     build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
     sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
     strip_prefix = "zlib-1.2.11",
-    urls = ["https://github.com/madler/zlib/archive/v1.2.11.tar.gz"],
+    urls = [
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/zlib-v1.2.11.tar.gz",
+        "https://github.com/madler/zlib/archive/v1.2.11.tar.gz",
+    ],
 )
+
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
