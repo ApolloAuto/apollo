@@ -9,7 +9,7 @@ MICROPHONE_COPTS = ['-DMODULE_NAME=\\"microphone\\"']
 cc_binary(
     name = "libmicrophone_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":microphone_component_lib",
     ],
@@ -24,9 +24,6 @@ install(
     ],
     targets = [
         ":libmicrophone_component.so",
-    ],
-    deps = [
-        "//cyber:install",
     ],
 )
 
@@ -44,6 +41,7 @@ cc_library(
     srcs = ["microphone_component.cc"],
     hdrs = ["microphone_component.h"],
     copts = MICROPHONE_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

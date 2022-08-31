@@ -6,7 +6,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "portaudio",
-    includes = ["include"],
+    hdrs = glob(["include/**/*"]),
+    strip_include_prefix = "include",
     linkopts = [
         "-lrt",
         "-lasound",
@@ -14,5 +15,4 @@ cc_library(
         "-lpthread",
         "-lportaudio",
     ],
-    strip_include_prefix = "include",
 )

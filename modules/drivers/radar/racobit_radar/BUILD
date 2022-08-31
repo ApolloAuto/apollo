@@ -56,6 +56,7 @@ cc_library(
     srcs = ["racobit_radar_canbus_component.cc"],
     hdrs = ["racobit_radar_canbus_component.h"],
     copts = ['-DMODULE_NAME=\\"racobit_radar_canbus\\"'],
+    alwayslink = True,
     deps = [
         ":racobit_radar_message_manager",
         "//cyber",
@@ -74,7 +75,7 @@ cc_library(
 cc_binary(
     name = "libracobit_radar_canbus_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":racobit_radar_canbus_lib"],
 )
 

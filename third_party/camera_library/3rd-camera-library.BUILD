@@ -1,5 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -12,18 +11,9 @@ cc_library(
     copts = [
         "-Iinclude",
     ],
-    includes = [
-        "include",
-    ],
     linkopts = [
         "-Llib",
     ],
+    include_prefix = "third_party/camera_library/smartereye",
     visibility = ["//visibility:public"],
-)
-
-install_src_files(
-    name = "headers",
-    src_dir = ["include"],
-    dest = "3rd-camera-library/include",
-    filter = "*",
 )

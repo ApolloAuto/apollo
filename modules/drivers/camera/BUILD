@@ -13,7 +13,7 @@ cc_binary(
         "-latomic",
     ],
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":camera_component_lib",
         ":compress_component_lib",
@@ -42,15 +42,13 @@ install(
     targets = [
       ":libcamera_component.so",
     ],
-    deps = [
-        "//cyber:install",
-    ],
 )
 
 cc_library(
     name = "camera_component_lib",
     srcs = ["camera_component.cc"],
     hdrs = ["camera_component.h"],
+    alwayslink = True,
     copts = CAMERA_COPTS,
     deps = [
         ":camera",
@@ -66,6 +64,7 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     copts = CAMERA_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",

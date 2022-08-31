@@ -28,7 +28,7 @@ filegroup(
 cc_binary(
     name = "libvideo_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":video_driver_component_lib"],
 )
 
@@ -37,6 +37,7 @@ cc_library(
     srcs = ["video_driver_component.cc"],
     hdrs = ["video_driver_component.h"],
     copts = ['-DMODULE_NAME=\\"video\\"'],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

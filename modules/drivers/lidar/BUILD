@@ -35,6 +35,7 @@ cc_library(
     name = "lidar_driver_component_lib",
     srcs = ["lidar_driver_component.cc"],
     hdrs = ["lidar_driver_component.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:lidar_driver_factory",
@@ -45,7 +46,7 @@ cc_library(
 cc_binary(
     name = "liblidar_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":lidar_driver_component_lib"],
 )
 

@@ -13,9 +13,6 @@ install(
     targets = [
         ":libimage_decompress.so",
     ],
-    deps = [
-        "//cyber:install",
-    ],
 )
 
 filegroup(
@@ -32,6 +29,7 @@ cc_library(
     srcs = ["image_decompress.cc"],
     hdrs = ["image_decompress.h"],
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
@@ -55,7 +53,7 @@ cc_test(
 cc_binary(
     name = "libimage_decompress.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":image_decompress_lib"],
 )
 

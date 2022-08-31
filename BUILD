@@ -81,6 +81,11 @@ install(
         "//third_party/gpus:install",
         "//third_party/tf2:install",
         "//third_party/localization_msf:install",
+        "//third_party/can_card_library:install",
+        "//third_party/camera_library:install",
+        "//third_party/rtklib:install",
+        "//third_party/ffmpeg:install",
+        "//third_party/adv_plat:install",
     ],
 )
 
@@ -151,5 +156,10 @@ install_src_files(
         "//third_party/gpus:install_src",
         "//third_party/tf2:install_src",
         "//third_party/localization_msf:install_src",
+        "//third_party/can_card_library:install_src",
+        "//third_party/camera_library:install_src",
+        "//third_party/rtklib:install_src",
+        "//third_party/ffmpeg:install_src",
+        "//third_party/adv_plat:install_src",
     ],
 )
