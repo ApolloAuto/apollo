@@ -16,6 +16,7 @@ from subprocess import check_output, check_call, Popen, PIPE
 import xml.etree.ElementTree as ET
 
 prefix = None
+pkg_name = None
 dbg = False
 gpu = False
 dev = True
@@ -82,9 +83,12 @@ def setup_cyberfile(cyberfile_path, replace=True, dev=False, dbg=False, gpu=Fals
     return old_name, name.text, ET.tostring(root)
 
 
-def setup_cyberfiles():
+def setup_cyberfiles(pkg_name=None):
     """Setup final cyberfiles by install parameters. """
     for d in os.listdir(prefix):
+        if pkg_name is not None and d != pkg_name:
+            # only handle target package
+            return
         cyberfile_path = prefix + d + "/local/cyberfile.xml"
         if os.path.exists(cyberfile_path):
             old_name, new_name, _ = setup_cyberfile(cyberfile_path, True, dev, dbg, gpu)
@@ -165,6 +169,7 @@ def install_src(src, dst, filter):
 
 def main(args):
     global prefix
+    global pkg_name
     global dbg
     global gpu
     global dev
@@ -173,6 +178,8 @@ def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('prefix', type=str, help='Install prefix')
 
+    parser.add_argument('--pkg_name', type=str, default=None,
+                                    help='Install target package name.')
     parser.add_argument('--dbg', action='store_true', default=False,
                                 help='debug package with debugging symbols.')
     parser.add_argument('--gpu', action='store_true', default=False,
@@ -184,6 +191,7 @@ def main(args):
     # Get install prefix.
     prefix = args.prefix
 
+    pkg_name = args.pkg_name
     dbg = args.dbg
     gpu = args.gpu
     dev = args.dev
@@ -204,7 +212,7 @@ def main(args):
     <<actions>>
 
     # Setup cyberfile
-    setup_cyberfiles()
+    setup_cyberfiles(pkg_name)
 
     # Fix config path
     fix_configs_in_pkg()
