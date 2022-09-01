@@ -200,7 +200,7 @@ proto_library(
     name = "scenario_proto",
     srcs = ["scenario.proto"],
     deps = [
-        "//modules/simulation/proto:scenario_proto",
+        "//modules/common_msgs/simulation_msgs:scenario_proto",
     ],
 )
 
