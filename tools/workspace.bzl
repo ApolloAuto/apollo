@@ -39,7 +39,6 @@ load("//third_party/py:python_configure.bzl", "python_configure")
 load("//third_party/tensorrt:tensorrt_configure.bzl", "tensorrt_configure")
 load("//third_party/vtk:vtk_configure.bzl", "vtk_configure")
 load("//third_party/pcl:pcl_configure.bzl", "pcl_configure")
-load("//third_party/openssl:workspace.bzl", openssl = "repo")
 
 def initialize_third_party():
     """ Load third party repositories.  See above load() statements. """
@@ -78,7 +77,6 @@ def initialize_third_party():
     tinyxml2()
     uuid()
     yaml_cpp()
-    openssl()
 
 # Define all external repositories required by
 def apollo_repositories():
