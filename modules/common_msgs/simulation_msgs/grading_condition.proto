@@ -1,0 +1,296 @@
+syntax = "proto2";
+
+package apollo.simulation;
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+
+// Next-id: 29
+message Condition {
+  oneof condition {
+    LogicalCondition logical_condition = 1;
+    SpeedCondition speed_condition = 2;
+    AccelerationCondition acceleration_condition = 3;
+    JerkCondition jerk_condition = 4;
+    ObjectOverlapCondition object_overlap_condition = 5;
+    RegionOverlapCondition region_overlap_condition = 6;
+    RegionOverlapLWCondition region_overlap_lw_condition = 7;
+    SpinCondition spin_condition = 8;
+    OnRoadCondition on_road_condition = 9;
+    RunRedLightCondition run_red_light_condition = 10;
+    ChangeLaneAtJunctionCondition change_lane_at_junction_condition = 11;
+    RoutingCondition routing_condition = 12;
+    CrosswalkYieldCondition crosswalk_yield_condition = 13;
+    AbnormalStopCondition abnormal_stop_condition = 14;
+    BrakeTapCondition brake_tap_condition = 15;
+    RunStopSignCondition run_stop_sign_condition = 16;
+    CheckpointCondition checkpoint_condition = 17;
+    DistToEndCondition dist_to_end_condition = 18;
+    DistToLaneCenterCondition dist_to_lane_center_condition = 19;
+    CrosswalkStopCondition crosswalk_stop_condition = 20;
+    RedLightStopCondition red_light_stop_condition = 21;
+    SpeedbumpLimitCondition speedbump_limit_condition = 22;
+    WorkingZoneAvoidLimitCondition working_zone_avoid_limit_condition = 23;
+    LimitedTimeParkingCondition limited_time_parking_condition = 24;
+    FollowAndBypassCondition follow_and_bypass_condition = 25;
+    ObstacleBypassCondition obstacle_bypass_condition = 26;
+    CentripetalAccelerationCondition centripetal_acceleration_condition = 27;
+    TimeLimitCondition time_limit_condition = 28;
+    AntiCheatingCondition anti_cheating_condition = 29;
+    KeyPointCondition key_point_condition = 30;
+  }
+
+  optional GradePlanning grade_planning = 100;
+}
+
+message GradePlanning {
+  // any negative integer: grade all the planning points,
+  // 0: do not grade any planning point,
+  // any positive integer k: grade planning points within k sec.
+  optional sint32 duration = 1 [default = 0];
+  // Whether to search for a perception obstacle frame that is
+  // close enough in time to the planning point.
+  optional bool update_obstacles = 2 [default = false];
+  // Whether to evaluate planning points in a certain range.
+  optional bool use_planning_as_history = 3 [default = false];
+}
+
+message LogicalCondition {
+  enum OperatorType {
+    UNKNOWN = 0;
+    NOT = 1;
+    AND = 2;
+    OR = 3;
+    IMPLY = 4;
+    XOR = 5;
+  }
+  optional OperatorType operator_type = 1;
+  repeated Condition sub_condition = 2;
+}
+
+message SpeedCondition {
+  optional string name = 1 [default = "speed"];
+  optional double min_speed = 2 [default = -0.5];
+  optional double max_speed = 3 [default = 1000.0];
+  optional bool use_score = 4 [default = false];
+  optional double single_deduction = 5 [default = 0.5];
+}
+
+message CentripetalAccelerationCondition {
+  // 向心加速度限制
+  optional string name = 1 [default = "centripetal_acceleration"];
+  optional double max_centripetal_acceleration = 2 [default = 2.0];
+  optional bool use_score = 3 [default = false];
+  optional double single_deduction = 4 [default = 0.5];
+}
+
+message AccelerationCondition {
+  optional string name = 1 [default = "acceleration"];
+  optional double min_acceleration = 2 [default = -1000.0];
+  optional double max_acceleration = 3 [default = 1000.0];
+  optional bool use_score = 4 [default = false];
+  optional double single_deduction = 5 [default = 0.5];
+}
+
+message JerkCondition {
+  optional string name = 1 [default = "jerk"];
+  optional double min_jerk = 2 [default = -1000.0];
+  optional double max_jerk = 3 [default = 1000.0];
+}
+
+message SpinCondition {
+  optional string name = 1 [default = "spin"];
+  optional double min_spin = 2 [default = -1000.0];
+  optional double max_spin = 3 [default = 1000.0];
+}
+
+message ObjectOverlapCondition {
+  enum DirectionType {
+    EXCLUDE_BACK = 0;
+    INCLUDE_BACK = 1;
+  }
+
+  optional string source_object_ids = 1;
+  optional string target_object_ids = 2;
+  optional double distance = 3;
+  // the relative direction from the source object
+  optional DirectionType direction = 4 [default = EXCLUDE_BACK];
+  repeated string ignore_object_ids = 5;
+  optional bool use_score = 6 [default = false];
+}
+
+message RegionOverlapCondition {
+  optional string object_ids = 1;
+
+  // Coordinates of region corners. e.g. x1, y1, x2, y2, etc.
+  repeated double region_corner_xy = 2 [packed = true];
+
+  // True if the condition requires the region fully containing the object.
+  optional bool require_fully_contain = 3;
+
+  // Specify if the polygon has certain pre-defined heading.
+  optional double heading = 4;
+  optional bool use_score = 5 [default = false];
+}
+
+message RegionOverlapLWCondition {
+  optional string object_ids = 1;
+
+  optional double x = 2;
+  optional double y = 3;
+
+  optional double length = 4;
+  optional double width = 5;
+
+  // True if the condition requires the region fully containing the object.
+  optional bool require_fully_contain = 6;
+  optional bool use_score = 7 [default = false];
+}
+
+message OnRoadCondition {
+  // True if evaluate based on road boundary rather than lane boundary.
+  optional bool use_road_boundary = 1 [default = false];
+  optional bool use_score = 2 [default = false];
+}
+
+message RunRedLightCondition {
+  optional bool use_score = 1 [default = false];
+}
+
+message RedLightStopCondition {
+  optional double min_distance = 1 [default = 2.0];
+  optional double max_distance = 2 [default = 2.2];
+  optional bool use_score = 3 [default = false];
+  optional double single_deduction = 4 [default = 5];
+}
+
+message ChangeLaneAtJunctionCondition {}
+
+message RoutingCondition {}
+
+message CrosswalkYieldCondition {}
+
+message CrosswalkStopCondition {
+  optional double min_distance = 1 [default = 2.2];
+  optional double max_distance = 2 [default = 2.7];
+  optional bool use_score = 3 [default = false];
+  optional double single_deduction = 4 [default = 5];
+}
+
+message AbnormalStopCondition {
+  optional double duration = 1 [default = 5.0];
+  optional double distance = 2 [default = 10.0];
+  optional double x = 3;
+  optional double y = 4;
+}
+
+message BrakeTapCondition {
+  optional double min_duration = 1 [default = 1.0];
+  optional double max_duration = 2 [default = 4.0];
+}
+
+message RunStopSignCondition {
+  optional double distance = 1 [default = 2.0];
+}
+
+message CheckpointCondition {
+  // Each checkpoint sub-condition needs to be true at least once.
+  repeated Condition checkpoint = 1;
+}
+
+message DistToEndCondition {}
+
+message DistToLaneCenterCondition {}
+
+message TimeLimitCondition {
+  // time limitation, in seconds
+  optional double timeout = 1;
+  optional bool use_score = 2 [default = false];
+}
+
+message SpeedbumpLimitCondition {
+  // change speedbump from line segment to rectangle which length = line segment
+  // length
+  optional double speedbump_half_width = 1 [default = 0.2];
+  optional double max_speed = 2 [default = 3.0];
+  // (adc_speed - max_speed)/deduction_speed_unit 来计算扣分次数
+  optional double deduction_speed_unit = 3 [default = 1.0];
+  optional bool use_score = 4 [default = false];
+  optional double single_deduction = 5 [default = 5];
+}
+
+// 区别：和regionOverlap希望包含这个polygon或者有重叠的情况
+// 施工区域：希望不包含这个polygon，同时含限时+限速
+// 忽略限速和限时，将变成一个判断no overlap的情况
+// 可以理解为：regionOverlap反向
+message WorkingZoneAvoidLimitCondition {
+  // adc should avoid working zone
+  repeated apollo.hdmap.Polygon working_zone = 1;
+  optional double max_speed = 2 [default = 8.33];
+  // whole area used for judge if car enter this area
+  // if enter, then check if enter working_zone
+  // this field required
+  optional apollo.hdmap.Polygon whole_area = 3;
+  optional bool use_score = 4 [default = false];
+  // 单帧扣分系数，应该与位移及检测帧率成负相关，与总分值成正相关
+  // 扣分公式为sum((vx/vl-1)^(vx/vl)*single_deduction)
+  //  vx 为当前帧速度
+  //  vl 即 max_speed, 最大限速
+  // 具体的系数公式待定，以下仅举例说明，由于公式不明确，暂时以一个
+  // 定值参数的形式从配置传入
+  // eg: 满分为120的情况下，频率100（间隔0.01s），距离600m的情况下
+  // single_deduction = (120 * k) / (600 * 100), k 为常数
+  // k为30则single_deduction为0.06，则通过扣分公式大概可得
+  // 平均速度超过60%之后可将分数扣完
+  // k为40则single_deduction为0.08，则通过扣分公式大概可得
+  // 平均速度超过43%之后可将分数扣完
+  // 调整k使用single_deduction可以让速度超过一定比例后将分数扣完
+  optional double single_deduction = 5 [default = 3];
+}
+
+message LimitedTimeParkingCondition {
+  optional apollo.hdmap.Polygon parking_lot = 1;
+  // 转变time to 次数
+  // eg: 90s内限时停车，频率10ms刷新一次 9000次
+  optional bool use_score = 2 [default = false];
+  optional double single_deduction = 3 [default = 5];
+}
+
+message FollowAndBypassCondition {
+  optional apollo.hdmap.Polygon test_range = 1;
+  optional double divide_speed = 2 [default = 3.0];  // 3
+  optional string obstacle_id = 3;                   // 1372
+  optional apollo.hdmap.LineSegment end_line = 4;
+  optional bool use_score = 5 [default = false];
+  // no single deduction only 100 or 0
+}
+
+message ObstacleBypassCondition {
+  optional apollo.hdmap.Polygon test_range = 1;
+  optional string obstacle_id = 2;
+  optional double min_lateral_distance = 3 [default = 1.0];
+  optional double max_speed = 4 [default = 5.0];
+  optional bool use_score = 5 [default = false];
+  optional double single_deduction = 6 [default = 5];
+}
+
+message AntiCheatingCondition {
+  optional bool use_score = 1 [default = false];
+}
+
+message KeyPoint {
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3 [default = 0.0];
+  optional double radius = 4 [default = 2.0];
+}
+
+// 这个条件是针对高速足跳变所设计，通过设置道路的检查点，看车辆是否保持合理的运
+// 行轨迹
+// TODO: 在解析评测配置的处增加根据路线生成检查点的逻辑
+message KeyPointCondition {
+  optional bool use_score = 1 [default = false];
+  optional bool in_order = 2 [default = true];
+  optional double radius = 3 [default = 2.0];
+  // 检查点，每个点都经过结果判定才会为真
+  repeated KeyPoint point = 4;
+}
