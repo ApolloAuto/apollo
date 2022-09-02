@@ -43,7 +43,7 @@ struct CalibratorOptions {
   double *timestamp = nullptr;
 };
 
-class BaseCalibrator {
+class BaseCalibrator : public Task {
  public:
   BaseCalibrator() = default;
 

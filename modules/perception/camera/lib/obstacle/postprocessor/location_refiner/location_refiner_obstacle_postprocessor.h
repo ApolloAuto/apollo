@@ -27,14 +27,10 @@ namespace camera {
 
 class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
  public:
-  LocationRefinerObstaclePostprocessor() : BaseObstaclePostprocessor() {
-    postprocessor_ = new ObjPostProcessor;
-  }
+  LocationRefinerObstaclePostprocessor();
 
-  virtual ~LocationRefinerObstaclePostprocessor() {
-    delete postprocessor_;
-    postprocessor_ = nullptr;
-  }
+  virtual ~LocationRefinerObstaclePostprocessor() = default;
+
   bool Init(const ObstaclePostprocessorInitOptions &options =
                 ObstaclePostprocessorInitOptions()) override;
 
@@ -44,15 +40,13 @@ class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
   bool Process(const ObstaclePostprocessorOptions &options,
                CameraFrame *frame) override;
 
-  // std::string Name() const override;
-
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   bool is_in_roi(const float pt[2], float img_w, float img_h, float v,
@@ -74,7 +68,7 @@ class LocationRefinerObstaclePostprocessor : public BaseObstaclePostprocessor {
  private:
   //  int image_width_ = 0;
   //  int image_height_ = 0;
-  ObjPostProcessor *postprocessor_ = nullptr;
+  std::unique_ptr<ObjPostProcessor> postprocessor_;
   location_refiner::LocationRefinerParam location_refiner_param_;
 };
 

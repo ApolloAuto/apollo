@@ -42,7 +42,7 @@ class LidarObstacleTracking : public BaseLidarObstacleTracking {
 
   bool Process(DataFrame* data_frame) override;
 
-  const std::string& Name() const override { return "LidarObstacleTracking"; }
+  std::string Name() const override { return "LidarObstacleTracking"; }
 
  private:
   std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;

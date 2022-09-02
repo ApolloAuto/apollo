@@ -56,7 +56,7 @@ class ProbabilisticFusion : public BaseFusionSystem {
 
   bool Process(DataFrame* data_frame) override;
 
-  const std::string& Name() const override;
+  std::string Name() const override;
 
  private:
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;

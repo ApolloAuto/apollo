@@ -31,23 +31,17 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 struct alignas(16) Hypothesis {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   int target;
   int object;
   float score;
 
-  Hypothesis() {
-    this->target = -1;
-    this->object = -1;
-    this->score = -1;
-  }
+  Hypothesis() : target(-1), object(-1), score(-1) {}
 
-  Hypothesis(int tar, int obj, float score) {
-    this->target = tar;
-    this->object = obj;
-    this->score = score;
-  }
+  Hypothesis(int tar, int obj, float score)
+      : target(tar), object(obj), score(score) {}
 
   bool operator<(const Hypothesis &b) const { return score < b.score; }
 
@@ -56,14 +50,12 @@ struct alignas(16) Hypothesis {
 
 class OMTObstacleTracker : public BaseObstacleTracker {
  public:
-  //  OMTObstacleTracker() : similar_(nullptr), track_id_(0),
-  //                         frame_num_(0), gpu_id_(0),
-  //                         width_(0.0f), height_(0.0f),
-  //                         BaseObstacleTracker() {
-  //  }
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  OMTObstacleTracker() : BaseObstacleTracker() {}
+  using cyber::common::GetAbsolutePath;
 
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  OMTObstacleTracker() = default;
   ~OMTObstacleTracker() = default;
 
   bool Init(const ObstacleTrackerInitOptions &options) override;
@@ -106,7 +98,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   float ScoreAppearance(const Target &target, TrackObjectPtr object);

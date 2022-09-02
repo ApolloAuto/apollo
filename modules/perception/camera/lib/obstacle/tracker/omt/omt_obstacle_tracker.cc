@@ -29,7 +29,9 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using cyber::common::GetAbsolutePath;
+OMTObstacleTracker::OMTObstacleTracker() {
+  name_ = "OMTObstacleTracker";
+}
 
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);
@@ -74,8 +76,6 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   object_template_manager_ = ObjectTemplateManager::Instance();
   return true;
 }
-
-std::string OMTObstacleTracker::Name() const { return "OMTObstacleTracker"; }
 
 // @description combine targets using iou after association
 bool OMTObstacleTracker::CombineDuplicateTargets() {
@@ -489,7 +489,30 @@ bool OMTObstacleTracker::Track(const ObstacleTrackerOptions &options,
   return true;
 }
 
+bool OMTObstacleTracker::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr) {
+    return;
+  }
+
+  CameraFrame* camera_frame = data_frame->camera_frame;
+  ObstacleTrackerOptions tracker_options;
+
+  if (camera_frame->proposed_objects.empty()) {
+    Predict(tracker_options, camera_frame);
+  // todo(zero): add condition
+  } else if () {
+    Associate2D(tracker_options, camera_frame);
+  } else if (camera_frame->tracked_objects.empty()) {
+    Associate3D(tracker_options, camera_frame);
+  } else {
+    Track(tracker_options, camera_frame);
+  }
+
+  return true;
+}
+
 REGISTER_OBSTACLE_TRACKER(OMTObstacleTracker);
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

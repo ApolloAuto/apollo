@@ -52,7 +52,7 @@ class BaseLidarObstacleTracking : public Pipeline {
 
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual const std::string& Name() const = 0;
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseLidarObstacleTracking);

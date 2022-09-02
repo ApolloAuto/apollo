@@ -61,7 +61,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  protected:
   void LoadInputShape(const smoke::ModelParam &model_param);

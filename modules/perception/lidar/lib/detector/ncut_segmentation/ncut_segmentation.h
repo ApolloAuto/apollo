@@ -61,7 +61,7 @@ class NCutSegmentation : public BaseLidarDetector {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   bool Configure(std::string model_name);

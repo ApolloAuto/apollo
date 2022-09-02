@@ -49,7 +49,7 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection {
 
   bool Process(DataFrame* data_frame) override;
 
-  const std::string& Name() const override { return "LidarObstacleDetection"; }
+  std::string Name() const override { return "LidarObstacleDetection"; }
 
  private:
   LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,

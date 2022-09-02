@@ -38,7 +38,7 @@ class Pipeline {
 
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual const std::string& Name() const = 0;
+  virtual std::string Name() const = 0;
 
  protected:
   bool Initialize(const PipelineConfig& pipeline_config);

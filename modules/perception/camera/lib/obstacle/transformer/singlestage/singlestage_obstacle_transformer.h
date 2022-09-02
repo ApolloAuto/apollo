@@ -65,7 +65,7 @@ class SingleStageObstacleTransformer : public BaseObstacleTransformer {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   int MatchTemplates(base::ObjectSubType sub_type, float *dimension_hwl);

@@ -27,12 +27,15 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 class ProjectFeature : public BaseFeatureExtractor {
  public:
+  ProjectFeature();
+  ~ProjectFeature() = default;
+
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 
@@ -40,7 +43,7 @@ class ProjectFeature : public BaseFeatureExtractor {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<inference::Inference> inference_;
