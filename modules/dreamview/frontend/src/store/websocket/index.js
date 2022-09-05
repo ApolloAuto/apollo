@@ -37,7 +37,11 @@ function deduceWebsocketServerAddr(type) {
       path = 'plugin';
       break;
   }
-  return `${protocol}://${link.hostname}:${port}/${path}`;
+  let pathname = '';
+  if (window.location.pathname !== '/') {
+    pathname = window.location.pathname;
+  }
+  return `${protocol}://${link.hostname}:${port}${pathname}/${path}`;
 }
 
 // NOTE: process.env.NODE_ENV will be set to "production" by webpack when
