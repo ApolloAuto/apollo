@@ -23,10 +23,10 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/proto/tracking_feature.pb.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/operators/roipooling_layer.h"
 #include "modules/perception/inference/utils/gemm.h"
+#include "modules/perception/pipeline/proto/stage/tracking_feature.pb.h"
 
 namespace apollo {
 namespace perception {

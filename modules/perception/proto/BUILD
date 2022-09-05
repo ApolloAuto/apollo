@@ -24,24 +24,6 @@ py_proto_library(
     ],
 )
 cc_proto_library(
-    name = "fused_classifier_config_cc_proto",
-    deps = [
-        ":fused_classifier_config_proto",
-    ],
-)
-
-proto_library(
-    name = "fused_classifier_config_proto",
-    srcs = ["fused_classifier_config.proto"],
-)
-
-py_proto_library(
-    name = "fused_classifier_config_py_pb2",
-    deps = [
-        ":fused_classifier_config_proto",
-    ],
-)
-cc_proto_library(
     name = "sensor_meta_schema_cc_proto",
     deps = [
         ":sensor_meta_schema_proto",

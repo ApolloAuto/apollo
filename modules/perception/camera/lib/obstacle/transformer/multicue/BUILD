@@ -23,7 +23,7 @@ cc_library(
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/transformer/multicue/proto:multicue_cc_proto",
+        "//modules/perception/pipeline/proto/stage:multicue_cc_proto",
     ],
     alwayslink = True,
 )

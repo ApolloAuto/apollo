@@ -12,9 +12,9 @@ cc_library(
         "//modules/perception/fusion/base:base_init_options",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:track",
-        "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto:pbf_gatekeeper_config_cc_proto",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/config_manager",
+        "//modules/perception/pipeline/proto/stage:pbf_gatekeeper_config_cc_proto",
     ],
 )
 

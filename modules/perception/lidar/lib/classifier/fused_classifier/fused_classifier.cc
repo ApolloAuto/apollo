@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "cyber/common/file.h"
-#include "modules/perception/proto/fused_classifier_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/fused_classifier_config.pb.h"
 
 namespace apollo {
 namespace perception {

@@ -22,7 +22,7 @@
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/roi_boundary_filter_config.pb.h"
+#include "modules/perception/pipeline/proto/task/roi_boundary_filter_config.pb.h"
 
 using apollo::common::EigenVector;
 

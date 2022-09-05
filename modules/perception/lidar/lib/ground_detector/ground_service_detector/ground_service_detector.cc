@@ -19,7 +19,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
-#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/ground_service_detector_config.pb.h"
 
 namespace apollo {
 namespace perception {

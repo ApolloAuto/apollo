@@ -19,7 +19,7 @@
 #include "cyber/common/log.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/map_manager_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/map_manager_config.pb.h"
 
 namespace apollo {
 namespace perception {

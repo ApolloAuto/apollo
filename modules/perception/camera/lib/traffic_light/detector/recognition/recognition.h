@@ -21,7 +21,6 @@
 
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
-// #include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/proto/stage/recognition.pb.h"
 

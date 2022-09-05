@@ -23,8 +23,8 @@
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
-#include "modules/perception/camera/lib/lane/postprocessor/denseline/proto/denseline_postprocessor.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/proto/stage/denseline_postprocessor.pb.h"
 
 namespace apollo {
 namespace perception {

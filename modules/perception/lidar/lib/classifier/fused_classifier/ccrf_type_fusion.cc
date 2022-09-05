@@ -22,7 +22,7 @@
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/ccrf_type_fusion_config.pb.h"
+#include "modules/perception/pipeline/proto/task/ccrf_type_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {

@@ -16,6 +16,9 @@
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
 #include <limits>
+#include <unordered_map>
+
+#include "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.pb.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"

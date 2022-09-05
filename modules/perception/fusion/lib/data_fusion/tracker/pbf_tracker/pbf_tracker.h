@@ -24,7 +24,7 @@
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
 #include "modules/perception/fusion/lib/interface/base_type_fusion.h"
-#include "modules/perception/proto/pbf_tracker_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/pbf_tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {

@@ -38,7 +38,7 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
-        "//modules/perception/proto:ccrf_type_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/task:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -54,7 +54,7 @@ cc_library(
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//modules/perception/proto:fused_classifier_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:fused_classifier_config_cc_proto",
     ],
     alwayslink = True,
 )

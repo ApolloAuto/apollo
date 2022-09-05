@@ -10,12 +10,12 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
     ],
 )
 
@@ -42,12 +42,12 @@ cc_library(
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
-        "//modules/perception/camera/lib/feature_extractor/tfe/proto:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
     ],
     alwayslink = True,
 )

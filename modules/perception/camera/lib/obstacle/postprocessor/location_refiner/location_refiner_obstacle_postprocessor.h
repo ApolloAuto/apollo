@@ -19,7 +19,7 @@
 
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"
-#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/proto/location_refiner.pb.h"
+#include "modules/perception/pipeline/proto/stage/location_refiner.pb.h"
 
 namespace apollo {
 namespace perception {

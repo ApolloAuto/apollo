@@ -17,7 +17,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface:base_pointcloud_preprocessor",
-        "//modules/perception/lidar/lib/pointcloud_preprocessor/proto:pointcloud_preprocessor_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_cc_proto",
         "@eigen",
     ],
     alwayslink = True,
