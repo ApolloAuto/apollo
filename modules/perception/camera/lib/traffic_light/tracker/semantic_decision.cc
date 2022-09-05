@@ -57,6 +57,33 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   return true;
 }
 
+bool Init(const StageConfig& stage_config){
+  const auto& semantic_param_ = stage_config.semantic_reviser_config();
+
+  int non_blink_coef = 2;
+  revise_time_s_ = semantic_param_.revise_time_second();
+  blink_threshold_s_ = semantic_param_.blink_threshold_second();
+  hysteretic_threshold_ = semantic_param_.hysteretic_threshold_count();
+  non_blink_threshold_s_ =
+      blink_threshold_s_ * static_cast<float>(non_blink_coef);
+
+  ADEBUG << "revise_time_s_: " << revise_time_s_;
+  ADEBUG << "blink_threshold_s_: " << blink_threshold_s_;
+  ADEBUG << "hysteretic_threshold_: " << hysteretic_threshold_;
+
+  return true;
+}
+
+bool TrafficLightDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  TrafficLightTrackerOptions traffic_light_tracker_options;
+  bool res = Track(traffic_light_tracker_options, data_frame->camera_frame);
+
+  return res;
+}
+
 void SemanticReviser::UpdateHistoryAndLights(
     const SemanticTable &cur, std::vector<base::TrafficLightPtr> *lights,
     std::vector<SemanticTable>::iterator *history) {

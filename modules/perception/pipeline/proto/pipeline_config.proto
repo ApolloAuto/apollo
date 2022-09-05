@@ -12,6 +12,9 @@ import "modules/perception/pipeline/proto/stage/map_manager_config.proto"
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto"
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto"
 import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto"
+import "modules/perception/pipeline/proto/stage/detection.proto"
+import "modules/perception/pipeline/proto/stage/recognition.proto"
+import "modules/perception/pipeline/proto/stage/semantic.proto"
 // task
 import "modules/perception/pipeline/proto/task/roi_boundary_filter_config.proto"
 
@@ -113,6 +116,10 @@ message StageConfig {
     FusedClassifierConfig fused_classifier_config = 13;
 
     PbfTrackerConfig pbf_tracker_config = 14;
+
+    TrafficLightDetectionConfig traffic_light_detection_config = 15;
+    TrafficLightRecognitionConfig traffic_light_recognition_config = 16;
+    SemanticReviserConfig semantic_reviser_config = 17;
   }
 }
 

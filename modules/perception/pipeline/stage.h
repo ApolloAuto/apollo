@@ -23,6 +23,8 @@
 
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/task.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+#include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -52,6 +54,8 @@ class Stage {
   bool enable_ = false;
   std::string name_;
 
+  TrafficLightConfig::StageConfig stage_config;
+  
   std::unordered_map<TaskType, const TaskConfig*, std::hash<int>>
       task_config_map_;
 

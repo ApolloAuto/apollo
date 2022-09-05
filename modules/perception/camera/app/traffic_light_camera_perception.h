@@ -38,6 +38,10 @@ class TrafficLightCameraPerception : public BaseCameraPerception {
   bool Init(const CameraPerceptionInitOptions &options) override;
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
+  
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+  virtual bool Process(DataFrame* data_frame) = 0;
+  
   std::string Name() const override { return "TrafficLightCameraPerception"; }
 
  private:

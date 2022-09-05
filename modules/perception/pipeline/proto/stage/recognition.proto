@@ -19,7 +19,7 @@ message ClassifyParam {
   optional bool is_bgr = 15 [default = true];
 }
 
-message RecognizeBoxParam {
+message TrafficLightRecognitionConfig {
   optional ClassifyParam vertical_model = 1;
   optional ClassifyParam quadrate_model = 2;
   optional ClassifyParam horizontal_model = 3;

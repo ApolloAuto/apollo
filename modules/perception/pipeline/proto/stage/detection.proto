@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.perception.camera.traffic_light.detection;
 
-message DetectionParam {
+message TrafficLightDetectionConfig {
   optional int32 min_crop_size = 1 [default = 270];
   optional int32 crop_method = 2 [default = 0];
   optional float mean_b = 3 [default = 95];

@@ -19,7 +19,8 @@
 #include <vector>
 
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
-#include "modules/perception/camera/lib/traffic_light/tracker/proto/semantic.pb.h"
+// #include "modules/perception/camera/lib/traffic_light/tracker/proto/semantic.pb.h"
+#include "modules/perception/pipeline/proto/stage/recognition.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -72,7 +73,9 @@ class SemanticReviser : public BaseTrafficLightTracker {
   const std::string& Name() const override { return name_; }
 
  private:
-  traffic_light::tracker::SemanticReviseParam semantic_param_;
+  // traffic_light::tracker::SemanticReviseParam semantic_param_;
+  pipeline::proto::stage::SemanticReviserConfig semantic_param_;
+
   float revise_time_s_ = 1.5f;
   float blink_threshold_s_ = 0.4f;
   float non_blink_threshold_s_ = 0.8f;

@@ -22,6 +22,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -86,6 +87,21 @@ bool TrafficLightCameraPerception::Init(
 
   AINFO << "tl pipeline init done";
   return true;
+}
+
+void TrafficLightCameraPerception::Init(const PipelineConfig& pipeline_config) {
+  
+  Initialize(pipeline_config);
+
+}
+
+bool TrafficLightCameraPerception::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+  // CameraPerceptionOptions options;
+  // Perception( options, data_frame->camera_frame);
+  
+  return InnerProcess(data_frame);
 }
 
 bool TrafficLightCameraPerception::Perception(

@@ -165,10 +165,10 @@ int TrafficLightsPerceptionComponent::InitConfig() {
       static_cast<float>(traffic_light_param.sync_interval_seconds());
   tl_preprocessor_name_ = traffic_light_param.tl_preprocessor_name();
 
-  camera_perception_init_options_.root_dir =
-      traffic_light_param.camera_traffic_light_perception_conf_dir();
-  camera_perception_init_options_.conf_file =
-      traffic_light_param.camera_traffic_light_perception_conf_file();
+  // camera_perception_init_options_.root_dir =
+  //     traffic_light_param.camera_traffic_light_perception_conf_dir();
+  // camera_perception_init_options_.conf_file =
+  //     traffic_light_param.camera_traffic_light_perception_conf_file();
   default_image_border_size_ = traffic_light_param.default_image_border_size();
 
   simulation_channel_name_ = traffic_light_param.simulation_channel_name();
@@ -241,9 +241,22 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     return cyber::FAIL;
   }
 
-  camera_perception_init_options_.use_cyber_work_root = true;
+  // camera_perception_init_options_.use_cyber_work_root = true;
+  // traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
+  // if (!traffic_light_pipeline_->Init(camera_perception_init_options_)) {
+  //   AERROR << "camera_obstacle_pipeline_->Init() failed";
+  //   return cyber::FAIL;
+  // }
+
+  const std::string trafficlight_config_file =
+      "/apollo/modules/perception/pipeline/config/trafficlights_perception.pb.txt";
+
+  ACHECK(
+      cyber::common::GetProtoFromFile(trafficlight_config_file, &trafficlight_config))
+      << "failed to load trafficlight config file " << trafficlight_config_file;
+  
   traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
-  if (!traffic_light_pipeline_->Init(camera_perception_init_options_)) {
+  if (!traffic_light_pipeline_->Init(trafficlight_config)) {
     AERROR << "camera_obstacle_pipeline_->Init() failed";
     return cyber::FAIL;
   }
@@ -397,7 +410,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   last_proc_image_ts_ = Clock::NowInSeconds();
 
   AINFO << "start proc.";
-  traffic_light_pipeline_->Perception(camera_perception_options_, frame_.get());
+  // traffic_light_pipeline_->Perception(camera_perception_options_, frame_.get());
+  traffic_light_pipeline_->Process(DataFrame* data_frame);
 
   for (auto light : frame_->traffic_lights) {
     AINFO << "after tl pipeline " << light->id << " color "

@@ -22,7 +22,8 @@
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
-
+#include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
+#include "modules/common/util/map_util.h"
 
 namespace apollo {
 namespace perception {
@@ -91,6 +92,15 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::OBJECT_FILTER_BANK:
       stage_ptr.reset(new ObjectFilterBank());
+      break;
+    case StageType::TRAFFIC_LIGHT_DETECTION:
+      stage_ptr.reset(new TrafficLightDetection());
+      break;
+    case StageType::TRAFFIC_LIGHT_RECOGNITION:
+      stage_ptr.reset(new TrafficLightRecognition());
+      break;
+    case StageType::SEMANTIC_REVISER:
+      stage_ptr.reset(new SemanticReviser());
       break;
     default:
       return nullptr;
