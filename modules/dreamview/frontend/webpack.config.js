@@ -33,8 +33,8 @@ module.exports = (env, argv) => {
 
     output: {
       path: path.join(__dirname, 'dist'),
-      filename: '[name].bundle.js',
-      publicPath: '/',
+      filename: './[name].bundle.js',
+      publicPath: '',
     },
 
     devtool: isEnvDevelopment ? 'inline-source-map' : 'hidden-source-map',
@@ -198,7 +198,6 @@ module.exports = (env, argv) => {
             },
           ],
         },
-
         {
           // For font-awesome (ttf)
           test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -221,23 +220,41 @@ module.exports = (env, argv) => {
             }],
         },
         {
-          test: /\.ya?ml$/,
-          use: [{
-            loader: 'file-loader',
-            options: {
-              name: '[path][name].json',
-              context: 'src/store/config',
-              outputPath: '.', // the "dist" dir
+          oneOf: [
+            {
+              test: /parameters.yml/,
+              use: [
+                {
+                  loader: 'file-loader',
+                  options: {
+                    name: '[path][name].json',
+                    context: 'src/store/config',
+                    outputPath: '.', // the "dist" dir
+                  },
+                },
+                {
+                  loader: 'yaml-loader',
+                  options: {
+                    asJSON: true,
+                  }
+                },
+              ]
             },
-          },
-          {
-            loader: 'yaml-loader',
-            options: {
-              asJSON: true,
-            }
-          },
-          ],
-        },
+            {
+              test: /\.yml$/,
+              exclude: /node_modules/,
+              use: [
+                "json-loader",
+                {
+                  loader: 'yaml-loader',
+                  options: {
+                    asJSON: true,
+                  }
+                },
+              ],
+            },
+          ]
+        }
       ],
     },
 
@@ -305,7 +322,7 @@ module.exports = (env, argv) => {
       port: 8080,
       devMiddleware: {
         // debug devserver
-        // writeToDisk: true,
+        writeToDisk: true,
       },
     },
 
