@@ -135,7 +135,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
       return true;
     }
 
-    bool is_publish_sensor = this->IsPublishSensor(sensor_frame);
+    bool is_publish_sensor = IsPublishSensor(sensor_frame);
 
     AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
           << ", obj_cnt : " << sensor_frame->objects.size() << ", "
@@ -179,9 +179,9 @@ void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
         << ", background_object_number: "
         << frame->GetBackgroundObjects().size()
         << ", timestamp: " << FORMAT_TIMESTAMP(frame->GetTimestamp());
-  this->FuseForegroundTrack(frame);
-  this->FusebackgroundTrack(frame);
-  this->RemoveLostTrack();
+  FuseForegroundTrack(frame);
+  FusebackgroundTrack(frame);
+  RemoveLostTrack();
 }
 
 void ProbabilisticFusion::FuseForegroundTrack(const SensorFramePtr& frame) {
@@ -195,17 +195,17 @@ void ProbabilisticFusion::FuseForegroundTrack(const SensorFramePtr& frame) {
 
   const std::vector<TrackMeasurmentPair>& assignments =
       association_result.assignments;
-  this->UpdateAssignedTracks(frame, assignments);
+  UpdateAssignedTracks(frame, assignments);
   PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_assigned_track");
 
   const std::vector<size_t>& unassigned_track_inds =
       association_result.unassigned_tracks;
-  this->UpdateUnassignedTracks(frame, unassigned_track_inds);
+  UpdateUnassignedTracks(frame, unassigned_track_inds);
   PERF_BLOCK_END_WITH_INDICATOR(indicator, "update_unassigned_track");
 
   const std::vector<size_t>& unassigned_obj_inds =
       association_result.unassigned_measurements;
-  this->CreateNewTracks(frame, unassigned_obj_inds);
+  CreateNewTracks(frame, unassigned_obj_inds);
   PERF_BLOCK_END_WITH_INDICATOR(indicator, "create_track");
 }
 
@@ -375,7 +375,7 @@ void ProbabilisticFusion::CollectFusedObjects(
       scenes_->GetForegroundTracks();
   for (size_t i = 0; i < foreground_tracks.size(); ++i) {
     if (gate_keeper_->AbleToPublish(foreground_tracks[i])) {
-      this->CollectObjectsByTrack(timestamp, foreground_tracks[i],
+      CollectObjectsByTrack(timestamp, foreground_tracks[i],
                                   fused_objects);
       ++fg_obj_num;
     }
@@ -386,7 +386,7 @@ void ProbabilisticFusion::CollectFusedObjects(
       scenes_->GetBackgroundTracks();
   for (size_t i = 0; i < background_tracks.size(); ++i) {
     if (gate_keeper_->AbleToPublish(background_tracks[i])) {
-      this->CollectObjectsByTrack(timestamp, background_tracks[i],
+      CollectObjectsByTrack(timestamp, background_tracks[i],
                                   fused_objects);
       ++bg_obj_num;
     }

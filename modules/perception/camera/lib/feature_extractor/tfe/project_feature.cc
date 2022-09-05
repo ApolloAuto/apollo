@@ -30,6 +30,10 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
+ProjectFeature::ProjectFeature() {
+  name_ = "ProjectFeature";
+}
+
 bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
   std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
   ACHECK(cyber::common::GetProtoFromFile(efx_config, &param_))
@@ -87,8 +91,6 @@ bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
   norm_.L2Norm(frame->track_feature_blob.get());
   return true;
 }
-
-std::string ProjectFeature::Name() const { return "ProjectFeature"; }
 
 REGISTER_FEATURE_EXTRACTOR(ProjectFeature);
 }  // namespace camera

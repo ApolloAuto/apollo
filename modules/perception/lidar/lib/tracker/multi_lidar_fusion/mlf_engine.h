@@ -57,7 +57,7 @@ class MlfEngine : public BaseMultiTargetTracker {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  protected:
   // @brief: split foreground/background objects and attach to tracked objects

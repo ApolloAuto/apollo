@@ -52,7 +52,7 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<ClassifyBySimple> classify_vertical_;

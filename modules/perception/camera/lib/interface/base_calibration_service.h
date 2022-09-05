@@ -37,7 +37,7 @@ struct CalibrationServiceInitOptions : public BaseInitOptions {
 
 struct CalibrationServiceOptions {};
 
-class BaseCalibrationService {
+class BaseCalibrationService : public Stage {
  public:
   BaseCalibrationService() = default;
 

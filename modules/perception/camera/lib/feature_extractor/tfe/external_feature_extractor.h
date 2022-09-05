@@ -25,8 +25,15 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 class ExternalFeatureExtractor : public BaseFeatureExtractor {
  public:
+  using cyber::common::GetAbsolutePath;
+
+ public:
+  ExternalFeatureExtractor();
+  ~ExternalFeatureExtractor() = default;
+
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
@@ -38,7 +45,10 @@ class ExternalFeatureExtractor : public BaseFeatureExtractor {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
+
+ private:
+  bool InitFeatureExtractor(const std::string &root_dir);
 
  private:
   std::shared_ptr<base::Image8U> image_ = nullptr;
@@ -47,9 +57,9 @@ class ExternalFeatureExtractor : public BaseFeatureExtractor {
   tracking_feature::ExternalParam param_;
   int height_;
   int width_;
-  bool InitFeatureExtractor(const std::string &root_dir);
   int gpu_id_;
 };
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

@@ -31,20 +31,21 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 struct FeatureExtractorLayer {
   std::shared_ptr<inference::Layer<float>> pooling_layer;
   std::shared_ptr<base::Blob<float>> rois_blob;
   std::shared_ptr<base::Blob<float>> top_blob;
 };
+
 class TrackingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  TrackingFeatureExtractor() = default;
+  TrackingFeatureExtractor();
   ~TrackingFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  // std::string Name() const override { return "TrackingFeatureExtractor"; }
 
   bool Init(const StageConfig& stage_config) override;
 
@@ -52,7 +53,7 @@ class TrackingFeatureExtractor : public BaseFeatureExtractor {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  protected:
   void init_roipooling(const FeatureExtractorInitOptions &init_options,

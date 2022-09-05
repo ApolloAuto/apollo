@@ -56,7 +56,7 @@ class MapManager : public Stage {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   LidarFrame* cached_frame_ = nullptr;

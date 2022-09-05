@@ -26,6 +26,11 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+LocationRefinerObstaclePostprocessor::LocationRefinerObstaclePostprocessor() {
+  postprocessor_.reset(new ObjPostProcessor);
+  name_ = "LocationRefinerObstaclePostprocessor";
+}
+
 bool LocationRefinerObstaclePostprocessor::Init(
     const ObstaclePostprocessorInitOptions &options) {
   std::string postprocessor_config =
@@ -53,20 +58,22 @@ bool LocationRefinerObstaclePostprocessor::Process(
     ADEBUG << "Do not run obstacle postprocessor.";
     return true;
   }
+
   Eigen::Vector4d plane;
   if (options.do_refinement_with_calibration_service &&
       !frame->calibration_service->QueryGroundPlaneInCameraFrame(&plane)) {
     AINFO << "No valid ground plane in the service.";
   }
+
   float query_plane[4] = {
       static_cast<float>(plane(0)), static_cast<float>(plane(1)),
       static_cast<float>(plane(2)), static_cast<float>(plane(3))};
+
   const auto &camera_k_matrix = frame->camera_k_matrix;
   float k_mat[9] = {0};
-  for (size_t i = 0; i < 3; i++) {
-    size_t i3 = i * 3;
-    for (size_t j = 0; j < 3; j++) {
-      k_mat[i3 + j] = camera_k_matrix(i, j);
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      k_mat[i * 3 + j] = camera_k_matrix(i, j);
     }
   }
   AINFO << "Camera k matrix input to obstacle postprocessor: \n"
@@ -77,9 +84,10 @@ bool LocationRefinerObstaclePostprocessor::Process(
   const int width_image = frame->data_provider->src_width();
   const int height_image = frame->data_provider->src_height();
   postprocessor_->Init(k_mat, width_image, height_image);
-  ObjPostProcessorOptions obj_postprocessor_options;
 
+  ObjPostProcessorOptions obj_postprocessor_options;
   int nr_valid_obj = 0;
+
   for (auto &obj : frame->detected_objects) {
     ++nr_valid_obj;
     float object_center[3] = {obj->camera_supplement.local_center(0),
@@ -157,11 +165,8 @@ bool LocationRefinerObstaclePostprocessor::Process(
     AINFO << "diff on camera z: " << z_diff_camera;
     AINFO << "Obj center from postprocessor: " << obj->center.transpose();
   }
-  return true;
-}
 
-std::string LocationRefinerObstaclePostprocessor::Name() const {
-  return "LocationRefinerObstaclePostprocessor";
+  return true;
 }
 
 // Register plugin.

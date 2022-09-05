@@ -51,7 +51,7 @@ class MaskPillarsDetection : public BaseLidarDetector {
 
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
