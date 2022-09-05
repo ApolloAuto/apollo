@@ -74,7 +74,7 @@ class SemanticReviser : public BaseTrafficLightTracker {
 
  private:
   // traffic_light::tracker::SemanticReviseParam semantic_param_;
-  pipeline::proto::stage::SemanticReviserConfig semantic_param_;
+  pipeline::stage::SemanticReviserConfig semantic_param_;
 
   float revise_time_s_ = 1.5f;
   float blink_threshold_s_ = 0.4f;

@@ -411,7 +411,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
 
   AINFO << "start proc.";
   // traffic_light_pipeline_->Perception(camera_perception_options_, frame_.get());
-  traffic_light_pipeline_->Process(DataFrame* data_frame);
+  traffic_light_pipeline_->Process(DataFrame* data_frame->data_frame);
 
   for (auto light : frame_->traffic_lights) {
     AINFO << "after tl pipeline " << light->id << " color "

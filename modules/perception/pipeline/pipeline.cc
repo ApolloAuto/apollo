@@ -23,7 +23,6 @@
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 #include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
-#include "modules/common/util/map_util.h"
 
 namespace apollo {
 namespace perception {

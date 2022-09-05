@@ -29,7 +29,8 @@ namespace camera {
 using cyber::common::GetAbsolutePath;
 
 void ClassifyBySimple::Init(
-    const traffic_light::recognition::ClassifyParam& model_config,
+    // const traffic_light::recognition::ClassifyParam& model_config,
+    pipeline::proto::stage::ClassifyParam& model_config,
     const int gpu_id, const std::string work_root) {
   AINFO << "Enter Classify init";
   net_inputs_.clear();

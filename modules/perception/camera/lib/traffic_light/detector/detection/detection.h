@@ -26,7 +26,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
 // #include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
 #include "modules/perception/inference/inference.h"
-#include "modules/perception/pipeline/proto/stage/recognition.pb.h"
+#include "modules/perception/pipeline/proto/stage/detection.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -74,7 +74,8 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
  private:
   // traffic_light::detection::DetectionParam detection_param_;
   
-  pipeline::proto::stage::TrafficLightDetectionConfig detection_param_;
+  pipeline::stage::TrafficLightDetectionConfig detection_param_;
+  std::string detection_root_dir = "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection";
 
   DataProvider::ImageOptions data_provider_image_option_;
   std::shared_ptr<inference::Inference> rt_net_ = nullptr;
