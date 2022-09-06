@@ -14,23 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
+
 #pragma once
 
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/fusion/base/fusion_frame.h"
-#include "modules/perception/lidar/common/lidar_frame.h"
+#include <memory>
+#include <unordered_map>
+
+#include "modules/common/util/factory.h"
+#include "modules/perception/pipeline/plugin.h"
 
 
 namespace apollo {
 namespace perception {
 namespace pipeline {
 
-struct DataFrame {
-  CameraFrame* camera_frame;
-  LidarFrame* lidar_frame;
-  // RadarFrame* radar_frame;
 
-  FusionFrame* fusion_frame;
+class PluginFactory {
+ public:
+  static void Init();
+
+  static std::unique_ptr<Plugin>
+        CreatePlugin(const PluginConfig& plugin_config);
+
+ private:
+  static apollo::common::util::Factory<
+      PluginType, Plugin,
+      Plugin *(*)(const PluginConfig& plugin_config),
+      std::unordered_map<
+          PluginType,
+          Plugin *(*)(const PluginConfig& plugin_config),
+          std::hash<int>>>
+      plugin_factory_;
 };
 
 } // namespace pipeline

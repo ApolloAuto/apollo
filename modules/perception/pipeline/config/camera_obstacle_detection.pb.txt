@@ -8,10 +8,9 @@ stage_type: OMT_OBSTACLE_TRACKER
 stage_config: {
   stage_type: OMT_OBSTACLE_TRACKER
   enabled: true
-  task_type:
 
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }
@@ -95,10 +94,9 @@ stage_config: {
 stage_config: {
   stage_type: SMOKE_OBSTACLE_DETECTOR
   enabled: true
-  task_type:
 
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }
@@ -151,10 +149,9 @@ stage_config: {
 stage_config: {
   stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
   enabled: true
-  task_type:
 
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }

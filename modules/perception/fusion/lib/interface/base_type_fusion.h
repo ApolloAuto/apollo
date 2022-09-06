@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseTypeFusion : public Task {
+class BaseTypeFusion {
  public:
   explicit BaseTypeFusion(TrackPtr track) : track_ref_(track) {}
   virtual ~BaseTypeFusion() = default;

@@ -43,18 +43,17 @@ struct PbfGatekeeperParams {
 
 class PbfGatekeeper : public BaseGatekeeper {
  public:
-  PbfGatekeeper() = default;
+  using cyber::common::GetAbsolutePath;
+
+ public:
+  PbfGatekeeper() { name_ = "PbfGatekeeper"; }
   ~PbfGatekeeper() = default;
 
   bool Init() override;
 
   bool AbleToPublish(const TrackPtr& track) override;
 
-  // std::string Name() const override;
-
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
   bool IsEnabled() override { return enable_; }
 

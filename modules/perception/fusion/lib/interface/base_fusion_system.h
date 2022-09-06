@@ -34,7 +34,7 @@ struct FusionInitOptions {
 
 struct FusionOptions {};
 
-class BaseFusionSystem : public Pipeline {
+class BaseFusionSystem : public Stage {
  public:
   BaseFusionSystem() = default;
   virtual ~BaseFusionSystem() = default;
@@ -49,11 +49,11 @@ class BaseFusionSystem : public Pipeline {
                     const base::FrameConstPtr& sensor_frame,
                     std::vector<base::ObjectPtr>* fused_objects) = 0;
 
-  // virtual std::string Name() const = 0;
-
-  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+  virtual bool Init(const StageConfig& stage_config) = 0;
 
   virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() = 0;
 
   virtual std::string Name() const = 0;
 

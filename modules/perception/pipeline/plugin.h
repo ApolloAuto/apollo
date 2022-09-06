@@ -16,21 +16,26 @@
 
 #pragma once
 
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/fusion/base/fusion_frame.h"
-#include "modules/perception/lidar/common/lidar_frame.h"
-
+#include <string>
 
 namespace apollo {
 namespace perception {
 namespace pipeline {
 
-struct DataFrame {
-  CameraFrame* camera_frame;
-  LidarFrame* lidar_frame;
-  // RadarFrame* radar_frame;
+class Plugin {
+ public:
+  Plugin() = default;
+  virtual ~Plugin() = default;
 
-  FusionFrame* fusion_frame;
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() = 0;
+
+  virtual std::string Name() const = 0;
+
+ protected:
+  bool enable_ = false;
+  std::string name_;
 };
 
 } // namespace pipeline

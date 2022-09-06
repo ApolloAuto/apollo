@@ -40,7 +40,7 @@ struct AssociationResult {
   std::vector<double> measurement2track_dist;
 };
 
-class BaseDataAssociation : public Stage {
+class BaseDataAssociation {
  public:
   BaseDataAssociation() = default;
   virtual ~BaseDataAssociation() = default;
@@ -55,14 +55,6 @@ class BaseDataAssociation : public Stage {
   virtual bool Associate(const AssociationOptions& options,
                          SensorFramePtr sensor_measurements, ScenePtr scene,
                          AssociationResult* association_result) = 0;
-
-  virtual bool Init(const StageConfig& stage_config) = 0;
-
-  virtual bool Process(DataFrame* data_frame) = 0;
-
-  virtual bool IsEnabled() = 0;
-
-  virtual std::string Name() const = 0;
 
   DISALLOW_COPY_AND_ASSIGN(BaseDataAssociation);
 };

@@ -62,7 +62,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:mlf_engine_config_proto",
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_proto",
-        "//modules/perception/pipeline/proto/task:roi_boundary_filter_config_proto",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
     ],
 )
 
@@ -78,7 +78,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:mlf_engine_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_py_pb2",
-        "//modules/perception/pipeline/proto/task:roi_boundary_filter_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
     ],
 )
 

@@ -22,7 +22,8 @@
 #include <vector>
 
 #include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/task.h"
+#include "modules/perception/pipeline/plugin.h"
+
 #include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 #include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
 
@@ -33,7 +34,7 @@ namespace pipeline {
 class Stage {
  public:
   Stage() = default;
-  virtual ~Stage();
+  virtual ~Stage() = default;
 
   virtual bool Init(const StageConfig& stage_config) = 0;
 
@@ -45,7 +46,6 @@ class Stage {
 
  protected:
   bool Initialize(const StageConfig& stage_config);
-  bool InnerProcess(DataFrame* data_frame);
 
  private:
   void Clear();
@@ -55,11 +55,8 @@ class Stage {
   std::string name_;
 
   TrafficLightConfig::StageConfig stage_config;
-  
-  std::unordered_map<TaskType, const TaskConfig*, std::hash<int>>
-      task_config_map_;
-
-  std::vector<Task*> task_ptrs_;
+  std::unordered_map<PluginType, const PluginConfig*, std::hash<int>>
+      plugin_config_map_;
 };
 
 } // namespace pipeline

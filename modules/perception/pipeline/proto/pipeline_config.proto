@@ -15,23 +15,23 @@ import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
 import "modules/perception/pipeline/proto/stage/detection.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
 import "modules/perception/pipeline/proto/stage/semantic.proto";
-// task
-import "modules/perception/pipeline/proto/task/roi_boundary_filter_config.proto";
+// plugin
+import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
 
-// task
-enum TaskType {
+// plugin
+enum PluginType {
   // filter
   ROI_BOUNDARY_FILTER = 1;
 }
 
-message TaskConfig {
-  optional TaskType task_type = 1;
+message PluginConfig {
+  optional PluginType plugin_type = 1;
   optional bool enabled = 2 [default = true];
 
   reserved 3 to 9;
 
-  oneof task_config {
+  oneof plugin_config {
     ROIBoundaryFilterConfig roi_boundary_filter_config = 10;
   }
 }
@@ -106,8 +106,7 @@ message StageConfig {
   optional StageType stage_type = 1;
   optional bool enabled = 2 [default = true];
 
-  repeated TaskType task_type = 3;
-  repeated TaskConfig task_config = 4;
+  repeated PluginConfig plugin_config = 4;
 
   reserved 5 to 9;
 

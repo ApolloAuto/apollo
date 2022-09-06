@@ -25,8 +25,6 @@
 namespace apollo {
 namespace perception {
 namespace fusion {
-/*
-TODO(all): not compiling. to be fixed
 
 TEST(PbfGatekeeperTest, test) {
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
@@ -215,7 +213,7 @@ TEST(PbfGatekeeperTest, test) {
   gate_keeper.params_.min_camera_publish_distance = 50;
   EXPECT_FALSE(gate_keeper.AbleToPublish(track3));
 }
-*/
+
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo

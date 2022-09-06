@@ -16,7 +16,7 @@
 
 #include "modules/perception/pipeline/stage.h"
 
-#include "modules/perception/pipeline/task_factory.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 
 namespace apollo {
@@ -27,49 +27,32 @@ namespace pipeline {
 bool Stage::Initialize(const StageConfig& stage_config) {
   Clear();
 
-  for (const auto& task_config : stage_config.task_config()) {
-    task_config_map_[task_config.task_type()] = &task_config;
+  for (const auto& plugin_config : stage_config.plugin_config()) {
+    plugin_config_map_[plugin_config.plugin_type()] = &plugin_config;
   }
 
-  for (int i = 0; i < stage_config.task_config_size(); ++i) {
-    auto task_type = stage_config.task_type(i);
-    if (!common::util::ContainsKey(task_config_map_, task_type)) {
-      AERROR << "Task type : " << TaskType_Name(task_type)
+  for (int i = 0; i < stage_config.plugin_config_size(); ++i) {
+    auto plugin_type = stage_config.plugin_type(i);
+    if (!common::util::ContainsKey(plugin_config_map_, plugin_type)) {
+      AERROR << "Plugin type : " << PluginType_Name(plugin_type)
              << " has no config";
       return false;
     }
 
-    Task* task_ptr = TaskFactory::CreateTask(stage_config);
+    Plugin* plugin_ptr = PluginFactory::CreatePlugin(stage_config);
 
-    if (task_ptr == nullptr) {
-      AERROR << "Create task type : " << TaskType_Name(task_type)
+    if (plugin_ptr == nullptr) {
+      AERROR << "Create task type : " << PluginType_Name(plugin_type)
              << " failed!";
-    } else {
-      task_ptrs_.push_back(task_ptr);
+      return false;
     }
   }
 
   return true;
 }
 
-bool Stage::InnerProcess(DataFrame* data_frame) {
-  for (const auto& task_ptr : task_ptrs_) {
-    if (task_ptr->IsEnabled()) {
-      task_ptr->Process(data_frame);
-    }
-  }
-}
-
 void Stage::Clear() {
-  task_config_map_.clear();
-  task_ptrs_.clear();
-}
-
-Stage::~Stage() {
-  for (Task* task_ptr : task_ptrs_) {
-    delete task_ptr;
-    task_ptr == nullptr;
-  }
+  plugin_config_map_.clear();
 }
 
 

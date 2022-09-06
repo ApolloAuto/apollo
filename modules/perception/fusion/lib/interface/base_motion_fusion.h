@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseMotionFusion : public Stage {
+class BaseMotionFusion {
  public:
   explicit BaseMotionFusion(TrackPtr track) : track_ref_(track) {}
   virtual ~BaseMotionFusion() = default;
@@ -42,14 +42,6 @@ class BaseMotionFusion : public Stage {
   virtual void UpdateWithoutMeasurement(const std::string& sensor_id,
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
-
-  virtual bool Init(const StageConfig& stage_config) = 0;
-
-  virtual bool Process(DataFrame* data_frame) = 0;
-
-  virtual bool IsEnabled() = 0;
-
-  virtual std::string Name() const = 0;
 
  protected:
   TrackPtr track_ref_;

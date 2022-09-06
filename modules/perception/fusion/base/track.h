@@ -35,9 +35,6 @@ class Track {
   Track();
   virtual ~Track() = default;
 
-  Track(const Track&) = delete;
-  Track& operator=(const Track&) = delete;
-
   // static members initialization
   inline static void SetMaxLidarInvisiblePeriod(double period) {
     s_max_lidar_invisible_period_ = period;
@@ -155,6 +152,8 @@ class Track {
   static double s_max_lidar_invisible_period_;
   static double s_max_radar_invisible_period_;
   static double s_max_camera_invisible_period_;
+
+  DISALLOW_COPY_AND_ASSIGN(Track);
 };
 
 typedef std::shared_ptr<Track> TrackPtr;

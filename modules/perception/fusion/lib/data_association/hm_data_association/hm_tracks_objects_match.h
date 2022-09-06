@@ -28,7 +28,7 @@ namespace fusion {
 
 class HMTrackersObjectsAssociation : public BaseDataAssociation {
  public:
-  HMTrackersObjectsAssociation() = default;
+  HMTrackersObjectsAssociation() { name_ = "HMTrackersObjectsAssociation"; }
   ~HMTrackersObjectsAssociation() = default;
 
   bool Init() override {
@@ -40,8 +40,6 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
   bool Associate(const AssociationOptions& options,
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
-
-//   std::string Name() const override { return "HMTrackersObjectsAssociation"; }
 
   bool Init(const StageConfig& stage_config) override;
 
