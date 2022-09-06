@@ -86,7 +86,6 @@ stage_config: {
 stage_config: {
   stage_type: SEMANTIC_REVISER
   enabled: true
-  task_type:
 
   semantic_reviser_config: {
     revise_time_second: 1.5
