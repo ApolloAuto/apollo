@@ -94,8 +94,8 @@ install_files(
     files = [
         "//modules/perception/pipeline/proto/stage:fused_classifier_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:map_manager_config_py_pb2",
-        "//modules/perception/proto:dst_existence_fusion_config_py_pb2",
-        "//modules/perception/proto:dst_type_fusion_config_py_pb2",
+        "//modules/perception/pipeline/proto/task:dst_existence_fusion_config_py_pb2",
+        "//modules/perception/pipeline/proto/task:dst_type_fusion_config_py_pb2",
         "//modules/perception/proto:motion_service_py_pb2",
         "//modules/common_msgs/perception_msgs:perception_camera_py_pb2",
         "//modules/perception/proto:perception_config_schema_py_pb2",
