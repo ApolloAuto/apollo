@@ -30,7 +30,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
@@ -59,7 +59,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
         "//modules/planning/common:frame",
@@ -84,7 +84,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",

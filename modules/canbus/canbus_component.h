@@ -31,7 +31,7 @@
 #include "cyber/timer/timer.h"
 
 #include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 #include "modules/common_msgs/guardian_msgs/guardian.pb.h"
 
 #include "modules/canbus/vehicle/vehicle_controller.h"

@@ -32,7 +32,7 @@ filegroup(
 cc_binary(
     name = "librobosense_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = ["//modules/drivers/lidar/robosense/driver:robosense_driver_component_lib"],
 )
 

@@ -34,7 +34,7 @@ from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 from modules.tools.common.logger import Logger
 from modules.common_msgs.chassis_msgs import chassis_pb2
-from modules.common.configs.proto import vehicle_config_pb2
+from modules.common_msgs.config_msgs import vehicle_config_pb2
 from modules.common_msgs.basic_msgs import drive_state_pb2
 from modules.common_msgs.basic_msgs import pnc_point_pb2
 from modules.common_msgs.control_msgs import pad_msg_pb2

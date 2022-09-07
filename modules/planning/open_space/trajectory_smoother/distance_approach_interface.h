@@ -32,7 +32,7 @@
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/util.h"

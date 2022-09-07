@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "fftw3",
     includes = ["include"],
+    hdrs = glob(["include/fftw3*"]),
     linkopts = [
         "-lfftw3",
         "-lm",

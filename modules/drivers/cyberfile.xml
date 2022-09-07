@@ -11,7 +11,7 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
-  <depend type="binary" src_path="//cyber" repo_name="cyber">cyber-dev</depend>
+  <depend type="binary" repo_name="cyber">cyber-dev</depend>
   <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <depend type="binary" repo_name="transform" lib_names="transform">transform-dev</depend>

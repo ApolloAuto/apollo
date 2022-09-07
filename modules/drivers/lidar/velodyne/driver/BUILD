@@ -16,7 +16,7 @@ install(
 cc_binary(
     name = "libvelodyne_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":velodyne_driver_component_lib"],
 )
 
@@ -30,6 +30,7 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/drivers/lidar/velodyne/driver",
     ],
+    alwayslink = True
 )
 
 cc_library(

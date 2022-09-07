@@ -35,7 +35,6 @@ install(
     data_dest = "common/include",
     data = [
         "//modules/common/adapters/proto:adapter_config_cc_proto",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
         "//modules/common/latency_recorder/proto:latency_record_cc_proto",
         "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
         "//modules/common/vehicle_model/proto:vehicle_model_config_cc_proto",
@@ -55,7 +54,6 @@ install_files(
         "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
         "//modules/common_msgs/basic_msgs:vehicle_signal_py_pb2",
         "//modules/common_msgs/basic_msgs:drive_event_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
     ],
 )
 

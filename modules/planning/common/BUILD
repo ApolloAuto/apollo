@@ -320,7 +320,7 @@ cc_library(
         ":obstacle",
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/math",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/reference_line",

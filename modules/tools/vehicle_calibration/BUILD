@@ -71,7 +71,7 @@ py_library(
     srcs = ["sanity_check.py"],
     deps = [
         "//cyber/python/cyber_py3:record",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
         "//modules/tools/common:file_utils",
         "//modules/tools/common:proto_utils",
     ],

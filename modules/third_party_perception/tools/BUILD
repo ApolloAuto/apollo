@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["conversion_radar.h"],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_state_cc_proto",
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/common_msgs/sensor_msgs:conti_radar_cc_proto",
@@ -28,7 +28,7 @@ cc_library(
     ],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_state_cc_proto",
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/common_msgs/sensor_msgs:smartereye_cc_proto",
@@ -45,7 +45,7 @@ cc_library(
     ],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_state_cc_proto",
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/common_msgs/sensor_msgs:mobileye_cc_proto",

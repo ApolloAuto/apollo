@@ -15,7 +15,7 @@ install(
 cc_binary(
     name = "libvelodyne_compensator_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":compensator_component_lib"],
 )
 
@@ -31,6 +31,7 @@ cc_library(
         "//modules/drivers/lidar/proto:velodyne_cc_proto",
         "//modules/drivers/lidar/velodyne/compensator:compensator_lib",
     ],
+    alwayslink = True,
 )
 
 cc_library(

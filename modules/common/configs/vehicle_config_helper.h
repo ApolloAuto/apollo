@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 
 #include "cyber/common/macros.h"

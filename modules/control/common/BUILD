@@ -61,7 +61,7 @@ cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/math",
         "//modules/common/status",
         "//modules/control/proto:mrac_conf_cc_proto",
@@ -195,7 +195,7 @@ cc_test(
     deps = [
         ":mrac_controller",
         "//cyber",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/control/proto:control_conf_cc_proto",
         "//modules/control/proto:mrac_conf_cc_proto",
         "@com_google_googletest//:gtest_main",

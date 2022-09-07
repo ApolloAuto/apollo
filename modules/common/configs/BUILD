@@ -57,7 +57,7 @@ cc_binary(
         ":config_gflags",
         "//cyber",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/math",
     ],
 )
@@ -72,7 +72,7 @@ cc_library(
     deps = [
         ":config_gflags",
         "//cyber",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/math",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
     ],

@@ -16,7 +16,7 @@ py_binary(
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
         "//modules/common_msgs/basic_msgs:drive_state_py_pb2",
         "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
         "//modules/common_msgs/control_msgs:pad_msg_py_pb2",

@@ -23,7 +23,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"

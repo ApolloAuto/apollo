@@ -30,7 +30,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
