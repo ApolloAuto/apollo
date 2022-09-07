@@ -15,6 +15,10 @@ enum StageType {
 
 }
 
+message PerceptionConfig {
+  optional int32 gpu_id = 1 [default = 0];
+}
+
 message StageConfig {
 
   optional StageType stage_type = 1;
@@ -32,4 +36,5 @@ message StageConfig {
 message TrafficLightConfig {
     repeated StageType stage_type = 1;
     repeated StageConfig stage_config = 2;
+    optional PerceptionConfig trafficlights_perception_config = 3;
 }

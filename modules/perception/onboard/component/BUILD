@@ -82,6 +82,7 @@ cc_library(
         "//modules/perception/onboard/proto:trafficlights_perception_component_cc_proto",
         "//modules/perception/onboard/transform_wrapper",
         "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/perception/pipeline/proto:traffic_light_config_cc_proto"
         "@eigen",
         "@opencv//:highgui",
     ],

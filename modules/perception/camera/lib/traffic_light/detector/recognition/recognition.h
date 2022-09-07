@@ -58,9 +58,8 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   std::shared_ptr<ClassifyBySimple> classify_quadrate_;
   std::shared_ptr<ClassifyBySimple> classify_horizontal_;
   // traffic_light::recognition::RecognizeBoxParam recognize_param_;
-  pipeline::proto::stage::TrafficLightRecognitionConfig recognize_param_;
-  std::string recognition_root_dir = "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition";
-  int gpu_id = 0;
+  pipeline::stage::TrafficLightRecognitionConfig recognize_param_;
+  std::string recognition_root_dir;
 
   DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);
 };

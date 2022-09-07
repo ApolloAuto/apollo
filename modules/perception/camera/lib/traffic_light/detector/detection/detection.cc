@@ -157,12 +157,13 @@ using cyber::common::GetAbsolutePath;
 // }
 
 bool TrafficLightDetection::Init(const StageConfig& stage_config) {
-  const auto& detection_param_ = stage_config.traffic_light_detection_config();
+  detection_param_ = stage_config.traffic_light_detection_config();
   
   std::string param_str;
   google::protobuf::TextFormat::PrintToString(detection_param_, &param_str);
   AINFO << "TL detection param: " << param_str;
 
+  detection_root_dir = detection_param_.traffic_light_detection_root_dir();
   std::string model_root =
       GetAbsolutePath(detection_root_dir, detection_param_.model_name());
   AINFO << "model_root " << model_root;
@@ -212,9 +213,9 @@ bool TrafficLightDetection::Init(const StageConfig& stage_config) {
                                                  net_inputs_, model_root));
   
   AINFO << "rt_net_ create succeed";
-  rt_net_->set_gpu_id(0);
-  AINFO << "set gpu id " << 0;
-  gpu_id_ = 0;
+  rt_net_->set_gpu_id(detection_param_.gpu_id());
+  AINFO << "set gpu id " << detection_param_.gpu_id();
+  gpu_id_ = detection_param_.gpu_id();
 
   int resize_height = detection_param_.min_crop_size();
   int resize_width = detection_param_.min_crop_size();

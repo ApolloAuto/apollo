@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
-// #include "modules/perception/camera/lib/traffic_light/tracker/proto/semantic.pb.h"
 #include "modules/perception/pipeline/proto/stage/recognition.pb.h"
 
 namespace apollo {
@@ -62,8 +61,6 @@ class SemanticReviser : public BaseTrafficLightTracker {
   void ReviseLights(std::vector<base::TrafficLightPtr> *lights,
                     const std::vector<int> &light_ids, base::TLColor dst_color);
 
-  // std::string Name() const override;
-
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
@@ -73,7 +70,7 @@ class SemanticReviser : public BaseTrafficLightTracker {
   std::string Name() const override { return name_; }
 
  private:
-  // traffic_light::tracker::SemanticReviseParam semantic_param_;
+
   pipeline::stage::SemanticReviserConfig semantic_param_;
 
   float revise_time_s_ = 1.5f;

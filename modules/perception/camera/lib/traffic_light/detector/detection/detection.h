@@ -58,7 +58,6 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
                 double iou_thresh = 0.6);
   bool Inference(std::vector<base::TrafficLightPtr> *lights,
                  DataProvider *data_provider);
-  // std::string Name() const override;
   const std::vector<base::TrafficLightPtr> &getDetectedBoxes() {
     return detected_bboxes_;
   }
@@ -73,9 +72,9 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
 
  private:
   // traffic_light::detection::DetectionParam detection_param_;
-  
+
   pipeline::stage::TrafficLightDetectionConfig detection_param_;
-  std::string detection_root_dir = "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection";
+  std::string detection_root_dir;
 
   DataProvider::ImageOptions data_provider_image_option_;
   std::shared_ptr<inference::Inference> rt_net_ = nullptr;

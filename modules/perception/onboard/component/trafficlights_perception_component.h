@@ -35,6 +35,7 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/transform/buffer.h"
 #include "modules/v2x/common/v2x_proxy_gflags.h"
+#include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -112,6 +113,8 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
 
   std::shared_ptr<camera::BaseTLPreprocessor> preprocessor_;
   apollo::perception::map::HDMapInput* hd_map_ = nullptr;
+
+  apollo::perception::pipeline::TrafficLightConfig trafficlight_config;
 
   camera::TrafficLightPreprocessorInitOptions preprocessor_init_options_;
   std::string tl_preprocessor_name_;

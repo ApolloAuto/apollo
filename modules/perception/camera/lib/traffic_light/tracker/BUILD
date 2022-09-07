@@ -10,7 +10,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
+        "//modules/perception/pipeline/proto/stage:semantic_cc_proto",
     ],
     alwayslink = True,
 )

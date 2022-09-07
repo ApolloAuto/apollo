@@ -22,6 +22,8 @@ stage_config: {
     proto_file:"deploy.prototxt"
     weight_file: "baidu_iter_140000.caffemodel"
     max_batch_size: 1  # only support 1 so far
+    traffic_light_detection_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection"
+    gpu_id: 0
   }
 }
 
@@ -45,6 +47,8 @@ stage_config: {
     mean_b: 66.56;
     is_bgr: true;
     scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
     }
 
     quadrate_model{
@@ -62,6 +66,8 @@ stage_config: {
     mean_b: 66.56;
     is_bgr: true;
     scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
     }
 
     horizontal_model{
@@ -79,6 +85,8 @@ stage_config: {
     mean_b: 66.56;
     is_bgr: true;
     scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
     }
   }
 }
@@ -92,9 +100,10 @@ stage_config: {
     blink_threshold_second: 0.55
     hysteretic_threshold_count: 1
     #yellow_blink_threshold_second: 10.0
+    traffic_light_semantic_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_tracker"
   }
 }
 
 trafficlights_perception_config: {
-
+  gpu_id: 0
 }

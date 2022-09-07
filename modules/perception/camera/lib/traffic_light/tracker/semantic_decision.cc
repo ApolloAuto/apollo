@@ -58,7 +58,7 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
 }
 
 bool Init(const StageConfig& stage_config){
-  const auto& semantic_param_ = stage_config.semantic_reviser_config();
+  semantic_param_ = stage_config.semantic_reviser_config();
 
   int non_blink_coef = 2;
   revise_time_s_ = semantic_param_.revise_time_second();

@@ -48,19 +48,27 @@ bool TrafficLightRecognition::Init(
 
 bool Init(const StageConfig& stage_config){
 
-  const auto& recognize_param_ = stage_config.traffic_light_recognition_config();
+  recognize_param_ = stage_config.traffic_light_recognition_config();
 
   classify_quadrate_.reset(new ClassifyBySimple);
   classify_vertical_.reset(new ClassifyBySimple);
   classify_horizontal_.reset(new ClassifyBySimple);
 
   //todo ：root_dir and gpu_id write into stage_config
-  classify_quadrate_->Init(recognize_param_.quadrate_model(), gpu_id,
-                           recognition_root_dir);
-  classify_vertical_->Init(recognize_param_.vertical_model(), gpu_id,
-                           recognition_root_dir);
+  int quadrate_gpu_id = recognize_param_.quadrate_model().gpu_id();
+  int vertical_gpu_id = recognize_param_.vertical_model().gpu_id();
+  int horizontal_gpu_id = recognize_param_.horizontal_model().gpu_id();
+
+  std::string quadrate_root_dir = recognize_param_.quadrate_model().traffic_light_recognition_root_dir();
+  std::string vertical_root_dir = recognize_param_.vertical_model().traffic_light_recognition_root_dir();
+  std::string horizontal_root_dir = recognize_param_.horizontal_model().traffic_light_recognition_root_dir();
+
+  classify_quadrate_->Init(recognize_param_.quadrate_model(), quadrate_gpu_id,
+                           quadrate_root_dir);
+  classify_vertical_->Init(recognize_param_.vertical_model(), vertical_gpu_id,
+                           vertical_root_dir);
   classify_horizontal_->Init(recognize_param_.horizontal_model(),
-                             gpu_id, recognition_root_dir);
+                             horizontal_gpu_id, horizontal_root_dir);
 
   return true;
 }

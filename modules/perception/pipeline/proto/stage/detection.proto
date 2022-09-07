@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.camera.traffic_light.detection;
+package apollo.perception.stage;
 
 message TrafficLightDetectionConfig {
   optional int32 min_crop_size = 1 [default = 270];
@@ -18,4 +18,7 @@ message TrafficLightDetectionConfig {
   optional string proto_file = 13 [default = "caffe.pt"];
   optional string weight_file = 14 [default = "caffe.model"];
   optional int32 max_batch_size = 15 [default = 1];
+  optional string traffic_light_detection_root_dir = 16
+      [default = "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection"];
+  optional int32 gpu_id = 17 [default = 0];
 }

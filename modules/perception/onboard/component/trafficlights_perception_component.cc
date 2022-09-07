@@ -86,6 +86,14 @@ static int GetGpuId(
   return trafficlight_param.gpu_id();
 }
 
+static int GetTrafficGpuId(const PipelineConfig& pipeline_config){
+  if (!pipeline_config.trafficlights_perception_config().has_gpu_id()){
+    AINFO << "gpu id not found.";
+    return -1;
+  }
+  return pipeline_config.trafficlights_perception_config().gpu_id();
+}
+
 bool TrafficLightsPerceptionComponent::Init() {
   frame_.reset(new camera::CameraFrame);
   writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
@@ -248,8 +256,13 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   //   return cyber::FAIL;
   // }
 
-  const std::string trafficlight_config_file =
-      "/apollo/modules/perception/pipeline/config/trafficlights_perception.pb.txt";
+  const auto& traffic_light_root_dir = traffic_light_param.camera_traffic_light_perception_conf_dir();
+  const auto& traffic_light_conf_file = traffic_light_param.camera_traffic_light_perception_conf_file();
+
+  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
+  std::string trafficlight_config_file =
+      GetAbsolutePath(traffic_light_root_dir, traffic_light_conf_file);
+  trafficlight_config_file = GetAbsolutePath(work_root, trafficlight_config_file);
 
   ACHECK(
       cyber::common::GetProtoFromFile(trafficlight_config_file, &trafficlight_config))
@@ -297,7 +310,8 @@ int TrafficLightsPerceptionComponent::InitV2XListener() {
 int TrafficLightsPerceptionComponent::InitCameraFrame() {
   data_provider_init_options_.image_height = image_height_;
   data_provider_init_options_.image_width = image_width_;
-  int gpu_id = GetGpuId(camera_perception_init_options_);
+  // int gpu_id = GetGpuId(camera_perception_init_options_);
+  int gpu_id = GetTrafficGpuId(trafficlight_config);
   if (gpu_id == -1) {
     return cyber::FAIL;
   }
