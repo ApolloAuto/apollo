@@ -46,16 +46,17 @@ cc_binary(
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
         "//modules/common_msgs/planning_msgs:decision_cc_proto",
-        "//modules/planning/proto:open_space_task_config_cc_proto",
-        "//modules/planning/proto:planner_open_space_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:open_space_task_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_internal_cc_proto",
         "//modules/common_msgs/planning_msgs:sl_boundary_cc_proto",
-        "//modules/planning/proto:task_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:task_config_cc_proto",
         "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
+    linkstatic = True,
 )
 
 cc_binary(
@@ -69,6 +70,7 @@ cc_binary(
         "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
+    linkstatic = True,
 )
 
 cpplint()

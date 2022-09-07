@@ -25,7 +25,7 @@
 #include <string>
 
 #include "modules/map/pnc_map/route_segments.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 

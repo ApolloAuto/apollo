@@ -39,7 +39,7 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {

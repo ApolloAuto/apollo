@@ -23,12 +23,13 @@ cc_library(
         "//cyber",
         "//modules/storytelling/story_tellers:close_to_junction_teller",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
     name = "libstorytelling_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":storytelling_lib"],
 )
 

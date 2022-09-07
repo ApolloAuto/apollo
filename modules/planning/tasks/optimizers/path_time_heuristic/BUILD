@@ -49,7 +49,7 @@ cc_library(
         "//modules/planning/common:st_graph_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
     ],
 )
 
@@ -79,7 +79,7 @@ cc_test(
     ],
     deps = [
         ":gridded_path_time_graph",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

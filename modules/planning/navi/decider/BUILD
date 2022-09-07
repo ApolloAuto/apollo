@@ -14,7 +14,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
     ],
 )
 
@@ -34,7 +34,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/navi/decider:navi_obstacle_decider",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
     ],
 )
@@ -61,7 +61,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/navi/decider:navi_obstacle_decider",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
     ],
 )

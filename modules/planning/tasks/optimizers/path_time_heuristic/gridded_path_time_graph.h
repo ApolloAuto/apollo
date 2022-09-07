@@ -32,8 +32,8 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/task_config.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_cost.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 

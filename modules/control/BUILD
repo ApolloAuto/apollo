@@ -41,6 +41,7 @@ cc_library(
         ":control_lib",
         "//modules/control/common:dependency_injector",
     ],
+    alwayslink = True
 )
 
 cc_binary(

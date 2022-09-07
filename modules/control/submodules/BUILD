@@ -27,12 +27,13 @@ cc_library(
         ":postprocessor_submodule_lib",
         ":preprocessor_submodule_lib",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
     name = "control_module.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":control_module_lib"],
 )
 
@@ -59,12 +60,13 @@ cc_library(
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
+    alwayslink = True
 )
 
 cc_binary(
     name = "preprocessor_submodule.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":preprocessor_submodule_lib"],
 )
 
@@ -99,7 +101,7 @@ cc_library(
 cc_binary(
     name = "mpc_controller_submodule.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":mpc_controller_submodule_lib"],
 )
 
@@ -128,7 +130,7 @@ cc_library(
 cc_binary(
     name = "lat_lon_controller_submodule.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":lat_lon_controller_submodule_lib"],
 )
 
@@ -162,7 +164,7 @@ cc_library(
 cc_binary(
     name = "postprocessor_submodule.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":postprocessor_submodule_lib"],
 )
 

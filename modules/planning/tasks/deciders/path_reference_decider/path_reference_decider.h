@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/planning/common/path_boundary.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
