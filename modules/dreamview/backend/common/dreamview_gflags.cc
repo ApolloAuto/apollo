@@ -123,6 +123,8 @@ DEFINE_string(plugin_channel_prefix,"/apollo/dreamview/plugins/","plugins must u
 
 DEFINE_string(resource_scenario_path,"/.apollo/resources/scenario_sets/","Scenario set placement");
 
+DEFINE_string(resource_dynamic_model_path,"/.apollo/resources/dynamic_models/","Dynamic Models placement");
+
 DEFINE_string(sim_obstacle_stop_command,"pkill -9 -f \"sim_obstacle\" ","Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,"/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle","sim obstacle binary placement.");

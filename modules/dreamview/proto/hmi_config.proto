@@ -20,6 +20,9 @@ enum HMIAction {
   CHANGE_SCENARIO_SET = 11;      // value = scenario_set_id
   LOAD_SCENARIOS = 12; // 加载全部scenarios
   DELETE_SCENARIO_SET = 13; // value = scenario_set_id
+  LOAD_DYNAMIC_MODELS = 14; // 加载全部动力学模型
+  CHANGE_DYNAMIC_MODEL = 15; // 切换动力学模型 value = dynamic_model_name
+  DELETE_DYNAMIC_MODEL = 16; // 删除动力学模型 value = dynamic_model_name
 }
 
 message HMIConfig {

@@ -24,7 +24,13 @@
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
 std::map<std::string, int> plugin_function_map = {{"UpdateScenarioSetToStatus", 0}};
-std::map<std::string, int> hmi_function_map = {{"SimControlRestart", 0},{"MapServiceReloadMap", 1}};
+std::map<std::string, int> hmi_function_map = {
+    {"SimControlRestart", 0},
+    {"MapServiceReloadMap", 1},
+    {"LoadDynamicModels", 2},
+    {"ChangeDynamicModel", 3},
+    {"DeleteDynamicMode", 4},
+};
 }
 
 namespace apollo {
@@ -85,6 +91,8 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
+  // todo: add map service to construct function
+  sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
   
@@ -92,6 +100,7 @@ Status Dreamview::Init() {
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
+      sim_control_manager_.get(),
       plugin_ws_.get(), map_service_.get(), perception_camera_updater_.get(),
       plugin_manager_.get(),
       FLAGS_routing_from_file));
@@ -132,20 +141,22 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
+  // todo: replace sim control then remove sim control and change name
   sim_control_->Stop();
+  sim_control_manager_->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();
   plugin_manager_->Stop();
 }
 
-bool Dreamview::HMICallbackSimControl(const std::string& function_name,
+nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name,
                                   const nlohmann::json& param_json) {
   if (hmi_function_map.find(function_name) == hmi_function_map.end()) {
     AERROR << "Donnot support this callback";
     return false;
   }
-  bool callback_res = false;
+  nlohmann::json callback_res  = {};
   switch(hmi_function_map[function_name]) {
     case 0: {
       // 解析结果
@@ -154,12 +165,46 @@ bool Dreamview::HMICallbackSimControl(const std::string& function_name,
         const double x = param_json["x"];
         const double y = param_json["y"];
         sim_control_->Restart(x,y);
-        callback_res = true;
+        callback_res["result"]=true;
       }
     } break;
     case 1:{
       map_service_->ReloadMap(true);
+      callback_res["result"]= true;
       break;
+    }
+    case 2:{
+      // loadDynamicModels
+      if(sim_control_manager_->IsEnabled()){
+        // 不打开callback_res就是false
+        nlohmann::json load_res =  sim_control_manager_->LoadDynamicModels();
+        //  result["loaded_dynamic_models"]
+        callback_res["result"]=!load_res.is_null();
+        if(!load_res.is_null()){
+          callback_res["loaded_dynamic_models"]=load_res["loaded_dynamic_models"];
+        }
+      } else{
+        AERROR<<"Sim control is not enabled!";
+      }
+    }
+    case 3:{
+      // 解析结果
+      if (param_json.contains("dynamic_model_name")&&sim_control_manager_->IsEnabled()) {
+        callback_res["result"]=sim_control_manager_->ChangeDynamicModel(param_json["dynamic_model_name"]);
+      }else{
+        AERROR<<"Sim control is not enabled or missing dynamic model name param!";
+      }
+     break;
+    }
+    case 4:{
+      // 解析结果
+      if (param_json.contains("dynamic_model_name")&&sim_control_manager_->IsEnabled()) {
+        sim_control_manager_->DeleteDynamicModel(param_json["dynamic_model_name"]);
+        callback_res["result"]=true;
+      }else{
+        AERROR<<"Sim control is not enabled or missing dynamic model name param!";
+      }
+     break;
     }
     default:
       break;

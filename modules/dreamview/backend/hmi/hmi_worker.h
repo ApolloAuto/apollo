@@ -113,6 +113,9 @@ class HMIWorker {
   void DeleteScenarioSet(const std::string& scenario_set_id);
   void ChangeScenario(const std::string& scenario_id);
   bool LoadScenarios();
+  bool LoadDynamicModes();
+  void ChangeDynamicModel(const std::string& dynamic_model_name);
+  void DeleteDynamicModel(const std::string& dynamic_model_name);
   void GetScenarioResourcePath(std::string& scenario_resource_path);
   bool UpdateScenarioSet(const std::string& scenario_set_id, const std::string& scenario_set_name,ScenarioSet& new_scenario_set);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);

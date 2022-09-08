@@ -80,6 +80,8 @@ DECLARE_string(plugin_channel_prefix);
 
 DECLARE_string(resource_scenario_path);
 
+DECLARE_string(resource_dynamic_model_path);
+
 DECLARE_string(sim_obstacle_stop_command);
 
 DECLARE_string(sim_obstacle_path);

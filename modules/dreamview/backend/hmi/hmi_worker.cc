@@ -373,6 +373,9 @@ bool HMIWorker::Trigger(const HMIAction action) {
     case HMIAction::LOAD_SCENARIOS:
       LoadScenarios();
       break;
+    case HMIAction::LOAD_DYNAMIC_MODELS:
+      LoadDynamicModels();
+      break;
     default:
       AERROR << "HMIAction not implemented, yet!";
       return false;
@@ -408,6 +411,12 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
       break;
     case HMIAction::CHANGE_SCENARIO:
       ChangeScenario(value);
+      break;
+    case HMIAction::CHANGE_DYNAMIC_MODEL:
+      ChangeDynamicModel(value);
+      break;
+    case HMIAction::DELETE_DYNAMIC_MODEL:
+      DeleteDynamicModel(value);
       break;
     default:
       AERROR << "HMIAction not implemented, yet!";
@@ -904,6 +913,35 @@ void HMIWorker::ChangeScenario(const std::string& scenario_id) {
   return;
 }
 
+void HMIWorker::ChangeDynamicModel(const std::string& dynamic_model_name) {
+  {
+    RLock rlock(status_mutex_);
+    // Skip if mode doesn't actually change.
+    if (status_.current_dynamic_model() == dynamic_model_name) {
+      return;
+    }
+  }
+    // 回调SimControl
+  Json callback_res = callback_api_("ChangeDynamicModel",{dynamic_model_name,});
+  if (callback_res.contains("result")) {
+    std::string current_dynamic_model_name = dynamic_model_name;
+    // 如果是sim control没开？或者参数没传过去？好像不太对 需要区分
+    if (!callback_res["result"]) {
+      AERROR
+          << "Failed to change dynamic model! Reset current dynamic model to "
+             "empty!";
+      // 在切换出错的过程中需要重置，直接关闭DM仿真，设置为空
+      current_dynamic_model_name = "";
+    }
+    {
+      WLock wlock(status_mutex_);
+      status_.set_current_dynamic_model(dynamic_model_name);
+      status_changed_ = true;
+    }
+  }
+  return;
+}
+
 bool HMIWorker::UpdateScenarioSetToStatus(
     const std::string& scenario_set_id, const std::string& scenario_set_name) {
   ScenarioSet new_scenario_set;
@@ -1075,6 +1113,29 @@ bool HMIWorker::LoadScenarios() {
   return true;
 }
 
+// LoadDynamicModels
+// HMI如果包含sim control子类-出现循环引用情况
+// 所以callback
+bool HMIWorker::LoadDynamicModels() {
+  Json load_res = callback_api_("LoadDynamicModels", {});
+  if (load_res.contains("result")&&load_res["result"]) {
+    // 成功的情况去加载 失败的情况不用管 AWRAN AERROR 保证能看懂就行
+    // 遍历字符串数组，添加到hmistatus字段里
+    // callback_res["loaded_dynamic_models"]
+    {
+      WLock wlock(status_mutex_);
+      auto dynamic_models = status_.mutable_dynamic_models();
+      // clear old data
+      dynamic_models->clear();
+      for(const auto& dynamic_model:load_res["loaded_dynamic_models"]){
+        status_.add_dynamic_models(dynamic_model);
+      }
+      status_changed_ = true;
+    }
+  }
+  return load_res["result"];
+}
+
 void HMIWorker::DeleteScenarioSet(const std::string& scenario_set_id) {
   if (scenario_set_id.empty()) {
     return;
@@ -1113,6 +1174,34 @@ void HMIWorker::DeleteScenarioSet(const std::string& scenario_set_id) {
     WLock wlock(status_mutex_);
     status_.mutable_scenario_set()->erase(scenario_set_id);
     status_changed_ = true;
+  }
+  return;
+}
+
+void HMIWorker::DeleteDynamicModel(const std::string& dynamic_model_name) {
+  if (dynamic_model_name.empty()) {
+    return;
+  }
+  {
+    RLock rlock(status_mutex_);
+    // do not allowed remove changed current dynamic model
+    if (dynamic_model_name == status_.current_dynamic_model()) {
+      AERROR << "Cannot delete current dynamic model!";
+      return;
+    }
+  }
+  callback_api_("DeleteDynamicModel", {
+                                          dynamic_model_name,
+                                      });
+  {
+    WLock wlock(status_mutex_);
+    auto iter = status_.dynamic_models().find(dynamic_model_name);
+    if (iter != status_.dynamic_models().end()) {
+      status_.mutable_dynamic_models().erase(iter);
+      status_changed_ = true;
+    } else{
+      AWARN<<"Can not find dynamic model to delete!";
+    }
   }
   return;
 }

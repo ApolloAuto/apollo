@@ -38,6 +38,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/dreamview/backend/plugins/plugin_manager.h"
 
@@ -67,6 +68,7 @@ class SimulationWorldUpdater {
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
                          WebSocketHandler *camera_ws, SimControl *sim_control,
+                         SimControlManager *sim_control_manager,
                          WebSocketHandler *plugin_ws,
                          const MapService *map_service,
                          PerceptionCameraUpdater *perception_camera_updater,
@@ -181,6 +183,7 @@ class SimulationWorldUpdater {
   WebSocketHandler *camera_ws_ = nullptr;
   WebSocketHandler *plugin_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
+  SimControlManager *sim_control_manager_ = nullptr;
   PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
   // End point for requesting default route
