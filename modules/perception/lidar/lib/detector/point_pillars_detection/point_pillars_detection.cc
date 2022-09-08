@@ -61,24 +61,44 @@ bool PointPillarsDetection::Init(const LidarDetectorInitOptions& options) {
 }
 
 bool PointPillarsDetection::Init(const StageConfig& config) {
-  Init(config.point_pillars_detection_config());
-  bool res = Initialize(config);
-  return res;
+  ACHECK(stage_config.has_pointpillars_detection());
+  point_pillars_detection_config_ = stage_config.pointpillars_detection();
+  name_ = StageType_Name(pointcloud_preprocessor_config_.stage_type());
+
+  point_pillars_ptr_.reset(
+      new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
+                       FLAGS_nms_overlap_threshold, FLAGS_pfe_torch_file,
+                       FLAGS_scattered_torch_file, FLAGS_backbone_torch_file,
+                       FLAGS_fpn_torch_file, FLAGS_bbox_head_torch_file));
+  return true;
 }
 
-bool PointPillarsDetection::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
+bool PointPillarsDetection::Process(DataFrame* data_frame) { return true; }
+
+bool PointPillarsDetection::Process(DataFrame* data_frame,
+                                    cons std::vector<float>& points_array,
+                                    int num_points,
+                                    std::vector<float>* out_detections,
+                                    std::vector<int>* out_labels) {
+  if (nullptr == data_frame) {
+    AERROR << "Input null data_frame ptr.";
     return false;
+  }
 
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
+  if (nullptr == out_detections) {
+    AERROR << "Input null out_detections ptr.";
+    return false;
+  }
 
-  LidarDetectorOptions options;
-  bool res = Detect(options, data_frame->lidar_frame);
+  if (nullptr == out_labels) {
+    AERROR << "Input null out_labels ptr.";
+    return false;
+  }
 
-  return res;
+  Detect(data_frame->lidar_frame, cons std::vector<float> & points_array,
+         int num_points, std::vector<float>* out_detections,
+         std::vector<int>* out_labels);
 }
-
 bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
                                    LidarFrame* frame) {
   // check input
@@ -227,6 +247,64 @@ bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
         << "collect: " << collect_time_;
 
   delete[] points_array;
+  return true;
+}
+
+bool PointPillarsDetection::Detect(LidarFrame* frame,
+                                   cons std::vector<float>& points_array,
+                                   int num_points,
+                                   std::vector<float>* out_detections,
+                                   std::vector<int>* out_labels) {
+  // check input
+  if (frame == nullptr) {
+    AERROR << "Input null frame ptr.";
+    return false;
+  }
+  if (frame->cloud == nullptr) {
+    AERROR << "Input null frame cloud.";
+    return false;
+  }
+  if (frame->cloud->size() == 0) {
+    AERROR << "Input none points.";
+    return false;
+  }
+  if (points_array == nullptr) {
+    AERROR << "Input null points_array ptr.";
+    return false;
+  }
+
+  // check output
+  frame->segmented_objects.clear();
+
+  if (cudaSetDevice(FLAGS_gpu_id) != cudaSuccess) {
+    AERROR << "Failed to set device to gpu " << FLAGS_gpu_id;
+    return false;
+  }
+
+  // inference
+  std::vector<float> out_detections;
+  std::vector<int> out_labels;
+  point_pillars_ptr_->DoInference(points_array.data(), num_points,
+                                  &out_detections, &out_labels);
+  inference_time_ = timer.toc(true);
+
+  // transfer output bounding boxes to objects
+  /*
+  GetObjects(&frame->segmented_objects, frame->lidar2world_pose,
+             &out_detections, &out_labels);
+  collect_time_ = timer.toc(true);
+
+  AINFO << "PointPillars: "
+        << "\n"
+        << "down sample: " << downsample_time_ << "\t"
+        << "fuse: " << fuse_time_ << "\t"
+        << "shuffle: " << shuffle_time_ << "\t"
+        << "cloud_to_array: " << cloud_to_array_time_ << "\t"
+        << "inference: " << inference_time_ << "\t"
+        << "collect: " << collect_time_;
+
+  delete[] points_array;
+  */
   return true;
 }
 
