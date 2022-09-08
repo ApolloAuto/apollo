@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "sim_control/core/sim_control_with_model_base.h"
+#include "modules/dreamview/backend/sim_control_manager/core/sim_control_with_model_base.h"
+#include "modules/dreamview/backend/map/map_service.h"
 
 namespace apollo {
 namespace dreamview {
@@ -42,7 +43,8 @@ using apollo::sim_control::SimCarStatus;
 SimControlWithModelBase::SimControlWithModelBase(const std::string& node_name)
     : node_(cyber::CreateNode(node_name)),
       gear_position_(0),
-      dt_(0.01) {
+      dt_(0.01),
+      map_service_(new MapService()) {
   InitTimerAndIO();
 }
 
@@ -162,7 +164,7 @@ void SimControlWithModelBase::OnRoutingResponse(
       theta = start_heading_;
     } else if (routing.road_size() > 0) {
       auto start_lane = routing.road(0).passage(0).segment(0);
-      theta = GetLaneHeading(start_lane.id(), start_lane.start_s());
+      theta = map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
     }
     point.set_theta(theta);
     SetStartPoint(point);

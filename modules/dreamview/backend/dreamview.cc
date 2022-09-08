@@ -157,6 +157,7 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
     return false;
   }
   nlohmann::json callback_res  = {};
+  std::string dynamic_model_name;
   switch(hmi_function_map[function_name]) {
     case 0: {
       // 解析结果
@@ -190,7 +191,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
     case 3:{
       // 解析结果
       if (param_json.contains("dynamic_model_name")&&sim_control_manager_->IsEnabled()) {
-        callback_res["result"]=sim_control_manager_->ChangeDynamicModel(param_json["dynamic_model_name"]);
+        dynamic_model_name = param_json["dynamic_model_name"];
+        callback_res["result"]=sim_control_manager_->ChangeDynamicModel(dynamic_model_name);
       }else{
         AERROR<<"Sim control is not enabled or missing dynamic model name param!";
       }
@@ -199,7 +201,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
     case 4:{
       // 解析结果
       if (param_json.contains("dynamic_model_name")&&sim_control_manager_->IsEnabled()) {
-        sim_control_manager_->DeleteDynamicModel(param_json["dynamic_model_name"]);
+        dynamic_model_name = param_json["dynamic_model_name"];
+        sim_control_manager_->DeleteDynamicModel(dynamic_model_name);
         callback_res["result"]=true;
       }else{
         AERROR<<"Sim control is not enabled or missing dynamic model name param!";

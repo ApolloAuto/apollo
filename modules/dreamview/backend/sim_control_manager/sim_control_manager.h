@@ -22,7 +22,7 @@
 #include "cyber/cyber.h"
 
 #include "modules/common/configs/config_gflags.h"
-#include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
+// #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/core/dynamic_model_factory.h"
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
 
@@ -72,7 +72,7 @@ class SimControlManager {
   void Stop();
 
  private:
-  std::unique_ptr<SimControlBase> model_ptr_;
+  SimControlBase* model_ptr_;
   std::string current_dynamic_model_ = "";
   // whether the sim control manager is enabled!
   // 与sim control这种dm的enabled区分。enabled 等于正在运行
@@ -81,5 +81,5 @@ class SimControlManager {
   bool enabled_ = false;
 };
 
-}  // namespace simulation
+}  // namespace dreamview
 }  // namespace apollo

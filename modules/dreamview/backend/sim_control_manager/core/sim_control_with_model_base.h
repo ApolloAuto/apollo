@@ -25,14 +25,15 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/message_util.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
 #include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
+#include "modules/dreamview/backend/map/map_service.h"
 
 /**
  * @namespace apollo::dreamview
@@ -127,6 +128,7 @@ class SimControlWithModelBase : public SimControlBase {
 
   // Whether to send dummy predictions
   bool send_dummy_prediction_ = true;
+  MapService *map_service_;
 };
 
 }  // namespace dreamview

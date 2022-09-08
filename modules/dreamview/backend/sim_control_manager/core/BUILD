@@ -20,8 +20,8 @@ cc_library(
         "//modules/common/util:message_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
-        "//modules/prediction/proto:scenario_cc_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
+        "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
     ],
 )
 
@@ -34,7 +34,6 @@ cc_library(
         "sim_control_with_model_base.h",
     ],
     deps = [
-        "//common/map:map_util",
         "//modules/dreamview/backend/sim_control_manager/common:sim_control_gflags",
         "//modules/dreamview/backend/sim_control_manager/common:sim_control_util",
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_base",

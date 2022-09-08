@@ -50,6 +50,7 @@ using google::protobuf::util::MessageToJsonString;
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
     WebSocketHandler *camera_ws, SimControl *sim_control,
+    SimControlManager *sim_control_manager,
     WebSocketHandler *plugin_ws,
     const MapService *map_service,
     PerceptionCameraUpdater *perception_camera_updater,

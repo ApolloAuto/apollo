@@ -210,3 +210,31 @@ py_proto_library(
         ":scenario_proto",
     ],
 )
+
+# @lijin: tmp add for debug,move it to common_msgs after end debug
+cc_proto_library(
+    name = "hmi_status_cc_proto",
+    deps = [
+        ":hmi_status_proto",
+    ],
+)
+
+proto_library(
+    name = "hmi_status_proto",
+    srcs = ["hmi_status.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/monitor_msgs:system_status_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+    ],
+)
+
+py_proto_library(
+    name = "hmi_status_py_pb2",
+    deps = [
+        ":hmi_status_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/monitor_msgs:system_status_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+    ],
+)

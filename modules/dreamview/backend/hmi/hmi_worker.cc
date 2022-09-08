@@ -1126,7 +1126,9 @@ bool HMIWorker::LoadDynamicModels() {
       WLock wlock(status_mutex_);
       auto dynamic_models = status_.mutable_dynamic_models();
       // clear old data
-      dynamic_models->clear();
+      for(auto iter=dynamic_models->begin();iter!=dynamic_models->end();iter++){
+         dynamic_models->erase(iter);
+      }
       for(const auto& dynamic_model:load_res["loaded_dynamic_models"]){
         status_.add_dynamic_models(dynamic_model);
       }
@@ -1195,9 +1197,16 @@ void HMIWorker::DeleteDynamicModel(const std::string& dynamic_model_name) {
                                       });
   {
     WLock wlock(status_mutex_);
-    auto iter = status_.dynamic_models().find(dynamic_model_name);
+    // auto iter = status_.dynamic_models().find(dynamic_model_name);
+    auto iter= status_.dynamic_models().begin();
+    while(iter!= status_.dynamic_models().end()){
+      if(*iter == dynamic_model_name){
+        break;
+      }
+      iter++;
+    }
     if (iter != status_.dynamic_models().end()) {
-      status_.mutable_dynamic_models().erase(iter);
+      status_.mutable_dynamic_models()->erase(iter);
       status_changed_ = true;
     } else{
       AWARN<<"Can not find dynamic model to delete!";

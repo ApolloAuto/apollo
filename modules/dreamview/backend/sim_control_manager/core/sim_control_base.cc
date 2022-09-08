@@ -17,7 +17,7 @@
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
 
 namespace apollo {
-namespace simulation {
+namespace dreamview {
 using apollo::common::Point3D;
 using apollo::common::Quaternion;
 using apollo::common::math::HeadingToQuaternion;
@@ -45,5 +45,5 @@ void SimControlBase::Stop() {
   }
 }
 
-}  // namespace simulation
+}  // namespace dreamview
 }  // namespace apollo

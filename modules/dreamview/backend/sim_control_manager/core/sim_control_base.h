@@ -25,8 +25,8 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_util.h"
@@ -36,7 +36,7 @@
  * @brief apollo::dreamview
  */
 namespace apollo {
-namespace simulation {
+namespace dreamview {
 
 /**
  * @class SimControlBase
@@ -69,7 +69,7 @@ class SimControlBase {
    */
   virtual void Stop();
 
-  virtual std::unique_ptr<SimControlBase> GetDynamicModel();
+  // virtual std::unique_ptr<SimControlBase> GetDynamicModel();
 
  protected:
   void TransformToVRF(const apollo::common::Point3D& point_mrf,
@@ -97,5 +97,5 @@ class SimControlBase {
   double start_heading_ = std::numeric_limits<double>::max();
 };
 
-}  // namespace simulation
+}  // namespace dreamview
 }  // namespace apollo
