@@ -194,7 +194,7 @@ cc_library(
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
     ],
 )
 
@@ -245,7 +245,7 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common/util:util_lib",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/reference_line:reference_line_provider",
         "@eigen",
     ],
@@ -262,7 +262,7 @@ cc_test(
         ":frame",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -320,7 +320,7 @@ cc_library(
         ":obstacle",
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/math",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
         "//modules/planning/reference_line",

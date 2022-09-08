@@ -16,7 +16,7 @@ proto_library(
     name = "canbus_conf_proto",
     srcs = ["canbus_conf.proto"],
     deps = [
-        "//modules/drivers/canbus/proto:can_card_parameter_proto",
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_proto",
         ":vehicle_parameter_proto",
     ],
 )
@@ -25,7 +25,7 @@ py_proto_library(
     name = "canbus_conf_py_pb2",
     deps = [
         ":canbus_conf_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_py_pb2",
         ":vehicle_parameter_py_pb2",
     ],
 )
@@ -42,7 +42,7 @@ proto_library(
     srcs = ["vehicle_parameter.proto"],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_proto",
-        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_proto",
     ],
 )
 
@@ -51,7 +51,7 @@ py_proto_library(
     deps = [
         ":vehicle_parameter_proto",
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
     ],
 )
 

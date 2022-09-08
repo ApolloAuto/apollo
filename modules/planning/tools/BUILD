@@ -13,7 +13,7 @@ cc_binary(
         "//modules/common/util:util_tool",
         "//modules/planning/common:planning_gflags",
         "//modules/common_msgs/planning_msgs:pad_msg_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

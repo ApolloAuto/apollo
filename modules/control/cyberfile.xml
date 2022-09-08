@@ -15,4 +15,20 @@
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/control</src_path>
 
+  <depend type="binary" repo_name="cyber">cyber-dev</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
+  <depend repo_name="eigen">3rd-eigen3-dev</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl-dev</depend>
+  <depend repo_name="osqp">3rd-osqp-dev</depend>
+
+  <depend>bazel-extend-tools-dev</depend>
+  <depend expose="False">3rd-rules-python-dev</depend>
+  <depend expose="False">3rd-grpc-dev</depend>
+  <depend expose="False">3rd-bazel-skylib-dev</depend>
+  <depend expose="False">3rd-rules-proto-dev</depend>
+  <depend expose="False">3rd-py-dev</depend>
+
 </package>

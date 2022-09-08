@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 

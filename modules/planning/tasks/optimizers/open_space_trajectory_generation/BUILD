@@ -45,7 +45,7 @@ cc_library(
         "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
         "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
         "//modules/planning/open_space/trajectory_smoother:iterative_anchoring_smoother",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],

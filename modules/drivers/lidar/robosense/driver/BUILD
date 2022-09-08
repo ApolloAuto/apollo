@@ -18,6 +18,7 @@ cc_library(
         ":driver",
         "//cyber",
     ],
+    alwayslink = True
 )
 
 cc_library(

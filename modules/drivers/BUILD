@@ -43,7 +43,6 @@ install_files(
     name = "pb_drivers",
     dest = "drivers",
     files = [
-        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
         "//modules/common_msgs/sensor_msgs:ins_py_pb2",
         "//modules/common_msgs/sensor_msgs:conti_radar_py_pb2",
         "//modules/common_msgs/sensor_msgs:pointcloud_py_pb2",
@@ -57,8 +56,6 @@ install(
     data_dest = "drivers/include",
     data = [
         "//modules/drivers/camera/proto:config_cc_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-        "//modules/drivers/canbus/proto:sensor_canbus_conf_cc_proto",
         "//modules/drivers/gnss/proto:config_cc_proto",
         "//modules/drivers/gnss/proto:gnss_status_cc_proto",
         "//modules/drivers/lidar/proto:config_cc_proto",

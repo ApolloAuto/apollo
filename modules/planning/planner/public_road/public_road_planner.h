@@ -26,7 +26,7 @@
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/tasks/task.h"

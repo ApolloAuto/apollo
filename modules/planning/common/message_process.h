@@ -36,7 +36,7 @@
 #include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/dependency_injector.h"
 #include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"

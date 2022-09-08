@@ -30,7 +30,7 @@
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/proto/st_drivable_boundary.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
+#include "modules/common_msgs/planning_msgs/task_config.pb.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 
 namespace apollo {

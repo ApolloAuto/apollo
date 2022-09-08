@@ -25,7 +25,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"

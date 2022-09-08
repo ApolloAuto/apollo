@@ -39,7 +39,7 @@ cc_library(
         "//cyber",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_state_cc_proto",
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
         "//modules/common/util:util_tool",

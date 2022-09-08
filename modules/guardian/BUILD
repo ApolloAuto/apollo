@@ -21,12 +21,13 @@ cc_library(
         "//modules/guardian/proto:guardian_conf_cc_proto",
         "//modules/common_msgs/monitor_msgs:system_status_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
     name = "libguardian_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":guardian_component_lib",
     ],

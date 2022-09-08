@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

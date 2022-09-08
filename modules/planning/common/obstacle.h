@@ -26,7 +26,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"

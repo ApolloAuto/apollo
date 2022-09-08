@@ -26,7 +26,7 @@
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {

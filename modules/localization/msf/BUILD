@@ -83,6 +83,7 @@ install(
         "//modules/localization/msf/local_tool/data_extraction:install",
         "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+        #"//modules/localization/msf/local_tool/ndt_mapping:install",
         "//modules/localization/msf/params:install",
     ],
 )

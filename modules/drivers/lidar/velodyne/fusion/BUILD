@@ -15,7 +15,7 @@ install(
 cc_binary(
     name = "libvelodyne_fusion_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":fusion_component_lib"],
 )
 
@@ -31,6 +31,7 @@ cc_library(
         "//modules/transform:buffer",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

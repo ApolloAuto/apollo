@@ -23,7 +23,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+#include "modules/common_msgs/drivers_msgs/sensor_canbus_conf.pb.h"
 #include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_canbus_component.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"

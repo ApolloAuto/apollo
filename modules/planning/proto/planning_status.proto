@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common_msgs/basic_msgs/geometry.proto";
-import "modules/planning/proto/planning_config.proto";
+import "modules/common_msgs/planning_msgs/planning_config.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
 import "modules/common_msgs/planning_msgs/scenario_type.proto";
 

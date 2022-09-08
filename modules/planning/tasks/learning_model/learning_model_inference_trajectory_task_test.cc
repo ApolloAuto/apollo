@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/learning_model/learning_model_inference_trajectory_task.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

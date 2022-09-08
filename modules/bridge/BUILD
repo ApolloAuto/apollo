@@ -21,6 +21,8 @@ install(
     data_dest = "bridge",
     data = [
       ":runtime_data",
+      "cyberfile.xml",
+      "bridge.BUILD"
     ],
     targets = [
       ":libudp_bridge_sender_component.so",
@@ -28,7 +30,6 @@ install(
       ":libudp_bridge_multi_receiver_component.so",
     ],
     deps = [
-        "//cyber:install",
         "//modules/bridge/test:install",
     ],
 )

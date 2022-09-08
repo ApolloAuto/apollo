@@ -16,6 +16,7 @@ cc_library(
         "//modules/drivers/lidar/hesai:parser_factory",
         "//modules/drivers/lidar/proto:hesai_config_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(

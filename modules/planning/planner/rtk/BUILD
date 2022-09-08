@@ -18,7 +18,7 @@ cc_library(
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/planner",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_absl//:absl",
         "@eigen",

@@ -31,7 +31,7 @@ filegroup(
 cc_binary(
     name = "libhesai_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [
         ":hesai_convert_component",
         "//modules/drivers/lidar/hesai/driver:hesai_component",
@@ -49,6 +49,7 @@ cc_library(
         "//modules/drivers/lidar/hesai/driver",
         "//modules/drivers/lidar/proto:hesai_config_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(

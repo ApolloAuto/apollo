@@ -36,7 +36,7 @@ proto_library(
     deps = [
         "//modules/canbus/proto:canbus_conf_proto",
         "//modules/common_msgs/chassis_msgs:chassis_proto",
-        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_proto",
         "//modules/control/proto:control_conf_proto",
         "//modules/common_msgs/routing_msgs:routing_proto",
     ],
@@ -48,7 +48,7 @@ py_proto_library(
         ":static_info_proto",
         "//modules/canbus/proto:canbus_conf_py_pb2",
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+        "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",
         "//modules/control/proto:control_conf_py_pb2",
         "//modules/common_msgs/routing_msgs:routing_py_pb2",
     ],

@@ -17,7 +17,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
     ],
 )

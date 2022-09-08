@@ -32,7 +32,7 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {

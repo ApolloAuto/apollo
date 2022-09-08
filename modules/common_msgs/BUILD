@@ -110,6 +110,7 @@ install(
         "//modules/common_msgs/transform_msgs:transform_cc_proto",
         "//modules/common_msgs/v2x_msgs:v2x_traffic_light_cc_proto",
         "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
     ],
 )
 

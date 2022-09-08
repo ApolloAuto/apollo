@@ -30,7 +30,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
@@ -47,7 +47,7 @@ cc_library(
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -59,7 +59,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
         "//modules/planning/common:frame",
@@ -72,7 +72,7 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -84,7 +84,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_cc_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/map/pnc_map",
@@ -100,7 +100,7 @@ cc_library(
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )

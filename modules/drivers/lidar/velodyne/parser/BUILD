@@ -15,7 +15,7 @@ install(
 cc_binary(
     name = "libvelodyne_convert_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":velodyne_convert_component_lib"],
 )
 
@@ -28,6 +28,7 @@ cc_library(
         "//cyber",
         "//modules/drivers/lidar/velodyne/parser:convert",
     ],
+    alwayslink = True
 )
 
 cc_library(

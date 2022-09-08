@@ -21,7 +21,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {

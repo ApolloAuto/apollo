@@ -29,7 +29,7 @@
 #undef ALIVE
 #endif
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -37,7 +37,7 @@
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
-#include "modules/planning/proto/open_space_task_config.pb.h"
+#include "modules/common_msgs/planning_msgs/open_space_task_config.pb.h"
 
 namespace apollo {
 namespace planning {

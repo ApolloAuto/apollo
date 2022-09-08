@@ -6,24 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "task_config_cc_proto",
-    deps = [
-        ":task_config_proto",
-    ],
-)
-
-proto_library(
-    name = "task_config_proto",
-    srcs = ["task_config.proto"],
-)
-
-py_proto_library(
-    name = "task_config_py_pb2",
-    deps = [
-        ":task_config_proto",
-    ],
-)
-cc_proto_library(
     name = "st_drivable_boundary_cc_proto",
     deps = [
         ":st_drivable_boundary_proto",
@@ -39,57 +21,6 @@ py_proto_library(
     name = "st_drivable_boundary_py_pb2",
     deps = [
         ":st_drivable_boundary_proto",
-    ],
-)
-cc_proto_library(
-    name = "planning_config_cc_proto",
-    deps = [
-        ":planning_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_config_proto",
-    srcs = ["planning_config.proto"],
-    deps = [
-        ":open_space_task_config_proto",
-        ":task_config_proto",
-        "//modules/common_msgs/planning_msgs:scenario_type_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_config_py_pb2",
-    deps = [
-        ":planning_config_proto",
-        ":open_space_task_config_py_pb2",
-        ":task_config_py_pb2",
-        "//modules/common_msgs/planning_msgs:scenario_type_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planner_open_space_config_cc_proto",
-    deps = [
-        ":planner_open_space_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planner_open_space_config_proto",
-    srcs = ["planner_open_space_config.proto"],
-    deps = [
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
-        ":task_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planner_open_space_config_py_pb2",
-    deps = [
-        ":planner_open_space_config_proto",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
-        ":task_config_py_pb2",
     ],
 )
 
@@ -147,28 +78,6 @@ py_proto_library(
         ":traffic_rule_config_proto",
     ],
 )
-cc_proto_library(
-    name = "open_space_task_config_cc_proto",
-    deps = [
-        ":open_space_task_config_proto",
-    ],
-)
-
-proto_library(
-    name = "open_space_task_config_proto",
-    srcs = ["open_space_task_config.proto"],
-    deps = [
-        ":planner_open_space_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "open_space_task_config_py_pb2",
-    deps = [
-        ":open_space_task_config_proto",
-        ":planner_open_space_config_py_pb2",
-    ],
-)
 
 cc_proto_library(
     name = "planning_status_cc_proto",
@@ -182,7 +91,7 @@ proto_library(
     srcs = ["planning_status.proto"],
     deps = [
         "//modules/common_msgs/basic_msgs:geometry_proto",
-        ":planning_config_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_proto",
         "//modules/common_msgs/routing_msgs:routing_proto",
         "//modules/common_msgs/planning_msgs:scenario_type_proto",
     ],
@@ -193,7 +102,7 @@ py_proto_library(
     deps = [
         ":planning_status_proto",
         "//modules/common_msgs/basic_msgs:geometry_py_pb2",
-        ":planning_config_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_config_py_pb2",
         "//modules/common_msgs/routing_msgs:routing_py_pb2",
         "//modules/common_msgs/planning_msgs:scenario_type_py_pb2",
     ],
@@ -311,7 +220,7 @@ proto_library(
     srcs = ["reference_line_smoother_config.proto"],
     deps = [
         "//modules/planning/proto/math:cos_theta_smoother_config_proto",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
+        "//modules/common_msgs/planning_msgs:fem_pos_deviation_smoother_config_proto",
     ],
 )
 
@@ -320,7 +229,7 @@ py_proto_library(
     deps = [
         ":reference_line_smoother_config_proto",
         "//modules/planning/proto/math:cos_theta_smoother_config_py_pb2",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
+        "//modules/common_msgs/planning_msgs:fem_pos_deviation_smoother_config_py_pb2",
     ],
 )
 
