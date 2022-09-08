@@ -86,7 +86,7 @@ static int GetGpuId(
   return trafficlight_param.gpu_id();
 }
 
-static int GetTrafficGpuId(const PipelineConfig& pipeline_config){
+static int GetTrafficGpuId(const apollo::perception::pipeline::TrafficLightConfig& pipeline_config){
   if (!pipeline_config.trafficlights_perception_config().has_gpu_id()){
     AINFO << "gpu id not found.";
     return -1;
@@ -173,10 +173,6 @@ int TrafficLightsPerceptionComponent::InitConfig() {
       static_cast<float>(traffic_light_param.sync_interval_seconds());
   tl_preprocessor_name_ = traffic_light_param.tl_preprocessor_name();
 
-  // camera_perception_init_options_.root_dir =
-  //     traffic_light_param.camera_traffic_light_perception_conf_dir();
-  // camera_perception_init_options_.conf_file =
-  //     traffic_light_param.camera_traffic_light_perception_conf_file();
   default_image_border_size_ = traffic_light_param.default_image_border_size();
 
   simulation_channel_name_ = traffic_light_param.simulation_channel_name();
@@ -249,13 +245,6 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     return cyber::FAIL;
   }
 
-  // camera_perception_init_options_.use_cyber_work_root = true;
-  // traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
-  // if (!traffic_light_pipeline_->Init(camera_perception_init_options_)) {
-  //   AERROR << "camera_obstacle_pipeline_->Init() failed";
-  //   return cyber::FAIL;
-  // }
-
   const auto& traffic_light_root_dir = traffic_light_param.camera_traffic_light_perception_conf_dir();
   const auto& traffic_light_conf_file = traffic_light_param.camera_traffic_light_perception_conf_file();
 
@@ -270,7 +259,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   
   traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
   if (!traffic_light_pipeline_->Init(trafficlight_config)) {
-    AERROR << "camera_obstacle_pipeline_->Init() failed";
+    AERROR << "camera_traffic_light_pipeline_->Init() failed";
     return cyber::FAIL;
   }
 
@@ -310,7 +299,6 @@ int TrafficLightsPerceptionComponent::InitV2XListener() {
 int TrafficLightsPerceptionComponent::InitCameraFrame() {
   data_provider_init_options_.image_height = image_height_;
   data_provider_init_options_.image_width = image_width_;
-  // int gpu_id = GetGpuId(camera_perception_init_options_);
   int gpu_id = GetTrafficGpuId(trafficlight_config);
   if (gpu_id == -1) {
     return cyber::FAIL;
@@ -424,7 +412,6 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   last_proc_image_ts_ = Clock::NowInSeconds();
 
   AINFO << "start proc.";
-  // traffic_light_pipeline_->Perception(camera_perception_options_, frame_.get());
   traffic_light_pipeline_->Process(DataFrame* data_frame->data_frame);
 
   for (auto light : frame_->traffic_lights) {
