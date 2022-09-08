@@ -57,7 +57,7 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   return true;
 }
 
-bool Init(const StageConfig& stage_config){
+bool Init(const apollo::perception::pipeline::StageConfig& stage_config){
   semantic_param_ = stage_config.semantic_reviser_config();
 
   int non_blink_coef = 2;
@@ -78,7 +78,7 @@ bool TrafficLightDetection::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  TrafficLightTrackerOptions traffic_light_tracker_options;
+  const TrafficLightTrackerOptions &traffic_light_tracker_options;
   bool res = Track(traffic_light_tracker_options, data_frame->camera_frame);
 
   return res;

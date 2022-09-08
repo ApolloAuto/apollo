@@ -54,7 +54,7 @@ class Stage {
   bool enable_ = false;
   std::string name_;
 
-  TrafficLightConfig::StageConfig stage_config;
+  apollo::perception::pipeline::StageConfig stage_config;
   std::unordered_map<PluginType, const PluginConfig*, std::hash<int>>
       plugin_config_map_;
 };

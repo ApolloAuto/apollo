@@ -46,7 +46,7 @@ bool TrafficLightRecognition::Init(
   return true;
 }
 
-bool Init(const StageConfig& stage_config){
+bool Init(const apollo::perception::pipeline::StageConfig& stage_config){
 
   recognize_param_ = stage_config.traffic_light_recognition_config();
 
@@ -54,7 +54,6 @@ bool Init(const StageConfig& stage_config){
   classify_vertical_.reset(new ClassifyBySimple);
   classify_horizontal_.reset(new ClassifyBySimple);
 
-  //todo ：root_dir and gpu_id write into stage_config
   int quadrate_gpu_id = recognize_param_.quadrate_model().gpu_id();
   int vertical_gpu_id = recognize_param_.vertical_model().gpu_id();
   int horizontal_gpu_id = recognize_param_.horizontal_model().gpu_id();
@@ -76,7 +75,7 @@ bool Init(const StageConfig& stage_config){
 bool TrafficLightDetection::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
-  TrafficLightDetectorOptions traffic_light_recognition_options;
+  const TrafficLightDetectorOptions &traffic_light_recognition_options;
   bool res = Detect(traffic_light_recognition_options, data_frame->camera_frame);
 
   return res;

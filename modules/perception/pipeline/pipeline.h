@@ -53,8 +53,8 @@ class Pipeline {
  protected:
   std::string name_;
 
-  PipelineConfig pipeline_config;
-  TrafficLightConfig trafficlight_config;
+  apollo::perception::pipeline::PipelineConfig pipeline_config;
+  apollo::perception::pipeline::TrafficLightConfig trafficlight_config;
   
   std::unordered_map<StageType, const StageConfig*, std::hash<int>>
       stage_config_map_;
