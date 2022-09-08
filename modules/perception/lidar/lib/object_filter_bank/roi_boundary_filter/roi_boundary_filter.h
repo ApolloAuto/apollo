@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class ROIBoundaryFilter : public Task {
+class ROIBoundaryFilter : public Plugin {
  public:
   ROIBoundaryFilter() = default;
 
@@ -47,7 +47,7 @@ class ROIBoundaryFilter : public Task {
 
   std::string Name() const override { return "ROIBoundaryFilter"; }
 
-  bool Init(const TaskConfig& task_config) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
   bool Process(DataFrame* data_frame) override;
 

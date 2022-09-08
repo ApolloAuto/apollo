@@ -1,35 +1,31 @@
-stage_type: PBF_TRACKER
-stage_type: HM_ASSOCIATION
-stage_type: PBF_GATEKEEPER
+stage_type: ALL_LATEST_FUSION
+stage_type: PROBABILISTIC_FUSION
+stage_type: COLLECT_FUSED_OBJECT
 
 stage_config: {
-  stage_type: PBF_TRACKER
+  stage_type: ALL_LATEST_FUSION
   enabled: true
-  task_type: DST_TYPE_FUSION
-  task_type: KALMAN_MOTION_FUSION
-  task_type: DST_EXISTENCE_FUSION
-  task_type: PBF_SHAPE_FUSION
 
-  task_config: {
-    task_type: DST_TYPE_FUSION
+  plugin_config: {
+    plugin_type: DST_TYPE_FUSION
     enabled: true
 
   }
 
-  task_config: {
-    task_type: KALMAN_MOTION_FUSION
+  plugin_config: {
+    plugin_type: KALMAN_MOTION_FUSION
     enabled: true
 
   }
 
-  task_config: {
-    task_type: DST_EXISTENCE_FUSION
+  plugin_config: {
+    plugin_type: DST_EXISTENCE_FUSION
     enabled: true
 
   }
 
-  task_config: {
-    task_type: PBF_SHAPE_FUSION
+  plugin_config: {
+    plugin_type: PBF_SHAPE_FUSION
     enabled: true
 
   }
@@ -43,21 +39,11 @@ stage_config: {
 }
 
 stage_config: {
-  stage_type: HM_ASSOCIATION
+  stage_type: PROBABILISTIC_FUSION
   enabled: true
 
-  hm_association_config {
-
-  }
-}
-
-stage_config: {
-  stage_type: PBF_GATEKEEPER
-  enabled: true
-  task_type:
-
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }
@@ -79,6 +65,15 @@ stage_config: {
 
     existence_threshold: 0.7
     radar_existence_threshold: 0.9
+  }
+}
+
+stage_config: {
+  stage_type: COLLECT_FUSED_OBJECT
+  enabled: true
+
+  hm_association_config {
+
   }
 }
 

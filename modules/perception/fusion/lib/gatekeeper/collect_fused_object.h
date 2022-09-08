@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,37 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #pragma once
 
-#include <memory>
 #include <string>
-#include <vector>
+#include <memory>
 
-#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
-#include "modules/perception/fusion/lib/interface/base_fusion_system.h"
+#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
+#include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
+class CollectFusedObject : public Stage {
  public:
-  ObstacleMultiSensorFusion() { name_ = "ObstacleMultiSensorFusion"; }
-  virtual ~ObstacleMultiSensorFusion() = default;
+  CollectFusedObject() { name_ = "CollectFusedObject"; }
+  ~CollectFusedObject() = default;
 
-  bool Init(const ObstacleMultiSensorFusionParam& param) override;
-
-  bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) override;
-
-  bool Init(const PipelineConfig& pipeline_config) override;
+  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
+  bool IsEnabled() override { return enable_; }
+
   std::string Name() const override { return name_; }
 
- protected:
-  std::unique_ptr<BaseFusionSystem> fusion_;
+ private:
+  void CollectObjectsByTrack(
+      double timestamp,
+      const TrackPtr& track,
+      std::vector<base::ObjectPtr>* fused_objects);
+
+  void CollectSensorMeasurementFromObject(
+      const SensorObjectConstPtr& object,
+      base::SensorObjectMeasurement* measurement);
+
+ private:
+  std::unique_ptr<BaseGatekeeper> gate_keeper_;
 };
 
 }  // namespace fusion

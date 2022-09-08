@@ -19,17 +19,15 @@ stage_config: {
 stage_config: {
   stage_type: FUSED_CLASSIFIER
   enabled: true
-  task_type: CCRFOneShotTypeFusion
-  task_type: CCRFSequenceTypeFusion
 
-  task_config: {
-    task_type: CCRFOneShotTypeFusion
+  plugin_config: {
+    plugin_type: CCRFOneShotTypeFusion
     enabled: true
 
   }
 
-  task_config: {
-    task_type: CCRFSequenceTypeFusion
+  plugin_config: {
+    plugin_type: CCRFSequenceTypeFusion
     enabled: true
 
   }

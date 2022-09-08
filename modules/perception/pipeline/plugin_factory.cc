@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 
-#include "modules/perception/pipeline/task_factory.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 
 namespace apollo {
@@ -24,27 +24,29 @@ namespace pipeline {
 
 
 apollo::common::util::Factory<
-    TaskType, Task,
-    Task *(*)(const TaskConfig& config),
+    PluginType, Plugin,
+    Plugin *(*)(const PluginConfig& config),
     std::unordered_map<
-        TaskType,
-        Task *(*)(const TaskConfig& config),
+        PluginType,
+        Plugin *(*)(const PluginConfig& config),
         std::hash<int>>>
-    TaskFactory::task_factory_;
+    PluginFactory::plugin_factory_;
 
-void TaskFactory::Init() {
-  task_factory_.Register(
-      TaskType::GLOBAL_ROT_SCALE_TRANS,
-      [](const TaskConfig& task_config) -> Task* {
-        return new GlobalRotScaleTrans(task_config);
+void PluginFactory::Init() {
+  plugin_factory_.Register(
+      PluginType::GLOBAL_ROT_SCALE_TRANS,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new GlobalRotScaleTrans(plugin_config);
       });
   // Todo(zero): need to add more type
   // need to deal with PipelineConfig& config
 
 }
 
-std::unique_ptr<Task> TaskFactory::CreateTask(const TaskConfig& task_config) {
-  return task_factory_.CreateObject(task_config.task_type(), task_config);
+std::unique_ptr<Plugin> PluginFactory::CreatePlugin(
+    const PluginConfig& plugin_config) {
+  return plugin_factory_.CreateObject(
+            plugin_config.plugin_type(), plugin_config);
 }
 
 } // namespace pipeline

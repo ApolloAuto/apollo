@@ -52,10 +52,9 @@ stage_config: {
 stage_config: {
   stage_type: OBJECT_FILTER_BANK
   enabled: true
-  task_type: ROI_BOUNDARY_FILTER
 
-  task_config: {
-    task_type: ROI_BOUNDARY_FILTER
+  plugin_config: {
+    plugin_type: ROI_BOUNDARY_FILTER
     enabled: true
 
     roi_boundary_filter_config: {

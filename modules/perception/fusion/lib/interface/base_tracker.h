@@ -29,7 +29,7 @@ struct TrackerOptions {
   double match_distance = 0.0;
 };
 
-class BaseTracker : public Stage {
+class BaseTracker : public Plugin {
  public:
   BaseTracker() = default;
   virtual ~BaseTracker() = default;
@@ -48,14 +48,6 @@ class BaseTracker : public Stage {
                                         const std::string& sensor_id,
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
-
-  virtual bool Init(const StageConfig& stage_config) = 0;
-
-  virtual bool Process(DataFrame* data_frame) = 0;
-
-  virtual bool IsEnabled() = 0;
-
-  virtual std::string Name() const = 0;
 
  protected:
   TrackPtr track_ = nullptr;

@@ -16,28 +16,25 @@
 
 #pragma once
 
+#include <vector>
+
+#include "modules/perception/base/frame.h"
+#include "modules/perception/base/object.h"
+
 namespace apollo {
 namespace perception {
-namespace pipeline {
+namespace fusion {
 
-class Task {
- public:
-  Task() = default;
-  virtual ~Task() = default;
+struct FusionFrame {
+  base::FrameConstPtr frame;
 
-  virtual bool Init(const TaskConfig& task_config) = 0;
+  std::vector<SensorFramePtr> sensor_frames;
 
-  virtual bool Process(DataFrame* data_frame) = 0;
+  std::vector<base::ObjectPtr> fused_objects;
 
-  virtual bool IsEnabled() = 0;
-
-  virtual std::string Name() const = 0;
-
- protected:
-  bool enable_ = false;
-  std::string name_;
+  ScenePtr scene_ptr;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace fusion
+}  // namespace perception
+}  // namespace apollo
