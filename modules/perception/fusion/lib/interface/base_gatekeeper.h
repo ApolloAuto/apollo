@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseGatekeeper : public Stage {
+class BaseGatekeeper : public Plugin {
  public:
   BaseGatekeeper() = default
   virtual ~BaseGatekeeper() = default;
@@ -34,14 +34,6 @@ class BaseGatekeeper : public Stage {
   virtual bool Init() = 0;
 
   virtual bool AbleToPublish(const TrackPtr& track) = 0;
-
-  virtual bool Init(const StageConfig& stage_config) = 0;
-
-  virtual bool Process(DataFrame* data_frame) = 0;
-
-  virtual bool IsEnabled() = 0;
-
-  virtual std::string Name() const = 0;
 
   DISALLOW_COPY_AND_ASSIGN(BaseGatekeeper);
 };

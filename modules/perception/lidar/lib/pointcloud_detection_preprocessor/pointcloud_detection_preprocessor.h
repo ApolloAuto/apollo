@@ -13,52 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-
 #pragma once
-
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
-
-#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
-#include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
-namespace pipeline {
+namespace lidar {
 
-class Stage {
+class PointCloudDetectionPreprocessor : public Stage {
  public:
-  Stage() = default;
-  virtual ~Stage() = default;
+  PointCloudDetectionPreprocessor(){name_ = "PointCloudDetectionPreprocessor"};
 
-  virtual bool Init(const StageConfig& stage_config) = 0;
+  virtual ~PointCloudDetectionPreprocessor() = default;
 
-  virtual bool Process(DataFrame* data_frame) = 0;
+  bool Init(const StageConfig& stage_config) override;
 
-  virtual bool IsEnabled() = 0;
+  bool Process(DataFrame* data_frame) override;
 
-  virtual std::string Name() const = 0;
+  bool Process(DataFrame* data_frame, float* points_array, int num_points);
+  
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
-  bool Initialize(const StageConfig& stage_config);
+  bool enable_;
 
  private:
-  void Clear();
-
- protected:
-  bool enable_ = false;
   std::string name_;
+  pipeline::stage::PointCloudDetectionPreprocessorConfig
+      pointcloud_detection_preprocessor_config_;
 
-  apollo::perception::pipeline::StageConfig stage_config;
-  std::unordered_map<PluginType, const PluginConfig*, std::hash<int>>
-      plugin_config_map_;
-};
+  std::unique_ptr<Plugin> pointcloud_downsample_;
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+};  // class PointCloudDetectionPreprocessor
+
+}  // namespace lidar
+}  // namespace perception
+}  // namespace apollo

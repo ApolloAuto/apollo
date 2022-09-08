@@ -25,8 +25,6 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using cyber::common::GetAbsolutePath;
-
 
 bool PbfGatekeeper::Init() {
   BaseInitOptions options;
@@ -60,23 +58,9 @@ bool PbfGatekeeper::Init() {
   return true;
 }
 
-std::string PbfGatekeeper::Name() const { return "PbfGatekeeper"; }
-
-bool PbfGatekeeper::Init(const StageConfig& config) {
+bool PbfGatekeeper::Init(const PluginConfig& plugin_config) {
   Init(config.pbf_gatekeeper_config());
   bool res = Initialize(config);
-  return res;
-}
-
-bool PbfGatekeeper::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
-
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
-
-  bool res = AbleToPublish(data_frame->lidar_frame);
-
   return res;
 }
 

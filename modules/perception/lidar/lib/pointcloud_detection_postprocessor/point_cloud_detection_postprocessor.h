@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,40 @@
  *****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
-#include "modules/perception/fusion/lib/interface/base_fusion_system.h"
+#include "modules/perception/pipeline/data_frame.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
-namespace fusion {
+namespace lidar {
 
-class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
+class PointCloudDetectionPostprocessor : public Stage {
  public:
-  ObstacleMultiSensorFusion() { name_ = "ObstacleMultiSensorFusion"; }
-  virtual ~ObstacleMultiSensorFusion() = default;
+  PointCloudDetectionPostprocessor() {name_ = "PointCloudDetectionPostprocessor"};
 
-  bool Init(const ObstacleMultiSensorFusionParam& param) override;
+  virtual ~PointCloudDetectionPostprocessor() = default;
 
-  bool Process(const base::FrameConstPtr& frame,
-               std::vector<base::ObjectPtr>* objects) override;
-
-  bool Init(const PipelineConfig& pipeline_config) override;
+  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
-  std::string Name() const override { return name_; }
+  bool Process(DataFrame* data_frame);
+
+  bool IsEnabled() override { return enable_; }
+
+  const std::string& Name() const override { return name_; }
 
  protected:
-  std::unique_ptr<BaseFusionSystem> fusion_;
-};
+  bool enable_;
 
-}  // namespace fusion
+
+ private:
+  std::string name_;
+  std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
+  std::vector<std::unique_ptr<Task>> task_list_;
+   std::unique_ptr<Plugin> get_objects_;
+};  // class PointCloudDetectionPostprocessor
+
+}  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

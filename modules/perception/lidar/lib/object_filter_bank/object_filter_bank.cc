@@ -95,15 +95,15 @@ bool ObjectFilterBank::Init(const StageConfig& stage_config) {
   stage_config.object_filter_bank_config
 
   filter_bank_.clear();
-  for (const auto& task_config : stage_config.task_config) {
-    const auto& name = task_config.task_type;
+  for (const auto& plugin_config : stage_config.plugin_config) {
+    const auto& name = plugin_config.plugin_type;
     BaseObjectFilter* filter =
         BaseObjectFilterRegisterer::GetInstanceByName(name);
     if (filter == nullptr) {
       AINFO << "Failed to find object filter: " << name << ", skipped";
       continue;
     }
-    if (!filter->Init(task_config)) {
+    if (!filter->Init(plugin_config)) {
       AINFO << "Failed to init object filter: " << name << ", skipped";
       continue;
     }

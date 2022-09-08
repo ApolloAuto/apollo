@@ -4,10 +4,9 @@ stage_type: DARKSCNN_LANE_POSTPROCESSOR
 stage_config: {
   stage_type: DARKSCNN_LANE_DETECTOR
   enabled: true
-  task_type:
 
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }
@@ -46,10 +45,9 @@ stage_config: {
 stage_config: {
   stage_type: DARKSCNN_LANE_POSTPROCESSOR
   enabled: true
-  task_type:
 
-  task_config: {
-    task_type:
+  plugin_config: {
+    plugin_type:
     enabled: true
 
   }

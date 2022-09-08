@@ -25,7 +25,6 @@
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -66,21 +65,29 @@ bool PointCloudPreprocessor::Init(
   return true;
 }
 
-bool PointCloudPreprocessor::Init(const StageConfig& config) {
-  bool res = Initialize(config);
-  return res;
+bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
+  ACHECK(stage_config.has_pointcloud_preprocessor());
+  pointcloud_preprocessor_config_ = stage_config.pointcloud_preprocessor();
+  filter_naninf_points_ = pointcloud_preprocessor_config_.filter_naninf_points();
+  filter_nearby_box_points_ = pointcloud_preprocessor_config_.filter_nearby_box_points();
+  box_forward_x_ = pointcloud_preprocessor_config_.box_forward_x();
+  box_backward_x_ = pointcloud_preprocessor_config_.box_backward_x();
+  box_forward_y_ = pointcloud_preprocessor_config_.box_forward_y();
+  box_backward_y_ = pointcloud_preprocessor_config_.box_backward_y();
+  filter_high_z_points_ = pointcloud_preprocessor_config_.filter_high_z_points();
+  z_threshold_ = pointcloud_preprocessor_config_.z_threshold();
+  return true;
 }
 
+// Process作用： 1、代替原有的Process逻辑(封装成为InnerProcess) ，
+// 2、循环调用不同task的Process函数(如果有task)
 bool PointCloudPreprocessor::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
+  if (data_frame == nullptr) return false;
 
   // todo(zero): change to task
   // bool res = InnerProcess(data_frame);
-
   PointCloudPreprocessorOptions options;
   Preprocess(options, data_frame->lidar_frame);
-
   return res;
 }
 

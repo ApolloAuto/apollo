@@ -14,38 +14,42 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #pragma once
 
-#include <memory>
-#include <unordered_map>
+#include <mutex>
+#include <string>
 
-#include "modules/common/util/factory.h"
-#include "modules/perception/pipeline/task.h"
+#include "modules/perception/fusion/base/fusion_frame.h"
 
 
 namespace apollo {
 namespace perception {
-namespace pipeline {
+namespace fusion {
 
 
-class TaskFactory {
+class AllLatestFusion : public Stage {
  public:
-  static void Init();
+  AllLatestFusion();
+  ~AllLatestFusion() = default;
 
-  static std::unique_ptr<Task> CreateTask(const TaskConfig& task_config);
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() override;
+
+  std::string Name() const override { return name_; }
+ private:
+  bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
 
  private:
-  static apollo::common::util::Factory<
-      TaskType, Task,
-      Task *(*)(const TaskConfig& task_config),
-      std::unordered_map<
-          TaskType,
-          Task *(*)(const TaskConfig& task_config),
-          std::hash<int>>>
-      task_factory_;
+  std::mutex data_mutex_;
+  std::mutex fuse_mutex_;
+
+  std::string main_sensor_;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+
+}  // namespace fusion
+}  // namespace perception
+}  // namespace apollo

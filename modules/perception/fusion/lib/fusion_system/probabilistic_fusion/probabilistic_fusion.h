@@ -41,7 +41,10 @@ struct FusionParams {
 
 class ProbabilisticFusion : public BaseFusionSystem {
  public:
-  ProbabilisticFusion() = default;
+  using cyber::common::GetAbsolutePath;
+
+ public:
+  ProbabilisticFusion() { name_ = "ProbabilisticFusion"; }
   ~ProbabilisticFusion() = default;
 
   bool Init(const FusionInitOptions& init_options) override;
@@ -50,13 +53,13 @@ class ProbabilisticFusion : public BaseFusionSystem {
             const base::FrameConstPtr& sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 
-  // std::string Name() const override;
-
-  bool Init(const PipelineConfig& pipeline_config) override;
+  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
-  std::string Name() const override;
+  bool IsEnabled() override;
+
+  std::string Name() const override { return name_; }
 
  private:
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
@@ -92,9 +95,7 @@ class ProbabilisticFusion : public BaseFusionSystem {
   std::mutex data_mutex_;
   std::mutex fuse_mutex_;
 
-  bool started_ = false;
-
-  ScenePtr scenes_ = nullptr;
+  ScenePtr scenes_;
   std::vector<std::shared_ptr<BaseTracker>> trackers_;  // for foreground
 
   std::unique_ptr<BaseDataAssociation> matcher_;

@@ -35,7 +35,7 @@ namespace lidar {
 
 class PointPillarsDetection : public BaseLidarDetector {
  public:
-  PointPillarsDetection();
+  PointPillarsDetection() {name_ = "PointPillarsDetection"};
   virtual ~PointPillarsDetection() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
@@ -48,6 +48,10 @@ class PointPillarsDetection : public BaseLidarDetector {
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
+
+  bool Process(const LidarFrame& frame, cons std::vector<float>& points_array,
+               int num_points, std::vector<float>* out_detections,
+               std::vector<int>* out_labels);
 
   bool IsEnabled() override { return enable_; }
 
@@ -67,6 +71,10 @@ class PointPillarsDetection : public BaseLidarDetector {
                   std::vector<int>* labels);
 
   base::ObjectSubType GetObjectSubType(int label);
+
+  bool Detect(LidarFrame* frame, cons std::vector<float>& points_array,
+              int num_points, std::vector<float>* out_detections,
+              std::vector<int>* out_labels);
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;
@@ -94,6 +102,10 @@ class PointPillarsDetection : public BaseLidarDetector {
   double cloud_to_array_time_ = 0.0;
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
+
+  pipeline::stage::PointPillarsDetectionConfig point_pillars_detection_config_;
+  std::string name_;
+  bool enable_;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

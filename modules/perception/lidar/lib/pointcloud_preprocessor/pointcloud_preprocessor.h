@@ -26,7 +26,7 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor() = default;
+  PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"};
 
   virtual ~PointCloudPreprocessor() = default;
 
@@ -65,6 +65,11 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   bool filter_high_z_points_ = true;
   float z_threshold_ = 5.0f;
   static const float kPointInfThreshold;
+
+  
+  pipeline::stage::PointCloudPreprocessorConfig pointcloud_preprocessor_config_;
+  std::string name_;
+  bool enable_;
 };  // class PointCloudPreprocessor
 
 }  // namespace lidar
