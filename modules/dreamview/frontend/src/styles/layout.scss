@@ -6,7 +6,7 @@
         align-items: center;
     }
     @mixin flex-percent($span, $total) {
-        $percent: percentage($span / $total);
+        $percent: calc($span / $total);
         .flex-span#{$span} {
             flex: 0 0 $percent;
         }
