@@ -198,7 +198,7 @@ bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
              &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
-  AINFO << "PointPillars: "
+  AERROR << "PointPillars: "
         << "\n"
         << "down sample: " << downsample_time_ << "\t"
         << "fuse: " << fuse_time_ << "\t"

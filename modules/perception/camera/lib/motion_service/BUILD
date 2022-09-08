@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "perception/lib",
+    library_dest = "perception/lib/camera/lib/motion_service",
     targets = [":libmotion_service.so"],
 )
 
@@ -33,7 +33,7 @@ cc_library(
 cc_binary(
     name = "libmotion_service.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":motion_service_lib"],
 )
 

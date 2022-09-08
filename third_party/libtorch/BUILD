@@ -18,6 +18,22 @@ cc_library(
 
 install(
     name = "install",
+    deps = [
+        ":install_cpu",
+        ":install_gpu"
+    ]
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_cpu_src",
+        ":install_gpu_src"
+    ]
+)
+
+install(
+    name = "install_cpu",
     data_dest = "3rd-libtorch-cpu",
     data = [
         ":cyberfile-cpu.xml",
@@ -31,8 +47,29 @@ install(
 )
 
 install_src_files(
-    name = "install_src",
+    name = "install_cpu_src",
     src_dir = ["."],
     dest = "3rd-libtorch-cpu/src",
+    filter = "*",
+)
+
+install(
+    name = "install_gpu",
+    data_dest = "3rd-libtorch-gpu",
+    data = [
+        ":cyberfile-gpu.xml",
+        ":3rd-libtorch-gpu.BUILD",
+        ":3rd-libtorch.BUILD",
+    ],
+    rename = {
+        "3rd-libtorch-gpu/cyberfile-gpu.xml" : "cyberfile.xml",
+        "3rd-libtorch-gpu/3rd-libtorch.BUILD" : "BUILD",
+    },
+)
+
+install_src_files(
+    name = "install_gpu_src",
+    src_dir = ["."],
+    dest = "3rd-libtorch-gpu/src",
     filter = "*",
 )

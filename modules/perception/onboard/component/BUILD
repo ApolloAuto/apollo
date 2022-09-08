@@ -9,13 +9,13 @@ PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 cc_binary(
     name = "libperception_component_camera.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":perception_component_inner_camera"],
 )
 
 install(
     name = "install",
-    library_dest = "perception/lib",
+    library_dest = "perception/lib/onboard/component",
     targets = [
         ":libperception_component_camera.so",
         ":libperception_component_lidar.so",
@@ -91,7 +91,7 @@ cc_library(
 cc_binary(
     name = "libperception_component_lidar.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":perception_component_inner_lidar"],
 )
 
@@ -148,6 +148,7 @@ cc_library(
         "//modules/perception/onboard/transform_wrapper",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_library(

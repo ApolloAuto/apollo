@@ -192,9 +192,9 @@ def main(args):
     prefix = args.prefix
 
     pkg_name = args.pkg_name
-    dbg = args.dbg
-    gpu = args.gpu
-    dev = args.dev
+    dbg = False
+    gpu = False
+    dev = True
 
     # Transform install prefix if DESTDIR is set.
     # https://www.gnu.org/prep/standards/html_node/DESTDIR.html

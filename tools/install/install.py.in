@@ -376,9 +376,9 @@ def main(args):
     install_lib = args.install_lib
     fix_rpath = args.fix_rpath
 
-    dbg = args.dbg
-    gpu = args.gpu
-    dev = args.dev
+    dbg = False
+    gpu = False
+    dev = True
 
     # Transform install prefix if DESTDIR is set.
     # https://www.gnu.org/prep/standards/html_node/DESTDIR.html

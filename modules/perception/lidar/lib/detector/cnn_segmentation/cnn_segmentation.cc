@@ -317,7 +317,7 @@ bool CNNSegmentation::Detect(const LidarDetectorOptions& options,
   // processing clustering
   GetObjectsFromSppEngine(&frame->segmented_objects);
 
-  AINFO << "CNNSEG: mapping: " << mapping_time_ << "\t"
+  AERROR << "CNNSEG: mapping: " << mapping_time_ << "\t"
         << " feature: " << feature_time_ << "\t"
         << " infer: " << infer_time_ << "\t"
         << " fg-seg: " << fg_seg_time_ << "\t"
