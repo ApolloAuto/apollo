@@ -150,11 +150,6 @@ export default class Dreamview extends React.Component {
             />
           </SplitPane>
         </div>
-        <MonitorPanel
-          hmi={hmi}
-          viewName={options.monitorName}
-          showVideo={options.showVideo}
-        />
         <ApplicationGuideModal />
       </div>
     );
