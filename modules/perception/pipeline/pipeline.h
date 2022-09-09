@@ -23,8 +23,7 @@
 
 #include "modules/perception/pipeline/stage.h"
 #include "modules/perception/pipeline/proto/pipeline_config.pb.h"
-#include "modules/perception/pipeline/stage.h"
-#include "modules/perception/pipeline/proto/traffic_light_config.pb.h"
+
 
 namespace apollo {
 namespace perception {
@@ -55,7 +54,7 @@ class Pipeline {
 
   apollo::perception::pipeline::PipelineConfig pipeline_config;
   apollo::perception::pipeline::TrafficLightConfig trafficlight_config;
-  
+
   std::unordered_map<StageType, const StageConfig*, std::hash<int>>
       stage_config_map_;
 

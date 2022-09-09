@@ -3,9 +3,9 @@ load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 cc_library(
-  name = "pointcloud_detection_preprocessor",
-  srcs = "pointcloud_detection_preprocessor.cc",
-  hdrs = "pointcloud_detection_preprocessor.h",
+  name = "get_objects",
+  srcs = "get_objects.cc",
+  hdrs = "get_objects.h",
   deps = [
 
   ],
