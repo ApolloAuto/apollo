@@ -27,22 +27,22 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class LidarObstacleTracking : public BaseLidarObstacleTracking {
+class LidarObstacleTracking final : public BaseLidarObstacleTracking {
  public:
-  LidarObstacleTracking() = default;
+  LidarObstacleTracking() { name_ = "LidarObstacleTracking"; }
   virtual ~LidarObstacleTracking() = default;
 
   bool Init(const LidarObstacleTrackingInitOptions& options =
                 LidarObstacleTrackingInitOptions()) override;
 
-  bool Init(const PipelineConfig& pipeline_config) override;
-
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
                              LidarFrame* frame) override;
 
+  bool Init(const PipelineConfig& pipeline_config) override;
+
   bool Process(DataFrame* data_frame) override;
 
-  std::string Name() const override { return "LidarObstacleTracking"; }
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<BaseMultiTargetTracker> multi_target_tracker_;

@@ -32,14 +32,13 @@ namespace lidar {
 
 class FusedClassifier : public BaseClassifier {
  public:
-  FusedClassifier() = default;
+  FusedClassifier() { name_ = "FusedClassifier"; }
   ~FusedClassifier() = default;
+
   bool Init(
       const ClassifierInitOptions& options = ClassifierInitOptions()) override;
 
   bool Classify(const ClassifierOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "FusedClassifier"; }
 
   bool Init(const StageConfig& stage_config) override;
 

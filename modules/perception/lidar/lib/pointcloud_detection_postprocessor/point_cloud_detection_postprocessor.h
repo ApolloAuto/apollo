@@ -24,7 +24,8 @@ namespace lidar {
 
 class PointCloudDetectionPostprocessor : public Stage {
  public:
-  PointCloudDetectionPostprocessor() {name_ = "PointCloudDetectionPostprocessor"};
+  PointCloudDetectionPostprocessor()
+      { name_ = "PointCloudDetectionPostprocessor"; }
 
   virtual ~PointCloudDetectionPostprocessor() = default;
 
@@ -32,20 +33,11 @@ class PointCloudDetectionPostprocessor : public Stage {
 
   bool Process(DataFrame* data_frame) override;
 
-  bool Process(DataFrame* data_frame);
-
   bool IsEnabled() override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
-
- protected:
-  bool enable_;
-
+  std::string Name() const override { return name_; }
 
  private:
-  std::string name_;
-  std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
-  std::vector<std::unique_ptr<Task>> task_list_;
    std::unique_ptr<Plugin> get_objects_;
 };  // class PointCloudDetectionPostprocessor
 

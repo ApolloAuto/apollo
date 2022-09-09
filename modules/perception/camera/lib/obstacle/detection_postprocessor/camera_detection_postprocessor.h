@@ -25,7 +25,7 @@ namespace camera {
 
 class CameraDetectionPostprocessor : public Stage {
  public:
-  CameraDetectionPostprocessor(){name_ = "CameraDetectionPostprocessor"};
+  CameraDetectionPostprocessor() { name_ = "CameraDetectionPostprocessor"; }
 
   virtual ~CameraDetectionPostprocessor() = default;
 
@@ -41,11 +41,7 @@ class CameraDetectionPostprocessor : public Stage {
 
   const std::string& Name() const override { return name_; }
 
- protected:
-  bool enable_;
-
  private:
-  std::string name_;
   pipeline::stage::CameraDetectionPostprocessorConfig
       camera_detection_postprocessor_config_;
 

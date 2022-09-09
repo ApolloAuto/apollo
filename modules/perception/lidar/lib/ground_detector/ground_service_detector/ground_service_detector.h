@@ -28,15 +28,13 @@ namespace lidar {
 
 class GroundServiceDetector : public BaseGroundDetector {
  public:
-  GroundServiceDetector() = default;
+  GroundServiceDetector() { name_ = "GroundServiceDetector"; }
   ~GroundServiceDetector() = default;
 
   bool Init(const GroundDetectorInitOptions& options =
                 GroundDetectorInitOptions()) override;
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "GroundServiceDetector"; }
 
   bool Init(const StageConfig& stage_config) override;
 

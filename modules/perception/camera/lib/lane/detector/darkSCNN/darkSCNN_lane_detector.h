@@ -51,6 +51,8 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
     lane_output_height_ = 0;
     lane_output_width_ = 0;
     num_lanes_ = 0;
+
+    name_ = "DarkSCNNLaneDetector";
   }
 
   virtual ~DarkSCNNLaneDetector() = default;

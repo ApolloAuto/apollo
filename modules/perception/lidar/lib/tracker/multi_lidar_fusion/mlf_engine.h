@@ -37,7 +37,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  MlfEngine() = default;
+  MlfEngine() { name_ = "MlfEngine"; }
   virtual ~MlfEngine() = default;
 
   bool Init(const MultiTargetTrackerInitOptions& options =
@@ -48,8 +48,6 @@ class MlfEngine : public BaseMultiTargetTracker {
   // @params [in/out]: lidar frame
   bool Track(const MultiTargetTrackerOptions& options,
              LidarFrame* frame) override;
-
-//   std::string Name() const override { return "MlfEngine"; };
 
   bool Init(const StageConfig& stage_config) override;
 

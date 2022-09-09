@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummySegmentation : public BaseLidarDetector {
  public:
-  DummySegmentation() = default;
+  DummySegmentation() { name_ = "DummySegmentation"; }
 
   virtual ~DummySegmentation() = default;
 
@@ -39,8 +39,6 @@ class DummySegmentation : public BaseLidarDetector {
   // segmented_objects should be filled, required,
   // label field of point cloud can be filled, optional,
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "DummySegmentation"; }
 
   bool Init(const StageConfig& stage_config) override;
 

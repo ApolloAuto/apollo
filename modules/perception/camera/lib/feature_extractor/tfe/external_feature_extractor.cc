@@ -28,9 +28,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-ExternalFeatureExtractor::ExternalFeatureExtractor() {
-    name_ = "ExternalFeatureExtractor";
-}
 
 bool ExternalFeatureExtractor::Init(
     const FeatureExtractorInitOptions &options) {

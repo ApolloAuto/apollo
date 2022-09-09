@@ -57,7 +57,7 @@ class ProbabilisticFusion : public BaseFusionSystem {
 
   bool Process(DataFrame* data_frame) override;
 
-  bool IsEnabled() override;
+  bool IsEnabled() override { return enable_; }
 
   std::string Name() const override { return name_; }
 

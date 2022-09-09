@@ -28,7 +28,7 @@ namespace lidar {
 
 class ObjectFilterBank : public Stage {
  public:
-  ObjectFilterBank() = default;
+  ObjectFilterBank() { name_ = "ObjectFilterBank"; }
 
   ~ObjectFilterBank() {
     for (auto& filter : filter_bank_) {
@@ -43,8 +43,6 @@ class ObjectFilterBank : public Stage {
   // @param [in/out]: frame
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame);
-
-  // std::string Name() const { return "ObjectFilterBank"; }
 
   size_t Size() const { return filter_bank_.size(); }
 

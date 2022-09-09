@@ -41,7 +41,9 @@ namespace camera {
 
 class SmokeObstacleDetector : public BaseObstacleDetector {
  public:
-  SmokeObstacleDetector() : BaseObstacleDetector() {}
+  SmokeObstacleDetector() : BaseObstacleDetector() {
+    name_ = "SmokeObstacleDetector";
+  }
   virtual ~SmokeObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);
@@ -57,7 +59,6 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   bool Detect(const std::vector<float> &k_inv,
               const std::vector<float> &image_data_array,
               const float *detect_result);
-  // std::string Name() const override { return "SmokeObstacleDetector"; }
 
   bool Init(const StageConfig &stage_config) override;
 
@@ -120,7 +121,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
 
 
  std::string name_;
- bool enable_;     
+ bool enable_;
 };
 
 }  // namespace camera

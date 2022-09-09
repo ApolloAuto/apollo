@@ -203,10 +203,6 @@ bool DenselineLaneDetector::Detect(const LaneDetectorOptions &options,
   return true;
 }
 
-std::string DenselineLaneDetector::Name() const {
-  return "DenselineLaneDetector";
-}
-
 REGISTER_LANE_DETECTOR(DenselineLaneDetector);
 
 }  // namespace camera

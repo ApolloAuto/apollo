@@ -29,15 +29,13 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class LidarObstacleDetection : public BaseLidarObstacleDetection {
+class LidarObstacleDetection final : public BaseLidarObstacleDetection {
  public:
-  LidarObstacleDetection() = default;
+  LidarObstacleDetection() { name_ = "LidarObstacleDetection"; }
   virtual ~LidarObstacleDetection() = default;
 
   bool Init(const LidarObstacleDetectionInitOptions& options =
                 LidarObstacleDetectionInitOptions()) override;
-
-  bool Init(const PipelineConfig& pipeline_config) override;
 
   LidarProcessResult Process(
       const LidarObstacleDetectionOptions& options,
@@ -47,25 +45,27 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection {
   LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
                              LidarFrame* frame) override;
 
+  bool Init(const PipelineConfig& pipeline_config) override;
+
   bool Process(DataFrame* data_frame) override;
 
-  std::string Name() const override { return "LidarObstacleDetection"; }
+  std::string Name() const override { return name_; }
 
  private:
   LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,
                                    LidarFrame* frame);
 
  private:
-  // std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
-  // std::shared_ptr<BaseLidarDetector> detector_;
-  // MapManager map_manager_;
-  // ObjectBuilder builder_;
-  // ObjectFilterBank filter_bank_;
+  std::shared_ptr<BasePointCloudPreprocessor> cloud_preprocessor_;
+  std::shared_ptr<BaseLidarDetector> detector_;
+  MapManager map_manager_;
+  ObjectBuilder builder_;
+  ObjectFilterBank filter_bank_;
 
   // params
-  // bool use_map_manager_ = true;
-  // bool use_object_filter_bank_ = true;
-  // bool use_object_builder_ = true;
+  bool use_map_manager_ = true;
+  bool use_object_filter_bank_ = true;
+  bool use_object_builder_ = true;
 };  // class LidarObstacleDetection
 
 }  // namespace lidar

@@ -26,8 +26,10 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"};
+  using GetAbsolutePath = cyber::common::GetAbsolutePath;
 
+ public:
+  PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"; }
   virtual ~PointCloudPreprocessor() = default;
 
   bool Init(const PointCloudPreprocessorInitOptions& options =
@@ -40,8 +42,6 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
 
   bool Preprocess(const PointCloudPreprocessorOptions& options,
                   LidarFrame* frame) const override;
-
-  // std::string Name() const override { return "PointCloudPreprocessor"; }
 
   bool Init(const StageConfig& stage_config) override;
 
@@ -66,7 +66,7 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   float z_threshold_ = 5.0f;
   static const float kPointInfThreshold;
 
-  
+
   pipeline::stage::PointCloudPreprocessorConfig pointcloud_preprocessor_config_;
   std::string name_;
   bool enable_;

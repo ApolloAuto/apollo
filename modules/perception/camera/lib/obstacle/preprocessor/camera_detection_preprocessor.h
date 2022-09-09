@@ -26,7 +26,7 @@ namespace camera {
 
 class CameraDetectionPreprocessor : public Stage {
  public:
-  CameraDetectionPreprocessor(){ name_ = "CameraDetectionPreprocessor"};
+  CameraDetectionPreprocessor() { name_ = "CameraDetectionPreprocessor"; }
 
   virtual ~CameraDetectionPreprocessor() = default;
 
@@ -40,11 +40,7 @@ class CameraDetectionPreprocessor : public Stage {
 
   const std::string& Name() const override { return name_; }
 
-  protected:
-   bool enable_;
-
  private:
-  std::string name_;
   pipeline::stage::CameraDetectionPreprocessorConfig
       camera_detection_preprocessor_config_;
 
@@ -52,7 +48,7 @@ std::unique_ptr<Plugin> get_image_data_;
 std::unique_ptr<Plugin> resize_and_normalize_;
 
 };  // class CameraDetectionPreprocessor
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
-

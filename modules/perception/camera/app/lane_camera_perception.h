@@ -35,14 +35,15 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class LaneCameraPerception : public BaseCameraPerception {
+class LaneCameraPerception final : public BaseCameraPerception {
  public:
-  LaneCameraPerception()
-      : lane_detector_(nullptr),
-        lane_postprocessor_(nullptr),
-        calibration_service_(nullptr) {}
+  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+  using EnsureDirectory = cyber::common::EnsureDirectory;
 
+ public:
+  LaneCameraPerception() { name_ = "LaneCameraPerception"; }
   ~LaneCameraPerception() = default;
+
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
                 base::BaseCameraModelPtr &model,  // NOLINT
@@ -58,7 +59,12 @@ class LaneCameraPerception : public BaseCameraPerception {
   bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "LaneCameraPerception"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;

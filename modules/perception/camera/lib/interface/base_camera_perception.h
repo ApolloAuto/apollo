@@ -43,10 +43,6 @@ class BaseCameraPerception : public Pipeline {
   virtual bool Perception(const CameraPerceptionOptions &options,
                           CameraFrame *frame) = 0;
 
-  virtual bool Process(DataFrame* data_frame) = 0;
-
-  // virtual std::string Name() const = 0;
-
   virtual bool Init(const PipelineConfig& pipeline_config) = 0;
 
   virtual bool Process(DataFrame* data_frame) = 0;

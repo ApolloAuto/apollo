@@ -25,7 +25,8 @@ namespace lidar {
 
 class PointCloudDetectionPreprocessor : public Stage {
  public:
-  PointCloudDetectionPreprocessor(){name_ = "PointCloudDetectionPreprocessor"};
+  PointCloudDetectionPreprocessor()
+      { name_ = "PointCloudDetectionPreprocessor"; }
 
   virtual ~PointCloudDetectionPreprocessor() = default;
 
@@ -34,16 +35,12 @@ class PointCloudDetectionPreprocessor : public Stage {
   bool Process(DataFrame* data_frame) override;
 
   bool Process(DataFrame* data_frame, float* points_array, int num_points);
-  
+
   bool IsEnabled() override { return enable_; }
 
   const std::string& Name() const override { return name_; }
 
- protected:
-  bool enable_;
-
  private:
-  std::string name_;
   pipeline::stage::PointCloudDetectionPreprocessorConfig
       pointcloud_detection_preprocessor_config_;
 

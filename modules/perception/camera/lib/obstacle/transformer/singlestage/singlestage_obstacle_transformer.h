@@ -45,9 +45,11 @@ struct TransformerParams {
 
 class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  public:
-  SingleStageObstacleTransformer() : BaseObstacleTransformer() {}
+  SingleStageObstacleTransformer() : BaseObstacleTransformer() {
+    name_ = "SingleStageObstacleTransformer";
+  }
+  virtual ~SingleStageObstacleTransformer() = default;
 
-  virtual ~SingleStageObstacleTransformer() {}
   bool Init(const ObstacleTransformerInitOptions &options =
                 ObstacleTransformerInitOptions()) override;
 
@@ -56,8 +58,6 @@ class SingleStageObstacleTransformer : public BaseObstacleTransformer {
   // @param [out]: frame
   bool Transform(const ObstacleTransformerOptions &options,
                  CameraFrame *frame) override;
-
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

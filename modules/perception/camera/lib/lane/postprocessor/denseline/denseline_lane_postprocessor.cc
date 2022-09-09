@@ -79,6 +79,20 @@ bool DenselineLanePostprocessor::Init(
   return true;
 }
 
+bool DenselineLanePostprocessor::Init(const StageConfig& stage_config) {
+  // enable_ =
+  return true;
+}
+
+bool DenselineLanePostprocessor::Process(DataFrame* data_frame) {
+  CameraFrame* frame = data_frame->camera_frame;
+  LanePostprocessorOptions options;
+  Process2D(options, frame);
+  frame->calibration_service->Update(frame);
+  Process3D(options, frame);
+  return true;
+}
+
 bool DenselineLanePostprocessor::Process2D(
     const LanePostprocessorOptions& options, CameraFrame* frame) {
   frame->lane_objects.clear();
@@ -143,10 +157,6 @@ void DenselineLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
       camera_point_set.push_back(camera_point);
     }
   }
-}
-
-std::string DenselineLanePostprocessor::Name() const {
-  return "DenselineLanePostprocessor";
 }
 
 void DenselineLanePostprocessor::CalLaneMap(

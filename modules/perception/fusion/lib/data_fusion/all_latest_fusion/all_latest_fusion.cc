@@ -25,9 +25,6 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-AllLatestFusion::AllLatestFusion() {
-  name_ = "AllLatestFusion";
-}
 
 bool AllLatestFusion::Init(const StageConfig& stage_config) {
   // todo(zero):

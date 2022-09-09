@@ -28,7 +28,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using cyber::common::GetAbsolutePath;
 
 bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
@@ -89,10 +88,9 @@ bool TrafficLightCameraPerception::Init(
   return true;
 }
 
-void TrafficLightCameraPerception::Init(const PipelineConfig& pipeline_config) {
-  
+bool TrafficLightCameraPerception::Init(const PipelineConfig& pipeline_config) {
   Initialize(pipeline_config);
-
+  return true;
 }
 
 bool TrafficLightCameraPerception::Process(DataFrame* data_frame) {
@@ -100,8 +98,8 @@ bool TrafficLightCameraPerception::Process(DataFrame* data_frame) {
     return false;
   // CameraPerceptionOptions options;
   // Perception( options, data_frame->camera_frame);
-  
-  return InnerProcess(data_frame);
+  CameraFrame* frame = data_frame->camera_frame;
+  return InnerProcess(frame);
 }
 
 bool TrafficLightCameraPerception::Perception(

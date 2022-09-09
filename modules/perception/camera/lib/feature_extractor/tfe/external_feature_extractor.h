@@ -31,13 +31,12 @@ class ExternalFeatureExtractor : public BaseFeatureExtractor {
   using cyber::common::GetAbsolutePath;
 
  public:
-  ExternalFeatureExtractor();
+  ExternalFeatureExtractor() { name_ = "ExternalFeatureExtractor"; }
   ~ExternalFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

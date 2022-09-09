@@ -116,6 +116,20 @@ bool DarkSCNNLanePostprocessor::Init(
   return true;
 }
 
+bool DarkSCNNLanePostprocessor::Init(const StageConfig& stage_config) {
+  // enable_ =
+  return true;
+}
+
+bool DarkSCNNLanePostprocessor::Process(DataFrame* data_frame) {
+  CameraFrame* frame = data_frame->camera_frame;
+  LanePostprocessorOptions options;
+  Process2D(options, frame);
+  frame->calibration_service->Update(frame);
+  Process3D(options, frame);
+  return true;
+}
+
 bool DarkSCNNLanePostprocessor::Process2D(
     const LanePostprocessorOptions& options, CameraFrame* frame) {
   ADEBUG << "Begin to Process2D.";

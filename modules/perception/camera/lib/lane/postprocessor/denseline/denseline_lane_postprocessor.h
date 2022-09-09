@@ -39,7 +39,8 @@ enum class LaneType {
 
 class DenselineLanePostprocessor : public BaseLanePostprocessor {
  public:
-  DenselineLanePostprocessor() : BaseLanePostprocessor() {}
+  DenselineLanePostprocessor() : BaseLanePostprocessor()
+      { name_ = "DenselineLanePostprocessor"; }
 
   virtual ~DenselineLanePostprocessor() = default;
 
@@ -57,8 +58,6 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
   // & fit the line using polynomial
   bool Process3D(const LanePostprocessorOptions& options,
                  CameraFrame* frame) override;
-
-//   std::string Name() const override;
 
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();

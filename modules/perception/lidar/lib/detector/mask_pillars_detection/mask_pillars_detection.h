@@ -35,15 +35,13 @@ namespace lidar {
 
 class MaskPillarsDetection : public BaseLidarDetector {
  public:
-  MaskPillarsDetection();
+  MaskPillarsDetection() { name_ = "MaskPillarsDetection"; }
   virtual ~MaskPillarsDetection() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
                 LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "MaskPillarsDetection"; }
 
   bool Init(const StageConfig& stage_config) override;
 

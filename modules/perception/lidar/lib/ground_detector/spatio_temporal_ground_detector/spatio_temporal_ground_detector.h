@@ -30,7 +30,7 @@ namespace lidar {
 
 class SpatioTemporalGroundDetector : public BaseGroundDetector {
  public:
-  SpatioTemporalGroundDetector() = default;
+  SpatioTemporalGroundDetector() { name_ = "SpatioTemporalGroundDetector"; }
   ~SpatioTemporalGroundDetector() {
     if (pfdetector_ != nullptr) {
       delete pfdetector_;
@@ -45,15 +45,13 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "SpatioTemporalGroundDetector"; }
-
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
-  bool IsEnabled() override;
+  bool IsEnabled() override { return enable_; }
 
-  std::string Name() const override;
+  std::string Name() const override { return name_; }
 
  private:
   common::PlaneFitGroundDetectorParam* param_ = nullptr;

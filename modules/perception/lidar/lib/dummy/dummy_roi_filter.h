@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyROIFilter : public BaseROIFilter {
  public:
-  DummyROIFilter() = default;
+  DummyROIFilter() { name_ = "DummyROIFilter"; }
 
   virtual ~DummyROIFilter() = default;
 
@@ -40,8 +40,6 @@ class DummyROIFilter : public BaseROIFilter {
   // roi_indices should be filled, required
   // label field of point cloud can be filled, optional
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "DummyROIFilter"; }
 
   bool Init(const StageConfig& stage_config) override;
 

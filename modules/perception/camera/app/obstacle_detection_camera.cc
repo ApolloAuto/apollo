@@ -153,6 +153,44 @@ bool ObstacleDetectionCamera::Init(
   return true;
 }
 
+bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
+  return true;
+}
+
+bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
+  inference::CudaUtil::set_device_id(perception_param_.gpu_id());
+
+  CameraFrame* frame = data_frame->camera_frame;
+  frame->camera_k_matrix =
+      name_intrinsic_map_.at(frame->data_provider->sensor_name());
+
+  InnerProcess(frame);
+
+  if (perception_param_.has_debug_param()) {
+    if (perception_param_.debug_param().has_camera2world_out_file()) {
+      WriteCamera2World(out_pose_, frame->frame_id, frame->camera2world_pose);
+    }
+    if (perception_param_.debug_param().has_track_out_file()) {
+      WriteTracking(out_track_, frame->frame_id, frame->tracked_objects);
+    }
+  }
+
+  // Save tracked detections results as kitti format
+  WriteDetections(
+      perception_param_.debug_param().has_tracked_detection_out_dir(),
+      absl::StrCat(perception_param_.debug_param().tracked_detection_out_dir(),
+                   "/", frame->frame_id, ".txt"),
+      frame->tracked_objects);
+
+  // Fill polygon and set anchor point
+  for (auto &obj : frame->tracked_objects) {
+    FillObjectPolygonFromBBox3D(obj.get());
+    obj->anchor_point = obj->center;
+  }
+
+  return true;
+}
+
 bool ObstacleDetectionCamera::Perception(
     const CameraPerceptionOptions &options, CameraFrame *frame) {
   PERF_FUNCTION();

@@ -63,13 +63,16 @@ bool LidarObstacleTracking::Init(
   return true;
 }
 
-void LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
+bool LidarObstacleTracking::Init(const PipelineConfig& pipeline_config) {
   Initialize(pipeline_config);
+  return true;
 }
 
-bool LidarObstacleDetection::Process(DataFrame* data_frame) {
+bool LidarObstacleTracking::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
+
+  LidarFrame* frame = data_frame->lidar_frame;
 
   return InnerProcess(data_frame);
 }

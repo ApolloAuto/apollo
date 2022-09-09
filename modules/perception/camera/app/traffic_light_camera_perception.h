@@ -30,19 +30,23 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class TrafficLightCameraPerception : public BaseCameraPerception {
+class TrafficLightCameraPerception final : public BaseCameraPerception {
  public:
-  TrafficLightCameraPerception()
-      : detector_(nullptr), recognizer_(nullptr), tracker_(nullptr) {}
+  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+
+ public:
+  TrafficLightCameraPerception() { name_ = "TrafficLightCameraPerception"; }
   ~TrafficLightCameraPerception() = default;
+
   bool Init(const CameraPerceptionInitOptions &options) override;
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  
+
   bool Init(const PipelineConfig& pipeline_config) override;
+
   bool Process(DataFrame* data_frame) override;
-  
-  std::string Name() const override { return "TrafficLightCameraPerception"; }
+
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<BaseTrafficLightDetector> detector_;

@@ -37,7 +37,7 @@ struct ObjectBuilderOptions {
 
 class ObjectBuilder : public Stage {
  public:
-  ObjectBuilder() = default;
+  ObjectBuilder() { name_ = "ObjectBuilder"; }
   ~ObjectBuilder() = default;
 
   // @brief: initialization. Get orientation estimator instance.
@@ -49,8 +49,6 @@ class ObjectBuilder : public Stage {
   // @param [in]: ObjectBuilderOptions.
   // @param [in/out]: LidarFrame*.
   bool Build(const ObjectBuilderOptions& options, LidarFrame* frame);
-
-//   std::string Name() const { return "ObjectBuilder"; }
 
   bool Init(const StageConfig& stage_config) override;
 

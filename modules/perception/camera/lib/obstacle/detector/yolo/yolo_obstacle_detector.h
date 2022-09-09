@@ -39,7 +39,9 @@ namespace camera {
 
 class YoloObstacleDetector : public BaseObstacleDetector {
  public:
-  YoloObstacleDetector() : BaseObstacleDetector() {}
+  YoloObstacleDetector() : BaseObstacleDetector() {
+    name_ = "YoloObstacleDetector";
+  }
   virtual ~YoloObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);
@@ -51,8 +53,6 @@ class YoloObstacleDetector : public BaseObstacleDetector {
 
   bool Detect(const ObstacleDetectorOptions &options,
               CameraFrame *frame) override;
-
-  // std::string Name() const override { return "YoloObstacleDetector"; }
 
   bool Init(const StageConfig& stage_config) override;
 

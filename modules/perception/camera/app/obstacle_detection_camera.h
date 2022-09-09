@@ -39,19 +39,23 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class ObstacleDetectionCamera : public BaseCameraPerception {
+class ObstacleDetectionCamera final : public BaseCameraPerception {
  public:
-  using cyber::common::EnsureDirectory;
-  using cyber::common::GetAbsolutePath;
+  using GetAbsolutePath = cyber::common::GetAbsolutePath;
 
  public:
-  ObstacleDetectionCamera() = default;
+  ObstacleDetectionCamera() { name_ = "ObstacleDetectionCamera"; }
   ~ObstacleDetectionCamera() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "ObstacleDetectionCamera"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
 
  protected:
   ObjectTemplateManager *object_template_manager_;

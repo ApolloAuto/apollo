@@ -39,8 +39,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::cyber::common::GetAbsolutePath;
-using cyber::common::EnsureDirectory;
 
 bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
@@ -64,6 +62,10 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   // Init calibration service
   InitCalibrationService(work_root, model, perception_param_);
 
+  return true;
+}
+
+bool LaneCameraPerception::Init(const PipelineConfig& pipeline_config) {
   return true;
 }
 
@@ -191,6 +193,12 @@ void LaneCameraPerception::SetIm2CarHomography(
 bool LaneCameraPerception::GetCalibrationService(
     BaseCalibrationService **calibration_service) {
   *calibration_service = calibration_service_.get();
+  return true;
+}
+
+bool LaneCameraPerception::Process(DataFrame* data_frame) {
+  CameraFrame* frame = data_frame->camera_frame;
+  InnerProcess(frame);
   return true;
 }
 

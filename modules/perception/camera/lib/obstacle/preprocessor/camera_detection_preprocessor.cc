@@ -43,7 +43,7 @@ bool CameraDetectionPreprocessor::Process(DataFrame* data_frame) {
 // input: data_frame
 // output:
 //          resize、normalize之后的 image_data_array -> input_blob(smoke detect
-//          stage) 
+//          stage)
 //          k_inv -> input_k_blob(smoke detect stage)
 
 bool CameraDetectionPreprocessor::Process(DataFrame* data_frame, float * k_inv, float * image_data_array) {

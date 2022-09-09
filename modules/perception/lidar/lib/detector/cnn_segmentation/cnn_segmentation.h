@@ -40,15 +40,13 @@ namespace lidar {
 
 class CNNSegmentation : public BaseLidarDetector {
  public:
-  CNNSegmentation() = default;
+  CNNSegmentation() { name_ = "CNNSegmentation"; }
   virtual ~CNNSegmentation() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
                 LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
-
-//   std::string Name() const override { return "CNNSegmentation"; }
 
   bool Init(const StageConfig& stage_config) override;
 

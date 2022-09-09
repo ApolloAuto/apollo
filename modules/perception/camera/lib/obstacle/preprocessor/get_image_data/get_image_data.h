@@ -25,33 +25,29 @@ namespace perception {
 namespace camera {
 
 class GetImageData : public Plugin{
-public:
-    GetImageData(){ name_ = "GetImageData"};
-    virtual ~GetImageData() = default;
+ public:
+  GetImageData() { name_ = "GetImageData"; }
+  virtual ~GetImageData() = default;
 
-    bool Init(const TaskConfig& task_config) override;
-    bool Process(DataFrame* data_frame);
-    bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv) override;
-    bool IsEnabled() override { return enable_; }
-    std::string Name() override {return name_;}
+  bool Init(const TaskConfig& task_config) override;
+  bool Process(DataFrame* data_frame);
+  bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv) override;
+  bool IsEnabled() override { return enable_; }
+  std::string Name() override { return name_; }
 
+ private:
+  bool GetKInverse(const CameraFrame& frame, float* k_inv);
+  bool GetImage(const CameraFrame& frame, cv::Mat* image_cv);
 
-protected:
-    bool enable_ = false;
+ private:
+  //原始图像的width、height
+  int image_origin_width_;
+  int image_origin_height_;
+  int image_origin_channel_;
 
-private:
-
-    bool GetKInverse(const CameraFrame& frame, float* k_inv);    
-    bool GetImage(const CameraFrame& frame, cv::Mat* image_cv);
-    std::string name_;
-    //原始图像的width、height
-    int image_origin_width_;
-    int image_origin_height_;
-    int image_origin_channel_;
-
-    std::shared_ptr<base::Image8U> image_ = nullptr;
+  std::shared_ptr<base::Image8U> image_ = nullptr;
 }; // class GetImageData
 
 }  // namespace camera
 }  // namespace perception
-}  // namespace apollo    
+}  // namespace apollo

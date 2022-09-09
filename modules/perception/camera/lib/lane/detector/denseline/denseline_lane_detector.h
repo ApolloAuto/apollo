@@ -46,6 +46,8 @@ class DenselineLaneDetector : public BaseLaneDetector {
     image_mean_[1] = 0;
     image_mean_[2] = 0;
     image_scale_ = 0;
+
+    name_ = "DenselineLaneDetector";
   }
 
   virtual ~DenselineLaneDetector() = default;

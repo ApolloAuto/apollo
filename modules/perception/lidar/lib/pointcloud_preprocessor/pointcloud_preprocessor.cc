@@ -30,7 +30,6 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::cyber::common::GetAbsolutePath;
 
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 
@@ -84,11 +83,9 @@ bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
 bool PointCloudPreprocessor::Process(DataFrame* data_frame) {
   if (data_frame == nullptr) return false;
 
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
   PointCloudPreprocessorOptions options;
-  Preprocess(options, data_frame->lidar_frame);
-  return res;
+  bool result = Preprocess(options, data_frame->lidar_frame);
+  return result;
 }
 
 bool PointCloudPreprocessor::Preprocess(

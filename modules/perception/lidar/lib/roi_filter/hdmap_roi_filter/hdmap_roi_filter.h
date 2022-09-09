@@ -29,6 +29,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 class HdmapROIFilterTest;
+
 class HdmapROIFilter : public BaseROIFilter {
  public:
   HdmapROIFilter()
@@ -36,12 +37,10 @@ class HdmapROIFilter : public BaseROIFilter {
         range_(120.0),
         cell_size_(0.25),
         extend_dist_(0.0),
-        no_edge_table_(false) {}
+        no_edge_table_(false) { name_ = "HdmapROIFilter"; }
   ~HdmapROIFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;
-
-//   std::string Name() const override { return "HdmapROIFilter"; }
 
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 

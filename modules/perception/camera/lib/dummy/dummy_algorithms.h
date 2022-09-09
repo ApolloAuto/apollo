@@ -40,7 +40,10 @@ namespace camera {
 
 class DummyInferenceEngine : public BaseInferenceEngine {
  public:
-  DummyInferenceEngine() : BaseInferenceEngine() {}
+  DummyInferenceEngine() : BaseInferenceEngine() {
+    name_ = "DummyInferenceEngine";
+    enable_ = true;
+  }
 
   virtual ~DummyInferenceEngine() = default;
 
@@ -54,11 +57,13 @@ class DummyInferenceEngine : public BaseInferenceEngine {
     return true;
   }
 
-  // std::string Name() const override { return "DummyInferenceEngine"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -67,7 +72,10 @@ class DummyInferenceEngine : public BaseInferenceEngine {
 
 class DummyLaneDetector : public BaseLaneDetector {
  public:
-  DummyLaneDetector() : BaseLaneDetector() {}
+  DummyLaneDetector() : BaseLaneDetector() {
+    name_ = "DummyLaneDetector";
+    enable_ = true;
+  }
 
   virtual ~DummyLaneDetector() = default;
 
@@ -79,11 +87,13 @@ class DummyLaneDetector : public BaseLaneDetector {
     return true;
   }
 
-  std::string Name() const override { return "DummyLaneDetector"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -92,7 +102,10 @@ class DummyLaneDetector : public BaseLaneDetector {
 
 class DummyLanePostprocessor : public BaseLanePostprocessor {
  public:
-  DummyLanePostprocessor() : BaseLanePostprocessor() {}
+  DummyLanePostprocessor() : BaseLanePostprocessor() {
+    name_ = "DummyLanePostprocessor";
+    enable_ = true;
+  }
 
   virtual ~DummyLanePostprocessor() = default;
 
@@ -111,11 +124,13 @@ class DummyLanePostprocessor : public BaseLanePostprocessor {
     return true;
   }
 
-  std::string Name() const override { return "DummyLanePostprocessor"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -124,7 +139,10 @@ class DummyLanePostprocessor : public BaseLanePostprocessor {
 
 class DummyLaneTracker : public BaseLaneTracker {
  public:
-  DummyLaneTracker() : BaseLaneTracker() {}
+  DummyLaneTracker() : BaseLaneTracker() {
+    name_ = "DummyLaneTracker";
+    enable_ = true;
+  }
 
   virtual ~DummyLaneTracker() = default;
 
@@ -137,11 +155,13 @@ class DummyLaneTracker : public BaseLaneTracker {
     return true;
   }
 
-  std::string Name() const override { return "DummyLaneTracker"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -150,7 +170,10 @@ class DummyLaneTracker : public BaseLaneTracker {
 
 class DummyObstacleDetector : public BaseObstacleDetector {
  public:
-  DummyObstacleDetector() : BaseObstacleDetector() {}
+  DummyObstacleDetector() : BaseObstacleDetector() {
+    name_ = "DummyObstacleDetector";
+    enable_ = true;
+  }
 
   virtual ~DummyObstacleDetector() = default;
 
@@ -164,11 +187,13 @@ class DummyObstacleDetector : public BaseObstacleDetector {
     return true;
   }
 
-  std::string Name() const override { return "DummyObstacleDetector"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -177,7 +202,10 @@ class DummyObstacleDetector : public BaseObstacleDetector {
 
 class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
  public:
-  DummyObstaclePostprocessor() : BaseObstaclePostprocessor() {}
+  DummyObstaclePostprocessor() : BaseObstaclePostprocessor() {
+    name_ = "DummyObstaclePostprocessor";
+    enable_ = true;
+  }
 
   virtual ~DummyObstaclePostprocessor() = default;
 
@@ -191,11 +219,13 @@ class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
     return true;
   }
 
-  std::string Name() const override { return "DummyObstaclePostprocessor"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -204,7 +234,15 @@ class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
 
 class DummyObstacleTracker : public BaseObstacleTracker {
  public:
-  bool Init(const ObstacleTrackerInitOptions &options) override { return true; }
+  DummyObstacleTracker() {
+    name_ = "DummyObstacleTracker";
+    enable_ = true;
+  }
+  ~DummyObstacleTracker() = default;
+
+  bool Init(const ObstacleTrackerInitOptions &options) override {
+    return true;
+  }
 
   bool Predict(const ObstacleTrackerOptions &options,
                CameraFrame *frame) override {
@@ -230,11 +268,13 @@ class DummyObstacleTracker : public BaseObstacleTracker {
     return true;
   }
 
-  std::string Name() const override { return "DummyObstacleTracker"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -243,6 +283,12 @@ class DummyObstacleTracker : public BaseObstacleTracker {
 
 class DummyObstacleTransformer : public BaseObstacleTransformer {
  public:
+  DummyObstacleTransformer() {
+    name_ = "DummyObstacleTransformer";
+    enable_ = true;
+  }
+  ~DummyObstacleTransformer() = default;
+
   bool Init(const ObstacleTransformerInitOptions &options) override {
     return true;
   }
@@ -250,11 +296,14 @@ class DummyObstacleTransformer : public BaseObstacleTransformer {
                  CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override { return "DummyObstacleTransformer"; }
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -263,7 +312,10 @@ class DummyObstacleTransformer : public BaseObstacleTransformer {
 
 class DummyFeatureExtractor : public BaseFeatureExtractor {
  public:
-  DummyFeatureExtractor() : BaseFeatureExtractor() {}
+  DummyFeatureExtractor() : BaseFeatureExtractor() {
+    name_ = "DummyFeatureExtractor";
+    enable_ = true;
+  }
   virtual ~DummyFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override {
@@ -274,11 +326,14 @@ class DummyFeatureExtractor : public BaseFeatureExtractor {
                CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override { return "DummyFeatureExtractor"; }
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -287,7 +342,10 @@ class DummyFeatureExtractor : public BaseFeatureExtractor {
 
 class DummyLandmarkDetector : public BaseLandmarkDetector {
  public:
-  DummyLandmarkDetector() : BaseLandmarkDetector() {}
+  DummyLandmarkDetector() : BaseLandmarkDetector() {
+    name_ = "DummyLandmarkDetector";
+    enable_ = true;
+  }
   virtual ~DummyLandmarkDetector() = default;
 
   bool Init(const LandmarkDetectorInitOptions &options =
@@ -299,11 +357,14 @@ class DummyLandmarkDetector : public BaseLandmarkDetector {
               CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override { return "DummyLandmarkDetector"; }
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
 
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
 
   bool IsEnabled() override { return enable_; }
 
@@ -328,7 +389,10 @@ class DummyCalibrator : public BaseCalibrator {
 
 class DummyCalibrationService : public BaseCalibrationService {
  public:
-  DummyCalibrationService() : BaseCalibrationService() {}
+  DummyCalibrationService() : BaseCalibrationService() {
+    name_ = "DummyCalibrationService";
+    enable_ = true;
+  }
   virtual ~DummyCalibrationService() = default;
 
   bool Init(const CalibrationServiceInitOptions &options =
@@ -364,7 +428,17 @@ class DummyCalibrationService : public BaseCalibrationService {
     // do nothing
   }
 
-  std::string Name() const override { return "DummyCalibrationService"; }
+  bool Init(const StageConfig& stage_config) override {
+    return true;
+  }
+
+  bool Process(DataFrame* data_frame) override {
+    return true;
+  }
+
+  bool IsEnabled() override { return enable_; }
+
+  std::string Name() const override { return name_; }
 };
 
 }  // namespace camera

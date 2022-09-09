@@ -21,9 +21,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-TrackingFeatureExtractor::TrackingFeatureExtractor() {
-  name_ = "TrackingFeatureExtractor";
-}
 
 bool TrackingFeatureExtractor::Init(
     const FeatureExtractorInitOptions &init_options) {

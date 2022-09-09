@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyObjectFilter : public BaseObjectFilter {
  public:
-  DummyObjectFilter() = default;
+  DummyObjectFilter() { name_ = "DummyObjectFilter"; }
 
   virtual ~DummyObjectFilter() = default;
 
@@ -38,8 +38,6 @@ class DummyObjectFilter : public BaseObjectFilter {
   // @param [in/out]: frame
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "DummyObjectFilter"; }
 
   bool Init(const StageConfig& stage_config) override;
 

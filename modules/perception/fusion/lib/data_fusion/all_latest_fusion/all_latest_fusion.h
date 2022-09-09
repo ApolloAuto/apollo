@@ -29,14 +29,14 @@ namespace fusion {
 
 class AllLatestFusion : public Stage {
  public:
-  AllLatestFusion();
+  AllLatestFusion() { name_ = "AllLatestFusion"; }
   ~AllLatestFusion() = default;
 
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
-  bool IsEnabled() override;
+  bool IsEnabled() override { return enable_; }
 
   std::string Name() const override { return name_; }
  private:

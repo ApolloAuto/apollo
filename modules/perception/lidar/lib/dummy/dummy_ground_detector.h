@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyGroundDetector : public BaseGroundDetector {
  public:
-  DummyGroundDetector() = default;
+  DummyGroundDetector() { name_ = "DummyGroundDetector"; }
 
   virtual ~DummyGroundDetector() = default;
 
@@ -39,8 +39,6 @@ class DummyGroundDetector : public BaseGroundDetector {
   // non_ground_indices should be filled, required,
   // label field of point cloud can be filled, optional,
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "DummyGroundDetector"; }
 
   bool Init(const StageConfig& stage_config) override;
 

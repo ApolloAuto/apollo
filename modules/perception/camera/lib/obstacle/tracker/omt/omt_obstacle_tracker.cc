@@ -29,9 +29,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-OMTObstacleTracker::OMTObstacleTracker() {
-  name_ = "OMTObstacleTracker";
-}
 
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);

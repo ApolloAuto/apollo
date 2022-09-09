@@ -40,15 +40,13 @@ using base::ObjectPtr;
 
 class NCutSegmentation : public BaseLidarDetector {
  public:
-  NCutSegmentation() = default;
+  NCutSegmentation() { name_ = "NCutSegmentation"; }
   virtual ~NCutSegmentation() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
                 LidarDetectorInitOptions()) override;
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
-
-  // std::string Name() const override { return "NCutSegmentation"; }
 
   void ByPassROIService() {
     remove_roi_ = false;

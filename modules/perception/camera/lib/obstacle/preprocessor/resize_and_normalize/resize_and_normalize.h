@@ -26,16 +26,13 @@ namespace camera {
 
 class ReSizeAndNormalize : public Plugin {
  public:
-  ReSizeAndNormalize(){name_ = "ReSizeAndNormalize"};
+  ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
   virtual ~ReSizeAndNormalize() = default;
 
   bool Init(const TaskConfig &task_config) override;
   bool Process(DataFrame *data_frame) override;
   bool IsEnabled() override { return enable_; }
   std::string Name() override { return name_; }
-
- protected:
-  bool enable_ = false;
 
  private:
   void Resize(const cv::Mat &img, int resized_h, int resized_w,
@@ -44,14 +41,11 @@ class ReSizeAndNormalize : public Plugin {
   void Normalize(cv::Mat *im, const std::vector<float> &mean,
                  const std::vector<float> &std, float &scale);
 
-  std::string name_;
-
   int resized_width_;
   int resized_height_;
   std::vector<float> mean_;
   std::vector<float> std_;
   std::vector<float> scale_;
-
 }  // class ReSizeAndNormalize
 
 }  // namespace camera

@@ -295,10 +295,6 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
   return true;
 }
 
-std::string DarkSCNNLaneDetector::Name() const {
-  return "DarkSCNNLaneDetector";
-}
-
 REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
 
 }  // namespace camera

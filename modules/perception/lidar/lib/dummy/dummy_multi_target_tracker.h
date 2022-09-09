@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyMultiTargetTracker : public BaseMultiTargetTracker {
  public:
-  DummyMultiTargetTracker() = default;
+  DummyMultiTargetTracker() { name_ = "DummyMultiTargetTracker"; }
 
   virtual ~DummyMultiTargetTracker() = default;
 
@@ -39,8 +39,6 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
   // tracked objects should be filled, required,
   bool Track(const MultiTargetTrackerOptions& options,
              LidarFrame* frame) override;
-
-  // std::string Name() const override { return "DummyMultiTargetTracker"; }
 
   bool Init(const StageConfig& stage_config) override;
 
