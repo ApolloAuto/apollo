@@ -28,25 +28,17 @@ bool Stage::Initialize(const StageConfig& stage_config) {
   Clear();
 
   for (const auto& plugin_config : stage_config.plugin_config()) {
-    plugin_config_map_[plugin_config.plugin_type()] = &plugin_config;
-  }
-
-  for (int i = 0; i < stage_config.plugin_config_size(); ++i) {
-    auto plugin_type = stage_config.plugin_type(i);
-    if (!common::util::ContainsKey(plugin_config_map_, plugin_type)) {
-      AERROR << "Plugin type : " << PluginType_Name(plugin_type)
-             << " has no config";
-      return false;
-    }
-
     std::unique_ptr<Plugin> plugin_ptr =
-        PluginFactory::CreatePlugin(stage_config);
+        PluginFactory::CreatePlugin(plugin_config);
 
+    auto plugin_type = plugin_config.plugin_type();
     if (plugin_ptr == nullptr) {
-      AERROR << "Create task type : " << PluginType_Name(plugin_type)
+      AERROR << "Create plugin type : " << PluginType_Name(plugin_type)
              << " failed!";
       return false;
     }
+
+    plugin_config_map_[plugin_type] = &plugin_config;
   }
 
   return true;
