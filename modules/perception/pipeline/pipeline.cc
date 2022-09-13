@@ -16,7 +16,7 @@
 
 #include "modules/perception/pipeline/pipeline.h"
 
-
+#include "modules/common/util/map_util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"

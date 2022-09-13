@@ -70,7 +70,7 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   base::ObjectSubType GetObjectSubType(int label);
 
-  bool Detect(LidarFrame* frame, cons std::vector<float>& points_array,
+  bool Detect(LidarFrame* frame, const std::vector<float>& points_array,
               int num_points, std::vector<float>* out_detections,
               std::vector<int>* out_labels);
 
@@ -101,9 +101,7 @@ class PointPillarsDetection : public BaseLidarDetector {
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
 
-  pipeline::stage::PointPillarsDetectionConfig point_pillars_detection_config_;
-  std::string name_;
-  bool enable_;
+  // PointPillarsDetectionConfig point_pillars_detection_config_;
 };  // class PointPillarsDetection
 
 }  // namespace lidar
