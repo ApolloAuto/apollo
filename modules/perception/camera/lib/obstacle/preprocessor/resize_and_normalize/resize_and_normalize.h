@@ -34,8 +34,8 @@ class ReSizeAndNormalize : public pipeline::Plugin {
 
   bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame *data_frame) override;
-  bool IsEnabled() override { return enable_; }
-  std::string Name() override { return name_; }
+  bool IsEnabled() const override { return enable_; }
+  std::string Name() const override { return name_; }
 
  private:
   void Resize(const cv::Mat &img, int resized_h, int resized_w,

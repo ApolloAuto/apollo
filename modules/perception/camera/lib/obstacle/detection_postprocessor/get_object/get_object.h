@@ -39,12 +39,9 @@ class GetObject : public pipeline::Plugin {
 
   bool Process(const std::vector<float> &detect_result, DataFrame *data_frame);
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
-  std::string Name() override { return name_; }
-
- protected:
-  bool enable_ = false;
+  std::string Name() const override { return name_; }
 
  private:
   void get_smoke_objects_cpu(const std::vector<float> &detect_result,
@@ -55,7 +52,6 @@ class GetObject : public pipeline::Plugin {
   void fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
                                   const float *bbox);
 
-  std::string name_;
   float confidence_threshold_;
 }
 

@@ -36,11 +36,8 @@ class PointCloudDownSample : public pipeline::Plugin {
   bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame* data_frame) override;
   bool Process(DataFrame* data_frame, float * point_array, int * num_points_result) override;
-  bool IsEnabled() override { return enable_; }
-  std::string Name() override {return name_;}
-
- protected:
-  bool enable_ = false;
+  bool IsEnabled() const override { return enable_; }
+  std::string Name() const override {return name_;}
 
  private:
   bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame, float * points_array);
@@ -53,12 +50,9 @@ class PointCloudDownSample : public pipeline::Plugin {
 
   //time statistics
   double downsample_time_ = 0.0;
-  std::string name_;
-
 
   bool enable_downsample_pointcloud_;
   bool enable_downsample_beams_;
-
 };
 
 }  // namespace lidar

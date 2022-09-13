@@ -41,7 +41,7 @@ class BaseGatekeeper : public pipeline::Plugin {
 
   virtual bool Init(const PluginConfig& plugin_config) = 0;
 
-  virtual bool IsEnabled() = 0;
+  virtual bool IsEnabled() const = 0;
 
   virtual std::string Name() const = 0;
 

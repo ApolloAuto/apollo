@@ -23,9 +23,7 @@
 
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point_cloud.h"
-#include "modules/perception/base/point.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
-#include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
@@ -36,7 +34,6 @@ namespace lidar {
 class ROIBoundaryFilter : public BaseObjectFilter {
  public:
   using PluginConfig = pipeline::PluginConfig;
-  using DataFrame = pipeline::DataFrame;
 
  public:
   ROIBoundaryFilter() { name_ = "ROIBoundaryFilter"; }
@@ -56,9 +53,9 @@ class ROIBoundaryFilter : public BaseObjectFilter {
 
   bool Init(const PluginConfig& plugin_config) override;
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
-  std::string Name() override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   // @brief: given input objects, build polygon in world frame
