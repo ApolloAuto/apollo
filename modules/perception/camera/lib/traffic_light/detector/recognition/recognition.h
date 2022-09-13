@@ -58,8 +58,8 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   std::shared_ptr<ClassifyBySimple> classify_vertical_;
   std::shared_ptr<ClassifyBySimple> classify_quadrate_;
   std::shared_ptr<ClassifyBySimple> classify_horizontal_;
-  // traffic_light::recognition::RecognizeBoxParam recognize_param_;
-  pipeline::stage::TrafficLightRecognitionConfig recognize_param_;
+
+  TrafficLightRecognitionConfig recognize_param_;
   std::string recognition_root_dir;
 
   DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);

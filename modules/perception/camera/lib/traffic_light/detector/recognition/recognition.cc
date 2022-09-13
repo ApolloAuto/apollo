@@ -46,7 +46,7 @@ bool TrafficLightRecognition::Init(
   return true;
 }
 
-bool Init(const apollo::perception::pipeline::StageConfig& stage_config){
+bool TrafficLightRecognition::Init(const StageConfig& stage_config) {
 
   recognize_param_ = stage_config.traffic_light_recognition_config();
 

@@ -71,9 +71,7 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   std::string Name() const override { return name_; }
 
  private:
-  // traffic_light::detection::DetectionParam detection_param_;
-
-  pipeline::stage::TrafficLightDetectionConfig detection_param_;
+  TrafficLightDetectionConfig detection_param_;
   std::string detection_root_dir;
 
   DataProvider::ImageOptions data_provider_image_option_;

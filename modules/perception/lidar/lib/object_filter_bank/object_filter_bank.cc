@@ -18,6 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
+#include "modules/perception/pipeline/proto/stage/object_filter_bank_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +37,7 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "filter_bank.conf");
-  FilterBankConfig config;
+  ObjectFilterBankConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();
   for (int i = 0; i < config.filter_name_size(); ++i) {
