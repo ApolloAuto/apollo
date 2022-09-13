@@ -124,9 +124,9 @@ message StageConfig {
 
     fusion.PbfTrackerConfig pbf_tracker_config = 15;
 
-    stage.TrafficLightDetectionConfig traffic_light_detection_config = 16;
-    stage.TrafficLightRecognitionConfig traffic_light_recognition_config = 17;
-    stage.SemanticReviserConfig semantic_reviser_config = 18;
+    camera.TrafficLightDetectionConfig traffic_light_detection_config = 16;
+    camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 17;
+    camera.SemanticReviserConfig semantic_reviser_config = 18;
   }
 }
 
