@@ -59,7 +59,6 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
 }
 
 bool ObjectFilterBank::Init(const StageConfig& config) {
-  Init(config.object_filter_bank_config());
   bool res = Initialize(config);
   return res;
 }

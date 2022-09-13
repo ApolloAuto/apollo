@@ -43,7 +43,7 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  bool Process(const LidarFrame& frame, cons std::vector<float>& points_array,
+  bool Process(const LidarFrame& frame, const std::vector<float>& points_array,
                int num_points, std::vector<float>* out_detections,
                std::vector<int>* out_labels);
 
