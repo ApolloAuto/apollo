@@ -69,11 +69,14 @@ cc_library(
   deps = [
     ":stage",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
-    "//modules/perception/lidar/lib/detector/point_pillars_detection",
+    # "//modules/perception/lidar/lib/detector/point_pillars_detection",
     "//modules/perception/lidar/lib/map_manager",
     "//modules/perception/lidar/lib/object_builder",
     "//modules/perception/lidar/lib/object_filter_bank",
     "//modules/perception/lidar/lib/pointcloud_preprocessor",
+    "//modules/perception/camera/lib/traffic_light/detector/detection",
+    "//modules/perception/camera/lib/traffic_light/detector/recognition",
+    "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
   ],
 )
 

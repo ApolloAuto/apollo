@@ -17,11 +17,14 @@
 #include "modules/perception/pipeline/pipeline.h"
 
 
-#include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars_detection.h"
+// #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
+#include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
+#include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
+#include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
 
 
 namespace apollo {
@@ -79,28 +82,28 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
   std::unique_ptr<Stage> stage_ptr;
   switch (stage_type) {
     case StageType::POINTCLOUD_PREPROCESSOR:
-      stage_ptr.reset(new PointCloudPreprocessor());
+      stage_ptr.reset(new lidar::PointCloudPreprocessor());
       break;
     case StageType::MAP_MANAGER:
-      stage_ptr.reset(new MapManager());
+      stage_ptr.reset(new lidar::MapManager());
       break;
-    case StageType::POINT_PILLARS_DETECTION:
-      stage_ptr.reset(new PointPillarsDetection());
-      break;
+    // case StageType::POINT_PILLARS_DETECTION:
+    //   stage_ptr.reset(new lidar::PointPillarsDetection());
+    //   break;
     case StageType::OBJECT_BUILDER:
-      stage_ptr.reset(new ObjectBuilder());
+      stage_ptr.reset(new lidar::ObjectBuilder());
       break;
     case StageType::OBJECT_FILTER_BANK:
-      stage_ptr.reset(new ObjectFilterBank());
+      stage_ptr.reset(new lidar::ObjectFilterBank());
       break;
     case StageType::TRAFFIC_LIGHT_DETECTION:
-      stage_ptr.reset(new TrafficLightDetection());
+      stage_ptr.reset(new camera::TrafficLightDetection());
       break;
     case StageType::TRAFFIC_LIGHT_RECOGNITION:
-      stage_ptr.reset(new TrafficLightRecognition());
+      stage_ptr.reset(new camera::TrafficLightRecognition());
       break;
     case StageType::SEMANTIC_REVISER:
-      stage_ptr.reset(new SemanticReviser());
+      stage_ptr.reset(new camera::SemanticReviser());
       break;
     default:
       return nullptr;

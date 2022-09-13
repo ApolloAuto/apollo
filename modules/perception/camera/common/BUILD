@@ -8,9 +8,12 @@ cc_library(
     hdrs = [
         "camera_frame.h",
         "data_provider.h",
+        "undistortion_handler.h",
     ],
     deps = [
         "//modules/perception/base",
+        "//modules/perception/base:blob",
+        "//modules/perception/common/sensor_manager",
     ],
 )
 
