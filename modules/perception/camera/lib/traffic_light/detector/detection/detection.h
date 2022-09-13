@@ -38,6 +38,7 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
     mean_[0] = 0;
     mean_[1] = 0;
     mean_[2] = 0;
+    name_ = "TrafficLightDetection";
   }
 
   ~TrafficLightDetection() = default;

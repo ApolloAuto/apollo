@@ -158,7 +158,7 @@ using cyber::common::GetAbsolutePath;
 
 bool TrafficLightDetection::Init(const apollo::perception::pipeline::StageConfig& stage_config) {
   detection_param_ = stage_config.traffic_light_detection_config();
-  
+
   std::string param_str;
   google::protobuf::TextFormat::PrintToString(detection_param_, &param_str);
   AINFO << "TL detection param: " << param_str;
@@ -175,7 +175,7 @@ bool TrafficLightDetection::Init(const apollo::perception::pipeline::StageConfig
   std::string weight_file =
       GetAbsolutePath(model_root, detection_param_.weight_file());
   AINFO << "weight_file " << weight_file;
-  
+
   if (detection_param_.is_bgr()) {
     data_provider_image_option_.target_color = base::Color::BGR;
     mean_[0] = detection_param_.mean_b();
@@ -211,7 +211,7 @@ bool TrafficLightDetection::Init(const apollo::perception::pipeline::StageConfig
   rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
                                                  weight_file, net_outputs_,
                                                  net_inputs_, model_root));
-  
+
   AINFO << "rt_net_ create succeed";
   rt_net_->set_gpu_id(detection_param_.gpu_id());
   AINFO << "set gpu id " << detection_param_.gpu_id();
@@ -277,7 +277,7 @@ bool TrafficLightDetection::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  const TrafficLightDetectorOptions &traffic_light_detection_options;
+  TrafficLightDetectorOptions traffic_light_detection_options;
   bool res = Detect(traffic_light_detection_options, data_frame->camera_frame);
 
   return res;
@@ -558,10 +558,6 @@ void TrafficLightDetection::ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
                kept_indices.end();
       });
   lights->erase(parted_itr, lights->end());
-}
-
-std::string TrafficLightDetection::Name() const {
-  return "TrafficLightDetection";
 }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightDetection);
