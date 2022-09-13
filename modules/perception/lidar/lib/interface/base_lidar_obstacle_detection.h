@@ -21,10 +21,11 @@
 #include "Eigen/Dense"
 
 #include "cyber/common/macros.h"
-#include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lib/registerer/registerer.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {

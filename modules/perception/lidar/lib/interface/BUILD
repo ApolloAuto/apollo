@@ -10,11 +10,9 @@ cc_library(
         ":base_classifier",
         ":base_ground_detector",
         ":base_multi_target_tracker",
-        ":base_object_filter",
         ":base_roi_filter",
         ":base_lidar_detector",
         ":base_pointcloud_preprocessor",
-        ":base_lidar_obstacle_tracking",
     ],
 )
 
