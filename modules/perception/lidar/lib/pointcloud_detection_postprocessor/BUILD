@@ -7,7 +7,7 @@ cc_library(
   srcs = "point_cloud_detection_postprocessor.cc",
   hdrs = "point_cloud_detection_postprocessor.h",
   deps = [
-
+    "//modules/perception/pipeline:stage",
   ],
 )
 
