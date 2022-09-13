@@ -14,7 +14,7 @@ cc_library(
     "plugin_factory.h",
   ],
   deps = [
-    "modules/common/util:util_tool",
+    "//modules/common/util:util_tool",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
     "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
   ],
