@@ -72,10 +72,10 @@ bool TrafficLightRecognition::Init(const StageConfig& stage_config) {
   return true;
 }
 
-bool TrafficLightDetection::Process(DataFrame* data_frame) {
+bool TrafficLightRecognition::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
-  const TrafficLightDetectorOptions &traffic_light_recognition_options;
+  TrafficLightDetectorOptions traffic_light_recognition_options;
   bool res = Detect(traffic_light_recognition_options, data_frame->camera_frame);
 
   return res;
@@ -110,10 +110,6 @@ bool TrafficLightRecognition::Detect(const TrafficLightDetectorOptions& options,
   }
 
   return true;
-}
-
-std::string TrafficLightRecognition::Name() const {
-  return "TrafficLightRecognition";
 }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightRecognition);

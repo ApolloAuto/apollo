@@ -31,7 +31,7 @@ namespace camera {
 
 class TrafficLightRecognition : public BaseTrafficLightDetector {
  public:
-  TrafficLightRecognition() = default;
+  TrafficLightRecognition() { name_ = "TrafficLightRecognition"; }
 
   ~TrafficLightRecognition() = default;
 
