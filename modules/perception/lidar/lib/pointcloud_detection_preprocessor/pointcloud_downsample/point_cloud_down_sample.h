@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
@@ -25,12 +25,15 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class PointCloudDownSample : public Plugin {
+class PointCloudDownSample : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   PointCloudDownSample();
   virtual ~PointCloudDownSample() = default;
 
-  bool Init(const TaskConfig& task_config) override;
+  bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame* data_frame) override;
   bool Process(DataFrame* data_frame, float * point_array, int * num_points_result) override;
   bool IsEnabled() override { return enable_; }
@@ -45,7 +48,7 @@ class PointCloudDownSample : public Plugin {
   LidarFrame* lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;
   std::shared_ptr<base::AttributePointCloud<base::PointD>> original_world_cloud_;
- 
+
   base::PointFCloudPtr cur_cloud_ptr_;
 
   //time statistics

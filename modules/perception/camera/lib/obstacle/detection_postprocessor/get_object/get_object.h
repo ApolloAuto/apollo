@@ -24,14 +24,17 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class GetObject : public Plugin {
+class GetObject : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   GetObject(){name_ = "GetObject"};
-  
+
   virtual ~GetObject() = default;
 
-  bool Init(const TaskConfig &task_config) override;
-  
+  bool Init(const PluginConfig& plugin_config) override;
+
   bool Process(DataFrame *data_frame) override;
 
   bool Process(const std::vector<float> &detect_result, DataFrame *data_frame);
@@ -48,10 +51,10 @@ class GetObject : public Plugin {
                              float confidence_threshold, int width, int height,
                              std::vector<base::ObjectPtr> *objects);
   void fill_smoke_base(base::ObjectPtr obj, const float *bbox,
-                                int width, int height);                           
+                                int width, int height);
   void fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
                                   const float *bbox);
-  
+
   std::string name_;
   float confidence_threshold_;
 }

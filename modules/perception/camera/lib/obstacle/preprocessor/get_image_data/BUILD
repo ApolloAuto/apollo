@@ -8,6 +8,7 @@ cc_library(
     srcs = ["get_image_data.cc"],
     hdrs = ["get_image_data.h"],
     deps = [
+        "//modules/perception/pipeline:plugin",
     ],
 )
 

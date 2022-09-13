@@ -19,10 +19,11 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
 
+#include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -43,7 +44,10 @@ struct CalibratorOptions {
   double *timestamp = nullptr;
 };
 
-class BaseCalibrator : public Plugin {
+class BaseCalibrator : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   BaseCalibrator() = default;
 
@@ -57,6 +61,10 @@ class BaseCalibrator : public Plugin {
   // @param [in/out]: pitch_angle
   virtual bool Calibrate(const CalibratorOptions &options,
                          float *pitch_angle) = 0;
+
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() = 0;
 
   virtual std::string Name() const = 0;
 

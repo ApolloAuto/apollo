@@ -106,6 +106,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:plugin",
     ],
 )
 
