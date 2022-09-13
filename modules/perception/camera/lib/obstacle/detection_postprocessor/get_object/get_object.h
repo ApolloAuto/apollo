@@ -29,7 +29,7 @@ class GetObject : public pipeline::Plugin {
   using PluginConfig = pipeline::PluginConfig;
 
  public:
-  GetObject(){name_ = "GetObject"};
+  GetObject(){ name_ = "GetObject"; }
 
   virtual ~GetObject() = default;
 

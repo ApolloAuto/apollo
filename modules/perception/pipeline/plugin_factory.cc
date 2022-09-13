@@ -37,7 +37,7 @@ void PluginFactory::Init() {
   plugin_factory_.Register(
       PluginType::ROI_BOUNDARY_FILTER,
       [](const PluginConfig& plugin_config) -> Plugin* {
-        return new ROIBoundaryFilter(plugin_config);
+        return new lidar::ROIBoundaryFilter(plugin_config);
       });
   // Todo(zero): need to add more type
   // need to deal with PipelineConfig& config

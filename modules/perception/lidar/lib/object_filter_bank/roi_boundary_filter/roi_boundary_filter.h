@@ -39,7 +39,7 @@ class ROIBoundaryFilter : public BaseObjectFilter {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  ROIBoundaryFilter() = default;
+  ROIBoundaryFilter() { name_ = "ROIBoundaryFilter"; }
 
   explicit ROIBoundaryFilter(const PluginConfig& plugin_config);
 
@@ -54,11 +54,11 @@ class ROIBoundaryFilter : public BaseObjectFilter {
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "ROIBoundaryFilter"; }
-
   bool Init(const PluginConfig& plugin_config) override;
 
-  bool Process(DataFrame* data_frame) override;
+  bool IsEnabled() override { return enable_; }
+
+  std::string Name() override { return name_; }
 
  private:
   // @brief: given input objects, build polygon in world frame
