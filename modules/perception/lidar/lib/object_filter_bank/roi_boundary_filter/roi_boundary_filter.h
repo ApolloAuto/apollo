@@ -33,7 +33,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class ROIBoundaryFilter : public Plugin {
+class ROIBoundaryFilter : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   ROIBoundaryFilter() = default;
 
