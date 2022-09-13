@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace pipeline {

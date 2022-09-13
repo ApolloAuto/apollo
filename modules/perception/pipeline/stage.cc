@@ -39,7 +39,8 @@ bool Stage::Initialize(const StageConfig& stage_config) {
       return false;
     }
 
-    Plugin* plugin_ptr = PluginFactory::CreatePlugin(stage_config);
+    std::unique_ptr<Plugin> plugin_ptr =
+        PluginFactory::CreatePlugin(stage_config);
 
     if (plugin_ptr == nullptr) {
       AERROR << "Create task type : " << PluginType_Name(plugin_type)

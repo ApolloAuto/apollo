@@ -32,7 +32,11 @@ namespace lidar {
 
 class ROIBoundaryFilter : public Plugin {
  public:
+  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+ public:
   ROIBoundaryFilter() = default;
+
+  explicit ROIBoundaryFilter(const PluginConfig& plugin_config);
 
   virtual ~ROIBoundaryFilter() = default;
 

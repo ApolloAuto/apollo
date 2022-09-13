@@ -23,6 +23,7 @@ import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.prot
 enum PluginType {
   // filter
   ROI_BOUNDARY_FILTER = 1;
+
 }
 
 message PluginConfig {
@@ -89,17 +90,17 @@ enum StageType {
   MLF_ENGINE = 125;
 
   // classifier
-  FUSED_CLASSIFIER = 124;
+  FUSED_CLASSIFIER = 126;
 
-  HDMAP_RADAR_ROI_FILTER = 125;
+  HDMAP_RADAR_ROI_FILTER = 127;
 
-  HM_ASSOCIATION = 126;
+  HM_ASSOCIATION = 128;
 
-  PBF_GATEKEEPER = 127;
+  PBF_GATEKEEPER = 129;
 
-  EXTERNAL_FEATURE_EXTRACTOR = 128;
+  EXTERNAL_FEATURE_EXTRACTOR = 130;
 
-  MULTI_CUE_OBSTACLE_TRANSFORMER = 129;
+  MULTI_CUE_OBSTACLE_TRANSFORMER = 131;
 }
 
 message StageConfig {

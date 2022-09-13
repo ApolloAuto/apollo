@@ -23,6 +23,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/perception/pipeline/plugin.h"
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {

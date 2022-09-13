@@ -51,9 +51,10 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
     if (stage_ptr == nullptr) {
       AERROR << "Create stage type : " << StageType_Name(stage_type)
              << " failed!";
-    } else {
-      stage_ptrs_.push_back(stage_ptr);
+      return false;
     }
+
+    stage_ptrs_.push_back(stage_ptr);
   }
 
   return true;

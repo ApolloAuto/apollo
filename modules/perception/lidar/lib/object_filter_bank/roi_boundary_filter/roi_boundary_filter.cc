@@ -34,7 +34,14 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using cyber::common::GetAbsolutePath;
+
+ROIBoundaryFilter::ROIBoundaryFilter(const PluginConfig& plugin_config) {
+  distance_to_boundary_threshold_ =
+      plugin_config.distance_to_boundary_threshold();
+  confidence_threshold_ = plugin_config.confidence_threshold();
+  cross_roi_threshold_ = plugin_config.cross_roi_threshold();
+  inside_threshold_ = plugin_config.inside_threshold();
+}
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
