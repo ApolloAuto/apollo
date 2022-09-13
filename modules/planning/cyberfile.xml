@@ -32,7 +32,8 @@
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
   <depend>3rd-mkl-dev</depend>
-  <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu">3rd-libtorch-cpu-dev</depend>
+  <depend repo_name="libtorch_cpu" lib_names="libtorch_cpu" condition="not gpu">3rd-libtorch-cpu-dev</depend>
+  <depend repo_name="libtorch_gpu" lib_names="libtorch_gpu" condition="gpu">3rd-libtorch-gpu-dev</depend>
   <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
 
   <depend expose="False">3rd-rules-python-dev</depend>

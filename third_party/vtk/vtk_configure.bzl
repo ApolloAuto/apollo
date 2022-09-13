@@ -78,7 +78,7 @@ def _vtk_match_version(repository_ctx, sysroot_dir = None):
         prefix = solib[:solib.rfind("/lib/")]
         libdict[solib] = (libpath, version, prefix)
 
-    prefix_dirs = ["/usr", "/usr/local"]
+    prefix_dirs = ["/usr", "/usr/local", "/opt/apollo/neo/packages/3rd-vtk-dev/latest"]
     if sysroot_dir:
         prefix_dirs.append(sysroot_dir)
 
@@ -95,7 +95,7 @@ def _vtk_match_version(repository_ctx, sysroot_dir = None):
         version = _vtk_version_from_incl_path(incl_dir)
         for k in libdict:
             (lib_path, lib_version, lib_prefix) = libdict[k]
-            if lib_version == version and lib_prefix == prefix:
+            if lib_version == version:
                 return (version, incl_dir, lib_path)
 
     return None

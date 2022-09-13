@@ -34,7 +34,6 @@
 #include "modules/perception/onboard/proto/trafficlights_perception_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/transform/buffer.h"
-#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace perception {

@@ -1,4 +1,6 @@
 # Macros for building CUDA code.
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
 def if_cuda(if_true, if_false = []):
     """Shorthand for select()'ing on whether we're building with CUDA.
 
@@ -82,7 +84,7 @@ def cuda_header_library(
     target without virtual includes. This works around the fact that bazel can't
     mix 'includes' and 'include_prefix' in the same target."""
 
-    native.cc_library(
+    cc_library(
         name = name + "_virtual",
         hdrs = hdrs,
         include_prefix = include_prefix,
@@ -91,7 +93,7 @@ def cuda_header_library(
         visibility = ["//visibility:private"],
     )
 
-    native.cc_library(
+    cc_library(
         name = name,
         textual_hdrs = hdrs,
         deps = deps + [":%s_virtual" % name],
@@ -100,4 +102,4 @@ def cuda_header_library(
 
 def cuda_library(copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
-    native.cc_library(copts = cuda_default_copts() + copts, **kwargs)
+    cc_library(copts = cuda_default_copts() + copts, **kwargs)

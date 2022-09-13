@@ -111,7 +111,7 @@ install_files(
 install_src_files(
     name = "install_src",
     deps = [
-        # ":install_perception_src",
+        ":install_perception_src",
         ":install_perception_hdrs"
     ],
 )

@@ -21,7 +21,6 @@ install(
         ":libperception_component_lidar.so",
     ],
     deps = [
-        "//cyber:install",
         "//modules/perception/production:install",
     ],
 )
@@ -81,7 +80,6 @@ cc_library(
         "//modules/perception/onboard/proto:lane_perception_component_cc_proto",
         "//modules/perception/onboard/proto:trafficlights_perception_component_cc_proto",
         "//modules/perception/onboard/transform_wrapper",
-        "//modules/v2x/common:v2x_proxy_gflags",
         "@eigen",
         "@opencv//:highgui",
     ],
