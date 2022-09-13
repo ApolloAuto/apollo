@@ -18,8 +18,6 @@
 #include <limits>
 #include <unordered_map>
 
-#include "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.pb.h"
-
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/base/object_pool_types.h"
@@ -66,8 +64,8 @@ bool PointCloudPreprocessor::Init(
 }
 
 bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
-  ACHECK(stage_config.has_pointcloud_preprocessor());
-  pointcloud_preprocessor_config_ = stage_config.pointcloud_preprocessor();
+  ACHECK(stage_config.has_pointcloud_preprocessor_config());
+  pointcloud_preprocessor_config_ = stage_config.pointcloud_preprocessor_config();
   filter_naninf_points_ = pointcloud_preprocessor_config_.filter_naninf_points();
   filter_nearby_box_points_ = pointcloud_preprocessor_config_.filter_nearby_box_points();
   box_forward_x_ = pointcloud_preprocessor_config_.box_forward_x();
