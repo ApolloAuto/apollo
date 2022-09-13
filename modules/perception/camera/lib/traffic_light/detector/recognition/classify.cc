@@ -29,7 +29,7 @@ namespace camera {
 using cyber::common::GetAbsolutePath;
 
 void ClassifyBySimple::Init(
-    ClassifyParam& model_config,
+    const ClassifyParam& model_config,
     const int gpu_id,
     const std::string work_root) {
   AINFO << "Enter Classify init";

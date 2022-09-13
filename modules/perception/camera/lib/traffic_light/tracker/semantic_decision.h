@@ -44,7 +44,7 @@ struct SemanticTable {
 
 class SemanticReviser : public BaseTrafficLightTracker {
  public:
-  SemanticReviser() = default;
+  SemanticReviser() { name_ = "SemanticReviser"; }
   ~SemanticReviser() = default;
 
   bool Init(const TrafficLightTrackerInitOptions &options =
