@@ -6,19 +6,19 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
   name = "plugin_factory",
-  srcs = "plugin_factory.cc",
+  srcs = ["plugin_factory.cc"],
   hdrs = [
     "plugin.h",
     "plugin_factory.h",
   ],
   deps = [
-    "modules/common/util:util_tool",
+    "//modules/common/util:util_tool",
   ],
 )
 
 cc_library(
   name = "stage",
-  srcs = "stage.cc",
+  srcs = ["stage.cc"],
   hdrs = [
     "plugin.h",
     "data_frame.h",
@@ -32,8 +32,8 @@ cc_library(
 
 cc_library(
   name = "pipeline",
-  srcs = "pipeline.cc",
-  hdrs = "pipeline.h",
+  srcs = ["pipeline.cc"],
+  hdrs = ["pipeline.h"],
   deps = [
     ":stage",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",

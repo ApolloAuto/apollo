@@ -111,6 +111,11 @@ cc_proto_library(
 proto_library(
     name = "traffic_light_config_proto",
     srcs = ["traffic_light_config.proto"],
+    deps = [
+        "//modules/perception/pipeline/proto/stage:detection_proto",
+        "//modules/perception/pipeline/proto/stage:recognition_proto",
+        "//modules/perception/pipeline/proto/stage:semantic_proto",
+    ]
 )
 
 py_proto_library(

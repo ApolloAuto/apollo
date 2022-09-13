@@ -89,9 +89,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
         "//modules/perception/camera/lib/traffic_light/detector/recognition",
-        "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
-        "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
-        "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
+        "//modules/perception/pipeline:pipeline",
     ],
     alwayslink = True,
 )
