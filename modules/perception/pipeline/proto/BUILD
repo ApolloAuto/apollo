@@ -33,23 +33,14 @@ cc_proto_library(
 proto_library(
     name = "traffic_light_config_proto",
     srcs = ["traffic_light_config.proto"],
-    deps = [
-        "//modules/perception/pipeline/proto/stage:detection_proto",
-        "//modules/perception/pipeline/proto/stage:recognition_proto",
-        "//modules/perception/pipeline/proto/stage:semantic_proto",
-    ],
 )
 
 py_proto_library(
     name = "traffic_light_config_py_pb2",
     deps = [
         ":traffic_light_config_proto",
-        "//modules/perception/pipeline/proto/stage:detection_py_pb2",
-        "//modules/perception/pipeline/proto/stage:recognition_py_pb2",
-        "//modules/perception/pipeline/proto/stage:semantic_py_pb2",
     ],
 )
-
 cc_proto_library(
     name = "lane_detection_config_cc_proto",
     deps = [
@@ -101,11 +92,12 @@ proto_library(
         ":lane_detection_config_proto",
         ":lidar_detection_config_proto",
         ":traffic_light_config_proto",
+        "//modules/perception/pipeline/proto/stage:detection_proto",
+        "//modules/perception/pipeline/proto/stage:fused_classifier_config_proto",
         "//modules/perception/pipeline/proto/stage:map_manager_config_proto",
+        "//modules/perception/pipeline/proto/stage:mlf_engine_config_proto",
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_proto",
-        "//modules/perception/pipeline/proto/stage:mlf_engine_config_proto",
-        "//modules/perception/pipeline/proto/stage:detection_proto",
         "//modules/perception/pipeline/proto/stage:recognition_proto",
         "//modules/perception/pipeline/proto/stage:semantic_proto",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
@@ -120,11 +112,12 @@ py_proto_library(
         ":lane_detection_config_py_pb2",
         ":lidar_detection_config_py_pb2",
         ":traffic_light_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:detection_py_pb2",
+        "//modules/perception/pipeline/proto/stage:fused_classifier_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:map_manager_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:mlf_engine_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_py_pb2",
-        "//modules/perception/pipeline/proto/stage:mlf_engine_config_py_pb2",
-        "//modules/perception/pipeline/proto/stage:detection_py_pb2",
         "//modules/perception/pipeline/proto/stage:recognition_py_pb2",
         "//modules/perception/pipeline/proto/stage:semantic_py_pb2",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",

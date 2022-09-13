@@ -8,11 +8,12 @@ import "modules/perception/pipeline/proto/lane_detection_config.proto";
 import "modules/perception/pipeline/proto/lidar_detection_config.proto";
 import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
+import "modules/perception/pipeline/proto/stage/detection.proto";
+import "modules/perception/pipeline/proto/stage/fused_classifier_config.proto"
 import "modules/perception/pipeline/proto/stage/map_manager_config.proto";
+import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
-import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
-import "modules/perception/pipeline/proto/stage/detection.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
 import "modules/perception/pipeline/proto/stage/semantic.proto";
 
@@ -115,16 +116,16 @@ message StageConfig {
   oneof stage_config {
     lidar.PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
     lidar.MapManagerConfig map_manager_config = 11;
-    lidar.ObjectFilterBankConfig object_filter_bank_config = 11;
+    lidar.ObjectFilterBankConfig object_filter_bank_config = 12;
 
-    lidar.MlfEngineConfig mlf_engine_config = 12;
-    lidar.FusedClassifierConfig fused_classifier_config = 13;
+    lidar.MlfEngineConfig mlf_engine_config = 13;
+    lidar.FusedClassifierConfig fused_classifier_config = 14;
 
-    fusion.PbfTrackerConfig pbf_tracker_config = 14;
+    fusion.PbfTrackerConfig pbf_tracker_config = 15;
 
-    stage.TrafficLightDetectionConfig traffic_light_detection_config = 15;
-    stage.TrafficLightRecognitionConfig traffic_light_recognition_config = 16;
-    stage.SemanticReviserConfig semantic_reviser_config = 17;
+    stage.TrafficLightDetectionConfig traffic_light_detection_config = 16;
+    stage.TrafficLightRecognitionConfig traffic_light_recognition_config = 17;
+    stage.SemanticReviserConfig semantic_reviser_config = 18;
   }
 }
 
