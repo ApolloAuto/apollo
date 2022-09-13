@@ -18,7 +18,6 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/object_filter_bank/proto/filter_bank_config.pb.h"
 
 namespace apollo {
 namespace perception {
