@@ -36,7 +36,7 @@ message PluginConfig {
   reserved 3 to 9;
 
   oneof plugin_config {
-    ROIBoundaryFilterConfig roi_boundary_filter_config = 10;
+    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 10;
   }
 }
 

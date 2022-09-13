@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.pipeline;
+package apollo.perception.lidar;
 
 message ROIBoundaryFilterConfig {
   optional double distance_to_boundary_threshold = 1 [default = 1.0];

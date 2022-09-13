@@ -37,11 +37,11 @@ namespace lidar {
 using cyber::common::GetAbsolutePath;
 
 ROIBoundaryFilter::ROIBoundaryFilter(const PluginConfig& plugin_config) {
-  distance_to_boundary_threshold_ =
-      plugin_config.distance_to_boundary_threshold();
-  confidence_threshold_ = plugin_config.confidence_threshold();
-  cross_roi_threshold_ = plugin_config.cross_roi_threshold();
-  inside_threshold_ = plugin_config.inside_threshold();
+  ROIBoundaryFilterConfig config = plugin_config.roi_boundary_filter_config();
+  distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
+  confidence_threshold_ = config.confidence_threshold();
+  cross_roi_threshold_ = config.cross_roi_threshold();
+  inside_threshold_ = config.inside_threshold();
 }
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
@@ -115,14 +115,6 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
 bool ROIBoundaryFilter::Init(const PluginConfig& plugin_config) {
   // plugin_config.roi_boundary_filter_conf
   return true;
-}
-
-bool ROIBoundaryFilter::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
-  ObjectFilterOptions object_filter_options;
-  bool res = Filter(object_filter_options, data_frame->lidar_frame);
-  return res;
 }
 
 void ROIBoundaryFilter::BuildWorldPolygons(const ObjectFilterOptions& options,
