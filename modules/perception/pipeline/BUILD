@@ -5,6 +5,16 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+  name = "plugin",
+  hdrs = [
+    "plugin.h",
+  ],
+  deps = [
+    "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
+  ],
+)
+
+cc_library(
   name = "plugin_factory",
   srcs = [
     "plugin_factory.cc",

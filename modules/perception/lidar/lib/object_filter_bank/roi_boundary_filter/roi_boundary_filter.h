@@ -22,9 +22,12 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/util/eigen_defs.h"
-#include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
+#include "modules/perception/pipeline/data_frame.h"
+#include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -32,7 +35,7 @@ namespace lidar {
 
 class ROIBoundaryFilter : public Plugin {
  public:
-  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+  using cyber::common::GetAbsolutePath;
  public:
   ROIBoundaryFilter() = default;
 

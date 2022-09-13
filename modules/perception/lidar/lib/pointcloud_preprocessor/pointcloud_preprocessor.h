@@ -26,7 +26,7 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+  using cyber::common::GetAbsolutePath;
 
  public:
   PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"; }

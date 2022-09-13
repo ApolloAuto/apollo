@@ -32,7 +32,7 @@ namespace camera {
 
 class TrafficLightCameraPerception final : public BaseCameraPerception {
  public:
-  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+  using cyber::common::GetAbsolutePath;
 
  public:
   TrafficLightCameraPerception() { name_ = "TrafficLightCameraPerception"; }

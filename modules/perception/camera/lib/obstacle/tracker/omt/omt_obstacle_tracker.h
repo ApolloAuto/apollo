@@ -50,7 +50,7 @@ struct alignas(16) Hypothesis {
 
 class OMTObstacleTracker : public BaseObstacleTracker {
  public:
-  using GetAbsolutePath = cyber::common::GetAbsolutePath;
+  using cyber::common::GetAbsolutePath;
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

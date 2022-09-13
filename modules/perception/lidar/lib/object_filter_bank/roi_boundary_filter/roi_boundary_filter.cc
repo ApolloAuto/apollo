@@ -112,7 +112,8 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
 }
 
 bool ROIBoundaryFilter::Init(const PluginConfig& plugin_config) {
-  plugin_config.roi_boundary_filter_conf
+  // plugin_config.roi_boundary_filter_conf
+  return true;
 }
 
 bool ROIBoundaryFilter::Process(DataFrame* data_frame) {
