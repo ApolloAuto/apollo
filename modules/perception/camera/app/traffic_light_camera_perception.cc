@@ -28,6 +28,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using cyber::common::GetAbsolutePath;
 
 bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {

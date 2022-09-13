@@ -36,6 +36,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
+using cyber::common::GetAbsolutePath;
 
 bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   main_sensor_ = init_options.main_sensor;

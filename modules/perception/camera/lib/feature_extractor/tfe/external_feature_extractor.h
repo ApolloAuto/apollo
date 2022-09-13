@@ -28,9 +28,6 @@ namespace camera {
 
 class ExternalFeatureExtractor : public BaseFeatureExtractor {
  public:
-  using cyber::common::GetAbsolutePath;
-
- public:
   ExternalFeatureExtractor() { name_ = "ExternalFeatureExtractor"; }
   ~ExternalFeatureExtractor() = default;
 

@@ -43,9 +43,6 @@ struct PbfGatekeeperParams {
 
 class PbfGatekeeper : public BaseGatekeeper {
  public:
-  using cyber::common::GetAbsolutePath;
-
- public:
   PbfGatekeeper() { name_ = "PbfGatekeeper"; }
   ~PbfGatekeeper() = default;
 

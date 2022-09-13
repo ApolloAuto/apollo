@@ -37,10 +37,6 @@ namespace camera {
 
 class LaneCameraPerception final : public BaseCameraPerception {
  public:
-  using cyber::common::GetAbsolutePath;
-  using cyber::common::EnsureDirectory;
-
- public:
   LaneCameraPerception() { name_ = "LaneCameraPerception"; }
   ~LaneCameraPerception() = default;
 

@@ -29,6 +29,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using cyber::common::GetAbsolutePath;
 
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);

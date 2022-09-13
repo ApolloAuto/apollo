@@ -41,9 +41,6 @@ namespace camera {
 
 class ObstacleDetectionCamera final : public BaseCameraPerception {
  public:
-  using cyber::common::GetAbsolutePath;
-
- public:
   ObstacleDetectionCamera() { name_ = "ObstacleDetectionCamera"; }
   ~ObstacleDetectionCamera() = default;
 

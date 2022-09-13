@@ -39,6 +39,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using cyber::common::GetAbsolutePath;
+using cyber::common::EnsureDirectory;
 
 bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root = "";

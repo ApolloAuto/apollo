@@ -30,6 +30,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using cyber::common::GetAbsolutePath;
 
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 

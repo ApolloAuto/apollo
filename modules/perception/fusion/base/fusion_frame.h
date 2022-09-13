@@ -20,6 +20,8 @@
 
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object.h"
+#include "modules/perception/fusion/base/scene.h"
+#include "modules/perception/fusion/base/sensor_frame.h"
 
 namespace apollo {
 namespace perception {
