@@ -5,9 +5,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "camera_frame",
-    hdrs = ["camera_frame.h"],
+    hdrs = [
+        "camera_frame.h",
+        "data_provider.h",
+    ],
     deps = [
-        ":data_provider",
         "//modules/perception/base",
     ],
 )
