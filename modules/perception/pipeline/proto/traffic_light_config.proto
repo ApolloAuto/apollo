@@ -2,37 +2,11 @@ syntax = "proto2";
 
 package apollo.perception.pipeline;
 
-import "modules/perception/pipeline/proto/stage/detection.proto";
-import "modules/perception/pipeline/proto/stage/recognition.proto";
-import "modules/perception/pipeline/proto/stage/semantic.proto";
-
-
-enum StageType {
-
-  TRAFFIC_LIGHT_DETECTION = 1;
-  TRAFFIC_LIGHT_RECOGNITION = 2;
-  SEMANTIC_REVISER = 3;
-
-}
 
 message PerceptionConfig {
   optional int32 gpu_id = 1 [default = 0];
 }
 
-message StageConfig {
-
-  optional StageType stage_type = 1;
-  optional bool enabled = 2 [default = true];
-
-  oneof stage_config {
-    stage.TrafficLightDetectionConfig traffic_light_detection_config = 3;
-    stage.TrafficLightRecognitionConfig traffic_light_recognition_config = 4;
-    stage.SemanticReviserConfig semantic_reviser_config = 5;
-  }
-}
-
 message TrafficLightConfig {
-    repeated StageType stage_type = 1;
-    repeated StageConfig stage_config = 2;
-    optional PerceptionConfig trafficlights_perception_config = 3;
+  optional PerceptionConfig trafficlights_perception_config = 1;
 }
