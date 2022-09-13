@@ -23,6 +23,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/proto/stage/recognition.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

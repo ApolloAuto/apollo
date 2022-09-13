@@ -146,7 +146,7 @@ cc_library(
     hdrs = ["track.h"],
     deps = [
         ":sensor",
-        "//cyber/common:macros",
+        "//cyber",
         "@com_google_googletest//:gtest",
     ],
 )

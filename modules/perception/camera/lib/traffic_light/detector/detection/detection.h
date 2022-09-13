@@ -24,9 +24,9 @@
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
-// #include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/proto/stage/detection.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
