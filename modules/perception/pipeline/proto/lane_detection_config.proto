@@ -3,6 +3,6 @@ syntax = "proto2";
 package apollo.perception.pipeline;
 
 
-message LidarDetectionConfig {
+message LaneDetectionConfig {
 
 }

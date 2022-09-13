@@ -15,6 +15,7 @@ import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
 import "modules/perception/pipeline/proto/stage/detection.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
 import "modules/perception/pipeline/proto/stage/semantic.proto";
+
 // plugin
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
@@ -112,18 +113,18 @@ message StageConfig {
   reserved 5 to 9;
 
   oneof stage_config {
-    PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
-    MapManagerConfig map_manager_config = 11;
-    ObjectFilterBankConfig object_filter_bank_config = 11;
+    lidar.PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
+    lidar.MapManagerConfig map_manager_config = 11;
+    lidar.ObjectFilterBankConfig object_filter_bank_config = 11;
 
-    MlfEngineConfig mlf_engine_config = 12;
-    FusedClassifierConfig fused_classifier_config = 13;
+    lidar.MlfEngineConfig mlf_engine_config = 12;
+    lidar.FusedClassifierConfig fused_classifier_config = 13;
 
-    PbfTrackerConfig pbf_tracker_config = 14;
+    fusion.PbfTrackerConfig pbf_tracker_config = 14;
 
-    TrafficLightDetectionConfig traffic_light_detection_config = 15;
-    TrafficLightRecognitionConfig traffic_light_recognition_config = 16;
-    SemanticReviserConfig semantic_reviser_config = 17;
+    stage.TrafficLightDetectionConfig traffic_light_detection_config = 15;
+    stage.TrafficLightRecognitionConfig traffic_light_recognition_config = 16;
+    stage.SemanticReviserConfig semantic_reviser_config = 17;
   }
 }
 
@@ -134,10 +135,10 @@ enum PipelineType {
 // pipeline
 message PipelineConfig {
   optional PipelineType pipeline_type = 1;
-  repeated StageType stage_type = 1;
-  repeated StageConfig stage_config = 2;
+  repeated StageType stage_type = 2;
+  repeated StageConfig stage_config = 3;
 
-  reserved 3 to 9;
+  reserved 4 to 9;
 
   oneof pipeline_config {
     CameraDetectionConfig camera_detection_config = 10;
