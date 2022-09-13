@@ -30,7 +30,11 @@ struct GroundDetectorInitOptions {};
 
 struct GroundDetectorOptions {};
 
-class BaseGroundDetector : public Stage {
+class BaseGroundDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseGroundDetector() = default;
 

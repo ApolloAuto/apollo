@@ -17,12 +17,18 @@
 
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-class PointCloudDetectionPostprocessor : public Stage {
+class PointCloudDetectionPostprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+
  public:
   PointCloudDetectionPostprocessor()
       { name_ = "PointCloudDetectionPostprocessor"; }

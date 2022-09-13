@@ -32,7 +32,11 @@ struct TrafficLightTrackerOptions {
   double time_stamp;
 };
 
-class BaseTrafficLightTracker : public Stage {
+class BaseTrafficLightTracker : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseTrafficLightTracker() = default;
 

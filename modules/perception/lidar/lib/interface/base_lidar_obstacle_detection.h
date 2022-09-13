@@ -42,7 +42,11 @@ struct LidarObstacleDetectionOptions {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-class BaseLidarObstacleDetection : public Pipeline {
+class BaseLidarObstacleDetection : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLidarObstacleDetection() = default;
   virtual ~BaseLidarObstacleDetection() = default;

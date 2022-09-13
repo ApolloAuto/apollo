@@ -23,6 +23,7 @@
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +35,11 @@ struct FusionInitOptions {
 
 struct FusionOptions {};
 
-class BaseFusionSystem : public Stage {
+class BaseFusionSystem : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseFusionSystem() = default;
   virtual ~BaseFusionSystem() = default;

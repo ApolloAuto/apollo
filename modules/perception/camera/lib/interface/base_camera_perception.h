@@ -34,7 +34,11 @@ struct CameraPerceptionInitOptions : public BaseInitOptions {
 
 struct CameraPerceptionOptions {};
 
-class BaseCameraPerception : public Pipeline {
+class BaseCameraPerception : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseCameraPerception() = default;
   virtual ~BaseCameraPerception() = default;

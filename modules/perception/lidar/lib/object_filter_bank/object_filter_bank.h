@@ -26,7 +26,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class ObjectFilterBank : public Stage {
+class ObjectFilterBank : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   ObjectFilterBank() { name_ = "ObjectFilterBank"; }
 

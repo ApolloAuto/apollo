@@ -35,7 +35,11 @@ struct LidarObstacleTrackingOptions {
   std::string sensor_name = "velodyne64";
 };
 
-class BaseLidarObstacleTracking : public Pipeline {
+class BaseLidarObstacleTracking : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLidarObstacleTracking() = default;
   virtual ~BaseLidarObstacleTracking() = default;

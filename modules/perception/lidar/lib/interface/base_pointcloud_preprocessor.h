@@ -38,7 +38,11 @@ struct PointCloudPreprocessorOptions {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-class BasePointCloudPreprocessor : public Stage {
+class BasePointCloudPreprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BasePointCloudPreprocessor() = default;
 

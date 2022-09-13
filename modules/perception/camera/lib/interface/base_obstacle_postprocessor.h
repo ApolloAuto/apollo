@@ -21,6 +21,7 @@
 #include "modules/perception/lib/registerer/registerer.h"
 
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +34,11 @@ struct ObstaclePostprocessorOptions {
   bool do_refinement_with_calibration_service = true;
 };
 
-class BaseObstaclePostprocessor : public Stage {
+class BaseObstaclePostprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseObstaclePostprocessor() = default;
 

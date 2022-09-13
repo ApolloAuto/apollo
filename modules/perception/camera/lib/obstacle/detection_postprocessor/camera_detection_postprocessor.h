@@ -18,12 +18,18 @@
 #include "modules/perception/camera/lib/obstacle/postprocessor/get_object/get_object.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class CameraDetectionPostprocessor : public Stage {
+class CameraDetectionPostprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+
  public:
   CameraDetectionPostprocessor() { name_ = "CameraDetectionPostprocessor"; }
 

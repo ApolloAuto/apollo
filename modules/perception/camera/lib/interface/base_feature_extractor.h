@@ -23,6 +23,7 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -43,7 +44,11 @@ struct FeatureExtractorInitOptions : public BaseInitOptions {
 struct FeatureExtractorOptions {
   bool normalized = true;
 };
-class BaseFeatureExtractor : public Stage {
+class BaseFeatureExtractor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseFeatureExtractor() = default;
   virtual ~BaseFeatureExtractor() = default;

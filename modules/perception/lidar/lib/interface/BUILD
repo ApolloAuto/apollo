@@ -35,6 +35,7 @@ cc_library(
         "//cyber",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -43,10 +44,11 @@ cc_library(
     hdrs = ["base_lidar_obstacle_detection.h"],
     deps = [
         "//cyber",
-        "//modules/perception/lidar/common:lidar_error_code",
-        "//modules/perception/lib/registerer",
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline",
         "@eigen",
     ],
 )
@@ -56,9 +58,10 @@ cc_library(
     hdrs = ["base_lidar_obstacle_tracking.h"],
     deps = [
         "//cyber",
-        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline",
     ],
 )
 
@@ -67,9 +70,10 @@ cc_library(
     hdrs = ["base_pointcloud_preprocessor.h"],
     deps = [
         "//cyber",
-        "//modules/perception/lib/registerer",
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
+        "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -79,6 +83,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -88,6 +93,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -97,6 +103,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -116,6 +123,7 @@ cc_library(
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

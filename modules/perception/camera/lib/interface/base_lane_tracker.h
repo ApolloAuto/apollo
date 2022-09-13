@@ -21,6 +21,7 @@
 #include "modules/perception/lib/registerer/registerer.h"
 
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +31,11 @@ struct LaneTrackerInitOptions : public BaseInitOptions {};
 
 struct LaneTrackerOptions {};
 
-class BaseLaneTracker : public Stage {
+class BaseLaneTracker : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLaneTracker() = default;
 
