@@ -14,10 +14,10 @@ import "modules/perception/pipeline/proto/stage/map_manager_config.proto";
 import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
 import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
+import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
 import "modules/perception/pipeline/proto/stage/semantic.proto";
-
 // plugin
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
@@ -118,6 +118,7 @@ message StageConfig {
     lidar.PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
     lidar.MapManagerConfig map_manager_config = 11;
     lidar.ObjectFilterBankConfig object_filter_bank_config = 12;
+    lidar.PointPillarsDetectionConfig pointpillars_detection = 19;
 
     lidar.MlfEngineConfig mlf_engine_config = 13;
     lidar.FusedClassifierConfig fused_classifier_config = 14;

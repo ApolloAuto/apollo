@@ -330,6 +330,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "point_pillars_detection_config_cc_proto",
+    deps = [
+        ":point_pillars_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "point_pillars_detection_config_proto",
+    srcs = ["point_pillars_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "point_pillars_detection_config_py_pb2",
+    deps = [
+        ":point_pillars_detection_config_proto",
+    ],
+)
+cc_proto_library(
     name = "denseline_postprocessor_cc_proto",
     deps = [
         ":denseline_postprocessor_proto",

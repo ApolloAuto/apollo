@@ -28,6 +28,7 @@
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/pipeline/proto/stage/point_pillars_detection_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -101,7 +102,7 @@ class PointPillarsDetection : public BaseLidarDetector {
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
 
-  // PointPillarsDetectionConfig point_pillars_detection_config_;
+  PointPillarsDetectionConfig point_pillars_detection_config_;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

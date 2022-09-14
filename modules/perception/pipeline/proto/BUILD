@@ -101,6 +101,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:recognition_proto",
         "//modules/perception/pipeline/proto/stage:semantic_proto",
+        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_proto",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
     ],
 )
@@ -122,6 +123,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:recognition_py_pb2",
         "//modules/perception/pipeline/proto/stage:semantic_py_pb2",
+        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
     ],
 )

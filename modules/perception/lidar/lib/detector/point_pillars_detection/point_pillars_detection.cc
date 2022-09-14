@@ -60,7 +60,7 @@ bool PointPillarsDetection::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
-bool PointPillarsDetection::Init(const StageConfig& config) {
+bool PointPillarsDetection::Init(const StageConfig& stage_config) {
   ACHECK(stage_config.has_pointpillars_detection());
   point_pillars_detection_config_ = stage_config.pointpillars_detection();
   name_ = StageType_Name(pointcloud_preprocessor_config_.stage_type());
@@ -76,7 +76,7 @@ bool PointPillarsDetection::Init(const StageConfig& config) {
 bool PointPillarsDetection::Process(DataFrame* data_frame) { return true; }
 
 bool PointPillarsDetection::Process(DataFrame* data_frame,
-                                    cons std::vector<float>& points_array,
+                                    const std::vector<float>& points_array,
                                     int num_points,
                                     std::vector<float>* out_detections,
                                     std::vector<int>* out_labels) {
@@ -95,7 +95,7 @@ bool PointPillarsDetection::Process(DataFrame* data_frame,
     return false;
   }
 
-  Detect(data_frame->lidar_frame, cons std::vector<float> & points_array,
+  Detect(data_frame->lidar_frame, const std::vector<float> & points_array,
          int num_points, std::vector<float>* out_detections,
          std::vector<int>* out_labels);
 }
@@ -251,7 +251,7 @@ bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
 }
 
 bool PointPillarsDetection::Detect(LidarFrame* frame,
-                                   cons std::vector<float>& points_array,
+                                   const std::vector<float>& points_array,
                                    int num_points,
                                    std::vector<float>* out_detections,
                                    std::vector<int>* out_labels) {
