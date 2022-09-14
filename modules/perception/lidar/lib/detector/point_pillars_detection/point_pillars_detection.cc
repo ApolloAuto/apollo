@@ -76,16 +76,11 @@ bool PointPillarsDetection::Init(const StageConfig& stage_config) {
 
 bool PointPillarsDetection::Process(DataFrame* data_frame) { return true; }
 
-bool PointPillarsDetection::Process(DataFrame* data_frame,
+bool PointPillarsDetection::Process(const LidarFrame& frame,
                                     const std::vector<float>& points_array,
                                     int num_points,
                                     std::vector<float>* out_detections,
                                     std::vector<int>* out_labels) {
-  if (nullptr == data_frame) {
-    AERROR << "Input null data_frame ptr.";
-    return false;
-  }
-
   if (nullptr == out_detections) {
     AERROR << "Input null out_detections ptr.";
     return false;
@@ -96,7 +91,7 @@ bool PointPillarsDetection::Process(DataFrame* data_frame,
     return false;
   }
 
-  Detect(data_frame->lidar_frame, const std::vector<float> & points_array,
+  Detect(&lidar_frame, const std::vector<float> & points_array,
          int num_points, std::vector<float>* out_detections,
          std::vector<int>* out_labels);
 }
