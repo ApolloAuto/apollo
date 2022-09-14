@@ -88,7 +88,7 @@ bool ObjectFilterBank::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  object_filter_bank_config_ = stage_config.stage_config();
+  object_filter_bank_config_ = stage_config.object_filter_bank_config();
 
   filter_bank_.clear();
   for (const auto& filter_name : object_filter_bank_config_.filter_name()) {
