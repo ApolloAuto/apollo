@@ -30,7 +30,7 @@ namespace camera {
 
 class ProjectFeature : public BaseFeatureExtractor {
  public:
-  ProjectFeature();
+  ProjectFeature() = default;
   ~ProjectFeature() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;

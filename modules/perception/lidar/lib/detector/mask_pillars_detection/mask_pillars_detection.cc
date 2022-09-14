@@ -62,8 +62,8 @@ bool MaskPillarsDetection::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
-bool MaskPillarsDetection::Init(const StageConfig& config) {
-  bool res = Initialize(config);
+bool MaskPillarsDetection::Init(const StageConfig& stage_config) {
+  bool res = Initialize(stage_config);
   return res;
 }
 
@@ -71,8 +71,7 @@ bool MaskPillarsDetection::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  bool res = InnerProcess(data_frame);
-  return res;
+  return true;
 }
 
 bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,

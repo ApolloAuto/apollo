@@ -62,8 +62,6 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
     trans_mat_inv = trans_mat_.inverse();
   }
 
-  std::string Name() const override;
-
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();
 

@@ -39,8 +39,7 @@ enum class LaneType {
 
 class DenselineLanePostprocessor : public BaseLanePostprocessor {
  public:
-  DenselineLanePostprocessor() : BaseLanePostprocessor()
-      { name_ = "DenselineLanePostprocessor"; }
+  DenselineLanePostprocessor() : BaseLanePostprocessor() {}
 
   virtual ~DenselineLanePostprocessor() = default;
 

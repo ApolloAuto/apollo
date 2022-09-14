@@ -107,9 +107,9 @@ bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
   return true;
 }
 
-bool PbfTracker::Init(const StageConfig& config) {
-  Init(config.pbf_tracker_config());
-  bool res = Initialize(config);
+bool PbfTracker::Init(const StageConfig& stage_config) {
+  Init(stage_config.pbf_tracker_config());
+  bool res = Initialize(stage_config);
   return res;
 }
 

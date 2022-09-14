@@ -30,7 +30,7 @@ namespace lidar {
 
 class SpatioTemporalGroundDetector : public BaseGroundDetector {
  public:
-  SpatioTemporalGroundDetector() { name_ = "SpatioTemporalGroundDetector"; }
+  SpatioTemporalGroundDetector() = default;
   ~SpatioTemporalGroundDetector() {
     if (pfdetector_ != nullptr) {
       delete pfdetector_;

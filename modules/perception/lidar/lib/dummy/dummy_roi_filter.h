@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyROIFilter : public BaseROIFilter {
  public:
-  DummyROIFilter() { name_ = "DummyROIFilter"; }
+  DummyROIFilter() = default;
 
   virtual ~DummyROIFilter() = default;
 

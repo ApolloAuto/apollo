@@ -60,6 +60,7 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
     stage_ptrs_.push_back(std::move(stage_ptr));
   }
 
+  name_ = PipelineType_Name(pipeline_config.pipeline_type());
   pipeline_config_.CopyFrom(pipeline_config);
 
   return true;

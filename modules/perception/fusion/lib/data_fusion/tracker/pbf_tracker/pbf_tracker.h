@@ -48,8 +48,6 @@ class PbfTracker : public BaseTracker {
                                 double measurement_timestamp,
                                 double target_timestamp) override;
 
-  // std::string Name() const override;
-
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;

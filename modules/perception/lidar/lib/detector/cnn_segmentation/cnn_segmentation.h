@@ -40,7 +40,7 @@ namespace lidar {
 
 class CNNSegmentation : public BaseLidarDetector {
  public:
-  CNNSegmentation() { name_ = "CNNSegmentation"; }
+  CNNSegmentation() = default;
   virtual ~CNNSegmentation() = default;
 
   bool Init(const LidarDetectorInitOptions& options =

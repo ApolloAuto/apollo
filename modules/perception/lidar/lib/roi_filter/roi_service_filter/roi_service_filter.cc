@@ -33,6 +33,14 @@ bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
   return true;
 }
 
+bool ROIServiceFilter::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool ROIServiceFilter::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
                               LidarFrame* frame) {
   if (frame == nullptr || frame->world_cloud == nullptr) {

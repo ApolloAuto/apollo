@@ -147,6 +147,14 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
   return true;
 }
 
+bool DenselineLaneDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DenselineLaneDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool DenselineLaneDetector::Detect(const LaneDetectorOptions &options,
                                    CameraFrame *frame) {
   if (frame == nullptr) {

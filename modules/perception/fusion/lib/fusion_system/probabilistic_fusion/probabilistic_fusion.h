@@ -41,7 +41,7 @@ struct FusionParams {
 
 class ProbabilisticFusion : public BaseFusionSystem {
  public:
-  ProbabilisticFusion() { name_ = "ProbabilisticFusion"; }
+  ProbabilisticFusion() = default;
   ~ProbabilisticFusion() = default;
 
   bool Init(const FusionInitOptions& init_options) override;

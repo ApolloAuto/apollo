@@ -28,7 +28,7 @@ namespace fusion {
 
 class ObstacleMultiSensorFusion : public BaseMultiSensorFusion {
  public:
-  ObstacleMultiSensorFusion() { name_ = "ObstacleMultiSensorFusion"; }
+  ObstacleMultiSensorFusion() = default;
   virtual ~ObstacleMultiSensorFusion() = default;
 
   bool Init(const ObstacleMultiSensorFusionParam& param) override;

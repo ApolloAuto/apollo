@@ -30,8 +30,7 @@ class PointCloudDetectionPreprocessor : public pipeline::Stage {
   using Plugin = pipeline::Plugin;
 
  public:
-  PointCloudDetectionPreprocessor()
-      { name_ = "PointCloudDetectionPreprocessor"; }
+  PointCloudDetectionPreprocessor() = default;
 
   virtual ~PointCloudDetectionPreprocessor() = default;
 

@@ -27,7 +27,7 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"; }
+  PointCloudPreprocessor() = default;
   virtual ~PointCloudPreprocessor() = default;
 
   bool Init(const PointCloudPreprocessorInitOptions& options =

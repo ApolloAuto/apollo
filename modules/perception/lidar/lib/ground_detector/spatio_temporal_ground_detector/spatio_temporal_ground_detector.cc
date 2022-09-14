@@ -74,6 +74,14 @@ bool SpatioTemporalGroundDetector::Init(
   return true;
 }
 
+bool SpatioTemporalGroundDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool SpatioTemporalGroundDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
                                           LidarFrame* frame) {
   // check input

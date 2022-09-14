@@ -26,6 +26,7 @@
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
 #include "modules/common_msgs/prediction_msgs/feature.pb.h"
+#include "modules/perception/pipeline/proto/stage/mlf_engine_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -33,6 +34,14 @@ namespace lidar {
 
 using apollo::prediction::Feature;
 using cyber::common::GetAbsolutePath;
+
+void MlfEngine::Clear() {
+  main_sensors_.clear();
+  foreground_objects_.clear();
+  background_objects_.clear();
+  foreground_track_data_.clear();
+  background_track_data_.clear();
+}
 
 bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -47,9 +56,15 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   MlfEngineConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
-  main_sensor_.clear();
+  Clear();
+
   for (int i = 0; i < config.main_sensor_size(); ++i) {
-    main_sensor_.emplace(config.main_sensor(i));
+    main_sensors_.emplace(config.main_sensor(i));
+  }
+
+  // default value
+  if (main_sensors_.empty()) {
+    main_sensors_.emplace("velodyne64");
   }
 
   use_histogram_for_match_ = config.use_histogram_for_match();
@@ -57,14 +72,6 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   output_predict_objects_ = config.output_predict_objects();
   reserved_invisible_time_ = config.reserved_invisible_time();
   use_frame_timestamp_ = config.use_frame_timestamp();
-
-  foreground_objects_.clear();
-  background_objects_.clear();
-  foreground_track_data_.clear();
-  background_track_data_.clear();
-  if (main_sensor_.empty()) {
-    main_sensor_.emplace("velodyne64");  // default value
-  }
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
@@ -76,14 +83,47 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   return true;
 }
 
-bool MlfEngine::Init(const StageConfig& config) {
-  Init(config.mlf_engine_config());
-  bool result = Initialize(config);
-  return result;
+bool MlfEngine::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  MlfEngineConfig config = stage_config.mlf_engine_config();
+
+  Clear();
+
+  for (const std::string& main_sensor : config.main_sensor()) {
+    main_sensors_.emplace(main_sensor);
+  }
+
+  // default value
+  if (main_sensors_.empty()) {
+    main_sensors_.emplace("velodyne64");
+  }
+
+  use_histogram_for_match_ = config.use_histogram_for_match();
+  histogram_bin_size_ = config.histogram_bin_size();
+  output_predict_objects_ = config.output_predict_objects();
+  reserved_invisible_time_ = config.reserved_invisible_time();
+  use_frame_timestamp_ = config.use_frame_timestamp();
+
+  // todo(zero): change to plugin
+  // matcher_ = PluginFactory::CreatePlugin(plugin_config_map_[plugin_type]);
+  // tracker_ = PluginFactory::CreatePlugin(plugin_config_map_[plugin_type]);
+
+  matcher_.reset(new MlfTrackObjectMatcher);
+  MlfTrackObjectMatcherInitOptions matcher_init_options;
+  ACHECK(matcher_->Init(matcher_init_options));
+
+  tracker_.reset(new MlfTracker);
+  MlfTrackerInitOptions tracker_init_options;
+  ACHECK(tracker_->Init(tracker_init_options));
+
+  return true;
 }
 
 bool MlfEngine::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
+  if (data_frame == nullptr || data_frame->lidar_frame == nullptr)
     return false;
 
   MultiTargetTrackerOptions options;
@@ -117,7 +157,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
                             &background_track_data_);
   // 4. state filter in tracker if is main sensor
   bool is_main_sensor =
-      (main_sensor_.find(frame->sensor_info.name) != main_sensor_.end());
+      (main_sensors_.find(frame->sensor_info.name) != main_sensors_.end());
   if (is_main_sensor) {
     TrackStateFilter(foreground_track_data_, frame->timestamp);
     TrackStateFilter(background_track_data_, frame->timestamp);

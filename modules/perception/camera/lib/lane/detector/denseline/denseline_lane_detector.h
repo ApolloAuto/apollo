@@ -46,8 +46,6 @@ class DenselineLaneDetector : public BaseLaneDetector {
     image_mean_[1] = 0;
     image_mean_[2] = 0;
     image_scale_ = 0;
-
-    name_ = "DenselineLaneDetector";
   }
 
   virtual ~DenselineLaneDetector() = default;
@@ -61,7 +59,6 @@ class DenselineLaneDetector : public BaseLaneDetector {
   // detected lanes should be filled, required,
   // 3D information of lane can be filled, optional.
   bool Detect(const LaneDetectorOptions &options, CameraFrame *frame) override;
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

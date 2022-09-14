@@ -33,8 +33,7 @@ class GetImageData : public pipeline::Plugin {
   virtual ~GetImageData() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
-  bool Process(DataFrame* data_frame);
-  bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv) override;
+  bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv);
   bool IsEnabled() const override { return enable_; }
   std::string Name() const override { return name_; }
 

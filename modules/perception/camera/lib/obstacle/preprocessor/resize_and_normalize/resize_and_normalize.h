@@ -33,7 +33,6 @@ class ReSizeAndNormalize : public pipeline::Plugin {
   virtual ~ReSizeAndNormalize() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
-  bool Process(DataFrame *data_frame) override;
   bool IsEnabled() const override { return enable_; }
   std::string Name() const override { return name_; }
 

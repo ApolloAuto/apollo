@@ -32,7 +32,7 @@ namespace camera {
 
 class TrafficLightCameraPerception final : public BaseCameraPerception {
  public:
-  TrafficLightCameraPerception() { name_ = "TrafficLightCameraPerception"; }
+  TrafficLightCameraPerception() = default;
   ~TrafficLightCameraPerception() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;

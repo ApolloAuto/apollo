@@ -52,7 +52,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  OMTObstacleTracker() { name_ = "OMTObstacleTracker"; }
+  OMTObstacleTracker() = default;
   ~OMTObstacleTracker() = default;
 
   bool Init(const ObstacleTrackerInitOptions &options) override;
@@ -86,8 +86,6 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   // motion information of obstacles should be filled, required.
   bool Track(const ObstacleTrackerOptions &options,
              CameraFrame *frame) override;
-
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

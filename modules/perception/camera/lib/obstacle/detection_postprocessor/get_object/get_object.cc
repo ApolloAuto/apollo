@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool GetObject::Init(const TaskConfig &task_config) {
+bool GetObject::Init(const PluginConfig& plugin_config) {
   ACHECK(task_config.GetObject());
   confidence_threshold_ = task_config.confidence_threshold();
 }

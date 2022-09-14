@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummySegmentation : public BaseLidarDetector {
  public:
-  DummySegmentation() { name_ = "DummySegmentation"; }
+  DummySegmentation() = default;
 
   virtual ~DummySegmentation() = default;
 

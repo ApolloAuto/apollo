@@ -28,7 +28,7 @@ namespace lidar {
 
 class GroundServiceDetector : public BaseGroundDetector {
  public:
-  GroundServiceDetector() { name_ = "GroundServiceDetector"; }
+  GroundServiceDetector() = default;
   ~GroundServiceDetector() = default;
 
   bool Init(const GroundDetectorInitOptions& options =

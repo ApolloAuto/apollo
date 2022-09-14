@@ -156,7 +156,7 @@ using cyber::common::GetAbsolutePath;
 //   return true;
 // }
 
-bool TrafficLightDetection::Init(const apollo::perception::pipeline::StageConfig& stage_config) {
+bool TrafficLightDetection::Init(const StageConfig& stage_config) {
   detection_param_ = stage_config.traffic_light_detection_config();
 
   std::string param_str;

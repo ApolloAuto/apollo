@@ -146,8 +146,8 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
-bool CNNSegmentation::Init(const StageConfig& config) {
-  bool res = Initialize(config);
+bool CNNSegmentation::Init(const StageConfig& stage_config) {
+  bool res = Initialize(stage_config);
   return res;
 }
 
@@ -155,8 +155,7 @@ bool CNNSegmentation::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  bool res = InnerProcess(data_frame);
-  return res;
+  return true;
 }
 
 bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {

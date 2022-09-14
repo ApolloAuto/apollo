@@ -84,8 +84,6 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
 }
 
 bool ObjectFilterBank::Init(const StageConfig& stage_config) {
-  enable_ = stage_config.enabled();
-
   // filter_bank_.clear();
   // for (const auto& plugin_config : stage_config.plugin_config()) {
   //   const auto& name = plugin_config.plugin_type();

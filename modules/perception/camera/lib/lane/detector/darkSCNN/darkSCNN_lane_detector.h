@@ -51,8 +51,6 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
     lane_output_height_ = 0;
     lane_output_width_ = 0;
     num_lanes_ = 0;
-
-    name_ = "DarkSCNNLaneDetector";
   }
 
   virtual ~DarkSCNNLaneDetector() = default;
@@ -66,7 +64,6 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
   // detected lanes should be filled, required,
   // 3D information of lane can be filled, optional.
   bool Detect(const LaneDetectorOptions &options, CameraFrame *frame) override;
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

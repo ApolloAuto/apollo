@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool GetImageData::Init(const TaskConfig& task_config) {
+bool GetImageData::Init(const PluginConfig& plugin_config) {
   ACHECK(config.has_get_image_data());
   image_origin_width_ = task_config.image_origin_width();
   image_origin_height_ = task_config.image_origin_height();
@@ -73,10 +73,10 @@ bool GetImageData::GetImage(const CameraFrame& frame, cv::Mat* image_cv) {
       static_cast<int>(base_camera_model_->get_height()) - offset_y_);
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
-  
+
   memcpy(image_cv->data, image_->cpu_data(),
          image_origin_width_ * image_origin_height_ * image_origin_channel_ *
-             sizeof(uint8_t));           
+             sizeof(uint8_t));
 }
 }  // namespace camera
 }  // namespace perception

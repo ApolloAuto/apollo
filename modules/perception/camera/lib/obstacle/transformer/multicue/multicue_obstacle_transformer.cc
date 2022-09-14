@@ -25,7 +25,6 @@ namespace camera {
 
 MultiCueObstacleTransformer::MultiCueObstacleTransformer() {
   mapper_.reset(new ObjMapper);
-  name_ = "MultiCueObstacleTransformer";
 }
 
 bool MultiCueObstacleTransformer::Init(
@@ -44,6 +43,14 @@ bool MultiCueObstacleTransformer::Init(
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
 
+  return true;
+}
+
+bool MultiCueObstacleTransformer::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool MultiCueObstacleTransformer::Process(DataFrame* data_frame) {
   return true;
 }
 

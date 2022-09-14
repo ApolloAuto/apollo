@@ -32,12 +32,20 @@ class HdmapROIFilterTest;
 
 class HdmapROIFilter : public BaseROIFilter {
  public:
+  using DirectionMajor = Bitmap2D::DirectionMajor;
+  using EigenVector = apollo::common::EigenVector;
+  using PolygonDType = base::PolygonDType;
+
+  template <typename T>
+  using Polygon = typename PolygonScanCvter<T>::Polygon;
+
+ public:
   HdmapROIFilter()
       : BaseROIFilter(),
         range_(120.0),
         cell_size_(0.25),
         extend_dist_(0.0),
-        no_edge_table_(false) { name_ = "HdmapROIFilter"; }
+        no_edge_table_(false) {}
   ~HdmapROIFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;

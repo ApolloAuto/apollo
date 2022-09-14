@@ -27,18 +27,12 @@ namespace pipeline {
 bool Stage::Initialize(const StageConfig& stage_config) {
   Clear();
 
+  stage_config_ = stage_config;
+  name_ = StageType_Name(stage_config.stage_type());
+  enable_ = stage_config.enabled();
+
   for (const auto& plugin_config : stage_config.plugin_config()) {
-    std::unique_ptr<Plugin> plugin_ptr =
-        PluginFactory::CreatePlugin(plugin_config);
-
-    auto plugin_type = plugin_config.plugin_type();
-    if (plugin_ptr == nullptr) {
-      AERROR << "Create plugin type : " << PluginType_Name(plugin_type)
-             << " failed!";
-      return false;
-    }
-
-    plugin_config_map_[plugin_type] = plugin_config;
+    plugin_config_map_[plugin_config.plugin_type()] = plugin_config;
   }
 
   return true;

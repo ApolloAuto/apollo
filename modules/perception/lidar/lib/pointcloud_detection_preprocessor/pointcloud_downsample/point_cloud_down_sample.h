@@ -34,8 +34,7 @@ class PointCloudDownSample : public pipeline::Plugin {
   virtual ~PointCloudDownSample() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
-  bool Process(DataFrame* data_frame) override;
-  bool Process(DataFrame* data_frame, float * point_array, int * num_points_result) override;
+  bool Process(DataFrame* data_frame, float * point_array, int * num_points_result);
   bool IsEnabled() const override { return enable_; }
   std::string Name() const override {return name_;}
 

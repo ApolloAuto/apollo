@@ -117,7 +117,6 @@ bool DarkSCNNLanePostprocessor::Init(
 }
 
 bool DarkSCNNLanePostprocessor::Init(const StageConfig& stage_config) {
-  // enable_ =
   return true;
 }
 
@@ -487,10 +486,6 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
-}
-
-std::string DarkSCNNLanePostprocessor::Name() const {
-  return "DarkSCNNLanePostprocessor";
 }
 
 REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);

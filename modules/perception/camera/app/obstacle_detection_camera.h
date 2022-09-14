@@ -45,7 +45,7 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   using CameraDetectionConfig = pipeline::CameraDetectionConfig;
 
  public:
-  ObstacleDetectionCamera() { name_ = "ObstacleDetectionCamera"; }
+  ObstacleDetectionCamera() = default;
   ~ObstacleDetectionCamera() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;

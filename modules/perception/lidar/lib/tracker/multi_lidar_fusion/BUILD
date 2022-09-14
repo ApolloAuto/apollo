@@ -27,6 +27,7 @@ cc_library(
         "//modules/perception/onboard/msg_serializer",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
+        "//modules/perception/pipeline/proto/stage:mlf_engine_config_cc_proto",
     ],
     alwayslink = True,
 )

@@ -80,7 +80,6 @@ bool DenselineLanePostprocessor::Init(
 }
 
 bool DenselineLanePostprocessor::Init(const StageConfig& stage_config) {
-  // enable_ =
   return true;
 }
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 
@@ -29,6 +28,10 @@ bool PointCloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
   if (!get_objects_->Init(stage_config.get_objects())) {
     return false;
   }
+  return true;
+}
+
+bool PointCloudDetectionPostprocessor::Process(DataFrame* data_frame) {
   return true;
 }
 

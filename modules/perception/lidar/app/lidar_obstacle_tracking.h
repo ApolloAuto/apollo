@@ -29,7 +29,7 @@ namespace lidar {
 
 class LidarObstacleTracking final : public BaseLidarObstacleTracking {
  public:
-  LidarObstacleTracking() { name_ = "LidarObstacleTracking"; }
+  LidarObstacleTracking() = default;
   virtual ~LidarObstacleTracking() = default;
 
   bool Init(const LidarObstacleTrackingInitOptions& options =

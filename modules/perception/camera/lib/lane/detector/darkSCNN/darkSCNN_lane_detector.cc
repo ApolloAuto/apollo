@@ -165,6 +165,14 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   return true;
 }
 
+bool DarkSCNNLaneDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DarkSCNNLaneDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
                                   CameraFrame *frame) {
   if (frame == nullptr) {

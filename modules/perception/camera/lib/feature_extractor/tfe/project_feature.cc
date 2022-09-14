@@ -30,10 +30,6 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
-ProjectFeature::ProjectFeature() {
-  name_ = "ProjectFeature";
-}
-
 bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
   std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
   ACHECK(cyber::common::GetProtoFromFile(efx_config, &param_))
@@ -62,6 +58,14 @@ bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
 
   ACHECK(inference_->Init(shape_map));
   inference_->Infer();
+  return true;
+}
+
+bool ProjectFeature::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool ProjectFeature::Process(DataFrame* data_frame) {
   return true;
 }
 

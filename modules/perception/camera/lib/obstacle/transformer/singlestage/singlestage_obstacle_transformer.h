@@ -45,9 +45,7 @@ struct TransformerParams {
 
 class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  public:
-  SingleStageObstacleTransformer() : BaseObstacleTransformer() {
-    name_ = "SingleStageObstacleTransformer";
-  }
+  SingleStageObstacleTransformer() : BaseObstacleTransformer() {}
   virtual ~SingleStageObstacleTransformer() = default;
 
   bool Init(const ObstacleTransformerInitOptions &options =

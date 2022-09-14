@@ -32,7 +32,7 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
   using Plugin = pipeline::Plugin;
 
  public:
-  CameraDetectionPreprocessor() { name_ = "CameraDetectionPreprocessor"; }
+  CameraDetectionPreprocessor() = default;
 
   virtual ~CameraDetectionPreprocessor() = default;
 

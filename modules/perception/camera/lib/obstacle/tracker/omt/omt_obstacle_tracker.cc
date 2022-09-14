@@ -75,6 +75,14 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   return true;
 }
 
+bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool OMTObstacleTracker::Process(DataFrame* data_frame) {
+  return true;
+}
+
 // @description combine targets using iou after association
 bool OMTObstacleTracker::CombineDuplicateTargets() {
   std::vector<Hypothesis> score_list;

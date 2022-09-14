@@ -40,7 +40,7 @@ struct FeatureExtractorLayer {
 
 class TrackingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  TrackingFeatureExtractor() { name_ = "TrackingFeatureExtractor"; }
+  TrackingFeatureExtractor() = default;
   ~TrackingFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;

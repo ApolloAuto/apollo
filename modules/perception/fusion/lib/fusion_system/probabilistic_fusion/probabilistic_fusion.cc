@@ -101,6 +101,10 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   return state;
 }
 
+bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
+  return true;
+}
+
 bool ProbabilisticFusion::Process(DataFrame* data_frame) {
     double fusion_time = data_frame->fusion_frame->frame->timestamp;
   base::FrameConstPtr frames = data_frame->fusion_frame->sensor_frames;
@@ -108,6 +112,7 @@ bool ProbabilisticFusion::Process(DataFrame* data_frame) {
       &(data_frame->fusion_frame->fused_objects);
   Fuse(fusion_time, frames, fused_objects);
   data_frame->fusion_frame->scene_ptr = scenes_;
+  return true;
 }
 
 bool ProbabilisticFusion::Fuse(double fusion_time,

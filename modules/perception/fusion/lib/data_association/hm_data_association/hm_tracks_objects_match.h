@@ -28,7 +28,7 @@ namespace fusion {
 
 class HMTrackersObjectsAssociation : public BaseDataAssociation {
  public:
-  HMTrackersObjectsAssociation() { name_ = "HMTrackersObjectsAssociation"; }
+  HMTrackersObjectsAssociation() = default;
   ~HMTrackersObjectsAssociation() = default;
 
   bool Init() override {

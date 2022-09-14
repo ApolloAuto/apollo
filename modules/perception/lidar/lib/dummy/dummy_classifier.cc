@@ -29,6 +29,14 @@ bool DummyClassifier::Classify(const ClassifierOptions& options,
   return true;
 }
 
+bool DummyClassifier::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DummyClassifier::Process(DataFrame* data_frame) {
+  return true;
+}
+
 PERCEPTION_REGISTER_CLASSIFIER(DummyClassifier);
 
 }  // namespace lidar

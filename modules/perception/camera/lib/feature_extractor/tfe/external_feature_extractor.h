@@ -28,7 +28,7 @@ namespace camera {
 
 class ExternalFeatureExtractor : public BaseFeatureExtractor {
  public:
-  ExternalFeatureExtractor() { name_ = "ExternalFeatureExtractor"; }
+  ExternalFeatureExtractor() = default;
   ~ExternalFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;

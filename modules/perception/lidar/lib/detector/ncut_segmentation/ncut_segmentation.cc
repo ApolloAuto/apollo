@@ -126,8 +126,8 @@ bool NCutSegmentation::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
-bool NCutSegmentation::Init(const StageConfig& config) {
-  bool res = Initialize(config);
+bool NCutSegmentation::Init(const StageConfig& stage_config) {
+  bool res = Initialize(stage_config);
   return res;
 }
 
@@ -135,8 +135,7 @@ bool NCutSegmentation::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  bool res = InnerProcess(data_frame);
-  return res;
+  return true;
 }
 
 bool NCutSegmentation::Configure(std::string param_file) {

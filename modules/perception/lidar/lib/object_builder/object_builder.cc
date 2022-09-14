@@ -39,8 +39,8 @@ bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
   return true;
 }
 
-bool ObjectBuilder::Init(const StageConfig& config) {
-  bool res = Initialize(config);
+bool ObjectBuilder::Init(const StageConfig& stage_config) {
+  bool res = Initialize(stage_config);
   return res;
 }
 

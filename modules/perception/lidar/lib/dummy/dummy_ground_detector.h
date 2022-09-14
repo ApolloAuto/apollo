@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyGroundDetector : public BaseGroundDetector {
  public:
-  DummyGroundDetector() { name_ = "DummyGroundDetector"; }
+  DummyGroundDetector() = default;
 
   virtual ~DummyGroundDetector() = default;
 

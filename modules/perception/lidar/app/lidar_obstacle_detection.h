@@ -31,7 +31,7 @@ namespace lidar {
 
 class LidarObstacleDetection final : public BaseLidarObstacleDetection {
  public:
-  LidarObstacleDetection() { name_ = "LidarObstacleDetection"; }
+  LidarObstacleDetection() = default;
   virtual ~LidarObstacleDetection() = default;
 
   bool Init(const LidarObstacleDetectionInitOptions& options =

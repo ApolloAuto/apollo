@@ -25,7 +25,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool PointCloudDownSample::Init(const TaskConfig& task_config) {
+bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
   ACHECK(task_config.has_pointcloud_down_sample());
   enable_downsample_pointcloud_ = task_config.enable_downsample_pointcloud();
   enable_downsample_beams_ = task_config.enable_downsample_beams();

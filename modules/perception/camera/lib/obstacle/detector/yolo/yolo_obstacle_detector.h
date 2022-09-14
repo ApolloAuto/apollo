@@ -39,9 +39,7 @@ namespace camera {
 
 class YoloObstacleDetector : public BaseObstacleDetector {
  public:
-  YoloObstacleDetector() : BaseObstacleDetector() {
-    name_ = "YoloObstacleDetector";
-  }
+  YoloObstacleDetector() : BaseObstacleDetector() {}
   virtual ~YoloObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);

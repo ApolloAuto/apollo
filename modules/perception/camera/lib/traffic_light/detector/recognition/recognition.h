@@ -31,7 +31,7 @@ namespace camera {
 
 class TrafficLightRecognition : public BaseTrafficLightDetector {
  public:
-  TrafficLightRecognition() { name_ = "TrafficLightRecognition"; }
+  TrafficLightRecognition() = default;
 
   ~TrafficLightRecognition() = default;
 
@@ -43,8 +43,6 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   // traffic_light type and 2D bbox should be filled, required,
   bool Detect(const TrafficLightDetectorOptions& options,
               CameraFrame* frame) override;
-
-  // std::string Name() const override;
 
   bool Init(const StageConfig& stage_config) override;
 

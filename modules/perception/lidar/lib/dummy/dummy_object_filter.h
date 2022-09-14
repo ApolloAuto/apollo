@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyObjectFilter : public BaseObjectFilter {
  public:
-  DummyObjectFilter() { name_ = "DummyObjectFilter"; }
+  DummyObjectFilter() = default;
 
   virtual ~DummyObjectFilter() = default;
 

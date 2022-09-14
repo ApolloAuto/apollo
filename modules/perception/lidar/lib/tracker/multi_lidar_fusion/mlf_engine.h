@@ -37,7 +37,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  public:
-  MlfEngine() { name_ = "MlfEngine"; }
+  MlfEngine() = default;
   virtual ~MlfEngine() = default;
 
   bool Init(const MultiTargetTrackerInitOptions& options =
@@ -92,6 +92,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   void RemoveStaleTrackData(const std::string& name, double timestamp,
                             std::vector<MlfTrackDataPtr>* tracks);
 
+  void Clear();
 //  void AttachDebugInfo(
 //      std::vector<std::shared_ptr<base::Object>>* foreground_objs);
 
@@ -113,7 +114,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   Eigen::Vector3d global_to_local_offset_;
   Eigen::Affine3d sensor_to_local_pose_;
   // main sensor info
-  std::set<std::string> main_sensor_;
+  std::set<std::string> main_sensors_;
   // params
   bool use_histogram_for_match_ = true;
   size_t histogram_bin_size_ = 10;

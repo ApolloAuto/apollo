@@ -34,7 +34,7 @@ class AllLatestFusion : public pipeline::Stage {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  AllLatestFusion() { name_ = "AllLatestFusion"; }
+  AllLatestFusion() = default;
   ~AllLatestFusion() = default;
 
   bool Init(const StageConfig& stage_config) override;

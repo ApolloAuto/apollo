@@ -37,7 +37,7 @@ namespace camera {
 
 class LaneCameraPerception final : public BaseCameraPerception {
  public:
-  LaneCameraPerception() { name_ = "LaneCameraPerception"; }
+  LaneCameraPerception() = default;
   ~LaneCameraPerception() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;

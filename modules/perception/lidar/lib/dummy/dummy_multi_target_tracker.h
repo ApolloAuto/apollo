@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyMultiTargetTracker : public BaseMultiTargetTracker {
  public:
-  DummyMultiTargetTracker() { name_ = "DummyMultiTargetTracker"; }
+  DummyMultiTargetTracker() = default;
 
   virtual ~DummyMultiTargetTracker() = default;
 

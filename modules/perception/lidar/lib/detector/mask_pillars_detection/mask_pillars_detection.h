@@ -35,7 +35,7 @@ namespace lidar {
 
 class MaskPillarsDetection : public BaseLidarDetector {
  public:
-  MaskPillarsDetection() { name_ = "MaskPillarsDetection"; }
+  MaskPillarsDetection() = default;
   virtual ~MaskPillarsDetection() = default;
 
   bool Init(const LidarDetectorInitOptions& options =

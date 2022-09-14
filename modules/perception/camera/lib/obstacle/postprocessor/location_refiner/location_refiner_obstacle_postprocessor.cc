@@ -28,7 +28,6 @@ namespace camera {
 
 LocationRefinerObstaclePostprocessor::LocationRefinerObstaclePostprocessor() {
   postprocessor_.reset(new ObjPostProcessor);
-  name_ = "LocationRefinerObstaclePostprocessor";
 }
 
 bool LocationRefinerObstaclePostprocessor::Init(
@@ -47,6 +46,15 @@ bool LocationRefinerObstaclePostprocessor::Init(
         << location_refiner_param_.min_dist_to_camera()
         << " \nroi_h2bottom_scale: "
         << location_refiner_param_.roi_h2bottom_scale();
+  return true;
+}
+
+bool LocationRefinerObstaclePostprocessor::Init(
+    const StageConfig& stage_config) {
+  return true;
+}
+
+bool LocationRefinerObstaclePostprocessor::Process(DataFrame* data_frame) {
   return true;
 }
 

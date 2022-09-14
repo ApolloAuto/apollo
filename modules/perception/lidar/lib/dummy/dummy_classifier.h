@@ -26,7 +26,7 @@ namespace lidar {
 
 class DummyClassifier : public BaseClassifier {
  public:
-  DummyClassifier() { name_ = "DummyClassifier"; }
+  DummyClassifier() = default;
 
   virtual ~DummyClassifier() = default;
 

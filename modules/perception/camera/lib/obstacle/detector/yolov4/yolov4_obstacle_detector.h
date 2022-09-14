@@ -39,9 +39,7 @@ namespace camera {
 
 class Yolov4ObstacleDetector : public BaseObstacleDetector {
  public:
-  Yolov4ObstacleDetector() : BaseObstacleDetector() {
-    name_ = "YoloObstacleDetector";
-  }
+  Yolov4ObstacleDetector() : BaseObstacleDetector() {}
   virtual ~Yolov4ObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);

@@ -65,6 +65,14 @@ bool ExternalFeatureExtractor::Init(
   return true;
 }
 
+bool ExternalFeatureExtractor::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool ExternalFeatureExtractor::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool ExternalFeatureExtractor::InitFeatureExtractor(
     const std::string &root_dir) {
   FeatureExtractorInitOptions feat_options;

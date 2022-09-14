@@ -30,14 +30,16 @@ class PointCloudDetectionPostprocessor : public pipeline::Stage {
   using Plugin = pipeline::Plugin;
 
  public:
-  PointCloudDetectionPostprocessor()
-      { name_ = "PointCloudDetectionPostprocessor"; }
+  PointCloudDetectionPostprocessor() = default;
 
   virtual ~PointCloudDetectionPostprocessor() = default;
 
   bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame* data_frame) override;
+
+  bool Process(DataFrame* data_frame, std::vector<float>* out_detections,
+      std::vector<int>* out_labels);
 
   bool IsEnabled() const override { return enable_; }
 

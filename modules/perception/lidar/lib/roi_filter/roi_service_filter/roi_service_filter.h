@@ -27,7 +27,7 @@ namespace lidar {
 
 class ROIServiceFilter : public BaseROIFilter {
  public:
-  ROIServiceFilter() { name_ = "ROIServiceFilter"; }
+  ROIServiceFilter() = default;
   ~ROIServiceFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;

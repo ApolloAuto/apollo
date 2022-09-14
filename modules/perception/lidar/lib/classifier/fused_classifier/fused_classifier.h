@@ -32,7 +32,7 @@ namespace lidar {
 
 class FusedClassifier : public BaseClassifier {
  public:
-  FusedClassifier() { name_ = "FusedClassifier"; }
+  FusedClassifier() = default;
   ~FusedClassifier() = default;
 
   bool Init(

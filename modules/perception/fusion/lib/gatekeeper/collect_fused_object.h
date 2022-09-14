@@ -33,7 +33,7 @@ class CollectFusedObject : public pipeline::Stage {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  CollectFusedObject() { name_ = "CollectFusedObject"; }
+  CollectFusedObject() = default;
   ~CollectFusedObject() = default;
 
   bool Init(const StageConfig& stage_config) override;

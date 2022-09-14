@@ -42,7 +42,7 @@ class ObjectBuilder : public pipeline::Stage {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  ObjectBuilder() { name_ = "ObjectBuilder"; }
+  ObjectBuilder() = default;
   ~ObjectBuilder() = default;
 
   // @brief: initialization. Get orientation estimator instance.

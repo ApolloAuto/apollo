@@ -49,8 +49,8 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
   return true;
 }
 
-bool MapManager::Init(const StageConfig& config) {
-  bool res = Initialize(config);
+bool MapManager::Init(const StageConfig& stage_config) {
+  bool res = Initialize(stage_config);
   return res;
 }
 

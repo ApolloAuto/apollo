@@ -38,7 +38,7 @@ class MapManager final : public pipeline::Stage {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  MapManager() { name_ = "MapManager"; }
+  MapManager() = default;
   ~MapManager() = default;
 
   bool Init(const MapManagerInitOptions& options = MapManagerInitOptions());

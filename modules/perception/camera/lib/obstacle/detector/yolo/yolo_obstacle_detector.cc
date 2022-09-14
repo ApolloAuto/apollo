@@ -294,6 +294,14 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   return true;
 }
 
+bool YoloObstacleDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool YoloObstacleDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool YoloObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   FeatureExtractorInitOptions feat_options;
   feat_options.conf_file = yolo_param_.model_param().feature_file();

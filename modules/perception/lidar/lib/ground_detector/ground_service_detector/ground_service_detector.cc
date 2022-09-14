@@ -54,6 +54,14 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   return true;
 }
 
+bool GroundServiceDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool GroundServiceDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
                                    LidarFrame* frame) {
   if (frame == nullptr || frame->world_cloud == nullptr) {

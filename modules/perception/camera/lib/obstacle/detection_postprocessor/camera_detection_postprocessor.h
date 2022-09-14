@@ -31,7 +31,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   using Plugin = pipeline::Plugin;
 
  public:
-  CameraDetectionPostprocessor() { name_ = "CameraDetectionPostprocessor"; }
+  CameraDetectionPostprocessor() = default;
 
   virtual ~CameraDetectionPostprocessor() = default;
 

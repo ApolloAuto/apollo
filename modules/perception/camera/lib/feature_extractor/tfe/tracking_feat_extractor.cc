@@ -66,6 +66,7 @@ bool TrackingFeatureExtractor::Init(
 
   return true;
 }
+
 void TrackingFeatureExtractor::init_roipooling(
     const FeatureExtractorInitOptions &options,
     const tracking_feature::ROIPoolingParam &param) {
@@ -86,6 +87,14 @@ void TrackingFeatureExtractor::init_roipooling(
   feature_extractor_layer_ptr->top_blob.reset(
       new base::Blob<float>(1, feat_blob_->channels(), pooled_h, pooled_w));
   roi_poolings_.push_back(feature_extractor_layer_ptr);
+}
+
+bool TrackingFeatureExtractor::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool TrackingFeatureExtractor::Process(DataFrame* data_frame) {
+  return true;
 }
 
 bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,

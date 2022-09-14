@@ -29,13 +29,11 @@ class GetObject : public pipeline::Plugin {
   using PluginConfig = pipeline::PluginConfig;
 
  public:
-  GetObject(){ name_ = "GetObject"; }
+  GetObject() { name_ = "GetObject"; }
 
   virtual ~GetObject() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
-
-  bool Process(DataFrame *data_frame) override;
 
   bool Process(const std::vector<float> &detect_result, DataFrame *data_frame);
 

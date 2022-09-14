@@ -44,9 +44,9 @@ void extract_vector(const std::vector<T>& vec,
   }
 }
 
-bool HMTrackersObjectsAssociation::Init(const StageConfig& config) {
+bool HMTrackersObjectsAssociation::Init(const StageConfig& stage_config) {
   // Init(config.fused_classifier_config());
-  bool res = Initialize(config);
+  bool res = Initialize(stage_config);
   return res;
 }
 

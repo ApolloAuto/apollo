@@ -32,7 +32,7 @@ class ObjectFilterBank : public pipeline::Stage {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  ObjectFilterBank() { name_ = "ObjectFilterBank"; }
+  ObjectFilterBank() = default;
 
   ~ObjectFilterBank() {
     for (auto& filter : filter_bank_) {
