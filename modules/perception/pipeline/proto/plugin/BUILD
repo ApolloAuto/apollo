@@ -23,45 +23,6 @@ py_proto_library(
         ":roi_boundary_filter_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "dst_type_fusion_config_cc_proto",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "dst_type_fusion_config_proto",
-    srcs = ["dst_type_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "dst_type_fusion_config_py_pb2",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "ccrf_type_fusion_config_cc_proto",
-    deps = [
-        ":ccrf_type_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "ccrf_type_fusion_config_proto",
-    srcs = ["ccrf_type_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "ccrf_type_fusion_config_py_pb2",
-    deps = [
-        ":ccrf_type_fusion_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "dst_existence_fusion_config_cc_proto",
     deps = [
@@ -80,60 +41,39 @@ py_proto_library(
         ":dst_existence_fusion_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "point_cloud_down_sample_config_cc_proto",
+    name = "dst_type_fusion_config_cc_proto",
     deps = [
-        ":point_cloud_down_sample_config_proto",
+        ":dst_type_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "point_cloud_down_sample_config_proto",
-    srcs = ["point_cloud_down_sample_config.proto"],
+    name = "dst_type_fusion_config_proto",
+    srcs = ["dst_type_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "point_cloud_down_sample_config_py_pb2",
+    name = "dst_type_fusion_config_py_pb2",
     deps = [
-        ":point_cloud_down_sample_config_proto",
+        ":dst_type_fusion_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "point_to_voxel_config_cc_proto",
+    name = "ccrf_type_fusion_config_cc_proto",
     deps = [
-        ":point_to_voxel_config_proto",
+        ":ccrf_type_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "point_to_voxel_config_proto",
-    srcs = ["point_to_voxel_config.proto"],
+    name = "ccrf_type_fusion_config_proto",
+    srcs = ["ccrf_type_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "point_to_voxel_config_py_pb2",
+    name = "ccrf_type_fusion_config_py_pb2",
     deps = [
-        ":point_to_voxel_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "point_cloud_fuse_config_cc_proto",
-    deps = [
-        ":point_cloud_fuse_config_proto",
-    ],
-)
-
-proto_library(
-    name = "point_cloud_fuse_config_proto",
-    srcs = ["point_cloud_fuse_config.proto"],
-)
-
-py_proto_library(
-    name = "point_cloud_fuse_config_py_pb2",
-    deps = [
-        ":point_cloud_fuse_config_proto",
+        ":ccrf_type_fusion_config_proto",
     ],
 )

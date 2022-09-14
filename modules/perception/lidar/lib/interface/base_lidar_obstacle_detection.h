@@ -21,10 +21,11 @@
 #include "Eigen/Dense"
 
 #include "cyber/common/macros.h"
-#include "modules/perception/lidar/common/lidar_error_code.h"
-#include "modules/perception/lib/registerer/registerer.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -42,7 +43,11 @@ struct LidarObstacleDetectionOptions {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-class BaseLidarObstacleDetection : public Pipeline {
+class BaseLidarObstacleDetection : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLidarObstacleDetection() = default;
   virtual ~BaseLidarObstacleDetection() = default;

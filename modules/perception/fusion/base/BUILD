@@ -37,6 +37,18 @@ cc_library(
 )
 
 cc_library(
+  name = "fusion_frame",
+  hdrs = [
+    "fusion_frame.h",
+  ],
+  deps = [
+    ":scene",
+    "//modules/perception/base:frame",
+    "//modules/perception/base:object",
+  ],
+)
+
+cc_library(
     name = "scene",
     srcs = ["scene.cc"],
     hdrs = ["scene.h"],
@@ -134,6 +146,7 @@ cc_library(
     hdrs = ["track.h"],
     deps = [
         ":sensor",
+        "//cyber",
         "@com_google_googletest//:gtest",
     ],
 )

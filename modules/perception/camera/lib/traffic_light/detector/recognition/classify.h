@@ -35,7 +35,7 @@ class ClassifyBySimple {
   ClassifyBySimple() = default;
   ~ClassifyBySimple() = default;
 
-  void Init(const traffic_light::recognition::ClassifyParam& model_config,
+  void Init(const ClassifyParam& model_config,
             const int gpu_id, const std::string work_root);
 
   void Perform(const CameraFrame* frame,

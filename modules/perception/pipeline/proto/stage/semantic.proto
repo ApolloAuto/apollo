@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.stage;
+package apollo.perception.camera;
 
 message SemanticReviserConfig {
   optional float revise_time_second = 1 [default = 1.5];

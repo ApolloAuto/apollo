@@ -30,7 +30,11 @@ struct ClassifierInitOptions {};
 
 struct ClassifierOptions {};
 
-class BaseClassifier : public Stage {
+class BaseClassifier : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseClassifier() = default;
 

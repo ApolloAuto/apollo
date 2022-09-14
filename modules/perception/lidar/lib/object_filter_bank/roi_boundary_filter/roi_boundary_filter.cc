@@ -22,7 +22,7 @@
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/pipeline/proto/task/roi_boundary_filter_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.pb.h"
 
 using apollo::common::EigenVector;
 
@@ -35,6 +35,14 @@ namespace perception {
 namespace lidar {
 
 using cyber::common::GetAbsolutePath;
+
+ROIBoundaryFilter::ROIBoundaryFilter(const PluginConfig& plugin_config) {
+  ROIBoundaryFilterConfig config = plugin_config.roi_boundary_filter_config();
+  distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
+  confidence_threshold_ = config.confidence_threshold();
+  cross_roi_threshold_ = config.cross_roi_threshold();
+  inside_threshold_ = config.inside_threshold();
+}
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -105,15 +113,8 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
 }
 
 bool ROIBoundaryFilter::Init(const PluginConfig& plugin_config) {
-  plugin_config.roi_boundary_filter_conf
-}
-
-bool ROIBoundaryFilter::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
-  ObjectFilterOptions object_filter_options;
-  bool res = Filter(object_filter_options, data_frame->lidar_frame);
-  return res;
+  // plugin_config.roi_boundary_filter_conf
+  return true;
 }
 
 void ROIBoundaryFilter::BuildWorldPolygons(const ObjectFilterOptions& options,

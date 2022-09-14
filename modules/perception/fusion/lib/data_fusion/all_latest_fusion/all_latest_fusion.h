@@ -20,6 +20,7 @@
 #include <string>
 
 #include "modules/perception/fusion/base/fusion_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 
 namespace apollo {
@@ -27,7 +28,11 @@ namespace perception {
 namespace fusion {
 
 
-class AllLatestFusion : public Stage {
+class AllLatestFusion : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   AllLatestFusion() { name_ = "AllLatestFusion"; }
   ~AllLatestFusion() = default;

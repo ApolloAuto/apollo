@@ -58,13 +58,10 @@ bool MapManager::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
-
   MapManagerOptions options;
   Update(options, data_frame->lidar_frame);
 
-  return res;
+  return true;
 }
 
 bool MapManager::Update(const MapManagerOptions& options, LidarFrame* frame) {

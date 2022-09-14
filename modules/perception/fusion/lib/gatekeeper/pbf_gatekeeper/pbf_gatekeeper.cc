@@ -25,6 +25,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
+using cyber::common::GetAbsolutePath;
 
 bool PbfGatekeeper::Init() {
   BaseInitOptions options;

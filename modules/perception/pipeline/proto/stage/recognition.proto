@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.stage;
+package apollo.perception.camera;
 
 message ClassifyParam {
   optional string model_name = 1;

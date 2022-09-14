@@ -23,6 +23,7 @@
 
 #include "modules/perception/base/camera.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +35,11 @@ struct TrafficLightDetectorInitOptions : public BaseInitOptions {
 
 struct TrafficLightDetectorOptions {};
 
-class BaseTrafficLightDetector : public Stage {
+class BaseTrafficLightDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseTrafficLightDetector() = default;
 

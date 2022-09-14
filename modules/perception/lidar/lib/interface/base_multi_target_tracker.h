@@ -29,7 +29,11 @@ struct MultiTargetTrackerInitOptions {};
 
 struct MultiTargetTrackerOptions {};
 
-class BaseMultiTargetTracker : public Stage {
+class BaseMultiTargetTracker : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseMultiTargetTracker() = default;
 

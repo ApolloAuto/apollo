@@ -8,6 +8,7 @@ cc_library(
     srcs = ["resize_and_normalize.cc"],
     hdrs = ["resize_and_normalize.h"],
     deps = [
+        "//modules/perception/pipeline:plugin",
     ],
 )
 

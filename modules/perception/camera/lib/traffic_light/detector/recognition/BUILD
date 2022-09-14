@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline:stage",
         "//modules/perception/pipeline/proto/stage:recognition_cc_proto",
     ],
 )

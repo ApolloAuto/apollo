@@ -30,7 +30,11 @@ struct ROIFilterInitOptions {};
 
 struct ROIFilterOptions {};
 
-class BaseROIFilter : public Stage {
+class BaseROIFilter : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseROIFilter() = default;
 

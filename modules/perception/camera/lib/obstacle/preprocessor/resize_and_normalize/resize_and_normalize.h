@@ -24,15 +24,18 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class ReSizeAndNormalize : public Plugin {
+class ReSizeAndNormalize : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
   virtual ~ReSizeAndNormalize() = default;
 
-  bool Init(const TaskConfig &task_config) override;
+  bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame *data_frame) override;
-  bool IsEnabled() override { return enable_; }
-  std::string Name() override { return name_; }
+  bool IsEnabled() const override { return enable_; }
+  std::string Name() const override { return name_; }
 
  private:
   void Resize(const cv::Mat &img, int resized_h, int resized_w,

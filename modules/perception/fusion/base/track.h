@@ -22,6 +22,7 @@
 
 #include "gtest/gtest_prod.h"
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 
 namespace apollo {

@@ -32,7 +32,11 @@ struct LidarDetectorInitOptions {
 
 struct LidarDetectorOptions {};
 
-class BaseLidarDetector : public Stage {
+class BaseLidarDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLidarDetector() = default;
 

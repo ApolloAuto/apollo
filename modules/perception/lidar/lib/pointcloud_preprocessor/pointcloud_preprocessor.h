@@ -19,15 +19,13 @@
 #include <memory>
 
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
+#include "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
- public:
-  using GetAbsolutePath = cyber::common::GetAbsolutePath;
-
  public:
   PointCloudPreprocessor(){ name_ = "PointCloudPreprocessor"; }
   virtual ~PointCloudPreprocessor() = default;
@@ -67,7 +65,7 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   static const float kPointInfThreshold;
 
 
-  pipeline::stage::PointCloudPreprocessorConfig pointcloud_preprocessor_config_;
+  PointCloudPreprocessorConfig pointcloud_preprocessor_config_;
   std::string name_;
   bool enable_;
 };  // class PointCloudPreprocessor

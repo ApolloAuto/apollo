@@ -24,16 +24,19 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class GetImageData : public Plugin{
+class GetImageData : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   GetImageData() { name_ = "GetImageData"; }
   virtual ~GetImageData() = default;
 
-  bool Init(const TaskConfig& task_config) override;
+  bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame* data_frame);
   bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv) override;
-  bool IsEnabled() override { return enable_; }
-  std::string Name() override { return name_; }
+  bool IsEnabled() const override { return enable_; }
+  std::string Name() const override { return name_; }
 
  private:
   bool GetKInverse(const CameraFrame& frame, float* k_inv);

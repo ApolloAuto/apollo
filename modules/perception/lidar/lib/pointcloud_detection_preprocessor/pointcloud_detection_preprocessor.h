@@ -23,7 +23,12 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class PointCloudDetectionPreprocessor : public Stage {
+class PointCloudDetectionPreprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+
  public:
   PointCloudDetectionPreprocessor()
       { name_ = "PointCloudDetectionPreprocessor"; }

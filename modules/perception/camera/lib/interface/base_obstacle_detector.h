@@ -22,6 +22,7 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +37,11 @@ struct ObstacleDetectorInitOptions : public BaseInitOptions {
 
 struct ObstacleDetectorOptions {};
 
-class BaseObstacleDetector : public Stage {
+class BaseObstacleDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseObstacleDetector() = default;
 

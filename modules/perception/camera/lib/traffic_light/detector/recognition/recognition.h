@@ -23,6 +23,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/proto/stage/recognition.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +31,7 @@ namespace camera {
 
 class TrafficLightRecognition : public BaseTrafficLightDetector {
  public:
-  TrafficLightRecognition() = default;
+  TrafficLightRecognition() { name_ = "TrafficLightRecognition"; }
 
   ~TrafficLightRecognition() = default;
 
@@ -57,8 +58,8 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   std::shared_ptr<ClassifyBySimple> classify_vertical_;
   std::shared_ptr<ClassifyBySimple> classify_quadrate_;
   std::shared_ptr<ClassifyBySimple> classify_horizontal_;
-  // traffic_light::recognition::RecognizeBoxParam recognize_param_;
-  pipeline::stage::TrafficLightRecognitionConfig recognize_param_;
+
+  TrafficLightRecognitionConfig recognize_param_;
   std::string recognition_root_dir;
 
   DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);

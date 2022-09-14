@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
 namespace apollo {
 namespace perception {
 namespace pipeline {
@@ -29,7 +31,7 @@ class Plugin {
 
   virtual bool Init(const PluginConfig& plugin_config) = 0;
 
-  virtual bool IsEnabled() = 0;
+  virtual bool IsEnabled() const = 0;
 
   virtual std::string Name() const = 0;
 

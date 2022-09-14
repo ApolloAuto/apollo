@@ -27,7 +27,11 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class CollectFusedObject : public Stage {
+class CollectFusedObject : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   CollectFusedObject() { name_ = "CollectFusedObject"; }
   ~CollectFusedObject() = default;

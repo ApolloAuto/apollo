@@ -22,17 +22,23 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/util/eigen_defs.h"
-#include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
+#include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-class ROIBoundaryFilter : public Plugin {
+class ROIBoundaryFilter : public BaseObjectFilter {
  public:
-  ROIBoundaryFilter() = default;
+  using PluginConfig = pipeline::PluginConfig;
+
+ public:
+  ROIBoundaryFilter() { name_ = "ROIBoundaryFilter"; }
+
+  explicit ROIBoundaryFilter(const PluginConfig& plugin_config);
 
   virtual ~ROIBoundaryFilter() = default;
 
@@ -45,11 +51,11 @@ class ROIBoundaryFilter : public Plugin {
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "ROIBoundaryFilter"; }
-
   bool Init(const PluginConfig& plugin_config) override;
 
-  bool Process(DataFrame* data_frame) override;
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   // @brief: given input objects, build polygon in world frame

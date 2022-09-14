@@ -18,7 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/object_filter_bank/proto/filter_bank_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/object_filter_bank_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -37,7 +37,7 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "filter_bank.conf");
-  FilterBankConfig config;
+  ObjectFilterBankConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();
   for (int i = 0; i < config.filter_name_size(); ++i) {
@@ -56,12 +56,6 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
     AINFO << "Filter bank add filter: " << name;
   }
   return true;
-}
-
-bool ObjectFilterBank::Init(const StageConfig& config) {
-  Init(config.object_filter_bank_config());
-  bool res = Initialize(config);
-  return res;
 }
 
 bool ObjectFilterBank::Process(DataFrame* data_frame) {
@@ -90,36 +84,26 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
 }
 
 bool ObjectFilterBank::Init(const StageConfig& stage_config) {
-  enable_ = stage_config.enabled;
+  enable_ = stage_config.enabled();
 
-  stage_config.object_filter_bank_config
-
-  filter_bank_.clear();
-  for (const auto& plugin_config : stage_config.plugin_config) {
-    const auto& name = plugin_config.plugin_type;
-    BaseObjectFilter* filter =
-        BaseObjectFilterRegisterer::GetInstanceByName(name);
-    if (filter == nullptr) {
-      AINFO << "Failed to find object filter: " << name << ", skipped";
-      continue;
-    }
-    if (!filter->Init(plugin_config)) {
-      AINFO << "Failed to init object filter: " << name << ", skipped";
-      continue;
-    }
-    filter_bank_.push_back(filter);
-    AINFO << "Filter bank add filter: " << name;
-  }
+  // filter_bank_.clear();
+  // for (const auto& plugin_config : stage_config.plugin_config()) {
+  //   const auto& name = plugin_config.plugin_type();
+  //   BaseObjectFilter* filter =
+  //       BaseObjectFilterRegisterer::GetInstanceByName(name);
+  //   if (filter == nullptr) {
+  //     AINFO << "Failed to find object filter: " << name << ", skipped";
+  //     continue;
+  //   }
+  //   if (!filter->Init(plugin_config)) {
+  //     AINFO << "Failed to init object filter: " << name << ", skipped";
+  //     continue;
+  //   }
+  //   filter_bank_.push_back(filter);
+  //   AINFO << "Filter bank add filter: " << name;
+  // }
 
   return true;
-}
-
-bool ObjectFilterBank::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
-  ObjectFilterOptions object_filter_options;
-  bool res = Filter(object_filter_options, data_frame->lidar_frame);
-  return res;
 }
 
 }  // namespace lidar

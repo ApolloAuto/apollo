@@ -7,7 +7,7 @@ cc_library(
   srcs = "point_cloud_down_sample.cc",
   hdrs = "point_cloud_down_sample.h",
   deps = [
-
+    "//modules/perception/pipeline:plugin",
   ],
 )
 

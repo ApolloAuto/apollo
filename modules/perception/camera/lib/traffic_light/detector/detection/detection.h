@@ -24,9 +24,9 @@
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
-// #include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/proto/stage/detection.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -38,6 +38,7 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
     mean_[0] = 0;
     mean_[1] = 0;
     mean_[2] = 0;
+    name_ = "TrafficLightDetection";
   }
 
   ~TrafficLightDetection() = default;
@@ -71,9 +72,7 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   std::string Name() const override { return name_; }
 
  private:
-  // traffic_light::detection::DetectionParam detection_param_;
-
-  pipeline::stage::TrafficLightDetectionConfig detection_param_;
+  TrafficLightDetectionConfig detection_param_;
   std::string detection_root_dir;
 
   DataProvider::ImageOptions data_provider_image_option_;

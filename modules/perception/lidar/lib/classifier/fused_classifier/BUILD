@@ -38,7 +38,7 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
-        "//modules/perception/pipeline/proto/task:ccrf_type_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )

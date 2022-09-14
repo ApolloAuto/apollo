@@ -41,9 +41,6 @@ struct FusionParams {
 
 class ProbabilisticFusion : public BaseFusionSystem {
  public:
-  using cyber::common::GetAbsolutePath;
-
- public:
   ProbabilisticFusion() { name_ = "ProbabilisticFusion"; }
   ~ProbabilisticFusion() = default;
 

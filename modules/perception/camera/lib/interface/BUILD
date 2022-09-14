@@ -20,6 +20,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:plugin",
     ],
 )
 

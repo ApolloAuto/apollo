@@ -24,6 +24,7 @@
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +36,11 @@ struct ObjectBuilderOptions {
   Eigen::Vector3d ref_center = Eigen::Vector3d(0, 0, 0);
 };
 
-class ObjectBuilder : public Stage {
+class ObjectBuilder : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   ObjectBuilder() { name_ = "ObjectBuilder"; }
   ~ObjectBuilder() = default;

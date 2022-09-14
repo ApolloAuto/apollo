@@ -53,7 +53,7 @@ class Stage {
   bool enable_ = false;
   std::string name_;
 
-  apollo::perception::pipeline::StageConfig stage_config;
+  StageConfig stage_config_;
   std::unordered_map<PluginType, const PluginConfig*, std::hash<int>>
       plugin_config_map_;
 };

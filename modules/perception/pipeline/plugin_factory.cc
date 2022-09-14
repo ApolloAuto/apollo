@@ -17,6 +17,7 @@
 
 #include "modules/perception/pipeline/plugin_factory.h"
 
+#include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 
 namespace apollo {
 namespace perception {
@@ -34,9 +35,9 @@ apollo::common::util::Factory<
 
 void PluginFactory::Init() {
   plugin_factory_.Register(
-      PluginType::GLOBAL_ROT_SCALE_TRANS,
+      PluginType::ROI_BOUNDARY_FILTER,
       [](const PluginConfig& plugin_config) -> Plugin* {
-        return new GlobalRotScaleTrans(plugin_config);
+        return new lidar::ROIBoundaryFilter(plugin_config);
       });
   // Todo(zero): need to add more type
   // need to deal with PipelineConfig& config

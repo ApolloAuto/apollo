@@ -22,6 +22,7 @@
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,11 @@ struct MapManagerInitOptions {};
 
 struct MapManagerOptions {};
 
-class MapManager final : public Stage {
+class MapManager final : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   MapManager() { name_ = "MapManager"; }
   ~MapManager() = default;

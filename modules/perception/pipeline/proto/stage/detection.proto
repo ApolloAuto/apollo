@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.stage;
+package apollo.perception.camera;
 
 message TrafficLightDetectionConfig {
   optional int32 min_crop_size = 1 [default = 270];

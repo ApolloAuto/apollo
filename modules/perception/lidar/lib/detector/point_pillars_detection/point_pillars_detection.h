@@ -28,6 +28,7 @@
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/pipeline/proto/stage/point_pillars_detection_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +36,7 @@ namespace lidar {
 
 class PointPillarsDetection : public BaseLidarDetector {
  public:
-  PointPillarsDetection() { name_ = "PointPillarsDetection"; }
+  PointPillarsDetection();
   virtual ~PointPillarsDetection() = default;
 
   bool Init(const LidarDetectorInitOptions& options =
@@ -43,7 +44,7 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  bool Process(const LidarFrame& frame, cons std::vector<float>& points_array,
+  bool Process(const LidarFrame& frame, const std::vector<float>& points_array,
                int num_points, std::vector<float>* out_detections,
                std::vector<int>* out_labels);
 
@@ -70,7 +71,7 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   base::ObjectSubType GetObjectSubType(int label);
 
-  bool Detect(LidarFrame* frame, cons std::vector<float>& points_array,
+  bool Detect(LidarFrame* frame, const std::vector<float>& points_array,
               int num_points, std::vector<float>* out_detections,
               std::vector<int>* out_labels);
 
@@ -101,9 +102,7 @@ class PointPillarsDetection : public BaseLidarDetector {
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
 
-  pipeline::stage::PointPillarsDetectionConfig point_pillars_detection_config_;
-  std::string name_;
-  bool enable_;
+  PointPillarsDetectionConfig point_pillars_detection_config_;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

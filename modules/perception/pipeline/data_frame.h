@@ -26,11 +26,11 @@ namespace perception {
 namespace pipeline {
 
 struct DataFrame {
-  CameraFrame* camera_frame;
-  LidarFrame* lidar_frame;
+  camera::CameraFrame* camera_frame;
+  lidar::LidarFrame* lidar_frame;
   // RadarFrame* radar_frame;
 
-  FusionFrame* fusion_frame;
+  fusion::FusionFrame* fusion_frame;
 };
 
 } // namespace pipeline

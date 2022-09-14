@@ -33,7 +33,11 @@ struct ObstacleMultiSensorFusionParam {
   std::string fusion_method;
 };
 
-class BaseMultiSensorFusion : public Pipeline {
+class BaseMultiSensorFusion : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseMultiSensorFusion() = default;
   virtual ~BaseMultiSensorFusion() = default;
