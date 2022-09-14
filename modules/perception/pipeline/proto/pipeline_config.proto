@@ -32,6 +32,7 @@ import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
 import "modules/perception/pipeline/proto/stage/denseline.proto";
 import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
 import "modules/perception/pipeline/proto/stage/denseline_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 

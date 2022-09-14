@@ -116,6 +116,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:denseline_proto",
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_proto",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_proto",
+        "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
     ],
 )
@@ -152,6 +153,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:denseline_py_pb2",
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_py_pb2",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_py_pb2",
+        "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
     ],
 )
