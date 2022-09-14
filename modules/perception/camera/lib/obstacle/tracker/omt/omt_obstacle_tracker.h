@@ -25,7 +25,7 @@
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
+#include "modules/perception/pipeline/proto/stage/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 namespace apollo {
