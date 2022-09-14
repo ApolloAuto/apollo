@@ -34,12 +34,16 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/pipeline/proto/camera_detection_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 class ObstacleDetectionCamera final : public BaseCameraPerception {
+ public:
+  using CameraDetectionConfig = pipeline::CameraDetectionConfig;
+
  public:
   ObstacleDetectionCamera() { name_ = "ObstacleDetectionCamera"; }
   ~ObstacleDetectionCamera() = default;
@@ -68,6 +72,8 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   app::PerceptionParam perception_param_;
   std::ofstream out_track_;
   std::ofstream out_pose_;
+
+  CameraDetectionConfig camera_detection_config_;
 
   DISALLOW_COPY_AND_ASSIGN(ObstacleDetectionCamera);
 };

@@ -52,7 +52,7 @@ class Pipeline {
  protected:
   std::string name_;
 
-  PipelineConfig pipeline_config;
+  PipelineConfig pipeline_config_;
 
   std::unordered_map<StageType, StageConfig, std::hash<int>>
       stage_config_map_;

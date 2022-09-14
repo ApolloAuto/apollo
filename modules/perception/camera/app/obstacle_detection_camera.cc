@@ -155,11 +155,23 @@ bool ObstacleDetectionCamera::Init(
 }
 
 bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
-  return true;
+  camera_detection_config_ =
+      pipeline_config.camera_detection_config();
+
+  base::BaseCameraModelPtr model =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          camera_detection_config_.camera_name());
+
+  auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
+  name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
+      camera_detection_config_.camera_name(), pinhole->get_intrinsic_params()));
+
+  bool res = Initialize(pipeline_config);
+  return res;
 }
 
 bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
-  inference::CudaUtil::set_device_id(perception_param_.gpu_id());
+  inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id());
 
   CameraFrame* frame = data_frame->camera_frame;
   frame->camera_k_matrix =
@@ -167,20 +179,21 @@ bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
 
   InnerProcess(frame);
 
-  if (perception_param_.has_debug_param()) {
-    if (perception_param_.debug_param().has_camera2world_out_file()) {
+  if (camera_detection_config_.has_debug_param()) {
+    if (camera_detection_config_.debug_param().has_camera2world_out_file()) {
       WriteCamera2World(out_pose_, frame->frame_id, frame->camera2world_pose);
     }
-    if (perception_param_.debug_param().has_track_out_file()) {
+    if (camera_detection_config_.debug_param().has_track_out_file()) {
       WriteTracking(out_track_, frame->frame_id, frame->tracked_objects);
     }
   }
 
   // Save tracked detections results as kitti format
   WriteDetections(
-      perception_param_.debug_param().has_tracked_detection_out_dir(),
-      absl::StrCat(perception_param_.debug_param().tracked_detection_out_dir(),
-                   "/", frame->frame_id, ".txt"),
+      camera_detection_config_.debug_param().has_tracked_detection_out_dir(),
+      absl::StrCat(
+          camera_detection_config_.debug_param().tracked_detection_out_dir(),
+          "/", frame->frame_id, ".txt"),
       frame->tracked_objects);
 
   // Fill polygon and set anchor point
@@ -200,13 +213,13 @@ bool ObstacleDetectionCamera::Perception(
   ObstacleTransformerOptions transformer_options;
   ObstaclePostprocessorOptions obstacle_postprocessor_options;
   ObstacleTrackerOptions tracker_options;
-
+  FeatureExtractorOptions extractor_options;
   PERF_BLOCK_START();
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
 
   // Obstacle prediction
-  if (!tracker_->Process(tracker_options, frame)) {
+  if (!tracker_->Predict(tracker_options, frame)) {
     AERROR << "Failed to predict.";
     return false;
   }
@@ -227,13 +240,25 @@ bool ObstacleDetectionCamera::Perception(
       absl::StrCat(perception_param_.debug_param().detection_out_dir(), "/",
                    frame->frame_id, ".txt"),
       frame->detected_objects);
+  if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
+    AERROR << "Failed to extractor";
+    return false;
+  }
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                "external_feature");
 
+  // Save detection results with bbox, detection_feature
+  WriteDetections(
+      perception_param_.debug_param().has_detect_feature_dir(),
+      absl::StrCat(perception_param_.debug_param().detect_feature_dir(), "/",
+                   frame->frame_id, ".txt"),
+      frame);
   // Set the sensor name of each object
   for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
     frame->detected_objects[i]->camera_supplement.sensor_name =
         frame->data_provider->sensor_name();
   }
-  if (!tracker_->Process(tracker_options, frame)) {
+  if (!tracker_->Associate2D(tracker_options, frame)) {
     AERROR << "Failed to associate2d.";
     return false;
   }
@@ -258,12 +283,18 @@ bool ObstacleDetectionCamera::Perception(
   PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                 "PostprocessObsacle");
 
-  if (!tracker_->Process(tracker_options, frame)) {
+  if (!tracker_->Associate3D(tracker_options, frame)) {
     AERROR << "Failed to Associate3D.";
     return false;
   }
   PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                 "Associate3D");
+
+  if (!tracker_->Track(tracker_options, frame)) {
+    AERROR << "Failed to track.";
+    return false;
+  }
+  PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(), "Track");
 
   if (perception_param_.has_debug_param()) {
     if (perception_param_.debug_param().has_camera2world_out_file()) {

@@ -60,6 +60,8 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
     stage_ptrs_.push_back(std::move(stage_ptr));
   }
 
+  pipeline_config_.CopyFrom(pipeline_config);
+
   return true;
 }
 
