@@ -54,7 +54,7 @@ class Pipeline {
 
   PipelineConfig pipeline_config;
 
-  std::unordered_map<StageType, const StageConfig*, std::hash<int>>
+  std::unordered_map<StageType, const StageConfig, std::hash<int>>
       stage_config_map_;
 
   std::vector<std::unique_ptr<Stage>> stage_ptrs_;

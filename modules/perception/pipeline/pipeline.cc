@@ -38,12 +38,12 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
   Clear();
 
   for (const auto& stage_config : pipeline_config.stage_config()) {
-    stage_config_map_[stage_config.stage_type()] = &stage_config;
+    stage_config_map_[stage_config.stage_type()] = stage_config;
   }
 
   for (int i = 0; i < pipeline_config.stage_config_size(); ++i) {
     auto stage_type = pipeline_config.stage_type(i);
-    if (!common::util::ContainsKey(stage_config_map_, stage_type)) {
+    if (!apollo::common::util::ContainsKey(stage_config_map_, stage_type)) {
       AERROR << "Stage type : " << StageType_Name(stage_type)
              << " has no config";
       return false;
@@ -57,7 +57,7 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
       return false;
     }
 
-    stage_ptrs_.push_back(stage_ptr);
+    stage_ptrs_.push_back(std::move(stage_ptr));
   }
 
   return true;
@@ -109,7 +109,8 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       return nullptr;
   }
 
-  stage_ptr->Init(stage_config_map_[stage_type]);
+  if (stage_ptr != nullptr)
+    stage_ptr->Init(stage_config_map_[stage_type]);
 
   return stage_ptr;
 }
