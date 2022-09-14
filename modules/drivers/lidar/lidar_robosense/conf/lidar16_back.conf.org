@@ -1,11 +1,11 @@
 frame_id: "robosense16_back"
-model: HELIOS_16P
+model: VLP16
 mode: STRONGEST
 rpm: 600.0
 use_gps_time: true
 time_zone: 8
-firing_data_port: 6699
-positioning_data_port: 7788
+firing_data_port: 2371
+positioning_data_port: 8311
 calibration_file: "/apollo/modules/drivers/lidar/robosense/params/VLP16_calibration.yaml"
 
 organized: true

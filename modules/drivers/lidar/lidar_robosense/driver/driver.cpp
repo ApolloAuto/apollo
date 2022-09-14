@@ -193,15 +193,6 @@ void RobosenseDriver::update_gps_top_hour(uint32_t current_time) {
   last_gps_time_ = current_time;
 }
 
-RobosenseDriver* RobosenseDriverFactory::create_driver(
-    const apollo::drivers::suteng::SutengConfig& roboconfig_) {
-  if (roboconfig_.model() == apollo::drivers::suteng::Model::VLP16) {
-    return new Robosense16Driver(roboconfig_);
-  } else {
-    AERROR << "Invalid model, must be VLP16";
-    return nullptr;
-  }
-}
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

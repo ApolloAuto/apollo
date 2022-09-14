@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/drivers/lidar/lidar_robosense/parser/robosense_parser.h"
+#include "modules/drivers/lidar/lidar_robosense/parser/robosense16p_parser.h"
 
 #include <pcl/common/time.h>
 
@@ -154,8 +155,10 @@ RobosenseParser* RobosenseParserFactory::create_parser(
     const apollo::drivers::suteng::SutengConfig& config) {
   if (config.model() == apollo::drivers::suteng::VLP16) {
     return new Robosense16Parser(config);
-  } else {
-    AERROR << " invalid model, must be VLP16";
+  } else if (config.model() == apollo::drivers::suteng::Model::HELIOS_16P){
+    return new Robosense16PParser(config);
+  }else {
+    AERROR << " invalid model, must be VLP16 or HELIOS_16P";
     return nullptr;
   }
 }

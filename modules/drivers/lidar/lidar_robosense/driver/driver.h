@@ -21,6 +21,7 @@
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/pcap_input.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/socket_input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/socket_input_16p.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
 
@@ -79,11 +80,6 @@ class Robosense16Driver : public RobosenseDriver {
   std::atomic<bool> running_ = {true};
 };
 
-class RobosenseDriverFactory {
- public:
-  static RobosenseDriver* create_driver(
-      const apollo::drivers::suteng::SutengConfig& robo_config);
-};
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

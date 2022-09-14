@@ -14,34 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
-#include <pcap.h>
-#include <unistd.h>
-
-#include <cstdio>
-
-#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/lib/input.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver_factory.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-/** @brief Live suteng input from socket. */
-class SocketInput : public Input {
- public:
-  SocketInput();
-  virtual ~SocketInput();
-  void init(uint32_t port);
-  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int time_zone, uint64_t start_time_);
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
-
- private:
-  int sockfd_;
-  int port_;
-  bool input_available(int timeout);
-};
+RobosenseDriver* RobosenseDriverFactory::create_driver(
+    const apollo::drivers::suteng::SutengConfig& roboconfig_) {
+  if (roboconfig_.model() == apollo::drivers::suteng::Model::VLP16) {
+    return new Robosense16Driver(roboconfig_);
+  } else if (roboconfig_.model() ==
+             apollo::drivers::suteng::Model::HELIOS_16P) {
+    AINFO << "RobosenseDriverFactory HELIOS_16P 1";
+    return new Robosense16PDriver(roboconfig_);
+  } else {
+    AERROR << "Invalid lidar model, must be VLP16 or HELIOS_16P";
+    return nullptr;
+  }
+}
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

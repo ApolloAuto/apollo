@@ -11,6 +11,7 @@ enum Model {
     HDL64E_S2 = 3;
     HDL32E = 4;
     VLP16 = 5;
+    HELIOS_16P = 6;
 }
 
 enum Mode {

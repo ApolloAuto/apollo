@@ -27,6 +27,7 @@ namespace apollo {
 namespace drivers {
 namespace robosense {
 
+static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 static const size_t FIRING_DATA_PACKET_SIZE = 1248;
 static const size_t POSITIONING_DATA_PACKET_SIZE =
     1248;  // beike-256  robosense-512;

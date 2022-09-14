@@ -28,14 +28,21 @@ namespace drivers {
 namespace robosense {
 
 /** @brief Live suteng input from socket. */
-class SocketInput : public Input {
+class SocketInput16P : public Input {
  public:
-  SocketInput();
-  virtual ~SocketInput();
+  SocketInput16P();
+  virtual ~SocketInput16P();
   void init(uint32_t port);
   int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int time_zone, uint64_t start_time_);
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
+                             bool use_gps_time);
+  int get_positioning_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
+                                  bool use_gps_time);
+  bool exract_utc_time_from_packet(uint64_t& utc_time_ns, const uint8_t* bytes);
+  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
+                             int time_zone, uint64_t start_time_) {
+    return 0;
+  };
+  int get_positioning_data_packtet(const NMEATimePtr& nmea_time) { return 0; };
 
  private:
   int sockfd_;

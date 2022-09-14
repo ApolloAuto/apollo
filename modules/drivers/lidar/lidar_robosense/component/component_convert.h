@@ -90,8 +90,8 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
     writer_->Write(point_cloud_send);
 
     if (seq_ % 10 == 0) {
-      AINFO << " total:" << seq_ + 1 << "-RS-cost:" << diff
-            << "-meta:" << point_cloud_send->header().lidar_timestamp();
+      AINFO << " total:" << seq_ + 1 << "-RS-cost:" << diff*1e-9
+            << "ms -meta:" << point_cloud_send->header().lidar_timestamp();
     }
     seq_++;
 

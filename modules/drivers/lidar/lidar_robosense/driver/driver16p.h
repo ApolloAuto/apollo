@@ -15,33 +15,45 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
+
+#include <time.h>
 #include <unistd.h>
 
-#include <cstdio>
+#include <cmath>
+#include <memory>
+#include <string>
+#include <thread>
 
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng.pb.h"
+#include "modules/drivers/lidar/lidar_robosense/proto/sensor_suteng_conf.pb.h"
+
+#include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
 #include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/lib/input.h"
+#include "modules/drivers/lidar/lidar_robosense/lib/socket_input_16p.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-/** @brief Live suteng input from socket. */
-class SocketInput : public Input {
+class Robosense16PDriver : public RobosenseDriver {
  public:
-  SocketInput();
-  virtual ~SocketInput();
-  void init(uint32_t port);
-  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int time_zone, uint64_t start_time_);
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
+  Robosense16PDriver(const apollo::drivers::suteng::SutengConfig& robo_config);
+  ~Robosense16PDriver();
+
+  void init();
+  bool poll(const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+  void poll_positioning_packet();
+  int poll_msop_sync_count(
+    const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
 
  private:
-  int sockfd_;
-  int port_;
-  bool input_available(int timeout);
+  std::shared_ptr<SocketInput16P> positioning_input_;
+  std::shared_ptr<SocketInput16P> input_16p_;
+  std::thread positioning_thread_;
+  std::atomic<bool> running_ = {true};
+  apollo::drivers::suteng::SutengPacket positioning_pkts_; // 1hz
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

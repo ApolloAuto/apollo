@@ -15,32 +15,18 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
-#include <unistd.h>
 
-#include <cstdio>
-
-#include "modules/drivers/lidar/lidar_robosense/lib/data_type.h"
-#include "modules/drivers/lidar/lidar_robosense/lib/input.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver.h"
+#include "modules/drivers/lidar/lidar_robosense/driver/driver16p.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
 
-/** @brief Live suteng input from socket. */
-class SocketInput : public Input {
+class RobosenseDriverFactory {
  public:
-  SocketInput();
-  virtual ~SocketInput();
-  void init(uint32_t port);
-  int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
-                             int time_zone, uint64_t start_time_);
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time);
-
- private:
-  int sockfd_;
-  int port_;
-  bool input_available(int timeout);
+  static RobosenseDriver* create_driver(
+      const apollo::drivers::suteng::SutengConfig& robo_config);
 };
 }  // namespace robosense
 }  // namespace drivers
