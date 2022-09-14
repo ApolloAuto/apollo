@@ -465,7 +465,7 @@ cc_test(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
-        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
+        "//modules/perception/pipeline/proto/stage:omt_cc_proto",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "@com_google_googletest//:gtest_main",
     ],
