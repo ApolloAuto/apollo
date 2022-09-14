@@ -73,6 +73,7 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/transformer/singlestage:singlestage_obstacle_transformer",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline/proto:camera_detection_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -89,9 +90,9 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
         "//modules/perception/camera/lib/traffic_light/detector/recognition",
-        "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
-        "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
+        "//modules/perception/pipeline/proto/stage:detection_cc_proto",
+        "//modules/perception/pipeline/proto/stage:semantic_cc_proto",
     ],
     alwayslink = True,
 )
