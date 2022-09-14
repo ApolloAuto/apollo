@@ -47,6 +47,7 @@ PointPillarsDetection::PointPillarsDetection()
   if (FLAGS_enable_ground_removal) {
     z_min_ = std::max(z_min_, static_cast<float>(FLAGS_ground_removal_height));
   }
+  name_ = "PointPillarsDetection";
 }
 
 // TODO(chenjiahao):
@@ -63,7 +64,7 @@ bool PointPillarsDetection::Init(const LidarDetectorInitOptions& options) {
 bool PointPillarsDetection::Init(const StageConfig& stage_config) {
   ACHECK(stage_config.has_pointpillars_detection());
   point_pillars_detection_config_ = stage_config.pointpillars_detection();
-  name_ = StageType_Name(pointcloud_preprocessor_config_.stage_type());
+  // name_ = StageType_Name(point_pillars_detection_config_.stage_type());
 
   point_pillars_ptr_.reset(
       new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
@@ -99,6 +100,7 @@ bool PointPillarsDetection::Process(DataFrame* data_frame,
          int num_points, std::vector<float>* out_detections,
          std::vector<int>* out_labels);
 }
+
 bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
                                    LidarFrame* frame) {
   // check input
@@ -281,11 +283,11 @@ bool PointPillarsDetection::Detect(LidarFrame* frame,
     return false;
   }
 
+  Timer timer;
+
   // inference
-  std::vector<float> out_detections;
-  std::vector<int> out_labels;
   point_pillars_ptr_->DoInference(points_array.data(), num_points,
-                                  &out_detections, &out_labels);
+                                  out_detections, out_labels);
   inference_time_ = timer.toc(true);
 
   // transfer output bounding boxes to objects
