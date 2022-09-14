@@ -91,9 +91,9 @@ bool PointPillarsDetection::Process(const LidarFrame& frame,
     return false;
   }
 
-  Detect(&lidar_frame, const std::vector<float> & points_array,
-         int num_points, std::vector<float>* out_detections,
-         std::vector<int>* out_labels);
+  // todo(zero) : const to point!!!
+  // Detect(&frame, points_array, num_points, out_detections, out_labels);
+  return true;
 }
 
 bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
@@ -263,10 +263,6 @@ bool PointPillarsDetection::Detect(LidarFrame* frame,
   }
   if (frame->cloud->size() == 0) {
     AERROR << "Input none points.";
-    return false;
-  }
-  if (points_array == nullptr) {
-    AERROR << "Input null points_array ptr.";
     return false;
   }
 
