@@ -4,8 +4,12 @@ load("//tools:cpplint.bzl", "cpplint")
 
 cc_library(
   name = "get_objects",
-  srcs = "get_objects.cc",
-  hdrs = "get_objects.h",
+  srcs = [
+    "get_objects.cc",
+  ],
+  hdrs = [
+    "get_objects.h",
+  ],
   deps = [
 
   ],
