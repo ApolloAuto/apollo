@@ -40,8 +40,10 @@ bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
 }
 
 bool ObjectBuilder::Init(const StageConfig& stage_config) {
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+  return true;
 }
 
 bool ObjectBuilder::Process(DataFrame* data_frame) {

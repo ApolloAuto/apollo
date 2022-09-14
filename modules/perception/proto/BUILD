@@ -125,21 +125,3 @@ py_proto_library(
     ],
 )
 
-cc_proto_library(
-    name = "probabilistic_fusion_config_cc_proto",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "probabilistic_fusion_config_proto",
-    srcs = ["probabilistic_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "probabilistic_fusion_config_py_pb2",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)

@@ -80,6 +80,42 @@ bool DenselineLanePostprocessor::Init(
 }
 
 bool DenselineLanePostprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  // Read detector config parameter
+  denseline::DenselineParam denseline_param;
+  const std::string& proto_path =
+      GetAbsolutePath(options.detect_config_root, options.detect_config_name);
+  if (!cyber::common::GetProtoFromFile(proto_path, &denseline_param)) {
+    AERROR << "Failed to load proto param, root dir: " << options.root_dir;
+    return false;
+  }
+  const auto& model_param = denseline_param.model_param();
+  input_offset_x_ = model_param.input_offset_x();
+  input_offset_y_ = model_param.input_offset_y();
+  input_crop_width_ = model_param.crop_width();
+  input_crop_height_ = model_param.crop_height();
+  AINFO << " offset_x=" << input_offset_x_ << " offset_y=" << input_offset_y_
+        << " crop_w=" << input_crop_width_ << " crop_h=" << input_crop_height_;
+
+  //  read postprocessor parameter
+  lane_postprocessor_param_ = stage_config.lane_postprocessor_param();
+  omit_bottom_line_num_ = lane_postprocessor_param_.omit_bottom_line_num();
+  laneline_map_score_thresh_ =
+      lane_postprocessor_param_.laneline_map_score_thresh();
+  laneline_point_score_thresh_ =
+      lane_postprocessor_param_.laneline_point_score_thresh();
+  laneline_point_min_num_thresh_ =
+      lane_postprocessor_param_.laneline_point_min_num_thresh();
+  cc_valid_pixels_ratio_ = lane_postprocessor_param_.cc_valid_pixels_ratio();
+  laneline_reject_dist_thresh_ =
+      lane_postprocessor_param_.laneline_reject_dist_thresh();
+
+  lane_map_dim_ = lane_map_width_ * lane_map_height_;
+  lane_pos_blob_.Reshape({4, lane_map_dim_});
+  lane_hist_blob_.Reshape({2, lane_map_dim_});
   return true;
 }
 

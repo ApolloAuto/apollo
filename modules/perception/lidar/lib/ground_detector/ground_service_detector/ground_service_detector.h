@@ -48,6 +48,8 @@ class GroundServiceDetector : public BaseGroundDetector {
   GroundServicePtr ground_service_ = nullptr;
   GroundServiceContent ground_service_content_;
   double ground_threshold_ = 0.25;
+
+  GroundServiceDetectorConfig ground_service_detector_config_;
 };
 
 }  // namespace lidar

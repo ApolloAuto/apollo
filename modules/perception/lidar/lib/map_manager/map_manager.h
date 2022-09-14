@@ -67,6 +67,8 @@ class MapManager final : public pipeline::Stage {
   bool update_pose_ = false;
   double roi_search_distance_ = 80.0;
 
+  MapManagerConfig map_manager_config_;
+
   FRIEND_TEST(LidarLibMapManagerTest, lidar_map_manager_test);
 };  // class MapManager
 

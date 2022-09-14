@@ -86,6 +86,8 @@ class HdmapROIFilter : public BaseROIFilter {
   Bitmap2D bitmap_;
   ROIServiceContent roi_service_content_;
 
+  HDMapRoiFilterConfig hdmap_roi_filter_config_;
+
   // unit tests only
   friend class HdmapROIFilterTest;
   friend class LidarLibROIServiceTest;

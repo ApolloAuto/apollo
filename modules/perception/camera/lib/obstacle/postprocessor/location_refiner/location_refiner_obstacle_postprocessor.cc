@@ -51,6 +51,9 @@ bool LocationRefinerObstaclePostprocessor::Init(
 
 bool LocationRefinerObstaclePostprocessor::Init(
     const StageConfig& stage_config) {
+  location_refiner_param_ = stage_config.location_refiner_param();
+  AINFO << "Load postprocessor parameters: "
+        << location_refiner_param_.DebugString();
   return true;
 }
 

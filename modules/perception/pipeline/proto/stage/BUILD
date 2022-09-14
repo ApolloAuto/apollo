@@ -258,6 +258,29 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "yolo_obstacle_detector_config_cc_proto",
+    deps = [
+        ":yolo_obstacle_detector_config_proto",
+    ],
+)
+
+proto_library(
+    name = "yolo_obstacle_detector_config_proto",
+    srcs = ["yolo_obstacle_detector_config.proto"],
+    deps = [
+        "//modules/perception/camera/proto:yolo_proto",
+    ],
+)
+
+py_proto_library(
+    name = "yolo_obstacle_detector_config_py_pb2",
+    deps = [
+        ":yolo_obstacle_detector_config_proto",
+        "//modules/perception/camera/proto:yolo_py_pb2",
+    ],
+)
+
+cc_proto_library(
     name = "mlf_engine_config_cc_proto",
     deps = [
         ":mlf_engine_config_proto",
@@ -276,6 +299,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "cnnseg_config_cc_proto",
+    deps = [
+        ":cnnseg_config_proto",
+    ],
+)
+
+proto_library(
+    name = "cnnseg_config_proto",
+    srcs = ["cnnseg_config.proto"],
+)
+
+py_proto_library(
+    name = "cnnseg_config_py_pb2",
+    deps = [
+        ":cnnseg_config_proto",
+    ],
+)
+cc_proto_library(
     name = "map_manager_config_cc_proto",
     deps = [
         ":map_manager_config_proto",
@@ -291,6 +332,24 @@ py_proto_library(
     name = "map_manager_config_py_pb2",
     deps = [
         ":map_manager_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "ncut_config_cc_proto",
+    deps = [
+        ":ncut_config_proto",
+    ],
+)
+
+proto_library(
+    name = "ncut_config_proto",
+    srcs = ["ncut_config.proto"],
+)
+
+py_proto_library(
+    name = "ncut_config_py_pb2",
+    deps = [
+        ":ncut_config_proto",
     ],
 )
 cc_proto_library(
@@ -417,5 +476,23 @@ py_proto_library(
     name = "spatio_temporal_ground_detector_config_py_pb2",
     deps = [
         ":spatio_temporal_ground_detector_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "probabilistic_fusion_config_cc_proto",
+    deps = [
+        ":probabilistic_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_proto",
+    srcs = ["probabilistic_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "probabilistic_fusion_config_py_pb2",
+    deps = [
+        ":probabilistic_fusion_config_proto",
     ],
 )

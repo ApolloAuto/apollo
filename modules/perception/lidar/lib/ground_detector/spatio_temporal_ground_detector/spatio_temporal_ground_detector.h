@@ -66,6 +66,8 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   size_t default_point_size_ = 320000;
   Eigen::Vector3d cloud_center_ = Eigen::Vector3d(0.0, 0.0, 0.0);
   GroundServiceContent ground_service_content_;
+
+  SpatioTemporalGroundDetectorConfig config_;
 };  // class SpatioTemporalGroundDetector
 
 }  // namespace lidar

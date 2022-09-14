@@ -127,8 +127,96 @@ bool NCutSegmentation::Init(const LidarDetectorInitOptions& options) {
 }
 
 bool NCutSegmentation::Init(const StageConfig& stage_config) {
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  ncut_config_ = stage_config.ncut_config();
+  if (!Configure(ncut_config_.param_file())) {
+    AERROR << "failed to load ncut config.";
+    return false;
+  }
+
+  // init ground detector
+  ground_detector_ =
+      BaseGroundDetectorRegisterer::GetInstanceByName(ground_detector_str_);
+  CHECK_NOTNULL(ground_detector_);
+  GroundDetectorInitOptions ground_detector_init_options;
+  ACHECK(ground_detector_->Init(ground_detector_init_options))
+      << "Failed to init ground detection.";
+
+  // init roi filter
+  roi_filter_ = BaseROIFilterRegisterer::GetInstanceByName(roi_filter_str_);
+  CHECK_NOTNULL(roi_filter_);
+  ROIFilterInitOptions roi_filter_init_options;
+  ACHECK(roi_filter_->Init(roi_filter_init_options))
+      << "Failed to init roi filter.";
+
+  _outliers.reset(new std::vector<ObjectPtr>);
+  if (!_outliers) {
+    AERROR << "Failed to reset outliers.";
+    return false;
+  }
+  int num_threads = 1;
+#pragma omp parallel
+  { num_threads = omp_get_num_threads(); }
+
+  AINFO << "number threads " << num_threads;
+  _segmentors.resize(num_threads);
+  for (int i = 0; i < num_threads; ++i) {
+    _segmentors[i].reset(new NCut);
+    if (!(_segmentors[i]->Init(ncut_param_))) {
+      AERROR << "failed to init NormalizedCut " << i << ".";
+      return false;
+    }
+  }
+
+  roi_cloud_ = base::PointFCloudPool::Instance().Get();
+  roi_world_cloud_ = base::PointDCloudPool::Instance().Get();
+
+  // init thread worker
+  worker_.Bind([&]() {
+    ROIFilterOptions roi_filter_options;
+    if (lidar_frame_ref_->hdmap_struct != nullptr &&
+        roi_filter_->Filter(roi_filter_options, lidar_frame_ref_)) {
+      roi_cloud_->CopyPointCloud(*lidar_frame_ref_->cloud,
+                                 lidar_frame_ref_->roi_indices);
+      roi_world_cloud_->CopyPointCloud(*lidar_frame_ref_->world_cloud,
+                                       lidar_frame_ref_->roi_indices);
+    } else {
+      AINFO << "Fail to call roi filter, use origin cloud.";
+      lidar_frame_ref_->roi_indices.indices.resize(original_cloud_->size());
+      // we manually fill roi indices with all cloud point indices
+      std::iota(lidar_frame_ref_->roi_indices.indices.begin(),
+                lidar_frame_ref_->roi_indices.indices.end(), 0);
+      // note roi cloud's memory should be kept here
+      *roi_cloud_ = *original_cloud_;
+      *roi_world_cloud_ = *original_world_cloud_;
+    }
+    lidar_frame_ref_->cloud = roi_cloud_;
+    lidar_frame_ref_->world_cloud = roi_world_cloud_;
+    AINFO << "lidar 2 world pose " << lidar_frame_ref_->lidar2world_pose(0, 3)
+          << " " << lidar_frame_ref_->lidar2world_pose(1, 3) << " "
+          << lidar_frame_ref_->lidar2world_pose(2, 3);
+    GroundDetectorOptions ground_detector_options;
+    ground_detector_->Detect(ground_detector_options, lidar_frame_ref_);
+    return true;
+  });
+
+  worker_.Start();
+
+#ifdef DEBUG_NCUT
+  _viewer = pcl::visualization::PCLVisualizer::Ptr(
+      new pcl::visualization::PCLVisualizer("3D Viewer"));
+  _viewer->setBackgroundColor(0, 0, 0);
+  _viewer->addCoordinateSystem(1.0);
+  _viewer->initCameraParameters();
+  _viewer_count = 0;
+  _rgb_cloud = CPointCloudPtr(new CPointCloud);
+#endif
+
+  AINFO << "NCutSegmentation init success, num_threads: " << num_threads;
+  return true;
 }
 
 bool NCutSegmentation::Process(DataFrame* data_frame) {

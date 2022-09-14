@@ -32,6 +32,7 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
+#include "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -102,6 +103,8 @@ class Yolov4ObstacleDetector : public BaseObstacleDetector {
   bool with_ratios_ = false;
   bool with_area_id_ = false;
   float border_ratio_ = 0.f;
+
+  YoloObstacleDetectorConfig yolo_obstacle_detector_config_;
 };
 
 }  // namespace camera

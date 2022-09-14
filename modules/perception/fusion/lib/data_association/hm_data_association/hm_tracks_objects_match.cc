@@ -45,9 +45,13 @@ void extract_vector(const std::vector<T>& vec,
 }
 
 bool HMTrackersObjectsAssociation::Init(const StageConfig& stage_config) {
-  // Init(config.fused_classifier_config());
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  track_object_distance_.set_distance_thresh(
+      static_cast<float>(s_match_distance_thresh_));
+  return true;
 }
 
 bool HMTrackersObjectsAssociation::Process(DataFrame* data_frame) {

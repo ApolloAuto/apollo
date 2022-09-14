@@ -55,6 +55,21 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
 }
 
 bool GroundServiceDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  ground_service_detector_config_ =
+      stage_config.ground_service_detector_config();
+
+  ground_threshold_ = ground_service_detector_config_.ground_threshold();
+
+  ground_service_ = std::dynamic_pointer_cast<GroundService>(
+      SceneManager::Instance().Service("GroundService"));
+  if (ground_service_ == nullptr) {
+    AERROR << "Ground service is nullptr, Init scene manager first !";
+    return false;
+  }
   return true;
 }
 

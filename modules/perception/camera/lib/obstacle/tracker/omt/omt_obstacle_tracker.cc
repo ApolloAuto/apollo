@@ -76,6 +76,40 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
 }
 
 bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  omt_param_ = stage_config.omt_param();
+  AINFO << "Load omt parameters: " << omt_param_.DebugString();
+
+  track_id_ = 0;
+  frame_num_ = 0;
+  frame_list_.Init(omt_param_.img_capability());
+  // todo(zero): options.gpu_id
+  gpu_id_ = options.gpu_id;
+  similar_map_.Init(omt_param_.img_capability(), gpu_id_);
+  similar_.reset(new GPUSimilar);
+  width_ = options.image_width;
+  height_ = options.image_height;
+  reference_.Init(omt_param_.reference(), width_, height_);
+  std::string type_change_cost =
+      GetAbsolutePath(options.root_dir, omt_param_.type_change_cost());
+  std::ifstream fin(type_change_cost);
+  ACHECK(fin.is_open());
+  kTypeAssociatedCost_.clear();
+  int n_type = static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE);
+  for (int i = 0; i < n_type; ++i) {
+    kTypeAssociatedCost_.emplace_back(std::vector<float>(n_type, 0));
+    for (int j = 0; j < n_type; ++j) {
+      fin >> kTypeAssociatedCost_[i][j];
+    }
+  }
+  targets_.clear();
+  used_.clear();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
   return true;
 }
 

@@ -53,6 +53,16 @@ bool SingleStageObstacleTransformer::Init(
 }
 
 bool SingleStageObstacleTransformer::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  singlestage_param_ = stage_config.singlestage_param();
+  AINFO << "Load transformer parameters: " << singlestage_param_.DebugString();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
+
   return true;
 }
 

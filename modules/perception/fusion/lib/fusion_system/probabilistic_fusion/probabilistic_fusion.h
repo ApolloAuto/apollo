@@ -24,6 +24,7 @@
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
+#include "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -99,6 +100,8 @@ class ProbabilisticFusion : public BaseFusionSystem {
   std::unique_ptr<BaseGatekeeper> gate_keeper_;
 
   FusionParams params_;
+
+  ProbabilisticFusionConfig probabilistic_fusion_config_;
 
   DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };

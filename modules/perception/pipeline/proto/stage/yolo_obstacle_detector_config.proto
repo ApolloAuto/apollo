@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+import "modules/perception/camera/proto/yolo.proto";
+
+message YoloObstacleDetectorConfig {
+  optional int32 gpu_id = 1;
+  optional yolo.YoloParam yolo_param = 2;
+}

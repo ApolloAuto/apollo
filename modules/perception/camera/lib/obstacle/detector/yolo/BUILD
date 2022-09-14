@@ -49,6 +49,7 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_cc_proto",
     ],
     alwayslink = True,
 )

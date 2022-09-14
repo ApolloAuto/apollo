@@ -58,9 +58,29 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
 }
 
 bool FusedClassifier::Init(const StageConfig& stage_config) {
-  Init(stage_config.fused_classifier_config());
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  fused_classifier_config_ = stage_config.fused_classifier_config();
+
+  temporal_window_ = fused_classifier_config_.temporal_window();
+  enable_temporal_fusion_ = fused_classifier_config_.enable_temporal_fusion();
+  use_tracked_objects_ = fused_classifier_config_.use_tracked_objects();
+  one_shot_fusion_method_ = fused_classifier_config_.one_shot_fusion_method();
+  sequence_fusion_method_ = fused_classifier_config_.sequence_fusion_method();
+
+  one_shot_fuser_ = BaseOneShotTypeFusionRegisterer::GetInstanceByName(
+      one_shot_fusion_method_);
+  CHECK_NOTNULL(one_shot_fuser_);
+  ACHECK(one_shot_fuser_->Init(init_option_));
+
+  sequence_fuser_ = BaseSequenceTypeFusionRegisterer::GetInstanceByName(
+      sequence_fusion_method_);
+  CHECK_NOTNULL(sequence_fuser_);
+  ACHECK(sequence_fuser_->Init(init_option_));
+
+  return true;
 }
 
 bool FusedClassifier::Process(DataFrame* data_frame) {

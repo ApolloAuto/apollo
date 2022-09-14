@@ -157,6 +157,10 @@ using cyber::common::GetAbsolutePath;
 // }
 
 bool TrafficLightDetection::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   detection_param_ = stage_config.traffic_light_detection_config();
 
   std::string param_str;

@@ -33,6 +33,7 @@
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/feature_generator.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/spp_engine/spp_engine.h"
+#include "modules/perception/pipeline/proto/stage/cnnseg_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -129,6 +130,8 @@ class CNNSegmentation : public BaseLidarDetector {
   // secondary segmentation to improve miss detection
   // not found by neural networks !
   std::shared_ptr<BaseLidarDetector> secondary_segmentor;
+
+  CNNSegConfig cnnseg_config_;
 
  private:
   const int kDefaultPointCloudSize = 120000;

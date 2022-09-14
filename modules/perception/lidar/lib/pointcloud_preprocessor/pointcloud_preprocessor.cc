@@ -64,16 +64,24 @@ bool PointCloudPreprocessor::Init(
 }
 
 bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   ACHECK(stage_config.has_pointcloud_preprocessor_config());
-  pointcloud_preprocessor_config_ = stage_config.pointcloud_preprocessor_config();
-  filter_naninf_points_ = pointcloud_preprocessor_config_.filter_naninf_points();
-  filter_nearby_box_points_ = pointcloud_preprocessor_config_.filter_nearby_box_points();
-  box_forward_x_ = pointcloud_preprocessor_config_.box_forward_x();
+  pointcloud_preprocessor_config_ =
+      stage_config.pointcloud_preprocessor_config();
+  filter_naninf_points_ =
+      pointcloud_preprocessor_config_.filter_naninf_points();
+  filter_nearby_box_points_ =
+      pointcloud_preprocessor_config_.filter_nearby_box_points();
+  box_forward_x_  = pointcloud_preprocessor_config_.box_forward_x();
   box_backward_x_ = pointcloud_preprocessor_config_.box_backward_x();
-  box_forward_y_ = pointcloud_preprocessor_config_.box_forward_y();
+  box_forward_y_  = pointcloud_preprocessor_config_.box_forward_y();
   box_backward_y_ = pointcloud_preprocessor_config_.box_backward_y();
-  filter_high_z_points_ = pointcloud_preprocessor_config_.filter_high_z_points();
-  z_threshold_ = pointcloud_preprocessor_config_.z_threshold();
+  filter_high_z_points_ =
+      pointcloud_preprocessor_config_.filter_high_z_points();
+  z_threshold_    = pointcloud_preprocessor_config_.z_threshold();
   return true;
 }
 

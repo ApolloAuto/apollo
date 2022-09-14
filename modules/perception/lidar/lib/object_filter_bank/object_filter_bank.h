@@ -60,6 +60,8 @@ class ObjectFilterBank : public pipeline::Stage {
 
  private:
   std::vector<BaseObjectFilter*> filter_bank_;
+  ObjectFilterBankConfig object_filter_bank_config_;
+
   DISALLOW_COPY_AND_ASSIGN(ObjectFilterBank);
 };
 

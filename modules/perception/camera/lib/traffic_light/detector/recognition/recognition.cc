@@ -47,6 +47,9 @@ bool TrafficLightRecognition::Init(
 }
 
 bool TrafficLightRecognition::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
 
   recognize_param_ = stage_config.traffic_light_recognition_config();
 

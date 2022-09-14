@@ -84,22 +84,27 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
 }
 
 bool ObjectFilterBank::Init(const StageConfig& stage_config) {
-  // filter_bank_.clear();
-  // for (const auto& plugin_config : stage_config.plugin_config()) {
-  //   const auto& name = plugin_config.plugin_type();
-  //   BaseObjectFilter* filter =
-  //       BaseObjectFilterRegisterer::GetInstanceByName(name);
-  //   if (filter == nullptr) {
-  //     AINFO << "Failed to find object filter: " << name << ", skipped";
-  //     continue;
-  //   }
-  //   if (!filter->Init(plugin_config)) {
-  //     AINFO << "Failed to init object filter: " << name << ", skipped";
-  //     continue;
-  //   }
-  //   filter_bank_.push_back(filter);
-  //   AINFO << "Filter bank add filter: " << name;
-  // }
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  object_filter_bank_config_ = stage_config.stage_config();
+
+  filter_bank_.clear();
+  for (const auto& filter_name : object_filter_bank_config_.filter_name()) {
+    BaseObjectFilter* filter =
+        BaseObjectFilterRegisterer::GetInstanceByName(filter_name);
+    if (!filter) {
+      AINFO << "Failed to find object filter: " << filter_name << ", skipped";
+      continue;
+    }
+    if (!filter->Init()) {
+      AINFO << "Failed to init object filter: " << filter_name << ", skipped";
+      continue;
+    }
+    filter_bank_.push_back(filter);
+    AINFO << "Filter bank add filter: " << filter_name;
+  }
 
   return true;
 }

@@ -90,6 +90,10 @@ void TrackingFeatureExtractor::init_roipooling(
 }
 
 bool TrackingFeatureExtractor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   return true;
 }
 

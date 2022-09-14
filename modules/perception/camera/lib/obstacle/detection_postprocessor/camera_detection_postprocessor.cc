@@ -21,6 +21,10 @@ namespace perception {
 namespace camera {
 
 bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   ACHECK(stage_config.has_camera_detection_postprocessor());
   camera_detection_postprocessor_config_ =
       stage_config.camera_detection_postprocessor();

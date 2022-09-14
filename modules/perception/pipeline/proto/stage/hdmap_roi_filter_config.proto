@@ -1,4 +1,5 @@
 syntax = "proto2";
+
 package apollo.perception.lidar;
 
 message HDMapRoiFilterConfig {

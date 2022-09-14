@@ -50,8 +50,21 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
 }
 
 bool MapManager::Init(const StageConfig& stage_config) {
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  map_manager_config_ = stage_config.map_manager_config();
+
+  update_pose_ = map_manager_config_.update_pose();
+  roi_search_distance_ = map_manager_config_.roi_search_distance();
+
+  hdmap_input_ = map::HDMapInput::Instance();
+  if (!hdmap_input_->Init()) {
+    AINFO << "Failed to init hdmap input.";
+    return false;
+  }
+  return true;
 }
 
 bool MapManager::Process(DataFrame* data_frame) {

@@ -65,6 +65,8 @@ class FusedClassifier : public BaseClassifier {
 
   TypeFusionOption option_;
   TypeFusionInitOption init_option_;
+
+  FusedClassifierConfig fused_classifier_config_;
 };  // class FusedClassifier
 
 }  // namespace lidar

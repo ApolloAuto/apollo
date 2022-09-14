@@ -24,6 +24,9 @@ namespace fusion {
 
 
 bool CollectFusedObject::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
 
   // gate_keeper_ = PluginFactory::CreatePlugin();
   return true;

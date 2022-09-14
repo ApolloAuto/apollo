@@ -30,7 +30,6 @@
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/probabilistic_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -102,7 +101,65 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
 }
 
 bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
-  return true;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  // todo(zero): main_sensor_
+  // main_sensor_ = init_options.main_sensor;
+
+  probabilistic_fusion_config_ = stage_config.probabilistic_fusion_config();
+
+  params_.use_lidar = probabilistic_fusion_config_.use_lidar();
+  params_.use_radar = probabilistic_fusion_config_.use_radar();
+  params_.use_camera = probabilistic_fusion_config_.use_camera();
+  params_.tracker_method = probabilistic_fusion_config_.tracker_method();
+  params_.data_association_method =
+      probabilistic_fusion_config_.data_association_method();
+  params_.gate_keeper_method =
+      probabilistic_fusion_config_.gate_keeper_method();
+  for (const auto& prohibition_sensor :
+          probabilistic_fusion_config_.prohibition_sensors()) {
+    params_.prohibition_sensors.push_back(prohibition_sensor);
+  }
+
+  // static member initialization from PB config
+  Track::SetMaxLidarInvisiblePeriod(
+      probabilistic_fusion_config_.max_lidar_invisible_period());
+  Track::SetMaxRadarInvisiblePeriod(
+      probabilistic_fusion_config_.max_radar_invisible_period());
+  Track::SetMaxCameraInvisiblePeriod(
+      probabilistic_fusion_config_.max_camera_invisible_period());
+  Sensor::SetMaxCachedFrameNumber(
+      probabilistic_fusion_config_.max_cached_frame_num());
+
+  scenes_.reset(new Scene());
+  if (params_.data_association_method == "HMAssociation") {
+    matcher_.reset(new HMTrackersObjectsAssociation());
+  } else {
+    AERROR << "Unknown association method: " << params_.data_association_method;
+    return false;
+  }
+  if (!matcher_->Init()) {
+    AERROR << "Failed to init matcher.";
+    return false;
+  }
+
+  if (params_.gate_keeper_method == "PbfGatekeeper") {
+    gate_keeper_.reset(new PbfGatekeeper());
+  } else {
+    AERROR << "Unknown gate keeper method: " << params_.gate_keeper_method;
+    return false;
+  }
+  if (!gate_keeper_->Init()) {
+    AERROR << "Failed to init gatekeeper.";
+    return false;
+  }
+
+  bool state = DstTypeFusion::Init() && DstExistenceFusion::Init() &&
+               PbfTracker::InitParams();
+
+  return state;
 }
 
 bool ProbabilisticFusion::Process(DataFrame* data_frame) {

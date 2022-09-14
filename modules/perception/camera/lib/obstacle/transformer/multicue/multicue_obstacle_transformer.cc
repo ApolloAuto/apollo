@@ -47,6 +47,16 @@ bool MultiCueObstacleTransformer::Init(
 }
 
 bool MultiCueObstacleTransformer::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  multicue_param_ = stage_config.multicue_param();
+  AINFO << "Load transformer parameters: " << multicue_param_.DebugString();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
+
   return true;
 }
 

@@ -113,6 +113,8 @@ class NCutSegmentation : public BaseLidarDetector {
   std::string roi_filter_str_;
   NCutParam ncut_param_;
 
+  NCutConfig ncut_config_;
+
 #ifdef DEBUG_NCUT
   pcl::visualization::PCLVisualizer::Ptr _viewer;
   CPointCloudPtr _rgb_cloud;

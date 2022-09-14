@@ -27,7 +27,10 @@ namespace fusion {
 
 
 bool AllLatestFusion::Init(const StageConfig& stage_config) {
-  // todo(zero):
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   return true;
 }
 

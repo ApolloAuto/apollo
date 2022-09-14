@@ -108,9 +108,17 @@ bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
 }
 
 bool PbfTracker::Init(const StageConfig& stage_config) {
-  Init(stage_config.pbf_tracker_config());
-  bool res = Initialize(stage_config);
-  return res;
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  // todo(zero): track
+  // track_ = track;
+  // if (!InitMethods()) {
+  //   return false;
+  // }
+  // motion_fusion_->Init();
+  return true;
 }
 
 bool PbfTracker::Process(DataFrame* data_frame) {

@@ -71,6 +71,31 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
 }
 
 bool HdmapROIFilter::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  hdmap_roi_filter_config_ = stage_config.hdmap_roi_filter_config();
+  range_ = hdmap_roi_filter_config_.range();
+  cell_size_ = hdmap_roi_filter_config_.cell_size();
+  extend_dist_ = hdmap_roi_filter_config_.extend_dist();
+  no_edge_table_ = hdmap_roi_filter_config_.no_edge_table();
+  set_roi_service_ = hdmap_roi_filter_config_.set_roi_service();
+
+  // reserve mem
+  const size_t KPolygonMaxNum = 100;
+  polygons_world_.reserve(KPolygonMaxNum);
+  polygons_local_.reserve(KPolygonMaxNum);
+
+  // init bitmap
+  Eigen::Vector2d min_range(-range_, -range_);
+  Eigen::Vector2d max_range(range_, range_);
+  Eigen::Vector2d cell_size(cell_size_, cell_size_);
+  bitmap_.Init(min_range, max_range, cell_size);
+
+  // output input parameters
+  AINFO << " HDMap Roi Filter Parameters: "
+        << hdmap_roi_filter_config_.DebugString();
   return true;
 }
 
