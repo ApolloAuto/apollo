@@ -65,7 +65,7 @@ class DummyInferenceEngine : public BaseInferenceEngine {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -95,7 +95,7 @@ class DummyLaneDetector : public BaseLaneDetector {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -132,7 +132,7 @@ class DummyLanePostprocessor : public BaseLanePostprocessor {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -163,7 +163,7 @@ class DummyLaneTracker : public BaseLaneTracker {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -195,7 +195,7 @@ class DummyObstacleDetector : public BaseObstacleDetector {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -227,7 +227,7 @@ class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -276,7 +276,7 @@ class DummyObstacleTracker : public BaseObstacleTracker {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -305,7 +305,7 @@ class DummyObstacleTransformer : public BaseObstacleTransformer {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -335,7 +335,7 @@ class DummyFeatureExtractor : public BaseFeatureExtractor {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -366,7 +366,7 @@ class DummyLandmarkDetector : public BaseLandmarkDetector {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };
@@ -436,7 +436,7 @@ class DummyCalibrationService : public BaseCalibrationService {
     return true;
   }
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 };

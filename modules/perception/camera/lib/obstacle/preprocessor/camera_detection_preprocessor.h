@@ -42,7 +42,7 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
 
   bool Process(DataFrame* data_frame, float * k_inv, cv::Mat * image_cv);
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   const std::string& Name() const override { return name_; }
 

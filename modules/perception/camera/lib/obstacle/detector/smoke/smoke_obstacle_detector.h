@@ -68,7 +68,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
                const std::vector<float> &image_data_array,
                const float *detect_result);
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 

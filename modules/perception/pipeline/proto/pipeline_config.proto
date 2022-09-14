@@ -110,9 +110,9 @@ message StageConfig {
   optional StageType stage_type = 1;
   optional bool enabled = 2 [default = true];
 
-  repeated PluginConfig plugin_config = 4;
+  repeated PluginConfig plugin_config = 3;
 
-  reserved 5 to 9;
+  reserved 4 to 9;
 
   oneof stage_config {
     lidar.PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;

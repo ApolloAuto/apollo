@@ -74,7 +74,6 @@ bool Pipeline::InnerProcess(DataFrame* frame) {
       }
     }
   }
-
   return true;
 }
 

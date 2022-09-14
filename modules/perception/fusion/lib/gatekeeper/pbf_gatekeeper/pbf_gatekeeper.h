@@ -52,7 +52,7 @@ class PbfGatekeeper : public BaseGatekeeper {
 
   bool Init(const PluginConfig& plugin_config) override;
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 

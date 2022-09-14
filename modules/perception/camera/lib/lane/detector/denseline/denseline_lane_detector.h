@@ -67,7 +67,7 @@ class DenselineLaneDetector : public BaseLaneDetector {
 
   bool Process(DataFrame* data_frame) override;
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 

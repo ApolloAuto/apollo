@@ -39,7 +39,7 @@ class Stage {
 
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual bool IsEnabled() = 0;
+  virtual bool IsEnabled() const = 0;;
 
   virtual std::string Name() const = 0;
 
@@ -54,7 +54,7 @@ class Stage {
   std::string name_;
 
   StageConfig stage_config_;
-  std::unordered_map<PluginType, const PluginConfig*, std::hash<int>>
+  std::unordered_map<PluginType, PluginConfig, std::hash<int>>
       plugin_config_map_;
 };
 

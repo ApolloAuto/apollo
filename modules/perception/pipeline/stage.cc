@@ -38,7 +38,7 @@ bool Stage::Initialize(const StageConfig& stage_config) {
       return false;
     }
 
-    plugin_config_map_[plugin_type] = &plugin_config;
+    plugin_config_map_[plugin_type] = plugin_config;
   }
 
   return true;

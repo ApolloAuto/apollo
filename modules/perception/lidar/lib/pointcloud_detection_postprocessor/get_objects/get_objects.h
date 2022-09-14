@@ -33,7 +33,7 @@ class GetObjects : public Task {
 
   bool Init(const TaskConfig& task_config) override;
   bool Process(DataFrame* data_frame) override;
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
  protected:
   bool enable_ = false;

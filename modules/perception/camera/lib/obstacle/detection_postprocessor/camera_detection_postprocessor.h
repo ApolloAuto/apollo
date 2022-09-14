@@ -43,7 +43,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
                const std::vector<base::ObjectSubType>& types,
                DataFrame* data_frame);
 
-  bool IsEnabled() override { return enable_; }
+  bool IsEnabled() const override { return enable_; }
 
   const std::string& Name() const override { return name_; }
 
