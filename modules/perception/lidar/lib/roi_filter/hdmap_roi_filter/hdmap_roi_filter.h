@@ -33,11 +33,7 @@ class HdmapROIFilterTest;
 class HdmapROIFilter : public BaseROIFilter {
  public:
   using DirectionMajor = Bitmap2D::DirectionMajor;
-  using EigenVector = apollo::common::EigenVector;
   using PolygonDType = base::PolygonDType;
-
-  template <typename T>
-  using Polygon = typename PolygonScanCvter<T>::Polygon;
 
  public:
   HdmapROIFilter()

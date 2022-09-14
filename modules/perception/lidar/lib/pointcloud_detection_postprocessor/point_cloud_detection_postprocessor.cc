@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/point_cloud_detection_postprocessor.h"
 
 namespace apollo {
 namespace perception {

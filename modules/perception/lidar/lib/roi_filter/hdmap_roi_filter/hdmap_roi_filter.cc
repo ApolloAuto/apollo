@@ -29,7 +29,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::EigenVector;
 using apollo::cyber::common::GetAbsolutePath;
+
+template <typename T>
+using Polygon = typename PolygonScanCvter<T>::Polygon;
 
 bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   // load model config

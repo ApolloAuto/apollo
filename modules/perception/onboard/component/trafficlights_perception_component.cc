@@ -86,12 +86,12 @@ static int GetGpuId(
   return trafficlight_param.gpu_id();
 }
 
-static int GetTrafficGpuId(const apollo::perception::pipeline::TrafficLightConfig& pipeline_config){
-  if (!pipeline_config.trafficlights_perception_config().has_gpu_id()){
+static int GetTrafficGpuId(const apollo::perception::pipeline::PipelineConfig& pipeline_config){
+  if (!pipeline_config.traffic_light_config().trafficlights_perception_config().has_gpu_id()){
     AINFO << "gpu id not found.";
     return -1;
   }
-  return pipeline_config.trafficlights_perception_config().gpu_id();
+  return pipeline_config.traffic_light_config().trafficlights_perception_config().gpu_id();
 }
 
 bool TrafficLightsPerceptionComponent::Init() {
@@ -185,6 +185,18 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   v2x_sync_interval_seconds_ = traffic_light_param.v2x_sync_interval_seconds();
   max_v2x_msg_buff_size_ = traffic_light_param.max_v2x_msg_buff_size();
   v2x_msg_buffer_.set_capacity(max_v2x_msg_buff_size_);
+
+  const auto& traffic_light_root_dir = traffic_light_param.camera_traffic_light_perception_conf_dir();
+  const auto& traffic_light_conf_file = traffic_light_param.camera_traffic_light_perception_conf_file();
+
+  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
+  std::string trafficlight_config_file =
+      GetAbsolutePath(traffic_light_root_dir, traffic_light_conf_file);
+  trafficlight_config_file = GetAbsolutePath(work_root, trafficlight_config_file);
+
+  ACHECK(
+      cyber::common::GetProtoFromFile(trafficlight_config_file, &trafficlight_config))
+      << "failed to load trafficlight config file " << trafficlight_config_file;
   return cyber::SUCC;
 }
 
@@ -244,18 +256,6 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     AERROR << "PreprocessComponent init hd-map failed.";
     return cyber::FAIL;
   }
-
-  const auto& traffic_light_root_dir = traffic_light_param.camera_traffic_light_perception_conf_dir();
-  const auto& traffic_light_conf_file = traffic_light_param.camera_traffic_light_perception_conf_file();
-
-  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
-  std::string trafficlight_config_file =
-      GetAbsolutePath(traffic_light_root_dir, traffic_light_conf_file);
-  trafficlight_config_file = GetAbsolutePath(work_root, trafficlight_config_file);
-
-  ACHECK(
-      cyber::common::GetProtoFromFile(trafficlight_config_file, &trafficlight_config))
-      << "failed to load trafficlight config file " << trafficlight_config_file;
   
   traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
   if (!traffic_light_pipeline_->Init(trafficlight_config)) {
@@ -412,7 +412,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   last_proc_image_ts_ = Clock::NowInSeconds();
 
   AINFO << "start proc.";
-  traffic_light_pipeline_->Process(DataFrame* data_frame->data_frame);
+  traffic_light_pipeline_->Process(data_frame_);
 
   for (auto light : frame_->traffic_lights) {
     AINFO << "after tl pipeline " << light->id << " color "

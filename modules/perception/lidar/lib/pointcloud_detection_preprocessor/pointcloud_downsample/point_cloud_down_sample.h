@@ -39,7 +39,7 @@ class PointCloudDownSample : public pipeline::Plugin {
   std::string Name() const override {return name_;}
 
  private:
-  bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame, float * points_array);
+  bool DownSample(LidarFrame* lidar_frame, float * points_array);
   // to store lidar_frame
   LidarFrame* lidar_frame_ref_ = nullptr;
   std::shared_ptr<base::AttributePointCloud<base::PointF>> original_cloud_;

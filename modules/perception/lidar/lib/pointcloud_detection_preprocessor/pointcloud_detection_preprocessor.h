@@ -36,16 +36,14 @@ class PointCloudDetectionPreprocessor : public pipeline::Stage {
 
   bool Init(const StageConfig& stage_config) override;
 
-  bool Process(DataFrame* data_frame) override;
-
   bool Process(DataFrame* data_frame, float* points_array, int num_points);
 
   bool IsEnabled() const override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
-  pipeline::stage::PointCloudDetectionPreprocessorConfig
+  pipeline::PointCloudDetectionPreprocessorConfig
       pointcloud_detection_preprocessor_config_;
 
   std::unique_ptr<Plugin> pointcloud_downsample_;

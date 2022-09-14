@@ -97,15 +97,12 @@ bool LidarObstacleDetection::Init(
 }
 
 bool LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
-  Initialize(pipeline_config);
-  return true;
+  return Initialize(pipeline_config);
 }
 
 bool LidarObstacleDetection::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
-
-  LidarFrame* frame = data_frame->lidar_frame;
 
   return InnerProcess(data_frame);
 }

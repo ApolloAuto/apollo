@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#pragma once
 
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 
@@ -56,12 +55,12 @@ bool PointCloudDetectionPreprocessor::Process(DataFrame* data_frame,
     AERROR << "Input null points_array ptr.";
     return false;
   }
-  if (!pointcloud_downsample_->Process(DataFrame * data_frame,
-                                       float* points_array, int num_points)) {
+  if (!pointcloud_downsample_->Process(data_frame, points_array, num_points)) {
     return false;
   }
   return true;
 }
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
