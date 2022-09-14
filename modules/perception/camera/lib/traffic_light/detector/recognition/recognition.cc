@@ -21,30 +21,30 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool TrafficLightRecognition::Init(
-    const TrafficLightDetectorInitOptions& options) {
-  std::string proto_path =
-      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
+// bool TrafficLightRecognition::Init(
+//     const TrafficLightDetectorInitOptions& options) {
+//   std::string proto_path =
+//       cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
 
-  AINFO << "proto_path " << proto_path;
-  if (!cyber::common::GetProtoFromFile(proto_path, &recognize_param_)) {
-    AINFO << "load proto param failed, root dir: " << options.root_dir;
-    return false;
-  }
+//   AINFO << "proto_path " << proto_path;
+//   if (!cyber::common::GetProtoFromFile(proto_path, &recognize_param_)) {
+//     AINFO << "load proto param failed, root dir: " << options.root_dir;
+//     return false;
+//   }
 
-  classify_quadrate_.reset(new ClassifyBySimple);
-  classify_vertical_.reset(new ClassifyBySimple);
-  classify_horizontal_.reset(new ClassifyBySimple);
+//   classify_quadrate_.reset(new ClassifyBySimple);
+//   classify_vertical_.reset(new ClassifyBySimple);
+//   classify_horizontal_.reset(new ClassifyBySimple);
 
-  classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id,
-                           options.root_dir);
-  classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id,
-                           options.root_dir);
-  classify_horizontal_->Init(recognize_param_.horizontal_model(),
-                             options.gpu_id, options.root_dir);
+//   classify_quadrate_->Init(recognize_param_.quadrate_model(), options.gpu_id,
+//                            options.root_dir);
+//   classify_vertical_->Init(recognize_param_.vertical_model(), options.gpu_id,
+//                            options.root_dir);
+//   classify_horizontal_->Init(recognize_param_.horizontal_model(),
+//                              options.gpu_id, options.root_dir);
 
-  return true;
-}
+//   return true;
+// }
 
 bool TrafficLightRecognition::Init(const StageConfig& stage_config) {
 

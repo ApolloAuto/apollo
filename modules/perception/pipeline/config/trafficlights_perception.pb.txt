@@ -104,6 +104,8 @@ stage_config: {
   }
 }
 
-trafficlights_perception_config: {
+traffic_light_config: {
+  trafficlights_perception_config: {
   gpu_id: 0
+  }
 }

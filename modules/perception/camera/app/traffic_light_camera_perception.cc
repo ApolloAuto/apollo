@@ -97,10 +97,8 @@ bool TrafficLightCameraPerception::Init(const PipelineConfig& pipeline_config) {
 bool TrafficLightCameraPerception::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
-  // CameraPerceptionOptions options;
-  // Perception( options, data_frame->camera_frame);
-  CameraFrame* frame = data_frame->camera_frame;
-  return InnerProcess(frame);
+  
+  return InnerProcess(data_frame);
 }
 
 bool TrafficLightCameraPerception::Perception(

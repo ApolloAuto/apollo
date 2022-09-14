@@ -57,8 +57,7 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   return true;
 }
 
-bool SemanticReviser::Init(
-    const apollo::perception::pipeline::StageConfig& stage_config){
+bool SemanticReviser::Init(const StageConfig& stage_config){
   semantic_param_ = stage_config.semantic_reviser_config();
 
   int non_blink_coef = 2;
