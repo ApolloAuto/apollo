@@ -45,6 +45,7 @@ bool CameraDetectionPreprocessor::Init(const StageConfig& stage_config) {
 bool CameraDetectionPreprocessor::Process(DataFrame* data_frame) {
   return true;
 }
+
 // input: data_frame
 // output:
 //          resize、normalize之后的 image_data_array -> input_blob(smoke detect
