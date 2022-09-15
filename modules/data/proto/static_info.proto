@@ -4,7 +4,7 @@ package apollo.data;
 
 import "modules/canbus/proto/canbus_conf.proto";
 import "modules/common_msgs/chassis_msgs/chassis.proto";
-import "modules/common/configs/proto/vehicle_config.proto";
+import "modules/common_msgs/config_msgs/vehicle_config.proto";
 import "modules/control/proto/control_conf.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
 
