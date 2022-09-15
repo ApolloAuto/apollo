@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest_prod.h"
+// #include "gtest/gtest_prod.h"
 
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
@@ -65,7 +65,7 @@ class Sensor {
   }
 
  private:
-  FRIEND_TEST(SensorTest, test);
+  // FRIEND_TEST(SensorTest, test);
 
   base::SensorInfo sensor_info_;
 

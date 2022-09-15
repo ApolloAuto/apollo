@@ -9,6 +9,11 @@ cc_library(
     hdrs = ["get_object.h"],
     deps = [
         "//modules/perception/pipeline:plugin",
+        "@boost",
+        "@eigen",
+        "@com_google_absl//:absl",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_cuda//cuda:cuda_headers",
     ],
 )
 

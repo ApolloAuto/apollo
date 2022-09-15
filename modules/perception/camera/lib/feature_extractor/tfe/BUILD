@@ -16,6 +16,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -31,6 +32,7 @@ cc_library(
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -48,6 +50,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

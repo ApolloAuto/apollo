@@ -33,6 +33,7 @@
 #include "modules/perception/camera/lib/interface/base_scene_parser.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

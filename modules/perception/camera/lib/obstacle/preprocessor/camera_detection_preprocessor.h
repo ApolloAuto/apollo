@@ -44,14 +44,13 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
 
   bool IsEnabled() const override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
-  pipeline::stage::CameraDetectionPreprocessorConfig
-      camera_detection_preprocessor_config_;
+//   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
 
-std::unique_ptr<Plugin> get_image_data_;
-std::unique_ptr<Plugin> resize_and_normalize_;
+  std::unique_ptr<Plugin> get_image_data_;
+  std::unique_ptr<Plugin> resize_and_normalize_;
 
 };  // class CameraDetectionPreprocessor
 

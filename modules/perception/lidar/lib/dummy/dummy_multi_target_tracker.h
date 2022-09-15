@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

@@ -24,6 +24,7 @@
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/geometry/common.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -87,14 +88,18 @@ bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
   frame_num_ = 0;
   frame_list_.Init(omt_param_.img_capability());
   // todo(zero): options.gpu_id
-  gpu_id_ = options.gpu_id;
+  gpu_id_ = omt_param_.gpu_id();
   similar_map_.Init(omt_param_.img_capability(), gpu_id_);
   similar_.reset(new GPUSimilar);
-  width_ = options.image_width;
-  height_ = options.image_height;
+
+  base::BaseCameraModelPtr model =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          omt_param_.camera_name());
+  width_ = model->get_width();
+  height_ = model->get_height();
   reference_.Init(omt_param_.reference(), width_, height_);
   std::string type_change_cost =
-      GetAbsolutePath(options.root_dir, omt_param_.type_change_cost());
+      GetAbsolutePath(omt_param_.root_dir(), omt_param_.type_change_cost());
   std::ifstream fin(type_change_cost);
   ACHECK(fin.is_open());
   kTypeAssociatedCost_.clear();
@@ -110,10 +115,6 @@ bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
 
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
-  return true;
-}
-
-bool OMTObstacleTracker::Process(DataFrame* data_frame) {
   return true;
 }
 
@@ -531,7 +532,7 @@ bool OMTObstacleTracker::Track(const ObstacleTrackerOptions &options,
 
 bool OMTObstacleTracker::Process(DataFrame* data_frame) {
   if (data_frame == nullptr) {
-    return;
+    return false;
   }
 
   CameraFrame* camera_frame = data_frame->camera_frame;
@@ -540,7 +541,7 @@ bool OMTObstacleTracker::Process(DataFrame* data_frame) {
   if (camera_frame->proposed_objects.empty()) {
     Predict(tracker_options, camera_frame);
   // todo(zero): add condition
-  } else if () {
+  } else if (camera_frame->tracked_objects.empty()) {
     Associate2D(tracker_options, camera_frame);
   } else if (camera_frame->tracked_objects.empty()) {
     Associate3D(tracker_options, camera_frame);

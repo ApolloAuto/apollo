@@ -30,6 +30,7 @@ cc_library(
         "//modules/perception/lidar/lib/detector/ncut_segmentation:ncut_segmentation",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
         "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//modules/perception/pipeline:stage",
         "@com_google_absl//:absl",
     ],
     alwayslink = True,

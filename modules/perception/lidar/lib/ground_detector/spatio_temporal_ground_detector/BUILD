@@ -25,6 +25,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

@@ -25,6 +25,7 @@
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/pipeline/proto/stage/denseline_postprocessor.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

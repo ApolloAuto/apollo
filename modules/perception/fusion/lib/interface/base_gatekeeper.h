@@ -32,7 +32,7 @@ class BaseGatekeeper : public pipeline::Plugin {
   using PluginConfig = pipeline::PluginConfig;
 
  public:
-  BaseGatekeeper() = default
+  BaseGatekeeper() = default;
   virtual ~BaseGatekeeper() = default;
 
   virtual bool Init() = 0;

@@ -14,6 +14,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/common/i_lib/core",
         "//modules/perception/pipeline/proto/stage:singlestage_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

@@ -10,6 +10,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -56,6 +57,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -66,6 +68,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -76,12 +79,16 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
 cc_library(
     name = "base_obstacle_postprocessor",
     hdrs = ["base_obstacle_postprocessor.h"],
+    deps = [
+        "//modules/perception/pipeline:stage",
+    ],
 )
 
 cc_library(
@@ -91,6 +98,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -101,6 +109,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -111,6 +120,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -121,6 +131,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -132,6 +143,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -148,6 +160,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -158,6 +171,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -169,6 +183,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -180,6 +195,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -190,6 +206,7 @@ cc_library(
         ":base_init_options",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

@@ -30,6 +30,7 @@ cc_library(
         "//cyber",
         "//modules/perception/fusion/base",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline",
     ],
 )
 

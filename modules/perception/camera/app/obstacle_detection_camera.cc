@@ -155,29 +155,51 @@ bool ObstacleDetectionCamera::Init(
 }
 
 bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
-  camera_detection_config_ =
-      pipeline_config.camera_detection_config();
+  if (!Initialize(pipeline_config)) {
+    return false;
+  }
 
-  base::BaseCameraModelPtr model =
-      common::SensorManager::Instance()->GetUndistortCameraModel(
-          camera_detection_config_.camera_name());
+  camera_detection_config_ = pipeline_config.camera_detection_config();
+  ACHECK(inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id()));
 
-  auto pinhole = static_cast<base::PinholeCameraModel*>(model.get());
-  name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
-      camera_detection_config_.camera_name(), pinhole->get_intrinsic_params()));
+  // Init detector
+  // Init tracker
+  // Init transformer
+  // Init obstacle postprocessor
+  // Init debug_param
+  if (camera_detection_config_.has_debug_param()) {
+    // Init debug info
+    if (camera_detection_config_.debug_param().has_track_out_file()) {
+      out_track_.open(camera_detection_config_.debug_param().track_out_file(),
+                      std::ofstream::out);
+    }
+    if (camera_detection_config_.debug_param().has_camera2world_out_file()) {
+      out_pose_.open(
+          camera_detection_config_.debug_param().camera2world_out_file(),
+          std::ofstream::out);
+    }
+  }
 
-  bool res = Initialize(pipeline_config);
-  return res;
+  // Init object template
+  if (camera_detection_config_.has_object_template_param()) {
+    ObjectTemplateManagerInitOptions init_options;
+    auto plugin_param =
+        camera_detection_config_.object_template_param().plugin_param();
+    // todo(zero): need fix work_root
+    // init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
+    init_options.conf_file = plugin_param.config_file();
+    ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
+  }
+
+  return true;
 }
 
 bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
-  inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id());
-
   CameraFrame* frame = data_frame->camera_frame;
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
 
-  InnerProcess(frame);
+  InnerProcess(data_frame);
 
   if (camera_detection_config_.has_debug_param()) {
     if (camera_detection_config_.debug_param().has_camera2world_out_file()) {
@@ -240,10 +262,11 @@ bool ObstacleDetectionCamera::Perception(
       absl::StrCat(perception_param_.debug_param().detection_out_dir(), "/",
                    frame->frame_id, ".txt"),
       frame->detected_objects);
-  if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
-    AERROR << "Failed to extractor";
-    return false;
-  }
+  // todo(zero): need fix
+  // if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
+  //   AERROR << "Failed to extractor";
+  //   return false;
+  // }
   PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                 "external_feature");
 

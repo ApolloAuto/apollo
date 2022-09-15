@@ -5,6 +5,9 @@ package apollo.perception.camera.darkSCNN;
 message DarkSCNNParam {
   optional ModelParam model_param = 1;
   optional NetworkParam net_param = 2;
+  optional string root_dir = 3;
+  optional int32 gpu_id = 4;
+  optional string camera_name = 5;
 }
 
 message ModelParam {

@@ -42,6 +42,7 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/transformer/singlestage:singlestage_obstacle_transformer",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -74,6 +75,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/pipeline/proto:camera_detection_config_cc_proto",
+        "//modules/perception/pipeline",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -115,6 +117,7 @@ cc_library(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

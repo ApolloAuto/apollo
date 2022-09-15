@@ -21,6 +21,7 @@
 #include "cyber/common/file.h"
 
 #include "modules/perception/camera/common/util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
 
@@ -173,18 +174,21 @@ bool DarkSCNNLaneDetector::Init(const StageConfig& stage_config) {
   darkscnn_param_ = stage_config.dark_scnn_param();
   const auto& model_param = darkscnn_param_.model_param();
 
-  // todo(zero): options.root_dir
+  // todo(zero): options
   std::string model_root =
-      GetAbsolutePath(options.root_dir, model_param.model_name());
+      GetAbsolutePath(darkscnn_param_.root_dir(), model_param.model_name());
   std::string proto_file =
       GetAbsolutePath(model_root, model_param.proto_file());
   std::string weight_file =
       GetAbsolutePath(model_root, model_param.weight_file());
-  AINFO << " proto_file: " << proto_file;
-  AINFO << " weight_file: " << weight_file;
-  AINFO << " model_root: " << model_root;
+  AINFO << " proto_file: " << proto_file
+        << " weight_file: " << weight_file
+        << " model_root: " << model_root;
 
-  base_camera_model_ = options.base_camera_model;
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          darkscnn_param_.camera_name());
+
   if (base_camera_model_ == nullptr) {
     AERROR << "options.intrinsic is nullptr!";
     input_height_ = 1080;
@@ -230,7 +234,7 @@ bool DarkSCNNLaneDetector::Init(const StageConfig& stage_config) {
   data_provider_image_option_.crop_roi.width = crop_width_;
 
   cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, options.gpu_id);
+  cudaGetDeviceProperties(&prop, darkscnn_param_.gpu_id());
   AINFO << "GPU: " << prop.name;
 
   const auto& net_param = darkscnn_param_.net_param();
@@ -256,7 +260,7 @@ bool DarkSCNNLaneDetector::Init(const StageConfig& stage_config) {
                                        net_outputs_, net_inputs_, model_root));
   ACHECK(cnnadapter_lane_ != nullptr);
 
-  cnnadapter_lane_->set_gpu_id(options.gpu_id);
+  cnnadapter_lane_->set_gpu_id(darkscnn_param_.gpu_id());
   ACHECK(resize_width_ > 0) << "resize width should be more than 0";
   ACHECK(resize_height_ > 0) << "resize height should be more than 0";
   std::vector<int> shape = {1, 3, resize_height_, resize_width_};

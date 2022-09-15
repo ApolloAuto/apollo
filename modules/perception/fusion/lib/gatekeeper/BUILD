@@ -9,5 +9,6 @@ cc_library(
     hdrs = ["collect_fused_object.h"],
     deps = [
         "//modules/perception/fusion/base:sensor_data_manager",
+        "//modules/perception/pipeline:stage",
     ],
 )

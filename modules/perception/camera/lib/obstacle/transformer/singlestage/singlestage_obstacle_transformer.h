@@ -24,8 +24,9 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/twod_threed_util.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
-#include "modules/perception/pipeline/proto/stage/singlestage.pb.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
+#include "modules/perception/pipeline/proto/stage/singlestage.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

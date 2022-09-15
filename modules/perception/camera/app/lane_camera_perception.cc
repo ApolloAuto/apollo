@@ -34,6 +34,7 @@
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -199,9 +200,7 @@ bool LaneCameraPerception::GetCalibrationService(
 }
 
 bool LaneCameraPerception::Process(DataFrame* data_frame) {
-  CameraFrame* frame = data_frame->camera_frame;
-  InnerProcess(frame);
-  return true;
+  return InnerProcess(data_frame);
 }
 
 bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,

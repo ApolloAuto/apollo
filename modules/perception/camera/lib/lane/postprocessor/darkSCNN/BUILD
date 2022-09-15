@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/pipeline/proto/stage:darkSCNN_cc_proto",
         "//modules/perception/lib/registerer",
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

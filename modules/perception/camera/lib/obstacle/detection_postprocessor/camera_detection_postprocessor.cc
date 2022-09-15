@@ -25,15 +25,17 @@ bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  ACHECK(stage_config.has_camera_detection_postprocessor());
+  ACHECK(stage_config.has_camera_detection_postprocessor_config());
   camera_detection_postprocessor_config_ =
-      stage_config.camera_detection_postprocessor();
+      stage_config.camera_detection_postprocessor_config();
 
-  get_object_ = PluginFactory::CreatePlugin(stage_config.get_object());
+  // todo(zero): need fix
+  // get_object_ = PluginFactory::CreatePlugin(stage_config.get_object());
 
-  if (!get_object_->Init(stage_config.get_object())) {
-    return false;
-  }
+  // if (!get_object_->Init(stage_config.get_object())) {
+  //   return false;
+  // }
+
   return true;
 }
 
@@ -48,20 +50,19 @@ bool CameraDetectionPostprocessor::Process(const std::vector<float> &detect_resu
     AERROR << "Input null data_frame ptr.";
     return false;
   }
-  if (nullptr == image) {
-    AERROR << "Input null image ptr.";
-    return false;
-  }
-  if (nullptr == k_inv) {
-    AERROR << "Input null k_inv ptr.";
-    return false;
-  }
+  // todo(zero): need fix
+  // if (nullptr == image) {
+  //   AERROR << "Input null image ptr.";
+  //   return false;
+  // }
+  // if (nullptr == k_inv) {
+  //   AERROR << "Input null k_inv ptr.";
+  //   return false;
+  // }
 
-  auto camera_frame = data_frame->camera_frame;
-
-  if (!get_object_->Process(detect_result, types, camera_frame)){
-    return false;
-  }
+  // if (!get_object_->Process(detect_result, types, data_frame)){
+  //   return false;
+  // }
 
   return true;
 }

@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/postprocessor/get_object/get_object.h"
-#include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/camera/lib/obstacle/detection_postprocessor/get_object/get_object.h"
+#include "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.pb.h"
 #include "modules/perception/pipeline/stage.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {
@@ -29,6 +29,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
+  using PluginFactory = pipeline::PluginFactory;
 
  public:
   CameraDetectionPostprocessor() = default;
@@ -45,11 +46,10 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
 
   bool IsEnabled() const override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
-  pipeline::stage::CameraDetectionPostprocessorConfig
-      camera_detection_postprocessor_config_;
+  CameraDetectionPostprocessorConfig camera_detection_postprocessor_config_;
 
   std::unique_ptr<Plugin> get_object_;
 

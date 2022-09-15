@@ -28,6 +28,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
         "//modules/perception/pipeline/proto/stage:mlf_engine_config_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

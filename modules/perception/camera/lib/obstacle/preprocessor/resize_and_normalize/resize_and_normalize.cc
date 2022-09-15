@@ -23,16 +23,15 @@ namespace perception {
 namespace camera {
 
 bool ReSizeAndNormalize::Init(const PluginConfig& plugin_config) {
-  ACHECK(task_config.has_resize_and_normalize());
-  resized_width_ = task_config.resized_width();
-  resized_height_ = task_config.resized_height();
-  mean_ = task_config.mean();
-  std_ = task_config.std();
-  scale_ = task_cofnig.scale();
+  // todo(zero): need fix
+  // ACHECK(plugin_config.has_resize_and_normalize());
+  // resized_width_ = plugin_config.resized_width();
+  // resized_height_ = plugin_config.resized_height();
+  // mean_ = plugin_config.mean();
+  // std_ = plugin_config.std();
+  // scale_ = plugin_config.scale();
   return true;
 }
-
-bool ReSizeAndNormalize::Process(DataFrame *data_frame) { return true; }
 
 // input: data_frame
 // output: 预处理之后的image数组
@@ -40,7 +39,8 @@ bool ReSizeAndNormalize::Process(cv::Mat &im, float *image_data_array) {
 
   cv::Mat resized_image;
   Resize(im, resized_height_, resized_width_, &resized_image);
-  Normalize(mean_, std_, scale_, &resized_image);
+  // todo(zero): need fix
+  // Normalize(mean_, std_, scale_, &resized_image);
   Mat2Vec(resized_image, image_data_array);
   return true;
 }

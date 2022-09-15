@@ -121,26 +121,18 @@ bool DarkSCNNLanePostprocessor::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  // todo(zero): darkSCNN::DarkSCNNParam??
-  // Read detector config parameter
-  darkSCNN::DarkSCNNParam darkscnn_param;
-  const std::string& proto_path =
-      GetAbsolutePath(options.detect_config_root, options.detect_config_name);
-  if (!GetProtoFromFile(proto_path, &darkscnn_param)) {
-    AINFO << "Failed to load proto param, root dir: " << options.root_dir;
-    return false;
-  }
-  const auto& model_param = darkscnn_param.model_param();
-  input_offset_x_ = model_param.input_offset_x();
-  input_offset_y_ = model_param.input_offset_y();
-  lane_map_width_ = model_param.resize_width();
-  lane_map_height_ = model_param.resize_height();
+  // todo(zero): repeated with darkSCNN::DarkSCNNParam??
+  // Read postprocessor parameter
+  lane_postprocessor_param_ = stage_config.darkscnn_lane_postprocessor_param();
+
+  input_offset_x_ = lane_postprocessor_param_.input_offset_x();
+  input_offset_y_ = lane_postprocessor_param_.input_offset_y();
+  lane_map_width_ = lane_postprocessor_param_.resize_width();
+  lane_map_height_ = lane_postprocessor_param_.resize_height();
   AINFO << "offset_x=" << input_offset_x_ << " offset_y=" << input_offset_y_
         << " lane_map_width=" << lane_map_width_
         << " lane_map_height_=" << lane_map_height_;
 
-  // Read postprocessor parameter
-  lane_postprocessor_param_ = stage_config.darkscnn_lane_postprocessor_param();
   roi_height_ = lane_postprocessor_param_.roi_height();
   roi_start_ = lane_postprocessor_param_.roi_start();
   roi_width_ = lane_postprocessor_param_.roi_width();

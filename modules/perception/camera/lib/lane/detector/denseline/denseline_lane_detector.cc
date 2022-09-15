@@ -20,6 +20,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/camera/common/util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
 
@@ -153,15 +154,19 @@ bool DenselineLaneDetector::Init(const StageConfig& stage_config) {
   }
 
   denseline_param_ = stage_config.denseline_param();
-  // todo(zero): options.base_camera_model
+  // todo(zero): options
   const auto& model_param = denseline_param_.model_param();
   std::string model_root =
-      GetAbsolutePath(options.root_dir, model_param.model_name());
+      GetAbsolutePath(denseline_param_.root_dir(), model_param.model_name());
   std::string proto_file =
       GetAbsolutePath(model_root, model_param.proto_file());
   std::string weight_file =
       GetAbsolutePath(model_root, model_param.weight_file());
-  base_camera_model_ = options.base_camera_model;
+
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          denseline_param_.camera_name());
+
   if (base_camera_model_ == nullptr) {
     AERROR << "options.intrinsic is nullptr!";
     input_height_ = 1080;
@@ -204,7 +209,7 @@ bool DenselineLaneDetector::Init(const StageConfig& stage_config) {
   data_provider_image_option_.crop_roi.width = crop_width_;
 
   cudaDeviceProp prop;
-  cudaGetDeviceProperties(&prop, options.gpu_id);
+  cudaGetDeviceProperties(&prop, denseline_param_.gpu_id());
   AINFO << "GPU: " << prop.name;
 
   const auto net_param = denseline_param_.net_param();
@@ -227,7 +232,7 @@ bool DenselineLaneDetector::Init(const StageConfig& stage_config) {
                                                  weight_file, net_outputs_,
                                                  net_inputs_, model_root));
   ACHECK(rt_net_ != nullptr);
-  rt_net_->set_gpu_id(options.gpu_id);
+  rt_net_->set_gpu_id(denseline_param_.gpu_id());
 
   resize_height_ = static_cast<uint16_t>(crop_height_ * image_scale_);
   resize_width_ = static_cast<uint16_t>(crop_width_ * image_scale_);

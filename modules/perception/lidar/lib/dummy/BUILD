@@ -28,6 +28,7 @@ cc_library(
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
+        "//modules/perception/pipeline:stage",
         "@eigen",
     ],
 )

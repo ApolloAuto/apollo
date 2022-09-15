@@ -24,6 +24,7 @@
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
 #include "modules/perception/fusion/lib/interface/base_type_fusion.h"
+#include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/proto/stage/pbf_tracker_config.pb.h"
 
 namespace apollo {
@@ -48,9 +49,7 @@ class PbfTracker : public BaseTracker {
                                 double measurement_timestamp,
                                 double target_timestamp) override;
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
   bool IsEnabled() const override { return enable_; }
 

@@ -180,6 +180,14 @@ bool ObstacleCameraPerception::Init(
   return true;
 }
 
+bool ObstacleCameraPerception::Init(const PipelineConfig& pipeline_config) {
+  return true;
+}
+
+bool ObstacleCameraPerception::Process(DataFrame* data_frame) {
+  return true;
+}
+
 void ObstacleCameraPerception::InitLane(
     const std::string &work_root,
     const app::PerceptionParam &perception_param) {

@@ -24,6 +24,7 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/pipeline/proto/stage:multicue_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

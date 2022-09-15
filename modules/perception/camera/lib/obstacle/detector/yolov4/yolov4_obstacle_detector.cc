@@ -305,14 +305,17 @@ bool Yolov4ObstacleDetector::Init(const StageConfig& stage_config) {
   BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
-  base_camera_model_ = yolo_obstacle_detector_config_.base_camera_model();
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          yolo_obstacle_detector_config_.camera_name());
   ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
 
   yolo_param_ = yolo_obstacle_detector_config_.yolo_param();
   const auto &model_param = yolo_param_.model_param();
   //todo(zero): options.root_dir
+  std::string root_dir = yolo_obstacle_detector_config_.root_dir();
   std::string model_root =
-      GetAbsolutePath(options.root_dir, model_param.model_name());
+      GetAbsolutePath(root_dir, model_param.model_name());
   std::string anchors_file =
       GetAbsolutePath(model_root, model_param.anchors_file());
   std::string types_file =

@@ -43,6 +43,8 @@ class BaseShapeFusion {
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
 
+  virtual std::string Name() const;
+
  protected:
   TrackPtr track_ref_;
 

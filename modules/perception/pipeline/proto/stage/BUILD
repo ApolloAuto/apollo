@@ -78,6 +78,42 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "pointcloud_detection_preprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_detection_preprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_detection_preprocessor_config_proto",
+    srcs = ["pointcloud_detection_preprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_detection_preprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_detection_preprocessor_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "pointcloud_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_detection_postprocessor_config_proto",
+    srcs = ["pointcloud_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
+cc_proto_library(
     name = "semantic_cc_proto",
     deps = [
         ":semantic_proto",
@@ -186,6 +222,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "smoke_obstacle_detection_config_cc_proto",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "smoke_obstacle_detection_config_proto",
+    srcs = ["smoke_obstacle_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "smoke_obstacle_detection_config_py_pb2",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+cc_proto_library(
     name = "detection_cc_proto",
     deps = [
         ":detection_proto",
@@ -201,6 +255,24 @@ py_proto_library(
     name = "detection_py_pb2",
     deps = [
         ":detection_proto",
+    ],
+)
+cc_proto_library(
+    name = "camera_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_detection_postprocessor_config_proto",
+    srcs = ["camera_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
     ],
 )
 cc_proto_library(
@@ -257,45 +329,6 @@ py_proto_library(
         ":pointcloud_preprocessor_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "pointcloud_detection_preprocessor_config_cc_proto",
-    deps = [
-        ":pointcloud_detection_preprocessor_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pointcloud_detection_preprocessor_config_proto",
-    srcs = ["pointcloud_detection_preprocessor_config.proto"],
-)
-
-py_proto_library(
-    name = "pointcloud_detection_preprocessor_config_py_pb2",
-    deps = [
-        ":pointcloud_detection_preprocessor_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pointcloud_detection_postprocessor_config_cc_proto",
-    deps = [
-        ":pointcloud_detection_postprocessor_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pointcloud_detection_postprocessor_config_proto",
-    srcs = ["pointcloud_detection_postprocessor_config.proto"],
-)
-
-py_proto_library(
-    name = "pointcloud_detection_postprocessor_config_py_pb2",
-    deps = [
-        ":pointcloud_detection_postprocessor_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "yolo_obstacle_detector_config_cc_proto",
     deps = [

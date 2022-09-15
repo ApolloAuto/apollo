@@ -21,6 +21,7 @@
 
 #include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {

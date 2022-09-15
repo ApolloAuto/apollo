@@ -16,6 +16,7 @@
 #pragma once
 
 #include <vector>
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
@@ -31,6 +32,8 @@ class ReSizeAndNormalize : public pipeline::Plugin {
  public:
   ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
   virtual ~ReSizeAndNormalize() = default;
+
+  bool Process(cv::Mat &im, float *image_data_array);
 
   bool Init(const PluginConfig& plugin_config) override;
   bool IsEnabled() const override { return enable_; }
@@ -48,7 +51,7 @@ class ReSizeAndNormalize : public pipeline::Plugin {
   std::vector<float> mean_;
   std::vector<float> std_;
   std::vector<float> scale_;
-}  // class ReSizeAndNormalize
+};  // class ReSizeAndNormalize
 
 }  // namespace camera
 }  // namespace perception

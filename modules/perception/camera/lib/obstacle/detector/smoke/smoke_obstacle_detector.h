@@ -34,6 +34,7 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -41,9 +42,7 @@ namespace camera {
 
 class SmokeObstacleDetector : public BaseObstacleDetector {
  public:
-  SmokeObstacleDetector() : BaseObstacleDetector() {
-    name_ = "SmokeObstacleDetector";
-  }
+  SmokeObstacleDetector() : BaseObstacleDetector() {}
   virtual ~SmokeObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);
@@ -60,7 +59,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
               const std::vector<float> &image_data_array,
               const float *detect_result);
 
-  bool Init(const StageConfig &stage_config) override;
+  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame *data_frame) override;
 
@@ -116,12 +115,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   bool with_area_id_ = false;
   float border_ratio_ = 0.f;
 
-  pipeline::stage::SmokeObstacleDetectionConfig
-      smoke_obstacle_detection_config_;
-
-
- std::string name_;
- bool enable_;
+  SmokeObstacleDetectionConfig smoke_obstacle_detection_config_;
 };
 
 }  // namespace camera

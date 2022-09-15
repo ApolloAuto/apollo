@@ -18,7 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -60,9 +60,7 @@ bool PbfGatekeeper::Init() {
 }
 
 bool PbfGatekeeper::Init(const PluginConfig& plugin_config) {
-  Init(config.pbf_gatekeeper_config());
-  bool res = Initialize(config);
-  return res;
+  return true;
 }
 
 bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {

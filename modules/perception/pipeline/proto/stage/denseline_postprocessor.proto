@@ -9,4 +9,8 @@ message LanePostprocessorParam {
   optional int32 laneline_point_min_num_thresh = 4 [default = 2];
   optional float cc_valid_pixels_ratio = 5 [default = 2];
   optional float laneline_reject_dist_thresh = 6 [default = 50];
+  optional uint32 input_offset_x = 7 [default = 0];
+  optional uint32 input_offset_y = 8 [default = 0];
+  optional uint32 crop_height = 9 [default = 512];
+  optional uint32 crop_width = 10 [default = 512];
 }

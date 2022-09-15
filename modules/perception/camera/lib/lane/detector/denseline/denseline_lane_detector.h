@@ -26,6 +26,7 @@
 #include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/pipeline/proto/stage/denseline.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

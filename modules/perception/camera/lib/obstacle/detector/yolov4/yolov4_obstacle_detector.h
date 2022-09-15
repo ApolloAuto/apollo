@@ -33,6 +33,7 @@
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

@@ -58,9 +58,6 @@ bool HMTrackersObjectsAssociation::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
-
   AssociationOptions options;
   bool res = Associate(options, data_frame);
 
