@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message PointcloudDownSampleConfig {
+  optional bool enable_downsample_pointcloud = 1;
+  optional bool enable_downsample_beams = 2;
+}

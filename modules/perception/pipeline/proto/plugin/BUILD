@@ -6,6 +6,24 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "pointcloud_down_sample_config_cc_proto",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_down_sample_config_proto",
+    srcs = ["pointcloud_down_sample_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_down_sample_config_py_pb2",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+cc_proto_library(
     name = "roi_boundary_filter_config_cc_proto",
     deps = [
         ":roi_boundary_filter_config_proto",
@@ -57,6 +75,24 @@ py_proto_library(
     name = "dst_type_fusion_config_py_pb2",
     deps = [
         ":dst_type_fusion_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "pointcloud_get_objects_config_cc_proto",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_get_objects_config_proto",
+    srcs = ["pointcloud_get_objects_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_get_objects_config_py_pb2",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
     ],
 )
 cc_proto_library(

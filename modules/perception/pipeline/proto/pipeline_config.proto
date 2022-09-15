@@ -25,6 +25,8 @@ import "modules/perception/pipeline/proto/stage/ncut_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
 import "modules/perception/pipeline/proto/stage/omt.proto";
 import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
+import "modules/perception/pipeline/proto/stage/pointcloud_detection_postprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/pointcloud_detection_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.proto";
@@ -36,14 +38,17 @@ import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 // plugin
+import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
 
 // plugin
 enum PluginType {
+  POINTCLOUD_DOWN_SAMPLE = 1 ;
+  POINTCLOUD_GET_OBJECTS = 2;
   // filter
-  ROI_BOUNDARY_FILTER = 1;
-
+  ROI_BOUNDARY_FILTER = 3;
 }
 
 message PluginConfig {
@@ -53,7 +58,9 @@ message PluginConfig {
   reserved 3 to 9;
 
   oneof plugin_config {
-    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 10;
+    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 10;
+    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 11;
+    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 12;
   }
 }
 
@@ -64,10 +71,12 @@ enum StageType {
   TL_PREPROCESSOR = 1;
   // lidar preprocessors
   POINTCLOUD_PREPROCESSOR = 2;
+  // lidar detection preprocessor
+  POINTCLOUD_DETECTION_PREPROCESSOR = 3;
   // radar preprocessors
-  CONTI_ARS_PREPROCESSOR = 3;
+  CONTI_ARS_PREPROCESSOR = 4;
 
-  MAP_MANAGER = 4;
+  MAP_MANAGER = 5;
 
 
   // detectors
@@ -97,8 +106,9 @@ enum StageType {
   DARKSCNN_LANE_POSTPROCESSOR = 102;
   DENSELINE_LANE_POSTPROCESSOR = 103;
   // lidar post processors
-  OBJECT_BUILDER = 104;
-  OBJECT_FILTER_BANK = 105;
+  POINTCLOUD_DETECTION_POSTPROCESSOR = 104;
+  OBJECT_BUILDER = 105;
+  OBJECT_FILTER_BANK = 106;
 
 
   // tracker
