@@ -223,9 +223,6 @@ void OnlineCalibrationService::SetCameraHeightAndPitch(
   }
 }
 
-std::string OnlineCalibrationService::Name() const {
-  return "OnlineCalibrationService";
-}
 REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
 
 }  // namespace camera

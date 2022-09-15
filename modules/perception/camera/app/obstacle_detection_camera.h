@@ -34,6 +34,7 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/pipeline/pipeline.h"
 #include "modules/perception/pipeline/proto/camera_detection_config.pb.h"
 
 namespace apollo {
