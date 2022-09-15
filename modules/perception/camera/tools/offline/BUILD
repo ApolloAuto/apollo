@@ -59,6 +59,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "@boost",
         "@com_google_absl//:absl",
         "@opencv//:imgcodecs",

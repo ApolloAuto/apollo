@@ -37,7 +37,7 @@ struct CameraStatus {
 
 class OnlineCalibrationService : public BaseCalibrationService {
  public:
-  OnlineCalibrationService() { name_ = "OnlineCalibrationService"; }
+  OnlineCalibrationService() = default;
 
   virtual ~OnlineCalibrationService() = default;
 
