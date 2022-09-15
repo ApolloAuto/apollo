@@ -80,4 +80,6 @@ message OmtParam {
   optional double same_ts_eps = 18 [default = 0.05];
   optional ReferenceParam reference = 19;
   optional string type_change_cost = 20;
+  optional int32 gpu_id = 21;
+  optional string root_dir = 22;
 }

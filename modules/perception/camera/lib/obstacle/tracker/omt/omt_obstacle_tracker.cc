@@ -24,6 +24,7 @@
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/geometry/common.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -87,14 +88,18 @@ bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
   frame_num_ = 0;
   frame_list_.Init(omt_param_.img_capability());
   // todo(zero): options.gpu_id
-  gpu_id_ = options.gpu_id;
+  gpu_id_ = omt_param_.gpu_id();
   similar_map_.Init(omt_param_.img_capability(), gpu_id_);
   similar_.reset(new GPUSimilar);
-  width_ = options.image_width;
-  height_ = options.image_height;
+
+  base::BaseCameraModelPtr model =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          darkscnn_param_.camera_name());
+  width_ = model->get_width();
+  height_ = model->get_height();
   reference_.Init(omt_param_.reference(), width_, height_);
   std::string type_change_cost =
-      GetAbsolutePath(options.root_dir, omt_param_.type_change_cost());
+      GetAbsolutePath(omt_param_.root_dir(), omt_param_.type_change_cost());
   std::ifstream fin(type_change_cost);
   ACHECK(fin.is_open());
   kTypeAssociatedCost_.clear();

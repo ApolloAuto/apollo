@@ -163,12 +163,6 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
   ACHECK(inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id()));
 
   // Init detector
-  model = common::SensorManager::Instance()->GetUndistortCameraModel(
-      camera_detection_config_.camera_name());
-  auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
-  name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
-      camera_detection_config_.camera_name(), pinhole->get_intrinsic_params()));
-
   // Init tracker
   // Init transformer
   // Init obstacle postprocessor

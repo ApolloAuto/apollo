@@ -311,8 +311,9 @@ bool Yolov4ObstacleDetector::Init(const StageConfig& stage_config) {
   yolo_param_ = yolo_obstacle_detector_config_.yolo_param();
   const auto &model_param = yolo_param_.model_param();
   //todo(zero): options.root_dir
+  std::string root_dir = yolo_obstacle_detector_config_.root_dir();
   std::string model_root =
-      GetAbsolutePath(options.root_dir, model_param.model_name());
+      GetAbsolutePath(root_dir, model_param.model_name());
   std::string anchors_file =
       GetAbsolutePath(model_root, model_param.anchors_file());
   std::string types_file =
