@@ -82,4 +82,5 @@ message OmtParam {
   optional string type_change_cost = 20;
   optional int32 gpu_id = 21;
   optional string root_dir = 22;
+  optional string camera_name = 23;
 }

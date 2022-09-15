@@ -10,6 +10,6 @@ message DarkSCNNLanePostprocessorParam {
   optional uint32 roi_width = 5 [default = 1920];
   optional uint32 input_offset_x = 6 [default = 0];
   optional uint32 input_offset_y = 7 [default = 0];
-  optional uint32 crop_height = 8 [default = 512];
-  optional uint32 crop_width = 9 [default = 512];
+  optional uint32 resize_width = 8 [default = 512];
+  optional uint32 resize_height = 9 [default = 512];
 }

@@ -44,6 +44,7 @@ struct FeatureExtractorInitOptions : public BaseInitOptions {
 struct FeatureExtractorOptions {
   bool normalized = true;
 };
+
 class BaseFeatureExtractor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
