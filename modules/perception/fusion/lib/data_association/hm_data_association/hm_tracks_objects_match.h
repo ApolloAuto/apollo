@@ -21,7 +21,7 @@
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_distance.h"
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
-#include "modules/perception/pipeline/stage.h"
+// #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -42,13 +42,14 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
 
-  bool Init(const StageConfig& stage_config) override;
+// todo(zero): need fix
+//   bool Init(const StageConfig& stage_config) override;
 
-  bool Process(DataFrame* data_frame) override;
+//   bool Process(DataFrame* data_frame) override;
 
-  bool IsEnabled() const override { return enable_; }
+//   bool IsEnabled() const override { return enable_; }
 
-  std::string Name() const override { return name_; }
+//   std::string Name() const override { return name_; }
 
  private:
   void ComputeAssociationDistanceMat(
