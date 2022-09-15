@@ -190,7 +190,7 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   return true;
 }
 
-bool Init(const StageConfig &stage_config) {
+bool SmokeObstacleDetector::Init(const StageConfig& stage_config) {
   ACHECK(stage_config.has_smoke_obstacle_detection());
   smoke_obstacle_detection_config_ =
       stage_config.smoke_obstacle_detection_config();
@@ -258,6 +258,10 @@ bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   if (!feature_extractor_->Init(feature_options)) {
     return false;
   }
+  return true;
+}
+
+bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
   return true;
 }
 
