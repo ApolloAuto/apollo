@@ -195,22 +195,25 @@ bool Init(const StageConfig &stage_config) {
   smoke_obstacle_detection_config_ =
       stage_config.smoke_obstacle_detection_config();
 
-  gpu_id_ = smoke_obstacle_detection_config_.gpu_id;
+  gpu_id_ = smoke_obstacle_detection_config_.gpu_id();
   BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
-  base_camera_model_ = smoke_obstacle_detection_config_.base_camera_model;
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          smoke_obstacle_detection_config_.camera_name());
   ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+
   std::string config_path =
-      GetAbsolutePath(smoke_obstacle_detection_config_.root_dir,
-                      smoke_obstacle_detection_config_.conf_file);
+      GetAbsolutePath(smoke_obstacle_detection_config_.root_dir(),
+                      smoke_obstacle_detection_config_.conf_file());
   if (!cyber::common::GetProtoFromFile(config_path, &smoke_param_)) {
     AERROR << "read proto_config fail";
     return false;
   }
   const auto &model_param = smoke_param_.model_param();
   std::string model_root = GetAbsolutePath(
-      smoke_obstacle_detection_config_.root_dir, model_param.model_name());
+      smoke_obstacle_detection_config_.root_dir(), model_param.model_name());
   std::string anchors_file =
       GetAbsolutePath(model_root, model_param.anchors_file());
   std::string types_file =
@@ -395,14 +398,14 @@ bool SmokeObstacleDetector::Process(
 
   K_data = k_inv.data();
   input_blob->mutable_cpu_data() = image_data_array.data();
-  
- 
+
+
   AINFO << "Camera type: " << frame->data_provider->sensor_name();
   /////////////////////////// detection part ///////////////////////////
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";
-  
+
   detect_result = smoke_blobs_.det1_loc_blob->cpu_data();
   return true;
 }

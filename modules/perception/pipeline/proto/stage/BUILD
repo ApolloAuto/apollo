@@ -186,6 +186,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "smoke_obstacle_detection_config_cc_proto",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "smoke_obstacle_detection_config_proto",
+    srcs = ["smoke_obstacle_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "smoke_obstacle_detection_config_py_pb2",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+cc_proto_library(
     name = "detection_cc_proto",
     deps = [
         ":detection_proto",

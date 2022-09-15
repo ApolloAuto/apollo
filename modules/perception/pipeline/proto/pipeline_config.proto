@@ -8,31 +8,32 @@ import "modules/perception/pipeline/proto/lane_detection_config.proto";
 import "modules/perception/pipeline/proto/lidar_detection_config.proto";
 import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
+import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
+import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
+import "modules/perception/pipeline/proto/stage/denseline_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/denseline.proto";
 import "modules/perception/pipeline/proto/stage/detection.proto";
 import "modules/perception/pipeline/proto/stage/fused_classifier_config.proto";
+import "modules/perception/pipeline/proto/stage/ground_service_detector_config.proto";
+import "modules/perception/pipeline/proto/stage/hdmap_roi_filter_config.proto";
+import "modules/perception/pipeline/proto/stage/location_refiner.proto";
 import "modules/perception/pipeline/proto/stage/map_manager_config.proto";
 import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
+import "modules/perception/pipeline/proto/stage/multicue.proto";
+import "modules/perception/pipeline/proto/stage/ncut_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
+import "modules/perception/pipeline/proto/stage/omt.proto";
 import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
 import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
 import "modules/perception/pipeline/proto/stage/semantic.proto";
-import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
-import "modules/perception/pipeline/proto/stage/location_refiner.proto";
-import "modules/perception/pipeline/proto/stage/omt.proto";
-import "modules/perception/pipeline/proto/stage/multicue.proto";
 import "modules/perception/pipeline/proto/stage/singlestage.proto";
-import "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.proto";
-import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
-import "modules/perception/pipeline/proto/stage/ncut_config.proto";
-import "modules/perception/pipeline/proto/stage/ground_service_detector_config.proto";
-import "modules/perception/pipeline/proto/stage/hdmap_roi_filter_config.proto";
-import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
-import "modules/perception/pipeline/proto/stage/denseline.proto";
-import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
-import "modules/perception/pipeline/proto/stage/denseline_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
+import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
@@ -154,6 +155,7 @@ message StageConfig {
     camera.denseline.DenselineParam denseline_param = 59;
     camera.lane.DarkSCNNLanePostprocessorParam darkscnn_lane_postprocessor_param = 60;
     camera.lane.LanePostprocessorParam lane_postprocessor_param = 61;
+    camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
 
     fusion.PbfTrackerConfig pbf_tracker_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;

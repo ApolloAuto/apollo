@@ -42,9 +42,7 @@ namespace camera {
 
 class SmokeObstacleDetector : public BaseObstacleDetector {
  public:
-  SmokeObstacleDetector() : BaseObstacleDetector() {
-    name_ = "SmokeObstacleDetector";
-  }
+  SmokeObstacleDetector() : BaseObstacleDetector() {}
   virtual ~SmokeObstacleDetector() {
     if (stream_ != nullptr) {
       cudaStreamDestroy(stream_);
@@ -117,12 +115,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   bool with_area_id_ = false;
   float border_ratio_ = 0.f;
 
-  pipeline::stage::SmokeObstacleDetectionConfig
-      smoke_obstacle_detection_config_;
-
-
- std::string name_;
- bool enable_;
+  SmokeObstacleDetectionConfig smoke_obstacle_detection_config_;
 };
 
 }  // namespace camera
