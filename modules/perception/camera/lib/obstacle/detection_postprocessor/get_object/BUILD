@@ -11,6 +11,8 @@ cc_library(
         "//modules/perception/pipeline:plugin",
         "@boost",
         "@eigen",
+        "@com_google_absl//:absl",
+        "@local_config_cuda//cuda:cudart",
     ],
 )
 
