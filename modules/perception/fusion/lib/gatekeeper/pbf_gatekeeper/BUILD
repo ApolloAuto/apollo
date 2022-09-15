@@ -18,17 +18,18 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "pbf_gatekeeper_test",
-    size = "small",
-    srcs = ["pbf_gatekeeper_test.cc"],
-    deps = [
-        ":pbf_gatekeeper",
-        "//modules/perception/common/sensor_manager",
-        "//modules/perception/fusion/base:sensor",
-        "//modules/perception/fusion/base:track",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+# todo(zero)
+# cc_test(
+#     name = "pbf_gatekeeper_test",
+#     size = "small",
+#     srcs = ["pbf_gatekeeper_test.cc"],
+#     deps = [
+#         ":pbf_gatekeeper",
+#         "//modules/perception/common/sensor_manager",
+#         "//modules/perception/fusion/base:sensor",
+#         "//modules/perception/fusion/base:track",
+#         "@com_google_googletest//:gtest_main",
+#     ],
+# )
 
 cpplint()

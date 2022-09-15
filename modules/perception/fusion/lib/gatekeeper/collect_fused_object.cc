@@ -16,6 +16,12 @@
 
 #include "modules/perception/fusion/lib/gatekeeper/collect_fused_object.h"
 
+#include "modules/common/util/string_util.h"
+#include "modules/perception/base/object_supplement.h"
+#include "modules/perception/base/object.h"
+#include "modules/perception/fusion/base/sensor_object.h"
+#include "modules/perception/fusion/base/track.h"
+
 namespace apollo {
 namespace perception {
 namespace fusion {
