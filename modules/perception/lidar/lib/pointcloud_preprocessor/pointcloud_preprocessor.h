@@ -20,6 +20,7 @@
 
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
 #include "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

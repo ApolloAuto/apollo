@@ -23,6 +23,7 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/gemm.h"
 #include "modules/perception/pipeline/proto/stage/tracking_feature.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

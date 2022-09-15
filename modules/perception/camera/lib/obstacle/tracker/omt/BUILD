@@ -54,6 +54,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/obstacle/tracker/common",
         "//modules/perception/pipeline/proto/stage:omt_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

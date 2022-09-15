@@ -18,6 +18,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/registerer",
         "//modules/perception/pipeline/proto/stage:denseline_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

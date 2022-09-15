@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/ground_service:ground_struct",
         "//modules/perception/pipeline/proto/stage:ground_service_detector_config_cc_proto",
         "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//modules/perception/pipeline:stage",
         "@eigen",
     ],
 )

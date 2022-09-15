@@ -23,6 +23,7 @@
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

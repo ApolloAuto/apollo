@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/pipeline/proto/stage:hdmap_roi_filter_config_cc_proto",
+        "//modules/perception/pipeline:stage",
         "@eigen",
     ],
     alwayslink = True,

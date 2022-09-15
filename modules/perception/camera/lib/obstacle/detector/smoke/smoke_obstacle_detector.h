@@ -34,6 +34,7 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -60,7 +61,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
               const std::vector<float> &image_data_array,
               const float *detect_result);
 
-  bool Init(const StageConfig &stage_config) override;
+  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame *data_frame) override;
 

@@ -55,6 +55,7 @@ cc_library(
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/lidar/lib/interface:base_classifier",
         "//modules/perception/pipeline/proto/stage:fused_classifier_config_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

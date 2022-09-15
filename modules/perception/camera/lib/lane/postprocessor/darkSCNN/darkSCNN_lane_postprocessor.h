@@ -28,6 +28,7 @@
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/pipeline/proto/stage/darkSCNN.pb.h"
 #include "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

@@ -8,6 +8,7 @@ cc_library(
     srcs = ["camera_detection_preprocessor.cc"],
     hdrs = ["camera_detection_preprocessor.h"],
     deps = [
+        "//modules/perception/pipeline:stage",
     ],
 )
 

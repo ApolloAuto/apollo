@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["dummy_algorithms.h"],
     deps = [
         "//modules/perception/camera/lib/interface",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

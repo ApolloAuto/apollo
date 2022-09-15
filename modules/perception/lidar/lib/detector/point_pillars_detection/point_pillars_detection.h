@@ -29,6 +29,7 @@
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/pipeline/proto/stage/point_pillars_detection_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

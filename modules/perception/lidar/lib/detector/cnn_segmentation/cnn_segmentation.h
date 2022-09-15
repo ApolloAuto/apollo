@@ -34,6 +34,7 @@
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/feature_generator.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/spp_engine/spp_engine.h"
 #include "modules/perception/pipeline/proto/stage/cnnseg_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

@@ -25,6 +25,7 @@
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
 #include "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {

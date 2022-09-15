@@ -16,6 +16,7 @@ cc_library(
         "//modules/perception/lib/registerer",
         "//modules/perception/pipeline/proto/stage:denseline_cc_proto",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

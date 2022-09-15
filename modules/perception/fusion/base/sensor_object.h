@@ -19,7 +19,7 @@
 #include <string>
 
 #include "Eigen/Core"
-#include "gtest/gtest_prod.h"
+// #include "gtest/gtest_prod.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -58,7 +58,7 @@ class SensorObject {
   inline void SetInvisiblePeriod(double period) { invisible_period_ = period; }
 
  private:
-  FRIEND_TEST(SensorObjectTest, test);
+  // FRIEND_TEST(SensorObjectTest, test);
 
   std::shared_ptr<const base::Object> object_;
   double invisible_period_ = 0.0;
