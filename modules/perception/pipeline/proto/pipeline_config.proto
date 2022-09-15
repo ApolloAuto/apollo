@@ -142,17 +142,19 @@ message StageConfig {
   reserved 4 to 9;
 
   oneof stage_config {
-    lidar.PointCloudPreprocessorConfig pointcloud_preprocessor_config = 10;
-    lidar.MapManagerConfig map_manager_config = 11;
-    lidar.ObjectFilterBankConfig object_filter_bank_config = 12;
-    lidar.PointPillarsDetectionConfig pointpillars_detection = 13;
-    lidar.MlfEngineConfig mlf_engine_config = 14;
-    lidar.FusedClassifierConfig fused_classifier_config = 15;
-    lidar.CNNSegConfig cnnseg_config = 16;
-    lidar.NCutConfig ncut_config = 17;
-    lidar.GroundServiceDetectorConfig ground_service_detector_config = 18;
-    lidar.SpatioTemporalGroundDetectorConfig spatio_temporal_ground_detector_config = 19;
-    lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 20;
+    lidar.PointcloudDetectionPreprocessorConfig pointcloud_detection_preprocessor_config = 10;
+    lidar.PointcloudDetectionPostprocessorConfig pointcloud_detection_postprocessor_config = 11;
+    lidar.PointcloudPreprocessorConfig pointcloud_preprocessor_config = 12;
+    lidar.MapManagerConfig map_manager_config = 13;
+    lidar.ObjectFilterBankConfig object_filter_bank_config = 14;
+    lidar.PointPillarsDetectionConfig pointpillars_detection = 15;
+    lidar.MlfEngineConfig mlf_engine_config = 16;
+    lidar.FusedClassifierConfig fused_classifier_config = 17;
+    lidar.CNNSegConfig cnnseg_config = 18;
+    lidar.NCutConfig ncut_config = 19;
+    lidar.GroundServiceDetectorConfig ground_service_detector_config = 20;
+    lidar.SpatioTemporalGroundDetectorConfig spatio_temporal_ground_detector_config = 21;
+    lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 22;
 
     camera.TrafficLightDetectionConfig traffic_light_detection_config = 50;
     camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 51;

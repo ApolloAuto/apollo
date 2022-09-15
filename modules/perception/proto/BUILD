@@ -6,42 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "perception_config_schema_cc_proto",
-    deps = [
-        ":perception_config_schema_proto",
-    ],
-)
-
-proto_library(
-    name = "perception_config_schema_proto",
-    srcs = ["perception_config_schema.proto"],
-)
-
-py_proto_library(
-    name = "perception_config_schema_py_pb2",
-    deps = [
-        ":perception_config_schema_proto",
-    ],
-)
-cc_proto_library(
-    name = "sensor_meta_schema_cc_proto",
-    deps = [
-        ":sensor_meta_schema_proto",
-    ],
-)
-
-proto_library(
-    name = "sensor_meta_schema_proto",
-    srcs = ["sensor_meta_schema.proto"],
-)
-
-py_proto_library(
-    name = "sensor_meta_schema_py_pb2",
-    deps = [
-        ":sensor_meta_schema_proto",
-    ],
-)
-cc_proto_library(
     name = "motion_service_cc_proto",
     deps = [
         ":motion_service_proto",
@@ -65,23 +29,24 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "tracker_config_cc_proto",
+    name = "sensor_meta_schema_cc_proto",
     deps = [
-        ":tracker_config_proto",
+        ":sensor_meta_schema_proto",
     ],
 )
 
 proto_library(
-    name = "tracker_config_proto",
-    srcs = ["tracker_config.proto"],
+    name = "sensor_meta_schema_proto",
+    srcs = ["sensor_meta_schema.proto"],
 )
 
 py_proto_library(
-    name = "tracker_config_py_pb2",
+    name = "sensor_meta_schema_py_pb2",
     deps = [
-        ":tracker_config_proto",
+        ":sensor_meta_schema_proto",
     ],
 )
+
 cc_proto_library(
     name = "rt_cc_proto",
     deps = [
@@ -100,6 +65,45 @@ py_proto_library(
         ":rt_proto",
     ],
 )
+
+cc_proto_library(
+    name = "perception_config_schema_cc_proto",
+    deps = [
+        ":perception_config_schema_proto",
+    ],
+)
+
+proto_library(
+    name = "perception_config_schema_proto",
+    srcs = ["perception_config_schema.proto"],
+)
+
+py_proto_library(
+    name = "perception_config_schema_py_pb2",
+    deps = [
+        ":perception_config_schema_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "tracker_config_cc_proto",
+    deps = [
+        ":tracker_config_proto",
+    ],
+)
+
+proto_library(
+    name = "tracker_config_proto",
+    srcs = ["tracker_config.proto"],
+)
+
+py_proto_library(
+    name = "tracker_config_py_pb2",
+    deps = [
+        ":tracker_config_proto",
+    ],
+)
+
 cc_proto_library(
     name = "perception_ultrasonic_cc_proto",
     deps = [
@@ -111,8 +115,8 @@ proto_library(
     name = "perception_ultrasonic_proto",
     srcs = ["perception_ultrasonic.proto"],
     deps = [
-        "//modules/common_msgs/basic_msgs:header_proto",
         "//modules/common_msgs/basic_msgs:geometry_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
@@ -120,8 +124,7 @@ py_proto_library(
     name = "perception_ultrasonic_py_pb2",
     deps = [
         ":perception_ultrasonic_proto",
-        "//modules/common_msgs/basic_msgs:header_py_pb2",
         "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
     ],
 )
-

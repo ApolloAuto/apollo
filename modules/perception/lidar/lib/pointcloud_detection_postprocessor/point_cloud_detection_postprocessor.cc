@@ -16,50 +16,44 @@
 
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/point_cloud_detection_postprocessor.h"
 
+#include "modules/perception/pipeline/plugin_factory.h"
+
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 // stage init
-bool PointCloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
+bool PointcloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
+  ACHECK(stage_config.has_pointcloud_detection_postprocessor_config());
+
   if (!Initialize(stage_config)) {
     return false;
   }
 
-  ACHECK(stage_config.has_pointcloud_detection_postprocessor());
+  pointcloud_get_objects_ = pipeline::PluginFactory::CreatePlugin(
+      plugin_config_map_
+          [apollo::perception::pipeline::PluginType::POINTCLOUD_GET_OBJECTS]);
 
-  get_objects_ = PluginFactory::CreatePlugin(stage_config.get_objects());
-  if (!get_objects_->Init(stage_config.get_objects())) {
-    return false;
-  }
   return true;
 }
 
-bool PointCloudDetectionPostprocessor::Process(DataFrame* data_frame) {
+bool PointcloudDetectionPostprocessor::Process(DataFrame* data_frame) {
   return true;
 }
 
-bool PointCloudDetectionPostprocessor::Process(
-    DataFrame* data_frame, std::vector<float>* out_detections,
-    std::vector<int>* out_labels) {
+bool PointcloudDetectionPostprocessor::Process(
+    const std::vector<float>& detections, const std::vector<int>& labels,
+    DataFrame* data_frame) {
   if (nullptr == data_frame) {
     AERROR << "Input null data_frame ptr.";
     return false;
   }
-  if (nullptr == out_detections) {
-    AERROR << "Input null out_detections ptr.";
+  if (!dynamic_cast<PointCloudGetObjects*>(pointcloud_get_objects_.get())
+           ->Process(detections, labels, data_frame)) {
     return false;
   }
-
-  if (nullptr == out_labels) {
-    AERROR << "Input null out_labels ptr.";
-    return false;
-  }
-    if(!get_objects_->Process(DataFrame* data_frame, float* points_array, int num_points)){
-    return false;
-  }
+  return true;
 }
-
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

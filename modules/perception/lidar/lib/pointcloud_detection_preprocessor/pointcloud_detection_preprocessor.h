@@ -15,6 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
+#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/pointcloud_down_sample.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/stage.h"
@@ -23,32 +26,34 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class PointCloudDetectionPreprocessor : public pipeline::Stage {
+class PointcloudDetectionPreprocessor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
 
  public:
-  PointCloudDetectionPreprocessor() = default;
+  PointcloudDetectionPreprocessor() = default;
 
-  virtual ~PointCloudDetectionPreprocessor() = default;
+  virtual ~PointcloudDetectionPreprocessor() = default;
 
   bool Init(const StageConfig& stage_config) override;
 
-  bool Process(DataFrame* data_frame, float* points_array, int num_points);
+  bool Process(DataFrame* data_frame) override;
+
+  bool Process(DataFrame* data_frame, std::vector<float>* points_array, int *num_points);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  pipeline::PointCloudDetectionPreprocessorConfig
+  PointcloudDetectionPreprocessorConfig
       pointcloud_detection_preprocessor_config_;
 
   std::unique_ptr<Plugin> pointcloud_downsample_;
 
-};  // class PointCloudDetectionPreprocessor
+};  // class PointcloudDetectionPreprocessor
 
 }  // namespace lidar
 }  // namespace perception

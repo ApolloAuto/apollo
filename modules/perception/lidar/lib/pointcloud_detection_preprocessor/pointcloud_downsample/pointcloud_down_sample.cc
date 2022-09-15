@@ -14,40 +14,46 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/point_cloud_down_sample.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/pointcloud_down_sample.h"
+
+#include <random>
 
 #include "modules/perception/base/point_cloud_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/common/pcl_util.h"
+#include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
-  ACHECK(plugin_config.has_pointcloud_down_sample());
-  enable_downsample_pointcloud_ = plugin_config.enable_downsample_pointcloud();
-  enable_downsample_beams_ = plugin_config.enable_downsample_beams();
+  ACHECK(plugin_config.has_pointcloud_down_sample_config());
+  enable_downsample_pointcloud_ = plugin_config.pointcloud_down_sample_config().enable_downsample_pointcloud();
+  enable_downsample_beams_ = plugin_config.pointcloud_down_sample_config().enable_downsample_beams();
+  x_min_range_ = plugin_config.pointcloud_down_sample_config().x_min_range();
+  x_max_range_ = plugin_config.pointcloud_down_sample_config().x_max_range();
+  y_min_range_ = plugin_config.pointcloud_down_sample_config().y_min_range();
+  y_max_range_ = plugin_config.pointcloud_down_sample_config().y_max_range();
+  z_min_range_ = plugin_config.pointcloud_down_sample_config().z_min_range();
+  z_max_range_ = plugin_config.pointcloud_down_sample_config().z_max_range();
   return true;
 }
 
-bool PointCloudDownSample::Process(DataFrame* data_frame, float* point_array) {
-  if (data_frame == nullptr) {
-    AERROR << "Input null data_frame ptr.";
-    return false;
-  }
-  if (point_array == nullptr) {
-    AERROR << "Input null point_array ptr.";
-    return false;
-  }
-
+bool PointCloudDownSample::Process(DataFrame* data_frame,
+                                   std::vector<float>* points_array,
+                                   int* num_points_result) {
   auto lidar_frame = data_frame->lidar_frame;
-  DownSample(data_frame, point_array);
+  if (!DownSample(lidar_frame, points_array, num_points_result)) {
+    return false;
+  }
+  return true;
 }
 
 bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
-                                      float* points_array,
+                                      std::vector<float>* points_array,
                                       int* num_points_result) {
   if (lidar_frame->cloud == nullptr) {
     AERROR << "Input null frame cloud.";
@@ -70,6 +76,7 @@ bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
 
   Timer timer;
 
+  int num_points;
   cur_cloud_ptr_ = std::shared_ptr<base::PointFCloud>(
       new base::PointFCloud(*original_cloud_));
 
@@ -87,7 +94,8 @@ bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
   }
 
   if (enable_downsample_pointcloud_) {
-    pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_ptr(
+        new pcl::PointCloud<pcl::PointXYZI>());
     pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_cloud_ptr(
         new pcl::PointCloud<pcl::PointXYZI>());
     TransformToPCLXYZI(*cur_cloud_ptr_, pcl_cloud_ptr);
@@ -111,7 +119,8 @@ bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
   if (FLAGS_enable_fuse_frames && FLAGS_num_fuse_frames > 1) {
     // before fusing
     while (!prev_world_clouds_.empty() &&
-           frame->timestamp - prev_world_clouds_.front()->get_timestamp() >
+           lidar_frame->timestamp -
+                   prev_world_clouds_.front()->get_timestamp() >
                FLAGS_fuse_time_interval) {
       prev_world_clouds_.pop_front();
     }
@@ -122,14 +131,14 @@ bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
       auto& pt = cur_cloud_ptr_->at(i);
       Eigen::Vector3d trans_point(pt.x, pt.y, pt.z);
       trans_point = lidar_frame_ref_->lidar2world_pose * trans_point;
-      PointD world_point;
+      base::PointD world_point;
       world_point.x = trans_point(0);
       world_point.y = trans_point(1);
       world_point.z = trans_point(2);
       world_point.intensity = pt.intensity;
       cur_world_cloud_ptr->push_back(world_point);
     }
-    cur_world_cloud_ptr->set_timestamp(frame->timestamp);
+    cur_world_cloud_ptr->set_timestamp(lidar_frame->timestamp);
 
     // fusing clouds
     for (auto& prev_world_cloud_ptr : prev_world_clouds_) {
@@ -159,8 +168,8 @@ bool PointCloudDownSample::DownSample(LidarFrame* lidar_frame,
 
   // point cloud to array
   // float* points_array = new float[num_points * FLAGS_num_point_feature]();
-  points_array->resize(num_points * FLAGS_num_point_feature)
-      CloudToArray(cur_cloud_ptr_, points_array, FLAGS_normalizing_factor);
+  points_array->resize(num_points * FLAGS_num_point_feature);
+  CloudToArray(cur_cloud_ptr_, points_array->data(), FLAGS_normalizing_factor);
   *num_points_result = num_points;
   cloud_to_array_time_ = timer.toc(true);
 
@@ -186,6 +195,45 @@ void PointCloudDownSample::FuseCloud(
       out_cloud_ptr->push_back(pt, delta_t);
     }
   }
+}
+
+void PointCloudDownSample::CloudToArray(const base::PointFCloudPtr& pc_ptr,
+                                        float* out_points_array,
+                                        const float normalizing_factor) {
+  for (size_t i = 0; i < pc_ptr->size(); ++i) {
+    const auto& point = pc_ptr->at(i);
+    float x = point.x;
+    float y = point.y;
+    float z = point.z;
+    float intensity = point.intensity;
+    if (z < z_min_range_ || z > z_max_range_ || y < y_min_range_ ||
+        y > y_max_range_ || x < x_min_range_ || x > x_max_range_) {
+      continue;
+    }
+    out_points_array[i * FLAGS_num_point_feature + 0] = x;
+    out_points_array[i * FLAGS_num_point_feature + 1] = y;
+    out_points_array[i * FLAGS_num_point_feature + 2] = z;
+    out_points_array[i * FLAGS_num_point_feature + 3] =
+        intensity / normalizing_factor;
+    // delta of timestamp between prev and cur frames
+    out_points_array[i * FLAGS_num_point_feature + 4] =
+        static_cast<float>(pc_ptr->points_timestamp(i));
+  }
+}
+
+std::vector<int> PointCloudDownSample::GenerateIndices(int start_index,
+                                                       int size, bool shuffle) {
+  // create a range number array
+  std::vector<int> indices(size);
+  std::iota(indices.begin(), indices.end(), start_index);
+
+  // shuffle the index array
+  if (shuffle) {
+    unsigned seed = 0;
+    std::shuffle(indices.begin(), indices.end(),
+                 std::default_random_engine(seed));
+  }
+  return indices;
 }
 
 }  // namespace lidar

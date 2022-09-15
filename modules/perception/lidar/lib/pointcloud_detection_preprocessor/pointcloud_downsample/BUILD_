@@ -1,0 +1,25 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//tools/install:install.bzl", "install")
+load("//tools:cpplint.bzl", "cpplint")
+
+cc_library(
+  name = "pointcloud_down_sample",
+  srcs = [
+    "pointcloud_down_sample.cc",
+  ],
+  hdrs = [
+    "pointcloud_down_sample.h",
+  ],
+  deps = [
+    "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_cc_proto",
+    "//modules/perception/pipeline:plugin",
+    "@com_google_absl//:absl",
+    "@eigen",
+    "@local_config_cuda//cuda:cuda_headers",
+    "@boost",
+    "@com_google_googletest//:gtest_main",
+    "@local_config_pcl//:pcl",
+  ],
+)
+
+cpplint()

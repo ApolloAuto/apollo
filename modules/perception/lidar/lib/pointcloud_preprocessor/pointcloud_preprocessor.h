@@ -66,7 +66,7 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   static const float kPointInfThreshold;
 
 
-  PointCloudPreprocessorConfig pointcloud_preprocessor_config_;
+  PointcloudPreprocessorConfig pointcloud_preprocessor_config_;
   std::string name_;
   bool enable_;
 };  // class PointCloudPreprocessor
