@@ -27,6 +27,7 @@ namespace camera {
 class GetImageData : public pipeline::Plugin {
  public:
   using PluginConfig = pipeline::PluginConfig;
+  using DataFrame = pipeline::DataFrame;
 
  public:
   GetImageData() { name_ = "GetImageData"; }

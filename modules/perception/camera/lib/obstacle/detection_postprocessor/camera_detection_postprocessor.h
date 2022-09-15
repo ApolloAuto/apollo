@@ -18,6 +18,7 @@
 #include "modules/perception/camera/lib/obstacle/detection_postprocessor/get_object/get_object.h"
 #include "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.pb.h"
 #include "modules/perception/pipeline/stage.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {

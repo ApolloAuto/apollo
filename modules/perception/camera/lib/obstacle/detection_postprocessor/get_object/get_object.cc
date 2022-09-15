@@ -29,8 +29,6 @@ bool GetObject::Init(const PluginConfig& plugin_config) {
   return true;
 }
 
-bool Process(DataFrame *data_frame) { return true; }
-
 // input: detect_result、types
 // input/output: frames
 bool GetObject::Process(const std::vector<float> &detect_result,
@@ -53,32 +51,33 @@ void GetObject::get_smoke_objects_cpu(const std::vector<float> &detect_result,
                                       std::vector<base::ObjectPtr> *objects) {
   objects->clear();
 
-  int len_pred = 14;
-  for (int i = 0; i < 50; i++) {
-    const float *bbox = detect_result.data() + i * len_pred;
-    float score = bbox[13];
-    if (score < model_param.confidence_threshold()) {
-      continue;
-    }
+  // todo(zero): need fix model_param
+  // int len_pred = 14;
+  // for (int i = 0; i < 50; i++) {
+  //   const float *bbox = detect_result.data() + i * len_pred;
+  //   float score = bbox[13];
+  //   if (score < model_param.confidence_threshold()) {
+  //     continue;
+  //   }
 
-    float label = bbox[0];
-    base::ObjectPtr obj = nullptr;
-    obj.reset(new base::Object);
-    obj->sub_type = get_smoke_object_subtype(label);
-    obj->type = base::kSubType2TypeMap.at(obj->sub_type);
-    obj->type_probs.assign(static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE),
-                           0);
-    obj->sub_type_probs.assign(
-        static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE), 0);
-    obj->type_probs[static_cast<int>(obj->type)] = score;
-    obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
-    obj->confidence = score;
+  //   float label = bbox[0];
+  //   base::ObjectPtr obj = nullptr;
+  //   obj.reset(new base::Object);
+  //   obj->sub_type = get_smoke_object_subtype(label);
+  //   obj->type = base::kSubType2TypeMap.at(obj->sub_type);
+  //   obj->type_probs.assign(static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE),
+  //                          0);
+  //   obj->sub_type_probs.assign(
+  //       static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE), 0);
+  //   obj->type_probs[static_cast<int>(obj->type)] = score;
+  //   obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
+  //   obj->confidence = score;
 
-    fill_smoke_base(obj, bbox + 2, width, height);
-    fill_smoke_bbox3d(model_param.with_box3d(), obj, bbox);
+  //   fill_smoke_base(obj, bbox + 2, width, height);
+  //   fill_smoke_bbox3d(model_param.with_box3d(), obj, bbox);
 
-    objects->push_back(obj);
-  }
+  //   objects->push_back(obj);
+  // }
 }
 
 void GetObject::fill_smoke_base(base::ObjectPtr obj, const float *bbox,

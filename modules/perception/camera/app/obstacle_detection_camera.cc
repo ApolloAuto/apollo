@@ -262,10 +262,11 @@ bool ObstacleDetectionCamera::Perception(
       absl::StrCat(perception_param_.debug_param().detection_out_dir(), "/",
                    frame->frame_id, ".txt"),
       frame->detected_objects);
-  if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
-    AERROR << "Failed to extractor";
-    return false;
-  }
+  // todo(zero): need fix
+  // if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
+  //   AERROR << "Failed to extractor";
+  //   return false;
+  // }
   PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                 "external_feature");
 
