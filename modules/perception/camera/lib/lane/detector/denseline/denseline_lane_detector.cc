@@ -165,7 +165,7 @@ bool DenselineLaneDetector::Init(const StageConfig& stage_config) {
 
   base_camera_model_ =
       common::SensorManager::Instance()->GetUndistortCameraModel(
-          darkscnn_param_.camera_name());
+          denseline_param_.camera_name());
 
   if (base_camera_model_ == nullptr) {
     AERROR << "options.intrinsic is nullptr!";

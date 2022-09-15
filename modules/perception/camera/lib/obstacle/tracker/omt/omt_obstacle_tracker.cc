@@ -118,10 +118,6 @@ bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
   return true;
 }
 
-bool OMTObstacleTracker::Process(DataFrame* data_frame) {
-  return true;
-}
-
 // @description combine targets using iou after association
 bool OMTObstacleTracker::CombineDuplicateTargets() {
   std::vector<Hypothesis> score_list;
@@ -536,7 +532,7 @@ bool OMTObstacleTracker::Track(const ObstacleTrackerOptions &options,
 
 bool OMTObstacleTracker::Process(DataFrame* data_frame) {
   if (data_frame == nullptr) {
-    return;
+    return false;
   }
 
   CameraFrame* camera_frame = data_frame->camera_frame;
@@ -545,7 +541,7 @@ bool OMTObstacleTracker::Process(DataFrame* data_frame) {
   if (camera_frame->proposed_objects.empty()) {
     Predict(tracker_options, camera_frame);
   // todo(zero): add condition
-  } else if () {
+  } else if (camera_frame->tracked_objects.empty()) {
     Associate2D(tracker_options, camera_frame);
   } else if (camera_frame->tracked_objects.empty()) {
     Associate3D(tracker_options, camera_frame);
