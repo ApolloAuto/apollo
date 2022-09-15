@@ -33,7 +33,7 @@ namespace pipeline {
 
 
 bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
-  ACHECK(pipeline_config.stage_type().empty());
+  ACHECK(!pipeline_config.stage_type().empty());
 
   Clear();
 
