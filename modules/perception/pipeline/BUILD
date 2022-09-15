@@ -13,6 +13,7 @@ cc_library(
     "//modules/perception/camera/common:camera_frame",
     "//modules/perception/fusion/base:fusion_frame",
     "//modules/perception/lidar/common:lidar_frame",
+    "@com_google_googletest//:gtest_main",
   ],
 )
 
