@@ -23,12 +23,12 @@ namespace perception {
 namespace camera {
 
 bool ReSizeAndNormalize::Init(const PluginConfig& plugin_config) {
-  ACHECK(task_config.has_resize_and_normalize());
-  resized_width_ = task_config.resized_width();
-  resized_height_ = task_config.resized_height();
-  mean_ = task_config.mean();
-  std_ = task_config.std();
-  scale_ = task_cofnig.scale();
+  ACHECK(plugin_config.has_resize_and_normalize());
+  resized_width_ = plugin_config.resized_width();
+  resized_height_ = plugin_config.resized_height();
+  mean_ = plugin_config.mean();
+  std_ = plugin_config.std();
+  scale_ = plugin_config.scale();
   return true;
 }
 

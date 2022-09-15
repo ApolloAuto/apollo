@@ -24,8 +24,8 @@ namespace perception {
 namespace camera {
 
 bool GetObject::Init(const PluginConfig& plugin_config) {
-  ACHECK(task_config.GetObject());
-  confidence_threshold_ = task_config.confidence_threshold();
+  ACHECK(plugin_config.GetObject());
+  confidence_threshold_ = plugin_config.confidence_threshold();
 }
 
 bool Process(DataFrame *data_frame) { return true; }

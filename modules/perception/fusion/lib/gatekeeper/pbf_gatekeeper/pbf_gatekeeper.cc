@@ -60,9 +60,7 @@ bool PbfGatekeeper::Init() {
 }
 
 bool PbfGatekeeper::Init(const PluginConfig& plugin_config) {
-  Init(config.pbf_gatekeeper_config());
-  bool res = Initialize(config);
-  return res;
+  return true;
 }
 
 bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {

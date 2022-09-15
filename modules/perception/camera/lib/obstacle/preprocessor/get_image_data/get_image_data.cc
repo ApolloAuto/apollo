@@ -25,10 +25,13 @@ namespace camera {
 
 bool GetImageData::Init(const PluginConfig& plugin_config) {
   ACHECK(config.has_get_image_data());
-  image_origin_width_ = task_config.image_origin_width();
-  image_origin_height_ = task_config.image_origin_height();
-  image_origin_channel_ = task_config.image_origin_channel();
-  image_.reset(new base::Image8U(image_origin_height_, image_origin_width_, base::Color::RGB));
+  image_origin_width_ = plugin_config.image_origin_width();
+  image_origin_height_ = plugin_config.image_origin_height();
+  image_origin_channel_ = plugin_config.image_origin_channel();
+  image_.reset(
+    new base::Image8U(image_origin_height_,
+                      image_origin_width_,
+                      base::Color::RGB));
   return true;
 }
 
