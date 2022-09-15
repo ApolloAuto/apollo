@@ -18,7 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {

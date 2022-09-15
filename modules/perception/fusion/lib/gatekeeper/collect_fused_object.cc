@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
-
 #include "modules/perception/fusion/lib/gatekeeper/collect_fused_object.h"
 
 namespace apollo {

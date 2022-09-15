@@ -107,11 +107,7 @@ bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
   return true;
 }
 
-bool PbfTracker::Init(const StageConfig& stage_config) {
-  if (!Initialize(stage_config)) {
-    return false;
-  }
-
+bool PbfTracker::Init(const PluginConfig& plugin_config) {
   // todo(zero): track
   // track_ = track;
   // if (!InitMethods()) {
@@ -119,19 +115,6 @@ bool PbfTracker::Init(const StageConfig& stage_config) {
   // }
   // motion_fusion_->Init();
   return true;
-}
-
-bool PbfTracker::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
-
-  // todo(zero): change to task
-  // bool res = InnerProcess(data_frame);
-
-  TrackerOptions options;
-  bool res = UpdateWithMeasurement(options, data_frame->lidar_frame);
-
-  return res;
 }
 
 void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
