@@ -222,6 +222,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "camera_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_detection_postprocessor_config_proto",
+    srcs = ["camera_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
+    ],
+)
+cc_proto_library(
     name = "pbf_gatekeeper_config_cc_proto",
     deps = [
         ":pbf_gatekeeper_config_proto",

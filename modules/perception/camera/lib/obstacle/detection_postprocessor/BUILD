@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["camera_detection_postprocessor.h"],
     deps = [
         "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_cc_proto",
     ],
 )
 

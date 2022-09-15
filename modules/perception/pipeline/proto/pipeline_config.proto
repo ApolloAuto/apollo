@@ -156,6 +156,7 @@ message StageConfig {
     camera.lane.DarkSCNNLanePostprocessorParam darkscnn_lane_postprocessor_param = 60;
     camera.lane.LanePostprocessorParam lane_postprocessor_param = 61;
     camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
+    camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
 
     fusion.PbfTrackerConfig pbf_tracker_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;

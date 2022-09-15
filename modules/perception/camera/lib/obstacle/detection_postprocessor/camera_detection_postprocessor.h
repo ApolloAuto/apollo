@@ -15,9 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/postprocessor/get_object/get_object.h"
-#include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/plugin.h"
+#include "modules/perception/camera/lib/obstacle/detection_postprocessor/get_object/get_object.h"
+#include "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.pb.h"
 #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
@@ -48,8 +47,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   const std::string& Name() const override { return name_; }
 
  private:
-  pipeline::stage::CameraDetectionPostprocessorConfig
-      camera_detection_postprocessor_config_;
+  CameraDetectionPostprocessorConfig camera_detection_postprocessor_config_;
 
   std::unique_ptr<Plugin> get_object_;
 

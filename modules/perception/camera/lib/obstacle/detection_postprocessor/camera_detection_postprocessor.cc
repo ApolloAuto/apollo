@@ -25,9 +25,9 @@ bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  ACHECK(stage_config.has_camera_detection_postprocessor());
+  ACHECK(stage_config.has_camera_detection_postprocessor_config());
   camera_detection_postprocessor_config_ =
-      stage_config.camera_detection_postprocessor();
+      stage_config.camera_detection_postprocessor_config();
 
   get_object_ = PluginFactory::CreatePlugin(stage_config.get_object());
 
