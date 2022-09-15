@@ -10,5 +10,6 @@ cc_library(
     deps = [
         "//modules/perception/fusion/base:sensor_data_manager",
         "//modules/perception/pipeline:stage",
+        "//modules/common/util:util_tool",
     ],
 )

@@ -51,6 +51,8 @@ class AllLatestFusion : public pipeline::Stage {
   std::mutex data_mutex_;
   std::mutex fuse_mutex_;
 
+  // FusionParams params_;
+
   std::string main_sensor_;
 };
 
