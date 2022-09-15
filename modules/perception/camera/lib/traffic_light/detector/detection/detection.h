@@ -34,11 +34,7 @@ namespace camera {
 
 class TrafficLightDetection : public BaseTrafficLightDetector {
  public:
-  TrafficLightDetection() {
-    mean_[0] = 0;
-    mean_[1] = 0;
-    mean_[2] = 0;
-  }
+  TrafficLightDetection();
 
   ~TrafficLightDetection() = default;
 
@@ -85,12 +81,12 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   std::vector<std::string> net_inputs_;
   std::vector<std::string> net_outputs_;
   Select select_;
-  int max_batch_size_ = 4;
-  int param_blob_length_ = 6;
+  int max_batch_size_;
+  int param_blob_length_;
   float mean_[3];
   std::vector<base::RectI> crop_box_list_;
   std::vector<float> resize_scale_list_;
-  int gpu_id_ = 0;
+  int gpu_id_;
 
   DISALLOW_COPY_AND_ASSIGN(TrafficLightDetection);
 };  // class TrafficLightDetection

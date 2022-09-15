@@ -42,9 +42,9 @@ struct SemanticTable {
   HystereticWindow hystertic_window;
 };
 
-class SemanticReviser : public BaseTrafficLightTracker {
+class SemanticReviser final : public BaseTrafficLightTracker {
  public:
-  SemanticReviser() = default;
+  SemanticReviser();
   ~SemanticReviser() = default;
 
   bool Init(const TrafficLightTrackerInitOptions &options =
@@ -73,10 +73,10 @@ class SemanticReviser : public BaseTrafficLightTracker {
  private:
   SemanticReviserConfig semantic_param_;
 
-  float revise_time_s_ = 1.5f;
-  float blink_threshold_s_ = 0.4f;
-  float non_blink_threshold_s_ = 0.8f;
-  int hysteretic_threshold_ = 1;
+  float revise_time_s_;
+  float blink_threshold_s_;
+  float non_blink_threshold_s_;
+  int hysteretic_threshold_;
   std::vector<SemanticTable> history_semantic_;
 
   DISALLOW_COPY_AND_ASSIGN(SemanticReviser);

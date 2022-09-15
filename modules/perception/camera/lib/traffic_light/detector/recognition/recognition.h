@@ -29,7 +29,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class TrafficLightRecognition : public BaseTrafficLightDetector {
+class TrafficLightRecognition final : public BaseTrafficLightDetector {
  public:
   TrafficLightRecognition() = default;
 

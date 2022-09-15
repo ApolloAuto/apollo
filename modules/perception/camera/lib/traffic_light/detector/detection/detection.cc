@@ -32,6 +32,9 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
+TrafficLightDetection::TrafficLightDetection()
+    : max_batch_size_(4), param_blob_length_(6), mean_{0, 0, 0}, gpu_id_(0) {}
+
 bool TrafficLightDetection::Init(
     const camera::TrafficLightDetectorInitOptions &options) {
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);

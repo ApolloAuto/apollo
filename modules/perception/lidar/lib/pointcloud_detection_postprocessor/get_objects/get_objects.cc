@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/task/point_cloud_down_sample.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/get_objects/get_objects.h"
 
 #include <vector>
 

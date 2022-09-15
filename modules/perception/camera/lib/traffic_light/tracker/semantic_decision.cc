@@ -35,6 +35,12 @@ bool compare(const SemanticTable &s1, const SemanticTable &s2) {
   return s1.semantic == s2.semantic;
 }
 
+SemanticReviser::SemanticReviser()
+    : revise_time_s_(1.5f),
+      blink_threshold_s_(0.4f),
+      non_blink_threshold_s_(0.8f),
+      hysteretic_threshold_(1) {}
+
 bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   std::string proto_path =
       cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
@@ -75,7 +81,7 @@ bool SemanticReviser::Init(const StageConfig& stage_config){
 }
 
 bool SemanticReviser::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
+  if (data_frame == nullptr || data_frame->camera_frame == nullptr)
     return false;
 
   TrafficLightTrackerOptions traffic_light_tracker_options;
