@@ -118,6 +118,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_proto",
+        "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_proto",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
     ],
 )
@@ -156,6 +157,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
     ],
 )

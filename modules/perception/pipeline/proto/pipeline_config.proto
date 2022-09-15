@@ -34,6 +34,7 @@ import "modules/perception/pipeline/proto/stage/singlestage.proto";
 import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
+import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
