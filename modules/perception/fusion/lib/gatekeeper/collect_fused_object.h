@@ -40,6 +40,8 @@ class CollectFusedObject : public pipeline::Stage {
 
   bool Process(DataFrame* data_frame) override;
 
+  void Process(double timestamp, std::vector<base::ObjectPtr>* fused_objects);
+
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
@@ -56,6 +58,7 @@ class CollectFusedObject : public pipeline::Stage {
 
  private:
   std::unique_ptr<BaseGatekeeper> gate_keeper_;
+  ScenePtr scenes_;
 };
 
 }  // namespace fusion

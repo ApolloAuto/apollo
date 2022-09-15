@@ -17,6 +17,7 @@
 #include "modules/perception/fusion/lib/data_fusion/all_latest_fusion/all_latest_fusion.h"
 
 
+#include "modules/common/util/string_util.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/pipeline/data_frame.h"
 
@@ -40,15 +41,16 @@ bool AllLatestFusion::Process(DataFrame* data_frame) {
   // 1. save frame data
   {
     std::lock_guard<std::mutex> data_lock(data_mutex_);
-    if (!params_.use_lidar && sensor_data_manager->IsLidar(sensor_frame)) {
-      return true;
-    }
-    if (!params_.use_radar && sensor_data_manager->IsRadar(sensor_frame)) {
-      return true;
-    }
-    if (!params_.use_camera && sensor_data_manager->IsCamera(sensor_frame)) {
-      return true;
-    }
+    // todo(zero): need fix params_
+    // if (!params_.use_lidar && sensor_data_manager->IsLidar(sensor_frame)) {
+    //   return true;
+    // }
+    // if (!params_.use_radar && sensor_data_manager->IsRadar(sensor_frame)) {
+    //   return true;
+    // }
+    // if (!params_.use_camera && sensor_data_manager->IsCamera(sensor_frame)) {
+    //   return true;
+    // }
 
     AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
           << ", obj_cnt : " << sensor_frame->objects.size() << ", "

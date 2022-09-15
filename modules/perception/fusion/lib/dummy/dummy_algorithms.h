@@ -55,8 +55,6 @@ class DummyDataAssociation : public BaseDataAssociation {
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
 
-  std::string Name() const override { return "DummyDataAssociation"; }
-
   DISALLOW_COPY_AND_ASSIGN(DummyDataAssociation);
 };
 

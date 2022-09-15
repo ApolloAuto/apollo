@@ -43,7 +43,7 @@ class BaseMotionFusion {
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
 
-  virtual std::string Name() const;
+  virtual std::string Name() const = 0;
 
  protected:
   TrackPtr track_ref_;
