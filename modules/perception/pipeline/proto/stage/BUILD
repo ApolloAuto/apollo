@@ -257,6 +257,45 @@ py_proto_library(
         ":pointcloud_preprocessor_config_proto",
     ],
 )
+
+cc_proto_library(
+    name = "pointcloud_detection_preprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_detection_preprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_detection_preprocessor_config_proto",
+    srcs = ["pointcloud_detection_preprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_detection_preprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_detection_preprocessor_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "pointcloud_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_detection_postprocessor_config_proto",
+    srcs = ["pointcloud_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
+
 cc_proto_library(
     name = "yolo_obstacle_detector_config_cc_proto",
     deps = [

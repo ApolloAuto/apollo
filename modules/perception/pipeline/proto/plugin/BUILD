@@ -23,6 +23,45 @@ py_proto_library(
         ":roi_boundary_filter_config_proto",
     ],
 )
+
+cc_proto_library(
+    name = "pointcloud_down_sample_config_cc_proto",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_down_sample_config_proto",
+    srcs = ["pointcloud_down_sample_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_down_sample_config_py_pb2",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "pointcloud_get_objects_config_cc_proto",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_get_objects_config_proto",
+    srcs = ["pointcloud_get_objects_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_get_objects_config_py_pb2",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
+    ],
+)
+
 cc_proto_library(
     name = "dst_existence_fusion_config_cc_proto",
     deps = [

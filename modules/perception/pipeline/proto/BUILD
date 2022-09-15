@@ -92,6 +92,9 @@ proto_library(
         ":lane_detection_config_proto",
         ":lidar_detection_config_proto",
         ":traffic_light_config_proto",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_proto",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_proto",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
         "//modules/perception/pipeline/proto/stage:detection_proto",
         "//modules/perception/pipeline/proto/stage:fused_classifier_config_proto",
         "//modules/perception/pipeline/proto/stage:map_manager_config_proto",
@@ -99,6 +102,8 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_proto",
         "//modules/perception/pipeline/proto/stage:pbf_tracker_config_proto",
         "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_proto",
+        "//modules/perception/pipeline/proto/stage:pointcloud_detection_postprocessor_config_proto",
+        "//modules/perception/pipeline/proto/stage:pointcloud_detection_preprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:recognition_proto",
         "//modules/perception/pipeline/proto/stage:semantic_proto",
@@ -117,7 +122,6 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_proto",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_proto",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
-        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
     ],
 )
 
@@ -129,6 +133,9 @@ py_proto_library(
         ":lane_detection_config_py_pb2",
         ":lidar_detection_config_py_pb2",
         ":traffic_light_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:detection_py_pb2",
         "//modules/perception/pipeline/proto/stage:fused_classifier_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:map_manager_config_py_pb2",
@@ -136,6 +143,8 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pbf_tracker_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:pointcloud_detection_postprocessor_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:pointcloud_detection_preprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:recognition_py_pb2",
         "//modules/perception/pipeline/proto/stage:semantic_py_pb2",
@@ -154,7 +163,6 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_py_pb2",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_py_pb2",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
     ],
 )
 
