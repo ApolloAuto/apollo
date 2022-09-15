@@ -23,6 +23,7 @@
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {

@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/fusion/lib/interface:base_fusion_system",
         "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion:probabilistic_fusion",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline",
         "@eigen",
     ],
     alwayslink = True,
