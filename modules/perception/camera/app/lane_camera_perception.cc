@@ -199,9 +199,7 @@ bool LaneCameraPerception::GetCalibrationService(
 }
 
 bool LaneCameraPerception::Process(DataFrame* data_frame) {
-  CameraFrame* frame = data_frame->camera_frame;
-  InnerProcess(frame);
-  return true;
+  return InnerProcess(frame);
 }
 
 bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,

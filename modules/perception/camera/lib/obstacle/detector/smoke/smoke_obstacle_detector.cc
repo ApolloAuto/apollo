@@ -374,43 +374,42 @@ bool SmokeObstacleDetector::Process(
     return false;
   }
 
-  if (nullptr == typesCameraFrame) {
-    AERROR << "Input null typesCameraFrame ptr.";
-    return false;
-  }
+  // if (nullptr == typesCameraFrame) {
+  //   AERROR << "Input null typesCameraFrame ptr.";
+  //   return false;
+  // }
 
-  if (nullptr == data_frame) {
-    AERROR << "Input null data_frame ptr.";
-    return false;
-  }
+  // if (nullptr == data_frame) {
+  //   AERROR << "Input null data_frame ptr.";
+  //   return false;
+  // }
+
+  // Timer timer;
+  // if (cudaSetDevice(gpu_id_) != cudaSuccess) {
+  //   AERROR << "Failed to set device to " << gpu_id_;
+  //   return false;
+  // }
+
+  // const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
+  // auto const &net_param = smoke_param_.net_param();
+  // auto input_blob = inference_->get_blob(net_param.input_data_blob());
+  // auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
+  // auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
+
+  // float *ratio_data = input_ratio_blob->mutable_cpu_data();
+  // float *K_data = input_K_blob->mutable_cpu_data();
+
+  // K_data = k_inv.data();
+  // input_blob->mutable_cpu_data() = image_data_array.data();
 
 
-  Timer timer;
-  if (cudaSetDevice(gpu_id_) != cudaSuccess) {
-    AERROR << "Failed to set device to " << gpu_id_;
-    return false;
-  }
+  // AINFO << "Camera type: " << frame->data_provider->sensor_name();
+  // /////////////////////////// detection part ///////////////////////////
+  // inference_->Infer();
+  // AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
+  //       << "ms";
 
-  const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
-  auto const &net_param = smoke_param_.net_param();
-  auto input_blob = inference_->get_blob(net_param.input_data_blob());
-  auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
-  auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
-
-  float *ratio_data = input_ratio_blob->mutable_cpu_data();
-  float *K_data = input_K_blob->mutable_cpu_data();
-
-  K_data = k_inv.data();
-  input_blob->mutable_cpu_data() = image_data_array.data();
-
-
-  AINFO << "Camera type: " << frame->data_provider->sensor_name();
-  /////////////////////////// detection part ///////////////////////////
-  inference_->Infer();
-  AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
-        << "ms";
-
-  detect_result = smoke_blobs_.det1_loc_blob->cpu_data();
+  // detect_result = smoke_blobs_.det1_loc_blob->cpu_data();
   return true;
 }
 

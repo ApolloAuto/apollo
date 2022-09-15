@@ -9,6 +9,8 @@ cc_library(
     hdrs = ["get_object.h"],
     deps = [
         "//modules/perception/pipeline:plugin",
+        "@boost",
+        "@eigen",
     ],
 )
 

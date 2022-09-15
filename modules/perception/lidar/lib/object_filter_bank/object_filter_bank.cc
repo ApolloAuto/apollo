@@ -62,8 +62,6 @@ bool ObjectFilterBank::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  // bool res = InnerProcess(data_frame);
-
   ObjectFilterOptions options;
   bool res = Filter(options, data_frame->lidar_frame);
 
