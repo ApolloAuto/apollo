@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "gtest/gtest_prod.h"
+// #include "gtest/gtest_prod.h"
 
 #include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/sensor_object.h"
@@ -147,7 +147,7 @@ class Track {
   size_t tracked_times_ = 0;
 
  private:
-  FRIEND_TEST(TrackTest, test);
+  // FRIEND_TEST(TrackTest, test);
 
   static size_t s_track_idx_;
   static double s_max_lidar_invisible_period_;
