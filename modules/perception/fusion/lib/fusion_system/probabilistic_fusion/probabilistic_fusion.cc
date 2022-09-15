@@ -163,33 +163,34 @@ bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
 }
 
 bool ProbabilisticFusion::Process(DataFrame* data_frame) {
-    double fusion_time = data_frame->fusion_frame->frame->timestamp;
-  base::FrameConstPtr frames = data_frame->fusion_frame->sensor_frames;
-  std::vector<base::ObjectPtr>* fused_objects =
-      &(data_frame->fusion_frame->fused_objects);
-  Fuse(fusion_time, frames, fused_objects);
-  data_frame->fusion_frame->scene_ptr = scenes_;
+  // todo(zero): need fix
+  //   double fusion_time = data_frame->fusion_frame->frame->timestamp;
+  // std::vector<SensorFramePtr> frames = data_frame->fusion_frame->sensor_frames;
+  // std::vector<base::ObjectPtr>* fused_objects =
+  //     &(data_frame->fusion_frame->fused_objects);
+  // Fuse(fusion_time, frames, fused_objects);
+  // data_frame->fusion_frame->scene_ptr = scenes_;
   return true;
 }
 
-bool ProbabilisticFusion::Fuse(double fusion_time,
-                               const std::vector<SensorFramePtr>& frames,
-                               std::vector<base::ObjectPtr>* fused_objects) {
-  if (frames.empty()) {
-    return true;
-  }
+// bool ProbabilisticFusion::Fuse(double fusion_time,
+//                                const std::vector<SensorFramePtr>& frames,
+//                                std::vector<base::ObjectPtr>* fused_objects) {
+//   if (frames.empty()) {
+//     return true;
+//   }
 
-  if (fused_objects == nullptr) {
-    return false;
-  }
+//   if (fused_objects == nullptr) {
+//     return false;
+//   }
 
-  // 3. perform fusion on related frames
-  for (const auto& frame : frames) {
-    FuseFrame(frame);
-  }
+//   // 3. perform fusion on related frames
+//   for (const auto& frame : frames) {
+//     FuseFrame(frame);
+//   }
 
-  return true;
-}
+//   return true;
+// }
 
 bool ProbabilisticFusion::Fuse(const FusionOptions& options,
                                const base::FrameConstPtr& sensor_frame,

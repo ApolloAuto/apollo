@@ -149,8 +149,6 @@ void PbfTracker::UpdateWithoutMeasurement(const TrackerOptions& options,
   track_->UpdateWithoutSensorObject(sensor_id, measurement_timestamp);
 }
 
-std::string PbfTracker::Name() const { return "PbfTracker"; }
-
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo
