@@ -102,9 +102,10 @@ bool DummyRoiFilter::RoiFilter(const RoiFilterOptions& options,
 }
 std::string DummyRoiFilter::Name() const { return "DummyRoiFilter"; }
 
-PERCEPTION_REGISTER_PREPROCESSOR(DummyPreprocessor);
-PERCEPTION_REGISTER_ROI_FILTER(DummyRoiFilter);
-PERCEPTION_REGISTER_DETECTOR(DummyDetector);
+// todo(zero): need fix
+// PERCEPTION_REGISTER_PREPROCESSOR(DummyPreprocessor);
+// PERCEPTION_REGISTER_ROI_FILTER(DummyRoiFilter);
+// PERCEPTION_REGISTER_DETECTOR(DummyDetector);
 
 }  // namespace radar
 }  // namespace perception
