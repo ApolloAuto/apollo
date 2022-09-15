@@ -28,6 +28,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
+  using PluginFactory = pipeline::PluginFactory;
 
  public:
   CameraDetectionPostprocessor() = default;
@@ -44,7 +45,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
 
   bool IsEnabled() const override { return enable_; }
 
-  const std::string& Name() const override { return name_; }
+  std::string Name() const override { return name_; }
 
  private:
   CameraDetectionPostprocessorConfig camera_detection_postprocessor_config_;

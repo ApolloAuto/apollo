@@ -27,6 +27,7 @@ namespace camera {
 class GetObject : public pipeline::Plugin {
  public:
   using PluginConfig = pipeline::PluginConfig;
+  using DataFrame = pipeline::DataFrame;
 
  public:
   GetObject() { name_ = "GetObject"; }
@@ -51,7 +52,7 @@ class GetObject : public pipeline::Plugin {
                                   const float *bbox);
 
   float confidence_threshold_;
-}
+};
 
 }  // namespace camera
 }  // namespace perception
