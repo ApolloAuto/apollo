@@ -31,8 +31,7 @@ bool PointcloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
   }
 
   pointcloud_get_objects_ = pipeline::PluginFactory::CreatePlugin(
-      plugin_config_map_
-          [apollo::perception::pipeline::PluginType::POINTCLOUD_GET_OBJECTS]);
+      plugin_config_map_[pipeline::PluginType::POINTCLOUD_GET_OBJECTS]);
 
   return true;
 }
@@ -42,18 +41,19 @@ bool PointcloudDetectionPostprocessor::Process(DataFrame* data_frame) {
 }
 
 bool PointcloudDetectionPostprocessor::Process(
-    const std::vector<float>& detections, const std::vector<int>& labels,
+    const std::vector<float>& detections,
+    const std::vector<int>& labels,
     DataFrame* data_frame) {
   if (nullptr == data_frame) {
     AERROR << "Input null data_frame ptr.";
     return false;
   }
-  if (!dynamic_cast<PointCloudGetObjects*>(pointcloud_get_objects_.get())
-           ->Process(detections, labels, data_frame)) {
+  if (!pointcloud_get_objects_->Process(detections, labels, data_frame)) {
     return false;
   }
   return true;
 }
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

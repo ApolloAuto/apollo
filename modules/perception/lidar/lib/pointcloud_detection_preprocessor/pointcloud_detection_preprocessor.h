@@ -41,7 +41,9 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
 
   bool Process(DataFrame* data_frame) override;
 
-  bool Process(DataFrame* data_frame, std::vector<float>* points_array, int *num_points);
+  bool Process(DataFrame* data_frame,
+               std::vector<float>* points_array,
+               int *num_points);
 
   bool IsEnabled() const override { return enable_; }
 

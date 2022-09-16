@@ -32,8 +32,7 @@ bool PointcloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
       stage_config.pointcloud_detection_preprocessor_config();
 
   pointcloud_downsample_ = pipeline::PluginFactory::CreatePlugin(
-      plugin_config_map_
-          [apollo::perception::pipeline::PluginType::POINTCLOUD_DOWN_SAMPLE]);
+      plugin_config_map_[pipeline::PluginType::POINTCLOUD_DOWN_SAMPLE]);
 
   return true;
 }
@@ -54,8 +53,7 @@ bool PointcloudDetectionPreprocessor::Process(DataFrame* data_frame,
     return false;
   }
 
-  if (!dynamic_cast<PointCloudDownSample*>(pointcloud_downsample_.get())
-           ->Process(data_frame, points_array, num_points)) {
+  if (!pointcloud_downsample_->Process(data_frame, points_array, num_points)) {
     return false;
   }
   return true;

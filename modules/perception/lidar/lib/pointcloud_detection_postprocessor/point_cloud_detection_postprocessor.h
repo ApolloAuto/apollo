@@ -40,14 +40,15 @@ class PointcloudDetectionPostprocessor : public pipeline::Stage {
   bool Process(DataFrame* data_frame) override;
 
   bool Process(const std::vector<float>& detections,
-               const std::vector<int>& labels, DataFrame* data_frame);
+               const std::vector<int>& labels,
+               DataFrame* data_frame);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  std::unique_ptr<Plugin> pointcloud_get_objects_;
+  std::unique_ptr<PointCloudGetObjects> pointcloud_get_objects_;
 };  // class PointcloudDetectionPostprocessor
 
 }  // namespace lidar

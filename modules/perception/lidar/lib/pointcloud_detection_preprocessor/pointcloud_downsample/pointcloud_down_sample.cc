@@ -31,14 +31,15 @@ namespace lidar {
 
 bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
   ACHECK(plugin_config.has_pointcloud_down_sample_config());
-  enable_downsample_pointcloud_ = plugin_config.pointcloud_down_sample_config().enable_downsample_pointcloud();
-  enable_downsample_beams_ = plugin_config.pointcloud_down_sample_config().enable_downsample_beams();
-  x_min_range_ = plugin_config.pointcloud_down_sample_config().x_min_range();
-  x_max_range_ = plugin_config.pointcloud_down_sample_config().x_max_range();
-  y_min_range_ = plugin_config.pointcloud_down_sample_config().y_min_range();
-  y_max_range_ = plugin_config.pointcloud_down_sample_config().y_max_range();
-  z_min_range_ = plugin_config.pointcloud_down_sample_config().z_min_range();
-  z_max_range_ = plugin_config.pointcloud_down_sample_config().z_max_range();
+  auto config = plugin_config.pointcloud_down_sample_config();
+  enable_downsample_pointcloud_ = config.enable_downsample_pointcloud();
+  enable_downsample_beams_ = config.enable_downsample_beams();
+  x_min_range_ = config.x_min_range();
+  x_max_range_ = config.x_max_range();
+  y_min_range_ = config.y_min_range();
+  y_max_range_ = config.y_max_range();
+  z_min_range_ = config.z_min_range();
+  z_max_range_ = config.z_max_range();
   return true;
 }
 

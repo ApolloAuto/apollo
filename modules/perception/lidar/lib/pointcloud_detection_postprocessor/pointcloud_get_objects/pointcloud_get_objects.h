@@ -32,18 +32,16 @@ class PointCloudGetObjects : public pipeline::Plugin {
   using PluginConfig = pipeline::PluginConfig;
 
   PointCloudGetObjects();
-  
+
   virtual ~PointCloudGetObjects() = default;
 
-  bool Init(const PluginConfig& _config) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
   bool Process(const std::vector<float>& detections,
-               const std::vector<int>& labels, DataFrame* data_frame);
+               const std::vector<int>& labels,
+               DataFrame* data_frame);
 
   bool IsEnabled() const override { return enable_; }
-
- protected:
-  bool enable_ = false;
 
  private:
   base::ObjectSubType GetObjectsubType(const int label);

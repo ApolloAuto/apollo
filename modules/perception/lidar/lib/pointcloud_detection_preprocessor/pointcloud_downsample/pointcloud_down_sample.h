@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <cublas_v2.h>
-
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
