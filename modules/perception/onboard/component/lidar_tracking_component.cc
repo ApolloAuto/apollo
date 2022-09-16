@@ -101,7 +101,8 @@ bool LidarTrackingComponent::InternalProc(
   // lidar::LidarProcessResult ret =
   //     tracker_->Process(track_options, lidar_frame.get());
 
-  lidar_track_pipeline_->Process(lidar_frame.get());
+  // todo(zero): need fix
+  // lidar_track_pipeline_->Process(lidar_frame.get());
 
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
   if (ret.error_code != lidar::LidarErrorCode::Succeed) {

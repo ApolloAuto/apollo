@@ -80,7 +80,6 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
       lidar::BaseLidarObstacleDetectionRegisterer::
       GetInstanceByName(detector_name_);
   CHECK_NOTNULL(detector);
-  lidar_detection_pipeline_.reset(detector);
 
   // lidar::LidarObstacleDetectionInitOptions init_options;
   // init_options.sensor_name = sensor_name_;
@@ -152,7 +151,7 @@ bool LidarDetectionComponent::InternalProc(
 
   // todo(zero): need to add "sensor_name" and "lidar2world_trans_"
   ConvertCloud(frame->cloud, in_message);
-  bool res = lidar_detection_pipeline_->Process(frame.get());
+  // bool res = lidar_detection_pipeline_->Process(frame.get());
 
   // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
   //   out_message->error_code_ =

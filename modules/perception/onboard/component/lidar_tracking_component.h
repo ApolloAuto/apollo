@@ -19,18 +19,21 @@
 #include <string>
 
 #include "cyber/cyber.h"
-
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
-#include "modules/perception/onboard/inner_component_messages/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
+#include "modules/perception/onboard/inner_component_messages/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/proto/lidar_component_config.pb.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
 class LidarTrackingComponent : public cyber::Component<LidarFrameMessage> {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+
  public:
   LidarTrackingComponent() : tracker_(nullptr) {}
   ~LidarTrackingComponent() = default;
@@ -42,9 +45,9 @@ class LidarTrackingComponent : public cyber::Component<LidarFrameMessage> {
   bool InitAlgorithmPlugin();
   bool InternalProc(const std::shared_ptr<const LidarFrameMessage>& in_message,
                     const std::shared_ptr<SensorFrameMessage>& out_message);
-  // std::unique_ptr<lidar::LidarObstacleTracking> tracker_;
+  std::unique_ptr<lidar::LidarObstacleTracking> tracker_;
 
-  std::unique_ptr<Pipeline> lidar_track_pipeline_;
+  std::unique_ptr<lidar::BaseLidarObstacleTracking> lidar_track_pipeline_;
 
   base::SensorInfo sensor_info_;
   std::string main_sensor_name_;

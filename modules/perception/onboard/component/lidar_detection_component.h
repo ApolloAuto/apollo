@@ -34,6 +34,9 @@ namespace onboard {
 
 class LidarDetectionComponent : public cyber::Component<drivers::PointCloud> {
  public:
+  using PipelineConfig = pipeline::PipelineConfig;
+
+ public:
   LidarDetectionComponent() = default;
   virtual ~LidarDetectionComponent() = default;
 
