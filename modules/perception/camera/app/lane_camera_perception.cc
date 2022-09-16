@@ -33,6 +33,7 @@
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/pipeline/pipeline.h"
 
