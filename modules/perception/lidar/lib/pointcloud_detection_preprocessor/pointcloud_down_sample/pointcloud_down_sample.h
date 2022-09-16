@@ -30,7 +30,8 @@ class PointCloudDownSample : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  PointCloudDownSample();
+  PointCloudDownSample() = default;
+  explicit PointCloudDownSample(const PluginConfig& plugin_config);
   virtual ~PointCloudDownSample() = default;
 
   bool Init(const PluginConfig& plugin_config) override;

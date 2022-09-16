@@ -25,6 +25,10 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+PointCloudGetObjects::PointCloudGetObjects(const PluginConfig& plugin_config) {
+  return Init(plugin_config);
+}
+
 bool PointCloudGetObjects::Init(const PluginConfig& plugin_config) {
   ACHECK(plugin_config.has_pointcloud_get_objects_config());
   return true;

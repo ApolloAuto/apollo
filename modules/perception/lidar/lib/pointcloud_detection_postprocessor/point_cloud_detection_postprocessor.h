@@ -28,6 +28,7 @@ class PointcloudDetectionPostprocessor : public pipeline::Stage {
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
+  using PointCloudGetObjectsPtr = std::unique_ptr<PointCloudGetObjects>;
 
  public:
   PointcloudDetectionPostprocessor() = default;
@@ -47,7 +48,7 @@ class PointcloudDetectionPostprocessor : public pipeline::Stage {
   std::string Name() const override { return name_; }
 
  private:
-  std::unique_ptr<PointCloudGetObjects> pointcloud_get_objects_;
+  PointCloudGetObjectsPtr pointcloud_get_objects_;
 };  // class PointcloudDetectionPostprocessor
 
 }  // namespace lidar

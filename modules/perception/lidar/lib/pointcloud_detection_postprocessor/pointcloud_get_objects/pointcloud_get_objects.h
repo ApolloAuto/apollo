@@ -33,7 +33,8 @@ class PointCloudGetObjects : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
   using PluginConfig = pipeline::PluginConfig;
 
-  PointCloudGetObjects();
+  PointCloudGetObjects() = default;
+  explicit PointCloudGetObjects(const PluginConfig& plugin_config);
 
   virtual ~PointCloudGetObjects() = default;
 

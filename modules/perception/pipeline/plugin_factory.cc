@@ -18,6 +18,8 @@
 #include "modules/perception/pipeline/plugin_factory.h"
 
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
 
 namespace apollo {
 namespace perception {
@@ -38,6 +40,16 @@ void PluginFactory::Init() {
       PluginType::ROI_BOUNDARY_FILTER,
       [](const PluginConfig& plugin_config) -> Plugin* {
         return new lidar::ROIBoundaryFilter(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::POINTCLOUD_GET_OBJECTS,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::PointCloudGetObjects(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::POINTCLOUD_DOWN_SAMPLE,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::PointCloudDownSample(plugin_config);
       });
   // Todo(zero): need to add more type
   // need to deal with PipelineConfig& config

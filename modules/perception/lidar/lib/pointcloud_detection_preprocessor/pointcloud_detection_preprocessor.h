@@ -29,6 +29,7 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
+  using PointCloudDownSamplePtr = std::unique_ptr<PointCloudDownSample>;
 
  public:
   PointcloudDetectionPreprocessor() = default;
@@ -51,7 +52,7 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
   PointcloudDetectionPreprocessorConfig
       pointcloud_detection_preprocessor_config_;
 
-  std::unique_ptr<PointCloudDownSample> pointcloud_downsample_;
+  PointCloudDownSamplePtr pointcloud_downsample_;
 
 };  // class PointcloudDetectionPreprocessor
 

@@ -29,6 +29,10 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+PointCloudDownSample::PointCloudDownSample(const PluginConfig& plugin_config) {
+  return Init(plugin_config);
+}
+
 bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
   ACHECK(plugin_config.has_pointcloud_down_sample_config());
   auto config = plugin_config.pointcloud_down_sample_config();
