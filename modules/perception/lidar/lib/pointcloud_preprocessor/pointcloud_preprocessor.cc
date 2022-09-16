@@ -44,7 +44,7 @@ bool PointCloudPreprocessor::Init(
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
-  PointCloudPreprocessorConfig config;
+  PointcloudPreprocessorConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();

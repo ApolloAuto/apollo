@@ -16,37 +16,35 @@
 
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/point_cloud_down_sample.h"
 #include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool PointCloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
+bool PointcloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
+  ACHECK(stage_config.has_pointcloud_detection_preprocessor_config());
   if (!Initialize(stage_config)) {
     return false;
   }
 
-  ACHECK(stage_config.has_pointcloud_detection_preprocessor());
   pointcloud_detection_preprocessor_config_ =
-      stage_config.pointcloud_detection_preprocessor();
+      stage_config.pointcloud_detection_preprocessor_config();
 
-  pointcloud_downsample_ =
-      PluginFactory::CreatePlugin(stage_config.pointcloud_downsample());
-  if (!pointcloud_downsample_->Init(stage_config.pointcloud_downsample())) {
-    return false;
-  }
+  pointcloud_downsample_ = pipeline::PluginFactory::CreatePlugin(
+      plugin_config_map_
+          [apollo::perception::pipeline::PluginType::POINTCLOUD_DOWN_SAMPLE]);
+
   return true;
 }
 
-bool PointCloudDetectionPreprocessor::Process(DataFrame* data_frame) {
+bool PointcloudDetectionPreprocessor::Process(DataFrame* data_frame) {
   return true;
 }
 
-bool PointCloudDetectionPreprocessor::Process(DataFrame* data_frame,
-                                              float* points_array,
-                                              int num_points) {
+bool PointcloudDetectionPreprocessor::Process(DataFrame* data_frame,
+                                              std::vector<float>* points_array,
+                                              int* num_points) {
   if (nullptr == data_frame) {
     AERROR << "Input null data_frame ptr.";
     return false;
@@ -55,7 +53,9 @@ bool PointCloudDetectionPreprocessor::Process(DataFrame* data_frame,
     AERROR << "Input null points_array ptr.";
     return false;
   }
-  if (!pointcloud_downsample_->Process(data_frame, points_array, num_points)) {
+
+  if (!dynamic_cast<PointCloudDownSample*>(pointcloud_downsample_.get())
+           ->Process(data_frame, points_array, num_points)) {
     return false;
   }
   return true;

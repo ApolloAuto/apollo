@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/get_objects/get_objects.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 
 #include <vector>
 
@@ -28,26 +28,28 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-bool GetObjects::Init(const TaskConfig& task_config) {
-  ACHECK(task_config.has_get_objects());
+bool PointCloudGetObjects::Init(const PluginConfig& plugin_config) {
+  ACHECK(plugin_config.has_pointcloud_get_objects_config());
   return true;
 }
 
-bool GetObjects::Process( const std::vector<float> & detections, const std::vector<int>& labels, DataFrame* data_frame) {
-  if (frame == nullptr) {
-    AERROR << "Input null dataframe ptr.";
+bool PointCloudGetObjects::Process(const std::vector<float>& detections,
+                                   const std::vector<int>& labels,
+                                   DataFrame* data_frame) {
+  if (nullptr == data_frame) {
+    AERROR << "Input null data_frame ptr.";
     return false;
   }
-auto lidar_frame = data_frame->lidar_frame;
-if(!GetObjects(lidar_frame->lidar2world_pose, detections, labels, lidar_frame->segmented_objects)){
-  return false;
-}
-return true;
+  auto lidar_frame = data_frame->lidar_frame;
+  GetObjects(lidar_frame->lidar2world_pose, detections, labels,
+             &lidar_frame->segmented_objects);
+  return true;
 }
 
-void GetObjects::GetObjects(
-    const Eigen::Affine3d& pose,
-    const std::vector<float> & detections, const std::vector<int>& labels, std::vector<std::shared_ptr<Object>>* objects) {
+void PointCloudGetObjects::GetObjects(
+    const Eigen::Affine3d& pose, const std::vector<float>& detections,
+    const std::vector<int>& labels,
+    std::vector<std::shared_ptr<base::Object>>* objects) {
   int num_objects = detections.size() / FLAGS_num_output_box_feature;
 
   objects->clear();
@@ -92,7 +94,7 @@ void GetObjects::GetObjects(
         for (float vz : std::vector<float>{0, dz}) {
           Eigen::Vector3f v3f(vx, vy, vz);
           v3f = affine3f * v3f;
-          PointF point;
+          base::PointF point;
           point.x = v3f.x();
           point.y = v3f.y();
           point.z = v3f.z();
@@ -100,7 +102,7 @@ void GetObjects::GetObjects(
 
           Eigen::Vector3d trans_point(point.x, point.y, point.z);
           trans_point = pose * trans_point;
-          PointD world_point;
+          base::PointD world_point;
           world_point.x = trans_point(0);
           world_point.y = trans_point(1);
           world_point.z = trans_point(2);
@@ -113,7 +115,7 @@ void GetObjects::GetObjects(
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
-    object->sub_type = GetObjectSubType(labels.at(i));
+    object->sub_type = GetObjectsubType(labels.at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
     object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
         1.0f;
@@ -123,7 +125,7 @@ void GetObjects::GetObjects(
   }
 }
 
-base::ObjectSubType GetObjects::GetObjectSubType(const int label) {
+base::ObjectSubType PointCloudGetObjects::GetObjectsubType(const int label) {
   switch (label) {
     case 0:
       return base::ObjectSubType::CAR;
@@ -135,7 +137,6 @@ base::ObjectSubType GetObjects::GetObjectSubType(const int label) {
       return base::ObjectSubType::UNKNOWN;
   }
 }
-
 
 }  // namespace lidar
 }  // namespace perception

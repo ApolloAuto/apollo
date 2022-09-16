@@ -2,6 +2,6 @@ syntax = "proto2";
 
 package apollo.perception.lidar;
 
-message PointCloudDetectionPostprocessorConfig {
+message PointcloudDetectionPostprocessorConfig {
 
 }

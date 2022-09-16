@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.perception.lidar;
 
-message PointCloudPreprocessorConfig {
+message PointcloudPreprocessorConfig {
   optional bool filter_naninf_points = 1 [default = true];
   optional bool filter_nearby_box_points = 2 [default = false];
   optional float box_forward_x = 3 [default = 0];

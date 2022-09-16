@@ -26,29 +26,36 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class GetObjects : public Task {
+class PointCloudGetObjects : public pipeline::Plugin {
  public:
-  GetObjects();
-  virtual ~GetObjects() = default;
+  using DataFrame = pipeline::DataFrame;
+  using PluginConfig = pipeline::PluginConfig;
 
-  bool Init(const TaskConfig& task_config) override;
-  bool Process(DataFrame* data_frame) override;
+  PointCloudGetObjects();
+  
+  virtual ~PointCloudGetObjects() = default;
+
+  bool Init(const PluginConfig& _config) override;
+
+  bool Process(const std::vector<float>& detections,
+               const std::vector<int>& labels, DataFrame* data_frame);
+
   bool IsEnabled() const override { return enable_; }
 
  protected:
   bool enable_ = false;
 
  private:
-  base::ObjectSubType GetObjects::GetObjectSubType(const int label);
+  base::ObjectSubType GetObjectsubType(const int label);
   /*
-  void GetObjects::GetObjects(
+  void PointCloudGetObjects::PointCloudGetObjects(
   std::vector<std::shared_ptr<Object>>* objects, const Eigen::Affine3d& pose,
   std::vector<float>* detections, std::vector<int>* labels);
   */
-  void GetObjects::GetObjects(const Eigen::Affine3d& pose,
-                              const std::vector<float>& detections,
-                              const std::vector<int>& labels,
-                              std::vector<std::shared_ptr<Object>>* objects);
+  void GetObjects(const Eigen::Affine3d& pose,
+                  const std::vector<float>& detections,
+                  const std::vector<int>& labels,
+                  std::vector<std::shared_ptr<base::Object>>* objects);
 };
 
 }  // namespace lidar
