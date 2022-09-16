@@ -22,7 +22,7 @@
 #include "cyber/cyber.h"
 #include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
-#include "modules/perception/onboard/component/lidar_inner_component_messages.h"
+#include "modules/perception/onboard/inner_component_messages/lidar_inner_component_messages.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
