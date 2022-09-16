@@ -49,6 +49,10 @@ class LidarDetectionComponent : public cyber::Component<drivers::PointCloud> {
       const std::shared_ptr<const drivers::PointCloud>& in_message,
       const std::shared_ptr<LidarFrameMessage>& out_message);
 
+  bool ConvertCloud(
+      std::shared_ptr<const drivers::PointCloud>& from,
+      std::shared_ptr<base::AttributePointCloud<base::PointF>> to);
+
  private:
   static std::atomic<uint32_t> seq_num_;
   std::string sensor_name_;
