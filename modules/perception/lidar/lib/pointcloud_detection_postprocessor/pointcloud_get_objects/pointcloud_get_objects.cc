@@ -26,7 +26,7 @@ namespace perception {
 namespace lidar {
 
 PointCloudGetObjects::PointCloudGetObjects(const PluginConfig& plugin_config) {
-  return Init(plugin_config);
+  Init(plugin_config);
 }
 
 bool PointCloudGetObjects::Init(const PluginConfig& plugin_config) {

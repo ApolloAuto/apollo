@@ -43,6 +43,7 @@ cc_library(
   ],
   deps = [
     ":scene",
+    ":sensor",
     "//modules/perception/base:frame",
     "//modules/perception/base:object",
   ],
@@ -53,7 +54,6 @@ cc_library(
     srcs = ["scene.cc"],
     hdrs = ["scene.h"],
     deps = [
-        ":sensor",
         ":track",
     ],
 )
@@ -74,11 +74,6 @@ cc_library(
         ":base_forward_declaration",
         "//cyber",
         "//modules/perception/base",
-        "//modules/perception/base:base_type",
-        "//modules/perception/base:frame",
-        "//modules/perception/base:object",
-        "//modules/perception/base:object_pool_types",
-        "//modules/perception/common/sensor_manager",
         "@com_google_googletest//:gtest_main",
         "@eigen",
     ],

@@ -30,7 +30,7 @@ namespace perception {
 namespace lidar {
 
 PointCloudDownSample::PointCloudDownSample(const PluginConfig& plugin_config) {
-  return Init(plugin_config);
+  Init(plugin_config);
 }
 
 bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
