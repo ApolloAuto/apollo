@@ -3,15 +3,19 @@ load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 cc_library(
-  name = "point_cloud_down_sample",
+  name = "pointcloud_down_sample",
   srcs = [
-    "point_cloud_down_sample.cc",
+    "pointcloud_down_sample.cc",
   ],
   hdrs = [
-    "point_cloud_down_sample.h",
+    "pointcloud_down_sample.h",
   ],
   deps = [
+    "//modules/perception/base",
+    "//modules/perception/common:perception_gflags",
+    "//modules/perception/lidar/common",
     "//modules/perception/pipeline:plugin",
+    "//modules/perception/pipeline/proto/stage:pointcloud_down_sample_config_cc_proto",
   ],
 )
 

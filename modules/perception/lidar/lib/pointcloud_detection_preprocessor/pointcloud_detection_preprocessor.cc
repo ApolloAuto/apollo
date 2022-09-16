@@ -23,11 +23,11 @@ namespace perception {
 namespace lidar {
 
 bool PointcloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
-  ACHECK(stage_config.has_pointcloud_detection_preprocessor_config());
   if (!Initialize(stage_config)) {
     return false;
   }
 
+  ACHECK(stage_config.has_pointcloud_detection_preprocessor_config());
   pointcloud_detection_preprocessor_config_ =
       stage_config.pointcloud_detection_preprocessor_config();
 

@@ -11,8 +11,9 @@ cc_library(
     "pointcloud_detection_preprocessor.h",
   ],
   deps = [
+    "//modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample",
     "//modules/perception/pipeline:stage",
-    # "//modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample:pointcloud_down_sample",
+    "//modules/perception/pipeline/proto/stage:pointcloud_detection_preprocessor_config_cc_proto",
   ],
 )
 
