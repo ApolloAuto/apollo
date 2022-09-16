@@ -37,6 +37,7 @@ class PointCloudDownSample : public pipeline::Plugin {
   bool Init(const PluginConfig& plugin_config) override;
   bool Process(DataFrame* data_frame, std::vector<float>* points_array,
                int* num_points_result);
+
   bool IsEnabled() const override { return enable_; }
   std::string Name() const override { return name_; }
 

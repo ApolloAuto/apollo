@@ -29,6 +29,8 @@ cc_library(
     "//modules/common/util:util_tool",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
     "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
+    "//modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects",
+    "//modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample",
   ],
 )
 

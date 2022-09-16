@@ -45,6 +45,7 @@ class PointCloudGetObjects : public pipeline::Plugin {
                DataFrame* data_frame);
 
   bool IsEnabled() const override { return enable_; }
+  std::string Name() const override { return name_; }
 
  private:
   base::ObjectSubType GetObjectsubType(const int label);
