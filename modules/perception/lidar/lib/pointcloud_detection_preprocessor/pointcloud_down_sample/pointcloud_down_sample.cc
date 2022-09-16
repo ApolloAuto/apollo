@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/pointcloud_down_sample.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
 
 #include <random>
 

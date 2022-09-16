@@ -15,7 +15,7 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_downsample/pointcloud_down_sample.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/stage.h"
 
