@@ -16,21 +16,32 @@
 
 #include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
 
+#include "modules/perception/pipeline/plugin_factory.h"
 namespace apollo {
 namespace perception {
 namespace camera {
 
 bool CameraDetectionPreprocessor::Init(const StageConfig& stage_config) {
+  ACHECK(stage_config.has_camera_detection_preprocessor_config());
   if (!Initialize(stage_config)) {
     return false;
   }
+
+  get_image_data_ = pipeline::PluginFactory::CreatePlugin(
+      plugin_config_map_
+          [apollo::perception::pipeline::PluginType::GET_IMAGE_DATA]);
+
+  resize_and_normalize_ = pipeline::PluginFactory::CreatePlugin(
+      plugin_config_map_
+          [apollo::perception::pipeline::PluginType::RESIZIE_AND_NORMALIZE]);
 
   // todo(zero): need fix
   // ACHECK(stage_config.has_camera_detection_preprocessor());
   // camera_detection_preprocessor_config_ =
   //     stage_config.camera_detection_preprocessor();
 
-  // get_image_data_ = PluginFactory::CreatePlugin(stage_config.get_image_data());
+  // get_image_data_ =
+  // PluginFactory::CreatePlugin(stage_config.get_image_data());
   // resize_and_normalize_ =
   //     PluginFactory::CreatePlugin(stage_config.resize_and_normalize());
   // if (!get_image_data_->Init(stage_config.get_image_data())) {
@@ -46,34 +57,29 @@ bool CameraDetectionPreprocessor::Process(DataFrame* data_frame) {
   return true;
 }
 
-// input: data_frame
-// output:
-//          resize、normalize之后的 image_data_array -> input_blob(smoke detect
-//          stage)
-//          k_inv -> input_k_blob(smoke detect stage)
-
-bool CameraDetectionPreprocessor::Process(
-    DataFrame* data_frame, float * k_inv, float * image_data_array) {
+bool CameraDetectionPreprocessor::Process(DataFrame* data_frame, float* k_inv,
+                                          float* image_data_array) {
   if (nullptr == data_frame) {
     AERROR << "Input null data_frame ptr.";
-    return false;
-  }
-  if (nullptr == image) {
-    AERROR << "Input null image ptr.";
     return false;
   }
   if (nullptr == k_inv) {
     AERROR << "Input null k_inv ptr.";
     return false;
   }
-
-  auto camera_frame = data_frame->camera_frame;
-  cv::Mat image_cv;
-  if (!get_image_data_->Process(*camera_frame, k_inv, &image_cv)){
+  if (nullptr == image_data_array) {
+    AERROR << "Input null image_data_array ptr.";
     return false;
   }
 
-  if (!resize_and_normalize_->Process(image_cv,  image_data_array)){
+  cv::Mat image_cv;
+  if (!dynamic_cast<GetImageData*>(get_image_data_.get())
+           ->Process(data_frame, k_inv, &image_cv)) {
+    return false;
+  }
+
+  if (!dynamic_cast<ReSizeAndNormalize*>(resize_and_normalize_.get())
+           ->Process(image_cv, image_data_array)) {
     return false;
   }
 

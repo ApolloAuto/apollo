@@ -31,26 +31,33 @@ class ReSizeAndNormalize : public pipeline::Plugin {
 
  public:
   ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
+  
   virtual ~ReSizeAndNormalize() = default;
 
   bool Process(cv::Mat &im, float *image_data_array);
 
   bool Init(const PluginConfig& plugin_config) override;
+
+  
   bool IsEnabled() const override { return enable_; }
+  
   std::string Name() const override { return name_; }
 
  private:
   void Resize(const cv::Mat &img, int resized_h, int resized_w,
               cv::Mat *resize_img);
 
-  void Normalize(cv::Mat *im, const std::vector<float> &mean,
-                 const std::vector<float> &std, float &scale);
+void Normalize(const std::vector<float> &mean,
+                                   const std::vector<float> &std, float scale,
+                                   cv::Mat *im);
+
+  void Mat2Vec(const cv::Mat &im, float *image_data_array);               
 
   int resized_width_;
   int resized_height_;
   std::vector<float> mean_;
   std::vector<float> std_;
-  std::vector<float> scale_;
+  float scale_;
 };  // class ReSizeAndNormalize
 
 }  // namespace camera

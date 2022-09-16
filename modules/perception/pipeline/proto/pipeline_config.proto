@@ -8,6 +8,8 @@ import "modules/perception/pipeline/proto/lane_detection_config.proto";
 import "modules/perception/pipeline/proto/lidar_detection_config.proto";
 import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
+import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
 import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
 import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
@@ -36,19 +38,23 @@ import "modules/perception/pipeline/proto/stage/singlestage.proto";
 import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
-import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 // plugin
+import "modules/perception/pipeline/proto/plugin/get_image_data_config.proto";
 import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
 import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
+import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 
 
 // plugin
 enum PluginType {
-  POINTCLOUD_DOWN_SAMPLE = 1 ;
-  POINTCLOUD_GET_OBJECTS = 2;
+  POINTCLOUD_DOWN_SAMPLE = 1;
+  RESIZIE_AND_NORMALIZE = 2;
+  POINTCLOUD_GET_OBJECTS = 3;
+  GET_IMAGE_DATA = 4;
+  
   // filter
-  ROI_BOUNDARY_FILTER = 3;
+  ROI_BOUNDARY_FILTER = 5;
 }
 
 message PluginConfig {
@@ -58,25 +64,29 @@ message PluginConfig {
   reserved 3 to 9;
 
   oneof plugin_config {
-    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 10;
-    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 11;
-    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 12;
+    camera.GetImageDataConfig get_image_data_config = 10;
+    camera.ResizeAndNormalizeConfig resize_and_normalize_config = 12;
+    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 13;
+    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 14;
+    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 15;
   }
 }
 
 // stage
 enum StageType {
   // preprocessors
+  // camera preprocessor
+   CAMERA_DETECTION_PREPROCESSOR = 1;
   // traffic light preprocessors
-  TL_PREPROCESSOR = 1;
+  TL_PREPROCESSOR = 2;
   // lidar preprocessors
-  POINTCLOUD_PREPROCESSOR = 2;
+  POINTCLOUD_PREPROCESSOR = 3;
   // lidar detection preprocessor
-  POINTCLOUD_DETECTION_PREPROCESSOR = 3;
+  POINTCLOUD_DETECTION_PREPROCESSOR = 4;
   // radar preprocessors
-  CONTI_ARS_PREPROCESSOR = 4;
+  CONTI_ARS_PREPROCESSOR = 5;
 
-  MAP_MANAGER = 5;
+  MAP_MANAGER = 6;
 
 
   // detectors
@@ -102,13 +112,15 @@ enum StageType {
   // camera post processors
   OBJ_POST_PROCESSOR = 100;
   LOCATION_REFINER_OBSTACLE_POSTPROCESSOR = 101;
+  CAMERA_DETECTION_POSTPROCESSOR = 102;
   // lane post processors
-  DARKSCNN_LANE_POSTPROCESSOR = 102;
-  DENSELINE_LANE_POSTPROCESSOR = 103;
+  DARKSCNN_LANE_POSTPROCESSOR = 103;
+  DENSELINE_LANE_POSTPROCESSOR = 104;
   // lidar post processors
-  POINTCLOUD_DETECTION_POSTPROCESSOR = 104;
-  OBJECT_BUILDER = 105;
-  OBJECT_FILTER_BANK = 106;
+  POINTCLOUD_DETECTION_POSTPROCESSOR = 105;
+  OBJECT_BUILDER = 106;
+  OBJECT_FILTER_BANK = 107;
+
 
 
   // tracker
@@ -170,6 +182,7 @@ message StageConfig {
     camera.lane.LanePostprocessorParam lane_postprocessor_param = 61;
     camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
     camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
+    camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
 
     fusion.PbfTrackerConfig pbf_tracker_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
