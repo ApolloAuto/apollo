@@ -29,8 +29,8 @@ function start() {
   TIME="$(date +%F-%H-%M-%S)"
   MODULE="smart_recorder"
 
-  REUSE_POOL_DIR="${APOLLO_ROOT_DIR}/data/bag/ReusedRecordsPool"
-  TASK_EXE_DIR="${APOLLO_ROOT_DIR}/data/bag/${MODULE}/${TIME}"
+  REUSE_POOL_DIR="${APOLLO_ROOT_DIR}/data/ReusedRecordsPool"
+  TASK_EXE_DIR="${APOLLO_ROOT_DIR}/data/${MODULE}/${TIME}"
   LOG="${APOLLO_ROOT_DIR}/data/log/smart_recorder.out"
   RECORD_EXE="${APOLLO_BIN_PREFIX}/modules/data/tools/${MODULE}/${MODULE}"
 

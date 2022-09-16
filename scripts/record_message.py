@@ -126,9 +126,9 @@ class Recorder(object):
         which will be cleared every time the smart recorder get started.
         Meanwhile, restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
         """
-        reuse_pool_dir = os.path.join(disk, 'data/bag', 'ReusedRecordsPool')
+        reuse_pool_dir = os.path.join(disk, 'data', 'ReusedRecordsPool')
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        task_dir = os.path.join(disk, 'data/bag/smart_recorder', task_id)
+        task_dir = os.path.join(disk, 'data/smart_recorder', task_id)
         print('Recording bag to {}'.format(task_dir))
         log_file = '/apollo/data/log/smart_recorder.out'
         recorder_exe = '/apollo/bazel-bin/modules/data/tools/smart_recorder/smart_recorder'
