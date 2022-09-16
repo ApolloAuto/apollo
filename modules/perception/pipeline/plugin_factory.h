@@ -30,11 +30,9 @@ namespace perception {
 namespace pipeline {
 
 template <typename To, typename From>
-std::unique_ptr<To>
-    dynamic_unique_cast(std::unique_ptr<From>&& p) {
+std::unique_ptr<To> dynamic_unique_cast(std::unique_ptr<From>&& p) {
   To* q = dynamic_cast<To*>(p.get());
-  if (q)
-    p.release();
+  if (q) p.release();
   return std::unique_ptr<To>(q);
 }
 
