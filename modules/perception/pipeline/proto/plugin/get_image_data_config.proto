@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message GetImageDataConfig {
+    optional int32 image_origin_width = 1;
+    optional int32 image_origin_height = 2;
+    optional int32 image_origin_channel = 3;
+}

@@ -22,38 +22,40 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool ReSizeAndNormalize::Init(const PluginConfig& plugin_config) {
+bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
   // todo(zero): need fix
-  // ACHECK(plugin_config.has_resize_and_normalize());
-  // resized_width_ = plugin_config.resized_width();
-  // resized_height_ = plugin_config.resized_height();
-  // mean_ = plugin_config.mean();
-  // std_ = plugin_config.std();
-  // scale_ = plugin_config.scale();
+  ACHECK(plugin_config.has_resize_and_normalize_config());
+  resized_width_ = plugin_config.resize_and_normalize_config().resized_width();
+  resized_height_ =
+      plugin_config.resize_and_normalize_config().resized_height();
+  mean_[0] = plugin_config.resize_and_normalize_config().mean_r();
+  mean_[1] = plugin_config.resize_and_normalize_config().mean_g();
+  mean_[2] = plugin_config.resize_and_normalize_config().mean_b();
+  std_[0] = plugin_config.resize_and_normalize_config().std_r();
+  std_[1] = plugin_config.resize_and_normalize_config().std_g();
+  std_[2] = plugin_config.resize_and_normalize_config().std_b();
+  scale_ = plugin_config.resize_and_normalize_config().scale();
   return true;
 }
 
-// input: data_frame
-// output: 预处理之后的image数组
 bool ReSizeAndNormalize::Process(cv::Mat &im, float *image_data_array) {
-
   cv::Mat resized_image;
   Resize(im, resized_height_, resized_width_, &resized_image);
   // todo(zero): need fix
-  // Normalize(mean_, std_, scale_, &resized_image);
+  Normalize(mean_, std_, scale_, &resized_image);
   Mat2Vec(resized_image, image_data_array);
   return true;
 }
 
 void ReSizeAndNormalize::Resize(const cv::Mat &img, int resized_h,
                                 int resized_w, cv::Mat *resize_img) {
-  cv::resize(img, resize_img, cv::Size(resized_h, resized_w), 0, 0,
+  cv::resize(img, *resize_img, cv::Size(resized_h, resized_w), 0, 0,
              cv::INTER_LINEAR);
 }
 
 void ReSizeAndNormalize::Normalize(const std::vector<float> &mean,
-                                   const std::vector<float> &std, float &scale,
-                                   cv::Mat *im, ) {
+                                   const std::vector<float> &std, float scale,
+                                   cv::Mat *im) {
   if (scale) {
     (*im).convertTo(*im, CV_32FC3, scale);
   }
@@ -69,13 +71,13 @@ void ReSizeAndNormalize::Normalize(const std::vector<float> &mean,
   }
 }
 
-void Mat2Vec(const cv::Mat &im, float *image_data_array) {
-  int rh = im->rows;
-  int rw = im->cols;
-  int rc = im->channels();
+void ReSizeAndNormalize::Mat2Vec(const cv::Mat &im, float *image_data_array) {
+  int rh = im.rows;
+  int rw = im.cols;
+  int rc = im.channels();
   for (int i = 0; i < rc; ++i) {
     cv::extractChannel(
-        *im, cv::Mat(rh, rw, CV_32FC1, image_data_array + i * rh * rw), i);
+        im, cv::Mat(rh, rw, CV_32FC1, image_data_array + i * rh * rw), i);
   }
 }
 

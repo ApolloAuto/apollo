@@ -31,25 +31,33 @@ class GetImageData : public pipeline::Plugin {
 
  public:
   GetImageData() { name_ = "GetImageData"; }
+
   virtual ~GetImageData() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
-  bool Process(DataFrame* data_frame, float * k_inv, cv::Mat* imag_cv);
+
+  bool Process(DataFrame* data_frame, float* k_inv, cv::Mat* imag_cv);
+
   bool IsEnabled() const override { return enable_; }
+
   std::string Name() const override { return name_; }
 
  private:
   bool GetKInverse(const CameraFrame& frame, float* k_inv);
+
   bool GetImage(const CameraFrame& frame, cv::Mat* image_cv);
 
  private:
-  //原始图像的width、height
   int image_origin_width_;
   int image_origin_height_;
   int image_origin_channel_;
 
+  float offset_y_ = 0.0;
+
+  std::shared_ptr<base::BaseCameraModel> base_camera_model_ = nullptr;
+
   std::shared_ptr<base::Image8U> image_ = nullptr;
-}; // class GetImageData
+};  // class GetImageData
 
 }  // namespace camera
 }  // namespace perception

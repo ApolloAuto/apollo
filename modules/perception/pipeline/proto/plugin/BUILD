@@ -6,24 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "pointcloud_down_sample_config_cc_proto",
-    deps = [
-        ":pointcloud_down_sample_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pointcloud_down_sample_config_proto",
-    srcs = ["pointcloud_down_sample_config.proto"],
-)
-
-py_proto_library(
-    name = "pointcloud_down_sample_config_py_pb2",
-    deps = [
-        ":pointcloud_down_sample_config_proto",
-    ],
-)
-cc_proto_library(
     name = "roi_boundary_filter_config_cc_proto",
     deps = [
         ":roi_boundary_filter_config_proto",
@@ -41,42 +23,7 @@ py_proto_library(
         ":roi_boundary_filter_config_proto",
     ],
 )
-cc_proto_library(
-    name = "dst_existence_fusion_config_cc_proto",
-    deps = [
-        ":dst_existence_fusion_config_proto",
-    ],
-)
 
-proto_library(
-    name = "dst_existence_fusion_config_proto",
-    srcs = ["dst_existence_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "dst_existence_fusion_config_py_pb2",
-    deps = [
-        ":dst_existence_fusion_config_proto",
-    ],
-)
-cc_proto_library(
-    name = "dst_type_fusion_config_cc_proto",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "dst_type_fusion_config_proto",
-    srcs = ["dst_type_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "dst_type_fusion_config_py_pb2",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
 cc_proto_library(
     name = "pointcloud_get_objects_config_cc_proto",
     deps = [
@@ -95,6 +42,26 @@ py_proto_library(
         ":pointcloud_get_objects_config_proto",
     ],
 )
+
+cc_proto_library(
+    name = "dst_type_fusion_config_cc_proto",
+    deps = [
+        ":dst_type_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "dst_type_fusion_config_proto",
+    srcs = ["dst_type_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "dst_type_fusion_config_py_pb2",
+    deps = [
+        ":dst_type_fusion_config_proto",
+    ],
+)
+
 cc_proto_library(
     name = "ccrf_type_fusion_config_cc_proto",
     deps = [
@@ -111,5 +78,81 @@ py_proto_library(
     name = "ccrf_type_fusion_config_py_pb2",
     deps = [
         ":ccrf_type_fusion_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dst_existence_fusion_config_cc_proto",
+    deps = [
+        ":dst_existence_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "dst_existence_fusion_config_proto",
+    srcs = ["dst_existence_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "dst_existence_fusion_config_py_pb2",
+    deps = [
+        ":dst_existence_fusion_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "get_image_data_config_cc_proto",
+    deps = [
+        ":get_image_data_config_proto",
+    ],
+)
+
+proto_library(
+    name = "get_image_data_config_proto",
+    srcs = ["get_image_data_config.proto"],
+)
+
+py_proto_library(
+    name = "get_image_data_config_py_pb2",
+    deps = [
+        ":get_image_data_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "resize_and_normalize_config_cc_proto",
+    deps = [
+        ":resize_and_normalize_config_proto",
+    ],
+)
+
+proto_library(
+    name = "resize_and_normalize_config_proto",
+    srcs = ["resize_and_normalize_config.proto"],
+)
+
+py_proto_library(
+    name = "resize_and_normalize_config_py_pb2",
+    deps = [
+        ":resize_and_normalize_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "pointcloud_down_sample_config_cc_proto",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_down_sample_config_proto",
+    srcs = ["pointcloud_down_sample_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_down_sample_config_py_pb2",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
     ],
 )

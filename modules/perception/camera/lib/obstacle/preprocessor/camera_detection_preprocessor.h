@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
 #include "modules/perception/camera/lib/obstacle/preprocessor/get_image_data/get_image_data.h"
+#include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/stage.h"
@@ -40,14 +40,14 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
 
   bool Process(DataFrame* data_frame) override;
 
-  bool Process(DataFrame* data_frame, float * k_inv, cv::Mat * image_cv);
+  bool Process(DataFrame* data_frame, float* k_inv, float* image_data_array);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-//   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
+  //   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
 
   std::unique_ptr<Plugin> get_image_data_;
   std::unique_ptr<Plugin> resize_and_normalize_;
