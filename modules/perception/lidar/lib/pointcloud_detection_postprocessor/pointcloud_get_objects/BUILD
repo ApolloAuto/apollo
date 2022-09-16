@@ -13,11 +13,11 @@ cc_library(
     "pointcloud_get_objects.h",
   ],
   deps = [
-    "//modules/perception/pipeline:plugin",
-    "//modules/perception/pipeline:data_frame",
     "//modules/perception/base:object",
     "//modules/perception/base:point",
     "//modules/perception/common:perception_gflags",
+    "//modules/perception/pipeline:data_frame",
+    "//modules/perception/pipeline:plugin",
   ],
 )
 

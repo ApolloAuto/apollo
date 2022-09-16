@@ -25,9 +25,11 @@ namespace lidar {
 
 class PointcloudDetectionPostprocessor : public pipeline::Stage {
  public:
-  using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
+  using PluginFactory = pipeline::PluginFactory;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
   using PointCloudGetObjectsPtr = std::unique_ptr<PointCloudGetObjects>;
 
  public:

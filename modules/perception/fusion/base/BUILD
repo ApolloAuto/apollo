@@ -74,6 +74,7 @@ cc_library(
         ":base_forward_declaration",
         "//cyber",
         "//modules/perception/base",
+        "//modules/perception/common/sensor_manager",
         "@com_google_googletest//:gtest_main",
         "@eigen",
     ],
