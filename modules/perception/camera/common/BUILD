@@ -7,13 +7,10 @@ cc_library(
     name = "camera_frame",
     hdrs = [
         "camera_frame.h",
-        "data_provider.h",
-        "undistortion_handler.h",
     ],
     deps = [
+        ":data_provider",
         "//modules/perception/base",
-        "//modules/perception/base:blob",
-        "//modules/perception/common/sensor_manager",
     ],
 )
 
@@ -35,6 +32,7 @@ cc_library(
     hdrs = ["data_provider.h"],
     deps = [
         ":undistortion_handler",
+        "//cyber",
         "//modules/perception/base",
         "@npp",
     ],
@@ -88,9 +86,10 @@ cc_library(
     srcs = ["undistortion_handler.cc"],
     hdrs = ["undistortion_handler.h"],
     deps = [
+        "//cyber",
         "//modules/perception/base",
-        "//modules/perception/base:blob",
         "//modules/perception/common/sensor_manager",
+        "@npp",
     ],
 )
 

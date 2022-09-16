@@ -15,10 +15,12 @@
  *****************************************************************************/
 #pragma once
 
+#include <vector>
+#include <memory>
+
+#include "Eigen/Core"
+
 #include "modules/perception/base/object.h"
-#include "modules/perception/base/point.h"
-#include "modules/perception/base/point_cloud.h"
-#include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
 

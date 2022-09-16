@@ -16,13 +16,10 @@
 
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 
-#include <vector>
 
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/point_cloud_util.h"
+#include "modules/perception/base/point.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lidar/common/lidar_timer.h"
-#include "modules/perception/lidar/common/pcl_util.h"
 
 namespace apollo {
 namespace perception {

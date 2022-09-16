@@ -12,6 +12,10 @@ cc_library(
   ],
   deps = [
     "//modules/perception/pipeline:plugin",
+    "//modules/perception/pipeline:data_frame",
+    "//modules/perception/base:object",
+    "//modules/perception/base:point",
+    "//modules/perception/common:perception_gflags",
     "@boost",
     "@eigen",
     "@com_google_absl//:absl",
