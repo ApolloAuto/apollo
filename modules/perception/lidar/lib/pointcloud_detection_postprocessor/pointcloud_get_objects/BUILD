@@ -2,6 +2,8 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
   name = "pointcloud_get_objects",
   srcs = [
@@ -16,12 +18,6 @@ cc_library(
     "//modules/perception/base:object",
     "//modules/perception/base:point",
     "//modules/perception/common:perception_gflags",
-    "@boost",
-    "@eigen",
-    "@com_google_absl//:absl",
-    "@local_config_cuda//cuda:cuda_headers",
-    "@com_google_googletest//:gtest_main",
-    "@local_config_pcl//:pcl",
   ],
 )
 

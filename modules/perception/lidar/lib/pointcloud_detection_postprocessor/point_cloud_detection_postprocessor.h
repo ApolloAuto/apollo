@@ -17,7 +17,6 @@
 
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 #include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
