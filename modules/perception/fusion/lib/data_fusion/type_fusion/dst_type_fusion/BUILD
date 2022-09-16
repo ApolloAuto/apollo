@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["dst_type_fusion.h"],
     deps = [
         "//cyber",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:base_init_options",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:sensor_data_manager",

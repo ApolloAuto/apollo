@@ -28,6 +28,7 @@
 #include "modules/perception/fusion/common/camera_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/pipeline/proto/plugin/dst_type_fusion_config.pb.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {

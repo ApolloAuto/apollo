@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["dst_existence_fusion.h"],
     deps = [
         "//modules/common/util",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base",
         "//modules/perception/fusion/common:camera_util",
         "//modules/perception/fusion/common:dst_evidence",
