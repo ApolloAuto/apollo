@@ -25,6 +25,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/camera/tools/offline/colormap.h"
 #include "modules/perception/camera/tools/offline/keycode.h"
+#include "modules/perception/common/perception_gflags.h"
 
 namespace apollo {
 namespace perception {

@@ -23,6 +23,7 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
+        "//modules/perception/common:perception_gflags",
         "//modules/perception/proto:motion_service_cc_proto",
         "@opencv//:imgcodecs",
         "@opencv//:imgproc",
