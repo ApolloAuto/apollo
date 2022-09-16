@@ -98,8 +98,8 @@ bool LidarTrackingComponent::InternalProc(
   auto& lidar_frame = in_message->lidar_frame_;
   lidar::LidarObstacleTrackingOptions track_options;
   track_options.sensor_name = sensor_name;
-  // lidar::LidarProcessResult ret =
-  //     tracker_->Process(track_options, lidar_frame.get());
+  lidar::LidarProcessResult ret =
+      tracker_->Process(track_options, lidar_frame.get());
 
   // todo(zero): need fix
   // lidar_track_pipeline_->Process(lidar_frame.get());
