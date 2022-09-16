@@ -81,8 +81,8 @@ cc_library(
         "//modules/perception/onboard/proto:lane_perception_component_cc_proto",
         "//modules/perception/onboard/proto:trafficlights_perception_component_cc_proto",
         "//modules/perception/onboard/transform_wrapper",
-        "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/perception/pipeline/proto:traffic_light_config_cc_proto",
+        "//modules/v2x/common:v2x_proxy_gflags",
         "@eigen",
         "@opencv//:highgui",
     ],
@@ -111,29 +111,19 @@ cc_library(
 )
 
 cc_library(
-    name = "lidar_inner_component_messages",
-    hdrs = [
-        "lidar_inner_component_messages.h",
-    ],
-    deps = [
-        "//cyber",
-        "//modules/perception/lidar/common",
-        "//modules/perception/onboard/inner_component_messages",
-    ],
-)
-
-cc_library(
     name = "lidar_detection_component",
     srcs = ["lidar_detection_component.cc"],
     hdrs = ["lidar_detection_component.h"],
     deps = [
-        ":lidar_inner_component_messages",
         "//cyber",
         "//modules/common/util:util_tool",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/lib/registerer",
-        "//modules/perception/lidar/common",
         "//modules/perception/lidar/app:lidar_obstacle_detection",
+        "//modules/perception/lidar/common",
+        "//modules/perception/lidar/lib/detector/cnn_segmentation:cnn_segmentation",
+        "//modules/perception/lidar/lib/detector/ncut_segmentation:ncut_segmentation",
+        "//modules/perception/lidar/lib/detector/point_pillars_detection:point_pillars_detection",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/object_builder",
@@ -141,10 +131,8 @@ cc_library(
         "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
-        "//modules/perception/lidar/lib/detector/point_pillars_detection:point_pillars_detection",
-        "//modules/perception/lidar/lib/detector/cnn_segmentation:cnn_segmentation",
-        "//modules/perception/lidar/lib/detector/ncut_segmentation:ncut_segmentation",
         "//modules/perception/onboard/common_flags",
+        "//modules/perception/onboard/inner_component_messages:lidar_inner_component_messages",
         "//modules/perception/onboard/proto:lidar_component_config_cc_proto",
         "//modules/perception/onboard/transform_wrapper",
         "@eigen",
@@ -160,7 +148,7 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",
-        "//modules/perception/fusion/lib/dummy:dummy_algorithms",
+        # "//modules/perception/fusion/lib/dummy:dummy_algorithms",
         "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/fusion/lib/interface:base_multisensor_fusion",
@@ -228,7 +216,6 @@ cc_library(
         "lidar_tracking_component.h",
     ],
     deps = [
-        ":lidar_inner_component_messages",
         "//cyber",
         "//modules/common/util:util_tool",
         "//modules/perception/base",
@@ -240,6 +227,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
+        "//modules/perception/onboard/inner_component_messages:lidar_inner_component_messages",
         "//modules/perception/onboard/proto:lidar_component_config_cc_proto",
     ],
     alwayslink = True,
