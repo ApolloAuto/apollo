@@ -20,6 +20,7 @@
 
 #include "Eigen/StdVector"
 
+#include "cyber/common/macros.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/fusion_log.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"

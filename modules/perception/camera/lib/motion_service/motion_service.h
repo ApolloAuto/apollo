@@ -23,6 +23,7 @@
 
 #include "Eigen/Core"
 
+#include "cyber/common/macros.h"
 #include "cyber/component/component.h"
 #include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"

@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"

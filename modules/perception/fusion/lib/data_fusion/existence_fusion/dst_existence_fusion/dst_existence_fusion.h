@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/common/dst_evidence.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 

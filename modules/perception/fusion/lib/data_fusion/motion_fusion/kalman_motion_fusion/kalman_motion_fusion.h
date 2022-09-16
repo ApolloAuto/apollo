@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/common/kalman_filter.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 

@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"

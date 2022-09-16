@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/pipeline/plugin.h"
 

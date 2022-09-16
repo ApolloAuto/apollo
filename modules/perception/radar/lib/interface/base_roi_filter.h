@@ -54,7 +54,6 @@
 
 #include "Eigen/Core"
 
-#include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 
 #include "modules/perception/base/frame.h"

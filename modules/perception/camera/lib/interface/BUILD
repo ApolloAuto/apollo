@@ -19,6 +19,7 @@ cc_library(
     hdrs = ["base_calibrator.h"],
     deps = [
         ":base_init_options",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
         "//modules/perception/pipeline:plugin",

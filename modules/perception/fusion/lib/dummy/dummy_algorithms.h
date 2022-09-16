@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"

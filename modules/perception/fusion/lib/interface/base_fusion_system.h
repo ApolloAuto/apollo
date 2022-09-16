@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"

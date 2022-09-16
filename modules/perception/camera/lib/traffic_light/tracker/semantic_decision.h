@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
 #include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 #include "modules/perception/pipeline/stage.h"

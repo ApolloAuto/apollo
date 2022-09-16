@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/common/dst_evidence.h"
 #include "modules/perception/fusion/lib/interface/base_type_fusion.h"
 
