@@ -29,16 +29,13 @@ namespace apollo {
 namespace perception {
 namespace pipeline {
 
-template <typename To, typename From, typename Deleter>
-std::unique_ptr<To, Deleter>
-    dynamic_unique_cast(std::unique_ptr<From, Deleter>&& p) {
+template <typename To, typename From>
+std::unique_ptr<To>
+    dynamic_unique_cast(std::unique_ptr<From>&& p) {
   To* q = dynamic_cast<To*>(p.get());
-  if (q) {
-    std::unique_ptr<To, Deleter> res(q, std::move(p.get_deleter()));
+  if (q)
     p.release();
-    return res;
-  }
-  return std::unique_ptr<To, Deleter>(nullptr);
+  return std::unique_ptr<To>(q);
 }
 
 class PluginFactory {

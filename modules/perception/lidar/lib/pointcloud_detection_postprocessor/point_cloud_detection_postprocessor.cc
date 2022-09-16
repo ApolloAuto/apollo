@@ -33,7 +33,7 @@ bool PointcloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
   pointcloud_get_objects_ =
       pipeline::dynamic_unique_cast<PointCloudGetObjects>(
           pipeline::PluginFactory::CreatePlugin(
-              plugin_config_map_[PluginType::POINTCLOUD_GET_OBJECTS]);
+              plugin_config_map_[PluginType::POINTCLOUD_GET_OBJECTS])
       );
 
   return true;
