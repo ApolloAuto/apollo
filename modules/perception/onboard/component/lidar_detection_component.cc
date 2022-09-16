@@ -151,7 +151,7 @@ bool LidarDetectionComponent::InternalProc(
   //     detector_->Process(detect_opts, in_message, frame.get());
 
   // todo(zero): need to add "sensor_name" and "lidar2world_trans_"
-  ConvertCloud(frame->cloud, in_message);
+  // ConvertCloud(frame->cloud, in_message);
   // bool res = lidar_detection_pipeline_->Process(frame.get());
 
   // if (ret.error_code != lidar::LidarErrorCode::Succeed) {

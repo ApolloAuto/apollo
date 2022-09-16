@@ -141,7 +141,8 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   // camera obstacle pipeline
   camera::CameraPerceptionInitOptions camera_perception_init_options_;
   camera::CameraPerceptionOptions camera_perception_options_;
-  std::unique_ptr<camera::ObstacleDetectionCamera> camera_obstacle_pipeline_;
+  // todo(zero): need fix to ObstacleDetectionCamera
+  std::unique_ptr<camera::ObstacleCameraPerception> camera_obstacle_pipeline_;
 
   // fixed size camera frames
   int frame_capacity_ = 20;
