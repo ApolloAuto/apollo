@@ -88,10 +88,11 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
   // ACHECK(detector_->Init(init_options)) <<
   //                           "lidar obstacle detection init error";
 
+  // todo(zero): no sensor_name\enable_hdmap_input
   PipelineConfig pipeline_config;
-  pipeline_config.set_sensor_name(sensor_name_);
-  pipeline_config.set_enable_hdmap_input(
-    FLAGS_obs_enable_hdmap_input && enable_hdmap_);
+  // pipeline_config.set_sensor_name(sensor_name_);
+  // pipeline_config.set_enable_hdmap_input(
+  //   FLAGS_obs_enable_hdmap_input && enable_hdmap_);
   ACHECK(lidar_detection_pipeline_->Init(pipeline_config))
       << "lidar obstacle detection init error";
 
@@ -160,12 +161,12 @@ bool LidarDetectionComponent::InternalProc(
   //   return false;
   // }
 
-  if (!res) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Lidar detection process error, ";
-    return false;
-  }
+  // if (!res) {
+  //   out_message->error_code_ =
+  //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+  //   AERROR << "Lidar detection process error, ";
+  //   return false;
+  // }
 
   return true;
 }
