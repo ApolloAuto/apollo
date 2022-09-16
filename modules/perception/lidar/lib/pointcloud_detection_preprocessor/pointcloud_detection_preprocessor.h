@@ -29,6 +29,7 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
+  using PluginType = pipeline::PluginType;
   using PointCloudDownSamplePtr = std::unique_ptr<PointCloudDownSample>;
 
  public:

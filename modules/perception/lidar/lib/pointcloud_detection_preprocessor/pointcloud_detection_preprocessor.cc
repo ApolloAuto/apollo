@@ -31,9 +31,10 @@ bool PointcloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
   pointcloud_detection_preprocessor_config_ =
       stage_config.pointcloud_detection_preprocessor_config();
 
-  pointcloud_downsample_ = dynamic_cast<PointCloudDownSamplePtr>(
-      pipeline::PluginFactory::CreatePlugin(
-          plugin_config_map_[pipeline::PluginType::POINTCLOUD_DOWN_SAMPLE]));
+  std::unique_ptr<Plugin> ptr = pipeline::PluginFactory::CreatePlugin(
+      plugin_config_map_[PluginType::POINTCLOUD_DOWN_SAMPLE]);
+
+  pointcloud_downsample_ = dynamic_cast<PointCloudDownSamplePtr>(ptr);
 
   return true;
 }
