@@ -29,11 +29,9 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
   using Plugin = pipeline::Plugin;
-  using PluginFactory = pipeline::PluginFactory;
 
  public:
   CameraDetectionPostprocessor() = default;
-
   virtual ~CameraDetectionPostprocessor() = default;
 
   bool Init(const StageConfig& stage_config) override;
@@ -51,7 +49,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
  private:
   CameraDetectionPostprocessorConfig camera_detection_postprocessor_config_;
 
-  std::unique_ptr<Plugin> get_object_;
+  std::unique_ptr<GetObject> get_object_;
 
 };  // class CameraDetectionPostprocessor
 }  // namespace camera

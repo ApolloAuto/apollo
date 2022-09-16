@@ -18,7 +18,6 @@
 #include "modules/perception/camera/lib/obstacle/preprocessor/get_image_data/get_image_data.h"
 #include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
 #include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
@@ -49,8 +48,8 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
  private:
   //   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
 
-  std::unique_ptr<Plugin> get_image_data_;
-  std::unique_ptr<Plugin> resize_and_normalize_;
+  std::unique_ptr<GetImageData> get_image_data_;
+  std::unique_ptr<ReSizeAndNormalize> resize_and_normalize_;
 
 };  // class CameraDetectionPreprocessor
 

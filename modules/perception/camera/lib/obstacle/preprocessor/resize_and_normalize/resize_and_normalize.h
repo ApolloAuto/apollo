@@ -31,16 +31,17 @@ class ReSizeAndNormalize : public pipeline::Plugin {
 
  public:
   ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
-  
+
+  explicit ReSizeAndNormalize(const PluginConfig& plugin_config);
+
   virtual ~ReSizeAndNormalize() = default;
 
   bool Process(cv::Mat &im, float *image_data_array);
 
   bool Init(const PluginConfig& plugin_config) override;
 
-  
   bool IsEnabled() const override { return enable_; }
-  
+
   std::string Name() const override { return name_; }
 
  private:
@@ -51,7 +52,7 @@ void Normalize(const std::vector<float> &mean,
                                    const std::vector<float> &std, float scale,
                                    cv::Mat *im);
 
-  void Mat2Vec(const cv::Mat &im, float *image_data_array);               
+  void Mat2Vec(const cv::Mat &im, float *image_data_array);
 
   int resized_width_;
   int resized_height_;

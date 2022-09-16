@@ -29,8 +29,11 @@ bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
   camera_detection_postprocessor_config_ =
       stage_config.camera_detection_postprocessor_config();
 
-  // todo(zero): need fix
-  // get_object_ = PluginFactory::CreatePlugin(stage_config.get_object());
+  // get_object_ =
+  //     pipeline::dynamic_unique_cast<GetObject>(
+  //         pipeline::PluginFactory::CreatePlugin(
+  //             plugin_config_map_[PluginType::POINTCLOUD_GET_OBJECTS])
+  //     );
 
   // if (!get_object_->Init(stage_config.get_object())) {
   //   return false;
