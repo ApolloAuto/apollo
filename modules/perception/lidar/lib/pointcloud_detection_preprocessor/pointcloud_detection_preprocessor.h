@@ -29,7 +29,6 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
-  using PreprocessorConfig = pipeline::PointcloudDetectionPreprocessorConfig;
 
  public:
   PointcloudDetectionPreprocessor() = default;
@@ -49,7 +48,8 @@ class PointcloudDetectionPreprocessor : public pipeline::Stage {
   std::string Name() const override { return name_; }
 
  private:
-  PreprocessorConfig pointcloud_detection_preprocessor_config_;
+  PointcloudDetectionPreprocessorConfig
+      pointcloud_detection_preprocessor_config_;
 
   std::unique_ptr<PointCloudDownSample> pointcloud_downsample_;
 

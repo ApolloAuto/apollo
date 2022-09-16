@@ -17,7 +17,7 @@ cc_library(
     "//modules/perception/common:perception_gflags",
     "//modules/perception/lidar/common",
     "//modules/perception/pipeline:plugin",
-    "//modules/perception/pipeline/proto/stage:pointcloud_down_sample_config_cc_proto",
+    "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_cc_proto",
   ],
 )
 
