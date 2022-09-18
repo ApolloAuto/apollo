@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message FilterBboxConfig {
+    optional float min_2d_height = 1;
+    optional float min_3d_height = 2;
+    optional float min_3d_length = 3;
+    optional float min_3d_width = 4;
+}

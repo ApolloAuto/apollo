@@ -29,8 +29,9 @@ bool GetObject::Init(const PluginConfig& plugin_config) {
   return true;
 }
 
-// input: detect_result、types
-// input/output: frames
+
+// input  : DataFrame *data_frame
+// output : DataFrame * data_frame
 bool GetObject::Process(const std::vector<float> &detect_result,
                         DataFrame *data_frame) {
   if (nullptr == data_frame) {
