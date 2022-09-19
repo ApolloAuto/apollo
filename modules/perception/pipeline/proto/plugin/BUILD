@@ -44,6 +44,44 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "filter_bbox_config_cc_proto",
+    deps = [
+        ":filter_bbox_config_proto",
+    ],
+)
+
+proto_library(
+    name = "filter_bbox_config_proto",
+    srcs = ["filter_bbox_config.proto"],
+)
+
+py_proto_library(
+    name = "filter_bbox_config_py_pb2",
+    deps = [
+        ":filter_bbox_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "recover_bbox_config_cc_proto",
+    deps = [
+        ":recover_bbox_config_proto",
+    ],
+)
+
+proto_library(
+    name = "recover_bbox_config_proto",
+    srcs = ["recover_bbox_config.proto"],
+)
+
+py_proto_library(
+    name = "recover_bbox_config_py_pb2",
+    deps = [
+        ":recover_bbox_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "dst_type_fusion_config_cc_proto",
     deps = [
         ":dst_type_fusion_config_proto",
