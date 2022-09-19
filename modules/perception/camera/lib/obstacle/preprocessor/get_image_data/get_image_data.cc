@@ -23,14 +23,17 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+GetImageData::GetImageData(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 bool GetImageData::Init(const PluginConfig& plugin_config) {
   ACHECK(plugin_config.has_get_image_data_config());
-  image_origin_width_ =
-      plugin_config.get_image_data_config().image_origin_width();
-  image_origin_height_ =
-      plugin_config.get_image_data_config().image_origin_height();
-  image_origin_channel_ =
-      plugin_config.get_image_data_config().image_origin_channel();
+
+  auto image_data_config = plugin_config.has_get_image_data_config();
+  image_origin_width_ = image_data_config.image_origin_width();
+  image_origin_height_ = image_data_config.image_origin_height();
+  image_origin_channel_ = image_data_config.image_origin_channel();
   image_.reset(new base::Image8U(image_origin_height_, image_origin_width_,
                                  base::Color::RGB));
   return true;

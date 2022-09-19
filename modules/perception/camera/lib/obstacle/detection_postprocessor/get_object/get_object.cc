@@ -23,6 +23,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+GetObject::GetObject(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 bool GetObject::Init(const PluginConfig& plugin_config) {
   // ACHECK(plugin_config.GetObject());
   // confidence_threshold_ = plugin_config.confidence_threshold();

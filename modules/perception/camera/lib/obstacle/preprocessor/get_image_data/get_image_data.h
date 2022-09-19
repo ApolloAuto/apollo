@@ -31,6 +31,7 @@ class GetImageData : public pipeline::Plugin {
 
  public:
   GetImageData() { name_ = "GetImageData"; }
+  explicit GetImageData(const PluginConfig& plugin_config);
 
   virtual ~GetImageData() = default;
 

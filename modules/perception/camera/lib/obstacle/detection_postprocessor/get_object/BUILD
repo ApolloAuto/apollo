@@ -8,12 +8,9 @@ cc_library(
     srcs = ["get_object.cc"],
     hdrs = ["get_object.h"],
     deps = [
+        "//cyber",
         "//modules/perception/pipeline:plugin",
-        "@boost",
-        "@eigen",
-        "@com_google_absl//:absl",
-        "@local_config_cuda//cuda:cudart",
-        "@local_config_cuda//cuda:cuda_headers",
+        "//modules/perception/base",
     ],
 )
 

@@ -17,6 +17,7 @@
 #include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
 
 #include "modules/perception/pipeline/plugin_factory.h"
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -27,13 +28,17 @@ bool CameraDetectionPreprocessor::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  get_image_data_ = pipeline::PluginFactory::CreatePlugin(
-      plugin_config_map_
-          [apollo::perception::pipeline::PluginType::GET_IMAGE_DATA]);
+  get_image_data_ =
+      pipeline::dynamic_unique_cast<GetImageData>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::GET_IMAGE_DATA])
+      );
 
-  resize_and_normalize_ = pipeline::PluginFactory::CreatePlugin(
-      plugin_config_map_
-          [apollo::perception::pipeline::PluginType::RESIZIE_AND_NORMALIZE]);
+  resize_and_normalize_ =
+      pipeline::dynamic_unique_cast<ReSizeAndNormalize>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::RESIZIE_AND_NORMALIZE])
+      );
 
   // todo(zero): need fix
   // ACHECK(stage_config.has_camera_detection_preprocessor());
@@ -73,13 +78,11 @@ bool CameraDetectionPreprocessor::Process(DataFrame* data_frame, float* k_inv,
   }
 
   cv::Mat image_cv;
-  if (!dynamic_cast<GetImageData*>(get_image_data_.get())
-           ->Process(data_frame, k_inv, &image_cv)) {
+  if (!get_image_data_->Process(data_frame, k_inv, &image_cv)) {
     return false;
   }
 
-  if (!dynamic_cast<ReSizeAndNormalize*>(resize_and_normalize_.get())
-           ->Process(image_cv, image_data_array)) {
+  if (!resize_and_normalize_->Process(image_cv, image_data_array)) {
     return false;
   }
 

@@ -16,25 +16,29 @@
 
 #include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
 
-#include <opencv2/opencv.hpp>
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
+ReSizeAndNormalize::ReSizeAndNormalize(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
   // todo(zero): need fix
   ACHECK(plugin_config.has_resize_and_normalize_config());
-  resized_width_ = plugin_config.resize_and_normalize_config().resized_width();
-  resized_height_ =
-      plugin_config.resize_and_normalize_config().resized_height();
-  mean_[0] = plugin_config.resize_and_normalize_config().mean_r();
-  mean_[1] = plugin_config.resize_and_normalize_config().mean_g();
-  mean_[2] = plugin_config.resize_and_normalize_config().mean_b();
-  std_[0] = plugin_config.resize_and_normalize_config().std_r();
-  std_[1] = plugin_config.resize_and_normalize_config().std_g();
-  std_[2] = plugin_config.resize_and_normalize_config().std_b();
-  scale_ = plugin_config.resize_and_normalize_config().scale();
+
+  const auto& config = plugin_config.has_resize_and_normalize_config();
+  resized_width_ = config.resized_width();
+  resized_height_ = config.resized_height();
+  mean_[0] = config.mean_r();
+  mean_[1] = config.mean_g();
+  mean_[2] = config.mean_b();
+  std_[0] = config.std_r();
+  std_[1] = config.std_g();
+  std_[2] = config.std_b();
+  scale_ = config.scale();
   return true;
 }
 
