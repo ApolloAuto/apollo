@@ -39,6 +39,7 @@ import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
 // plugin
+import "modules/perception/pipeline/proto/plugin/camera_get_object_config.proto";
 import "modules/perception/pipeline/proto/plugin/filter_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/get_image_data_config.proto";
 import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
@@ -50,16 +51,17 @@ import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.prot
 
 // plugin
 enum PluginType {
-  POINTCLOUD_DOWN_SAMPLE = 1;
-  RESIZIE_AND_NORMALIZE = 2;
-  POINTCLOUD_GET_OBJECTS = 3;
-  GET_IMAGE_DATA = 4;
+  CAMERA_GET_OBJECT = 1;
+  POINTCLOUD_DOWN_SAMPLE = 2;
+  RESIZIE_AND_NORMALIZE = 3;
+  POINTCLOUD_GET_OBJECTS = 4;
+  GET_IMAGE_DATA = 5;
   
   // filter
-  ROI_BOUNDARY_FILTER = 5;
-  FILTER_BBOX = 6;
+  ROI_BOUNDARY_FILTER = 6;
+  FILTER_BBOX = 7;
 
-  RECOVER_BBOX = 7;
+  RECOVER_BBOX = 8;
 }
 
 message PluginConfig {
@@ -69,13 +71,14 @@ message PluginConfig {
   reserved 3 to 9;
 
   oneof plugin_config {
-    camera.FilterBboxConfig filter_bbox_config = 10;
-    camera.GetImageDataConfig get_image_data_config = 11;
-    camera.ResizeAndNormalizeConfig resize_and_normalize_config = 12;
+    camera.CameraGetObjectConfig camera_get_object_config = 10;
+    camera.FilterBboxConfig filter_bbox_config = 11;
+    camera.GetImageDataConfig get_image_data_config = 12;
     camera.RecoverBboxConfig recover_bbox_config = 13;
-    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 14;
-    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 15;
-    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 16;
+    camera.ResizeAndNormalizeConfig resize_and_normalize_config = 14;
+    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 15;
+    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 16;
+    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 17;
   }
 }
 

@@ -29,13 +29,13 @@ bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
   camera_detection_postprocessor_config_ =
       stage_config.camera_detection_postprocessor_config();
 
-  // get_object_ =
+  // camera_get_object_ =
   //     pipeline::dynamic_unique_cast<GetObject>(
   //         pipeline::PluginFactory::CreatePlugin(
   //             plugin_config_map_[PluginType::POINTCLOUD_GET_OBJECTS])
   //     );
 
-  // if (!get_object_->Init(stage_config.get_object())) {
+  // if (!camera_get_object_->Init(stage_config.get_object())) {
   //   return false;
   // }
 
@@ -63,7 +63,7 @@ bool CameraDetectionPostprocessor::Process(const std::vector<float> &detect_resu
   //   return false;
   // }
 
-  // if (!get_object_->Process(detect_result, types, data_frame)){
+  // if (!camera_get_object_->Process(detect_result, types, data_frame)){
   //   return false;
   // }
 

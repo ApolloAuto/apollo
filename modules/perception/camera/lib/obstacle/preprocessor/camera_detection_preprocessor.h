@@ -28,7 +28,7 @@ class CameraDetectionPreprocessor : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
-  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
 
  public:
   CameraDetectionPreprocessor() = default;

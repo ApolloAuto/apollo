@@ -24,16 +24,16 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class GetObject : public pipeline::Plugin {
+class CameraGetObject : public pipeline::Plugin {
  public:
   using PluginConfig = pipeline::PluginConfig;
   using DataFrame = pipeline::DataFrame;
 
  public:
-  GetObject() { name_ = "GetObject"; }
-  explicit GetObject(const PluginConfig& plugin_config);
+  CameraGetObject() { name_ = "CameraGetObject"; }
+  explicit CameraGetObject(const PluginConfig& plugin_config);
 
-  virtual ~GetObject() = default;
+  virtual ~CameraGetObject() = default;
 
   bool Init(const PluginConfig& plugin_config) override;
 

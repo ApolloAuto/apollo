@@ -8,12 +8,9 @@ cc_library(
     srcs = ["recover_bbox.cc"],
     hdrs = ["recover_bbox.h"],
     deps = [
-    #    "//modules/perception/pipeline:plugin",
-    #    "@boost",
-    #    "@eigen",
-    #    "@com_google_absl//:absl",
-    #    "@local_config_cuda//cuda:cudart",
-    #    "@local_config_cuda//cuda:cuda_headers",
+        "//modules/perception/pipeline:data_frame",
+        "//modules/perception/pipeline:plugin",
+        "//modules/perception/pipeline/proto/plugin:recover_bbox_config_cc_proto",
     ],
 )
 

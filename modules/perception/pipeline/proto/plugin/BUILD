@@ -101,6 +101,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "camera_get_object_config_cc_proto",
+    deps = [
+        ":camera_get_object_config_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_get_object_config_proto",
+    srcs = ["camera_get_object_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_get_object_config_py_pb2",
+    deps = [
+        ":camera_get_object_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "ccrf_type_fusion_config_cc_proto",
     deps = [
         ":ccrf_type_fusion_config_proto",
