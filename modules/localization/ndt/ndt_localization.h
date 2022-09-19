@@ -133,7 +133,7 @@ class NDTLocalization {
   double error_ndt_score_ = 2.0;
   bool is_service_started_ = false;
 
-  std::list<TimeStampPose> odometry_buffer_;
+  std::list<TimeStampPose, Eigen::aligned_allocator<TimeStampPose>> odometry_buffer_;
   std::mutex odometry_buffer_mutex_;
   unsigned int odometry_buffer_size_ = 0;
   const unsigned int max_odometry_buffer_size_ = 100;
