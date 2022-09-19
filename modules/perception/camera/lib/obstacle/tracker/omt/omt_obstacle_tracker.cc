@@ -76,7 +76,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   return true;
 }
 
-bool OMTObstacleTracker::Init(const StageConfig& stage_config) {
+bool OMTObstacleTracker::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
@@ -363,11 +363,9 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
       auto &min_tmplt = kMinTemplateHWL.at(sub_type);
       if (OutOfValidRegion(rect, width_, height_, omt_param_.border())) {
         AINFO << "Out of valid region";
-        AINFO << "Rect x: " << rect.x
-              << " Rect y: " << rect.y
+        AINFO << "Rect x: " << rect.x << " Rect y: " << rect.y
               << " Rect height: " << rect.height
-              << " Rect width: " << rect.width
-              << " GT height_: " << height_
+              << " Rect width: " << rect.width << " GT height_: " << height_
               << " GT width_: " << width_;
         continue;
       }
@@ -530,24 +528,49 @@ bool OMTObstacleTracker::Track(const ObstacleTrackerOptions &options,
   return true;
 }
 
-bool OMTObstacleTracker::Process(DataFrame* data_frame) {
+bool OMTObstacleTracker::Process(DataFrame *data_frame) {
   if (data_frame == nullptr) {
     return false;
   }
 
-  CameraFrame* camera_frame = data_frame->camera_frame;
+  CameraFrame *camera_frame = data_frame->camera_frame;
   ObstacleTrackerOptions tracker_options;
 
-  if (camera_frame->proposed_objects.empty()) {
-    Predict(tracker_options, camera_frame);
-  // todo(zero): add condition
-  } else if (camera_frame->tracked_objects.empty()) {
-    Associate2D(tracker_options, camera_frame);
-  } else if (camera_frame->tracked_objects.empty()) {
-    Associate3D(tracker_options, camera_frame);
-  } else {
-    Track(tracker_options, camera_frame);
+  auto track_state = data_frame->camera_frame->track_state;
+
+  switch (track_state) {
+    case TrackState::Predict: {
+      Predict(tracker_options, camera_frame);
+      track_state = TrackState::Associate2D;
+      break;
+    }
+    case TrackState::Associate2D: {
+      Associate2D(tracker_options, camera_frame);
+      track_state = TrackState::Associate3D;
+      break;
+    }
+    case TrackState::Associate3D: {
+      Associate3D(tracker_options, camera_frame);
+      track_state = TrackState::Track;
+      break;
+    }
+    case TrackState::Track: {
+      Track(tracker_options, camera_frame);
+      track_state = TrackState::Predict;
+      break;
+    }
   }
+
+  // if (camera_frame->proposed_objects.empty()) {
+  //   Predict(tracker_options, camera_frame);
+  // // todo(zero): add condition
+  // } else if (camera_frame->tracked_objects.empty()) {
+  //   Associate2D(tracker_options, camera_frame);
+  // } else if (camera_frame->tracked_objects.empty()) {
+  //   Associate3D(tracker_options, camera_frame);
+  // } else {
+  //   Track(tracker_options, camera_frame);
+  // }
 
   return true;
 }
