@@ -71,6 +71,35 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   return true;
 }
 
+bool CCRFOneShotTypeFusion::Init(const PluginConfig& plugin_config) {
+  CcrfTypeFusionConfig config = plugin_config.ccrf_type_fusion_config();
+
+  auto config_manager = lib::ConfigManager::Instance();
+  const std::string work_root = config_manager->work_root();
+  std::string classifiers_property_file_path =
+      GetAbsolutePath(work_root, config.classifiers_property_file_path());
+  ACHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
+                                        &smooth_matrices_));
+
+  for (auto& pair : smooth_matrices_) {
+    util::NormalizeRow(&pair.second);
+    pair.second.transposeInPlace();
+    AINFO << "Source: " << pair.first;
+    AINFO << pair.second;
+  }
+
+  confidence_smooth_matrix_ = Matrixd::Identity();
+  auto iter = smooth_matrices_.find("Confidence");
+  if (iter != smooth_matrices_.end()) {
+    confidence_smooth_matrix_ = iter->second;
+    smooth_matrices_.erase(iter);
+  }
+  AINFO << "Confidence: ";
+  AINFO << confidence_smooth_matrix_;
+
+  return true;
+}
+
 bool CCRFOneShotTypeFusion::TypeFusion(const TypeFusionOption& option,
                                        ObjectPtr object) {
   if (object == nullptr) {
@@ -156,6 +185,31 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
     }
   }
   AINFO << std::endl << transition_matrix_;
+  return true;
+}
+
+bool CCRFSequenceTypeFusion::Init(const PluginConfig& plugin_config) {
+  ACHECK(one_shot_fuser_.Init(plugin_config));
+
+  CcrfTypeFusionConfig config = plugin_config.ccrf_type_fusion_config();
+
+  auto config_manager = lib::ConfigManager::Instance();
+  const std::string work_root = config_manager->work_root();
+  std::string transition_property_file_path =
+      GetAbsolutePath(work_root, config.transition_property_file_path());
+  s_alpha_ = config.transition_matrix_alpha();
+  ACHECK(util::LoadSingleMatrixFile(transition_property_file_path,
+                                    &transition_matrix_));
+  transition_matrix_ += Matrixd::Ones() * 1e-6;
+  util::NormalizeRow(&transition_matrix_);
+  AINFO << "transition matrix: ";
+  AINFO << transition_matrix_;
+  for (std::size_t i = 0; i < VALID_OBJECT_TYPE; ++i) {
+    for (std::size_t j = 0; j < VALID_OBJECT_TYPE; ++j) {
+      transition_matrix_(i, j) = log(transition_matrix_(i, j));
+    }
+  }
+  AINFO << transition_matrix_;
   return true;
 }
 

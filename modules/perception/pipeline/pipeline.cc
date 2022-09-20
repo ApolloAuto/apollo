@@ -20,11 +20,13 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
+#include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
 
 
 namespace apollo {
@@ -97,6 +99,12 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::OBJECT_FILTER_BANK:
       stage_ptr.reset(new lidar::ObjectFilterBank());
+      break;
+    case StageType::MLF_ENGINE:
+      stage_ptr.reset(new lidar::MlfEngine());
+      break;
+    case StageType::FUSED_CLASSIFIER:
+      stage_ptr.reset(new lidar::FusedClassifier());
       break;
     case StageType::TRAFFIC_LIGHT_DETECTION:
       stage_ptr.reset(new camera::TrafficLightDetection());

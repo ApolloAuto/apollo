@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/base:object",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common",
+        "//modules/perception/pipeline:plugin",
     ],
 )
 
@@ -38,6 +39,7 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
+        "//modules/perception/pipeline:plugin",
         "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,

@@ -72,13 +72,13 @@ bool FusedClassifier::Init(const StageConfig& stage_config) {
 
   // create plugins
   one_shot_fuser_ptr_ =
-      pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
+      pipeline::dynamic_unique_cast<CCRFOneShotTypeFusion>(
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::CCRF_ONESHOT_TYPE_FUSION]));
   CHECK_NOTNULL(one_shot_fuser_ptr_);
 
   sequence_fuser_ptr_ =
-      pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
+      pipeline::dynamic_unique_cast<CCRFSequenceTypeFusion>(
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::CCRF_SEQUENCE_TYPE_FUSION]));
   CHECK_NOTNULL(sequence_fuser_ptr_);
@@ -123,7 +123,7 @@ bool FusedClassifier::Process(DataFrame* data_frame) {
         AERROR << "There must exist some timestamp in disorder, so skip.";
         continue;
       }
-      if (!sequence_fuser_->TypeFusion(option_, &tracked_objects)) {
+      if (!sequence_fuser_ptr_->TypeFusion(option_, &tracked_objects)) {
         AERROR << "Failed to fuse types, so break.";
         break;
       }
@@ -140,7 +140,7 @@ bool FusedClassifier::Process(DataFrame* data_frame) {
             1.0;
         continue;
       }
-      if (!one_shot_fuser_->TypeFusion(option_, object)) {
+      if (!one_shot_fuser_ptr_->TypeFusion(option_, object)) {
         AERROR << "Failed to fuse types, so continue.";
       }
     }

@@ -58,7 +58,10 @@ enum PluginType {
   ROI_BOUNDARY_FILTER = 5;
 
   MLF_TRACK_OBJECT_MATCHER = 6;
-  MLF_TRACKER = 7
+  MLF_TRACKER = 7;
+
+  CCRF_ONESHOT_TYPE_FUSION = 8;
+  CCRF_SEQUENCE_TYPE_FUSION = 9;
 }
 
 message PluginConfig {
@@ -75,6 +78,7 @@ message PluginConfig {
     lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 15;
     lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 16;
     lidar.MlfTrackerConfig mlf_tracker_config = 17;
+    lidar.CcrfTypeFusionConfig ccrf_type_fusion_config = 18;
   }
 }
 

@@ -51,9 +51,41 @@ void PluginFactory::Init() {
       [](const PluginConfig& plugin_config) -> Plugin* {
         return new lidar::PointCloudDownSample(plugin_config);
       });
-  // Todo(zero): need to add more type
-  // need to deal with PipelineConfig& config
-
+  plugin_factory_.Register(
+      PluginType::CCRF_ONESHOT_TYPE_FUSION,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::CCRFOneShotTypeFusion(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::CCRF_SEQUENCE_TYPE_FUSION,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::CCRFSequenceTypeFusion(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::ROI_BOUNDARY_FILTER,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::ROIBoundaryFilter(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::POINTCLOUD_GET_OBJECTS,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::PointCloudGetObjects(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::POINTCLOUD_DOWN_SAMPLE,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::PointCloudDownSample(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::MLF_TRACK_OBJECT_MATCHER,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::MlfTrackObjectMatcher(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::MLF_TRACKER,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new lidar::MlfTracker(plugin_config);
+      });
 }
 
 std::unique_ptr<Plugin> PluginFactory::CreatePlugin(
