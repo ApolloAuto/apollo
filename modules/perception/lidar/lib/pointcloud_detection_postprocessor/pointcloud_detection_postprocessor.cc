@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/point_cloud_detection_postprocessor.h"
+#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_detection_postprocessor.h"
 
 #include "modules/perception/pipeline/plugin_factory.h"
 
