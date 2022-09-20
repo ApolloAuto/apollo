@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #include "modules/perception/pipeline/plugin_factory.h"
 
+#include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
+
 
 namespace apollo {
 namespace perception {
@@ -60,21 +63,6 @@ void PluginFactory::Init() {
       PluginType::CCRF_SEQUENCE_TYPE_FUSION,
       [](const PluginConfig& plugin_config) -> Plugin* {
         return new lidar::CCRFSequenceTypeFusion(plugin_config);
-      });
-  plugin_factory_.Register(
-      PluginType::ROI_BOUNDARY_FILTER,
-      [](const PluginConfig& plugin_config) -> Plugin* {
-        return new lidar::ROIBoundaryFilter(plugin_config);
-      });
-  plugin_factory_.Register(
-      PluginType::POINTCLOUD_GET_OBJECTS,
-      [](const PluginConfig& plugin_config) -> Plugin* {
-        return new lidar::PointCloudGetObjects(plugin_config);
-      });
-  plugin_factory_.Register(
-      PluginType::POINTCLOUD_DOWN_SAMPLE,
-      [](const PluginConfig& plugin_config) -> Plugin* {
-        return new lidar::PointCloudDownSample(plugin_config);
       });
   plugin_factory_.Register(
       PluginType::MLF_TRACK_OBJECT_MATCHER,
