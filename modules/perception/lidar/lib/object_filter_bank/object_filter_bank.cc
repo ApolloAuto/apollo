@@ -18,6 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 #include "modules/perception/pipeline/proto/stage/object_filter_bank_config.pb.h"
 
 namespace apollo {
@@ -64,7 +65,7 @@ bool ObjectFilterBank::Init(const StageConfig& stage_config) {
     auto filter = pipeline::dynamic_unique_cast<BaseObjectFilter>(
                       pipeline::PluginFactory::CreatePlugin(plugin_config));
 
-    std::string plugin_name = PluginType_Name(plugin_config.plugin_type);
+    std::string plugin_name = PluginType_Name(plugin_config.plugin_type());
     if (filter == nullptr) {
       AINFO << "Failed to find object filter: " << plugin_name << ", skipped";
       continue;

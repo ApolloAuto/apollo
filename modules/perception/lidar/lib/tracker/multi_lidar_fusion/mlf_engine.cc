@@ -22,10 +22,11 @@
 
 #include "cyber/common/file.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 #include "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.pb.h"
-#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 #include "modules/perception/pipeline/proto/stage/mlf_engine_config.pb.h"
 
 namespace apollo {

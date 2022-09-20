@@ -29,7 +29,7 @@ bool DummyObjectFilter::Filter(const ObjectFilterOptions& options,
   return true;
 }
 
-bool DummyObjectFilter::Init(const StageConfig& stage_config) {
+bool DummyObjectFilter::Init(const PluginConfig& plugin_config) {
   return true;
 }
 

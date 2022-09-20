@@ -55,9 +55,11 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
+        "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//modules/perception/pipeline/proto/stage:fused_classifier_config_cc_proto",
+        "//modules/perception/pipeline:plugin_factory",
         "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:fused_classifier_config_cc_proto",
     ],
     alwayslink = True,
 )

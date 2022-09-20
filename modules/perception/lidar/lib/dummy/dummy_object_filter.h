@@ -19,7 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
-#include "modules/perception/pipeline/stage.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -40,9 +40,7 @@ class DummyObjectFilter : public BaseObjectFilter {
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) override;
 
-  bool Init(const StageConfig& stage_config) override;
-
-  bool Process(DataFrame* data_frame) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
   bool IsEnabled() const override { return enable_; }
 

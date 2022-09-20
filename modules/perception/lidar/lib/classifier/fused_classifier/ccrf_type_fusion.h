@@ -31,6 +31,9 @@ namespace lidar {
 class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  CCRFOneShotTypeFusion() = default;
+  explicit CCRFOneShotTypeFusion(const PluginConfig& plugin_config);
+  ~CCRFOneShotTypeFusion() = default;
 
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
@@ -55,6 +58,9 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
 class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  CCRFSequenceTypeFusion() = default;
+  explicit CCRFSequenceTypeFusion(const PluginConfig& plugin_config);
+  ~CCRFSequenceTypeFusion() = default;
 
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,

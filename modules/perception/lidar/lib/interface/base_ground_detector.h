@@ -32,8 +32,10 @@ struct GroundDetectorOptions {};
 
 class BaseGroundDetector : public pipeline::Stage {
  public:
-  using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
 
  public:
   BaseGroundDetector() = default;

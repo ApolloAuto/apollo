@@ -34,6 +34,9 @@ struct TypeFusionOption {};
 
 class BaseOneShotTypeFusion : public pipeline::Plugin {
  public:
+  using PluginConfig = pipeline::PluginConfig;
+
+ public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;
   virtual bool TypeFusion(const TypeFusionOption& option,
                           std::shared_ptr<perception::base::Object> object) = 0;
@@ -51,7 +54,8 @@ PERCEPTION_REGISTER_REGISTERER(BaseOneShotTypeFusion);
 
 class BaseSequenceTypeFusion : public pipeline::Plugin {
  public:
-  typedef ObjectSequence::TrackedObjects TrackedObjects;
+  using PluginConfig = pipeline::PluginConfig;
+  using TrackedObjects = ObjectSequence::TrackedObjects;
 
  public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;

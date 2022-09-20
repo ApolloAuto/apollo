@@ -71,6 +71,11 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   return true;
 }
 
+CCRFOneShotTypeFusion::CCRFOneShotTypeFusion(
+    const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 bool CCRFOneShotTypeFusion::Init(const PluginConfig& plugin_config) {
   CcrfTypeFusionConfig config = plugin_config.ccrf_type_fusion_config();
 
@@ -186,6 +191,11 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   }
   AINFO << std::endl << transition_matrix_;
   return true;
+}
+
+CCRFSequenceTypeFusion::CCRFSequenceTypeFusion(
+    const PluginConfig& plugin_config) {
+  Init(plugin_config);
 }
 
 bool CCRFSequenceTypeFusion::Init(const PluginConfig& plugin_config) {

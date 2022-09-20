@@ -14,6 +14,7 @@ cc_library(
   ],
   deps = [
     "//modules/perception/pipeline:stage",
+    "//modules/perception/pipeline:plugin_factory",
     "//modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects",
   ],
 )

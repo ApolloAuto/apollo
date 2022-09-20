@@ -18,6 +18,8 @@
 #include <vector>
 
 #include "cyber/common/file.h"
+#include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 #include "modules/perception/pipeline/proto/stage/fused_classifier_config.pb.h"
 
 namespace apollo {

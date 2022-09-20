@@ -25,10 +25,11 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
         "//modules/perception/onboard/msg_serializer",
+        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:mlf_engine_config_cc_proto",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/perception/pipeline/proto/stage:mlf_engine_config_cc_proto",
-        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

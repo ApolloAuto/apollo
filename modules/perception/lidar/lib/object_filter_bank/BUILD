@@ -13,9 +13,10 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface",
+        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/pipeline:stage",
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_cc_proto",
         "//modules/perception/proto:perception_config_schema_cc_proto",
-        "//modules/perception/pipeline:stage",
         "@eigen",
     ],
 )
