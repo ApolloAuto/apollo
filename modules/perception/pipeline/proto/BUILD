@@ -131,6 +131,7 @@ proto_library(
         "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_proto",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
         "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_proto",
+        "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_proto",
     ],
 )
 
@@ -181,6 +182,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_py_pb2",
     ],
 )
 

@@ -48,6 +48,7 @@ import "modules/perception/pipeline/proto/plugin/recover_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
+import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
 
 
 // plugin
@@ -146,7 +147,6 @@ enum StageType {
   // tracker
   OMT_OBSTACLE_TRACKER = 120;
   SEMANTIC_REVISER = 121;
-  MLF_TRACKER = 122;
   CONTI_ARS_TRACKER = 123;
   PBF_TRACKER = 124;
   MLF_ENGINE = 125;
