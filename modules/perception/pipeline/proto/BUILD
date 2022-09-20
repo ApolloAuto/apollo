@@ -23,7 +23,24 @@ py_proto_library(
         ":lidar_detection_config_proto",
     ],
 )
+cc_proto_library(
+    name = "traffic_light_config_cc_proto",
+    deps = [
+        ":traffic_light_config_proto",
+    ],
+)
 
+proto_library(
+    name = "traffic_light_config_proto",
+    srcs = ["traffic_light_config.proto"],
+)
+
+py_proto_library(
+    name = "traffic_light_config_py_pb2",
+    deps = [
+        ":traffic_light_config_proto",
+    ],
+)
 cc_proto_library(
     name = "lane_detection_config_cc_proto",
     deps = [
@@ -42,7 +59,24 @@ py_proto_library(
         ":lane_detection_config_proto",
     ],
 )
+cc_proto_library(
+    name = "camera_detection_config_cc_proto",
+    deps = [
+        ":camera_detection_config_proto",
+    ],
+)
 
+proto_library(
+    name = "camera_detection_config_proto",
+    srcs = ["camera_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_detection_config_py_pb2",
+    deps = [
+        ":camera_detection_config_proto",
+    ],
+)
 cc_proto_library(
     name = "pipeline_config_cc_proto",
     deps = [
@@ -58,11 +92,6 @@ proto_library(
         ":lane_detection_config_proto",
         ":lidar_detection_config_proto",
         ":traffic_light_config_proto",
-        "//modules/perception/pipeline/proto/plugin:get_image_data_config_proto",
-        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_proto",
-        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_proto",
-        "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_proto",
-        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
         "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:camera_detection_preprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:cnnseg_config_proto",
@@ -82,9 +111,9 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_proto",
         "//modules/perception/pipeline/proto/stage:omt_proto",
         "//modules/perception/pipeline/proto/stage:pbf_tracker_config_proto",
-        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_detection_postprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_detection_preprocessor_config_proto",
+        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_proto",
         "//modules/perception/pipeline/proto/stage:probabilistic_fusion_config_proto",
         "//modules/perception/pipeline/proto/stage:recognition_proto",
@@ -93,22 +122,26 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_proto",
+        "//modules/perception/pipeline/proto/plugin:camera_get_object_config_proto",
+        "//modules/perception/pipeline/proto/plugin:filter_bbox_config_proto",
+        "//modules/perception/pipeline/proto/plugin:get_image_data_config_proto",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_proto",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_proto",
+        "//modules/perception/pipeline/proto/plugin:recover_bbox_config_proto",
+        "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_proto",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_proto",
     ],
 )
 
 py_proto_library(
     name = "pipeline_config_py_pb2",
     deps = [
+        ":pipeline_config_proto",
         ":camera_detection_config_py_pb2",
         ":lane_detection_config_py_pb2",
         ":lidar_detection_config_py_pb2",
-        ":pipeline_config_proto",
         ":traffic_light_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:get_image_data_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_py_pb2",
-        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:camera_detection_preprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:cnnseg_config_py_pb2",
@@ -128,9 +161,9 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:object_filter_bank_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:omt_py_pb2",
         "//modules/perception/pipeline/proto/stage:pbf_tracker_config_py_pb2",
-        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_detection_postprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_detection_preprocessor_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:pointcloud_preprocessor_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:probabilistic_fusion_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:recognition_py_pb2",
@@ -139,43 +172,15 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:camera_get_object_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:filter_bbox_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:get_image_data_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:pointcloud_get_objects_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:recover_bbox_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:resize_and_normalize_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_py_pb2",
     ],
 )
 
-cc_proto_library(
-    name = "camera_detection_config_cc_proto",
-    deps = [
-        ":camera_detection_config_proto",
-    ],
-)
-
-proto_library(
-    name = "camera_detection_config_proto",
-    srcs = ["camera_detection_config.proto"],
-)
-
-py_proto_library(
-    name = "camera_detection_config_py_pb2",
-    deps = [
-        ":camera_detection_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "traffic_light_config_cc_proto",
-    deps = [
-        ":traffic_light_config_proto",
-    ],
-)
-
-proto_library(
-    name = "traffic_light_config_proto",
-    srcs = ["traffic_light_config.proto"],
-)
-
-py_proto_library(
-    name = "traffic_light_config_py_pb2",
-    deps = [
-        ":traffic_light_config_proto",
-    ],
-)

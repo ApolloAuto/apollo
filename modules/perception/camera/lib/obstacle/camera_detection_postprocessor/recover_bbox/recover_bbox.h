@@ -24,35 +24,31 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class GetObject : public pipeline::Plugin {
+class RecoverBbox : public pipeline::Plugin {
  public:
   using PluginConfig = pipeline::PluginConfig;
   using DataFrame = pipeline::DataFrame;
 
  public:
-  GetObject() { name_ = "GetObject"; }
-  explicit GetObject(const PluginConfig& plugin_config);
+  RecoverBbox() { name_ = "RecoverBbox"; }
 
-  virtual ~GetObject() = default;
+  virtual ~RecoverBbox() = default;
 
-  bool Init(const PluginConfig& plugin_config) override;
+  bool Init(const PluginConfig &plugin_config) override;
 
-  bool Process(const std::vector<float> &detect_result, DataFrame *data_frame);
+  bool Process(DataFrame *data_frame);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  void get_smoke_objects_cpu(const std::vector<float> &detect_result,
-                             float confidence_threshold, int width, int height,
-                             std::vector<base::ObjectPtr> *objects);
-  void fill_smoke_base(base::ObjectPtr obj, const float *bbox,
-                                int width, int height);
-  void fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
-                                  const float *bbox);
 
-  float confidence_threshold_;
+void recover_bbox(int roi_w, int roi_h, int offset_y,
+                  std::vector<base::ObjectPtr> *objects);
+  int roi_w_;
+  int roi_h_; 
+  int offset_y_;
 };
 
 }  // namespace camera

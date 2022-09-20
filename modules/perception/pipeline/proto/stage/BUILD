@@ -6,81 +6,23 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "smoke_obstacle_detection_config_cc_proto",
+    name = "denseline_cc_proto",
     deps = [
-        ":smoke_obstacle_detection_config_proto",
+        ":denseline_proto",
     ],
 )
 
 proto_library(
-    name = "smoke_obstacle_detection_config_proto",
-    srcs = ["smoke_obstacle_detection_config.proto"],
+    name = "denseline_proto",
+    srcs = ["denseline.proto"],
 )
 
 py_proto_library(
-    name = "smoke_obstacle_detection_config_py_pb2",
+    name = "denseline_py_pb2",
     deps = [
-        ":smoke_obstacle_detection_config_proto",
+        ":denseline_proto",
     ],
 )
-
-cc_proto_library(
-    name = "spatio_temporal_ground_detector_config_cc_proto",
-    deps = [
-        ":spatio_temporal_ground_detector_config_proto",
-    ],
-)
-
-proto_library(
-    name = "spatio_temporal_ground_detector_config_proto",
-    srcs = ["spatio_temporal_ground_detector_config.proto"],
-)
-
-py_proto_library(
-    name = "spatio_temporal_ground_detector_config_py_pb2",
-    deps = [
-        ":spatio_temporal_ground_detector_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "ncut_config_cc_proto",
-    deps = [
-        ":ncut_config_proto",
-    ],
-)
-
-proto_library(
-    name = "ncut_config_proto",
-    srcs = ["ncut_config.proto"],
-)
-
-py_proto_library(
-    name = "ncut_config_py_pb2",
-    deps = [
-        ":ncut_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "fused_classifier_config_cc_proto",
-    deps = [
-        ":fused_classifier_config_proto",
-    ],
-)
-
-proto_library(
-    name = "fused_classifier_config_proto",
-    srcs = ["fused_classifier_config.proto"],
-)
-
-py_proto_library(
-    name = "fused_classifier_config_py_pb2",
-    deps = [
-        ":fused_classifier_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "ground_service_detector_config_cc_proto",
     deps = [
@@ -99,26 +41,6 @@ py_proto_library(
         ":ground_service_detector_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "darkSCNN_postprocessor_cc_proto",
-    deps = [
-        ":darkSCNN_postprocessor_proto",
-    ],
-)
-
-proto_library(
-    name = "darkSCNN_postprocessor_proto",
-    srcs = ["darkSCNN_postprocessor.proto"],
-)
-
-py_proto_library(
-    name = "darkSCNN_postprocessor_py_pb2",
-    deps = [
-        ":darkSCNN_postprocessor_proto",
-    ],
-)
-
 cc_proto_library(
     name = "omt_cc_proto",
     deps = [
@@ -137,140 +59,6 @@ py_proto_library(
         ":omt_proto",
     ],
 )
-
-cc_proto_library(
-    name = "point_pillars_detection_config_cc_proto",
-    deps = [
-        ":point_pillars_detection_config_proto",
-    ],
-)
-
-proto_library(
-    name = "point_pillars_detection_config_proto",
-    srcs = ["point_pillars_detection_config.proto"],
-)
-
-py_proto_library(
-    name = "point_pillars_detection_config_py_pb2",
-    deps = [
-        ":point_pillars_detection_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "darkSCNN_cc_proto",
-    deps = [
-        ":darkSCNN_proto",
-    ],
-)
-
-proto_library(
-    name = "darkSCNN_proto",
-    srcs = ["darkSCNN.proto"],
-)
-
-py_proto_library(
-    name = "darkSCNN_py_pb2",
-    deps = [
-        ":darkSCNN_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "probabilistic_fusion_config_cc_proto",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "probabilistic_fusion_config_proto",
-    srcs = ["probabilistic_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "probabilistic_fusion_config_py_pb2",
-    deps = [
-        ":probabilistic_fusion_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "recognition_cc_proto",
-    deps = [
-        ":recognition_proto",
-    ],
-)
-
-proto_library(
-    name = "recognition_proto",
-    srcs = ["recognition.proto"],
-)
-
-py_proto_library(
-    name = "recognition_py_pb2",
-    deps = [
-        ":recognition_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pointcloud_detection_postprocessor_config_cc_proto",
-    deps = [
-        ":pointcloud_detection_postprocessor_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pointcloud_detection_postprocessor_config_proto",
-    srcs = ["pointcloud_detection_postprocessor_config.proto"],
-)
-
-py_proto_library(
-    name = "pointcloud_detection_postprocessor_config_py_pb2",
-    deps = [
-        ":pointcloud_detection_postprocessor_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pbf_tracker_config_cc_proto",
-    deps = [
-        ":pbf_tracker_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pbf_tracker_config_proto",
-    srcs = ["pbf_tracker_config.proto"],
-)
-
-py_proto_library(
-    name = "pbf_tracker_config_py_pb2",
-    deps = [
-        ":pbf_tracker_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "map_manager_config_cc_proto",
-    deps = [
-        ":map_manager_config_proto",
-    ],
-)
-
-proto_library(
-    name = "map_manager_config_proto",
-    srcs = ["map_manager_config.proto"],
-)
-
-py_proto_library(
-    name = "map_manager_config_py_pb2",
-    deps = [
-        ":map_manager_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "location_refiner_cc_proto",
     deps = [
@@ -289,64 +77,6 @@ py_proto_library(
         ":location_refiner_proto",
     ],
 )
-
-cc_proto_library(
-    name = "cnnseg_config_cc_proto",
-    deps = [
-        ":cnnseg_config_proto",
-    ],
-)
-
-proto_library(
-    name = "cnnseg_config_proto",
-    srcs = ["cnnseg_config.proto"],
-)
-
-py_proto_library(
-    name = "cnnseg_config_py_pb2",
-    deps = [
-        ":cnnseg_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "denseline_cc_proto",
-    deps = [
-        ":denseline_proto",
-    ],
-)
-
-proto_library(
-    name = "denseline_proto",
-    srcs = ["denseline.proto"],
-)
-
-py_proto_library(
-    name = "denseline_py_pb2",
-    deps = [
-        ":denseline_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pbf_gatekeeper_config_cc_proto",
-    deps = [
-        ":pbf_gatekeeper_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pbf_gatekeeper_config_proto",
-    srcs = ["pbf_gatekeeper_config.proto"],
-)
-
-py_proto_library(
-    name = "pbf_gatekeeper_config_py_pb2",
-    deps = [
-        ":pbf_gatekeeper_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "pointcloud_detection_preprocessor_config_cc_proto",
     deps = [
@@ -365,7 +95,24 @@ py_proto_library(
         ":pointcloud_detection_preprocessor_config_proto",
     ],
 )
+cc_proto_library(
+    name = "pointcloud_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
 
+proto_library(
+    name = "pointcloud_detection_postprocessor_config_proto",
+    srcs = ["pointcloud_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_detection_postprocessor_config_proto",
+    ],
+)
 cc_proto_library(
     name = "semantic_cc_proto",
     deps = [
@@ -384,140 +131,24 @@ py_proto_library(
         ":semantic_proto",
     ],
 )
-
 cc_proto_library(
-    name = "tracking_feature_cc_proto",
+    name = "fused_classifier_config_cc_proto",
     deps = [
-        ":tracking_feature_proto",
+        ":fused_classifier_config_proto",
     ],
 )
 
 proto_library(
-    name = "tracking_feature_proto",
-    srcs = ["tracking_feature.proto"],
+    name = "fused_classifier_config_proto",
+    srcs = ["fused_classifier_config.proto"],
 )
 
 py_proto_library(
-    name = "tracking_feature_py_pb2",
+    name = "fused_classifier_config_py_pb2",
     deps = [
-        ":tracking_feature_proto",
+        ":fused_classifier_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "camera_detection_postprocessor_config_cc_proto",
-    deps = [
-        ":camera_detection_postprocessor_config_proto",
-    ],
-)
-
-proto_library(
-    name = "camera_detection_postprocessor_config_proto",
-    srcs = ["camera_detection_postprocessor_config.proto"],
-)
-
-py_proto_library(
-    name = "camera_detection_postprocessor_config_py_pb2",
-    deps = [
-        ":camera_detection_postprocessor_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "detection_cc_proto",
-    deps = [
-        ":detection_proto",
-    ],
-)
-
-proto_library(
-    name = "detection_proto",
-    srcs = ["detection.proto"],
-)
-
-py_proto_library(
-    name = "detection_py_pb2",
-    deps = [
-        ":detection_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "object_filter_bank_config_cc_proto",
-    deps = [
-        ":object_filter_bank_config_proto",
-    ],
-)
-
-proto_library(
-    name = "object_filter_bank_config_proto",
-    srcs = ["object_filter_bank_config.proto"],
-)
-
-py_proto_library(
-    name = "object_filter_bank_config_py_pb2",
-    deps = [
-        ":object_filter_bank_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "mlf_engine_config_cc_proto",
-    deps = [
-        ":mlf_engine_config_proto",
-    ],
-)
-
-proto_library(
-    name = "mlf_engine_config_proto",
-    srcs = ["mlf_engine_config.proto"],
-)
-
-py_proto_library(
-    name = "mlf_engine_config_py_pb2",
-    deps = [
-        ":mlf_engine_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "pointcloud_preprocessor_config_cc_proto",
-    deps = [
-        ":pointcloud_preprocessor_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pointcloud_preprocessor_config_proto",
-    srcs = ["pointcloud_preprocessor_config.proto"],
-)
-
-py_proto_library(
-    name = "pointcloud_preprocessor_config_py_pb2",
-    deps = [
-        ":pointcloud_preprocessor_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "singlestage_cc_proto",
-    deps = [
-        ":singlestage_proto",
-    ],
-)
-
-proto_library(
-    name = "singlestage_proto",
-    srcs = ["singlestage.proto"],
-)
-
-py_proto_library(
-    name = "singlestage_py_pb2",
-    deps = [
-        ":singlestage_proto",
-    ],
-)
-
 cc_proto_library(
     name = "camera_detection_preprocessor_config_cc_proto",
     deps = [
@@ -536,45 +167,186 @@ py_proto_library(
         ":camera_detection_preprocessor_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "denseline_postprocessor_cc_proto",
+    name = "pbf_tracker_config_cc_proto",
     deps = [
-        ":denseline_postprocessor_proto",
+        ":pbf_tracker_config_proto",
     ],
 )
 
 proto_library(
-    name = "denseline_postprocessor_proto",
-    srcs = ["denseline_postprocessor.proto"],
+    name = "pbf_tracker_config_proto",
+    srcs = ["pbf_tracker_config.proto"],
 )
 
 py_proto_library(
-    name = "denseline_postprocessor_py_pb2",
+    name = "pbf_tracker_config_py_pb2",
     deps = [
-        ":denseline_postprocessor_proto",
+        ":pbf_tracker_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "multicue_cc_proto",
+    name = "object_filter_bank_config_cc_proto",
     deps = [
-        ":multicue_proto",
+        ":object_filter_bank_config_proto",
     ],
 )
 
 proto_library(
-    name = "multicue_proto",
-    srcs = ["multicue.proto"],
+    name = "object_filter_bank_config_proto",
+    srcs = ["object_filter_bank_config.proto"],
 )
 
 py_proto_library(
-    name = "multicue_py_pb2",
+    name = "object_filter_bank_config_py_pb2",
     deps = [
-        ":multicue_proto",
+        ":object_filter_bank_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "singlestage_cc_proto",
+    deps = [
+        ":singlestage_proto",
     ],
 )
 
+proto_library(
+    name = "singlestage_proto",
+    srcs = ["singlestage.proto"],
+)
+
+py_proto_library(
+    name = "singlestage_py_pb2",
+    deps = [
+        ":singlestage_proto",
+    ],
+)
+cc_proto_library(
+    name = "darkSCNN_postprocessor_cc_proto",
+    deps = [
+        ":darkSCNN_postprocessor_proto",
+    ],
+)
+
+proto_library(
+    name = "darkSCNN_postprocessor_proto",
+    srcs = ["darkSCNN_postprocessor.proto"],
+)
+
+py_proto_library(
+    name = "darkSCNN_postprocessor_py_pb2",
+    deps = [
+        ":darkSCNN_postprocessor_proto",
+    ],
+)
+cc_proto_library(
+    name = "smoke_obstacle_detection_config_cc_proto",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "smoke_obstacle_detection_config_proto",
+    srcs = ["smoke_obstacle_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "smoke_obstacle_detection_config_py_pb2",
+    deps = [
+        ":smoke_obstacle_detection_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "detection_cc_proto",
+    deps = [
+        ":detection_proto",
+    ],
+)
+
+proto_library(
+    name = "detection_proto",
+    srcs = ["detection.proto"],
+)
+
+py_proto_library(
+    name = "detection_py_pb2",
+    deps = [
+        ":detection_proto",
+    ],
+)
+cc_proto_library(
+    name = "camera_detection_postprocessor_config_cc_proto",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_detection_postprocessor_config_proto",
+    srcs = ["camera_detection_postprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_detection_postprocessor_config_py_pb2",
+    deps = [
+        ":camera_detection_postprocessor_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "pbf_gatekeeper_config_cc_proto",
+    deps = [
+        ":pbf_gatekeeper_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pbf_gatekeeper_config_proto",
+    srcs = ["pbf_gatekeeper_config.proto"],
+)
+
+py_proto_library(
+    name = "pbf_gatekeeper_config_py_pb2",
+    deps = [
+        ":pbf_gatekeeper_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "darkSCNN_cc_proto",
+    deps = [
+        ":darkSCNN_proto",
+    ],
+)
+
+proto_library(
+    name = "darkSCNN_proto",
+    srcs = ["darkSCNN.proto"],
+)
+
+py_proto_library(
+    name = "darkSCNN_py_pb2",
+    deps = [
+        ":darkSCNN_proto",
+    ],
+)
+cc_proto_library(
+    name = "pointcloud_preprocessor_config_cc_proto",
+    deps = [
+        ":pointcloud_preprocessor_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_preprocessor_config_proto",
+    srcs = ["pointcloud_preprocessor_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_preprocessor_config_py_pb2",
+    deps = [
+        ":pointcloud_preprocessor_config_proto",
+    ],
+)
 cc_proto_library(
     name = "yolo_obstacle_detector_config_cc_proto",
     deps = [
@@ -599,6 +371,168 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "mlf_engine_config_cc_proto",
+    deps = [
+        ":mlf_engine_config_proto",
+    ],
+)
+
+proto_library(
+    name = "mlf_engine_config_proto",
+    srcs = ["mlf_engine_config.proto"],
+)
+
+py_proto_library(
+    name = "mlf_engine_config_py_pb2",
+    deps = [
+        ":mlf_engine_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "cnnseg_config_cc_proto",
+    deps = [
+        ":cnnseg_config_proto",
+    ],
+)
+
+proto_library(
+    name = "cnnseg_config_proto",
+    srcs = ["cnnseg_config.proto"],
+)
+
+py_proto_library(
+    name = "cnnseg_config_py_pb2",
+    deps = [
+        ":cnnseg_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "map_manager_config_cc_proto",
+    deps = [
+        ":map_manager_config_proto",
+    ],
+)
+
+proto_library(
+    name = "map_manager_config_proto",
+    srcs = ["map_manager_config.proto"],
+)
+
+py_proto_library(
+    name = "map_manager_config_py_pb2",
+    deps = [
+        ":map_manager_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "ncut_config_cc_proto",
+    deps = [
+        ":ncut_config_proto",
+    ],
+)
+
+proto_library(
+    name = "ncut_config_proto",
+    srcs = ["ncut_config.proto"],
+)
+
+py_proto_library(
+    name = "ncut_config_py_pb2",
+    deps = [
+        ":ncut_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "multicue_cc_proto",
+    deps = [
+        ":multicue_proto",
+    ],
+)
+
+proto_library(
+    name = "multicue_proto",
+    srcs = ["multicue.proto"],
+)
+
+py_proto_library(
+    name = "multicue_py_pb2",
+    deps = [
+        ":multicue_proto",
+    ],
+)
+cc_proto_library(
+    name = "tracking_feature_cc_proto",
+    deps = [
+        ":tracking_feature_proto",
+    ],
+)
+
+proto_library(
+    name = "tracking_feature_proto",
+    srcs = ["tracking_feature.proto"],
+)
+
+py_proto_library(
+    name = "tracking_feature_py_pb2",
+    deps = [
+        ":tracking_feature_proto",
+    ],
+)
+cc_proto_library(
+    name = "point_pillars_detection_config_cc_proto",
+    deps = [
+        ":point_pillars_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "point_pillars_detection_config_proto",
+    srcs = ["point_pillars_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "point_pillars_detection_config_py_pb2",
+    deps = [
+        ":point_pillars_detection_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "denseline_postprocessor_cc_proto",
+    deps = [
+        ":denseline_postprocessor_proto",
+    ],
+)
+
+proto_library(
+    name = "denseline_postprocessor_proto",
+    srcs = ["denseline_postprocessor.proto"],
+)
+
+py_proto_library(
+    name = "denseline_postprocessor_py_pb2",
+    deps = [
+        ":denseline_postprocessor_proto",
+    ],
+)
+cc_proto_library(
+    name = "recognition_cc_proto",
+    deps = [
+        ":recognition_proto",
+    ],
+)
+
+proto_library(
+    name = "recognition_proto",
+    srcs = ["recognition.proto"],
+)
+
+py_proto_library(
+    name = "recognition_py_pb2",
+    deps = [
+        ":recognition_proto",
+    ],
+)
+cc_proto_library(
     name = "hdmap_roi_filter_config_cc_proto",
     deps = [
         ":hdmap_roi_filter_config_proto",
@@ -614,5 +548,41 @@ py_proto_library(
     name = "hdmap_roi_filter_config_py_pb2",
     deps = [
         ":hdmap_roi_filter_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "spatio_temporal_ground_detector_config_cc_proto",
+    deps = [
+        ":spatio_temporal_ground_detector_config_proto",
+    ],
+)
+
+proto_library(
+    name = "spatio_temporal_ground_detector_config_proto",
+    srcs = ["spatio_temporal_ground_detector_config.proto"],
+)
+
+py_proto_library(
+    name = "spatio_temporal_ground_detector_config_py_pb2",
+    deps = [
+        ":spatio_temporal_ground_detector_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "probabilistic_fusion_config_cc_proto",
+    deps = [
+        ":probabilistic_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "probabilistic_fusion_config_proto",
+    srcs = ["probabilistic_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "probabilistic_fusion_config_py_pb2",
+    deps = [
+        ":probabilistic_fusion_config_proto",
     ],
 )

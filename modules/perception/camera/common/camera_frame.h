@@ -30,6 +30,9 @@ namespace camera {
 
 class BaseCalibrationService;
 
+
+enum class TrackState{ Predict, Associate2D, Associate3D, Track};
+
 struct CameraFrame {
   // timestamp
   double timestamp = 0.0;
@@ -65,9 +68,12 @@ struct CameraFrame {
   // todo(zero): Add stage status to distinguish different stages
   // stage status
   // StageStatus stage_status;
+  TrackState track_state = TrackState::Predict;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;  // struct CameraFrame
+
+
 
 }  // namespace camera
 }  // namespace perception

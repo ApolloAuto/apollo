@@ -15,43 +15,46 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/preprocessor/get_image_data/get_image_data.h"
-#include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
+#include "modules/perception/base/box.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/stage.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class CameraDetectionPreprocessor : public pipeline::Stage {
+class FilterBbox : public pipeline::Plugin {
  public:
-  using StageConfig = pipeline::StageConfig;
+  using PluginConfig = pipeline::PluginConfig;
   using DataFrame = pipeline::DataFrame;
-  using PluginType = pipeline::PluginType;
 
  public:
-  CameraDetectionPreprocessor() = default;
+  FilterBbox() { name_ = "FilterBbox"; }
 
-  virtual ~CameraDetectionPreprocessor() = default;
+  virtual ~FilterBbox() = default;
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const PluginConfig &plugin_config) override;
 
-  bool Process(DataFrame* data_frame) override;
-
-  bool Process(DataFrame* data_frame, float* k_inv, float* image_data_array);
+  bool Process(DataFrame *data_frame);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  //   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
+  struct MinDims {
+    float min_2d_height = 0.0f;
+    float min_3d_height = 0.0f;
+    float min_3d_length = 0.0f;
+    float min_3d_width = 0.0f;
+  };
 
-  std::unique_ptr<GetImageData> get_image_data_;
-  std::unique_ptr<ReSizeAndNormalize> resize_and_normalize_;
+  void filter_bbox(const MinDims &min_dims,
+                   std::vector<base::ObjectPtr> *objects);
 
-};  // class CameraDetectionPreprocessor
+  MinDims min_dims_;
+};
 
 }  // namespace camera
 }  // namespace perception

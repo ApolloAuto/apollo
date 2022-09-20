@@ -8,7 +8,9 @@ cc_library(
     srcs = ["camera_detection_postprocessor.cc"],
     hdrs = ["camera_detection_postprocessor.h"],
     deps = [
-        "//modules/perception/camera/lib/obstacle/detection_postprocessor/get_object",
+        "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object",
+        "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/filter_bbox",
+        "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/recover_bbox",
         "//modules/perception/pipeline:stage",
         "//modules/perception/pipeline/proto/stage:camera_detection_postprocessor_config_cc_proto",
     ],

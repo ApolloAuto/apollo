@@ -71,6 +71,10 @@ cc_library(
   deps = [
     ":stage",
     "//modules/common/util:util_tool",
+    "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor",
+    "//modules/perception/camera/lib/obstacle/detector/smoke:smoke_obstacle_detector",
+    "//modules/perception/camera/lib/obstacle/preprocessor:camera_detection_preprocessor",
+    "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
     "//modules/perception/camera/lib/traffic_light/detector/detection",
     "//modules/perception/camera/lib/traffic_light/detector/recognition",
     "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",

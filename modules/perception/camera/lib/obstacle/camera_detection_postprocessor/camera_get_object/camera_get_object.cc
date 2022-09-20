@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/camera/lib/obstacle/detection_postprocessor/get_object/get_object.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object/camera_get_object.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -23,19 +23,20 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-GetObject::GetObject(const PluginConfig& plugin_config) {
+CameraGetObject::CameraGetObject(const PluginConfig& plugin_config) {
   Init(plugin_config);
 }
 
-bool GetObject::Init(const PluginConfig& plugin_config) {
-  // ACHECK(plugin_config.GetObject());
+bool CameraGetObject::Init(const PluginConfig& plugin_config) {
+  // ACHECK(plugin_config.CameraGetObject());
   // confidence_threshold_ = plugin_config.confidence_threshold();
   return true;
 }
 
-// input: detect_result、types
-// input/output: frames
-bool GetObject::Process(const std::vector<float> &detect_result,
+
+// input  : DataFrame *data_frame
+// output : DataFrame * data_frame
+bool CameraGetObject::Process(const std::vector<float> &detect_result,
                         DataFrame *data_frame) {
   if (nullptr == data_frame) {
     AERROR << "Input null dataframe ptr.";
@@ -49,7 +50,7 @@ bool GetObject::Process(const std::vector<float> &detect_result,
   return true;
 }
 
-void GetObject::get_smoke_objects_cpu(const std::vector<float> &detect_result,
+void CameraGetObject::get_smoke_objects_cpu(const std::vector<float> &detect_result,
                                       float confidence_threshold, int width,
                                       int height,
                                       std::vector<base::ObjectPtr> *objects) {
@@ -84,7 +85,7 @@ void GetObject::get_smoke_objects_cpu(const std::vector<float> &detect_result,
   // }
 }
 
-void GetObject::fill_smoke_base(base::ObjectPtr obj, const float *bbox,
+void CameraGetObject::fill_smoke_base(base::ObjectPtr obj, const float *bbox,
                                 int width, int height) {
   obj->camera_supplement.box.xmin = bbox[0] / width;
   obj->camera_supplement.box.ymin = bbox[1] / height;
@@ -92,7 +93,7 @@ void GetObject::fill_smoke_base(base::ObjectPtr obj, const float *bbox,
   obj->camera_supplement.box.ymax = bbox[3] / height;
 }
 
-void GetObject::fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
+void CameraGetObject::fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
                                   const float *bbox) {
   if (with_box3d) {
     obj->camera_supplement.alpha = bbox[1];

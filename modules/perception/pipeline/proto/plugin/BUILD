@@ -6,6 +6,60 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
+    name = "recover_bbox_config_cc_proto",
+    deps = [
+        ":recover_bbox_config_proto",
+    ],
+)
+
+proto_library(
+    name = "recover_bbox_config_proto",
+    srcs = ["recover_bbox_config.proto"],
+)
+
+py_proto_library(
+    name = "recover_bbox_config_py_pb2",
+    deps = [
+        ":recover_bbox_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "filter_bbox_config_cc_proto",
+    deps = [
+        ":filter_bbox_config_proto",
+    ],
+)
+
+proto_library(
+    name = "filter_bbox_config_proto",
+    srcs = ["filter_bbox_config.proto"],
+)
+
+py_proto_library(
+    name = "filter_bbox_config_py_pb2",
+    deps = [
+        ":filter_bbox_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "pointcloud_down_sample_config_cc_proto",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_down_sample_config_proto",
+    srcs = ["pointcloud_down_sample_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_down_sample_config_py_pb2",
+    deps = [
+        ":pointcloud_down_sample_config_proto",
+    ],
+)
+cc_proto_library(
     name = "roi_boundary_filter_config_cc_proto",
     deps = [
         ":roi_boundary_filter_config_proto",
@@ -23,64 +77,24 @@ py_proto_library(
         ":roi_boundary_filter_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "pointcloud_get_objects_config_cc_proto",
+    name = "camera_get_object_config_cc_proto",
     deps = [
-        ":pointcloud_get_objects_config_proto",
+        ":camera_get_object_config_proto",
     ],
 )
 
 proto_library(
-    name = "pointcloud_get_objects_config_proto",
-    srcs = ["pointcloud_get_objects_config.proto"],
+    name = "camera_get_object_config_proto",
+    srcs = ["camera_get_object_config.proto"],
 )
 
 py_proto_library(
-    name = "pointcloud_get_objects_config_py_pb2",
+    name = "camera_get_object_config_py_pb2",
     deps = [
-        ":pointcloud_get_objects_config_proto",
+        ":camera_get_object_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "dst_type_fusion_config_cc_proto",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "dst_type_fusion_config_proto",
-    srcs = ["dst_type_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "dst_type_fusion_config_py_pb2",
-    deps = [
-        ":dst_type_fusion_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "ccrf_type_fusion_config_cc_proto",
-    deps = [
-        ":ccrf_type_fusion_config_proto",
-    ],
-)
-
-proto_library(
-    name = "ccrf_type_fusion_config_proto",
-    srcs = ["ccrf_type_fusion_config.proto"],
-)
-
-py_proto_library(
-    name = "ccrf_type_fusion_config_py_pb2",
-    deps = [
-        ":ccrf_type_fusion_config_proto",
-    ],
-)
-
 cc_proto_library(
     name = "dst_existence_fusion_config_cc_proto",
     deps = [
@@ -99,26 +113,60 @@ py_proto_library(
         ":dst_existence_fusion_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "get_image_data_config_cc_proto",
+    name = "dst_type_fusion_config_cc_proto",
     deps = [
-        ":get_image_data_config_proto",
+        ":dst_type_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "get_image_data_config_proto",
-    srcs = ["get_image_data_config.proto"],
+    name = "dst_type_fusion_config_proto",
+    srcs = ["dst_type_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "get_image_data_config_py_pb2",
+    name = "dst_type_fusion_config_py_pb2",
     deps = [
-        ":get_image_data_config_proto",
+        ":dst_type_fusion_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "multi_lidar_fusion_config_cc_proto",
+    deps = [
+        ":multi_lidar_fusion_config_proto",
     ],
 )
 
+proto_library(
+    name = "multi_lidar_fusion_config_proto",
+    srcs = ["multi_lidar_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "multi_lidar_fusion_config_py_pb2",
+    deps = [
+        ":multi_lidar_fusion_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "pointcloud_get_objects_config_cc_proto",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
+    ],
+)
+
+proto_library(
+    name = "pointcloud_get_objects_config_proto",
+    srcs = ["pointcloud_get_objects_config.proto"],
+)
+
+py_proto_library(
+    name = "pointcloud_get_objects_config_py_pb2",
+    deps = [
+        ":pointcloud_get_objects_config_proto",
+    ],
+)
 cc_proto_library(
     name = "resize_and_normalize_config_cc_proto",
     deps = [
@@ -137,22 +185,39 @@ py_proto_library(
         ":resize_and_normalize_config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "pointcloud_down_sample_config_cc_proto",
+    name = "ccrf_type_fusion_config_cc_proto",
     deps = [
-        ":pointcloud_down_sample_config_proto",
+        ":ccrf_type_fusion_config_proto",
     ],
 )
 
 proto_library(
-    name = "pointcloud_down_sample_config_proto",
-    srcs = ["pointcloud_down_sample_config.proto"],
+    name = "ccrf_type_fusion_config_proto",
+    srcs = ["ccrf_type_fusion_config.proto"],
 )
 
 py_proto_library(
-    name = "pointcloud_down_sample_config_py_pb2",
+    name = "ccrf_type_fusion_config_py_pb2",
     deps = [
-        ":pointcloud_down_sample_config_proto",
+        ":ccrf_type_fusion_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "get_image_data_config_cc_proto",
+    deps = [
+        ":get_image_data_config_proto",
+    ],
+)
+
+proto_library(
+    name = "get_image_data_config_proto",
+    srcs = ["get_image_data_config.proto"],
+)
+
+py_proto_library(
+    name = "get_image_data_config_py_pb2",
+    deps = [
+        ":get_image_data_config_proto",
     ],
 )

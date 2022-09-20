@@ -15,43 +15,45 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/preprocessor/get_image_data/get_image_data.h"
-#include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
+#include "modules/perception/base/box.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/pipeline/data_frame.h"
-#include "modules/perception/pipeline/stage.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class CameraDetectionPreprocessor : public pipeline::Stage {
+class CameraGetObject : public pipeline::Plugin {
  public:
-  using StageConfig = pipeline::StageConfig;
+  using PluginConfig = pipeline::PluginConfig;
   using DataFrame = pipeline::DataFrame;
-  using PluginType = pipeline::PluginType;
 
  public:
-  CameraDetectionPreprocessor() = default;
+  CameraGetObject() { name_ = "CameraGetObject"; }
+  explicit CameraGetObject(const PluginConfig& plugin_config);
 
-  virtual ~CameraDetectionPreprocessor() = default;
+  virtual ~CameraGetObject() = default;
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const PluginConfig& plugin_config) override;
 
-  bool Process(DataFrame* data_frame) override;
-
-  bool Process(DataFrame* data_frame, float* k_inv, float* image_data_array);
+  bool Process(const std::vector<float> &detect_result, DataFrame *data_frame);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  //   CameraDetectionPreprocessorConfig camera_detection_preprocessor_config_;
+  void get_smoke_objects_cpu(const std::vector<float> &detect_result,
+                             float confidence_threshold, int width, int height,
+                             std::vector<base::ObjectPtr> *objects);
+  void fill_smoke_base(base::ObjectPtr obj, const float *bbox,
+                                int width, int height);
+  void fill_smoke_bbox3d(bool with_box3d, base::ObjectPtr obj,
+                                  const float *bbox);
 
-  std::unique_ptr<GetImageData> get_image_data_;
-  std::unique_ptr<ReSizeAndNormalize> resize_and_normalize_;
-
-};  // class CameraDetectionPreprocessor
+  float confidence_threshold_;
+};
 
 }  // namespace camera
 }  // namespace perception

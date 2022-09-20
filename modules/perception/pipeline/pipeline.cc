@@ -17,6 +17,10 @@
 #include "modules/perception/pipeline/pipeline.h"
 
 #include "modules/common/util/map_util.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_detection_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
@@ -114,6 +118,18 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::SEMANTIC_REVISER:
       stage_ptr.reset(new camera::SemanticReviser());
+      break;
+    case StageType::CAMERA_DETECTION_POSTPROCESSOR:
+      stage_ptr.reset(new camera::CameraDetectionPostprocessor());
+      break;
+    case StageType::SMOKE_OBSTACLE_DETECTOR:
+      stage_ptr.reset(new camera::SmokeObstacleDetector());
+      break;
+    case StageType::CAMERA_DETECTION_PREPROCESSOR:
+      stage_ptr.reset(new camera::CameraDetectionPreprocessor());
+      break;
+    case StageType::OMT_OBSTACLE_TRACKER:
+      stage_ptr.reset(new camera::OMTObstacleTracker());
       break;
     default:
       return nullptr;

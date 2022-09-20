@@ -182,11 +182,14 @@ bool ObstacleCameraPerception::Init(
 }
 
 bool ObstacleCameraPerception::Init(const PipelineConfig& pipeline_config) {
-  return true;
+   return Initialize(pipeline_config);
 }
 
 bool ObstacleCameraPerception::Process(DataFrame* data_frame) {
-  return true;
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
 }
 
 void ObstacleCameraPerception::InitLane(

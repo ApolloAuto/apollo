@@ -29,7 +29,7 @@ bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
   // todo(zero): need fix
   ACHECK(plugin_config.has_resize_and_normalize_config());
 
-  const auto& config = plugin_config.has_resize_and_normalize_config();
+  const auto& config = plugin_config.resize_and_normalize_config();
   resized_width_ = config.resized_width();
   resized_height_ = config.resized_height();
   mean_[0] = config.mean_r();
