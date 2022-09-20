@@ -71,6 +71,7 @@ bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
   ACHECK(stage_config.has_pointcloud_preprocessor_config());
   pointcloud_preprocessor_config_ =
       stage_config.pointcloud_preprocessor_config();
+
   filter_naninf_points_ =
       pointcloud_preprocessor_config_.filter_naninf_points();
   filter_nearby_box_points_ =
@@ -90,8 +91,12 @@ bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
 bool PointCloudPreprocessor::Process(DataFrame* data_frame) {
   if (data_frame == nullptr) return false;
 
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) return false;
+
   PointCloudPreprocessorOptions options;
-  bool result = Preprocess(options, data_frame->lidar_frame);
+  options.sensor2novatel_extrinsics = lidar_frame->lidar2novatel_extrinsics;
+  bool result = Preprocess(options, lidar_frame);
   return result;
 }
 

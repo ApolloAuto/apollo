@@ -67,8 +67,6 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
 
 
   PointcloudPreprocessorConfig pointcloud_preprocessor_config_;
-  std::string name_;
-  bool enable_;
 };  // class PointCloudPreprocessor
 
 }  // namespace lidar

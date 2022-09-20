@@ -147,6 +147,8 @@ bool LidarDetectionComponent::InternalProc(
   lidar::LidarObstacleDetectionOptions detect_opts;
   detect_opts.sensor_name = sensor_name_;
   lidar2world_trans_.GetExtrinsics(&detect_opts.sensor2novatel_extrinsics);
+  frame->lidar2novatel_extrinsics = detect_opts.sensor2novatel_extrinsics;
+
   // lidar::LidarProcessResult ret =
   //     detector_->Process(detect_opts, in_message, frame.get());
 

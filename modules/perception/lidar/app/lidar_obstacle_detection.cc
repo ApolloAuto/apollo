@@ -47,6 +47,7 @@ bool LidarObstacleDetection::Init(
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();
+  // todo(zero): need fix, always true?
   use_object_builder_ = ("PointPillarsDetection" != config.detector() ||
                          "MaskPillarsDetection" != config.detector());
 
@@ -97,6 +98,9 @@ bool LidarObstacleDetection::Init(
 }
 
 bool LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
+  SceneManagerInitOptions scene_manager_init_options;
+  ACHECK(SceneManager::Instance().Init(scene_manager_init_options));
+
   return Initialize(pipeline_config);
 }
 

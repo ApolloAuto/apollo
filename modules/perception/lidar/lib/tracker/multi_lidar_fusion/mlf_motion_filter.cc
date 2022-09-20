@@ -23,7 +23,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {

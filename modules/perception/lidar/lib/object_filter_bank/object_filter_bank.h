@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
@@ -60,6 +61,8 @@ class ObjectFilterBank : public pipeline::Stage {
 
  private:
   std::vector<BaseObjectFilter*> filter_bank_;
+
+  std::vector<std::unique_ptr<BaseObjectFilter>> filter_ptrs_;
   ObjectFilterBankConfig object_filter_bank_config_;
 
   DISALLOW_COPY_AND_ASSIGN(ObjectFilterBank);

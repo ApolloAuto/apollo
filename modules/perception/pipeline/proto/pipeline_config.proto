@@ -44,6 +44,7 @@ import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.p
 import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
 import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
+import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
 
 
 // plugin
@@ -52,9 +53,12 @@ enum PluginType {
   RESIZIE_AND_NORMALIZE = 2;
   POINTCLOUD_GET_OBJECTS = 3;
   GET_IMAGE_DATA = 4;
-  
+
   // filter
   ROI_BOUNDARY_FILTER = 5;
+
+  MLF_TRACK_OBJECT_MATCHER = 6;
+  MLF_TRACKER = 7
 }
 
 message PluginConfig {
@@ -69,6 +73,8 @@ message PluginConfig {
     lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 13;
     lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 14;
     lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 15;
+    lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 16;
+    lidar.MlfTrackerConfig mlf_tracker_config = 17;
   }
 }
 

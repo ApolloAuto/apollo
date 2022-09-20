@@ -58,14 +58,46 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   return true;
 }
 
+bool ObjectFilterBank::Init(const StageConfig& stage_config) {
+  filter_ptrs_.clear();
+  for (const auto& plugin_config : stage_config_.plugin_config()) {
+    auto filter = pipeline::dynamic_unique_cast<BaseObjectFilter>(
+                      pipeline::PluginFactory::CreatePlugin(plugin_config));
+
+    std::string plugin_name = PluginType_Name(plugin_config.plugin_type);
+    if (filter == nullptr) {
+      AINFO << "Failed to find object filter: " << plugin_name << ", skipped";
+      continue;
+    }
+
+    filter_ptrs_.push_back(std::move(filter));
+    AINFO << "Filter bank add filter: " << plugin_name;
+  }
+
+  return true;
+}
+
 bool ObjectFilterBank::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  ObjectFilterOptions options;
-  bool res = Filter(options, data_frame->lidar_frame);
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
+    return false;
 
-  return res;
+  size_t object_number = lidar_frame->segmented_objects.size();
+
+  ObjectFilterOptions options;
+  for (const auto& filter : filter_ptrs_) {
+    if (!filter->Filter(options, lidar_frame)) {
+      AINFO << "Failed to filter objects in: " << filter->Name();
+    }
+  }
+
+  AINFO << "Object filter bank, filtered objects size: from "
+        << object_number
+        << " to " << lidar_frame->segmented_objects.size();
+  return true;
 }
 
 bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
@@ -78,32 +110,6 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
   }
   AINFO << "Object filter bank, filtered objects size: from " << object_number
         << " to " << frame->segmented_objects.size();
-  return true;
-}
-
-bool ObjectFilterBank::Init(const StageConfig& stage_config) {
-  if (!Initialize(stage_config)) {
-    return false;
-  }
-
-  object_filter_bank_config_ = stage_config.object_filter_bank_config();
-
-  filter_bank_.clear();
-  for (const auto& filter_name : object_filter_bank_config_.filter_name()) {
-    BaseObjectFilter* filter =
-        BaseObjectFilterRegisterer::GetInstanceByName(filter_name);
-    if (!filter) {
-      AINFO << "Failed to find object filter: " << filter_name << ", skipped";
-      continue;
-    }
-    if (!filter->Init()) {
-      AINFO << "Failed to init object filter: " << filter_name << ", skipped";
-      continue;
-    }
-    filter_bank_.push_back(filter);
-    AINFO << "Filter bank add filter: " << filter_name;
-  }
-
   return true;
 }
 

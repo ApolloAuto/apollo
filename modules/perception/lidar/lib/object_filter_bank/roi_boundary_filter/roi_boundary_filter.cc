@@ -37,11 +37,7 @@ namespace lidar {
 using cyber::common::GetAbsolutePath;
 
 ROIBoundaryFilter::ROIBoundaryFilter(const PluginConfig& plugin_config) {
-  ROIBoundaryFilterConfig config = plugin_config.roi_boundary_filter_config();
-  distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
-  confidence_threshold_ = config.confidence_threshold();
-  cross_roi_threshold_ = config.cross_roi_threshold();
-  inside_threshold_ = config.inside_threshold();
+  Init(plugin_config);
 }
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
@@ -113,7 +109,12 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
 }
 
 bool ROIBoundaryFilter::Init(const PluginConfig& plugin_config) {
-  // plugin_config.roi_boundary_filter_conf
+  ROIBoundaryFilterConfig config = plugin_config.roi_boundary_filter_config();
+
+  distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
+  confidence_threshold_ = config.confidence_threshold();
+  cross_roi_threshold_ = config.cross_roi_threshold();
+  inside_threshold_ = config.inside_threshold();
   return true;
 }
 

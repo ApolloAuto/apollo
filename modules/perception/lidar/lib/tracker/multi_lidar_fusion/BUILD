@@ -69,7 +69,7 @@ cc_library(
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -84,7 +84,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_object_util",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -99,7 +99,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -117,6 +117,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/association:gnn_bipartite_graph_matcher",
         "//modules/perception/lidar/lib/tracker/association:multi_hm_bipartite_graph_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_distance",
+        "//modules/perception/pipeline:plugin",
     ],
     alwayslink = True,
 )
@@ -135,6 +136,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_shape_filter",
+        "//modules/perception/pipeline:plugin",
     ],
     alwayslink = True,
 )

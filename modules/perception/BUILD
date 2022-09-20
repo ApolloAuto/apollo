@@ -62,7 +62,7 @@ install(
         "//modules/perception/lidar/lib/scene_manager/ground_service/proto:ground_service_config_cc_proto",
         "//modules/perception/lidar/lib/scene_manager/proto:scene_manager_config_cc_proto",
         "//modules/perception/lidar/lib/scene_manager/roi_service/proto:roi_service_cc_proto",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_cc_proto",
         "//modules/perception/onboard/proto:fusion_camera_detection_component_cc_proto",
         "//modules/perception/onboard/proto:fusion_component_config_cc_proto",
         "//modules/perception/onboard/proto:lidar_component_config_cc_proto",

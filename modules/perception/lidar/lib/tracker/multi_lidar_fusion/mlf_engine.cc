@@ -24,7 +24,7 @@
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.pb.h"
 #include "modules/common_msgs/prediction_msgs/feature.pb.h"
 #include "modules/perception/pipeline/proto/stage/mlf_engine_config.pb.h"
 
@@ -102,23 +102,19 @@ bool MlfEngine::Init(const StageConfig& stage_config) {
   }
 
   use_histogram_for_match_ = config.use_histogram_for_match();
-  histogram_bin_size_ = config.histogram_bin_size();
-  output_predict_objects_ = config.output_predict_objects();
+  histogram_bin_size_      = config.histogram_bin_size();
+  output_predict_objects_  = config.output_predict_objects();
   reserved_invisible_time_ = config.reserved_invisible_time();
-  use_frame_timestamp_ = config.use_frame_timestamp();
+  use_frame_timestamp_     = config.use_frame_timestamp();
 
-  // todo(zero): change to plugin
-  // matcher_ = PluginFactory::CreatePlugin(plugin_config_map_[plugin_type]);
-  // tracker_ = PluginFactory::CreatePlugin(plugin_config_map_[plugin_type]);
+  // create plugins
+  matcher_ = pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
+                pipeline::PluginFactory::CreatePlugin(
+                    plugin_config_map_[PluginType::MLF_TRACK_OBJECT_MATCHER]));
 
-  matcher_.reset(new MlfTrackObjectMatcher);
-  MlfTrackObjectMatcherInitOptions matcher_init_options;
-  ACHECK(matcher_->Init(matcher_init_options));
-
-  tracker_.reset(new MlfTracker);
-  MlfTrackerInitOptions tracker_init_options;
-  ACHECK(tracker_->Init(tracker_init_options));
-
+  tracker_ = pipeline::dynamic_unique_cast<MlfTracker>(
+                pipeline::PluginFactory::CreatePlugin(
+                    plugin_config_map_[PluginType::MLF_TRACKER]));
   return true;
 }
 

@@ -64,21 +64,24 @@ bool FusedClassifier::Init(const StageConfig& stage_config) {
 
   fused_classifier_config_ = stage_config.fused_classifier_config();
 
-  temporal_window_ = fused_classifier_config_.temporal_window();
+  temporal_window_        = fused_classifier_config_.temporal_window();
   enable_temporal_fusion_ = fused_classifier_config_.enable_temporal_fusion();
-  use_tracked_objects_ = fused_classifier_config_.use_tracked_objects();
+  use_tracked_objects_    = fused_classifier_config_.use_tracked_objects();
   one_shot_fusion_method_ = fused_classifier_config_.one_shot_fusion_method();
   sequence_fusion_method_ = fused_classifier_config_.sequence_fusion_method();
 
-  one_shot_fuser_ = BaseOneShotTypeFusionRegisterer::GetInstanceByName(
-      one_shot_fusion_method_);
-  CHECK_NOTNULL(one_shot_fuser_);
-  ACHECK(one_shot_fuser_->Init(init_option_));
+  // create plugins
+  one_shot_fuser_ptr_ =
+      pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::CCRF_ONESHOT_TYPE_FUSION]));
+  CHECK_NOTNULL(one_shot_fuser_ptr_);
 
-  sequence_fuser_ = BaseSequenceTypeFusionRegisterer::GetInstanceByName(
-      sequence_fusion_method_);
-  CHECK_NOTNULL(sequence_fuser_);
-  ACHECK(sequence_fuser_->Init(init_option_));
+  sequence_fuser_ptr_ =
+      pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::CCRF_SEQUENCE_TYPE_FUSION]));
+  CHECK_NOTNULL(sequence_fuser_ptr_);
 
   return true;
 }
@@ -87,10 +90,62 @@ bool FusedClassifier::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  ClassifierOptions options;
-  bool res = Classify(options, data_frame->lidar_frame);
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) {
+    return false;
+  }
 
-  return res;
+  std::vector<ObjectPtr>* objects = use_tracked_objects_
+                                        ? &(lidar_frame->tracked_objects)
+                                        : &(lidar_frame->segmented_objects);
+  if (enable_temporal_fusion_ && lidar_frame->timestamp > 0.0) {
+    // sequence fusion
+    AINFO << "Combined classifier, temporal fusion";
+    sequence_.AddTrackedFrameObjects(*objects, lidar_frame->timestamp);
+    ObjectSequence::TrackedObjects tracked_objects;
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      const int track_id = object->track_id;
+      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
+                                         temporal_window_);
+      if (tracked_objects.empty()) {
+        AERROR << "Find zero-length track, so skip.";
+        continue;
+      }
+      if (object != tracked_objects.rbegin()->second) {
+        AERROR << "There must exist some timestamp in disorder, so skip.";
+        continue;
+      }
+      if (!sequence_fuser_->TypeFusion(option_, &tracked_objects)) {
+        AERROR << "Failed to fuse types, so break.";
+        break;
+      }
+    }
+  } else {
+    // one shot fusion
+    AINFO << "Combined classifier, one shot fusion";
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      if (!one_shot_fuser_->TypeFusion(option_, object)) {
+        AERROR << "Failed to fuse types, so continue.";
+      }
+    }
+  }
+  return true;
 }
 
 bool FusedClassifier::Classify(const ClassifierOptions& options,
