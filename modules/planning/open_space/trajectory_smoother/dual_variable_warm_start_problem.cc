@@ -41,7 +41,7 @@ bool DualVariableWarmStartProblem::Solve(
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
     Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* s_warm_up) {
-  PERF_BLOCK_START()
+  PERF_BLOCK_START();
   bool solver_flag = false;
 
   if (planner_open_space_config_.dual_variable_warm_start_config()
