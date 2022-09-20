@@ -15,7 +15,7 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/detection_postprocessor/camera_get_object/camera_get_object.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object/camera_get_object.h"
 #include "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.pb.h"
 #include "modules/perception/pipeline/stage.h"
 #include "modules/perception/pipeline/plugin_factory.h"

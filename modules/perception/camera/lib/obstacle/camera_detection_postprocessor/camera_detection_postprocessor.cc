@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/camera/lib/obstacle/detection_postprocessor/camera_detection_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_detection_postprocessor.h"
 
 namespace apollo {
 namespace perception {

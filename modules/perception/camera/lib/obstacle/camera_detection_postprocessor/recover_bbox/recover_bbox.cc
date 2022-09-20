@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/camera/lib/obstacle/detection_postprocessor/recover_bbox/recover_bbox.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/recover_bbox/recover_bbox.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
