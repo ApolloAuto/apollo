@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.perception.camera;
+package apollo.perception.fusion;
 
 message AllLatestFusionConfig {
   optional string main_sensor = 1;

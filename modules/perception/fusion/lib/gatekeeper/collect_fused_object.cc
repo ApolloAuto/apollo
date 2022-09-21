@@ -21,6 +21,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {

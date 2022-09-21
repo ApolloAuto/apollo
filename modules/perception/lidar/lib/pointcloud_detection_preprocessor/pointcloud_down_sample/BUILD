@@ -18,7 +18,7 @@ cc_library(
     "//modules/perception/lidar/common",
     "//modules/perception/pipeline:data_frame",
     "//modules/perception/pipeline:plugin",
-    "//modules/perception/pipeline/proto/plugin:pointcloud_down_sample_config_cc_proto",
+    "//modules/perception/pipeline/proto/plugin:pointcloud_downsample_config_cc_proto",
   ],
 )
 

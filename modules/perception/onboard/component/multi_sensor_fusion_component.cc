@@ -140,12 +140,13 @@ bool MultiSensorFusionComponent::InternalProc(
   fusion::FusionFrame fusion_frame;
   data_frame.fusion_frame = &fusion_frame;
 
-  data_frame.fusion_frame->frame = in_message->frame_;
-  data_frame.fusion_frame->frame->timestamp = in_message->timestamp_;
+  fusion_frame.frame = in_message->frame_;
+  fusion_frame.frame->timestamp = in_message->timestamp_;
   if (!fusion_->Process(&data_frame)) {
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
+  std::vector<base::ObjectPtr>& fused_objects = fusion_frame.fused_objects;
 
   // base::FramePtr frame = in_message->frame_;
   // frame->timestamp = in_message->timestamp_;
