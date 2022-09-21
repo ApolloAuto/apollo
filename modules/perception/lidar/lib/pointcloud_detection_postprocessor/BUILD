@@ -5,12 +5,12 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-  name = "point_cloud_detection_postprocessor",
+  name = "pointcloud_detection_postprocessor",
   srcs = [
-    "point_cloud_detection_postprocessor.cc",
+    "pointcloud_detection_postprocessor.cc",
   ],
   hdrs = [
-    "point_cloud_detection_postprocessor.h",
+    "pointcloud_detection_postprocessor.h",
   ],
   deps = [
     "//modules/perception/pipeline:stage",
