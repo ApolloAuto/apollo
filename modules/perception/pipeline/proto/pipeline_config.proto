@@ -52,6 +52,7 @@ import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.prot
 import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
 import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
 import "modules/perception/pipeline/proto/plugin/pbf_gatekeeper_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
 
 
 // plugin
