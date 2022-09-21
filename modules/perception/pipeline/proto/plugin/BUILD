@@ -42,21 +42,21 @@ py_proto_library(
     ],
 )
 cc_proto_library(
-    name = "pointcloud_down_sample_config_cc_proto",
+    name = "pointcloud_downsample_config_cc_proto",
     deps = [
-        ":pointcloud_down_sample_config_proto",
+        ":pointcloud_downsample_config_proto",
     ],
 )
 
 proto_library(
-    name = "pointcloud_down_sample_config_proto",
-    srcs = ["pointcloud_down_sample_config.proto"],
+    name = "pointcloud_downsample_config_proto",
+    srcs = ["pointcloud_downsample_config.proto"],
 )
 
 py_proto_library(
-    name = "pointcloud_down_sample_config_py_pb2",
+    name = "pointcloud_downsample_config_py_pb2",
     deps = [
-        ":pointcloud_down_sample_config_proto",
+        ":pointcloud_downsample_config_proto",
     ],
 )
 cc_proto_library(
