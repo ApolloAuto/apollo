@@ -132,6 +132,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "object_builder_config_cc_proto",
+    deps = [
+        ":object_builder_config_proto",
+    ],
+)
+
+proto_library(
+    name = "object_builder_config_proto",
+    srcs = ["object_builder_config.proto"],
+)
+
+py_proto_library(
+    name = "object_builder_config_py_pb2",
+    deps = [
+        ":object_builder_config_proto",
+    ],
+)
+cc_proto_library(
     name = "fused_classifier_config_cc_proto",
     deps = [
         ":fused_classifier_config_proto",
