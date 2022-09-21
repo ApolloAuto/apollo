@@ -24,7 +24,7 @@ namespace lidar {
 
 // stage init
 bool PointcloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
-  ACHECK(stage_config.has_pointcloud_detection_postprocessor_config());
+  // ACHECK(stage_config.has_pointcloud_detection_postprocessor_config());
 
   if (!Initialize(stage_config)) {
     return false;

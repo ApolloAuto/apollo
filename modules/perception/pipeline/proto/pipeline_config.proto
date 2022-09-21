@@ -71,6 +71,8 @@ enum PluginType {
 
   CCRF_ONESHOT_TYPE_FUSION = 11;
   CCRF_SEQUENCE_TYPE_FUSION = 12;
+
+  POINTCLOUD_DOWNSAMPLE = 13;
 }
 
 message PluginConfig {

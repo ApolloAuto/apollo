@@ -43,6 +43,10 @@ stage_config: {
         float z_max_range : 4.0
     }
   }
+  
+  pointcloud_detection_preprocessor_config:{
+
+  }
 }
 
 stage_config: {
