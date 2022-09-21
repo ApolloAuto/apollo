@@ -28,9 +28,9 @@ stage_config: {
   stage_type: POINTCLOUD_DETECTION_PREPROCESSOR
   enabled: true
 
-    plugin_config: {
-      plugin_type: POINTCLOUD_DOWNSAMPLE
-      enabled: true
+  plugin_config: {
+    plugin_type: POINTCLOUD_DOWNSAMPLE
+    enabled: true
 
     pointcloud_downsample_config: {
       enable_downsample_pointcloud : true
@@ -72,13 +72,13 @@ stage_config: {
   stage_type: POINTCLOUD_DETECTION_POSTPROCESSOR
   enabled: true
 
-    plugin_config: {
-      plugin_type: POINTCLOUD_GET_OBJECTS
-      enabled: true
+  plugin_config: {
+    plugin_type: POINTCLOUD_GET_OBJECTS
+    enabled: true
 
-      pointcloud_get_objects_config:{
+    pointcloud_get_objects_config:{
 
-      }
+    }
   }
 }
 
