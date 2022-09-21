@@ -65,7 +65,7 @@ bool PointPillarsDetection::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  ACHECK(stage_config.has_pointpillars_detection());
+  // ACHECK(stage_config.has_pointpillars_detection());
   point_pillars_detection_config_ = stage_config.pointpillars_detection();
 
   point_pillars_ptr_.reset(

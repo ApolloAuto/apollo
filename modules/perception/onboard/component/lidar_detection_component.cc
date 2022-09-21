@@ -108,6 +108,8 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
   // pipeline_config.set_enable_hdmap_input(
   //   FLAGS_obs_enable_hdmap_input && enable_hdmap_);
 
+  lidar_detection_pipeline_.reset(new lidar::LidarObstacleDetection);
+
   ACHECK(lidar_detection_pipeline_->Init(lidardetection_config))
       << "lidar obstacle detection init error";
 
