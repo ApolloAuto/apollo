@@ -35,7 +35,7 @@ PointCloudDownSample::PointCloudDownSample(const PluginConfig& plugin_config) {
 
 bool PointCloudDownSample::Init(const PluginConfig& plugin_config) {
   ACHECK(plugin_config.has_pointcloud_downsample_config());
-  auto config = plugin_config.has_pointcloud_downsample_config();
+  auto config = plugin_config.pointcloud_downsample_config();
   enable_downsample_pointcloud_ = config.enable_downsample_pointcloud();
   enable_downsample_beams_ = config.enable_downsample_beams();
   x_min_range_ = config.x_min_range();
