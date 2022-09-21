@@ -44,9 +44,6 @@ namespace pipeline {
 
 
 bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
-  // Register Plugin
-  PluginFactory::Init();
-
   ACHECK(!pipeline_config.stage_type().empty());
 
   Clear();
@@ -54,6 +51,9 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
   for (const auto& stage_config : pipeline_config.stage_config()) {
     stage_config_map_[stage_config.stage_type()] = stage_config;
   }
+
+  // Register Plugins, Must be initialized before 'CreateStage'!!!
+  PluginFactory::Init();
 
   for (int i = 0; i < pipeline_config.stage_config_size(); ++i) {
     auto stage_type = pipeline_config.stage_type(i);
