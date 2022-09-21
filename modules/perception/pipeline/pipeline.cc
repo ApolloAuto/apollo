@@ -29,10 +29,9 @@
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
-#include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_detection_postprocessor.h"
-#include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
+
 
 namespace apollo {
 namespace perception {
@@ -93,12 +92,6 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
     case StageType::POINTCLOUD_PREPROCESSOR:
       stage_ptr.reset(new lidar::PointCloudPreprocessor());
       break;
-    case StageType::POINTCLOUD_DETECTION_PREPROCESSOR:
-      stage_ptr.reset(new lidar::PointcloudDetectionPreprocessor());
-      break;
-    case StageType::POINTCLOUD_DETECTION_POSTPROCESSOR:
-      stage_ptr.reset(new lidar::PointcloudDetectionPostprocessor());
-      break;      
     case StageType::MAP_MANAGER:
       stage_ptr.reset(new lidar::MapManager());
       break;

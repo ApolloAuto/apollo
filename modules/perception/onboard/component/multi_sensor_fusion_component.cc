@@ -42,6 +42,15 @@ bool MultiSensorFusionComponent::Init() {
   object_in_roi_check_ = comp_config.object_in_roi_check();
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
+  // read pipeline config
+  std::string pipeline_conf_file =
+      comp_config.multi_sensor_fusion_pipeline_conf();
+  if (!cyber::common::GetProtoFromFile(
+          pipeline_conf_file, &multi_sensor_fusion_pipeline_)) {
+    AERROR << "Read config failed: " << pipeline_conf_file;
+    return false;
+  }
+
   // init algorithm plugin
   ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   writer_ = node_->CreateWriter<PerceptionObstacles>(
@@ -87,7 +96,9 @@ bool MultiSensorFusionComponent::InitAlgorithmPlugin() {
   fusion::ObstacleMultiSensorFusionParam param;
   param.main_sensor = fusion_main_sensor_;
   param.fusion_method = fusion_method_;
-  ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
+  ACHECK(fusion_->Init(multi_sensor_fusion_pipeline_))
+      << "Failed to init ObstacleMultiSensorFusion";
+  // ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = map::HDMapInput::Instance();
@@ -124,14 +135,27 @@ bool MultiSensorFusionComponent::InternalProc(
     AERROR << "Fusion receive message with error code, skip it.";
     return true;
   }
-  base::FramePtr frame = in_message->frame_;
-  frame->timestamp = in_message->timestamp_;
 
-  std::vector<base::ObjectPtr> fused_objects;
-  if (!fusion_->Process(frame, &fused_objects)) {
+  pipeline::DataFrame data_frame;
+  fusion::FusionFrame fusion_frame;
+  data_frame.fusion_frame = &fusion_frame;
+
+  data_frame.fusion_frame->frame = in_message->frame_;
+  data_frame.fusion_frame->frame->timestamp = in_message->timestamp_;
+  if (!fusion_->Process(&data_frame)) {
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
+
+  // base::FramePtr frame = in_message->frame_;
+  // frame->timestamp = in_message->timestamp_;
+
+  // std::vector<base::ObjectPtr> fused_objects;
+  // if (!fusion_->Process(frame, &fused_objects)) {
+  //   AERROR << "Failed to call fusion plugin.";
+  //   return false;
+  // }
+
   PERF_BLOCK_END_WITH_INDICATOR("fusion_process", in_message->sensor_id_);
 
   if (in_message->sensor_id_ != fusion_main_sensor_) {

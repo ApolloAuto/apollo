@@ -18,8 +18,6 @@ cc_library(
         "//modules/perception/lib/thread",
         "//modules/perception/proto:perception_config_schema_cc_proto",
         "//modules/perception/proto:sensor_meta_schema_cc_proto",
-        # todo(zero): need delete
-        # "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 

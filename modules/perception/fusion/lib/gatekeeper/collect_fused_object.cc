@@ -32,11 +32,29 @@ bool CollectFusedObject::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  // gate_keeper_ = PluginFactory::CreatePlugin();
+  // create plugins
+  gate_keeper_ =
+      pipeline::dynamic_unique_cast<BaseGatekeeper>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::PBF_GATEKEEPER]));
   return true;
 }
 
 bool CollectFusedObject::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  FusionFrame* fusion_frame = data_frame->fusion_frame;
+  if (fusion_frame == nullptr)
+    return false;
+
+  base::FrameConstPtr sensor_frame = fusion_frame->frame;
+  if (sensor_frame == nullptr)
+    return false;
+
+  double fusion_time = sensor_frame->timestamp;
+  scenes_ = fusion_frame->scene_ptr;
+  Process(fusion_time, &fusion_frame->fused_objects);
 
   return true;
 }

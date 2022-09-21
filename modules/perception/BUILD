@@ -38,7 +38,7 @@ install(
         "//modules/perception/pipeline/proto/stage:denseline_cc_proto",
         "//modules/perception/pipeline/proto/stage:darkSCNN_postprocessor_cc_proto",
         "//modules/perception/pipeline/proto/stage:denseline_postprocessor_cc_proto",
-        "//modules/perception/pipeline/proto/stage:pbf_gatekeeper_config_cc_proto",
+        "//modules/perception/pipeline/proto/plugin:pbf_gatekeeper_config_cc_proto",
         "//modules/perception/pipeline/proto/stage:recognition_cc_proto",
         "//modules/perception/pipeline/proto/stage:tracking_feature_cc_proto",
         "//modules/perception/camera/lib/obstacle/detector/smoke/proto:smoke_cc_proto",

@@ -122,7 +122,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_proto",
-        "//modules/perception/pipeline/proto/stage:object_builder_config_proto",
+        "//modules/perception/pipeline/proto/stage:all_latest_fusion_config_proto",
         "//modules/perception/pipeline/proto/plugin:camera_get_object_config_proto",
         "//modules/perception/pipeline/proto/plugin:filter_bbox_config_proto",
         "//modules/perception/pipeline/proto/plugin:get_image_data_config_proto",
@@ -133,6 +133,7 @@ proto_library(
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_proto",
         "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_proto",
         "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_proto",
+        "//modules/perception/pipeline/proto/plugin:pbf_gatekeeper_config_proto",
     ],
 )
 
@@ -174,6 +175,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_py_pb2",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_py_pb2",
+        "//modules/perception/pipeline/proto/stage:all_latest_fusion_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:camera_get_object_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:filter_bbox_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:get_image_data_config_py_pb2",
@@ -184,6 +186,7 @@ py_proto_library(
         "//modules/perception/pipeline/proto/plugin:roi_boundary_filter_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:multi_lidar_fusion_config_py_pb2",
         "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_py_pb2",
+        "//modules/perception/pipeline/proto/plugin:pbf_gatekeeper_config_py_pb2",
     ],
 )
 

@@ -107,16 +107,6 @@ bool PbfTracker::Init(TrackPtr track, SensorObjectPtr measurement) {
   return true;
 }
 
-bool PbfTracker::Init(const PluginConfig& plugin_config) {
-  // todo(zero): track
-  // track_ = track;
-  // if (!InitMethods()) {
-  //   return false;
-  // }
-  // motion_fusion_->Init();
-  return true;
-}
-
 void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                        const SensorObjectPtr measurement,
                                        double target_timestamp) {

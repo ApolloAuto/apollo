@@ -55,9 +55,6 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     AERROR << "Read config failed: " << config;
     return false;
   }
-  params_.use_lidar = params.use_lidar();
-  params_.use_radar = params.use_radar();
-  params_.use_camera = params.use_camera();
   params_.tracker_method = params.tracker_method();
   params_.data_association_method = params.data_association_method();
   params_.gate_keeper_method = params.gate_keeper_method();
@@ -105,19 +102,11 @@ bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  // todo(zero): main_sensor_
-  // main_sensor_ = init_options.main_sensor;
-
   probabilistic_fusion_config_ = stage_config.probabilistic_fusion_config();
 
-  params_.use_lidar = probabilistic_fusion_config_.use_lidar();
-  params_.use_radar = probabilistic_fusion_config_.use_radar();
-  params_.use_camera = probabilistic_fusion_config_.use_camera();
   params_.tracker_method = probabilistic_fusion_config_.tracker_method();
   params_.data_association_method =
       probabilistic_fusion_config_.data_association_method();
-  params_.gate_keeper_method =
-      probabilistic_fusion_config_.gate_keeper_method();
   for (const auto& prohibition_sensor :
           probabilistic_fusion_config_.prohibition_sensors()) {
     params_.prohibition_sensors.push_back(prohibition_sensor);
@@ -145,17 +134,6 @@ bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  if (params_.gate_keeper_method == "PbfGatekeeper") {
-    gate_keeper_.reset(new PbfGatekeeper());
-  } else {
-    AERROR << "Unknown gate keeper method: " << params_.gate_keeper_method;
-    return false;
-  }
-  if (!gate_keeper_->Init()) {
-    AERROR << "Failed to init gatekeeper.";
-    return false;
-  }
-
   bool state = DstTypeFusion::Init() && DstExistenceFusion::Init() &&
                PbfTracker::InitParams();
 
@@ -163,34 +141,21 @@ bool ProbabilisticFusion::Init(const StageConfig& stage_config) {
 }
 
 bool ProbabilisticFusion::Process(DataFrame* data_frame) {
-  // todo(zero): need fix
-  //   double fusion_time = data_frame->fusion_frame->frame->timestamp;
-  // std::vector<SensorFramePtr> frames = data_frame->fusion_frame->sensor_frames;
-  // std::vector<base::ObjectPtr>* fused_objects =
-  //     &(data_frame->fusion_frame->fused_objects);
-  // Fuse(fusion_time, frames, fused_objects);
-  // data_frame->fusion_frame->scene_ptr = scenes_;
+  if (data_frame == nullptr)
+    return false;
+
+  FusionFrame* fusion_frame = data_frame->fusion_frame;
+  if (fusion_frame == nullptr)
+    return false;
+
+  // 3. perform fusion on related frames
+  for (const auto& frame : fusion_frame->sensor_frames) {
+    FuseFrame(frame);
+  }
+
+  fusion_frame->scene_ptr = scenes_;
   return true;
 }
-
-// bool ProbabilisticFusion::Fuse(double fusion_time,
-//                                const std::vector<SensorFramePtr>& frames,
-//                                std::vector<base::ObjectPtr>* fused_objects) {
-//   if (frames.empty()) {
-//     return true;
-//   }
-
-//   if (fused_objects == nullptr) {
-//     return false;
-//   }
-
-//   // 3. perform fusion on related frames
-//   for (const auto& frame : frames) {
-//     FuseFrame(frame);
-//   }
-
-//   return true;
-// }
 
 bool ProbabilisticFusion::Fuse(const FusionOptions& options,
                                const base::FrameConstPtr& sensor_frame,

@@ -32,29 +32,45 @@ bool AllLatestFusion::Init(const StageConfig& stage_config) {
     return false;
   }
 
+  all_latest_fusion_config_ = stage_config.all_latest_fusion_config();
+
+  main_sensor_ = all_latest_fusion_config_.main_sensor();
+  use_lidar_ = all_latest_fusion_config_.use_lidar();
+  use_radar_ = all_latest_fusion_config_.use_radar();
+  use_camera_ = all_latest_fusion_config_.use_camera();
   return true;
 }
 
 bool AllLatestFusion::Process(DataFrame* data_frame) {
-  base::FrameConstPtr sensor_frame = data_frame->fusion_frame->frame;
+  if (data_frame == nullptr) {
+    return false;
+  }
+
+  FusionFrame* fusion_frame = data_frame->fusion_frame;
+  if (fusion_frame == nullptr)
+    return false;
+
+  base::FrameConstPtr sensor_frame = fusion_frame->frame;
+  if (sensor_frame == nullptr)
+    return false;
+
   SensorDataManager* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data
   {
     std::lock_guard<std::mutex> data_lock(data_mutex_);
-    // todo(zero): need fix params_
-    // if (!params_.use_lidar && sensor_data_manager->IsLidar(sensor_frame)) {
-    //   return true;
-    // }
-    // if (!params_.use_radar && sensor_data_manager->IsRadar(sensor_frame)) {
-    //   return true;
-    // }
-    // if (!params_.use_camera && sensor_data_manager->IsCamera(sensor_frame)) {
-    //   return true;
-    // }
-
+    if (!use_lidar_ && sensor_data_manager->IsLidar(sensor_frame)) {
+      return true;
+    }
+    if (!use_radar_ && sensor_data_manager->IsRadar(sensor_frame)) {
+      return true;
+    }
+    if (!use_camera_ && sensor_data_manager->IsCamera(sensor_frame)) {
+      return true;
+    }
     AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
           << ", obj_cnt : " << sensor_frame->objects.size() << ", "
           << FORMAT_TIMESTAMP(sensor_frame->timestamp);
+
     sensor_data_manager->AddSensorMeasurements(sensor_frame);
 
     bool is_publish_sensor = IsPublishSensor(sensor_frame);
@@ -66,8 +82,7 @@ bool AllLatestFusion::Process(DataFrame* data_frame) {
   // 2. query related sensor_frames for fusion
   std::lock_guard<std::mutex> fuse_lock(fuse_mutex_);
   double fusion_time = sensor_frame->timestamp;
-  std::vector<SensorFramePtr>* frames =
-      &(data_frame->fusion_frame->sensor_frames);
+  std::vector<SensorFramePtr>* frames = &fusion_frame->sensor_frames;
   sensor_data_manager->GetLatestFrames(fusion_time, frames);
   AINFO << "Get " << frames->size() << " related frames for fusion";
 

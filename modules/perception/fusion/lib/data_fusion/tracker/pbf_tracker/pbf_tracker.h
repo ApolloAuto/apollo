@@ -25,7 +25,6 @@
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
 #include "modules/perception/fusion/lib/interface/base_type_fusion.h"
-#include "modules/perception/pipeline/plugin.h"
 #include "modules/perception/pipeline/proto/stage/pbf_tracker_config.pb.h"
 
 namespace apollo {
@@ -49,12 +48,6 @@ class PbfTracker : public BaseTracker {
                                 const std::string& sensor_id,
                                 double measurement_timestamp,
                                 double target_timestamp) override;
-
-  bool Init(const PluginConfig& plugin_config) override;
-
-  bool IsEnabled() const override { return enable_; }
-
-  std::string Name() const override { return name_; }
 
  protected:
   bool InitMethods();

@@ -161,6 +161,7 @@ cc_library(
         "//modules/perception/onboard/inner_component_messages",
         "//modules/perception/onboard/msg_serializer",
         "//modules/perception/onboard/proto:fusion_component_config_cc_proto",
+        "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
         "@eigen",
     ],
     alwayslink = True,

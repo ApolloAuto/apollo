@@ -38,7 +38,7 @@ import "modules/perception/pipeline/proto/stage/singlestage.proto";
 import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
-import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
+import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/camera_get_object_config.proto";
 import "modules/perception/pipeline/proto/plugin/filter_bbox_config.proto";
@@ -50,6 +50,7 @@ import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.pro
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
 import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
 import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
+import "modules/perception/pipeline/proto/plugin/pbf_gatekeeper_config.proto";
 
 
 // plugin
@@ -71,6 +72,8 @@ enum PluginType {
 
   CCRF_ONESHOT_TYPE_FUSION = 11;
   CCRF_SEQUENCE_TYPE_FUSION = 12;
+
+  PBF_GATEKEEPER = 13;
 }
 
 message PluginConfig {
@@ -85,12 +88,13 @@ message PluginConfig {
     camera.GetImageDataConfig get_image_data_config = 12;
     camera.RecoverBboxConfig recover_bbox_config = 13;
     camera.ResizeAndNormalizeConfig resize_and_normalize_config = 14;
-    lidar.PointcloudDownSampleConfig pointcloud_downsample_config = 15;
+    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 15;
     lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 16;
     lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 17;
     lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 18;
     lidar.MlfTrackerConfig mlf_tracker_config = 19;
     lidar.CcrfTypeFusionConfig ccrf_type_fusion_config = 20;
+    fusion.PbfGatekeeperConfig pbf_gatekeeper_config = 21;
   }
 }
 
@@ -188,8 +192,6 @@ message StageConfig {
     lidar.GroundServiceDetectorConfig ground_service_detector_config = 20;
     lidar.SpatioTemporalGroundDetectorConfig spatio_temporal_ground_detector_config = 21;
     lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 22;
-    lidar.PointPillarsDetectionConfig point_pillars_detection_config = 23;
-    lidar.ObjectBuilderConfig object_builder_config = 24;
 
     camera.TrafficLightDetectionConfig traffic_light_detection_config = 50;
     camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 51;
@@ -207,9 +209,8 @@ message StageConfig {
     camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
     camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
 
-    fusion.PbfTrackerConfig pbf_tracker_config = 100;
+    fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
-
   }
 }
 
