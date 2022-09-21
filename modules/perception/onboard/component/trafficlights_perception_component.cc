@@ -412,6 +412,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   last_proc_image_ts_ = Clock::NowInSeconds();
 
   AINFO << "start proc.";
+  data_frame_->camera_frame = frame_.get();
   traffic_light_pipeline_->Process(data_frame_);
 
   for (auto light : frame_->traffic_lights) {
