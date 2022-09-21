@@ -84,6 +84,7 @@ cc_library(
     "//modules/perception/fusion/lib/data_fusion/all_latest_fusion",
     "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
     "//modules/perception/fusion/lib/gatekeeper:collect_fused_object",
+    "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
     "//modules/perception/lidar/lib/classifier/fused_classifier",
     "//modules/perception/lidar/lib/detector/point_pillars_detection",
     "//modules/perception/lidar/lib/map_manager",

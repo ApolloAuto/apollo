@@ -22,7 +22,7 @@
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
-
+#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
 namespace apollo {
 namespace perception {
@@ -73,6 +73,11 @@ void PluginFactory::Init() {
       PluginType::MLF_TRACKER,
       [](const PluginConfig& plugin_config) -> Plugin* {
         return new lidar::MlfTracker(plugin_config);
+      });
+  plugin_factory_.Register(
+      PluginType::PBF_GATEKEEPER,
+      [](const PluginConfig& plugin_config) -> Plugin* {
+        return new fusion::PbfGatekeeper(plugin_config);
       });
 }
 

@@ -76,7 +76,6 @@ enum PluginType {
 
   PBF_GATEKEEPER = 13;
   POINTCLOUD_DOWNSAMPLE = 14;
-
 }
 
 message PluginConfig {
