@@ -67,6 +67,8 @@ class LidarDetectionComponent : public cyber::Component<drivers::PointCloud> {
 
   std::unique_ptr<lidar::BaseLidarObstacleDetection> lidar_detection_pipeline_;
 
+  pipeline::PipelineConfig lidardetection_config;
+
   std::shared_ptr<apollo::cyber::Writer<LidarFrameMessage>> writer_;
 };
 

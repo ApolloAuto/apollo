@@ -29,6 +29,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
+using apollo::cyber::common::GetAbsolutePath;
+
 std::atomic<uint32_t> LidarDetectionComponent::seq_num_{0};
 
 bool LidarDetectionComponent::Init() {
@@ -47,6 +49,18 @@ bool LidarDetectionComponent::Init() {
       static_cast<float>(comp_config.lidar_query_tf_offset());
   enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
+
+  const auto& lidar_detection_root_dir = comp_config.lidar_detection_conf_dir();
+  const auto& lidar_detection_conf_file = comp_config.lidar_detection_conf_file();
+
+  std::string work_root = "";
+  std::string lidardetection_config_file =
+      GetAbsolutePath(lidar_detection_root_dir, lidar_detection_conf_file);
+  lidardetection_config_file = GetAbsolutePath(work_root, lidardetection_config_file);
+
+  ACHECK(
+      cyber::common::GetProtoFromFile(lidardetection_config_file, &lidardetection_config))
+      << "failed to load trafficlight config file " << lidardetection_config_file;
 
   if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init detection component algorithm plugin.";
@@ -89,11 +103,12 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
   //                           "lidar obstacle detection init error";
 
   // todo(zero): no sensor_name\enable_hdmap_input
-  PipelineConfig pipeline_config;
+  // PipelineConfig pipeline_config;
   // pipeline_config.set_sensor_name(sensor_name_);
   // pipeline_config.set_enable_hdmap_input(
   //   FLAGS_obs_enable_hdmap_input && enable_hdmap_);
-  ACHECK(lidar_detection_pipeline_->Init(pipeline_config))
+  
+  ACHECK(lidar_detection_pipeline_->Init(lidardetection_config))
       << "lidar obstacle detection init error";
 
   lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);

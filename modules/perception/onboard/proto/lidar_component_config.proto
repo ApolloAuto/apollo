@@ -9,6 +9,10 @@ message LidarDetectionComponentConfig {
   optional double lidar_query_tf_offset = 4;
   optional string lidar2novatel_tf2_child_frame_id = 5;
   optional string output_channel_name = 6;
+  optional string lidar_detection_conf_dir = 7
+      [default = "/apollo/modules/perception/pipeline/config"];
+  optional string lidar_detection_conf_file = 8
+      [default = "lidar_detection_pipeline.pb.txt"];
 }
 
 message LidarRecognitionComponentConfig {

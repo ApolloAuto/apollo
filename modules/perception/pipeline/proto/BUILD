@@ -122,6 +122,7 @@ proto_library(
         "//modules/perception/pipeline/proto/stage:smoke_obstacle_detection_config_proto",
         "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/pipeline/proto/stage:yolo_obstacle_detector_config_proto",
+        "//modules/perception/pipeline/proto/stage:object_builder_config_proto",
         "//modules/perception/pipeline/proto/plugin:camera_get_object_config_proto",
         "//modules/perception/pipeline/proto/plugin:filter_bbox_config_proto",
         "//modules/perception/pipeline/proto/plugin:get_image_data_config_proto",
