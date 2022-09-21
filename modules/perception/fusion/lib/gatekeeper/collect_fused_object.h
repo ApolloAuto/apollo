@@ -19,7 +19,6 @@
 #include <string>
 #include <memory>
 
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/pipeline/stage.h"
 
@@ -31,6 +30,7 @@ class CollectFusedObject : public pipeline::Stage {
  public:
   using StageConfig = pipeline::StageConfig;
   using DataFrame = pipeline::DataFrame;
+  using PluginType = pipeline::PluginType;
 
  public:
   CollectFusedObject() = default;
@@ -40,13 +40,13 @@ class CollectFusedObject : public pipeline::Stage {
 
   bool Process(DataFrame* data_frame) override;
 
-  void Process(double timestamp, std::vector<base::ObjectPtr>* fused_objects);
-
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
+  void Process(double timestamp, std::vector<base::ObjectPtr>* fused_objects);
+
   void CollectObjectsByTrack(
       double timestamp,
       const TrackPtr& track,

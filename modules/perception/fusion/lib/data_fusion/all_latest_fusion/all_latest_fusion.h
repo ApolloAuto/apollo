@@ -44,14 +44,20 @@ class AllLatestFusion : public pipeline::Stage {
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
+
  private:
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
 
  private:
+  AllLatestFusionConfig all_latest_fusion_config_;
+
   std::mutex data_mutex_;
   std::mutex fuse_mutex_;
 
   // FusionParams params_;
+  bool use_lidar_;
+  bool use_radar_;
+  bool use_camera_;
 
   std::string main_sensor_;
 };

@@ -22,7 +22,6 @@
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -32,10 +31,7 @@ struct TrackerOptions {
   double match_distance = 0.0;
 };
 
-class BaseTracker : public pipeline::Plugin {
- public:
-  using PluginConfig = pipeline::PluginConfig;
-
+class BaseTracker {
  public:
   BaseTracker() = default;
   virtual ~BaseTracker() = default;
@@ -54,12 +50,6 @@ class BaseTracker : public pipeline::Plugin {
                                         const std::string& sensor_id,
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
-
-  virtual bool Init(const PluginConfig& plugin_config) = 0;
-
-  virtual bool IsEnabled() const = 0;
-
-  virtual std::string Name() const = 0;
 
  protected:
   TrackPtr track_ = nullptr;

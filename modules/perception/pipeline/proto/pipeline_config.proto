@@ -8,6 +8,7 @@ import "modules/perception/pipeline/proto/lane_detection_config.proto";
 import "modules/perception/pipeline/proto/lidar_detection_config.proto";
 import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
+import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
@@ -24,12 +25,13 @@ import "modules/perception/pipeline/proto/stage/map_manager_config.proto";
 import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
 import "modules/perception/pipeline/proto/stage/multicue.proto";
 import "modules/perception/pipeline/proto/stage/ncut_config.proto";
+import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
 import "modules/perception/pipeline/proto/stage/omt.proto";
 import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
+import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_detection_postprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_detection_preprocessor_config.proto";
-import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.proto";
 import "modules/perception/pipeline/proto/stage/recognition.proto";
@@ -38,18 +40,18 @@ import "modules/perception/pipeline/proto/stage/singlestage.proto";
 import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
-import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/camera_get_object_config.proto";
+import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
 import "modules/perception/pipeline/proto/plugin/filter_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/get_image_data_config.proto";
-import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
+import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
+import "modules/perception/pipeline/proto/plugin/pbf_gatekeeper_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_downsample_config.proto";
 import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
 import "modules/perception/pipeline/proto/plugin/recover_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
 import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
-import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
-import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
 
 
 // plugin
@@ -72,7 +74,9 @@ enum PluginType {
   CCRF_ONESHOT_TYPE_FUSION = 11;
   CCRF_SEQUENCE_TYPE_FUSION = 12;
 
-  POINTCLOUD_DOWNSAMPLE = 13;
+  PBF_GATEKEEPER = 13;
+  POINTCLOUD_DOWNSAMPLE = 14;
+
 }
 
 message PluginConfig {
@@ -93,6 +97,7 @@ message PluginConfig {
     lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 18;
     lidar.MlfTrackerConfig mlf_tracker_config = 19;
     lidar.CcrfTypeFusionConfig ccrf_type_fusion_config = 20;
+    fusion.PbfGatekeeperConfig pbf_gatekeeper_config = 21;
   }
 }
 
@@ -100,7 +105,7 @@ message PluginConfig {
 enum StageType {
   // preprocessors
   // camera preprocessor
-   CAMERA_DETECTION_PREPROCESSOR = 1;
+  CAMERA_DETECTION_PREPROCESSOR = 1;
   // traffic light preprocessors
   TL_PREPROCESSOR = 2;
   // lidar preprocessors
@@ -111,6 +116,7 @@ enum StageType {
   CONTI_ARS_PREPROCESSOR = 5;
 
   MAP_MANAGER = 6;
+  ALL_LATEST_FUSION = 7;
 
 
   // detectors
@@ -161,11 +167,11 @@ enum StageType {
 
   HM_ASSOCIATION = 128;
 
-  PBF_GATEKEEPER = 129;
-
   EXTERNAL_FEATURE_EXTRACTOR = 130;
 
   MULTI_CUE_OBSTACLE_TRANSFORMER = 131;
+  PROBABILISTIC_FUSION = 132;
+  COLLECT_FUSED_OBJECT = 133;
 }
 
 message StageConfig {
@@ -209,9 +215,8 @@ message StageConfig {
     camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
     camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
 
-    fusion.PbfTrackerConfig pbf_tracker_config = 100;
+    fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
-
   }
 }
 

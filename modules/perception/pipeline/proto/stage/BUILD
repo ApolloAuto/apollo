@@ -132,6 +132,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "object_builder_config_cc_proto",
+    deps = [
+        ":object_builder_config_proto",
+    ],
+)
+
+proto_library(
+    name = "object_builder_config_proto",
+    srcs = ["object_builder_config.proto"],
+)
+
+py_proto_library(
+    name = "object_builder_config_py_pb2",
+    deps = [
+        ":object_builder_config_proto",
+    ],
+)
+cc_proto_library(
     name = "fused_classifier_config_cc_proto",
     deps = [
         ":fused_classifier_config_proto",
@@ -258,6 +276,24 @@ py_proto_library(
     ],
 )
 cc_proto_library(
+    name = "all_latest_fusion_config_cc_proto",
+    deps = [
+        ":all_latest_fusion_config_proto",
+    ],
+)
+
+proto_library(
+    name = "all_latest_fusion_config_proto",
+    srcs = ["all_latest_fusion_config.proto"],
+)
+
+py_proto_library(
+    name = "all_latest_fusion_config_py_pb2",
+    deps = [
+        ":all_latest_fusion_config_proto",
+    ],
+)
+cc_proto_library(
     name = "detection_cc_proto",
     deps = [
         ":detection_proto",
@@ -291,24 +327,6 @@ py_proto_library(
     name = "camera_detection_postprocessor_config_py_pb2",
     deps = [
         ":camera_detection_postprocessor_config_proto",
-    ],
-)
-cc_proto_library(
-    name = "pbf_gatekeeper_config_cc_proto",
-    deps = [
-        ":pbf_gatekeeper_config_proto",
-    ],
-)
-
-proto_library(
-    name = "pbf_gatekeeper_config_proto",
-    srcs = ["pbf_gatekeeper_config.proto"],
-)
-
-py_proto_library(
-    name = "pbf_gatekeeper_config_py_pb2",
-    deps = [
-        ":pbf_gatekeeper_config_proto",
     ],
 )
 cc_proto_library(
@@ -584,24 +602,5 @@ py_proto_library(
     name = "probabilistic_fusion_config_py_pb2",
     deps = [
         ":probabilistic_fusion_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "object_builder_config_cc_proto",
-    deps = [
-        ":object_builder_config_proto",
-    ],
-)
-
-proto_library(
-    name = "object_builder_config_proto",
-    srcs = ["object_builder_config.proto"],
-)
-
-py_proto_library(
-    name = "pobject_builder_config_py_pb2",
-    deps = [
-        ":object_builder_config_proto",
     ],
 )

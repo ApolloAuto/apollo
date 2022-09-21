@@ -8,9 +8,10 @@ cc_library(
     srcs = ["collect_fused_object.cc"],
     hdrs = ["collect_fused_object.h"],
     deps = [
-        "//modules/perception/fusion/base:sensor_data_manager",
-        "//modules/perception/pipeline:stage",
         "//modules/common/util:util_tool",
+        "//modules/perception/fusion/base:sensor_data_manager",
         "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
+        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/pipeline:stage",
     ],
 )

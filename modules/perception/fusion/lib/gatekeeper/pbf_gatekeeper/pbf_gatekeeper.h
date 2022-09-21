@@ -46,6 +46,7 @@ struct PbfGatekeeperParams {
 class PbfGatekeeper : public BaseGatekeeper {
  public:
   PbfGatekeeper() { name_ = "PbfGatekeeper"; }
+  explicit PbfGatekeeper(const PluginConfig& plugin_config);
   ~PbfGatekeeper() = default;
 
   bool Init() override;

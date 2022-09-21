@@ -28,7 +28,7 @@ namespace perception {
 namespace fusion {
 
 struct FusionFrame {
-  base::FrameConstPtr frame;
+  base::FramePtr frame;
 
   std::vector<SensorFramePtr> sensor_frames;
 

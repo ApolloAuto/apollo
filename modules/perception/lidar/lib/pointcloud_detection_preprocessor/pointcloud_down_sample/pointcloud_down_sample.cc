@@ -23,7 +23,7 @@
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/common/pcl_util.h"
 
-#include "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/pointcloud_downsample_config.pb.h"
 
 namespace apollo {
 namespace perception {

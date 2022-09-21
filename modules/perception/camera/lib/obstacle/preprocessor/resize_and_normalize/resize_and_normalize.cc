@@ -26,7 +26,6 @@ ReSizeAndNormalize::ReSizeAndNormalize(const PluginConfig& plugin_config) {
 }
 
 bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
-  // todo(zero): need fix
   ACHECK(plugin_config.has_resize_and_normalize_config());
 
   const auto& config = plugin_config.resize_and_normalize_config();
@@ -45,7 +44,6 @@ bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
 bool ReSizeAndNormalize::Process(cv::Mat &im, float *image_data_array) {
   cv::Mat resized_image;
   Resize(im, resized_height_, resized_width_, &resized_image);
-  // todo(zero): need fix
   Normalize(mean_, std_, scale_, &resized_image);
   Mat2Vec(resized_image, image_data_array);
   return true;

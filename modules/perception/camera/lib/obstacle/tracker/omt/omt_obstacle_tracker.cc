@@ -561,17 +561,6 @@ bool OMTObstacleTracker::Process(DataFrame *data_frame) {
     }
   }
 
-  // if (camera_frame->proposed_objects.empty()) {
-  //   Predict(tracker_options, camera_frame);
-  // // todo(zero): add condition
-  // } else if (camera_frame->tracked_objects.empty()) {
-  //   Associate2D(tracker_options, camera_frame);
-  // } else if (camera_frame->tracked_objects.empty()) {
-  //   Associate3D(tracker_options, camera_frame);
-  // } else {
-  //   Track(tracker_options, camera_frame);
-  // }
-
   return true;
 }
 

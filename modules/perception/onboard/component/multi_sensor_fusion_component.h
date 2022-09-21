@@ -21,11 +21,12 @@
 
 #include "cyber/component/component.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
+#include "modules/perception/fusion/lib/interface/base_multisensor_fusion.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/fusion_component_config.pb.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -53,6 +54,8 @@ class MultiSensorFusionComponent : public cyber::Component<SensorFrameMessage> {
   std::string fusion_main_sensor_;
   bool object_in_roi_check_ = false;
   double radius_for_roi_object_check_ = 0;
+
+  pipeline::PipelineConfig multi_sensor_fusion_pipeline_;
 
   std::unique_ptr<fusion::BaseMultiSensorFusion> fusion_;
   map::HDMapInput* hdmap_input_ = nullptr;

@@ -81,6 +81,10 @@ cc_library(
     "//modules/perception/camera/lib/traffic_light/detector/detection",
     "//modules/perception/camera/lib/traffic_light/detector/recognition",
     "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
+    "//modules/perception/fusion/lib/data_fusion/all_latest_fusion",
+    "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
+    "//modules/perception/fusion/lib/gatekeeper:collect_fused_object",
+    "//modules/perception/lidar/lib/classifier/fused_classifier",
     "//modules/perception/lidar/lib/detector/point_pillars_detection",
     "//modules/perception/lidar/lib/map_manager",
     "//modules/perception/lidar/lib/object_builder",
@@ -88,9 +92,8 @@ cc_library(
     "//modules/perception/lidar/lib/pointcloud_detection_postprocessor",
     "//modules/perception/lidar/lib/pointcloud_detection_preprocessor",
     "//modules/perception/lidar/lib/pointcloud_preprocessor",
-    "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
     "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
-    "//modules/perception/lidar/lib/classifier/fused_classifier",
+    "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
   ],
 )
 

@@ -44,27 +44,6 @@ void extract_vector(const std::vector<T>& vec,
   }
 }
 
-// todo(zero): need fix
-// bool HMTrackersObjectsAssociation::Init(const StageConfig& stage_config) {
-//   if (!Initialize(stage_config)) {
-//     return false;
-//   }
-
-//   track_object_distance_.set_distance_thresh(
-//       static_cast<float>(s_match_distance_thresh_));
-//   return true;
-// }
-
-// bool HMTrackersObjectsAssociation::Process(DataFrame* data_frame) {
-//   if (data_frame == nullptr)
-//     return false;
-
-//   AssociationOptions options;
-//   bool res = Associate(options, data_frame);
-
-//   return res;
-// }
-
 bool HMTrackersObjectsAssociation::Associate(
     const AssociationOptions& options, SensorFramePtr sensor_measurements,
     ScenePtr scene, AssociationResult* association_result) {

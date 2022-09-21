@@ -24,6 +24,9 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
+#include "modules/perception/fusion/lib/data_fusion/all_latest_fusion/all_latest_fusion.h"
+#include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
+#include "modules/perception/fusion/lib/gatekeeper/collect_fused_object.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
@@ -98,7 +101,7 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::POINTCLOUD_DETECTION_POSTPROCESSOR:
       stage_ptr.reset(new lidar::PointcloudDetectionPostprocessor());
-      break;      
+      break;
     case StageType::MAP_MANAGER:
       stage_ptr.reset(new lidar::MapManager());
       break;
@@ -137,6 +140,15 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::OMT_OBSTACLE_TRACKER:
       stage_ptr.reset(new camera::OMTObstacleTracker());
+      break;
+    case StageType::ALL_LATEST_FUSION:
+      stage_ptr.reset(new fusion::AllLatestFusion());
+      break;
+    case StageType::PROBABILISTIC_FUSION:
+      stage_ptr.reset(new fusion::ProbabilisticFusion());
+      break;
+    case StageType::COLLECT_FUSED_OBJECT:
+      stage_ptr.reset(new fusion::CollectFusedObject());
       break;
     default:
       return nullptr;

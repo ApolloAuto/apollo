@@ -27,20 +27,20 @@ stage_config: {
 stage_config: {
   stage_type: POINTCLOUD_DETECTION_PREPROCESSOR
   enabled: true
-    
+
     plugin_config: {
       plugin_type: POINTCLOUD_DOWNSAMPLE
       enabled: true
 
-      pointcloud_downsample_config: {
-        enable_downsample_pointcloud : true
-        enable_downsample_beams : true
-        float x_min_range : -74.88
-        float x_max_range : 74.88
-        float y_min_range : -74.88
-        float y_max_range : 74.88
-        float z_min_range : -2.0
-        float z_max_range : 4.0
+    pointcloud_downsample_config: {
+      enable_downsample_pointcloud : true
+      enable_downsample_beams : true
+      float x_min_range : -74.88
+      float x_max_range : 74.88
+      float y_min_range : -74.88
+      float y_max_range : 74.88
+      float z_min_range : -2.0
+      float z_max_range : 4.0
     }
   }
   
@@ -77,7 +77,7 @@ stage_config: {
       enabled: true
 
       pointcloud_get_objects_config:{
-        
+
       }
   }
 }
