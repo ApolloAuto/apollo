@@ -119,7 +119,14 @@ bool LidarTrackingComponent::InternalProc(
   auto& lidar_frame = in_message->lidar_frame_;
   pipeline::DataFrame data_frame;
   data_frame.lidar_frame = lidar_frame.get();
-  tracker_->Process(data_frame);
+  bool res = tracker_->Process(data_frame);
+
+  if (!res) {
+    out_message->error_code_ =
+        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+    AERROR << "Lidar recognition process error, " << ret.log;
+    return true;
+  }
 
   // lidar::LidarObstacleTrackingOptions track_options;
   // track_options.sensor_name = sensor_name;
@@ -127,12 +134,12 @@ bool LidarTrackingComponent::InternalProc(
   //     tracker_->Process(track_options, lidar_frame.get());
 
   PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
-  if (ret.error_code != lidar::LidarErrorCode::Succeed) {
-    out_message->error_code_ =
-        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Lidar recognition process error, " << ret.log;
-    return true;
-  }
+  // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
+  //   out_message->error_code_ =
+  //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+  //   AERROR << "Lidar recognition process error, " << ret.log;
+  //   return true;
+  // }
   // TODO(shigintmin)
   out_message->hdmap_ = lidar_frame->hdmap_struct;
   auto& frame = out_message->frame_;
