@@ -29,7 +29,7 @@ stage_config: {
   enabled: true
 
   plugin_config: {
-    plugin_type: POINTCLOUD_DOWNSAMPLE
+    plugin_type: POINTCLOUD_DOWN_SAMPLE
     enabled: true
 
     pointcloud_downsample_config: {
@@ -43,7 +43,7 @@ stage_config: {
       z_max_range : 4.0
     }
   }
-  
+
   pointcloud_detection_preprocessor_config:{
 
   }
