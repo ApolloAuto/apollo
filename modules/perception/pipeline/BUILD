@@ -27,6 +27,7 @@ cc_library(
   deps = [
     ":plugin",
     "//modules/common/util:util_tool",
+    "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
     "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
     "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
     "//modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects",
@@ -84,7 +85,6 @@ cc_library(
     "//modules/perception/fusion/lib/data_fusion/all_latest_fusion",
     "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
     "//modules/perception/fusion/lib/gatekeeper:collect_fused_object",
-    "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
     "//modules/perception/lidar/lib/classifier/fused_classifier",
     "//modules/perception/lidar/lib/detector/point_pillars_detection",
     "//modules/perception/lidar/lib/map_manager",
