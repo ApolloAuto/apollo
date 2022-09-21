@@ -36,6 +36,7 @@ bool PointcloudDetectionPreprocessor::Init(const StageConfig& stage_config) {
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::POINTCLOUD_DOWN_SAMPLE])
       );
+  CHECK_NOTNULL(pointcloud_downsample_);
 
   return true;
 }

@@ -35,6 +35,7 @@ bool PointcloudDetectionPostprocessor::Init(const StageConfig& stage_config) {
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::POINTCLOUD_GET_OBJECTS])
       );
+  CHECK_NOTNULL(pointcloud_get_objects_);
 
   return true;
 }

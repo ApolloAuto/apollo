@@ -38,6 +38,7 @@ bool CollectFusedObject::Init(const StageConfig& stage_config) {
       pipeline::dynamic_unique_cast<BaseGatekeeper>(
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::PBF_GATEKEEPER]));
+  CHECK_NOTNULL(gate_keeper_);
   return true;
 }
 

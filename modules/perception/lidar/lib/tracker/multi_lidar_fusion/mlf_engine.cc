@@ -112,10 +112,12 @@ bool MlfEngine::Init(const StageConfig& stage_config) {
   matcher_ = pipeline::dynamic_unique_cast<MlfTrackObjectMatcher>(
                 pipeline::PluginFactory::CreatePlugin(
                     plugin_config_map_[PluginType::MLF_TRACK_OBJECT_MATCHER]));
+  CHECK_NOTNULL(matcher_);
 
   tracker_ = pipeline::dynamic_unique_cast<MlfTracker>(
                 pipeline::PluginFactory::CreatePlugin(
                     plugin_config_map_[PluginType::MLF_TRACKER]));
+  CHECK_NOTNULL(tracker_);
   return true;
 }
 
