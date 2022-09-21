@@ -86,6 +86,8 @@ cc_library(
     "//modules/perception/lidar/lib/map_manager",
     "//modules/perception/lidar/lib/object_builder",
     "//modules/perception/lidar/lib/object_filter_bank",
+    "//modules/perception/lidar/lib/pointcloud_detection_postprocessor",
+    "//modules/perception/lidar/lib/pointcloud_detection_preprocessor",
     "//modules/perception/lidar/lib/pointcloud_preprocessor",
     "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",

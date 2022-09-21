@@ -39,11 +39,12 @@ import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.
 import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
+import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
 // plugin
 import "modules/perception/pipeline/proto/plugin/camera_get_object_config.proto";
 import "modules/perception/pipeline/proto/plugin/filter_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/get_image_data_config.proto";
-import "modules/perception/pipeline/proto/plugin/pointcloud_down_sample_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_downsample_config.proto";
 import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
 import "modules/perception/pipeline/proto/plugin/recover_bbox_config.proto";
 import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
@@ -88,7 +89,7 @@ message PluginConfig {
     camera.GetImageDataConfig get_image_data_config = 12;
     camera.RecoverBboxConfig recover_bbox_config = 13;
     camera.ResizeAndNormalizeConfig resize_and_normalize_config = 14;
-    lidar.PointcloudDownSampleConfig pointcloud_down_sample_config = 15;
+    lidar.PointcloudDownSampleConfig pointcloud_downsample_config = 15;
     lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 16;
     lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 17;
     lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 18;
@@ -192,6 +193,8 @@ message StageConfig {
     lidar.GroundServiceDetectorConfig ground_service_detector_config = 20;
     lidar.SpatioTemporalGroundDetectorConfig spatio_temporal_ground_detector_config = 21;
     lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 22;
+    lidar.PointPillarsDetectionConfig point_pillars_detection_config = 23;
+    lidar.ObjectBuilderConfig object_builder_config = 24;
 
     camera.TrafficLightDetectionConfig traffic_light_detection_config = 50;
     camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 51;
