@@ -36,6 +36,7 @@
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {
@@ -72,6 +73,9 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
 
   name_ = PipelineType_Name(pipeline_config.pipeline_type());
   pipeline_config_.CopyFrom(pipeline_config);
+
+  // Register Plugin
+  PluginFactory::Init();
 
   return true;
 }
