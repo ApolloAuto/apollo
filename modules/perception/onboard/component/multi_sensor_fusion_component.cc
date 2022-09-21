@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
+using apollo::cyber::common::GetAbsolutePath;
+
 uint32_t MultiSensorFusionComponent::s_seq_num_ = 0;
 std::mutex MultiSensorFusionComponent::s_mutex_;
 
@@ -43,11 +45,18 @@ bool MultiSensorFusionComponent::Init() {
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
   // read pipeline config
-  std::string pipeline_conf_file =
-      comp_config.multi_sensor_fusion_pipeline_conf();
+  std::string sensor_fusion_conf_dir = comp_config.sensor_fusion_conf_dir();
+  std::string sensor_fusion_conf_file = comp_config.sensor_fusion_conf_file();
+
+  std::string work_root = "";
+  std::string sensor_fusion_config_path =
+      GetAbsolutePath(sensor_fusion_conf_dir, sensor_fusion_conf_file);
+  sensor_fusion_config_path =
+      GetAbsolutePath(work_root, sensor_fusion_config_path);
+
   if (!cyber::common::GetProtoFromFile(
-          pipeline_conf_file, &multi_sensor_fusion_pipeline_)) {
-    AERROR << "Read config failed: " << pipeline_conf_file;
+          sensor_fusion_config_path, &multi_sensor_fusion_pipeline_)) {
+    AERROR << "Read config failed: " << sensor_fusion_config_path;
     return false;
   }
 

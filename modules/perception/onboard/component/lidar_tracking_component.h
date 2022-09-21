@@ -45,9 +45,10 @@ class LidarTrackingComponent : public cyber::Component<LidarFrameMessage> {
   bool InitAlgorithmPlugin();
   bool InternalProc(const std::shared_ptr<const LidarFrameMessage>& in_message,
                     const std::shared_ptr<SensorFrameMessage>& out_message);
-  std::unique_ptr<lidar::LidarObstacleTracking> tracker_;
 
-  std::unique_ptr<lidar::BaseLidarObstacleTracking> lidar_track_pipeline_;
+ private:
+  std::unique_ptr<lidar::BaseLidarObstacleTracking> tracker_;
+  pipeline::PipelineConfig lidar_tracking_config_;
 
   base::SensorInfo sensor_info_;
   std::string main_sensor_name_;
