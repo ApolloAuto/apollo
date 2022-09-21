@@ -28,6 +28,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
+using apollo::cyber::common::GetAbsolutePath;
+
 bool LidarTrackingComponent::Init() {
   LidarRecognitionComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
@@ -37,6 +39,23 @@ bool LidarTrackingComponent::Init() {
   output_channel_name_ = comp_config.output_channel_name();
   main_sensor_name_ = comp_config.main_sensor_name();
   writer_ = node_->CreateWriter<SensorFrameMessage>(output_channel_name_);
+
+  // read pipeline config
+  std::string lidar_tracking_conf_dir = comp_config.lidar_tracking_conf_dir();
+  std::string lidar_tracking_conf_file = comp_config.lidar_tracking_conf_file();
+
+  std::string work_root = "";
+  std::string lidar_tracking_config_path =
+      GetAbsolutePath(lidar_tracking_conf_dir, lidar_tracking_conf_file);
+  lidar_tracking_config_path =
+      GetAbsolutePath(work_root, lidar_tracking_config_path);
+
+  if (!cyber::common::GetProtoFromFile(
+          lidar_tracking_config_path, &lidar_tracking_config_)) {
+    AERROR << "Read config failed: " << lidar_tracking_config_path;
+    return false;
+  }
+
   if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init recongnition component algorithm plugin.";
     return false;
@@ -67,12 +86,14 @@ bool LidarTrackingComponent::InitAlgorithmPlugin() {
     AERROR << "Failed to get tracking instance.";
     return false;
   }
-  lidar::LidarObstacleTrackingInitOptions init_options;
-  init_options.sensor_name = main_sensor_name_;
-  if (!tracker_->Init(init_options)) {
-    AERROR << "Failed to init tracking.";
-    return false;
-  }
+  tracker_->Init(lidar_tracking_config_);
+
+  // lidar::LidarObstacleTrackingInitOptions init_options;
+  // init_options.sensor_name = main_sensor_name_;
+  // if (!tracker_->Init(init_options)) {
+  //   AERROR << "Failed to init tracking.";
+  //   return false;
+  // }
 
   return true;
 }
@@ -96,21 +117,29 @@ bool LidarTrackingComponent::InternalProc(
 
   PERF_BLOCK_START();
   auto& lidar_frame = in_message->lidar_frame_;
-  lidar::LidarObstacleTrackingOptions track_options;
-  track_options.sensor_name = sensor_name;
-  lidar::LidarProcessResult ret =
-      tracker_->Process(track_options, lidar_frame.get());
+  pipeline::DataFrame data_frame;
+  data_frame.lidar_frame = lidar_frame.get();
+  bool res = tracker_->Process(&data_frame);
 
-  // todo(zero): need fix
-  // lidar_track_pipeline_->Process(lidar_frame.get());
-
-  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
-  if (ret.error_code != lidar::LidarErrorCode::Succeed) {
+  if (!res) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-    AERROR << "Lidar recognition process error, " << ret.log;
+    AERROR << "Lidar recognition process error.";
     return true;
   }
+
+  // lidar::LidarObstacleTrackingOptions track_options;
+  // track_options.sensor_name = sensor_name;
+  // lidar::LidarProcessResult ret =
+  //     tracker_->Process(track_options, lidar_frame.get());
+
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
+  // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
+  //   out_message->error_code_ =
+  //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+  //   AERROR << "Lidar recognition process error, " << ret.log;
+  //   return true;
+  // }
   // TODO(shigintmin)
   out_message->hdmap_ = lidar_frame->hdmap_struct;
   auto& frame = out_message->frame_;

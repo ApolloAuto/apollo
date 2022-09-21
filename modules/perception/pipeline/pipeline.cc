@@ -36,6 +36,7 @@
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_detection_preprocessor.h"
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_engine.h"
+#include "modules/perception/pipeline/plugin_factory.h"
 
 namespace apollo {
 namespace perception {
@@ -50,6 +51,9 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
   for (const auto& stage_config : pipeline_config.stage_config()) {
     stage_config_map_[stage_config.stage_type()] = stage_config;
   }
+
+  // Register Plugins, Must be initialized before 'CreateStage'!!!
+  PluginFactory::Init();
 
   for (int i = 0; i < pipeline_config.stage_config_size(); ++i) {
     auto stage_type = pipeline_config.stage_type(i);
