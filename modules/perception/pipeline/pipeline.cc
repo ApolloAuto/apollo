@@ -44,6 +44,9 @@ namespace pipeline {
 
 
 bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
+  // Register Plugin
+  PluginFactory::Init();
+
   ACHECK(!pipeline_config.stage_type().empty());
 
   Clear();
@@ -73,9 +76,6 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
 
   name_ = PipelineType_Name(pipeline_config.pipeline_type());
   pipeline_config_.CopyFrom(pipeline_config);
-
-  // Register Plugin
-  PluginFactory::Init();
 
   return true;
 }
