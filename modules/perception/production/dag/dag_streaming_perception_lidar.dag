@@ -2,7 +2,7 @@ module_config {
   module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_lidar.so"
 
   components {
-    class_name : "DetectionComponent"
+    class_name : "LidarDetectionComponent"
     config {
       name: "Velodyne128Detection"
       config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_detection_conf.pb.txt"
