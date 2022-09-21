@@ -119,7 +119,7 @@ bool LidarTrackingComponent::InternalProc(
   auto& lidar_frame = in_message->lidar_frame_;
   pipeline::DataFrame data_frame;
   data_frame.lidar_frame = lidar_frame.get();
-  bool res = tracker_->Process(data_frame);
+  bool res = tracker_->Process(&data_frame);
 
   if (!res) {
     out_message->error_code_ =
