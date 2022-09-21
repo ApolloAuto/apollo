@@ -214,7 +214,7 @@ message StageConfig {
     camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
 
     fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
-    fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 14;
+    fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
   }
 }
 
