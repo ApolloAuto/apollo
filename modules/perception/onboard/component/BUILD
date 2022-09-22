@@ -30,14 +30,14 @@ cc_library(
     name = "perception_component_inner_camera",
     srcs = [
         # todo(zero): need fix
-        # "camera_obstacle_detection_component.cc",
+        "camera_obstacle_detection_component.cc",
         "camera_perception_viz_message.cc",
         "fusion_camera_detection_component.cc",
         "lane_detection_component.cc",
         "trafficlights_perception_component.cc",
     ],
     hdrs = [
-        # "camera_obstacle_detection_component.h",
+        "camera_obstacle_detection_component.h",
         "camera_perception_viz_message.h",
         "fusion_camera_detection_component.h",
         "lane_detection_component.h",

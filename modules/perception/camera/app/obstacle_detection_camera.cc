@@ -37,6 +37,7 @@ using cyber::common::GetAbsolutePath;
 
 bool ObstacleDetectionCamera::Init(
     const CameraPerceptionInitOptions &options) {
+
   std::string work_root;
   if (options.use_cyber_work_root) {
     work_root = GetCyberWorkRoot();
@@ -178,7 +179,7 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
       out_pose_.open(
           camera_detection_config_.debug_param().camera2world_out_file(),
           std::ofstream::out);
-    }
+    } 
   }
 
   // Init object template
@@ -196,6 +197,7 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
 }
 
 bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
+  
   CameraFrame* frame = data_frame->camera_frame;
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());

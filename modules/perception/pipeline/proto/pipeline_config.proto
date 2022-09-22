@@ -120,7 +120,7 @@ enum StageType {
 
   // detectors
   // camera detectors
-  SMOKE_OBSTACLE_DETECTOR = 21;
+  SMOKE_OBSTACLE_DETECTION = 21;
   YOLO_OBSTACLE_DETECTOR = 22;
   YOLOV4_OBSTACLE_DETECTOR = 23;
   // lane detectors

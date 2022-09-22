@@ -136,7 +136,7 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
     case StageType::CAMERA_DETECTION_POSTPROCESSOR:
       stage_ptr.reset(new camera::CameraDetectionPostprocessor());
       break;
-    case StageType::SMOKE_OBSTACLE_DETECTOR:
+    case StageType::SMOKE_OBSTACLE_DETECTION:
       stage_ptr.reset(new camera::SmokeObstacleDetector());
       break;
     case StageType::CAMERA_DETECTION_PREPROCESSOR:
