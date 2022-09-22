@@ -19,6 +19,7 @@ cc_library(
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/detector/point_pillars_detection:point_pillars",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
+        "//modules/perception/pipeline:stage",
         "@eigen",
         "@local_config_pcl//:pcl",
     ],

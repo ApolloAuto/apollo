@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+message AllLatestFusionConfig {
+  optional string main_sensor = 1;
+  optional bool use_lidar = 2 [default = true];
+  optional bool use_radar = 3 [default = true];
+  optional bool use_camera = 4 [default = true];
+}

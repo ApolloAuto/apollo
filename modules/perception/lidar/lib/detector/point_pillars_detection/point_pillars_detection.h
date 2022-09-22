@@ -28,6 +28,8 @@
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/pipeline/proto/stage/point_pillars_detection_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -43,7 +45,17 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "PointPillarsDetection"; }
+  bool Process(const LidarFrame& frame, const std::vector<float>& points_array,
+               int num_points, std::vector<float>* out_detections,
+               std::vector<int>* out_labels);
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   void CloudToArray(const base::PointFCloudPtr& pc_ptr, float* out_points_array,
@@ -59,6 +71,10 @@ class PointPillarsDetection : public BaseLidarDetector {
                   std::vector<int>* labels);
 
   base::ObjectSubType GetObjectSubType(int label);
+
+  bool Detect(LidarFrame* frame, const std::vector<float>& points_array,
+              int num_points, std::vector<float>* out_detections,
+              std::vector<int>* out_labels);
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;
@@ -86,6 +102,8 @@ class PointPillarsDetection : public BaseLidarDetector {
   double cloud_to_array_time_ = 0.0;
   double inference_time_ = 0.0;
   double collect_time_ = 0.0;
+
+  PointPillarsDetectionConfig point_pillars_detection_config_;
 };  // class PointPillarsDetection
 
 }  // namespace lidar

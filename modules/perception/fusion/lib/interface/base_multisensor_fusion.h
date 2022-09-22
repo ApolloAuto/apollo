@@ -23,6 +23,7 @@
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +34,11 @@ struct ObstacleMultiSensorFusionParam {
   std::string fusion_method;
 };
 
-class BaseMultiSensorFusion {
+class BaseMultiSensorFusion : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseMultiSensorFusion() = default;
   virtual ~BaseMultiSensorFusion() = default;
@@ -42,6 +47,10 @@ class BaseMultiSensorFusion {
 
   virtual bool Process(const base::FrameConstPtr& frame,
                std::vector<base::ObjectPtr>* objects) = 0;
+
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
 
   virtual std::string Name() const = 0;
 

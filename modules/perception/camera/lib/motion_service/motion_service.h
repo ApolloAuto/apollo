@@ -23,6 +23,7 @@
 
 #include "Eigen/Core"
 
+#include "cyber/common/macros.h"
 #include "cyber/component/component.h"
 #include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -39,7 +40,7 @@ namespace camera {
 typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
 typedef std::shared_ptr<localization::LocalizationEstimate> LocalizationMsgType;
 
-class MotionService : public apollo::cyber::Component<> {
+class MotionService final : public apollo::cyber::Component<> {
  public:
   MotionService() = default;
   virtual ~MotionService() { delete vehicle_planemotion_; }

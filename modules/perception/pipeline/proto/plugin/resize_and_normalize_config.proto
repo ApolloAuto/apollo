@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message ResizeAndNormalizeConfig {
+    optional int32 resized_width = 1;
+    optional int32 resized_height = 2;
+    optional float scale= 3;
+    optional float mean_r = 4;
+    optional float mean_g = 5;
+    optional float mean_b = 6;
+    optional float std_r = 7;
+    optional float std_g = 8;
+    optional float std_b = 9;
+}

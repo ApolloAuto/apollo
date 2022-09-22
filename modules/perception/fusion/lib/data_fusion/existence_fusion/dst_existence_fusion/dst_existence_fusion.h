@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/common/dst_evidence.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 
@@ -52,7 +53,7 @@ struct DstExistenceFusionOptions {
 class DstExistenceFusion : public BaseExistenceFusion {
  public:
   explicit DstExistenceFusion(TrackPtr track);
-  ~DstExistenceFusion() {}
+  ~DstExistenceFusion() = default;
 
   // @brief: add dst application
   static bool Init();
@@ -102,6 +103,8 @@ class DstExistenceFusion : public BaseExistenceFusion {
   static ExistenceDstMaps existence_dst_maps_;
   static ToicDstMaps toic_dst_maps_;
   static DstExistenceFusionOptions options_;
+
+  DISALLOW_COPY_AND_ASSIGN(DstExistenceFusion);
 };
 
 }  // namespace fusion

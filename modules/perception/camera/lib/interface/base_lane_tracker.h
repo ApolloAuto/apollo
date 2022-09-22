@@ -17,10 +17,12 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +32,11 @@ struct LaneTrackerInitOptions : public BaseInitOptions {};
 
 struct LaneTrackerOptions {};
 
-class BaseLaneTracker {
+class BaseLaneTracker : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLaneTracker() = default;
 
@@ -45,10 +51,15 @@ class BaseLaneTracker {
   // 3D information of detected lanes should be refined.
   virtual bool Track(const LaneTrackerOptions& options, CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
-  BaseLaneTracker(const BaseLaneTracker&) = delete;
-  BaseLaneTracker& operator=(const BaseLaneTracker&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLaneTracker);
 };  // class BaseLaneTracker
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneTracker);

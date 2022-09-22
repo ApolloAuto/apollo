@@ -62,6 +62,30 @@ bool MaskPillarsDetection::Init(const LidarDetectorInitOptions& options) {
   return true;
 }
 
+bool MaskPillarsDetection::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  point_pillars_ptr_.reset(
+      new PointPillars(FLAGS_reproduce_result_mode,
+                       FLAGS_score_threshold,
+                       FLAGS_nms_overlap_threshold,
+                       FLAGS_mask_pfe_torch_file,
+                       FLAGS_mask_scattered_torch_file,
+                       FLAGS_mask_backbone_torch_file,
+                       FLAGS_mask_fpn_torch_file,
+                       FLAGS_mask_bbox_head_torch_file));
+  return true;
+}
+
+bool MaskPillarsDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return true;
+}
+
 bool MaskPillarsDetection::Detect(const LidarDetectorOptions& options,
                                    LidarFrame* frame) {
   // check input

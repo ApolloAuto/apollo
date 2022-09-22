@@ -19,6 +19,7 @@ cc_library(
         "//modules/perception/fusion/base:base_forward_declaration",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:plugin",
     ],
 )
 
@@ -29,6 +30,7 @@ cc_library(
         "//cyber",
         "//modules/perception/fusion/base",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline",
     ],
 )
 

@@ -33,13 +33,15 @@
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/utils/cuda_util.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::cyber::common::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 using cyber::common::EnsureDirectory;
 
 bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
@@ -64,6 +66,10 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   // Init calibration service
   InitCalibrationService(work_root, model, perception_param_);
 
+  return true;
+}
+
+bool LaneCameraPerception::Init(const PipelineConfig& pipeline_config) {
   return true;
 }
 
@@ -194,6 +200,10 @@ bool LaneCameraPerception::GetCalibrationService(
   return true;
 }
 
+bool LaneCameraPerception::Process(DataFrame* data_frame) {
+  return InnerProcess(data_frame);
+}
+
 bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
                                       CameraFrame *frame) {
   PERF_FUNCTION();
@@ -259,6 +269,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
   }
   return true;
 }
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

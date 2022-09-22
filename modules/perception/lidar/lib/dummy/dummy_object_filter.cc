@@ -29,6 +29,14 @@ bool DummyObjectFilter::Filter(const ObjectFilterOptions& options,
   return true;
 }
 
+bool DummyObjectFilter::Init(const PluginConfig& plugin_config) {
+  return true;
+}
+
+bool DummyObjectFilter::Process(DataFrame* data_frame) {
+  return true;
+}
+
 PERCEPTION_REGISTER_OBJECTFILTER(DummyObjectFilter);
 
 }  // namespace lidar

@@ -23,7 +23,7 @@
 #include "modules/perception/camera/common/camera_ground_plane.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/proto/omt.pb.h"
+#include "modules/perception/pipeline/proto/stage/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 using apollo::common::EigenVector;

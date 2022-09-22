@@ -24,6 +24,7 @@
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +36,13 @@ struct ObjectBuilderOptions {
   Eigen::Vector3d ref_center = Eigen::Vector3d(0, 0, 0);
 };
 
-class ObjectBuilder {
+class ObjectBuilder : public pipeline::Stage {
+ public:
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
+
  public:
   ObjectBuilder() = default;
   ~ObjectBuilder() = default;
@@ -50,7 +57,13 @@ class ObjectBuilder {
   // @param [in/out]: LidarFrame*.
   bool Build(const ObjectBuilderOptions& options, LidarFrame* frame);
 
-  std::string Name() const { return "ObjectBuilder"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   // @brief: calculate 2d polygon.

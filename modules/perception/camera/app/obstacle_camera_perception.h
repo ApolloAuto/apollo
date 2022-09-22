@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
@@ -34,6 +35,7 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -41,17 +43,21 @@ namespace camera {
 
 class ObstacleCameraPerception : public BaseCameraPerception {
  public:
+  using CameraDetectionConfig = pipeline::CameraDetectionConfig;
+
+ public:
   ObstacleCameraPerception()
-      : transformer_(nullptr),
+      : object_template_manager_(nullptr),
+        transformer_(nullptr),
+        obstacle_postprocessor_(nullptr),
         tracker_(nullptr),
         extractor_(nullptr),
         lane_detector_(nullptr),
         lane_postprocessor_(nullptr),
-        calibration_service_(nullptr),
-        object_template_manager_(nullptr) {}
-  ObstacleCameraPerception(const ObstacleCameraPerception &) = delete;
-  ObstacleCameraPerception &operator=(const ObstacleCameraPerception &) =
-      delete;
+        calibration_service_(nullptr) {
+            name_ = "ObstacleCameraPerception";
+        }
+
   ~ObstacleCameraPerception() = default;
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
@@ -67,7 +73,15 @@ class ObstacleCameraPerception : public BaseCameraPerception {
   bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "ObstacleCameraPerception"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
+
+ protected:
+  ObjectTemplateManager *object_template_manager_;
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
@@ -83,14 +97,13 @@ class ObstacleCameraPerception : public BaseCameraPerception {
   app::PerceptionParam perception_param_;
   std::ofstream out_track_;
   std::ofstream out_pose_;
-  std::string lane_calibration_working_sensor_name_ = "";
+  std::string lane_calibration_working_sensor_name_;
   bool write_out_lane_file_ = false;
   bool write_out_calib_file_ = false;
   std::string out_lane_dir_;
   std::string out_calib_dir_;
 
- protected:
-  ObjectTemplateManager *object_template_manager_ = nullptr;
+  DISALLOW_COPY_AND_ASSIGN(ObstacleCameraPerception);
 };
 
 }  // namespace camera

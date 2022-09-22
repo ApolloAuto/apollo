@@ -38,6 +38,8 @@
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/pipeline/data_frame.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 #include "modules/perception/proto/motion_service.pb.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
@@ -209,6 +211,8 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;
+
+  pipeline::PipelineConfig camera_obstacle_detection_config_;
 };
 
 CYBER_REGISTER_COMPONENT(CameraObstacleDetectionComponent);

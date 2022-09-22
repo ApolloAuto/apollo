@@ -24,6 +24,7 @@
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/geometry/common.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -75,7 +76,47 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   return true;
 }
 
-std::string OMTObstacleTracker::Name() const { return "OMTObstacleTracker"; }
+bool OMTObstacleTracker::Init(const StageConfig &stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  omt_param_ = stage_config.omt_param();
+  AINFO << "Load omt parameters: " << omt_param_.DebugString();
+
+  track_id_ = 0;
+  frame_num_ = 0;
+  frame_list_.Init(omt_param_.img_capability());
+  // todo(zero): options.gpu_id
+  gpu_id_ = omt_param_.gpu_id();
+  similar_map_.Init(omt_param_.img_capability(), gpu_id_);
+  similar_.reset(new GPUSimilar);
+
+  base::BaseCameraModelPtr model =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          omt_param_.camera_name());
+  width_ = model->get_width();
+  height_ = model->get_height();
+  reference_.Init(omt_param_.reference(), width_, height_);
+  std::string type_change_cost =
+      GetAbsolutePath(omt_param_.root_dir(), omt_param_.type_change_cost());
+  std::ifstream fin(type_change_cost);
+  ACHECK(fin.is_open());
+  kTypeAssociatedCost_.clear();
+  int n_type = static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE);
+  for (int i = 0; i < n_type; ++i) {
+    kTypeAssociatedCost_.emplace_back(std::vector<float>(n_type, 0));
+    for (int j = 0; j < n_type; ++j) {
+      fin >> kTypeAssociatedCost_[i][j];
+    }
+  }
+  targets_.clear();
+  used_.clear();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
+  return true;
+}
 
 // @description combine targets using iou after association
 bool OMTObstacleTracker::CombineDuplicateTargets() {
@@ -322,11 +363,9 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
       auto &min_tmplt = kMinTemplateHWL.at(sub_type);
       if (OutOfValidRegion(rect, width_, height_, omt_param_.border())) {
         AINFO << "Out of valid region";
-        AINFO << "Rect x: " << rect.x
-              << " Rect y: " << rect.y
+        AINFO << "Rect x: " << rect.x << " Rect y: " << rect.y
               << " Rect height: " << rect.height
-              << " Rect width: " << rect.width
-              << " GT height_: " << height_
+              << " Rect width: " << rect.width << " GT height_: " << height_
               << " GT width_: " << width_;
         continue;
       }
@@ -489,7 +528,44 @@ bool OMTObstacleTracker::Track(const ObstacleTrackerOptions &options,
   return true;
 }
 
+bool OMTObstacleTracker::Process(DataFrame *data_frame) {
+  if (data_frame == nullptr) {
+    return false;
+  }
+
+  CameraFrame *camera_frame = data_frame->camera_frame;
+  ObstacleTrackerOptions tracker_options;
+
+  auto track_state = data_frame->camera_frame->track_state;
+
+  switch (track_state) {
+    case TrackState::Predict: {
+      Predict(tracker_options, camera_frame);
+      track_state = TrackState::Associate2D;
+      break;
+    }
+    case TrackState::Associate2D: {
+      Associate2D(tracker_options, camera_frame);
+      track_state = TrackState::Associate3D;
+      break;
+    }
+    case TrackState::Associate3D: {
+      Associate3D(tracker_options, camera_frame);
+      track_state = TrackState::Track;
+      break;
+    }
+    case TrackState::Track: {
+      Track(tracker_options, camera_frame);
+      track_state = TrackState::Predict;
+      break;
+    }
+  }
+
+  return true;
+}
+
 REGISTER_OBSTACLE_TRACKER(OMTObstacleTracker);
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

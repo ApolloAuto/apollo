@@ -19,6 +19,8 @@
 #include <memory>
 
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
+#include "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -26,8 +28,7 @@ namespace lidar {
 
 class PointCloudPreprocessor : public BasePointCloudPreprocessor {
  public:
-  PointCloudPreprocessor() : BasePointCloudPreprocessor() {}
-
+  PointCloudPreprocessor() = default;
   virtual ~PointCloudPreprocessor() = default;
 
   bool Init(const PointCloudPreprocessorInitOptions& options =
@@ -41,7 +42,13 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   bool Preprocess(const PointCloudPreprocessorOptions& options,
                   LidarFrame* frame) const override;
 
-  std::string Name() const override { return "PointCloudPreprocessor"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   bool TransformCloud(const base::PointFCloudPtr& local_cloud,
@@ -57,6 +64,9 @@ class PointCloudPreprocessor : public BasePointCloudPreprocessor {
   bool filter_high_z_points_ = true;
   float z_threshold_ = 5.0f;
   static const float kPointInfThreshold;
+
+
+  PointcloudPreprocessorConfig pointcloud_preprocessor_config_;
 };  // class PointCloudPreprocessor
 
 }  // namespace lidar

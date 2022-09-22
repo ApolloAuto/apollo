@@ -23,7 +23,8 @@
 
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/obj_mapper.h"
-#include "modules/perception/camera/lib/obstacle/transformer/multicue/proto/multicue.pb.h"
+#include "modules/perception/pipeline/proto/stage/multicue.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -31,14 +32,10 @@ namespace camera {
 
 class MultiCueObstacleTransformer : public BaseObstacleTransformer {
  public:
-  MultiCueObstacleTransformer() : BaseObstacleTransformer() {
-    mapper_ = new ObjMapper;
-  }
+  MultiCueObstacleTransformer();
 
-  virtual ~MultiCueObstacleTransformer() {
-    delete mapper_;
-    mapper_ = nullptr;
-  }
+  virtual ~MultiCueObstacleTransformer() = default;
+
   bool Init(const ObstacleTransformerInitOptions &options =
                 ObstacleTransformerInitOptions()) override;
 
@@ -48,7 +45,13 @@ class MultiCueObstacleTransformer : public BaseObstacleTransformer {
   bool Transform(const ObstacleTransformerOptions &options,
                  CameraFrame *frame) override;
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   void SetObjMapperOptions(base::ObjectPtr obj, Eigen::Matrix3f camera_k_matrix,
@@ -64,7 +67,7 @@ class MultiCueObstacleTransformer : public BaseObstacleTransformer {
   multicue::MulticueParam multicue_param_;
   int image_width_ = 0;
   int image_height_ = 0;
-  ObjMapper *mapper_ = nullptr;
+  std::unique_ptr<ObjMapper> mapper_;
 
  protected:
   ObjectTemplateManager *object_template_manager_ = nullptr;

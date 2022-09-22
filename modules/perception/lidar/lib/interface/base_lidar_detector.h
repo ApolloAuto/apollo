@@ -20,6 +20,7 @@
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,13 @@ struct LidarDetectorInitOptions {
 
 struct LidarDetectorOptions {};
 
-class BaseLidarDetector {
+class BaseLidarDetector : public pipeline::Stage {
+ public:
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
+
  public:
   BaseLidarDetector() = default;
 
@@ -47,6 +54,12 @@ class BaseLidarDetector {
   // label field of point cloud can be filled, optional,
   virtual bool Detect(const LidarDetectorOptions& options,
                        LidarFrame* frame) = 0;
+
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
 
   virtual std::string Name() const = 0;
 

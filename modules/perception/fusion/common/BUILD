@@ -28,6 +28,7 @@ cc_test(
     srcs = ["camera_util_test.cc"],
     deps = [
         ":camera_util",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base",
         "@com_google_googletest//:gtest_main",
     ],

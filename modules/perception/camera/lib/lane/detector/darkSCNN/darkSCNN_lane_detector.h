@@ -25,9 +25,10 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/camera/lib/interface/base_lane_detector.h"
-#include "modules/perception/camera/lib/lane/common/proto/darkSCNN.pb.h"
+#include "modules/perception/pipeline/proto/stage/darkSCNN.pb.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -53,7 +54,7 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
     num_lanes_ = 0;
   }
 
-  virtual ~DarkSCNNLaneDetector() {}
+  virtual ~DarkSCNNLaneDetector() = default;
 
   bool Init(const LaneDetectorInitOptions &options =
                 LaneDetectorInitOptions()) override;
@@ -64,7 +65,14 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
   // detected lanes should be filled, required,
   // 3D information of lane can be filled, optional.
   bool Detect(const LaneDetectorOptions &options, CameraFrame *frame) override;
-  std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<inference::Inference> cnnadapter_lane_ = nullptr;

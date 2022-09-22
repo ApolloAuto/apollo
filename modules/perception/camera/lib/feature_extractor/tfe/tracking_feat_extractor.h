@@ -23,28 +23,38 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/proto/tracking_feature.pb.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/operators/roipooling_layer.h"
 #include "modules/perception/inference/utils/gemm.h"
+#include "modules/perception/pipeline/proto/stage/tracking_feature.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
 struct FeatureExtractorLayer {
   std::shared_ptr<inference::Layer<float>> pooling_layer;
   std::shared_ptr<base::Blob<float>> rois_blob;
   std::shared_ptr<base::Blob<float>> top_blob;
 };
+
 class TrackingFeatureExtractor : public BaseFeatureExtractor {
  public:
-  TrackingFeatureExtractor() {}
-  ~TrackingFeatureExtractor() {}
+  TrackingFeatureExtractor() = default;
+  ~TrackingFeatureExtractor() = default;
 
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  std::string Name() const override { return "TrackingFeatureExtractor"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   void init_roipooling(const FeatureExtractorInitOptions &init_options,

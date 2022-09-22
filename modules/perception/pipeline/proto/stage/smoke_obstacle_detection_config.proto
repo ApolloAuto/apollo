@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message SmokeObstacleDetectionConfig {
+  optional int32 gpu_id = 1;
+  optional string camera_name = 2;
+  optional string root_dir = 3;
+  optional string conf_file = 4;
+}

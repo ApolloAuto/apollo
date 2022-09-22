@@ -22,6 +22,7 @@
 #include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_base_filter.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -31,9 +32,14 @@ struct MlfTrackerInitOptions {};
 
 struct MlfTrackOptions {};
 
-class MlfTracker {
+class MlfTracker : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   MlfTracker() = default;
+  MlfTracker(const PluginConfig& plugin_config);
+
   ~MlfTracker() {
     for (auto& filter : filters_) {
       delete filter;
@@ -60,7 +66,11 @@ class MlfTracker {
   void UpdateTrackDataWithoutObject(double timestamp,
                                     MlfTrackDataPtr track_data);
 
-  std::string Name() const { return "MlfTracker"; }
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   // @brief: get next track id

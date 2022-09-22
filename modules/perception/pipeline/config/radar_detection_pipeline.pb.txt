@@ -1,0 +1,52 @@
+stage_type: CONTI_ARS_PREPROCESSOR
+stage_type: HDMAP_RADAR_ROI_FILTER
+stage_type: CONTI_ARS_TRACKER
+
+stage_config: {
+  stage_type: CONTI_ARS_PREPROCESSOR
+  enabled: true
+
+  plugin_config: {
+    plugin_type:
+    enabled: true
+
+  }
+
+  conti_ars_preprocessor_config {
+
+  }
+}
+
+stage_config: {
+  stage_type: HDMAP_RADAR_ROI_FILTER
+  enabled: true
+
+  plugin_config: {
+    plugin_type:
+    enabled: true
+
+  }
+
+  hdmap_radar_roi_filter_config {
+
+  }
+}
+
+stage_config: {
+  stage_type: CONTI_ARS_TRACKER
+  enabled: true
+
+  plugin_config: {
+    plugin_type:
+    enabled: true
+
+  }
+
+  conti_ars_tracker_config {
+
+  }
+}
+
+radar_obstacle_detection_config: {
+
+}

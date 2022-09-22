@@ -29,9 +29,9 @@ namespace camera {
 
 class LaneLineCalibrator : public BaseCalibrator {
  public:
-  LaneLineCalibrator() : BaseCalibrator() {}
+  LaneLineCalibrator() { name_ = "LaneLineCalibrator"; }
 
-  virtual ~LaneLineCalibrator() {}
+  virtual ~LaneLineCalibrator() = default;
 
   bool Init(
       const CalibratorInitOptions &options = CalibratorInitOptions()) override;
@@ -41,7 +41,11 @@ class LaneLineCalibrator : public BaseCalibrator {
   // @param [in/out]: pitch_angle
   bool Calibrate(const CalibratorOptions &options, float *pitch_angle) override;
 
-  std::string Name() const override { return "LaneLineCalibrator"; }
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
   inline float GetTimeDiff() const { return time_diff_; }
   inline float GetYawRate() const { return yaw_rate_; }

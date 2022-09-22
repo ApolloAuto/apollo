@@ -61,6 +61,18 @@ bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
   return true;
 }
 
+bool ProjectFeature::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool ProjectFeature::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
                              CameraFrame *frame) {
   auto input_blob = inference_->get_blob(param_.input_blob());
@@ -87,8 +99,6 @@ bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
   norm_.L2Norm(frame->track_feature_blob.get());
   return true;
 }
-
-std::string ProjectFeature::Name() const { return "ProjectFeature"; }
 
 REGISTER_FEATURE_EXTRACTOR(ProjectFeature);
 }  // namespace camera

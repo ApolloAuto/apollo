@@ -59,7 +59,7 @@ TEST(SensorObjectTest, test) {
   EXPECT_EQ(object->GetSensorId(), "test");
   EXPECT_NE(object->GetBaseObject(), nullptr);
 
-  object->frame_header_ = nullptr;
+  // object->frame_header_ = nullptr;
   EXPECT_DOUBLE_EQ(object->GetTimestamp(), 0);
   EXPECT_FALSE(object->GetRelatedFramePose(&pose));
   EXPECT_EQ(object->GetSensorId(), "");

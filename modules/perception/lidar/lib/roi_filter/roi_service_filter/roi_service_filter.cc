@@ -33,6 +33,24 @@ bool ROIServiceFilter::Init(const ROIFilterInitOptions& options) {
   return true;
 }
 
+bool ROIServiceFilter::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  roi_service_ = std::dynamic_pointer_cast<ROIService>(
+      SceneManager::Instance().Service("ROIService"));
+  if (roi_service_ == nullptr) {
+    AERROR << "ROi service is nullptr, Init scene manager first !";
+    return false;
+  }
+  return true;
+}
+
+bool ROIServiceFilter::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
                               LidarFrame* frame) {
   if (frame == nullptr || frame->world_cloud == nullptr) {

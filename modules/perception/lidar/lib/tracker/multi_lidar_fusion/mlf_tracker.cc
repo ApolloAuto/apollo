@@ -18,13 +18,17 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
 using cyber::common::GetAbsolutePath;
+
+MlfTracker::MlfTracker(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
 
 bool MlfTracker::Init(const MlfTrackerInitOptions options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -42,6 +46,25 @@ bool MlfTracker::Init(const MlfTrackerInitOptions options) {
   for (int i = 0; i < config.filter_name_size(); ++i) {
     const auto& name = config.filter_name(i);
     MlfBaseFilter* filter = MlfBaseFilterRegisterer::GetInstanceByName(name);
+    ACHECK(filter);
+    MlfFilterInitOptions filter_init_options;
+    ACHECK(filter->Init(filter_init_options));
+    filters_.push_back(filter);
+    AINFO << "MlfTracker add filter: " << filter->Name();
+  }
+
+  return true;
+}
+
+bool MlfTracker::Init(const PluginConfig& plugin_config) {
+  name_ = PluginType_Name(plugin_config.plugin_type());
+  enable_ = plugin_config.enabled();
+
+  MlfTrackerConfig config = plugin_config.mlf_tracker_config();
+
+  for (const auto& filter_name : config.filter_name()) {
+    MlfBaseFilter* filter =
+        MlfBaseFilterRegisterer::GetInstanceByName(filter_name);
     ACHECK(filter);
     MlfFilterInitOptions filter_init_options;
     ACHECK(filter->Init(filter_init_options));

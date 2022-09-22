@@ -61,6 +61,7 @@ bool HMTrackersObjectsAssociation::Associate(
               association_result->unassigned_measurements.end(), 0);
     return true;
   }
+
   std::string measurement_sensor_id = sensor_objects[0]->GetSensorId();
   double measurement_timestamp = sensor_objects[0]->GetTimestamp();
   track_object_distance_.ResetProjectionCache(measurement_sensor_id,
@@ -87,7 +88,7 @@ bool HMTrackersObjectsAssociation::Associate(
   association_result->measurement2track_dist.assign(num_measurement, 0);
   std::vector<int> track_ind_g2l;
   track_ind_g2l.resize(num_track, -1);
-  for (size_t i = 0; i < association_result->unassigned_tracks.size(); i++) {
+  for (size_t i = 0; i < association_result->unassigned_tracks.size(); ++i) {
     track_ind_g2l[association_result->unassigned_tracks[i]] =
         static_cast<int>(i);
   }
@@ -96,7 +97,7 @@ bool HMTrackersObjectsAssociation::Associate(
   std::vector<size_t> measurement_ind_l2g =
       association_result->unassigned_measurements;
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
-       i++) {
+       ++i) {
     measurement_ind_g2l[association_result->unassigned_measurements[i]] =
         static_cast<int>(i);
   }
@@ -141,6 +142,7 @@ bool HMTrackersObjectsAssociation::Associate(
 
   return state;
 }
+
 void HMTrackersObjectsAssociation::PostIdAssign(
     const std::vector<TrackPtr>& fusion_tracks,
     const std::vector<SensorObjectPtr>& sensor_objects,
@@ -224,7 +226,7 @@ void HMTrackersObjectsAssociation::ComputeDistance(
     const std::vector<size_t>& measurement_ind_l2g,
     const std::vector<std::vector<double>>& association_mat,
     AssociationResult* association_result) {
-  for (size_t i = 0; i < association_result->assignments.size(); i++) {
+  for (size_t i = 0; i < association_result->assignments.size(); ++i) {
     int track_ind = static_cast<int>(association_result->assignments[i].first);
     int measurement_ind =
         static_cast<int>(association_result->assignments[i].second);
@@ -237,7 +239,7 @@ void HMTrackersObjectsAssociation::ComputeDistance(
           association_mat[track_ind_loc][measurement_ind_loc];
     }
   }
-  for (size_t i = 0; i < association_result->unassigned_tracks.size(); i++) {
+  for (size_t i = 0; i < association_result->unassigned_tracks.size(); ++i) {
     int track_ind = static_cast<int>(unassigned_fusion_tracks[i]);
     int track_ind_loc = track_ind_g2l[track_ind];
     association_result->track2measurements_dist[track_ind] =
@@ -277,7 +279,7 @@ void HMTrackersObjectsAssociation::ComputeDistance(
     }
   }
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
-       i++) {
+       ++i) {
     int m_ind =
         static_cast<int>(association_result->unassigned_measurements[i]);
     int m_ind_loc = measurement_ind_g2l[m_ind];
@@ -307,11 +309,11 @@ void HMTrackersObjectsAssociation::ComputeAssociationDistanceMat(
   opt.ref_point = &tmp;
   association_mat->resize(unassigned_tracks.size());
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
-    int fusion_idx = static_cast<int>(unassigned_tracks[i]);
+    size_t fusion_idx = unassigned_tracks[i];
     (*association_mat)[i].resize(unassigned_measurements.size());
     const TrackPtr& fusion_track = fusion_tracks[fusion_idx];
     for (size_t j = 0; j < unassigned_measurements.size(); ++j) {
-      int sensor_idx = static_cast<int>(unassigned_measurements[j]);
+      size_t sensor_idx = unassigned_measurements[j];
       const SensorObjectPtr& sensor_object = sensor_objects[sensor_idx];
       double distance = s_match_distance_thresh_;
       double center_dist =
@@ -354,10 +356,11 @@ void HMTrackersObjectsAssociation::IdAssign(
               unassigned_sensor_objects->end(), 0);
     return;
   }
+
   const std::string sensor_id = sensor_objects[0]->GetSensorId();
 
   std::map<int, int> sensor_id_2_track_ind;
-  for (size_t i = 0; i < num_track; i++) {
+  for (size_t i = 0; i < num_track; ++i) {
     SensorObjectConstPtr obj = fusion_tracks[i]->GetSensorObject(sensor_id);
     /* when camera system has sub-fusion of obstacle & narrow, they share
      * the same track-id sequence. thus, latest camera object is ok for
@@ -372,7 +375,7 @@ void HMTrackersObjectsAssociation::IdAssign(
   }
   std::vector<bool> fusion_used(num_track, false);
   std::vector<bool> sensor_used(num_obj, false);
-  for (size_t i = 0; i < num_obj; i++) {
+  for (size_t i = 0; i < num_obj; ++i) {
     int track_id = sensor_objects[i]->GetBaseObject()->track_id;
     auto it = sensor_id_2_track_ind.find(track_id);
 

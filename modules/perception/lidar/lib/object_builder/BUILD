@@ -14,6 +14,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

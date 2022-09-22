@@ -55,7 +55,6 @@
 
 #include "Eigen/Core"
 
-#include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 
 #include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"

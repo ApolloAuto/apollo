@@ -21,6 +21,7 @@
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -36,12 +37,20 @@ class GroundServiceDetector : public BaseGroundDetector {
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "GroundServiceDetector"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   GroundServicePtr ground_service_ = nullptr;
   GroundServiceContent ground_service_content_;
   double ground_threshold_ = 0.25;
+
+  GroundServiceDetectorConfig ground_service_detector_config_;
 };
 
 }  // namespace lidar

@@ -17,10 +17,12 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +37,11 @@ struct ObstacleTransformerOptions {
   */
 };
 
-class BaseObstacleTransformer {
+class BaseObstacleTransformer : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseObstacleTransformer() = default;
 
@@ -51,10 +57,15 @@ class BaseObstacleTransformer {
   virtual bool Transform(const ObstacleTransformerOptions& options,
                          CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
-  BaseObstacleTransformer(const BaseObstacleTransformer&) = delete;
-  BaseObstacleTransformer& operator=(const BaseObstacleTransformer&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstacleTransformer);
 };  // class BaseObstacleTransformer
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstacleTransformer);

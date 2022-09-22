@@ -21,6 +21,7 @@
 #include "modules/perception/lidar/app/proto/lidar_obstacle_detection_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -46,6 +47,7 @@ bool LidarObstacleDetection::Init(
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();
+  // todo(zero): need fix, always true?
   use_object_builder_ = ("PointPillarsDetection" != config.detector() ||
                          "MaskPillarsDetection" != config.detector());
 
@@ -93,6 +95,20 @@ bool LidarObstacleDetection::Init(
   }
 
   return true;
+}
+
+bool LidarObstacleDetection::Init(const PipelineConfig& pipeline_config) {
+  SceneManagerInitOptions scene_manager_init_options;
+  ACHECK(SceneManager::Instance().Init(scene_manager_init_options));
+
+  return Initialize(pipeline_config);
+}
+
+bool LidarObstacleDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
 }
 
 LidarProcessResult LidarObstacleDetection::Process(

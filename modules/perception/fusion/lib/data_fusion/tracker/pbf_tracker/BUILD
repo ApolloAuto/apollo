@@ -14,7 +14,7 @@ cc_library(
         "//modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion",
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
         "//modules/perception/fusion/lib/interface",
-        "//modules/perception/proto:pbf_tracker_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:pbf_tracker_config_cc_proto",
     ],
 )
 
