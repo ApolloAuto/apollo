@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -164,13 +165,22 @@ filegroup(
 
 install(
     name = "install",
-    data_dest = "planning",
-    library_dest = "planning/lib",
+    data_dest = if_gpu(
+        "planning-gpu",
+        "planning"
+    ),
+    library_dest = if_gpu(
+        "planning-gpu/lib",
+        "planning/lib"
+    ),
     data = [
         ":runtime_data",
-        "cyberfile.xml",
-        "planning.BUILD",
-    ],
+        
+    ] + if_gpu(
+        ["planning-gpu.BUILD", "cyberfile_gpu.xml",],
+        ["planning.BUILD", "cyberfile.xml",]
+    ),
+    rename= if_gpu({"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"}, {}),
     targets = [
         ":libplanning_component.so",
     ],
@@ -181,7 +191,10 @@ install(
 
 install_files(
     name = "pb_planning",
-    dest = "planning",
+    dest = if_gpu(
+        "planning-gpu",
+        "planning"
+    ),
     files = [
         "//modules/planning/proto:auto_tuning_raw_feature_py_pb2",
         "//modules/common_msgs/planning_msgs:decision_py_pb2",
@@ -214,14 +227,20 @@ install_src_files(
 install_src_files(
     name = "install_planning_src",
     src_dir = ["."],
-    dest = "planning/src",
+    dest = if_gpu(
+        "planning-gpu/src",
+        "planning/src"
+    ),
     filter = "*",
 )
 
 install_src_files(
     name = "install_planning_hdrs",
     src_dir = ["."],
-    dest = "planning/include",
+    dest = if_gpu(
+        "planning-gpu/include",
+        "planning/include"
+    ),
     filter = "*.h",
 )
 

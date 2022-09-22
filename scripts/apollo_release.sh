@@ -10,7 +10,7 @@ export PREFIX_DIR=/opt/apollo/neo/packages/
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS="--config=gpu --copt=-march=x86-64 --copt=-mtune=generic --host_copt=-march=x86-64 --host_copt=-mtune=generic --jobs=8 --local_ram_resources=HOST_RAM*0.5"
+BAZEL_OPTS="--config=gpu --copt=-mavx2 --host_copt=-mavx2 --jobs=8 --local_ram_resources=HOST_RAM*0.5"
 SHORTHAND_TARGETS=
 
 function _usage() {

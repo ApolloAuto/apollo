@@ -9,7 +9,7 @@ install(
     data_dest = "cyber-bridge",
     data = [
         ":cyberfile.xml",
-        ":cyber_bridge.BUILD",
+        ":cyber-bridge.BUILD",
     ],
     targets = [
       ":cyber_bridge",

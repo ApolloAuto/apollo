@@ -41,6 +41,7 @@ cc_library(
     name = "third_party_perception_smartereye_lib",
     srcs = ["third_party_perception_smartereye.cc"],
     hdrs = ["third_party_perception_smartereye.h"],
+    alwayslink = True,
     deps = [
         ":third_party_perception_lib",
         "//cyber",
@@ -69,7 +70,7 @@ cc_library(
 cc_binary(
     name = "libthird_party_perception_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":third_party_perception_component_lib"],
 )
 
@@ -89,7 +90,7 @@ install(
     data = [
         ":runtime_data",
         ":cyberfile.xml",
-        ":third_party_perception.BUILD",
+        ":third-party-perception.BUILD",
     ],
     targets = [
         ":libthird_party_perception_component.so",

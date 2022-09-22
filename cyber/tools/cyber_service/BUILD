@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -10,4 +11,10 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
     ],
+)
+
+install(
+    name = "install",
+    py_dest = "cyber/bin",
+    targets = [":cyber_service"]
 )
