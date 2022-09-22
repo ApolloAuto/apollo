@@ -74,13 +74,13 @@ bool FusedClassifier::Init(const StageConfig& stage_config) {
 
   // create plugins
   one_shot_fuser_ptr_ =
-      pipeline::dynamic_unique_cast<CCRFOneShotTypeFusion>(
+      pipeline::dynamic_unique_cast<BaseOneShotTypeFusion>(
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::CCRF_ONESHOT_TYPE_FUSION]));
   CHECK_NOTNULL(one_shot_fuser_ptr_);
 
   sequence_fuser_ptr_ =
-      pipeline::dynamic_unique_cast<CCRFSequenceTypeFusion>(
+      pipeline::dynamic_unique_cast<BaseSequenceTypeFusion>(
           pipeline::PluginFactory::CreatePlugin(
               plugin_config_map_[PluginType::CCRF_SEQUENCE_TYPE_FUSION]));
   CHECK_NOTNULL(sequence_fuser_ptr_);

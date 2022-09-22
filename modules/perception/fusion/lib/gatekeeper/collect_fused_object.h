@@ -19,7 +19,7 @@
 #include <string>
 #include <memory>
 
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
+#include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
@@ -57,7 +57,7 @@ class CollectFusedObject : public pipeline::Stage {
       base::SensorObjectMeasurement* measurement);
 
  private:
-  std::unique_ptr<PbfGatekeeper> gate_keeper_;
+  std::unique_ptr<BaseGatekeeper> gate_keeper_;
   ScenePtr scenes_;
 };
 

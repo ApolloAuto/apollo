@@ -42,21 +42,6 @@ bool CameraDetectionPreprocessor::Init(const StageConfig& stage_config) {
       );
   CHECK_NOTNULL(resize_and_normalize_);
 
-  // todo(zero): need fix
-  // ACHECK(stage_config.has_camera_detection_preprocessor());
-  // camera_detection_preprocessor_config_ =
-  //     stage_config.camera_detection_preprocessor();
-
-  // get_image_data_ =
-  // PluginFactory::CreatePlugin(stage_config.get_image_data());
-  // resize_and_normalize_ =
-  //     PluginFactory::CreatePlugin(stage_config.resize_and_normalize());
-  // if (!get_image_data_->Init(stage_config.get_image_data())) {
-  //   return false;
-  // }
-  // if (!resize_and_normalize_->Init(stage_config.resize_and_normalize())) {
-  //   return false;
-  // }
   return true;
 }
 

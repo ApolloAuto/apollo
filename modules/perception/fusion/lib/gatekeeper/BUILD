@@ -11,7 +11,7 @@ cc_library(
         "//modules/common/util:util_tool",
         "//modules/perception/fusion/base:sensor_data_manager",
         "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
-        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/fusion/lib/interface",
         "//modules/perception/pipeline:stage",
     ],
 )
