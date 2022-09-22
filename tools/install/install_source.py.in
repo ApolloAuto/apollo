@@ -39,10 +39,6 @@ def get_pkg_real_name(name, dev=False, dbg=False, gpu=False):
     new_name = name
     if dev:
         new_name += "-dev"
-    if dbg:
-        new_name += "-dbg"
-    if gpu:
-        new_name += "-gpu"
     return new_name
 
 
@@ -114,9 +110,9 @@ def get_module_name_from_cyberfile(cyberfile_path):
 def replace_config(pkg_module_dict, prefix, config_file):
     """
     e.g.
-    1. /apollo/bazel-bin/modules/planning/libplanning_component.so ==> /opt/apollo/neo/packages/planning-dev/lib/libplanning_component.so
-    2. /apollo/modules/planning/conf/planning_config_navi.pb.txt ==> /opt/apollo/neo/packages/planning-dev/conf/planning_config_navi.pb.txt
-    3. /apollo/modules/planning/dag/planning.dag ==> /opt/apollo/neo/packages/planning-dev/dag/planning.dag
+    1. /apollo/bazel-bin/modules/planning/libplanning_component.so ==> /opt/apollo/neo/packages/planning-dev/local/lib/libplanning_component.so
+    # 2. /apollo/modules/planning/conf/planning_config_navi.pb.txt ==> /opt/apollo/neo/packages/planning-dev/local/conf/planning_config_navi.pb.txt
+    # 3. /apollo/modules/planning/dag/planning.dag ==> /opt/apollo/neo/packages/planning-dev/local/dag/planning.dag
     """
     for pkg_name, module_name in pkg_module_dict.items():
         shell_cmd("sed -i 's/\/apollo\/bazel-bin\/{}\//{}{}\/local\/lib\//g' {}".format(module_name, prefix.replace("/", "\/"), pkg_name, config_file))
@@ -135,8 +131,8 @@ def replace_config_dir(full_c_d, prefix, pkg_module_dict):
 def fix_configs_in_pkg():
     conf_dirs = [
         "/local/dag",
-        "/local/launch",
-        "/local/conf"
+        # "/local/launch",
+        # "/local/conf"
     ]
     pkg_module_dict = {}
     for d in os.listdir(prefix):
@@ -192,8 +188,8 @@ def main(args):
     prefix = args.prefix
 
     pkg_name = args.pkg_name
-    dbg = False
-    gpu = False
+    dbg = args.dbg
+    gpu = args.gpu
     dev = True
 
     # Transform install prefix if DESTDIR is set.

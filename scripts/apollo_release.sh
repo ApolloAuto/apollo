@@ -10,8 +10,11 @@ export PREFIX_DIR=/opt/apollo/neo/packages/
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS="--config=gpu --copt=-mavx2 --host_copt=-mavx2 --jobs=8 --local_ram_resources=HOST_RAM*0.5"
+BAZEL_OPTS=" --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5"
 SHORTHAND_TARGETS=
+CMDLINE_OPTIONS=
+INSTALL_OPTIONS=
+USE_GPU=-1
 
 function _usage() {
     info "Usage: $0 <module>(Can be empty) [Options]"
@@ -73,6 +76,26 @@ function parse_cmdline_args() {
         exit 1
     fi
     SHORTHAND_TARGETS="${remained_args}"
+}
+
+function determine_cpu_or_gpu_build() {
+  if [ "${USE_GPU}" -lt 0 ]; then
+    # USE_GPU unset, defaults to USE_GPU_TARGET
+    USE_GPU="${USE_GPU_TARGET}"
+  elif [ "${USE_GPU}" -gt "${USE_GPU_TARGET}" ]; then
+    warning "USE_GPU=${USE_GPU} without GPU can't compile. Exiting ..."
+    exit 1
+  fi
+
+  if [ "${USE_GPU}" -eq 1 ]; then
+    CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
+    INSTALL_OPTIONS=" --gpu ${INSTALL_OPTIONS}"
+
+    ok "Running GPU build."
+  else
+    CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
+    ok "Running CPU build."
+  fi
 }
 
 function determine_release_targets() {
@@ -188,12 +211,12 @@ function resolve_directory_path() {
 function run_install() {
     local install_targets
     install_targets="$(determine_release_targets ${SHORTHAND_TARGETS})"
-    bazel run ${BAZEL_OPTS} ${install_targets} \
-        -- ${install_opts} "${PREFIX_DIR}"
+    bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${install_targets} \
+        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
     
     # install files copy from source code.
-    bazel run ${BAZEL_OPTS} //:install_src \
-        -- ${install_opts} "${PREFIX_DIR}"
+    bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install_src \
+        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
 }
 
 function main() {
@@ -206,6 +229,8 @@ function main() {
     if [[ "${PRE_CLEAN}" -gt 0 ]]; then
         install_opts="${install_opts} --pre_clean"
     fi
+
+    determine_cpu_or_gpu_build
 
     run_install
 
