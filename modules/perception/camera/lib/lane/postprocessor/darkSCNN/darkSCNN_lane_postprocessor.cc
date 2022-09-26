@@ -116,6 +116,41 @@ bool DarkSCNNLanePostprocessor::Init(
   return true;
 }
 
+bool DarkSCNNLanePostprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  // todo(zero): repeated with darkSCNN::DarkSCNNParam??
+  // Read postprocessor parameter
+  lane_postprocessor_param_ = stage_config.darkscnn_lane_postprocessor_param();
+
+  input_offset_x_ = lane_postprocessor_param_.input_offset_x();
+  input_offset_y_ = lane_postprocessor_param_.input_offset_y();
+  lane_map_width_ = lane_postprocessor_param_.resize_width();
+  lane_map_height_ = lane_postprocessor_param_.resize_height();
+  AINFO << "offset_x=" << input_offset_x_ << " offset_y=" << input_offset_y_
+        << " lane_map_width=" << lane_map_width_
+        << " lane_map_height_=" << lane_map_height_;
+
+  roi_height_ = lane_postprocessor_param_.roi_height();
+  roi_start_ = lane_postprocessor_param_.roi_start();
+  roi_width_ = lane_postprocessor_param_.roi_width();
+
+  lane_type_num_ = static_cast<int>(spatialLUTind.size());
+  AINFO << "lane_type_num_: " << lane_type_num_;
+  return true;
+}
+
+bool DarkSCNNLanePostprocessor::Process(DataFrame* data_frame) {
+  CameraFrame* frame = data_frame->camera_frame;
+  LanePostprocessorOptions options;
+  Process2D(options, frame);
+  frame->calibration_service->Update(frame);
+  Process3D(options, frame);
+  return true;
+}
+
 bool DarkSCNNLanePostprocessor::Process2D(
     const LanePostprocessorOptions& options, CameraFrame* frame) {
   ADEBUG << "Begin to Process2D.";
@@ -473,10 +508,6 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
-}
-
-std::string DarkSCNNLanePostprocessor::Name() const {
-  return "DarkSCNNLanePostprocessor";
 }
 
 REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);

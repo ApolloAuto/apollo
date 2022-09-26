@@ -28,7 +28,7 @@ export default class Selector extends React.Component {
       name, options, currentOption, onChange,
     } = this.props;
 
-    this.entries = this.props.options.map((key) => (
+    this.entries = options.map((key) => (
             <option value={key} key={key}>{key}</option>
     ));
     this.entries.unshift(

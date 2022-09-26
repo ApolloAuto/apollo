@@ -23,12 +23,12 @@ import matplotlib.pyplot as plt
 
 from cyber.python.cyber_py3.record import RecordReader
 from modules.tools.record_analyzer.lidar_endtoend_analyzer import LidarEndToEndAnalyzer
-from modules.canbus.proto import chassis_pb2
-from modules.control.proto import control_cmd_pb2
-from modules.drivers.proto import pointcloud_pb2
-from modules.perception.proto import perception_obstacle_pb2
-from modules.planning.proto import planning_pb2
-from modules.prediction.proto import prediction_obstacle_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.control_msgs import control_cmd_pb2
+from modules.common_msgs.sensor_msgs import pointcloud_pb2
+from modules.common_msgs.perception_msgs import perception_obstacle_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
+from modules.common_msgs.prediction_msgs import prediction_obstacle_pb2
 from modules.tools.record_analyzer.module_control_analyzer import ControlAnalyzer
 from modules.tools.record_analyzer.module_planning_analyzer import PlannigAnalyzer
 

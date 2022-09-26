@@ -13,4 +13,6 @@ message FusionComponentConfig {
       [default = "/perception/vehicle/obstacles"];
   optional string output_viz_fused_content_channel_name = 7
       [default = "/perception/inner/visualization/FusedObjects"];
+  optional string sensor_fusion_conf_dir = 8;
+  optional string sensor_fusion_conf_file = 9;
 }

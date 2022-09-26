@@ -36,6 +36,12 @@ bash ${CURR_DIR}/install_protobuf.sh
 info "Install fast-rtps ..."
 bash ${CURR_DIR}/install_fast-rtps.sh
 
+# absl
+bash ${CURR_DIR}/install_abseil.sh
+
+# gflags and glog
+bash ${CURR_DIR}/install_gflags_glog.sh
+
 # Clean up cache to reduce layer size.
 apt-get clean && \
     rm -rf /var/lib/apt/lists/*

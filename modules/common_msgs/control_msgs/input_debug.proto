@@ -1,0 +1,11 @@
+syntax = "proto2";
+package apollo.control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message InputDebug {
+  optional apollo.common.Header localization_header = 1;
+  optional apollo.common.Header canbus_header = 2;
+  optional apollo.common.Header trajectory_header = 3;
+  optional apollo.common.Header latest_replan_trajectory_header = 4;
+}

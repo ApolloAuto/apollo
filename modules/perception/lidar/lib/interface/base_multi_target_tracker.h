@@ -19,6 +19,7 @@
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -28,7 +29,13 @@ struct MultiTargetTrackerInitOptions {};
 
 struct MultiTargetTrackerOptions {};
 
-class BaseMultiTargetTracker {
+class BaseMultiTargetTracker : public pipeline::Stage {
+ public:
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
+
  public:
   BaseMultiTargetTracker() = default;
 
@@ -43,6 +50,12 @@ class BaseMultiTargetTracker {
   // tracked objects should be filled, required,
   virtual bool Track(const MultiTargetTrackerOptions& options,
                      LidarFrame* frame) = 0;
+
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
 
   virtual std::string Name() const = 0;
 

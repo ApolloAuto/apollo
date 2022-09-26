@@ -7,8 +7,8 @@ cc_library(
     name = "ft_definitions",
     hdrs = ["ft_definitions.h"],
     deps = [
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/perception/proto:perception_camera_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_camera_cc_proto",
         "//modules/v2x/fusion/libs/common:v2x_object",
         "//modules/v2x/proto:v2x_obstacles_cc_proto",
     ],

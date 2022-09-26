@@ -32,7 +32,7 @@
 #include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
-#include "modules/prediction/util/data_extraction.h"
+#include "modules/common/util/data_extraction.h"
 
 namespace apollo {
 namespace prediction {

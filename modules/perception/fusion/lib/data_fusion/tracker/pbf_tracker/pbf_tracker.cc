@@ -37,9 +37,6 @@ std::string PbfTracker::s_motion_fusion_method_ =  // NOLINT
     "KalmanMotionFusion";
 std::string PbfTracker::s_shape_fusion_method_ = "PbfShapeFusion";  // NOLINT
 
-PbfTracker::PbfTracker() {}
-
-PbfTracker::~PbfTracker() {}
 
 bool PbfTracker::InitParams() {
   BaseInitOptions options;
@@ -141,8 +138,6 @@ void PbfTracker::UpdateWithoutMeasurement(const TrackerOptions& options,
                                          options.match_distance);
   track_->UpdateWithoutSensorObject(sensor_id, measurement_timestamp);
 }
-
-std::string PbfTracker::Name() const { return "PbfTracker"; }
 
 }  // namespace fusion
 }  // namespace perception

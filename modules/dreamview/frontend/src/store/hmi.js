@@ -11,6 +11,11 @@ const TELEOP_MODE = Object.freeze({
 });
 
 export default class HMI {
+
+  constructor(studioConnector) {
+    this.studioConnector = studioConnector;
+  }
+
   modes = [];
 
   @observable currentMode = 'none';
@@ -174,7 +179,6 @@ export default class HMI {
     if (newStatus.monitoredComponents) {
       const newKeyList = JSON.stringify(
         Object.keys(newStatus.monitoredComponents).sort(),
-
       );
       const curKeyList = JSON.stringify(this.componentStatus.keys().sort());
       if (newKeyList !== curKeyList) {

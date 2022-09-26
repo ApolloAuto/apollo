@@ -23,6 +23,7 @@
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -291,6 +292,61 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   if (!InitFeatureExtractor(model_root)) {
     return false;
   }
+  return true;
+}
+
+bool YoloObstacleDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  yolo_obstacle_detector_config_ = stage_config.yolo_obstacle_detector_config();
+  gpu_id_ = yolo_obstacle_detector_config_.gpu_id();
+  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          yolo_obstacle_detector_config_.camera_name());
+  ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+
+  yolo_param_ = yolo_obstacle_detector_config_.yolo_param();
+  const auto &model_param = yolo_param_.model_param();
+  //todo(zero): options.root_dir
+  std::string root_dir = yolo_obstacle_detector_config_.root_dir();
+  std::string model_root =
+      GetAbsolutePath(root_dir, model_param.model_name());
+  std::string anchors_file =
+      GetAbsolutePath(model_root, model_param.anchors_file());
+  std::string types_file =
+      GetAbsolutePath(model_root, model_param.types_file());
+  std::string expand_file =
+      GetAbsolutePath(model_root, model_param.expand_file());
+  LoadInputShape(model_param);
+  LoadParam(yolo_param_);
+  min_dims_.min_2d_height /= static_cast<float>(height_);
+
+  if (!LoadAnchors(anchors_file, &anchors_)) {
+    return false;
+  }
+  if (!LoadTypes(types_file, &types_)) {
+    return false;
+  }
+  if (!LoadExpand(expand_file, &expands_)) {
+    return false;
+  }
+  ACHECK(expands_.size() == types_.size());
+  if (!InitNet(yolo_param_, model_root)) {
+    return false;
+  }
+  InitYoloBlob(yolo_param_.net_param());
+  if (!InitFeatureExtractor(model_root)) {
+    return false;
+  }
+  return true;
+}
+
+bool YoloObstacleDetector::Process(DataFrame* data_frame) {
   return true;
 }
 

@@ -29,7 +29,7 @@
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/proto/lattice_structure.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

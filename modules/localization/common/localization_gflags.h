@@ -30,7 +30,7 @@ DECLARE_double(localization_publish_freq);
 DECLARE_string(localization_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
-DECLARE_bool(enable_map_reference_unify);
+
 DECLARE_bool(enable_watchdog);
 
 DECLARE_double(gps_time_delay_tolerance);

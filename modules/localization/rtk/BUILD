@@ -15,20 +15,19 @@ cc_library(
         "rtk_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
+    alwayslink = True,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/util:message_util",
-        "//modules/common/util:string_util",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
-        "//modules/drivers/gnss/proto:ins_cc_proto",
-        "//modules/localization/proto:gps_cc_proto",
-        "//modules/localization/proto:imu_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/sensor_msgs:gnss_best_pose_cc_proto",
+        "//modules/common_msgs/sensor_msgs:gnss_cc_proto",
+        "//modules/common_msgs/sensor_msgs:ins_cc_proto",
+        "//modules/common_msgs/localization_msgs:gps_cc_proto",
+        "//modules/common_msgs/localization_msgs:imu_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/localization/proto:rtk_config_cc_proto",
         "//modules/transform:transform_broadcaster",
         "@com_google_googletest//:gtest",
@@ -39,7 +38,7 @@ cc_library(
 cc_binary(
     name = "librtk_localization_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":rtk_localization_component_lib"],
 )
 
@@ -50,7 +49,6 @@ cc_test(
     data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",
         "@com_google_googletest//:gtest_main",
@@ -59,6 +57,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib/rtk",
     targets = [
         ":librtk_localization_component.so",
     ],

@@ -1,5 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install_files")
+load("//tools/install:install.bzl", "install")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -15,13 +15,8 @@ py_binary(
     ],
 )
 
-install_files(
+install(
     name = "install",
-    dest = "bin",
-    files = [
-        ":cyber_channel.py",
-    ],
-    rename = {
-        "bin/cyber_channel.py": "cyber_channel",
-    },
+    py_dest = "cyber/bin",
+    targets = [":cyber_channel"]
 )

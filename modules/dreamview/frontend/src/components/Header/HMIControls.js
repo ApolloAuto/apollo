@@ -9,9 +9,6 @@ export default class HMIControls extends React.Component {
   render() {
     const {
       dockerImage,
-      modes, currentMode,
-      maps, currentMap,
-      vehicles, currentVehicle,
       isCoDriver,
       isMute,
     } = this.props.store.hmi;
@@ -41,14 +38,7 @@ export default class HMIControls extends React.Component {
                 >
                     Mute
                 </button>
-                <HMISelectors
-                    modes={modes}
-                    currentMode={currentMode}
-                    maps={maps}
-                    currentMap={currentMap}
-                    vehicles={vehicles}
-                    currentVehicle={currentVehicle}
-                />
+                <HMISelectors />
             </React.Fragment>
     );
   }

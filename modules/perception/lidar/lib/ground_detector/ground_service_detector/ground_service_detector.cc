@@ -19,7 +19,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
-#include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/ground_service_detector_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -51,6 +51,29 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
     AERROR << "Ground service is nullptr, Init scene manager first !";
     return false;
   }
+  return true;
+}
+
+bool GroundServiceDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  ground_service_detector_config_ =
+      stage_config.ground_service_detector_config();
+
+  ground_threshold_ = ground_service_detector_config_.ground_threshold();
+
+  ground_service_ = std::dynamic_pointer_cast<GroundService>(
+      SceneManager::Instance().Service("GroundService"));
+  if (ground_service_ == nullptr) {
+    AERROR << "Ground service is nullptr, Init scene manager first !";
+    return false;
+  }
+  return true;
+}
+
+bool GroundServiceDetector::Process(DataFrame* data_frame) {
   return true;
 }
 

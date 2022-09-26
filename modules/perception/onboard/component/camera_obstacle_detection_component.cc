@@ -72,10 +72,12 @@ static bool SetCameraHeight(const std::string &sensor_name,
                             float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
+
   try {
     YAML::Node lidar_height =
         YAML::LoadFile(
           params_dir + "/" + lidar_sensor_name + "_height.yaml");
+      
     base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
     AINFO << base_h;
     YAML::Node camera_ex =
@@ -221,7 +223,7 @@ bool CameraObstacleDetectionComponent::Init() {
     return false;
   }
 
-  SetCameraHeightAndPitch();
+  //SetCameraHeightAndPitch();
 
   // Init visualizer
   // TODO(techoe, yg13): homography from image to ground should be
@@ -244,8 +246,8 @@ bool CameraObstacleDetectionComponent::Init() {
       ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
       image_height_, image_width_));
 
-  homography_im2car_ = visualize_.homography_im2car(visual_camera_);
-  camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
+  //homography_im2car_ = visualize_.homography_im2car(visual_camera_);
+  //camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
   if (enable_cipv_) {
     camera::BaseCipv* cipv = camera::BaseCipvRegisterer::
@@ -441,6 +443,15 @@ int CameraObstacleDetectionComponent::InitConfig() {
           write_visual_img_);
   AINFO << config_info_str;
 
+
+  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
+  std::string camera_obstacle_perception_conf_file =
+      GetAbsolutePath(camera_perception_init_options_.root_dir, camera_perception_init_options_.conf_file);
+  camera_obstacle_perception_conf_file = GetAbsolutePath(work_root, camera_obstacle_perception_conf_file);
+
+  ACHECK(
+      cyber::common::GetProtoFromFile(camera_obstacle_perception_conf_file, &camera_obstacle_detection_config_))
+      << "failed to load camera obstacle perception config file " << camera_obstacle_perception_conf_file;
   return cyber::SUCC;
 }
 
@@ -496,7 +507,8 @@ int CameraObstacleDetectionComponent::InitSensorInfo() {
 
 int CameraObstacleDetectionComponent::InitAlgorithmPlugin() {
   camera_obstacle_pipeline_.reset(new camera::ObstacleDetectionCamera);
-  if (!camera_obstacle_pipeline_->Init(camera_perception_init_options_)) {
+  //if (!camera_obstacle_pipeline_->Init(camera_perception_init_options_)) {
+    if (!camera_obstacle_pipeline_->Init(camera_obstacle_detection_config_)) {
     AERROR << "camera_obstacle_pipeline_->Init() failed";
     return cyber::FAIL;
   }
@@ -661,11 +673,13 @@ void CameraObstacleDetectionComponent::OnMotionService(
   // TODO(@yg13): output motion in text file
 }
 
+/*
 void CameraObstacleDetectionComponent::SetCameraHeightAndPitch() {
   camera_obstacle_pipeline_->SetCameraHeightAndPitch(
       camera_height_map_, name_camera_pitch_angle_diff_map_,
       default_camera_pitch_);
 }
+*/
 
 int CameraObstacleDetectionComponent::InternalProc(
     const std::shared_ptr<apollo::drivers::Image const> &in_message,
@@ -721,10 +735,11 @@ int CameraObstacleDetectionComponent::InternalProc(
 
   ++frame_id_;
   // Run camera perception pipeline
-
-  if (!camera_obstacle_pipeline_->Perception(camera_perception_options_,
-                                             &camera_frame)) {
-    AERROR << "camera_obstacle_pipeline_->Perception() failed"
+    
+    pipeline::DataFrame data_frame;
+    data_frame.camera_frame = &camera_frame;
+    if (!camera_obstacle_pipeline_->Process(&data_frame)) {
+    AERROR << "camera_obstacle_pipeline_->Process() failed"
            << " msg_timestamp: " << msg_timestamp;
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     prefused_message->error_code_ = *error_code;

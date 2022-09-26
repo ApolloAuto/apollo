@@ -25,12 +25,10 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gflags/gflags.h"
 #include "gtest/gtest_prod.h"
 
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/routing/proto/routing.pb.h"
-
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/route_segments.h"

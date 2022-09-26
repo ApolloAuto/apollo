@@ -11,11 +11,12 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/traffic_light/detector/recognition/proto:recognition_cc_proto",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:recognition_cc_proto",
     ],
 )
 
@@ -25,7 +26,7 @@ cc_library(
     hdrs = ["recognition.h"],
     deps = [
         ":classify",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",
     ],

@@ -18,11 +18,13 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -34,12 +36,14 @@ struct FusionInitOptions {
 
 struct FusionOptions {};
 
-class BaseFusionSystem {
+class BaseFusionSystem : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseFusionSystem() = default;
   virtual ~BaseFusionSystem() = default;
-  BaseFusionSystem(const BaseFusionSystem&) = delete;
-  BaseFusionSystem& operator=(const BaseFusionSystem&) = delete;
 
   virtual bool Init(const FusionInitOptions& options) = 0;
 
@@ -51,10 +55,18 @@ class BaseFusionSystem {
                     const base::FrameConstPtr& sensor_frame,
                     std::vector<base::ObjectPtr>* fused_objects) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
  protected:
   std::string main_sensor_;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseFusionSystem);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseFusionSystem);

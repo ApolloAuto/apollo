@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"

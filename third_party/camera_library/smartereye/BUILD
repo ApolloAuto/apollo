@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,4 +19,11 @@ cc_library(
         "-Llib",
     ],
     visibility = ["//visibility:public"],
+)
+
+install_src_files(
+    name = "headers",
+    src_dir = ["include"],
+    dest = "3rd-camera-library/include",
+    filter = "*",
 )

@@ -22,7 +22,7 @@
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/roi_boundary_filter_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.pb.h"
 
 using apollo::common::EigenVector;
 
@@ -35,6 +35,10 @@ namespace perception {
 namespace lidar {
 
 using cyber::common::GetAbsolutePath;
+
+ROIBoundaryFilter::ROIBoundaryFilter(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -101,6 +105,16 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
   objects.resize(count);
   AINFO << "Roi boundary filter, " << objects_valid_flag_.size() << " to "
         << count;
+  return true;
+}
+
+bool ROIBoundaryFilter::Init(const PluginConfig& plugin_config) {
+  ROIBoundaryFilterConfig config = plugin_config.roi_boundary_filter_config();
+
+  distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
+  confidence_threshold_ = config.confidence_threshold();
+  cross_roi_threshold_ = config.cross_roi_threshold();
+  inside_threshold_ = config.inside_threshold();
   return true;
 }
 

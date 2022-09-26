@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.perception;
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 message MotionType {
   optional float m00 = 1;

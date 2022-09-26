@@ -16,6 +16,8 @@
 
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
+#include "gtest/gtest.h"
+
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -25,8 +27,6 @@
 namespace apollo {
 namespace perception {
 namespace fusion {
-/*
-TODO(all): not compiling. to be fixed
 
 TEST(PbfGatekeeperTest, test) {
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
@@ -215,7 +215,7 @@ TEST(PbfGatekeeperTest, test) {
   gate_keeper.params_.min_camera_publish_distance = 50;
   EXPECT_FALSE(gate_keeper.AbleToPublish(track3));
 }
-*/
+
 }  // namespace fusion
 }  // namespace perception
 }  // namespace apollo

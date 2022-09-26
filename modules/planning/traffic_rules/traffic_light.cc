@@ -31,7 +31,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
 #include "modules/planning/common/util/util.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {

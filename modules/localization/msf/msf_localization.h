@@ -30,11 +30,11 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
+#include "modules/common_msgs/sensor_msgs/imu.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"

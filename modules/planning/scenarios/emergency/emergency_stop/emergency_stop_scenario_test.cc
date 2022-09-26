@@ -49,7 +49,7 @@ TEST_F(EmergencyStopScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new EmergencyStopScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::EMERGENCY_STOP);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::EMERGENCY_STOP);
 }
 
 }  // namespace emergency_stop

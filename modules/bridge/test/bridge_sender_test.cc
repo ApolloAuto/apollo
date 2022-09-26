@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <thread>
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"

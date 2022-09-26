@@ -25,7 +25,7 @@
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/proto/pad_msg.pb.h"
+#include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -81,7 +81,7 @@ class NaviPlanning : public PlanningBase {
   /**
    * @brief make driving decisions by received planning pad msg
    */
-  void ProcessPadMsg(DrivingAction drvie_action);
+  void ProcessPadMsg(PadMessage::DrivingAction drvie_action);
 
   /**
    * @brief get the lane Id of the lane in which the vehicle is located

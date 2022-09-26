@@ -1,0 +1,153 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/map_msgs/map_lane.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+import "modules/common_msgs/prediction_msgs/lane_graph.proto";
+import "modules/common_msgs/prediction_msgs/prediction_point.proto";
+
+message Lane {
+  // Features of all possible current lanes.
+  repeated LaneFeature current_lane_feature = 1;
+
+  // Features of the most possible current lane.
+  optional LaneFeature lane_feature = 2;
+
+  // Features of all nearby lanes.
+  repeated LaneFeature nearby_lane_feature = 3;
+
+  // Lane graph
+  optional LaneGraph lane_graph = 4;
+  optional LaneGraph lane_graph_ordered = 5;
+
+  // For modeling
+  optional double label_update_time_delta = 26;
+}
+
+message LaneFeature {
+  optional string lane_id = 1;
+  optional uint32 lane_turn_type = 2;
+  optional double lane_s = 3;
+  optional double lane_l = 4;
+  optional double angle_diff = 5;
+  optional double dist_to_left_boundary = 6;
+  optional double dist_to_right_boundary = 7;
+  optional double lane_heading = 8;
+  optional apollo.hdmap.Lane.LaneType lane_type = 9;
+}
+
+message JunctionExit {
+  optional string exit_lane_id = 1;
+  optional apollo.common.Point3D exit_position = 2;
+  optional double exit_heading = 3;
+  optional double exit_width = 4;
+}
+
+message JunctionFeature {
+  optional string junction_id = 1;
+  optional double junction_range = 2;
+  optional LaneFeature enter_lane = 3;
+  repeated JunctionExit junction_exit = 4;
+  repeated double junction_mlp_feature = 5;
+  repeated int32 junction_mlp_label = 6;  // dim is number of masks, i.e. 12
+  repeated double junction_mlp_probability = 7;
+  repeated string start_lane_id = 8;
+}
+
+message ObstaclePriority {
+  enum Priority {
+    CAUTION = 1;
+    NORMAL = 2;
+    IGNORE = 3;
+  }
+  optional Priority priority = 25 [default = NORMAL];
+}
+
+message ObstacleInteractiveTag {
+  enum InteractiveTag {
+    INTERACTION = 1;
+    NONINTERACTION = 2;
+  }
+  optional InteractiveTag interactive_tag = 37 [default = NONINTERACTION];
+}
+message Trajectory {
+  optional double probability = 1;  // probability of this trajectory
+  repeated apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
+// next id = 40
+message Feature {
+  // Obstacle ID
+  optional int32 id = 1;
+
+  // Obstacle features
+  repeated apollo.common.Point3D polygon_point = 30;
+  optional apollo.common.Point3D position = 2;
+  optional apollo.common.Point3D front_position = 27;
+  optional apollo.common.Point3D velocity = 3;
+  optional apollo.common.Point3D raw_velocity = 28;  // from perception
+  optional apollo.common.Point3D acceleration = 4;
+  optional double velocity_heading = 5;
+  optional double speed = 6;
+  optional double acc = 7;
+  optional double theta = 8;
+  optional double length = 9;
+  optional double width = 10;
+  optional double height = 11;
+  optional double tracking_time = 12;
+  optional double timestamp = 13;
+
+  // Obstacle type-specific features
+  optional Lane lane = 14;
+  optional JunctionFeature junction_feature = 26;
+
+  // Obstacle tracked features
+  optional apollo.common.Point3D t_position = 16;
+  optional apollo.common.Point3D t_velocity = 17 [deprecated = true];
+  optional double t_velocity_heading = 18 [deprecated = true];
+  optional double t_speed = 19 [deprecated = true];
+  optional apollo.common.Point3D t_acceleration = 20 [deprecated = true];
+  optional double t_acc = 21 [deprecated = true];
+
+  optional bool is_still = 22 [default = false];
+  optional apollo.perception.PerceptionObstacle.Type type = 23;
+  optional double label_update_time_delta = 24;
+
+  optional ObstaclePriority priority = 25;
+  optional ObstacleInteractiveTag interactive_tag = 37;
+
+  optional bool is_near_junction = 29 [default = false];
+
+  // Obstacle ground-truth labels:
+  repeated PredictionTrajectoryPoint future_trajectory_points = 31;
+
+  // Obstacle short-term predicted trajectory points
+  repeated apollo.common.TrajectoryPoint
+      short_term_predicted_trajectory_points = 32;
+
+  // Obstacle predicted trajectories
+  repeated Trajectory predicted_trajectory = 33;
+
+  // ADC trajectory at the same frame, and ADC trajectory timestamp
+  repeated apollo.common.TrajectoryPoint adc_trajectory_point = 34;
+  optional double adc_timestamp = 38;
+  optional apollo.perception.PerceptionObstacle adc_localization = 39;
+
+  // Surrounding lanes
+  repeated string surrounding_lane_id = 35;
+  repeated string within_lane_id = 36;
+}
+
+message ObstacleHistory {
+  repeated Feature feature = 1;
+  optional bool is_trainable = 2 [default = false];
+}
+
+message FrameEnv {
+  optional double timestamp = 1;
+  optional ObstacleHistory ego_history = 2;
+  repeated ObstacleHistory obstacles_history = 3;
+}

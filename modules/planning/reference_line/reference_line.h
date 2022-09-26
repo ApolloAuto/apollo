@@ -25,13 +25,13 @@
 #include <vector>
 
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/map/proto/map.pb.h"
-#include "modules/map/proto/map_geometry.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
+#include "modules/common_msgs/map_msgs/map_geometry.pb.h"
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 #include "modules/planning/reference_line/reference_point.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {

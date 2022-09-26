@@ -17,8 +17,6 @@
 
 #include <map>
 
-#include "modules/perception/lidar/lib/detector/cnn_segmentation/proto/cnnseg_config.pb.h"
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -143,6 +141,110 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
          return false;
      }
   }*/
+  return true;
+}
+
+bool CNNSegmentation::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  //todo(zero): options.sensor_name
+  // if (!FLAGS_lidar_model_version.empty()) {
+  //   sensor_name_ = FLAGS_lidar_model_version;
+  // } else {
+  //   sensor_name_ = options.sensor_name;
+  // }
+
+  cnnseg_config_ = stage_config.cnnseg_config();
+  AINFO << "CNNSegmentation: " << cnnseg_config_.DebugString();
+
+  // get cnnseg params
+  ACHECK(GetProtoFromFile(cnnseg_config_.param_file(), &cnnseg_param_))
+      << "Failed to parse CNNSegParam config file." << cnnseg_config_.param_file();
+  ACHECK(GetProtoFromFile(cnnseg_config_.engine_file(), &spp_engine_config_))
+      << "Failed to parse SppEngine config file." << cnnseg_config_.engine_file();
+
+  // init feature parameters
+  const FeatureParam& feature_param = cnnseg_param_.feature_param();
+  range_ = feature_param.point_cloud_range();
+  width_ = feature_param.width();
+  height_ = feature_param.height();
+  min_height_ = feature_param.min_height();
+  max_height_ = feature_param.max_height();
+
+  // init inference model
+  const NetworkParam& network_param = cnnseg_param_.network_param();
+  std::vector<std::string> output_names;
+  output_names.push_back(network_param.instance_pt_blob());
+  output_names.push_back(network_param.category_pt_blob());
+  output_names.push_back(network_param.confidence_pt_blob());
+  output_names.push_back(network_param.height_pt_blob());
+  output_names.push_back(network_param.heading_pt_blob());
+  output_names.push_back(network_param.class_pt_blob());
+  std::vector<std::string> input_names;
+  input_names.push_back(network_param.feature_blob());
+  inference_.reset(
+      inference::CreateInferenceByName(cnnseg_param_.model_type(),
+                                       cnnseg_config_.proto_file(),
+                                       cnnseg_config_.weight_file(),
+                                       output_names,
+                                       input_names));
+  CHECK_NOTNULL(inference_.get());
+
+  gpu_id_ = cnnseg_param_.has_gpu_id() ? cnnseg_param_.gpu_id() : -1;
+  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  inference_->set_gpu_id(gpu_id_);  // inference sets CPU mode when -1
+
+  std::map<std::string, std::vector<int>> input_shapes;
+  auto& input_shape = input_shapes[network_param.feature_blob()];
+  input_shape = {1, 8, height_, width_};
+  if (!feature_param.use_intensity_feature()) {
+    input_shape[1] -= 2;
+  }
+  if (!feature_param.use_constant_feature()) {
+    input_shape[1] -= 2;
+  }
+  ACHECK(inference_->Init(input_shapes)) << "Failed to init inference.";
+
+  // init blobs
+  instance_pt_blob_ = inference_->get_blob(network_param.instance_pt_blob());
+  CHECK_NOTNULL(instance_pt_blob_.get());
+  category_pt_blob_ = inference_->get_blob(network_param.category_pt_blob());
+  CHECK_NOTNULL(category_pt_blob_.get());
+  confidence_pt_blob_ =
+      inference_->get_blob(network_param.confidence_pt_blob());
+  CHECK_NOTNULL(confidence_pt_blob_.get());
+  height_pt_blob_ = inference_->get_blob(network_param.height_pt_blob());
+  CHECK_NOTNULL(height_pt_blob_.get());
+  feature_blob_ = inference_->get_blob(network_param.feature_blob());
+  CHECK_NOTNULL(feature_blob_.get());
+  if (cnnseg_param_.do_classification()) {
+    classify_pt_blob_ = inference_->get_blob(network_param.class_pt_blob());
+    CHECK_NOTNULL(classify_pt_blob_.get());
+  }
+  if (cnnseg_param_.do_heading()) {
+    heading_pt_blob_ = inference_->get_blob(network_param.heading_pt_blob());
+    CHECK_NOTNULL(heading_pt_blob_.get());
+  }
+
+  // init feature generator
+  feature_generator_.reset(new FeatureGenerator);
+  ACHECK(feature_generator_->Init(feature_param, feature_blob_.get()))
+      << "Failed to init feature generator.";
+
+  point2grid_.reserve(kDefaultPointCloudSize);
+
+  // init cluster and background segmentation methods
+  ACHECK(InitClusterAndBackgroundSegmentation());
+
+  return true;
+}
+
+bool CNNSegmentation::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
   return true;
 }
 
@@ -317,7 +419,7 @@ bool CNNSegmentation::Detect(const LidarDetectorOptions& options,
   // processing clustering
   GetObjectsFromSppEngine(&frame->segmented_objects);
 
-  AINFO << "CNNSEG: mapping: " << mapping_time_ << "\t"
+  AERROR << "CNNSEG: mapping: " << mapping_time_ << "\t"
         << " feature: " << feature_time_ << "\t"
         << " infer: " << infer_time_ << "\t"
         << " fg-seg: " << fg_seg_time_ << "\t"

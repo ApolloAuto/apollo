@@ -29,7 +29,7 @@ import simplejson
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 
-from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
+from modules.common_msgs.prediction_msgs.prediction_obstacle_pb2 import PredictionObstacles
 
 
 def prediction_publisher(prediction_channel, rate):

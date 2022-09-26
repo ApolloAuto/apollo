@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package apollo.relative_map;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/localization_msgs/localization.proto";
+import "modules/common_msgs/map_msgs/map.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+
+message NavigationPath {
+  optional apollo.common.Path path = 1;
+  // highest = 0 which can directly reach destination; change lane indicator
+  optional uint32 path_priority = 2;
+}
+
+message NavigationInfo {
+  optional apollo.common.Header header = 1;
+  repeated NavigationPath navigation_path = 2;
+}
+
+// The map message in transmission format.
+message MapMsg {
+  optional apollo.common.Header header = 1;
+
+  // Coordination: FLU
+  // x: Forward
+  // y: Left
+  // z: Up
+  optional apollo.hdmap.Map hdmap = 2;
+
+  // key: type string; the lane id in Map
+  // value: Navigation path; the reference line of the lane
+  map<string, NavigationPath> navigation_path = 3;
+
+  // lane marker info from perception
+  optional apollo.perception.LaneMarkers lane_marker = 4;
+
+  // localization
+  optional apollo.localization.LocalizationEstimate localization = 5;
+}

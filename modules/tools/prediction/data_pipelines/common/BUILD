@@ -26,7 +26,7 @@ py_library(
     name = "feature_io",
     srcs = ["feature_io.py"],
     deps = [
-        "//modules/prediction/proto:feature_py_pb2",
+        "//modules/common_msgs/prediction_msgs:feature_py_pb2",
         "//modules/prediction/proto:offline_features_py_pb2",
     ],
 )

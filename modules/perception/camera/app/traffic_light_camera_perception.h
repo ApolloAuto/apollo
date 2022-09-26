@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
@@ -30,21 +31,28 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class TrafficLightCameraPerception : public BaseCameraPerception {
+class TrafficLightCameraPerception final : public BaseCameraPerception {
  public:
-  TrafficLightCameraPerception()
-      : detector_(nullptr), recognizer_(nullptr), tracker_(nullptr) {}
+  TrafficLightCameraPerception() = default;
   ~TrafficLightCameraPerception() = default;
+
   bool Init(const CameraPerceptionInitOptions &options) override;
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "TrafficLightCameraPerception"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<BaseTrafficLightDetector> detector_;
   std::shared_ptr<BaseTrafficLightDetector> recognizer_;
   std::shared_ptr<BaseTrafficLightTracker> tracker_;
   app::TrafficLightParam tl_param_;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightCameraPerception);
 };
 
 }  // namespace camera

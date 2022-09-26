@@ -16,10 +16,10 @@ proto_library(
     name = "radar_obstacle_proto",
     srcs = ["radar_obstacle.proto"],
     deps = [
-        "//modules/common/proto:error_code_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
+        "//modules/common_msgs/basic_msgs:error_code_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
     ],
 )
 
@@ -27,10 +27,10 @@ py_proto_library(
     name = "radar_obstacle_py_pb2",
     deps = [
         ":radar_obstacle_proto",
-        "//modules/common/proto:error_code_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/common_msgs/basic_msgs:error_code_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
     ],
 )
 

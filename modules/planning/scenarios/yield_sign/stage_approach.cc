@@ -163,7 +163,7 @@ Stage::StageStatus YieldSignStageApproach::FinishStage() {
 
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
-  next_stage_ = ScenarioConfig::YIELD_SIGN_CREEP;
+  next_stage_ = StageType::YIELD_SIGN_CREEP;
   return Stage::FINISHED;
 }
 

@@ -26,7 +26,7 @@
 
 #include "modules/common/util/factory.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -62,7 +62,7 @@ class TrafficLightUnprotectedLeftTurnScenario : public Scenario {
 
  private:
   static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
+      StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                  const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;

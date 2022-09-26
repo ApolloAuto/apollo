@@ -19,11 +19,14 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
+#include "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -41,11 +44,8 @@ struct FusionParams {
 
 class ProbabilisticFusion : public BaseFusionSystem {
  public:
-  ProbabilisticFusion();
-  ~ProbabilisticFusion();
-
-  ProbabilisticFusion(const ProbabilisticFusion&) = delete;
-  ProbabilisticFusion& operator=(const ProbabilisticFusion&) = delete;
+  ProbabilisticFusion() = default;
+  ~ProbabilisticFusion() = default;
 
   bool Init(const FusionInitOptions& init_options) override;
 
@@ -53,7 +53,13 @@ class ProbabilisticFusion : public BaseFusionSystem {
             const base::FrameConstPtr& sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
@@ -89,15 +95,17 @@ class ProbabilisticFusion : public BaseFusionSystem {
   std::mutex data_mutex_;
   std::mutex fuse_mutex_;
 
-  bool started_ = false;
-
-  ScenePtr scenes_ = nullptr;
+  ScenePtr scenes_;
   std::vector<std::shared_ptr<BaseTracker>> trackers_;  // for foreground
 
   std::unique_ptr<BaseDataAssociation> matcher_;
   std::unique_ptr<BaseGatekeeper> gate_keeper_;
 
   FusionParams params_;
+
+  ProbabilisticFusionConfig probabilistic_fusion_config_;
+
+  DISALLOW_COPY_AND_ASSIGN(ProbabilisticFusion);
 };
 
 }  // namespace fusion

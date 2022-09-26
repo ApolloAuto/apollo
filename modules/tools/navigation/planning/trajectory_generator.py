@@ -17,9 +17,9 @@
 ###############################################################################
 import math
 from numpy.polynomial.polynomial import polyval
-from modules.planning.proto import planning_pb2
-from modules.canbus.proto import chassis_pb2
-from modules.common.proto import drive_state_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.basic_msgs import drive_state_pb2
 from cyber.python.cyber_py3 import cyber_time
 
 

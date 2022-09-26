@@ -22,7 +22,7 @@
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/public_road/public_road_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

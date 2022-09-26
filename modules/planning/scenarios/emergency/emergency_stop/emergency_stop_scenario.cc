@@ -30,7 +30,7 @@ namespace scenario {
 namespace emergency_stop {
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     EmergencyStopScenario::s_stage_factory_;
@@ -55,13 +55,13 @@ void EmergencyStopScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::EMERGENCY_STOP_APPROACH,
+      StageType::EMERGENCY_STOP_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new EmergencyStopStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::EMERGENCY_STOP_STANDBY,
+      StageType::EMERGENCY_STOP_STANDBY,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new EmergencyStopStageStandby(config, injector);

@@ -3,6 +3,15 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_data_hdrs",
+    srcs = glob([
+        "*.h",
+        "fusion/*.h"
+    ]),
+)
+
+
 cc_library(
     name = "data",
     deps = [

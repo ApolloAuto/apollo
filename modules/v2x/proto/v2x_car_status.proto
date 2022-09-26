@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.v2x;
 
-import "modules/localization/proto/localization.proto";
-import "modules/canbus/proto/chassis_detail.proto";
+import "modules/common_msgs/localization_msgs/localization.proto";
+import "modules/common_msgs/chassis_msgs/chassis_detail.proto";
 import "modules/v2x/proto/v2x_junction.proto";
 
 message CarStatus {

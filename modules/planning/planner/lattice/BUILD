@@ -9,8 +9,8 @@ cc_library(
     hdrs = ["lattice_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//cyber/common:log",
-        "//modules/common/math:path_matcher",
+        "//cyber",
+        "//modules/common/math",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker",
@@ -22,7 +22,7 @@ cc_library(
         "//modules/planning/lattice/trajectory_generation:trajectory_combiner",
         "//modules/planning/lattice/trajectory_generation:trajectory_evaluator",
         "//modules/planning/planner",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

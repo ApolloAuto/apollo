@@ -6,12 +6,30 @@ cc_library(
         "src/*.cpp",
     ]),
     hdrs = glob([
-        "include/yaml-cpp/*.h",
-        "src/*.h",
+        "include/yaml-cpp/**/*.h",
     ]),
     includes = [
         "include",
         "src",
     ],
+    deps = ["yaml-headers", "yaml-headers-without-prefix"],
+    strip_include_prefix = "include",
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "yaml-headers",
+    hdrs = glob([
+        "src/**/*.h",
+    ]),
+    include_prefix = "yaml-cpp",
+    strip_include_prefix = "src",
+)
+
+cc_library(
+    name = "yaml-headers-without-prefix",
+    hdrs = glob([
+        "src/**/*.h",
+    ]),
+    strip_include_prefix = "src",
 )

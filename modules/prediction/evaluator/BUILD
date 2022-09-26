@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -30,8 +31,11 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
         "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction/pipeline:vector_net",
-        "//third_party:libtorch",
-    ],
+        #"//third_party/libtorch",
+    ]  + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    )
 )
 
 cc_test(

@@ -24,7 +24,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace control {

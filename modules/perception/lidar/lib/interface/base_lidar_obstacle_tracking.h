@@ -19,9 +19,10 @@
 #include <string>
 
 #include "cyber/common/macros.h"
-#include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +36,11 @@ struct LidarObstacleTrackingOptions {
   std::string sensor_name = "velodyne64";
 };
 
-class BaseLidarObstacleTracking {
+class BaseLidarObstacleTracking : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLidarObstacleTracking() = default;
   virtual ~BaseLidarObstacleTracking() = default;
@@ -48,7 +53,11 @@ class BaseLidarObstacleTracking {
             const LidarObstacleTrackingOptions& options,
             LidarFrame* frame) = 0;
 
-  virtual std::string Name() const  = 0;
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual std::string Name() const = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(BaseLidarObstacleTracking);

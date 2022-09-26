@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -41,7 +42,13 @@ class DummyROIFilter : public BaseROIFilter {
   // label field of point cloud can be filled, optional
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyROIFilter"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 };  // class DummyROIFilter
 
 }  // namespace lidar

@@ -21,6 +21,7 @@
 #include "cyber/common/file.h"
 
 #include "modules/perception/camera/common/util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
 
@@ -165,6 +166,145 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   return true;
 }
 
+bool DarkSCNNLaneDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  darkscnn_param_ = stage_config.dark_scnn_param();
+  const auto& model_param = darkscnn_param_.model_param();
+
+  // todo(zero): options
+  std::string model_root =
+      GetAbsolutePath(darkscnn_param_.root_dir(), model_param.model_name());
+  std::string proto_file =
+      GetAbsolutePath(model_root, model_param.proto_file());
+  std::string weight_file =
+      GetAbsolutePath(model_root, model_param.weight_file());
+  AINFO << " proto_file: " << proto_file
+        << " weight_file: " << weight_file
+        << " model_root: " << model_root;
+
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          darkscnn_param_.camera_name());
+
+  if (base_camera_model_ == nullptr) {
+    AERROR << "options.intrinsic is nullptr!";
+    input_height_ = 1080;
+    input_width_ = 1920;
+  } else {
+    input_height_ = static_cast<uint16_t>(base_camera_model_->get_height());
+    input_width_ = static_cast<uint16_t>(base_camera_model_->get_width());
+  }
+  ACHECK(input_width_ > 0) << "input width should be more than 0";
+  ACHECK(input_height_ > 0) << "input height should be more than 0";
+
+  AINFO << "input_height: " << input_height_;
+  AINFO << "input_width: " << input_width_;
+
+  // compute image provider parameters
+  input_offset_y_ = static_cast<uint16_t>(model_param.input_offset_y());
+  input_offset_x_ = static_cast<uint16_t>(model_param.input_offset_x());
+  resize_height_  = static_cast<uint16_t>(model_param.resize_height());
+  resize_width_   = static_cast<uint16_t>(model_param.resize_width());
+  crop_height_    = static_cast<uint16_t>(model_param.crop_height());
+  crop_width_     = static_cast<uint16_t>(model_param.crop_width());
+  confidence_threshold_lane_ = model_param.confidence_threshold();
+
+  CHECK_LE(crop_height_, input_height_)
+      << "crop height larger than input height";
+  CHECK_LE(crop_width_, input_width_) << "crop width larger than input width";
+
+  if (model_param.is_bgr()) {
+    data_provider_image_option_.target_color = base::Color::BGR;
+    image_mean_[0] = model_param.mean_b();
+    image_mean_[1] = model_param.mean_g();
+    image_mean_[2] = model_param.mean_r();
+  } else {
+    data_provider_image_option_.target_color = base::Color::RGB;
+    image_mean_[0] = model_param.mean_r();
+    image_mean_[1] = model_param.mean_g();
+    image_mean_[2] = model_param.mean_b();
+  }
+  data_provider_image_option_.do_crop = true;
+  data_provider_image_option_.crop_roi.x = input_offset_x_;
+  data_provider_image_option_.crop_roi.y = input_offset_y_;
+  data_provider_image_option_.crop_roi.height = crop_height_;
+  data_provider_image_option_.crop_roi.width = crop_width_;
+
+  cudaDeviceProp prop;
+  cudaGetDeviceProperties(&prop, darkscnn_param_.gpu_id());
+  AINFO << "GPU: " << prop.name;
+
+  const auto& net_param = darkscnn_param_.net_param();
+  net_inputs_.push_back(net_param.input_blob());
+  net_outputs_.push_back(net_param.seg_blob());
+  if (model_param.model_type() == "CaffeNet" && net_param.has_vpt_blob() &&
+      net_param.vpt_blob().size() > 0) {
+    net_outputs_.push_back(net_param.vpt_blob());
+  }
+
+  for (const auto& name : net_inputs_) {
+    AINFO << "net input blobs: " << name;
+  }
+  for (const auto& name : net_outputs_) {
+    AINFO << "net output blobs: " << name;
+  }
+
+  // initialize caffe net
+  const auto &model_type = model_param.model_type();
+  AINFO << "model_type: " << model_type;
+  cnnadapter_lane_.reset(
+      inference::CreateInferenceByName(model_type, proto_file, weight_file,
+                                       net_outputs_, net_inputs_, model_root));
+  ACHECK(cnnadapter_lane_ != nullptr);
+
+  cnnadapter_lane_->set_gpu_id(darkscnn_param_.gpu_id());
+  ACHECK(resize_width_ > 0) << "resize width should be more than 0";
+  ACHECK(resize_height_ > 0) << "resize height should be more than 0";
+  std::vector<int> shape = {1, 3, resize_height_, resize_width_};
+  std::map<std::string, std::vector<int>> input_reshape{
+      {net_inputs_[0], shape}};
+  AINFO << "input_reshape: " << input_reshape[net_inputs_[0]][0] << ", "
+        << input_reshape[net_inputs_[0]][1] << ", "
+        << input_reshape[net_inputs_[0]][2] << ", "
+        << input_reshape[net_inputs_[0]][3];
+  if (!cnnadapter_lane_->Init(input_reshape)) {
+    AINFO << "net init fail.";
+    return false;
+  }
+
+  for (auto &input_blob_name : net_inputs_) {
+    auto input_blob = cnnadapter_lane_->get_blob(input_blob_name);
+    AINFO << input_blob_name << ": " << input_blob->channels() << " "
+          << input_blob->height() << " " << input_blob->width();
+  }
+
+  auto output_blob = cnnadapter_lane_->get_blob(net_outputs_[0]);
+  AINFO << net_outputs_[0] << " : " << output_blob->channels() << " "
+        << output_blob->height() << " " << output_blob->width();
+  lane_output_height_ = output_blob->height();
+  lane_output_width_ = output_blob->width();
+  num_lanes_ = output_blob->channels();
+
+  if (net_outputs_.size() > 1) {
+    vpt_mean_.push_back(model_param.vpt_mean_dx());
+    vpt_mean_.push_back(model_param.vpt_mean_dy());
+    vpt_std_.push_back(model_param.vpt_std_dx());
+    vpt_std_.push_back(model_param.vpt_std_dy());
+  }
+
+  std::vector<int> lane_shape = {1, 1, lane_output_height_, lane_output_width_};
+  lane_blob_.reset(new base::Blob<float>(lane_shape));
+
+  return true;
+}
+
+bool DarkSCNNLaneDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
                                   CameraFrame *frame) {
   if (frame == nullptr) {
@@ -293,10 +433,6 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
          << " Avg detection merge output time: " << time_2 / time_num;
   ADEBUG << "Lane detection done!";
   return true;
-}
-
-std::string DarkSCNNLaneDetector::Name() const {
-  return "DarkSCNNLaneDetector";
 }
 
 REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);

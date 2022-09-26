@@ -67,7 +67,8 @@ bool DeadEndRoutingManager::JudgeCarInDeadEndJunction(
   }
   size_t junction_num = junctions.size();
   for (size_t i = 0; i < junction_num; ++i) {
-    if (junctions.at(i)->junction().type() == DEAD_END) {
+    if (junctions.at(i)->junction().type() ==
+        apollo::hdmap::Junction::DEAD_END) {
       double distance_to_vehicle =
         (car_position.x() - target_point.x()) *
         (car_position.x() - target_point.x()) +

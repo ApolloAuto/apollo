@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/control_component.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #define RUN_GOLDEN_TEST                                            \
   {                                                                \

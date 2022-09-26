@@ -26,7 +26,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/map/proto/map_id.pb.h"
+#include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -74,7 +74,7 @@ class ValetParkingScenario : public Scenario {
  private:
   bool init_ = false;
   static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
+      StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                  const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;

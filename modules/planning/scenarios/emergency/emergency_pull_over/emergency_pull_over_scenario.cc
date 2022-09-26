@@ -33,7 +33,7 @@ namespace scenario {
 namespace emergency_pull_over {
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     EmergencyPullOverScenario::s_stage_factory_;
@@ -58,19 +58,19 @@ void EmergencyPullOverScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN,
+      StageType::EMERGENCY_PULL_OVER_SLOW_DOWN,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new EmergencyPullOverStageSlowDown(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH,
+      StageType::EMERGENCY_PULL_OVER_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new EmergencyPullOverStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY,
+      StageType::EMERGENCY_PULL_OVER_STANDBY,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new EmergencyPullOverStageStandby(config, injector);

@@ -20,8 +20,8 @@
 #include "cyber/init.h"
 #include "cyber/time/time.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/control/proto/pad_msg.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"

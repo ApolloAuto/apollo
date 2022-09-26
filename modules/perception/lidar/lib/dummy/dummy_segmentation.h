@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +41,13 @@ class DummySegmentation : public BaseLidarDetector {
   // label field of point cloud can be filled, optional,
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummySegmentation"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 };  // class DummySegmentation
 
 }  // namespace lidar

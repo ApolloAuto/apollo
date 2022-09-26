@@ -6,180 +6,21 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "sl_boundary_cc_proto",
+    name = "st_drivable_boundary_cc_proto",
     deps = [
-        ":sl_boundary_proto",
+        ":st_drivable_boundary_proto",
     ],
 )
 
 proto_library(
-    name = "sl_boundary_proto",
-    srcs = ["sl_boundary.proto"],
-    deps = [
-        "//modules/common/proto:pnc_point_proto",
-    ],
+    name = "st_drivable_boundary_proto",
+    srcs = ["st_drivable_boundary.proto"],
 )
 
 py_proto_library(
-    name = "sl_boundary_py_pb2",
+    name = "st_drivable_boundary_py_pb2",
     deps = [
-        ":sl_boundary_proto",
-        "//modules/common/proto:pnc_point_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "lattice_structure_cc_proto",
-    deps = [
-        ":lattice_structure_proto",
-    ],
-)
-
-proto_library(
-    name = "lattice_structure_proto",
-    srcs = ["lattice_structure.proto"],
-)
-
-py_proto_library(
-    name = "lattice_structure_py_pb2",
-    deps = [
-        ":lattice_structure_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "decision_cc_proto",
-    deps = [
-        ":decision_proto",
-    ],
-)
-
-proto_library(
-    name = "decision_proto",
-    srcs = ["decision.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:vehicle_signal_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "decision_py_pb2",
-    deps = [
-        ":decision_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:vehicle_signal_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_status_cc_proto",
-    deps = [
-        ":planning_status_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_status_proto",
-    srcs = ["planning_status.proto"],
-    deps = [
-        ":planning_config_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_status_py_pb2",
-    deps = [
-        ":planning_config_py_pb2",
-        ":planning_status_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planner_open_space_config_cc_proto",
-    deps = [
-        ":planner_open_space_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planner_open_space_config_proto",
-    srcs = ["planner_open_space_config.proto"],
-    deps = [
-        ":task_config_proto",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planner_open_space_config_py_pb2",
-    deps = [
-        ":planner_open_space_config_proto",
-        ":task_config_py_pb2",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "auto_tuning_model_input_cc_proto",
-    deps = [
-        ":auto_tuning_model_input_proto",
-    ],
-)
-
-proto_library(
-    name = "auto_tuning_model_input_proto",
-    srcs = ["auto_tuning_model_input.proto"],
-)
-
-py_proto_library(
-    name = "auto_tuning_model_input_py_pb2",
-    deps = [
-        ":auto_tuning_model_input_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_semantic_map_config_cc_proto",
-    deps = [
-        ":planning_semantic_map_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_semantic_map_config_proto",
-    srcs = ["planning_semantic_map_config.proto"],
-)
-
-py_proto_library(
-    name = "planning_semantic_map_config_py_pb2",
-    deps = [
-        ":planning_semantic_map_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "traffic_rule_config_cc_proto",
-    deps = [
-        ":traffic_rule_config_proto",
-    ],
-)
-
-proto_library(
-    name = "traffic_rule_config_proto",
-    srcs = ["traffic_rule_config.proto"],
-)
-
-py_proto_library(
-    name = "traffic_rule_config_py_pb2",
-    deps = [
-        ":traffic_rule_config_proto",
+        ":st_drivable_boundary_proto",
     ],
 )
 
@@ -201,27 +42,169 @@ py_proto_library(
         ":planning_stats_proto",
     ],
 )
-
 cc_proto_library(
-    name = "open_space_task_config_cc_proto",
+    name = "planning_semantic_map_config_cc_proto",
     deps = [
-        ":open_space_task_config_proto",
+        ":planning_semantic_map_config_proto",
     ],
 )
 
 proto_library(
-    name = "open_space_task_config_proto",
-    srcs = ["open_space_task_config.proto"],
+    name = "planning_semantic_map_config_proto",
+    srcs = ["planning_semantic_map_config.proto"],
+)
+
+py_proto_library(
+    name = "planning_semantic_map_config_py_pb2",
     deps = [
-        ":planner_open_space_config_proto",
+        ":planning_semantic_map_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "traffic_rule_config_cc_proto",
+    deps = [
+        ":traffic_rule_config_proto",
+    ],
+)
+
+proto_library(
+    name = "traffic_rule_config_proto",
+    srcs = ["traffic_rule_config.proto"],
+)
+
+py_proto_library(
+    name = "traffic_rule_config_py_pb2",
+    deps = [
+        ":traffic_rule_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "planning_status_cc_proto",
+    deps = [
+        ":planning_status_proto",
+    ],
+)
+
+proto_library(
+    name = "planning_status_proto",
+    srcs = ["planning_status.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_proto",
+        "//modules/common_msgs/routing_msgs:routing_proto",
+        "//modules/common_msgs/planning_msgs:scenario_type_proto",
     ],
 )
 
 py_proto_library(
-    name = "open_space_task_config_py_pb2",
+    name = "planning_status_py_pb2",
     deps = [
-        ":open_space_task_config_proto",
-        ":planner_open_space_config_py_pb2",
+        ":planning_status_proto",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_config_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
+        "//modules/common_msgs/planning_msgs:scenario_type_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "lattice_structure_cc_proto",
+    deps = [
+        ":lattice_structure_proto",
+    ],
+)
+
+proto_library(
+    name = "lattice_structure_proto",
+    srcs = ["lattice_structure.proto"],
+)
+
+py_proto_library(
+    name = "lattice_structure_py_pb2",
+    deps = [
+        ":lattice_structure_proto",
+    ],
+)
+cc_proto_library(
+    name = "learning_data_cc_proto",
+    deps = [
+        ":learning_data_proto",
+    ],
+)
+
+proto_library(
+    name = "learning_data_proto",
+    srcs = ["learning_data.proto"],
+    deps = [
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+        "//modules/common_msgs/basic_msgs:geometry_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_proto",
+        "//modules/common_msgs/map_msgs:map_lane_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
+        "//modules/common_msgs/prediction_msgs:feature_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_proto",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_proto",
+        "//modules/common_msgs/routing_msgs:routing_proto",
+    ],
+)
+
+py_proto_library(
+    name = "learning_data_py_pb2",
+    deps = [
+        ":learning_data_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/basic_msgs:geometry_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
+        "//modules/common_msgs/map_msgs:map_lane_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
+        "//modules/common_msgs/prediction_msgs:feature_py_pb2",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_py_pb2",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_py_pb2",
+        "//modules/common_msgs/routing_msgs:routing_py_pb2",
+    ],
+)
+
+cc_proto_library(
+    name = "auto_tuning_model_input_cc_proto",
+    deps = [
+        ":auto_tuning_model_input_proto",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_model_input_proto",
+    srcs = ["auto_tuning_model_input.proto"],
+)
+
+py_proto_library(
+    name = "auto_tuning_model_input_py_pb2",
+    deps = [
+        ":auto_tuning_model_input_proto",
+    ],
+)
+cc_proto_library(
+    name = "auto_tuning_raw_feature_cc_proto",
+    deps = [
+        ":auto_tuning_raw_feature_proto",
+    ],
+)
+
+proto_library(
+    name = "auto_tuning_raw_feature_proto",
+    srcs = ["auto_tuning_raw_feature.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:pnc_point_proto",
+    ],
+)
+
+py_proto_library(
+    name = "auto_tuning_raw_feature_py_pb2",
+    deps = [
+        ":auto_tuning_raw_feature_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_py_pb2",
     ],
 )
 
@@ -237,7 +220,7 @@ proto_library(
     srcs = ["reference_line_smoother_config.proto"],
     deps = [
         "//modules/planning/proto/math:cos_theta_smoother_config_proto",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_proto",
+        "//modules/common_msgs/planning_msgs:fem_pos_deviation_smoother_config_proto",
     ],
 )
 
@@ -246,219 +229,7 @@ py_proto_library(
     deps = [
         ":reference_line_smoother_config_proto",
         "//modules/planning/proto/math:cos_theta_smoother_config_py_pb2",
-        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "task_config_cc_proto",
-    deps = [
-        ":task_config_proto",
-    ],
-)
-
-proto_library(
-    name = "task_config_proto",
-    srcs = ["task_config.proto"],
-)
-
-py_proto_library(
-    name = "task_config_py_pb2",
-    deps = [
-        ":task_config_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "learning_data_cc_proto",
-    deps = [
-        ":learning_data_proto",
-    ],
-)
-
-proto_library(
-    name = "learning_data_proto",
-    srcs = ["learning_data.proto"],
-    deps = [
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/map/proto:map_lane_proto",
-        "//modules/perception/proto:perception_obstacle_proto",
-        "//modules/perception/proto:traffic_light_detection_proto",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:prediction_obstacle_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "learning_data_py_pb2",
-    deps = [
-        ":learning_data_proto",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/map/proto:map_lane_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
-        "//modules/prediction/proto:feature_py_pb2",
-        "//modules/prediction/proto:prediction_obstacle_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_cc_proto",
-    deps = [
-        ":planning_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_proto",
-    srcs = ["planning.proto"],
-    deps = [
-        ":decision_proto",
-        ":planning_internal_proto",
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:drive_state_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/map/proto:map_id_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_py_pb2",
-    deps = [
-        ":decision_py_pb2",
-        ":planning_internal_py_pb2",
-        ":planning_proto",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/map/proto:map_id_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_internal_cc_proto",
-    deps = [
-        ":planning_internal_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_internal_proto",
-    srcs = ["planning_internal.proto"],
-    deps = [
-        ":decision_proto",
-        ":planning_config_proto",
-        ":sl_boundary_proto",
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/dreamview/proto:chart_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/map/relative_map/proto:navigation_proto",
-        "//modules/perception/proto:traffic_light_detection_proto",
-        "//modules/routing/proto:routing_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_internal_py_pb2",
-    deps = [
-        ":decision_py_pb2",
-        ":planning_config_py_pb2",
-        ":planning_internal_proto",
-        ":sl_boundary_py_pb2",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/dreamview/proto:chart_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/map/relative_map/proto:navigation_py_pb2",
-        "//modules/perception/proto:traffic_light_detection_py_pb2",
-        "//modules/routing/proto:routing_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "planning_config_cc_proto",
-    deps = [
-        ":planning_config_proto",
-    ],
-)
-
-proto_library(
-    name = "planning_config_proto",
-    srcs = ["planning_config.proto"],
-    deps = [
-        ":open_space_task_config_proto",
-        ":task_config_proto",
-    ],
-)
-
-py_proto_library(
-    name = "planning_config_py_pb2",
-    deps = [
-        ":open_space_task_config_py_pb2",
-        ":planning_config_proto",
-        ":task_config_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "pad_msg_cc_proto",
-    deps = [
-        ":pad_msg_proto",
-    ],
-)
-
-proto_library(
-    name = "pad_msg_proto",
-    srcs = ["pad_msg.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "pad_msg_py_pb2",
-    deps = [
-        ":pad_msg_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "auto_tuning_raw_feature_cc_proto",
-    deps = [
-        ":auto_tuning_raw_feature_proto",
-    ],
-)
-
-proto_library(
-    name = "auto_tuning_raw_feature_proto",
-    srcs = ["auto_tuning_raw_feature.proto"],
-    deps = [
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-py_proto_library(
-    name = "auto_tuning_raw_feature_py_pb2",
-    deps = [
-        ":auto_tuning_raw_feature_proto",
-        "//modules/common/proto:pnc_point_py_pb2",
+        "//modules/common_msgs/planning_msgs:fem_pos_deviation_smoother_config_py_pb2",
     ],
 )
 
@@ -478,24 +249,5 @@ py_proto_library(
     name = "ipopt_return_status_py_pb2",
     deps = [
         ":ipopt_return_status_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "st_drivable_boundary_cc_proto",
-    deps = [
-        ":st_drivable_boundary_proto",
-    ],
-)
-
-proto_library(
-    name = "st_drivable_boundary_proto",
-    srcs = ["st_drivable_boundary.proto"],
-)
-
-py_proto_library(
-    name = "st_drivable_boundary_py_pb2",
-    deps = [
-        ":st_drivable_boundary_proto",
     ],
 )

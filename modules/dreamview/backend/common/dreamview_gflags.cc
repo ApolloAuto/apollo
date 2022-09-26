@@ -112,3 +112,19 @@ DEFINE_string(camera_calibration_mode, "Camera-Lidar Sensor Calibration",
 DEFINE_double(parking_routing_distance_threshold, 20.0,
               "For open space planner parking situation: get the routing"
               "end point based on this threshold.");
+
+DEFINE_string(plugin_path,
+              "/.apollo/dreamview/plugins/", "Plugin placement");
+
+DEFINE_string(plugin_config_file_name_suffix, "_plugin_config.pb.txt",
+               "PLugin config file name!");
+
+DEFINE_string(plugin_channel_prefix,"/apollo/dreamview/plugins/","plugins must use this as channel prefix");
+
+DEFINE_string(resource_scenario_path,"/.apollo/resources/scenario_sets/","Scenario set placement");
+
+DEFINE_string(sim_obstacle_stop_command,"pkill -9 -f \"sim_obstacle\" ","Sim obstacle stop command");
+
+DEFINE_string(sim_obstacle_path,"/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle","sim obstacle binary placement.");
+
+DEFINE_string(gflag_command_arg," --flagfile=/apollo/modules/common/data/global_flagfile.txt","sim obstacle need use gflag!");

@@ -27,9 +27,9 @@
 #include "modules/common/util/factory.h"
 #include "modules/control/common/dependency_injector.h"
 #include "modules/control/controller/controller.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 /**
  * @namespace apollo::control

@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "modules/storytelling/frame_manager.h"
-#include "modules/storytelling/proto/story.pb.h"
+#include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/storytelling/proto/storytelling_config.pb.h"
 
 namespace apollo {

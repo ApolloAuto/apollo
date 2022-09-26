@@ -48,7 +48,7 @@ TEST_F(DeadEndTurnAroundScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new DeadEndTurnAroundScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::DEADEND_TURNAROUND);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::DEADEND_TURNAROUND);
 }
 
 }  // namespace deadend_turnaround

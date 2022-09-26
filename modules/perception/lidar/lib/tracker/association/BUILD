@@ -35,7 +35,7 @@ cc_library(
     srcs = ["distance_collection.cc"],
     hdrs = ["distance_collection.h"],
     deps = [
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lidar/common:lidar_log",

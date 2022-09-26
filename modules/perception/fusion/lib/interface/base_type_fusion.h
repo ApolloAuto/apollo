@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -29,9 +30,7 @@ namespace fusion {
 class BaseTypeFusion {
  public:
   explicit BaseTypeFusion(TrackPtr track) : track_ref_(track) {}
-  virtual ~BaseTypeFusion() {}
-  BaseTypeFusion(const BaseTypeFusion&) = delete;
-  BaseTypeFusion& operator=(const BaseTypeFusion&) = delete;
+  virtual ~BaseTypeFusion() = default;
 
   static bool Init();
 
@@ -50,6 +49,8 @@ class BaseTypeFusion {
 
  protected:
   TrackPtr track_ref_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseTypeFusion);
 };
 
 }  // namespace fusion

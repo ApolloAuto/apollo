@@ -3,10 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "ge3_vehicle_factory",
     srcs = ["ge3_vehicle_factory.cc"],
     hdrs = ["ge3_vehicle_factory.h"],
+    copts = CANBUS_COPTS,
     deps = [
         ":ge3_controller",
         ":ge3_message_manager",
@@ -29,8 +32,9 @@ cc_library(
     name = "ge3_message_manager",
     srcs = ["ge3_message_manager.cc"],
     hdrs = ["ge3_message_manager.h"],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -51,9 +55,10 @@ cc_library(
     name = "ge3_controller",
     srcs = ["ge3_controller.cc"],
     hdrs = ["ge3_controller.h"],
+    copts = CANBUS_COPTS,
     deps = [
         ":ge3_message_manager",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "//modules/drivers/canbus/can_comm:can_sender",

@@ -20,6 +20,7 @@
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +32,10 @@ struct ObjectFilterInitOptions {
 
 struct ObjectFilterOptions {};
 
-class BaseObjectFilter {
+class BaseObjectFilter : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   BaseObjectFilter() = default;
 
@@ -46,6 +50,10 @@ class BaseObjectFilter {
   // segmented_objects should be valid, and will be filtered,
   virtual bool Filter(const ObjectFilterOptions& options,
                       LidarFrame* frame) = 0;
+
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() const = 0;
 
   virtual std::string Name() const = 0;
 

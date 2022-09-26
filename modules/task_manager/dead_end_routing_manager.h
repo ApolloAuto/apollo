@@ -24,8 +24,8 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
 #include "modules/task_manager/proto/task_manager_config.pb.h"
 #include "modules/task_manager/common/task_manager_gflags.h"
 

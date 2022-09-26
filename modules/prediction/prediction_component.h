@@ -29,7 +29,7 @@
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/submodules/submodule_output.h"
-#include "modules/storytelling/proto/story.pb.h"
+#include "modules/common_msgs/storytelling_msgs/story.pb.h"
 
 /**
  * @namespace apollo::prediction

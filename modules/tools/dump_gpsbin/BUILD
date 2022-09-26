@@ -8,6 +8,6 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
-        "//modules/drivers/gnss/proto:gnss_py_pb2",
+        "//modules/common_msgs/sensor_msgs:gnss_py_pb2",
     ],
 )

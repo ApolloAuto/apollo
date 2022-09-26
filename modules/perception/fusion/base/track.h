@@ -20,8 +20,9 @@
 #include <memory>
 #include <string>
 
-#include "gtest/gtest_prod.h"
+// #include "gtest/gtest_prod.h"
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 
 namespace apollo {
@@ -34,9 +35,6 @@ class Track {
  public:
   Track();
   virtual ~Track() = default;
-
-  Track(const Track&) = delete;
-  Track& operator=(const Track&) = delete;
 
   // static members initialization
   inline static void SetMaxLidarInvisiblePeriod(double period) {
@@ -149,12 +147,14 @@ class Track {
   size_t tracked_times_ = 0;
 
  private:
-  FRIEND_TEST(TrackTest, test);
+  // FRIEND_TEST(TrackTest, test);
 
   static size_t s_track_idx_;
   static double s_max_lidar_invisible_period_;
   static double s_max_radar_invisible_period_;
   static double s_max_camera_invisible_period_;
+
+  DISALLOW_COPY_AND_ASSIGN(Track);
 };
 
 typedef std::shared_ptr<Track> TrackPtr;

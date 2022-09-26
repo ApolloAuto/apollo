@@ -20,7 +20,7 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 
 #include "gtest/gtest.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"

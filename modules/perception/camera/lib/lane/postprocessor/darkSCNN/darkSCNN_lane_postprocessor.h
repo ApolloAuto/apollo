@@ -25,9 +25,10 @@
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
-#include "modules/perception/camera/lib/lane/common/proto/darkSCNN.pb.h"
-#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/proto/darkSCNN_postprocessor.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/proto/stage/darkSCNN.pb.h"
+#include "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +41,7 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
  public:
   DarkSCNNLanePostprocessor() : BaseLanePostprocessor() {}
 
-  virtual ~DarkSCNNLanePostprocessor() {}
+  virtual ~DarkSCNNLanePostprocessor() = default;
 
   bool Init(const LanePostprocessorInitOptions& options =
                 LanePostprocessorInitOptions()) override;
@@ -62,10 +63,16 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
     trans_mat_inv = trans_mat_.inverse();
   }
 
-  std::string Name() const override;
-
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   void ConvertImagePoint2Camera(CameraFrame* frame);

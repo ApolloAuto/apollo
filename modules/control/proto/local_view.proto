@@ -2,11 +2,11 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/canbus/proto/chassis.proto";
-import "modules/common/proto/header.proto";
-import "modules/control/proto/pad_msg.proto";
-import "modules/localization/proto/localization.proto";
-import "modules/planning/proto/planning.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/control_msgs/pad_msg.proto";
+import "modules/common_msgs/localization_msgs/localization.proto";
+import "modules/common_msgs/planning_msgs/planning.proto";
 
 message LocalView {
   optional apollo.common.Header header = 1;

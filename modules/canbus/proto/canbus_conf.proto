@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.canbus;
 
-import "modules/drivers/canbus/proto/can_card_parameter.proto";
+import "modules/common_msgs/drivers_msgs/can_card_parameter.proto";
 import "modules/canbus/proto/vehicle_parameter.proto";
 
 message CanbusConf {

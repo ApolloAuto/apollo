@@ -20,7 +20,7 @@ cc_library(
     srcs = ["hm_matcher.cc"],
     hdrs = ["hm_matcher.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/common/graph",
         "//modules/perception/lib/config_manager",
@@ -30,7 +30,7 @@ cc_library(
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/interface:base_matcher",
         "//modules/perception/radar/lib/tracker/common:radar_track",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@eigen",
     ],
 )

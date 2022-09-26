@@ -21,7 +21,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;

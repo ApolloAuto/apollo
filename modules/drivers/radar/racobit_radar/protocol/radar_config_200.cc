@@ -80,14 +80,14 @@ void RadarConfig200::Reset() {
 
   radar_conf_.set_max_distance(125);
   radar_conf_.set_sensor_id(0);
-  radar_conf_.set_output_type(OUTPUT_TYPE_NONE);
+  radar_conf_.set_output_type(RacobitRadarState_201::OUTPUT_TYPE_NONE);
   radar_conf_.set_radar_power(0);
   radar_conf_.set_ctrl_relay(0);
   radar_conf_.set_send_ext_info(1);
   radar_conf_.set_send_quality(1);
   radar_conf_.set_sort_index(0);
   radar_conf_.set_store_in_nvm(1);
-  radar_conf_.set_rcs_threshold(RCS_THRESHOLD_STANDARD);
+  radar_conf_.set_rcs_threshold(RacobitRadarState_201::RCS_THRESHOLD_STANDARD);
 }
 
 RadarConf RadarConfig200::radar_conf() { return radar_conf_; }
@@ -157,7 +157,8 @@ RadarConfig200* RadarConfig200::set_sensor_id(uint8_t data) {
   return this;
 }
 
-RadarConfig200* RadarConfig200::set_output_type(OutputType type) {
+RadarConfig200* RadarConfig200::set_output_type(
+    RacobitRadarState_201::OutputType type) {
   radar_conf_.set_output_type(type);
   return this;
 }
@@ -192,7 +193,8 @@ RadarConfig200* RadarConfig200::set_store_in_nvm(uint8_t data) {
   return this;
 }
 
-RadarConfig200* RadarConfig200::set_rcs_threshold(RcsThreshold rcs_theshold) {
+RadarConfig200* RadarConfig200::set_rcs_threshold(
+    RacobitRadarState_201::RcsThreshold rcs_theshold) {
   radar_conf_.set_rcs_threshold(rcs_theshold);
   return this;
 }
@@ -304,7 +306,8 @@ void RadarConfig200::set_sensor_id_p(uint8_t* data, uint8_t value) {
   frame.set_value(value, 0, 3);
 }
 
-void RadarConfig200::set_output_type_p(uint8_t* data, OutputType type) {
+void RadarConfig200::set_output_type_p(
+    uint8_t* data, RacobitRadarState_201::OutputType type) {
   Byte frame(data + 4);
   uint8_t value = static_cast<uint8_t>(type);
   frame.set_value(value, 3, 2);
@@ -340,8 +343,8 @@ void RadarConfig200::set_store_in_nvm_p(uint8_t* data, uint8_t value) {
   frame.set_value(value, 7, 1);
 }
 
-void RadarConfig200::set_rcs_threshold_p(uint8_t* data,
-                                         RcsThreshold rcs_threshold) {
+void RadarConfig200::set_rcs_threshold_p(
+    uint8_t* data, RacobitRadarState_201::RcsThreshold rcs_threshold) {
   Byte frame(data + 6);
   uint8_t value = static_cast<uint8_t>(rcs_threshold);
   frame.set_value(value, 1, 3);

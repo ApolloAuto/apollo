@@ -25,7 +25,7 @@ import google.protobuf.text_format as text_format
 from absl import logging
 
 from cyber.python.cyber_py3.record import RecordReader
-import modules.common.configs.proto.vehicle_config_pb2 as vehicle_config_pb2
+import modules.common_msgs.config_msgs.vehicle_config_pb2 as vehicle_config_pb2
 import modules.tools.common.proto_utils as proto_utils
 import modules.tools.common.file_utils as file_utils
 

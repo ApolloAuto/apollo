@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/common/kalman_filter.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 
@@ -33,9 +34,6 @@ class KalmanMotionFusion : public BaseMotionFusion {
  public:
   explicit KalmanMotionFusion(TrackPtr track) : BaseMotionFusion(track) {}
   ~KalmanMotionFusion() = default;
-
-  KalmanMotionFusion(const KalmanMotionFusion&) = delete;
-  KalmanMotionFusion& operator=(const KalmanMotionFusion&) = delete;
 
   // @brief init kalman filter and some magic number
   bool Init() override;
@@ -131,6 +129,8 @@ class KalmanMotionFusion : public BaseMotionFusion {
   static int s_eval_window_;
   static size_t s_history_size_maximum_;
   double velocity_length_change_thresh_ = 5.0f;  // diff < 5 m/s
+
+  DISALLOW_COPY_AND_ASSIGN(KalmanMotionFusion);
 };
 
 }  // namespace fusion

@@ -82,8 +82,8 @@ py_binary(
     srcs = ["plot_chassis_acc.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
     ],
 )
 
@@ -92,8 +92,8 @@ py_binary(
     srcs = ["plot_planning_acc.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
     ],
 )
 
@@ -102,8 +102,8 @@ py_binary(
     srcs = ["plot_planning_speed.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
     ],
 )
 
@@ -122,8 +122,8 @@ py_binary(
     srcs = ["plot_speed_steering.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 
@@ -132,9 +132,9 @@ py_library(
     srcs = ["record_reader.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 
@@ -143,6 +143,6 @@ py_binary(
     srcs = ["speed_dsteering_data.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//modules/canbus/proto:chassis_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
     ],
 )

@@ -29,9 +29,9 @@ import simplejson
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
-from modules.common.proto.geometry_pb2 import Point3D
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
+from modules.common_msgs.basic_msgs.geometry_pb2 import Point3D
+from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import PerceptionObstacle
+from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import PerceptionObstacles
 
 
 _s_seq_num = 0

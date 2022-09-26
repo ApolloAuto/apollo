@@ -20,7 +20,7 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
 from cyber.python.cyber_py3 import cyber
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 from modules.tools.mapshow.libs.planning import Planning
 from modules.tools.mapshow.libs.subplot_traj_acc import TrajAccSubplot
 from modules.tools.mapshow.libs.subplot_traj_path import TrajPathSubplot

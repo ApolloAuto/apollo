@@ -3,6 +3,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
+
 cc_library(
     name = "neolix_edu_vehicle_factory",
     srcs = [
@@ -11,6 +13,7 @@ cc_library(
     hdrs = [
         "neolix_edu_vehicle_factory.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         ":neolix_edu_controller",
         ":neolix_edu_message_manager",
@@ -26,8 +29,9 @@ cc_library(
     hdrs = [
         "neolix_edu_message_manager.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/neolix_edu/protocol:canbus_neolix_edu_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -42,9 +46,10 @@ cc_library(
     hdrs = [
         "neolix_edu_controller.h",
     ],
+    copts = CANBUS_COPTS,
     deps = [
         ":neolix_edu_message_manager",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/neolix_edu/protocol:canbus_neolix_edu_protocol",
         "//modules/drivers/canbus/can_comm:can_sender",

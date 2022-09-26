@@ -16,6 +16,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
 

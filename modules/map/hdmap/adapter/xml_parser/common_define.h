@@ -19,7 +19,7 @@ limitations under the License.
 #include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/map/proto/map.pb.h"
+#include "modules/common_msgs/map_msgs/map.pb.h"
 
 namespace apollo {
 namespace hdmap {

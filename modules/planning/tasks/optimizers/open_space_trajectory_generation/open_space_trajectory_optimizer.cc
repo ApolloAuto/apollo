@@ -33,8 +33,7 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
     const OpenSpaceTrajectoryOptimizerConfig& config)
     : config_(config) {
   // Load config
-  config_ = config;
-
+  AINFO << config_.DebugString();
   // Initialize hybrid astar class pointer
   warm_start_.reset(new HybridAStar(config.planner_open_space_config()));
 

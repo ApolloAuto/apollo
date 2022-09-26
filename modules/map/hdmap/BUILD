@@ -1,51 +1,100 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-
-package(default_visibility = ["//visibility:public"])
+load("//tools/install:install.bzl", "install")
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
-cc_library(
-    name = "hdmap",
+install(
+    name = "install",
+    library_dest = "map/lib",
+    targets = [
+        ":libhdmap.so",
+        ":libhdmap_util.so"
+        ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "libhdmap.so",
     srcs = [
         "hdmap.cc",
         "hdmap_common.cc",
         "hdmap_impl.cc",
-    ],
-    hdrs = [
         "hdmap.h",
         "hdmap_common.h",
         "hdmap_impl.h",
         "hdmap_util.h",
     ],
+    linkshared = True,
+    linkstatic = True,
     copts = MAP_COPTS,
     deps = [
-        "//cyber/common:file",
-        "//cyber/common:macros",
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/util",
+        "//modules/common/util:util_tool",
         "//modules/map/hdmap/adapter:opendrive_adapter",
-        "//modules/map/proto:map_cc_proto",
-        "//modules/map/relative_map/proto:navigation_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@com_github_google_glog//:glog",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "hdmap",
+    srcs = ["libhdmap.so"],
+    hdrs = [
+        "hdmap.h",
+        "hdmap_common.h",
+        "hdmap_impl.h",
+    ],
+    copts = MAP_COPTS,
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_cc_proto",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/math",
+        "//modules/common/util:util_tool",
+        "//modules/map/hdmap/adapter:opendrive_adapter",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "libhdmap_util.so",
+    srcs = [
+        "hdmap_util.cc",
+        "hdmap_util.h",
+    ],
+    linkshared = True,
+    linkstatic = True,
+    copts = MAP_COPTS,
+    deps = [
+        ":hdmap",
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_id_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
+        "//modules/common/configs:config_gflags",
+        "@com_google_absl//:absl",
     ],
 )
 
 cc_library(
     name = "hdmap_util",
-    srcs = ["hdmap_util.cc"],
+    srcs = ["libhdmap_util.so"],
     hdrs = ["hdmap_util.h"],
     copts = MAP_COPTS,
     deps = [
         ":hdmap",
-        "//cyber/common:file",
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_id_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/common/configs:config_gflags",
-        "//modules/map/relative_map/proto:navigation_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
+    visibility = ["//visibility:public"],
 )
 
 filegroup(
@@ -69,7 +118,7 @@ cc_test(
     ],
     deps = [
         ":hdmap",
-        "//cyber/common:file",
+        "//cyber",
         "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],
@@ -85,6 +134,7 @@ cc_test(
     ],
     deps = [
         ":hdmap_util",
+        "@com_google_absl//:absl",
         "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],

@@ -47,8 +47,8 @@ py_library(
     srcs = ["trajectory_generator.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/basic_msgs:drive_state_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )

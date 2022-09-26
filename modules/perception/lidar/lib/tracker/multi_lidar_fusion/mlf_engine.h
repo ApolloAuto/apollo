@@ -24,9 +24,10 @@
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
 #include "modules/perception/onboard/msg_serializer/msg_serializer.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -49,7 +50,13 @@ class MlfEngine : public BaseMultiTargetTracker {
   bool Track(const MultiTargetTrackerOptions& options,
              LidarFrame* frame) override;
 
-  std::string Name() const override { return "MlfEngine"; };
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   // @brief: split foreground/background objects and attach to tracked objects
@@ -86,6 +93,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   void RemoveStaleTrackData(const std::string& name, double timestamp,
                             std::vector<MlfTrackDataPtr>* tracks);
 
+  void Clear();
 //  void AttachDebugInfo(
 //      std::vector<std::shared_ptr<base::Object>>* foreground_objs);
 
@@ -107,7 +115,7 @@ class MlfEngine : public BaseMultiTargetTracker {
   Eigen::Vector3d global_to_local_offset_;
   Eigen::Affine3d sensor_to_local_pose_;
   // main sensor info
-  std::set<std::string> main_sensor_;
+  std::set<std::string> main_sensors_;
   // params
   bool use_histogram_for_match_ = true;
   size_t histogram_bin_size_ = 10;

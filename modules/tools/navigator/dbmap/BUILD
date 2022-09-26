@@ -6,7 +6,7 @@ py_library(
     name = "generator",
     srcs = ["generator.py"],
     deps = [
-        "//modules/map/relative_map/proto:navigation_py_pb2",
+        "//modules/common_msgs/planning_msgs:navigation_py_pb2",
     ],
 )
 
@@ -14,6 +14,6 @@ py_binary(
     name = "viewer",
     srcs = ["viewer.py"],
     deps = [
-        "//modules/map/relative_map/proto:navigation_py_pb2",
+        "//modules/common_msgs/planning_msgs:navigation_py_pb2",
     ],
 )

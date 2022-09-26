@@ -21,7 +21,7 @@
 #pragma once
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -30,7 +30,7 @@ namespace scenario {
 class StageIntersectionCruiseImpl {
  public:
   bool CheckDone(const Frame& frame,
-                 const ScenarioConfig::ScenarioType& scenario_type,
+                 const ScenarioType& scenario_type,
                  const ScenarioConfig::StageConfig& config,
                  const PlanningContext* context,
                  const bool right_of_way_status);

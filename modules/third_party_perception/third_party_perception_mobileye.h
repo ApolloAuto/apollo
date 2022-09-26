@@ -23,9 +23,9 @@
 
 #include "modules/third_party_perception/third_party_perception_base.h"
 
-#include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/drivers/proto/delphi_esr.pb.h"
-#include "modules/drivers/proto/mobileye.pb.h"
+#include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/delphi_esr.pb.h"
+#include "modules/common_msgs/sensor_msgs/mobileye.pb.h"
 
 /**
  * @namespace apollo::third_party_perception

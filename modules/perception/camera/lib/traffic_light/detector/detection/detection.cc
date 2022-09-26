@@ -32,6 +32,9 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
+TrafficLightDetection::TrafficLightDetection()
+    : max_batch_size_(4), param_blob_length_(6), mean_{0, 0, 0}, gpu_id_(0) {}
+
 bool TrafficLightDetection::Init(
     const camera::TrafficLightDetectorInitOptions &options) {
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
@@ -44,6 +47,8 @@ bool TrafficLightDetection::Init(
   std::string param_str;
   google::protobuf::TextFormat::PrintToString(detection_param_, &param_str);
   AINFO << "TL detection param: " << param_str;
+
+  //todo:determine details
 
   std::string model_root =
       GetAbsolutePath(options.root_dir, detection_param_.model_name());
@@ -152,6 +157,134 @@ bool TrafficLightDetection::Init(
   image_.reset(
       new base::Image8U(resize_height, resize_width, base::Color::BGR));
   return true;
+}
+
+bool TrafficLightDetection::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  detection_param_ = stage_config.traffic_light_detection_config();
+  AINFO << "TL detection param: " << detection_param_.DebugString();
+
+  detection_root_dir = detection_param_.traffic_light_detection_root_dir();
+  std::string model_root =
+      GetAbsolutePath(detection_root_dir, detection_param_.model_name());
+  AINFO << "model_root " << model_root;
+
+  std::string proto_file =
+      GetAbsolutePath(model_root, detection_param_.proto_file());
+  AINFO << "proto_file " << proto_file;
+
+  std::string weight_file =
+      GetAbsolutePath(model_root, detection_param_.weight_file());
+  AINFO << "weight_file " << weight_file;
+
+  if (detection_param_.is_bgr()) {
+    data_provider_image_option_.target_color = base::Color::BGR;
+    mean_[0] = detection_param_.mean_b();
+    mean_[1] = detection_param_.mean_g();
+    mean_[2] = detection_param_.mean_r();
+  } else {
+    data_provider_image_option_.target_color = base::Color::RGB;
+    mean_[0] = detection_param_.mean_r();
+    mean_[1] = detection_param_.mean_g();
+    mean_[2] = detection_param_.mean_b();
+  }
+
+  net_inputs_.push_back(detection_param_.input_blob_name());
+  net_inputs_.push_back(detection_param_.im_param_blob_name());
+  net_outputs_.push_back(detection_param_.output_blob_name());
+
+  AINFO << "net input blobs: "
+        << std::accumulate(net_inputs_.begin(), net_inputs_.end(),
+                           std::string(""),
+                           [](std::string &sum, const std::string &s) {
+                             return sum + "\n" + s;
+                           });
+  AINFO << "net output blobs: "
+        << std::accumulate(net_outputs_.begin(), net_outputs_.end(),
+                           std::string(""),
+                           [](std::string &sum, const std::string &s) {
+                             return sum + "\n" + s;
+                           });
+
+  const auto &model_type = detection_param_.model_type();
+  AINFO << "model_type: " << model_type;
+
+  rt_net_.reset(inference::CreateInferenceByName(model_type, proto_file,
+                                                 weight_file, net_outputs_,
+                                                 net_inputs_, model_root));
+
+  AINFO << "rt_net_ create succeed";
+  rt_net_->set_gpu_id(detection_param_.gpu_id());
+  AINFO << "set gpu id " << detection_param_.gpu_id();
+  gpu_id_ = detection_param_.gpu_id();
+
+  int resize_height = detection_param_.min_crop_size();
+  int resize_width = detection_param_.min_crop_size();
+  max_batch_size_ = detection_param_.max_batch_size();
+  param_blob_length_ = 6;
+
+  CHECK_GT(resize_height, 0);
+  CHECK_GT(resize_width, 0);
+  CHECK_GT(max_batch_size_, 0);
+
+  std::vector<int> shape_input = {max_batch_size_, resize_height, resize_width,
+                                  3};
+  std::vector<int> shape_param = {max_batch_size_, 1, param_blob_length_, 1};
+
+  std::map<std::string, std::vector<int>> input_reshape;
+  input_reshape.insert(
+      (std::pair<std::string, std::vector<int>>(net_inputs_[0], shape_input)));
+  input_reshape.insert(
+      (std::pair<std::string, std::vector<int>>(net_inputs_[1], shape_param)));
+
+  if (!rt_net_->Init(input_reshape)) {
+    AINFO << "net init fail.";
+    return false;
+  }
+  AINFO << "net init success.";
+
+  mean_buffer_.reset(new base::Blob<float>(1, resize_height, resize_height, 3));
+
+  param_blob_ = rt_net_->get_blob(net_inputs_[1]);
+  float *param_data = param_blob_->mutable_cpu_data();
+  for (int i = 0; i < max_batch_size_; ++i) {
+    auto offset = i * param_blob_length_;
+    param_data[offset + 0] = static_cast<float>(resize_width);
+    param_data[offset + 1] = static_cast<float>(resize_height);
+    param_data[offset + 2] = 1;
+    param_data[offset + 3] = 1;
+    param_data[offset + 4] = 0;
+    param_data[offset + 5] = 0;
+  }
+
+  switch (detection_param_.crop_method()) {
+    default:
+    case 0:
+      crop_.reset(new CropBox(detection_param_.crop_scale(),
+                              detection_param_.min_crop_size()));
+      break;
+    case 1:
+      crop_.reset(new CropBoxWholeImage());
+      break;
+  }
+
+  select_.Init(resize_width, resize_height);
+  image_.reset(
+      new base::Image8U(resize_height, resize_width, base::Color::BGR));
+  return true;
+}
+
+bool TrafficLightDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr || data_frame->camera_frame == nullptr)
+    return false;
+
+  TrafficLightDetectorOptions traffic_light_detection_options;
+  bool res = Detect(traffic_light_detection_options, data_frame->camera_frame);
+
+  return res;
 }
 
 // TODO(chenjiahao): temporarily do inference serially for multiple
@@ -430,10 +563,6 @@ void TrafficLightDetection::ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
                kept_indices.end();
       });
   lights->erase(parted_itr, lights->end());
-}
-
-std::string TrafficLightDetection::Name() const {
-  return "TrafficLightDetection";
 }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightDetection);

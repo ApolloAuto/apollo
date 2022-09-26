@@ -21,6 +21,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+
 bool TrackingFeatureExtractor::Init(
     const FeatureExtractorInitOptions &init_options) {
   //  setup bottom and top
@@ -33,14 +34,17 @@ bool TrackingFeatureExtractor::Init(
   tracking_feature::FeatureParam feat_param;
   std::string config_path = cyber::common::GetAbsolutePath(
       init_options.root_dir, init_options.conf_file);
+
   if (!cyber::common::GetProtoFromFile(config_path, &feat_param)) {
     AERROR << "read proto_config fail";
     return false;
   }
+
   if (feat_param.extractor_size() != 1) {
     AERROR << "extractor should be 1";
     return false;
   }
+
   CHECK_EQ(input_height_ / feat_height, input_width_ / feat_width)
       << "Invalid aspect ratio: " << feat_height << "x" << feat_width
       << " from " << input_height_ << "x" << input_width_;
@@ -54,6 +58,7 @@ bool TrackingFeatureExtractor::Init(
         break;
     }
   }
+
   if (roi_poolings_.empty()) {
     AERROR << "no proper extractor";
     return false;
@@ -61,6 +66,7 @@ bool TrackingFeatureExtractor::Init(
 
   return true;
 }
+
 void TrackingFeatureExtractor::init_roipooling(
     const FeatureExtractorInitOptions &options,
     const tracking_feature::ROIPoolingParam &param) {
@@ -81,6 +87,18 @@ void TrackingFeatureExtractor::init_roipooling(
   feature_extractor_layer_ptr->top_blob.reset(
       new base::Blob<float>(1, feat_blob_->channels(), pooled_h, pooled_w));
   roi_poolings_.push_back(feature_extractor_layer_ptr);
+}
+
+bool TrackingFeatureExtractor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool TrackingFeatureExtractor::Process(DataFrame* data_frame) {
+  return true;
 }
 
 bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,
@@ -113,6 +131,7 @@ bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,
              << " " << rois_data[3] << " " << rois_data[4];
       rois_data += feature_extractor_layer_ptr->rois_blob->offset(1);
     }
+
     feature_extractor_layer_ptr->pooling_layer->ForwardGPU(
         {feat_blob_, feature_extractor_layer_ptr->rois_blob},
         {frame->track_feature_blob});
@@ -124,6 +143,7 @@ bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,
   norm_.L2Norm(frame->track_feature_blob.get());
   return true;
 }
+
 REGISTER_FEATURE_EXTRACTOR(TrackingFeatureExtractor);
 }  // namespace camera
 }  // namespace perception

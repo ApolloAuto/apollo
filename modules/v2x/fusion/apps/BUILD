@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    library_dest = "v2x/lib",
     targets = [
         ":libv2x_fusion_component.so",
     ]
@@ -19,7 +20,7 @@ cc_library(
         "-DMODULE_NAME=\\\"v2x_fusion\\\"",
     ],
     deps = [
-        "//cyber/component",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/v2x/fusion/apps/common:trans_tools",
         "//modules/v2x/fusion/configs:ft_config_manager",
@@ -32,7 +33,7 @@ cc_library(
 cc_binary(
     name = "libv2x_fusion_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":v2x_fusion_component_lib"],
 )
 

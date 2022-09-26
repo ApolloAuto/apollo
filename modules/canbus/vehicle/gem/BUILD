@@ -35,7 +35,7 @@ cc_library(
     hdrs = ["gem_message_manager.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -59,7 +59,7 @@ cc_library(
     copts = CANBUS_COPTS,
     deps = [
         ":gem_message_manager",
-        "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
         "//modules/drivers/canbus/can_comm:can_sender",

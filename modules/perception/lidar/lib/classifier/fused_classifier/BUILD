@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/perception/base:object",
         "@eigen",
     ],
@@ -22,6 +22,7 @@ cc_library(
         "//modules/perception/base:object",
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common",
+        "//modules/perception/pipeline:plugin",
     ],
 )
 
@@ -33,12 +34,13 @@ cc_library(
         ":type_fusion_interface",
         ":util",
         "//cyber",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "//modules/perception/base:object",
         "//modules/perception/base:point_cloud",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:object_sequence",
-        "//modules/perception/proto:ccrf_type_fusion_config_cc_proto",
+        "//modules/perception/pipeline:plugin",
+        "//modules/perception/pipeline/proto/plugin:ccrf_type_fusion_config_cc_proto",
     ],
     alwayslink = True,
 )
@@ -53,8 +55,11 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:object_sequence",
+        "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
         "//modules/perception/lidar/lib/interface:base_classifier",
-        "//modules/perception/proto:fused_classifier_config_cc_proto",
+        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:fused_classifier_config_cc_proto",
     ],
     alwayslink = True,
 )

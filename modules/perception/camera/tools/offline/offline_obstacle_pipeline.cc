@@ -43,6 +43,7 @@
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 DEFINE_string(test_list,
               "/apollo/modules/perception/testdata/camera/lib/obstacle/"

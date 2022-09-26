@@ -23,10 +23,10 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 
+#include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/common/util/string_util.h"
 
 // https://nacto.org/publication/urban-street-design-guide/street-design-elements/lane-width/

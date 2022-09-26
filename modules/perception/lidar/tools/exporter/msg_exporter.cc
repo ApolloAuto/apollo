@@ -26,7 +26,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/transform/proto/transform.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 
 namespace apollo {
 namespace perception {

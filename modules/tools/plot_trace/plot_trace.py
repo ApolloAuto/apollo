@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from cyber.python.cyber_py3 import cyber
-from modules.canbus.proto import chassis_pb2
-from modules.localization.proto import localization_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
 
 
 GPS_X = list()

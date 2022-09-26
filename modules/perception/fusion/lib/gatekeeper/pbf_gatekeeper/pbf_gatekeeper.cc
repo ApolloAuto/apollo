@@ -18,7 +18,7 @@
 #include "cyber/common/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -27,9 +27,9 @@ namespace fusion {
 
 using cyber::common::GetAbsolutePath;
 
-PbfGatekeeper::PbfGatekeeper() {}
-
-PbfGatekeeper::~PbfGatekeeper() {}
+PbfGatekeeper::PbfGatekeeper(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
 
 bool PbfGatekeeper::Init() {
   BaseInitOptions options;
@@ -63,7 +63,24 @@ bool PbfGatekeeper::Init() {
   return true;
 }
 
-std::string PbfGatekeeper::Name() const { return "PbfGatekeeper"; }
+bool PbfGatekeeper::Init(const PluginConfig& plugin_config) {
+  PbfGatekeeperConfig config = plugin_config.pbf_gatekeeper_config();
+
+  params_.publish_if_has_lidar = config.publish_if_has_lidar();
+  params_.publish_if_has_radar = config.publish_if_has_radar();
+  params_.publish_if_has_camera = config.publish_if_has_camera();
+  params_.use_camera_3d = config.use_camera_3d();
+  params_.min_radar_confident_distance = config.min_radar_confident_distance();
+  params_.max_radar_confident_angle = config.max_radar_confident_angle();
+  params_.min_camera_publish_distance = config.min_camera_publish_distance();
+  params_.invisible_period_threshold = config.invisible_period_threshold();
+  params_.existence_threshold = config.existence_threshold();
+  params_.radar_existence_threshold = config.radar_existence_threshold();
+  params_.toic_threshold = config.toic_threshold();
+  params_.use_track_time_pub_strategy = config.use_track_time_pub_strategy();
+  params_.pub_track_time_thresh = config.pub_track_time_thresh();
+  return true;
+}
 
 bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   bool invisible_in_lidar = !(track->IsLidarVisible());

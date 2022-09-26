@@ -18,6 +18,8 @@
 #include <iomanip>
 
 #include "cyber/common/log.h"
+#include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/camera/lib/interface/base_calibration_service.h"
 
 namespace apollo {
 namespace perception {

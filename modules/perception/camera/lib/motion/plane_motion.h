@@ -35,7 +35,7 @@ class PlaneMotion {
  public:
   explicit PlaneMotion(int s);
 
-  ~PlaneMotion(void);
+  ~PlaneMotion();
   enum { ACCUM_MOTION = 0, ACCUM_PUSH_MOTION, PUSH_ACCUM_MOTION, RESET };
 
  private:

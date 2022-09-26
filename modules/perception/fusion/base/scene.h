@@ -19,7 +19,6 @@
 #include <memory>
 #include <vector>
 
-#include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
 
 namespace apollo {

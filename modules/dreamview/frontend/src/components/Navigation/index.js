@@ -52,15 +52,15 @@ export default class Navigation extends React.Component {
   }
 
   scriptOnLoadHandler() {
-        import(`components/Navigation/${PARAMETERS.navigation.map}Adapter`).then(
-          (mapAdapterModule) => {
-            const MapAdapterClass = mapAdapterModule.default;
-            const mapAdapter = new MapAdapterClass();
-            MAP_NAVIGATOR.mapAPILoaded = true;
-            MAP_NAVIGATOR.initialize(WS, mapAdapter);
-            MAP_NAVIGATOR.disableControls();
-          },
-        );
+    import(`components/Navigation/${PARAMETERS.navigation.map}Adapter`).then(
+      (mapAdapterModule) => {
+        const MapAdapterClass = mapAdapterModule.default;
+        const mapAdapter = new MapAdapterClass();
+        MAP_NAVIGATOR.mapAPILoaded = true;
+        MAP_NAVIGATOR.initialize(WS, mapAdapter);
+        MAP_NAVIGATOR.disableControls();
+      },
+    );
   }
 
   componentWillUnmount() {

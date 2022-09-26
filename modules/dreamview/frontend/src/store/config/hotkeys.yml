@@ -5,5 +5,6 @@
 4: showRouteEditingBar
 5: showDataRecorder
 7: showPOI
+8: showProfile
 v: cameraAngle
 p: showPNCMonitor

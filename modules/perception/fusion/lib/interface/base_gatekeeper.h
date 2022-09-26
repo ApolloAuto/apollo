@@ -17,27 +17,36 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
 namespace fusion {
 
-class BaseGatekeeper {
+class BaseGatekeeper : public pipeline::Plugin {
  public:
-  BaseGatekeeper() {}
-  virtual ~BaseGatekeeper() {}
-  BaseGatekeeper(const BaseGatekeeper&) = delete;
-  BaseGatekeeper& operator=(const BaseGatekeeper&) = delete;
+  using PluginConfig = pipeline::PluginConfig;
+
+ public:
+  BaseGatekeeper() = default;
+  virtual ~BaseGatekeeper() = default;
 
   virtual bool Init() = 0;
 
   virtual bool AbleToPublish(const TrackPtr& track) = 0;
 
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() const = 0;
+
   virtual std::string Name() const = 0;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseGatekeeper);
 };
 
 }  // namespace fusion

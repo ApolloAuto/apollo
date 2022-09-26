@@ -21,10 +21,12 @@
 #include <vector>
 
 #include "cyber/component/component.h"
+#include "modules/common_msgs/perception_msgs/perception_camera.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/common/util/eigen_defs.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
@@ -37,8 +39,6 @@
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/motion_service.pb.h"
-#include "modules/perception/proto/perception_camera.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;

@@ -23,8 +23,8 @@
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/base/traffic_light.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
-#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/pipeline/proto/stage/recognition.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -35,7 +35,7 @@ class ClassifyBySimple {
   ClassifyBySimple() = default;
   ~ClassifyBySimple() = default;
 
-  void Init(const traffic_light::recognition::ClassifyParam& model_config,
+  void Init(const ClassifyParam& model_config,
             const int gpu_id, const std::string work_root);
 
   void Perform(const CameraFrame* frame,

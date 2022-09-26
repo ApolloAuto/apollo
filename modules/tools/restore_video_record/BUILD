@@ -7,6 +7,6 @@ py_binary(
     srcs = ["restore_video_record.py"],
     deps = [
         "//cyber/python/cyber_py3:record",
-        "//modules/drivers/proto:sensor_image_py_pb2",
+        "//modules/common_msgs/sensor_msgs:sensor_image_py_pb2",
     ],
 )

@@ -14,6 +14,7 @@ filegroup(
 
 install(
     name = "install",
+    data_dest = "common/data",
     data = [
         ":global_flagfile",
         ":vehicle_config_data",

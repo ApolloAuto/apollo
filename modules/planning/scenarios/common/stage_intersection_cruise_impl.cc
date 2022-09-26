@@ -33,7 +33,7 @@ namespace planning {
 namespace scenario {
 
 bool StageIntersectionCruiseImpl::CheckDone(
-    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type,
+    const Frame& frame, const ScenarioType& scenario_type,
     const ScenarioConfig::StageConfig& config, const PlanningContext* context,
     const bool right_of_way_status) {
   const auto& reference_line_info = frame.reference_line_info().front();
@@ -45,8 +45,8 @@ bool StageIntersectionCruiseImpl::CheckDone(
     // pnc_junction not exist on map, use current traffic_sign's end_s
     // get traffic sign overlap along reference line
     hdmap::PathOverlap* traffic_sign_overlap = nullptr;
-    if (scenario_type == ScenarioConfig::STOP_SIGN_PROTECTED ||
-        scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
+    if (scenario_type == ScenarioType::STOP_SIGN_PROTECTED ||
+        scenario_type == ScenarioType::STOP_SIGN_UNPROTECTED) {
       // stop_sign scenarios
       const auto& stop_sign_status = context->planning_status().stop_sign();
       const std::string traffic_sign_overlap_id =
@@ -54,11 +54,11 @@ bool StageIntersectionCruiseImpl::CheckDone(
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
           reference_line_info, traffic_sign_overlap_id,
           ReferenceLineInfo::STOP_SIGN);
-    } else if (scenario_type == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
+    } else if (scenario_type == ScenarioType::TRAFFIC_LIGHT_PROTECTED ||
                scenario_type ==
-                   ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
+                   ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
                scenario_type ==
-                   ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
+                   ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
       // traffic_light scenarios
       const auto& traffic_light_status =
           context->planning_status().traffic_light();
@@ -69,7 +69,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
           reference_line_info, traffic_sign_overlap_id,
           ReferenceLineInfo::SIGNAL);
-    } else if (scenario_type == ScenarioConfig::YIELD_SIGN) {
+    } else if (scenario_type == ScenarioType::YIELD_SIGN) {
       // yield_sign scenarios
       const auto& yield_sign_status = context->planning_status().yield_sign();
       const std::string traffic_sign_overlap_id =

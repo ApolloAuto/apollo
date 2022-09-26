@@ -22,7 +22,7 @@
 #include "modules/drivers/lidar/proto/config.pb.h"
 #include "modules/drivers/lidar/proto/robosense.pb.h"
 #include "modules/drivers/lidar/proto/robosense_config.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/common/driver_factory/driver_base.h"

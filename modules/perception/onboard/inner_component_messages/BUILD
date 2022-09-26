@@ -8,4 +8,16 @@ cc_library(
     hdrs = ["inner_component_messages.h"],
 )
 
+cc_library(
+    name = "lidar_inner_component_messages",
+    hdrs = [
+        "lidar_inner_component_messages.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/lidar/common",
+        "//modules/perception/onboard/inner_component_messages",
+    ],
+)
+
 cpplint()

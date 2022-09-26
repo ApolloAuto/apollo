@@ -23,26 +23,3 @@ py_proto_library(
         ":storytelling_config_proto",
     ],
 )
-
-cc_proto_library(
-    name = "story_cc_proto",
-    deps = [
-        ":story_proto",
-    ],
-)
-
-proto_library(
-    name = "story_proto",
-    srcs = ["story.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "story_py_pb2",
-    deps = [
-        ":story_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)

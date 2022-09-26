@@ -5,6 +5,9 @@ ARG CUDA_LITE
 ARG CUDNN_VERSION
 ARG TENSORRT_VERSION
 
+# nvidia gpg key error. ref: https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
+RUN apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/3bf863cc.pub
+
 RUN M="${CUDNN_VERSION%%.*}" \
     && PATCH="-1+cuda${CUDA_LITE}" \
     && apt-get update \

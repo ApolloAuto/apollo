@@ -16,19 +16,19 @@
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
 #include <limits>
+#include <unordered_map>
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/pointcloud_preprocessor/proto/pointcloud_preprocessor_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::cyber::common::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 
@@ -44,7 +44,7 @@ bool PointCloudPreprocessor::Init(
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
-  PointCloudPreprocessorConfig config;
+  PointcloudPreprocessorConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
@@ -61,6 +61,43 @@ bool PointCloudPreprocessor::Init(
   filter_high_z_points_ = config.filter_high_z_points();
   z_threshold_ = config.z_threshold();
   return true;
+}
+
+bool PointCloudPreprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  ACHECK(stage_config.has_pointcloud_preprocessor_config());
+  pointcloud_preprocessor_config_ =
+      stage_config.pointcloud_preprocessor_config();
+
+  filter_naninf_points_ =
+      pointcloud_preprocessor_config_.filter_naninf_points();
+  filter_nearby_box_points_ =
+      pointcloud_preprocessor_config_.filter_nearby_box_points();
+  box_forward_x_  = pointcloud_preprocessor_config_.box_forward_x();
+  box_backward_x_ = pointcloud_preprocessor_config_.box_backward_x();
+  box_forward_y_  = pointcloud_preprocessor_config_.box_forward_y();
+  box_backward_y_ = pointcloud_preprocessor_config_.box_backward_y();
+  filter_high_z_points_ =
+      pointcloud_preprocessor_config_.filter_high_z_points();
+  z_threshold_    = pointcloud_preprocessor_config_.z_threshold();
+  return true;
+}
+
+// Process作用： 1、代替原有的Process逻辑(封装成为InnerProcess) ，
+// 2、循环调用不同task的Process函数(如果有task)
+bool PointCloudPreprocessor::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr) return false;
+
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) return false;
+
+  PointCloudPreprocessorOptions options;
+  options.sensor2novatel_extrinsics = lidar_frame->lidar2novatel_extrinsics;
+  bool result = Preprocess(options, lidar_frame);
+  return result;
 }
 
 bool PointCloudPreprocessor::Preprocess(

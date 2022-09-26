@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -39,7 +40,11 @@ class DummyObjectFilter : public BaseObjectFilter {
   // segmented_objects should be valid, and will be filtered,
   bool Filter(const ObjectFilterOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyObjectFilter"; }
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 };  // class DummyObjectFilter
 
 }  // namespace lidar

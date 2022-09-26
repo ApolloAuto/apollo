@@ -37,6 +37,14 @@ bool DummyROIFilter::Filter(const ROIFilterOptions& options,
   return true;
 }
 
+bool DummyROIFilter::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DummyROIFilter::Process(DataFrame* data_frame) {
+  return true;
+}
+
 PERCEPTION_REGISTER_ROIFILTER(DummyROIFilter);
 
 }  // namespace lidar

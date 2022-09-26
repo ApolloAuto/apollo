@@ -6,25 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "lidar_obstacle_detection_config_cc_proto",
-    deps = [
-        ":lidar_obstacle_detection_config_proto",
-    ],
-)
-
-proto_library(
-    name = "lidar_obstacle_detection_config_proto",
-    srcs = ["lidar_obstacle_detection_config.proto"],
-)
-
-py_proto_library(
-    name = "lidar_obstacle_detection_config_py_pb2",
-    deps = [
-        ":lidar_obstacle_detection_config_proto",
-    ],
-)
-
-cc_proto_library(
     name = "lidar_obstacle_tracking_config_cc_proto",
     deps = [
         ":lidar_obstacle_tracking_config_proto",
@@ -40,5 +21,23 @@ py_proto_library(
     name = "lidar_obstacle_tracking_config_py_pb2",
     deps = [
         ":lidar_obstacle_tracking_config_proto",
+    ],
+)
+cc_proto_library(
+    name = "lidar_obstacle_detection_config_cc_proto",
+    deps = [
+        ":lidar_obstacle_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "lidar_obstacle_detection_config_proto",
+    srcs = ["lidar_obstacle_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "lidar_obstacle_detection_config_py_pb2",
+    deps = [
+        ":lidar_obstacle_detection_config_proto",
     ],
 )

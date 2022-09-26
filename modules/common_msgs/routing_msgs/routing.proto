@@ -1,0 +1,96 @@
+syntax = "proto2";
+
+package apollo.routing;
+
+import "modules/common_msgs/basic_msgs/error_code.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_parking_space.proto";
+
+message LaneWaypoint {
+  optional string id = 1;
+  optional double s = 2;
+  optional apollo.common.PointENU pose = 3;
+  // When the developer selects a point on the dreamview route editing
+  // the direction can be specified by dragging the mouse
+  // dreamview calculates the heading based on this to support construct lane way point with heading
+  optional double heading = 4;
+}
+
+message LaneSegment {
+  optional string id = 1;
+  optional double start_s = 2;
+  optional double end_s = 3;
+}
+
+enum ParkingSpaceType {
+  VERTICAL_PLOT = 0;
+  PARALLEL_PARKING = 1;
+}
+
+enum DeadEndRoutingType {
+  ROUTING_OTHER = 0;
+  ROUTING_IN = 1;
+  ROUTING_OUT = 2;
+}
+
+message ParkingInfo {
+  optional string parking_space_id = 1;
+  optional apollo.common.PointENU parking_point = 2;
+  optional ParkingSpaceType parking_space_type = 3;
+  // The four corner points are in order.
+  optional apollo.hdmap.Polygon corner_point = 4;
+}
+
+message DeadEndInfo {
+  // dead end in/out routing
+  optional DeadEndRoutingType dead_end_routing_type = 1;
+  // traget point from the out routing's start point
+  optional apollo.common.PointENU target_point = 2;
+}
+
+message RoutingRequest {
+  optional apollo.common.Header header = 1;
+  // at least two points. The first is start point, the end is final point.
+  // The routing must go through each point in waypoint.
+  repeated LaneWaypoint waypoint = 2;
+  repeated LaneSegment blacklisted_lane = 3;
+  repeated string blacklisted_road = 4;
+  optional bool broadcast = 5 [default = true];
+  optional apollo.hdmap.ParkingSpace parking_space = 6 [deprecated = true];
+  optional ParkingInfo parking_info = 7;
+  optional DeadEndInfo dead_end_info = 8;
+}
+
+message Measurement {
+  optional double distance = 1;
+}
+
+enum ChangeLaneType {
+  FORWARD = 0;
+  LEFT = 1;
+  RIGHT = 2;
+};
+
+message Passage {
+  repeated LaneSegment segment = 1;
+  optional bool can_exit = 2;
+  optional ChangeLaneType change_lane_type = 3 [default = FORWARD];
+}
+
+message RoadSegment {
+  optional string id = 1;
+  repeated Passage passage = 2;
+}
+
+message RoutingResponse {
+  optional apollo.common.Header header = 1;
+  repeated RoadSegment road = 2;
+  optional Measurement measurement = 3;
+  optional RoutingRequest routing_request = 4;
+
+  // the map version which is used to build road graph
+  optional bytes map_version = 5;
+  optional apollo.common.StatusPb status = 6;
+}

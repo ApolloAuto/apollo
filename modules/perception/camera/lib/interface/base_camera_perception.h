@@ -17,9 +17,11 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +35,11 @@ struct CameraPerceptionInitOptions : public BaseInitOptions {
 
 struct CameraPerceptionOptions {};
 
-class BaseCameraPerception {
+class BaseCameraPerception : public pipeline::Pipeline {
+ public:
+  using PipelineConfig = pipeline::PipelineConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseCameraPerception() = default;
   virtual ~BaseCameraPerception() = default;
@@ -42,10 +48,13 @@ class BaseCameraPerception {
   virtual bool Perception(const CameraPerceptionOptions &options,
                           CameraFrame *frame) = 0;
 
+  virtual bool Init(const PipelineConfig& pipeline_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
   virtual std::string Name() const = 0;
 
-  BaseCameraPerception(const BaseCameraPerception &) = delete;
-  BaseCameraPerception &operator=(const BaseCameraPerception &) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseCameraPerception);
 };
 
 PERCEPTION_REGISTER_REGISTERER(BaseCameraPerception);

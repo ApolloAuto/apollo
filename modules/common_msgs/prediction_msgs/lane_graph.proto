@@ -1,0 +1,115 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/map_msgs/map_lane.proto";
+
+message LanePoint {
+  optional apollo.common.Point3D position = 1;
+  optional double heading = 2 [default = 0.0];
+  optional double width = 3 [default = 0.0];
+  // relative s to focus obstacle
+  optional double relative_s = 4 [default = 0.0];
+  // relative l to focus obstacle
+  optional double relative_l = 5 [default = 0.0];
+  // lane point heading relative to focused obstacle heading
+  optional double angle_diff = 6 [default = 0.0];
+  optional double kappa = 7 [default = 0.0];
+
+  enum ScenarioType {
+    URBAN_ROAD = 0;
+    JUNCTION = 1;
+    HIGHWAY = 2;
+  }
+
+  optional ScenarioType scenario_type = 8;
+  optional double speed_limit = 9;
+}
+
+message LaneSegment {
+  optional string lane_id = 1;
+  // s offset of the first lane point
+  optional double start_s = 2 [default = 0.0];
+  // s offset of the last lane point
+  optional double end_s = 3 [default = 0.0];
+  optional uint32 lane_turn_type = 4 [default = 0];
+  repeated LanePoint lane_point = 5;
+  // If this lane-segment is the one that's closest to ADC,
+  // then adc_s gives the s of the ADC.
+  optional double adc_s = 7 [default = 0.0];
+  optional int32 adc_lane_point_idx = 8 [default = 0];
+  optional double total_length = 6 [default = 0.0];
+}
+
+message NearbyObstacle {
+  optional int32 id = 1;
+  optional double s = 2;  // relative to focus obstacle
+  optional double l = 3;  // relative to focus obstacle
+}
+
+message StopSign {
+  optional string stop_sign_id = 1;
+  optional string lane_id = 2;
+  optional double lane_s = 3;           // the s value within the lane
+  optional double lane_sequence_s = 4;  // the s value along lane sequence
+}
+
+// next id = 24
+message LaneSequence {
+  optional int32 lane_sequence_id = 1;
+  repeated LaneSegment lane_segment = 2;
+  // The index of the lane-segment that is closest to ADC:
+  optional int32 adc_lane_segment_idx = 23 [default = 0];
+  repeated apollo.common.PathPoint path_point = 8;
+  optional apollo.hdmap.Lane.LaneType lane_type = 22;
+  optional double lane_s = 17;
+  optional double lane_l = 18;
+  optional bool vehicle_on_lane = 10;
+
+  // nearby obstacles on this lane sequence
+  repeated NearbyObstacle nearby_obstacle = 3;
+  optional StopSign stop_sign = 20;
+  optional int32 right_of_way = 21;  // right_of_way score
+
+  message Features {
+    repeated double mlp_features = 1;
+  }
+  optional Features features = 4;
+  optional int32 label = 5 [default = 0];
+  optional double probability = 6 [default = 0.0];
+  optional double acceleration = 7 [default = 0.0];
+  optional double time_to_lane_center = 16;
+  optional double time_to_lane_edge = 19;
+  enum BehaviorType {
+    NOT_GOTO_LANE = 1;
+    CONSTANT_SPEED = 2;
+    SMALL_ACCELERATION = 3;
+    LARGE_ACCELERATION = 4;
+    SMALL_DECELERATION = 5;
+    LARGE_DECELERATION = 6;
+  }
+  optional BehaviorType behavior_type = 9;
+  // lane points on this lane sequence
+  repeated LanePoint curr_lane_point = 11;
+  // lane points on the left neighbor lane sequence
+  repeated LanePoint left_neighbor_point = 12;
+  // lane points on the right neighbor lane sequence
+  repeated LanePoint right_neighbor_point = 13;
+  // nearby obstacles on the left neighbor lane sequence
+  repeated NearbyObstacle left_nearby_obstacle = 14;
+  // nearby obstacles on the right neighbor lane sequence
+  repeated NearbyObstacle right_nearby_obstacle = 15;
+}
+
+message LaneGraph {
+  repeated LaneSequence lane_sequence = 1;
+}
+
+message LaneObstacle {
+  optional int32 obstacle_id = 1;
+  optional string lane_id = 2;
+  optional double lane_s = 3;
+  optional double lane_l = 4;
+}

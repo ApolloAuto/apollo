@@ -6,7 +6,7 @@ py_library(
     name = "localization",
     srcs = ["localization.py"],
     deps = [
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )
@@ -15,7 +15,7 @@ py_library(
     name = "map",
     srcs = ["map.py"],
     deps = [
-        "//modules/map/proto:map_py_pb2",
+        "//modules/common_msgs/map_msgs:map_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )
@@ -29,7 +29,7 @@ py_library(
     name = "planning",
     srcs = ["planning.py"],
     deps = [
-        "//modules/planning/proto:planning_internal_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_internal_py_pb2",
     ],
 )
 
@@ -45,7 +45,7 @@ py_library(
         ":subplot_st_main",
         ":subplot_st_speed",
         "//cyber/python/cyber_py3:cyber",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 
@@ -58,7 +58,7 @@ py_library(
         ":subplot_traj_path",
         ":subplot_traj_speed",
         "//cyber/python/cyber_py3:cyber",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 
@@ -70,7 +70,7 @@ py_library(
         ":subplot_st_main",
         ":subplot_st_speed",
         "//cyber/python/cyber_py3:cyber",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 

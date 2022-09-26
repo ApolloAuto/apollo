@@ -23,22 +23,3 @@ py_proto_library(
         ":ncut_param_proto",
     ],
 )
-
-cc_proto_library(
-    name = "ncut_config_cc_proto",
-    deps = [
-        ":ncut_config_proto",
-    ],
-)
-
-proto_library(
-    name = "ncut_config_proto",
-    srcs = ["ncut_config.proto"],
-)
-
-py_proto_library(
-    name = "ncut_config_py_pb2",
-    deps = [
-        ":ncut_config_proto",
-    ],
-)

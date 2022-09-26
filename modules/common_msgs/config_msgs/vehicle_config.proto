@@ -1,0 +1,101 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/vehicle_id.proto";
+
+message Transform {
+  optional bytes source_frame = 1;  // Also known as "frame_id."
+
+  optional bytes target_frame = 2;  // Also known as "child_frame_id."
+
+  // Position of target in the source frame.
+  optional Point3D translation = 3;
+
+  // Activate rotation from the source frame to the target frame.
+  optional Quaternion rotation = 4;
+}
+
+message Extrinsics {
+  repeated Transform tansforms = 1;
+}
+
+// Vehicle parameters shared among several modules.
+// By default, all are measured with the SI units (meters, meters per second,
+// etc.).
+
+enum VehicleBrand {
+  LINCOLN_MKZ = 0;
+  GEM = 1;
+  LEXUS = 2;
+  TRANSIT = 3;
+  GE3 = 4;
+  WEY = 5;
+  ZHONGYUN = 6;
+  CH = 7;
+  DKIT = 8;
+  NEOLIX = 9;
+}
+
+message LatencyParam {
+  // latency parameters, in second (s)
+  optional double dead_time = 1;
+  optional double rise_time = 2;
+  optional double peak_time = 3;
+  optional double settling_time = 4;
+}
+
+message VehicleParam {
+  optional VehicleBrand brand = 1;
+  // Car center point is car reference point, i.e., center of rear axle.
+  optional VehicleID vehicle_id = 2;
+  optional double front_edge_to_center = 3 [default = nan];
+  optional double back_edge_to_center = 4 [default = nan];
+  optional double left_edge_to_center = 5 [default = nan];
+  optional double right_edge_to_center = 6 [default = nan];
+
+  optional double length = 7 [default = nan];
+  optional double width = 8 [default = nan];
+  optional double height = 9 [default = nan];
+
+  optional double min_turn_radius = 10 [default = nan];
+  optional double max_acceleration = 11 [default = nan];
+  optional double max_deceleration = 12 [default = nan];
+
+  // The following items are used to compute trajectory constraints in
+  // planning/control/canbus,
+  // vehicle max steer angle
+  optional double max_steer_angle = 13 [default = nan];
+  // vehicle max steer rate; how fast can the steering wheel turn.
+  optional double max_steer_angle_rate = 14 [default = nan];
+  // vehicle min steer rate;
+  optional double min_steer_angle_rate = 15 [default = nan];
+  // ratio between the turn of steering wheel and the turn of wheels
+  optional double steer_ratio = 16 [default = nan];
+  // the distance between the front and back wheels
+  optional double wheel_base = 17 [default = nan];
+  // Tire effective rolling radius (vertical distance between the wheel center
+  // and the ground).
+  optional double wheel_rolling_radius = 18 [default = nan];
+
+  // minimum differentiable vehicle speed, in m/s
+  optional float max_abs_speed_when_stopped = 19 [default = nan];
+
+  // minimum value get from chassis.brake, in percentage
+  optional double brake_deadzone = 20 [default = nan];
+  // minimum value get from chassis.throttle, in percentage
+  optional double throttle_deadzone = 21 [default = nan];
+
+  // vehicle latency parameters
+  optional LatencyParam steering_latency_param = 22;
+  optional LatencyParam throttle_latency_param = 23;
+  optional LatencyParam brake_latency_param = 24;
+}
+
+message VehicleConfig {
+  optional apollo.common.Header header = 1;
+  optional VehicleParam vehicle_param = 2;
+  optional Extrinsics extrinsics = 3;
+}

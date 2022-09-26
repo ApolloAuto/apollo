@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+// used for dv communicate with dv's plugin
+message DvPluginMsg {
+    optional apollo.common.Header header = 1;
+    optional string name = 2;
+    // info:json
+    optional string info = 3;
+    optional string source = 4 ;
+    optional string target = 5;
+    enum ComponentType{
+        module = 0; 
+        plugins = 1; 
+    }
+    optional ComponentType source_type =6;
+    optional ComponentType target_type = 7;
+}

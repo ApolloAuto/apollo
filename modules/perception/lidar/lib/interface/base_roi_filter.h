@@ -20,6 +20,7 @@
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -29,7 +30,13 @@ struct ROIFilterInitOptions {};
 
 struct ROIFilterOptions {};
 
-class BaseROIFilter {
+class BaseROIFilter : public pipeline::Stage {
+ public:
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
+
  public:
   BaseROIFilter() = default;
 
@@ -45,6 +52,12 @@ class BaseROIFilter {
   // roi_indices should be filled, required
   // label field of point cloud can be filled, optional
   virtual bool Filter(const ROIFilterOptions& options, LidarFrame* frame) = 0;
+
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
 
   virtual std::string Name() const = 0;
 

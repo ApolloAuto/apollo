@@ -17,10 +17,12 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -33,7 +35,11 @@ struct ObstaclePostprocessorOptions {
   bool do_refinement_with_calibration_service = true;
 };
 
-class BaseObstaclePostprocessor {
+class BaseObstaclePostprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseObstaclePostprocessor() = default;
 
@@ -49,11 +55,15 @@ class BaseObstaclePostprocessor {
   virtual bool Process(const ObstaclePostprocessorOptions& options,
                        CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
-  BaseObstaclePostprocessor(const BaseObstaclePostprocessor&) = delete;
-  BaseObstaclePostprocessor& operator=(const BaseObstaclePostprocessor&) =
-      delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseObstaclePostprocessor);
 };  // class BaseObstaclePostprocessor
 
 PERCEPTION_REGISTER_REGISTERER(BaseObstaclePostprocessor);

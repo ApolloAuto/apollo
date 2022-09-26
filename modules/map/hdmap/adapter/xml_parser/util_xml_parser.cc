@@ -17,7 +17,7 @@ limitations under the License.
 #include <algorithm>
 
 #include "cyber/common/log.h"
-#include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+#include "modules/map/hdmap/adapter/xml_parser/coordinate_convert_tool.h"
 
 namespace apollo {
 namespace hdmap {

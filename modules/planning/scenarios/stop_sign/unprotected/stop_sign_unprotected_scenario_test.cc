@@ -50,7 +50,7 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new StopSignUnprotectedScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::STOP_SIGN_UNPROTECTED);
 }
 
 }  // namespace stop_sign

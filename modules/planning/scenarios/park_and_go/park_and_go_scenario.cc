@@ -28,7 +28,7 @@ namespace scenario {
 namespace park_and_go {
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     ParkAndGoScenario::s_stage_factory_;
@@ -53,25 +53,25 @@ void ParkAndGoScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::PARK_AND_GO_CHECK,
+      StageType::PARK_AND_GO_CHECK,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new ParkAndGoStageCheck(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::PARK_AND_GO_ADJUST,
+      StageType::PARK_AND_GO_ADJUST,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new ParkAndGoStageAdjust(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::PARK_AND_GO_PRE_CRUISE,
+      StageType::PARK_AND_GO_PRE_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new ParkAndGoStagePreCruise(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::PARK_AND_GO_CRUISE,
+      StageType::PARK_AND_GO_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new ParkAndGoStageCruise(config, injector);

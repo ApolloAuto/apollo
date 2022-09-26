@@ -39,9 +39,7 @@ cc_library(
     name = "base_detector",
     hdrs = ["base_detector.h"],
     deps = [
-        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-        "//modules/drivers/proto:conti_radar_cc_proto",
-        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
+        "//modules/common_msgs/sensor_msgs:conti_radar_cc_proto",
     ],
 )
 
@@ -49,9 +47,7 @@ cc_library(
     name = "base_preprocessor",
     hdrs = ["base_preprocessor.h"],
     deps = [
-        "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-        "//modules/drivers/proto:conti_radar_cc_proto",
-        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_cc_proto",
+        "//modules/common_msgs/sensor_msgs:conti_radar_cc_proto",
     ],
 )
 

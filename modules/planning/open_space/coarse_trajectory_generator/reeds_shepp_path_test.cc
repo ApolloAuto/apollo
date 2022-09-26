@@ -22,12 +22,12 @@
 
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {

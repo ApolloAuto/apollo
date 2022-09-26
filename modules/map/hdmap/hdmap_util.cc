@@ -19,7 +19,6 @@ limitations under the License.
 
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
 namespace hdmap {

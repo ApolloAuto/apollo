@@ -11,8 +11,8 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber/common:log",
-        "//modules/common/util:map_util",
+        "//cyber",
+        "//modules/common/util:util_tool",
         "//modules/planning/common:planning_common",
     ],
 )

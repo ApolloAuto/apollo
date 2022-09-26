@@ -52,6 +52,24 @@ bool SingleStageObstacleTransformer::Init(
   return true;
 }
 
+bool SingleStageObstacleTransformer::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  singlestage_param_ = stage_config.singlestage_param();
+  AINFO << "Load transformer parameters: " << singlestage_param_.DebugString();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
+
+  return true;
+}
+
+bool SingleStageObstacleTransformer::Process(DataFrame* data_frame) {
+  return true;
+}
+
 int SingleStageObstacleTransformer::MatchTemplates(
     base::ObjectSubType sub_type, float *dimension_hwl) {
   const TemplateMap &kMinTemplateHWL =
@@ -300,7 +318,7 @@ void SingleStageObstacleTransformer::ConstraintCenterPoint(const float *bbox,
   // Get rotation matrix rot_y
   /*
       cos(ry)   0   sin(ry)
-  R =    0      1     0  
+  R =    0      1     0
       -sin(ry)  0   cos(ry)
   */
   GenRotMatrix(ry, rot_y);
@@ -376,10 +394,6 @@ void SingleStageObstacleTransformer::ConstraintCenterPoint(const float *bbox,
              cost_pre < K_MIN_COST;
     }
   }
-}
-
-std::string SingleStageObstacleTransformer::Name() const {
-  return "SingleStageObstacleTransformer";
 }
 
 // Register plugin.

@@ -1,0 +1,332 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// CreesDeciderConfig
+
+message CreepDeciderConfig {
+  // stop distance(m) to the creeping stop fence while creeping
+  optional double stop_distance = 1 [default = 0.5];  // meter
+  optional double speed_limit = 2 [default = 1.0];    // m/s
+  // max distance(m) to the to the creeping stop fence
+  // to be considered as a valid stop for creep
+  optional double max_valid_stop_distance = 3 [default = 0.3];  // meter
+  // min boundary t to ignore obstacles while creeping
+  optional double min_boundary_t = 4 [default = 6.0];  // second
+  // tolerance min_t & min_s to ignore obstacles which are moving
+  // on same direction of ADC while creeping
+  optional double ignore_max_st_min_t = 5 [default = 0.1];   // second
+  optional double ignore_min_st_min_s = 6 [default = 15.0];  // meter
+}
+
+//////////////////////////////////
+// LaneChangeDeciderConfig
+
+message LaneChangeDeciderConfig {
+  optional bool enable_lane_change_urgency_check = 1;
+  // True to enable prioritize change_lane reference line
+  optional bool enable_prioritize_change_lane = 2 [default = false];
+  // True to enable remove change_lane reference line");
+  optional bool enable_remove_change_lane = 3 [default = false];
+  // always allow the vehicle change lane. The vehicle may continue changing
+  // lane
+  optional bool reckless_change_lane = 4 [default = false];
+  // not allowed to change lane this amount of time if just finished
+  optional double change_lane_success_freeze_time = 5
+      [default = 1.5];  // second
+  // not allowed to change lane this amount of time if just failed
+  optional double change_lane_fail_freeze_time = 6 [default = 1.0];  // second
+}
+
+//////////////////////////////////
+// LearningModelInferenceTaskConfig
+
+message LearningModelInferenceTaskConfig {
+  enum ModelType {
+    CNN = 1;
+    CNN_LSTM = 2;
+  }
+  optional ModelType model_type = 1;
+  optional string cpu_model_file = 2;
+  optional string gpu_model_file = 3;
+  optional bool use_cuda = 4 [default = true];
+  // delta_t depends on the model output, not a configurable value here
+  optional double trajectory_delta_t = 5 [default = 0.2];  // second
+  optional bool allow_empty_learning_based_data = 6 [default = false];
+  optional bool allow_empty_output_trajectory = 7 [default = false];
+}
+
+//////////////////////////////////
+// LearningModelInferenceTrajectoryTaskConfig
+
+message LearningModelInferenceTrajectoryTaskConfig {
+  optional double min_adc_future_trajectory_time_length = 1
+      [default = 2.0];  // second
+}
+
+//////////////////////////////////
+// Navi
+
+message NaviObstacleDeciderConfig {
+  optional double min_nudge_distance = 1 [default = 0.2];
+  optional double max_nudge_distance = 2 [default = 1.2];
+  optional double max_allow_nudge_speed = 3 [default = 16.667];
+  optional double safe_distance = 4 [default = 0.2];
+  optional double nudge_allow_tolerance = 5 [default = 0.05];
+  optional uint32 cycles_number = 6 [default = 3];
+  optional double judge_dis_coeff = 7 [default = 2.0];
+  optional double basis_dis_value = 8 [default = 30.0];
+  optional double lateral_velocity_value = 9 [default = 0.5];
+  optional double speed_decider_detect_range = 10 [default = 1.0];
+  optional uint32 max_keep_nudge_cycles = 11 [default = 100];
+}
+
+message NaviPathDeciderConfig {
+  optional double min_path_length = 1 [default = 5];
+  optional uint32 min_look_forward_time = 2 [default = 2];
+  optional double max_keep_lane_distance = 3 [default = 0.8];
+  optional double max_keep_lane_shift_y = 4 [default = 20.0];
+  optional double min_keep_lane_offset = 5 [default = 15.0];
+  optional double keep_lane_shift_compensation = 6 [default = 0.01];
+  optional MoveDestLaneConfigTable move_dest_lane_config_talbe = 7;
+  optional double move_dest_lane_compensation = 8 [default = 0.35];
+  optional double max_kappa_threshold = 9 [default = 0.0];
+  optional double kappa_move_dest_lane_compensation = 10 [default = 0.0];
+  optional uint32 start_plan_point_from = 11 [default = 0];
+}
+
+message MoveDestLaneConfigTable {
+  repeated ShiftConfig lateral_shift = 1;
+}
+
+message ShiftConfig {
+  optional double max_speed = 1 [default = 4.16];
+  optional double max_move_dest_lane_shift_y = 3 [default = 0.4];
+}
+
+message NaviSpeedDeciderConfig {
+  optional double preferred_accel = 1 [default = 2.0];
+  optional double preferred_decel = 2 [default = 2.0];
+  optional double preferred_jerk = 3 [default = 2.0];
+  optional double max_accel = 4 [default = 4.0];
+  optional double max_decel = 5 [default = 5.0];
+  optional double obstacle_buffer = 6 [default = 0.5];
+  optional double safe_distance_base = 7 [default = 2.0];
+  optional double safe_distance_ratio = 8 [default = 1.0];
+  optional double following_accel_ratio = 9 [default = 0.5];
+  optional double soft_centric_accel_limit = 10 [default = 1.2];
+  optional double hard_centric_accel_limit = 11 [default = 1.5];
+  optional double hard_speed_limit = 12 [default = 100.0];
+  optional double hard_accel_limit = 13 [default = 10.0];
+  optional bool enable_safe_path = 14 [default = true];
+  optional bool enable_planning_start_point = 15 [default = true];
+  optional bool enable_accel_auto_compensation = 16 [default = true];
+  optional double kappa_preview = 17 [default = 0.0];
+  optional double kappa_threshold = 18 [default = 0.0];
+}
+
+//////////////////////////////////
+// PathAssessmentDeciderConfig
+
+message PathAssessmentDeciderConfig {}
+
+//////////////////////////////////
+// PathBoundsDeciderConfig
+
+message PathBoundsDeciderConfig {
+  optional bool is_lane_borrowing = 1;
+  optional bool is_pull_over = 2;
+  // not search pull-over position if the destination is within this distance
+  // from ADC
+  optional double pull_over_destination_to_adc_buffer = 3 [default = 25.0];
+  // not search pull-over position if the destination is within this distance to
+  // path-end
+  optional double pull_over_destination_to_pathend_buffer = 4 [default = 10.0];
+  // disquality a pull-over position if the available path boundary's edge is
+  // not within this distance from the road edge
+  optional double pull_over_road_edge_buffer = 5 [default = 0.15];
+  optional double pull_over_approach_lon_distance_adjust_factor = 6
+      [default = 1.5];
+  optional double adc_buffer_coeff = 7 [default = 1.0];
+  optional bool is_extend_lane_bounds_to_include_adc = 8 [default = true];
+}
+
+//////////////////////////////////
+// PathDeciderConfig
+
+message PathDeciderConfig {
+  // buffer for static obstacles (meter)
+  optional double static_obstacle_buffer = 1 [default = 0.3];
+}
+
+//////////////////////////////////
+// PathLaneBorrowDeciderConfig
+
+message PathLaneBorrowDeciderConfig {
+  optional bool allow_lane_borrowing = 1;
+}
+
+//////////////////////////////////
+// PathReferenceDeciderConfig
+
+message PathReferenceDeciderConfig {
+  optional uint32 min_path_reference_length = 1 [default = 20];
+  // learning model s weight
+  optional double weight_x_ref_path_reference = 2;
+}
+
+//////////////////////////////////
+// PathReuseDeciderConfig
+
+message PathReuseDeciderConfig {
+  optional bool reuse_path = 1;
+}
+
+//////////////////////////////////
+// PiecewiseJerkNonlinearSpeedOptimizerConfig
+
+message PiecewiseJerkNonlinearSpeedOptimizerConfig {
+  // Driving comfort weights
+  optional double acc_weight = 1 [default = 500.0];
+  optional double jerk_weight = 2 [default = 100.0];
+  optional double lat_acc_weight = 3 [default = 500.0];
+
+  // Minimal traversal time weight
+  optional double s_potential_weight = 4 [default = 10.0];
+
+  // Preferred cruising speed weight
+  optional double ref_v_weight = 5 [default = 10.0];
+
+  // Optional reference speed profile weight
+  optional double ref_s_weight = 6 [default = 10.0];
+
+  // Task specific end point weight
+  optional double end_s_weight = 7 [default = 10.0];
+  optional double end_v_weight = 8 [default = 10.0];
+  optional double end_a_weight = 9 [default = 10.0];
+
+  // soft safety boundary constraint violation weight
+  optional double soft_s_bound_weight = 10 [default = 10.0];
+
+  // Solver settings
+  optional bool use_warm_start = 100 [default = true];
+}
+
+//////////////////////////////////
+// PiecewiseJerkPathOptimizerConfig
+
+message PiecewiseJerkPathOptimizerConfig {
+  optional PiecewiseJerkPathWeights default_path_config = 1;
+  optional PiecewiseJerkPathWeights lane_change_path_config = 2;
+  optional double path_reference_l_weight = 3 [default = 0.0];
+}
+
+message PiecewiseJerkPathWeights {
+  optional double l_weight = 1 [default = 1.0];
+  optional double dl_weight = 2 [default = 100.0];
+  optional double ddl_weight = 3 [default = 1000.0];
+  optional double dddl_weight = 4 [default = 10000.0];
+}
+
+//////////////////////////////////
+// PiecewiseJerkSpeedOptimizerConfig
+
+message PiecewiseJerkSpeedOptimizerConfig {
+  optional double acc_weight = 1 [default = 1.0];
+  optional double jerk_weight = 2 [default = 10.0];
+  optional double kappa_penalty_weight = 3 [default = 1000.0];
+  optional double ref_s_weight = 4 [default = 10.0];
+  optional double ref_v_weight = 5 [default = 10.0];
+}
+
+//////////////////////////////////
+// RuleBasedStopDeciderConfig
+
+message RuleBasedStopDeciderConfig {
+  optional double max_adc_stop_speed = 1 [default = 0.3];
+  optional double max_valid_stop_distance = 2 [default = 0.5];
+  optional double search_beam_length = 3 [default = 5.0];
+  optional double search_beam_radius_intensity = 4 [default = 0.08];
+  optional double search_range = 5 [default = 3.14];
+  optional double is_block_angle_threshold = 6 [default = 1.57];
+
+  optional double approach_distance_for_lane_change = 10 [default = 80.0];
+  optional double urgent_distance_for_lane_change = 11 [default = 50.0];
+}
+
+//////////////////////////////////
+// SpeedBoundsDeciderConfig
+
+message SpeedBoundsDeciderConfig {
+  optional double total_time = 1 [default = 7.0];
+  optional double boundary_buffer = 2 [default = 0.1];
+  optional double max_centric_acceleration_limit = 3 [default = 2.0];
+  optional double minimal_kappa = 4 [default = 0.00001];
+  optional double point_extension = 5 [default = 1.0];
+  optional double lowest_speed = 6 [default = 2.5];
+  optional double collision_safety_range = 7 [default = 1.0];
+  optional double static_obs_nudge_speed_ratio = 8;
+  optional double dynamic_obs_nudge_speed_ratio = 9;
+}
+
+//////////////////////////////////
+// SpeedHeuristicOptimizerConfig
+
+message SpeedHeuristicOptimizerConfig {
+  optional DpStSpeedOptimizerConfig default_speed_config = 1;
+  optional DpStSpeedOptimizerConfig lane_change_speed_config = 2;
+}
+
+message DpStSpeedOptimizerConfig {
+  optional double unit_t = 1 [default = 1.0];
+  optional int32 dense_dimension_s = 2 [default = 41];
+  optional double dense_unit_s = 3 [default = 0.5];
+  optional double sparse_unit_s = 4 [default = 1.0];
+
+  optional double speed_weight = 10 [default = 0.0];
+  optional double accel_weight = 11 [default = 10.0];
+  optional double jerk_weight = 12 [default = 10.0];
+  optional double obstacle_weight = 13 [default = 1.0];
+  optional double reference_weight = 14 [default = 0.0];
+  optional double go_down_buffer = 15 [default = 5.0];
+  optional double go_up_buffer = 16 [default = 5.0];
+
+  // obstacle cost config
+  optional double default_obstacle_cost = 20 [default = 1e10];
+
+  // speed cost config
+  optional double default_speed_cost = 31 [default = 1.0];
+  optional double exceed_speed_penalty = 32 [default = 10.0];
+  optional double low_speed_penalty = 33 [default = 2.5];
+  optional double reference_speed_penalty = 34 [default = 1.0];
+  optional double keep_clear_low_speed_penalty = 35 [default = 10.0];
+
+  // accel cost config
+  optional double accel_penalty = 40 [default = 2.0];
+  optional double decel_penalty = 41 [default = 2.0];
+
+  // jerk cost config
+  optional double positive_jerk_coeff = 50 [default = 1.0];
+  optional double negative_jerk_coeff = 51 [default = 300.0];
+
+  // other constraint
+  optional double max_acceleration = 60 [default = 4.5];
+  optional double max_deceleration = 61 [default = -4.5];
+
+  // buffer
+  optional double safe_time_buffer = 70 [default = 3.0];
+  optional double safe_distance = 71 [default = 20.0];
+
+  // spatial potential cost config for minimal time traversal
+  optional double spatial_potential_penalty = 80 [default = 1.0];
+
+  optional bool is_lane_changing = 81 [default = false];
+}
+
+//////////////////////////////////
+// STBoundsDeciderConfig
+
+message STBoundsDeciderConfig {
+  optional double total_time = 1 [default = 7.0];
+}

@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/base/track.h"
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
@@ -28,9 +29,7 @@ namespace fusion {
 class PbfShapeFusion : public BaseShapeFusion {
  public:
   explicit PbfShapeFusion(TrackPtr track) : BaseShapeFusion(track) {}
-  virtual ~PbfShapeFusion() {}
-  PbfShapeFusion(const PbfShapeFusion&) = delete;
-  PbfShapeFusion& operator=(const PbfShapeFusion&) = delete;
+  virtual ~PbfShapeFusion() = default;
 
   bool Init() override;
 
@@ -53,6 +52,8 @@ class PbfShapeFusion : public BaseShapeFusion {
 
   static bool s_use_camera_3d_;
   static float s_camera_radar_time_diff_th_;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfShapeFusion);
 };
 
 }  // namespace fusion

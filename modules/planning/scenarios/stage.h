@@ -28,7 +28,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -51,7 +51,7 @@ class Stage {
 
   const ScenarioConfig::StageConfig& config() const { return config_; }
 
-  ScenarioConfig::StageType stage_type() const { return config_.stage_type(); }
+  StageType stage_type() const { return config_.stage_type(); }
 
   /**
    * @brief Each stage does its business logic inside Process function.
@@ -78,7 +78,7 @@ class Stage {
 
   Task* FindTask(TaskConfig::TaskType task_type) const;
 
-  ScenarioConfig::StageType NextStage() const { return next_stage_; }
+  StageType NextStage() const { return next_stage_; }
 
  protected:
   bool ExecuteTaskOnReferenceLine(
@@ -98,7 +98,7 @@ class Stage {
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;
-  ScenarioConfig::StageType next_stage_;
+  StageType next_stage_;
   void* context_ = nullptr;
   std::string name_;
   std::shared_ptr<DependencyInjector> injector_;

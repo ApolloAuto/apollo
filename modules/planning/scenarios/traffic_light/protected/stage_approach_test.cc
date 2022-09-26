@@ -29,7 +29,7 @@ namespace traffic_light {
 class TrafficLightProtectedStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH);
+    config_.set_stage_type(StageType::TRAFFIC_LIGHT_PROTECTED_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,8 +42,8 @@ TEST_F(TrafficLightProtectedStageApproachTest, Init) {
   TrafficLightProtectedStageApproach traffic_light_protected_stage_approach(
       config_, injector_);
   EXPECT_EQ(traffic_light_protected_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH));
+            StageType_Name(
+                StageType::TRAFFIC_LIGHT_PROTECTED_APPROACH));
 }
 
 }  // namespace traffic_light

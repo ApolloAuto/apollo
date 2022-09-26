@@ -37,7 +37,7 @@ PlaneMotion::PlaneMotion(int s) {
   }
 }
 
-PlaneMotion::~PlaneMotion(void) {
+PlaneMotion::~PlaneMotion() {
   if (mot_buffer_ != nullptr) {
     mot_buffer_->clear();
     mot_buffer_ = nullptr;

@@ -24,10 +24,10 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/localization_msgs/imu.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/localization/proto/rtk_config.pb.h"
 
 namespace apollo {

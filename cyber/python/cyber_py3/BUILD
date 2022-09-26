@@ -6,7 +6,7 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "*.py",
-    ])
+    ]) + ["cyber_py3.BUILD"]
 )
 
 py_library(

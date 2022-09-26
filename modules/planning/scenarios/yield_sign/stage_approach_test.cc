@@ -29,7 +29,7 @@ namespace yield_sign {
 class YieldSignStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::YIELD_SIGN_APPROACH);
+    config_.set_stage_type(StageType::YIELD_SIGN_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,7 +42,7 @@ TEST_F(YieldSignStageApproachTest, Init) {
   YieldSignStageApproach yield_sign_stage_approach(config_, injector_);
   EXPECT_EQ(
       yield_sign_stage_approach.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_APPROACH));
+      StageType_Name(StageType::YIELD_SIGN_APPROACH));
 }
 
 }  // namespace yield_sign

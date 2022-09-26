@@ -35,7 +35,7 @@ import glog
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3.record import RecordReader
 from cyber.python.cyber_py3.record import RecordWriter
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 
 
 class ChannelSizeStats(object):

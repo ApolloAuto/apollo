@@ -16,12 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
+import math
 import sys
 
-from modules.map.proto import map_pb2
-from modules.map.proto import map_lane_pb2
-from modules.map.proto import map_road_pb2
-import math
+from modules.common_msgs.map_msgs import map_pb2
+from modules.common_msgs.map_msgs import map_lane_pb2
+from modules.common_msgs.map_msgs import map_road_pb2
 from shapely.geometry import LineString, Point
 
 LANE_WIDTH = 3.3

@@ -23,8 +23,8 @@
 #include "nlohmann/json.hpp"
 
 #if WITH_TELEOP == 1
-#include "modules/planning/proto/pad_msg.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/teleop/daemon/proto/daemon_cmd.pb.h"
 #include "modules/teleop/daemon/proto/daemon_rpt.pb.h"
 #include "modules/teleop/modem/proto/modem_info.pb.h"

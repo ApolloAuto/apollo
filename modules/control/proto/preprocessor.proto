@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/drive_state.proto";
-import "modules/control/proto/input_debug.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/drive_state.proto";
+import "modules/common_msgs/control_msgs/input_debug.proto";
 import "modules/control/proto/local_view.proto";
 
 message Preprocessor {

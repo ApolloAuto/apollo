@@ -29,7 +29,7 @@ namespace planning {
 namespace scenario {
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     LearningModelSampleScenario::s_stage_factory_;
@@ -54,7 +54,7 @@ void LearningModelSampleScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::LEARNING_MODEL_RUN,
+      StageType::LEARNING_MODEL_RUN,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new LearningModelSampleStageRun(config, injector);

@@ -27,7 +27,7 @@ import time
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
-from modules.routing.proto import routing_pb2
+from modules.common_msgs.routing_msgs import routing_pb2
 
 
 def main():

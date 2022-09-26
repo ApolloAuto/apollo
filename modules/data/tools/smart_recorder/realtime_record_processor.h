@@ -24,8 +24,7 @@
 #include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/tools/cyber_recorder/recorder.h"
-
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
+#include "modules/common_msgs/monitor_msgs/smart_recorder_status.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
 #include "modules/data/tools/smart_recorder/record_processor.h"
 

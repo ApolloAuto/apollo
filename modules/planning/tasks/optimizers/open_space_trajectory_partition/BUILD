@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/status",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:trajectory_optimizer",
     ],

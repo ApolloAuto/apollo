@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.v2x;
 
-import "modules/common/proto/geometry.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
 
 message Id {
   optional bytes id = 1;

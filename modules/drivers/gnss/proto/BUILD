@@ -6,100 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "gnss_best_pose_cc_proto",
-    deps = [
-        ":gnss_best_pose_proto",
-    ],
-)
-
-proto_library(
-    name = "gnss_best_pose_proto",
-    srcs = ["gnss_best_pose.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "gnss_best_pose_py_pb2",
-    deps = [
-        ":gnss_best_pose_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "gnss_status_cc_proto",
-    deps = [
-        ":gnss_status_proto",
-    ],
-)
-
-proto_library(
-    name = "gnss_status_proto",
-    srcs = ["gnss_status.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "gnss_status_py_pb2",
-    deps = [
-        ":gnss_status_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "imu_cc_proto",
-    deps = [
-        ":imu_proto",
-    ],
-)
-
-proto_library(
-    name = "imu_proto",
-    srcs = ["imu.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "imu_py_pb2",
-    deps = [
-        ":imu_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "heading_cc_proto",
-    deps = [
-        ":heading_proto",
-    ],
-)
-
-proto_library(
-    name = "heading_proto",
-    srcs = ["heading.proto"],
-    deps = [
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "heading_py_pb2",
-    deps = [
-        ":heading_proto",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)
-
-cc_proto_library(
     name = "config_cc_proto",
     deps = [
         ":config_proto",
@@ -117,72 +23,26 @@ py_proto_library(
         ":config_proto",
     ],
 )
-
 cc_proto_library(
-    name = "gnss_raw_observation_cc_proto",
+    name = "gnss_status_cc_proto",
     deps = [
-        ":gnss_raw_observation_proto",
+        ":gnss_status_proto",
     ],
 )
 
 proto_library(
-    name = "gnss_raw_observation_proto",
-    srcs = ["gnss_raw_observation.proto"],
-)
-
-py_proto_library(
-    name = "gnss_raw_observation_py_pb2",
+    name = "gnss_status_proto",
+    srcs = ["gnss_status.proto"],
     deps = [
-        ":gnss_raw_observation_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "gnss_cc_proto",
-    deps = [
-        ":gnss_proto",
-    ],
-)
-
-proto_library(
-    name = "gnss_proto",
-    srcs = ["gnss.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
+        "//modules/common_msgs/basic_msgs:header_proto",
     ],
 )
 
 py_proto_library(
-    name = "gnss_py_pb2",
+    name = "gnss_status_py_pb2",
     deps = [
-        ":gnss_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
+        ":gnss_status_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
     ],
 )
 
-cc_proto_library(
-    name = "ins_cc_proto",
-    deps = [
-        ":ins_proto",
-    ],
-)
-
-proto_library(
-    name = "ins_proto",
-    srcs = ["ins.proto"],
-    deps = [
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/proto:header_proto",
-    ],
-)
-
-py_proto_library(
-    name = "ins_py_pb2",
-    deps = [
-        ":ins_proto",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-    ],
-)

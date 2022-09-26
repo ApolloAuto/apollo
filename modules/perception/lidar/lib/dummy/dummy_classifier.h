@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -38,7 +39,13 @@ class DummyClassifier : public BaseClassifier {
   // @param [in/out]: object list
   bool Classify(const ClassifierOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyClassifier"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 };  // class DummyClassifier
 
 }  // namespace lidar

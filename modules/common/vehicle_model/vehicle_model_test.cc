@@ -18,9 +18,8 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-
 #include "cyber/common/file.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {

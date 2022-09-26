@@ -22,13 +22,13 @@ cc_library(
     hdrs = ["grpc_server.h"],
     deps = [
         "//cyber",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
-        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
         "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/v2x/proto:v2x_obu_rsi_cc_proto",
         "//modules/v2x/proto:v2x_service_car_to_obu_cc_grpc",
         "//modules/v2x/proto:v2x_service_obu_to_car_cc_grpc",
-        "//modules/v2x/proto:v2x_traffic_light_cc_proto",
+        "//modules/common_msgs/v2x_msgs:v2x_traffic_light_cc_proto",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )

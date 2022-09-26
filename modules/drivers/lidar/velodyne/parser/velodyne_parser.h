@@ -61,7 +61,7 @@
 
 #include "modules/drivers/lidar/proto/velodyne.pb.h"
 #include "modules/drivers/lidar/proto/velodyne_config.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 #include "modules/drivers/lidar/velodyne/parser/calibration.h"
 #include "modules/drivers/lidar/velodyne/parser/const_variables.h"
