@@ -43,7 +43,7 @@ software packages and library dependencies of newer versions including:
 2. LibTorch (both CPU and GPU version) bumped to version 1.7.0 accordingly.
 
 We do not expect a disruption to your current work, but to ease your life of
-migratation, you would need to: 
+migration, you would need to: 
 
 1. Update NVIDIA driver on your host to version >= 455.32.
   ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
@@ -213,7 +213,7 @@ Apollo is provided under the [Apache-2.0 license](https://github.com/ApolloAuto/
 
 Apollo open source platform only has the source code for models, algorithms and processes, which will be integrated with cybersecurity defense strategy in the deployment for commercialization and productization.
 
-Please refer to the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
+Please refer to the Disclaimer of Apollo in [Apollo's official website](https://developer.apollo.auto/docs/disclaimer.html).
 
 ## Connect with us
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)

@@ -476,14 +476,14 @@ void TeleopService::SendResumeCruiseCmd() {
   pad_message_writer_->Write(pad_msg);
 }
 
-void TeleopService::SendEstopCmd() {
+void TeleopService::SendPullOverCmd() {
   AINFO << "Pull over";
   PadMessage pad_msg;
   pad_msg.set_action(DrivingAction::PULL_OVER);
   pad_message_writer_->Write(pad_msg);
 }
 
-void TeleopService::SendPullOverCmd() {
+void TeleopService::SendEstopCmd() {
   AINFO << "EStop";
   PadMessage pad_msg;
   pad_msg.set_action(DrivingAction::STOP);
