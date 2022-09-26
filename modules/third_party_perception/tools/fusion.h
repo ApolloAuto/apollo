@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 
 /**
  * @namespace apollo::third_party_perception::fusion

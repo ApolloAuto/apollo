@@ -23,9 +23,9 @@ cc_library(
     hdrs = ["quartic_polynomial_curve1d.h"],
     deps = [
         ":polynomial_curve1d",
-        "//cyber/common",
-        "//modules/common/util:string_util",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "//modules/common/util:util_tool",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_test(
         ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -49,9 +49,9 @@ cc_library(
     hdrs = ["quintic_polynomial_curve1d.h"],
     deps = [
         ":polynomial_curve1d",
-        "//cyber/common",
-        "//modules/common/util:string_util",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "//modules/common/util:util_tool",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -63,8 +63,8 @@ cc_library(
     deps = [
         ":polynomial_curve1d",
         ":quartic_polynomial_curve1d",
-        "//cyber/common:log",
-        "@com_google_absl//absl/strings",
+        "//cyber",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -75,7 +75,7 @@ cc_test(
     deps = [
         ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -90,9 +90,9 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":quintic_polynomial_curve1d",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -103,9 +103,9 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         ":quintic_spiral_path",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/common/math",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -117,7 +117,7 @@ cc_test(
     deps = [
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -129,7 +129,7 @@ cc_test(
     copts = PLANNING_COPTS,
     deps = [
         ":piecewise_quintic_spiral_path",
-        "//cyber/common:log",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )

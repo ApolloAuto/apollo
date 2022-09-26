@@ -26,6 +26,12 @@ color = False
 prefix = None
 strip = True
 strip_tool = None
+install_lib = True
+fix_rpath = True
+
+dbg = False
+gpu = False
+dev = True
 
 # Mapping used to (a) check for unique shared library names and (b) provide a
 # mapping from library name to paths for RPath fixes (where (a) is essential).
@@ -45,6 +51,37 @@ list_only = False
 # N.B. On linux, dynamic libraries may have their version number as a suffix
 # (e.g. my_lib.so.x.y.z).
 dylib_match = re.compile(r"(.*\.so)(\.\d+)*$")
+
+def get_pkg_real_name(name, dev=False, dbg=False, gpu=False):
+    """Get real package name by install parameters"""
+    new_name = name
+    if dev:
+        new_name += "-dev"
+    if dbg:
+        new_name += "-dbg"
+    if gpu:
+        new_name += "-gpu"
+    return new_name
+
+
+def rename_package_name(dest):
+    """Get packages name from file install destination."""
+    if not dev and not dbg and not gpu:
+        return dest
+    if dest.startswith("lib/"):
+        return dest
+    curr_pkg_name = dest.split("/")[0]
+    new_pkg_name = get_pkg_real_name(curr_pkg_name, dev, dbg, gpu)
+
+    # Local build package version is fiexed `local`
+    pkg_name_with_ver = new_pkg_name + "/local"
+    new_dest = dest.replace(curr_pkg_name, pkg_name_with_ver, 1)
+
+    # Install ${package_name}.BUILD to ${new_package_name}.BUILD
+    if dest == curr_pkg_name + "/" + curr_pkg_name + ".BUILD":
+        new_dest = new_pkg_name + "/local/" + new_pkg_name + ".BUILD"
+
+    return new_dest
 
 def is_relative_link(filepath):
     """Find if a file is a relative link.
@@ -133,7 +170,11 @@ def copy_or_link(src, dst):
 
 def install(src, dst):
     global subdirs
+    dst = rename_package_name(dst)
 
+    # Do not install files in ${prefx}/lib dir
+    if not install_lib and dst.startswith("lib/"):
+        return
     # In list-only mode, just display the filename, don't do any real work.
     if list_only:
         print(dst)
@@ -170,10 +211,20 @@ def install(src, dst):
             # in the library dictionary. If it is referenced multiple times,
             # we do not know which one to use, and fail fast.
             if basename in libraries_to_fix_rpath:
-                sys.stderr.write(
-                    "Multiple installation rules found for {}."
-                    .format(basename))
-                sys.exit(1)
+                pre_full_dst = libraries_to_fix_rpath[basename]
+                # libxxxx.so produced by module is only installed once to it's module dir
+                if dst.startswith("lib/"):
+                    # remove it from lib/
+                    os.remove(dst_full)
+                    return
+                elif not pre_full_dst.startswith(os.path.join(prefix, "lib/")):
+                    sys.stderr.write("Multiple installation rules found for {}."
+                        .format(basename))
+                    # sys.exit(1)
+                    return
+                else:
+                    # remove it from lib/
+                    os.remove(pre_full_dst)
             libraries_to_fix_rpath[basename] = dst_full
     elif may_be_binary(dst_full):  # May be an executable.
         potential_binaries_to_fix_rpath.append(dst_full)
@@ -275,6 +326,11 @@ def main(args):
     global prefix
     global strip
     global strip_tool
+    global install_lib
+
+    global dbg
+    global gpu
+    global dev
 
     # Set up options.
     parser = argparse.ArgumentParser()
@@ -295,6 +351,18 @@ def main(args):
         '--pre_clean', action='store_true', default=False,
         help='ensure clean install by removing `prefix` dir if it exists '
              'before installing')
+    parser.add_argument('--no_lib', dest='install_lib', action='store_false', default=True,
+                                help='do not install files in lib dir.')
+
+    parser.add_argument('--no_fix_rpath', dest='fix_rpath', action='store_false', default=True,
+                                help='do not fix the rpath of .so files.')
+
+    parser.add_argument('--dbg', action='store_true', default=False,
+                                help='debug package with debugging symbols.')
+    parser.add_argument('--gpu', action='store_true', default=False,
+                            help='build with gpu.')
+    parser.add_argument('--dev', action='store_true', default=True,
+                            help='dev package with headers.')
     args = parser.parse_args(args)
 
     color = args.color
@@ -305,6 +373,12 @@ def main(args):
     strip = args.strip
     strip_tool = args.strip_tool
     pre_clean = args.pre_clean
+    install_lib = args.install_lib
+    fix_rpath = args.fix_rpath
+
+    dbg = False
+    gpu = False
+    dev = True
 
     # Transform install prefix if DESTDIR is set.
     # https://www.gnu.org/prep/standards/html_node/DESTDIR.html
@@ -346,7 +420,8 @@ def main(args):
     <<actions>>
 
     # Libraries paths may need to be updated in libraries and executables.
-    fix_rpaths_and_strip()
+    if fix_rpath:
+        fix_rpaths_and_strip()
 
 
 if __name__ == "__main__":

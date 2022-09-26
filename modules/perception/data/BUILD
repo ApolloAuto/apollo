@@ -4,6 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    data_dest = "perception",
     data = [
         ":runtime_data",
     ],

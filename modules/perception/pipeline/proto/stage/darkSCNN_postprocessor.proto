@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.perception.camera.lane;
+
+message DarkSCNNLanePostprocessorParam {
+  optional uint32 lane_map_width = 1 [default = 640];
+  optional uint32 lane_map_height = 2 [default = 480];
+  optional uint32 roi_height = 3 [default = 768];
+  optional uint32 roi_start = 4 [default = 312];
+  optional uint32 roi_width = 5 [default = 1920];
+  optional uint32 input_offset_x = 6 [default = 0];
+  optional uint32 input_offset_y = 7 [default = 0];
+  optional uint32 resize_width = 8 [default = 512];
+  optional uint32 resize_height = 9 [default = 512];
+}

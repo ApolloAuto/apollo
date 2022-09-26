@@ -49,7 +49,7 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
   }
 }
 
-void HMI::Start() { hmi_worker_->Start(); }
+void HMI::Start(DvCallback callback_api) { hmi_worker_->Start(callback_api); }
 
 void HMI::Stop() { hmi_worker_->Stop(); }
 
@@ -232,6 +232,10 @@ void HMI::SendStatus(WebSocketHandler::Connection* conn) {
   const auto status_json =
       JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
   websocket_->SendData(conn, status_json.dump());
+}
+
+bool HMI::UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name){
+  return hmi_worker_->UpdateScenarioSetToStatus(scenario_set_id, scenario_set_name);
 }
 
 }  // namespace dreamview

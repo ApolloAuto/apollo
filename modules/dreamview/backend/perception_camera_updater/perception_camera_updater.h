@@ -26,11 +26,11 @@
 #include "cyber/cyber.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/proto/camera_update.pb.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/pose.pb.h"
 #include "modules/transform/buffer.h"
-#include "modules/transform/proto/transform.pb.h"
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
 
 namespace apollo {
 namespace dreamview {

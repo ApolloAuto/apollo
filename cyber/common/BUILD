@@ -24,6 +24,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "@com_google_protobuf//:protobuf",
+        "@com_github_nlohmann_json//:json",
     ],
 )
 

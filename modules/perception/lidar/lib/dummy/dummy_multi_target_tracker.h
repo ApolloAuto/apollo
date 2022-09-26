@@ -19,6 +19,7 @@
 #include <string>
 
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +41,13 @@ class DummyMultiTargetTracker : public BaseMultiTargetTracker {
   bool Track(const MultiTargetTrackerOptions& options,
              LidarFrame* frame) override;
 
-  std::string Name() const override { return "DummyMultiTargetTracker"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   int id_ = 0;

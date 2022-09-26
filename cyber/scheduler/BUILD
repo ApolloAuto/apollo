@@ -3,6 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_scheduler_hdrs",
+    srcs = glob([
+        "*.h",
+        "**/*.h"
+    ]),
+)
+
 cc_library(
     name = "processor",
     srcs = ["processor.cc"],
@@ -116,7 +124,6 @@ cc_test(
     srcs = ["scheduler_test.cc"],
     deps = [
         "//cyber",
-        "//cyber/scheduler:scheduler_factory",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -127,7 +134,6 @@ cc_test(
     srcs = ["scheduler_classic_test.cc"],
     deps = [
         "//cyber",
-        "//cyber/scheduler:scheduler_factory",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -138,7 +144,6 @@ cc_test(
     srcs = ["scheduler_choreo_test.cc"],
     deps = [
         "//cyber",
-        "//cyber/scheduler:scheduler_factory",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -149,7 +154,6 @@ cc_test(
     srcs = ["processor_test.cc"],
     deps = [
         "//cyber",
-        "//cyber/scheduler:processor",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -160,7 +164,6 @@ cc_test(
     srcs = ["common/pin_thread_test.cc"],
     deps = [
         "//cyber",
-        "//cyber/scheduler:pin_thread",
         "@com_google_googletest//:gtest_main",
     ],
 )

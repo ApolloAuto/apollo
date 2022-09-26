@@ -24,14 +24,14 @@
 #include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
 namespace apollo {

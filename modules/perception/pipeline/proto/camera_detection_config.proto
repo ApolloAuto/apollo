@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+message PluginParam {
+  optional string name = 1;
+  optional string root_dir = 2;
+  optional string config_file = 3;
+}
+
+message ObjectTemplateParam {
+  optional PluginParam plugin_param = 1;
+}
+
+message DebugParam {
+  optional string detection_out_dir = 1;
+  optional string tracked_detection_out_dir = 2;
+  optional string track_out_file = 3;
+  optional string detect_feature_dir = 4;
+  optional string lane_out_dir = 5;
+  optional string camera2world_out_file = 6;
+  optional string calibration_out_dir = 7;
+}
+
+message CameraDetectionConfig {
+  optional int32 gpu_id = 1;
+  optional string camera_name = 2;
+  optional DebugParam debug_param = 3;
+  optional ObjectTemplateParam object_template_param = 4;
+}

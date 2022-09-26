@@ -37,8 +37,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 
 #include "gflags/gflags.h"
 #include "modules/drivers/canbus/can_client/can_client.h"

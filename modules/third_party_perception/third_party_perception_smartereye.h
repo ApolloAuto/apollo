@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "modules/drivers/proto/smartereye.pb.h"
+#include "modules/common_msgs/sensor_msgs/smartereye.pb.h"
 #include "modules/third_party_perception/third_party_perception_base.h"
 
 /**

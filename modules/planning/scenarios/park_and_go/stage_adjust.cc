@@ -69,10 +69,10 @@ Stage::StageStatus ParkAndGoStageAdjust::FinishStage() {
   ADEBUG << vehicle_status->steering_percentage();
   if (std::fabs(vehicle_status->steering_percentage()) <
       scenario_config_.max_steering_percentage_when_cruise()) {
-    next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+    next_stage_ = StageType::PARK_AND_GO_CRUISE;
   } else {
     ResetInitPostion();
-    next_stage_ = ScenarioConfig::PARK_AND_GO_PRE_CRUISE;
+    next_stage_ = StageType::PARK_AND_GO_PRE_CRUISE;
   }
   return Stage::FINISHED;
 }

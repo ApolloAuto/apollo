@@ -40,6 +40,14 @@ bool DummyGroundDetector::Detect(const GroundDetectorOptions& options,
   return true;
 }
 
+bool DummyGroundDetector::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DummyGroundDetector::Process(DataFrame* data_frame) {
+  return true;
+}
+
 PERCEPTION_REGISTER_GROUNDDETECTOR(DummyGroundDetector);
 
 }  // namespace lidar

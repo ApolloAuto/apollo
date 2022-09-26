@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/localization_msgs/pose.proto";
+
+message DriveEvent {
+  enum Type {
+    CRITICAL = 0;
+    PROBLEM = 1;
+    DESIRED = 2;
+    OUT_OF_SCOPE = 3;
+  }
+
+  optional apollo.common.Header header = 1;
+  optional string event = 2;
+  optional apollo.localization.Pose location = 3;
+  repeated Type type = 4;
+  optional bool is_reportable = 5;
+}

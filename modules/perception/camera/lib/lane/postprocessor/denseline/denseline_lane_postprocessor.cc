@@ -21,7 +21,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/camera/lib/lane/common/proto/denseline.pb.h"
+#include "modules/perception/pipeline/proto/stage/denseline.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -76,6 +76,48 @@ bool DenselineLanePostprocessor::Init(
   lane_map_dim_ = lane_map_width_ * lane_map_height_;
   lane_pos_blob_.Reshape({4, lane_map_dim_});
   lane_hist_blob_.Reshape({2, lane_map_dim_});
+  return true;
+}
+
+bool DenselineLanePostprocessor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  //  read postprocessor parameter
+  lane_postprocessor_param_ = stage_config.lane_postprocessor_param();
+
+  // todo(zero): Repeat with ModelParam
+  input_offset_x_ = lane_postprocessor_param_.input_offset_x();
+  input_offset_y_ = lane_postprocessor_param_.input_offset_y();
+  input_crop_width_ = lane_postprocessor_param_.crop_width();
+  input_crop_height_ = lane_postprocessor_param_.crop_height();
+  AINFO << " offset_x=" << input_offset_x_ << " offset_y=" << input_offset_y_
+        << " crop_w=" << input_crop_width_ << " crop_h=" << input_crop_height_;
+
+  omit_bottom_line_num_ = lane_postprocessor_param_.omit_bottom_line_num();
+  laneline_map_score_thresh_ =
+      lane_postprocessor_param_.laneline_map_score_thresh();
+  laneline_point_score_thresh_ =
+      lane_postprocessor_param_.laneline_point_score_thresh();
+  laneline_point_min_num_thresh_ =
+      lane_postprocessor_param_.laneline_point_min_num_thresh();
+  cc_valid_pixels_ratio_ = lane_postprocessor_param_.cc_valid_pixels_ratio();
+  laneline_reject_dist_thresh_ =
+      lane_postprocessor_param_.laneline_reject_dist_thresh();
+
+  lane_map_dim_ = lane_map_width_ * lane_map_height_;
+  lane_pos_blob_.Reshape({4, lane_map_dim_});
+  lane_hist_blob_.Reshape({2, lane_map_dim_});
+  return true;
+}
+
+bool DenselineLanePostprocessor::Process(DataFrame* data_frame) {
+  CameraFrame* frame = data_frame->camera_frame;
+  LanePostprocessorOptions options;
+  Process2D(options, frame);
+  frame->calibration_service->Update(frame);
+  Process3D(options, frame);
   return true;
 }
 
@@ -143,10 +185,6 @@ void DenselineLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
       camera_point_set.push_back(camera_point);
     }
   }
-}
-
-std::string DenselineLanePostprocessor::Name() const {
-  return "DenselineLanePostprocessor";
 }
 
 void DenselineLanePostprocessor::CalLaneMap(

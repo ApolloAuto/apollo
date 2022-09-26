@@ -26,18 +26,19 @@
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-using cyber::common::EnsureDirectory;
 using cyber::common::GetAbsolutePath;
 
 bool ObstacleDetectionCamera::Init(
     const CameraPerceptionInitOptions &options) {
-  std::string work_root = "";
+
+  std::string work_root;
   if (options.use_cyber_work_root) {
     work_root = GetCyberWorkRoot();
   }
@@ -130,25 +131,6 @@ bool ObstacleDetectionCamera::Init(
         << "Failed to init: " << plugin_param.name();
   }
 
-  // Init feature_extractor
-  if (!perception_param_.has_feature_param()) {
-    AINFO << "No feature config found.";
-    extractor_ = nullptr;
-  } else {
-    FeatureExtractorInitOptions init_options;
-    auto plugin_param = perception_param_.feature_param().plugin_param();
-    init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
-    init_options.conf_file = plugin_param.config_file();
-    extractor_.reset(
-        BaseFeatureExtractorRegisterer::GetInstanceByName(plugin_param.name()));
-    ACHECK(extractor_ != nullptr);
-    ACHECK(extractor_->Init(init_options))
-        << "Failed to init: " << plugin_param.name();
-  }
-
-  lane_calibration_working_sensor_name_ =
-      options.lane_calibration_working_sensor_name;
-
   // Init debug_param
   if (perception_param_.has_debug_param()) {
     // Init debug info
@@ -174,31 +156,77 @@ bool ObstacleDetectionCamera::Init(
   return true;
 }
 
-void ObstacleDetectionCamera::SetCameraHeightAndPitch(
-    const std::map<std::string, float> &name_camera_ground_height_map,
-    const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-    const float &pitch_angle_calibrator_working_sensor) {
-  if (calibration_service_ == nullptr) {
-    AERROR << "Calibraion service is not available";
-    return;
+bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
+  if (!Initialize(pipeline_config)) {
+    return false;
   }
-  calibration_service_->SetCameraHeightAndPitch(
-      name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
-      pitch_angle_calibrator_working_sensor);
+
+  camera_detection_config_ = pipeline_config.camera_detection_config();
+  ACHECK(inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id()));
+
+  // Init detector
+  // Init tracker
+  // Init transformer
+  // Init obstacle postprocessor
+  // Init debug_param
+  if (camera_detection_config_.has_debug_param()) {
+    // Init debug info
+    if (camera_detection_config_.debug_param().has_track_out_file()) {
+      out_track_.open(camera_detection_config_.debug_param().track_out_file(),
+                      std::ofstream::out);
+    }
+    if (camera_detection_config_.debug_param().has_camera2world_out_file()) {
+      out_pose_.open(
+          camera_detection_config_.debug_param().camera2world_out_file(),
+          std::ofstream::out);
+    } 
+  }
+
+  // Init object template
+  if (camera_detection_config_.has_object_template_param()) {
+    ObjectTemplateManagerInitOptions init_options;
+    auto plugin_param =
+        camera_detection_config_.object_template_param().plugin_param();
+    // todo(zero): need fix work_root
+    // init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
+    init_options.conf_file = plugin_param.config_file();
+    ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
+  }
+
+  return true;
 }
 
-void ObstacleDetectionCamera::SetIm2CarHomography(
-    Eigen::Matrix3d homography_im2car) {
-  if (calibration_service_ == nullptr) {
-    AERROR << "Calibraion service is not available";
-    return;
-  }
-  lane_postprocessor_->SetIm2CarHomography(homography_im2car);
-}
+bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
+  
+  CameraFrame* frame = data_frame->camera_frame;
+  frame->camera_k_matrix =
+      name_intrinsic_map_.at(frame->data_provider->sensor_name());
 
-bool ObstacleDetectionCamera::GetCalibrationService(
-    BaseCalibrationService **calibration_service) {
-  *calibration_service = calibration_service_.get();
+  InnerProcess(data_frame);
+
+  if (camera_detection_config_.has_debug_param()) {
+    if (camera_detection_config_.debug_param().has_camera2world_out_file()) {
+      WriteCamera2World(out_pose_, frame->frame_id, frame->camera2world_pose);
+    }
+    if (camera_detection_config_.debug_param().has_track_out_file()) {
+      WriteTracking(out_track_, frame->frame_id, frame->tracked_objects);
+    }
+  }
+
+  // Save tracked detections results as kitti format
+  WriteDetections(
+      camera_detection_config_.debug_param().has_tracked_detection_out_dir(),
+      absl::StrCat(
+          camera_detection_config_.debug_param().tracked_detection_out_dir(),
+          "/", frame->frame_id, ".txt"),
+      frame->tracked_objects);
+
+  // Fill polygon and set anchor point
+  for (auto &obj : frame->tracked_objects) {
+    FillObjectPolygonFromBBox3D(obj.get());
+    obj->anchor_point = obj->center;
+  }
+
   return true;
 }
 
@@ -214,18 +242,6 @@ bool ObstacleDetectionCamera::Perception(
   PERF_BLOCK_START();
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
-
-  if (write_out_lane_file_) {
-    std::string lane_file_path =
-        absl::StrCat(out_lane_dir_, "/", frame->frame_id, ".txt");
-    WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
-  }
-
-  if (write_out_calib_file_) {
-    std::string calib_file_path =
-        absl::StrCat(out_calib_dir_, "/", frame->frame_id, ".txt");
-    WriteCalibrationOutput(write_out_calib_file_, calib_file_path, frame);
-  }
 
   // Obstacle prediction
   if (!tracker_->Predict(tracker_options, frame)) {
@@ -249,10 +265,11 @@ bool ObstacleDetectionCamera::Perception(
       absl::StrCat(perception_param_.debug_param().detection_out_dir(), "/",
                    frame->frame_id, ".txt"),
       frame->detected_objects);
-  if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
-    AERROR << "Failed to extractor";
-    return false;
-  }
+  // todo(zero): need fix
+  // if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
+  //   AERROR << "Failed to extractor";
+  //   return false;
+  // }
   PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                 "external_feature");
 
@@ -313,6 +330,7 @@ bool ObstacleDetectionCamera::Perception(
       WriteTracking(out_track_, frame->frame_id, frame->tracked_objects);
     }
   }
+
   // Save tracked detections results as kitti format
   WriteDetections(
       perception_param_.debug_param().has_tracked_detection_out_dir(),
@@ -328,6 +346,7 @@ bool ObstacleDetectionCamera::Perception(
 
   return true;
 }
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

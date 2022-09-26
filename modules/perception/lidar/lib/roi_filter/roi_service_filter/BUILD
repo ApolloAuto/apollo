@@ -26,6 +26,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_roi_filter",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
+        "//modules/perception/pipeline:stage",
         "@eigen",
     ],
 )

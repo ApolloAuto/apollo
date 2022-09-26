@@ -20,15 +20,13 @@
 #include <utility>
 #include <vector>
 
-#include "modules/map/proto/map_lane.pb.h"
-
-#include "cyber/common/log.h"
+#include "modules/common_msgs/map_msgs/map_lane.pb.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/hdmap/hdmap.h"
 
 namespace apollo {
 namespace hdmap {

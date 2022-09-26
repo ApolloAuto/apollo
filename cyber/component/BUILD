@@ -3,6 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_component_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
+
 cc_library(
     name = "component",
     hdrs = ["component.h"],
@@ -33,6 +40,7 @@ cc_library(
         "//cyber/transport/message:history",
         "//cyber/transport/transmitter",
     ],
+    alwayslink = True,
 )
 
 cc_test(

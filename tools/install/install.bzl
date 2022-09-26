@@ -1,6 +1,6 @@
 # -*- python -*-
 # Adapted from RobotLocomotion/drake:tools/install/install.bzl
-load("//tools:common.bzl", "dirname", "join_paths", "output_path")
+load("//tools:common.bzl", "dirname", "join_paths", "output_path", "remove_prefix")
 
 InstallInfo = provider()
 
@@ -56,6 +56,11 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
     else:
         dest = join_paths(owner.package, input_file.basename)
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
+    # Possibly remove prefixes.
+    for p in strip_prefix:
+        dest = remove_prefix(dest, p)
+        if dest != None:
+            return dest
     return dest
 
 #------------------------------------------------------------------------------
@@ -89,7 +94,9 @@ def _install_action(
         dests,
         strip_prefixes = [],
         rename = {},
-        warn_foreign = True):
+        warn_foreign = True,
+        py_runfiles = False,
+        py_runfiles_path = None):
     """Compute install action for a single file.
 
     This takes a single file artifact and returns the appropriate install
@@ -103,7 +110,7 @@ def _install_action(
 
     dest_replacements = (
         ("@WORKSPACE@", _workspace(ctx)),
-        ("@PACKAGE@", ctx.label.package),
+        ("@PACKAGE@", ctx.label.package.replace("/", "-")),
     )
     for old, new in dest_replacements:
         if old in dest:
@@ -116,11 +123,16 @@ def _install_action(
         )
     else:
         strip_prefix = strip_prefixes
-
-    file_dest = join_paths(
-        dest,
-        _output_path(ctx, artifact, strip_prefix, warn_foreign),
-    )
+    if py_runfiles:
+        file_dest = join_paths(
+            dest,
+            py_runfiles_path
+        )
+    else:
+        file_dest = join_paths(
+            dest,
+            _output_path(ctx, artifact, strip_prefix, warn_foreign),
+        )
     file_dest = _rename(file_dest, rename)
 
     return struct(src = artifact, dst = file_dest)
@@ -246,14 +258,35 @@ def _install_cc_actions(ctx, target):
 # Compute install actions for a py_library or py_binary.
 # TODO(jamiesnape): Install native shared libraries that the target may use.
 def _install_py_actions(ctx, target):
-    return _install_actions(
+    actions = _install_actions(
         ctx,
         [target],
         ctx.attr.py_dest,
         ctx.attr.py_strip_prefix,
         rename = ctx.attr.rename,
     )
+    
+    runfile_actions = []
+    runfiles_dir = "%s.runfiles" % str(target.label).split(":")[1]
+    runfiles_dest = join_paths(ctx.attr.py_dest, runfiles_dir)
 
+    for f in _depset_to_list(target.default_runfiles.files):
+        runfile_actions.append(
+            _install_action(
+                ctx,
+                f,
+                runfiles_dest,
+                ctx.attr.py_strip_prefix,
+                ctx.attr.rename,
+                True,
+                True,
+                join_paths("%s" % ctx.workspace_name, f.short_path)
+            )
+        )
+
+    actions += runfile_actions
+    
+    return actions
 #------------------------------------------------------------------------------
 # Compute install actions for a script or an executable.
 def _install_runtime_actions(ctx, target):
@@ -269,6 +302,12 @@ def _install_runtime_actions(ctx, target):
 # Generate install code for an install action.
 def _install_code(action):
     return "install(%r, %r)" % (action.src.short_path, action.dst)
+
+#------------------------------------------------------------------------------
+# Generate install code for an install_src action.
+def _install_src_code(action):
+    # print(action.src.short_path)
+    return "install_src(%r, %r, %r)" % (action.src.short_path, action.dst, action.filter)
 
 #BEGIN rules
 
@@ -379,7 +418,7 @@ _install_rule = rule(
         "targets": attr.label_list(),
         "archive_dest": attr.string(default = "lib"),
         "archive_strip_prefix": attr.string_list(),
-        "library_dest": attr.string(default = "@PACKAGE@"),
+        "library_dest": attr.string(default = "@PACKAGE@/lib"),
         "library_strip_prefix": attr.string_list(),
         "mangled_library_dest": attr.string(default = "lib"),
         "mangled_library_strip_prefix": attr.string_list(),
@@ -546,5 +585,75 @@ Args:
     rename: Mapping of install paths to alternate file names, used to rename
       files upon installation.
 """
+
+#------------------------------------------------------------------------------
+# Generate information to install files to specified destination.
+def _install_src_files_impl(ctx):
+    # Get path components.
+    dest = ctx.attr.dest
+    src_dir = ctx.attr.src_dir
+    filter = ctx.attr.filter
+
+    actions = []
+    for a in _depset_to_list(src_dir):
+        for b in _depset_to_list(a.files):
+            actions.append(struct(src = b, dst = dest, filter = filter))
+
+    # Collect install actions from dependencies.
+    for d in ctx.attr.deps:
+        actions += d[InstallInfo].install_actions
+
+    script_actions = []
+    for a in actions:
+        if not hasattr(a, "src"):
+            fail("Action(dst={}) has no 'src' attribute".format(a.dst))
+        
+        if hasattr(a, "filter"):
+            script_actions.append(_install_src_code(a))
+
+
+    # Generate install script.
+    ctx.actions.expand_template(
+        template = ctx.executable.install_script_template,
+        output = ctx.outputs.executable,
+        substitutions = {"<<actions>>": "\n    ".join(script_actions)},
+    )
+
+    # Return actions.
+    files = ctx.runfiles(
+        files = [a.src for a in actions],
+    )
+    return [
+        InstallInfo(
+            install_actions = actions,
+            rename = {},
+        ),
+        DefaultInfo(runfiles = files),
+    ]
+
+_install_src_files_rule = rule(
+    # Update buildifier-tables.json when this changes.
+    attrs = {
+        "deps": attr.label_list(providers = [InstallInfo]),
+        "dest": attr.string(),
+        "src_dir": attr.label_list(allow_files = True),
+        "filter": attr.string(),
+        "install_script_template": attr.label(
+            allow_files = True,
+            executable = True,
+            cfg = "target",
+            default = Label("//tools/install:install_source.py.in"),
+        ),
+    },
+    executable = True,
+    implementation = _install_src_files_impl,
+)
+
+def install_src_files(tags = [], **kwargs):
+    # (The documentation for this function is immediately below.)
+    _install_src_files_rule(
+        tags = tags + ["install"],
+        **kwargs
+    )
 
 #END rules

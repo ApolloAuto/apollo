@@ -22,7 +22,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -40,8 +40,10 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
         "//modules/perception/camera/lib/obstacle/transformer/singlestage:singlestage_obstacle_transformer",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -53,7 +55,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -71,8 +73,11 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
         "//modules/perception/camera/lib/obstacle/transformer/singlestage:singlestage_obstacle_transformer",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline",
+        "//modules/perception/pipeline/proto:camera_detection_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -83,15 +88,13 @@ cc_library(
     hdrs = ["traffic_light_camera_perception.h"],
     deps = [
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
         "//modules/perception/camera/lib/traffic_light/detector/recognition",
-        "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
-        "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
-        "//modules/perception/camera/lib/traffic_light/tracker/proto:semantic_cc_proto",
+        "//modules/perception/pipeline:pipeline",
     ],
     alwayslink = True,
 )
@@ -103,7 +106,7 @@ cc_library(
     deps = [
         ":debug_info",
         "//cyber",
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/app/proto:perception_cc_proto",
         "//modules/perception/camera/common",
@@ -114,8 +117,10 @@ cc_library(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline",
         "@com_github_gflags_gflags//:gflags",
     ],
 )
@@ -127,7 +132,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/perception/base",
         "//modules/perception/camera/common:lane_object",
         "//modules/perception/camera/lib/interface",

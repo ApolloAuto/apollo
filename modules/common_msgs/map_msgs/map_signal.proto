@@ -1,0 +1,57 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_id.proto";
+
+message Subsignal {
+  enum Type {
+    UNKNOWN = 1;
+    CIRCLE = 2;
+    ARROW_LEFT = 3;
+    ARROW_FORWARD = 4;
+    ARROW_RIGHT = 5;
+    ARROW_LEFT_AND_FORWARD = 6;
+    ARROW_RIGHT_AND_FORWARD = 7;
+    ARROW_U_TURN = 8;
+  };
+
+  optional Id id = 1;
+  optional Type type = 2;
+
+  // Location of the center of the bulb. now no data support.
+  optional apollo.common.PointENU location = 3;
+}
+
+message SignInfo {
+  enum Type {
+    None = 0;
+    NO_RIGHT_TURN_ON_RED = 1;
+  };
+
+  optional Type type = 1;
+}
+
+message Signal {
+  enum Type {
+    UNKNOWN = 1;
+    MIX_2_HORIZONTAL = 2;
+    MIX_2_VERTICAL = 3;
+    MIX_3_HORIZONTAL = 4;
+    MIX_3_VERTICAL = 5;
+    SINGLE = 6;
+  };
+
+  optional Id id = 1;
+  optional Polygon boundary = 2;
+  repeated Subsignal subsignal = 3;
+  // TODO: add orientation. now no data support.
+  repeated Id overlap_id = 4;
+  optional Type type = 5;
+  // stop line
+  repeated Curve stop_line = 6;
+
+  repeated SignInfo sign_info = 7;
+}

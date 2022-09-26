@@ -19,7 +19,7 @@
 #include <mutex>
 #include <vector>
 
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
 #include "modules/map/tools/map_datachecker/server/common.h"
 #include "modules/map/tools/map_datachecker/server/pj_transformer.h"
 #include "modules/map/tools/map_datachecker/server/pose_collection.h"

@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
-#include "modules/drivers/proto/smartereye.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/smartereye.pb.h"
 #include "modules/drivers/smartereye/proto/config.pb.h"
 #include "modules/drivers/smartereye/smartereye_device.h"
 #include "third_party/camera_library/smartereye/include/frameext.h"

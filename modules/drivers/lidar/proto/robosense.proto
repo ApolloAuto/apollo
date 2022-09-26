@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.drivers.robosense;
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 message RobosenseScanPacket {
   optional uint64 stamp = 1;

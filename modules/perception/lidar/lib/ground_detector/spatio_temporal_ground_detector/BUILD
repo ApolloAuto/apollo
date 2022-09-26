@@ -20,11 +20,12 @@ cc_library(
         "//modules/perception/common/i_lib/pc:i_util",
         "//modules/perception/common/point_cloud_processing",
         "//modules/perception/lidar/common",
-        "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto:spatio_temporal_ground_detector_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:spatio_temporal_ground_detector_config_cc_proto",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/proto:perception_config_schema_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

@@ -1,7 +1,19 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "prediction/bin",
+    targets = [
+        ":records_to_offline_data",
+        ":vector_net_feature",
+        ":vector_net_offline_data",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_binary(
     name = "records_to_offline_data",
@@ -15,7 +27,7 @@ cc_binary(
     deps = [
         "//modules/prediction/common:message_process",
         "@boost",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -27,9 +39,9 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//cyber/common:file",
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/util:point_factory",
+        "//cyber",
+        "//modules/common/math",
+        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:prediction_system_gflags",
         "//modules/prediction/proto:vector_net_cc_proto",

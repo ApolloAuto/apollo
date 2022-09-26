@@ -24,7 +24,6 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace common {

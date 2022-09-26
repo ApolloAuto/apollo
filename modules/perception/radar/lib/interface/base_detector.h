@@ -55,10 +55,9 @@
 
 #include "Eigen/Core"
 
-#include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 
-#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/geometry/roi_filter.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

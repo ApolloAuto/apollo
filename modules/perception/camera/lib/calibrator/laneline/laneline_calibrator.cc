@@ -33,6 +33,10 @@ bool LaneLineCalibrator::Init(const CalibratorInitOptions &options) {
   return true;
 }
 
+bool LaneLineCalibrator::Init(const PluginConfig& plugin_config) {
+  return true;
+}
+
 bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
                                    float *pitch_angle) {
   if (pitch_angle == nullptr) {

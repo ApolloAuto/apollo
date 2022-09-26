@@ -6,14 +6,12 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
     targets = [
         ":libimage_decompress.so",
-    ],
-    deps = [
-        "//cyber:install",
     ],
 )
 
@@ -31,11 +29,12 @@ cc_library(
     srcs = ["image_decompress.cc"],
     hdrs = ["image_decompress.h"],
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
+    alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:header_cc_proto",
+        "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
         "//modules/drivers/tools/image_decompress/proto:config_cc_proto",
         "@opencv//:imgcodecs",
     ],
@@ -54,7 +53,7 @@ cc_test(
 cc_binary(
     name = "libimage_decompress.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":image_decompress_lib"],
 )
 

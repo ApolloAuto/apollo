@@ -24,6 +24,7 @@
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_distance.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -33,9 +34,14 @@ struct MlfTrackObjectMatcherInitOptions {};
 
 struct MlfTrackObjectMatcherOptions {};
 
-class MlfTrackObjectMatcher {
+class MlfTrackObjectMatcher : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   MlfTrackObjectMatcher() = default;
+  MlfTrackObjectMatcher(const PluginConfig& plugin_config);
+
   ~MlfTrackObjectMatcher() = default;
 
   bool Init(const MlfTrackObjectMatcherInitOptions &options =
@@ -54,7 +60,11 @@ class MlfTrackObjectMatcher {
              std::vector<size_t> *unassigned_tracks,
              std::vector<size_t> *unassigned_objects);
 
-  std::string Name() const { return "MlfTrackObjectMatcher"; }
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   // @brief: compute association matrix

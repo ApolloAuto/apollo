@@ -31,14 +31,24 @@ namespace lidar {
 class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  CCRFOneShotTypeFusion() = default;
+  explicit CCRFOneShotTypeFusion(const PluginConfig& plugin_config);
+  ~CCRFOneShotTypeFusion() = default;
 
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
                   std::shared_ptr<perception::base::Object> object) override;
-  std::string Name() const override { return "CCRFOneShotTypeFusion"; }
+  // std::string Name() const override { return "CCRFOneShotTypeFusion"; }
+
   bool FuseOneShotTypeProbs(
       const std::shared_ptr<perception::base::Object>& object,
       Vectord* log_prob);
+
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   apollo::common::EigenMap<std::string, Matrixd> smooth_matrices_;
@@ -48,11 +58,20 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
 class CCRFSequenceTypeFusion : public BaseSequenceTypeFusion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  CCRFSequenceTypeFusion() = default;
+  explicit CCRFSequenceTypeFusion(const PluginConfig& plugin_config);
+  ~CCRFSequenceTypeFusion() = default;
 
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
                   TrackedObjects* tracked_objects) override;
-  std::string Name() const override { return "CCRFSequenceTypeFusion"; }
+  // std::string Name() const override { return "CCRFSequenceTypeFusion"; }
+
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   // The fusion problem is modeled

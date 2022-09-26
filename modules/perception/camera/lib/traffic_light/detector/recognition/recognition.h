@@ -19,20 +19,22 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
-#include "modules/perception/camera/lib/traffic_light/detector/recognition/proto/recognition.pb.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/pipeline/proto/stage/recognition.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class TrafficLightRecognition : public BaseTrafficLightDetector {
+class TrafficLightRecognition final : public BaseTrafficLightDetector {
  public:
-  TrafficLightRecognition() {}
+  TrafficLightRecognition() = default;
 
-  ~TrafficLightRecognition() {}
+  ~TrafficLightRecognition() = default;
 
   bool Init(const TrafficLightDetectorInitOptions& options) override;
 
@@ -43,16 +45,23 @@ class TrafficLightRecognition : public BaseTrafficLightDetector {
   bool Detect(const TrafficLightDetectorOptions& options,
               CameraFrame* frame) override;
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
 
-  explicit TrafficLightRecognition(const BaseTrafficLightDetector&) = delete;
-  TrafficLightRecognition& operator=(const BaseTrafficLightDetector&) = delete;
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   std::shared_ptr<ClassifyBySimple> classify_vertical_;
   std::shared_ptr<ClassifyBySimple> classify_quadrate_;
   std::shared_ptr<ClassifyBySimple> classify_horizontal_;
-  traffic_light::recognition::RecognizeBoxParam recognize_param_;
+
+  TrafficLightRecognitionConfig recognize_param_;
+  std::string recognition_root_dir;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightRecognition);
 };
 
 }  // namespace camera

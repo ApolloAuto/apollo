@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"

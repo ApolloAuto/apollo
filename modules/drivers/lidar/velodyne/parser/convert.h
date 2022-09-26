@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/velodyne/parser/velodyne_parser.h"
 #include "modules/drivers/lidar/proto/velodyne_config.pb.h"
 #include "modules/drivers/lidar/proto/velodyne.pb.h"

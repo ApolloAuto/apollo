@@ -18,13 +18,14 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_tracker.h"
 #include "modules/perception/fusion/lib/interface/base_type_fusion.h"
-#include "modules/perception/proto/pbf_tracker_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/pbf_tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -32,11 +33,8 @@ namespace fusion {
 
 class PbfTracker : public BaseTracker {
  public:
-  PbfTracker();
-  virtual ~PbfTracker();
-
-  PbfTracker(const PbfTracker&) = delete;
-  PbfTracker& operator=(const PbfTracker&) = delete;
+  PbfTracker() = default;
+  virtual ~PbfTracker() = default;
 
   static bool InitParams();
 
@@ -51,8 +49,6 @@ class PbfTracker : public BaseTracker {
                                 double measurement_timestamp,
                                 double target_timestamp) override;
 
-  std::string Name() const override;
-
  protected:
   bool InitMethods();
 
@@ -66,6 +62,8 @@ class PbfTracker : public BaseTracker {
   std::unique_ptr<BaseMotionFusion> motion_fusion_ = nullptr;
   std::unique_ptr<BaseExistenceFusion> existence_fusion_ = nullptr;
   std::unique_ptr<BaseShapeFusion> shape_fusion_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfTracker);
 };
 
 }  // namespace fusion

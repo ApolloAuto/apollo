@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"

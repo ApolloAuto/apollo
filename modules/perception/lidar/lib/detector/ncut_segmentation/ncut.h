@@ -29,7 +29,7 @@
 
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/common/flood_fill.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/common/lr_classifier.h"
-#include "modules/perception/lidar/lib/detector/ncut_segmentation/proto/ncut_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/ncut_config.pb.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/proto/ncut_param.pb.h"
 
 namespace apollo {

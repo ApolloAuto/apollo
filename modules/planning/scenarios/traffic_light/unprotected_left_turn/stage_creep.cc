@@ -24,7 +24,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -107,7 +107,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
 
 Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::FinishStage() {
   next_stage_ =
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
+      StageType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 

@@ -19,7 +19,7 @@
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {

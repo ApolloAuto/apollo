@@ -23,7 +23,7 @@
 
 #include "cyber/cyber.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 

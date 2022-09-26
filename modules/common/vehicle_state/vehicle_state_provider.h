@@ -23,12 +23,12 @@
 #include <memory>
 #include <string>
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 
 /**
  * @namespace apollo::common

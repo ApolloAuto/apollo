@@ -20,7 +20,7 @@ from datetime import datetime
 import json
 import sys
 
-from modules.map.relative_map.proto import navigation_pb2
+from modules.common_msgs.planning_msgs import navigation_pb2
 
 
 if __name__ == '__main__':

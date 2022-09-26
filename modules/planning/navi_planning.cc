@@ -313,15 +313,15 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   injector_->frame_history()->Add(seq_num, std::move(frame_));
 }
 
-void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
+void NaviPlanning::ProcessPadMsg(PadMessage::DrivingAction drvie_action) {
   if (config_.has_navigation_planning_config()) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = *frame_->mutable_reference_line_info();
-    if (drvie_action != DrivingAction::NONE) {
+    if (drvie_action != PadMessage::NONE) {
       using LaneInfoPair = std::pair<std::string, double>;
       std::string current_lane_id;
       switch (drvie_action) {
-        case DrivingAction::FOLLOW: {
+        case PadMessage::FOLLOW: {
           AINFO << "Received follow drive action";
           std::string current_lane_id = GetCurrentLaneId();
           if (!current_lane_id.empty()) {
@@ -329,7 +329,7 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
           }
           break;
         }
-        case DrivingAction::CHANGE_LEFT: {
+        case PadMessage::CHANGE_LEFT: {
           AINFO << "Received change left lane drive action";
           std::vector<LaneInfoPair> lane_info_group;
           GetLeftNeighborLanesInfo(&lane_info_group);
@@ -338,7 +338,7 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
           }
           break;
         }
-        case DrivingAction::CHANGE_RIGHT: {
+        case PadMessage::CHANGE_RIGHT: {
           AINFO << "Received change right lane drive action";
           std::vector<LaneInfoPair> lane_info_group;
           GetRightNeighborLanesInfo(&lane_info_group);
@@ -347,12 +347,12 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
           }
           break;
         }
-        case DrivingAction::PULL_OVER: {
+        case PadMessage::PULL_OVER: {
           AINFO << "Received pull over drive action";
           // to do
           break;
         }
-        case DrivingAction::STOP: {
+        case PadMessage::STOP: {
           AINFO << "Received stop drive action";
           // to do
           break;

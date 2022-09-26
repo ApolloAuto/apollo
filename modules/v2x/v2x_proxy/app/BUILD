@@ -1,7 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    runtime_dest = "v2x/bin",
+    targets = [
+        ":v2x",
+    ]
+)
 
 cc_library(
     name = "utils",
@@ -9,7 +18,7 @@ cc_library(
     hdrs = ["utils.h"],
     deps = [
         "//cyber",
-        "//modules/common/math:quaternion",
+        "//modules/common/math",
         "//modules/map/hdmap:hdmap_util",
         "//modules/v2x/v2x_proxy/obu_interface:obu_interface_grpc_impl",
         "//modules/v2x/v2x_proxy/os_interface",

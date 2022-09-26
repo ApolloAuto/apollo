@@ -1,18 +1,45 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    data_dest = "cyber-bridge",
+    data = [
+        ":cyberfile.xml",
+        ":cyber-bridge.BUILD",
+    ],
     targets = [
       ":cyber_bridge",
     ],
-    runtime_dest = "modules/contrib/cyber_bridge",
+    runtime_dest = "cyber-bridge/bin",
     deps = [
         "//cyber:install",
     ],
+)
+
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_cyber-bridge_src",
+        ":install_cyber-bridge_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_cyber-bridge_src",
+    src_dir = ["."],
+    dest = "cyber-bridge/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_cyber-bridge_hdrs",
+    src_dir = ["."],
+    dest = "cyber-bridge/include",
+    filter = "*.h",
 )
 
 cc_binary(

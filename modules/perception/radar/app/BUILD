@@ -8,7 +8,7 @@ cc_library(
     srcs = ["radar_obstacle_perception.cc"],
     hdrs = ["radar_obstacle_perception.h"],
     deps = [
-        "//modules/common/util:perf_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/common/geometry:roi_filter",
         "//modules/perception/lib/config_manager",

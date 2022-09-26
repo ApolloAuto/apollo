@@ -32,10 +32,10 @@ from matplotlib import patches
 from matplotlib import lines
 
 from cyber.python.cyber_py3 import cyber
-from modules.localization.proto import localization_pb2
-from modules.canbus.proto import chassis_pb2
-from modules.planning.proto import planning_pb2
-from modules.control.proto import control_cmd_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
+from modules.common_msgs.control_msgs import control_cmd_pb2
 
 
 class ControlInfo(object):

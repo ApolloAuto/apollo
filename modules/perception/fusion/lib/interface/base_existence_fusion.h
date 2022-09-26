@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -29,9 +30,7 @@ namespace fusion {
 class BaseExistenceFusion {
  public:
   explicit BaseExistenceFusion(TrackPtr track) : track_ref_(track) {}
-  virtual ~BaseExistenceFusion() {}
-  BaseExistenceFusion(const BaseExistenceFusion&) = delete;
-  BaseExistenceFusion& operator=(const BaseExistenceFusion&) = delete;
+  virtual ~BaseExistenceFusion() = default;
 
   static bool Init();
 
@@ -48,10 +47,10 @@ class BaseExistenceFusion {
                                         double target_timestamp,
                                         double min_match_dist) = 0;
 
-  virtual std::string Name() const = 0;
-
  protected:
   TrackPtr track_ref_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseExistenceFusion);
 };
 
 }  // namespace fusion

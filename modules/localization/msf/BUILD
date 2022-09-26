@@ -19,28 +19,26 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_cc_proto",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
         "//modules/common/status",
         "//modules/common/util",
-        "//modules/drivers/gnss/proto:config_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
-        "//modules/drivers/gnss/proto:heading_cc_proto",
-        "//modules/drivers/gnss/proto:imu_cc_proto",
-        "//modules/localization/common:localization_common",
+        "//modules/common_msgs/sensor_msgs:gnss_best_pose_cc_proto",
+        "//modules/common_msgs/sensor_msgs:gnss_cc_proto",
+        "//modules/common_msgs/sensor_msgs:heading_cc_proto",
+        "//modules/common_msgs/sensor_msgs:imu_cc_proto",
+        "//modules/localization/common:localization_gflags",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_integ",
         "//modules/localization/msf/local_pyramid_map/base_map",
         "//modules/localization/msf/local_pyramid_map/pyramid_map",
         "//modules/localization/proto:gnss_pnt_result_cc_proto",
-        "//modules/localization/proto:gps_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:gps_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/localization/proto:localization_config_cc_proto",
-        "//modules/localization/proto:localization_status_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_status_cc_proto",
         "//modules/localization/proto:measure_cc_proto",
         "//modules/localization/proto:sins_pva_cc_proto",
         "//modules/transform:transform_broadcaster",
@@ -49,12 +47,13 @@ cc_library(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
     name = "libmsf_localization_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":msf_localization_component_lib"],
 )
 
@@ -67,7 +66,7 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
         "@com_google_googletest//:gtest_main",
@@ -76,6 +75,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib/msf",
     targets = [
         ":libmsf_localization_component.so",
     ],
@@ -83,6 +83,7 @@ install(
         "//modules/localization/msf/local_tool/data_extraction:install",
         "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+        #"//modules/localization/msf/local_tool/ndt_mapping:install",
         "//modules/localization/msf/params:install",
     ],
 )

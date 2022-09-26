@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_distance.h"
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
@@ -28,11 +29,8 @@ namespace fusion {
 
 class HMTrackersObjectsAssociation : public BaseDataAssociation {
  public:
-  HMTrackersObjectsAssociation() {}
-  ~HMTrackersObjectsAssociation() {}
-  HMTrackersObjectsAssociation(const HMTrackersObjectsAssociation&) = delete;
-  HMTrackersObjectsAssociation& operator=(const HMTrackersObjectsAssociation&) =
-      delete;
+  HMTrackersObjectsAssociation() = default;
+  ~HMTrackersObjectsAssociation() = default;
 
   bool Init() override {
     track_object_distance_.set_distance_thresh(
@@ -43,8 +41,6 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
   bool Associate(const AssociationOptions& options,
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
-
-  std::string Name() const override { return "HMTrackersObjectsAssociation"; }
 
  private:
   void ComputeAssociationDistanceMat(
@@ -97,6 +93,8 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
   static double s_match_distance_thresh_;
   static double s_match_distance_bound_;
   static double s_association_center_dist_threshold_;
+
+  DISALLOW_COPY_AND_ASSIGN(HMTrackersObjectsAssociation);
 };
 
 }  // namespace fusion

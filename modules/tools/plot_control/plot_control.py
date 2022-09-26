@@ -21,7 +21,7 @@ import gflags
 from cyber.python.cyber_py3 import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from modules.control.proto import control_cmd_pb2
+from modules.common_msgs.control_msgs import control_cmd_pb2
 BRAKE_LINE_DATA = []
 TROTTLE_LINE_DATA = []
 STEERING_LINE_DATA = []

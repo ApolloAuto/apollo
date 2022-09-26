@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/common/proto/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {

@@ -22,7 +22,7 @@
 #include <memory>
 #include <vector>
 
-#include "modules/map/proto/map_lane.pb.h"
+#include "modules/common_msgs/map_msgs/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/common.h"

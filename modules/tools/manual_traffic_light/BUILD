@@ -1,7 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    library_dest = "tools/lib",
+    targets = [":libmanual_traffic_light_component.so"],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "manual_traffic_light",
@@ -10,10 +18,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:color",
-        "//modules/common/util:message_util",
+        "//modules/common/util:util_tool",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/perception/proto:traffic_light_detection_cc_proto",
+        "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
     ],
 )
 

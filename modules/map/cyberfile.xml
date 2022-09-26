@@ -1,0 +1,38 @@
+<package format="2">
+  <name>map</name>
+  <version>local</version>
+  <description>
+    Apollo map module.
+  </description>
+  
+  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+  <depend expose="False">3rd-rules-python-dev</depend>
+  <depend expose="False">3rd-grpc-dev</depend>
+  <depend expose="False">3rd-bazel-skylib-dev</depend>  
+  <depend expose="False">3rd-rules-proto-dev</depend>
+  <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+  <depend repo_name="proj">3rd-proj-dev</depend>
+  <depend repo_name="tinyxml2" so_names="tinyxml2">libtinyxml2-dev</depend>
+  <depend repo_name="eigen">3rd-eigen3-dev</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl-dev</depend>
+  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
+  <depend repo_name="com_github_nlohmann_json" lib_names="single_json,json">3rd-nlohmann-json-dev</depend>
+  <depend repo_name="boost">3rd-boost-dev</depend>
+
+  <type>module</type>
+  <depend expose="False">3rd-rules-python-dev</depend>
+  <depend expose="False">3rd-grpc-dev</depend>
+  <depend expose="False">3rd-bazel-skylib-dev</depend>  
+  <depend expose="False">3rd-rules-proto-dev</depend>
+
+  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/map</src_path>
+
+</package>

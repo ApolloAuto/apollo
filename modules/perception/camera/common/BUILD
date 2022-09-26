@@ -5,7 +5,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "camera_frame",
-    hdrs = ["camera_frame.h"],
+    hdrs = [
+        "camera_frame.h",
+    ],
     deps = [
         ":data_provider",
         "//modules/perception/base",
@@ -30,6 +32,7 @@ cc_library(
     hdrs = ["data_provider.h"],
     deps = [
         ":undistortion_handler",
+        "//cyber",
         "//modules/perception/base",
         "@npp",
     ],
@@ -83,9 +86,10 @@ cc_library(
     srcs = ["undistortion_handler.cc"],
     hdrs = ["undistortion_handler.h"],
     deps = [
+        "//cyber",
         "//modules/perception/base",
-        "//modules/perception/base:blob",
         "//modules/perception/common/sensor_manager",
+        "@npp",
     ],
 )
 

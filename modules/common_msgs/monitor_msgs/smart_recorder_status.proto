@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.data;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum RecordingState {
+  STOPPED = 0;
+  RECORDING = 1;
+  TERMINATING = 2;
+}
+
+message SmartRecorderStatus {
+  optional apollo.common.Header header = 1;
+  optional RecordingState recording_state = 2;
+  optional string state_message = 3;
+}

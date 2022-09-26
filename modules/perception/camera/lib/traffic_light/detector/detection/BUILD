@@ -14,11 +14,12 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/traffic_light/proto:detection_cc_proto",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:detection_cc_proto",
     ],
     alwayslink = True,
 )

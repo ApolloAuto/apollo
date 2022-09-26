@@ -20,7 +20,7 @@
 #include "modules/planning/scenarios/dead_end/deadend_turnaround/stage_turning.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -30,7 +30,7 @@ namespace deadend_turnaround {
 class StageTurningTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::DEADEND_TURNAROUND_TURNING);
+    config_.set_stage_type(StageType::DEADEND_TURNAROUND_TURNING);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,8 +41,8 @@ class StageTurningTest : public ::testing::Test {
 
 TEST_F(StageTurningTest, Init) {
   StageTurning stage_turning(config_, injector_);
-  EXPECT_EQ(stage_turning.Name(), ScenarioConfig::StageType_Name(
-      ScenarioConfig::DEADEND_TURNAROUND_TURNING));
+  EXPECT_EQ(stage_turning.Name(), StageType_Name(
+      StageType::DEADEND_TURNAROUND_TURNING));
 }
 
 }  // namespace deadend_turnaround

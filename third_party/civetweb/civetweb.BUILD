@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 
 licenses(["notice"])
 
@@ -9,11 +9,11 @@ cc_library(
     srcs = [
         "src/civetweb.c",
     ],
-    hdrs = [
-        "include/civetweb.h",
-        "src/handle_form.inl",
-        "src/md5.inl",
-    ],
+    #hdrs = glob([
+    #    "include/*.h",
+    #    "src/*.inl",
+    #    #"src/md5.inl",
+    #]),
     copts = [
         "-DUSE_WEBSOCKET",
     ],
@@ -25,20 +25,73 @@ cc_library(
         "-lpthread",
         "-ldl",
     ],
+    deps = [
+        "h_headers",
+        "inl_headers"
+    ],
     visibility = ["//visibility:public"],
+    alwayslink = True,
 )
 
-# The C++ wrapper for civetweb.
 cc_library(
-    name = "civetweb++",
+    name = "h_headers",
+    hdrs = glob([
+        "include/*.h",
+    ]),
+    strip_include_prefix = "include",
+)
+
+cc_library(
+    name = "inl_headers",
+    hdrs = glob([
+        "src/*.inl",
+    ]),
+    strip_include_prefix = "src",
+)
+
+cc_binary(
+    name = "libcivetweb++.so",
     srcs = [
         "src/CivetServer.cpp",
-    ],
-    hdrs = [
         "include/CivetServer.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":civetweb",
     ],
+    linkshared = True,
+    linkstatic = True,
+)
+
+# The C++ wrapper for civetweb.
+cc_library(
+    name = "civetweb++",
+    srcs = [
+        "libcivetweb++.so",
+    ],
+    #hdrs = glob([
+    #    "include/*.h",
+    #]),
+    includes = [
+        "include",
+    ],
+    deps = [
+        "h_headers",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "civetweb_hdrs",
+    srcs = glob([
+        "include/*.h",
+    ]),
+    visibility = ["//visibility:public"],
+)
+filegroup(
+    name = "civetweb_libs",
+    srcs = [
+        ":libcivetweb++.so",
+    ],
+    visibility = ["//visibility:public"],
 )

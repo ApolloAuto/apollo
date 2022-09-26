@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "portaudio",
     includes = ["."],
+    hdrs = ["portaudio.h"],
     linkopts = [
         "-lrt",
         "-lasound",

@@ -23,12 +23,12 @@
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/control/proto/pad_msg.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 DEFINE_string(
     chassis_test_file,

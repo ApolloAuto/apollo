@@ -27,7 +27,7 @@
 #include "absl/strings/str_cat.h"
 #include "modules/planning/learning_based/model_inference/trajectory_imitation_libtorch_inference.h"
 #include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

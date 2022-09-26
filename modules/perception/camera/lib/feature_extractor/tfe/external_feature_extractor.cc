@@ -64,6 +64,19 @@ bool ExternalFeatureExtractor::Init(
   image_.reset(new base::Image8U(height_, width_, base::Color::BGR));
   return true;
 }
+
+bool ExternalFeatureExtractor::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  return true;
+}
+
+bool ExternalFeatureExtractor::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool ExternalFeatureExtractor::InitFeatureExtractor(
     const std::string &root_dir) {
   FeatureExtractorInitOptions feat_options;
@@ -79,6 +92,7 @@ bool ExternalFeatureExtractor::InitFeatureExtractor(
   feature_extractor_->Init(feat_options);
   return true;
 }
+
 bool ExternalFeatureExtractor::Extract(const FeatureExtractorOptions &options,
                                        CameraFrame *frame) {
   int raw_height = frame->data_provider->src_height();
@@ -104,9 +118,7 @@ bool ExternalFeatureExtractor::Extract(const FeatureExtractorOptions &options,
   AINFO << "Extract Done";
   return true;
 }
-std::string ExternalFeatureExtractor::Name() const {
-  return "ExternalFeatureExtractor";
-}
+
 REGISTER_FEATURE_EXTRACTOR(ExternalFeatureExtractor);
 }  // namespace camera
 }  // namespace perception

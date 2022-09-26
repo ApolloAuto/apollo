@@ -18,7 +18,7 @@
 #include "cyber/time/rate.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt",
               "file name to dump routing response.");

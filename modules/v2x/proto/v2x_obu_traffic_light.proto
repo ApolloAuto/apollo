@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.v2x.obu;
 
-import "modules/common/proto/header.proto";
-import "modules/v2x/proto/v2x_traffic_light.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/v2x_msgs/v2x_traffic_light.proto";
 
 message SingleTrafficLight {
   enum Type {

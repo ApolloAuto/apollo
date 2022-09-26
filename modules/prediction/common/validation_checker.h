@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/common_msgs/prediction_msgs/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

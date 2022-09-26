@@ -21,7 +21,7 @@
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
 #include "modules/drivers/camera/proto/config.pb.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 
 namespace apollo {
 namespace drivers {

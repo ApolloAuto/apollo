@@ -33,8 +33,8 @@
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 
 /**
  * @namespace apollo::dreamview

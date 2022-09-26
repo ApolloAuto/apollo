@@ -4,7 +4,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "localization_common",
+    name = "localization_gflags",
     srcs = [
         "localization_gflags.cc",
     ],
@@ -12,9 +12,7 @@ cc_library(
         "localization_gflags.h",
     ],
     deps = [
-        "//cyber",
-        "//modules/dreamview/backend/hmi:vehicle_manager",
-        "//modules/localization/proto:localization_cc_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

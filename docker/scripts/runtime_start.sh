@@ -173,6 +173,10 @@ function setup_devices_and_mount_local_volumes() {
         volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
     fi
 
+    [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
+    volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"
+
+
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
         16.04)

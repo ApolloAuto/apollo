@@ -29,6 +29,14 @@ bool DummySegmentation::Detect(const LidarDetectorOptions& options,
   return true;
 }
 
+bool DummySegmentation::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DummySegmentation::Process(DataFrame* data_frame) {
+  return true;
+}
+
 PERCEPTION_REGISTER_LIDARDETECTOR(DummySegmentation);
 
 }  // namespace lidar

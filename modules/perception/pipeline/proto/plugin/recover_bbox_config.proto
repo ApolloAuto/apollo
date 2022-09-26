@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+message RecoverBboxConfig {
+    optional int32 roi_w = 1;
+    optional int32 roi_h = 2;
+    optional int32 offset_y = 3;
+}

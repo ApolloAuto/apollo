@@ -18,7 +18,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 namespace apollo {
 namespace data {

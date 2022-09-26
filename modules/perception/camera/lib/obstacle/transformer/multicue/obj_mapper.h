@@ -74,7 +74,7 @@ class ObjMapper {
     set_default_variance();
   }
 
-  ~ObjMapper() {}
+  ~ObjMapper() = default;
 
   void set_default_variance() {
     orientation_variance_(0) = 1.0f;

@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 
 /**

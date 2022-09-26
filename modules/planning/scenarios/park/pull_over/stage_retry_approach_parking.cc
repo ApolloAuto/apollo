@@ -38,7 +38,7 @@ PullOverStageRetryApproachParking::PullOverStageRetryApproachParking(
     : Stage(config, injector) {}
 
 Stage::StageStatus PullOverStageRetryApproachParking::FinishStage() {
-  next_stage_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
+  next_stage_ = StageType::PULL_OVER_RETRY_PARKING;
   return Stage::FINISHED;
 }
 

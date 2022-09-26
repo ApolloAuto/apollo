@@ -29,8 +29,8 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/routing/proto/poi.pb.h"
-#include "modules/task_manager/proto/task_manager.pb.h"
+#include "modules/common_msgs/routing_msgs/poi.pb.h"
+#include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -39,6 +39,7 @@
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
+#include "modules/dreamview/backend/plugins/plugin_manager.h"
 
 /**
  * @namespace apollo::dreamview
@@ -66,8 +67,10 @@ class SimulationWorldUpdater {
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
                          WebSocketHandler *camera_ws, SimControl *sim_control,
+                         WebSocketHandler *plugin_ws,
                          const MapService *map_service,
                          PerceptionCameraUpdater *perception_camera_updater,
+                         PluginManager* plugin_manager,
                          bool routing_from_file = false);
 
   /**
@@ -176,6 +179,7 @@ class SimulationWorldUpdater {
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
   WebSocketHandler *camera_ws_ = nullptr;
+  WebSocketHandler *plugin_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
   PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
@@ -201,6 +205,8 @@ class SimulationWorldUpdater {
   std::unique_ptr<cyber::Timer> timer_;
 
   volatile double last_pushed_adc_timestamp_sec_ = 0.0f;
+  
+  std::unique_ptr<PluginManager> plugin_manager_;
 };
 
 }  // namespace dreamview

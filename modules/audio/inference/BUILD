@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,7 +9,7 @@ cc_library(
     srcs = ["moving_detection.cc"],
     hdrs = ["moving_detection.h"],
     deps = [
-        "//modules/audio/proto:audio_cc_proto",
+        "//modules/common_msgs/audio_msgs:audio_cc_proto",
         "@fftw3",
     ],
 )
@@ -19,12 +20,15 @@ cc_library(
     hdrs = ["direction_detection.h"],
     deps = [
         "//cyber",
-        "//modules/common/math:math_utils",
-        "//modules/common/proto:geometry_cc_proto",
-        "//third_party:libtorch",
+        "//modules/common/math",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        #"//third_party/libtorch",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
-    ],
+    ] + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 cc_library(
@@ -32,10 +36,13 @@ cc_library(
     srcs = ["siren_detection.cc"],
     hdrs = ["siren_detection.h"],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/audio/common:audio_gflags",
-        "//third_party:libtorch",
-    ],
+        #"//third_party/libtorch",
+    ] + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 # cc_test(

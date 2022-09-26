@@ -22,10 +22,10 @@
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 %(control_protocol_include_list)s
 

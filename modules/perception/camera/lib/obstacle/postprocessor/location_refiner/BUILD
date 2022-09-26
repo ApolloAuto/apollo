@@ -12,7 +12,8 @@ cc_library(
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner/proto:location_refiner_cc_proto",
+        "//modules/perception/pipeline/proto/stage:location_refiner_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
     alwayslink = True,
 )

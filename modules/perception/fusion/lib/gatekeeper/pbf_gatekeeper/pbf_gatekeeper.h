@@ -17,7 +17,9 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
+#include "modules/perception/pipeline/plugin.h"
 
 namespace apollo {
 namespace perception {
@@ -43,17 +45,19 @@ struct PbfGatekeeperParams {
 
 class PbfGatekeeper : public BaseGatekeeper {
  public:
-  PbfGatekeeper();
-  ~PbfGatekeeper();
-
-  PbfGatekeeper(const PbfGatekeeper&) = delete;
-  PbfGatekeeper& operator=(const PbfGatekeeper&) = delete;
+  PbfGatekeeper() { name_ = "PbfGatekeeper"; }
+  explicit PbfGatekeeper(const PluginConfig& plugin_config);
+  ~PbfGatekeeper() = default;
 
   bool Init() override;
 
   bool AbleToPublish(const TrackPtr& track) override;
 
-  std::string Name() const override;
+  bool Init(const PluginConfig& plugin_config) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   bool LidarAbleToPublish(const TrackPtr& track);
@@ -61,6 +65,8 @@ class PbfGatekeeper : public BaseGatekeeper {
   bool CameraAbleToPublish(const TrackPtr& track, bool is_night);
 
   PbfGatekeeperParams params_;
+
+  DISALLOW_COPY_AND_ASSIGN(PbfGatekeeper);
 };
 
 }  // namespace fusion

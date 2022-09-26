@@ -18,7 +18,8 @@
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/lidar/lib/object_filter_bank/proto/filter_bank_config.pb.h"
+#include "modules/perception/pipeline/plugin_factory.h"
+#include "modules/perception/pipeline/proto/stage/object_filter_bank_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -37,7 +38,7 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "filter_bank.conf");
-  FilterBankConfig config;
+  ObjectFilterBankConfig config;
   ACHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_bank_.clear();
   for (int i = 0; i < config.filter_name_size(); ++i) {
@@ -55,6 +56,48 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
     filter_bank_.push_back(filter);
     AINFO << "Filter bank add filter: " << name;
   }
+  return true;
+}
+
+bool ObjectFilterBank::Init(const StageConfig& stage_config) {
+  filter_ptrs_.clear();
+  for (const auto& plugin_config : stage_config_.plugin_config()) {
+    auto filter = pipeline::dynamic_unique_cast<BaseObjectFilter>(
+                      pipeline::PluginFactory::CreatePlugin(plugin_config));
+
+    std::string plugin_name = PluginType_Name(plugin_config.plugin_type());
+    if (filter == nullptr) {
+      AINFO << "Failed to find object filter: " << plugin_name << ", skipped";
+      continue;
+    }
+
+    filter_ptrs_.push_back(std::move(filter));
+    AINFO << "Filter bank add filter: " << plugin_name;
+  }
+
+  return true;
+}
+
+bool ObjectFilterBank::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
+    return false;
+
+  size_t object_number = lidar_frame->segmented_objects.size();
+
+  ObjectFilterOptions options;
+  for (const auto& filter : filter_ptrs_) {
+    if (!filter->Filter(options, lidar_frame)) {
+      AINFO << "Failed to filter objects in: " << filter->Name();
+    }
+  }
+
+  AINFO << "Object filter bank, filtered objects size: from "
+        << object_number
+        << " to " << lidar_frame->segmented_objects.size();
   return true;
 }
 

@@ -21,7 +21,7 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
-#include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto/spatio_temporal_ground_detector_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -71,6 +71,45 @@ bool SpatioTemporalGroundDetector::Init(
   ground_service_content_.Init(
       config_params.roi_rad_x(), config_params.roi_rad_y(),
       config_params.grid_size(), config_params.grid_size());
+  return true;
+}
+
+bool SpatioTemporalGroundDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  // get config params
+  config_ = stage_config.spatio_temporal_ground_detector_config();
+
+  ground_thres_ = config_.ground_thres();
+  use_roi_ = config_.use_roi();
+  use_ground_service_ = config_.use_ground_service();
+
+  param_ = new common::PlaneFitGroundDetectorParam;
+  param_->roi_region_rad_x = config_.roi_rad_x();
+  param_->roi_region_rad_y = config_.roi_rad_y();
+  param_->roi_region_rad_z = config_.roi_rad_z();
+  param_->nr_grids_coarse = config_.grid_size();
+  param_->nr_smooth_iter = config_.nr_smooth_iter();
+
+  pfdetector_ = new common::PlaneFitGroundDetector(*param_);
+  pfdetector_->Init();
+
+  point_indices_temp_.resize(default_point_size_);
+  data_.resize(default_point_size_ * 3);
+  ground_height_signed_.resize(default_point_size_);
+
+  ground_service_content_.Init(
+      config_.roi_rad_x(),
+      config_.roi_rad_y(),
+      config_.grid_size(),
+      config_.grid_size());
+
+  return true;
+}
+
+bool SpatioTemporalGroundDetector::Process(DataFrame* data_frame) {
   return true;
 }
 

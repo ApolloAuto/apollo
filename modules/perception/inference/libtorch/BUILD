@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["torch_net.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
+        "@libtorch_gpu",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
         "@local_config_cuda//cuda:cudart",
@@ -22,7 +22,7 @@ cc_library(
     hdrs = ["torch_det.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
+        "@libtorch_gpu",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
         "@local_config_cuda//cuda:cudart",

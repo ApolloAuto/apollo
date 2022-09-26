@@ -30,11 +30,11 @@ import numpy as np
 from pypcd import pypcd
 
 from modules.tools.sensor_calibration.data_file_object import TimestampFileObject, OdometryFileObject
-from modules.drivers.proto import conti_radar_pb2
-from modules.drivers.proto import sensor_image_pb2
-from modules.drivers.proto import pointcloud_pb2
-from modules.localization.proto import gps_pb2
-from modules.localization.proto import localization_pb2
+from modules.common_msgs.sensor_msgs import conti_radar_pb2
+from modules.common_msgs.sensor_msgs import sensor_image_pb2
+from modules.common_msgs.sensor_msgs import pointcloud_pb2
+from modules.common_msgs.localization_msgs import gps_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
 
 
 class SensorMessageParser(object):

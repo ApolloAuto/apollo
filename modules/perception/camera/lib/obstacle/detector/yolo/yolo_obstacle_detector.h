@@ -32,6 +32,8 @@
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
+#include "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -51,7 +53,14 @@ class YoloObstacleDetector : public BaseObstacleDetector {
 
   bool Detect(const ObstacleDetectorOptions &options,
               CameraFrame *frame) override;
-  std::string Name() const override { return "YoloObstacleDetector"; }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  protected:
   void LoadInputShape(const yolo::ModelParam &model_param);
@@ -95,6 +104,8 @@ class YoloObstacleDetector : public BaseObstacleDetector {
   bool with_ratios_ = false;
   bool with_area_id_ = false;
   float border_ratio_ = 0.f;
+
+  YoloObstacleDetectorConfig yolo_obstacle_detector_config_;
 };
 
 }  // namespace camera

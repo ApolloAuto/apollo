@@ -1,0 +1,64 @@
+syntax = "proto2";
+
+package apollo.hdmap;
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+import "modules/common_msgs/map_msgs/map_id.proto";
+
+message BoundaryEdge {
+  optional Curve curve = 1;
+  enum Type {
+    UNKNOWN = 0;
+    NORMAL = 1;
+    LEFT_BOUNDARY = 2;
+    RIGHT_BOUNDARY = 3;
+  };
+  optional Type type = 2;
+}
+
+message BoundaryPolygon {
+  repeated BoundaryEdge edge = 1;
+}
+
+// boundary with holes
+message RoadBoundary {
+  optional BoundaryPolygon outer_polygon = 1;
+  // if boundary without hole, hole is null
+  repeated BoundaryPolygon hole = 2;
+}
+
+message RoadROIBoundary {
+  optional Id id = 1;
+  repeated RoadBoundary road_boundaries = 2;
+}
+
+// road section defines a road cross-section, At least one section must be
+// defined in order to
+// use a road, If multiple road sections are defined, they must be listed in
+// order along the road
+message RoadSection {
+  optional Id id = 1;
+  // lanes contained in this section
+  repeated Id lane_id = 2;
+  // boundary of section
+  optional RoadBoundary boundary = 3;
+}
+
+// The road is a collection of traffic elements, such as lanes, road boundary
+// etc.
+// It provides general information about the road.
+message Road {
+  optional Id id = 1;
+  repeated RoadSection section = 2;
+
+  // if lane road not in the junction, junction id is null.
+  optional Id junction_id = 3;
+
+  enum Type {
+    UNKNOWN = 0;
+    HIGHWAY = 1;
+    CITY_ROAD = 2;
+    PARK = 3;
+  };
+  optional Type type = 4;
+}

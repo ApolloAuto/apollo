@@ -10,6 +10,7 @@ cc_library(
         ":record_viewer",
         ":record_writer",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -111,6 +112,7 @@ cc_library(
         ":record_file_reader",
         ":record_message",
     ],
+    alwayslink = True,
 )
 
 cc_test(
@@ -132,6 +134,7 @@ cc_library(
         ":record_message",
         ":record_reader",
     ],
+    alwayslink = True,
 )
 
 cc_test(
@@ -157,6 +160,7 @@ cc_library(
         "//cyber/message:raw_message",
         "//cyber/proto:record_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cpplint()

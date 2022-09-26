@@ -6,6 +6,8 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -33,17 +35,18 @@ cc_library(
     name = "lidar_driver_component_lib",
     srcs = ["lidar_driver_component.cc"],
     hdrs = ["lidar_driver_component.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/drivers/lidar/common/driver_factory:lidar_driver_factory",
-        "//modules/drivers/lidar/proto:config",
+        "//modules/drivers/lidar/proto:config_cc_proto",
     ],
 )
 
 cc_binary(
     name = "liblidar_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":lidar_driver_component_lib"],
 )
 

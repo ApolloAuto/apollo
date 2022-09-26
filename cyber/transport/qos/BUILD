@@ -1,6 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
+filegroup(
+    name = "cyber_transport_qos_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "qos",
     visibility = ["//visibility:public"],

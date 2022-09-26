@@ -22,6 +22,7 @@
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -31,10 +32,15 @@ struct MapManagerInitOptions {};
 
 struct MapManagerOptions {};
 
-class MapManager {
+class MapManager final : public pipeline::Stage {
+ public:
+  using DataFrame = pipeline::DataFrame;
+  using Plugin = pipeline::Plugin;
+  using PluginType = pipeline::PluginType;
+  using StageConfig = pipeline::StageConfig;
+
  public:
   MapManager() = default;
-
   ~MapManager() = default;
 
   bool Init(const MapManagerInitOptions& options = MapManagerInitOptions());
@@ -48,7 +54,13 @@ class MapManager {
 
   bool QueryPose(Eigen::Affine3d* sensor2world_pose) const;
 
-  std::string Name() const { return "MapManager"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   LidarFrame* cached_frame_ = nullptr;
@@ -56,6 +68,8 @@ class MapManager {
   // params
   bool update_pose_ = false;
   double roi_search_distance_ = 80.0;
+
+  MapManagerConfig map_manager_config_;
 
   FRIEND_TEST(LidarLibMapManagerTest, lidar_map_manager_test);
 };  // class MapManager

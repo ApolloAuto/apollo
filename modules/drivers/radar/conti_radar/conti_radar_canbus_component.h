@@ -32,13 +32,13 @@
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
+#include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/radar/conti_radar/protocol/motion_input_speed_300.h"
 #include "modules/drivers/radar/conti_radar/protocol/motion_input_yawrate_301.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 
 /**
  * @namespace apollo::drivers

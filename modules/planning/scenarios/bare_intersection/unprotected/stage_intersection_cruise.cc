@@ -40,7 +40,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageIntersectionCruise::Process(
   }
 
   bool stage_done = stage_impl_.CheckDone(
-      *frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED, config_,
+      *frame, ScenarioType::BARE_INTERSECTION_UNPROTECTED, config_,
       injector_->planning_context(), false);
   if (stage_done) {
     return FinishStage();

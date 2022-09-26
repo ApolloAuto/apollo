@@ -9,7 +9,7 @@ cc_library(
     srcs = if_esd_can(["esd_can_client.cc"]),
     hdrs = if_esd_can(["esd_can_client.h"]),
     deps = if_esd_can([
-        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client",
         "//third_party/can_card_library/esd_can",

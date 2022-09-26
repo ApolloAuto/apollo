@@ -18,7 +18,7 @@
 
 #include "gflags/gflags.h"
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"

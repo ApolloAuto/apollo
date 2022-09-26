@@ -19,13 +19,15 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
-#include "modules/perception/camera/lib/traffic_light/proto/detection.pb.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/pipeline/proto/stage/detection.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -33,13 +35,9 @@ namespace camera {
 
 class TrafficLightDetection : public BaseTrafficLightDetector {
  public:
-  TrafficLightDetection() {
-    mean_[0] = 0;
-    mean_[1] = 0;
-    mean_[2] = 0;
-  }
+  TrafficLightDetection();
 
-  ~TrafficLightDetection() {}
+  ~TrafficLightDetection() = default;
 
   bool Init(const TrafficLightDetectorInitOptions &options) override;
 
@@ -57,16 +55,22 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
                 double iou_thresh = 0.6);
   bool Inference(std::vector<base::TrafficLightPtr> *lights,
                  DataProvider *data_provider);
-  std::string Name() const override;
   const std::vector<base::TrafficLightPtr> &getDetectedBoxes() {
     return detected_bboxes_;
   }
 
-  TrafficLightDetection(const TrafficLightDetection &) = delete;
-  TrafficLightDetection &operator=(const TrafficLightDetection &) = delete;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
-  traffic_light::detection::DetectionParam detection_param_;
+  TrafficLightDetectionConfig detection_param_;
+  std::string detection_root_dir;
+
   DataProvider::ImageOptions data_provider_image_option_;
   std::shared_ptr<inference::Inference> rt_net_ = nullptr;
   std::shared_ptr<base::Image8U> image_ = nullptr;
@@ -78,12 +82,14 @@ class TrafficLightDetection : public BaseTrafficLightDetector {
   std::vector<std::string> net_inputs_;
   std::vector<std::string> net_outputs_;
   Select select_;
-  int max_batch_size_ = 4;
-  int param_blob_length_ = 6;
+  int max_batch_size_;
+  int param_blob_length_;
   float mean_[3];
   std::vector<base::RectI> crop_box_list_;
   std::vector<float> resize_scale_list_;
-  int gpu_id_ = 0;
+  int gpu_id_;
+
+  DISALLOW_COPY_AND_ASSIGN(TrafficLightDetection);
 };  // class TrafficLightDetection
 
 }  // namespace camera

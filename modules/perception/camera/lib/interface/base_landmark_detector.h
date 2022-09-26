@@ -17,10 +17,11 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-
 #include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +31,11 @@ struct LandmarkDetectorInitOptions : public BaseInitOptions {};
 
 struct LandmarkDetectorOptions {};
 
-class BaseLandmarkDetector {
+class BaseLandmarkDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLandmarkDetector() = default;
 
@@ -46,10 +51,15 @@ class BaseLandmarkDetector {
   virtual bool Detect(const LandmarkDetectorOptions& options,
                       CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
-  BaseLandmarkDetector(const BaseLandmarkDetector&) = delete;
-  BaseLandmarkDetector& operator=(const BaseLandmarkDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLandmarkDetector);
 };  // class BaseLandmarkDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLandmarkDetector);

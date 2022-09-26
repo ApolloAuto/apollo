@@ -23,7 +23,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/proto/decision.pb.h"
+#include "modules/common_msgs/planning_msgs/decision.pb.h"
 
 namespace apollo {
 namespace planning {

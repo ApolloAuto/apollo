@@ -9,11 +9,11 @@ cc_library(
     hdrs = ["lane_change_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/map/pnc_map:route_segments",
+        "//modules/map/pnc_map",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/tasks/deciders:decider_base",
     ],
 )

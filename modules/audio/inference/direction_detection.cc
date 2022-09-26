@@ -17,6 +17,8 @@
 #include "modules/audio/inference/direction_detection.h"
 #include "yaml-cpp/yaml.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {

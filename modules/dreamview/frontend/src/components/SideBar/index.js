@@ -11,6 +11,7 @@ import ModuleControllerIcon from 'assets/images/sidebar/module_controller.png';
 import LayerMenuIcon from 'assets/images/sidebar/layer_menu.png';
 import RouteEditingIcon from 'assets/images/sidebar/route_editing.png';
 import DataRecorderIcon from 'assets/images/sidebar/data_recorder.png';
+import ProfileIcon from 'assets/images/sidebar/profile.png';
 
 const sidebarIconMapping = {
   showTasks: TasksIcon,
@@ -18,6 +19,7 @@ const sidebarIconMapping = {
   showMenu: LayerMenuIcon,
   showRouteEditingBar: RouteEditingIcon,
   showDataRecorder: DataRecorderIcon,
+  showProfile: ProfileIcon,
 };
 
 const sidebarLabelMapping = {
@@ -27,6 +29,7 @@ const sidebarLabelMapping = {
   showRouteEditingBar: 'Route Editing',
   showDataRecorder: 'Data Recorder',
   showPOI: 'Default Routing',
+  showProfile: 'Profile',
 };
 
 @inject('store') @observer
@@ -62,6 +65,7 @@ export default class SideBar extends React.Component {
                     <SideBarButton type="main" {...settings.showMenu} />
                     <SideBarButton type="main" {...settings.showRouteEditingBar} />
                     <SideBarButton type="main" {...settings.showDataRecorder} />
+                    <SideBarButton type="main" {...settings.showProfile} />
                 </div>
                 <div className="sub-button-panel">
                     <SideBarButton

@@ -21,7 +21,7 @@ config navigation mode
 import sys
 import configparser
 from modules.dreamview.proto import hmi_config_pb2
-from modules.planning.proto import planning_config_pb2
+from modules.common_msgs.planning_msgs import planning_config_pb2
 from modules.tools.common import proto_utils
 
 DEFAULT_NAVI_CONFIG_FILE = "/apollo/modules/tools/navigation/config/default.ini"

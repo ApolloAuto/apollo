@@ -18,8 +18,10 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
-#include "modules/perception/camera/lib/traffic_light/tracker/proto/semantic.pb.h"
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -41,10 +43,10 @@ struct SemanticTable {
   HystereticWindow hystertic_window;
 };
 
-class SemanticReviser : public BaseTrafficLightTracker {
+class SemanticReviser final : public BaseTrafficLightTracker {
  public:
-  SemanticReviser() {}
-  ~SemanticReviser() {}
+  SemanticReviser();
+  ~SemanticReviser() = default;
 
   bool Init(const TrafficLightTrackerInitOptions &options =
                 TrafficLightTrackerInitOptions()) override;
@@ -61,18 +63,24 @@ class SemanticReviser : public BaseTrafficLightTracker {
   void ReviseLights(std::vector<base::TrafficLightPtr> *lights,
                     const std::vector<int> &light_ids, base::TLColor dst_color);
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
 
-  explicit SemanticReviser(const BaseTrafficLightTracker &) = delete;
-  SemanticReviser &operator=(const BaseTrafficLightTracker &) = delete;
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
-  traffic_light::tracker::SemanticReviseParam semantic_param_;
-  float revise_time_s_ = 1.5f;
-  float blink_threshold_s_ = 0.4f;
-  float non_blink_threshold_s_ = 0.8f;
-  int hysteretic_threshold_ = 1;
+  SemanticReviserConfig semantic_param_;
+
+  float revise_time_s_;
+  float blink_threshold_s_;
+  float non_blink_threshold_s_;
+  int hysteretic_threshold_;
   std::vector<SemanticTable> history_semantic_;
+
+  DISALLOW_COPY_AND_ASSIGN(SemanticReviser);
 };
 
 }  // namespace camera

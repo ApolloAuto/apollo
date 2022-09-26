@@ -3,6 +3,12 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "cyber_class_loader_shared_library_hdrs",
+    srcs = glob([
+        "*.h",
+    ]),
+)
 cc_library(
     name = "shared_library",
     srcs = ["shared_library.cc"],

@@ -24,10 +24,10 @@ cc_library(
         "libtorch_obstacle_detector.h",
     ],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
+        "@libtorch_gpu",
     ],
 )
 

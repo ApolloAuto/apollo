@@ -23,8 +23,9 @@
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
-#include "modules/perception/camera/lib/lane/postprocessor/denseline/proto/denseline_postprocessor.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/proto/stage/denseline_postprocessor.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -41,7 +42,7 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
  public:
   DenselineLanePostprocessor() : BaseLanePostprocessor() {}
 
-  virtual ~DenselineLanePostprocessor() {}
+  virtual ~DenselineLanePostprocessor() = default;
 
   bool Init(const LanePostprocessorInitOptions& options =
                 LanePostprocessorInitOptions()) override;
@@ -58,8 +59,6 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
   bool Process3D(const LanePostprocessorOptions& options,
                  CameraFrame* frame) override;
 
-  std::string Name() const override;
-
   std::vector<std::vector<LanePointInfo>> GetLanelinePointSet();
   std::vector<LanePointInfo> GetAllInferLinePointSet();
 
@@ -67,6 +66,14 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
                   int* lane_map_height,
                   std::vector<ConnectedComponent>* connected_components,
                   std::vector<ConnectedComponent>* select_connected_components);
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   void ConvertImagePoint2Camera(CameraFrame* frame);

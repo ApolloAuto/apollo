@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+package apollo.storytelling;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message CloseToCrosswalk {
+  optional string id = 1;
+  optional double distance = 2 [default = nan];
+}
+
+message CloseToClearArea {
+  optional string id = 1;
+  optional double distance = 2 [default = nan];
+}
+
+message CloseToJunction {
+  enum JunctionType {
+    PNC_JUNCTION = 1;
+    JUNCTION = 2;
+  };
+  optional string id = 1;
+  optional JunctionType type = 2;
+  optional double distance = 3 [default = nan];
+}
+
+message CloseToSignal {
+  optional string id = 1;
+  optional double distance = 2 [default = nan];
+}
+
+message CloseToStopSign {
+  optional string id = 1;
+  optional double distance = 2 [default = nan];
+}
+
+message CloseToYieldSign {
+  optional string id = 1;
+  optional double distance = 2 [default = nan];
+}
+
+// Usage guide for action modules:
+// 1. Call `stories.has_XXX()` to check if a story you are interested is in
+//    charge.
+// 2. Access the story details if necessary, and take action accordingly.
+message Stories {
+  optional apollo.common.Header header = 1;
+
+  optional CloseToClearArea close_to_clear_area = 2;
+  optional CloseToCrosswalk close_to_crosswalk = 3;
+  optional CloseToJunction close_to_junction = 4;
+  optional CloseToSignal close_to_signal = 5;
+  optional CloseToStopSign close_to_stop_sign = 6;
+  optional CloseToYieldSign close_to_yield_sign = 7;
+}

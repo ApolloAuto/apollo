@@ -143,7 +143,7 @@ def __remove_prefix(path, prefix):
 
     return "/".join(path[len(prefix):])
 
-def _remove_prefix(path, prefix):
+def remove_prefix(path, prefix):
     """Remove prefix from path.
 
     This attempts to remove the specified prefix from the specified path. The
@@ -209,10 +209,10 @@ def output_path(ctx, input_file, strip_prefix, package_root = None):
     # Bazel output-files path.
     input_path = input_file.path
     if input_file.is_source:
-        input_path = _remove_prefix(input_path, package_root)
+        input_path = remove_prefix(input_path, package_root)
     else:
         out_root = join_paths("bazel-out/*/*", package_root)
-        input_path = _remove_prefix(input_path, out_root)
+        input_path = remove_prefix(input_path, out_root)
 
     # Deal with possible case of file outside the package root.
     if input_path == None:
@@ -220,7 +220,7 @@ def output_path(ctx, input_file, strip_prefix, package_root = None):
 
     # Possibly remove prefixes.
     for p in strip_prefix:
-        output_path = _remove_prefix(input_path, p)
+        output_path = remove_prefix(input_path, p)
         if output_path != None:
             return output_path
 

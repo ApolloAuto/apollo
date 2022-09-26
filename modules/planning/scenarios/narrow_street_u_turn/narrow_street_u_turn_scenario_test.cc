@@ -49,7 +49,7 @@ TEST_F(NarrowStreetUTurnTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new NarrowStreetUTurnScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::NARROW_STREET_U_TURN);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::NARROW_STREET_U_TURN);
 }
 }  // namespace narrow_street_u_turn
 }  // namespace scenario

@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+
+message LidarDetectionConfig {
+  optional string sensor_name = 1;
+  // optional Eigen::Affine3d sensor2novatel_extrinsics = 2;
+}

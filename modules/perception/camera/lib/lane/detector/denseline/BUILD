@@ -8,16 +8,18 @@ cc_library(
     srcs = ["denseline_lane_detector.cc"],
     hdrs = ["denseline_lane_detector.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/lane/common/proto:denseline_cc_proto",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/registerer",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:denseline_cc_proto",
     ],
 )
 

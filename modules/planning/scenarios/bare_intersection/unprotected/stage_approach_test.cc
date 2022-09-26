@@ -29,7 +29,7 @@ class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(
-        ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH);
+        StageType::BARE_INTERSECTION_UNPROTECTED_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,8 +42,8 @@ TEST_F(StageApproachTest, Init) {
   BareIntersectionUnprotectedStageApproach
       bare_intersection_unprotected_stage_approach(config_, injector_);
   EXPECT_EQ(bare_intersection_unprotected_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH));
+            StageType_Name(
+                StageType::BARE_INTERSECTION_UNPROTECTED_APPROACH));
 }
 
 }  // namespace bare_intersection

@@ -27,6 +27,14 @@ bool DummyMultiTargetTracker::Init(
   return true;
 }
 
+bool DummyMultiTargetTracker::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool DummyMultiTargetTracker::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool DummyMultiTargetTracker::Track(const MultiTargetTrackerOptions& options,
                                     LidarFrame* frame) {
   if (frame == nullptr) {

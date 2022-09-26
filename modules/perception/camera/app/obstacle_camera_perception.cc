@@ -26,6 +26,7 @@
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 
 namespace apollo {
@@ -178,6 +179,17 @@ bool ObstacleCameraPerception::Init(
     ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
   }
   return true;
+}
+
+bool ObstacleCameraPerception::Init(const PipelineConfig& pipeline_config) {
+   return Initialize(pipeline_config);
+}
+
+bool ObstacleCameraPerception::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  return InnerProcess(data_frame);
 }
 
 void ObstacleCameraPerception::InitLane(

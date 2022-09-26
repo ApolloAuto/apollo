@@ -7,11 +7,11 @@ py_library(
     srcs = ["dump_message.py"],
     deps = [
         "//cyber/python/cyber_py3:record",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/control/proto:control_cmd_py_pb2",
-        "//modules/drivers/proto:pointcloud_py_pb2",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/control_msgs:control_cmd_py_pb2",
+        "//modules/common_msgs/sensor_msgs:pointcloud_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 
@@ -21,6 +21,6 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
     ],
 )

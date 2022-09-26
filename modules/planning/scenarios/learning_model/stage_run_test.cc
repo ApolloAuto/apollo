@@ -27,7 +27,7 @@ namespace scenario {
 class StageRunTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::LEARNING_MODEL_RUN);
+    config_.set_stage_type(StageType::LEARNING_MODEL_RUN);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -39,7 +39,7 @@ class StageRunTest : public ::testing::Test {
 TEST_F(StageRunTest, Init) {
   LearningModelSampleStageRun learning_model_stage_run(config_, injector_);
   EXPECT_EQ(learning_model_stage_run.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::LEARNING_MODEL_RUN));
+            StageType_Name(StageType::LEARNING_MODEL_RUN));
 }
 
 }  // namespace scenario

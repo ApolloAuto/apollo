@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.prediction;
 
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/prediction/proto/feature.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+import "modules/common_msgs/prediction_msgs/feature.proto";
 
 message ObstacleConf {
   enum ObstacleStatus {

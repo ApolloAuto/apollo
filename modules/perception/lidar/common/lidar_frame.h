@@ -43,6 +43,8 @@ struct LidarFrame {
   Eigen::Affine3d lidar2world_pose = Eigen::Affine3d::Identity();
   // lidar to world pose
   Eigen::Affine3d novatel2world_pose = Eigen::Affine3d::Identity();
+  // lidar to
+  Eigen::Affine3d lidar2novatel_extrinsics = Eigen::Affine3d::Identity();
   // hdmap struct
   std::shared_ptr<base::HdmapStruct> hdmap_struct = nullptr;
   // segmented objects

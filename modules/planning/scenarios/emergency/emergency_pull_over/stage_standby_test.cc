@@ -28,7 +28,7 @@ namespace emergency_pull_over {
 class StageStandbyTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY);
+    config_.set_stage_type(StageType::EMERGENCY_PULL_OVER_STANDBY);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,8 +41,8 @@ TEST_F(StageStandbyTest, Init) {
   EmergencyPullOverStageStandby emergency_pull_over_stage_standby(config_,
                                                                   injector_);
   EXPECT_EQ(emergency_pull_over_stage_standby.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY));
+            StageType_Name(
+                StageType::EMERGENCY_PULL_OVER_STANDBY));
 }
 
 }  // namespace emergency_pull_over

@@ -22,11 +22,11 @@
 
 #include <memory>
 
+#include "modules/common_msgs/planning_msgs/decision.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {
 namespace planning {

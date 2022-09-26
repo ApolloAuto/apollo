@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"

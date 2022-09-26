@@ -27,8 +27,8 @@ cc_library(
     deps = [
         ":object_supplement",
         ":types",
-        "//modules/common/util:string_util",
-        "@com_google_absl//absl/strings",
+        "//modules/common/util:util_tool",
+        "@com_google_absl//:absl",
         "@eigen",
         "@local_config_pcl//:pcl",
     ],
@@ -70,8 +70,8 @@ cc_library(
     srcs = ["option_parser.cc"],
     hdrs = ["option_parser.h"],
     deps = [
-        "//modules/common/util:string_util",
-        "@com_google_absl//absl/strings",
+        "//modules/common/util:util_tool",
+        "@com_google_absl//:absl",
     ],
 )
 

@@ -49,7 +49,7 @@ TEST_F(EmergencyPullOverScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new EmergencyPullOverScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::EMERGENCY_PULL_OVER);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::EMERGENCY_PULL_OVER);
 }
 
 }  // namespace emergency_pull_over

@@ -24,12 +24,18 @@
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/bitmap2d.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 class HdmapROIFilterTest;
+
 class HdmapROIFilter : public BaseROIFilter {
+ public:
+  using DirectionMajor = Bitmap2D::DirectionMajor;
+  using PolygonDType = base::PolygonDType;
+
  public:
   HdmapROIFilter()
       : BaseROIFilter(),
@@ -41,9 +47,15 @@ class HdmapROIFilter : public BaseROIFilter {
 
   bool Init(const ROIFilterInitOptions& options) override;
 
-  std::string Name() const override { return "HdmapROIFilter"; }
-
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   void TransformFrame(
@@ -70,6 +82,8 @@ class HdmapROIFilter : public BaseROIFilter {
   apollo::common::EigenVector<base::PolygonDType> polygons_local_;
   Bitmap2D bitmap_;
   ROIServiceContent roi_service_content_;
+
+  HDMapRoiFilterConfig hdmap_roi_filter_config_;
 
   // unit tests only
   friend class HdmapROIFilterTest;

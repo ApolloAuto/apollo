@@ -8,7 +8,7 @@ cc_library(
     srcs = ["autotuning_raw_feature_generator.cc"],
     hdrs = ["autotuning_raw_feature_generator.h"],
     deps = [
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
@@ -42,7 +42,7 @@ cc_library(
     srcs = ["autotuning_mlp_net_model.cc"],
     hdrs = ["autotuning_mlp_net_model.h"],
     deps = [
-        "//cyber/common:macros",
+        "//cyber",
         "//modules/prediction/network:net_model",
     ],
 )

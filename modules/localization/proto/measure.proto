@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.localization;
 
-import "modules/common/proto/header.proto";
-import "modules/common/proto/geometry.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
 
 message IntegMeasure {
   optional apollo.common.Header header = 1;

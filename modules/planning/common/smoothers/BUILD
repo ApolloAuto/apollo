@@ -12,7 +12,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 

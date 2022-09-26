@@ -9,7 +9,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//cyber",
-        "//modules/common/util:eigen_defs",
+        "//modules/common/util:util_tool",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@local_config_pcl//:pcl",
     ],

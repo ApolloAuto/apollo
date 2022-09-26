@@ -40,19 +40,21 @@ cc_library(
     hdrs = ["smoke_obstacle_detector.h"],
     deps = [
         ":smoke_region_output",
-        "//modules/perception/camera/lib/obstacle/detector/yolo:region_output",
-        "//cyber/common:file",
-        "//modules/common/util:perf_util",
+        "//cyber",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/feature_extractor/tfe:external_feature_extractor",
         "//modules/perception/camera/lib/feature_extractor/tfe:project_feature",
         "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
         "//modules/perception/camera/lib/interface",
+        "//modules/perception/camera/lib/obstacle/detector/yolo:region_output",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/pipeline:stage",
     ],
 )
 
@@ -61,7 +63,7 @@ cc_library(
     srcs = ["object_maintainer.cc"],
     hdrs = ["object_maintainer.h"],
     deps = [
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/base",
     ],
 )

@@ -11,7 +11,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/planning/common:planning_gflags",
         "@osqp",
     ],

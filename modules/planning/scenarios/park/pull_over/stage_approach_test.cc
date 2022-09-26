@@ -29,7 +29,7 @@ namespace pull_over {
 class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PULL_OVER_APPROACH);
+    config_.set_stage_type(StageType::PULL_OVER_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,7 +41,7 @@ class StageApproachTest : public ::testing::Test {
 TEST_F(StageApproachTest, Init) {
   PullOverStageApproach pull_over_stage_approach(config_, injector_);
   EXPECT_EQ(pull_over_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_APPROACH));
+            StageType_Name(StageType::PULL_OVER_APPROACH));
 }
 
 }  // namespace pull_over
