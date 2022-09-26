@@ -86,12 +86,20 @@ static int GetGpuId(
   return trafficlight_param.gpu_id();
 }
 
-static int GetTrafficGpuId(const apollo::perception::pipeline::PipelineConfig& pipeline_config){
-  if (!pipeline_config.traffic_light_config().trafficlights_perception_config().has_gpu_id()){
-    AINFO << "gpu id not found.";
+static int GetTrafficGpuId(const pipeline::PipelineConfig& pipeline_config) {
+  if (!pipeline_config
+        .traffic_light_config()
+        .trafficlights_perception_config()
+        .has_gpu_id()){
+    AERROR << "traffic light gpu id not found.";
     return -1;
   }
-  return pipeline_config.traffic_light_config().trafficlights_perception_config().gpu_id();
+
+  int gpu_id = pipeline_config
+                .traffic_light_config()
+                .trafficlights_perception_config()
+                .gpu_id();
+  return gpu_id;
 }
 
 bool TrafficLightsPerceptionComponent::Init() {
@@ -186,17 +194,22 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   max_v2x_msg_buff_size_ = traffic_light_param.max_v2x_msg_buff_size();
   v2x_msg_buffer_.set_capacity(max_v2x_msg_buff_size_);
 
-  const auto& traffic_light_root_dir = traffic_light_param.camera_traffic_light_perception_conf_dir();
-  const auto& traffic_light_conf_file = traffic_light_param.camera_traffic_light_perception_conf_file();
+  const auto& traffic_light_root_dir =
+      traffic_light_param.camera_traffic_light_perception_conf_dir();
+  const auto& traffic_light_conf_file =
+      traffic_light_param.camera_traffic_light_perception_conf_file();
 
   std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
   std::string trafficlight_config_file =
       GetAbsolutePath(traffic_light_root_dir, traffic_light_conf_file);
-  trafficlight_config_file = GetAbsolutePath(work_root, trafficlight_config_file);
+  trafficlight_config_file =
+      GetAbsolutePath(work_root, trafficlight_config_file);
 
   ACHECK(
-      cyber::common::GetProtoFromFile(trafficlight_config_file, &trafficlight_config))
-      << "failed to load trafficlight config file " << trafficlight_config_file;
+      cyber::common::GetProtoFromFile(
+          trafficlight_config_file, &trafficlight_config))
+      << "failed to load trafficlight config file "
+      << trafficlight_config_file;
   return cyber::SUCC;
 }
 
@@ -256,7 +269,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     AERROR << "PreprocessComponent init hd-map failed.";
     return cyber::FAIL;
   }
-  
+
   traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
   if (!traffic_light_pipeline_->Init(trafficlight_config)) {
     AERROR << "camera_traffic_light_pipeline_->Init() failed";
@@ -412,8 +425,9 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   last_proc_image_ts_ = Clock::NowInSeconds();
 
   AINFO << "start proc.";
-  data_frame_->camera_frame = frame_.get();
-  traffic_light_pipeline_->Process(data_frame_);
+  pipeline::DataFrame data_frame;
+  data_frame.camera_frame = frame_.get();
+  traffic_light_pipeline_->Process(&data_frame);
 
   for (auto light : frame_->traffic_lights) {
     AINFO << "after tl pipeline " << light->id << " color "
