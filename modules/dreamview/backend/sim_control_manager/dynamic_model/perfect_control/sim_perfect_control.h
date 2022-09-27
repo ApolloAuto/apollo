@@ -22,8 +22,6 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
-
 #include "gtest/gtest_prod.h"
 
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -31,9 +29,10 @@
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/backend/sim_control/sim_control_interface.h"
+#include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
 
 /**
  * @namespace apollo::dreamview
@@ -43,27 +42,25 @@ namespace apollo {
 namespace dreamview {
 
 /**
- * @class SimControl
+ * @class SimPerfectControl
  * @brief A module that simulates a 'perfect control' algorithm, which assumes
  * an ideal world where the car can be perfectly placed wherever the planning
  * asks it to be, with the expected speed, acceleration, etc.
  */
-class SimControl : SimControlInterface {
+class SimPerfectControl final : public SimControlBase {
  public:
   /**
-   * @brief Constructor of SimControl.
+   * @brief Constructor of SimPerfectControl.
    * @param map_service the pointer of MapService.
    */
-  explicit SimControl(const MapService *map_service);
-
-  bool IsEnabled() const { return enabled_; }
+  explicit SimPerfectControl(const MapService *map_service);
 
   /**
    * @brief setup callbacks and timer
    * @param set_start_point initialize localization.
    */
-  void Init(double start_velocity = 0.0,
-            double start_acceleration = 0.0) override;
+  void Init(bool set_start_point, nlohmann::json start_point_attr,
+            bool use_start_point_position = false) override;
 
   /**
    * @brief Starts the timer to publish simulated localization and chassis
@@ -82,8 +79,6 @@ class SimControl : SimControlInterface {
   void Reset() override;
 
   void RunOnce() override;
-
-  void Restart(double x, double y);
 
  private:
   void OnPlanning(
@@ -113,16 +108,18 @@ class SimControl : SimControlInterface {
 
   void InitTimerAndIO();
 
-   /**
+  /**
    * @brief Starts the timer to publish simulated localization and chassis
    * messages. Designated Start point for scenario
    */
-  void Start(double x, double y);
+  void Start(double x, double y) override;
 
   void InitStartPoint(double start_velocity, double start_acceleration);
 
-  // use scenario start point to init start point under the simulation condition.
-  void InitStartPoint(double x, double y, double start_velocity, double start_acceleration);
+  // use scenario start point to init start point under the simulation
+  // condition.
+  void InitStartPoint(double x, double y, double start_velocity,
+                      double start_acceleration);
 
   // Reset the start point, which can be a dummy point on the map, a current
   // localization pose, or a start position received from the routing module.
@@ -177,9 +174,6 @@ class SimControl : SimControlInterface {
 
   // Whether planning has requested a re-routing.
   bool re_routing_triggered_ = false;
-
-  // Whether the sim control is enabled.
-  bool enabled_ = false;
 
   // Whether start point is initialized from actual localization data
   bool start_point_from_localization_ = false;

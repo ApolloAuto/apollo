@@ -35,15 +35,5 @@ void SimControlBase::TransformToVRF(const Point3D& point_mrf,
   point_vrf->set_z(v_vrf.z());
 }
 
-void SimControlBase::Stop() {
-  std::lock_guard<std::mutex> lock(mutex_);
-
-  if (enabled_) {
-    sim_control_timer_->Stop();
-    sim_prediction_timer_->Stop();
-    enabled_ = false;
-  }
-}
-
 }  // namespace dreamview
 }  // namespace apollo

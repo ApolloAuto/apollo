@@ -43,6 +43,10 @@ std::map<string, int> data_type_dict = {{
                                         {
                                             "scenarios",
                                             1,
+                                        },
+                                        {
+                                            "dynamic_model",
+                                            2,
                                         }};
 }
 namespace apollo {
@@ -319,6 +323,7 @@ void PluginManager::RegisterDvSupportApi(const string& api_name,
 
 void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
+  RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -361,6 +366,12 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
   switch (data_type_index) {
     case 0: {
       update_data_res = callback_api_("UpdateScenarioSetToStatus", info);
+      break;
+    }
+    case 2:{
+      // 下载成功-新增文件+register+本地hmistatus
+      // 删除-删除文件+unregister+本地Hmistatus
+      update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
       break;
     }
     default:

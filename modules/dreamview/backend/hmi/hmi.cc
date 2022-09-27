@@ -238,5 +238,9 @@ bool HMI::UpdateScenarioSetToStatus(const std::string& scenario_set_id, const st
   return hmi_worker_->UpdateScenarioSetToStatus(scenario_set_id, scenario_set_name);
 }
 
+bool HMI::UpdateDynamicModelToStatus(std::string& dynamic_model_name) {
+  return hmi_worker_->UpdateDynamicModelToStatus(dynamic_model_name);
+}
+
 }  // namespace dreamview
 }  // namespace apollo

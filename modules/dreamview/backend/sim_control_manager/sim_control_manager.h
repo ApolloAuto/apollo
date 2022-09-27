@@ -22,7 +22,7 @@
 #include "cyber/cyber.h"
 
 #include "modules/common/configs/config_gflags.h"
-// #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
+#include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/core/dynamic_model_factory.h"
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
 
@@ -41,13 +41,14 @@ class SimControlManager {
   SimControlManager() {}
   bool IsEnabled() const { return enabled_; }
   nlohmann::json LoadDynamicModels();
-  bool ChangeDynamicModel(std::string& dynamic_model_name);
-  void DeleteDynamicModel(std::string& dynamic_model_name);
-  bool ResetDynamicModel();
+  bool AddDynamicModel(std::string &dynamic_model_name);
+  bool ChangeDynamicModel(std::string &dynamic_model_name);
+  bool DeleteDynamicModel(std::string &dynamic_model_name);
+  void ResetDynamicModel();
+  void Restart(double x, double y);
+  void Reset();
 
-  virtual ~SimControlManager() {
-    Stop();
-  }
+  virtual ~SimControlManager() { Stop(); }
 
   std::string Name() const;
 

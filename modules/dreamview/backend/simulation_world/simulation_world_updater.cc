@@ -75,7 +75,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       [this](WebSocketHandler::Connection *conn) {
         Json response;
         response["type"] = "SimControlStatus";
-        response["enabled"] = sim_control_->IsEnabled();
+        response["enabled"] = sim_control_manager_->IsEnabled();
         websocket_->SendData(conn, response.dump());
       });
 
@@ -376,6 +376,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         sim_world_service_.SetToClear();
         // todo(lijin)：sim control manager(sim control)reset
         sim_control_->Reset();
+        sim_control_manager_->Reset();
       });
 
   websocket_->RegisterMessageHandler(

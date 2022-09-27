@@ -59,17 +59,21 @@ class SimControlWithModelBase : public SimControlBase {
    */
   void Start() override;
 
+  void Start(double x, double y) override;
+
+  void Stop() override;
+
   /**
    * @brief Resets the internal state.
    */
-  void Reset();
+  void Reset() override;
 
  protected:
   void InitTimerAndIO();
 
   void UpdateGearPosition();
-  void InitStartPoint(double start_velocity, double start_acceleration,
-                      double start_heading);
+  void InitStartPoint(nlohmann::json start_point_attr,
+                      bool use_start_point_position = false);
 
   void InternalReset();
 

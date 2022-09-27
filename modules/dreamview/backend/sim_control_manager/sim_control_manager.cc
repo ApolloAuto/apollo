@@ -35,82 +35,72 @@ namespace apollo
     Json SimControlManager::LoadDynamicModels()
     {
       auto *model_factory = DynamicModelFactory::Instance();
-      // 获取json
       return model_factory->RegisterDynamicModels();
     }
 
-    bool SimControlManager::ResetDynamicModel()
+    void SimControlManager::Reset(){
+      if(IsEnabled() && model_ptr_){
+        model_ptr_->Reset();
+      }
+    }
+
+    void SimControlManager::ResetDynamicModel()
     {
       if (!current_dynamic_model_.empty())
       {
         if (!model_ptr_)
         {
-          // 正常不应该出现这种情况
           auto *model_factory = DynamicModelFactory::Instance();
-         if(!model_factory->GetModelType(current_dynamic_model_, model_ptr_)){
-            current_dynamic_model_ = "";
-            AERROR << "Can not get dynamic model to reset.";
-            return false;
-          }
+          model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
         }
-        // 旧dynamic model stop 注意-stop记得重置一些参数，保证下一次start又是对的
-        model_ptr_->Stop();
+        if (!model_ptr_)
+        {
+          model_ptr_->Stop();
+        }
       }
-      return true;
+      return;
+    }
+
+    bool SimControlManager::AddDynamicModel(std::string &dynamic_model_name)
+    {
+      if (IsEnabled())
+      {
+        auto *model_factory = DynamicModelFactory::Instance();
+        return model_factory->RegisterDynamicModel(dynamic_model_name);
+      }
+      else
+      {
+        AERROR << "Sim control manager is not enabled! Can not download dynamic model to local!";
+        return false;
+      }
     }
 
     bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name)
     {
-      // 感觉我这个设计模式谜之设计模式
-      if (!ResetDynamicModel())
+      ResetDynamicModel();
+      auto *model_factory = DynamicModelFactory::Instance();
+      model_ptr_ = model_factory->GetModelType(dynamic_model_name);
+      if (!model_ptr_)
       {
+        AERROR << "Can not get dynamic model to start.Reset it to original dynamic model!";
+        model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
+        // 重新启动之前的动力学模型
+        if (!model_ptr_)
+        {
+          model_ptr_->Start();
+        }
         return false;
       }
-      auto *model_factory = DynamicModelFactory::Instance();
-      if (!dynamic_model_name.empty())
-      {
-        if (!model_factory->GetModelType(dynamic_model_name, model_ptr_))
-        {
-          // 改写dm的Init+start 变为新的start
-          current_dynamic_model_ = "";
-          AERROR << "Can not get dynamic model to start.";
-          return false;
-        }
-        model_ptr_->Start();
-      }
-      else
-      {
-        // dm为空，关闭动力学模型仿真
-        // 校验sim obstacle是否正在运行
-        // 删除sim obstacle
-        std::system(FLAGS_sim_obstacle_stop_command.data());
-        model_ptr_ = nullptr;
-      }
+      model_ptr_->Start();
       current_dynamic_model_ = dynamic_model_name;
       return true;
     }
 
-    void SimControlManager::DeleteDynamicModel(std::string &dynamic_model_name)
+    bool SimControlManager::DeleteDynamicModel(std::string &dynamic_model_name)
     {
       auto *model_factory = DynamicModelFactory::Instance();
-      model_factory->UnregisterDynamicModel(dynamic_model_name);
-      return;
+      return model_factory->UnregisterDynamicModel(dynamic_model_name);
     }
-
-    // bool SimControlManager::Init(bool set_start_point, double start_velocity,
-    //                              double start_acceleration, double start_heading) {
-    //   auto* model_factory = DynamicModelFactory::Instance();
-    //   model_ptr_ = model_factory->GetModelType();
-    //   if (!model_ptr_) {
-    //     AERROR << "Failed to create dynamic model.";
-    //     // TODO(QiL): fulfill status error definition in apollo
-    //     return false;
-    //   }
-    //   AINFO << "Dynamic Model is successfully created.";
-    //   model_ptr_->Init(set_start_point, start_velocity, start_acceleration,
-    //                    start_heading);
-    //   return true;
-    // }
 
     void SimControlManager::Start()
     {
@@ -118,7 +108,20 @@ namespace apollo
       if (!enabled_)
       {
         enabled_ = true;
+        LoadDynamicModels();
+        ChangeDynamicModel(FLAGS_sim_perfect_control);
       }
+    }
+
+    void SimControlManager::Restart(double x, double y)
+    {
+      // 只涉及模型，不涉及全局管理。只是重新开启更新起点
+      if(!IsEnabled() || !model_ptr_){
+        AERROR<<"Sim control is invalid,Failed to restart!";
+      }
+      model_ptr_->Stop();
+      model_ptr_->Start(x,y);
+      return;
     }
 
     void SimControlManager::RunOnce() { model_ptr_->RunOnce(); }

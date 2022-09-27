@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/dreamview/backend/sim_control_manager/dynamic_model/perfect_control/sim_perfect_control.h"
 
 #include "cyber/blocker/blocker_manager.h"
 #include "cyber/time/clock.h"
@@ -49,12 +49,12 @@ class SimControlTest : public ::testing::Test {
     FLAGS_base_map_filename = "garage.bin";
 
     map_service_.reset(new MapService(false));
-    sim_control_.reset(new SimControl(map_service_.get()));
+    sim_control_.reset(new SimPerfectControl(map_service_.get()));
   }
 
  protected:
   std::unique_ptr<MapService> map_service_;
-  std::unique_ptr<SimControl> sim_control_;
+  std::unique_ptr<SimPerfectControl> sim_control_;
 };
 
 void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,

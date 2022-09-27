@@ -31,6 +31,7 @@
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_util.h"
 #include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
+#include "nlohmann/json.hpp"
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -54,9 +55,9 @@ class SimControlBase {
    * @brief Initialization.
    */
   virtual void Init(
-      bool set_start_point, double start_velocity = 0.0,
-      double start_acceleration = 0.0,
-      double start_heading = std::numeric_limits<double>::max()) = 0;
+      bool set_start_point,
+      nlohmann::json start_point_attr,
+      bool use_start_point_position=false) = 0;
 
   /**
    * @brief Starts running the simulated control algorithm, e.g., publish
@@ -64,10 +65,21 @@ class SimControlBase {
    */
   virtual void Start() = 0;
 
+   /**
+   * @brief Starts running the simulated control algorithm with position, e.g., publish
+   * simulated localization and chassis messages triggered by timer.
+   */
+  virtual void Start(double x,double y) = 0;
+
   /**
    * @brief Stops the algorithm.
    */
-  virtual void Stop();
+  virtual void Stop() = 0;
+
+ /**
+   * @brief Resets the internal state.
+   */
+  virtual void Reset() = 0;
 
   // virtual std::unique_ptr<SimControlBase> GetDynamicModel();
 
@@ -96,6 +108,11 @@ class SimControlBase {
   double start_acceleration_ = 0.0;
   double start_heading_ = std::numeric_limits<double>::max();
 };
+
+ /**
+   * @brief Get SimControl class
+   */
+typedef SimControlBase* create_t(std::string dynamic_name, std::string home_path);
 
 }  // namespace dreamview
 }  // namespace apollo

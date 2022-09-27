@@ -34,13 +34,14 @@ using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
 using apollo::sim_control::SimCarStatus;
+using Json = nlohmann::json;
 
 /**
  * @brief Construct a new Sim Control With Model Base:: Sim Control With Model
  * Base object
  * @param node_name: depens on different dynamic model
  */
-SimControlWithModelBase::SimControlWithModelBase(const std::string& node_name)
+SimControlWithModelBase::SimControlWithModelBase(const std::string &node_name)
     : node_(cyber::CreateNode(node_name)),
       gear_position_(0),
       dt_(0.01),
@@ -86,11 +87,11 @@ void SimControlWithModelBase::InitTimerAndIO() {
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
-  sim_control_timer_.reset(
-      new cyber::Timer(kModelIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(
-      new cyber::Timer(kSimPredictionIntervalMs,
-                       [this]() { this->PublishDummyPrediction(); }, false));
+  sim_control_timer_.reset(new cyber::Timer(
+      kModelIntervalMs, [this]() { this->RunOnce(); }, false));
+  sim_prediction_timer_.reset(new cyber::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
 void SimControlWithModelBase::UpdateGearPosition() {
@@ -109,9 +110,45 @@ void SimControlWithModelBase::Start() {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     InternalReset();
+    // todo: Compatible with scenario conf and default value
+    Json start_point_attr({});
+    // start_point_attr:from scenario conf json or default value.here dm is divided from scenario
+    // use default value
+    start_point_attr["start_velocity"] = 0.0;
+    start_point_attr["start_acceleration"] = 0.0;
+    start_point_attr["start_heading"] = std::numeric_limits<double>::max();
+    Init(true, start_point_attr);
     sim_control_timer_->Start();
     sim_prediction_timer_->Start();
     enabled_ = true;
+  }
+}
+
+void SimControlWithModelBase::Start(double x, double y) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (!enabled_) {
+    InternalReset();
+    Json start_point_attr({});
+    start_point_attr["start_velocity"] = 0.0;
+    start_point_attr["start_acceleration"] = 0.0;
+    start_point_attr["start_heading"] = std::numeric_limits<double>::max();
+    start_point_attr["x"] = x;
+    start_point_attr["y"] = y;
+    Init(true, start_point_attr, true);
+    sim_control_timer_->Start();
+    sim_prediction_timer_->Start();
+    enabled_ = true;
+  }
+}
+
+void SimControlWithModelBase::Stop() {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (enabled_) {
+    sim_control_timer_->Stop();
+    sim_prediction_timer_->Stop();
+    enabled_ = false;
+    std::system(FLAGS_sim_obstacle_stop_command.data());
   }
 }
 
@@ -164,7 +201,8 @@ void SimControlWithModelBase::OnRoutingResponse(
       theta = start_heading_;
     } else if (routing.road_size() > 0) {
       auto start_lane = routing.road(0).passage(0).segment(0);
-      theta = map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
+      theta =
+          map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
     }
     point.set_theta(theta);
     SetStartPoint(point);
@@ -175,44 +213,62 @@ void SimControlWithModelBase::SetStartPoint(const SimCarStatus& point) {
   previous_point_ = point;
 }
 
-void SimControlWithModelBase::InitStartPoint(double start_velocity,
-                                             double start_acceleration,
-                                             double start_heading) {
-  start_velocity_ = start_velocity;
-  start_acceleration_ = start_acceleration;
-  start_heading_ = start_heading;
-  
+void SimControlWithModelBase::InitStartPoint(nlohmann::json start_point_attr,
+                                             bool use_start_point_position) {
+  AINFO << "Init start point with position!";
+
+  start_velocity_ = start_point_attr["start_velocity"];
+  start_acceleration_ = start_point_attr["start_acceleration"];
+  start_heading_ = start_point_attr["start_heading"];
   SimCarStatus point;
   localization_reader_->Observe();
-  if (localization_reader_->Empty()) {
-    // Routing will provide all other pose info
+  if (use_start_point_position) {
+    // add start point position for dynamic model
+    // new add feature to keep same with simcontrol
     start_point_from_localization_ = false;
+    point.set_x(start_point_attr["x"]);
+    point.set_y(start_point_attr["y"]);
+    // z use default 0
+    point.set_z(0);
+    // Todo(@lijin): tmp not support map service,support theta
+    // double theta = 0.0;
+    // double s = 0.0;
+    // map_service_->GetPoseWithRegardToLane(x, y, &theta, &s);
+    // point.set_theta();
     point.set_speed(start_velocity_);
     point.set_acceleration_s(start_acceleration_);
   } else {
-    start_point_from_localization_ = true;
-    const auto& pose = localization_reader_->GetLatestObserved()->pose();
+    if (localization_reader_->Empty()) {
+      // Routing will provide all other pose info
+      start_point_from_localization_ = false;
+      point.set_speed(start_velocity_);
+      point.set_acceleration_s(start_acceleration_);
+    } else {
+      start_point_from_localization_ = true;
+      const auto &pose = localization_reader_->GetLatestObserved()->pose();
 
-    point.set_x(pose.position().x());
-    point.set_y(pose.position().y());
-    point.set_z(pose.position().z());
-    point.set_theta(pose.heading());
-    point.set_speed(
-        std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
-    // Calculates the dot product of acceleration and velocity. The sign
-    // of this projection indicates whether this is acceleration or
-    // deceleration.
-    double projection =
-        pose.linear_acceleration().x() * pose.linear_velocity().x() +
-        pose.linear_acceleration().y() * pose.linear_velocity().y();
+      point.set_x(pose.position().x());
+      point.set_y(pose.position().y());
+      point.set_z(pose.position().z());
+      point.set_theta(pose.heading());
+      point.set_speed(
+          std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+      // Calculates the dot product of acceleration and velocity. The sign
+      // of this projection indicates whether this is acceleration or
+      // deceleration.
+      double projection =
+          pose.linear_acceleration().x() * pose.linear_velocity().x() +
+          pose.linear_acceleration().y() * pose.linear_velocity().y();
 
-    // Calculates the magnitude of the acceleration. Negate the value if
-    // it is indeed a deceleration.
-    double magnitude = std::hypot(pose.linear_acceleration().x(),
-                                  pose.linear_acceleration().y());
-    point.set_acceleration_s(std::signbit(projection) ? -magnitude : magnitude);
-    // Set init gear to neutral position
-    point.set_gear_position(0);
+      // Calculates the magnitude of the acceleration. Negate the value if
+      // it is indeed a deceleration.
+      double magnitude = std::hypot(pose.linear_acceleration().x(),
+                                    pose.linear_acceleration().y());
+      point.set_acceleration_s(std::signbit(projection) ? -magnitude
+                                                        : magnitude);
+      // Set init gear to neutral position
+      point.set_gear_position(0);
+    }
   }
   SetStartPoint(point);
 }
