@@ -16,34 +16,34 @@
 
 #include "modules/perception/pipeline/plugin_factory.h"
 
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object/camera_get_object.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/filter_bbox/filter_bbox.h"
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/recover_bbox/recover_bbox.h"
+#include "modules/perception/camera/lib/obstacle/preprocessor/get_image_data/get_image_data.h"
+#include "modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize/resize_and_normalize.h"
+#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 #include "modules/perception/lidar/lib/pointcloud_detection_preprocessor/pointcloud_down_sample/pointcloud_down_sample.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
-#include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
 namespace apollo {
 namespace perception {
 namespace pipeline {
 
-
 apollo::common::util::Factory<
-    PluginType, Plugin,
-    Plugin *(*)(const PluginConfig& config),
-    std::unordered_map<
-        PluginType,
-        Plugin *(*)(const PluginConfig& config),
-        std::hash<int>>>
+    PluginType, Plugin, Plugin* (*)(const PluginConfig& config),
+    std::unordered_map<PluginType, Plugin* (*)(const PluginConfig& config),
+                       std::hash<int>>>
     PluginFactory::plugin_factory_;
 
 void PluginFactory::Init() {
-  plugin_factory_.Register(
-      PluginType::ROI_BOUNDARY_FILTER,
-      [](const PluginConfig& plugin_config) -> Plugin* {
-        return new lidar::ROIBoundaryFilter(plugin_config);
-      });
+  plugin_factory_.Register(PluginType::ROI_BOUNDARY_FILTER,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new lidar::ROIBoundaryFilter(plugin_config);
+                           });
   plugin_factory_.Register(
       PluginType::POINTCLOUD_GET_OBJECTS,
       [](const PluginConfig& plugin_config) -> Plugin* {
@@ -69,24 +69,43 @@ void PluginFactory::Init() {
       [](const PluginConfig& plugin_config) -> Plugin* {
         return new lidar::MlfTrackObjectMatcher(plugin_config);
       });
+  plugin_factory_.Register(PluginType::MLF_TRACKER,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new lidar::MlfTracker(plugin_config);
+                           });
+  plugin_factory_.Register(PluginType::PBF_GATEKEEPER,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new fusion::PbfGatekeeper(plugin_config);
+                           });
+  plugin_factory_.Register(PluginType::CAMERA_GET_OBJECT,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new camera::CameraGetObject(plugin_config);
+                           });
+  plugin_factory_.Register(PluginType::FILTER_BBOX,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new camera::FilterBbox(plugin_config);
+                           });
+  plugin_factory_.Register(PluginType::RECOVER_BBOX,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new camera::RecoverBbox(plugin_config);
+                           });
+  plugin_factory_.Register(PluginType::GET_IMAGE_DATA,
+                           [](const PluginConfig& plugin_config) -> Plugin* {
+                             return new camera::GetImageData(plugin_config);
+                           });
   plugin_factory_.Register(
-      PluginType::MLF_TRACKER,
+      PluginType::RESIZIE_AND_NORMALIZE,
       [](const PluginConfig& plugin_config) -> Plugin* {
-        return new lidar::MlfTracker(plugin_config);
-      });
-  plugin_factory_.Register(
-      PluginType::PBF_GATEKEEPER,
-      [](const PluginConfig& plugin_config) -> Plugin* {
-        return new fusion::PbfGatekeeper(plugin_config);
+        return new camera::ReSizeAndNormalize(plugin_config);
       });
 }
 
 std::unique_ptr<Plugin> PluginFactory::CreatePlugin(
     const PluginConfig& plugin_config) {
-  return plugin_factory_.CreateObject(
-            plugin_config.plugin_type(), plugin_config);
+  return plugin_factory_.CreateObject(plugin_config.plugin_type(),
+                                      plugin_config);
 }
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

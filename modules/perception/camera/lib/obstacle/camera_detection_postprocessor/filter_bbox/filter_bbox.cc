@@ -23,6 +23,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+FilterBbox::FilterBbox(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 // wxt todo: delete min_dims from model_param
 bool FilterBbox::Init(const PluginConfig &plugin_config) {
   ACHECK(plugin_config.has_filter_bbox_config());

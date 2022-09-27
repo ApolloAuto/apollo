@@ -45,9 +45,11 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  bool Process(const LidarFrame& frame, const std::vector<float>& points_array,
-               int num_points, std::vector<float>* out_detections,
-               std::vector<int>* out_labels);
+  bool Process(const std::vector<float>& points_array,
+                                   int num_points,
+                                   std::vector<float>* out_detections,
+                                   std::vector<int>* out_labels,
+                                   DataFrame* frame);
 
   bool Init(const StageConfig& stage_config) override;
 
@@ -72,9 +74,11 @@ class PointPillarsDetection : public BaseLidarDetector {
 
   base::ObjectSubType GetObjectSubType(int label);
 
-  bool Detect(LidarFrame* frame, const std::vector<float>& points_array,
-              int num_points, std::vector<float>* out_detections,
-              std::vector<int>* out_labels);
+  bool Detect(const std::vector<float>& points_array,
+                                   int num_points,
+                                   std::vector<float>* out_detections,
+                                   std::vector<int>* out_labels,
+                                   LidarFrame* frame);
 
   // reference pointer of lidar frame
   LidarFrame* lidar_frame_ref_ = nullptr;

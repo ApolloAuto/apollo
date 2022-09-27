@@ -30,7 +30,9 @@ class RecoverBbox : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  RecoverBbox() { name_ = "RecoverBbox"; }
+  RecoverBbox() = default;
+
+  explicit RecoverBbox(const PluginConfig& plugin_config);
 
   virtual ~RecoverBbox() = default;
 

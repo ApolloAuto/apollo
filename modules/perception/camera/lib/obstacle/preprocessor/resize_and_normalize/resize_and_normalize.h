@@ -30,7 +30,7 @@ class ReSizeAndNormalize : public pipeline::Plugin {
   using PluginConfig = pipeline::PluginConfig;
 
  public:
-  ReSizeAndNormalize() { name_ = "ReSizeAndNormalize"; }
+  ReSizeAndNormalize() = default;
 
   explicit ReSizeAndNormalize(const PluginConfig& plugin_config);
 
