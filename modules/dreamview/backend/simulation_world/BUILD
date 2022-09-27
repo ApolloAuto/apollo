@@ -59,6 +59,7 @@ cc_library(
     srcs = ["simulation_world_updater.cc"],
     hdrs = ["simulation_world_updater.h"],
     copts = DREAMVIEW_COPTS,
+    alwayslink = True,
     deps = [
         ":simulation_world_service",
         "//modules/common/util:util_tool",

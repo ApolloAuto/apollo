@@ -27,3 +27,41 @@ py_proto_library(
         "//modules/common/proto:header_py_pb2",
     ],
 )
+
+cc_proto_library(
+    name = "fnn_model_cc_proto",
+    deps = [
+        ":fnn_model_proto",
+    ],
+)
+
+proto_library(
+    name = "fnn_model_proto",
+    srcs = ["fnn_model.proto"],
+)
+
+py_proto_library(
+    name = "fnn_model_py_pb2",
+    deps = [
+        ":fnn_model_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dynamic_model_conf_cc_proto",
+    deps = [
+        ":dynamic_model_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "dynamic_model_conf_proto",
+    srcs = ["dynamic_model_conf.proto"],
+)
+
+py_proto_library(
+    name = "dynamic_model_conf_py_pb2",
+    deps = [
+        ":dynamic_model_conf_proto",
+    ],
+)

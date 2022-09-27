@@ -9,9 +9,10 @@ cc_library(
     hdrs = [
         "sim_control_manager.h",
     ],
+    alwayslink = True,
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
-        #"//modules/dreamview/backend/sim_control_manager/common:sim_control_gflags",
+        "//modules/dreamview/backend/sim_control_manager/common:sim_control_gflags",
         "//cyber",
         "//modules/dreamview/backend/sim_control_manager/core:dynamic_model_factory",
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_base",

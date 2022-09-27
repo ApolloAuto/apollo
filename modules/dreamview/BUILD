@@ -51,7 +51,9 @@ install(
         ":pb_hdrs", 
         "//modules/dreamview/backend/common:install",
         "//modules/dreamview/backend/hmi:install",
-        "//modules/dreamview/backend/map:install"
+        "//modules/dreamview/backend/map:install",
+        "//modules/dreamview/backend:install",
+        "//modules/dreamview/backend/sim_control_manager/common:install",
     ],
 )
 
@@ -62,6 +64,7 @@ install(
         "//modules/dreamview/proto:camera_update_cc_proto",
         "//modules/dreamview/proto:hmi_config_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
+        "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/dreamview/proto:data_collection_table_cc_proto",
         "//modules/dreamview/proto:point_cloud_cc_proto",
         "//modules/dreamview/proto:preprocess_table_cc_proto",
