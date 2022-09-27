@@ -4,6 +4,21 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+install(
+    name = "install",
+    data_dest = "perception/pipeline",
+    data = [
+        ":runtime_data",
+    ],
+)
+
+filegroup(
+    name = "runtime_data",
+    srcs = glob([
+        "config/*",
+    ]),
+)
+
 cc_library(
   name = "data_frame",
   hdrs = [

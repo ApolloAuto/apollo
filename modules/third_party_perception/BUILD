@@ -65,6 +65,7 @@ cc_library(
         ":third_party_perception_mobileye_lib",
         ":third_party_perception_smartereye_lib",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
