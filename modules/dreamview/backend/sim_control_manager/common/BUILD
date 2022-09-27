@@ -46,14 +46,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "interpolation_2d",
-    srcs = [
-        "interpolation_2d.cc",
-    ],
-    hdrs = [
-        "interpolation_2d.h",
-    ],
-)
-
 cpplint()
