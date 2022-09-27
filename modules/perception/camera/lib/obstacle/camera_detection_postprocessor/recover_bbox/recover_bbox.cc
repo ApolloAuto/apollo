@@ -23,6 +23,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+RecoverBbox::RecoverBbox(const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
+
 // wxt todo: get roi_w、roi_h、offset_y more reasonable
 bool RecoverBbox::Init(const PluginConfig &plugin_config) {
   ACHECK(plugin_config.has_recover_bbox_config());

@@ -11,6 +11,8 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/preprocessor/get_image_data",
         "//modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize",
         "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline:plugin_factory",
+        "//modules/perception/pipeline/proto/stage:camera_detection_preprocessor_config_cc_proto",
     ],
 )
 
