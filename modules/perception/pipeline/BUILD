@@ -28,6 +28,13 @@ cc_library(
     ":plugin",
     "//modules/common/util:util_tool",
     "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",
+
+    "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object:camera_get_object",
+    "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/filter_bbox",
+    "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor/recover_bbox",
+    "//modules/perception/camera/lib/obstacle/preprocessor/get_image_data",
+    "//modules/perception/camera/lib/obstacle/preprocessor/resize_and_normalize",
+
     "//modules/perception/lidar/lib/classifier/fused_classifier:ccrf_type_fusion",
     "//modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter",
     "//modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects",
