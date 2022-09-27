@@ -88,6 +88,50 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   return true;
 }
 
+bool CenterPointDetection::Init(const StageConfig& stage_config) {
+  /*
+  num_point_feature
+  */
+  paddle::AnalysisConfig config;
+  config.EnableUseGpu(1000, FLAGS_gpu_id);
+  config.SetModel(FLAGS_center_point_model_file,
+                  FLAGS_center_point_params_file);
+  if (FLAGS_use_trt) {
+    paddle::AnalysisConfig::Precision precision;
+    if (FLAGS_trt_precision == 0) {
+      precision = paddle_infer::PrecisionType::kFloat32;
+    } else if (FLAGS_trt_precision == 1) {
+      precision = paddle_infer::PrecisionType::kHalf;
+    } else {
+      AERROR << "Tensorrt type can only support 0 or 1, but recieved is"
+             << FLAGS_trt_precision << "\n";
+      return false;
+    }
+    config.EnableTensorRtEngine(1 << 30, 1, 3, precision, FLAGS_trt_use_static,
+                                false);
+    // todo: solve EnableTunedTensorRtDynamicShape
+    config.CollectShapeRangeInfo(FLAGS_dynamic_shape_file);
+    // config.EnableTunedTensorRtDynamicShape(FLAGS_dynamic_shape_file, true);
+
+    if (FLAGS_trt_use_static) {
+      config.SetOptimCacheDir(FLAGS_trt_static_dir);
+    }
+  }
+  config.SwitchIrOptim(true);
+
+  predictor_ = paddle_infer::CreatePredictor(config);
+  return true;
+}
+
+bool CenterPointDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr || data_frame->lidar_frame == nullptr)
+    return false;
+
+  LidarDetectorOptions options;
+  bool res = Detect(options, data_frame->lidar_frame);
+  return res;
+}
+
 bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
                                   LidarFrame *frame) {
   // check input

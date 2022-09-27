@@ -30,7 +30,9 @@ class RecoverBbox : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  RecoverBbox() { name_ = "RecoverBbox"; }
+  RecoverBbox() = default;
+
+  explicit RecoverBbox(const PluginConfig& plugin_config);
 
   virtual ~RecoverBbox() = default;
 
@@ -47,7 +49,7 @@ class RecoverBbox : public pipeline::Plugin {
 void recover_bbox(int roi_w, int roi_h, int offset_y,
                   std::vector<base::ObjectPtr> *objects);
   int roi_w_;
-  int roi_h_; 
+  int roi_h_;
   int offset_y_;
 };
 
