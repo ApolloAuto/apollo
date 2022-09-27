@@ -30,7 +30,8 @@ class GetImageData : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  GetImageData() { name_ = "GetImageData"; }
+  GetImageData() = default;
+
   explicit GetImageData(const PluginConfig& plugin_config);
 
   virtual ~GetImageData() = default;
