@@ -50,7 +50,7 @@ class LidarDetectionComponent : public cyber::Component<drivers::PointCloud> {
       const std::shared_ptr<LidarFrameMessage>& out_message);
 
   bool ConvertCloud(
-      std::shared_ptr<const drivers::PointCloud>& from,
+      const std::shared_ptr<const drivers::PointCloud>& from,
       std::shared_ptr<base::AttributePointCloud<base::PointF>> to);
 
  private:
@@ -65,9 +65,9 @@ class LidarDetectionComponent : public cyber::Component<drivers::PointCloud> {
   TransformWrapper lidar2world_trans_;
   // std::unique_ptr<lidar::BaseLidarObstacleDetection> detector_;
 
-  std::unique_ptr<lidar::LidarObstacleDetection> lidar_detection_pipeline_;
+  std::unique_ptr<lidar::BaseLidarObstacleDetection> lidar_detection_pipeline_;
 
-  pipeline::PipelineConfig lidardetection_config;
+  pipeline::PipelineConfig lidar_detection_config_;
 
   std::shared_ptr<apollo::cyber::Writer<LidarFrameMessage>> writer_;
 };
