@@ -66,6 +66,7 @@ install(
     deps = [
         ":pb_hdrs",
         "//modules/prediction/pipeline:install",
+        "//modules/prediction/common:install",
         "//modules/prediction/submodules:install",
         
     ],

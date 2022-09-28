@@ -71,7 +71,9 @@ install_src_files(
     name = "install_src",
     deps = [
         ":install_audio_src",
-        ":install_audio_hdrs"
+        ":install_audio_hdrs",
+        ":install_audio_model"
+
     ],
 )
 
@@ -80,6 +82,13 @@ install_src_files(
     src_dir = ["."],
     dest = "audio/src",
     filter = "*",
+)
+
+install_src_files(
+    name = "install_audio_model",
+    src_dir = ["data"],
+    dest = "audio/data",
+    filter = "*"
 )
 
 install_src_files(

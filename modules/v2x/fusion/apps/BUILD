@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "v2x/lib",
+    library_dest = "v2x/lib/fusion/apps",
     targets = [
         ":libv2x_fusion_component.so",
     ]

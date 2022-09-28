@@ -1,13 +1,45 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
 cc_library(
     name = "prediction_gflags",
-    srcs = ["prediction_gflags.cc"],
+    srcs = ["libprediction_gflags.so"],
     hdrs = ["prediction_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "libprediction_gflags.so",
+    srcs = ["prediction_gflags.cc", "prediction_gflags.h"],
+    linkshared = True,
+    linkstatic = True,
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+install(
+    name = "install",
+    library_dest = "prediction/lib",
+    targets = [
+        ":libprediction_gflags.so",
+        ":libprediction_system_gflags.so"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "libprediction_system_gflags.so",
+    srcs = ["prediction_system_gflags.cc", "prediction_system_gflags.h"],
+    linkshared = True,
+    linkstatic = True,
     deps = [
         "@com_github_gflags_gflags//:gflags",
     ],
@@ -15,7 +47,7 @@ cc_library(
 
 cc_library(
     name = "prediction_system_gflags",
-    srcs = ["prediction_system_gflags.cc"],
+    srcs = [":libprediction_system_gflags.so"],
     hdrs = ["prediction_system_gflags.h"],
     deps = [
         "@com_github_gflags_gflags//:gflags",

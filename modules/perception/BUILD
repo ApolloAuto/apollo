@@ -22,9 +22,14 @@ install(
         ":pb_hdrs",
         "//modules/perception/data:install",
         "//modules/perception/onboard/component:install",
+        "//modules/perception/onboard/transform_wrapper:install",
+        "//modules/perception/onboard/common_flags:install",
         "//modules/perception/production:install",
+        "//modules/perception/pipeline:install",
         "//modules/perception/camera/lib/motion_service:install",
         "//modules/perception/camera/tools/offline:install",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:install",
+        "//modules/perception/lidar/lib/tracker/semantic_map:install",
     ],
 )
 
