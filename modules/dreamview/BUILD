@@ -64,7 +64,6 @@ install(
         "//modules/dreamview/proto:camera_update_cc_proto",
         "//modules/dreamview/proto:hmi_config_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
-        "//modules/dreamview/proto:hmi_status_cc_proto",
         "//modules/dreamview/proto:data_collection_table_cc_proto",
         "//modules/dreamview/proto:point_cloud_cc_proto",
         "//modules/dreamview/proto:preprocess_table_cc_proto",

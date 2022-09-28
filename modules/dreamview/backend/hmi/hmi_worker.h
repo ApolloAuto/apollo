@@ -28,9 +28,7 @@
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
-// #include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
-// use dv hmi_status for debug
-#include "modules/dreamview/proto/hmi_status.pb.h"
+#include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "nlohmann/json.hpp"
 #include "modules/dreamview/proto/hmi_config.pb.h"
