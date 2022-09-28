@@ -18,6 +18,9 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+
+#include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/perf_util.h"
@@ -35,9 +38,7 @@ namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
-bool ObstacleDetectionCamera::Init(
-    const CameraPerceptionInitOptions &options) {
-
+bool ObstacleDetectionCamera::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root;
   if (options.use_cyber_work_root) {
     work_root = GetCyberWorkRoot();
@@ -156,15 +157,39 @@ bool ObstacleDetectionCamera::Init(
   return true;
 }
 
-bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
+bool ObstacleDetectionCamera::Init(const PipelineConfig &pipeline_config) {
   if (!Initialize(pipeline_config)) {
     return false;
   }
 
   camera_detection_config_ = pipeline_config.camera_detection_config();
   ACHECK(inference::CudaUtil::set_device_id(camera_detection_config_.gpu_id()));
+  std::string work_root = GetCyberWorkRoot();
+  // Init detector
+
+  // wxt todo: remove this init to smoke stage
+  SmokeObstacleDetectionConfig smoke_obstacle_det_config =
+      (stage_config_map_.at(StageType::SMOKE_OBSTACLE_DETECTION))
+          .smoke_obstacle_detection_config();
+  std::string config_file =
+      GetAbsolutePath(smoke_obstacle_det_config.root_dir(),
+                      smoke_obstacle_det_config.conf_file());
+  config_file = GetAbsolutePath(work_root, config_file);
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &smoke_param_))
+      << "Read config failed: " << config_file;
+  // ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   // Init detector
+  base::BaseCameraModelPtr model;
+
+  model = common::SensorManager::Instance()->GetUndistortCameraModel(
+      smoke_obstacle_det_config.camera_name());
+
+  auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
+  name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
+      smoke_obstacle_det_config.camera_name(),
+      pinhole->get_intrinsic_params()));
+
   // Init tracker
   // Init transformer
   // Init obstacle postprocessor
@@ -179,7 +204,7 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
       out_pose_.open(
           camera_detection_config_.debug_param().camera2world_out_file(),
           std::ofstream::out);
-    } 
+    }
   }
 
   // Init object template
@@ -188,7 +213,8 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
     auto plugin_param =
         camera_detection_config_.object_template_param().plugin_param();
     // todo(zero): need fix work_root
-    // init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
+    // init_options.root_dir = GetAbsolutePath(work_root,
+    // plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
     ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
   }
@@ -196,9 +222,8 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig& pipeline_config) {
   return true;
 }
 
-bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
-  
-  CameraFrame* frame = data_frame->camera_frame;
+bool ObstacleDetectionCamera::Process(DataFrame *data_frame) {
+  CameraFrame *frame = data_frame->camera_frame;
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
 
@@ -230,8 +255,8 @@ bool ObstacleDetectionCamera::Process(DataFrame* data_frame) {
   return true;
 }
 
-bool ObstacleDetectionCamera::Perception(
-    const CameraPerceptionOptions &options, CameraFrame *frame) {
+bool ObstacleDetectionCamera::Perception(const CameraPerceptionOptions &options,
+                                         CameraFrame *frame) {
   PERF_FUNCTION();
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
   ObstacleDetectorOptions detector_options;
