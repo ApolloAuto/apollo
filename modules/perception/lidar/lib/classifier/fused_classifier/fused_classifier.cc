@@ -89,12 +89,65 @@ bool FusedClassifier::Init(const StageConfig& stage_config) {
 }
 
 bool FusedClassifier::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr || data_frame->lidar_frame == nullptr)
+  if (data_frame == nullptr)
     return false;
 
-  ClassifierOptions options;
-  bool res = Classify(options, data_frame->lidar_frame);
-  return res;
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) {
+    return false;
+  }
+
+  std::vector<ObjectPtr>* objects = use_tracked_objects_
+                                        ? &(lidar_frame->tracked_objects)
+                                        : &(lidar_frame->segmented_objects);
+  if (enable_temporal_fusion_ && lidar_frame->timestamp > 0.0) {
+    // sequence fusion
+    AINFO << "Combined classifier, temporal fusion";
+    sequence_.AddTrackedFrameObjects(*objects, lidar_frame->timestamp);
+    ObjectSequence::TrackedObjects tracked_objects;
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      const int track_id = object->track_id;
+      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
+                                         temporal_window_);
+      if (tracked_objects.empty()) {
+        AERROR << "Find zero-length track, so skip.";
+        continue;
+      }
+      if (object != tracked_objects.rbegin()->second) {
+        AERROR << "There must exist some timestamp in disorder, so skip.";
+        continue;
+      }
+      if (!sequence_fuser_ptr_->TypeFusion(option_, &tracked_objects)) {
+        AERROR << "Failed to fuse types, so break.";
+        break;
+      }
+    }
+  } else {
+    // one shot fusion
+    AINFO << "Combined classifier, one shot fusion";
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      if (!one_shot_fuser_ptr_->TypeFusion(option_, object)) {
+        AERROR << "Failed to fuse types, so continue.";
+      }
+    }
+  }
+  return true;
 }
 
 bool FusedClassifier::Classify(const ClassifierOptions& options,
