@@ -76,7 +76,18 @@ bool PointPillarsDetection::Init(const StageConfig& stage_config) {
   return true;
 }
 
-bool PointPillarsDetection::Process(DataFrame* data_frame) { return true; }
+bool PointPillarsDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
+    return false;
+
+  LidarDetectorOptions options;
+  bool res = Detect(options, lidar_frame);
+  return res;
+}
 
 bool PointPillarsDetection::Process(const std::vector<float>& points_array,
                                     int num_points,
@@ -235,14 +246,13 @@ bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
              &out_detections, &out_labels);
   collect_time_ = timer.toc(true);
 
-  AERROR << "PointPillars: "
-         << "\n"
-         << "down sample: " << downsample_time_ << "\t"
-         << "fuse: " << fuse_time_ << "\t"
-         << "shuffle: " << shuffle_time_ << "\t"
-         << "cloud_to_array: " << cloud_to_array_time_ << "\t"
-         << "inference: " << inference_time_ << "\t"
-         << "collect: " << collect_time_;
+  AINFO << "PointPillars: \n"
+        << "down sample: " << downsample_time_ << "\t"
+        << "fuse: " << fuse_time_ << "\t"
+        << "shuffle: " << shuffle_time_ << "\t"
+        << "cloud_to_array: " << cloud_to_array_time_ << "\t"
+        << "inference: " << inference_time_ << "\t"
+        << "collect: " << collect_time_;
 
   delete[] points_array;
   return true;
