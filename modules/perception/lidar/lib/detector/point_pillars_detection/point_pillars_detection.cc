@@ -245,7 +245,6 @@ bool PointPillarsDetection::Detect(const LidarDetectorOptions& options,
          << "collect: " << collect_time_;
 
   delete[] points_array;
-  */
   return true;
 }
 
