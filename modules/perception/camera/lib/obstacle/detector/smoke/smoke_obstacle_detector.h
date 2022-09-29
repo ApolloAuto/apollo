@@ -52,14 +52,14 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   bool Init(const ObstacleDetectorInitOptions &options =
                 ObstacleDetectorInitOptions()) override;
 
+  bool Init(const StageConfig& stage_config) override;
+
   bool Detect(const ObstacleDetectorOptions &options,
               CameraFrame *frame) override;
 
   bool Detect(const std::vector<float> &k_inv,
               const std::vector<float> &image_data_array,
               const float *detect_result);
-
-  bool Init(const StageConfig& stage_config) override;
 
   bool Process(DataFrame *data_frame) override;
 
