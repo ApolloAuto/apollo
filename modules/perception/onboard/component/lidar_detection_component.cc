@@ -51,16 +51,20 @@ bool LidarDetectionComponent::Init() {
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
   const auto& lidar_detection_root_dir = comp_config.lidar_detection_conf_dir();
-  const auto& lidar_detection_conf_file = comp_config.lidar_detection_conf_file();
+  const auto& lidar_detection_conf_file =
+                  comp_config.lidar_detection_conf_file();
 
   std::string work_root = "";
   std::string lidardetection_config_file =
       GetAbsolutePath(lidar_detection_root_dir, lidar_detection_conf_file);
-  lidardetection_config_file = GetAbsolutePath(work_root, lidardetection_config_file);
+  lidardetection_config_file =
+      GetAbsolutePath(work_root, lidardetection_config_file);
 
   ACHECK(
-      cyber::common::GetProtoFromFile(lidardetection_config_file, &lidardetection_config))
-      << "failed to load trafficlight config file " << lidardetection_config_file;
+      cyber::common::GetProtoFromFile(
+        lidardetection_config_file, &lidar_detection_config_))
+      << "failed to load trafficlight config file "
+      << lidardetection_config_file;
 
   if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init detection component algorithm plugin.";
@@ -94,7 +98,7 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
       lidar::BaseLidarObstacleDetectionRegisterer::
       GetInstanceByName(detector_name_);
   CHECK_NOTNULL(detector);
-
+  // detector_.reset(detector);
   // lidar::LidarObstacleDetectionInitOptions init_options;
   // init_options.sensor_name = sensor_name_;
   // init_options.enable_hdmap_input =
@@ -102,15 +106,9 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
   // ACHECK(detector_->Init(init_options)) <<
   //                           "lidar obstacle detection init error";
 
-  // todo(zero): no sensor_name\enable_hdmap_input
-  // PipelineConfig pipeline_config;
-  // pipeline_config.set_sensor_name(sensor_name_);
-  // pipeline_config.set_enable_hdmap_input(
-  //   FLAGS_obs_enable_hdmap_input && enable_hdmap_);
-
   lidar_detection_pipeline_.reset(new lidar::LidarObstacleDetection);
 
-  ACHECK(lidar_detection_pipeline_->Init(lidardetection_config))
+  ACHECK(lidar_detection_pipeline_->Init(lidar_detection_config_))
       << "lidar obstacle detection init error";
 
   lidar2world_trans_.Init(lidar2novatel_tf2_child_frame_id_);
@@ -118,9 +116,20 @@ bool LidarDetectionComponent::InitAlgorithmPlugin() {
 }
 
 bool LidarDetectionComponent::ConvertCloud(
-    std::shared_ptr<const drivers::PointCloud>& from,
+    const std::shared_ptr<const drivers::PointCloud>& from,
     std::shared_ptr<base::AttributePointCloud<base::PointF>> to) {
-  // todo(zero)
+  to->set_timestamp(from->measurement_time());
+  to->reserve(from->point_size());
+  base::PointF point;
+  for (int i = 0; i < from->point_size(); ++i) {
+    const apollo::drivers::PointXYZIT& pt = from->point(i);
+    point.x = pt.x();
+    point.y = pt.y();
+    point.z = pt.z();
+    point.intensity = static_cast<float>(pt.intensity());
+    to->push_back(point, static_cast<double>(pt.timestamp()) * 1e-9,
+                  std::numeric_limits<float>::max(), i, 0);
+  }
   return true;
 }
 
@@ -164,15 +173,8 @@ bool LidarDetectionComponent::InternalProc(
   lidar::LidarObstacleDetectionOptions detect_opts;
   detect_opts.sensor_name = sensor_name_;
   lidar2world_trans_.GetExtrinsics(&detect_opts.sensor2novatel_extrinsics);
-  frame->lidar2novatel_extrinsics = detect_opts.sensor2novatel_extrinsics;
-
   // lidar::LidarProcessResult ret =
   //     detector_->Process(detect_opts, in_message, frame.get());
-
-  // todo(zero): need to add "sensor_name" and "lidar2world_trans_"
-  // ConvertCloud(frame->cloud, in_message);
-  // bool res = lidar_detection_pipeline_->Process(frame.get());
-
   // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
   //   out_message->error_code_ =
   //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
@@ -180,12 +182,20 @@ bool LidarDetectionComponent::InternalProc(
   //   return false;
   // }
 
-  // if (!res) {
-  //   out_message->error_code_ =
-  //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
-  //   AERROR << "Lidar detection process error, ";
-  //   return false;
-  // }
+  // Add point cloud to frame
+  ConvertCloud(in_message, frame->cloud);
+  frame->lidar2novatel_extrinsics = detect_opts.sensor2novatel_extrinsics;
+
+  pipeline::DataFrame data_frame;
+  data_frame.lidar_frame = frame.get();
+  bool res = lidar_detection_pipeline_->Process(&data_frame);
+
+  if (!res) {
+    out_message->error_code_ =
+        apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
+    AERROR << "Lidar detection process error!";
+    return false;
+  }
 
   return true;
 }

@@ -60,14 +60,18 @@ bool ObjectFilterBank::Init(const ObjectFilterInitOptions& options) {
 }
 
 bool ObjectFilterBank::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   filter_ptrs_.clear();
-  for (const auto& plugin_config : stage_config_.plugin_config()) {
+  for (const auto& plugin_config : stage_config.plugin_config()) {
     auto filter = pipeline::dynamic_unique_cast<BaseObjectFilter>(
                       pipeline::PluginFactory::CreatePlugin(plugin_config));
 
     std::string plugin_name = PluginType_Name(plugin_config.plugin_type());
     if (filter == nullptr) {
-      AINFO << "Failed to find object filter: " << plugin_name << ", skipped";
+      AERROR << "Failed to find object filter: " << plugin_name << ", skipped";
       continue;
     }
 

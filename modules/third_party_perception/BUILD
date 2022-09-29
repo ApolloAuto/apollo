@@ -8,6 +8,7 @@ cc_library(
     name = "third_party_perception_lib",
     srcs = ["third_party_perception_base.cc"],
     hdrs = ["third_party_perception_base.h"],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -24,6 +25,7 @@ cc_library(
     name = "third_party_perception_mobileye_lib",
     srcs = ["third_party_perception_mobileye.cc"],
     hdrs = ["third_party_perception_mobileye.h"],
+    alwayslink = True,
     deps = [
         ":third_party_perception_lib",
         "//cyber",
@@ -65,6 +67,7 @@ cc_library(
         ":third_party_perception_mobileye_lib",
         ":third_party_perception_smartereye_lib",
     ],
+    alwayslink = True,
 )
 
 cc_binary(

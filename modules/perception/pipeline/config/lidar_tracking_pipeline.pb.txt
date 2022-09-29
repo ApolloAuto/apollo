@@ -1,7 +1,6 @@
 stage_type: MLF_ENGINE
 stage_type: FUSED_CLASSIFIER
 
-
 stage_config: {
   stage_type: MLF_ENGINE
   enabled: true
@@ -64,7 +63,7 @@ stage_config: {
     }
   }
 
-  fused_classifier_config {
+  fused_classifier_config: {
     one_shot_fusion_method: "CCRFOneShotTypeFusion"
     sequence_fusion_method: "CCRFSequenceTypeFusion"
     enable_temporal_fusion: true

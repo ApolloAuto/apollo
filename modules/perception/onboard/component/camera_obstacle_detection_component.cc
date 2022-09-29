@@ -65,6 +65,14 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   return perception_param.gpu_id();
 }
 
+static int GetGpuId(const apollo::perception::pipeline::PipelineConfig& pipeline_config){
+  if (!pipeline_config.camera_detection_config().has_gpu_id()){
+    AINFO << "gpu id not found.";
+    return -1;
+  }
+  return pipeline_config.camera_detection_config().gpu_id();
+}
+
 static bool SetCameraHeight(const std::string &sensor_name,
                             const std::string &params_dir,
                             const std::string &lidar_sensor_name,
@@ -517,6 +525,7 @@ int CameraObstacleDetectionComponent::InitAlgorithmPlugin() {
 }
 
 int CameraObstacleDetectionComponent::InitCameraFrames() {
+  
   if (camera_names_.size() != 2) {
     AERROR << "invalid camera_names_.size(): " << camera_names_.size();
     return cyber::FAIL;
@@ -535,7 +544,7 @@ int CameraObstacleDetectionComponent::InitCameraFrames() {
     data_provider_init_options.image_width = image_width_;
     data_provider_init_options.do_undistortion = enable_undistortion_;
     data_provider_init_options.sensor_name = camera_name;
-    int gpu_id = GetGpuId(camera_perception_init_options_);
+    int gpu_id = GetGpuId(camera_obstacle_detection_config_);
     if (gpu_id == -1) {
       return cyber::FAIL;
     }
@@ -582,7 +591,6 @@ int CameraObstacleDetectionComponent::InitCameraFrames() {
     frame.track_feature_blob.reset(new base::Blob<float>());
     frame.lane_detected_blob.reset(new base::Blob<float>());
   }
-
   return cyber::SUCC;
 }
 

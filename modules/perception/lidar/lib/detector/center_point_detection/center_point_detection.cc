@@ -89,6 +89,10 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
 }
 
 bool CenterPointDetection::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   /*
   num_point_feature
   */
