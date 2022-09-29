@@ -98,6 +98,10 @@ export default class HMI {
 
   @observable counter = 0;
 
+  @observable dynamicModels = [];
+
+  @observable currentDynamicModel = '';
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -223,6 +227,14 @@ export default class HMI {
 
     if (typeof newStatus.passengerMsg === 'string') {
       UTTERANCE.speakRepeatedly(newStatus.passengerMsg);
+    }
+
+    if (newStatus.dynamicModels) {
+      this.dynamicModels = newStatus.dynamicModels;
+    }
+
+    if (newStatus.currentDynamicModel) {
+      this.currentDynamicModel = newStatus.currentDynamicModel;
     }
   }
 

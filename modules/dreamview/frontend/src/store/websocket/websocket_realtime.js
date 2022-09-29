@@ -188,6 +188,13 @@ export default class RealtimeWebSocketEndpoint {
     }, this.simWorldUpdatePeriodMs);
   }
 
+  checkWsConnection() {
+    if (this.websocket.readyState === this.websocket.OPEN) {
+      return this;
+    }
+    return this.initialize();
+  }
+
   updateMapIndex(message) {
     const now = new Date();
     const duration = now - this.mapLastUpdateTimestamp;
@@ -362,6 +369,37 @@ export default class RealtimeWebSocketEndpoint {
       type: 'HMIAction',
       action: 'DELETE_SCENARIO_SET',
       value: scenarioSetId,
+    }));
+  }
+
+  getDymaticModelList() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      daction: 'LOAD_DYNAMIC_MODELS',
+    }));
+  }
+
+  changeDynamicModel(model) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      daction: 'CHANGE_DYNAMIC_MODEL',
+      value: model,
+    }));
+  }
+
+  switchToDefaultDynamicModel() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'CHANGE_DYNAMIC_MODEL',
+      value: 'sim_perfect_control',
+    }));
+  }
+
+  deleteDynamicModels(dynamicModelId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action: 'DELETE_DYNAMIC_MODEL',
+      value: dynamicModelId,
     }));
   }
 

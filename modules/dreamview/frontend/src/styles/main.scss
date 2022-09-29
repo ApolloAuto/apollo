@@ -442,17 +442,27 @@ body {
             width: 100%;
             padding-bottom: 15px;
 
-            span {
-                width: 200px;
-                border-bottom: 1px solid #999999;
-                padding: 10px 10px 10px 0px;
+          span {
+            display: inline-block;
+            width: 200px;
+            height: 100%;
+            padding: 10px 10px 10px 0px;
+            text-align: center;
 
-                font-size: 18px;
+            font-size: 18px;
 
-                @include small-screen {
-                    font-size: 16px;
-                }
+            @include small-screen {
+              font-size: 16px;
             }
+
+            &:not(.active) {
+              cursor: pointer;
+            }
+
+            &.active {
+              border-bottom: 1px solid #999999;
+            }
+          }
 
             .card-header-btn {
                 border: none;

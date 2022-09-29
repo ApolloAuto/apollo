@@ -80,6 +80,10 @@ export default class Others extends React.Component {
                         extraClasses="others-checkbox"
                         onClick={() => {
                           WS.toggleSimControl(!options.enableSimControl);
+                          if (options.enableSimControl) {
+                            WS.getDymaticModelList();
+                            WS.switchToDefaultDynamicModel();
+                          }
                           this.props.store.handleOptionToggle('enableSimControl');
                         }}
                     />
