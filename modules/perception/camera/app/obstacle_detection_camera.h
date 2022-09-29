@@ -35,6 +35,7 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
 #include "modules/perception/pipeline/pipeline.h"
 #include "modules/perception/pipeline/proto/camera_detection_config.pb.h"
 
@@ -45,16 +46,18 @@ namespace camera {
 class ObstacleDetectionCamera final : public BaseCameraPerception {
  public:
   using CameraDetectionConfig = pipeline::CameraDetectionConfig;
+  using StageType = pipeline::StageType;
 
  public:
   ObstacleDetectionCamera() = default;
   ~ObstacleDetectionCamera() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;
+  
+  bool Init(const PipelineConfig& pipeline_config) override;
+
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-
-  bool Init(const PipelineConfig& pipeline_config) override;
 
   bool Process(DataFrame* data_frame) override;
 
@@ -72,6 +75,7 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   std::shared_ptr<BaseObstacleTracker> tracker_;
 
   app::PerceptionParam perception_param_;
+  smoke::SmokeParam smoke_param_;
   std::ofstream out_track_;
   std::ofstream out_pose_;
 

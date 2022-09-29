@@ -6,7 +6,7 @@ stage_config: {
   stage_type: ALL_LATEST_FUSION
   enabled: true
 
-  all_latest_fusion_config {
+  all_latest_fusion_config: {
     main_sensor: "velodyne128"
     use_lidar: true
     use_radar: true
@@ -18,7 +18,7 @@ stage_config: {
   stage_type: PROBABILISTIC_FUSION
   enabled: true
 
-  probabilistic_fusion_config {
+  probabilistic_fusion_config: {
     use_lidar: true
     use_radar: true
     use_camera: true

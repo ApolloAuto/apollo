@@ -19,6 +19,8 @@ cc_library(
     ],
 )
 
+
+
 cc_library(
     name = "third_party_perception_smartereye_conversion",
     srcs = ["conversion_smartereye.cc"],
@@ -26,6 +28,7 @@ cc_library(
         "conversion_base.h",
         "conversion_smartereye.h",
     ],
+    linkopts = ["-Wl,--allow-multiple-definition"],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
@@ -43,6 +46,7 @@ cc_library(
         "conversion_base.h",
         "conversion_mobileye.h",
     ],
+    linkopts = ["-Wl,--allow-multiple-definition"],
     deps = [
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",

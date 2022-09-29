@@ -55,7 +55,7 @@ class MultiSensorFusionComponent : public cyber::Component<SensorFrameMessage> {
   bool object_in_roi_check_ = false;
   double radius_for_roi_object_check_ = 0;
 
-  pipeline::PipelineConfig multi_sensor_fusion_pipeline_;
+  pipeline::PipelineConfig multi_sensor_fusion_config_;
 
   std::unique_ptr<fusion::BaseMultiSensorFusion> fusion_;
   map::HDMapInput* hdmap_input_ = nullptr;
