@@ -71,6 +71,8 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
       return false;
     }
 
+    AINFO << "Create stage type : " << StageType_Name(stage_type)
+          << " success!";
     stage_ptrs_.push_back(std::move(stage_ptr));
   }
 
@@ -89,6 +91,9 @@ bool Pipeline::InnerProcess(DataFrame* frame) {
                << " Stage : " << stage_ptr->Name() << " failed!";
         return false;
       }
+    } else {
+      AINFO << "Pipeline: " << name_
+            << " Stage : " << stage_ptr->Name() << " disabled!";
     }
   }
   return true;

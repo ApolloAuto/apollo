@@ -192,6 +192,10 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
 }
 
 bool SmokeObstacleDetector::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
   ACHECK(stage_config.has_smoke_obstacle_detection_config());
   smoke_obstacle_detection_config_ =
       stage_config.smoke_obstacle_detection_config();

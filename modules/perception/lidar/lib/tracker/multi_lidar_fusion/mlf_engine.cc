@@ -126,9 +126,8 @@ bool MlfEngine::Process(DataFrame* data_frame) {
     return false;
 
   MultiTargetTrackerOptions options;
-  bool result = Track(options, data_frame->lidar_frame);
-
-  return result;
+  bool res = Track(options, data_frame->lidar_frame);
+  return res;
 }
 
 bool MlfEngine::Track(const MultiTargetTrackerOptions& options,

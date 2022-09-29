@@ -86,7 +86,6 @@ bool LidarTrackingComponent::InitAlgorithmPlugin() {
     AERROR << "Failed to get tracking instance.";
     return false;
   }
-  tracker_->Init(lidar_tracking_config_);
 
   // lidar::LidarObstacleTrackingInitOptions init_options;
   // init_options.sensor_name = main_sensor_name_;
@@ -94,6 +93,11 @@ bool LidarTrackingComponent::InitAlgorithmPlugin() {
   //   AERROR << "Failed to init tracking.";
   //   return false;
   // }
+
+  if (!tracker_->Init(lidar_tracking_config_)) {
+    AERROR << "Failed to init tracking.";
+    return false;
+  }
 
   return true;
 }
@@ -121,6 +125,7 @@ bool LidarTrackingComponent::InternalProc(
   data_frame.lidar_frame = lidar_frame.get();
   bool res = tracker_->Process(&data_frame);
 
+  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
   if (!res) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
@@ -128,12 +133,13 @@ bool LidarTrackingComponent::InternalProc(
     return true;
   }
 
+  // PERF_BLOCK_START();
+  // auto& lidar_frame = in_message->lidar_frame_;
   // lidar::LidarObstacleTrackingOptions track_options;
   // track_options.sensor_name = sensor_name;
   // lidar::LidarProcessResult ret =
   //     tracker_->Process(track_options, lidar_frame.get());
-
-  PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
+  // PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
   // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
   //   out_message->error_code_ =
   //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
