@@ -57,9 +57,9 @@ export default class RealtimeWebSocketEndpoint {
           this.checkMessage(message);
 
           const isNewMode = (this.currentMode
-                                       && this.currentMode !== STORE.hmi.currentMode);
+            && this.currentMode !== STORE.hmi.currentMode);
           const isNavigationModeInvolved = (this.currentMode === 'Navigation'
-                                                    || STORE.hmi.currentMode === 'Navigation');
+            || STORE.hmi.currentMode === 'Navigation');
           this.currentMode = STORE.hmi.currentMode;
           if (STORE.hmi.shouldDisplayNavigationMap) {
             if (MAP_NAVIGATOR.isInitialized()) {
@@ -144,7 +144,7 @@ export default class RealtimeWebSocketEndpoint {
       const lossDuration = now - this.simWorldLastUpdateTimestamp;
       const alertDuration = now - STORE.monitor.lastUpdateTimestamp;
       if (this.simWorldLastUpdateTimestamp !== 0
-                && lossDuration > 10000 && alertDuration > 2000) {
+        && lossDuration > 10000 && alertDuration > 2000) {
         const message = 'Connection to the server has been lost.';
         STORE.monitor.insert('FATAL', message, now);
         if (UTTERANCE.getCurrentText() !== message || !UTTERANCE.isSpeaking()) {
@@ -375,14 +375,14 @@ export default class RealtimeWebSocketEndpoint {
   getDymaticModelList() {
     this.websocket.send(JSON.stringify({
       type: 'HMIAction',
-      daction: 'LOAD_DYNAMIC_MODELS',
+      action: 'LOAD_DYNAMIC_MODELS',
     }));
   }
 
   changeDynamicModel(model) {
     this.websocket.send(JSON.stringify({
       type: 'HMIAction',
-      daction: 'CHANGE_DYNAMIC_MODEL',
+      action: 'CHANGE_DYNAMIC_MODEL',
       value: model,
     }));
   }
@@ -487,7 +487,7 @@ export default class RealtimeWebSocketEndpoint {
     this.pointcloudWS = pointcloudws;
   }
 
-  saveDefaultRouting(routingName,points) {
+  saveDefaultRouting(routingName, points) {
     const request = {
       type: 'SaveDefaultRouting',
       name: routingName,
