@@ -8,6 +8,7 @@ import { ScenarioNoCertificate, ScenarioCertificateInvalid } from './ScenarioNoC
 import ScenarioSetItem from './ScenarioSetItem';
 import LocalScenarioSetItem from './LocalScenarioSetItem';
 import LocalDynamicModelsItem from './LocalDynamicModelsItem';
+import LocalRecordItem from './LocalRecordItem';
 import WS, { PLUGIN_WS } from 'store/websocket';
 
 const RadioGroup = Radio.Group;
@@ -30,6 +31,10 @@ export default class DataProfile extends React.Component {
           title: 'Dynamic Model',
           key: 'dynamicModel',
         },
+        {
+          title: 'Record Profiles',
+          key: 'recordProfiles',
+        },
       ],
     };
   }
@@ -41,6 +46,7 @@ export default class DataProfile extends React.Component {
       PLUGIN_WS.checkWsConnection()
         .checkCertificate();
       WS.checkWsConnection().loadLoocalScenarioSets();
+      WS.checkWsConnection().loadLocalRecords();
       const {enableSimControl} = store.options;
       if (enableSimControl) {
         WS.getDymaticModelList();
@@ -61,6 +67,11 @@ export default class DataProfile extends React.Component {
     WS.changeDynamicModel(e.target.value);
   };
 
+  onRecordChange = (item) => {
+    WS.changeRecord(item);
+  };
+
+  // 渲染动力学模型tab
   renderDynamicModelList = () => {
     const { store } = this.props;
     const { currentDynamicModel, dynamicModels } = store.hmi;
@@ -84,6 +95,33 @@ export default class DataProfile extends React.Component {
         })
         }
       </RadioGroup>
+    </div>);
+  };
+
+  // 渲染数据包tab
+  renderRecordProfilesList = () => {
+    const { store } = this.props;
+    /**
+     * @param currentRecordId string
+     * @param records {id: number}
+     */
+    const { currentRecordId, records } = store.hmi;
+    const {enableSimControl} = store.options;
+    if (enableSimControl) {
+      return <div>Please close SimControl to switch the records player.</div>;
+    }
+    return (<div className='local-record-list'>
+        {toJS(records).keys().map((item) => {
+          return (
+            <LocalRecordItem
+              key={item}
+              item={item}
+              currentRecordId={currentRecordId}
+              changeRecord={this.onRecordChange}
+            />
+          );
+        })
+        }
     </div>);
   };
 
@@ -173,6 +211,7 @@ export default class DataProfile extends React.Component {
 
             {/*dynamic model*/}
             {currentKey === 'dynamicModel' && this.renderDynamicModelList()}
+            {currentKey === 'recordProfiles' && this.renderRecordProfilesList()}
           </div>
         </div>
       </div>

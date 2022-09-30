@@ -102,6 +102,10 @@ export default class HMI {
 
   @observable currentDynamicModel = '';
 
+  @observable records = {};
+
+  @observable currentRecordId = '';
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -235,6 +239,14 @@ export default class HMI {
 
     if (newStatus.currentDynamicModel) {
       this.currentDynamicModel = newStatus.currentDynamicModel;
+    }
+
+    if (newStatus.records) {
+      this.records = newStatus.records;
+    }
+
+    if (newStatus.currentRecordId) {
+      this.currentRecordId = newStatus.currentRecordId;
     }
   }
 

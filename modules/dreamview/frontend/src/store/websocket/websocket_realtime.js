@@ -403,6 +403,39 @@ export default class RealtimeWebSocketEndpoint {
     }));
   }
 
+  // 加载本地records
+  loadLocalRecords() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action:'LOAD_RECORDS',
+    }));
+  }
+
+  // 选择本地records
+  changeRecord(recordId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action:'CHANGE_RECORD',
+      value: recordId,
+    }));
+  }
+
+  // 删除本地record
+  deleteRecord(recordId) {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action:'DELETE_RECORD',
+      value: recordId,
+    }));
+  }
+
+  // 停止本地record播放
+  stopRecord() {
+    this.websocket.send(JSON.stringify({
+      type: 'HMIAction',
+      action:'STOP_RECORD',
+    }));
+  }
   executeModeCommand(action) {
     if (!['SETUP_MODE', 'RESET_MODE', 'ENTER_AUTO_MODE'].includes(action)) {
       console.error('Unknown mode command found:', action);
