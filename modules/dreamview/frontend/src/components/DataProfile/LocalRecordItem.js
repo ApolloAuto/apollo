@@ -110,7 +110,7 @@ function LocalDynamicModelItem(props) {
                alt='local-profile-record-play' />
         </div>)}
 
-        {/*下载中*/}
+        {/* 下载中 */}
         {(recordStatus === 0) && (<div
           className='local-record-list-item_download'
         >
