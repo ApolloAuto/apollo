@@ -44,9 +44,8 @@ export default class DataProfile extends React.Component {
     setTimeout(() => {
       // 校验ws是否连接，确认链接后再校验证书
       PLUGIN_WS.checkWsConnection()
-        .checkCertificate();
+        .checkCertificate().downloadRecord();
       WS.checkWsConnection().loadLoocalScenarioSets();
-      WS.checkWsConnection().loadLocalRecords();
       const {enableSimControl} = store.options;
       if (enableSimControl) {
         WS.getDymaticModelList();
@@ -183,7 +182,12 @@ export default class DataProfile extends React.Component {
                   <span
                     key={index}
                     className={currentKey === tab.key ? 'active' : ''}
-                    onClick={() => this.setState({ currentKey: tab.key })}
+                    onClick={() => {
+                      this.setState({ currentKey: tab.key });
+                      if (tab.key === 'recordProfiles') {
+                        WS.checkWsConnection().loadLocalRecords();
+                      }
+                    }}
                   >{tab.title}</span>
                 );
               })
