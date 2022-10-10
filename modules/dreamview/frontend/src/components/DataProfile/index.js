@@ -10,6 +10,7 @@ import LocalScenarioSetItem from './LocalScenarioSetItem';
 import LocalDynamicModelsItem from './LocalDynamicModelsItem';
 import LocalRecordItem from './LocalRecordItem';
 import WS, { PLUGIN_WS } from 'store/websocket';
+import { throttle } from 'lodash';
 
 const RadioGroup = Radio.Group;
 
@@ -97,6 +98,11 @@ export default class DataProfile extends React.Component {
     </div>);
   };
 
+  // 更新record列表节流函数
+  updateRecordList = throttle(() => {
+    WS.checkWsConnection().loadLocalRecords();
+  }, 5000);
+
   // 渲染数据包tab
   renderRecordProfilesList = () => {
     const { store } = this.props;
@@ -111,10 +117,15 @@ export default class DataProfile extends React.Component {
     }
     return (<div className='local-record-list'>
         {toJS(records).keys().map((item) => {
+          // record下载状态
+          const recordStatus = records[item];
           return (
             <LocalRecordItem
               key={item}
               item={item}
+              updateRecordList={this.updateRecordList}
+              // 0 下载中 1 下载完成
+              recordStatus={recordStatus}
               currentRecordId={currentRecordId}
               changeRecord={this.onRecordChange}
             />

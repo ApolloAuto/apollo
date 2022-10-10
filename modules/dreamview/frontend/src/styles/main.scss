@@ -1551,6 +1551,16 @@ body {
           display: none;
         }
       }
+
+      &_download {
+        width: 14px;
+        padding-left: 6px;
+
+        &_icon {
+          cursor: pointer;
+          width: 100%;
+        }
+      }
     }
   }
 }

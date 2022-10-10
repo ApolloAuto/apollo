@@ -7,7 +7,8 @@ import { inject } from 'mobx-react';
 
 import ProfileDeleteIcon from 'assets/images/icons/profile_delete.png';
 import ProfileWarningIcon from 'assets/images/icons/profile_warning.png';
-import WS, { PLUGIN_WS } from 'store/websocket';
+import ProfileDownloadIcon from 'assets/images/icons/download.png';
+import WS from 'store/websocket';
 
 import PlayIcon from 'assets/images/icons/play.png';
 import PauseIcon from 'assets/images/icons/pause.png';
@@ -17,6 +18,8 @@ import PauseIcon from 'assets/images/icons/pause.png';
  * @param props {{
  * currentRecordId: string,
  * item: string,
+ * recordStatus: 0 | 1,
+ * updateRecordList: () => void,
  * changeRecord: (item:string)=> void,
  * store: any,
  * }}
@@ -25,7 +28,12 @@ import PauseIcon from 'assets/images/icons/pause.png';
  */
 function LocalDynamicModelItem(props) {
 
-  const { currentRecordId, item, store, changeRecord } = props;
+  const { currentRecordId, item, store, changeRecord, recordStatus, updateRecordList } = props;
+
+  // 下载中 刷新列表
+  if (recordStatus === 0) {
+    updateRecordList();
+  }
 
   const { monitor } = store;
 
@@ -55,11 +63,18 @@ function LocalDynamicModelItem(props) {
       <div className={classNames(['local-record-list-item', {
         'local-record-list-item_selected': currentRecordId === item,
       }])}
-      onClick={() => changeRecord(item)}
+      onClick={() => {
+        // 下载完成 可以播放
+        if (recordStatus === 1) {
+          changeRecord(item);
+        }
+      }}
       >
         <div>{item}</div>
         {/*删除按钮*/}
-        {currentRecordId !== item && <div
+        { (recordStatus === 1) &&
+          (currentRecordId !== item) &&
+          (<div
           className='local-record-list-item_delete'
           onClick={(e) => {
             e.stopPropagation();
@@ -68,9 +83,11 @@ function LocalDynamicModelItem(props) {
         >
           <img className='local-record-list-item_delete_icon' src={ProfileDeleteIcon}
                alt='local-profile-record-delete' />
-        </div>}
+        </div>)}
         {/*播放控制按钮*/}
-        {currentRecordId !== item && <div
+        {(recordStatus === 1) &&
+          (currentRecordId !== item) &&
+          (<div
           className='local-record-list-item_ctrl'
           onClick={(e) => {
             e.stopPropagation();
@@ -79,9 +96,10 @@ function LocalDynamicModelItem(props) {
         >
           <img className='local-record-list-item_ctrl_icon' src={PlayIcon}
                alt='local-profile-record-play' />
-        </div>}
+        </div>)}
 
-        {currentRecordId === item && <div
+        {(recordStatus === 1) &&
+          (currentRecordId === item) && (<div
           className='local-record-list-item_ctrl'
           onClick={(e) => {
             e.stopPropagation();
@@ -90,7 +108,17 @@ function LocalDynamicModelItem(props) {
         >
           <img className='local-record-list-item_ctrl_icon' src={PauseIcon}
                alt='local-profile-record-play' />
-        </div>}
+        </div>)}
+
+        {/*下载中*/}
+        {(recordStatus === 0) && (<div
+          className='local-record-list-item_download'
+        >
+          <img className='local-record-list-item_download_icon'
+               src={ProfileDownloadIcon}
+               alt='local-profile-record-download' />
+        </div>)}
+
       </div>
       <Modal
         wrapClassName='local-scenario-set-delete-confirm-modal'
