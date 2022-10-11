@@ -223,7 +223,13 @@ bool NCutSegmentation::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  return true;
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
+    return false;
+
+  LidarDetectorOptions options;
+  bool res = Detect(options, lidar_frame);
+  return res;
 }
 
 bool NCutSegmentation::Configure(std::string param_file) {
