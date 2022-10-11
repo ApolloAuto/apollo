@@ -41,6 +41,7 @@ cc_library(
     hdrs = [
         "sim_control_util.h",
     ],
+    alwayslink = True,
     deps = [
         "//cyber",
     ],

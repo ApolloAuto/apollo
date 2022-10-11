@@ -34,6 +34,7 @@ cc_library(
     hdrs = [
         "sim_control_with_model_base.h",
     ],
+    alwayslink = True,
     deps = [
         "//modules/dreamview/backend/sim_control_manager/common:sim_control_gflags",
         "//modules/dreamview/backend/sim_control_manager/common:sim_control_util",

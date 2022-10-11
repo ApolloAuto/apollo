@@ -29,25 +29,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "fnn_model_cc_proto",
-    deps = [
-        ":fnn_model_proto",
-    ],
-)
-
-proto_library(
-    name = "fnn_model_proto",
-    srcs = ["fnn_model.proto"],
-)
-
-py_proto_library(
-    name = "fnn_model_py_pb2",
-    deps = [
-        ":fnn_model_proto",
-    ],
-)
-
-cc_proto_library(
     name = "dynamic_model_conf_cc_proto",
     deps = [
         ":dynamic_model_conf_proto",
