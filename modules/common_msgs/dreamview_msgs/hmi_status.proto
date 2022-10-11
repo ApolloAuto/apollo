@@ -49,4 +49,6 @@ message HMIStatus {
   optional string current_scenario_id = 17 [default = ""];
   repeated string dynamic_models = 18;
   optional string current_dynamic_model = 19;
+   optional string current_record_id = 20 [default = ""];
+  map<string,int32> records = 21;
 }

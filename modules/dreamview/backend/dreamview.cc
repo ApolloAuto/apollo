@@ -23,7 +23,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
-std::map<std::string, int> plugin_function_map = {{"UpdateScenarioSetToStatus", 0},
+std::map<std::string, int> plugin_function_map = {{"UpdateScenarioSetToStatus", 0},{"UpdateRecordToStatus",1},
 {"UpdateDynamicModelToStatus", 2}};
 std::map<std::string, int> hmi_function_map = {
     {"SimControlRestart", 0},
@@ -96,7 +96,7 @@ Status Dreamview::Init() {
   sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
-  
+
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
@@ -249,6 +249,15 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
         if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
           callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
                                                          scenario_set_name);
+        }
+      }
+    } break;
+    case 1:{
+      if(param_json.contains("record_id")&&param_json.contains("status")){
+        const std::string record_id = param_json["record_id"];
+        const std::string record_status = param_json["status"];
+        if(!record_id.empty()&&record_status.empty()){
+          callback_res = hmi_->UpdateRecordToStatus(record_id,record_status);
         }
       }
     } break;

@@ -91,3 +91,7 @@ DECLARE_string(sim_obstacle_path);
 DECLARE_string(gflag_command_arg);
 
 DECLARE_string(sim_perfect_control);
+
+DECLARE_string(resource_record_path);
+
+DECLARE_string(cyber_recorder_stop_command);

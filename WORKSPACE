@@ -1,7 +1,9 @@
+#######################################APOLLO#######################################
 workspace(name = "apollo")
 
 load("//tools:workspace.bzl", "apollo_repositories")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_archive(
     name = "rules_foreign_cc",
     sha256 = "6041f1374ff32ba711564374ad8e007aef77f71561a7ce784123b9b4b88614fc",
@@ -22,7 +24,8 @@ http_archive(
     name = "rules_cc",
     urls = [
         "https://apollo-system.cdn.bcebos.com/archive/8.0/rules_cc-0.0.1.tar.gz",
-        "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",   
+        "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",
+        "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",
     ],
     sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
     patches = ["//tools/package:rules_cc.patch"],
@@ -60,6 +63,46 @@ load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_
 rules_proto_dependencies()
 
 rules_proto_toolchains()
+
+http_archive(
+    name = "rules_python",
+    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
+    urls = [
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/rules_python-0.1.0.tar.gz",
+        "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+    ],
+)
+
+# load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+# grpc
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "419dba362eaf8f1d36849ceee17c3e2ff8ff12ac666b42d3ff02a164ebe090e9",
+    patches = ["//third_party/absl:grpc.patch"],
+    strip_prefix = "grpc-1.30.0",
+    urls = [
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/v1.30.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.30.0.tar.gz",
+    ],
+)
+http_archive(
+    name = "zlib",
+    build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+    sha256 = "629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff",
+    strip_prefix = "zlib-1.2.11",
+    urls = [
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/zlib-v1.2.11.tar.gz",
+        "https://github.com/madler/zlib/archive/v1.2.11.tar.gz",
+    ],
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
+grpc_extra_deps()
 
 http_archive(
     name = "rules_python",

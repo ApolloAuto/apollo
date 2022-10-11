@@ -23,6 +23,10 @@ enum HMIAction {
   LOAD_DYNAMIC_MODELS = 14; // 加载全部动力学模型
   CHANGE_DYNAMIC_MODEL = 15; // 切换动力学模型 value = dynamic_model_name
   DELETE_DYNAMIC_MODEL = 16; // 删除动力学模型 value = dynamic_model_name
+  CHANGE_RECORD = 17; //value = record_id
+  DELETE_RECORD = 18; //value = record_id
+  LOAD_RECORDS = 19;     // Load all records
+  STOP_RECORD = 20; //value = module_name
 }
 
 message HMIConfig {
