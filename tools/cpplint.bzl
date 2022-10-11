@@ -43,7 +43,7 @@ def _add_linter_rules(source_labels, source_filenames, name, data = None):
     tags = ["cpplint"]
 
     # Google cpplint.
-    cpplint_cfg = ["//:CPPLINT.cfg"] + native.glob(["CPPLINT.cfg"])
+    cpplint_cfg = ["//tools:CPPLINT.cfg"] + native.glob(["CPPLINT.cfg"])
     py_test(
         name = name + "_cpplint",
         srcs = ["@cpplint//:cpplint"],
