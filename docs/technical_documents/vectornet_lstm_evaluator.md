@@ -2,7 +2,7 @@
 
 # Introduction
 
-Vectornet lstm evaluator is is based on a GNN encoding network taking environments and traffic agents as nodes. Comparing with semantic map CNN model, it has less parameters to learn and better performance.
+Vectornet lstm evaluator is based on a GNN encoding network taking environments and traffic agents as nodes. Comparing with semantic map CNN model, it has less parameters to learn and better performance.
 
 ![Diagram](images/vectornet.svg)
 

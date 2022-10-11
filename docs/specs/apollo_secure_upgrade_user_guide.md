@@ -138,7 +138,7 @@ output para:
 ### 3. Additional Information
 
 1. SDK uses standard PEM certificates.
-2. Before using SDK, users need to generate two seperate chains of certificate
+2. Before using SDK, users need to generate two separate chains of certificate
    for server and device.
 3. Certificates from the server certificate chain are deployed to server and
    make sure they cannot sign other certificates.
