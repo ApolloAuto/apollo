@@ -79,6 +79,8 @@ class SimControlWithModelBase : public SimControlBase {
 
   void OnControlCommand(const apollo::control::ControlCommand& control_command);
   void OnRoutingResponse(const apollo::routing::RoutingResponse& routing);
+  void OnRoutingRequest(
+      const std::shared_ptr<apollo::routing::RoutingRequest> &routing_request);
 
   virtual void SetStartPoint(const ::apollo::sim_control::SimCarStatus& point);
 
@@ -95,6 +97,8 @@ class SimControlWithModelBase : public SimControlBase {
       control_command_reader_;
   std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_reader_;
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
+      routing_request_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
 

@@ -33,6 +33,7 @@ using apollo::control::ControlCommand;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacles;
 using apollo::routing::RoutingResponse;
+using apollo::routing::RoutingRequest;
 using apollo::sim_control::SimCarStatus;
 using Json = nlohmann::json;
 
@@ -41,7 +42,7 @@ using Json = nlohmann::json;
  * Base object
  * @param node_name: depens on different dynamic model
  */
-SimControlWithModelBase::SimControlWithModelBase(const std::string &node_name)
+SimControlWithModelBase::SimControlWithModelBase(const std::string& node_name)
     : node_(cyber::CreateNode(node_name)),
       gear_position_(0),
       dt_(0.01),
@@ -112,8 +113,8 @@ void SimControlWithModelBase::Start() {
     InternalReset();
     // todo: Compatible with scenario conf and default value
     Json start_point_attr({});
-    // start_point_attr:from scenario conf json or default value.here dm is divided from scenario
-    // use default value
+    // start_point_attr:from scenario conf json or default value.here dm is
+    // divided from scenario use default value
     start_point_attr["start_velocity"] = 0.0;
     start_point_attr["start_acceleration"] = 0.0;
     start_point_attr["start_heading"] = std::numeric_limits<double>::max();
@@ -180,33 +181,86 @@ void SimControlWithModelBase::OnRoutingResponse(
     return;
   }
 
+  CHECK_GE(routing.routing_request().waypoint_size(), 2)
+      << "routing should have at least two waypoints";
+
+  current_routing_header_ = routing.header();
   // If this is from a planning re-routing request, or the start point has been
   // initialized by an actual localization pose, don't reset the start point.
-  re_routing_triggered_ =
-      routing.routing_request().header().module_name() == "planning";
-  if (!re_routing_triggered_ && !start_point_from_localization_) {
-    CHECK_GE(routing.routing_request().waypoint_size(), 2)
-        << "routing should have at least two waypoints";
-    current_routing_header_ = routing.header();
-    const auto& start_pose = routing.routing_request().waypoint(0).pose();
-    SimCarStatus point;
-    point.set_x(start_pose.x());
-    point.set_y(start_pose.y());
-    point.set_acceleration_s(start_acceleration_);
-    point.set_speed(start_velocity_);
-    // Use configured heading if available, otherwise find heading based on
-    // first lane in routing response
-    double theta = 0.0;
-    if (start_heading_ < std::numeric_limits<double>::max()) {
-      theta = start_heading_;
-    } else if (routing.road_size() > 0) {
-      auto start_lane = routing.road(0).passage(0).segment(0);
-      theta =
-          map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
-    }
-    point.set_theta(theta);
-    SetStartPoint(point);
+  // re_routing_triggered_ =
+  //     routing.routing_request().header().module_name() == "planning";
+  // if (!re_routing_triggered_ && !start_point_from_localization_) {
+  //   CHECK_GE(routing.routing_request().waypoint_size(), 2)
+  //       << "routing should have at least two waypoints";
+  //   current_routing_header_ = routing.header();
+  //   const auto& start_pose = routing.routing_request().waypoint(0).pose();
+  //   SimCarStatus point;
+  //   point.set_x(start_pose.x());
+  //   point.set_y(start_pose.y());
+  //   point.set_acceleration_s(start_acceleration_);
+  //   point.set_speed(start_velocity_);
+  //   // Use configured heading if available, otherwise find heading based on
+  //   // first lane in routing response
+  //   double theta = 0.0;
+  //   if (start_heading_ < std::numeric_limits<double>::max()) {
+  //     theta = start_heading_;
+  //   } else if (routing.road_size() > 0) {
+  //     auto start_lane = routing.road(0).passage(0).segment(0);
+  //     theta =
+  //         map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
+  //   }
+  //   point.set_theta(theta);
+  //   SetStartPoint(point);
+  // }
+
+}
+
+void SimControlWithModelBase::OnRoutingRequest(
+    const std::shared_ptr<RoutingRequest>& routing_request) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (!enabled_) {
+    return;
   }
+
+  CHECK_GE(routing_request->waypoint_size(), 2)
+      << "routing should have at least two waypoints";
+  const auto& start_pose = routing_request->waypoint(0).pose();
+
+  SimCarStatus point;
+  point.set_x(start_pose.x());
+  point.set_y(start_pose.y());
+  point.set_acceleration_s(start_acceleration_);
+  point.set_speed(start_velocity_);
+  // Use configured heading if available, otherwise find heading based on
+  // first lane in routing response
+  double theta = 0.0;
+  double s = 0.0;
+  const auto& start_way_point = routing_request->waypoint().Get(0);
+  // If the lane id has been set, set theta as the lane heading.
+  if (start_way_point.has_id()) {
+    auto& hdmap = hdmap::HDMapUtil::BaseMap();
+    hdmap::Id lane_id = hdmap::MakeMapId(start_way_point.id());
+    auto lane = hdmap.GetLaneById(lane_id);
+    if (nullptr != lane) {
+      theta = lane->Heading(start_way_point.s());
+    } else {
+      map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
+                                            &theta, &s);
+    }
+  } else {
+    // Find the lane nearest to the start pose and get its heading as theta.
+    map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
+                                          &theta, &s);
+  }
+  point.set_theta(theta);
+  // if (start_heading_ < std::numeric_limits<double>::max()) {
+  //   theta = start_heading_;
+  // } else if (routing_request.road_size() > 0) {
+  //   auto start_lane = routing_request.road(0).passage(0).segment(0);
+  //   theta = map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
+  // }
+  // point.set_theta(theta);
+  SetStartPoint(point);
 }
 
 void SimControlWithModelBase::SetStartPoint(const SimCarStatus& point) {
@@ -245,7 +299,7 @@ void SimControlWithModelBase::InitStartPoint(nlohmann::json start_point_attr,
       point.set_acceleration_s(start_acceleration_);
     } else {
       start_point_from_localization_ = true;
-      const auto &pose = localization_reader_->GetLatestObserved()->pose();
+      const auto& pose = localization_reader_->GetLatestObserved()->pose();
 
       point.set_x(pose.position().x());
       point.set_y(pose.position().y());
