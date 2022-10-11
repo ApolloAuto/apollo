@@ -51,7 +51,9 @@ install(
         ":pb_hdrs", 
         "//modules/dreamview/backend/common:install",
         "//modules/dreamview/backend/hmi:install",
-        "//modules/dreamview/backend/map:install"
+        "//modules/dreamview/backend/map:install",
+        "//modules/dreamview/backend:install",
+        "//modules/dreamview/backend/sim_control_manager/common:install",
     ],
 )
 

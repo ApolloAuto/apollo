@@ -7,6 +7,7 @@ cc_library(
     name = "plugin_manager",
     srcs = ["plugin_manager.cc"],
     hdrs = ["plugin_manager.h"],
+    alwayslink = True,
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",

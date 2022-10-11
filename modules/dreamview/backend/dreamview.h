@@ -29,7 +29,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
-#include "modules/dreamview/backend/sim_control/sim_control.h"
+#include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 #include "modules/dreamview/backend/plugins/plugin_manager.h"
 #if WITH_TELEOP == 1
@@ -54,14 +54,14 @@ class Dreamview {
  private:
   void TerminateProfilingMode();
   bool PluginCallbackHMI(const std::string& function_name, const nlohmann::json &param_json);
-  bool HMICallbackSimControl(const std::string& function_name,
+  nlohmann::json HMICallbackSimControl(const std::string& function_name,
                              const nlohmann::json& param_json);
 
   std::unique_ptr<cyber::Timer> exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
   std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
-  std::unique_ptr<SimControl> sim_control_;
+  std::unique_ptr<SimControlManager> sim_control_manager_;
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<WebSocketHandler> websocket_;
   std::unique_ptr<WebSocketHandler> map_ws_;

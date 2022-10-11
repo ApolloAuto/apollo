@@ -2,6 +2,9 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/install:install.bzl", "install")
 
+
+package(default_visibility = ["//visibility:public"])
+
 install(
     name = "install",
     library_dest = "common/lib",
@@ -145,6 +148,7 @@ cc_library(
         "@com_google_absl//:absl",
         "@com_google_protobuf//:protobuf",
     ],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(

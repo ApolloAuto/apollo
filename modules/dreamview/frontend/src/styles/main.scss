@@ -442,17 +442,27 @@ body {
             width: 100%;
             padding-bottom: 15px;
 
-            span {
-                width: 200px;
-                border-bottom: 1px solid #999999;
-                padding: 10px 10px 10px 0px;
+          span {
+            display: inline-block;
+            width: 200px;
+            height: 100%;
+            padding: 10px 10px 10px 0px;
+            text-align: center;
 
-                font-size: 18px;
+            font-size: 18px;
 
-                @include small-screen {
-                    font-size: 16px;
-                }
+            @include small-screen {
+              font-size: 16px;
             }
+
+            &:not(.active) {
+              cursor: pointer;
+            }
+
+            &.active {
+              border-bottom: 1px solid #999999;
+            }
+          }
 
             .card-header-btn {
                 border: none;
@@ -1485,6 +1495,71 @@ body {
           display: none;
         }
 
+      }
+    }
+  }
+
+  //local record list container
+  .local-record-list {
+    display: flex;
+    &-item {
+      height: 44px;
+      margin-right: 37px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: #393E43;
+        border-radius: 6px;
+        .local-record-list-item_ctrl {
+          &_icon {
+            display: block;
+          }
+        }
+      }
+
+      &:not(.local-record-list-item_selected):hover {
+        .local-record-list-item_delete {
+          padding-left: 4px;
+          &_icon {
+            display: block;
+          }
+        }
+      }
+
+      &_delete {
+        width: 16px;
+        height: 16px;
+
+        &_icon {
+          cursor: pointer;
+          width: 100%;
+          height: 100%;
+          display: none;
+        }
+      }
+
+      &_ctrl {
+        width: 14px;
+        padding-left: 6px;
+
+        &_icon {
+          cursor: pointer;
+          width: 100%;
+          display: none;
+        }
+      }
+
+      &_download {
+        width: 14px;
+        padding-left: 6px;
+
+        &_icon {
+          cursor: pointer;
+          width: 100%;
+        }
       }
     }
   }

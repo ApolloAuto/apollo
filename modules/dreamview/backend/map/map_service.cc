@@ -568,5 +568,19 @@ size_t MapService::CalculateMapHash(const MapElementIds &ids) const {
   return hash_function(ids.DebugString());
 }
 
+double MapService::GetLaneHeading(const std::string& id_str, double s) {
+  auto* hdmap = HDMap();
+  CHECK(hdmap) << "Failed to get hdmap";
+
+  Id id;
+  id.set_id(id_str);
+  LaneInfoConstPtr lane_ptr = hdmap->GetLaneById(id);
+  if (lane_ptr != nullptr) {
+    return lane_ptr->Heading(s);
+  }
+  return 0.0;
+}
+
+
 }  // namespace dreamview
 }  // namespace apollo
