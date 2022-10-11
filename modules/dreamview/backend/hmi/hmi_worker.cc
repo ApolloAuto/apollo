@@ -215,6 +215,8 @@ HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
     module.set_stop_command(absl::StrCat("pkill -f \"", first_dag, "\""));
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
+    // todo(@Lijin)
+    module.mutable_process_monitor_config()->add_command_keywords("-d");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
   }
   mode.clear_cyber_modules();
@@ -1155,9 +1157,8 @@ bool HMIWorker::LoadDynamicModels() {
     WLock wlock(status_mutex_);
     auto dynamic_models = status_.mutable_dynamic_models();
     // clear old data
-    for (auto iter = dynamic_models->begin(); iter != dynamic_models->end();
-         iter++) {
-      dynamic_models->erase(iter);
+    for (auto iter = dynamic_models->begin(); iter != dynamic_models->end();) {
+      iter = dynamic_models->erase(iter);
     }
     for (const auto &dynamic_model : load_res["loaded_dynamic_models"]) {
       status_.add_dynamic_models(dynamic_model);

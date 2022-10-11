@@ -24,7 +24,7 @@ py_proto_library(
     name = "sim_control_internal_py_pb2",
     deps = [
         ":sim_control_internal_proto",
-        "//modules/common/proto:header_py_pb2",
+        "//modules/common_msgs/basic_msgs:header_py_pb2",
     ],
 )
 

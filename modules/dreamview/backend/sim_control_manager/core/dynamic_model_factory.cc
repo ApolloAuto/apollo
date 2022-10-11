@@ -173,7 +173,7 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
         if (iter != s_dynamic_model_map_.end()) {
           continue;
         }
-        bool register_res = RegisterDynamicModel(dynamic_model_name);
+        RegisterDynamicModel(dynamic_model_name);
       }
       closedir(directory);
     }

@@ -44,6 +44,7 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
     ],
 )
 

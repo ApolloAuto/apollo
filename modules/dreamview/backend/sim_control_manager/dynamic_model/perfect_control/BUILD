@@ -25,18 +25,18 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "sim_control_test",
-    size = "small",
-    srcs = ["sim_control_test.cc"],
-    data = [
-        "//modules/dreamview/backend/testdata",
-    ],
-    deps = [
-        ":sim_perfect_control",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+# cc_test(
+#     name = "sim_control_test",
+#     size = "small",
+#     srcs = ["sim_control_test.cc"],
+#     data = [
+#         "//modules/dreamview/backend/testdata",
+#     ],
+#     deps = [
+#         ":sim_perfect_control",
+#         "//cyber",
+#         "@com_google_googletest//:gtest_main",
+#     ],
+# )
 
 cpplint()

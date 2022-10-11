@@ -92,7 +92,6 @@ Status Dreamview::Init() {
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  sim_control_.reset(new SimControl(map_service_.get()));
   // todo: add map service to construct function
   sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
@@ -101,7 +100,7 @@ Status Dreamview::Init() {
   hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
+      websocket_.get(), map_ws_.get(), camera_ws_.get(),
       sim_control_manager_.get(),
       plugin_ws_.get(), map_service_.get(), perception_camera_updater_.get(),
       plugin_manager_.get(),
@@ -146,7 +145,6 @@ Status Dreamview::Start() {
 void Dreamview::Stop() {
   server_->close();
   // todo: replace sim control then remove sim control and change name
-  sim_control_->Stop();
   sim_control_manager_->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
@@ -170,7 +168,6 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
           param_json.contains("y")) {
         const double x = param_json["x"];
         const double y = param_json["y"];
-        sim_control_->Restart(x, y);
         sim_control_manager_->Restart(x, y);
         callback_res["result"] = true;
       }

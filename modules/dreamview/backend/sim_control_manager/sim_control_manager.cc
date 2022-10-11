@@ -53,7 +53,7 @@ namespace apollo
           auto *model_factory = DynamicModelFactory::Instance();
           model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
         }
-        if (!model_ptr_)
+        if (model_ptr_)
         {
           model_ptr_->Stop();
         }
@@ -108,8 +108,6 @@ namespace apollo
       if (!enabled_)
       {
         enabled_ = true;
-        LoadDynamicModels();
-        ChangeDynamicModel(FLAGS_sim_perfect_control);
       }
     }
 
