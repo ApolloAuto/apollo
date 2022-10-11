@@ -149,7 +149,6 @@ void SimControlWithModelBase::Stop() {
     sim_control_timer_->Stop();
     sim_prediction_timer_->Stop();
     enabled_ = false;
-    std::system(FLAGS_sim_obstacle_stop_command.data());
   }
 }
 
