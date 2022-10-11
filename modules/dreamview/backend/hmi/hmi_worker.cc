@@ -1299,7 +1299,7 @@ void HMIWorker::StopRecordPlay(){
   AERROR << "stop record--start";
   WLock wlock(status_mutex_);
   {
-    status_.set_current_record_id("")
+    status_.set_current_record_id("");
   }
   if (!StopModuleByCommand(FLAGS_cyber_recorder_stop_command))
   {
