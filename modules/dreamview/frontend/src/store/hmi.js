@@ -241,13 +241,8 @@ export default class HMI {
       this.currentDynamicModel = newStatus.currentDynamicModel;
     }
 
-    if (newStatus.records) {
-      this.records = newStatus.records;
-    }
-
-    if (newStatus.currentRecordId) {
-      this.currentRecordId = newStatus.currentRecordId;
-    }
+    this.records = newStatus.records;
+    this.currentRecordId = newStatus.currentRecordId;
   }
 
   @action update(world) {

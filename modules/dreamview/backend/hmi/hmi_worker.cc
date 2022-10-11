@@ -1297,12 +1297,16 @@ bool HMIWorker::RePlayRecord(const std::string& record_id) {
 }
 void HMIWorker::StopRecordPlay(){
   AERROR << "stop record--start";
+  WLock wlock(status_mutex_);
+  {
+    status_.set_current_record_id("")
+  }
   if (!StopModuleByCommand(FLAGS_cyber_recorder_stop_command))
   {
     AERROR << "stop record failed";
   }
   AERROR << "stop record--over";
-
+  status_changed_ = true;
 }
 void HMIWorker::ChangeRecord(const std::string& record_id){
   AERROR << "change record--start";
