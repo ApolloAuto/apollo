@@ -74,6 +74,7 @@ install(
         "//modules/dreamview/backend/teleop/proto:daemon_cmd_cc_proto",
         "//modules/dreamview/backend/teleop/proto:daemon_rpt_cc_proto",
         "//modules/dreamview/backend/teleop/proto:modem_info_cc_proto",
+        "//modules/dreamview/backend/sim_control_manager/proto:sim_control_internal_cc_proto",
     ],
 )
 

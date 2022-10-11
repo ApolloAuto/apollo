@@ -1,16 +1,16 @@
-import React from 'react';
-import { inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
+import { inject, observer } from 'mobx-react';
+import React from 'react';
 
 import { Radio } from 'antd';
 
-import { ScenarioNoCertificate, ScenarioCertificateInvalid } from './ScenarioNoCertificate';
-import ScenarioSetItem from './ScenarioSetItem';
-import LocalScenarioSetItem from './LocalScenarioSetItem';
+import { throttle } from 'lodash';
+import WS, { PLUGIN_WS } from 'store/websocket';
 import LocalDynamicModelsItem from './LocalDynamicModelsItem';
 import LocalRecordItem from './LocalRecordItem';
-import WS, { PLUGIN_WS } from 'store/websocket';
-import { throttle } from 'lodash';
+import LocalScenarioSetItem from './LocalScenarioSetItem';
+import { ScenarioCertificateInvalid, ScenarioNoCertificate } from './ScenarioNoCertificate';
+import ScenarioSetItem from './ScenarioSetItem';
 
 const RadioGroup = Radio.Group;
 
@@ -47,7 +47,7 @@ export default class DataProfile extends React.Component {
       PLUGIN_WS.checkWsConnection()
         .checkCertificate().downloadRecord();
       WS.checkWsConnection().loadLoocalScenarioSets();
-      const {enableSimControl} = store.options;
+      const { enableSimControl } = store.options;
       if (enableSimControl) {
         WS.getDymaticModelList();
       }
@@ -75,7 +75,7 @@ export default class DataProfile extends React.Component {
   renderDynamicModelList = () => {
     const { store } = this.props;
     const { currentDynamicModel, dynamicModels } = store.hmi;
-    const {enableSimControl} = store.options;
+    const { enableSimControl } = store.options;
     if (!enableSimControl) {
       return <div>Please open SimControl to switch the dynamic model</div>;
     }
@@ -84,7 +84,7 @@ export default class DataProfile extends React.Component {
         onChange={this.onDynamicModelChange}
         value={currentDynamicModel}
       >
-        {toJS(dynamicModels).map((item) => {
+        {Object.keys(toJS(dynamicModels)).map((item) => {
           return (
             <LocalDynamicModelsItem
               key={item}
@@ -111,27 +111,27 @@ export default class DataProfile extends React.Component {
      * @param records {id: number}
      */
     const { currentRecordId, records } = store.hmi;
-    const {enableSimControl} = store.options;
+    const { enableSimControl } = store.options;
     if (enableSimControl) {
       return <div>Please close SimControl to switch the records player.</div>;
     }
     return (<div className='local-record-list'>
-        {toJS(records).keys().map((item) => {
-          // record下载状态
-          const recordStatus = records[item];
-          return (
-            <LocalRecordItem
-              key={item}
-              item={item}
-              updateRecordList={this.updateRecordList}
-              // 0 下载中 1 下载完成
-              recordStatus={recordStatus}
-              currentRecordId={currentRecordId}
-              changeRecord={this.onRecordChange}
-            />
-          );
-        })
-        }
+      {Object.keys(toJS(records)).map((item) => {
+        // record下载状态
+        const recordStatus = records[item];
+        return (
+          <LocalRecordItem
+            key={item}
+            item={item}
+            updateRecordList={this.updateRecordList}
+            // 0 下载中 1 下载完成
+            recordStatus={recordStatus}
+            currentRecordId={currentRecordId}
+            changeRecord={this.onRecordChange}
+          />
+        );
+      })
+      }
     </div>);
   };
 
@@ -169,7 +169,7 @@ export default class DataProfile extends React.Component {
           </div>
           <div className='data-profile_scenario_set_column'>
             {/*no cerfiticate*/}
-            { certificateStatus === 'notFound' && <ScenarioNoCertificate />}
+            {certificateStatus === 'notFound' && <ScenarioNoCertificate />}
             {/*scenario set list*/}
             <div className='scenario-set-list'>
               {certificateStatus === 'expired' && <ScenarioCertificateInvalid />}
@@ -233,3 +233,4 @@ export default class DataProfile extends React.Component {
     );
   }
 }
+;
