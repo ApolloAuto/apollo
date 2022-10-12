@@ -331,7 +331,7 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordList", &PluginManager::UpdateData);
-  RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
+ // RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -382,10 +382,10 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
       update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
       break;
     }
-    case 3:{
-      update_data_res = callback_api_("UpdateRecordToStatus", info);
-      break;
-    }
+    // case 3:{
+    //   update_data_res = callback_api_("UpdateRecordToStatus", info);
+    //   break;
+    // }
     default:
       break;
   }
