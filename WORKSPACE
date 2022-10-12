@@ -65,7 +65,6 @@ http_archive(
     strip_prefix = "zlib-1.2.11",
     urls = ["https://github.com/madler/zlib/archive/v1.2.11.tar.gz"],
 )
-
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
