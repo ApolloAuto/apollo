@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 
-#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -48,6 +47,7 @@ OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
   open_space_trajectory_optimizer_.reset(new OpenSpaceTrajectoryOptimizer(
       config.open_space_trajectory_provider_config()
           .open_space_trajectory_optimizer_config()));
+  AINFO << config_.DebugString();
 }
 
 OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
@@ -124,10 +124,10 @@ Status OpenSpaceTrajectoryProvider::Process() {
     const double start_timestamp = Clock::NowInSeconds();
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
         vehicle_state, start_timestamp, planning_cycle_time,
-        FLAGS_open_space_trajectory_stitching_preserved_length, false,
+        FLAGS_open_space_trajectory_stitching_preserved_length, true,
         &last_frame_complete_trajectory, &replan_reason);
   } else {
-    ADEBUG << "Replan due to fallback stop";
+    AINFO << "Replan due to fallback stop";
     const double planning_cycle_time =
         1.0 / static_cast<double>(FLAGS_planning_loop_rate);
     stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
@@ -160,7 +160,15 @@ Status OpenSpaceTrajectoryProvider::Process() {
       thread_data_.obstacles_vertices_vec =
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
-      data_ready_.store(true);
+      if (stitching_trajectory.size() <= 1 || !injector_->planning_context()
+                                                   ->mutable_planning_status()
+                                                   ->mutable_open_space()
+                                                   ->position_init()) {
+        data_ready_.store(true);
+      } else {
+        data_ready_.store(false);
+        AINFO << "SKIP BECAUSE HAS PLAN";
+      }
     }
 
     // Check vehicle state
@@ -296,53 +304,39 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
 
   end_pose_to_world_frame.SelfRotate(rotate_angle);
   end_pose_to_world_frame += translate_origin;
-  double distance_to_vehicle2 =
-      std::sqrt((vehicle_state.x() - end_pose_to_world_frame.x()) *
-                      (vehicle_state.x() - end_pose_to_world_frame.x()) +
-                  (vehicle_state.y() - end_pose_to_world_frame.y()) *
-                      (vehicle_state.y() - end_pose_to_world_frame.y()));
+
   double end_theta_to_world_frame = end_pose[2];
   end_theta_to_world_frame += rotate_angle;
-  double distance_to_vehicle1 =
-      std::sqrt((vehicle_state.x() - end_pose[0]) *
-                    (vehicle_state.x() - end_pose[0]) +
-                (vehicle_state.y() - end_pose[1]) *
-                    (vehicle_state.y() - end_pose[1]));
+
   double distance_to_vehicle =
       std::sqrt((vehicle_state.x() - end_pose_to_world_frame.x()) *
                     (vehicle_state.x() - end_pose_to_world_frame.x()) +
                 (vehicle_state.y() - end_pose_to_world_frame.y()) *
                     (vehicle_state.y() - end_pose_to_world_frame.y()));
+
   double theta_to_vehicle = std::abs(common::math::AngleDiff(
       vehicle_state.heading(), end_theta_to_world_frame));
-  AERROR << "distance_to_vehicle1 is: " << distance_to_vehicle1;
-  AERROR << "distance_to_vehicle2 is: " << distance_to_vehicle2;
-  AERROR << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
+  ADEBUG << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
          << end_theta_to_world_frame << "rotate_angle" << rotate_angle;
-  AERROR << "is_near_destination_threshold"
+  ADEBUG << "is_near_destination_threshold"
          << config_.open_space_trajectory_provider_config()
                 .open_space_trajectory_optimizer_config()
                 .planner_open_space_config()
                 .is_near_destination_threshold();  // which config file
-  AERROR << "is_near_destination_theta_threshold"
+  ADEBUG << "is_near_destination_theta_threshold"
          << config_.open_space_trajectory_provider_config()
                 .open_space_trajectory_optimizer_config()
                 .planner_open_space_config()
                 .is_near_destination_theta_threshold();
-  distance_to_vehicle = std::min(
-                        std::min(distance_to_vehicle, distance_to_vehicle1),
-                        distance_to_vehicle2);
-  theta_to_vehicle = std::min(theta_to_vehicle,
-                     std::abs(vehicle_state.heading()));
   if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
                                 .open_space_trajectory_optimizer_config()
                                 .planner_open_space_config()
                                 .is_near_destination_threshold() &&
-     theta_to_vehicle < config_.open_space_trajectory_provider_config()
+      theta_to_vehicle < config_.open_space_trajectory_provider_config()
                              .open_space_trajectory_optimizer_config()
                              .planner_open_space_config()
                              .is_near_destination_theta_threshold()) {
-    AERROR << "vehicle reach end_pose";
+    ADEBUG << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);
     return true;
   }

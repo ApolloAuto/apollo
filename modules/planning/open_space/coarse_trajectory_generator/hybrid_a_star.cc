@@ -20,6 +20,8 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
+#include <limits>
+
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
@@ -37,8 +39,10 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       std::make_unique<GridSearch>(planner_open_space_config_);
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
-  max_steer_angle_ =
-      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  max_steer_angle_ = vehicle_param_.max_steer_angle() /
+                     vehicle_param_.steer_ratio() *
+                     planner_open_space_config_.warm_start_config()
+                         .traj_kappa_contraint_ratio();
   step_size_ = planner_open_space_config_.warm_start_config().step_size();
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config().xy_grid_resolution();
@@ -53,6 +57,40 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       planner_open_space_config_.warm_start_config().traj_steer_penalty();
   traj_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
                                    .traj_steer_change_penalty();
+  acc_weight_ = planner_open_space_config_.iterative_anchoring_smoother_config()
+                    .s_curve_config()
+                    .acc_weight();
+  jerk_weight_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .s_curve_config()
+          .jerk_weight();
+  kappa_penalty_weight_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .s_curve_config()
+          .kappa_penalty_weight();
+  ref_s_weight_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .s_curve_config()
+          .ref_s_weight();
+  ref_v_weight_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .s_curve_config()
+          .ref_v_weight();
+  max_forward_v_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_forward_v();
+  max_reverse_v_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_reverse_v();
+  max_forward_acc_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_forward_acc();
+  max_reverse_acc_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_reverse_acc();
+  max_acc_jerk_ =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_acc_jerk();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
@@ -60,15 +98,31 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
       std::make_shared<ReedSheppPath>();
   if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
                                           reeds_shepp_to_check)) {
-    ADEBUG << "ShortestRSP failed";
+    AERROR << "ShortestRSP failed";
     return false;
   }
-
   if (!RSPCheck(reeds_shepp_to_check)) {
     return false;
   }
 
-  ADEBUG << "Reach the end configuration with Reed Sharp";
+  AINFO << "Reach the end configuration with Reed Sharp";
+  AINFO << "current node x" << current_node->GetX() << ","
+        << current_node->GetY();
+  AINFO << "final node x" << end_node_->GetX() << "," << end_node_->GetY();
+  AINFO << "distance "
+        << sqrt(pow((current_node->GetX() - end_node_->GetX()), 2) +
+                pow((current_node->GetY() - end_node_->GetY()), 2));
+  AINFO << "delta phi" << current_node->GetPhi() - end_node_->GetPhi();
+  AINFO << "reed shepp set_type,gear,length";
+  for (size_t i = 0; i < reeds_shepp_to_check->segs_types.size(); i++) {
+    AINFO << reeds_shepp_to_check->segs_types[i] << ", "
+          << reeds_shepp_to_check->gear[i] << ","
+          << reeds_shepp_to_check->segs_lengths[i];
+  }
+  AINFO << reeds_shepp_to_check->x.front() << ","
+        << reeds_shepp_to_check->y.front();
+  AINFO << reeds_shepp_to_check->x.back() << ","
+        << reeds_shepp_to_check->y.back();
   // load the whole RSP as nodes and add to the close set
   final_node_ = LoadRSPinCS(reeds_shepp_to_check, current_node);
   return true;
@@ -383,38 +437,37 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // minimum time speed optimization
   // TODO(Jinyun): move to confs
-  const double max_forward_v = 2.0;
-  const double max_reverse_v = 1.0;
-  const double max_forward_acc = 2.0;
-  const double max_reverse_acc = 1.0;
-  const double max_acc_jerk = 0.5;
-  const double delta_t = 0.2;
 
   SpeedData speed_data;
 
   // TODO(Jinyun): explore better time horizon heuristic
   const double path_length = result->accumulated_s.back();
-  const double total_t = std::max(gear ? 1.5 *
-                                             (max_forward_v * max_forward_v +
-                                              path_length * max_forward_acc) /
-                                             (max_forward_acc * max_forward_v)
-                                       : 1.5 *
-                                             (max_reverse_v * max_reverse_v +
-                                              path_length * max_reverse_acc) /
-                                             (max_reverse_acc * max_reverse_v),
-                                  10.0);
-
-  const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
+  const double total_t =
+      std::max(gear ? 1.5 *
+                          (max_forward_v_ * max_forward_v_ +
+                           path_length * max_forward_acc_) /
+                          (max_forward_acc_ * max_forward_v_)
+                    : 1.5 *
+                          (max_reverse_v_ * max_reverse_v_ +
+                           path_length * max_reverse_acc_) /
+                          (max_reverse_acc_ * max_reverse_v_),
+               10.0);
+  if (total_t + delta_t_ >= delta_t_ * std::numeric_limits<size_t>::max()) {
+    AERROR << "Number of knots overflow. total_t: " << total_t
+           << ", delta_t: " << delta_t_;
+    return false;
+  }
+  const size_t num_of_knots = static_cast<size_t>(total_t / delta_t_) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
-      num_of_knots, delta_t, {0.0, std::abs(init_v), std::abs(init_a)});
+      num_of_knots, delta_t_, {0.0, std::abs(init_v), std::abs(init_a)});
 
   // set end constraints
   std::vector<std::pair<double, double>> x_bounds(num_of_knots,
                                                   {0.0, path_length});
 
-  const double max_v = gear ? max_forward_v : max_reverse_v;
-  const double max_acc = gear ? max_forward_acc : max_reverse_acc;
+  const double max_v = gear ? max_forward_v_ : max_reverse_v_;
+  const double max_acc = gear ? max_forward_acc_ : max_reverse_acc_;
 
   const auto upper_dx = std::fmax(max_v, std::abs(init_v));
   std::vector<std::pair<double, double>> dx_bounds(num_of_knots,
@@ -428,13 +481,14 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // TODO(Jinyun): move to confs
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(10000.0, std::move(x_ref));
-  piecewise_jerk_problem.set_weight_ddx(10.0);
-  piecewise_jerk_problem.set_weight_dddx(10.0);
+  piecewise_jerk_problem.set_x_ref(ref_s_weight_, std::move(x_ref));
+  piecewise_jerk_problem.set_dx_ref(ref_v_weight_, max_v * 0.8);
+  piecewise_jerk_problem.set_weight_ddx(acc_weight_);
+  piecewise_jerk_problem.set_weight_dddx(jerk_weight_);
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
   piecewise_jerk_problem.set_dx_bounds(std::move(dx_bounds));
   piecewise_jerk_problem.set_ddx_bounds(std::move(ddx_bounds));
-  piecewise_jerk_problem.set_dddx_bound(max_acc_jerk);
+  piecewise_jerk_problem.set_dddx_bound(max_acc_jerk_);
 
   // solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
@@ -454,12 +508,12 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   for (size_t i = 1; i < num_of_knots; ++i) {
     if (s[i - 1] - s[i] > kEpislon) {
       ADEBUG << "unexpected decreasing s in speed smoothing at time "
-             << static_cast<double>(i) * delta_t << "with total time "
+             << static_cast<double>(i) * delta_t_ << "with total time "
              << total_t;
       break;
     }
-    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i],
-                                dds[i], (dds[i] - dds[i - 1]) / delta_t);
+    speed_data.AppendSpeedPoint(s[i], delta_t_ * static_cast<double>(i), ds[i],
+                                dds[i], (dds[i] - dds[i - 1]) / delta_t_);
     // cut the speed data when it is about to meet end condition
     if (path_length - s[i] < sEpislon) {
       break;
@@ -609,6 +663,7 @@ bool HybridAStar::GetTemporalProfile(HybridAStartResult* result) {
     AERROR << "TrajectoryPartition fail";
     return false;
   }
+  ADEBUG << "PARTION SIZE " << partitioned_results.size();
   HybridAStartResult stitched_result;
   for (const auto& result : partitioned_results) {
     std::copy(result.x.begin(), result.x.end() - 1,
@@ -655,15 +710,56 @@ bool HybridAStar::Plan(
     obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
   }
   obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
+  std::stringstream ssm;
+  ssm << "roi boundary" << std::endl;
+  for (auto vec : obstacles_linesegments_vec_) {
+    for (auto linesg : vec) {
+      ssm << linesg.start().x() << "," << linesg.start().y() << std::endl;
+      ssm << linesg.end().x() << "," << linesg.end().y() << std::endl;
+    }
+  }
+  ssm << "--vehicle start box" << std::endl;
+  Vec2d sposition(sx, sy);
+  Vec2d svec_to_center((vehicle_param_.front_edge_to_center() -
+                        vehicle_param_.back_edge_to_center()) /
+                           2.0,
+                       (vehicle_param_.left_edge_to_center() -
+                        vehicle_param_.right_edge_to_center()) /
+                           2.0);
+  Vec2d scenter(sposition + svec_to_center.rotate(sphi));
+  Box2d sbox(scenter, sphi, vehicle_param_.length(), vehicle_param_.width());
+  for (auto corner : sbox.GetAllCorners())
+    ssm << corner.x() << "," << corner.y() << std::endl;
+  ssm << "--vehicle end box" << std::endl;
+  Vec2d eposition(ex, ey);
+  Vec2d evec_to_center((vehicle_param_.front_edge_to_center() -
+                        vehicle_param_.back_edge_to_center()) /
+                           2.0,
+                       (vehicle_param_.left_edge_to_center() -
+                        vehicle_param_.right_edge_to_center()) /
+                           2.0);
+  Vec2d ecenter(eposition + evec_to_center.rotate(ephi));
+  Box2d ebox(ecenter, ephi, vehicle_param_.length(), vehicle_param_.width());
+  for (auto corner : ebox.GetAllCorners())
+    ssm << corner.x() << "," << corner.y() << std::endl;
   // load XYbounds
+  ssm << "--" << std::endl;
+  ssm << "XYbounds" << std::endl;
+  ssm << XYbounds[0] << ", " << XYbounds[1] << std::endl;
+  ssm << XYbounds[2] << ", " << XYbounds[3] << std::endl;
   XYbounds_ = XYbounds;
   // load nodes and obstacles
   start_node_.reset(
       new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
+  AINFO << "start node" << sx << "," << sy << "," << sphi;
+  AINFO << "end node " << ex << "," << ey << "," << ephi;
   if (!ValidityCheck(start_node_)) {
     AERROR << "start_node in collision with obstacles";
+    AERROR << start_node_->GetX() << "," << start_node_->GetY() << ","
+           << start_node_->GetPhi();
+    AERROR << ssm.str();
     return false;
   }
   if (!ValidityCheck(end_node_)) {
@@ -723,11 +819,12 @@ bool HybridAStar::Plan(
     }
   }
   if (final_node_ == nullptr) {
-    ADEBUG << "Hybrid A searching return null ptr(open_set ran out)";
+    AERROR << "Hybrid A searching return null ptr(open_set ran out)";
+    AINFO << ssm.str();
     return false;
   }
   if (!GetResult(result)) {
-    ADEBUG << "GetResult failed";
+    AERROR << "GetResult failed";
     return false;
   }
   ADEBUG << "explored node num is " << explored_node_num;

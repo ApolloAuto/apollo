@@ -29,6 +29,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_optimizer.h"
 #include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 #include "modules/planning/tasks/task.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace planning {
