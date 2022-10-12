@@ -42,7 +42,7 @@ class HdmapROIFilter : public BaseROIFilter {
         range_(120.0),
         cell_size_(0.25),
         extend_dist_(0.0),
-        no_edge_table_(false) {}
+        no_edge_table_(false) { name_ = "HdmapROIFilter"; }
   ~HdmapROIFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;

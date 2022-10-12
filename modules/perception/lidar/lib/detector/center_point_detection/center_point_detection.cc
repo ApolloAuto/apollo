@@ -128,11 +128,15 @@ bool CenterPointDetection::Init(const StageConfig& stage_config) {
 }
 
 bool CenterPointDetection::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr || data_frame->lidar_frame == nullptr)
+  if (data_frame == nullptr)
+    return false;
+
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
     return false;
 
   LidarDetectorOptions options;
-  bool res = Detect(options, data_frame->lidar_frame);
+  bool res = Detect(options, lidar_frame);
   return res;
 }
 

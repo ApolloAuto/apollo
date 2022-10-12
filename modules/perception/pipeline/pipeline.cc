@@ -16,6 +16,8 @@
 
 #include "modules/perception/pipeline/pipeline.h"
 
+#include "cyber/time/clock.h"
+
 #include "modules/common/util/map_util.h"
 #include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_detection_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
@@ -28,6 +30,10 @@
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/collect_fused_object.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
+// #include "modules/perception/lidar/lib/detector/center_point_detection/center_point_detection.h"
+#include "modules/perception/lidar/lib/detector/cnn_segmentation/cnn_segmentation.h"
+#include "modules/perception/lidar/lib/detector/mask_pillars_detection/mask_pillars_detection.h"
+#include "modules/perception/lidar/lib/detector/ncut_segmentation/ncut_segmentation.h"
 #include "modules/perception/lidar/lib/detector/point_pillars_detection/point_pillars_detection.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
@@ -85,7 +91,10 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
 bool Pipeline::InnerProcess(DataFrame* frame) {
   for (const auto& stage_ptr : stage_ptrs_) {
     if (stage_ptr->IsEnabled()) {
+      double start_time = apollo::cyber::Clock::NowInSeconds();
       bool res = stage_ptr->Process(frame);
+      AINFO << "Stage: " << stage_ptr->Name()
+            << " Cost: " << apollo::cyber::Clock::NowInSeconds() - start_time;
       if (!res) {
         AERROR << "Pipeline: " << name_
                << " Stage : " << stage_ptr->Name() << " failed!";
@@ -117,6 +126,19 @@ std::unique_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
     case StageType::POINT_PILLARS_DETECTION:
       stage_ptr.reset(new lidar::PointPillarsDetection());
       break;
+    case StageType::CNN_SEGMENTATION:
+      stage_ptr.reset(new lidar::CNNSegmentation());
+      break;
+    case StageType::NCUT_SEGMENTATION:
+      stage_ptr.reset(new lidar::NCutSegmentation());
+      break;
+    case StageType::MASK_PILLARS_DETECTION:
+      stage_ptr.reset(new lidar::MaskPillarsDetection());
+      break;
+    // todo(zero): Compile Error
+    // case StageType::CENTER_POINT_DETECTION:
+    //   stage_ptr.reset(new lidar::CenterPointDetection());
+    //   break;
     case StageType::OBJECT_BUILDER:
       stage_ptr.reset(new lidar::ObjectBuilder());
       break;

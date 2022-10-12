@@ -105,6 +105,7 @@ cc_library(
         ":multi_sensor_fusion_component",
         ":radar_detection_component",
         ":lidar_tracking_component",
+        ":lidar_output_component",
     ],
     alwayslink = True,
 )
@@ -230,6 +231,22 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
         "//modules/perception/onboard/inner_component_messages:lidar_inner_component_messages",
         "//modules/perception/onboard/proto:lidar_component_config_cc_proto",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "lidar_output_component",
+    srcs = [
+        "lidar_output_component.cc",
+    ],
+    hdrs = [
+        "lidar_output_component.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/onboard/inner_component_messages:lidar_inner_component_messages",
+        "//modules/perception/onboard/msg_serializer",
     ],
     alwayslink = True,
 )
