@@ -1392,7 +1392,7 @@ bool HMIWorker::LoadRecords(){
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
     const std::string local_record_resource = record_id.substr(0, index);
-    new_records[local_record_resource] = 0;
+    new_records[local_record_resource] = 1;
   }
   closedir(directory);
   AERROR << "load record--close dir";

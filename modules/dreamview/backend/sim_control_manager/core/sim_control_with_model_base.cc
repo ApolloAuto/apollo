@@ -72,6 +72,11 @@ void SimControlWithModelBase::InitTimerAndIO() {
         ADEBUG << "Received routing data: run canbus callback.";
         OnRoutingResponse(*cmd);
       });
+   routing_request_reader_ = node_->CreateReader<RoutingRequest>(
+      FLAGS_routing_request_topic,
+      [this](const std::shared_ptr<RoutingRequest>& routing_request) {
+        this->OnRoutingRequest(routing_request);
+      });
 
   // Setup localization callback.
   cyber::ReaderConfig localization_reader_config;
