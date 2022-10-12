@@ -27,6 +27,7 @@ cc_library(
     name = "sensor_gflags",
     srcs = ["libsensor_gflags.so"],
     hdrs = ["sensor_gflags.h"],
+    alwayslink = True,
     deps = [
         "@com_github_gflags_gflags//:gflags",
     ],
