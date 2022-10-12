@@ -96,6 +96,7 @@ cc_library(
   ],
   deps = [
     ":stage",
+    "//cyber",
     "//modules/common/util:util_tool",
     "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor",
     "//modules/perception/camera/lib/obstacle/detector/smoke:smoke_obstacle_detector",

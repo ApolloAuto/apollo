@@ -16,6 +16,8 @@
 
 #include "modules/perception/pipeline/pipeline.h"
 
+#include "cyber/time/clock.h"
+
 #include "modules/common/util/map_util.h"
 #include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_detection_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
@@ -89,7 +91,10 @@ bool Pipeline::Initialize(const PipelineConfig& pipeline_config) {
 bool Pipeline::InnerProcess(DataFrame* frame) {
   for (const auto& stage_ptr : stage_ptrs_) {
     if (stage_ptr->IsEnabled()) {
+      double start_time = apollo::cyber::Clock::NowInSeconds();
       bool res = stage_ptr->Process(frame);
+      AINFO << "Stage: " << stage_ptr->Name()
+            << " Cost: " << apollo::cyber::Clock::NowInSeconds() - start_time;
       if (!res) {
         AERROR << "Pipeline: " << name_
                << " Stage : " << stage_ptr->Name() << " failed!";
