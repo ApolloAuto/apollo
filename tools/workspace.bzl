@@ -6,6 +6,7 @@ load("//third_party/ad_rss_lib:workspace.bzl", ad_rss_lib = "repo")
 load("//third_party/atlas:workspace.bzl", atlas = "repo")
 load("//third_party/benchmark:workspace.bzl", benchmark = "repo")
 load("//third_party/boost:workspace.bzl", boost = "repo")
+load("//third_party/centerpoint_infer_op:workspace.bzl", centerpoint_infer_op = "repo")
 load("//third_party/civetweb:workspace.bzl", civetweb = "repo")
 load("//third_party/cpplint:workspace.bzl", cpplint = "repo")
 load("//third_party/eigen3:workspace.bzl", eigen = "repo")
@@ -24,6 +25,7 @@ load("//third_party/opencv:workspace.bzl", opencv = "repo")
 load("//third_party/opengl:workspace.bzl", opengl = "repo")
 load("//third_party/openh264:workspace.bzl", openh264 = "repo")
 load("//third_party/osqp:workspace.bzl", osqp = "repo")
+load("//third_party/paddleinference:workspace.bzl", paddleinference = "repo")
 load("//third_party/portaudio:workspace.bzl", portaudio = "repo")
 load("//third_party/proj:workspace.bzl", proj = "repo")
 load("//third_party/protobuf:workspace.bzl", protobuf = "repo")
@@ -32,6 +34,7 @@ load("//third_party/sqlite3:workspace.bzl", sqlite3 = "repo")
 load("//third_party/tinyxml2:workspace.bzl", tinyxml2 = "repo")
 load("//third_party/uuid:workspace.bzl", uuid = "repo")
 load("//third_party/yaml_cpp:workspace.bzl", yaml_cpp = "repo")
+
 # load("//third_party/glew:workspace.bzl", glew = "repo")
 
 load("//third_party/gpus:cuda_configure.bzl", "cuda_configure")
@@ -50,6 +53,7 @@ def initialize_third_party():
     atlas()
     benchmark()
     boost()
+    centerpoint_infer_op()
     cpplint()
     civetweb()
     eigen()
@@ -69,6 +73,7 @@ def initialize_third_party():
     opengl()
     openh264()
     osqp()
+    paddleinference()
     portaudio()
     proj()
     protobuf()
@@ -77,7 +82,7 @@ def initialize_third_party():
     tinyxml2()
     uuid()
     yaml_cpp()
-
+    
 # Define all external repositories required by
 def apollo_repositories():
     cuda_configure(name = "local_config_cuda")
