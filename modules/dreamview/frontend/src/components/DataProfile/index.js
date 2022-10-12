@@ -84,7 +84,7 @@ export default class DataProfile extends React.Component {
         onChange={this.onDynamicModelChange}
         value={currentDynamicModel}
       >
-        {toJS(dynamicModels).map((item) => {
+        {Object.keys(toJS(dynamicModels)).map((item) => {
           return (
             <LocalDynamicModelsItem
               key={item}
