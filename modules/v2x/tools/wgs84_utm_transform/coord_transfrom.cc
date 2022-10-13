@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   double x(0), y(0), z(0);
   bool flag(0);
   int zone_id(0);
-  std::cout << "0|1 zone_id x y.   0 is 84 to UTM | 1 is UTM to 84"
+  std::cout << "0|1 zone_id x y.   0 is WGS84 to UTM | 1 is UTM to WGS84"
             << std::endl;
   while (1) {
     std::cin >> flag >> zone_id >> x >> y;

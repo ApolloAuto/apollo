@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 V2X_COPTS = ["-DMODULE_NAME=\\\"v2x\\\""]
@@ -85,12 +85,12 @@ cc_binary(
     ],
 )
 
-install_files(
-    name = "v2x_binary",
-    dest = "modules/v2x/v2x_proxy/app",
-    files = [
+install(
+    name = "install",
+    targets = [
         ":v2x",
     ],
+    runtime_dest = "modules/v2x/v2x_proxy/app",
 )
 
 cc_library(
