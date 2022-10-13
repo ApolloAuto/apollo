@@ -75,10 +75,6 @@ class SimControlManager {
  private:
   SimControlBase* model_ptr_;
   std::string current_dynamic_model_ = "";
-  // whether the sim control manager is enabled!
-  // 与sim control这种dm的enabled区分。enabled 等于正在运行
-  // 此处enabled 只是控制sim control manager 的开关
-  // 相当于标识了是否开着
   bool enabled_ = false;
 };
 
