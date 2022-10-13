@@ -46,7 +46,6 @@ install(
         ":libguardian_component.so",
     ],
     deps = [
-        "//cyber:install",
         ":pb_hdrs",
     ],
 )

@@ -35,6 +35,7 @@ cc_library(
         ":autotuning_speed_feature_builder",
         "//modules/planning/tuning:autotuning_base_model",
     ],
+    tags = ["exclude"]
 )
 
 cc_test(
@@ -45,6 +46,7 @@ cc_test(
         ":autotuning_speed_mlp_model",
         "@com_google_googletest//:gtest_main",
     ],
+    tags = ["exclude"]
 )
 
 cpplint()

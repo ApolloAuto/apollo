@@ -116,7 +116,7 @@ def replace_config(pkg_module_dict, prefix, config_file):
     """
     for pkg_name, module_name in pkg_module_dict.items():
         shell_cmd("sed -i 's/\/apollo\/bazel-bin\/{}\//{}{}\/local\/lib\//g' {}".format(module_name, prefix.replace("/", "\/"), pkg_name, config_file))
-        shell_cmd("sed -i 's/\/apollo\/{}\//{}{}\/local\//g' {}".format(module_name, prefix.replace("/", "\/"), pkg_name, config_file))
+        #shell_cmd("sed -i 's/\/apollo\/{}\//{}{}\/local\//g' {}".format(module_name, prefix.replace("/", "\/"), pkg_name, config_file))
 
 def replace_config_dir(full_c_d, prefix, pkg_module_dict):
     if not os.path.exists(full_c_d):

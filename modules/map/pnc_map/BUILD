@@ -24,6 +24,7 @@ cuda_library(
         "//modules/common/math",
         "@local_config_cuda//cuda:cudart",
     ],
+    tags = ["exclude"]
 )
 
 cc_test(
@@ -41,6 +42,7 @@ cc_test(
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart",
     ],
+    tags = ["exclude"]
 )
 
 cc_library(

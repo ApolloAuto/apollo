@@ -45,6 +45,7 @@ cc_library(
         "//cyber",
         "//modules/prediction/network:net_model",
     ],
+    tags = ["exclude"]
 )
 
 cc_test(
@@ -55,6 +56,7 @@ cc_test(
         ":autotuning_mlp_net_model",
         "@com_google_googletest//:gtest_main",
     ],
+    tags = ["exclude"]
 )
 
 cc_library(
@@ -66,6 +68,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/proto:auto_tuning_model_input_cc_proto",
     ],
+    tags = ["exclude"]
 )
 
 cpplint()

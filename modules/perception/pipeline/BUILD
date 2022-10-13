@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    data_dest = "perception/pipeline",
+    data_dest = "perception/addition_data/pipeline",
     data = [
         ":runtime_data",
     ],

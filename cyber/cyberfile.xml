@@ -29,6 +29,9 @@
   <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
+  <depend expose="False">3rd-cpplint-dev</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
+  <depend repo_name="com_github_nlohmann_json" lib_names="single_json,json">3rd-nlohmann-json-dev</depend>
   <depend>bazel-extend-tools-dev</depend>
 
 </package>

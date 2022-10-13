@@ -100,6 +100,7 @@ cc_library(
     copts = [
         '-DMODULE_NAME=\\"perception\\"',
     ],
+    linkopts = ["-lleveldb"],
     deps = [
         ":lidar_detection_component",
         ":multi_sensor_fusion_component",
