@@ -92,7 +92,6 @@ Status Dreamview::Init() {
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  // todo: add map service to construct function
   sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
@@ -144,7 +143,6 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  // todo: replace sim control then remove sim control and change name
   sim_control_manager_->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();

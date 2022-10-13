@@ -77,20 +77,15 @@ namespace apollo
 
     bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name)
     {
-      ResetDynamicModel();
       auto *model_factory = DynamicModelFactory::Instance();
-      model_ptr_ = model_factory->GetModelType(dynamic_model_name);
-      if (!model_ptr_)
-      {
-        AERROR << "Can not get dynamic model to start.Reset it to original dynamic model!";
-        model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
-        // 重新启动之前的动力学模型
-        if (!model_ptr_)
-        {
-          model_ptr_->Start();
-        }
-        return false;
+      auto next_model_ptr_ = model_factory->GetModelType(dynamic_model_name);
+      if(!next_model_ptr_){
+         AERROR << "Can not get dynamic model to start.Use original dynamic model!";
+         return false;
       }
+      ResetDynamicModel();
+      model_ptr_=next_model_ptr_;
+      next_model_ptr_ = nullptr;
       model_ptr_->Start();
       current_dynamic_model_ = dynamic_model_name;
       return true;
@@ -113,7 +108,7 @@ namespace apollo
 
     void SimControlManager::Restart(double x, double y)
     {
-      // 只涉及模型，不涉及全局管理。只是重新开启更新起点
+      // reset start point for dynamic model.
       if(!IsEnabled() || !model_ptr_){
         AERROR<<"Sim control is invalid,Failed to restart!";
       }
@@ -126,14 +121,10 @@ namespace apollo
 
     void SimControlManager::Stop()
     {
-      // todo: stop 需要好好补充！ 关闭太多相关的东西了
       if (enabled_)
       {
-        //...do something
         enabled_ = false;
-        // 获取当前 reset
         ResetDynamicModel();
-        // kill sim obstacle
         std::system(FLAGS_sim_obstacle_stop_command.data());
         model_ptr_ = nullptr;
         current_dynamic_model_ = "";

@@ -215,8 +215,6 @@ HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
     module.set_stop_command(absl::StrCat("pkill -f \"", first_dag, "\""));
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
-    // todo(@Lijin)
-    module.mutable_process_monitor_config()->add_command_keywords("-d");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
   }
   mode.clear_cyber_modules();
@@ -949,8 +947,8 @@ void HMIWorker::ChangeDynamicModel(const std::string &dynamic_model_name) {
   param_json["dynamic_model_name"] = dynamic_model_name;
   Json callback_res = callback_api_("ChangeDynamicModel", param_json);
   if (!callback_res.contains("result") || !callback_res["result"]) {
-    // badcase1：没开sim control badcase2：缺失参数
-    // badcase3：切换模型不是已注册模型 resolution：return with no action,keep
+    // badcase1：sim control is not enabled. badcase2：miss params
+    // badcase3：change dynamic model is not registered. resolution：return with no action,keep
     // sim control not enabled or use original dynamic model!
     AERROR << "Failed to change dynamic model! Please check if the param is "
               "valid!";
@@ -1244,8 +1242,8 @@ void HMIWorker::DeleteDynamicModel(const std::string &dynamic_model_name) {
   param_json["dynamic_model_name"] = dynamic_model_name;
   Json callback_res = callback_api_("DeleteDynamicModel", param_json);
   if (!callback_res.contains("result") || !callback_res["result"]) {
-    // badcase1: sim control 没打开 badcase2:缺少参数
-    // badcase3:删除文件夹失败，删除失败
+    // badcase1: sim control is not enable. badcase2: miss param
+    // badcase3: Failed to delete file
     AERROR << "Failed to delete dynamic model!";
     return;
   }
