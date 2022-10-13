@@ -23,8 +23,8 @@ namespace perception {
 namespace inference {
 
 TEST(RTReshapeDimsTest, test) {
-  nvinfer1::DimsCHW dims;
-  nvinfer1::DimsCHW input_dims;
+  nvinfer1::Dims3 dims;
+  nvinfer1::Dims3 input_dims;
   dims.d[2] = -1;
   dims.d[1] = 0;
   dims.d[0] = 3;

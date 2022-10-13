@@ -42,7 +42,7 @@ class BatchStream {
   float *getBatch() { return &mBatch[0]; }
   int getBatchesRead() const { return mBatchCount; }
   int getBatchSize() const { return mBatchSize; }
-  nvinfer1::DimsNCHW getDims() const { return mDims; }
+  nvinfer1::Dims4 getDims() const { return mDims; }
 
  private:
   float *getFileBatch() { return &mFileBatch[0]; }
@@ -57,7 +57,7 @@ class BatchStream {
   int mFileBatchPos{0};
   int mImageSize{0};
 
-  nvinfer1::DimsNCHW mDims;
+  nvinfer1::Dims4 mDims;
   std::vector<float> mBatch;
   std::vector<float> mFileBatch;
   std::string mPath;

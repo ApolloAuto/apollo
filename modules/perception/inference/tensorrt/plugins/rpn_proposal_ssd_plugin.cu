@@ -105,9 +105,10 @@ __global__ void reshape_scores_kernel(const int nthreads,
   }
 }
 
-int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
-                                  void **outputs, void *workspace,
-                                  cudaStream_t stream) {
+int32_t RPNProposalSSDPlugin::enqueue(int32_t batchSize,
+                                      const void *const *inputs,
+                                      void *const *outputs, void *workspace,
+                                      cudaStream_t stream) noexcept {
   // dimsNCHW: [N, 2 * num_anchor_per_point, H, W]
   const float *rpn_cls_prob_reshape =
       reinterpret_cast<const float *>(inputs[0]);

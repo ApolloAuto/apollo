@@ -1,5 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/platform:build_defs.bzl", "if_x86_64")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,10 +26,10 @@ install(
     ],
     deps = [
         ":pb_localization",
-        "//modules/localization/msf:install",
         "//modules/localization/ndt:install",
         "//modules/localization/rtk:install",
-    ],
+# remove from condition when `third_party/localization_msf/aarch64` is ready
+    ] + if_x86_64(["//modules/localization/msf:install"]),
 )
 
 install_files(

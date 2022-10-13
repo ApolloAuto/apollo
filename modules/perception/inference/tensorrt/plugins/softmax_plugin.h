@@ -22,13 +22,12 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-class SoftmaxPlugin : public nvinfer1::IPlugin {
+class SoftmaxPlugin : public nvinfer1::IPluginV2 {
  public:
   SoftmaxPlugin(const SoftmaxParameter &param, nvinfer1::Dims in_dims) {
     input_dims_.nbDims = in_dims.nbDims;
     for (int i = 0; i < in_dims.nbDims; i++) {
       input_dims_.d[i] = in_dims.d[i];
-      input_dims_.type[i] = in_dims.type[i];
     }
     axis_ = param.axis() - 1;
     CHECK_GE(axis_, 0);
@@ -52,40 +51,71 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
     cudnnDestroyTensorDescriptor(input_desc_);
     cudnnDestroyTensorDescriptor(output_desc_);
   }
-  virtual int initialize() {
+  int32_t initialize() noexcept override {
     cudnnCreate(&cudnn_);  // initialize cudnn and cublas
     cublasCreate(&cublas_);
     return 0;
   }
-  virtual void terminate() {
+  void terminate() noexcept override {
     cublasDestroy(cublas_);
     cudnnDestroy(cudnn_);
   }
-  int getNbOutputs() const override { return 1; }
+  int32_t getNbOutputs() const noexcept override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
-                                     int nbInputDims) override {
+  nvinfer1::Dims getOutputDimensions(int32_t index,
+                                     const nvinfer1::Dims *inputs,
+                                     int32_t nbInputDims) noexcept override {
     nvinfer1::Dims out_dims = inputs[0];
     return out_dims;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
-                 int maxBatchSize) override {
+  void configureWithFormat(const nvinfer1::Dims *inputDims, int32_t nbInputs,
+                           const nvinfer1::Dims *outputDims, int32_t nbOutputs,
+                           nvinfer1::DataType type,
+                           nvinfer1::PluginFormat format,
+                           int32_t maxBatchSize) noexcept override {
     input_dims_ = inputDims[0];
   }
 
-  size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
+  size_t getWorkspaceSize(int32_t maxBatchSize) const noexcept override {
+    return 0;
+  }
 
-  int enqueue(int batchSize, const void *const *inputs, void **outputs,
-              void *workspace, cudaStream_t stream) override;
+  int32_t enqueue(int32_t batchSize, const void *const *inputs,
+                  void *const *outputs, void *workspace,
+                  cudaStream_t stream) noexcept override;
 
-  size_t getSerializationSize() override { return 0; }
+  size_t getSerializationSize() const noexcept override { return 0; }
 
-  void serialize(void *buffer) override {
+  void serialize(void *buffer) const noexcept override {
     char *d = reinterpret_cast<char *>(buffer), *a = d;
     size_t size = getSerializationSize();
     CHECK_EQ(d, a + size);
+  }
+
+  IPluginV2 *clone() const noexcept override {
+    return const_cast<SoftmaxPlugin *>(this);
+  }
+
+  void destroy() noexcept override {}
+
+  const nvinfer1::AsciiChar *getPluginNamespace() const noexcept override {
+    return "apollo::perception::inference";
+  }
+
+  const nvinfer1::AsciiChar *getPluginType() const noexcept override {
+    return "default";
+  }
+
+  const nvinfer1::AsciiChar *getPluginVersion() const noexcept override {
+    return "1.0";
+  }
+
+  void setPluginNamespace(const nvinfer1::AsciiChar *) noexcept override {}
+
+  bool supportsFormat(nvinfer1::DataType,
+                      nvinfer1::PluginFormat) const noexcept override {
+    return true;
   }
 
  private:
