@@ -29,7 +29,6 @@ namespace apollo
     class DynamicModelFactory
     {
     public:
-      // 改动1：add dynamic model name param
       ~DynamicModelFactory();
       SimControlBase* GetModelType(std::string dynamic_model_name);
       nlohmann::json RegisterDynamicModels();

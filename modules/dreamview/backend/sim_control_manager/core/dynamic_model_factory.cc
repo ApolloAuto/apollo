@@ -24,7 +24,6 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control_manager/dynamic_model/perfect_control/sim_perfect_control.h"
 
-// 专门用DynamicModel来管理这个类
 namespace apollo {
 namespace dreamview {
 
@@ -41,14 +40,13 @@ struct DynamicModelInfo {
   std::string library_name;
   SimControlBase *dynamic_model_ptr;
 };
-// 这个全局变量应该如何拿捏
 unordered_map<string, DynamicModelInfo> s_dynamic_model_map_;
 unordered_map<string, int> s_dm_lib_count_;
 
 DynamicModelFactory::DynamicModelFactory() : dynamic_model_local_path_("") {
   home_path_ = cyber::common::GetEnv("HOME");
   dynamic_model_local_path_ = home_path_ + FLAGS_resource_dynamic_model_path;
-  // 初始化自动加载SimPerfectControl
+  // init should register default sim control:SimPerfectControl
   RegisterSimPerfectControl();
 }
 
@@ -64,8 +62,7 @@ void DynamicModelFactory::RegisterSimPerfectControl() {
   // map_service当参数
   if (s_dynamic_model_map_.find(FLAGS_sim_perfect_control) ==
       s_dynamic_model_map_.end()) {
-    // 加载之后在整个生命周期都不应该重复加载。这是一个原则，因为binary有可能正在使用
-    // 永远只加载没加载过的
+    // Avoid dumplicate register dynamic model which is already registered
     s_dynamic_model_map_[FLAGS_sim_perfect_control] = {};
     s_dynamic_model_map_[FLAGS_sim_perfect_control].dynamic_model_name =
         FLAGS_sim_perfect_control;
@@ -107,7 +104,6 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_name) {
         (create_t *)shared_library->GetSymbol("create");
     SimControlBase *dynamic_model_ptr =
         create_dynamic_model(dm_name, home_path_);
-    // 这里应该是调用函数 返回生成的指针
     if (!dynamic_model_ptr) {
       return false;
     }
@@ -173,7 +169,6 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
         if (iter != s_dynamic_model_map_.end()) {
           continue;
         }
-        //bool register_res = RegisterDynamicModel(dynamic_model_name);
         RegisterDynamicModel(dynamic_model_name);
       }
       closedir(directory);
@@ -189,10 +184,8 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
 
 SimControlBase *DynamicModelFactory::GetModelType(
     std::string dynamic_model_name) {
-  // 我觉得应该配置成字典
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter == s_dynamic_model_map_.end()) {
-    // 返回空指针
     AERROR << "Failed to get " << dynamic_model_name << " related pointer.";
     return nullptr;
   }
@@ -203,9 +196,7 @@ bool DynamicModelFactory::UnregisterDynamicModel(
     std::string &dynamic_model_name) {
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter == s_dynamic_model_map_.end()) {
-    // 返回空指针
     AERROR << "Failed to get " << dynamic_model_name << " related pointer.";
-    // 不需要下面的步骤，直接结束
     return true;
   }
   std::string library_name = iter->second.library_name;
@@ -220,10 +211,9 @@ bool DynamicModelFactory::UnregisterDynamicModel(
            << std::strerror(errno);
     return false;
   }
-  // 删除related library if library is only used by this dynamic model
+  // delete related library if library is only used by this dynamic model
   auto count_iter = s_dm_lib_count_.find(library_name);
   if (count_iter->second == 1) {
-    // 删除对应文件夹
     std::string lib_path =
         home_path_ + FLAGS_dynamic_model_library_path + library_name;
     cyber::common::DeleteFile(lib_path);
