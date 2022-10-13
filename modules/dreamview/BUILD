@@ -69,6 +69,7 @@ install(
         "//modules/dreamview/proto:preprocess_table_cc_proto",
         "//modules/dreamview/proto:simulation_world_cc_proto",
         "//modules/dreamview/proto:scenario_cc_proto",
+        "//modules/dreamview/proto:record_cc_proto",
         "//modules/dreamview/proto:dv_plugin_msg_cc_proto",
         "//modules/dreamview/proto:plugin_config_cc_proto",
         "//modules/dreamview/backend/teleop/proto:daemon_cmd_cc_proto",
