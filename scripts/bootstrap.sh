@@ -39,7 +39,7 @@ function start() {
     if [ $http_status -eq 200 ]; then
       echo "Dreamview is running at" $DREAMVIEW_URL
     else
-      echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
+      echo "Failed to start Dreamview. Please check /apollo/nohup.out or /apollo/data/core for more information"
     fi
   fi
 }
