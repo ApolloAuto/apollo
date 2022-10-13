@@ -55,6 +55,9 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
     AERROR << "Read config failed: " << config;
     return false;
   }
+  params_.use_lidar = params.use_lidar();
+  params_.use_radar = params.use_radar();
+  params_.use_camera = params.use_camera();
   params_.tracker_method = params.tracker_method();
   params_.data_association_method = params.data_association_method();
   params_.gate_keeper_method = params.gate_keeper_method();
