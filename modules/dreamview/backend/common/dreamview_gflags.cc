@@ -133,7 +133,7 @@ DEFINE_string(sim_obstacle_path,"/.apollo/dreamview/plugins/sim_obstacle/sim_obs
 
 DEFINE_string(gflag_command_arg," --flagfile=/apollo/modules/common/data/global_flagfile.txt","sim obstacle need use gflag!");
 
-DEFINE_string(sim_perfect_control,"sim_perfect_control","sim perfect control!");
+DEFINE_string(sim_perfect_control,"Simulation Perfect Control","sim perfect control!");
 
 DEFINE_string(resource_record_path,"/.apollo/resources/records/","Records placement");
 
