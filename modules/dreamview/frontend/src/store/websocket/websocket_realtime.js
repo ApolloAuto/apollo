@@ -391,7 +391,7 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify({
       type: 'HMIAction',
       action: 'CHANGE_DYNAMIC_MODEL',
-      value: 'sim_perfect_control',
+      value: 'Simulation Perfect Control',
     }));
   }
 

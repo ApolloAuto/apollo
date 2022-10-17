@@ -71,12 +71,12 @@ void DynamicModelFactory::RegisterSimPerfectControl() {
   }
 }
 
-bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_name) {
+bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   std::string dynamic_model_conf_json_path;
-  GetDynamicModelPath(dm_name, dynamic_model_conf_json_path, true);
+  GetDynamicModelPath(dm_dir_name, dynamic_model_conf_json_path, true);
   if (!cyber::common::PathExists(dynamic_model_conf_json_path)) {
-    AERROR << "Failed to load Dynamic Model: " << dm_name
-           << ". DM conf file is not exists!";
+    AERROR << "Failed to load Dynamic Model: " << dm_dir_name
+           << ". conf file is not exists!";
     return false;
   }
   DynamicModelConf dynamic_model_conf;
@@ -86,10 +86,17 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_name) {
            << dynamic_model_conf_json_path;
     return false;
   }
+  std::string dynamic_model_name = dynamic_model_conf.dynamic_model_name();
   // get library name to load dm class
   if (!dynamic_model_conf.has_library_name() ||
       !dynamic_model_conf.has_dynamic_model_name()) {
     AERROR << "Missing required field!";
+    return false;
+  }
+  // if is already registered
+  auto iter = s_dynamic_model_map_.find(dynamic_model_name);
+  if (iter != s_dynamic_model_map_.end()) {
+    AINFO<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
     return false;
   }
   std::string dm_library_name = dynamic_model_conf.library_name();
@@ -103,14 +110,14 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_name) {
     create_t *create_dynamic_model =
         (create_t *)shared_library->GetSymbol("create");
     SimControlBase *dynamic_model_ptr =
-        create_dynamic_model(dm_name, home_path_);
+        create_dynamic_model(dm_dir_name, home_path_);
     if (!dynamic_model_ptr) {
       return false;
     }
-    s_dynamic_model_map_[dm_name] = {};
-    s_dynamic_model_map_[dm_name].dynamic_model_name = dm_name;
-    s_dynamic_model_map_[dm_name].dynamic_model_ptr = dynamic_model_ptr;
-    s_dynamic_model_map_[dm_name].library_name = dm_library_name;
+    s_dynamic_model_map_[dynamic_model_name] = {};
+    s_dynamic_model_map_[dynamic_model_name].dynamic_model_name = dynamic_model_name;
+    s_dynamic_model_map_[dynamic_model_name].dynamic_model_ptr = dynamic_model_ptr;
+    s_dynamic_model_map_[dynamic_model_name].library_name = dm_library_name;
     auto iter = s_dm_lib_count_.find(dm_library_name);
     if (iter == s_dm_lib_count_.end()) {
       s_dm_lib_count_[dm_library_name] = 1;
@@ -135,7 +142,7 @@ void DynamicModelFactory::GetDynamicModelPath(std::string &dynamic_model_name,
                                               bool get_conf_json) {
   path = dynamic_model_local_path_ + dynamic_model_name;
   if (get_conf_json) {
-    path = path + "/" + dynamic_model_name + ".json";
+    path = path + "/dynamic_model.json";
   }
   return;
 }
@@ -153,7 +160,7 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
       AERROR << "Cannot open directory " << dynamic_model_local_path_;
     } else {
       struct dirent *file;
-      std::string dynamic_model_name;
+      std::string dynamic_model_dir_name;
       std::string dynamic_model_library_path;
       while ((file = readdir(directory)) != nullptr) {
         // skip directory_path/. and directory_path/..
@@ -163,21 +170,24 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
         if (file->d_type != DT_DIR) {
           continue;
         }
-        dynamic_model_name = file->d_name;
+        dynamic_model_dir_name = file->d_name;
         // avpid dumplicate register dynamic model
-        auto iter = s_dynamic_model_map_.find(dynamic_model_name);
-        if (iter != s_dynamic_model_map_.end()) {
-          continue;
-        }
-        RegisterDynamicModel(dynamic_model_name);
+        RegisterDynamicModel(dynamic_model_dir_name);
       }
       closedir(directory);
     }
   }
-  result["loaded_dynamic_models"] = {};
+
+// c++ map's traversal order is different from the insertion order.
+// To ensure that the default sim control is in the front,put it before other
+// dynamic models.
+  result["loaded_dynamic_models"] = {FLAGS_sim_perfect_control};
   for (auto iter = s_dynamic_model_map_.begin();
        iter != s_dynamic_model_map_.end(); iter++) {
-    result["loaded_dynamic_models"].push_back(iter->first);
+    if (iter->first != FLAGS_sim_perfect_control)
+    {
+      result["loaded_dynamic_models"].push_back(iter->first);
+    }
   }
   return result;
 }
