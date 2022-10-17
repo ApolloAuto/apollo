@@ -1,11 +1,12 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
-    name = "py_files",
+    name = "readme",
     srcs = glob([
-        "*.py",
+        "README.md",
     ]),
 )
 
@@ -36,5 +37,16 @@ py_binary(
         "//modules/common_msgs/localization_msgs:localization_py_pb2",
         "//modules/tools/common:logger",
         "//modules/tools/common:proto_utils",
+    ],
+)
+
+install(
+    name = "install",
+    data = [":readme"],
+    data_dest = "tools/record_play",
+    py_dest = "tools/record_play",
+    targets = [
+        ":rtk_player",
+        ":rtk_recorder"
     ],
 )

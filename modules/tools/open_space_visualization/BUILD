@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -48,4 +49,15 @@ py_binary(
     deps = [
         ":open_space_roi_interface",
     ],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/open_space_visualization",
+    targets = [
+        ":open_space_roi_interface",
+        ":hybrid_a_star_python_interface",
+        ":distance_approach_python_interface",
+        ":distance_approach_visualizer",
+    ]
 )

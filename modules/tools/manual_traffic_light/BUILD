@@ -7,8 +7,19 @@ package(default_visibility = ["//visibility:public"])
 install(
     name = "install",
     library_dest = "tools/lib",
+    data_dest = "tools/manual_traffic_light",
+    data = [":conf_files"],
     targets = [":libmanual_traffic_light_component.so"],
     visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "conf_files",
+    srcs = [
+        "manual_traffic_light.conf",
+        "manual_traffic_light.dag",
+        "manual_traffic_light.launch",
+    ],
 )
 
 cc_library(
@@ -27,7 +38,7 @@ cc_library(
 cc_binary(
     name = "libmanual_traffic_light_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":manual_traffic_light"],
 )
 

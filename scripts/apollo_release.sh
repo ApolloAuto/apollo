@@ -10,7 +10,7 @@ export PREFIX_DIR=/opt/apollo/neo/packages/
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS=" --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5"
+BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5"
 SHORTHAND_TARGETS=
 CMDLINE_OPTIONS=
 INSTALL_OPTIONS=
@@ -24,6 +24,8 @@ function _usage() {
     info "${TAB} -c, --clean        Ensure clean install by removing prefix dir if exist before installing"
     info "${TAB} -r, --resolve      Also resolve APT packages on which this release build depends"
     info "${TAB} -h, --help         Show this message and exit"
+    info "${TAB} --gpu              Running GPU build"
+    info "${TAB} --cpu              Running CPU build"
 }
 
 function _check_arg_for_opt() {
@@ -58,6 +60,12 @@ function parse_cmdline_args() {
             -h | --help)
                 _usage
                 exit 0
+                ;;
+            --cpu)
+                USE_GPU=0
+                ;;
+            --gpu)
+                USE_GPU=1
                 ;;
             *)
                 remained_args="${remained_args} ${opt}"

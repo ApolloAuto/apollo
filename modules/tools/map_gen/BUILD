@@ -1,13 +1,7 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
-
-filegroup(
-    name = "py_files",
-    srcs = glob([
-        "*.py",
-    ]),
-)
 
 py_binary(
     name = "add_signal",
@@ -56,4 +50,17 @@ py_binary(
         "//modules/common_msgs/map_msgs:map_lane_py_pb2",
         "//modules/common_msgs/map_msgs:map_py_pb2",
     ],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/map_gen",
+    targets = [
+        "add_signal",
+        "extract_path",
+        "map_gen_single_lane",
+        "map_gen_two_lanes_right_ext",
+        "map_gen",
+    ]
+
 )

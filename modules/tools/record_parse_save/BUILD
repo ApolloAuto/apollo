@@ -1,10 +1,11 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "config",
-    srcs = glob(["*.yaml"]),
+    srcs = glob(["*.yaml"]) + ["README.md"],
 )
 
 py_library(
@@ -47,5 +48,15 @@ py_binary(
         ":parse_radar",
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
+    ],
+)
+
+install(
+    name = "install",
+    data = [":config"],
+    data_dest = "tools/record_parse_save",
+    py_dest = "tools/record_parse_save",
+    targets = [
+        ":record_parse_save",
     ],
 )

@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -30,4 +31,12 @@ py_library(
 py_library(
     name = "xyitem",
     srcs = ["xyitem.py"],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/realtime_plot",
+    targets = [
+        ":realtime_plot",
+    ]
 )

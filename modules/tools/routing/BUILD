@@ -1,6 +1,17 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    py_dest = "tools/routing",
+    targets = [
+        ":debug_passage_region",
+        ":debug_route",
+        ":road_show",
+    ],
+)
 
 py_binary(
     name = "debug_passage_region",
