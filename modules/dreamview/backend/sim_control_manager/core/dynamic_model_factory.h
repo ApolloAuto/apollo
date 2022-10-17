@@ -32,7 +32,7 @@ namespace apollo
       ~DynamicModelFactory();
       SimControlBase* GetModelType(std::string dynamic_model_name);
       nlohmann::json RegisterDynamicModels();
-      bool RegisterDynamicModel(std::string &dm_dir_name);
+      bool RegisterDynamicModel(std::string &dm_name);
       bool UnregisterDynamicModel(std::string &dynamic_model_name);
       void GetDynamicModelPath(std::string &dynamic_model_name, std::string &path, bool get_conf_json = true);
 

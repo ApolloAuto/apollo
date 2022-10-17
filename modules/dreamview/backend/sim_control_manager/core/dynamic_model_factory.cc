@@ -178,13 +178,14 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
     }
   }
 
-  // c++ map's traversal order is different from the insertion order.
-  // To ensure that the default sim control is in the front,put it before other
-  // dynamic models.
+// c++ map's traversal order is different from the insertion order.
+// To ensure that the default sim control is in the front,put it before other
+// dynamic models.
   result["loaded_dynamic_models"] = {FLAGS_sim_perfect_control};
   for (auto iter = s_dynamic_model_map_.begin();
        iter != s_dynamic_model_map_.end(); iter++) {
-    if (iter->first != FLAGS_sim_perfect_control) {
+    if (iter->first != FLAGS_sim_perfect_control)
+    {
       result["loaded_dynamic_models"].push_back(iter->first);
     }
   }
