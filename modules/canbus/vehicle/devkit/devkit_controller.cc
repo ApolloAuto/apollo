@@ -226,7 +226,7 @@ Chassis DevkitController::chassis() {
                                .throttle_command_100()
                                .throttle_pedal_target()));
   } else {
-    chassis_.set_throttle_percentage(0);
+    chassis_.set_throttle_percentage_cmd(0);
   }
   // 10 brake
   if (chassis_detail.devkit().has_brake_report_501() &&

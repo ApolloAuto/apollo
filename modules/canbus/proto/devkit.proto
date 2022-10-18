@@ -130,7 +130,6 @@ message Vehicle_mode_command_105 {
   optional Steer_mode_ctrlType steer_mode_ctrl = 5;
 }
 
-
 message Throttle_report_500 {
 // Report Message
   enum Throttle_flt2Type {
