@@ -43,6 +43,8 @@ class Stage {
 
   virtual std::string Name() const = 0;
 
+  StageConfig stage_config_;
+
  protected:
   bool Initialize(const StageConfig& stage_config);
 
@@ -53,7 +55,6 @@ class Stage {
   bool enable_ = false;
   std::string name_;
 
-  StageConfig stage_config_;
   std::unordered_map<PluginType, PluginConfig, std::hash<int>>
       plugin_config_map_;
 };

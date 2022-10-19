@@ -213,8 +213,7 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig &pipeline_config) {
     auto plugin_param =
         camera_detection_config_.object_template_param().plugin_param();
     // todo(zero): need fix work_root
-    // init_options.root_dir = GetAbsolutePath(work_root,
-    // plugin_param.root_dir());
+    init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
     ACHECK(ObjectTemplateManager::Instance()->Init(init_options));
   }
@@ -226,7 +225,6 @@ bool ObstacleDetectionCamera::Process(DataFrame *data_frame) {
   CameraFrame *frame = data_frame->camera_frame;
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
-
   InnerProcess(data_frame);
 
   if (camera_detection_config_.has_debug_param()) {

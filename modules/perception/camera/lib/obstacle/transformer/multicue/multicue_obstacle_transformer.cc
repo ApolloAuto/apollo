@@ -46,7 +46,7 @@ bool MultiCueObstacleTransformer::Init(
   return true;
 }
 
-bool MultiCueObstacleTransformer::Init(const StageConfig& stage_config) {
+bool MultiCueObstacleTransformer::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
@@ -60,8 +60,58 @@ bool MultiCueObstacleTransformer::Init(const StageConfig& stage_config) {
   return true;
 }
 
-bool MultiCueObstacleTransformer::Process(DataFrame* data_frame) {
-  return true;
+bool MultiCueObstacleTransformer::Process(DataFrame *data_frame) {
+  auto frame = data_frame->camera_frame;
+  if (frame->detected_objects.empty()) {
+    ADEBUG << "No object input to transformer.";
+    return true;
+  }
+
+  const auto &camera_k_matrix = frame->camera_k_matrix;
+  float k_mat[9] = {0};
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      k_mat[i * 3 + j] = camera_k_matrix(i, j);
+    }
+  }
+  ADEBUG << "Camera k matrix input to transformer: \n"
+         << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
+         << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
+         << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
+
+  const int width_image = frame->data_provider->src_width();
+  const int height_image = frame->data_provider->src_height();
+  const auto &camera2world_pose = frame->camera2world_pose;
+  mapper_->Init(k_mat, width_image, height_image);
+
+  ObjMapperOptions obj_mapper_options;
+  float object_center[3] = {0};
+  float dimension_hwl[3] = {0};
+  float rotation_y = 0.0f;
+  int nr_transformed_obj = 0;
+
+  for (auto &obj : frame->detected_objects) {
+    if (obj == nullptr) {
+      ADEBUG << "Empty object input to transformer.";
+      continue;
+    }
+
+    // set object mapper options
+    float theta_ray = 0.0f;
+    SetObjMapperOptions(obj, camera_k_matrix, width_image, height_image,
+                        &obj_mapper_options, &theta_ray);
+
+    // process
+    mapper_->Solve3dBbox(obj_mapper_options, object_center, dimension_hwl,
+                         &rotation_y);
+
+    // fill back results
+    FillResults(object_center, dimension_hwl, rotation_y, camera2world_pose,
+                theta_ray, obj);
+
+    ++nr_transformed_obj;
+  }
+  return nr_transformed_obj > 0;
 }
 
 void MultiCueObstacleTransformer::SetObjMapperOptions(

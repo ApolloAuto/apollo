@@ -37,7 +37,6 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
 #include "modules/perception/pipeline/pipeline.h"
-#include "modules/perception/pipeline/proto/camera_detection_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -53,13 +52,13 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   ~ObstacleDetectionCamera() = default;
 
   bool Init(const CameraPerceptionInitOptions &options) override;
-  
-  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Init(const PipelineConfig &pipeline_config) override;
 
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
 
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame *data_frame) override;
 
   std::string Name() const override { return name_; }
 
