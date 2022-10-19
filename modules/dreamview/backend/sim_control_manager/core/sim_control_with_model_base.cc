@@ -85,6 +85,11 @@ void SimControlWithModelBase::InitTimerAndIO() {
       FLAGS_reader_pending_queue_size;
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       localization_reader_config, nullptr);
+  prediction_reader_ = node_->CreateReader<PredictionObstacles>(
+      FLAGS_prediction_topic,
+      [this](const std::shared_ptr<PredictionObstacles> &obstacles) {
+        this->OnPredictionObstacles(obstacles);
+      });
 
   localization_writer_ =
       node_->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);
@@ -265,6 +270,17 @@ void SimControlWithModelBase::OnRoutingRequest(
   // }
   // point.set_theta(theta);
   SetStartPoint(point);
+}
+
+void SimControlWithModelBase::OnPredictionObstacles(
+    const std::shared_ptr<PredictionObstacles> &obstacles) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  if (!enabled_) {
+    return;
+  }
+
+  send_dummy_prediction_ = obstacles->header().module_name() == "SimPrediction";
 }
 
 void SimControlWithModelBase::SetStartPoint(const SimCarStatus& point) {
