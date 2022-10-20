@@ -56,6 +56,11 @@ void SimControlWithModelBase::InitTimerAndIO() {
   control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
   control_cmd_reader_config.pending_queue_size =
       FLAGS_reader_pending_queue_size;
+  prediction_reader_ = node_->CreateReader<PredictionObstacles>(
+      FLAGS_prediction_topic,
+      [this](const std::shared_ptr<PredictionObstacles> &obstacles) {
+        this->OnPredictionObstacles(obstacles);
+      });
   control_command_reader_ = node_->CreateReader<ControlCommand>(
       control_cmd_reader_config,
       [this](const std::shared_ptr<ControlCommand>& cmd) {
@@ -110,6 +115,15 @@ void SimControlWithModelBase::UpdateGearPosition() {
     gear_position_ = 0;
   }
   current_point_.set_gear_position(gear_position_);
+}
+
+void SimControlWithModelBase::OnPredictionObstacles(
+    const std::shared_ptr<PredictionObstacles> &obstacles) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (!enabled_) {
+    return;
+  }
+  send_dummy_prediction_ = obstacles->header().module_name() == "SimMlpPrediction";
 }
 
 void SimControlWithModelBase::Start() {
@@ -371,7 +385,7 @@ void SimControlWithModelBase::PublishDummyPrediction() {
     if (!send_dummy_prediction_) {
       return;
     }
-    FillHeader("SimPrediction", prediction.get());
+    FillHeader("SimMlpPrediction", prediction.get());
   }
   prediction_writer_->Write(prediction);
 }
