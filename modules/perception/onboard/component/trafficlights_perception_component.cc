@@ -18,6 +18,8 @@
 #include <limits>
 #include <map>
 #include <utility>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <boost/algorithm/string.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -102,6 +104,24 @@ static int GetTrafficGpuId(const pipeline::PipelineConfig& pipeline_config) {
   return gpu_id;
 }
 
+int IsFileExist(const char* path) {
+    return !access(path, F_OK);
+}
+
+bool TrafficLightsPerceptionComponent::CreateDir(){
+  if (!IsFileExist("/apollo/debug_vis")) {
+    int status = mkdir("/apollo/debug_vis", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (!status) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    AINFO << "debug_vis dir already exist";
+    return true;
+  }
+}
+
 bool TrafficLightsPerceptionComponent::Init() {
   frame_.reset(new camera::CameraFrame);
   writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
@@ -110,6 +130,12 @@ bool TrafficLightsPerceptionComponent::Init() {
   if (InitConfig() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitConfig failed.";
     return false;
+  }
+
+  if (CreateDir()) {
+    AINFO << "debug_vis dir create success.";
+  } else {
+    AERROR << "debug_vis dir cteate failed.";
   }
 
   if (InitAlgorithmPlugin() != cyber::SUCC) {
@@ -1052,6 +1078,8 @@ void TrafficLightsPerceptionComponent::Visualize(
   cv::imwrite(absl::StrCat("/apollo/debug_vis/",
                            std::to_string(frame.timestamp), ".jpg"),
               output_image);
+  cv::imshow("Apollo traffic light detection", output_image);
+  cv::waitKey(1);
 }
 
 void TrafficLightsPerceptionComponent::SyncV2XTrafficLights(
