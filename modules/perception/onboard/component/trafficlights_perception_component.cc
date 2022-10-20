@@ -135,7 +135,7 @@ bool TrafficLightsPerceptionComponent::Init() {
   if (CreateDir()) {
     AINFO << "debug_vis dir create success.";
   } else {
-    AERROR << "debug_vis dir cteate failed.";
+    AERROR << "debug_vis dir create failed.";
   }
 
   if (InitAlgorithmPlugin() != cyber::SUCC) {
