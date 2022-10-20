@@ -201,7 +201,7 @@ export default class RoutingEditor {
     const parkingRoutingRequest = (index !== -1);
     if (parkingRoutingRequest) {
       const { id } = this.parkingSpaceInfo[index];
-      const parkingSpaceId= _.get(id, 'id');
+      const parkingSpaceId = _.get(id, 'id');
       WS.sendParkingRequest(parkingSpaceId);
       // WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, laneId);
       return true;
