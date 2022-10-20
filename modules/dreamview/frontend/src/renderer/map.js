@@ -10,10 +10,6 @@ import {
   changeMaterial,
 } from 'utils/draw';
 import {
-  pointOnVectorRight,
-  directionVectorCrossProduct,
-  getIntersectionPoint,
-  directionSameWithVector,
   getBehindPointIndexDistanceApart,
   getInFrontOfPointIndexDistanceApart,
   getPointDistance,
@@ -364,7 +360,6 @@ export default class Map {
   // side. This also means that the server should maintain a state of
   // (possibly) visible elements, presummably in the global store.
   appendMapData(newData, coordinates, scene) {
-    const parkingSpaceCalcInfo = [];
     for (const kind in newData) {
       if (!newData[kind]) {
         continue;
@@ -448,8 +443,6 @@ export default class Map {
               ),
               text: this.addParkingSpaceId(newData[kind][i], coordinates, scene),
             }));
-            parkingSpaceCalcInfo.push(this.calcParkingSpaceExtraInfo(newData[kind][i],
-              coordinates));
             break;
           case 'speedBump':
             this.data[kind].push(Object.assign(newData[kind][i], {
@@ -464,7 +457,7 @@ export default class Map {
         }
       }
     }
-    return [parkingSpaceCalcInfo];
+    return;
   }
 
   shouldDrawObjectOfThisElementKind(kind) {
@@ -548,29 +541,6 @@ export default class Map {
       changeMaterial(mesh, color);
     });
   }
-
-  // find parking space based which lane
-  getLaneBasedOverlapId(overlapId, coordinates) {
-    // Default based one lane if overlapId.length>=2 only choose the first
-    if (_.isEmpty(overlapId)) {
-      return null;
-    }
-    const laneIndex = _.findIndex(this.data.lane, item => {
-      return _.findIndex(item.overlapId, { 'id': overlapId[0].id }) !== -1;
-    });
-    if (laneIndex === -1) {
-      return null;
-    }
-    const lane = this.data.lane[laneIndex];
-    const points = this.getPointsFromLane(lane, coordinates);
-    return {
-      centerLine: points,
-      length: _.get(lane, 'length'),
-      successorId: _.get(lane, 'successorId'), // array
-      predecessorId: _.get(lane, 'predecessorId'), // array
-    };
-  }
-
   // get all offset points from the lane's segements
   getPointsFromLane(lane, coordinates, offset = true) {
     const centralLine = _.get(lane, 'centralCurve.segment');
@@ -724,151 +694,302 @@ export default class Map {
     }
   }
 
-  calcParkingSpaceExtraInfo(parkingSpace, coordinates) {
-    const border = coordinates.applyOffsetToArray(parkingSpace.polygon.point);
-    const basedLane = this.getLaneBasedOverlapId(parkingSpace.overlapId, coordinates);
-    let routingPoint = null;
-    if (_.isEmpty(basedLane)) {
+  // Get the point on the lane that is closest to the overlap
+  // between junction and lane(outside of Junction)
+  // junctionPoints: junction polygon point, currently there are only
+  // rectangular junctions.
+  // reverse means find direction
+  // return the point no offset (for in lane) the related info array (for out lane)
+  getPointClosestToTheJunctionOnLane(lane, junctionPoints, coordinates, reverse = false) {
+    let laneEndPoint = getLaneFirstAndLastPoint(lane);
+    laneEndPoint = coordinates.applyOffsetToArray(laneEndPoint);
+    if (_.isEmpty(laneEndPoint)) {
       return null;
     }
-    const centerLine = basedLane.centerLine;
-    let result = [];
-    const laneCenterLineEndPoint = centerLine[centerLine.length - 1];
-    let intersectionPoint = null;
-    const laneVector = {
-      x: laneCenterLineEndPoint.x - centerLine[0].x,
-      y: laneCenterLineEndPoint.y - centerLine[0].y,
-    };
-    const vector01 = {
-      x: border[1].x - border[0].x,
-      y: border[1].y - border[0].y,
-    };
-    const vector12 = {
-      x: border[1].x - border[2].x,
-      y: border[1].y - border[2].y,
-    };
-    const parallel = directionVectorCrossProduct(laneVector, vector01, true)
-      > directionVectorCrossProduct(laneVector, vector12, true) ? 2 : 1;
-    let orderIndex = -1;
-    if (parallel === 1) {
-      const mid01 = {
-        x: (border[0].x + border[1].x) / 2,
-        y: (border[0].y + border[1].y) / 2,
-      };
-      const mid23 = {
-        x: (border[2].x + border[3].x) / 2,
-        y: (border[2].y + border[3].y) / 2,
-      };
-      intersectionPoint = getIntersectionPoint(mid01, centerLine[0], laneCenterLineEndPoint);
-      if (intersectionPoint.x === mid01.x || intersectionPoint.x === mid23.x
-        || mid01.x === mid23.x) {
-        // equal x situation
-        if (intersectionPoint.y < mid01.y) {
-          if (mid01.y < mid23.y) {
-            // 01->23
-            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
-          } else {
-            // 23->01
-            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
-          }
+    let targetLane = lane;
+    const direction = reverse ? 'successorId' : 'predecessorId';
+    while (isLaneCompleteInRectangle(junctionPoints, laneEndPoint)) {
+      targetLane = _.find(this.data.lane,
+        item => _.isEqual(item.id, _.get(lane, `${direction}.0`)));// lane.predecessorId[0]
+      if (_.isEmpty(targetLane)) {
+        return null;
+      }
+      laneEndPoint = coordinates.applyOffsetToArray(getLaneFirstAndLastPoint(targetLane));
+    }
+    const laneSegment = _.get(targetLane, 'centralCurve.segment');
+    if (_.isEmpty(laneSegment)) {
+      return null;
+    }
+    let findTargetPoint = false;
+    let targetPoint = null;
+    let points = null;
+    let offsetPoints = null;
+    let idx = 0;
+    if (reverse) {
+      for (; idx < laneSegment.length && !findTargetPoint; idx++) {
+        points = _.get(laneSegment[idx], 'lineSegment.point');
+        offsetPoints = coordinates.applyOffsetToArray(points);
+        if (_.isEmpty(offsetPoints)) {
+          return null;
         } else {
-          if (mid01.y < mid23.y) {
-            // 23->01
-            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
-          } else {
-            // 01->23
-            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
-          }
-        }
-      } else {
-        if (intersectionPoint.x < mid01.x) {
-          if (mid01.x < mid23.x) {
-            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
-          } else {
-            // 32 -> 01
-            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
-          }
-        } else {
-          if (mid01.x < mid23.x) {
-            // 32->01
-            orderIndex = pointOnVectorRight(border[0], mid23, mid01) ? 0 : 1;
-          } else {
-            // 01->32
-            orderIndex = pointOnVectorRight(border[3], mid01, mid23) ? 3 : 2;
+          const pointIndex = _.findIndex(offsetPoints,
+            point => !IsPointInRectangle(junctionPoints, point));
+          if (pointIndex !== -1) {
+            targetPoint = pointIndex;
+            findTargetPoint = true;
           }
         }
       }
-      result = order1[orderIndex];
     } else {
-      const mid12 = {
-        x: (border[2].x + border[1].x) / 2,
-        y: (border[2].y + border[1].y) / 2,
-      };
-      const mid03 = {
-        x: (border[0].x + border[3].x) / 2,
-        y: (border[0].y + border[3].y) / 2,
-      };
-      intersectionPoint = getIntersectionPoint(mid12, centerLine[0], laneCenterLineEndPoint);
-      if (intersectionPoint.x === mid12.x || intersectionPoint.x === mid03.x
-        || mid12.x === mid03.x) {
-        if (intersectionPoint.y < mid12.y) {
-          if (mid12.y < mid03.y) {
-            // 12->03
-            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
-          } else {
-            // 03->12
-            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
-          }
+      for (let i = laneSegment.length - 1; i >= 0 && !findTargetPoint; i--) {
+        points = _.get(laneSegment[i], 'lineSegment.point');
+        offsetPoints = coordinates.applyOffsetToArray(points);
+        if (_.isEmpty(offsetPoints)) {
+          return null;
         } else {
-          if (mid12.y < mid03.y) {
-            // 03->12
-            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
-          } else {
-            // 12->03
-            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
-          }
-        }
-      } else {
-        if (intersectionPoint.x < mid12.x) {
-          if (mid12.x < mid03.x) {
-            // 12->03
-            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
-          } else {
-            // 03 -> 12
-            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
-          }
-        } else {
-          if (mid12.x < mid03.x) {
-            // 03->12
-            orderIndex = pointOnVectorRight(border[1], mid03, mid12) ? 1 : 2;
-          } else {
-            // 12->03
-            orderIndex = pointOnVectorRight(border[0], mid12, mid03) ? 0 : 3;
+          const pointIndex = _.findLastIndex(offsetPoints,
+            point => !IsPointInRectangle(junctionPoints, point));
+          if (pointIndex !== -1) {
+            targetPoint = points[pointIndex];
+            findTargetPoint = true;
           }
         }
       }
-      result = order2[orderIndex];
     }
-    const successor = directionSameWithVector(border[result[0]], border[result[1]], laneVector);
-    const projectionPointOnLane = getIntersectionPoint(border[result[2]], centerLine[0],
-      laneCenterLineEndPoint);
-    const laneWidth = getPointDistance(border[result[2]], projectionPointOnLane) * 4;
-    const id = successor ? basedLane.successorId : basedLane.predecessorId;
-    const routingRes = this.getRoutingPoint(successor, projectionPointOnLane,
-      STORE.routeEditingManager.parkingRoutingDistanceThreshold,
-      centerLine, laneVector, coordinates, id);
-    if (!_.isArray(routingRes) || routingRes.length !== 2) {
+    if (!findTargetPoint) {
       return null;
     }
-    routingPoint = routingRes[0];
-    const type = getPointDistance(border[result[0]],
-      border[result[1]]) < getPointDistance(border[result[2]], border[result[1]]) ? 0 : 1;
-    return {
-      order: result,
-      type,
-      laneWidth,
-      routingEndPoint: routingPoint,
-      laneId: routingRes[1],
-    };
+    return reverse ? [targetPoint, points, targetLane, idx] : targetPoint; // no offset
+  }
+
+  getPointOnJunctionInLane(lane, junctionPoints, coordinates) {
+    let laneEndPoint = getLaneFirstAndLastPoint(lane);
+    laneEndPoint = coordinates.applyOffsetToArray(laneEndPoint);
+    if (_.isEmpty(laneEndPoint)) {
+      return null;
+    }
+    let InLane = lane;
+    while (isLaneCompleteInRectangle(junctionPoints, laneEndPoint)) {
+      InLane = _.find(this.data.lane, item => _.isEqual(item.id, lane.predecessorId[0]));
+      if (_.isEmpty(InLane)) {
+        return null;
+      }
+      laneEndPoint = coordinates.applyOffsetToArray(getLaneFirstAndLastPoint(InLane));
+    }
+    const laneSegment = _.get(InLane, 'centralCurve.segment');
+    if (_.isEmpty(laneSegment)) {
+      return null;
+    }
+    let findInLanePoint = false;
+    let inLanePoint = null;
+    for (let i = laneSegment.length - 1; i >= 0 && !findInLanePoint; i--) {
+      const points = _.get(laneSegment[i], 'lineSegment.point');
+      const offsetPoints = coordinates.applyOffsetToArray(points);
+      if (_.isEmpty(offsetPoints)) {
+        findInLanePoint = true;
+      } else {
+        const pointIndex = _.findLastIndex(offsetPoints,
+          point => !IsPointInRectangle(junctionPoints, point));
+        if (pointIndex !== -1) {
+          inLanePoint = points[pointIndex];
+          findInLanePoint = true;
+        }
+      }
+    }
+    if (!findInLanePoint) {
+      return null;
+    }
+    return inLanePoint;
+  }
+
+  getPointsOnJunctionOutLane(lane, junctionPoints, threshold, coordinates) {
+    const outLaneRelatedInfo = this.getPointClosestToTheJunctionOnLane(
+      lane, junctionPoints, coordinates, true);
+    if (!_.isArray(outLaneRelatedInfo) || outLaneRelatedInfo.length !== 4) {
+      return null;
+    }
+    const outLanePointIndex = outLaneRelatedInfo[0];
+    let points = outLaneRelatedInfo[1];
+    let offsetPoints = coordinates.applyOffsetToArray(points);
+    const outLaneStartPoint = offsetPoints[outLanePointIndex];
+    const outLanePoints = [points[outLanePointIndex]];
+    const distance = getPointDistance(outLaneStartPoint, _.last(offsetPoints));
+    if (distance > threshold) {
+      // find in current segment
+      const pointIdx = _.findIndex(offsetPoints,
+        point => getPointDistance(outLaneStartPoint, point) >= threshold, outLanePointIndex + 1);
+      if (pointIdx === -1) {
+        return null;
+      }
+      outLanePoints.push(points[pointIdx]);
+    } else if (distance === threshold) {
+      outLanePoints.push(_.last(points));
+    } else {
+      let findRoutingPoint = false;
+      let findPointIdx = null;
+      let currLane = outLaneRelatedInfo[2];
+      let idx = outLaneRelatedInfo[3];
+      let remainThreshold = threshold - distance;
+      let laneSegment = _.get(currLane, 'centralCurve.segment');
+      while (!findRoutingPoint) {
+        if (idx === laneSegment.length) {
+          // Change Lane
+          idx = 0;
+          currLane = _.find(this.data.lane, item => _.isEqual(item.id, currLane.successorId[0]));
+          laneSegment = _.get(currLane, 'centralCurve.segment');
+          if (_.isEmpty(laneSegment)) {
+            return null;
+          }
+        }
+        if (laneSegment[idx].length < remainThreshold) {
+          remainThreshold -= laneSegment[idx].length;
+          idx++;
+        } else {
+          points = _.get(laneSegment[idx], 'lineSegment.point');
+          offsetPoints = coordinates.applyOffsetToArray(points);
+          findPointIdx = _.findIndex(offsetPoints,
+            p => getPointDistance(offsetPoints[0], p) >= remainThreshold, 1);
+          if (findPointIdx === -1) {
+            return null;
+          }
+          findRoutingPoint = true;
+          outLanePoints.push(points[findPointIdx]);
+        }
+      }
+    }
+    return outLanePoints;
+  }
+
+  // Get lane ids which meet the following conditions
+  // along a certain direction of lane: The point on
+  // the lane is within a certain threshold from the starting point
+  // direction: predecessorId(in) successorId(out)
+  getRangeLaneIds(startPoint, lane, threshold, direction) {
+    const laneEndPoint = (direction === 'predecessorId') ? getLaneFirstPoint(lane)
+      : getLaneLastPoint(lane);
+    if (_.isEmpty(laneEndPoint)) {
+      return null;
+    }
+    const idsArr = [_.get(lane, 'id.id')];
+    let distance = getPointDistance(startPoint, laneEndPoint);
+    let nextLaneId = _.get(lane, `${direction}.0.id`);
+    while (distance < threshold && nextLaneId) {
+      const nextLane = _.find(this.data.lane, item => _.isEqual(_.get(item, 'id.id'), nextLaneId));
+      if (_.isEmpty(nextLane)) {
+        break;
+      }
+      distance += nextLane.length;
+      idsArr.push(nextLaneId);
+      nextLaneId = _.get(nextLane, `${direction}.0.id`);
+    }
+    return idsArr;
+  }
+
+  getInAndOutLaneForDeadEndJunction(deadJunction, coordinates) {
+    const deadJunctionInfo = {};
+    const { overlapId } = deadJunction;
+    if (!_.isArray(overlapId) || overlapId.length < 2) {
+      return null;
+    }
+    const lanes = [];
+    overlapId.forEach(overlap => {
+      const overlapLane = _.find(this.data.lane,
+        lane => _.findIndex(lane.overlapId, overlap) !== -1);
+      if (!_.isEmpty(overlapLane)) {
+        lanes.push(overlapLane);
+      }
+    });
+    if (lanes.length < 2) {
+      return null;
+    }
+    // grouping overlap lane to two groups
+    const laneGroup1 = [lanes[0]];
+    const laneGroup2 = [];
+    for (let i = 1; i < lanes.length; i++) {
+      const relation1 = determineTheRelationBetweenLanes(
+        laneGroup1[0].predecessorId, _.last(laneGroup1).successorId, lanes[i],
+      );
+      if (relation1) {
+        (relation1 === 1) ? laneGroup1.unshift(lanes[i]) : laneGroup1.push(lanes[i]);
+      } else {
+        if (_.isEmpty(laneGroup2)) {
+          laneGroup2.push(lanes[i]);
+        } else {
+          const relation2 = determineTheRelationBetweenLanes(
+            laneGroup2[0].predecessorId, _.last(laneGroup2).successorId, lanes[i],
+          );
+          if (!relation2) {
+            return null;
+          }
+          (relation2 > 1) ? laneGroup2.unshift(lanes[i]) : laneGroup2.push(lanes[i]);
+        }
+      }
+    }
+
+    if (_.isEmpty(laneGroup2)) {
+      return null;
+    }
+    const laneGroup = [laneGroup1, laneGroup2];
+    const deadEndJunctionPoints = coordinates.applyOffsetToArray(deadJunction.polygon.point);
+    laneGroup.forEach(group => {
+      let laneEndPoint = getLaneArrayFirstAndLastPoint(group[0], _.last(group));
+      if (!_.isEmpty(laneEndPoint)) {
+        laneEndPoint = coordinates.applyOffsetToArray(laneEndPoint);
+        deadJunctionInfo[determinLaneDirection(laneEndPoint, deadEndJunctionPoints[0])] = group;
+      }
+    });
+    if (!_.has(deadJunctionInfo, 'in') || !_.has(deadJunctionInfo, 'out')) {
+      return null;
+    }
+    // After grouping, choose the one with the least overlap
+    // Ideally, there are some points outside of junction.
+    deadJunctionInfo.in = deadJunctionInfo.in[0];
+    deadJunctionInfo.out = deadJunctionInfo.out[0];
+    const laneDistanceThreshold = 100;
+    deadJunctionInfo.inEndPoint = getLaneLastPoint(deadJunctionInfo.in);
+    deadJunctionInfo.inLaneIds = this.getRangeLaneIds(
+      deadJunctionInfo.inEndPoint, deadJunctionInfo.in, laneDistanceThreshold, 'predecessorId');
+    const routingPointThreshold = 10;
+    deadJunctionInfo.outStartPoint = getLaneFirstPoint(deadJunctionInfo.out);
+    const lanePoints = this.getPointsFromLane(deadJunctionInfo.out, coordinates, false);
+    if (!_.isArray(lanePoints) || lanePoints.length < 2) {
+      return null;
+    }
+    const routingPointInfo = this.getRoutingPoint(
+      true, deadJunctionInfo.outStartPoint, routingPointThreshold,
+      lanePoints, null, coordinates, _.get(deadJunctionInfo.out, 'successorId'),
+    );
+    if (!_.isArray(routingPointInfo) || routingPointInfo.length !== 2) {
+      return null;
+    }
+    const offsetRoutingPoint = coordinates.applyOffset(
+      { x: routingPointInfo[0].x, y: routingPointInfo[0].y },
+      true
+    );
+    deadJunctionInfo.routingPoint = offsetRoutingPoint;
+    deadJunctionInfo.deadJunctionPoints = deadJunction.polygon.point;
+    deadJunctionInfo.outLaneIds = this.getRangeLaneIds(
+      deadJunctionInfo.outStartPoint, deadJunctionInfo.out, laneDistanceThreshold, 'successorId');
+    deadJunctionInfo.deadJunctionId = deadJunction.id.id;
+    let validDeadJunctionInfo = true;
+    Object.keys(deadJunctionInfo).forEach(key => {
+      if (_.isNil(deadJunctionInfo[key])) {
+        validDeadJunctionInfo = false;
+      }
+    });
+    return (validDeadJunctionInfo) ? deadJunctionInfo : null;
+  }
+
+  getDeadEndJunctionInfo(deadEndJunctions, coordinates) {
+    const deadJunctionInfos = [];
+    for (let i = 0; i < deadEndJunctions.length; i++) {
+      const deadJunctionInfo =
+        this.getInAndOutLaneForDeadEndJunction(deadEndJunctions[i], coordinates);
+      if (_.isEmpty(deadJunctionInfo)) {
+        return null;
+      }
+      deadJunctionInfos.push(deadJunctionInfo);
+    }
+    return deadJunctionInfos;
   }
 }

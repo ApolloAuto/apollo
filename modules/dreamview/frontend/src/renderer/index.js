@@ -536,9 +536,9 @@ class Renderer {
       this.map.removeAllElements(this.scene);
     }
     const extraInfo = this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData.parkingSpace && !_.isEmpty(extraInfo[0])) {
+    if (newData.parkingSpace) {
       this.routingEditor.setParkingSpaceInfo(
-        newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
+        newData.parkingSpace, this.coordinates
       );
     }
   }

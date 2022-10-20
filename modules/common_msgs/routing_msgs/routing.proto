@@ -41,6 +41,7 @@ message ParkingInfo {
   optional ParkingSpaceType parking_space_type = 3;
   // The four corner points are in order.
   optional apollo.hdmap.Polygon corner_point = 4;
+  // todo(@lijin):remove it from proto
 }
 
 message DeadEndInfo {
