@@ -117,7 +117,7 @@ bool TrafficLightsPerceptionComponent::CreateDir(){
       return false;
     }
   } else {
-    AINFO << "debug_vis dir aready exist";
+    AINFO << "debug_vis dir already exist";
     return true;
   }
 }
@@ -135,7 +135,7 @@ bool TrafficLightsPerceptionComponent::Init() {
   if (CreateDir()) {
     AINFO << "debug_vis dir create success.";
   } else {
-    AINFO << "debug_vis dir cteate failed.";
+    AERROR << "debug_vis dir cteate failed.";
   }
 
   if (InitAlgorithmPlugin() != cyber::SUCC) {
@@ -1078,7 +1078,7 @@ void TrafficLightsPerceptionComponent::Visualize(
   cv::imwrite(absl::StrCat("/apollo/debug_vis/",
                            std::to_string(frame.timestamp), ".jpg"),
               output_image);
-  cv::imshow("Apollo traffic_light detection", output_image);
+  cv::imshow("Apollo traffic light detection", output_image);
   cv::waitKey(1);
 }
 
