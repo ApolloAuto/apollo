@@ -540,8 +540,8 @@ class Renderer {
       this.map.removeAllElements(this.scene);
     }
     this.map.appendMapData(newData, this.coordinates, this.scene);
-    if (newData['parkingSpace']) {
-      this.routingEditor.setParkingSpaceInfo(newData['parkingSpace'], this.coordinates,this.scene);
+    if (newData.parkingSpace) {
+      this.routingEditor.setParkingSpaceInfo(newData.parkingSpace, this.coordinates, this.scene);
     }
   }
 
