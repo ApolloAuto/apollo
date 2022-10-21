@@ -39,19 +39,8 @@ class ParkingRoutingManager {
   common::Status Init(const task_manager::ParkingRoutingTask&
                       parking_routing_task);
 
-  /**
-   * @brief check if the size of vehicle is smaller than size of parking space
-   * @return false/true
-   */
-  bool SizeVerification(const task_manager::ParkingRoutingTask&
-                        parking_routing_task);
-
-  /**
-   * @brief check if the width of vehicle is smaller than width of road
-   * @return false/true
-  */
-  bool RoadWidthVerification(const task_manager::ParkingRoutingTask&
-                             parking_routing_task);
+  bool ConstructParkingRoutingRequest(
+    ParkingRoutingTask* parking_routing_task);
 
   /**
    * @brief destructor

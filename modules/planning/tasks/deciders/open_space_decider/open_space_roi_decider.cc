@@ -1362,23 +1362,21 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
 
   // left or right of the parking lot is decided when viewing the parking spot
   // open upward
-  Vec2d left_top = target_parking_spot->polygon().points().at(3);
-  Vec2d left_down = target_parking_spot->polygon().points().at(0);
-  Vec2d right_down = target_parking_spot->polygon().points().at(1);
-  Vec2d right_top = target_parking_spot->polygon().points().at(2);
+  ADEBUG<<target_parking_spot->parking_space().DebugString();
+  auto parking_polygon = target_parking_spot->parking_space().polygon();
+  Vec2d left_top(parking_polygon.point(0).x(),parking_polygon.point(0).y());
+  Vec2d left_down(parking_polygon.point(3).x(),parking_polygon.point(3).y());
+  Vec2d right_down(parking_polygon.point(2).x(),parking_polygon.point(2).y());
+  Vec2d right_top(parking_polygon.point(1).x(),parking_polygon.point(1).y());
   if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
-    const auto &routing_request =
-      frame->local_view().routing->routing_request();
-    auto corner_point =
-        routing_request.parking_info().corner_point();
-    left_top.set_x(corner_point.point().at(3).x());
-    left_top.set_y(corner_point.point().at(3).y());
-    left_down.set_x(corner_point.point().at(0).x());
-    left_down.set_y(corner_point.point().at(0).y());
-    right_down.set_x(corner_point.point().at(1).x());
-    right_down.set_y(corner_point.point().at(1).y());
-    right_top.set_x(corner_point.point().at(2).x());
-    right_top.set_y(corner_point.point().at(2).y());
+    left_top.set_x(parking_polygon.point(3).x());
+    left_top.set_y(parking_polygon.point(3).y());
+    left_down.set_x(parking_polygon.point(2).x());
+    left_down.set_y(parking_polygon.point(2).y());
+    right_down.set_x(parking_polygon.point(1).x());
+    right_down.set_y(parking_polygon.point(1).y());
+    right_top.set_x(parking_polygon.point(0).x());
+    right_top.set_y(parking_polygon.point(0).y());
   }
   std::array<Vec2d, 4> parking_vertices{left_top, left_down, right_down,
                                         right_top};
