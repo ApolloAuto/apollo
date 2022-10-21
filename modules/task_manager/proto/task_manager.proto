@@ -18,8 +18,9 @@ message CycleRoutingTask {
 }
 
 message ParkingRoutingTask {
-  optional double lane_width = 1;
-  optional apollo.routing.RoutingRequest routing_request = 2;
+  optional apollo.routing.RoutingRequest routing_request = 1;
+  optional double lane_width = 2;
+  // todo(@lijin):remove lane_width
 }
 
 message ParkGoRoutingTask {

@@ -95,66 +95,13 @@ export function IsPointInRectangle(points, p) {
   return isPointIn;
 }
 
-export function pointOnVectorRight(p, p1, p2) {
-  const p1p2 = {
-    x: p2.x - p1.x,
-    y: p2.y - p1.y,
-  };
-  const p1p = {
-    x: p.x - p1.x,
-    y: p.y - p1.y,
-  };
-  return (directionVectorCrossProduct(p1p2, p1p)) < 0;
-}
-
-export function directionVectorCrossProduct(p1, p2, abs = false) {
-  //p1 X p2
-  let crossProduct = p1.x * p2.y - p1.y * p2.x;
-  if (abs) {
-    crossProduct = Math.abs(crossProduct);
-  }
-  return crossProduct;
-}
-
 function directionVectorDotProduct(p1, p2) {
   // The same direction :p1·p2 >0 The opposite direction: <0
   return p1.x * p2.x + p1.y * p2.y;
 }
 
-export function getIntersectionPoint(p0, p1, p2) {
-  // Projection of point p on vector p1p2(p1->p2)
-  const vector12 = {
-    x: p2.x - p1.x,
-    y: p2.y - p1.y,
-  };
-  const normalizeVector12 = {
-    x: vector12.x / Math.hypot(vector12.x, vector12.y),
-    y: vector12.y / Math.hypot(vector12.x, vector12.y),
-  };
-  const vector10 = {
-    x: p0.x - p1.x,
-    y: p0.y - p1.y,
-  };
-  const vectorLength = Math.abs(directionVectorDotProduct(vector10, normalizeVector12));
-  const vector1p = {
-    x: normalizeVector12.x * vectorLength,
-    y: normalizeVector12.y * vectorLength,
-  };
-  return {
-    x: vector1p.x + p1.x,
-    y: vector1p.y + p1.y,
-  };
-}
-
 export function getPointDistance(p1, p2) {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
-}
-
-export function directionSameWithVector(p0, p1,vector) {
-  return directionVectorDotProduct(vector, {
-    x: p1.x - p0.x,
-    y: p1.y - p0.y,
-  }) > 0;
 }
 
 function getPointInFrontOf(points, p,vector) {
