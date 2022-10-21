@@ -10,4 +10,5 @@ message CNNSegConfig {
       [default = "./data/models/cnnseg/deploy.caffemodel"];
   optional string engine_file = 4
       [default = "./data/models/cnnseg/engine.conf"];
+  optional string sensor_name = 5;
 }

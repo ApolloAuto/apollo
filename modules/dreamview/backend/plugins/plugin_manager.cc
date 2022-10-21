@@ -43,6 +43,15 @@ std::map<string, int> data_type_dict = {{
                                         {
                                             "scenarios",
                                             1,
+                                        },
+                                        {
+                                            "dynamic_model",
+                                            2,
+                                        },
+                                        {
+                                          "records",
+                                          3,
+
                                         }};
 }
 namespace apollo {
@@ -281,6 +290,7 @@ bool PluginManager::CheckPluginStatus(const string& plugin_name) {
 }
 
 bool PluginManager::SendMsgToPlugin(const string& json_str) {
+  AERROR << "send message to plugin start";
   auto plugin_msg = std::make_shared<DvPluginMsg>();
   if (!JsonStringToMessage(json_str, plugin_msg.get()).ok()) {
     AERROR << "Failed to parse DvPluginMsg from json!";
@@ -319,6 +329,9 @@ void PluginManager::RegisterDvSupportApi(const string& api_name,
 
 void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
+  RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
+  RegisterDvSupportApi("UpdateRecordList", &PluginManager::UpdateData);
+ // RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -363,6 +376,16 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
       update_data_res = callback_api_("UpdateScenarioSetToStatus", info);
       break;
     }
+    case 2:{
+      // 下载成功-新增文件+register+本地hmistatus
+      // 删除-删除文件+unregister+本地Hmistatus
+      update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
+      break;
+    }
+    // case 3:{
+    //   update_data_res = callback_api_("UpdateRecordToStatus", info);
+    //   break;
+    // }
     default:
       break;
   }

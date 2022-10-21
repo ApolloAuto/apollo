@@ -47,8 +47,8 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
- 
-  using DvCallback = std::function<bool(const std::string &function_name,
+
+  using DvCallback = std::function<nlohmann::json(const std::string &function_name,
                                         const nlohmann::json &param_json)>;
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
@@ -89,6 +89,12 @@ class HMIWorker {
   HMIStatus GetStatus() const;
 
   bool UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name);
+  bool UpdateScenarioSet(const std::string& scenario_set_id, const std::string& scenario_set_name,ScenarioSet& new_scenario_set);
+  bool UpdateDynamicModelToStatus(std::string& dynamic_model_name);
+  void UpdateComponentStatus();
+  bool UpdateRecordToStatus(const std::string& record_id,
+                      const std::string& record_status);
+
   void GetScenarioSetPath(const std::string& scenario_set_id, std::string& scenario_set_path);
 
   // Load HMIConfig and HMIMode.
@@ -110,20 +116,32 @@ class HMIWorker {
   bool ChangeMap(const std::string& map_name);
   void ChangeVehicle(const std::string& vehicle_name);
   void ChangeScenarioSet(const std::string& scenario_set_id);
-  void DeleteScenarioSet(const std::string& scenario_set_id);
+  void ChangeRecord(const std::string& record_id);
+  void ChangeDynamicModel(const std::string& dynamic_model_name);
   void ChangeScenario(const std::string& scenario_id);
-  bool LoadScenarios();
-  void GetScenarioResourcePath(std::string& scenario_resource_path);
-  bool UpdateScenarioSet(const std::string& scenario_set_id, const std::string& scenario_set_name,ScenarioSet& new_scenario_set);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
+
+  bool LoadScenarios();
+  bool LoadRecords();
+  bool LoadDynamicModels();
+
+  void DeleteScenarioSet(const std::string& scenario_set_id);
+  void DeleteRecord(const std::string& record_id);
+  void DeleteDynamicModel(const std::string& dynamic_model_name);
+
+  void GetScenarioResourcePath(std::string& scenario_resource_path);
+  void GetRecordPath(std::string& record_path);
+
+  bool RePlayRecord(const std::string& record_id);
 
   // Start / stop a module.
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
   bool StopModuleByCommand(const std::string& stop_command) const;
+  void StopRecordPlay();
 
   void ResetComponentStatusTimer();
-  void UpdateComponentStatus();
+
 
   const HMIConfig config_;
 

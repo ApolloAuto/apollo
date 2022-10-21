@@ -94,6 +94,8 @@ class MapService {
 
   size_t CalculateMapHash(const MapElementIds &ids) const;
 
+  double GetLaneHeading(const std::string& id_str, double s);
+
  private:
   void UpdateOffsets();
   bool GetNearestLane(const double x, const double y,

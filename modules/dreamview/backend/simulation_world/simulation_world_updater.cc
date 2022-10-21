@@ -49,7 +49,8 @@ using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
-    WebSocketHandler *camera_ws, SimControl *sim_control,
+    WebSocketHandler *camera_ws,
+    SimControlManager *sim_control_manager,
     WebSocketHandler *plugin_ws,
     const MapService *map_service,
     PerceptionCameraUpdater *perception_camera_updater,
@@ -61,7 +62,7 @@ SimulationWorldUpdater::SimulationWorldUpdater(
       map_ws_(map_ws),
       camera_ws_(camera_ws),
       plugin_ws_(plugin_ws),
-      sim_control_(sim_control),
+      sim_control_manager_(sim_control_manager),
       perception_camera_updater_(perception_camera_updater),
       plugin_manager_(plugin_manager) {
   RegisterMessageHandlers();
@@ -73,7 +74,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       [this](WebSocketHandler::Connection *conn) {
         Json response;
         response["type"] = "SimControlStatus";
-        response["enabled"] = sim_control_->IsEnabled();
+        response["enabled"] = sim_control_manager_->IsEnabled();
         websocket_->SendData(conn, response.dump());
       });
 
@@ -372,7 +373,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "Reset", [this](const Json &json, WebSocketHandler::Connection *conn) {
         sim_world_service_.SetToClear();
-        sim_control_->Reset();
+        sim_control_manager_->Reset();
       });
 
   websocket_->RegisterMessageHandler(
@@ -386,9 +387,9 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         auto enable = json.find("enable");
         if (enable != json.end() && enable->is_boolean()) {
           if (*enable) {
-            sim_control_->Start();
+            sim_control_manager_->Start();
           } else {
-            sim_control_->Stop();
+            sim_control_manager_->Stop();
           }
         }
       });
