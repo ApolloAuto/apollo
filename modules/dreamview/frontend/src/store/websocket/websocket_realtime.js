@@ -548,11 +548,18 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  sendParkingRequest(parkingSpaceId) {
+  sendParkingRequest(
+    start, start_heading, waypoint, end, parkingInfo) {
     const request = {
       type: 'SendParkingRoutingRequest',
-      parkingSpaceId,
+      start,
+      end,
+      waypoint,
+      parkingInfo,
     };
+    if (start_heading) {
+      request.start.heading = start_heading;
+    }
     this.websocket.send(JSON.stringify(request));
   }
 }

@@ -687,13 +687,9 @@ Json SimulationWorldUpdater::GetConstructRoutingRequestJson(
 bool SimulationWorldUpdater::ConstructParkingRoutingTask(
     const Json &json, ParkingRoutingTask *parking_routing_task) {
   // set parking Space
-  if (!ContainsKey(json, "parkingSpaceId")) {
-    AERROR << "Failed to prepare a parking routing task: "
-           << "parking space id not found.";
-    return false;
-  }
-  parking_routing_task->set_parking_space_id(json["parkingSpaceId"]);
-  return true;
+  auto *routing_request = parking_routing_task->mutable_routing_request();
+  bool succeed = ConstructRoutingRequest(json, routing_request);
+  return succeed;
 }
 
 bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {

@@ -214,7 +214,17 @@ export default class RoutingEditor {
     const start_heading = (points.length > 1) ? null : carHeading;
     const end = points[points.length - 1];
     const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
-    WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
+    if (parkingRoutingRequest) {
+      const { id } = this.parkingSpaceInfo[index];
+      const parkingInfo = {
+        parkingSpaceId: _.get(id, 'id'),
+      };
+
+      WS.sendParkingRequest(
+        start, start_heading, waypoint, end, parkingInfo);
+    } else {
+      WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
+    }
     return true;
   }
 
