@@ -24,8 +24,9 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/twod_threed_util.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
-#include "modules/perception/camera/lib/obstacle/transformer/singlestage/proto/singlestage.pb.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
+#include "modules/perception/pipeline/proto/stage/singlestage.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -46,8 +47,8 @@ struct TransformerParams {
 class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  public:
   SingleStageObstacleTransformer() : BaseObstacleTransformer() {}
+  virtual ~SingleStageObstacleTransformer() = default;
 
-  virtual ~SingleStageObstacleTransformer() {}
   bool Init(const ObstacleTransformerInitOptions &options =
                 ObstacleTransformerInitOptions()) override;
 
@@ -57,7 +58,13 @@ class SingleStageObstacleTransformer : public BaseObstacleTransformer {
   bool Transform(const ObstacleTransformerOptions &options,
                  CameraFrame *frame) override;
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   int MatchTemplates(base::ObjectSubType sub_type, float *dimension_hwl);

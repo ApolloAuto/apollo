@@ -20,11 +20,16 @@
 
 #include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
+#include "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
+MlfTrackObjectMatcher::MlfTrackObjectMatcher(
+    const PluginConfig& plugin_config) {
+  Init(plugin_config);
+}
 
 bool MlfTrackObjectMatcher::Init(
     const MlfTrackObjectMatcherInitOptions &options) {
@@ -40,6 +45,33 @@ bool MlfTrackObjectMatcher::Init(
                                                "mlf_track_object_matcher.conf");
   MlfTrackObjectMatcherConfig config;
   ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
+
+  foreground_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
+      config.foreground_mathcer_method());
+  ACHECK(foreground_matcher_ != nullptr);
+  AINFO << "MlfTrackObjectMatcher, fg: " << foreground_matcher_->Name();
+  background_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
+      config.background_matcher_method());
+  ACHECK(background_matcher_ != nullptr);
+  AINFO << "MlfTrackObjectMatcher, bg: " << background_matcher_->Name();
+  foreground_matcher_->cost_matrix()->Reserve(1000, 1000);
+  background_matcher_->cost_matrix()->Reserve(1000, 1000);
+
+  track_object_distance_.reset(new MlfTrackObjectDistance);
+  MlfTrackObjectDistanceInitOptions distance_init_options;
+  ACHECK(track_object_distance_->Init(distance_init_options));
+
+  bound_value_ = config.bound_value();
+  max_match_distance_ = config.max_match_distance();
+  return true;
+}
+
+bool MlfTrackObjectMatcher::Init(const PluginConfig& plugin_config) {
+  name_ = PluginType_Name(plugin_config.plugin_type());
+  enable_ = plugin_config.enabled();
+
+  MlfTrackObjectMatcherConfig config =
+      plugin_config.mlf_track_object_matcher_config();
 
   foreground_matcher_ = BaseBipartiteGraphMatcherRegisterer::GetInstanceByName(
       config.foreground_mathcer_method());

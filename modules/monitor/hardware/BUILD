@@ -13,7 +13,7 @@ cc_library(
     copts = MONITOR_COPTS,
     deps = [
         "//cyber",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
+        "//modules/common_msgs/sensor_msgs:gnss_best_pose_cc_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",

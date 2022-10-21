@@ -10,8 +10,8 @@ cc_library(
     hdrs = ["discretized_path.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_cc_proto",
+        "//modules/common/math",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
     ],
 )
 
@@ -22,7 +22,6 @@ cc_test(
     deps = [
         ":discretized_path",
         "//modules/common/util",
-        "//modules/common/util:point_factory",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -33,8 +32,8 @@ cc_library(
     hdrs = ["frenet_frame_path.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//modules/common/math:linear_interpolation",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common/math",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 
@@ -56,7 +55,7 @@ cc_library(
     deps = [
         ":discretized_path",
         ":frenet_frame_path",
-        "//modules/common/math:cartesian_frenet_conversion",
+        "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line",
     ],

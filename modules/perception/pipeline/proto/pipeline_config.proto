@@ -1,0 +1,240 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+// pipeline
+import "modules/perception/pipeline/proto/camera_detection_config.proto";
+import "modules/perception/pipeline/proto/lane_detection_config.proto";
+import "modules/perception/pipeline/proto/lidar_detection_config.proto";
+import "modules/perception/pipeline/proto/traffic_light_config.proto";
+// stage
+import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
+import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
+import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
+import "modules/perception/pipeline/proto/stage/denseline_postprocessor.proto";
+import "modules/perception/pipeline/proto/stage/denseline.proto";
+import "modules/perception/pipeline/proto/stage/detection.proto";
+import "modules/perception/pipeline/proto/stage/fused_classifier_config.proto";
+import "modules/perception/pipeline/proto/stage/ground_service_detector_config.proto";
+import "modules/perception/pipeline/proto/stage/hdmap_roi_filter_config.proto";
+import "modules/perception/pipeline/proto/stage/location_refiner.proto";
+import "modules/perception/pipeline/proto/stage/map_manager_config.proto";
+import "modules/perception/pipeline/proto/stage/mlf_engine_config.proto";
+import "modules/perception/pipeline/proto/stage/multicue.proto";
+import "modules/perception/pipeline/proto/stage/ncut_config.proto";
+import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
+import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
+import "modules/perception/pipeline/proto/stage/omt.proto";
+import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
+import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
+import "modules/perception/pipeline/proto/stage/pointcloud_detection_postprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/pointcloud_detection_preprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/pointcloud_preprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/probabilistic_fusion_config.proto";
+import "modules/perception/pipeline/proto/stage/recognition.proto";
+import "modules/perception/pipeline/proto/stage/semantic.proto";
+import "modules/perception/pipeline/proto/stage/singlestage.proto";
+import "modules/perception/pipeline/proto/stage/smoke_obstacle_detection_config.proto";
+import "modules/perception/pipeline/proto/stage/spatio_temporal_ground_detector_config.proto";
+import "modules/perception/pipeline/proto/stage/yolo_obstacle_detector_config.proto";
+// plugin
+import "modules/perception/pipeline/proto/plugin/camera_get_object_config.proto";
+import "modules/perception/pipeline/proto/plugin/ccrf_type_fusion_config.proto";
+import "modules/perception/pipeline/proto/plugin/filter_bbox_config.proto";
+import "modules/perception/pipeline/proto/plugin/get_image_data_config.proto";
+import "modules/perception/pipeline/proto/plugin/multi_lidar_fusion_config.proto";
+import "modules/perception/pipeline/proto/plugin/pbf_gatekeeper_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_downsample_config.proto";
+import "modules/perception/pipeline/proto/plugin/pointcloud_get_objects_config.proto";
+import "modules/perception/pipeline/proto/plugin/recover_bbox_config.proto";
+import "modules/perception/pipeline/proto/plugin/resize_and_normalize_config.proto";
+import "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.proto";
+
+
+// plugin
+enum PluginType {
+  CAMERA_GET_OBJECT = 1;
+  POINTCLOUD_DOWN_SAMPLE = 2;
+  RESIZIE_AND_NORMALIZE = 3;
+  POINTCLOUD_GET_OBJECTS = 4;
+  GET_IMAGE_DATA = 5;
+
+  // filter
+  ROI_BOUNDARY_FILTER = 6;
+  FILTER_BBOX = 7;
+
+  RECOVER_BBOX = 8;
+
+  MLF_TRACK_OBJECT_MATCHER = 9;
+  MLF_TRACKER = 10;
+
+  CCRF_ONESHOT_TYPE_FUSION = 11;
+  CCRF_SEQUENCE_TYPE_FUSION = 12;
+
+  PBF_GATEKEEPER = 13;
+  POINTCLOUD_DOWNSAMPLE = 14;
+}
+
+message PluginConfig {
+  optional PluginType plugin_type = 1;
+  optional bool enabled = 2 [default = true];
+
+  reserved 3 to 9;
+
+  oneof plugin_config {
+    camera.CameraGetObjectConfig camera_get_object_config = 10;
+    camera.FilterBboxConfig filter_bbox_config = 11;
+    camera.GetImageDataConfig get_image_data_config = 12;
+    camera.RecoverBboxConfig recover_bbox_config = 13;
+    camera.ResizeAndNormalizeConfig resize_and_normalize_config = 14;
+    lidar.PointcloudDownSampleConfig pointcloud_downsample_config = 15;
+    lidar.PointcloudGetObjectsConfig pointcloud_get_objects_config = 16;
+    lidar.ROIBoundaryFilterConfig roi_boundary_filter_config = 17;
+    lidar.MlfTrackObjectMatcherConfig mlf_track_object_matcher_config = 18;
+    lidar.MlfTrackerConfig mlf_tracker_config = 19;
+    lidar.CcrfTypeFusionConfig ccrf_type_fusion_config = 20;
+    fusion.PbfGatekeeperConfig pbf_gatekeeper_config = 21;
+  }
+}
+
+// stage
+enum StageType {
+  // preprocessors
+  // camera preprocessor
+  CAMERA_DETECTION_PREPROCESSOR = 1;
+  // traffic light preprocessors
+  TL_PREPROCESSOR = 2;
+  // lidar preprocessors
+  POINTCLOUD_PREPROCESSOR = 3;
+  // lidar detection preprocessor
+  POINTCLOUD_DETECTION_PREPROCESSOR = 4;
+  // radar preprocessors
+  CONTI_ARS_PREPROCESSOR = 5;
+
+  MAP_MANAGER = 6;
+  ALL_LATEST_FUSION = 7;
+
+
+  // detectors
+  // camera detectors
+  SMOKE_OBSTACLE_DETECTION = 21;
+  YOLO_OBSTACLE_DETECTOR = 22;
+  YOLOV4_OBSTACLE_DETECTOR = 23;
+  // lane detectors
+  DARKSCNN_LANE_DETECTOR = 24;
+  DENSELINE_LANE_DETECTOR = 25;
+  // traffic light detectors
+  TRAFFIC_LIGHT_DETECTION = 26;
+  TRAFFIC_LIGHT_RECOGNITION = 27;
+  // lidar detectors
+  CNN_SEGMENTATION = 28;
+  MASK_PILLARS_DETECTION = 29;
+  NCUT_SEGMENTATION = 30;
+  POINT_PILLARS_DETECTION = 31;
+  // radar detectors
+  CONTI_ARS_DETECTOR = 32;
+
+  // post processors
+  // camera post processors
+  OBJ_POST_PROCESSOR = 100;
+  LOCATION_REFINER_OBSTACLE_POSTPROCESSOR = 101;
+  CAMERA_DETECTION_POSTPROCESSOR = 102;
+  // lane post processors
+  DARKSCNN_LANE_POSTPROCESSOR = 103;
+  DENSELINE_LANE_POSTPROCESSOR = 104;
+  // lidar post processors
+  POINTCLOUD_DETECTION_POSTPROCESSOR = 105;
+  OBJECT_BUILDER = 106;
+  OBJECT_FILTER_BANK = 107;
+
+
+
+  // tracker
+  OMT_OBSTACLE_TRACKER = 120;
+  SEMANTIC_REVISER = 121;
+  CONTI_ARS_TRACKER = 123;
+  PBF_TRACKER = 124;
+  MLF_ENGINE = 125;
+
+  // classifier
+  FUSED_CLASSIFIER = 126;
+
+  HDMAP_RADAR_ROI_FILTER = 127;
+
+  HM_ASSOCIATION = 128;
+
+  EXTERNAL_FEATURE_EXTRACTOR = 130;
+
+  MULTI_CUE_OBSTACLE_TRANSFORMER = 131;
+  PROBABILISTIC_FUSION = 132;
+  COLLECT_FUSED_OBJECT = 133;
+}
+
+message StageConfig {
+  optional StageType stage_type = 1;
+  optional bool enabled = 2 [default = true];
+
+  repeated PluginConfig plugin_config = 3;
+
+  reserved 4 to 9;
+
+  oneof stage_config {
+    lidar.PointcloudDetectionPreprocessorConfig pointcloud_detection_preprocessor_config = 10;
+    lidar.PointcloudDetectionPostprocessorConfig pointcloud_detection_postprocessor_config = 11;
+    lidar.PointcloudPreprocessorConfig pointcloud_preprocessor_config = 12;
+    lidar.MapManagerConfig map_manager_config = 13;
+    lidar.ObjectFilterBankConfig object_filter_bank_config = 14;
+    lidar.PointPillarsDetectionConfig pointpillars_detection = 15;
+    lidar.MlfEngineConfig mlf_engine_config = 16;
+    lidar.FusedClassifierConfig fused_classifier_config = 17;
+    lidar.CNNSegConfig cnnseg_config = 18;
+    lidar.NCutConfig ncut_config = 19;
+    lidar.GroundServiceDetectorConfig ground_service_detector_config = 20;
+    lidar.SpatioTemporalGroundDetectorConfig spatio_temporal_ground_detector_config = 21;
+    lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 22;
+    lidar.PointPillarsDetectionConfig point_pillars_detection_config = 23;
+    lidar.ObjectBuilderConfig object_builder_config = 24;
+
+    camera.TrafficLightDetectionConfig traffic_light_detection_config = 50;
+    camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 51;
+    camera.SemanticReviserConfig semantic_reviser_config = 52;
+    camera.YoloObstacleDetectorConfig yolo_obstacle_detector_config = 53;
+    camera.location_refiner.LocationRefinerParam location_refiner_param = 54;
+    camera.omt.OmtParam omt_param = 55;
+    camera.multicue.MulticueParam multicue_param = 56;
+    camera.singlestage.SinglestageParam singlestage_param = 57;
+    camera.darkSCNN.DarkSCNNParam dark_scnn_param = 58;
+    camera.denseline.DenselineParam denseline_param = 59;
+    camera.lane.DarkSCNNLanePostprocessorParam darkscnn_lane_postprocessor_param = 60;
+    camera.lane.LanePostprocessorParam lane_postprocessor_param = 61;
+    camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
+    camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
+    camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
+
+    fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
+    fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
+  }
+}
+
+enum PipelineType {
+  LIDAR_DETECTION = 1;
+}
+
+// pipeline
+message PipelineConfig {
+  optional PipelineType pipeline_type = 1;
+  repeated StageType stage_type = 2;
+  repeated StageConfig stage_config = 3;
+
+  reserved 4 to 9;
+
+  oneof pipeline_config {
+    CameraDetectionConfig camera_detection_config = 10;
+    LidarDetectionConfig lidar_detection_config = 11;
+    TrafficLightConfig traffic_light_config = 12;
+    LaneDetectionConfig lane_detection_config = 13;
+  }
+}

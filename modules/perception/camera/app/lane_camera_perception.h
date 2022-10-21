@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
@@ -35,15 +36,11 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-class LaneCameraPerception : public BaseCameraPerception {
+class LaneCameraPerception final : public BaseCameraPerception {
  public:
-  LaneCameraPerception()
-      : lane_detector_(nullptr),
-        lane_postprocessor_(nullptr),
-        calibration_service_(nullptr) {}
-  LaneCameraPerception(const LaneCameraPerception &) = delete;
-  LaneCameraPerception &operator=(const LaneCameraPerception &) = delete;
+  LaneCameraPerception() = default;
   ~LaneCameraPerception() = default;
+
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
                 base::BaseCameraModelPtr &model,  // NOLINT
@@ -59,7 +56,12 @@ class LaneCameraPerception : public BaseCameraPerception {
   bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "LaneCameraPerception"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
@@ -73,6 +75,8 @@ class LaneCameraPerception : public BaseCameraPerception {
   bool write_out_calib_file_ = false;
   std::string out_lane_dir_;
   std::string out_calib_dir_;
+
+  DISALLOW_COPY_AND_ASSIGN(LaneCameraPerception);
 };
 
 }  // namespace camera

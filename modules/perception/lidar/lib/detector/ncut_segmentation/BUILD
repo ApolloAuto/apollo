@@ -12,7 +12,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/common:flood_fill",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/common:lr_classifier",
-        "//modules/perception/lidar/lib/detector/ncut_segmentation/proto:ncut_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:ncut_config_cc_proto",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/proto:ncut_param_cc_proto",
     ],
 )
@@ -40,6 +40,7 @@ cc_library(
         "//modules/perception/lidar/lib/detector/ncut_segmentation/common:lr_classifier",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/proto:ncut_param_cc_proto",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
+        "//modules/perception/pipeline:stage",
         "@local_config_pcl//:pcl",
         "@local_config_vtk//:vtk",
     ],

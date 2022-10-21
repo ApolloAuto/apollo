@@ -18,7 +18,7 @@
 
 #include <deque>
 
-#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 

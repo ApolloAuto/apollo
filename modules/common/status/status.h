@@ -23,7 +23,7 @@
 #include <string>
 
 #include "google/protobuf/descriptor.h"
-#include "modules/common/proto/error_code.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common/util/future.h"
 
 /**

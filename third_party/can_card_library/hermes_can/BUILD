@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,5 +21,30 @@ cc_library(
     hdrs = [
         "include/bcan.h",
     ],
+    alwayslink = True,
     include_prefix = "hermes_can",
+)
+
+install_src_files(
+    name = "lib",
+    src_dir = select(
+        {
+            "@platforms//cpu:x86_64": [
+                "lib_x86_64",
+            ],
+            "@platforms//cpu:aarch64": [
+                "lib_aarch64",
+            ],
+        },
+        no_match_error = "Please Build with a Linux aarch64 or x86_64 platform",
+    ),
+    dest = "3rd-can-card-library/lib",
+    filter = "*.so",
+)
+
+install_src_files(
+    name = "headers",
+    src_dir = ["include"],
+    dest = "3rd-can-card-library/include",
+    filter = "*",
 )

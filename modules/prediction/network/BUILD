@@ -10,7 +10,7 @@ cc_library(
     hdrs = ["net_util.h"],
     copts = PREDICTION_COPTS,
     deps = [
-        "//cyber/common:log",
+        "//cyber",
         "//modules/prediction/proto:network_layers_cc_proto",
         "@eigen",
     ],

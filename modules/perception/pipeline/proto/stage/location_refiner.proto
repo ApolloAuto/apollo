@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.perception.camera.location_refiner;
+
+message LocationRefinerParam {
+  optional float min_dist_to_camera = 1 [default = 30.0];
+  optional float roi_h2bottom_scale = 2 [default = 0.5];
+}

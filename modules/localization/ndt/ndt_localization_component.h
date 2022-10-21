@@ -25,11 +25,11 @@
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
 
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/localization/ndt/ndt_localization.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/transform/transform_broadcaster.h"
 
 namespace apollo {

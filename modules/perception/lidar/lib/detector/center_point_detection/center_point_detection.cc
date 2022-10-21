@@ -470,6 +470,16 @@ void CenterPointDetection::FilterScore(
   }
 }
 
+bool CenterPointDetection::Init(const StageConfig& stage_config) {
+   return false;
+}
+   
+bool CenterPointDetection::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;   
+  return true;
+}
+   
 PERCEPTION_REGISTER_LIDARDETECTOR(CenterPointDetection);
 
 }  // namespace lidar

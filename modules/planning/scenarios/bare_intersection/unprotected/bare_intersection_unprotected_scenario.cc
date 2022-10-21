@@ -25,7 +25,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_approach.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_intersection_cruise.h"
 
@@ -71,7 +71,7 @@ void BareIntersectionUnprotectedScenario::Init() {
 }
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     BareIntersectionUnprotectedScenario::s_stage_factory_;
@@ -81,13 +81,13 @@ void BareIntersectionUnprotectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH,
+      StageType::BARE_INTERSECTION_UNPROTECTED_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new BareIntersectionUnprotectedStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE,
+      StageType::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new BareIntersectionUnprotectedStageIntersectionCruise(config,

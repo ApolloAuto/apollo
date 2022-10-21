@@ -21,6 +21,8 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lidar/common/object_sequence.h"
+#include "modules/perception/pipeline/plugin.h"
+
 
 namespace apollo {
 namespace perception {
@@ -30,11 +32,19 @@ struct TypeFusionInitOption {};
 
 struct TypeFusionOption {};
 
-class BaseOneShotTypeFusion {
+class BaseOneShotTypeFusion : public pipeline::Plugin {
+ public:
+  using PluginConfig = pipeline::PluginConfig;
+
  public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;
   virtual bool TypeFusion(const TypeFusionOption& option,
                           std::shared_ptr<perception::base::Object> object) = 0;
+
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() const = 0;
+
   virtual std::string Name() const = 0;
 };
 
@@ -42,14 +52,20 @@ PERCEPTION_REGISTER_REGISTERER(BaseOneShotTypeFusion);
 #define PERCEPTION_REGISTER_ONESHOTTYPEFUSION(name) \
   PERCEPTION_REGISTER_CLASS(BaseOneShotTypeFusion, name)
 
-class BaseSequenceTypeFusion {
+class BaseSequenceTypeFusion : public pipeline::Plugin {
  public:
-  typedef ObjectSequence::TrackedObjects TrackedObjects;
+  using PluginConfig = pipeline::PluginConfig;
+  using TrackedObjects = ObjectSequence::TrackedObjects;
 
  public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;
   virtual bool TypeFusion(const TypeFusionOption& option,
                           TrackedObjects* tracked_objects) = 0;
+
+  virtual bool Init(const PluginConfig& plugin_config) = 0;
+
+  virtual bool IsEnabled() const = 0;
+
   virtual std::string Name() const = 0;
 };
 

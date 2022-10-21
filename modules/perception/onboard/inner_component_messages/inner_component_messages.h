@@ -21,7 +21,7 @@
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/impending_collision_edge.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common_msgs/perception_msgs/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {

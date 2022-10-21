@@ -22,7 +22,7 @@
 #pragma once
 
 #include "localization_msf/gnss_struct.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_raw_observation.pb.h"
 
 /**
  * @namespace apollo::localization::msf

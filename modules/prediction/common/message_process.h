@@ -24,15 +24,15 @@
 #include <string>
 
 #include "cyber/proto/record.pb.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
-#include "modules/storytelling/proto/story.pb.h"
+#include "modules/common_msgs/storytelling_msgs/story.pb.h"
 
 namespace apollo {
 namespace prediction {

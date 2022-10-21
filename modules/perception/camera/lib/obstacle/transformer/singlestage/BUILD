@@ -12,8 +12,9 @@ cc_library(
         "//modules/perception/camera/common",
         "//modules/perception/camera/common:object_template_manager",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/transformer/singlestage/proto:singlestage_cc_proto",
         "//modules/perception/common/i_lib/core",
+        "//modules/perception/pipeline/proto/stage:singlestage_cc_proto",
+        "//modules/perception/pipeline:stage",
     ],
 )
 

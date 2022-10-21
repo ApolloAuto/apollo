@@ -20,7 +20,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 
 namespace apollo {
 namespace drivers {

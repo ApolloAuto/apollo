@@ -23,7 +23,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/common_msgs/prediction_msgs/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

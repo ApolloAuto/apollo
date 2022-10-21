@@ -64,6 +64,7 @@ pushd glog-${VERSION}
     mkdir build && cd build
     cmake .. \
         -DBUILD_SHARED_LIBS=ON \
+        -DWITH_GFLAGS=OFF \
         -DCMAKE_BUILD_TYPE=Release
 
     # if [ "$ARCH" == "aarch64" ]; then

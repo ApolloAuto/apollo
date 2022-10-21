@@ -21,7 +21,7 @@
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/task_manager/cycle_routing_manager.h"
 #include "modules/task_manager/parking_routing_manager.h"
 #include "modules/task_manager/dead_end_routing_manager.h"

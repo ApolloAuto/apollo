@@ -22,16 +22,13 @@
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/text_format.h"
 
-#include "modules/map/proto/map_id.pb.h"
-
 #include "cyber/common/log.h"
+#include "modules/common_msgs/map_msgs/map_id.pb.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/routing/common/routing_gflags.h"
 
 DEFINE_double(
     look_backward_distance, 50,

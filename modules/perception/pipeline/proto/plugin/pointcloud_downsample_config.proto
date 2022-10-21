@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message PointcloudDownSampleConfig {
+  optional bool enable_downsample_pointcloud = 1;
+  optional bool enable_downsample_beams = 2;
+  optional float x_min_range = 3; 
+  optional float x_max_range = 4;
+  optional float y_min_range = 5;
+  optional float y_max_range = 6;
+  optional float z_min_range = 7;
+  optional float z_max_range = 8;
+}

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,8 +17,12 @@ filegroup(
 
 install(
     name = "install",
+    library_dest = "bridge/lib",
+    data_dest = "bridge",
     data = [
       ":runtime_data",
+      "cyberfile.xml",
+      "bridge.BUILD"
     ],
     targets = [
       ":libudp_bridge_sender_component.so",
@@ -26,7 +30,14 @@ install(
       ":libudp_bridge_multi_receiver_component.so",
     ],
     deps = [
-        "//cyber:install",
+        "//modules/bridge/test:install",
+    ],
+)
+install(
+    name = "pb_hdrs",
+    data_dest = "bridge/include",
+    data = [
+        "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
     ],
 )
 
@@ -43,11 +54,10 @@ cc_library(
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
-        "//modules/common/adapters:adapter_gflags",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common/monitor_log",
         "//modules/common/util",
-        "//modules/planning/proto:planning_cc_proto",
-        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -56,6 +66,7 @@ cc_library(
     srcs = ["udp_bridge_sender_component.cc"],
     hdrs = ["udp_bridge_sender_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
     ],
@@ -66,6 +77,7 @@ cc_library(
     srcs = ["udp_bridge_receiver_component.cc"],
     hdrs = ["udp_bridge_receiver_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
         "//modules/bridge/common:udp_listener",
@@ -77,6 +89,7 @@ cc_library(
     srcs = ["udp_bridge_multi_receiver_component.cc"],
     hdrs = ["udp_bridge_multi_receiver_component.h"],
     copts = BRIDGE_COPTS,
+    alwayslink = True,
     deps = [
         ":udp_bridge",
         "//modules/bridge/common:udp_listener",
@@ -86,21 +99,21 @@ cc_library(
 cc_binary(
     name = "libudp_bridge_sender_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_sender"],
 )
 
 cc_binary(
     name = "libudp_bridge_receiver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_receiver"],
 )
 
 cc_binary(
     name = "libudp_bridge_multi_receiver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":udp_bridge_multi_receiver"],
 )
 
@@ -112,6 +125,27 @@ cc_test(
         ":udp_bridge_sender",
         "@com_google_googletest//:gtest_main",
     ],
+)
+install_src_files(
+    name = "install_src",
+    deps = [
+        ":install_bridge_src",
+        ":install_bridge_hdrs"
+    ],
+)
+
+install_src_files(
+    name = "install_bridge_src",
+    src_dir = ["."],
+    dest = "bridge/src",
+    filter = "*",
+)
+
+install_src_files(
+    name = "install_bridge_hdrs",
+    src_dir = ["."],
+    dest = "bridge/include",
+    filter = "*.h",
 )
 
 cpplint()

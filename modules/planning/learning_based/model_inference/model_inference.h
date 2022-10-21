@@ -24,7 +24,7 @@
 #include <string>
 
 #include "modules/planning/proto/learning_data.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
+#include "modules/common_msgs/planning_msgs/task_config.pb.h"
 
 namespace apollo {
 namespace planning {

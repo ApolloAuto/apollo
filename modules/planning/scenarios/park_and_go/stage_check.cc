@@ -44,9 +44,9 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
 
 Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
   if (success) {
-    next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+    next_stage_ = StageType::PARK_AND_GO_CRUISE;
   } else {
-    next_stage_ = ScenarioConfig::PARK_AND_GO_ADJUST;
+    next_stage_ = StageType::PARK_AND_GO_ADJUST;
   }
   injector_->planning_context()
       ->mutable_planning_status()

@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {

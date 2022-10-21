@@ -22,7 +22,7 @@ import random
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 
-from modules.planning.proto import planner_open_space_config_pb2
+from modules.common_msgs.planning_msgs import planner_open_space_config_pb2
 import modules.tools.common.proto_utils as proto_utils
 import distance_approach_visualizer
 import hybrid_a_star_visualizer

@@ -31,7 +31,7 @@ namespace scenario {
 namespace pull_over {
 
 apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
+    StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                const std::shared_ptr<DependencyInjector>& injector)>
     PullOverScenario::s_stage_factory_;
@@ -56,19 +56,19 @@ void PullOverScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_APPROACH,
+      StageType::PULL_OVER_APPROACH,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new PullOverStageApproach(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING,
+      StageType::PULL_OVER_RETRY_APPROACH_PARKING,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new PullOverStageRetryApproachParking(config, injector);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_RETRY_PARKING,
+      StageType::PULL_OVER_RETRY_PARKING,
       [](const ScenarioConfig::StageConfig& config,
          const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
         return new PullOverStageRetryParking(config, injector);

@@ -16,7 +16,7 @@
 
 #include "modules/canbus/vehicle/neolix_edu/neolix_edu_controller.h"
 
-#include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"

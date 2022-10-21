@@ -24,11 +24,8 @@ cc_library(
     ],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
-        "//modules/common/proto:pnc_point_cc_proto",
-        "//modules/common/status",
-        "//modules/common/util:factory",
-        "//modules/planning/reference_line",
+        "//cyber",
+        "//modules/common/util:util_tool",
         "//modules/planning/scenarios:scenario",
         "@eigen",
         "//third_party:libtorch",

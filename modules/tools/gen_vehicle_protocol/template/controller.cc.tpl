@@ -16,7 +16,7 @@
 
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_controller.h"
 
-#include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"

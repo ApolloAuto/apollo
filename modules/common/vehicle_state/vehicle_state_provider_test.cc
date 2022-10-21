@@ -22,9 +22,9 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
-#include "modules/canbus/proto/chassis.pb.h"
-#include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/proto/localization.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common/configs/config_gflags.h"
 
 namespace apollo {
 namespace common {

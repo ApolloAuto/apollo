@@ -12,7 +12,7 @@ cc_library(
         "hermes_can_client.h",
     ],
     deps = [
-        "//modules/common/proto:error_code_cc_proto",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/drivers/canbus/can_client",
         "//third_party/can_card_library/hermes_can",
     ],

@@ -1,0 +1,17 @@
+<package format="2">
+  <name>bazel-extend-tools</name>
+  <version>local</version>
+  <description>
+    Some extend rules of bazel and scripts.
+  </description>
+  
+  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module-wrapper</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//tools</src_path>
+  
+</package>

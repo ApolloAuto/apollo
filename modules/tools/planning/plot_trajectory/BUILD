@@ -10,8 +10,8 @@ py_binary(
     ],
     deps = [
         ":mkz_polygon",
-        "//modules/localization/proto:localization_py_pb2",
-        "//modules/planning/proto:planning_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )

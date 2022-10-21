@@ -81,7 +81,7 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::FinishStage() {
                                ->mutable_pull_over();
   pull_over_status->set_plan_pull_over_path(true);
 
-  next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH;
+  next_stage_ = StageType::EMERGENCY_PULL_OVER_APPROACH;
   return Stage::FINISHED;
 }
 

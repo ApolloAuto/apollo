@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
+
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <boost/circular_buffer.hpp>
 #include "Eigen/Core"
 
 #include "modules/perception/base/object_supplement.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/vehicle_struct.h"
-// #include "modules/prediction/proto/feature.pb.h"
+// #include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 namespace apollo {
 namespace perception {

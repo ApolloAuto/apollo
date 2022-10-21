@@ -23,6 +23,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+MultiCueObstacleTransformer::MultiCueObstacleTransformer() {
+  mapper_.reset(new ObjMapper);
+}
+
 bool MultiCueObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
   std::string transformer_config =
@@ -39,6 +43,24 @@ bool MultiCueObstacleTransformer::Init(
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
 
+  return true;
+}
+
+bool MultiCueObstacleTransformer::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  multicue_param_ = stage_config.multicue_param();
+  AINFO << "Load transformer parameters: " << multicue_param_.DebugString();
+
+  // Init object template
+  object_template_manager_ = ObjectTemplateManager::Instance();
+
+  return true;
+}
+
+bool MultiCueObstacleTransformer::Process(DataFrame* data_frame) {
   return true;
 }
 
@@ -221,10 +243,9 @@ bool MultiCueObstacleTransformer::Transform(
 
   const auto &camera_k_matrix = frame->camera_k_matrix;
   float k_mat[9] = {0};
-  for (size_t i = 0; i < 3; i++) {
-    size_t i3 = i * 3;
-    for (size_t j = 0; j < 3; j++) {
-      k_mat[i3 + j] = camera_k_matrix(i, j);
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      k_mat[i * 3 + j] = camera_k_matrix(i, j);
     }
   }
   ADEBUG << "Camera k matrix input to transformer: \n"
@@ -241,8 +262,8 @@ bool MultiCueObstacleTransformer::Transform(
   float object_center[3] = {0};
   float dimension_hwl[3] = {0};
   float rotation_y = 0.0f;
-
   int nr_transformed_obj = 0;
+
   for (auto &obj : frame->detected_objects) {
     if (obj == nullptr) {
       ADEBUG << "Empty object input to transformer.";
@@ -264,11 +285,8 @@ bool MultiCueObstacleTransformer::Transform(
 
     ++nr_transformed_obj;
   }
-  return nr_transformed_obj > 0;
-}
 
-std::string MultiCueObstacleTransformer::Name() const {
-  return "MultiCueObstacleTransformer";
+  return nr_transformed_obj > 0;
 }
 
 // Register plugin.

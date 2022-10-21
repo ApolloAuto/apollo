@@ -10,10 +10,10 @@ cc_library(
     deps = [
         ":driver_base",
         "//cyber",
-        "//modules/common/util:factory",
+        "//modules/common/util:util_tool",
         "//modules/drivers/lidar/hesai/driver",
-        "//modules/drivers/lidar/proto:config",
-        "//modules/drivers/lidar/proto:lidar_parameter",
+        "//modules/drivers/lidar/proto:config_cc_proto",
+        "//modules/drivers/lidar/proto:lidar_parameter_cc_proto",
         "//modules/drivers/lidar/robosense/driver",
         "//modules/drivers/lidar/velodyne/driver",
     ],
@@ -24,7 +24,7 @@ cc_library(
     hdrs = ["driver_base.h"],
     deps = [
         "//modules/common/util",
-        "//modules/common/util:factory",
+        "//modules/common/util:util_tool",
     ],
 )
 

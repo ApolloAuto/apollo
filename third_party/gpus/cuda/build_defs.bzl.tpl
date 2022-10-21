@@ -1,4 +1,5 @@
 # Macros for building CUDA code.
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 def cuda_extra_copts():
     return %{cuda_extra_copts}
@@ -34,7 +35,7 @@ def cuda_header_library(
     target without virtual includes. This works around the fact that bazel can't
     mix 'includes' and 'include_prefix' in the same target."""
 
-    native.cc_library(
+    cc_library(
         name = name + "_virtual",
         hdrs = hdrs,
         include_prefix = include_prefix,
@@ -43,7 +44,7 @@ def cuda_header_library(
         visibility = ["//visibility:private"],
     )
 
-    native.cc_library(
+    cc_library(
         name = name,
         textual_hdrs = hdrs,
         deps = deps + [":%s_virtual" % name],

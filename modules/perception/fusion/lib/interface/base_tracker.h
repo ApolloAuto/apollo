@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -25,16 +26,15 @@
 namespace apollo {
 namespace perception {
 namespace fusion {
+
 struct TrackerOptions {
   double match_distance = 0.0;
 };
 
 class BaseTracker {
  public:
-  BaseTracker() {}
-  virtual ~BaseTracker() {}
-  BaseTracker(const BaseTracker&) = delete;
-  BaseTracker& operator=(const BaseTracker&) = delete;
+  BaseTracker() = default;
+  virtual ~BaseTracker() = default;
 
   virtual bool Init(TrackPtr track, SensorObjectPtr measurement) = 0;
 
@@ -51,10 +51,10 @@ class BaseTracker {
                                         double measurement_timestamp,
                                         double target_timestamp) = 0;
 
-  virtual std::string Name() const = 0;
-
  protected:
   TrackPtr track_ = nullptr;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseTracker);
 };
 
 }  // namespace fusion

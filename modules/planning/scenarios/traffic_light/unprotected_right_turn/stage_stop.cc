@@ -162,14 +162,14 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
     const bool protected_mode) {
   if (protected_mode) {
     // intersection_cruise
-    next_stage_ = ScenarioConfig ::
+    next_stage_ = StageType ::
         TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   } else {
     // check speed at stop_stage
     const double adc_speed = injector_->vehicle_state()->linear_velocity();
     if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
       // skip creep
-      next_stage_ = ScenarioConfig ::
+      next_stage_ = StageType ::
           TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
     } else {
       // creep
@@ -188,7 +188,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
       }
 
       GetContext()->creep_start_time = Clock::NowInSeconds();
-      next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
+      next_stage_ = StageType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
     }
   }
   return Stage::FINISHED;

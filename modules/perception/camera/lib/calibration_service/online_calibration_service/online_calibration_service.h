@@ -37,9 +37,9 @@ struct CameraStatus {
 
 class OnlineCalibrationService : public BaseCalibrationService {
  public:
-  OnlineCalibrationService() : BaseCalibrationService() {}
+  OnlineCalibrationService() = default;
 
-  virtual ~OnlineCalibrationService() {}
+  virtual ~OnlineCalibrationService() = default;
 
   bool Init(const CalibrationServiceInitOptions &options =
                 CalibrationServiceInitOptions()) override;
@@ -87,7 +87,13 @@ class OnlineCalibrationService : public BaseCalibrationService {
       const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
       const float &pitch_angle_master_sensor) override;
 
-  std::string Name() const override;
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   bool HasSetIntrinsics() const {

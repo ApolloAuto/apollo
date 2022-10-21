@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+
+message LaneDetectionConfig {
+
+}

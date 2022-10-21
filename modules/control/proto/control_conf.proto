@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/canbus/proto/chassis.proto";
-import "modules/control/proto/pad_msg.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/control_msgs/pad_msg.proto";
 import "modules/control/proto/lat_controller_conf.proto";
 import "modules/control/proto/lon_controller_conf.proto";
 import "modules/control/proto/mpc_controller_conf.proto";

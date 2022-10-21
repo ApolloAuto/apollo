@@ -11,7 +11,7 @@ cc_library(
         "//cyber",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@local_config_cuda//cuda:cudnn_header",
     ],
 )
@@ -120,7 +120,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
     ],

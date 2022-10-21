@@ -10,12 +10,13 @@ cc_library(
     hdrs = ["torch_net.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
     ] + if_cuda([
+        "@libtorch_gpu_cuda",
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
+    ])+ if_rocm([
+        "@libtorch_gpu_rocm",
         "@local_config_rocm//rocm:hip",
     ]),
 )
@@ -26,12 +27,13 @@ cc_library(
     hdrs = ["torch_det.h"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        "//third_party:libtorch",
         "@com_google_protobuf//:protobuf",
         "@opencv//:imgcodecs",
     ] + if_cuda([
+        "@libtorch_gpu_cuda",
         "@local_config_cuda//cuda:cudart",
-    ]) + if_rocm([
+    ])+ if_rocm([
+        "@libtorch_gpu_rocm",
         "@local_config_rocm//rocm:hip",
     ]),
 )

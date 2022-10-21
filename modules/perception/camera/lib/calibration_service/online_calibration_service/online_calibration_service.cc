@@ -65,6 +65,14 @@ bool OnlineCalibrationService::Init(
   return true;
 }
 
+bool OnlineCalibrationService::Init(const StageConfig& stage_config) {
+  return true;
+}
+
+bool OnlineCalibrationService::Process(DataFrame* data_frame) {
+  return true;
+}
+
 bool OnlineCalibrationService::BuildIndex() {
   is_service_ready_ = HasSetIntrinsics() && HasSetGroundPlane();
   return is_service_ready_;
@@ -223,9 +231,6 @@ void OnlineCalibrationService::SetCameraHeightAndPitch(
   }
 }
 
-std::string OnlineCalibrationService::Name() const {
-  return "OnlineCalibrationService";
-}
 REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
 
 }  // namespace camera

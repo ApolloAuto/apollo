@@ -22,7 +22,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/drivers/proto/racobit_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
 
 /**

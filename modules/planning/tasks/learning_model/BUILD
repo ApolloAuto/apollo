@@ -16,7 +16,7 @@ cc_library(
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "//modules/planning/learning_based/model_inference:trajectory_imitation_libtorch_inference",
         "//modules/planning/proto:learning_data_cc_proto",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
     ],
 )
@@ -30,7 +30,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/proto:planning_config_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
         "//modules/planning/tasks:task",
     ],
 )

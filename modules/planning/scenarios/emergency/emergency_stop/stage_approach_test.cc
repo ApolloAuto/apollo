@@ -28,7 +28,7 @@ namespace emergency_stop {
 class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::EMERGENCY_STOP_APPROACH);
+    config_.set_stage_type(StageType::EMERGENCY_STOP_APPROACH);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,7 +41,7 @@ TEST_F(StageApproachTest, Init) {
   EmergencyStopStageApproach emergency_stop_stage_approach(config_, injector_);
   EXPECT_EQ(
       emergency_stop_stage_approach.Name(),
-      ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_APPROACH));
+      StageType_Name(StageType::EMERGENCY_STOP_APPROACH));
 }
 
 }  // namespace emergency_stop

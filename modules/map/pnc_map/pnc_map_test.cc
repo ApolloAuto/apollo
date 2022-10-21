@@ -23,7 +23,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 DECLARE_double(min_length_for_lane_change);
 

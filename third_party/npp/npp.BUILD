@@ -16,6 +16,11 @@ cc_library(
         "@platforms//cpu:aarch64": ["targets/aarch64-linux/include"],
         "//conditions:default": [],
     }),
+    hdrs = select({
+        "@platforms//cpu:x86_64": glob(["targets/x86_64-linux/include/**/*"]),
+        "@platforms//cpu:aarch64": glob(["targets/aarch64-linux/include/**/*"]),
+        "//conditions:default": [],
+    }),
     linkopts = [
         "-L/usr/local/cuda/lib64",
         "-lnppc",

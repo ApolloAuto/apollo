@@ -16,7 +16,7 @@ py_library(
     deps = [
         ":distribution_analyzer",
         ":statistical_analyzer",
-        "//modules/common/proto:error_code_py_pb2",
+        "//modules/common_msgs/basic_msgs:error_code_py_pb2",
     ],
 )
 
@@ -26,7 +26,7 @@ py_library(
     deps = [
         ":distribution_analyzer",
         ":statistical_analyzer",
-        "//modules/common/proto:error_code_py_pb2",
+        "//modules/common_msgs/basic_msgs:error_code_py_pb2",
     ],
 )
 

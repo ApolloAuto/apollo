@@ -25,7 +25,7 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/common",
-        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
+        "//modules/perception/pipeline/proto/stage:omt_cc_proto",
     ],
 )
 
@@ -49,11 +49,13 @@ cc_library(
         ":frame_list",
         ":obstacle_reference",
         ":target",
-        "//cyber/common:file",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/obstacle/tracker/common",
-        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
+        "//modules/perception/common/sensor_manager",
+        "//modules/perception/pipeline:stage",
+        "//modules/perception/pipeline/proto/stage:omt_cc_proto",
     ],
     alwayslink = True,
 )
@@ -68,7 +70,7 @@ cc_library(
         "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/obstacle/tracker/omt/proto:omt_cc_proto",
+        "//modules/perception/pipeline/proto/stage:omt_cc_proto",
     ],
 )
 

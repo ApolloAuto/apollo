@@ -21,7 +21,7 @@
 
 #include "cyber/time/clock.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
-#include "modules/prediction/proto/feature.pb.h"
+#include "modules/common_msgs/prediction_msgs/feature.pb.h"
 
 using Clock = apollo::cyber::Clock;
 

@@ -8,11 +8,11 @@ cc_library(
     srcs = ["msg_serializer.cc"],
     hdrs = ["msg_serializer.h"],
     deps = [
-        "//cyber/time:clock",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/onboard/common_flags",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
-        "//modules/prediction/proto:feature_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/common_msgs/prediction_msgs:feature_cc_proto",
         "@eigen",
     ],
 )

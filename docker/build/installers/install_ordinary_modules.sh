@@ -35,6 +35,12 @@ apt_get_update_and_install \
 
 ######################################################
 
+COMPONENT="modules/perception"
+info "Install support for [${COMPONENT}] ..."
+bash ${CURR_DIR}/install_paddle_deps.sh
+
+######################################################
+
 COMPONENT="modules/prediction"
 info "Install support for [${COMPONENT}] ..."
 bash ${CURR_DIR}/install_opencv.sh

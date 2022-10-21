@@ -19,9 +19,10 @@
 #include <memory>
 
 #include "cyber/common/macros.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -37,7 +38,11 @@ struct PointCloudPreprocessorOptions {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
-class BasePointCloudPreprocessor {
+class BasePointCloudPreprocessor : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BasePointCloudPreprocessor() = default;
 
@@ -61,6 +66,12 @@ class BasePointCloudPreprocessor {
   // cloud should be filled, required,
   virtual bool Preprocess(const PointCloudPreprocessorOptions& options,
                   LidarFrame* frame) const = 0;
+
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
 
   virtual std::string Name() const = 0;
 

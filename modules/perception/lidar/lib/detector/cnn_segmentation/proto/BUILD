@@ -23,7 +23,6 @@ py_proto_library(
         ":spp_engine_config_proto",
     ],
 )
-
 cc_proto_library(
     name = "cnnseg_param_cc_proto",
     deps = [
@@ -40,24 +39,5 @@ py_proto_library(
     name = "cnnseg_param_py_pb2",
     deps = [
         ":cnnseg_param_proto",
-    ],
-)
-
-cc_proto_library(
-    name = "cnnseg_config_cc_proto",
-    deps = [
-        ":cnnseg_config_proto",
-    ],
-)
-
-proto_library(
-    name = "cnnseg_config_proto",
-    srcs = ["cnnseg_config.proto"],
-)
-
-py_proto_library(
-    name = "cnnseg_config_py_pb2",
-    deps = [
-        ":cnnseg_config_proto",
     ],
 )

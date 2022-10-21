@@ -6,7 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "camera_frame",
-    hdrs = ["camera_frame.h"],
+    hdrs = [
+        "camera_frame.h",
+    ],
     deps = [
         ":data_provider",
         "//modules/perception/base",
@@ -32,6 +34,7 @@ cc_library(
     deps = [
         ":undistortion_handler",
         ":image_data_operations",
+        "//cyber",
         "//modules/perception/base",
     ] + if_cuda([
         "@npp"
@@ -89,10 +92,14 @@ cc_library(
     hdrs = ["undistortion_handler.h"],
     deps = [
         ":image_data_operations",
+        "//cyber",
         "//modules/perception/base",
-        "//modules/perception/base:blob",
         "//modules/perception/common/sensor_manager",
-    ],
+    ] + if_cuda([
+        "@npp"
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rpp"
+    ]),
 )
 
 gpu_library(

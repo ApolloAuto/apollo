@@ -14,7 +14,6 @@ cc_binary(
         "module_controller.h",
     ],
     linkopts = ["-pthread"],
-    linkstatic = False,
     deps = [
         "//cyber:cyber_core",
         "//cyber/proto:dag_conf_cc_proto",
@@ -23,6 +22,7 @@ cc_binary(
 
 install(
     name = "install",
+    runtime_dest = "cyber/bin",
     targets = [":mainboard"],
 )
 

@@ -35,7 +35,7 @@
 #include "modules/prediction/scenario/interaction_filter/interaction_filter.h"
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 #include "modules/prediction/scenario/right_of_way/right_of_way.h"
-#include "modules/prediction/util/data_extraction.h"
+#include "modules/common/util/data_extraction.h"
 
 namespace apollo {
 namespace prediction {

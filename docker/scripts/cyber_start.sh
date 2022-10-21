@@ -210,6 +210,10 @@ function setup_devices_and_mount_volumes() {
     local volumes
     volumes="-v ${APOLLO_ROOT_DIR}:/apollo"
 
+    [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
+    volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"
+
+
     if [[ "${HOST_OS}" != "Linux" ]]; then
         warning "Running Cyber container on ${HOST_OS} is experimental!"
     else

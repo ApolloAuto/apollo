@@ -28,7 +28,7 @@ namespace emergency_pull_over {
 class StageSlowDownTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN);
+    config_.set_stage_type(StageType::EMERGENCY_PULL_OVER_SLOW_DOWN);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -41,8 +41,8 @@ TEST_F(StageSlowDownTest, Init) {
   EmergencyPullOverStageSlowDown emergency_pull_over_stage_slow_down(config_,
                                                                      injector_);
   EXPECT_EQ(emergency_pull_over_stage_slow_down.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN));
+            StageType_Name(
+                StageType::EMERGENCY_PULL_OVER_SLOW_DOWN));
 }
 
 }  // namespace emergency_pull_over

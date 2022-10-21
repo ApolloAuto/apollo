@@ -18,7 +18,9 @@
 #include <vector>
 
 #include "cyber/common/file.h"
-#include "modules/perception/proto/fused_classifier_config.pb.h"
+#include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
+#include "modules/perception/pipeline/plugin_factory.h"
+#include "modules/perception/pipeline/proto/stage/fused_classifier_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -55,6 +57,97 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   CHECK_NOTNULL(sequence_fuser_);
   ACHECK(sequence_fuser_->Init(init_option_));
   return init_success;
+}
+
+bool FusedClassifier::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  fused_classifier_config_ = stage_config.fused_classifier_config();
+
+  temporal_window_        = fused_classifier_config_.temporal_window();
+  enable_temporal_fusion_ = fused_classifier_config_.enable_temporal_fusion();
+  use_tracked_objects_    = fused_classifier_config_.use_tracked_objects();
+  one_shot_fusion_method_ = fused_classifier_config_.one_shot_fusion_method();
+  sequence_fusion_method_ = fused_classifier_config_.sequence_fusion_method();
+
+  // create plugins
+  one_shot_fuser_ptr_ =
+      pipeline::dynamic_unique_cast<BaseOneShotTypeFusion>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::CCRF_ONESHOT_TYPE_FUSION]));
+  CHECK_NOTNULL(one_shot_fuser_ptr_);
+
+  sequence_fuser_ptr_ =
+      pipeline::dynamic_unique_cast<BaseSequenceTypeFusion>(
+          pipeline::PluginFactory::CreatePlugin(
+              plugin_config_map_[PluginType::CCRF_SEQUENCE_TYPE_FUSION]));
+  CHECK_NOTNULL(sequence_fuser_ptr_);
+
+  return true;
+}
+
+bool FusedClassifier::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) {
+    return false;
+  }
+
+  std::vector<ObjectPtr>* objects = use_tracked_objects_
+                                        ? &(lidar_frame->tracked_objects)
+                                        : &(lidar_frame->segmented_objects);
+  if (enable_temporal_fusion_ && lidar_frame->timestamp > 0.0) {
+    // sequence fusion
+    AINFO << "Combined classifier, temporal fusion";
+    sequence_.AddTrackedFrameObjects(*objects, lidar_frame->timestamp);
+    ObjectSequence::TrackedObjects tracked_objects;
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      const int track_id = object->track_id;
+      sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
+                                         temporal_window_);
+      if (tracked_objects.empty()) {
+        AERROR << "Find zero-length track, so skip.";
+        continue;
+      }
+      if (object != tracked_objects.rbegin()->second) {
+        AERROR << "There must exist some timestamp in disorder, so skip.";
+        continue;
+      }
+      if (!sequence_fuser_ptr_->TypeFusion(option_, &tracked_objects)) {
+        AERROR << "Failed to fuse types, so break.";
+        break;
+      }
+    }
+  } else {
+    // one shot fusion
+    AINFO << "Combined classifier, one shot fusion";
+    for (auto& object : *objects) {
+      if (object->lidar_supplement.is_background) {
+        object->type_probs.assign(static_cast<int>(ObjectType::MAX_OBJECT_TYPE),
+                                  0);
+        object->type = ObjectType::UNKNOWN_UNMOVABLE;
+        object->type_probs[static_cast<int>(ObjectType::UNKNOWN_UNMOVABLE)] =
+            1.0;
+        continue;
+      }
+      if (!one_shot_fuser_ptr_->TypeFusion(option_, object)) {
+        AERROR << "Failed to fuse types, so continue.";
+      }
+    }
+  }
+  return true;
 }
 
 bool FusedClassifier::Classify(const ClassifierOptions& options,

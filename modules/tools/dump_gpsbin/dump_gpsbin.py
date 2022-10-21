@@ -34,7 +34,7 @@ import glog
 
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import record
-from modules.drivers.gnss.proto.gnss_pb2 import RawData
+from modules.common_msgs.sensor_msgs.gnss_pb2 import RawData
 
 
 # Requried flags.

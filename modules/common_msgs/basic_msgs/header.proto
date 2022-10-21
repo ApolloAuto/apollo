@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common_msgs/basic_msgs/error_code.proto";
+
+message Header {
+  // Message publishing time in seconds.
+  optional double timestamp_sec = 1;
+
+  // Module name.
+  optional string module_name = 2;
+
+  // Sequence number for each message. Each module maintains its own counter for
+  // sequence_num, always starting from 1 on boot.
+  optional uint32 sequence_num = 3;
+
+  // Lidar Sensor timestamp for nano-second.
+  optional uint64 lidar_timestamp = 4;
+
+  // Camera Sensor timestamp for nano-second.
+  optional uint64 camera_timestamp = 5;
+
+  // Radar Sensor timestamp for nano-second.
+  optional uint64 radar_timestamp = 6;
+
+  // data version
+  optional uint32 version = 7 [default = 1];
+
+  optional StatusPb status = 8;
+
+  optional string frame_id = 9;
+}

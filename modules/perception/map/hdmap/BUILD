@@ -8,7 +8,10 @@ cc_library(
     srcs = ["hdmap_input.cc"],
     hdrs = ["hdmap_input.h"],
     deps = [
-        "//modules/common/math:geometry",
+        "//cyber",
+        "//modules/common/math",
+        "//modules/common/util:util_tool",
+        "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap",
         "//modules/perception/base:base_type",
         "//modules/perception/base:blob",

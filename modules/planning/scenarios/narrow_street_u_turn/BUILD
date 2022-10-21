@@ -19,8 +19,8 @@ cc_library(
     hdrs = ["narrow_street_u_turn_scenario.h"],
     copts = PLANNING_COPTS,
     deps = [
-        "//cyber/common:log",
-        "//modules/planning/proto:planning_cc_proto",
+        "//cyber",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/planning/scenarios:scenario",
     ],
 )

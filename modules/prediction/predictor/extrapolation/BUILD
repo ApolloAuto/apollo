@@ -11,14 +11,14 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/predictor/sequence:sequence_predictor",
-        "//modules/prediction/proto:lane_graph_cc_proto",
+        "//modules/common_msgs/prediction_msgs:lane_graph_cc_proto",
     ],
 )
 

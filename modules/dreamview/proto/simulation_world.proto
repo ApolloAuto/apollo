@@ -2,13 +2,13 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-import "modules/canbus/proto/chassis.proto";
-import "modules/common/monitor_log/proto/monitor_log.proto";
-import "modules/common/proto/pnc_point.proto";
-import "modules/perception/proto/perception_obstacle.proto";
-import "modules/planning/proto/planning_internal.proto";
-import "modules/prediction/proto/feature.proto";
-import "modules/routing/proto/routing.proto";
+import "modules/common_msgs/chassis_msgs/chassis.proto";
+import "modules/common_msgs/monitor_msgs/monitor_log.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+import "modules/common_msgs/planning_msgs/planning_internal.proto";
+import "modules/common_msgs/prediction_msgs/feature.proto";
+import "modules/common_msgs/routing_msgs/routing.proto";
 
 // Next-id: 4
 message PolygonPoint {

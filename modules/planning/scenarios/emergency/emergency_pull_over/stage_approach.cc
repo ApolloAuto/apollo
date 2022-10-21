@@ -110,7 +110,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
 }
 
 Stage::StageStatus EmergencyPullOverStageApproach::FinishStage() {
-  next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY;
+  next_stage_ = StageType::EMERGENCY_PULL_OVER_STANDBY;
   return Stage::FINISHED;
 }
 

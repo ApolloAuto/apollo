@@ -18,6 +18,14 @@ limitations under the License.
 
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/adapter/proto_organizer.h"
+#include "modules/map/hdmap/adapter/xml_parser/common_define.h"
+#include "modules/map/hdmap/adapter/xml_parser/coordinate_convert_tool.h"
+#include "modules/map/hdmap/adapter/xml_parser/header_xml_parser.h"
+#include "modules/map/hdmap/adapter/xml_parser/junctions_xml_parser.h"
+#include "modules/map/hdmap/adapter/xml_parser/lanes_xml_parser.h"
+#include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
+#include "modules/map/hdmap/adapter/xml_parser/roads_xml_parser.h"
+#include "modules/map/hdmap/adapter/xml_parser/signals_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
 namespace apollo {

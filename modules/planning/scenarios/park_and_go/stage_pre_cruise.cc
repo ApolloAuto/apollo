@@ -59,7 +59,7 @@ Stage::StageStatus ParkAndGoStagePreCruise::Process(
 }
 
 Stage::StageStatus ParkAndGoStagePreCruise::FinishStage() {
-  next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  next_stage_ = StageType::PARK_AND_GO_CRUISE;
   return Stage::FINISHED;
 }
 

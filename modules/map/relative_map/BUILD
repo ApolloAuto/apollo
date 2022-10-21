@@ -8,6 +8,8 @@ MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
 install(
     name = "install",
+    data_dest = "map",
+    library_dest = "map/lib",
     data = [
         ":relative_map_conf",
         ":testdata",
@@ -36,14 +38,14 @@ cc_library(
     ],
     deps = [
         ":navigation_lane_lib",
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/common/monitor_log",
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/map/relative_map/proto:relative_map_config_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
     ],
 )
 
@@ -54,13 +56,17 @@ cc_library(
     copts = MAP_COPTS,
     deps = [
         "//cyber",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
+        "//modules/common/math",
+        "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
         "//modules/map/relative_map/common:relative_map_gflags",
-        "//modules/map/relative_map/proto:navigation_cc_proto",
         "//modules/map/relative_map/proto:relative_map_config_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "@com_google_absl//:absl",
     ],
 )
 
@@ -81,7 +87,7 @@ cc_binary(
     name = "librelative_map_component.so",
     copts = MAP_COPTS,
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":relative_map_component_lib"],
 )
 

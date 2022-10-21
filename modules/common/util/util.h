@@ -33,8 +33,8 @@
 #include "cyber/common/types.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 
 /**
  * @namespace apollo::common::util

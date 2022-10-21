@@ -56,6 +56,7 @@ DEFAULT_MAPS=(
     sunnyvale_loop
     sunnyvale_with_two_offices
     san_mateo
+    apollo_virutal_map
 )
 
 DEFAULT_TEST_MAPS=(
@@ -208,9 +209,17 @@ function setup_devices_and_mount_local_volumes() {
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
+
+    [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
+    volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"
+
     local teleop="${APOLLO_ROOT_DIR}/../apollo-teleop"
     if [ -d "${teleop}" ]; then
-        volumes="-v ${teleop}:/apollo/modules/teleop ${volumes}"
+        volumes="${volumes} -v ${teleop}:/apollo/modules/teleop ${volumes}"
+    fi
+    local apollo_tools="${APOLLO_ROOT_DIR}/../apollo-tools"
+    if [ -d "${apollo_tools}" ]; then
+        volumes="${volumes} -v ${apollo_tools}:/tools"
     fi
 
     local os_release="$(lsb_release -rs)"

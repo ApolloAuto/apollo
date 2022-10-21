@@ -53,10 +53,10 @@ build --define AMD=1
 build:dbg -c dbg
 build:opt -c opt
 
-build --config=optimize
+#build --config=optimize
 # Instruction set optimizations
-build:optimize --copt=-march=native
-build:optimize --host_copt=-march=native
+#build:optimize --copt=-march=native
+#build:optimize --host_copt=-march=native
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures

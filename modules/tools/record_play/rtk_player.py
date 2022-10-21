@@ -33,13 +33,13 @@ import scipy.signal as signal
 from cyber.python.cyber_py3 import cyber
 from cyber.python.cyber_py3 import cyber_time
 from modules.tools.common.logger import Logger
-from modules.canbus.proto import chassis_pb2
-from modules.common.configs.proto import vehicle_config_pb2
-from modules.common.proto import drive_state_pb2
-from modules.common.proto import pnc_point_pb2
-from modules.control.proto import pad_msg_pb2
-from modules.localization.proto import localization_pb2
-from modules.planning.proto import planning_pb2
+from modules.common_msgs.chassis_msgs import chassis_pb2
+from modules.common_msgs.config_msgs import vehicle_config_pb2
+from modules.common_msgs.basic_msgs import drive_state_pb2
+from modules.common_msgs.basic_msgs import pnc_point_pb2
+from modules.common_msgs.control_msgs import pad_msg_pb2
+from modules.common_msgs.localization_msgs import localization_pb2
+from modules.common_msgs.planning_msgs import planning_pb2
 import modules.tools.common.proto_utils as proto_utils
 
 # TODO(all): hard-coded path temporarily. Better approach needed.

@@ -25,6 +25,7 @@
 #include "modules/perception/lidar/common/object_sequence.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/interface/base_classifier.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -34,12 +35,19 @@ class FusedClassifier : public BaseClassifier {
  public:
   FusedClassifier() = default;
   ~FusedClassifier() = default;
+
   bool Init(
       const ClassifierInitOptions& options = ClassifierInitOptions()) override;
 
   bool Classify(const ClassifierOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "FusedClassifier"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   FRIEND_TEST(FusedClassifierTest, test_one_shot_fusion);
@@ -56,8 +64,13 @@ class FusedClassifier : public BaseClassifier {
   BaseOneShotTypeFusion* one_shot_fuser_;
   BaseSequenceTypeFusion* sequence_fuser_;
 
+  std::unique_ptr<BaseOneShotTypeFusion> one_shot_fuser_ptr_;
+  std::unique_ptr<BaseSequenceTypeFusion> sequence_fuser_ptr_;
+
   TypeFusionOption option_;
   TypeFusionInitOption init_option_;
+
+  FusedClassifierConfig fused_classifier_config_;
 };  // class FusedClassifier
 
 }  // namespace lidar

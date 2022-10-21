@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "modules/drivers/proto/pointcloud.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 namespace apollo {
 namespace localization {

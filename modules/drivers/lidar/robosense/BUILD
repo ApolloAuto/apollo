@@ -8,6 +8,8 @@ ROBOSENSE_COPTS = ['-DMODULE_NAME=\\"robosense\\"']
 
 install(
     name = "install",
+    data_dest = "drivers",
+    library_dest = "drivers/lib",
     data = [
         ":runtime_data",
     ],
@@ -30,7 +32,7 @@ filegroup(
 cc_binary(
     name = "librobosense_driver_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = ["//modules/drivers/lidar/robosense/driver:robosense_driver_component_lib"],
 )
 

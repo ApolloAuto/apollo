@@ -18,19 +18,34 @@
 #include <memory>
 #include <string>
 
-#include "modules/perception/camera/lib/feature_extractor/tfe/proto/tracking_feature.pb.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/inference.h"
+#include "modules/perception/pipeline/proto/stage/tracking_feature.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
 class ExternalFeatureExtractor : public BaseFeatureExtractor {
  public:
+  ExternalFeatureExtractor() = default;
+  ~ExternalFeatureExtractor() = default;
+
   bool Init(const FeatureExtractorInitOptions &init_options) override;
   bool Extract(const FeatureExtractorOptions &options,
                CameraFrame *frame) override;
-  std::string Name() const override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
+
+ private:
+  bool InitFeatureExtractor(const std::string &root_dir);
 
  private:
   std::shared_ptr<base::Image8U> image_ = nullptr;
@@ -39,9 +54,9 @@ class ExternalFeatureExtractor : public BaseFeatureExtractor {
   tracking_feature::ExternalParam param_;
   int height_;
   int width_;
-  bool InitFeatureExtractor(const std::string &root_dir);
   int gpu_id_;
 };
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

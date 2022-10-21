@@ -24,7 +24,7 @@
 #include "cyber/time/clock.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {

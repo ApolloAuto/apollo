@@ -17,23 +17,23 @@ cc_library(
         "ndt_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/math",
         "//modules/common/monitor_log",
-        "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/util:message_util",
-        "//modules/common/util:perf_util",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
-        "//modules/drivers/gnss/proto:ins_cc_proto",
-        "//modules/drivers/proto:pointcloud_cc_proto",
-        "//modules/localization/common:localization_common",
+        "//modules/common_msgs/basic_msgs:geometry_cc_proto",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/sensor_msgs:gnss_best_pose_cc_proto",
+        "//modules/common_msgs/sensor_msgs:gnss_cc_proto",
+        "//modules/common_msgs/sensor_msgs:ins_cc_proto",
+        "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
+        "//modules/localization/common:localization_gflags",
         "//modules/localization/msf/common/util",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
-        "//modules/localization/proto:gps_cc_proto",
-        "//modules/localization/proto:localization_cc_proto",
+        "//modules/common_msgs/localization_msgs:gps_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/transform:buffer",
         "//modules/transform:transform_broadcaster",
         "@boost",
@@ -46,7 +46,7 @@ cc_library(
 cc_binary(
     name = "libndt_localization_component.so",
     linkshared = True,
-    linkstatic = False,
+    linkstatic = True,
     deps = [":ndt_localization_component_lib"],
 )
 
@@ -77,6 +77,7 @@ cc_test(
 
 install(
     name = "install",
+    library_dest = "localization/lib/ndt",
     targets = [
         ":libndt_localization_component.so",
     ],

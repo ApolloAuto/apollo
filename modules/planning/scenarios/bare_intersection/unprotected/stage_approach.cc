@@ -182,7 +182,7 @@ bool BareIntersectionUnprotectedStageApproach::CheckClear(
 Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage(
     Frame* frame) {
   next_stage_ =
-      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE;
+      StageType::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE;
 
   // reset cruise_speed
   auto& reference_line_info = frame->mutable_reference_line_info()->front();

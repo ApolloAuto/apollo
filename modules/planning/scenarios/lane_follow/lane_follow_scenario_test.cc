@@ -48,7 +48,7 @@ TEST_F(LaneFollowScenarioTest, Init) {
   ScenarioContext context;
   auto injector = std::make_shared<DependencyInjector>();
   scenario_.reset(new LaneFollowScenario(config, &context, injector));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
+  EXPECT_EQ(scenario_->scenario_type(), ScenarioType::LANE_FOLLOW);
 }
 
 }  // namespace lane_follow

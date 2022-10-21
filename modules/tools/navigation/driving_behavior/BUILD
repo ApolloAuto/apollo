@@ -7,7 +7,7 @@ py_binary(
     srcs = ["path_extract.py"],
     deps = [
         "//cyber/python/cyber_py3:record",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )
 

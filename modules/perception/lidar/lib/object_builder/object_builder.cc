@@ -39,6 +39,23 @@ bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
   return true;
 }
 
+bool ObjectBuilder::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+  return true;
+}
+
+bool ObjectBuilder::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  ObjectBuilderOptions options;
+  Build(options, data_frame->lidar_frame);
+
+  return true;
+}
+
 bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
                           LidarFrame* frame) {
   if (frame == nullptr) {

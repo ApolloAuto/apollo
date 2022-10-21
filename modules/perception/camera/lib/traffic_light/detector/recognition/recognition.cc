@@ -46,6 +46,50 @@ bool TrafficLightRecognition::Init(
   return true;
 }
 
+bool TrafficLightRecognition::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  recognize_param_ = stage_config.traffic_light_recognition_config();
+
+  classify_quadrate_.reset(new ClassifyBySimple);
+  classify_vertical_.reset(new ClassifyBySimple);
+  classify_horizontal_.reset(new ClassifyBySimple);
+
+  int quadrate_gpu_id = recognize_param_.quadrate_model().gpu_id();
+  int vertical_gpu_id = recognize_param_.vertical_model().gpu_id();
+  int horizontal_gpu_id = recognize_param_.horizontal_model().gpu_id();
+
+  std::string quadrate_root_dir =
+      recognize_param_.quadrate_model().traffic_light_recognition_root_dir();
+  std::string vertical_root_dir =
+      recognize_param_.vertical_model().traffic_light_recognition_root_dir();
+  std::string horizontal_root_dir =
+      recognize_param_.horizontal_model().traffic_light_recognition_root_dir();
+
+  classify_quadrate_->Init(recognize_param_.quadrate_model(),
+                           quadrate_gpu_id,
+                           quadrate_root_dir);
+  classify_vertical_->Init(recognize_param_.vertical_model(),
+                           vertical_gpu_id,
+                           vertical_root_dir);
+  classify_horizontal_->Init(recognize_param_.horizontal_model(),
+                             horizontal_gpu_id,
+                             horizontal_root_dir);
+  return true;
+}
+
+bool TrafficLightRecognition::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr || data_frame->camera_frame == nullptr)
+    return false;
+
+  TrafficLightDetectorOptions traffic_light_recognition_options;
+  bool res = Detect(traffic_light_recognition_options,
+                    data_frame->camera_frame);
+  return res;
+}
+
 bool TrafficLightRecognition::Detect(const TrafficLightDetectorOptions& options,
                                      CameraFrame* frame) {
   std::vector<base::TrafficLightPtr> candidate(1);
@@ -75,10 +119,6 @@ bool TrafficLightRecognition::Detect(const TrafficLightDetectorOptions& options,
   }
 
   return true;
-}
-
-std::string TrafficLightRecognition::Name() const {
-  return "TrafficLightRecognition";
 }
 
 REGISTER_TRAFFIC_LIGHT_DETECTOR(TrafficLightRecognition);

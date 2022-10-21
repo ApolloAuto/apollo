@@ -29,7 +29,7 @@ namespace stop_sign {
 class StopSignUnprotectedStageStopTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP);
+    config_.set_stage_type(StageType::STOP_SIGN_UNPROTECTED_STOP);
     injector_ = std::make_shared<DependencyInjector>();
   }
 
@@ -42,8 +42,8 @@ TEST_F(StopSignUnprotectedStageStopTest, Init) {
   StopSignUnprotectedStageStop stop_sign_unprotected_stage_stop(config_,
                                                                 injector_);
   EXPECT_EQ(stop_sign_unprotected_stage_stop.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP));
+            StageType_Name(
+                StageType::STOP_SIGN_UNPROTECTED_STOP));
 }
 
 }  // namespace stop_sign

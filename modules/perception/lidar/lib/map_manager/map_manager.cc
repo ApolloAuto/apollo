@@ -19,7 +19,7 @@
 #include "cyber/common/log.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/proto/map_manager_config.pb.h"
+#include "modules/perception/pipeline/proto/stage/map_manager_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -46,6 +46,34 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
     AINFO << "Failed to init hdmap input.";
     return false;
   }
+  return true;
+}
+
+bool MapManager::Init(const StageConfig& stage_config) {
+  if (!Initialize(stage_config)) {
+    return false;
+  }
+
+  map_manager_config_ = stage_config.map_manager_config();
+
+  update_pose_ = map_manager_config_.update_pose();
+  roi_search_distance_ = map_manager_config_.roi_search_distance();
+
+  hdmap_input_ = map::HDMapInput::Instance();
+  if (!hdmap_input_->Init()) {
+    AINFO << "Failed to init hdmap input.";
+    return false;
+  }
+  return true;
+}
+
+bool MapManager::Process(DataFrame* data_frame) {
+  if (data_frame == nullptr)
+    return false;
+
+  MapManagerOptions options;
+  Update(options, data_frame->lidar_frame);
+
   return true;
 }
 

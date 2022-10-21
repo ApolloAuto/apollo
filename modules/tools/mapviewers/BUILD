@@ -6,7 +6,7 @@ py_binary(
     name = "gmapviewer",
     srcs = ["gmapviewer.py"],
     deps = [
-        "//modules/map/proto:map_py_pb2",
+        "//modules/common_msgs/map_msgs:map_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )
@@ -15,7 +15,7 @@ py_binary(
     name = "hdmapviewer",
     srcs = ["hdmapviewer.py"],
     deps = [
-        "//modules/map/proto:map_py_pb2",
+        "//modules/common_msgs/map_msgs:map_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )

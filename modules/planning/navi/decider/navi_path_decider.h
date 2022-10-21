@@ -27,12 +27,12 @@
 
 #include "gflags/gflags.h"
 #include "gtest/gtest_prod.h"
-#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 #include "modules/planning/navi/decider/navi_task.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/task_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/task_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 /**

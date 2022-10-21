@@ -31,9 +31,9 @@ namespace lane_follow {
 std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config,
     const std::shared_ptr<DependencyInjector>& injector) {
-  if (stage_config.stage_type() != ScenarioConfig::LANE_FOLLOW_DEFAULT_STAGE) {
+  if (stage_config.stage_type() != StageType::LANE_FOLLOW_DEFAULT_STAGE) {
     AERROR << "Follow lane does not support stage type: "
-           << ScenarioConfig::StageType_Name(stage_config.stage_type());
+           << StageType_Name(stage_config.stage_type());
     return nullptr;
   }
   return std::unique_ptr<Stage>(new LaneFollowStage(stage_config, injector));

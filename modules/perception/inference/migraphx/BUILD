@@ -12,7 +12,7 @@ cc_library(
         "//cyber",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_cc_proto",
-        "@com_google_absl//absl/strings",
+        "@com_google_absl//:absl",
         "@local_config_rocm//rocm:migraphx",
         "@local_config_rocm//rocm:rocm_headers",
     ],

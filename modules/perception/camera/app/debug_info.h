@@ -21,7 +21,6 @@
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/camera/lib/interface/base_calibration_service.h"
 
 namespace apollo {
 namespace perception {

@@ -8,13 +8,13 @@ cc_library(
     srcs = ["pbf_tracker.cc"],
     hdrs = ["pbf_tracker.h"],
     deps = [
-        "//modules/common/util:string_util",
+        "//modules/common/util:util_tool",
         "//modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion",
         "//modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion",
         "//modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion",
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
         "//modules/perception/fusion/lib/interface",
-        "//modules/perception/proto:pbf_tracker_config_cc_proto",
+        "//modules/perception/pipeline/proto/stage:pbf_tracker_config_cc_proto",
     ],
 )
 

@@ -10,14 +10,14 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/localization/proto:localization_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
-        "//modules/planning/proto:planning_cc_proto",
+        "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/v2x/proto:v2x_obstacles_cc_proto",
         "//modules/v2x/proto:v2x_obu_rsi_cc_proto",
         "//modules/v2x/proto:v2x_obu_traffic_light_cc_proto",
-        "//modules/v2x/proto:v2x_traffic_light_cc_proto",
+        "//modules/common_msgs/v2x_msgs:v2x_traffic_light_cc_proto",
     ],
 )
 

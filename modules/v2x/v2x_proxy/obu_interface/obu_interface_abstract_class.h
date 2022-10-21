@@ -24,11 +24,11 @@
 #include <chrono>
 #include <memory>
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/v2x/proto/v2x_car_status.pb.h"
 #include "modules/v2x/proto/v2x_obstacles.pb.h"
 #include "modules/v2x/proto/v2x_obu_rsi.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
+#include "modules/common_msgs/v2x_msgs/v2x_traffic_light.pb.h"
 
 #include "cyber/cyber.h"
 

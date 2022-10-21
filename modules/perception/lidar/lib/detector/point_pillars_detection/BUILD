@@ -26,13 +26,14 @@ cc_library(
         ":postprocess_cuda",
         ":preprocess_points",
         ":scatter_cuda",
-        "//cyber/common",
+        "//cyber",
         "//modules/perception/common:perception_gflags",
-        "//third_party:libtorch",
     ] + if_cuda([
+        "@libtorch_gpu_cuda",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
-    ]) + if_rocm([
+    ])+ if_rocm([
+        "@libtorch_gpu_rocm", 
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:migraphx",
     ]),
@@ -49,11 +50,13 @@ cc_library(
     ],
     deps = [
         ":point_pillars",
-        "//cyber/common",
+        "//cyber",
         "//modules/perception/base",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
+        "//modules/perception/pipeline/proto/stage:point_pillars_detection_config_cc_proto",
+        "//modules/perception/pipeline:stage",
         "@eigen",
         "@local_config_pcl//:pcl",
     ],

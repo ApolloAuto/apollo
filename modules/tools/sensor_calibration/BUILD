@@ -63,7 +63,7 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/drivers/gnss/proto:ins_py_pb2",
+        "//modules/common_msgs/sensor_msgs:ins_py_pb2",
     ],
 )
 
@@ -73,8 +73,8 @@ py_binary(
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:cyber_time",
-        "//modules/localization/proto:gps_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/localization_msgs:gps_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )
 
@@ -83,11 +83,11 @@ py_library(
     srcs = ["sensor_msg_extractor.py"],
     deps = [
         ":data_file_object",
-        "//modules/drivers/proto:conti_radar_py_pb2",
-        "//modules/drivers/proto:pointcloud_py_pb2",
-        "//modules/drivers/proto:sensor_image_py_pb2",
-        "//modules/localization/proto:gps_py_pb2",
-        "//modules/localization/proto:localization_py_pb2",
+        "//modules/common_msgs/sensor_msgs:conti_radar_py_pb2",
+        "//modules/common_msgs/sensor_msgs:pointcloud_py_pb2",
+        "//modules/common_msgs/sensor_msgs:sensor_image_py_pb2",
+        "//modules/common_msgs/localization_msgs:gps_py_pb2",
+        "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
 )
 

@@ -18,9 +18,9 @@
 #include <string>
 #include <memory>
 
+#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_obstacle_detection.h"
 #include "modules/perception/lidar/lib/interface/base_pointcloud_preprocessor.h"
-#include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
@@ -29,7 +29,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class LidarObstacleDetection : public BaseLidarObstacleDetection{
+class LidarObstacleDetection final : public BaseLidarObstacleDetection {
  public:
   LidarObstacleDetection() = default;
   virtual ~LidarObstacleDetection() = default;
@@ -45,7 +45,11 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection{
   LidarProcessResult Process(const LidarObstacleDetectionOptions& options,
                              LidarFrame* frame) override;
 
-  std::string Name() const override { return "LidarObstacleDetection"; }
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
 
  private:
   LidarProcessResult ProcessCommon(const LidarObstacleDetectionOptions& options,
@@ -57,6 +61,7 @@ class LidarObstacleDetection : public BaseLidarObstacleDetection{
   MapManager map_manager_;
   ObjectBuilder builder_;
   ObjectFilterBank filter_bank_;
+
   // params
   bool use_map_manager_ = true;
   bool use_object_filter_bank_ = true;

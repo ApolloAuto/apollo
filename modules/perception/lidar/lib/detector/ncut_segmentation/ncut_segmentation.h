@@ -31,6 +31,7 @@
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/ncut.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/proto/ncut_param.pb.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -48,12 +49,18 @@ class NCutSegmentation : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "NCutSegmentation"; }
-
   void ByPassROIService() {
     remove_roi_ = false;
     remove_ground_ = false;
   }
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   bool Configure(std::string model_name);
@@ -106,6 +113,8 @@ class NCutSegmentation : public BaseLidarDetector {
   std::string ground_detector_str_;
   std::string roi_filter_str_;
   NCutParam ncut_param_;
+
+  NCutConfig ncut_config_;
 
 #ifdef DEBUG_NCUT
   pcl::visualization::PCLVisualizer::Ptr _viewer;

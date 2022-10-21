@@ -16,8 +16,8 @@ proto_library(
     name = "vehicle_state_proto",
     srcs = ["vehicle_state.proto"],
     deps = [
-        "//modules/canbus/proto:chassis_proto",
-        "//modules/localization/proto:pose_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_proto",
+        "//modules/common_msgs/localization_msgs:pose_proto",
     ],
 )
 
@@ -25,7 +25,8 @@ py_proto_library(
     name = "vehicle_state_py_pb2",
     deps = [
         ":vehicle_state_proto",
-        "//modules/canbus/proto:chassis_py_pb2",
-        "//modules/localization/proto:pose_py_pb2",
+        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+        "//modules/common_msgs/localization_msgs:pose_py_pb2",
     ],
 )
+

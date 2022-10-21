@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/task_factory.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"

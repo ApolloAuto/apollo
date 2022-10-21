@@ -22,7 +22,7 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/prediction/util/data_extraction.h"
+#include "modules/common/util/data_extraction.h"
 
 namespace apollo {
 namespace prediction {

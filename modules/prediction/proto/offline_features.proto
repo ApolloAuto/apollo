@@ -2,10 +2,10 @@ syntax = "proto2";
 
 package apollo.prediction;
 
-import "modules/common/proto/pnc_point.proto";
-import "modules/prediction/proto/feature.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/prediction_msgs/feature.proto";
 import "modules/prediction/proto/prediction_conf.proto";
-import "modules/prediction/proto/scenario.proto";
+import "modules/common_msgs/prediction_msgs/scenario.proto";
 
 message DataForLearning {
   // The task category of the data for learning

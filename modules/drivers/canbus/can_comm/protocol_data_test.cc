@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 
 namespace apollo {
 namespace drivers {

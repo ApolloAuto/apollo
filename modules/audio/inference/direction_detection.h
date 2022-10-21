@@ -34,8 +34,7 @@
 #include "ATen/ATen.h"
 #include "torch/torch.h"
 
-#include "cyber/cyber.h"
-#include "modules/common/proto/geometry.pb.h"
+#include "modules/common_msgs/basic_msgs/geometry.pb.h"
 
 namespace apollo {
 namespace audio {

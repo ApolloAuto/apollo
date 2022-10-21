@@ -704,6 +704,6 @@ function run_bazel() {
     bash ${APOLLO_ROOT_DIR}/docker/build/installers/install_rpp.sh
   fi
 
-  job_args="--jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }

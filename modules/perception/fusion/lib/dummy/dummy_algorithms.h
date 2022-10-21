@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
 #include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
@@ -34,8 +35,6 @@ class DummyFusionSystem : public BaseFusionSystem {
  public:
   DummyFusionSystem() = default;
   ~DummyFusionSystem() = default;
-  DummyFusionSystem(const DummyFusionSystem&) = delete;
-  DummyFusionSystem& operator=(const DummyFusionSystem&) = delete;
 
   bool Init(const FusionInitOptions& options) override;
   std::string Name() const override { return "DummyFusionSystem"; }
@@ -43,29 +42,27 @@ class DummyFusionSystem : public BaseFusionSystem {
   bool Fuse(const FusionOptions& options,
             const base::FrameConstPtr& sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
+
+  DISALLOW_COPY_AND_ASSIGN(DummyFusionSystem);
 };
 
 class DummyDataAssociation : public BaseDataAssociation {
  public:
   DummyDataAssociation() = default;
   ~DummyDataAssociation() = default;
-  DummyDataAssociation(const DummyDataAssociation&) = delete;
-  DummyDataAssociation& operator=(const DummyDataAssociation&) = delete;
 
   bool Init() override;
   bool Associate(const AssociationOptions& options,
                  SensorFramePtr sensor_measurements, ScenePtr scene,
                  AssociationResult* association_result) override;
 
-  std::string Name() const override { return "DummyDataAssociation"; }
+  DISALLOW_COPY_AND_ASSIGN(DummyDataAssociation);
 };
 
 class DummyTracker : public BaseTracker {
  public:
   DummyTracker() = default;
   ~DummyTracker() = default;
-  DummyTracker(const DummyTracker&) = delete;
-  DummyTracker& operator=(const DummyTracker&) = delete;
 
   bool Init(TrackPtr track, SensorObjectPtr measurement) override;
 
@@ -79,6 +76,8 @@ class DummyTracker : public BaseTracker {
                                 double target_timestamp) override;
 
   std::string Name() const override { return "DummyTracker"; }
+
+  DISALLOW_COPY_AND_ASSIGN(DummyTracker);
 };
 
 }  // namespace fusion

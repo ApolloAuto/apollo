@@ -52,3 +52,11 @@ DECLARE_bool(reverse_heading_vehicle_state);
 DECLARE_bool(state_transform_to_com_reverse);
 DECLARE_bool(state_transform_to_com_drive);
 DECLARE_bool(multithread_run);
+
+// localizaiton
+DECLARE_bool(enable_map_reference_unify);
+
+// planning
+// parameters for trajectory stitching and reinit planning starting point.
+DECLARE_double(replan_lateral_distance_threshold);
+DECLARE_double(replan_longitudinal_distance_threshold);

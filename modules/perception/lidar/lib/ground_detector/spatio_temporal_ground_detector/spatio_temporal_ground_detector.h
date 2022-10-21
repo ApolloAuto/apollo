@@ -23,6 +23,7 @@
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -45,7 +46,13 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
 
   bool Detect(const GroundDetectorOptions& options, LidarFrame* frame) override;
 
-  std::string Name() const override { return "SpatioTemporalGroundDetector"; }
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   common::PlaneFitGroundDetectorParam* param_ = nullptr;
@@ -60,6 +67,8 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
   size_t default_point_size_ = 320000;
   Eigen::Vector3d cloud_center_ = Eigen::Vector3d(0.0, 0.0, 0.0);
   GroundServiceContent ground_service_content_;
+
+  SpatioTemporalGroundDetectorConfig config_;
 };  // class SpatioTemporalGroundDetector
 
 }  // namespace lidar

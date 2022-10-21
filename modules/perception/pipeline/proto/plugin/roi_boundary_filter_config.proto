@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message ROIBoundaryFilterConfig {
+  optional double distance_to_boundary_threshold = 1 [default = 1.0];
+  optional float confidence_threshold = 2 [default = 0.5];
+  optional float cross_roi_threshold = 3 [default = 0.6];
+  optional double inside_threshold = 4 [default = 1.0];
+}

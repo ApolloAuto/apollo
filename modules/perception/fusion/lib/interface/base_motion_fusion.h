@@ -17,6 +17,7 @@
 
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -29,9 +30,7 @@ namespace fusion {
 class BaseMotionFusion {
  public:
   explicit BaseMotionFusion(TrackPtr track) : track_ref_(track) {}
-  virtual ~BaseMotionFusion() {}
-  BaseMotionFusion(const BaseMotionFusion&) = delete;
-  BaseMotionFusion& operator=(const BaseMotionFusion&) = delete;
+  virtual ~BaseMotionFusion() = default;
 
   virtual bool Init() = 0;
 
@@ -49,6 +48,8 @@ class BaseMotionFusion {
 
  protected:
   TrackPtr track_ref_;
+
+  DISALLOW_COPY_AND_ASSIGN(BaseMotionFusion);
 };
 
 }  // namespace fusion

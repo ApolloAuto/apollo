@@ -25,7 +25,7 @@
 
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle.h"
-#include "modules/planning/proto/decision.pb.h"
+#include "modules/common_msgs/planning_msgs/decision.pb.h"
 
 namespace apollo {
 namespace planning {

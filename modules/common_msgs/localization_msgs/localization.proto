@@ -1,0 +1,81 @@
+/******************************************************************************
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+syntax = "proto2";
+
+package apollo.localization;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/basic_msgs/geometry.proto";
+import "modules/common_msgs/basic_msgs/pnc_point.proto";
+import "modules/common_msgs/localization_msgs/localization_status.proto";
+import "modules/common_msgs/localization_msgs/pose.proto";
+
+message Uncertainty {
+  // Standard deviation of position, east/north/up in meters.
+  optional apollo.common.Point3D position_std_dev = 1;
+
+  // Standard deviation of quaternion qx/qy/qz, unitless.
+  optional apollo.common.Point3D orientation_std_dev = 2;
+
+  // Standard deviation of linear velocity, east/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity_std_dev = 3;
+
+  // Standard deviation of linear acceleration, right/forward/up in meters per
+  // square second.
+  optional apollo.common.Point3D linear_acceleration_std_dev = 4;
+
+  // Standard deviation of angular velocity, right/forward/up in radians per
+  // second.
+  optional apollo.common.Point3D angular_velocity_std_dev = 5;
+
+  // TODO: Define covariance items when needed.
+}
+
+message LocalizationEstimate {
+  optional apollo.common.Header header = 1;
+  optional apollo.localization.Pose pose = 2;
+  optional Uncertainty uncertainty = 3;
+
+  // The time of pose measurement, seconds since 1970-1-1 (UNIX time).
+  optional double measurement_time = 4;  // In seconds.
+
+  // Future trajectory actually driven by the drivers
+  repeated apollo.common.TrajectoryPoint trajectory_point = 5;
+
+  // msf status
+  optional MsfStatus msf_status = 6;
+  // msf quality
+  optional MsfSensorMsgStatus sensor_status = 7;
+}
+
+enum MeasureState {
+  OK = 0;
+  WARNNING = 1;
+  ERROR = 2;
+  CRITICAL_ERROR = 3;
+  FATAL_ERROR = 4;
+}
+
+message LocalizationStatus {
+  optional apollo.common.Header header = 1;
+  optional MeasureState fusion_status = 2;
+  optional MeasureState gnss_status = 3 [deprecated = true];
+  optional MeasureState lidar_status = 4 [deprecated = true];
+  // The time of pose measurement, seconds since 1970-1-1 (UNIX time).
+  optional double measurement_time = 5;  // In seconds.
+  optional string state_message = 6;
+}

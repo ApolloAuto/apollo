@@ -27,6 +27,9 @@ function _create_user_account() {
   adduser --disabled-password --force-badname --gecos '' \
     "${user_name}" --uid "${uid}" --gid "${gid}" # 2>/dev/null
 
+  # copy init scripts manually
+  cp /etc/skel/.* $(getent passwd ${user_name} | cut -d: -f6)/
+
   usermod -aG sudo "${user_name}"
   usermod -aG video "${user_name}"
 }

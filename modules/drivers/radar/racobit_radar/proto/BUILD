@@ -16,7 +16,8 @@ proto_library(
     name = "racobit_radar_conf_proto",
     srcs = ["racobit_radar_conf.proto"],
     deps = [
-        "//modules/drivers/canbus/proto:can_card_parameter_proto",
+        "//modules/common_msgs/sensor_msgs:racobit_radar_proto",
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_proto",
     ],
 )
 
@@ -24,6 +25,8 @@ py_proto_library(
     name = "racobit_radar_conf_py_pb2",
     deps = [
         ":racobit_radar_conf_proto",
-        "//modules/drivers/canbus/proto:can_card_parameter_py_pb2",
+        "//modules/common_msgs/sensor_msgs:racobit_radar_py_pb2",
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_py_pb2",
     ],
 )
+

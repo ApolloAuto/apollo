@@ -17,12 +17,12 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/common/util/perf_util.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -31,7 +31,7 @@ namespace camera {
 using cyber::common::GetAbsolutePath;
 
 void SmokeObstacleDetector::LoadInputShape(
-                            const smoke::ModelParam &model_param) {
+    const smoke::ModelParam &model_param) {
   float offset_ratio = model_param.offset_ratio();
   float cropped_ratio = model_param.cropped_ratio();
   int resized_width = model_param.resized_width();
@@ -80,7 +80,7 @@ void SmokeObstacleDetector::LoadParam(const smoke::SmokeParam &smoke_param) {
 }
 
 bool SmokeObstacleDetector::InitNet(const smoke::SmokeParam &smoke_param,
-                                   const std::string &model_root) {
+                                    const std::string &model_root) {
   const auto &model_param = smoke_param.model_param();
 
   std::string proto_file =
@@ -132,7 +132,7 @@ bool SmokeObstacleDetector::InitNet(const smoke::SmokeParam &smoke_param,
 }
 
 void SmokeObstacleDetector::InitSmokeBlob(
-                            const smoke::NetworkParam &net_param) {
+    const smoke::NetworkParam &net_param) {
   auto obj_blob_scale1 = inference_->get_blob(net_param.det1_obj_blob());
   overlapped_.reset(
       new base::Blob<bool>(std::vector<int>{obj_k_, obj_k_}, true));
@@ -191,6 +191,60 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   return true;
 }
 
+bool SmokeObstacleDetector::Init(const StageConfig& stage_config) {
+  ACHECK(stage_config.has_smoke_obstacle_detection_config());
+  smoke_obstacle_detection_config_ =
+      stage_config.smoke_obstacle_detection_config();
+
+  gpu_id_ = smoke_obstacle_detection_config_.gpu_id();
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
+
+  base_camera_model_ =
+      common::SensorManager::Instance()->GetUndistortCameraModel(
+          smoke_obstacle_detection_config_.camera_name());
+  ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
+
+  std::string config_path =
+      GetAbsolutePath(smoke_obstacle_detection_config_.root_dir(),
+                      smoke_obstacle_detection_config_.conf_file());
+  if (!cyber::common::GetProtoFromFile(config_path, &smoke_param_)) {
+    AERROR << "read proto_config fail";
+    return false;
+  }
+  const auto &model_param = smoke_param_.model_param();
+  std::string model_root = GetAbsolutePath(
+      smoke_obstacle_detection_config_.root_dir(), model_param.model_name());
+  std::string anchors_file =
+      GetAbsolutePath(model_root, model_param.anchors_file());
+  std::string types_file =
+      GetAbsolutePath(model_root, model_param.types_file());
+  std::string expand_file =
+      GetAbsolutePath(model_root, model_param.expand_file());
+  LoadInputShape(model_param);
+  LoadParam(smoke_param_);
+  min_dims_.min_2d_height /= static_cast<float>(height_);
+
+  if (!LoadAnchors(anchors_file, &anchors_)) {
+    return false;
+  }
+  if (!LoadTypes(types_file, &types_)) {
+    return false;
+  }
+  if (!LoadExpand(expand_file, &expands_)) {
+    return false;
+  }
+  ACHECK(expands_.size() == types_.size());
+  if (!InitNet(smoke_param_, model_root)) {
+    return false;
+  }
+  InitSmokeBlob(smoke_param_.net_param());
+  if (!InitFeatureExtractor(model_root)) {
+    return false;
+  }
+  return true;
+}
+
 bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   FeatureExtractorInitOptions feature_options;
   feature_options.conf_file = smoke_param_.model_param().feature_file();
@@ -208,8 +262,12 @@ bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   return true;
 }
 
+bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
+  return true;
+}
+
 bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
-                                  CameraFrame *frame) {
+                                   CameraFrame *frame) {
   if (frame == nullptr) {
     return false;
   }
@@ -225,8 +283,8 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
   auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
 
-  float* ratio_data = input_ratio_blob->mutable_cpu_data();
-  float* K_data = input_K_blob->mutable_cpu_data();
+  float *ratio_data = input_ratio_blob->mutable_cpu_data();
+  float *K_data = input_K_blob->mutable_cpu_data();
   for (size_t i = 0; i < 3; i++) {
     size_t i3 = i * 3;
     for (size_t j = 0; j < 3; j++) {
@@ -241,10 +299,10 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
         << K_data[0] << ", " << K_data[1] << ", " << K_data[2] << "\n"
         << K_data[3] << ", " << K_data[4] << ", " << K_data[5] << "\n"
         << K_data[6] << ", " << K_data[7] << ", " << K_data[8] << "\n";
-  ratio_data[0] = 4.f * static_cast<float>(frame->data_provider->src_width())
-                  / static_cast<float>(width_);
-  ratio_data[1] = 4.f * static_cast<float>(frame->data_provider->src_height())
-                  / static_cast<float>(height_);
+  ratio_data[0] = 4.f * static_cast<float>(frame->data_provider->src_width()) /
+                  static_cast<float>(width_);
+  ratio_data[1] = 4.f * static_cast<float>(frame->data_provider->src_height()) /
+                  static_cast<float>(height_);
 
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
@@ -265,10 +323,11 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";
   get_smoke_objects_cpu(smoke_blobs_, types_, smoke_param_.model_param(),
-                  light_vis_conf_threshold_, light_swt_conf_threshold_,
-                  overlapped_.get(), idx_sm_.get(), &(frame->detected_objects),
-                  frame->data_provider->src_width(),
-                  frame->data_provider->src_height() - offset_y_);
+                        light_vis_conf_threshold_, light_swt_conf_threshold_,
+                        overlapped_.get(), idx_sm_.get(),
+                        &(frame->detected_objects),
+                        frame->data_provider->src_width(),
+                        frame->data_provider->src_height() - offset_y_);
 
   AINFO << "GetObj: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   filter_bbox(min_dims_, &(frame->detected_objects));
@@ -278,8 +337,8 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   feature_extractor_->Extract(feature_options, frame);
   AINFO << "Extract: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   recover_smoke_bbox(frame->data_provider->src_width(),
-               frame->data_provider->src_height() - offset_y_, offset_y_,
-               &frame->detected_objects);
+                     frame->data_provider->src_height() - offset_y_, offset_y_,
+                     &frame->detected_objects);
 
   // post processing
   int left_boundary =
@@ -305,6 +364,53 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   }
   AINFO << "Post2: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
+  return true;
+}
+
+bool SmokeObstacleDetector::Process(
+    const std::vector<float> &k_inv, const std::vector<float> &image_data_array,
+    const float *detect_result) {
+  if (nullptr == detect_result) {
+    AERROR << "Input null detect_result ptr.";
+    return false;
+  }
+
+  // if (nullptr == typesCameraFrame) {
+  //   AERROR << "Input null typesCameraFrame ptr.";
+  //   return false;
+  // }
+
+  // if (nullptr == data_frame) {
+  //   AERROR << "Input null data_frame ptr.";
+  //   return false;
+  // }
+
+  // Timer timer;
+  // if (cudaSetDevice(gpu_id_) != cudaSuccess) {
+  //   AERROR << "Failed to set device to " << gpu_id_;
+  //   return false;
+  // }
+
+  // const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
+  // auto const &net_param = smoke_param_.net_param();
+  // auto input_blob = inference_->get_blob(net_param.input_data_blob());
+  // auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
+  // auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
+
+  // float *ratio_data = input_ratio_blob->mutable_cpu_data();
+  // float *K_data = input_K_blob->mutable_cpu_data();
+
+  // K_data = k_inv.data();
+  // input_blob->mutable_cpu_data() = image_data_array.data();
+
+
+  // AINFO << "Camera type: " << frame->data_provider->sensor_name();
+  // /////////////////////////// detection part ///////////////////////////
+  // inference_->Infer();
+  // AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
+  //       << "ms";
+
+  // detect_result = smoke_blobs_.det1_loc_blob->cpu_data();
   return true;
 }
 

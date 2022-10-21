@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
@@ -34,35 +35,33 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/pipeline/pipeline.h"
+#include "modules/perception/pipeline/proto/camera_detection_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-class ObstacleDetectionCamera : public BaseCameraPerception {
+class ObstacleDetectionCamera final : public BaseCameraPerception {
  public:
-  ObstacleDetectionCamera()
-      : transformer_(nullptr),
-        tracker_(nullptr),
-        extractor_(nullptr),
-        lane_detector_(nullptr),
-        lane_postprocessor_(nullptr),
-        calibration_service_(nullptr),
-        object_template_manager_(nullptr) {}
-  ObstacleDetectionCamera(const ObstacleDetectionCamera &) = delete;
-  ObstacleDetectionCamera &operator=(const ObstacleDetectionCamera &) =
-      delete;
+  using CameraDetectionConfig = pipeline::CameraDetectionConfig;
+
+ public:
+  ObstacleDetectionCamera() = default;
   ~ObstacleDetectionCamera() = default;
+
   bool Init(const CameraPerceptionInitOptions &options) override;
-  void SetCameraHeightAndPitch(
-      const std::map<std::string, float> &name_camera_ground_height_map,
-      const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-      const float &pitch_angle_calibrator_working_sensor);
-  void SetIm2CarHomography(Eigen::Matrix3d homography_im2car);
-  bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
-  std::string Name() const override { return "ObstacleDetectionCamera"; }
+
+  bool Init(const PipelineConfig& pipeline_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  std::string Name() const override { return name_; }
+
+ protected:
+  ObjectTemplateManager *object_template_manager_;
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
@@ -71,21 +70,14 @@ class ObstacleDetectionCamera : public BaseCameraPerception {
   std::shared_ptr<BaseObstacleTransformer> transformer_;
   std::shared_ptr<BaseObstaclePostprocessor> obstacle_postprocessor_;
   std::shared_ptr<BaseObstacleTracker> tracker_;
-  std::shared_ptr<BaseFeatureExtractor> extractor_;
-  std::shared_ptr<BaseLaneDetector> lane_detector_;
-  std::shared_ptr<BaseLanePostprocessor> lane_postprocessor_;
-  std::shared_ptr<BaseCalibrationService> calibration_service_;
+
   app::PerceptionParam perception_param_;
   std::ofstream out_track_;
   std::ofstream out_pose_;
-  std::string lane_calibration_working_sensor_name_ = "";
-  bool write_out_lane_file_ = false;
-  bool write_out_calib_file_ = false;
-  std::string out_lane_dir_;
-  std::string out_calib_dir_;
 
- protected:
-  ObjectTemplateManager *object_template_manager_ = nullptr;
+  CameraDetectionConfig camera_detection_config_;
+
+  DISALLOW_COPY_AND_ASSIGN(ObstacleDetectionCamera);
 };
 
 }  // namespace camera

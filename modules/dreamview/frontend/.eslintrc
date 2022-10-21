@@ -1,5 +1,5 @@
 {
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module",
@@ -10,7 +10,12 @@
     }
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
+  },
+  "globals": {
+    "OFFLINE_PLAYBACK": true,
+    "PARAMETERS": true
   },
   "rules": {
     // Require a semi colon at the end of a statement.

@@ -19,7 +19,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "//modules/routing/proto:routing_config_cc_proto",
         "//modules/routing/proto:topo_graph_cc_proto",
     ],
@@ -55,8 +55,8 @@ cc_library(
     hdrs = ["node_creator.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
-        "//modules/map/proto:map_lane_cc_proto",
-        "//modules/routing/proto:routing_cc_proto",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "//modules/routing/proto:routing_config_cc_proto",
         "//modules/routing/proto:topo_graph_cc_proto",
     ],

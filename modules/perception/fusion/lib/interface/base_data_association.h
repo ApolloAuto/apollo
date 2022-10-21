@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/fusion/base/base_forward_declaration.h"
 #include "modules/perception/fusion/base/scene.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
@@ -42,10 +43,8 @@ struct AssociationResult {
 
 class BaseDataAssociation {
  public:
-  BaseDataAssociation() {}
-  virtual ~BaseDataAssociation() {}
-  BaseDataAssociation(const BaseDataAssociation&) = delete;
-  BaseDataAssociation& operator=(const BaseDataAssociation&) = delete;
+  BaseDataAssociation() = default;
+  virtual ~BaseDataAssociation() = default;
 
   virtual bool Init() = 0;
 
@@ -58,7 +57,7 @@ class BaseDataAssociation {
                          SensorFramePtr sensor_measurements, ScenePtr scene,
                          AssociationResult* association_result) = 0;
 
-  virtual std::string Name() const = 0;
+  DISALLOW_COPY_AND_ASSIGN(BaseDataAssociation);
 };
 
 }  // namespace fusion

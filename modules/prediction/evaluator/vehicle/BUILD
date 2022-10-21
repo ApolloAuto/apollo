@@ -68,7 +68,7 @@ cc_library(
     hdrs = ["junction_mlp_evaluator.h"],
     copts = PREDICTION_FOPENMP_COPTS,
     deps = [
-        "//modules/common/math:geometry",
+        "//modules/common/math",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container:container_manager",

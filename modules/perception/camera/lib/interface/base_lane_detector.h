@@ -18,10 +18,12 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -34,7 +36,11 @@ struct LaneDetectorInitOptions : public BaseInitOptions {
 
 struct LaneDetectorOptions {};
 
-class BaseLaneDetector {
+class BaseLaneDetector : public pipeline::Stage {
+ public:
+  using StageConfig = pipeline::StageConfig;
+  using DataFrame = pipeline::DataFrame;
+
  public:
   BaseLaneDetector() = default;
 
@@ -51,10 +57,15 @@ class BaseLaneDetector {
   virtual bool Detect(const LaneDetectorOptions& options,
                       CameraFrame* frame) = 0;
 
+  virtual bool Init(const StageConfig& stage_config) = 0;
+
+  virtual bool Process(DataFrame* data_frame) = 0;
+
+  virtual bool IsEnabled() const = 0;;
+
   virtual std::string Name() const = 0;
 
-  BaseLaneDetector(const BaseLaneDetector&) = delete;
-  BaseLaneDetector& operator=(const BaseLaneDetector&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(BaseLaneDetector);
 };  // class BaseLaneDetector
 
 PERCEPTION_REGISTER_REGISTERER(BaseLaneDetector);

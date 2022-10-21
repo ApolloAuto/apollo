@@ -20,6 +20,7 @@
 
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -27,14 +28,20 @@ namespace lidar {
 
 class ROIServiceFilter : public BaseROIFilter {
  public:
-  ROIServiceFilter() : BaseROIFilter() {}
+  ROIServiceFilter() = default;
   ~ROIServiceFilter() = default;
 
   bool Init(const ROIFilterInitOptions& options) override;
 
-  std::string Name() const override { return "ROIServiceFilter"; }
-
   bool Filter(const ROIFilterOptions& options, LidarFrame* frame) override;
+
+  bool Init(const StageConfig& stage_config) override;
+
+  bool Process(DataFrame* data_frame) override;
+
+  bool IsEnabled() const override { return enable_; }
+
+  std::string Name() const override { return name_; }
 
  private:
   ROIServicePtr roi_service_ = nullptr;

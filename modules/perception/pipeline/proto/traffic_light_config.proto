@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.pipeline;
+
+
+message PerceptionConfig {
+  optional int32 gpu_id = 1 [default = 0];
+}
+
+message TrafficLightConfig {
+  optional PerceptionConfig trafficlights_perception_config = 1;
+}

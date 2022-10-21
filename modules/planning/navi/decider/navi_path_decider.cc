@@ -28,7 +28,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {

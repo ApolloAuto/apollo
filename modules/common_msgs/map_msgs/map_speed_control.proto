@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+import "modules/common_msgs/map_msgs/map_geometry.proto";
+
+package apollo.hdmap;
+
+// This proto defines the format of an auxiliary file that helps to
+// define the speed limit on certain area of road.
+// Apollo can use this file to quickly fix speed problems on maps,
+// instead of waiting for updating map data.
+message SpeedControl {
+  optional string name = 1;
+  optional apollo.hdmap.Polygon polygon = 2;
+  optional double speed_limit = 3;
+}
+
+message SpeedControls {
+  repeated SpeedControl speed_control = 1;
+}

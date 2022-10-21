@@ -57,7 +57,7 @@ class EmergencyStopScenario : public Scenario {
 
  private:
   static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
+      StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
                  const std::shared_ptr<DependencyInjector>& injector)>
       s_stage_factory_;

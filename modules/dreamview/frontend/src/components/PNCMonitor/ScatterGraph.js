@@ -97,8 +97,8 @@ function syncXYWindowSize(scale) {
     if (chart.isDatasetVisible(datasetIndex) && IDMatches(meta)) {
       Chart.helpers.each(dataset.data, (rawValue, index) => {
         if (!isValidValue(rawValue.x)
-                    || !isValidValue(rawValue.y)
-                    || meta.data[index].hidden) {
+          || !isValidValue(rawValue.y)
+          || meta.data[index].hidden) {
           return;
         }
 
@@ -120,7 +120,7 @@ function syncXYWindowSize(scale) {
 
   // set min/max based on the larger range
   if (isValidValue(min.x) && isValidValue(min.y)
-        && isValidValue(max.x) && isValidValue(max.y)) {
+    && isValidValue(max.x) && isValidValue(max.y)) {
     const max_diff = Math.max(max.x - min.x, max.y - min.y);
     const mid = scale.isHorizontal()
       ? Math.floor((max.x + min.x) / 2)
@@ -339,7 +339,7 @@ export default class ScatterGraph extends React.Component {
         }
 
         const properties =
-                    _.get(props, `properties.polygons[${nameInString}]`, defaultPolygonProperties);
+          _.get(props, `properties.polygons[${nameInString}]`, defaultPolygonProperties);
 
         this.updateData(idx, name, properties, points);
         idx++;
@@ -372,12 +372,12 @@ export default class ScatterGraph extends React.Component {
       title, options, properties, data,
     } = this.props;
     return (
-            <div className="scatter-graph">
-                <canvas ref={(input) => {
-                  this.canvasElement = input;
-                }}
-                />
-            </div>
+      <div className="scatter-graph">
+        <canvas ref={(input) => {
+          this.canvasElement = input;
+        }}
+        />
+      </div>
     );
   }
 }
@@ -389,18 +389,18 @@ function generateScatterGraph(setting, lineDatasets, carDatasets, polygonsDatase
   }
 
   if (!setting || !setting.properties || !setting.options) {
-    console.error('Graph setting not found:', setting.title);
+    console.error('Graph setting not found:', setting?.title);
     return null;
   }
 
   return (
-        <ScatterGraph
-            key={setting.title}
-            title={setting.title}
-            options={setting.options}
-            properties={setting.properties}
-            data={{ lines: lineDatasets, cars: carDatasets, polygons: polygonsDatasets }}
-        />
+    <ScatterGraph
+      key={setting.title}
+      title={setting.title}
+      options={setting.options}
+      properties={setting.properties}
+      data={{ lines: lineDatasets, cars: carDatasets, polygons: polygonsDatasets }}
+    />
   );
 }
 

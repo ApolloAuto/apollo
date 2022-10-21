@@ -1,8 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
+
+install(
+    name = "install",
+    library_dest = "prediction/lib",
+    targets = [
+        ":evaluator_submodule.so",
+        ":predictor_submodule.so",
+        ":prediction_lego.so",
+        ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "submodule_output",
@@ -10,8 +22,8 @@ cc_library(
     hdrs = ["submodule_output.h"],
     copts = PREDICTION_COPTS,
     deps = [
-        "//modules/common/util:lru_cache",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
     ],
@@ -24,10 +36,9 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_cc_proto",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
@@ -49,16 +60,15 @@ cc_library(
     copts = PREDICTION_COPTS,
     deps = [
         "//cyber",
-        "//cyber/time:clock",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_cc_proto",
-        "//modules/common/util:message_util",
-        "//modules/perception/proto:perception_obstacle_cc_proto",
+        "//modules/common/util:util_tool",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/predictor:predictor_manager",
-        "//modules/prediction/proto:prediction_obstacle_cc_proto",
+        "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
     ],
     alwayslink = True,
 )

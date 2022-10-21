@@ -17,10 +17,10 @@
 #include "modules/planning/planning_base.h"
 
 #include "cyber/time/clock.h"
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {

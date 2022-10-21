@@ -17,15 +17,13 @@
 #pragma once
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
-#include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/common_msgs/sensor_msgs/conti_radar.pb.h"
 
 namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
-using ::apollo::drivers::conti_radar::OutputType;
-using ::apollo::drivers::conti_radar::RcsThreshold;
 
 class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
  public:
@@ -39,9 +37,11 @@ class RadarState201 : public apollo::drivers::canbus::ProtocolData<ContiRadar> {
 
   int radar_power(const std::uint8_t* bytes, int32_t length) const;
 
-  OutputType output_type(const std::uint8_t* bytes, int32_t length) const;
+  RadarState_201::OutputType output_type(
+      const std::uint8_t* bytes, int32_t length) const;
 
-  RcsThreshold rcs_threshold(const std::uint8_t* bytes, int32_t length) const;
+  RadarState_201::RcsThreshold rcs_threshold(
+      const std::uint8_t* bytes, int32_t length) const;
 
   bool send_quality(const std::uint8_t* bytes, int32_t length) const;
 

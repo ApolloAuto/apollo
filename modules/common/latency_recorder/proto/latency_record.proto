@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.common;
 
-import "modules/common/proto/header.proto";
+import "modules/common_msgs/basic_msgs/header.proto";
 
 message LatencyRecord {
   optional uint64 begin_time = 1;

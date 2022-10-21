@@ -33,8 +33,20 @@
 
 class RTLogger : public nvinfer1::ILogger {
   void log(Severity severity, const char *msg) override {
-    if (severity != Severity::kINFO) {
-      AINFO << msg;
+    switch (severity) {
+      case Severity::kINTERNAL_ERROR:
+      case Severity::kERROR:
+        AERROR << msg;
+        break;
+      case Severity::kWARNING:
+        AWARN << msg;
+        break;
+      case Severity::kINFO:
+      case Severity::kVERBOSE:
+        ADEBUG << msg;
+        break;
+      default:
+        break;
     }
   }
 } rt_gLogger;

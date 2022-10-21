@@ -18,7 +18,7 @@
 
 #include <memory>
 #include "cyber/cyber.h"
-#include "modules/drivers/proto/sensor_image.pb.h"
+#include "modules/common_msgs/sensor_msgs/sensor_image.pb.h"
 #include "modules/drivers/video/proto/video_h265cfg.pb.h"
 #include "modules/drivers/video/socket_input.h"
 

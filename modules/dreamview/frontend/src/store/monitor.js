@@ -77,7 +77,12 @@ export default class Monitor {
       return JSON.stringify(this.items[0]) !== JSON.stringify(newItems[0]);
     }
 
-    // Inserts the provided message into the items. This message won't send to backend
+    /**
+   * Inserts the provided message into the items. This message won't send to backend
+   * @param level {'FATAL' | 'WARN' | 'ERROR' | 'INFO'}
+   * @param message {string}
+   * @param timestamp {number}
+   */
     @action insert(level, message, timestamp) {
       const newItems = [];
       newItems.push({
