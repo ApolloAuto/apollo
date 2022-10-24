@@ -84,7 +84,12 @@ install(
         "//modules/tools/vehicle_calibration:install",
         "//modules/tools/visualizer:install",
         ":pb_hdrs"
-    ]
+    ],
+    data = [
+        ":cyberfile.xml",
+        ":tools.BUILD"
+    ],
+    data_dest = "tools",
 )
 
 install_src_files(
