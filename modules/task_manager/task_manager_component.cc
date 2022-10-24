@@ -106,49 +106,11 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
       rate.Sleep();
     }
   } else if (task->task_type() == PARKING_ROUTING) {
-    AERROR << "enter the parking routing task";
     parking_routing_manager_ = std::make_shared<ParkingRoutingManager>();
-    parking_routing_manager_->Init(task->parking_routing_task());
-    routing_request_ = task->parking_routing_task().routing_request();
-    if (parking_routing_manager_->SizeVerification(
-            task->parking_routing_task()) &&
-        parking_routing_manager_->RoadWidthVerification(
-            task->parking_routing_task())) {
-      AERROR << "compelet the Verification";
-      common::util::FillHeader(node_->Name(), &routing_request_);
-      request_writer_->Write(routing_request_);
-      AINFO << "send a auto parking task";
-    } else {
-      auto last_routing_response_ = routing_response_;
-      if (!routing_response_.has_header()) {
-           AINFO << "[TaskManagerComponent]parking routing failed";
-           return false;
-         }
-         if (last_routing_response_.has_header()) {
-           if (last_routing_response_.header().sequence_num() ==
-               routing_response_.header().sequence_num()) {
-             AINFO << "[TaskManagerComponent]No parking routing response: "
-                   << "new parking routing failed";
-             return false;
-           }
-         }
-      AERROR << "plot verification failed, please select suitable plot!";
-      return false;
-    }
-  } else if (task->task_type() == DEAD_END_ROUTING) {
-    dead_end_routing_manager_ = std::make_shared<DeadEndRoutingManager>();
-    dead_end_routing_manager_->Init(task->dead_end_routing_task());
-    routing_request_ = task->dead_end_routing_task().routing_request_in();
-    Rate rate(1.0);
-    while (dead_end_routing_manager_->GetNumber() > 0) {
-      if (dead_end_routing_manager_->GetNewRouting(localization_.pose(),
-                                                   &routing_request_)) {
-        common::util::FillHeader(node_->Name(), &routing_request_);
-        request_writer_->Write(routing_request_);
-        rate.Sleep();
-      }
-    rate.Sleep();
-    }
+    parking_routing_manager_->ConstructParkingRoutingRequest(task->mutable_parking_routing_task());
+    RoutingRequest msg;
+    msg.CopyFrom(task->parking_routing_task().routing_request());
+    request_writer_->Write(msg);
   }
   return true;
 }
