@@ -44,5 +44,6 @@ py_binary(
         "//cyber/python/cyber_py3:cyber_time",
         "//modules/common/proto:geometry_py_pb2",
         "//modules/perception/proto:perception_obstacle_py_pb2",
+        "//modules/prediction/proto:prediction_obstacle_py_pb2",
     ],
 )
