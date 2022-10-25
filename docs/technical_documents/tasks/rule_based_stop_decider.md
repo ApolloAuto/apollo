@@ -1,104 +1,105 @@
-# 基于规则的停止决策
+# Rule Based Stop Decider
 
-### *目录*
+### *Contents*
 
-- [概览](#概览)
-- [相关代码及对应版本](#相关代码及对应版本)
-- [代码流程及框架](#代码流程及框架)
-- [相关算法解析](#相关算法解析)
+- [Introduction](#introduction)
+- [Where is the code](#where-is-the-code)
+- [Code Reading](#code-reading)
+- [Algorithm Detail](#algorithm-detail)
 
-# 概览
+# Introduction
 
-`基于规则的停止决策`是规划模块的任务，属于task中的decider类别。
+`Rule based stop decider` is the task of planning module,belongs to `decider`.
 
-规划模块的运动总体流程图如下：
+The overall flow chart of the planning module:
 
-![总体流程图](../images/task/lane_follow.png)
+![Planning Diagram](../images/task/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+The overall flow chart is illustrated with [lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt) scenario as an example.The main function of tasks is located in `Process` method.
 
-Fig.1的具体运行过程可以参考[path_bounds_decider]()。
+The specific running process of Fig.1 can be referred to [path_bounds_decider]().
 
-# 相关代码及对应版本
 
-基于规则的停止决策根据一些规则来设置停止标志。
+# Where is the code
 
-代码位于[Apollo r6.0.0 rule_based_stop_decider](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/deciders/rule_based_stop_decider)。
+`Rule based stop decider` sets stop signs according to some rules.
 
-- 输入
+`Rule based stop decider` codes [Apollo r6.0.0 rule_based_stop_decider](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/deciders/rule_based_stop_decider).
+
+- Input
 
 `apollo::common::Status RuleBasedStopDecider::Process(Frame *const frame, ReferenceLineInfo *const reference_line_info)`
 
-输入是frame和reference_line_info。具体解释可以参考[path_bounds_decider]()。
+The input is `frame` and `reference_line_info`,specific information can refer to [path_bounds_decider]().
 
-- 输出
+- Output
 
-输出保存到reference_line_info中。
+Results save in reference_line_info.
 
 
-# 代码流程及框架
+# Code Reading
 
-代码的运行流程如下图。
+The flow chart of the codes is as follow:
 
-![流程图](../images/task/rule_based_stop_decider/rule_based_stop_decider_cn.png)
+![Diagram](../images/task/rule_based_stop_decider/rule_based_stop_decider.png)
 
-代码结构比较清楚：
+Code structure:
 
 ```C++
 apollo::common::Status RuleBasedStopDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
-  // 1. 逆向车道通过，停止
+  // 1. Rule_based stop for side pass onto reverse lane
   StopOnSidePass(frame, reference_line_info);
 
-  // 2. 紧急换道，停止
+  // 2. Rule_based stop for urgent lane change
   if (FLAGS_enable_lane_change_urgency_checking) {
     CheckLaneChangeUrgency(frame);
   }
 
-  // 3. 路径尽头，停止
+  // 3. Rule_based stop at path end position
   AddPathEndStop(frame, reference_line_info);
 
   return Status::OK();
 }
 ```
 
-# 相关算法解析
+# Algorithm Detail
 
-对上图总流程的的每个部分拆分开分析。
+Analyze each part of the total process in the diagram above. 
 
 - Stop on side pass
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/stop_on_side_pass_cn.png)
+![StopOnSidePass](../images/task/rule_based_stop_decider/stop_on_side_pass.png)
 
-代码如下：
+Codes:
 
 ```C++
 void RuleBasedStopDecider::StopOnSidePass(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
-  static bool check_clear;    // 默认false
+  static bool check_clear;    // default is false
   static common::PathPoint change_lane_stop_path_point;
 
-  // 获取path_data
+  // get path_data
   const PathData &path_data = reference_line_info->path_data();
   double stop_s_on_pathdata = 0.0;
 
-  // 1. 找到"self"，直接return
+  // 1. find "self",return directly
   if (path_data.path_label().find("self") != std::string::npos) {
     check_clear = false;
     change_lane_stop_path_point.Clear();
     return;
   }
 
-  // 2. 如果check_clear为true，且CheckClearDone成功。设置check_clear为false
+  // 2. If check_clear is true and CheckClearDone successes.Set check_clear to false
   if (check_clear &&
       CheckClearDone(*reference_line_info, change_lane_stop_path_point)) {
     check_clear = false;
   }
 
-  // 3.如果check_clear为false，且检查stop fence
+  // 3.If check_clear is false,check stop fence
   if (!check_clear &&
       CheckSidePassStop(path_data, *reference_line_info, &stop_s_on_pathdata)) {
-    // 3.1 如果障碍物没有阻塞且可以换道，直接return
+    // 3.1 If the obstacle is not blocked and the lane can be changed,return directly
     if (!LaneChangeDecider::IsPerceptionBlocked(
             *reference_line_info,
             rule_based_stop_decider_config_.search_beam_length(),
@@ -108,9 +109,9 @@ void RuleBasedStopDecider::StopOnSidePass(
         LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
       return;
     }
-    // 3.2 检查adc是否停在了stop fence前，否返回true
+    // 3.2 Check whether the adc stops before the stop fence,if not return true
     if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
-      // 设置stop fence，成功就执行 check_clear = true;
+      // Set the stop fence,execute 'check_clear = true' if success
       if (!BuildSidePassStopFence(path_data, stop_s_on_pathdata,
                                   &change_lane_stop_path_point, frame,
                                   reference_line_info)) {
@@ -127,16 +128,16 @@ void RuleBasedStopDecider::StopOnSidePass(
 
 - Check lane change Urgency
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/check_lane_change_urgency_cn.png)
+![StopOnSidePass](../images/task/rule_based_stop_decider/check_lane_change_urgency.png)
 
-检查紧急换道，代码如下：
+Check the emergency lane change,the code is as follows:
 
 ```C++
 void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
-  // 直接进入循环，检查每个reference_line_info
+  // check every reference_line_info
   for (auto &reference_line_info : *frame->mutable_reference_line_info()) {
 
-    // 1. 检查目标道路是否阻塞，如果在change lane path上，就跳过
+    // 1. Check whether the target road is blocked.Skip if it is on the lane change path.
     if (reference_line_info.IsChangeLanePath()) {
       is_clear_to_change_lane_ =
           LaneChangeDecider::IsClearToChangeLane(&reference_line_info);
@@ -145,7 +146,7 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
       continue;
     }
 
-    // 2.如果不是换道的场景，或者（目标lane没有阻塞）并且换道规划成功，跳过
+    // 2.If it is not lane change scenario and lane change is successful,skip.
     if (frame->reference_line_info().size() <= 1 ||
         (is_clear_to_change_lane_ && is_change_lane_planning_succeed_)) {
       continue;
@@ -155,7 +156,7 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
     const auto &route_end_waypoint =
         reference_line_info.Lanes().RouteEndWaypoint();
 
-    // 3.在route的末端无法获得lane，跳过
+    // 3.Skip if it cannot obtain lane at the end of routing.
     if (!route_end_waypoint.lane) {
       continue;
     }
@@ -163,20 +164,20 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
     auto *reference_line = reference_line_info.mutable_reference_line();
     common::SLPoint sl_point;
 
-    // 将当前参考线的点映射到frenet坐标系下
+    // mapping points of reference line to the frenet coordinate system.
     if (reference_line->XYToSL(point, &sl_point) &&
         reference_line->IsOnLane(sl_point)) {
       // Check the distance from ADC to the end point of current routing
       double distance_to_passage_end =
           sl_point.s() - reference_line_info.AdcSlBoundary().end_s();
 
-      // 4. 如果adc距离routing终点较远，不需要停止，跳过
+      // 4. If the adc is far away from the end of routing,it does not need to stop and skip.
       if (distance_to_passage_end >
           rule_based_stop_decider_config_.approach_distance_for_lane_change()) {
         continue;
       }
 
-      // 5.如果遇到紧急情况，设置临时的stop fence，等待换道
+      // 5.In case of emergency,set temporary stop fence and wait for lane change.
       const std::string stop_wall_id = "lane_change_stop";
       std::vector<std::string> wait_for_obstacles;
       util::BuildStopDecision(
@@ -191,9 +192,9 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
 
 - Add path end stop
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/add_path_end_stop_cn.png)
+![StopOnSidePass](../images/task/rule_based_stop_decider/add_path_end_stop.png)
 
-在道路的尽头添加stop fence。代码如下：
+Add stop fence at the end of lane.
 
 ```C++
 void RuleBasedStopDecider::AddPathEndStop(
@@ -206,7 +207,7 @@ void RuleBasedStopDecider::AddPathEndStop(
         PATH_END_VO_ID_PREFIX + reference_line_info->path_data().path_label();
     std::vector<std::string> wait_for_obstacles;
 
-    // 创建stop fence
+    // Build stop fence
     util::BuildStopDecision(
         stop_wall_id,
         reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,

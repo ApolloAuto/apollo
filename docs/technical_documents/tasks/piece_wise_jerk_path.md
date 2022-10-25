@@ -1,75 +1,78 @@
-# 分段加加速度路径优化
+# Piecewise Jerk Path Optimizer
 
-_**Tip**: 为了更好的展示本文档中的等式，我们建议使用者使用带有[插件](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn)的Chrome浏览器，或者将Latex等式拷贝到[在线编辑公式网站](http://www.hostmath.com/)进行浏览。_
+_**Tip**: to read the equations in the document, you are recommended to use Chrome with [a plugin](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn) or copy the latex equation to [an online editor](http://www.hostmath.com/)_
 
-### *目录*
+### *Contents*
 
-- [概览](#概览)
-- [相关代码及对应版本](#相关代码及对应版本)
-- [代码流程及框架](#代码流程及框架)
-- [相关算法解析](#相关算法解析)
+- [Introduction](#introduction)
+- [Where is the code](#where-is-the-code)
+- [Code Reading](#code-reading)
+- [Algorithm Detail](#algorithm-detail)
 
-# 概览
+# Introduction
 
-`分段加加速度路径优化`是规划模块的任务，属于task中的optimizer类别。
+`Piecewise jerk path optimizer` is the task of planning module,belongs to `optimizer`.
 
-规划模块的运动总体流程图如下：
+The overall flow chart of the planning module:
 
-![总体流程图](../images/task/lane_follow.png)
+![Planning Diagram](../images/task/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+The overall flow chart is illustrated with [lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt) scenario as an example.The main function of tasks is located in `Process` method.
 
-Fig.1的具体运行过程可以参考[path_bounds_decider]()。
-
-`分段加加速度路径优化`的流程如下图：
-![总体流程图](../images/task/piecewise_jerk_path/piecewise_jerk_path_cn.png)
+The specific running process of Fig.1 can be referred to [path_bounds_decider]().
 
 
-# 相关代码及对应版本
+The flow chart of `piecewise jerk path optimizer` is as follow:
 
-本节说明`分段加加速度路径优化`代码和算法。
+![Diagram](../images/task/piecewise_jerk_path/piecewise_jerk_path.png)
 
-请参考代码[Apollo r6.0.0 piecewise_jerk_path_optimization](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/optimizers/piecewise_jerk_path)
 
-- 输入
+# Where is the code
+
+This section of `piecewise jerk path optimizer` describes codes.
+
+Please refer to [Apollo r6.0.0 piecewise_jerk_path_optimization](https://github.com/ApolloAuto/apollo/tree/r6.0.0/modules/planning/tasks/optimizers/piecewise_jerk_path)
+
+- Input
 `PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, const bool path_reusable,
     PathData* const final_path_data)`
 
-其中包括参考线，起始点等。
+Include reference line and start point,etc.
 
-- 输出
+- Output
 
-`OptimizePath`函数得到最优的路径，信息包括$opt\_l, opt\_dl, opt\_ddl$。在`Process`函数中最终结果保存到了task基类的变量reference_line_info_中。
+The `OptimizePath` method gets the optimal path,include $opt\_l, opt\_dl, opt\_ddl$.In `Process`method,results save into reference_line_info_ of the task base class.
 
-# 代码流程及框架
+# Code Reading
 
-`分段加加速度路径优化`代码的流程图如下。
+The diagram of `piecewise jerk path optimizer` is as follow:
 
-![代码流程图](../images/task/piecewise_jerk_path/code_cn.png)
+![Diagram](../images/task/piecewise_jerk_path/code.png)
 
-- 如果重复使用path则return
+- Return if reuse path
+
 ```C++
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, const bool path_reusable,
     PathData* const final_path_data) {
-  // 跳过piecewise_jerk_path_optimizer 如果路径重复使用
+  // Skip if reuse path
   if (FLAGS_enable_skip_path_tasks && path_reusable) {
     return Status::OK();
   }
   ... ...
 ```
 
-- adc起始点转化到frenet坐标
+- Transform start point of adc to frenet coordinate system
 ```C++
   ... ...
   const auto init_frenet_state =
       reference_line.ToFrenetFrame(planning_start_point);
 
-  // 为lane-change选择lane_change_path_config
-  // 否则, 选择default_path_config
+  // choose lane_change_path_config for lane-change
+  // otherwise,choose default_path_config
   const auto& config = reference_line_info_->IsChangeLanePath()
                            ? config_.piecewise_jerk_path_optimizer_config()
                                  .lane_change_path_config()
@@ -78,7 +81,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   ... ...
 ```
 
-- 遍历每个路径边界
+- Traverse the boundary of each path
+
 ```C++
   ... ...
   const auto& path_boundaries =
@@ -87,19 +91,20 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto& reference_path_data = reference_line_info_->path_data();
 
   std::vector<PathData> candidate_path_data;
-  // 遍历每个路径
+  // traverse each path boundary
   for (const auto& path_boundary : path_boundaries) {
     size_t path_boundary_size = path_boundary.boundary().size();
   ... ...
 ```
 
-- 判断是否pull-over或regular
-① 判断是否是pull-over
+- Decider whether to pull over or regular
+
+① decider whether it is pull over
 
 ```C++
     ... ...
     if (!FLAGS_enable_force_pull_over_open_space_parking_test) {
-      // pull over场景
+      // pull over scenario
       const auto& pull_over_status =
           injector_->planning_context()->planning_status().pull_over();
       if (pull_over_status.has_position() &&
@@ -114,14 +119,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     ... ...
 ```
 
-② 判断是否是regular
+② Decide whether it is regular
 
 ```C++
     ... ...
     if (path_boundary.label().find("regular") != std::string::npos &&
         reference_path_data.is_valid_path_reference()) {
       ADEBUG << "path label is: " << path_boundary.label();
-      // 当参考路径就位
+      // when reference road is ready
       for (size_t i = 0; i < path_reference_size; ++i) {
         common::SLPoint path_reference_sl;
         reference_line.XYToSL(
@@ -138,11 +143,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     ... ...
 ```
 
-- 优化路径
+- Optimizer path
 
 ```C++
     ... ...
-    // 设置参数
+    // setting parameters 
     const auto& veh_param =
         common::VehicleConfigHelper::GetConfig().vehicle_param();
     const double lat_acc_bound =
@@ -155,7 +160,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       double kappa = reference_line.GetNearestReferencePoint(s).kappa();
       ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
     }
-    // 优化算法
+    // path optimize method
     bool res_opt = OptimizePath(
         init_frenet_state.second, end_state, std::move(path_reference_l),
         path_reference_size, path_boundary.delta_s(), is_valid_path_reference,
@@ -164,17 +169,17 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     ... ...
 ```
 
-优化过程：
-1).定义piecewise_jerk_problem变量，优化算法
-2).设置变量
-&emsp; a.权重
-&emsp; b.D方向距离、速度加速度边界
-&emsp; c.最大转角速度
+Optimize process:
+1).Define piecewise_jerk_problem variable
+2).Set variable
+&emsp; a.weights
+&emsp; b.distance,speed and acceleration boundaries of D direction
+&emsp; c.Maximum angular speed
 &emsp; d.jerk bound
-3).优化算法
-4).获取结果
+3).Optimize algorithm
+4).Acquire results
 
-- 如果成功将值保存到candidate_path_data
+- Save results to candidate_path_data if success
 
 ```C++
     ... ...
@@ -201,7 +206,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     ... ...
 ```
 
-- 失败则返回错误码，成功则保存路径点
+- Fail,return error code.Sucess,save path points.
 
 ```C++
   ... ...
@@ -214,23 +219,23 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   ... ...
 ```
 
-# 相关算法解析
+# Algorithm Detail
 
-`分段加加速度路径优化`算法详细介绍在论文[Optimal Vehicle Path Planning Using Quadratic Optimization for Baidu Apollo Open Platform
-](https://ieeexplore.ieee.org/document/9304787)中。
+The algorithm of `Piecewise jerk path optimizer` is introduced in this paper [Optimal Vehicle Path Planning Using Quadratic Optimization for Baidu Apollo Open Platform
+](https://ieeexplore.ieee.org/document/9304787)
 
-![算法](../images/task/piecewise_jerk_path/path.png)
+![algorithm](../images/task/piecewise_jerk_path/path.png)
 
-路径优化算法：
-- 根据导引线和障碍物生成路径边界
-- 将导引线在s方向等间隔采样
-- 对每个s方向的离散点迭代的优化 $𝑙, 𝑙^{'}, 𝑙^{''}$ 。
+Optimization algorithm:
+- Generate the path boundary according to guide line and obstacle
+- The guide is sampled at equal intervals in the s direction
+- Optimize discrete points iteratively for each s direction $𝑙, 𝑙^{'}, 𝑙^{''}$ 
 
-## 建立数学模型
+## Build mathematical model
 
-### （1）轨迹平滑
+### (1) trajectory smoothing
 
-![平滑](../images/task/piecewise_jerk_path/smooth.png)
+![smoothing](../images/task/piecewise_jerk_path/smooth.png)
 
 $$
 min \sum_{k=1}^{n-2} ||2P_k - P_{k-1} + P_{k+1}||_2^2 +\\
@@ -245,15 +250,13 @@ P_k \in B, for: k = 0,...,n-1 \\
 for: k=1,...,n-2 
 $$
 
-其中
-- $P_k$是$(x_k, y_k)$
-- $P_{k\_ref}$是路由线的原始点
-- $B$是$P_k$在$P_{k\_ref}$的边界
-- $\frac{d_{ref}^2}{R_{min}}$是最大曲率约束
+Among them:
+- $P_k$ is $(x_k, y_k)$
+- $P_{k\_ref}$ is the original point of routing
+- $B$ is the boundary of $P_k$ in $P_{k\_ref}$
+- $\frac{d_{ref}^2}{R_{min}}$ is the constrain of maximum curvature
 
-### （2）优化目标
-
-
+### (2) Optimization target
 
 $$
 \tilde{f}(l(s)) = w_l * \sum_{i=0}^{n-1} l_i^2 + w_{l^{'}} * \sum_{i=0}^{n-1} l_i^{'2} + w_{l^{''}} * \sum_{i=0}^{n-1} l_i^{''2} +\\
@@ -261,9 +264,9 @@ w_{l^{'''}} * \sum_{i=0}^{n-2}(\frac{l_{i+1}^{''} - l_i^{''}}{\Delta s})^2 +\\
 w_{obs} * \sum_{i=0}^{n-1}(l_i - 0.5*(l_{min}^i + l_{max}^i))^2
 $$
 
-### （3）约束条件
+### （3）Constrain conditions
 
-- 连续性约束
+- Continuity constraints
 
 $$
 l_{i+1}^{'''} = l_i^{''} + \int_0^{\Delta{s}} l_{i\rightarrow{i+1}}^{'''} ds = l_i^{''} + l_{i\rightarrow{i+1}}^{'''} * \Delta{s} \\
@@ -272,20 +275,20 @@ l_{i+1} = l_i + \int_0^{\Delta{s}}l^{'}(s)ds \\
 = l_i + l_i^{'}*\Delta(s^2) + \frac{1}{6}*l_{i\rightarrow{i+1}}*\Delta{s^3}
 $$
 
-- 安全性约束
+- Safty constrains
 
-$l$方向的点需要在边界内。
+The points of $l$ should be within the boundary.
 
 $$
 l(s) \in l_B(s), \forall{s} \in [0, s_{max}]
 $$
 
-- 曲率约束
+- Curverture constrains
 
-自车的转角不能超过最大转角。
+The turning angle of ego car shall not exceed the maximum turning angle.
 
 $$
 tan(\alpha_{max})*k_r*l - tan(\alpha_{max}) + |k_r|*L \leqslant 0
 $$
 
-优化方法采用[OSQP](https://osqp.org/)方法。
+The optimization algorithm is adopted [OSQP](https://osqp.org/).
