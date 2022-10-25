@@ -138,62 +138,70 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   int bytes = 0;
   int total_recv = 2 * FRAME_SIZE;
   char total_buf[2 * FRAME_SIZE] = {0};
-  bytes =
-      static_cast<int>(recvfrom(fd, total_buf, total_recv, 0,
-                                (struct sockaddr *)&client_addr, &sock_len));
-  ADEBUG << "total recv " << bytes;
-  if (bytes <= 0 || bytes > total_recv) {
-    return false;
-  }
-  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-  size_t offset = 0;
-  memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
-  if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
-    AINFO << "header flag not match!";
-    return false;
-  }
-  offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  char header_size_buf[sizeof(hsize) + 1] = {0};
-  const char *cursor = total_buf + offset;
-  memcpy(header_size_buf, cursor, sizeof(hsize));
-  hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
-  if (header_size > FRAME_SIZE) {
-    AINFO << "header size is more than FRAME_SIZE!";
-    return false;
-  }
-  offset += sizeof(hsize) + 1;
+  do {
+    bytes =
+        static_cast<int>(recvfrom(fd, total_buf, total_recv, 0,
+                                  (struct sockaddr *)&client_addr, &sock_len));
+    if (bytes <= 0) {
+      continue;
+    }
 
-  BridgeHeader header;
-  size_t buf_size = header_size - offset;
-  cursor = total_buf + offset;
-  if (!header.Diserialize(cursor, buf_size)) {
-    AINFO << "header diserialize failed!";
-    return false;
-  }
+    ADEBUG << "total recv " << bytes;
+    if (bytes <= 0 || bytes > total_recv) {
+      return false;
+    }
+    char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
+    size_t offset = 0;
+    memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
+    if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
+      AINFO << "header flag not match!";
+      return false;
+    }
+    offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  ADEBUG << "proto name : " << header.GetMsgName().c_str();
-  ADEBUG << "proto sequence num: " << header.GetMsgID();
-  ADEBUG << "proto total frames: " << header.GetTotalFrames();
-  ADEBUG << "proto frame index: " << header.GetIndex();
+    char header_size_buf[sizeof(hsize) + 1] = {0};
+    const char *cursor = total_buf + offset;
+    memcpy(header_size_buf, cursor, sizeof(hsize));
+    hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
+    if (header_size > FRAME_SIZE) {
+      AINFO << "header size is more than FRAME_SIZE!";
+      return false;
+    }
+    offset += sizeof(hsize) + 1;
 
-  std::lock_guard<std::mutex> lock(mutex_);
-  BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
-  if (!proto_buf) {
-    return false;
-  }
+    BridgeHeader header;
+    size_t buf_size = header_size - offset;
+    cursor = total_buf + offset;
+    if (!header.Diserialize(cursor, buf_size)) {
+      AINFO << "header diserialize failed!";
+      return false;
+    }
 
-  cursor = total_buf + header_size;
-  char *buf = proto_buf->GetBuf(header.GetFramePos());
-  memcpy(buf, cursor, header.GetFrameSize());
-  proto_buf->UpdateStatus(header.GetIndex());
-  if (proto_buf->IsReadyDiserialize()) {
-    auto pb_msg = std::make_shared<T>();
-    proto_buf->Diserialized(pb_msg);
-    writer_->Write(pb_msg);
-    RemoveInvalidBuf(proto_buf->GetMsgID());
-    RemoveItem(&proto_list_, proto_buf);
-  }
+    ADEBUG << "proto name : " << header.GetMsgName().c_str();
+    ADEBUG << "proto sequence num: " << header.GetMsgID();
+    ADEBUG << "proto total frames: " << header.GetTotalFrames();
+    ADEBUG << "proto frame index: " << header.GetIndex();
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
+    if (!proto_buf) {
+      return false;
+    }
+
+    cursor = total_buf + header_size;
+    char *buf = proto_buf->GetBuf(header.GetFramePos());
+    memcpy(buf, cursor, header.GetFrameSize());
+    proto_buf->UpdateStatus(header.GetIndex());
+    if (proto_buf->IsReadyDiserialize()) {
+      auto pb_msg = std::make_shared<T>();
+      proto_buf->Diserialized(pb_msg);
+      writer_->Write(pb_msg);
+      RemoveInvalidBuf(proto_buf->GetMsgID());
+      RemoveItem(&proto_list_, proto_buf);
+    }
+  } while (bytes > 0);
+
   return true;
 }
 
@@ -217,5 +225,6 @@ bool UDPBridgeReceiverComponent<T>::RemoveInvalidBuf(uint32_t msg_id) {
 }
 
 BRIDGE_RECV_IMPL(canbus::Chassis);
+BRIDGE_RECV_IMPL(drivers::PointCloud);
 }  // namespace bridge
 }  // namespace apollo

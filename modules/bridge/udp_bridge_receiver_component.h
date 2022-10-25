@@ -26,6 +26,7 @@
 
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/drivers/proto/pointcloud.pb.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
@@ -80,5 +81,6 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
 };
 
 RECEIVER_BRIDGE_COMPONENT_REGISTER(canbus::Chassis)
+RECEIVER_BRIDGE_COMPONENT_REGISTER(drivers::PointCloud)
 }  // namespace bridge
 }  // namespace apollo

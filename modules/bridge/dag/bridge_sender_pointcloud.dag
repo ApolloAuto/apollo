@@ -1,0 +1,15 @@
+module_config {
+    module_library: "/apollo/bazel-bin/modules/bridge/libudp_bridge_sender_component.so"
+
+    components {
+
+        class_name: "UDPBridgeSenderComponent<drivers::PointCloud>"
+        config {
+            name: "bridge_sender_PointCloud"
+            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_sender_pointcloud.pb.txt"
+            readers {
+                channel: "/apollo/sensor/lidar/PointCloud"
+            }
+      }
+   }
+}
