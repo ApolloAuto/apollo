@@ -1,0 +1,35 @@
+syntax = "proto2";
+
+package apollo.drivers.Surestar;
+
+import "modules/common/proto/header.proto"; 
+
+enum Model {
+    UNKOWN = 0;
+    RFANS16 = 1;
+}
+
+enum Mode {
+    STRONGEST = 1;
+    LAST = 2;
+    DUAL = 3;
+}
+
+message SurestarPacket {
+    optional uint64 stamp = 1;
+    required bytes data = 2;
+}
+
+message SurestarScan {
+    optional apollo.common.Header header = 1;
+    required Model model = 2; // Surestar device model
+    required Mode mode = 3; // Surestar work mode 
+
+    repeated SurestarPacket firing_pkts = 4;
+
+    repeated SurestarPacket positioning_pkts = 5;
+        // Surestar device serial number, corresponds to a specific calibration file
+    optional string sn = 6; 
+    required uint64 basetime = 7 [default = 0];
+    optional float temperature = 8;
+}
