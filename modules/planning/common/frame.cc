@@ -48,7 +48,7 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::cyber::Clock;
 using apollo::prediction::PredictionObstacles;
-
+using apollo::prediction::Trajectory;
 DrivingAction Frame::pad_msg_driving_action_ = DrivingAction::NONE;
 
 FrameHistory::FrameHistory()
@@ -448,6 +448,23 @@ void Frame::AlignPredictionTime(const double planning_start_time,
       prediction_obstacles->header().timestamp_sec();
   for (auto &obstacle : *prediction_obstacles->mutable_prediction_obstacle()) {
     for (auto &trajectory : *obstacle.mutable_trajectory()) {
+      Trajectory fix_trajectory;
+      fix_trajectory.set_probability(trajectory.probability());
+      for (auto &point : *trajectory.mutable_trajectory_point()) {
+        if (!fix_trajectory.trajectory_point().empty()) {
+          const auto &last_relative_time =
+              fix_trajectory
+                  .trajectory_point(fix_trajectory.trajectory_point_size() - 1)
+                  .relative_time();
+          // skip the abnormal trajectory_point
+          if (point.relative_time() < last_relative_time) {
+            continue;
+          }
+        }
+        auto trajectory_point = fix_trajectory.add_trajectory_point();
+        trajectory_point->CopyFrom(point);
+      }
+      trajectory.CopyFrom(fix_trajectory);
       for (auto &point : *trajectory.mutable_trajectory_point()) {
         point.set_relative_time(prediction_header_time + point.relative_time() -
                                 planning_start_time);
