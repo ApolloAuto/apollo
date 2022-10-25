@@ -33,7 +33,7 @@ def gen_report_header(car_type, protocol, output_dir):
     report_header_tpl_file = "template/report_protocol.h.tpl"
     FMT = get_tpl_fmt(report_header_tpl_file)
     report_header_file = output_dir + "%s.h" % protocol["name"]
-    with open(report_header_file, 'w') as h_fp:
+    with open(report_header_file, 'w', encoding='utf-8') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
         fmt_val["car_type_upper"] = car_type.upper()
@@ -61,7 +61,7 @@ def gen_report_cpp(car_type, protocol, output_dir):
     report_cpp_tpl_file = "template/report_protocol.cc.tpl"
     FMT = get_tpl_fmt(report_cpp_tpl_file)
     report_cpp_file = output_dir + "%s.cc" % protocol["name"]
-    with open(report_cpp_file, 'w') as fp:
+    with open(report_cpp_file, 'w', encoding='utf-8') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["protocol_name_lower"] = protocol["name"]
@@ -164,7 +164,7 @@ def gen_control_header(car_type, protocol, output_dir):
     control_header_tpl_file = "template/control_protocol.h.tpl"
     FMT = get_tpl_fmt(control_header_tpl_file)
     control_header_file = output_dir + "%s.h" % protocol["name"]
-    with open(control_header_file, 'w') as h_fp:
+    with open(control_header_file, 'w', encoding='utf-8') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["car_type_upper"] = car_type.upper()
@@ -368,7 +368,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
     control_cpp_tpl_file = "template/control_protocol.cc.tpl"
     FMT = get_tpl_fmt(control_cpp_tpl_file)
     control_cpp_file = output_dir + "%s.cc" % protocol["name"]
-    with open(control_cpp_file, 'w') as fp:
+    with open(control_cpp_file, 'w', encoding='utf-8') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["protocol_name_lower"] = protocol["name"]
@@ -415,7 +415,7 @@ def get_tpl_fmt(tpl_file):
     """
         get fmt from tpl_file
     """
-    with open(tpl_file, 'r') as tpl:
+    with open(tpl_file, 'r', encoding='utf-8') as tpl:
         fmt = tpl.readlines()
     fmt = "".join(fmt)
     return fmt
@@ -427,7 +427,7 @@ def gen_build_file(car_type, work_dir):
     """
     build_tpl_file = "template/protocol_BUILD.tpl"
     fmt = get_tpl_fmt(build_tpl_file)
-    with open(work_dir + "BUILD", "w") as build_fp:
+    with open(work_dir + "BUILD", "w", encoding='utf-8') as build_fp:
         fmt_var = {}
         fmt_var["car_type"] = car_type.lower()
         build_fp.write(fmt % fmt_var)
@@ -440,7 +440,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
     print("Generating protocols")
     if not os.path.exists(protocol_dir):
         os.makedirs(protocol_dir)
-    with open(protocol_conf_file, 'r') as fp:
+    with open(protocol_conf_file, 'r', encoding='utf-8') as fp:
         content = yaml.safe_load(fp)
         protocols = content["protocols"]
         car_type = content["car_type"]
@@ -465,7 +465,7 @@ def gen_esd_can_extended(str):
     """
     int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
-    int_id |= 0x20000000
+    int_id |= 0x80000000
     str = hex(int_id).replace('0x', '')
     return str
 
@@ -474,7 +474,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
-    with open(sys.argv[1], 'r') as fp:
+    with open(sys.argv[1], 'r', encoding='utf-8') as fp:
         conf = yaml.safe_load(fp)
     protocol_conf = conf["protocol_conf"]
 

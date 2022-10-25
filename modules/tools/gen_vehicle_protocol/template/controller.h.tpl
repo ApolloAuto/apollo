@@ -36,7 +36,7 @@ namespace %(car_type_lower)s {
 class %(car_type_cap)sController final : public VehicleController {
  public:
 
-  explicit %(car_type_cap)sController() {};
+  explicit %(car_type_cap)sController() {}
 
   virtual ~%(car_type_cap)sController();
 

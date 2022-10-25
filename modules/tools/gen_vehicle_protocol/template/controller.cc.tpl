@@ -18,10 +18,9 @@
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
-#include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -49,6 +48,8 @@ ErrorCode %(car_type_cap)sController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -151,8 +152,8 @@ ErrorCode %(car_type_cap)sController::EnableAutoMode() {
   }
   set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-  return ErrorCode::OK;
   */
+  return ErrorCode::OK;
 }
 
 ErrorCode %(car_type_cap)sController::DisableAutoMode() {
@@ -185,8 +186,8 @@ ErrorCode %(car_type_cap)sController::EnableSteeringOnlyMode() {
   }
   set_driving_mode(Chassis::AUTO_STEER_ONLY);
   AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-  return ErrorCode::OK;
   */
+  return ErrorCode::OK;
 }
 
 ErrorCode %(car_type_cap)sController::EnableSpeedOnlyMode() {
@@ -210,8 +211,8 @@ ErrorCode %(car_type_cap)sController::EnableSpeedOnlyMode() {
   }
   set_driving_mode(Chassis::AUTO_SPEED_ONLY);
   AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-  return ErrorCode::OK;
   */
+  return ErrorCode::OK;
 }
 
 // NEUTRAL, REVERSE, DRIVE
@@ -266,7 +267,7 @@ void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
 // acceleration_spd:60 ~ 100, suggest: 90
 // -> pedal
 void %(car_type_cap)sController::Brake(double pedal) {
-  // double real_value = params_.max_acc() * acceleration / 100;
+  // double real_value = vehicle_params_.max_acc() * acceleration / 100;
   // TODO(All) :  Update brake value based on mode
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
@@ -295,7 +296,7 @@ void %(car_type_cap)sController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void %(car_type_cap)sController::Acceleration(double acc) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE ||
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
@@ -314,7 +315,7 @@ void %(car_type_cap)sController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  // const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   // reverse sign
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
@@ -331,10 +332,10 @@ void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
     return;
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
+      vehicle_params_.min_steer_angle_spd(), vehicle_params_.max_steer_angle_spd(),
+      vehicle_params_.max_steer_angle_spd() * angle_spd / 100.0);
   steering_64_->set_steering_angle(real_angle)
       ->set_steering_angle_speed(real_angle_spd);
   */
@@ -403,11 +404,12 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
     std::this_thread::yield();
   }
 
-  std::chrono::duration<double, std::micro> default_period{50000};
   int64_t start = 0;
   int64_t end = 0;
+  std::chrono::duration<double, std::micro> default_period{50000};
+  start = ::apollo::cyber::Time::Now().ToMicrosecond();
+  
   while (can_sender_->IsRunning()) {
-    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -445,14 +447,16 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
+    end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
+      start = cyber::Time::Now().ToMicrosecond();
     } else {
       AERROR
           << "Too much time consumption in %(car_type_cap)sController looping process:"
           << elapsed.count();
+      start = end;
     }
   }
 }

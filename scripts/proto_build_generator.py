@@ -187,7 +187,7 @@ def grpc_check(fpath):
         return False
 
     grpc_found = False
-    with open(fpath) as fin:
+    with open(fpath, encoding='utf-8') as fin:
         kw1_found = False
         kw2_found = False
         for line in fin:
@@ -363,7 +363,7 @@ def _import_line_check(line):
 def dependency_analysis(workdir, protofile):
     dependencies = []
     fullpath = os.path.join(workdir, protofile)
-    with open(fullpath) as fin:
+    with open(fullpath, encoding='utf-8') as fin:
         for line in fin:
             if _import_line_check(line):
                 dependencies.append(line.split('"')[1])
