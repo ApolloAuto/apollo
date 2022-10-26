@@ -46,7 +46,9 @@ class Pipeline {
  private:
   void Clear();
 
-  std::unique_ptr<Stage> CreateStage(const StageType& stage_type);
+  std::shared_ptr<Stage> CreateStage(const StageType& stage_type);
+
+  bool CheckRepeatedStage(const std::string & stage_name);
 
  protected:
   std::string name_;
@@ -56,7 +58,7 @@ class Pipeline {
   std::unordered_map<StageType, StageConfig, std::hash<int>>
       stage_config_map_;
 
-  std::vector<std::unique_ptr<Stage>> stage_ptrs_;
+  std::vector<std::shared_ptr<Stage>> stage_ptrs_;
 };
 
 } // namespace pipeline

@@ -14,6 +14,7 @@ install(
     deps = [
         ":pb_drivers",
         ":pb_hdrs",
+        "//modules/drivers/canbus:install",
         "//modules/drivers/camera:install",
         "//modules/drivers/gnss:install",
         "//modules/drivers/lidar:install",

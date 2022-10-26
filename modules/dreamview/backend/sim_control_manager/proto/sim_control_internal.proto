@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.sim_control;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message SimCarStatus {
+    optional double x = 1;                      // pos x in meters.
+    optional double y = 2;                      // pos y in meters.
+    optional double z = 3;                      // pos z in meters.
+    optional double s = 4;                      // pos l in meters, reference to SL-coordinate
+    optional double l = 5;                      // pos s in meters, reference to SL-coordinate
+    optional double speed = 6;                  // speed, in m/s
+    optional double acceleration_s = 7;         // acceleration in s direction
+    optional double curvature = 8;              // curvature (k = 1/r), unit: (1/meters)
+    optional double curvature_change_rate = 9;  // change of curvature in unit s (dk/ds)
+    optional double relative_time = 10;         // in seconds relative time (relative_time = time_of_this_state - timestamp_in_header)
+    optional double theta = 11;                 // relative to absolute coordinate system
+    optional double accumulated_s = 12;         // calculated from the first point in this trajectory
+    optional float odometer = 13;               // current odometer
+    optional double angular_speed = 14;         // relative to absolute coordinate system
+    optional int32 gear_position = 15;          // gear position from control command, 1:forward, 0:neural, -1:backward
+}
+
+message SimControlData {
+   optional apollo.common.Header header = 1;
+   optional SimCarStatus sim_car_status = 2;
+}

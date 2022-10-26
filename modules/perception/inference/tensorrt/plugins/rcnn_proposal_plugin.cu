@@ -280,6 +280,8 @@ int RCNNProposalPlugin::enqueue(int batchSize, const void *const *inputs,
     // Get max score among classes and filter with threshold
     nthreads = batch_rois_nums[batch_id];
     block_size = DIVUP(nthreads, thread_size_);
+    if (block_size <= 0)
+      continue;
     get_max_score_kernel<<<block_size, thread_size_, 0, stream>>>(
         nthreads, decoded_bbox_pred + size_t(cur_ptr * (num_class_ + 1) * 4),
         cls_score_softmax + size_t(cur_ptr * (num_class_ + 1)), num_class_,

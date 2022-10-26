@@ -244,7 +244,7 @@ module.exports = (env, argv) => {
               test: /\.yml$/,
               exclude: /node_modules/,
               use: [
-                "json-loader",
+                'json-loader',
                 {
                   loader: 'yaml-loader',
                   options: {
@@ -322,7 +322,7 @@ module.exports = (env, argv) => {
       port: 8080,
       devMiddleware: {
         // debug devserver
-        writeToDisk: true,
+        // writeToDisk: true,
       },
     },
 

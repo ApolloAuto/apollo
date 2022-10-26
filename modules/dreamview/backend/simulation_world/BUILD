@@ -59,6 +59,7 @@ cc_library(
     srcs = ["simulation_world_updater.cc"],
     hdrs = ["simulation_world_updater.h"],
     copts = DREAMVIEW_COPTS,
+    alwayslink = True,
     deps = [
         ":simulation_world_service",
         "//modules/common/util:util_tool",
@@ -67,10 +68,10 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/perception_camera_updater",
-        "//modules/dreamview/backend/sim_control",
         "//modules/common_msgs/routing_msgs:poi_cc_proto",
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
         "//modules/dreamview/backend/plugins:plugin_manager",
+        "//modules/dreamview/backend/sim_control_manager:sim_control_manager",
         "@boost",
     ],
 )
