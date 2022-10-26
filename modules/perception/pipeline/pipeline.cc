@@ -95,7 +95,7 @@ bool Pipeline::CheckRepeatedStage(const std::string& stage_name) {
   for (auto created_state_ptr : stage_ptrs_) {
     if (StageType_Name(created_state_ptr->stage_config_.stage_type()) ==
         stage_name) {
-      AERROR << stage_name << " already created";
+      AINFO << stage_name << " already created";
       stage_ptrs_.push_back(std::move(created_state_ptr));
       res = true;
       break;
