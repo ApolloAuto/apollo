@@ -30,7 +30,9 @@ class FilterBbox : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  FilterBbox() { name_ = "FilterBbox"; }
+  FilterBbox() = default;
+
+  explicit FilterBbox(const PluginConfig& plugin_config);
 
   virtual ~FilterBbox() = default;
 

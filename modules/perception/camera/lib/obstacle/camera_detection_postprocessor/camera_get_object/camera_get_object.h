@@ -30,7 +30,7 @@ class CameraGetObject : public pipeline::Plugin {
   using DataFrame = pipeline::DataFrame;
 
  public:
-  CameraGetObject() { name_ = "CameraGetObject"; }
+  CameraGetObject() = default;
   explicit CameraGetObject(const PluginConfig& plugin_config);
 
   virtual ~CameraGetObject() = default;

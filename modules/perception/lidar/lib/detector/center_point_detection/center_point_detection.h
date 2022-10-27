@@ -29,6 +29,7 @@
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -48,9 +49,9 @@ class CenterPointDetection : public BaseLidarDetector {
    
   bool Process(DataFrame* data_frame) override;
    
-  bool IsEnabled() const override { return enable_;}
+  bool IsEnabled() const override { return enable_; }
 
-  std::string Name() const override { return "CenterPointDetection"; }
+  std::string Name() const override { return name_; }
 
  private:
   void CloudToArray(const base::PointFCloudPtr &pc_ptr, float *out_points_array,
