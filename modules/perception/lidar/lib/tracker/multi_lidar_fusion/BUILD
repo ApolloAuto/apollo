@@ -1,5 +1,6 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,10 +29,37 @@ cc_library(
         "//modules/perception/pipeline:plugin_factory",
         "//modules/perception/pipeline:stage",
         "//modules/perception/pipeline/proto/stage:mlf_engine_config_cc_proto",
-        "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/container/pose:pose_container",
+        ":external_mlf_lib"
     ],
     alwayslink = True,
+)
+
+install(
+    name = "install",
+    library_dest = "perception/lib",
+    targets = [
+        ":libexternal_mlf_lib.so",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "libexternal_mlf_lib.so",
+    linkstatic = True,
+    linkshared = True,
+    deps = [
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/container/pose:pose_container",
+    ]
+)
+
+cc_library(
+    name = "external_mlf_lib",
+    srcs = [":libexternal_mlf_lib.so"],
+    deps = [
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/container/pose:pose_container",
+    ]
 )
 
 cc_library(

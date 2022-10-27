@@ -55,7 +55,7 @@ bool MultiSensorFusionComponent::Init() {
       GetAbsolutePath(work_root, sensor_fusion_config_path);
 
   if (!cyber::common::GetProtoFromFile(
-          sensor_fusion_config_path, &multi_sensor_fusion_pipeline_)) {
+          sensor_fusion_config_path, &multi_sensor_fusion_config_)) {
     AERROR << "Read config failed: " << sensor_fusion_config_path;
     return false;
   }
@@ -102,12 +102,13 @@ bool MultiSensorFusionComponent::InitAlgorithmPlugin() {
     fusion::BaseMultiSensorFusionRegisterer::GetInstanceByName(fusion_name_);
   CHECK_NOTNULL(fusion);
   fusion_.reset(fusion);
-  fusion::ObstacleMultiSensorFusionParam param;
-  param.main_sensor = fusion_main_sensor_;
-  param.fusion_method = fusion_method_;
-  ACHECK(fusion_->Init(multi_sensor_fusion_pipeline_))
-      << "Failed to init ObstacleMultiSensorFusion";
+  // fusion::ObstacleMultiSensorFusionParam param;
+  // param.main_sensor = fusion_main_sensor_;
+  // param.fusion_method = fusion_method_;
   // ACHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
+
+  ACHECK(fusion_->Init(multi_sensor_fusion_config_))
+      << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = map::HDMapInput::Instance();
