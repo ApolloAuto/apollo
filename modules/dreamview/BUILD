@@ -48,10 +48,12 @@ install(
     targets = ["dreamview"],
     deps = [
         ":pb_dreamview",
-        ":pb_hdrs", 
+        ":pb_hdrs",
         "//modules/dreamview/backend/common:install",
         "//modules/dreamview/backend/hmi:install",
-        "//modules/dreamview/backend/map:install"
+        "//modules/dreamview/backend/map:install",
+        "//modules/dreamview/backend:install",
+        "//modules/dreamview/backend/sim_control_manager/common:install",
     ],
 )
 
@@ -67,11 +69,13 @@ install(
         "//modules/dreamview/proto:preprocess_table_cc_proto",
         "//modules/dreamview/proto:simulation_world_cc_proto",
         "//modules/dreamview/proto:scenario_cc_proto",
+        "//modules/dreamview/proto:record_cc_proto",
         "//modules/dreamview/proto:dv_plugin_msg_cc_proto",
         "//modules/dreamview/proto:plugin_config_cc_proto",
         "//modules/dreamview/backend/teleop/proto:daemon_cmd_cc_proto",
         "//modules/dreamview/backend/teleop/proto:daemon_rpt_cc_proto",
         "//modules/dreamview/backend/teleop/proto:modem_info_cc_proto",
+        "//modules/dreamview/backend/sim_control_manager/proto:sim_control_internal_cc_proto",
     ],
 )
 

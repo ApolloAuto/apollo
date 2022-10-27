@@ -44,6 +44,9 @@ int ReLUPlugin::enqueue(int batchSize, const void *const *inputs,
   const int nthreads =
       input_dims_.d[0] * input_dims_.d[1] * input_dims_.d[2] * batchSize;
 
+  if (block_size <= 0)
+    return 1;
+
   ReLU<<<block_size, thread_size, 0, stream>>>(
       nthreads, (const float *)(inputs[0]), negative_slope_,
       reinterpret_cast<float *>(outputs[0]));

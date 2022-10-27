@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message RecordList {
+  repeated string record_id = 1;
+  optional string userid = 2;
+  optional int32 category = 3;//以后用来区分系统和个人
+  optional string description_cn = 4;
+  optional string description_en = 5;
+}
+message Record{
+  optional string record_id = 1;
+  optional string userid = 2;
+  optional int32 category = 3;//以后用来区分系统和个人
+  optional string description_cn = 4;
+  optional string description_en = 5;
+}

@@ -23,7 +23,7 @@ http_archive(
     name = "rules_cc",
     urls = [
         "https://apollo-system.cdn.bcebos.com/archive/8.0/rules_cc-0.0.1.tar.gz",
-        "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",   
+        "https://github.com/bazelbuild/rules_cc/releases/download/0.0.1/rules_cc-0.0.1.tar.gz",
     ],
     sha256 = "4dccbfd22c0def164c8f47458bd50e0c7148f3d92002cdb459c2a96a68498241",
     patches = ["//tools/package:rules_cc.patch"],
@@ -61,6 +61,15 @@ load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_
 rules_proto_dependencies()
 
 rules_proto_toolchains()
+
+http_archive(
+    name = "rules_python",
+    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
+    urls = [
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/rules_python-0.1.0.tar.gz",
+        "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+    ],
+)
 
 http_archive(
     name = "rules_python",

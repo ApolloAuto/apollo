@@ -210,3 +210,14 @@ py_proto_library(
         ":scenario_proto",
     ],
 )
+proto_library(
+    name = "record_proto",
+    srcs = ["record.proto"],
+)
+
+cc_proto_library(
+    name = "record_cc_proto",
+    deps = [
+        ":record_proto",
+    ],
+)

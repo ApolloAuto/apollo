@@ -20,9 +20,9 @@
 #include "modules/common/util/perf_util.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
-#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -191,7 +191,7 @@ bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   return true;
 }
 
-bool SmokeObstacleDetector::Init(const StageConfig& stage_config) {
+bool SmokeObstacleDetector::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
@@ -263,10 +263,6 @@ bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   if (!feature_extractor_->Init(feature_options)) {
     return false;
   }
-  return true;
-}
-
-bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
   return true;
 }
 
@@ -371,50 +367,103 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   return true;
 }
 
-bool SmokeObstacleDetector::Process(
-    const std::vector<float> &k_inv, const std::vector<float> &image_data_array,
-    const float *detect_result) {
-  if (nullptr == detect_result) {
-    AERROR << "Input null detect_result ptr.";
+bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
+  if (data_frame == nullptr) {
     return false;
   }
+  auto frame = data_frame->camera_frame;
 
-  // if (nullptr == typesCameraFrame) {
-  //   AERROR << "Input null typesCameraFrame ptr.";
-  //   return false;
-  // }
+  Timer timer;
+  if (cudaSetDevice(gpu_id_) != cudaSuccess) {
+    AERROR << "Failed to set device to " << gpu_id_;
+    return false;
+  }
+  const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
+  auto const &net_param = smoke_param_.net_param();
+  auto input_blob = inference_->get_blob(net_param.input_data_blob());
+  auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
+  auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
 
-  // if (nullptr == data_frame) {
-  //   AERROR << "Input null data_frame ptr.";
-  //   return false;
-  // }
+  float *ratio_data = input_ratio_blob->mutable_cpu_data();
+  float *K_data = input_K_blob->mutable_cpu_data();
+  for (size_t i = 0; i < 3; i++) {
+    size_t i3 = i * 3;
+    for (size_t j = 0; j < 3; j++) {
+      if (frame->data_provider->sensor_name() == "front_12mm") {
+        K_data[i3 + j] = camera_k_matrix(i, j) * 2.f;
+      } else {
+        K_data[i3 + j] = camera_k_matrix(i, j);
+      }
+    }
+  }
+  AINFO << "Camera k matrix input to obstacle postprocessor: \n"
+        << K_data[0] << ", " << K_data[1] << ", " << K_data[2] << "\n"
+        << K_data[3] << ", " << K_data[4] << ", " << K_data[5] << "\n"
+        << K_data[6] << ", " << K_data[7] << ", " << K_data[8] << "\n";
+  ratio_data[0] = 4.f * static_cast<float>(frame->data_provider->src_width()) /
+                  static_cast<float>(width_);
+  ratio_data[1] = 4.f * static_cast<float>(frame->data_provider->src_height()) /
+                  static_cast<float>(height_);
 
-  // Timer timer;
-  // if (cudaSetDevice(gpu_id_) != cudaSuccess) {
-  //   AERROR << "Failed to set device to " << gpu_id_;
-  //   return false;
-  // }
+  AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  DataProvider::ImageOptions image_options;
+  image_options.target_color = base::Color::BGR;
+  image_options.crop_roi = base::RectI(
+      0, offset_y_, static_cast<int>(base_camera_model_->get_width()),
+      static_cast<int>(base_camera_model_->get_height()) - offset_y_);
+  image_options.do_crop = true;
+  frame->data_provider->GetImage(image_options, image_.get());
+  AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
+                       0);
+  AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
-  // const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
-  // auto const &net_param = smoke_param_.net_param();
-  // auto input_blob = inference_->get_blob(net_param.input_data_blob());
-  // auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
-  // auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
+  AINFO << "Camera type: " << frame->data_provider->sensor_name();
+  /////////////////////////// detection part ///////////////////////////
+  inference_->Infer();
+  AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
+        << "ms";
+  get_smoke_objects_cpu(smoke_blobs_, types_, smoke_param_.model_param(),
+                        light_vis_conf_threshold_, light_swt_conf_threshold_,
+                        overlapped_.get(), idx_sm_.get(),
+                        &(frame->detected_objects),
+                        frame->data_provider->src_width(),
+                        frame->data_provider->src_height() - offset_y_);
+  AINFO << "GetObj: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  filter_bbox(min_dims_, &(frame->detected_objects));
+  FeatureExtractorOptions feature_options;
+  feature_options.normalized = true;
+  AINFO << "Post1: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  feature_extractor_->Extract(feature_options, frame);
+  AINFO << "Extract: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  recover_smoke_bbox(frame->data_provider->src_width(),
+                     frame->data_provider->src_height() - offset_y_, offset_y_,
+                     &frame->detected_objects);
 
-  // float *ratio_data = input_ratio_blob->mutable_cpu_data();
-  // float *K_data = input_K_blob->mutable_cpu_data();
+  // post processing
+  int left_boundary =
+      static_cast<int>(border_ratio_ * static_cast<float>(image_->cols()));
+  int right_boundary = static_cast<int>((1.0f - border_ratio_) *
+                                        static_cast<float>(image_->cols()));
+  for (auto &obj : frame->detected_objects) {
+    // recover alpha
+    obj->camera_supplement.alpha /= ori_cycle_;
+    // get area_id from visible_ratios
+    if (smoke_param_.model_param().num_areas() == 0) {
+      obj->camera_supplement.area_id =
+          get_area_id(obj->camera_supplement.visible_ratios);
+    }
+    // clear cut off ratios
+    auto &box = obj->camera_supplement.box;
+    if (box.xmin >= left_boundary) {
+      obj->camera_supplement.cut_off_ratios[2] = 0;
+    }
+    if (box.xmax <= right_boundary) {
+      obj->camera_supplement.cut_off_ratios[3] = 0;
+    }
+  }
+  AINFO << "Post2: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
-  // K_data = k_inv.data();
-  // input_blob->mutable_cpu_data() = image_data_array.data();
-
-
-  // AINFO << "Camera type: " << frame->data_provider->sensor_name();
-  // /////////////////////////// detection part ///////////////////////////
-  // inference_->Infer();
-  // AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
-  //       << "ms";
-
-  // detect_result = smoke_blobs_.det1_loc_blob->cpu_data();
   return true;
 }
 

@@ -28,6 +28,7 @@ cc_library(
     name = "dreamview_gflags",
     srcs = ["libdreamview_gflags.so"],
     hdrs = ["dreamview_gflags.h"],
+    alwayslink = True,
     deps = [
         "@com_github_gflags_gflags//:gflags",
     ],

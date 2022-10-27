@@ -94,6 +94,7 @@ export default class PluginWebSocketEndpoint {
         'target_type': 'plugins',
       }
     }));
+    return this;
   }
 
 
@@ -126,5 +127,22 @@ export default class PluginWebSocketEndpoint {
     }));
     return this;
   }
+
+  // 下载record
+  downloadRecord() {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'DownloadRecord',
+        'source': 'dreamview',
+        'info': '',
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return this;
+  }
+
 
 }

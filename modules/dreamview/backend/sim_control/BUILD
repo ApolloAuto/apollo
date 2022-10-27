@@ -10,6 +10,7 @@ cc_library(
         "sim_control.h",
         "sim_control_interface.h",
     ],
+    alwayslink = True,
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",

@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/install:install.bzl", "install")
@@ -51,6 +51,7 @@ cc_test(
         "@local_config_rocm//rocm:rocm_headers",
         "@local_config_rocm//rocm:hip",
     ]),
+    tags = ["exclude"]
 )
 
 cc_library(

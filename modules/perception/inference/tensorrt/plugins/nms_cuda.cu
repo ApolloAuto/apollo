@@ -126,6 +126,9 @@ void NmsForward(const bool rpn_proposal_output_score,
               DIVUP(host_filter_count, NUM_THREADS_MACRO));
   dim3 threads(NUM_THREADS_MACRO);
 
+  if (blocks.x == 0 || blocks.y == 0)
+    return;
+
   int out_num_to_keep = 0;
   int *out_keep_inds = new int[host_filter_count]();
 

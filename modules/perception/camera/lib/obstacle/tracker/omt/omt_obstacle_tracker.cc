@@ -403,12 +403,10 @@ bool OMTObstacleTracker::Associate2D(const ObstacleTrackerOptions &options,
     similar_->Calc(frame_list_[frame1], frame_list_[frame2],
                    similar_map_.get(frame1, frame2).get());
   }
-
   for (auto &target : targets_) {
     target.RemoveOld(frame_list_.OldestFrameId());
     ++target.lost_age;
   }
-
   TrackObjectPtrs track_objects;
   for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
     // TODO(gaohan): use pool
@@ -541,24 +539,27 @@ bool OMTObstacleTracker::Process(DataFrame *data_frame) {
   switch (track_state) {
     case TrackState::Predict: {
       Predict(tracker_options, camera_frame);
-      track_state = TrackState::Associate2D;
+      data_frame->camera_frame->track_state = TrackState::Associate2D;
       break;
     }
     case TrackState::Associate2D: {
       Associate2D(tracker_options, camera_frame);
-      track_state = TrackState::Associate3D;
+      data_frame->camera_frame->track_state = TrackState::Associate3D;
       break;
     }
     case TrackState::Associate3D: {
       Associate3D(tracker_options, camera_frame);
-      track_state = TrackState::Track;
+      data_frame->camera_frame->track_state = TrackState::Track;
       break;
     }
     case TrackState::Track: {
       Track(tracker_options, camera_frame);
-      track_state = TrackState::Predict;
+      data_frame->camera_frame->track_state = TrackState::Predict;
       break;
     }
+    default:
+      // do nothing
+      break;
   }
 
   return true;

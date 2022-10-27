@@ -1,13 +1,16 @@
-import React from 'react';
-import { inject, observer } from 'mobx-react';
 import { toJS } from 'mobx';
+import { inject, observer } from 'mobx-react';
+import React from 'react';
 
 import { Radio } from 'antd';
 
-import { ScenarioNoCertificate, ScenarioCertificateInvalid } from './ScenarioNoCertificate';
-import ScenarioSetItem from './ScenarioSetItem';
-import LocalScenarioSetItem from './LocalScenarioSetItem';
+import { throttle } from 'lodash';
 import WS, { PLUGIN_WS } from 'store/websocket';
+import LocalDynamicModelsItem from './LocalDynamicModelsItem';
+import LocalRecordItem from './LocalRecordItem';
+import LocalScenarioSetItem from './LocalScenarioSetItem';
+import { ScenarioCertificateInvalid, ScenarioNoCertificate } from './ScenarioNoCertificate';
+import ScenarioSetItem from './ScenarioSetItem';
 
 const RadioGroup = Radio.Group;
 
@@ -18,15 +21,37 @@ export default class DataProfile extends React.Component {
   constructor(props) {
     super(props);
     PLUGIN_WS.initialize();
+    this.state = {
+      currentKey: 'scenarioProfiles',
+      tabs: [
+        {
+          title: 'Scenario Profiles',
+          key: 'scenarioProfiles',
+        },
+        {
+          title: 'Dynamic Model',
+          key: 'dynamicModel',
+        },
+        {
+          title: 'Record Profiles',
+          key: 'recordProfiles',
+        },
+      ],
+    };
   }
 
   componentDidMount() {
+    const { store } = this.props;
     setTimeout(() => {
       // 校验ws是否连接，确认链接后再校验证书
       PLUGIN_WS.checkWsConnection()
-        .checkCertificate();
-      WS.loadLoocalScenarioSets();
-    }, 200);
+        .checkCertificate().downloadRecord();
+      WS.checkWsConnection().loadLoocalScenarioSets();
+      const { enableSimControl } = store.options;
+      if (enableSimControl) {
+        WS.getDymaticModelList();
+      }
+    }, 300);
   }
 
   onSelectChange = (e) => {
@@ -38,6 +63,78 @@ export default class DataProfile extends React.Component {
     WS.changeScenarioSet(e.target.value);
   };
 
+  onDynamicModelChange = (e) => {
+    WS.changeDynamicModel(e.target.value);
+  };
+
+  onRecordChange = (item) => {
+    WS.changeRecord(item);
+  };
+
+  // 渲染动力学模型tab
+  renderDynamicModelList = () => {
+    const { store } = this.props;
+    const { currentDynamicModel, dynamicModels } = store.hmi;
+    const { enableSimControl } = store.options;
+    if (!enableSimControl) {
+      return <div>Please open SimControl to switch the dynamic model</div>;
+    }
+    return (<div className='local-scenario-set-list'>
+      <RadioGroup
+        onChange={this.onDynamicModelChange}
+        value={currentDynamicModel}
+      >
+        {toJS(dynamicModels).map((item) => {
+          return (
+            <LocalDynamicModelsItem
+              key={item}
+              item={item}
+              currentDynamicModel={currentDynamicModel}
+            />
+          );
+        })
+        }
+      </RadioGroup>
+    </div>);
+  };
+
+  // 更新record列表节流函数
+  updateRecordList = throttle(() => {
+    WS.checkWsConnection().loadLocalRecords();
+  }, 5000);
+
+  // 渲染数据包tab
+  renderRecordProfilesList = () => {
+    const { store } = this.props;
+    /**
+     * @param currentRecordId string
+     * @param records {id: number}
+     */
+    const { currentRecordId, records } = store.hmi;
+    const { enableSimControl } = store.options;
+    if (enableSimControl) {
+      return <div>Please close SimControl to switch the records player.</div>;
+    }
+    return (<div className='local-record-list'>
+      {Object.keys(toJS(records)).map((item) => {
+        // record下载状态
+        const recordStatus = records[item];
+        return (
+          <LocalRecordItem
+            key={item}
+            item={item}
+            updateRecordList={this.updateRecordList}
+            // 0 下载中 1 下载完成
+            recordStatus={recordStatus}
+            currentRecordId={currentRecordId}
+            changeRecord={this.onRecordChange}
+          />
+        );
+      })
+      }
+    </div>);
+  };
+
   render() {
 
     const { store } = this.props;
@@ -47,8 +144,10 @@ export default class DataProfile extends React.Component {
       remoteScenarioSetList,
       scenarioSet,
       currentScenarioSetId,
-      remoteScenarioSetListFiltered
+      remoteScenarioSetListFiltered,
     } = store.studioConnector;
+
+    const { tabs, currentKey } = this.state;
 
     return (
       <div className='data-profile'>
@@ -70,7 +169,7 @@ export default class DataProfile extends React.Component {
           </div>
           <div className='data-profile_scenario_set_column'>
             {/*no cerfiticate*/}
-            { certificateStatus === 'notFound' && <ScenarioNoCertificate />}
+            {certificateStatus === 'notFound' && <ScenarioNoCertificate />}
             {/*scenario set list*/}
             <div className='scenario-set-list'>
               {certificateStatus === 'expired' && <ScenarioCertificateInvalid />}
@@ -87,10 +186,27 @@ export default class DataProfile extends React.Component {
           </div>
         </div>
         <div className='card'>
-          <div className='card-header'><span>Scenario Profiles</span></div>
+          <div className='card-header'>
+            {
+              tabs.map((tab, index) => {
+                return (
+                  <span
+                    key={index}
+                    className={currentKey === tab.key ? 'active' : ''}
+                    onClick={() => {
+                      this.setState({ currentKey: tab.key });
+                      if (tab.key === 'recordProfiles') {
+                        WS.checkWsConnection().loadLocalRecords();
+                      }
+                    }}
+                  >{tab.title}</span>
+                );
+              })
+            }
+          </div>
           <div className='data-profile_profile_tabs_column'>
             {/*scenario set list*/}
-            <div className='local-scenario-set-list'>
+            {currentKey === 'scenarioProfiles' && <div className='local-scenario-set-list'>
               <RadioGroup
                 onChange={this.onRadioChange}
                 value={currentScenarioSetId}
@@ -106,10 +222,15 @@ export default class DataProfile extends React.Component {
                 })
                 }
               </RadioGroup>
-            </div>
+            </div>}
+
+            {/*dynamic model*/}
+            {currentKey === 'dynamicModel' && this.renderDynamicModelList()}
+            {currentKey === 'recordProfiles' && this.renderRecordProfilesList()}
           </div>
         </div>
       </div>
     );
   }
 }
+;

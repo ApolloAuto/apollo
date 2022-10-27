@@ -149,15 +149,14 @@ bool CNNSegmentation::Init(const StageConfig& stage_config) {
     return false;
   }
 
-  //todo(zero): options.sensor_name
-  // if (!FLAGS_lidar_model_version.empty()) {
-  //   sensor_name_ = FLAGS_lidar_model_version;
-  // } else {
-  //   sensor_name_ = options.sensor_name;
-  // }
-
   cnnseg_config_ = stage_config.cnnseg_config();
   AINFO << "CNNSegmentation: " << cnnseg_config_.DebugString();
+
+  if (!FLAGS_lidar_model_version.empty()) {
+    sensor_name_ = FLAGS_lidar_model_version;
+  } else {
+    sensor_name_ = cnnseg_config_.sensor_name();
+  }
 
   // get cnnseg params
   ACHECK(GetProtoFromFile(cnnseg_config_.param_file(), &cnnseg_param_))
@@ -245,7 +244,13 @@ bool CNNSegmentation::Process(DataFrame* data_frame) {
   if (data_frame == nullptr)
     return false;
 
-  return true;
+  LidarFrame* lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr)
+    return false;
+
+  LidarDetectorOptions options;
+  bool res = Detect(options, lidar_frame);
+  return res;
 }
 
 bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {

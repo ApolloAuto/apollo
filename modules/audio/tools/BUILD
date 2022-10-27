@@ -23,6 +23,7 @@ py_binary(
         "//modules/drivers/microphone/proto:audio_py_pb2",
         "//modules/drivers/microphone/proto:microphone_config_py_pb2",
     ],
+    tags = ["exclude"]
 )
 
 cc_binary(

@@ -34,6 +34,7 @@ cc_library(
     name = "map_service",
     srcs = ["libmap_service.so"],
     hdrs = ["map_service.h"],
+    alwayslink = True,
     deps = [
         "//modules/common/util:util_tool",
         "//modules/dreamview/proto:simulation_world_cc_proto",

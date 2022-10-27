@@ -9,6 +9,7 @@ cc_library(
     srcs = ["websocket_handler.cc"],
     hdrs = ["websocket_handler.h"],
     copts = DREAMVIEW_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
@@ -22,6 +23,7 @@ cc_library(
     srcs = ["image_handler.cc"],
     hdrs = ["image_handler.h"],
     copts = DREAMVIEW_COPTS,
+    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

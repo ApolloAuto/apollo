@@ -30,8 +30,12 @@ cc_library(
     name = "canbus_common",
     srcs = ["libcanbus_common.so"],
     hdrs = [
+        "byte.cc",
         "byte.h",
         "canbus_consts.h",
+    ],
+    deps = [
+        "//modules/drivers/canbus:sensor_gflags",
     ],
 )
 
