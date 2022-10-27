@@ -5,7 +5,7 @@ package(
 )
 
 install(
-    name = "install",
+    name = "install_scripts",
     data = [
         ":apollo_base",
         ":bootstrap",
@@ -15,6 +15,14 @@ install(
         ":recorder",
         ":tools",
     ],
+    data_dest = "scripts/src"
+)
+
+install(
+    name = "install",
+    data = [":cyberfile.xml"],
+    data_dest = "scripts",
+    deps = ["install_scripts"]
 )
 
 filegroup(
@@ -40,6 +48,7 @@ filegroup(
     srcs = [
         "record_bag.py",
         "record_bag.sh",
+	"cyberfile.xml"
     ],
 )
 

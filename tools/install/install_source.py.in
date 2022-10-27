@@ -125,12 +125,14 @@ def replace_config_dir(full_c_d, prefix, pkg_module_dict):
         c_f = full_c_d + "/" + c
         if os.path.isdir(c_f):
             replace_config_dir(c_f, prefix, pkg_module_dict)
-        else:
+        elif c_f.endswith(".dag"):
             replace_config(pkg_module_dict, prefix, c_f)
+        else:
+            continue
 
 def fix_configs_in_pkg():
     conf_dirs = [
-        "/local/dag",
+        "/local",
         # "/local/launch",
         # "/local/conf"
     ]
