@@ -110,7 +110,7 @@ cc_library(
     "//modules/perception/fusion/lib/fusion_system/probabilistic_fusion",
     "//modules/perception/fusion/lib/gatekeeper:collect_fused_object",
     "//modules/perception/lidar/lib/classifier/fused_classifier",
-    #"//modules/perception/lidar/lib/detector/center_point_detection",
+    "//modules/perception/lidar/lib/detector/center_point_detection",
     "//modules/perception/lidar/lib/detector/mask_pillars_detection",
     "//modules/perception/lidar/lib/detector/point_pillars_detection",
     "//modules/perception/lidar/lib/detector/cnn_segmentation",

@@ -11,6 +11,7 @@ import "modules/perception/pipeline/proto/traffic_light_config.proto";
 import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
+import "modules/perception/pipeline/proto/stage/center_point_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/cnnseg_config.proto";
 import "modules/perception/pipeline/proto/stage/darkSCNN_postprocessor.proto";
 import "modules/perception/pipeline/proto/stage/darkSCNN.proto";
@@ -183,6 +184,7 @@ message StageConfig {
   reserved 4 to 9;
 
   oneof stage_config {
+
     lidar.PointcloudDetectionPreprocessorConfig pointcloud_detection_preprocessor_config = 10;
     lidar.PointcloudDetectionPostprocessorConfig pointcloud_detection_postprocessor_config = 11;
     lidar.PointcloudPreprocessorConfig pointcloud_preprocessor_config = 12;
@@ -198,6 +200,7 @@ message StageConfig {
     lidar.HDMapRoiFilterConfig hdmap_roi_filter_config = 22;
     lidar.PointPillarsDetectionConfig point_pillars_detection_config = 23;
     lidar.ObjectBuilderConfig object_builder_config = 24;
+    lidar.CenterPointDetectionConfig center_point_detection_config = 25;
 
     camera.TrafficLightDetectionConfig traffic_light_detection_config = 50;
     camera.TrafficLightRecognitionConfig traffic_light_recognition_config = 51;

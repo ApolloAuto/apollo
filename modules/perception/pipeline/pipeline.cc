@@ -31,7 +31,7 @@
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/collect_fused_object.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
-// #include "modules/perception/lidar/lib/detector/center_point_detection/center_point_detection.h"
+#include "modules/perception/lidar/lib/detector/center_point_detection/center_point_detection.h"
 #include "modules/perception/lidar/lib/detector/cnn_segmentation/cnn_segmentation.h"
 #include "modules/perception/lidar/lib/detector/mask_pillars_detection/mask_pillars_detection.h"
 #include "modules/perception/lidar/lib/detector/ncut_segmentation/ncut_segmentation.h"
@@ -95,7 +95,7 @@ bool Pipeline::CheckRepeatedStage(const std::string& stage_name) {
   for (auto created_state_ptr : stage_ptrs_) {
     if (StageType_Name(created_state_ptr->stage_config_.stage_type()) ==
         stage_name) {
-      AERROR << stage_name << " already created";
+      AINFO << stage_name << " already created";
       stage_ptrs_.push_back(std::move(created_state_ptr));
       res = true;
       break;
@@ -151,10 +151,9 @@ std::shared_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
     case StageType::MASK_PILLARS_DETECTION:
       stage_ptr.reset(new lidar::MaskPillarsDetection());
       break;
-    // todo(zero): Compile Error
-    // case StageType::CENTER_POINT_DETECTION:
-    //   stage_ptr.reset(new lidar::CenterPointDetection());
-    //   break;
+    case StageType::CENTER_POINT_DETECTION:
+      stage_ptr.reset(new lidar::CenterPointDetection());
+      break;
     case StageType::OBJECT_BUILDER:
       stage_ptr.reset(new lidar::ObjectBuilder());
       break;

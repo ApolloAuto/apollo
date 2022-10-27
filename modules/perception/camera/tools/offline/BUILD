@@ -48,6 +48,7 @@ cc_binary(
     name = "offline_obstacle_pipeline",
     srcs = ["offline_obstacle_pipeline.cc"],
     linkstatic = False,
+    linkopts = ["-lleveldb"],
     deps = [
         ":transform_server",
         ":visualizer",
