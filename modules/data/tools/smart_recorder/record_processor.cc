@@ -19,6 +19,7 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
+#include "modules/data/tools/smart_recorder/bumper_crash_trigger.h"
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
 #include "modules/data/tools/smart_recorder/hard_brake_trigger.h"
@@ -82,6 +83,7 @@ bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new RegularIntervalTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new SwerveTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new BumperCrashTrigger));
   for (const auto& trigger : triggers_) {
     if (!trigger->Init(trigger_conf)) {
       AERROR << "unable to initiate trigger and collect channels";
