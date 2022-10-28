@@ -701,10 +701,6 @@ function run_bazel() {
   info "${TAB}$1 Targets: ${sp}${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  if [ "$GPU_PLATFORM" == "AMD" ]; then
-    bash ${APOLLO_ROOT_DIR}/docker/build/installers/install_rpp.sh
-  fi
-
   job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }

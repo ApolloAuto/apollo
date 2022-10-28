@@ -35,7 +35,7 @@ updates. Make sure either WiFi or Ethernet cable is connected to a network with
 Internet access. You might need to configure the network for your host if the
 connected network is not using the Dynamic Host Configuration Protocol (DHCP).
 
-## Installing NVIDIA GPU Driver
+## Installing NVIDIA GPU Driver for Nvidia GPU
 
 The Apollo runtime in the vehicle requires NVIDIA GPU Driver.
 
@@ -86,6 +86,73 @@ Mon Jan 25 15:51:08 2021
 +-----------------------------------------------------------------------------+
 ```
 
+## Installing ROCm for AMD GPU
+
+- Follow instructions at [ROCm
+  v5.1](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1/page/Prerequisite_Actions.html) or above upto running `amdgpu-install`.
+- When running `amdgpu-install` command use `--usecase=hiplibsdk,rocm,dkms`
+- Add user to the `render` group: `sudo usermod -a -G render $USER`.
+- Now you should be able to run `rocminfo` and `rocm-smi`
+```bash
+$ rocminfo
+ROCk module is loaded
+=====================
+HSA System Attributes
+=====================
+Runtime Version:         1.1
+System Timestamp Freq.:  1000.000000MHz
+Sig. Max Wait Duration:  18446744073709551615 (0xFFFFFFFFFFFFFFFF) (timestamp count)
+Machine Model:           LARGE
+System Endianness:       LITTLE
+
+==========
+HSA Agents
+==========
+*******
+Agent 1
+*******
+  Name:                    AMD EPYC Embedded 7292P 16-Core Processor
+  Uuid:                    CPU-XX
+  Marketing Name:          AMD EPYC Embedded 7292P 16-Core Processor
+  Vendor Name:             CPU
+  Feature:                 None specified
+  Profile:                 FULL_PROFILE
+  Float Round Mode:        NEAR
+  Max Queue Number:        0(0x0)
+  Queue Min Size:          0(0x0)
+  Queue Max Size:          0(0x0)
+  Queue Type:              MULTI
+  Node:                    0
+  Device Type:             CPU
+  ...
+*******
+Agent 2
+*******
+  Name:                    gfx90a
+  Uuid:                    GPU-4e8d8d5c57524677
+  Marketing Name:
+  Vendor Name:             AMD
+  Feature:                 KERNEL_DISPATCH
+  Profile:                 BASE_PROFILE
+  Float Round Mode:        NEAR
+  Max Queue Number:        128(0x80)
+  Queue Min Size:          64(0x40)
+  Queue Max Size:          131072(0x20000)
+  Queue Type:              MULTI
+  Node:                    1
+  Device Type:             GPU
+  ...
+*** Done ***
+
+$ rocm-smi
+======================= ROCm System Management Interface =======================
+================================= Concise Info =================================
+GPU  Temp   AvgPwr  SCLK    MCLK     Fan  Perf  PwrCap  VRAM%  GPU%
+0    31.0c  34.0W   800Mhz  1600Mhz  0%   auto  300.0W    0%   0%
+================================================================================
+============================= End of ROCm SMI Log ==============================
+```
+
 ## Installing Docker Engine
 
 Apollo 6.0+ requires Docker 19.03+ to work properly. Just follow the
@@ -95,8 +162,9 @@ doc to install docker engine.
 Docker-CE on Ubuntu can also be setup using Docker’s official convenience
 script:
 
-```
+```bash
 curl https://get.docker.com | sh
+sudo usermod -a -G docker $USER
 sudo systemctl start docker && sudo systemctl enable docker
 ```
 
@@ -112,7 +180,7 @@ There is also a
 provides to ease Docker installation, which works both for X86_64 and AArch64
 platforms.
 
-## Installing NVIDIA Container Toolkit
+## Installing NVIDIA Container Toolkit for Nvidia GPU
 
 The NVIDIA Container Toolkit for Docker is required to run Apollo's CUDA based
 Docker images.
