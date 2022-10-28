@@ -74,6 +74,7 @@ cc_library(
         "//modules/control/proto:mpc_controller_conf_cc_proto",
         "//modules/control/proto:mrac_conf_cc_proto",
         "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
+        "//modules/localization/common:localization_gflags",
         "@com_google_absl//:absl",
     ],
 )

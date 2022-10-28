@@ -56,6 +56,11 @@ class PIDController {
   void Reset();
 
   /**
+   * @brief reset integral for pid controller
+   */
+  void Reset_integral();
+
+  /**
    * @brief compute control value based on the error
    * @param error error value, the difference between
    * a desired value and a measured value
