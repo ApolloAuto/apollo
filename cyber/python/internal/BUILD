@@ -57,6 +57,7 @@ cc_test(
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest",
     ],
+    linkstatic = True,
 )
 
 cc_binary(
@@ -92,6 +93,7 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         #"@fastrtps",
     ],
+    linkstatic = True,
 )
 
 cc_binary(
