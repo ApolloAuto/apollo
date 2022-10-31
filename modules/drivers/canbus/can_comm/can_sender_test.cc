@@ -29,8 +29,9 @@ namespace canbus {
 
 TEST(CanSenderTest, OneRunCase) {
   CanSender<::apollo::canbus::ChassisDetail> sender;
+  MessageManager<::apollo::canbus::ChassisDetail> pm;
   can::FakeCanClient can_client;
-  sender.Init(&can_client, true);
+  sender.Init(&can_client, &pm, true);
 
   ProtocolData<::apollo::canbus::ChassisDetail> mpd;
   SenderMessage<::apollo::canbus::ChassisDetail> msg(1, &mpd);

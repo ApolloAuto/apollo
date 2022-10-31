@@ -37,6 +37,7 @@
 #include "cyber/time/time.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -93,6 +94,12 @@ class SenderMessage {
   void Update();
 
   /**
+   * @brief Always update the protocol data. But the updating process depends on
+   *        the real type of protocol data which inherites ProtocolData.
+   */
+  void Update_Heartbeat();
+
+  /**
    * @brief Get the CAN frame to send.
    * @return The CAN frame to send.
    */
@@ -147,7 +154,9 @@ class CanSender {
    * @param enable_log whether enable record the send can frame log
    * @return An error code indicating the status of this initialization.
    */
-  common::ErrorCode Init(CanClient *can_client, bool enable_log);
+  common::ErrorCode Init(CanClient *can_client,
+                         MessageManager<SensorType> *pt_manager,
+                         bool enable_log);
 
   /**
    * @brief Add a message with its ID, protocol data.
@@ -170,6 +179,11 @@ class CanSender {
    * @brief Update the protocol data based the types.
    */
   void Update();
+
+  /*
+   * @brief Update the heartbeat protocol data based the types.
+   */
+  void Update_Heartbeat();
 
   /**
    * @brief Stop the CAN sender.
@@ -195,6 +209,7 @@ class CanSender {
   bool is_running_ = false;
 
   CanClient *can_client_ = nullptr;  // Owned by global canbus.cc
+  MessageManager<SensorType> *pt_manager_ = nullptr;
   std::vector<SenderMessage<SensorType>> send_messages_;
   std::unique_ptr<std::thread> thread_;
   bool enable_log_ = false;
@@ -254,6 +269,18 @@ void SenderMessage<SensorType>::Update() {
 }
 
 template <typename SensorType>
+void SenderMessage<SensorType>::Update_Heartbeat() {
+  if (protocol_data_ == nullptr) {
+    AERROR << "Attention: ProtocolData is nullptr!";
+    return;
+  }
+  protocol_data_->UpdateData_Heartbeat(can_frame_to_update_.data);
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  can_frame_to_send_ = can_frame_to_update_;
+}
+
+template <typename SensorType>
 uint32_t SenderMessage<SensorType>::message_id() const {
   return message_id_;
 }
@@ -305,7 +332,12 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         AERROR << "Send msg failed:" << can_frame.CanFrameString();
       }
       if (enable_log()) {
-        ADEBUG << "send_can_frame#" << can_frame.CanFrameString();
+        ADEBUG << "send_can_frame#" << can_frame.CanFrameString()
+               << "echo send_can_frame# in chssis_detail.";
+        uint32_t uid = can_frame.id;
+        const uint8_t *data = can_frame.data;
+        uint8_t len = can_frame.len;
+        pt_manager_->Parse(uid, data, len);
       }
     }
     delta_period = new_delta_period;
@@ -324,8 +356,9 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
 }
 
 template <typename SensorType>
-common::ErrorCode CanSender<SensorType>::Init(CanClient *can_client,
-                                              bool enable_log) {
+common::ErrorCode CanSender<SensorType>::Init(
+    CanClient *can_client, MessageManager<SensorType> *pt_manager,
+    bool enable_log) {
   if (is_init_) {
     AERROR << "Duplicated Init request.";
     return common::ErrorCode::CANBUS_ERROR;
@@ -336,6 +369,7 @@ common::ErrorCode CanSender<SensorType>::Init(CanClient *can_client,
   }
   is_init_ = true;
   can_client_ = can_client;
+  pt_manager_ = pt_manager;
   enable_log_ = enable_log;
   return common::ErrorCode::OK;
 }
@@ -363,6 +397,14 @@ common::ErrorCode CanSender<SensorType>::Start() {
   thread_.reset(new std::thread([this] { PowerSendThreadFunc(); }));
 
   return common::ErrorCode::OK;
+}
+
+// cansender -> Update_Heartbeat()
+template <typename SensorType>
+void CanSender<SensorType>::Update_Heartbeat() {
+  for (auto &message : send_messages_) {
+    message.Update_Heartbeat();
+  }
 }
 
 template <typename SensorType>
