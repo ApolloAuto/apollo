@@ -105,6 +105,7 @@ class ZhongyunController final : public VehicleController {
   void SetTurningSignal(
       const ::apollo::control::ControlCommand& command) override;
 
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
 

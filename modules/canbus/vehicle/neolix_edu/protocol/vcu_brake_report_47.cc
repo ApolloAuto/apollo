@@ -63,6 +63,9 @@ void Vcubrakereport47::Parse(const std::uint8_t* bytes, int32_t length,
   chassis->mutable_neolix_edu()
       ->mutable_vcu_brake_report_47()
       ->set_vcu_brakerept_checksum(vcu_brakerept_checksum(bytes, length));
+  chassis->mutable_neolix_edu()
+      ->mutable_vcu_brake_report_47()
+      ->set_vcu_ehb_brake_state(vcu_ehb_brake_state(bytes, length));
 
   chassis->mutable_brake()->set_brake_pedal_position(
       vcu_real_brake(bytes, length));
@@ -180,6 +183,22 @@ double Vcubrakereport47::vehicleslope(const std::uint8_t* bytes,
   int32_t x = t0.get_byte(0, 8);
 
   double ret = x * 0.175813;
+  return ret;
+}
+
+// config detail: {'bit': 32, 'description': 'the vcu brake was caused reason',
+// 'enum': {0: 'VCU_EHB_NORMAL_BRAKE', 1: 'VCU_EHB_BACKUP_REMOTE_BRAKE',
+// 2: 'VCU_EHB_EMERGENCY_BUTTON_BRAKE', 3: 'VCU_EHB_ULTR_BRAKE', 4:
+// 'VCU_EHB_BUMPER_BRAKE'}, 'is_signed_var': False, 'len': 3, 'name':
+// 'vcu_ehb_brake_state', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|4]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+Vcu_brake_report_47::Vcu_ehb_brakeType Vcubrakereport47::vcu_ehb_brake_state(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 4);
+  int32_t x = t0.get_byte(0, 3);
+
+  Vcu_brake_report_47::Vcu_ehb_brakeType ret =
+      static_cast<Vcu_brake_report_47::Vcu_ehb_brakeType>(x);
   return ret;
 }
 

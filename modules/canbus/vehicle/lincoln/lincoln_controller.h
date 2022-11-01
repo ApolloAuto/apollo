@@ -127,6 +127,7 @@ class LincolnController final : public VehicleController {
   void SetHorn(const control::ControlCommand &command) override;
   void SetTurningSignal(const control::ControlCommand &command) override;
 
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
   bool CheckSafetyError(const canbus::ChassisDetail &chassis);

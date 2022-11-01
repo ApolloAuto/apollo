@@ -16,6 +16,7 @@
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 
+#include <string>
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
@@ -104,11 +105,20 @@ ErrorCode ChController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_mode_command_116_ = dynamic_cast<Vehiclemodecommand116*>(
+      message_manager_->GetMutableProtocolDataById(Vehiclemodecommand116::ID));
+  if (vehicle_mode_command_116_ == nullptr) {
+    AERROR << "Vehiclemodecommand116 does not exist in the ChMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
   can_sender_->AddMessage(Brakecommand111::ID, brake_command_111_, false);
   can_sender_->AddMessage(Gearcommand114::ID, gear_command_114_, false);
   can_sender_->AddMessage(Steercommand112::ID, steer_command_112_, false);
   can_sender_->AddMessage(Throttlecommand110::ID, throttle_command_110_, false);
   can_sender_->AddMessage(Turnsignalcommand113::ID, turnsignal_command_113_,
+                          false);
+  can_sender_->AddMessage(Vehiclemodecommand116::ID, vehicle_mode_command_116_,
                           false);
 
   // need sleep to ensure all messages received
@@ -151,9 +161,9 @@ Chassis ChController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  // if (driving_mode() == Chassis::EMERGENCY_MODE) {
+  //   set_chassis_error_code(Chassis::NO_ERROR);
+  // }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -191,8 +201,7 @@ Chassis ChController::chassis() {
   } else {
     chassis_.set_brake_percentage(0);
   }
-
-  // 23, previously 10   gear
+  // 10 gear
   if (chassis_detail.ch().has_gear_status_514() &&
       chassis_detail.ch().gear_status_514().has_gear_sts()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
@@ -227,32 +236,85 @@ Chassis ChController::chassis() {
   } else {
     chassis_.set_steering_percentage(0);
   }
-
-  // 26
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
+  // 12 battery soc
+  if (chassis_detail.ch().has_ecu_status_2_516() &&
+      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.ch().ecu_status_2_516().battery_soc());
   }
-
+  // 13
   if (chassis_detail.has_surround()) {
     chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
   }
-
-  // give engage_advice based on error_code and canbus feedback
-  if (!chassis_error_mask_ && (chassis_.throttle_percentage() == 0.0)) {
+  // 14 give engage_advice based on error_code and battery low soc warn
+  if (!chassis_error_mask_ && chassis_.battery_soc_percentage() > 15.0) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, throttle percentage is not zero!");
+    if (chassis_.battery_soc_percentage() > 0) {
+      chassis_.mutable_engage_advice()->set_reason(
+          "Battery soc percentage is lower than 15%, please charge it "
+          "quickly!");
+    }
   }
+  // 15 set vin
+  // vin set 17 bits, like LSBN1234567890123 is prased as
+  // vin17(L),vin16(S),vin15(B),.....,vin03(1)vin02(2),vin01(3)
+  std::string vin = "";
+  if (chassis_detail.ch().has_vin_resp1_51b()) {
+    Vin_resp1_51b vin_51b = chassis_detail.ch().vin_resp1_51b();
+    vin += vin_51b.vin01();
+    vin += vin_51b.vin02();
+    vin += vin_51b.vin03();
+    vin += vin_51b.vin04();
+    vin += vin_51b.vin05();
+    vin += vin_51b.vin06();
+    vin += vin_51b.vin07();
+    vin += vin_51b.vin08();
+  }
+  if (chassis_detail.ch().has_vin_resp2_51c()) {
+    Vin_resp2_51c vin_51c = chassis_detail.ch().vin_resp2_51c();
+    vin += vin_51c.vin09();
+    vin += vin_51c.vin10();
+    vin += vin_51c.vin11();
+    vin += vin_51c.vin12();
+    vin += vin_51c.vin13();
+    vin += vin_51c.vin14();
+    vin += vin_51c.vin15();
+    vin += vin_51c.vin16();
+  }
+  if (chassis_detail.ch().has_vin_resp3_51d()) {
+    Vin_resp3_51d vin_51d = chassis_detail.ch().vin_resp3_51d();
+    vin += vin_51d.vin17();
+  }
+  std::reverse(vin.begin(), vin.end());
+  chassis_.mutable_vehicle_id()->set_vin(vin);
 
-  // 27 battery soc
-  if (chassis_detail.ch().has_ecu_status_2_516() &&
-      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
-    chassis_.set_battery_soc_percentage(
-        chassis_detail.ch().ecu_status_2_516().battery_soc());
+  // 16 front bumper event
+  if (chassis_detail.ch().has_brake_status__511() &&
+      chassis_detail.ch().brake_status__511().has_front_bump_env()) {
+    if (chassis_detail.ch().brake_status__511().front_bump_env() ==
+        Brake_status__511::FRONT_BUMP_ENV_FRONT_BUMPER_ENV) {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+  }
+  // 17 back bumper event
+  if (chassis_detail.ch().has_brake_status__511() &&
+      chassis_detail.ch().brake_status__511().has_back_bump_env()) {
+    if (chassis_detail.ch().brake_status__511().back_bump_env() ==
+        Brake_status__511::BACK_BUMP_ENV_BACK_BUMPER_ENV) {
+      chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
+    } else {
+      chassis_.set_back_bumper_event(Chassis::BUMPER_NORMAL);
+    }
+  } else {
+    chassis_.set_back_bumper_event(Chassis::BUMPER_INVALID);
   }
 
   return chassis_;
@@ -275,12 +337,14 @@ ErrorCode ChController::EnableAutoMode() {
       Throttle_command_110::THROTTLE_PEDAL_EN_CTRL_ENABLE);
   steer_command_112_->set_steer_angle_en_ctrl(
       Steer_command_112::STEER_ANGLE_EN_CTRL_ENABLE);
-  AINFO << "\n\n\n set enable \n\n\n";
+  AINFO << "set enable";
+
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
-    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode. Please check the "
+              "emergency button or chassis.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
@@ -337,7 +401,7 @@ void ChController::Gear(Chassis::GearPosition gear_position) {
       break;
     }
     case Chassis::GEAR_INVALID: {
-      AERROR << "Gear command is invalid!";
+      // AERROR << "Gear command is invalid!";
       gear_command_114_->set_gear_cmd(Gear_command_114::GEAR_CMD_NEUTRAL);
       break;
     }
@@ -366,8 +430,8 @@ void ChController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void ChController::Throttle(double pedal) {
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
-      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -377,10 +441,10 @@ void ChController::Throttle(double pedal) {
 
 void ChController::Acceleration(double acc) {}
 
-// ch default, -23 ~ 23, left:+, right:-
+// ch default, 23 ~ -23, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// angle:99.99~0.00~-99.99, unit:, left:+, right:-
 void ChController::Steer(double angle) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_STEER_ONLY)) {
@@ -409,11 +473,73 @@ void ChController::Steer(double angle, double angle_spd) {
 
 void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {}
+void ChController::SetBeam(const ControlCommand& command) {
+  // Set low beam
+  if (command.signal().low_beam()) {
+    turnsignal_command_113_->set_low_beam_cmd(
+        Turnsignal_command_113::LOW_BEAM_CMD_ON);
+  } else {
+    turnsignal_command_113_->set_low_beam_cmd(
+        Turnsignal_command_113::LOW_BEAM_CMD_OFF);
+  }
+}
 
 void ChController::SetHorn(const ControlCommand& command) {}
 
-void ChController::SetTurningSignal(const ControlCommand& command) {}
+void ChController::SetTurningSignal(const ControlCommand& command) {
+  // Set Turn Signal
+  auto signal = command.signal().turn_signal();
+  if (signal == common::VehicleSignal::TURN_LEFT) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_LEFT);
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_RIGHT);
+  } else if (signal == common::VehicleSignal::TURN_HAZARD_WARNING) {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_HAZARD_WARNING_LAMPSTS);
+  } else {
+    turnsignal_command_113_->set_turn_signal_cmd(
+        Turnsignal_command_113::TURN_SIGNAL_CMD_NONE);
+  }
+}
+
+bool ChController::VerifyID() {
+  if (!CheckVin()) {
+    AERROR << "Failed to get the vin. Get vin again.";
+    GetVin();
+    return false;
+  } else {
+    ResetVin();
+    return true;
+  }
+}
+
+bool ChController::CheckVin() {
+  if (chassis_.vehicle_id().vin().size() >= 7) {
+    AINFO << "Vin check success! Vehicel vin is "
+          << chassis_.vehicle_id().vin();
+    return true;
+  } else {
+    AINFO << "Vin check failed! Current vin size is "
+          << chassis_.vehicle_id().vin().size();
+    return false;
+  }
+}
+
+void ChController::GetVin() {
+  vehicle_mode_command_116_->set_vin_req_cmd(
+      Vehicle_mode_command_116::VIN_REQ_CMD_VIN_REQ_ENABLE);
+  AINFO << "Get vin";
+  can_sender_->Update();
+}
+
+void ChController::ResetVin() {
+  vehicle_mode_command_116_->set_vin_req_cmd(
+      Vehicle_mode_command_116::VIN_REQ_CMD_VIN_REQ_DISABLE);
+  AINFO << "Reset vin";
+  can_sender_->Update();
+}
 
 void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
@@ -432,10 +558,11 @@ bool ChController::CheckChassisError() {
         ch.steer_status__512().steer_err()) {
       return true;
     }
-    if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
-        ch.steer_status__512().sensor_err()) {
-      return true;
-    }
+    // cancel the sensor err check because of discarding the steer sensor
+    // if (Steer_status__512::SENSOR_ERR_STEER_SENSOR_ERR ==
+    //     ch.steer_status__512().sensor_err()) {
+    //   return false;
+    // }
   }
   // drive error
   if (ch.has_throttle_status__510()) {
@@ -443,10 +570,12 @@ bool ChController::CheckChassisError() {
         ch.throttle_status__510().drive_motor_err()) {
       return true;
     }
-    if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
-        ch.throttle_status__510().battery_bms_err()) {
-      return true;
-    }
+    // cancel the battery err check bacause of always causing this error block
+    // the vehicle use
+    // if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
+    //     ch.throttle_status__510().battery_bms_err()) {
+    //   return false;
+    // }
   }
   // brake error
   if (ch.has_brake_status__511()) {
@@ -486,6 +615,7 @@ void ChController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -499,6 +629,7 @@ void ChController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
+        AINFO << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -512,6 +643,7 @@ void ChController::SecurityDogThreadFunc() {
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
+      can_sender_->Update();
     }
     end = ::apollo::cyber::Time::Now().ToMicrosecond();
     std::chrono::duration<double, std::micro> elapsed{end - start};
@@ -523,6 +655,7 @@ void ChController::SecurityDogThreadFunc() {
     }
   }
 }
+
 bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
   int32_t retry_num = 20;
   ChassisDetail chassis_detail;

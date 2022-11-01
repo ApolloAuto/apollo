@@ -32,21 +32,41 @@ void Turnsignalstatus513::Parse(const std::uint8_t* bytes, int32_t length,
                                 ChassisDetail* chassis) const {
   chassis->mutable_ch()->mutable_turnsignal_status__513()->set_turn_signal_sts(
       turn_signal_sts(bytes, length));
+  chassis->mutable_ch()->mutable_turnsignal_status__513()->set_low_beam_sts(
+      low_beam_sts(bytes, length));
 }
 
-// config detail: {'description': 'Lighting control(Status)', 'enum': {0:
-// 'TURN_SIGNAL_STS_NONE', 1: 'TURN_SIGNAL_STS_LEFT', 2:
-// 'TURN_SIGNAL_STS_RIGHT'}, 'precision': 1.0, 'len': 8, 'name':
-// 'turn_signal_sts', 'is_signed_var': False, 'offset': 0.0, 'physical_range':
-// '[0|2]', 'bit': 0, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+// config detail: {'bit': 0, 'description': 'Lighting control(Status)', 'enum':
+// {0: 'TURN_SIGNAL_STS_NONE', 1: 'TURN_SIGNAL_STS_LEFT', 2:
+// 'TURN_SIGNAL_STS_RIGHT', 3: 'TURN_SIGNAL_STS_HAZARD_WARNING_LAMPSTS_ON'},
+// 'is_signed_var': False, 'len': 8, 'name': 'turn_signal_sts', 'offset': 0.0,
+// 'order': 'intel', 'physical_range': '[0|2]', 'physical_unit': '',
+// 'precision': 1.0, 'type': 'enum'}
 Turnsignal_status__513::Turn_signal_stsType
 Turnsignalstatus513::turn_signal_sts(const std::uint8_t* bytes,
                                      int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  return static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);
+  Turnsignal_status__513::Turn_signal_stsType ret =
+      static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);
+  return ret;
 }
+
+// config detail: {'bit': 8, 'description': 'Lighting control(Status)', 'enum':
+// {0: 'LOW_BEAM_STS_ON', 1: 'LOW_BEAM_STS_OFF'}, 'is_signed_var': False, 'len':
+// 2, 'name': 'low_beam_sts', 'offset': 0.0, 'order': 'intel', 'physical_range':
+// '[0|2]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+Turnsignal_status__513::Low_beam_stsType Turnsignalstatus513::low_beam_sts(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 2);
+
+  Turnsignal_status__513::Low_beam_stsType ret =
+      static_cast<Turnsignal_status__513::Low_beam_stsType>(x);
+  return ret;
+}
+
 }  // namespace ch
 }  // namespace canbus
 }  // namespace apollo

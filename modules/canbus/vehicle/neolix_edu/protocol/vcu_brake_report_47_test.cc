@@ -56,6 +56,7 @@ TEST_F(Vcubrakereport47Test, reset) {
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().rampauxiliaryindication(),
             false);
   EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vehicleslope(), 0);
+  EXPECT_EQ(cd.neolix_edu().vcu_brake_report_47().vcu_ehb_brake_state(), 0);
 }
 
 }  // namespace neolix_edu

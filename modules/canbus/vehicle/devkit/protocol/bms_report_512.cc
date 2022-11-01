@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
 
 #include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -35,8 +36,20 @@ void Bmsreport512::Parse(const std::uint8_t* bytes, int32_t length,
       battery_current(bytes, length));
   chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_voltage(
       battery_voltage(bytes, length));
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_soc(
-      battery_soc(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_bms_report_512()
+      ->set_battery_soc_percentage(battery_soc_percentage(bytes, length));
+  chassis->mutable_devkit()->mutable_bms_report_512()->set_is_battery_soc_low(
+      battery_soc_percentage(bytes, length) <= 15);
+  chassis->mutable_devkit()
+      ->mutable_bms_report_512()
+      ->set_battery_inside_temperature(
+          battery_inside_temperature(bytes, length));
+  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_flt_low_temp(
+      battery_flt_low_temp(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_bms_report_512()
+      ->set_battery_flt_over_temp(battery_flt_over_temp(bytes, length));
 }
 
 // config detail: {'bit': 23, 'description': 'Battery Total Current',
@@ -76,14 +89,59 @@ double Bmsreport512::battery_voltage(const std::uint8_t* bytes,
 }
 
 // config detail: {'bit': 39, 'description': 'Battery Soc percentage',
-// 'is_signed_var': False, 'len': 8, 'name': 'battery_soc', 'offset': 0.0,
-// 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
+// 'is_signed_var': False, 'len': 8, 'name': 'battery_soc_percentage', 'offset':
+// 0.0, 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
 // 'precision': 1.0, 'type': 'int'}
-int Bmsreport512::battery_soc(const std::uint8_t* bytes, int32_t length) const {
+int Bmsreport512::battery_soc_percentage(const std::uint8_t* bytes,
+                                         int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
   int ret = x;
+  return ret;
+}
+
+// config detail: {'bit': 40, 'description': 'Battery Inside temperature',
+// 'is_signed_var': False, 'len': 1, 'name': 'Battery_Inside_Temperature',
+// 'offset': -40, 'order': 'motorola', 'physical_range': '[-40|215]',
+// 'physical_unit': 'C', 'precision': 1.0, 'type': 'int'}
+int Bmsreport512::battery_inside_temperature(const std::uint8_t* bytes,
+                                             const int32_t length) const {
+  Byte t0(bytes + 5);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x - 40;
+  return ret;
+}
+
+// config detail: {'description': 'Battery Below Low temp fault', 'enum':
+// {0: 'BATTERY_FLT_LOW_TEMP_NO_FAULT', 1:
+// 'BATTERY_FLT_LOW_TEMP_FAULT'}, 'precision': 1.0, 'len': 1,
+// 'name': 'Brake_FLT2', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 48, 'type': 'enum', 'order': 'motorola',
+// 'physical_unit': ''}
+Bms_report_512::Battery_flt_lowtempType Bmsreport512::battery_flt_low_temp(
+    const std::uint8_t* bytes, const int32_t length) const {
+  Byte t0(bytes + 6);
+  int32_t x = t0.get_byte(0, 1);
+
+  Bms_report_512::Battery_flt_lowtempType ret =
+      static_cast<Bms_report_512::Battery_flt_lowtempType>(x);
+  return ret;
+}
+// config detail: {'description': 'Battery Over High Temp fault', 'enum':
+// {0: 'BATTERY_FLT_OVER_TEMP_NO_FAULT', 1:
+// 'BATTERY_FLT_OVER_TEMP_FAULT'}, 'precision': 1.0, 'len': 1,
+// 'name': 'Brake_FLT2', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 49, 'type': 'enum', 'order': 'motorola',
+// 'physical_unit': ''}
+Bms_report_512::Battery_flt_overtempType Bmsreport512::battery_flt_over_temp(
+    const std::uint8_t* bytes, const int32_t length) const {
+  Byte t0(bytes + 6);
+  int32_t x = t0.get_byte(1, 1);
+
+  Bms_report_512::Battery_flt_overtempType ret =
+      static_cast<Bms_report_512::Battery_flt_overtempType>(x);
   return ret;
 }
 }  // namespace devkit

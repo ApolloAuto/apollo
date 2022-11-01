@@ -35,10 +35,24 @@ uint32_t Steeringcommand102::GetPeriod() const {
   return PERIOD;
 }
 
+void Steeringcommand102::Parse(const std::uint8_t* bytes, int32_t length,
+                               ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_steering_command_102()->set_steer_en_ctrl(
+      steer_en_ctrl(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_steering_command_102()
+      ->set_steer_angle_target(steer_angle_target(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_steering_command_102()
+      ->set_steer_angle_spd_target(steer_angle_spd_target(bytes, length));
+  chassis->mutable_devkit()->mutable_steering_command_102()->set_checksum_102(
+      checksum_102(bytes, length));
+}
+
 void Steeringcommand102::UpdateData(uint8_t* data) {
   set_p_steer_en_ctrl(data, steer_en_ctrl_);
   set_p_steer_angle_target(data, steer_angle_target_);
-  set_p_steer_angle_spd(data, steer_angle_spd_);
+  set_p_steer_angle_spd_target(data, steer_angle_spd_target_);
   checksum_102_ =
       data[0] ^ data[1] ^ data[2] ^ data[3] ^ data[4] ^ data[5] ^ data[6];
   set_p_checksum_102(data, checksum_102_);
@@ -48,7 +62,7 @@ void Steeringcommand102::Reset() {
   // TODO(All) :  you should check this manually
   steer_en_ctrl_ = Steering_command_102::STEER_EN_CTRL_DISABLE;
   steer_angle_target_ = 0;
-  steer_angle_spd_ = 0;
+  steer_angle_spd_target_ = 0;
   checksum_102_ = 0;
 }
 
@@ -78,8 +92,8 @@ Steeringcommand102* Steeringcommand102::set_steer_angle_target(
 
 // config detail: {'bit': 31, 'is_signed_var': False, 'len': 16, 'name':
 // 'Steer_ANGLE_Target', 'offset': -500.0, 'order': 'motorola',
-// 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
-// 'type': 'int'}
+// 'physical_range': '[-500|500]''right -, left +', 'physical_unit': 'deg',
+// 'precision': 1.0, 'type': 'int'}
 void Steeringcommand102::set_p_steer_angle_target(uint8_t* data,
                                                   int steer_angle_target) {
   steer_angle_target =
@@ -97,19 +111,21 @@ void Steeringcommand102::set_p_steer_angle_target(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-Steeringcommand102* Steeringcommand102::set_steer_angle_spd(
-    int steer_angle_spd) {
-  steer_angle_spd_ = steer_angle_spd;
+Steeringcommand102* Steeringcommand102::set_steer_angle_spd_target(
+    int steer_angle_spd_target) {
+  steer_angle_spd_target_ = steer_angle_spd_target;
   return this;
 }
 
 // config detail: {'bit': 15, 'is_signed_var': False, 'len': 8, 'name':
-// 'Steer_ANGLE_SPD', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0, 'type': 'int'}
-void Steeringcommand102::set_p_steer_angle_spd(uint8_t* data,
-                                               int steer_angle_spd) {
-  steer_angle_spd = ProtocolData::BoundedValue(0, 250, steer_angle_spd);
-  int x = steer_angle_spd;
+// 'Steer_ANGLE_SPD_Target', 'offset': 0.0, 'order': 'motorola',
+// 'physical_range': '[0|250]', 'physical_unit': 'deg/s', 'precision': 1.0,
+// 'type': 'int'}
+void Steeringcommand102::set_p_steer_angle_spd_target(
+    uint8_t* data, int steer_angle_spd_target) {
+  steer_angle_spd_target =
+      ProtocolData::BoundedValue(0, 250, steer_angle_spd_target);
+  int x = steer_angle_spd_target;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 0, 8);
@@ -129,6 +145,48 @@ void Steeringcommand102::set_p_checksum_102(uint8_t* data, int checksum_102) {
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
+}
+
+Steering_command_102::Steer_en_ctrlType Steeringcommand102::steer_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Steering_command_102::Steer_en_ctrlType ret =
+      static_cast<Steering_command_102::Steer_en_ctrlType>(x);
+  return ret;
+}
+
+double Steeringcommand102::steer_angle_target(const std::uint8_t* bytes,
+                                              int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 4);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 1 + -500.000000;
+  return ret;
+}
+
+double Steeringcommand102::steer_angle_spd_target(const std::uint8_t* bytes,
+                                                  int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 8);
+
+  double ret = x * 1;
+  return ret;
+}
+
+int Steeringcommand102::checksum_102(const std::uint8_t* bytes,
+                                     int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/wey_controller.h"
+
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/vehicle/wey/wey_message_manager.h"
@@ -148,9 +149,9 @@ Chassis WeyController::chassis() {
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
-  if (driving_mode() == Chassis::EMERGENCY_MODE) {
-    set_chassis_error_code(Chassis::NO_ERROR);
-  }
+  // if (driving_mode() == Chassis::EMERGENCY_MODE) {
+  //   set_chassis_error_code(Chassis::NO_ERROR);
+  // }
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
@@ -401,11 +402,11 @@ Chassis WeyController::chassis() {
   } else {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, epb is not released or firmware error!");
   }
   return chassis_;
 }
+
+bool WeyController::VerifyID() { return true; }
 
 void WeyController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
@@ -435,7 +436,8 @@ ErrorCode WeyController::EnableAutoMode() {
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
-    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode. Please check the "
+              "emergency button or chassis.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;

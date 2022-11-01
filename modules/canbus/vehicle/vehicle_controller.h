@@ -153,6 +153,12 @@ class VehicleController {
 
   virtual void SetLimits() {}
 
+  /**
+   * @brief Response to vehicle ID request.
+   * @return true if vehicle ID is successfully responsed.
+   */
+  virtual bool VerifyID() = 0;
+
  protected:
   virtual Chassis::DrivingMode driving_mode();
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);

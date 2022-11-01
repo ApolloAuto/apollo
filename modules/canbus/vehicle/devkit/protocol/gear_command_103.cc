@@ -29,6 +29,16 @@ const int32_t Gearcommand103::ID = 0x103;
 // public
 Gearcommand103::Gearcommand103() { Reset(); }
 
+void Gearcommand103::Parse(const std::uint8_t* bytes, int32_t length,
+                           ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_gear_command_103()->set_gear_target(
+      gear_target(bytes, length));
+  chassis->mutable_devkit()->mutable_gear_command_103()->set_gear_en_ctrl(
+      gear_en_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_gear_command_103()->set_checksum_103(
+      checksum_103(bytes, length));
+}
+
 uint32_t Gearcommand103::GetPeriod() const {
   // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
@@ -101,6 +111,35 @@ void Gearcommand103::set_p_checksum_103(uint8_t* data, int checksum_103) {
 
   Byte to_set(data + 7);
   to_set.set_value(x, 0, 8);
+}
+
+Gear_command_103::Gear_targetType Gearcommand103::gear_target(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 3);
+
+  Gear_command_103::Gear_targetType ret =
+      static_cast<Gear_command_103::Gear_targetType>(x);
+  return ret;
+}
+
+Gear_command_103::Gear_en_ctrlType Gearcommand103::gear_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Gear_command_103::Gear_en_ctrlType ret =
+      static_cast<Gear_command_103::Gear_en_ctrlType>(x);
+  return ret;
+}
+
+int Gearcommand103::checksum_103(const std::uint8_t* bytes,
+                                     int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

@@ -32,7 +32,14 @@ class Steeringreport502 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'bit': 55, 'is_signed_var': False, 'len': 8, 'name':
+  // config detail: {'bit': 47, 'is_signed_var': False, 'len': 16, 'name':
+  // 'Steer_ANGLE_Rear_Actual', 'offset': -500.0, 'order': 'motorola',
+  // 'physical_range': '[-500|500]', 'physical_unit': 'deg', 'precision': 1.0,
+  // 'type': 'int'}
+  int steer_angle_rear_actual(const std::uint8_t* bytes,
+                              const int32_t length) const;
+
+  // config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
   // 'Steer_ANGLE_SPD_Actual', 'offset': 0.0, 'order': 'motorola',
   // 'physical_range': '[0|0]', 'physical_unit': 'deg/s', 'precision': 1.0,
   // 'type': 'int'}

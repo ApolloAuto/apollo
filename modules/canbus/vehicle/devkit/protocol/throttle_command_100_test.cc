@@ -36,9 +36,9 @@ TEST_F(Throttlecommand100Test, simple) {
   EXPECT_EQ(data[2], 0b00110011);
   EXPECT_EQ(data[3], 0b00000000);
   EXPECT_EQ(data[4], 0b00000000);
-  EXPECT_EQ(data[5], 0b01110110);
-  EXPECT_EQ(data[6], 0b01110111);
-  EXPECT_EQ(data[7], 0b01000010);
+  EXPECT_EQ(data[5], 0b00000000);
+  EXPECT_EQ(data[6], 0b00110111);
+  EXPECT_EQ(data[7], 0b01110100);
 }
 
 }  // namespace devkit

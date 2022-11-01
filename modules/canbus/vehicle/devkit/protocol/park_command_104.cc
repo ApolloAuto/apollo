@@ -35,6 +35,16 @@ uint32_t Parkcommand104::GetPeriod() const {
   return PERIOD;
 }
 
+void Parkcommand104::Parse(const std::uint8_t* bytes, int32_t length,
+                           ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_park_command_104()->set_park_target(
+      park_target(bytes, length));
+  chassis->mutable_devkit()->mutable_park_command_104()->set_park_en_ctrl(
+      park_en_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_park_command_104()->set_checksum_104(
+      checksum_104(bytes, length));
+}
+
 void Parkcommand104::UpdateData(uint8_t* data) {
   set_p_park_target(data, park_target_);
   set_p_park_en_ctrl(data, park_en_ctrl_);
@@ -100,6 +110,35 @@ void Parkcommand104::set_p_park_en_ctrl(
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
+}
+
+Park_command_104::Park_targetType Parkcommand104::park_target(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 3);
+
+  Park_command_104::Park_targetType ret =
+      static_cast<Park_command_104::Park_targetType>(x);
+  return ret;
+}
+
+Park_command_104::Park_en_ctrlType Parkcommand104::park_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Park_command_104::Park_en_ctrlType ret =
+      static_cast<Park_command_104::Park_en_ctrlType>(x);
+  return ret;
+}
+
+int Parkcommand104::checksum_104(const std::uint8_t* bytes,
+                                     int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit
