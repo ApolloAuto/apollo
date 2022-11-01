@@ -37,6 +37,8 @@ using SharedLibraryPtr = std::shared_ptr<SharedLibrary>;
 
 struct DynamicModelInfo {
   std::string dynamic_model_name;
+  // for name may have empty space,but dir can not
+  std::string dynamic_model_dir_name;
   std::string library_name;
   SimControlBase *dynamic_model_ptr;
 };
@@ -96,7 +98,7 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   // if is already registered
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter != s_dynamic_model_map_.end()) {
-    AINFO<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
+    AERROR<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
     return false;
   }
   std::string dm_library_name = dynamic_model_conf.library_name();
@@ -116,6 +118,7 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
     }
     s_dynamic_model_map_[dynamic_model_name] = {};
     s_dynamic_model_map_[dynamic_model_name].dynamic_model_name = dynamic_model_name;
+    s_dynamic_model_map_[dynamic_model_name].dynamic_model_dir_name = dm_dir_name;
     s_dynamic_model_map_[dynamic_model_name].dynamic_model_ptr = dynamic_model_ptr;
     s_dynamic_model_map_[dynamic_model_name].library_name = dm_library_name;
     auto iter = s_dm_lib_count_.find(dm_library_name);
@@ -134,6 +137,7 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
     AERROR << "SymbolNotFoundException: " << e.what();
     return false;
   }
+  shared_library->Unload();
   return true;
 }
 
@@ -210,9 +214,9 @@ bool DynamicModelFactory::UnregisterDynamicModel(
     return true;
   }
   std::string library_name = iter->second.library_name;
-  s_dynamic_model_map_.erase(dynamic_model_name);
   std::string dynamic_model_dir;
-  GetDynamicModelPath(dynamic_model_name, dynamic_model_dir, false);
+  GetDynamicModelPath(s_dynamic_model_map_[dynamic_model_name].dynamic_model_dir_name, dynamic_model_dir, false);
+  s_dynamic_model_map_.erase(dynamic_model_name);
   std::string command = "rm -fr " + dynamic_model_dir;
   // use cyber::common::removeFiles do not support sub-directory
   // use rmdir do not support not empty directory

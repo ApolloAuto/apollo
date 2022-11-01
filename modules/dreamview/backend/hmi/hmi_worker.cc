@@ -999,7 +999,7 @@ bool HMIWorker::UpdateDynamicModelToStatus(std::string &dynamic_model_name) {
         return true;
       }
     }
-    status_.mutable_dynamic_models()->Add(std::move(dynamic_model_name));
+    status_.add_dynamic_models(dynamic_model_name);
     status_changed_ = true;
   }
   return true;
