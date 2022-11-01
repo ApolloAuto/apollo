@@ -55,8 +55,8 @@ uint64_t TriggerBase::GetValidValueInRange(const double desired_value,
 }
 
 void TriggerBase::TriggerIt(const uint64_t msg_time) const {
-  static constexpr float kMaxBackwardTime = 30.0;
-  static constexpr float kMaxForwardTime = 15.0;
+  static constexpr float kMaxBackwardTime = 80.0;
+  static constexpr float kMaxForwardTime = 80.0;
   static constexpr uint64_t kZero = 0.0;
   const uint64_t backward_time = GetValidValueInRange(
       trigger_obj_->backward_time(), kZero, kMaxBackwardTime);

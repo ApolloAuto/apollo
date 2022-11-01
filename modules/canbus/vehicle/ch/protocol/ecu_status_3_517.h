@@ -32,53 +32,61 @@ class Ecustatus3517 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
-  // config detail: {'description': 'Ultrasonic detection distance 1 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_1', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_1(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 0, 'description': 'Ultrasonic detection distance 1
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_1', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_1(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 2 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_2', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 8, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_2(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 8, 'description': 'Ultrasonic detection distance 2
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_2', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_2(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 3 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_3', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 16, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_3(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 16, 'description': 'Ultrasonic detection distance 3
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_3', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_3(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 4 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_4', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 24, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_4(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 24, 'description': 'Ultrasonic detection distance 4
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_4', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_4(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 5 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_5', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 32, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_5(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 32, 'description': 'Ultrasonic detection distance 5
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_5', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_5(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 6 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_6', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 40, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_6(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 40, 'description': 'Ultrasonic detection distance 6
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_6', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_6(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 7 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_7', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 48, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_7(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 48, 'description': 'Ultrasonic detection distance 7
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_7', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_7(const std::uint8_t* bytes,
+                           const int32_t length) const;
 
-  // config detail: {'description': 'Ultrasonic detection distance 8 (Ultrasound
-  // status)', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
-  // 'ULTRASOUND_DIST_8', 'is_signed_var': False, 'physical_range': '[0|0]',
-  // 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': 'cm'}
-  int ultrasound_dist_8(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'bit': 56, 'description': 'Ultrasonic detection distance 8
+  // (Ultrasound status)', 'is_signed_var': False, 'len': 8, 'name':
+  // 'ULTRASOUND_DIST_8', 'offset': 0.0, 'order': 'intel', 'physical_range':
+  // '[0|500]', 'physical_unit': 'cm', 'precision': 2.0, 'type': 'double'}
+  double ultrasound_dist_8(const std::uint8_t* bytes,
+                           const int32_t length) const;
 };
 
 }  // namespace ch

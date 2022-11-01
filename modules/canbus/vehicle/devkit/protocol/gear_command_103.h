@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -31,6 +32,9 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   Gearcommand103();
 
   uint32_t GetPeriod() const override;
+
+  void Parse(const std::uint8_t* bytes, int32_t length,
+             ChassisDetail* chassis) const override;
 
   void UpdateData(uint8_t* data) override;
 
@@ -76,6 +80,15 @@ class Gearcommand103 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': ''}
   void set_p_checksum_103(uint8_t* data, int checksum_103);
+
+  // report the command
+  Gear_command_103::Gear_targetType gear_target(const std::uint8_t* bytes,
+                                                const int32_t length) const;
+
+  Gear_command_103::Gear_en_ctrlType gear_en_ctrl(const std::uint8_t* bytes,
+                                                  const int32_t length) const;
+
+  int checksum_103(const std::uint8_t* bytes, const int32_t length) const;
 
  private:
   Gear_command_103::Gear_targetType gear_target_;

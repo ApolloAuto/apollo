@@ -27,6 +27,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
 #include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+#include "modules/canbus/vehicle/devkit/protocol/vehicle_mode_command_105.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -107,8 +108,13 @@ class DevkitController final : public VehicleController {
   void SetTurningSignal(
       const ::apollo::control::ControlCommand& command) override;
 
+  // response vid
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
+  bool CheckVin();
+  void GetVin();
+  void ResetVin();
 
  private:
   void SecurityDogThreadFunc();
@@ -125,6 +131,7 @@ class DevkitController final : public VehicleController {
   Parkcommand104* park_command_104_ = nullptr;
   Steeringcommand102* steering_command_102_ = nullptr;
   Throttlecommand100* throttle_command_100_ = nullptr;
+  Vehiclemodecommand105* vehicle_mode_command_105_ = nullptr;
 
   Chassis chassis_;
   std::unique_ptr<std::thread> thread_;

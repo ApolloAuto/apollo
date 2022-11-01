@@ -102,6 +102,7 @@ class Ge3Controller final : public VehicleController {
   void SetTurningSignal(
       const ::apollo::control::ControlCommand& command) override;
 
+  bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
   bool CheckSafetyError(const canbus::ChassisDetail& chassis);

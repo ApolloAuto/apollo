@@ -53,6 +53,12 @@ message Chassis {
     GEAR_NONE = 6;
   }
 
+  enum BumperEvent {
+    BUMPER_INVALID = 0;
+    BUMPER_NORMAL = 1;
+    BUMPER_PRESSED = 2;
+  }
+
   optional bool engine_started = 3;
 
   // Engine speed in RPM.
@@ -127,6 +133,22 @@ message Chassis {
   optional apollo.common.VehicleID vehicle_id = 33;
 
   optional int32 battery_soc_percentage = 34 [default = -1];
+
+  // Real send throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage_cmd = 35 [default = nan];
+
+  // Real send brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage_cmd = 36 [default = nan];
+
+  // Real send steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage_cmd = 37 [default = nan];
+
+  optional BumperEvent front_bumper_event = 38;
+
+  optional BumperEvent back_bumper_event = 39;
 }
 
 message ChassisGPS {

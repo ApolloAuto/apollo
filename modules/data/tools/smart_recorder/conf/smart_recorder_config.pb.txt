@@ -1,8 +1,15 @@
-trigger_log_file_path: "/apollo/data/log/smart_recorder_triggers"
+segment_setting {
+  size_segment: 1024
+  time_segment: 60
+}
+max_backward_time: 100
+min_restore_chunk: 10
+trigger_log_file_path: "/apollo/data/smart_recorder/smart_recorder_triggers"
+reused_record_num: 7
 
 triggers {
   trigger_name: "DriveEventTrigger"
-  enabled: true
+  enabled: false
   backward_time: 30.0
   forward_time: 5.0
   description: "triggered by DriveEvent messages"
@@ -12,13 +19,21 @@ triggers {
   trigger_name: "EmergencyModeTrigger"
   enabled: true
   backward_time: 25.0
-  forward_time: 5.0
+  forward_time: 10.0
   description: "triggered when mode changes from auto to driver engagement"
 }
 
 triggers {
+  trigger_name: "HardBrakeTrigger"
+  enabled: false
+  backward_time: 25.0
+  forward_time: 10.0
+  description: "triggered when hard brake happened"
+}
+
+triggers {
   trigger_name: "SmallTopicsTrigger"
-  enabled: true
+  enabled: false
   backward_time: 0
   forward_time: 0
   description: "record the messages from topics that are small in size"
@@ -26,7 +41,7 @@ triggers {
 
 triggers {
   trigger_name: "RegularIntervalTrigger"
-  enabled: true
+  enabled: false
   backward_time: 15
   forward_time: 15
   description: "regularly triggered every certain time interval"
@@ -34,8 +49,16 @@ triggers {
 
 triggers {
   trigger_name: "SwerveTrigger"
-  enabled: true
+  enabled: false
   backward_time: 15
   forward_time: 15
   description: "triggered when swerve happened"
+}
+
+triggers {
+  trigger_name: "BumperCrashTrigger"
+  enabled: true
+  backward_time: 60.0
+  forward_time: 30.0
+  description: "triggered when bumper was pressed by car crashed happened"
 }

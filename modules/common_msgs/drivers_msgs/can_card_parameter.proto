@@ -32,9 +32,18 @@ message CANCardParameter {
     SLCAN = 2;
   }
 
+  enum HERMES_BAUDRATE {
+    BCAN_BAUDRATE_1M = 0;
+    BCAN_BAUDRATE_500K = 1;
+    BCAN_BAUDRATE_250K = 2;
+    BCAN_BAUDRATE_150K = 3;
+    BCAN_BAUDRATE_NUM = 4;
+  }
+
   optional CANCardBrand brand = 1;
   optional CANCardType type = 2;
   optional CANChannelId channel_id = 3;
   optional CANInterface interface = 4;
   optional uint32 num_ports = 5 [default = 4];
+  optional HERMES_BAUDRATE hermes_baudrate = 6 [default = BCAN_BAUDRATE_500K];
 }

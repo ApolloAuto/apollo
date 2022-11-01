@@ -35,6 +35,21 @@ uint32_t Brakecommand101::GetPeriod() const {
   return PERIOD;
 }
 
+void Brakecommand101::Parse(const std::uint8_t* bytes, int32_t length,
+                               ChassisDetail* chassis) const {
+  chassis->mutable_devkit()->mutable_brake_command_101()->set_brake_en_ctrl(
+      brake_en_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_brake_command_101()->set_aeb_en_ctrl(
+      aeb_en_ctrl(bytes, length));
+  chassis->mutable_devkit()->mutable_brake_command_101()->set_brake_dec(
+      brake_dec(bytes, length));
+  chassis->mutable_devkit()
+      ->mutable_brake_command_101()
+      ->set_brake_pedal_target(brake_pedal_target(bytes, length));
+  chassis->mutable_devkit()->mutable_brake_command_101()->set_checksum_101(
+      checksum_101(bytes, length));
+}
+
 void Brakecommand101::UpdateData(uint8_t* data) {
   set_p_aeb_en_ctrl(data, aeb_en_ctrl_);
   set_p_brake_dec(data, brake_dec_);
@@ -52,6 +67,24 @@ void Brakecommand101::Reset() {
   checksum_101_ = 0;
   brake_pedal_target_ = 0.0;
   brake_en_ctrl_ = Brake_command_101::BRAKE_EN_CTRL_DISABLE;
+}
+
+Brakecommand101* Brakecommand101::set_brake_en_ctrl(
+    Brake_command_101::Brake_en_ctrlType brake_en_ctrl) {
+  brake_en_ctrl_ = brake_en_ctrl;
+  return this;
+}
+
+// config detail: {'bit': 0, 'enum': {0: 'BRAKE_EN_CTRL_DISABLE', 1:
+// 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
+// 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
+void Brakecommand101::set_p_brake_en_ctrl(
+    uint8_t* data, Brake_command_101::Brake_en_ctrlType brake_en_ctrl) {
+  int x = brake_en_ctrl;
+
+  Byte to_set(data + 0);
+  to_set.set_value(x, 0, 1);
 }
 
 Brakecommand101* Brakecommand101::set_aeb_en_ctrl(
@@ -95,22 +128,6 @@ void Brakecommand101::set_p_brake_dec(uint8_t* data, double brake_dec) {
   to_set1.set_value(t, 0, 8);
 }
 
-Brakecommand101* Brakecommand101::set_checksum_101(int checksum_101) {
-  checksum_101_ = checksum_101;
-  return this;
-}
-
-// config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
-// 'CheckSum_101', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
-void Brakecommand101::set_p_checksum_101(uint8_t* data, int checksum_101) {
-  checksum_101 = ProtocolData::BoundedValue(0, 255, checksum_101);
-  int x = checksum_101;
-
-  Byte to_set(data + 7);
-  to_set.set_value(x, 0, 8);
-}
-
 Brakecommand101* Brakecommand101::set_brake_pedal_target(
     double brake_pedal_target) {
   brake_pedal_target_ = brake_pedal_target;
@@ -137,22 +154,77 @@ void Brakecommand101::set_p_brake_pedal_target(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-Brakecommand101* Brakecommand101::set_brake_en_ctrl(
-    Brake_command_101::Brake_en_ctrlType brake_en_ctrl) {
-  brake_en_ctrl_ = brake_en_ctrl;
+Brakecommand101* Brakecommand101::set_checksum_101(int checksum_101) {
+  checksum_101_ = checksum_101;
   return this;
 }
 
-// config detail: {'bit': 0, 'enum': {0: 'BRAKE_EN_CTRL_DISABLE', 1:
-// 'BRAKE_EN_CTRL_ENABLE'}, 'is_signed_var': False, 'len': 1, 'name':
-// 'Brake_EN_CTRL', 'offset': 0.0, 'order': 'motorola', 'physical_range':
-// '[0|1]', 'physical_unit': '', 'precision': 1.0, 'type': 'enum'}
-void Brakecommand101::set_p_brake_en_ctrl(
-    uint8_t* data, Brake_command_101::Brake_en_ctrlType brake_en_ctrl) {
-  int x = brake_en_ctrl;
+// config detail: {'bit': 63, 'is_signed_var': False, 'len': 8, 'name':
+// 'CheckSum_101', 'offset': 0.0, 'order': 'motorola', 'physical_range':
+// '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type': 'int'}
+void Brakecommand101::set_p_checksum_101(uint8_t* data, int checksum_101) {
+  checksum_101 = ProtocolData::BoundedValue(0, 255, checksum_101);
+  int x = checksum_101;
 
-  Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  Byte to_set(data + 7);
+  to_set.set_value(x, 0, 8);
+}
+
+Brake_command_101::Brake_en_ctrlType Brakecommand101::brake_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  Brake_command_101::Brake_en_ctrlType ret =
+      static_cast<Brake_command_101::Brake_en_ctrlType>(x);
+  return ret;
+}
+
+Brake_command_101::Aeb_en_ctrlType Brakecommand101::aeb_en_ctrl(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(1, 1);
+
+  Brake_command_101::Aeb_en_ctrlType ret =
+      static_cast<Brake_command_101::Aeb_en_ctrlType>(x);
+  return ret;
+}
+
+double Brakecommand101::brake_dec(const std::uint8_t* bytes,
+                                  int32_t length) const {
+  Byte t0(bytes + 1);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 2);
+  int32_t t = t1.get_byte(6, 2);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.01;
+  return ret;
+}
+
+double Brakecommand101::brake_pedal_target(const std::uint8_t* bytes,
+                                           const int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 4);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.1;
+  return ret;
+}
+
+int Brakecommand101::checksum_101(const std::uint8_t* bytes,
+                                  int32_t length) const {
+  Byte t0(bytes + 7);
+  int32_t x = t0.get_byte(0, 8);
+
+  int ret = x;
+  return ret;
 }
 
 }  // namespace devkit

@@ -19,6 +19,9 @@
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd -P)"
 
 PREPROCESS_BIN=/opt/apollo/neo/packages/tools-dev/latest/vehicle_calibration/preprocess
+if [[ ! -f "${PREPROCESS_BIN}" ]]; then
+    PREPROCESS_BIN=${TOP_DIR}/bazel-bin/modules/tools/vehicle_calibration/preprocess
+fi
 
 if [[ -f "${PREPROCESS_BIN}" ]]; then
     "${PREPROCESS_BIN}" "$@"

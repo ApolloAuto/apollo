@@ -289,6 +289,8 @@ Chassis GemController::chassis() {
   return chassis_;
 }
 
+bool GemController::VerifyID() { return true; }
+
 void GemController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();

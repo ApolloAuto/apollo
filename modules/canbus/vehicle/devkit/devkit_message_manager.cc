@@ -21,6 +21,7 @@
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
 #include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+#include "modules/canbus/vehicle/devkit/protocol/vehicle_mode_command_105.h"
 
 #include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
 #include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
@@ -34,6 +35,9 @@
 #include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_4_510.h"
 #include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_5_511.h"
 #include "modules/canbus/vehicle/devkit/protocol/vcu_report_505.h"
+#include "modules/canbus/vehicle/devkit/protocol/vin_resp1_514.h"
+#include "modules/canbus/vehicle/devkit/protocol/vin_resp2_515.h"
+#include "modules/canbus/vehicle/devkit/protocol/vin_resp3_516.h"
 #include "modules/canbus/vehicle/devkit/protocol/wheelspeed_report_506.h"
 
 namespace apollo {
@@ -47,6 +51,7 @@ DevkitMessageManager::DevkitMessageManager() {
   AddSendProtocolData<Parkcommand104, true>();
   AddSendProtocolData<Steeringcommand102, true>();
   AddSendProtocolData<Throttlecommand100, true>();
+  AddSendProtocolData<Vehiclemodecommand105, true>();
 
   // Report Messages
   AddRecvProtocolData<Bmsreport512, true>();
@@ -61,6 +66,9 @@ DevkitMessageManager::DevkitMessageManager() {
   AddRecvProtocolData<Ultrsensor4510, true>();
   AddRecvProtocolData<Ultrsensor5511, true>();
   AddRecvProtocolData<Vcureport505, true>();
+  AddRecvProtocolData<Vinresp1514, true>();
+  AddRecvProtocolData<Vinresp2515, true>();
+  AddRecvProtocolData<Vinresp3516, true>();
   AddRecvProtocolData<Wheelspeedreport506, true>();
 }
 

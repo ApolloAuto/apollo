@@ -48,7 +48,33 @@ class Bmsreport512 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'len': 8, 'name': 'Battery_Soc', 'offset': 0.0,
   // 'order': 'motorola', 'physical_range': '[0|100]', 'physical_unit': '%',
   // 'precision': 1.0, 'type': 'int'}
-  int battery_soc(const std::uint8_t* bytes, const int32_t length) const;
+  int battery_soc_percentage(const std::uint8_t* bytes,
+                             const int32_t length) const;
+
+  // config detail: {'bit': 40, 'description': 'Battery Inside temperature',
+  // 'is_signed_var': False, 'len': 1, 'name': 'Battery_Inside_Temperature',
+  // 'offset': -40, 'order': 'motorola', 'physical_range': '[-40|215]',
+  // 'physical_unit': 'C', 'precision': 1.0, 'type': 'int'}
+  int battery_inside_temperature(const std::uint8_t* bytes,
+                                    const int32_t length) const;
+
+  // config detail: {'description': 'Battery Below Low temp fault', 'enum':
+  // {0: 'BATTERY_FLT_LOW_TEMP_NO_FAULT', 1:
+  // 'BATTERY_FLT_LOW_TEMP_FAULT'}, 'precision': 1.0, 'len': 1,
+  // 'name': 'Brake_FLT2', 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 48, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
+  Bms_report_512::Battery_flt_lowtempType battery_flt_low_temp(
+      const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'description': 'Battery Over High Temp fault', 'enum':
+  // {0: 'BATTERY_FLT_OVER_TEMP_NO_FAULT', 1:
+  // 'BATTERY_FLT_OVER_TEMP_FAULT'}, 'precision': 1.0, 'len': 1,
+  // 'name': 'Brake_FLT2', 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|1]', 'bit': 49, 'type': 'enum', 'order': 'motorola',
+  // 'physical_unit': ''}
+  Bms_report_512::Battery_flt_overtempType battery_flt_over_temp(
+      const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace devkit
