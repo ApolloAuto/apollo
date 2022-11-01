@@ -53,6 +53,12 @@ message Chassis {
     GEAR_NONE = 6;
   }
 
+  enum BumperEvent {
+    BUMPER_INVALID = 0;
+    BUMPER_NORMAL = 1;
+    BUMPER_PRESSED = 2;
+  }
+
   optional bool engine_started = 3;
 
   // Engine speed in RPM.
@@ -127,6 +133,10 @@ message Chassis {
   optional apollo.common.VehicleID vehicle_id = 33;
 
   optional int32 battery_soc_percentage = 34 [default = -1];
+
+  optional BumperEvent front_bumper_event = 38;
+
+  optional BumperEvent back_bumper_event = 39;
 }
 
 message ChassisGPS {

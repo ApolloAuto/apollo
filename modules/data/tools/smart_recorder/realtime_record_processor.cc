@@ -141,6 +141,8 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     AERROR << "base init failed";
     return false;
   }
+  reused_record_num_ = trigger_conf.reused_record_num();
+  record_files_.clear();
   return true;
 }
 
@@ -186,6 +188,36 @@ bool RealtimeRecordProcessor::Process() {
   return true;
 }
 
+void RealtimeRecordProcessor::ProcessRestoreRecord(
+    const std::string& record_path) {
+  // Get all the record files
+  std::string record_source_path = "";
+  record_source_path = record_path + "/";
+  std::vector<std::string> files =
+      cyber::common::ListSubPaths(record_source_path, DT_REG);
+  std::smatch result;
+  std::regex record_file_name_regex("[1-9][0-9]{13}\\.record\\.[0-9]{5}");
+  for (const auto& file : files) {
+    if (std::regex_match(file, result, record_file_name_regex)) {
+      if (std::find(record_files_.begin(), record_files_.end(), file) ==
+          record_files_.end()) {
+        record_files_.emplace_back(file);
+      }
+    }
+  }
+  // Sort the files in name order.
+  std::sort(record_files_.begin(), record_files_.end(),
+            [](const std::string& a, const std::string& b) { return a < b; });
+  // Delete the overdue files by num.
+  if (record_files_.size() > reused_record_num_) {
+    if (0 !=
+        std::remove((record_source_path + (*record_files_.begin())).c_str())) {
+      AWARN << "Failed to delete file: " << *record_files_.begin();
+    }
+    record_files_.erase(record_files_.begin());
+  }
+}
+
 void RealtimeRecordProcessor::MonitorStatus() {
   int status_counter = 0;
   while (!cyber::IsShutdown()) {
@@ -195,6 +227,8 @@ void RealtimeRecordProcessor::MonitorStatus() {
     if (++status_counter % kPublishStatusFrequency == 0) {
       status_counter = 0;
       PublishStatus(RecordingState::RECORDING, "smart recorder recording");
+      // AINFO << "smart recorder recording status check every 3000ms a time.";
+      ProcessRestoreRecord(source_record_dir_);
     }
   }
   recorder_->Stop();

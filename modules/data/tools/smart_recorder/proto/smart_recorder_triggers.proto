@@ -22,4 +22,5 @@ message SmartRecordTrigger {
   optional double max_backward_time = 3 [default = 30.0];
   optional double min_restore_chunk = 4 [default = 5.0];
   optional string trigger_log_file_path = 5;
+  optional int32 reused_record_num = 6 [default = 10];
 }
