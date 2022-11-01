@@ -85,6 +85,9 @@ test --test_output=errors
 
 test:unit_test --test_verbose_timeout_warnings
 
+# use --copt=-mavx2
+test --copt=-mavx2
+
 coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
 # coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
 coverage --instrument_test_targets

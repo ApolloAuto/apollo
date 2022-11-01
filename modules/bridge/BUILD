@@ -125,6 +125,7 @@ cc_test(
         ":udp_bridge_sender",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 install_src_files(
     name = "install_src",

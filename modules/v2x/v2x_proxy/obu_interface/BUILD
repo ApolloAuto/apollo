@@ -25,6 +25,7 @@ cc_test(
         ":obu_interface_grpc_impl",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

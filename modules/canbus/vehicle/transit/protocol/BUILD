@@ -45,6 +45,7 @@ cc_test(
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -93,6 +94,7 @@ cc_test(
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -189,6 +191,7 @@ cc_test(
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -261,6 +264,7 @@ cc_test(
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -309,6 +313,7 @@ cc_test(
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

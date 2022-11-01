@@ -46,6 +46,7 @@ cc_test(
         "//modules/prediction/network:net_util",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(

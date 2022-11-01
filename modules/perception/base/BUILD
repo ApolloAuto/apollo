@@ -85,6 +85,7 @@ cc_test(
         ":box",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -181,6 +182,7 @@ cc_test(
         ":image",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(

@@ -55,6 +55,7 @@ cc_test(
         ":planner_dispatcher",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -66,6 +67,7 @@ cc_test(
         ":planner_dispatcher",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

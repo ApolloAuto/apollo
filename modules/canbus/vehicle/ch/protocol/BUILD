@@ -304,6 +304,7 @@ cc_test(
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(

@@ -45,6 +45,7 @@ cc_test(
         ":rt_utils",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -82,6 +83,7 @@ cc_test(
         "@atlas//:cblas",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -110,6 +112,7 @@ cc_test(
         ":entropy_calibrator",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -137,6 +140,7 @@ cc_test(
         ":batch_stream",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

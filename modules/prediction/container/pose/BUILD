@@ -27,6 +27,7 @@ cc_test(
         "//modules/prediction/container/pose:pose_container",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

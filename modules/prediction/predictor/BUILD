@@ -42,6 +42,7 @@ cc_test(
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
     ],
+    linkstatic = True,
 )
 
 cc_library(

@@ -139,6 +139,7 @@ cc_test(
         ":control_component_lib",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 # TODO(storypku): split test_data

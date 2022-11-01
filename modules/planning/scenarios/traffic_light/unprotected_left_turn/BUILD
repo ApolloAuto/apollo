@@ -42,6 +42,7 @@ cc_test(
         ":traffic_light_unprotected_left_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -56,6 +57,7 @@ cc_test(
         ":traffic_light_unprotected_left_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -70,6 +72,7 @@ cc_test(
         ":traffic_light_unprotected_left_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

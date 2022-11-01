@@ -30,6 +30,7 @@ cc_test(
         ":os_interface",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

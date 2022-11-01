@@ -146,6 +146,7 @@ cc_test(
         "//cyber:cyber_core",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

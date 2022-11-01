@@ -43,6 +43,7 @@ cc_test(
         "learning_model_inference_task",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(

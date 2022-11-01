@@ -98,6 +98,7 @@ cc_test(
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -149,6 +150,7 @@ cc_test(
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
     ],
+    linkstatic = True,
 )
 
 cc_library(

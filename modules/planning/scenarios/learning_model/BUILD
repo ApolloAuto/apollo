@@ -47,6 +47,7 @@ cc_test(
         ":learning_model_sample_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -61,6 +62,7 @@ cc_test(
         ":learning_model_sample_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

@@ -51,6 +51,7 @@ cc_test(
         ":grpc_server",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

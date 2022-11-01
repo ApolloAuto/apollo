@@ -346,6 +346,7 @@ cc_test(
         ":integral",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -376,6 +377,7 @@ cc_test(
         ":euler_angles_zxy",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -426,6 +428,7 @@ cc_test(
         ":geometry",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -437,6 +440,7 @@ cc_test(
         ":kalman_filter",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(

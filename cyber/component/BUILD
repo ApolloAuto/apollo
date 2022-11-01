@@ -27,6 +27,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -51,6 +52,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(

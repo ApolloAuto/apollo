@@ -34,6 +34,7 @@ cc_test(
         "//modules/prediction/predictor/junction:junction_predictor",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()
