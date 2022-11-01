@@ -295,6 +295,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -308,6 +309,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -330,6 +332,7 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         "@ipopt",
     ],
+    linkstatic = True,
 )
 
 cc_test(

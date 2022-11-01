@@ -65,6 +65,7 @@ cc_test(
     deps = [
         ":planning_test_base",
     ],
+    linkstatic = True,
 )
 
 # cc_test(

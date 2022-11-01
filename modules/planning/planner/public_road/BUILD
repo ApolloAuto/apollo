@@ -44,6 +44,7 @@ cc_test(
         ":public_road_planner",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

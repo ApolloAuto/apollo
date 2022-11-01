@@ -47,6 +47,7 @@ cc_test(
         "//modules/planning/learning_based/img_feature_renderer:birdview_img_feature_renderer",
         "@com_google_googletest//:gtest",
     ],
+    linkstatic = True,
 )
 
 cpplint()

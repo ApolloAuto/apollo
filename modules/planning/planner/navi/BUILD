@@ -42,6 +42,7 @@ cc_test(
         "//modules/common/util",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

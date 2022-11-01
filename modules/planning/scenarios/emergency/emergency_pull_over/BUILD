@@ -46,6 +46,7 @@ cc_test(
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -60,6 +61,7 @@ cc_test(
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -74,6 +76,7 @@ cc_test(
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -88,6 +91,7 @@ cc_test(
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cpplint()

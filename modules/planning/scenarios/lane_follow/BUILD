@@ -90,6 +90,7 @@ cc_test(
         ":lane_follow",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cpplint()

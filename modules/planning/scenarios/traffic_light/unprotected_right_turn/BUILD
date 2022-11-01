@@ -43,6 +43,7 @@ cc_test(
         ":traffic_light_unprotected_right_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -57,6 +58,7 @@ cc_test(
         ":traffic_light_unprotected_right_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cc_test(
@@ -71,6 +73,7 @@ cc_test(
         ":traffic_light_unprotected_right_turn_scenario",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

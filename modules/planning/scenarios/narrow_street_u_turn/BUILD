@@ -37,6 +37,7 @@ cc_test(
         ":narrow_street_u_turn",
         "@com_google_googletest//:gtest_main",
     ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    linkstatic = True,
 )
 
 cpplint()
