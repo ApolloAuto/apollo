@@ -139,6 +139,7 @@ cc_test(
         "//modules/perception/inference/tensorrt:rt_common",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -151,6 +152,7 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         "@local_config_cuda//cuda:cublas",
     ],
+    linkstatic = True,
 )
 
 cpplint()

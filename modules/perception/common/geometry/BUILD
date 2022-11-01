@@ -93,6 +93,7 @@ cc_test(
         "//modules/perception/base:point_cloud",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

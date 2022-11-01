@@ -118,6 +118,7 @@ cc_test(
         ":inference_util_lib",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -142,6 +143,7 @@ cc_test(
         ":inference_binary_data_lib",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

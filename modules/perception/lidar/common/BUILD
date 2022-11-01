@@ -34,6 +34,7 @@ cc_test(
         ":cloud_mask",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(

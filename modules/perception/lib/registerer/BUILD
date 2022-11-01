@@ -20,6 +20,7 @@ cc_test(
         ":registerer",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()
