@@ -85,6 +85,7 @@ cc_test(
         "//modules/localization/msf/common/util:compression",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -96,6 +97,7 @@ cc_test(
         "//modules/localization/msf/common/util",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 filegroup(
@@ -114,6 +116,7 @@ cc_test(
         "@boost",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -135,6 +138,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

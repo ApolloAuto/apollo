@@ -36,6 +36,7 @@ cc_test(
         "//modules/prediction/container/obstacles:obstacles_container",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

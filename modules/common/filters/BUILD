@@ -73,6 +73,7 @@ cc_test(
         ":digital_filter",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -83,6 +84,7 @@ cc_test(
         ":mean_filter",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(

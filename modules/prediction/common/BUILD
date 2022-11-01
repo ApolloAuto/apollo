@@ -202,6 +202,7 @@ cc_test(
         ":environment_features",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(

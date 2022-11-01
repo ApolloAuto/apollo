@@ -138,6 +138,7 @@ cc_test(
         "@com_github_google_glog//:glog",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

@@ -83,6 +83,7 @@ cc_test(
         "//modules/drivers/canbus/common:canbus_common",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(
@@ -102,6 +103,7 @@ cc_test(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_test(

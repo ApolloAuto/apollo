@@ -42,6 +42,7 @@ cc_test(
     deps = [
         ":prediction_component_lib",
     ],
+    linkstatic = True,
 )
 
 cc_binary(

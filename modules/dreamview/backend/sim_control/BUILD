@@ -38,6 +38,7 @@ cc_test(
         "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

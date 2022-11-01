@@ -95,6 +95,7 @@ cc_test(
         "//modules/perception/fusion/base",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cpplint()

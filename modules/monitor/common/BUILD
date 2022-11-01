@@ -24,6 +24,7 @@ cc_test(
         ":recurrent_runner",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = True,
 )
 
 cc_library(
