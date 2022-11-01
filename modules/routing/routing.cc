@@ -193,7 +193,7 @@ bool Routing::SupplementParkingRequest(
   // The distance range when searching the lanes along the parking spot.
   static const double kMaxHeadingDistance = M_PI_4;
   double distance_search_range = 5.0;
-  double nearest_s;
+  double nearest_s =  std::numeric_limits<double>::max();
   double nearest_l = std::numeric_limits<double>::max();
   hdmap::LaneInfoConstPtr nearest_lane;
   bool has_found_nearest_lane = false;
