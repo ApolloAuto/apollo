@@ -211,8 +211,8 @@ bool DynamicModelFactory::UnregisterDynamicModel(
     return true;
   }
   std::string library_name = iter->second.library_name;
-  std::string dynamic_model_dir;
   s_dynamic_model_map_.erase(dynamic_model_name);
+  std::string dynamic_model_dir;
   GetDynamicModelPath(dynamic_model_name, dynamic_model_dir, false);
   std::string command = "rm -fr " + dynamic_model_dir;
   // use cyber::common::removeFiles do not support sub-directory
