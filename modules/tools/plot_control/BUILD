@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,4 +20,13 @@ py_binary(
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
         "//modules/common_msgs/localization_msgs:localization_py_pb2",
     ],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/plot_control",
+    targets = [
+        ":plot_control",
+        ":realtime_test"
+    ]
 )

@@ -26,6 +26,7 @@ cc_binary(
     linkopts = [
         "-pthread",
     ],
+    linkstatic = True,
     deps = [
         ":visualizer_lib",
         "@fastrtps",

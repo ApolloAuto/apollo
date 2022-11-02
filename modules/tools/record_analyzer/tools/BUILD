@@ -1,8 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
-py_library(
+py_binary(
     name = "dump_message",
     srcs = ["dump_message.py"],
     deps = [
@@ -23,4 +24,13 @@ py_binary(
         "//cyber/python/cyber_py3:cyber_time",
         "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
     ],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/record_analyzer/tools",
+    targets = [
+        ":perception_obstacle_sender",
+        ":dump_message",
+    ]
 )

@@ -1,4 +1,5 @@
 load("//tools/install:install.bzl", "install", "install_src_files")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -11,12 +12,18 @@ exports_files([
 
 install(
     name = "install",
-    deps = [
+    deps = if_gpu([
+        "//modules/perception:install",
+        "//modules/planning:install",
+        "//modules/v2x:install",
+        "//third_party/centerpoint_infer_op:install",
+        "//third_party/paddleinference:install",
+    ], [
         "//cyber:install",
         "//tools:install",
-        # "//cyber/examples:install",
-        # "//docker/scripts:install",
-        # "//docs:install",
+        #"//cyber/examples:install",
+        #"//docker/scripts:install",
+        #"//docs:install",
         "//modules/audio:install",
         "//modules/bridge:install",
         "//modules/calibration:install",
@@ -25,14 +32,13 @@ install(
         "//modules/common_msgs:install",
         "//modules/contrib/cyber_bridge:install",
         "//modules/control:install",
+        "//modules/planning:install",
         "//modules/dreamview:install",
         "//modules/drivers:install",
         "//modules/guardian:install",
         "//modules/localization:install",
         "//modules/map:install",
         "//modules/monitor:install",
-        "//modules/perception:install",
-        "//modules/planning:install",
         "//modules/prediction:install",
         "//modules/routing:install",
         "//modules/storytelling:install",
@@ -40,8 +46,7 @@ install(
         "//modules/third_party_perception:install",
         "//modules/tools:install",
         "//modules/transform:install",
-        "//modules/v2x:install",
-        # "//scripts:install",
+        #"//scripts:install",
         "//third_party/absl:install",
         "//third_party/ad_rss_lib:install",
         "//third_party/boost:install",
@@ -64,6 +69,7 @@ install(
         "//third_party/opengl:install",
         "//third_party/openh264:install",
         "//third_party/cpplint:install",
+        "//third_party/centerpoint_infer_op:install",
         "//third_party/portaudio:install",
         "//third_party/fftw3:install",
         "//third_party/glew:install",
@@ -86,12 +92,18 @@ install(
         "//third_party/rtklib:install",
         "//third_party/ffmpeg:install",
         "//third_party/adv_plat:install",
-    ],
+    ]),
 )
 
 install_src_files(
     name = "install_src",
-    deps = [
+    deps = if_gpu([
+        "//modules/perception:install_src",
+        "//modules/planning:install_src",
+        "//modules/v2x:install_src",
+        "//third_party/centerpoint_infer_op:install_src",
+        "//third_party/paddleinference:install_src",
+    ], [
         "//cyber:install_src",
         "//tools:install_src",
         "//modules/common:install_src",
@@ -112,17 +124,16 @@ install_src_files(
         "//modules/drivers:install_src",
         "//modules/guardian:install_src",
         "//modules/localization:install_src",
-        "//modules/perception:install_src",
         "//modules/prediction:install_src",
         "//modules/storytelling:install_src",
         "//modules/third_party_perception:install_src",
-        "//modules/tools:install_src",
-        "//modules/v2x:install_src",
+        "//modules/tools:install_src",  
         "//third_party/absl:install_src",
         "//third_party/boost:install_src",
         "//third_party/civetweb:install_src",
         "//third_party/eigen3:install_src",
         "//third_party/gtest:install_src",
+        "//third_party/centerpoint_infer_op:install_src",
         "//third_party/ipopt:install_src",
         "//third_party/libtorch:install_src",
         "//third_party/fastrtps:install_src",
@@ -161,5 +172,5 @@ install_src_files(
         "//third_party/rtklib:install_src",
         "//third_party/ffmpeg:install_src",
         "//third_party/adv_plat:install_src",
-    ],
+    ]),
 )

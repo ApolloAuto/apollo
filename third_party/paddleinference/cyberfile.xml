@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-localization-msf</name>
+  <name>3rd-paddleinference</name>
   <version>local</version>
   <description>
-    Apollo packaged localization-msf Lib.
+    Apollo packaged paddleinference.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -12,6 +12,6 @@
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
   <type>third-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/localization_msf</src_path>
+  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/paddleinference</src_path>
   
 </package>

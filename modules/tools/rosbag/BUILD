@@ -1,6 +1,28 @@
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    py_dest = "tools/rosbag",
+    targets = [
+        ":audio_event_record",
+        ":body_sensation_evaluation",
+        ":channel_size_stats",
+        ":drive_event",
+        ":dump_gpsbin",
+        ":dump_planning",
+        ":dump_record",
+        ":dump_road_test_log",
+        ":extract_trajectory",
+        ":sample_pnc_topics",
+        ":stat_mileage",
+        ":stat_static_info",
+        ":tf_stats",
+        ":transcribe",
+    ],
+)
 
 py_binary(
     name = "audio_event_record",

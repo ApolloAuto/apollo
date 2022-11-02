@@ -9,6 +9,7 @@ cc_library(
         "-ltorch",
         "-ltorch_cpu",
         "-ltorch_cuda",
+        "-lnvonnxparser",
     ],
     linkstatic = False,
     deps = [

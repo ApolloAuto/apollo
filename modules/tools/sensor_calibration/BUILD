@@ -1,6 +1,23 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    data = ["runtime_files"],
+    data_dest = "tools/sensor_calibration",
+    py_dest = "tools/sensor_calibration",
+    targets = [
+        ":extract_data",
+        ":extract_static_data",
+        ":ins_stat_publisher",
+        ":odom_publisher",
+        ":sanity_check",
+    ],
+    #deps = ["//modules/tools/sensor_calibration/config:install"]
+
+)
 
 filegroup(
     name = "runtime_files",
@@ -29,7 +46,7 @@ py_library(
 py_binary(
     name = "extract_data",
     srcs = ["extract_data.py"],
-    data = [":config"],
+    data = [":runtime_files"],
     deps = [
         ":configuration_yaml_generator",
         ":extract_static_data",
@@ -47,7 +64,7 @@ py_binary(
 py_binary(
     name = "extract_static_data",
     srcs = ["extract_static_data.py"],
-    data = [":config"],
+    data = [":runtime_files"],
     deps = [
         ":configuration_yaml_generator",
         ":data_file_object",

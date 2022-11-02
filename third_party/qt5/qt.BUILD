@@ -59,12 +59,13 @@ cc_library(
     linkopts = [
         "-L/usr/local/qt5/lib",
         "-lQt5OpenGL",
+        "-lGL",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":qt_core",
         ":qt_gui",
         ":qt_widgets",
-        "@opengl",
+        #"@opengl",
     ],
 )

@@ -1,8 +1,8 @@
 <package format="2">
-  <name>3rd-localization-msf</name>
+  <name>origin-scripts</name>
   <version>local</version>
   <description>
-    Apollo packaged localization-msf Lib.
+    Some apollo origin scripts.
   </description>
   
   <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
@@ -11,7 +11,7 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
-  <type>third-wrapper</type>
-  <src_path url="https://github.com/ApolloAuto/apollo">//third_party/localization_msf</src_path>
+  <type>module-wrapper</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//dev/scripts</src_path>
   
 </package>

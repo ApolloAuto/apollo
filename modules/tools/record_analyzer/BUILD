@@ -1,6 +1,14 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "readme",
+    srcs = [
+        "README.md",
+    ],
+)
 
 py_library(
     name = "lidar_endtoend_analyzer",
@@ -54,4 +62,18 @@ py_library(
         "//modules/tools/record_analyzer/metrics:lon_acceleration",
         "//modules/tools/record_analyzer/metrics:reference_line",
     ],
+)
+
+install(
+    name = "install",
+    data = [":readme"],
+    data_dest = "tools/record_analyzer",
+    py_dest = "tools/record_analyzer",
+    targets = [
+        ":main",
+    ],
+    deps = [
+        "//modules/tools/record_analyzer/tools:install",
+        "//modules/tools/record_analyzer/common:install",
+    ]
 )

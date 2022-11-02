@@ -1,6 +1,23 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    data = ["runtime_files"],
+    data_dest = "tools/vehicle_calibration",
+    py_dest = "tools/vehicle_calibration",
+    targets = [
+        ":data_collector",
+        ":plot_data",
+        ":plot_grid",
+        ":plot_results",
+        ":preprocess",
+        ":process_data",
+        ":result2pb",
+    ]
+)
 
 py_binary(
     name = "data_collector",

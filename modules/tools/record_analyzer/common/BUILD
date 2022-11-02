@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -38,4 +39,12 @@ py_binary(
 py_library(
     name = "statistical_analyzer",
     srcs = ["statistical_analyzer.py"],
+)
+
+install(
+    name = "install",
+    py_dest = "tools/record_analyzer/common",
+    targets = [
+        ":frechet_distance",
+    ]
 )

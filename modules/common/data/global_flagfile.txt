@@ -18,3 +18,6 @@
 --use_cyber_time=true
 
 --map_dir=/apollo/modules/map/data/sunnyvale
+
+--map_dir=/apollo/modules/map/data/sunnyvale_big_loop
+

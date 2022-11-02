@@ -90,6 +90,7 @@ function setup_apollo_directories() {
   local apollo_dir="/opt/apollo"
   [[ -d "${apollo_dir}" ]] || mkdir -p "${apollo_dir}"
   # chown -R "${uid}:${gid}" "${apollo_dir}"
+  chmod a+rw /opt /opt/apollo
 }
 
 # FIXME(infra): This will change core pattern on the host also,
