@@ -134,7 +134,6 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
     AERROR << "SymbolNotFoundException: " << e.what();
     return false;
   }
-  shared_library->Unload();
   return true;
 }
 
