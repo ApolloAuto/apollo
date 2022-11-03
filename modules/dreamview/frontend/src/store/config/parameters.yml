@@ -85,8 +85,9 @@ planning:
 
 options:
   # side bar options
+  // fixme: 发布替换
   showTasks:
-    default: true
+    default: false
   showModuleController:
     default: false
   showMenu:
@@ -98,7 +99,7 @@ options:
   showDataRecorder:
     default: false
   showProfile:
-    default: false
+    default: true
 
   # task panel options
   showPNCMonitor:

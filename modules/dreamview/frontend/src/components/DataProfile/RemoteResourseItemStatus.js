@@ -15,7 +15,7 @@ import ProfileFailIcon from 'assets/images/icons/profile_fail.png';
  * }}
  * @returns {JSX.Element|null}
  */
-export function ScenarioSetItemStatus(props) {
+export function RemoteResourseItemStatus(props) {
   const { status } = props;
 
   if (status === 'notDownloaded') {
@@ -73,19 +73,32 @@ export function ScenarioSetItemStatus(props) {
  * Show remote scene set download status
  * @param props {{
  * status: "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail",
- * scenarioSetId: string,
+ * id: string,
+ * type: 1|2|3,
  * store: object,
  * }}
  * @returns {JSX.Element|null}
  */
-export function ScenarioSetItemBtn(props) {
-  const { status, scenarioSetId, store } = props;
+export function RemoteResourceItemBtn(props) {
+  const { status, id, type, store } = props;
 
   const handleClick = () => {
-    if (status === 'updating') {
-      store.studioConnector.updatingTheScenarioSetById(scenarioSetId);
+    if (type === 1) {
+      if (status === 'updating') {
+        store.studioConnector.updatingTheScenarioSetById(id);
+      }
+      PLUGIN_WS.downloadScenarioSetById(id);
     }
-    PLUGIN_WS.downloadScenarioSetById(scenarioSetId);
+
+    if (type === 2) {
+      console.log('handleClick', status, id, type);
+      PLUGIN_WS.downloadDynamicsModel(id);
+    }
+
+    if (type === 3) {
+      PLUGIN_WS.downloadRecord(id);
+    }
+
   };
 
   if (status === 'notDownloaded') {

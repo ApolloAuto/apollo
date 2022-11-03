@@ -8,7 +8,7 @@ import { inject } from 'mobx-react';
 import ProfileDeleteIcon from 'assets/images/icons/profile_delete.png';
 import ProfileWarningIcon from 'assets/images/icons/profile_warning.png';
 import ProfileDownloadIcon from 'assets/images/icons/download.png';
-import WS from 'store/websocket';
+import WS, { PLUGIN_WS } from 'store/websocket';
 
 import PlayIcon from 'assets/images/icons/play.png';
 import PauseIcon from 'assets/images/icons/pause.png';
@@ -56,6 +56,7 @@ function LocalDynamicModelItem(props) {
     setDeleteConfirmModalVisible(false);
     // 刷新列表
     WS.loadLocalRecords();
+    PLUGIN_WS.getRecordList();
   };
 
   return (
