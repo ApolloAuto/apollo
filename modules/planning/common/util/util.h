@@ -23,9 +23,10 @@
 #include <boost/range/iterator_range.hpp>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -47,7 +48,7 @@ bool CheckTrafficLightOnReferenceLine(
     const ReferenceLineInfo& reference_line_info,
     const std::string& traffic_light_overlap_id);
 
-bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
+bool CheckInsideJunction(const ReferenceLineInfo& reference_line_info);
 
 void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files);

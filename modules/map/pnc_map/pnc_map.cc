@@ -22,8 +22,9 @@
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/text_format.h"
 
-#include "cyber/common/log.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
+
+#include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
@@ -487,48 +488,29 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
 
 bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
                                         LaneWaypoint *waypoint) const {
-  const double kMaxDistance = 10.0;  // meters.
-  const double kHeadingBuffer = M_PI / 10.0;
   waypoint->lane = nullptr;
   std::vector<LaneInfoConstPtr> lanes;
   const auto point = PointFactory::ToPointENU(state);
-  const int status =
-      hdmap_->GetLanesWithHeading(point, kMaxDistance, state.heading(),
-                                  M_PI / 2.0 + kHeadingBuffer, &lanes);
-  ADEBUG << "lanes:" << lanes.size();
-  if (status < 0) {
-    AERROR << "Failed to get lane from point: " << point.ShortDebugString();
-    return false;
-  }
-  if (lanes.empty()) {
-    AERROR << "No valid lane found within " << kMaxDistance
-           << " meters with heading " << state.heading();
-    return false;
-  }
   std::vector<LaneInfoConstPtr> valid_lanes;
-  std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
-               [&](LaneInfoConstPtr ptr) {
-                 return range_lane_ids_.count(ptr->lane().id().id()) > 0;
-               });
-  if (valid_lanes.empty()) {
-    std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
-                 [&](LaneInfoConstPtr ptr) {
-                   return all_lane_ids_.count(ptr->lane().id().id()) > 0;
-                 });
+  for (auto lane_id : all_lane_ids_) {
+    hdmap::Id id = hdmap::MakeMapId(lane_id);
+    auto lane = hdmap_->GetLaneById(id);
+    if (nullptr != lane) {
+      valid_lanes.emplace_back(lane);
+    }
   }
 
   // Get nearest_waypoints for current position
-  double min_distance = std::numeric_limits<double>::infinity();
+  std::vector<LaneWaypoint> valid_way_points;
   for (const auto &lane : valid_lanes) {
     if (range_lane_ids_.count(lane->id().id()) == 0) {
       continue;
     }
+    double s = 0.0;
+    double l = 0.0;
     {
-      double s = 0.0;
-      double l = 0.0;
       if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
-        AERROR << "fail to get projection";
-        return false;
+        continue;
       }
       // Use large epsilon to allow projection diff
       static constexpr double kEpsilon = 0.5;
@@ -536,27 +518,62 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
         continue;
       }
     }
-    double distance = 0.0;
-    common::PointENU map_point =
-        lane->GetNearestPoint({point.x(), point.y()}, &distance);
-    if (distance < min_distance) {
-      min_distance = distance;
-      double s = 0.0;
-      double l = 0.0;
-      if (!lane->GetProjection({map_point.x(), map_point.y()}, &s, &l)) {
-        AERROR << "Failed to get projection for map_point: "
-               << map_point.DebugString();
-        return false;
-      }
-      waypoint->lane = lane;
-      waypoint->s = s;
-    }
-    ADEBUG << "distance" << distance;
+
+    valid_way_points.emplace_back();
+    auto &last = valid_way_points.back();
+    last.lane = lane;
+    last.s = s;
+    last.l = l;
+    ADEBUG << "distance:" << std::fabs(l);
   }
-  if (waypoint->lane == nullptr) {
+  if (valid_way_points.empty()) {
     AERROR << "Failed to find nearest point: " << point.ShortDebugString();
+    return false;
   }
-  return waypoint->lane != nullptr;
+
+  // Choose the lane with the right heading if there is more than one candiate
+  // lanes. If there is no lane with the right heading, choose the closest one.
+  size_t closest_index = 0;
+  int right_heading_index = -1;
+  // The distance as the sum of the lateral and longitude distance, to estimate
+  // the distance from the vehicle to the lane.
+  double distance = std::numeric_limits<double>::max();
+  double lane_heading = 0.0;
+  double vehicle_heading = state.heading();
+  for (size_t i = 0; i < valid_way_points.size(); i++) {
+    double distance_to_lane = std::fabs(valid_way_points[i].l);
+    if (valid_way_points[i].s > valid_way_points[i].lane->total_length()) {
+      distance_to_lane +=
+          (valid_way_points[i].s - valid_way_points[i].lane->total_length());
+    } else if (valid_way_points[i].s < 0.0) {
+      distance_to_lane -= valid_way_points[i].s;
+    }
+    if (distance > distance_to_lane) {
+      distance = distance_to_lane;
+      closest_index = i;
+    }
+    lane_heading = valid_way_points[i].lane->Heading(valid_way_points[i].s);
+    if (std::abs(common::math::AngleDiff(lane_heading, vehicle_heading)) <
+        M_PI_2) {
+      // Choose the lane with the closest distance to the vehicle and with the
+      // right heading.
+      if (-1 == right_heading_index || closest_index == i) {
+        waypoint->lane = valid_way_points[i].lane;
+        waypoint->s = valid_way_points[i].s;
+        waypoint->l = valid_way_points[i].l;
+        right_heading_index = i;
+      }
+    }
+  }
+  // Use the lane with the closest distance to the current position of the
+  // vehicle.
+  if (-1 == right_heading_index) {
+    waypoint->lane = valid_way_points[closest_index].lane;
+    waypoint->s = valid_way_points[closest_index].s;
+    waypoint->l = valid_way_points[closest_index].l;
+    AWARN << "Find no lane with the right heading, use the cloesest lane!";
+  }
+  return true;
 }
 
 LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {

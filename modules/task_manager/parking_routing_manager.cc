@@ -14,95 +14,120 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/task_manager/parking_routing_manager.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/task_manager/common/task_manager_gflags.h"
+#include "modules/common/math/math_utils.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/task_manager/common/task_manager_gflags.h"
 
 namespace apollo {
 namespace task_manager {
 
-using apollo::common::math::Vec2d;
 using apollo::common::PointENU;
+using apollo::common::math::Vec2d;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::routing::ParkingSpaceType;
 
 ParkingRoutingManager::ParkingRoutingManager()
-: monitor_logger_buffer_(apollo::common::monitor::
-                         MonitorMessageItem::TASK_MANAGER) {}
+    : monitor_logger_buffer_(
+          apollo::common::monitor::MonitorMessageItem::TASK_MANAGER) {}
 
 common::Status ParkingRoutingManager::Init(
-        const ParkingRoutingTask& parking_routing_task) {
-    // get the message form routing
-    has_space_ = parking_routing_task.routing_request().has_parking_info();
-    has_space_id_ = parking_routing_task.routing_request().
-                    parking_info().has_parking_space_id();
-    id_ = parking_routing_task.routing_request().
-                    parking_info().parking_space_id();
-    return common::Status::OK();
+    const ParkingRoutingTask& parking_routing_task) {
+  return common::Status::OK();
 }
 
-bool ParkingRoutingManager::SizeVerification(
-        const ParkingRoutingTask& parking_routing_task) {
-  auto plot_type = parking_routing_task.routing_request()
-                       .parking_info()
-                       .parking_space_type();
-  const auto& vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  double ego_length = vehicle_config.vehicle_param().length();
-  double ego_width = vehicle_config.vehicle_param().width();
-  if (!has_space_ || !has_space_id_) {
-    AERROR << "No Valid park plot exits!";
+bool ParkingRoutingManager::ConstructParkingRoutingRequest(
+    ParkingRoutingTask* parking_routing_task) {
+  auto hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  hdmap::Id id;
+  id.set_id(parking_routing_task->routing_request()
+                .parking_info()
+                .parking_space_id());
+  auto parking_space_info = hdmap_->GetParkingSpaceById(id);
+  auto request_parking_info =
+      parking_routing_task->mutable_routing_request()->mutable_parking_info();
+  if (parking_space_info == nullptr) {
+    AERROR << "Can not find parking space" << id_ << "in map";
     return false;
-    }
-    auto corner_point =
-        parking_routing_task.routing_request().parking_info().corner_point();
-    PointENU left_bottom_point = corner_point.point().at(0);
-    PointENU right_bottom_point = corner_point.point().at(1);
-    PointENU right_top_point = corner_point.point().at(2);;
-    double length = sqrt((right_bottom_point.x() - right_top_point.x()) *
-                         (right_bottom_point.x() - right_top_point.x()) +
-                         (right_bottom_point.y() - right_top_point.y()) *
-                         (right_bottom_point.y() - right_top_point.y()));
-    double width = sqrt((right_bottom_point.x() - left_bottom_point.x()) *
-                        (right_bottom_point.x() - left_bottom_point.x()) +
-                        (right_bottom_point.y() - left_bottom_point.y()) *
-                        (right_bottom_point.y() - left_bottom_point.y()));
-    // judge by spot type
-    if (plot_type == ParkingSpaceType::VERTICAL_PLOT) {
-        if (length - FLAGS_plot_size_buffer < ego_length ||
-            width - FLAGS_plot_size_buffer < ego_width) {
-            monitor_logger_buffer_.WARN("veritical plot is not suit!");
-            AERROR << "The veritical plot is small";
-            return false;
-        }
-    } else if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
-        if (width - FLAGS_plot_size_buffer < ego_length ||
-            length - FLAGS_plot_size_buffer < ego_width) {
-            monitor_logger_buffer_.WARN("parallel plot is not suit!");
-            AERROR << "The parallel plot is small";
-            return false;
-        }
-    }
-    return true;
-}
+  }
+  auto points = parking_space_info->polygon().points();
+  // 0 1 2 3: left_top right_top right_rear left_rear corner point for heading
+  // upward
+  Vec2d center_point(0, 0);
+  for (size_t i = 0; i < points.size(); i++) {
+    center_point += points[i];
+  }
+  center_point /= 4.0;
+  request_parking_info->mutable_parking_point()->set_x(center_point.x());
+  request_parking_info->mutable_parking_point()->set_y(center_point.y());
+  request_parking_info->mutable_parking_point()->set_z(0);
+  apollo::common::PointENU center_enu;
+  center_enu.set_x(center_point.x());
+  center_enu.set_y(center_point.y());
+  apollo::hdmap::LaneInfoConstPtr nearest_lane;
+  double nearest_s;
+  double nearest_l;
+  hdmap_->GetNearestLane(center_enu, &nearest_lane, &nearest_s, &nearest_l);
+  double lane_heading = nearest_lane->Heading(nearest_s);
+  double diff_angle = common::math::AngleDiff(
+      lane_heading, parking_space_info->parking_space().heading());
 
-bool ParkingRoutingManager::RoadWidthVerification(
-        const ParkingRoutingTask& parking_routing_task) {
-    const auto& vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-    const double ego_width = vehicle_config.vehicle_param().width();
-    const double road_width = parking_routing_task.lane_width();
-    if (!has_space_ || !has_space_id_) {
-        AERROR << "No Valid park plot exits!";
-        return false;
-    }
-    if (ego_width > road_width + FLAGS_road_width_buffer) {
-        AERROR << "the road width is small!";
-        return false;
-    }
-    return true;
+  if (std::fabs(diff_angle) < M_PI / 3.0) {
+    AINFO << "Find a parallel parking" << id_ << "lane_heading" << lane_heading
+          << "parking heading" << parking_space_info->parking_space().heading();
+    request_parking_info->set_parking_space_type(
+        ParkingSpaceType::PARALLEL_PARKING);
+    auto left_down = request_parking_info->mutable_corner_point()->add_point();
+    left_down->set_x(points[0].x());
+    left_down->set_y(points[0].y());
+    auto right_down = request_parking_info->mutable_corner_point()->add_point();
+    right_down->set_x(points[1].x());
+    right_down->set_y(points[1].y());
+    auto right_up = request_parking_info->mutable_corner_point()->add_point();
+    right_up->set_x(points[2].x());
+    right_up->set_y(points[2].y());
+    auto left_up = request_parking_info->mutable_corner_point()->add_point();
+    left_up->set_x(points[3].x());
+    left_up->set_y(points[3].y());
+  } else {
+    AINFO << "Find a vertical parking";
+    request_parking_info->set_parking_space_type(
+        ParkingSpaceType::VERTICAL_PLOT);
+    auto left_down = request_parking_info->mutable_corner_point()->add_point();
+    left_down->set_x(points[0].x());
+    left_down->set_y(points[0].y());
+    auto right_down = request_parking_info->mutable_corner_point()->add_point();
+    right_down->set_x(points[1].x());
+    right_down->set_y(points[1].y());
+    auto right_up = request_parking_info->mutable_corner_point()->add_point();
+    right_up->set_x(points[2].x());
+    right_up->set_y(points[2].y());
+    auto left_up = request_parking_info->mutable_corner_point()->add_point();
+    left_up->set_x(points[3].x());
+    left_up->set_y(points[3].y());
+  }
+  // extend last point to aviod referenceline generated failed in parking
+  auto last_waypoint = parking_routing_task->mutable_routing_request()
+                           ->mutable_waypoint()
+                           ->rbegin();
+  static constexpr double kExtendParkingLength = 20;
+  apollo::common::PointENU extend_point;
+  extend_point.set_x(last_waypoint->pose().x() +
+                     kExtendParkingLength * std::cos(lane_heading));
+  extend_point.set_y(last_waypoint->pose().y() +
+                     kExtendParkingLength * std::sin(lane_heading));
+  hdmap_->GetNearestLaneWithHeading(extend_point, 20, lane_heading, M_PI_2,
+                                    &nearest_lane, &nearest_s, &nearest_l);
+  extend_point = nearest_lane->GetSmoothPoint(nearest_s);
+  last_waypoint->mutable_pose()->set_x(extend_point.x());
+  last_waypoint->mutable_pose()->set_y(extend_point.y());
+  last_waypoint->set_id(nearest_lane->id().id());
+  last_waypoint->set_s(nearest_s);
+
+  return true;
 }
 
 }  // namespace task_manager

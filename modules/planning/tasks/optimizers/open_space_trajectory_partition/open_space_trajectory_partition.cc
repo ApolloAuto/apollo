@@ -46,6 +46,8 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     const TaskConfig& config,
     const std::shared_ptr<DependencyInjector>& injector)
     : TrajectoryOptimizer(config, injector) {
+  config_.CopyFrom(config);
+  AINFO << config.DebugString();
   open_space_trajectory_partition_config_ =
       config_.open_space_trajectory_partition_config();
   heading_search_range_ =
@@ -158,6 +160,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     if (flag_change_to_next &&
         !CheckTrajTraversed(trajectories_encodings[current_trajectory_index])) {
       UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
+      AINFO << "change to traj " << i << " in " << trajectories_size;
       break;
     }
 
@@ -261,6 +264,31 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
   }
 
+  if (!flag_change_to_next) {
+    double veh_rel_time;
+    size_t time_match_index;
+    double now_time = Clock::Instance()->NowInSeconds();
+    auto& traj = partitioned_trajectories->at(current_trajectory_index).first;
+    if (last_index_ != -1) {
+      veh_rel_time = traj[last_index_].relative_time() + now_time - last_time_;
+      time_match_index = traj.QueryLowerBoundPoint(veh_rel_time);
+    } else {
+      time_match_index = current_trajectory_point_index;
+      last_time_ = now_time;
+      last_index_ = time_match_index;
+    }
+
+    if (std::abs(traj[time_match_index].path_point().s() -
+                 traj.at(current_trajectory_point_index).path_point().s()) <
+        2) {
+      current_trajectory_point_index = time_match_index;
+    } else {
+      last_index_ = current_trajectory_point_index;
+      last_time_ = now_time;
+    }
+  } else {
+    last_index_ = -1;
+  }
   auto* mutable_trajectory =
       open_space_info_ptr->mutable_stitched_trajectory_result();
   AdjustRelativeTimeAndS(open_space_info.partitioned_trajectories(),
@@ -547,7 +575,7 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
         *current_trajectory_index = trajectories_index + 1;
         *current_trajectory_point_index = 0;
       }
-      ADEBUG << "Reach the end of a trajectory, switching to next one";
+      AINFO << "Reach the end of a trajectory, switching to next one";
       return true;
     }
   }
@@ -666,11 +694,6 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
       current_gear_status->gear_shift_period_finished = true;
       current_gear_status->gear_shift_period_started = true;
     } else {
-      // send N gear to protect idle
-      if (!last_frame->open_space_info().open_space_provider_success()) {
-        current_gear_status->gear_shift_position =
-        canbus::Chassis::GEAR_NEUTRAL;
-      }
       GenerateGearShiftTrajectory(current_gear_status->gear_shift_position,
                                   gear_switch_idle_time_trajectory);
       current_gear_status->gear_shift_period_time =
@@ -738,8 +761,11 @@ void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
 
   // Reassign relative t and s on stitched_trajectory_result for accurate next
   // frame stitching
-  const size_t interpolated_pieces_num =
+  size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
+  if (FLAGS_use_iterative_anchoring_smoother) {
+    interpolated_pieces_num = 1;
+  }
   const size_t unpartitioned_trajectory_size =
       unpartitioned_trajectory_result->size();
   size_t index_estimate = 0;

@@ -166,7 +166,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     }
 
     bool res_opt = OptimizePath(
-        init_frenet_state, end_state, std::move(path_reference_l),
+        init_frenet_state.second, end_state, std::move(path_reference_l),
         path_reference_size, path_boundary.delta_s(), is_valid_path_reference,
         path_boundary.boundary(), ddl_bounds, w, max_iter, &opt_l, &opt_dl,
         &opt_ddl);
@@ -233,7 +233,7 @@ PiecewiseJerkPathOptimizer::ConvertPathPointRefFromFrontAxeToRearAxe(
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
-    const std::pair<std::array<double, 3>, std::array<double, 3>>& init_state,
+    const std::array<double, 3>& init_state,
     const std::array<double, 3>& end_state,
     std::vector<double> path_reference_l_ref, const size_t path_reference_size,
     const double delta_s, const bool is_valid_path_reference,
@@ -244,7 +244,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   // num of knots
   const size_t kNumKnots = lat_boundaries.size();
   PiecewiseJerkPathProblem piecewise_jerk_problem(kNumKnots, delta_s,
-                                                  init_state.second);
+                                                  init_state);
 
   // TODO(Hongyi): update end_state settings
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
@@ -280,9 +280,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
       ADEBUG << "i: " << i << ", weight: " << weight_x_ref_vec.at(i);
     }
     piecewise_jerk_problem.set_x_ref(std::move(weight_x_ref_vec),
-                                     std::move(path_reference_l_ref));
+                                     path_reference_l_ref);
   }
-
+  // for debug:here should use std::move
   piecewise_jerk_problem.set_weight_x(w[0]);
   piecewise_jerk_problem.set_weight_dx(w[1]);
   piecewise_jerk_problem.set_weight_ddx(w[2]);
@@ -303,8 +303,8 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   const double axis_distance = veh_param.wheel_base();
   const double max_yaw_rate =
       veh_param.max_steer_angle_rate() / veh_param.steer_ratio() / 2.0;
-  const double jerk_bound = EstimateJerkBoundary(
-      std::fmax(init_state.first[1], 1.0), axis_distance, max_yaw_rate);
+  const double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
+                                                 axis_distance, max_yaw_rate);
   piecewise_jerk_problem.set_dddx_bound(jerk_bound);
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
@@ -315,6 +315,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
 
   if (!success) {
     AERROR << "piecewise jerk path optimizer failed";
+    std::stringstream ssm;
+    AERROR << "dl bound" << FLAGS_lateral_derivative_bound_default
+           << " jerk bound" << jerk_bound;
+    for (size_t i = 0; i < lat_boundaries.size(); i++) {
+      ssm << lat_boundaries[i].first << " " << lat_boundaries[i].second << ","
+          << ddl_bounds[i].first << " " << ddl_bounds[i].second << ","
+          << path_reference_l_ref[i] << std::endl;
+    }
+    AERROR << "lat boundary, ddl boundary , path reference" << std::endl
+           << ssm.str();
     return false;
   }
 

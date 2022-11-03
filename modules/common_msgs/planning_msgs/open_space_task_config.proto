@@ -78,7 +78,7 @@ message OpenSpaceRoiDeciderConfig {
   optional double end_pose_s_distance = 14 [default = 10.0];
   // end pose x to parallel parking
   optional double parallel_park_end_x_buffer = 15 [default = 0.2];
-  // extend right spot width size 
+  // extend right spot width size
   optional double extend_right_x_buffer = 16 [default = 0.0];
   // extend left spot width size
   optional double extend_left_x_buffer = 17 [default = 0.0];
@@ -120,10 +120,17 @@ message OpenSpaceTrajectoryProviderConfig {
 }
 
 message OpenSpaceTrajectoryOptimizerConfig {
+  enum TrajectorySmoother {
+    ITERATIVE_ANCHORING_SMOOTHER = 0;
+    DISTANCE_APPROACH = 1;
+    USE_WARM_START = 2;
+  }
   // Hybrid a star warm start configs
   optional HybridAStarConfig hybrid_a_star_config = 1;
   // Dual variable configs
   optional DualVariableConfig dual_variable_warm_start_config = 2;
+  optional TrajectorySmoother trajectory_smoother = 7
+      [default = USE_WARM_START];
   // Distance approach trajectory smoothing configs
   optional DistanceApproachTrajectorySmootherConfig
       distance_approach_trajectory_smoother_config = 3;

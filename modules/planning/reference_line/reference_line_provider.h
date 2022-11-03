@@ -29,16 +29,17 @@
 #include <unordered_set>
 #include <vector>
 
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common_msgs/planning_msgs/navigation.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/util/factory.h"
 #include "modules/common/util/util.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/common_msgs/planning_msgs/navigation.pb.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/reference_line/discrete_points_reference_line_smoother.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -76,8 +77,6 @@ class ReferenceLineProvider {
   bool Start();
 
   void Stop();
-
-  void Wait();
 
   bool GetReferenceLines(std::list<ReferenceLine>* reference_lines,
                          std::list<hdmap::RouteSegments>* segments);

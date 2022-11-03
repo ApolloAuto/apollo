@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/status/status.h"
@@ -121,7 +122,8 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   double ego_v_ = 0.0;
   common::math::Box2d ego_box_;
   double vehicle_moving_direction_ = 0.0;
-
+  int last_index_ = -1;
+  double last_time_ = 0;
   struct pair_comp_ {
     bool operator()(
         const std::pair<std::pair<size_t, size_t>, double>& left,

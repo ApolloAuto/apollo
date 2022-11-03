@@ -108,22 +108,22 @@ bool CheckTrafficLightOnReferenceLine(
 /*
  * @brief: check if ADC is till inside a pnc-junction
  */
-bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
+bool CheckInsideJunction(const ReferenceLineInfo& reference_line_info) {
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
 
-  hdmap::PathOverlap pnc_junction_overlap;
-  reference_line_info.GetPnCJunction(adc_front_edge_s, &pnc_junction_overlap);
-  if (pnc_junction_overlap.object_id.empty()) {
+  hdmap::PathOverlap junction_overlap;
+  reference_line_info.GetJunction(adc_front_edge_s, &junction_overlap);
+  if (junction_overlap.object_id.empty()) {
     return false;
   }
 
   static constexpr double kIntersectionPassDist = 2.0;  // unit: m
   const double distance_adc_pass_intersection =
-      adc_back_edge_s - pnc_junction_overlap.end_s;
+      adc_back_edge_s - junction_overlap.end_s;
   ADEBUG << "distance_adc_pass_intersection[" << distance_adc_pass_intersection
-         << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
-         << "] start_s[" << pnc_junction_overlap.start_s << "]";
+         << "] junction_overlap[" << junction_overlap.object_id << "] start_s["
+         << junction_overlap.start_s << "]";
 
   return distance_adc_pass_intersection < kIntersectionPassDist;
 }
