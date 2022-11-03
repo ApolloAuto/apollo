@@ -97,10 +97,8 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
 bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
     double* target_s) {
-  const auto &routing_request =
-      frame->local_view().routing->routing_request();
-  auto corner_point =
-      routing_request.parking_info().corner_point();
+  const auto& routing_request = frame->local_view().routing->routing_request();
+  auto corner_point = routing_request.parking_info().corner_point();
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();

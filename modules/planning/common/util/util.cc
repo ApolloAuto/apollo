@@ -122,8 +122,8 @@ bool CheckInsideJunction(const ReferenceLineInfo& reference_line_info) {
   const double distance_adc_pass_intersection =
       adc_back_edge_s - junction_overlap.end_s;
   ADEBUG << "distance_adc_pass_intersection[" << distance_adc_pass_intersection
-         << "] junction_overlap[" << junction_overlap.object_id
-         << "] start_s[" << junction_overlap.start_s << "]";
+         << "] junction_overlap[" << junction_overlap.object_id << "] start_s["
+         << junction_overlap.start_s << "]";
 
   return distance_adc_pass_intersection < kIntersectionPassDist;
 }

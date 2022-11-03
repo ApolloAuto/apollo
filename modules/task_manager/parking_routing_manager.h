@@ -20,11 +20,12 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/status/status.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
 #include "modules/task_manager/proto/task_manager_config.pb.h"
+
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/status/status.h"
 
 namespace apollo {
 namespace task_manager {
@@ -36,11 +37,10 @@ class ParkingRoutingManager {
    * @brief module initialization function
    * @return initialization status
    */
-  common::Status Init(const task_manager::ParkingRoutingTask&
-                      parking_routing_task);
+  common::Status Init(
+      const task_manager::ParkingRoutingTask& parking_routing_task);
 
-  bool ConstructParkingRoutingRequest(
-    ParkingRoutingTask* parking_routing_task);
+  bool ConstructParkingRoutingRequest(ParkingRoutingTask* parking_routing_task);
 
   /**
    * @brief destructor

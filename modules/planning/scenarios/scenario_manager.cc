@@ -19,11 +19,12 @@
 #include <string>
 #include <vector>
 
+#include "modules/common_msgs/map_msgs/map_lane.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/common_msgs/map_msgs/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
@@ -149,18 +150,17 @@ void ScenarioManager::RegisterScenarios() {
       &config_map_[ScenarioType::BARE_INTERSECTION_UNPROTECTED]));
 
   // emergency_pull_over
-  ACHECK(
-      Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
-                           &config_map_[ScenarioType::EMERGENCY_PULL_OVER]));
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
+                              &config_map_[ScenarioType::EMERGENCY_PULL_OVER]));
 
   // emergency_stop
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
                               &config_map_[ScenarioType::EMERGENCY_STOP]));
 
   // learning model
-  ACHECK(Scenario::LoadConfig(
-      FLAGS_scenario_learning_model_sample_config_file,
-      &config_map_[ScenarioType::LEARNING_MODEL_SAMPLE]));
+  ACHECK(
+      Scenario::LoadConfig(FLAGS_scenario_learning_model_sample_config_file,
+                           &config_map_[ScenarioType::LEARNING_MODEL_SAMPLE]));
 
   // park_and_go
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
@@ -171,9 +171,9 @@ void ScenarioManager::RegisterScenarios() {
                               &config_map_[ScenarioType::PULL_OVER]));
 
   // stop_sign
-  ACHECK(Scenario::LoadConfig(
-      FLAGS_scenario_stop_sign_unprotected_config_file,
-      &config_map_[ScenarioType::STOP_SIGN_UNPROTECTED]));
+  ACHECK(
+      Scenario::LoadConfig(FLAGS_scenario_stop_sign_unprotected_config_file,
+                           &config_map_[ScenarioType::STOP_SIGN_UNPROTECTED]));
 
   // traffic_light
   ACHECK(Scenario::LoadConfig(
@@ -195,8 +195,7 @@ void ScenarioManager::RegisterScenarios() {
                               &config_map_[ScenarioType::YIELD_SIGN]));
 }
 
-ScenarioType ScenarioManager::SelectPullOverScenario(
-    const Frame& frame) {
+ScenarioType ScenarioManager::SelectPullOverScenario(const Frame& frame) {
   const auto& scenario_config =
       config_map_[ScenarioType::PULL_OVER].pull_over_config();
 
@@ -325,8 +324,7 @@ ScenarioType ScenarioManager::SelectPullOverScenario(
   return default_scenario_type_;
 }
 
-ScenarioType ScenarioManager::SelectPadMsgScenario(
-    const Frame& frame) {
+ScenarioType ScenarioManager::SelectPadMsgScenario(const Frame& frame) {
   const auto& pad_msg_driving_action = frame.GetPadMsgDrivingAction();
 
   switch (pad_msg_driving_action) {
@@ -343,8 +341,7 @@ ScenarioType ScenarioManager::SelectPadMsgScenario(
     case PadMessage::RESUME_CRUISE:
       if (current_scenario_->scenario_type() ==
               ScenarioType::EMERGENCY_PULL_OVER ||
-          current_scenario_->scenario_type() ==
-              ScenarioType::EMERGENCY_STOP) {
+          current_scenario_->scenario_type() == ScenarioType::EMERGENCY_STOP) {
         return ScenarioType::PARK_AND_GO;
       }
       break;
@@ -355,8 +352,7 @@ ScenarioType ScenarioManager::SelectPadMsgScenario(
   return default_scenario_type_;
 }
 
-ScenarioType ScenarioManager::SelectInterceptionScenario(
-    const Frame& frame) {
+ScenarioType ScenarioManager::SelectInterceptionScenario(const Frame& frame) {
   ScenarioType scenario_type = default_scenario_type_;
 
   hdmap::PathOverlap* traffic_sign_overlap = nullptr;
@@ -427,9 +423,8 @@ ScenarioType ScenarioManager::SelectInterceptionScenario(
 
 ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
-  const auto& scenario_config =
-      config_map_[ScenarioType::STOP_SIGN_UNPROTECTED]
-          .stop_sign_unprotected_config();
+  const auto& scenario_config = config_map_[ScenarioType::STOP_SIGN_UNPROTECTED]
+                                    .stop_sign_unprotected_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -478,16 +473,16 @@ ScenarioType ScenarioManager::SelectStopSignScenario(
 ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
   // some scenario may need start sooner than the others
-  const double start_check_distance = std::max(
-      {config_map_[ScenarioType::TRAFFIC_LIGHT_PROTECTED]
-           .traffic_light_protected_config()
-           .start_traffic_light_scenario_distance(),
-       config_map_[ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
-           .traffic_light_unprotected_left_turn_config()
-           .start_traffic_light_scenario_distance(),
-       config_map_[ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
-           .traffic_light_unprotected_right_turn_config()
-           .start_traffic_light_scenario_distance()});
+  const double start_check_distance =
+      std::max({config_map_[ScenarioType::TRAFFIC_LIGHT_PROTECTED]
+                    .traffic_light_protected_config()
+                    .start_traffic_light_scenario_distance(),
+                config_map_[ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
+                    .traffic_light_unprotected_left_turn_config()
+                    .start_traffic_light_scenario_distance(),
+                config_map_[ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
+                    .traffic_light_unprotected_right_turn_config()
+                    .start_traffic_light_scenario_distance()});
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -714,8 +709,7 @@ ScenarioType ScenarioManager::SelectBareIntersectionScenario(
   return default_scenario_type_;
 }
 
-ScenarioType ScenarioManager::SelectValetParkingScenario(
-    const Frame& frame) {
+ScenarioType ScenarioManager::SelectValetParkingScenario(const Frame& frame) {
   const auto& scenario_config =
       config_map_[ScenarioType::VALET_PARKING].valet_parking_config();
 
@@ -730,8 +724,7 @@ ScenarioType ScenarioManager::SelectValetParkingScenario(
   return default_scenario_type_;
 }
 
-ScenarioType ScenarioManager::SelectParkAndGoScenario(
-    const Frame& frame) {
+ScenarioType ScenarioManager::SelectParkAndGoScenario(const Frame& frame) {
   bool park_and_go = false;
   const auto& scenario_config =
       config_map_[ScenarioType::PARK_AND_GO].park_and_go_config();
@@ -812,8 +805,8 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
   if (injector_->learning_based_data() &&
       injector_->learning_based_data()->GetLatestLearningDataFrame()) {
     history_points_len = injector_->learning_based_data()
-                                  ->GetLatestLearningDataFrame()
-                                  ->adc_trajectory_point_size();
+                             ->GetLatestLearningDataFrame()
+                             ->adc_trajectory_point_size();
   }
   if ((planning_config_.learning_mode() == PlanningConfig::E2E ||
        planning_config_.learning_mode() == PlanningConfig::E2E_TEST) &&
@@ -823,8 +816,7 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
     scenario_type = ScenarioDispatchNonLearning(frame);
   }
 
-  ADEBUG << "select scenario: "
-         << ScenarioType_Name(scenario_type);
+  ADEBUG << "select scenario: " << ScenarioType_Name(scenario_type);
 
   // update PlanningContext
   UpdatePlanningContext(frame, scenario_type);
@@ -837,13 +829,11 @@ void ScenarioManager::ScenarioDispatch(const Frame& frame) {
 ScenarioType ScenarioManager::ScenarioDispatchLearning() {
   ////////////////////////////////////////
   // learning model scenario
-  ScenarioType scenario_type =
-      ScenarioType::LEARNING_MODEL_SAMPLE;
+  ScenarioType scenario_type = ScenarioType::LEARNING_MODEL_SAMPLE;
   return scenario_type;
 }
 
-ScenarioType ScenarioManager::ScenarioDispatchNonLearning(
-    const Frame& frame) {
+ScenarioType ScenarioManager::ScenarioDispatchNonLearning(const Frame& frame) {
   ////////////////////////////////////////
   // default: LANE_FOLLOW
   ScenarioType scenario_type = default_scenario_type_;
@@ -915,27 +905,24 @@ bool ScenarioManager::IsBareIntersectionScenario(
   return (scenario_type == ScenarioType::BARE_INTERSECTION_UNPROTECTED);
 }
 
-bool ScenarioManager::IsStopSignScenario(
-    const ScenarioType& scenario_type) {
+bool ScenarioManager::IsStopSignScenario(const ScenarioType& scenario_type) {
   return (scenario_type == ScenarioType::STOP_SIGN_PROTECTED ||
           scenario_type == ScenarioType::STOP_SIGN_UNPROTECTED);
 }
 
 bool ScenarioManager::IsTrafficLightScenario(
     const ScenarioType& scenario_type) {
-  return (
-      scenario_type == ScenarioType::TRAFFIC_LIGHT_PROTECTED ||
-      scenario_type == ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
-      scenario_type == ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
+  return (scenario_type == ScenarioType::TRAFFIC_LIGHT_PROTECTED ||
+          scenario_type == ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
+          scenario_type == ScenarioType::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
 }
 
-bool ScenarioManager::IsYieldSignScenario(
-    const ScenarioType& scenario_type) {
+bool ScenarioManager::IsYieldSignScenario(const ScenarioType& scenario_type) {
   return (scenario_type == ScenarioType::YIELD_SIGN);
 }
 
-void ScenarioManager::UpdatePlanningContext(
-    const Frame& frame, const ScenarioType& scenario_type) {
+void ScenarioManager::UpdatePlanningContext(const Frame& frame,
+                                            const ScenarioType& scenario_type) {
   // BareIntersection scenario
   UpdatePlanningContextBareIntersectionScenario(frame, scenario_type);
 

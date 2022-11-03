@@ -22,8 +22,9 @@
 #include "absl/strings/str_cat.h"
 #include "google/protobuf/text_format.h"
 
-#include "cyber/common/log.h"
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
+
+#include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"

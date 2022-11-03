@@ -23,14 +23,16 @@
 #include <algorithm>
 
 #include "absl/strings/str_cat.h"
+
+#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
+#include "modules/planning/proto/planning_status.pb.h"
+
 #include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/proto/planning_status.pb.h"
-#include "modules/common_msgs/planning_msgs/sl_boundary.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -998,8 +1000,8 @@ int ReferenceLineInfo::GetPnCJunction(
   return 0;
 }
 
-int ReferenceLineInfo::GetJunction(
-    const double s, hdmap::PathOverlap* junction_overlap) const {
+int ReferenceLineInfo::GetJunction(const double s,
+                                   hdmap::PathOverlap* junction_overlap) const {
   CHECK_NOTNULL(junction_overlap);
   const std::vector<hdmap::PathOverlap>& junction_overlaps =
       reference_line_.map_path().junction_overlaps();

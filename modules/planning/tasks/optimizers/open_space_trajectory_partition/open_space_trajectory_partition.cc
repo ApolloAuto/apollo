@@ -279,7 +279,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
 
     if (std::abs(traj[time_match_index].path_point().s() -
-            traj.at(current_trajectory_point_index).path_point().s()) < 2) {
+                 traj.at(current_trajectory_point_index).path_point().s()) <
+        2) {
       current_trajectory_point_index = time_match_index;
     } else {
       last_index_ = current_trajectory_point_index;

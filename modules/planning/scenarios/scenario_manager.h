@@ -19,9 +19,10 @@
 #include <memory>
 #include <unordered_map>
 
+#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -45,8 +46,7 @@ class ScenarioManager final {
  private:
   void Observe(const Frame& frame);
 
-  std::unique_ptr<Scenario> CreateScenario(
-      ScenarioType scenario_type);
+  std::unique_ptr<Scenario> CreateScenario(ScenarioType scenario_type);
 
   void RegisterScenarios();
 
@@ -76,11 +76,9 @@ class ScenarioManager final {
   ScenarioType ScenarioDispatchLearning();
   ScenarioType ScenarioDispatchNonLearning(const Frame& frame);
 
-  bool IsBareIntersectionScenario(
-      const ScenarioType& scenario_type);
+  bool IsBareIntersectionScenario(const ScenarioType& scenario_type);
   bool IsStopSignScenario(const ScenarioType& scenario_type);
-  bool IsTrafficLightScenario(
-      const ScenarioType& scenario_type);
+  bool IsTrafficLightScenario(const ScenarioType& scenario_type);
   bool IsYieldSignScenario(const ScenarioType& scenario_type);
 
   void UpdatePlanningContext(const Frame& frame,
@@ -92,11 +90,11 @@ class ScenarioManager final {
   void UpdatePlanningContextEmergencyStopcenario(
       const Frame& frame, const ScenarioType& scenario_type);
 
-  void UpdatePlanningContextPullOverScenario(
-      const Frame& frame, const ScenarioType& scenario_type);
+  void UpdatePlanningContextPullOverScenario(const Frame& frame,
+                                             const ScenarioType& scenario_type);
 
-  void UpdatePlanningContextStopSignScenario(
-      const Frame& frame, const ScenarioType& scenario_type);
+  void UpdatePlanningContextStopSignScenario(const Frame& frame,
+                                             const ScenarioType& scenario_type);
 
   void UpdatePlanningContextTrafficLightScenario(
       const Frame& frame, const ScenarioType& scenario_type);
@@ -107,9 +105,7 @@ class ScenarioManager final {
  private:
   std::shared_ptr<DependencyInjector> injector_;
   PlanningConfig planning_config_;
-  std::unordered_map<ScenarioType, ScenarioConfig,
-                     std::hash<int>>
-      config_map_;
+  std::unordered_map<ScenarioType, ScenarioConfig, std::hash<int>> config_map_;
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioType default_scenario_type_;
   ScenarioContext scenario_context_;

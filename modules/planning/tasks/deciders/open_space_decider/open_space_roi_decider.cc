@@ -214,8 +214,7 @@ void OpenSpaceRoiDecider::SetOrigin(
 
 void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices) {
-  const auto &routing_request =
-        frame->local_view().routing->routing_request();
+  const auto &routing_request = frame->local_view().routing->routing_request();
   auto plot_type = routing_request.parking_info().parking_space_type();
   auto left_top = vertices[0];
   auto left_down = vertices[1];
@@ -283,7 +282,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     parking_spot_heading = (left_down - right_down).Angle();
     end_y = (left_top.y() + left_down.y()) / 2.0;
     end_x = left_top.x() + vehicle_params_.back_edge_to_center() +
-      parllel_park_end_x_buffer;
+            parllel_park_end_x_buffer;
   }
   auto *end_pose =
       frame->mutable_open_space_info()->mutable_open_space_end_pose();
@@ -1209,8 +1208,7 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
 bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
                                          std::array<Vec2d, 4> *vertices,
                                          Path *nearby_path) {
-  const auto &routing_request =
-        frame->local_view().routing->routing_request();
+  const auto &routing_request = frame->local_view().routing->routing_request();
   auto plot_type = routing_request.parking_info().parking_space_type();
   if (frame == nullptr) {
     AERROR << "Invalid frame, fail to GetParkingSpotFromMap from frame. ";
@@ -1331,9 +1329,9 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
           auto succeed_lane_id = next_lane->lane().successor_id(j);
           auto succeed_lane = hdmap_->GetLaneById(succeed_lane_id);
           LaneSegment succeed_lanesegment =
-            LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
-                        succeed_lane->accumulate_s().back());
-            segments_vector.push_back(succeed_lanesegment);
+              LaneSegment(succeed_lane, succeed_lane->accumulate_s().front(),
+                          succeed_lane->accumulate_s().back());
+          segments_vector.push_back(succeed_lanesegment);
         }
       }
       *nearby_path = Path(segments_vector);
@@ -1362,12 +1360,12 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
 
   // left or right of the parking lot is decided when viewing the parking spot
   // open upward
-  ADEBUG<<target_parking_spot->parking_space().DebugString();
+  ADEBUG << target_parking_spot->parking_space().DebugString();
   auto parking_polygon = target_parking_spot->parking_space().polygon();
-  Vec2d left_top(parking_polygon.point(0).x(),parking_polygon.point(0).y());
-  Vec2d left_down(parking_polygon.point(3).x(),parking_polygon.point(3).y());
-  Vec2d right_down(parking_polygon.point(2).x(),parking_polygon.point(2).y());
-  Vec2d right_top(parking_polygon.point(1).x(),parking_polygon.point(1).y());
+  Vec2d left_top(parking_polygon.point(0).x(), parking_polygon.point(0).y());
+  Vec2d left_down(parking_polygon.point(3).x(), parking_polygon.point(3).y());
+  Vec2d right_down(parking_polygon.point(2).x(), parking_polygon.point(2).y());
+  Vec2d right_top(parking_polygon.point(1).x(), parking_polygon.point(1).y());
   if (plot_type == ParkingSpaceType::PARALLEL_PARKING) {
     left_top.set_x(parking_polygon.point(3).x());
     left_top.set_y(parking_polygon.point(3).y());
@@ -1461,13 +1459,10 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
 }
 
 bool OpenSpaceRoiDecider::CheckDistanceToParkingSpot(
-    Frame *const frame,
-    const hdmap::Path &nearby_path,
+    Frame *const frame, const hdmap::Path &nearby_path,
     const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot) {
-  const auto &routing_request =
-      frame->local_view().routing->routing_request();
-  auto corner_point =
-      routing_request.parking_info().corner_point();
+  const auto &routing_request = frame->local_view().routing->routing_request();
+  auto corner_point = routing_request.parking_info().corner_point();
   Vec2d left_bottom_point = target_parking_spot->polygon().points().at(0);
   Vec2d right_bottom_point = target_parking_spot->polygon().points().at(1);
   left_bottom_point.set_x(corner_point.point().at(0).x());

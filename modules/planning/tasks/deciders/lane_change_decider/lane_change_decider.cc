@@ -155,16 +155,14 @@ void LaneChangeDecider::UpdatePreparationDistance(
   ADEBUG << "Lane Change Status: " << lane_change_status->status();
   // If lane change planning succeeded, update and return
   if (is_opt_succeed) {
-    lane_change_status->set_last_succeed_timestamp(
-        Clock::NowInSeconds());
+    lane_change_status->set_last_succeed_timestamp(Clock::NowInSeconds());
     lane_change_status->set_is_current_opt_succeed(true);
     return;
   }
   // If path optimizer or speed optimizer failed, report the status
   lane_change_status->set_is_current_opt_succeed(false);
   // If the planner just succeed recently, let's be more patient and try again
-  if (Clock::NowInSeconds() -
-          lane_change_status->last_succeed_timestamp() <
+  if (Clock::NowInSeconds() - lane_change_status->last_succeed_timestamp() <
       FLAGS_allowed_lane_change_failure_time) {
     return;
   }

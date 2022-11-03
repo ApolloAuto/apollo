@@ -23,9 +23,10 @@
 #include <boost/range/iterator_range.hpp>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 namespace apollo {
 namespace planning {

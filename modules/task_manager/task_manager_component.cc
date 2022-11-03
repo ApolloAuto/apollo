@@ -16,6 +16,7 @@
 #include "modules/task_manager/task_manager_component.h"
 
 #include "modules/task_manager/proto/task_manager_config.pb.h"
+
 #include "cyber/time/rate.h"
 
 namespace apollo {
@@ -24,9 +25,9 @@ namespace task_manager {
 using apollo::cyber::ComponentBase;
 using apollo::cyber::Rate;
 using apollo::localization::LocalizationEstimate;
+using apollo::planning::ADCTrajectory;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
-using apollo::planning::ADCTrajectory;
 
 bool TaskManagerComponent::Init() {
   TaskManagerConfig task_manager_conf;
@@ -107,7 +108,8 @@ bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
     }
   } else if (task->task_type() == PARKING_ROUTING) {
     parking_routing_manager_ = std::make_shared<ParkingRoutingManager>();
-    parking_routing_manager_->ConstructParkingRoutingRequest(task->mutable_parking_routing_task());
+    parking_routing_manager_->ConstructParkingRoutingRequest(
+        task->mutable_parking_routing_task());
     RoutingRequest msg;
     msg.CopyFrom(task->parking_routing_task().routing_request());
     request_writer_->Write(msg);

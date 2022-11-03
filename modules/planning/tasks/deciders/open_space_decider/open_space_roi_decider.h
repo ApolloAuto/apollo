@@ -26,16 +26,18 @@
 #include <vector>
 
 #include "Eigen/Dense"
-#include "cyber/common/log.h"
+
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
+#include "modules/common_msgs/map_msgs/map_id.pb.h"
+
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
-#include "modules/common_msgs/map_msgs/map_id.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
@@ -147,8 +149,7 @@ class OpenSpaceRoiDecider : public Decider {
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
-      Frame *const frame,
-      const hdmap::Path &nearby_path,
+      Frame *const frame, const hdmap::Path &nearby_path,
       const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot);
 
   // @brief Helper function for fuse line segments into convex vertices set

@@ -21,13 +21,17 @@
 #include <list>
 #include <utility>
 
+#include "gtest/gtest_prod.h"
+
 #include "absl/strings/str_cat.h"
+
+#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
+#include "modules/planning/proto/planning_semantic_map_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
-#include "gtest/gtest_prod.h"
-#include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -39,7 +43,6 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/learning_based/img_feature_renderer/birdview_img_feature_renderer.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/proto/planning_semantic_map_config.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"

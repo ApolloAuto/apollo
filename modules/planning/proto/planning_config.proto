@@ -191,7 +191,6 @@ message ScenarioYieldSignConfig {
 
 // scenario configs
 message ScenarioConfig {
-
   message StageConfig {
     optional StageType stage_type = 1;
     optional bool enabled = 2 [default = true];
