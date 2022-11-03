@@ -297,8 +297,10 @@ bool LaneChangeDecider::IsClearToChangeLane(
     }
 
     if (reference_line_info->IsChangeLanePath()) {
-      static constexpr double kLateralShift = 2.5;
-      if (end_l < -kLateralShift || start_l > kLateralShift) {
+      double left_width(0), right_width(0);
+      reference_line_info->mutable_reference_line()->GetLaneWidth(
+          (start_s + end_s) * 0.5, &left_width, &right_width);
+      if (end_l < -right_width || start_l > left_width) {
         continue;
       }
     }
@@ -371,14 +373,13 @@ bool LaneChangeDecider::IsPerceptionBlocked(
   const common::math::Vec2d adv_pos(vehicle_state.x(), vehicle_state.y());
   const double adv_heading = vehicle_state.heading();
 
-  double left_most_angle =
-      common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
-  double right_most_angle =
-      common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
-  bool right_most_found = false;
-
   for (auto* obstacle :
        reference_line_info.path_decision().obstacles().Items()) {
+    double left_most_angle =
+        common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
+    double right_most_angle =
+        common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
+    bool right_most_found = false;
     if (obstacle->IsVirtual()) {
       ADEBUG << "skip one virtual obstacle";
       continue;
@@ -399,7 +400,7 @@ bool LaneChangeDecider::IsPerceptionBlocked(
       }
 
       if (right_most_found && !obstacle_polygon.HasOverlap(search_beam)) {
-        left_most_angle = beam_heading - search_angle;
+        left_most_angle = beam_heading;
         break;
       }
     }
