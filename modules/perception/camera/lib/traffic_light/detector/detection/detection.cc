@@ -48,7 +48,7 @@ bool TrafficLightDetection::Init(
   google::protobuf::TextFormat::PrintToString(detection_param_, &param_str);
   AINFO << "TL detection param: " << param_str;
 
-  //todo:determine details
+  // todo:determine details
 
   std::string model_root =
       GetAbsolutePath(options.root_dir, detection_param_.model_name());

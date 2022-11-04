@@ -17,119 +17,101 @@
 
 #include "nlohmann/json.hpp"
 
-namespace apollo
-{
-  namespace dreamview
-  {
+namespace apollo {
+namespace dreamview {
 
-    using apollo::canbus::Chassis;
-    using apollo::common::ErrorCode;
-    using apollo::control::ControlCommand;
-    using Json = nlohmann::json;
+using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
+using apollo::control::ControlCommand;
+using Json = nlohmann::json;
 
-    std::string SimControlManager::Name() const
-    {
-      return FLAGS_sim_control_module_name;
-    }
+std::string SimControlManager::Name() const {
+  return FLAGS_sim_control_module_name;
+}
 
-    Json SimControlManager::LoadDynamicModels()
-    {
+Json SimControlManager::LoadDynamicModels() {
+  auto *model_factory = DynamicModelFactory::Instance();
+  return model_factory->RegisterDynamicModels();
+}
+
+void SimControlManager::Reset() {
+  if (IsEnabled() && model_ptr_) {
+    model_ptr_->Reset();
+  }
+}
+
+void SimControlManager::ResetDynamicModel() {
+  if (!current_dynamic_model_.empty()) {
+    if (!model_ptr_) {
       auto *model_factory = DynamicModelFactory::Instance();
-      return model_factory->RegisterDynamicModels();
+      model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
     }
-
-    void SimControlManager::Reset(){
-      if(IsEnabled() && model_ptr_){
-        model_ptr_->Reset();
-      }
-    }
-
-    void SimControlManager::ResetDynamicModel()
-    {
-      if (!current_dynamic_model_.empty())
-      {
-        if (!model_ptr_)
-        {
-          auto *model_factory = DynamicModelFactory::Instance();
-          model_ptr_ = model_factory->GetModelType(current_dynamic_model_);
-        }
-        if (model_ptr_)
-        {
-          model_ptr_->Stop();
-        }
-      }
-      return;
-    }
-
-    bool SimControlManager::AddDynamicModel(std::string &dynamic_model_name)
-    {
-      if (IsEnabled())
-      {
-        auto *model_factory = DynamicModelFactory::Instance();
-        return model_factory->RegisterDynamicModel(dynamic_model_name);
-      }
-      else
-      {
-        AERROR << "Sim control manager is not enabled! Can not download dynamic model to local!";
-        return false;
-      }
-    }
-
-    bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name)
-    {
-      auto *model_factory = DynamicModelFactory::Instance();
-      auto next_model_ptr_ = model_factory->GetModelType(dynamic_model_name);
-      if(!next_model_ptr_){
-         AERROR << "Can not get dynamic model to start.Use original dynamic model!";
-         return false;
-      }
-      ResetDynamicModel();
-      model_ptr_=next_model_ptr_;
-      next_model_ptr_ = nullptr;
-      model_ptr_->Start();
-      current_dynamic_model_ = dynamic_model_name;
-      return true;
-    }
-
-    bool SimControlManager::DeleteDynamicModel(std::string &dynamic_model_name)
-    {
-      auto *model_factory = DynamicModelFactory::Instance();
-      return model_factory->UnregisterDynamicModel(dynamic_model_name);
-    }
-
-    void SimControlManager::Start()
-    {
-      // enabled_仅承担开关作用
-      if (!enabled_)
-      {
-        enabled_ = true;
-      }
-    }
-
-    void SimControlManager::Restart(double x, double y)
-    {
-      // reset start point for dynamic model.
-      if(!IsEnabled() || !model_ptr_){
-        AERROR<<"Sim control is invalid,Failed to restart!";
-      }
+    if (model_ptr_) {
       model_ptr_->Stop();
-      model_ptr_->Start(x,y);
-      return;
     }
+  }
+  return;
+}
 
-    void SimControlManager::RunOnce() { model_ptr_->RunOnce(); }
+bool SimControlManager::AddDynamicModel(std::string &dynamic_model_name) {
+  if (IsEnabled()) {
+    auto *model_factory = DynamicModelFactory::Instance();
+    return model_factory->RegisterDynamicModel(dynamic_model_name);
+  } else {
+    AERROR << "Sim control manager is not enabled! Can not download dynamic "
+              "model to local!";
+    return false;
+  }
+}
 
-    void SimControlManager::Stop()
-    {
-      if (enabled_)
-      {
-        enabled_ = false;
-        ResetDynamicModel();
-        std::system(FLAGS_sim_obstacle_stop_command.data());
-        model_ptr_ = nullptr;
-        current_dynamic_model_ = "";
-      }
-    }
+bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name) {
+  auto *model_factory = DynamicModelFactory::Instance();
+  auto next_model_ptr_ = model_factory->GetModelType(dynamic_model_name);
+  if (!next_model_ptr_) {
+    AERROR << "Can not get dynamic model to start.Use original dynamic model!";
+    return false;
+  }
+  ResetDynamicModel();
+  model_ptr_ = next_model_ptr_;
+  next_model_ptr_ = nullptr;
+  model_ptr_->Start();
+  current_dynamic_model_ = dynamic_model_name;
+  return true;
+}
 
-  } // namespace dreamview
-} // namespace apollo
+bool SimControlManager::DeleteDynamicModel(std::string &dynamic_model_name) {
+  auto *model_factory = DynamicModelFactory::Instance();
+  return model_factory->UnregisterDynamicModel(dynamic_model_name);
+}
+
+void SimControlManager::Start() {
+  // enabled_仅承担开关作用
+  if (!enabled_) {
+    enabled_ = true;
+  }
+}
+
+void SimControlManager::Restart(double x, double y) {
+  // reset start point for dynamic model.
+  if (!IsEnabled() || !model_ptr_) {
+    AERROR << "Sim control is invalid,Failed to restart!";
+  }
+  model_ptr_->Stop();
+  model_ptr_->Start(x, y);
+  return;
+}
+
+void SimControlManager::RunOnce() { model_ptr_->RunOnce(); }
+
+void SimControlManager::Stop() {
+  if (enabled_) {
+    enabled_ = false;
+    ResetDynamicModel();
+    std::system(FLAGS_sim_obstacle_stop_command.data());
+    model_ptr_ = nullptr;
+    current_dynamic_model_ = "";
+  }
+}
+
+}  // namespace dreamview
+}  // namespace apollo

@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #pragma once
 
 #include <memory>
 #include <unordered_map>
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
 #include "modules/common/util/factory.h"
 #include "modules/perception/pipeline/plugin.h"
-
-#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -40,20 +39,18 @@ class PluginFactory {
  public:
   static void Init();
 
-  static std::unique_ptr<Plugin>
-        CreatePlugin(const PluginConfig& plugin_config);
+  static std::unique_ptr<Plugin> CreatePlugin(
+      const PluginConfig& plugin_config);
 
  private:
   static apollo::common::util::Factory<
-      PluginType, Plugin,
-      Plugin *(*)(const PluginConfig& plugin_config),
-      std::unordered_map<
-          PluginType,
-          Plugin *(*)(const PluginConfig& plugin_config),
-          std::hash<int>>>
+      PluginType, Plugin, Plugin* (*)(const PluginConfig& plugin_config),
+      std::unordered_map<PluginType,
+                         Plugin* (*)(const PluginConfig& plugin_config),
+                         std::hash<int>>>
       plugin_factory_;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

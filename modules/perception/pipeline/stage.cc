@@ -18,11 +18,9 @@
 
 #include "modules/perception/pipeline/plugin_factory.h"
 
-
 namespace apollo {
 namespace perception {
 namespace pipeline {
-
 
 bool Stage::Initialize(const StageConfig& stage_config) {
   Clear();
@@ -38,11 +36,8 @@ bool Stage::Initialize(const StageConfig& stage_config) {
   return true;
 }
 
-void Stage::Clear() {
-  plugin_config_map_.clear();
-}
+void Stage::Clear() { plugin_config_map_.clear(); }
 
-
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

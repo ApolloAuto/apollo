@@ -40,6 +40,6 @@ class Plugin {
   std::string name_;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

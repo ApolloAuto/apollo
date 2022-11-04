@@ -69,7 +69,8 @@ bool MultiSensorFusionComponent::Init() {
   return true;
 }
 
-bool MultiSensorFusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
+bool MultiSensorFusionComponent::Proc(
+  const std::shared_ptr<SensorFrameMessage>& message) {
   if (message->process_stage_ == ProcessStage::SENSOR_FUSION) {
     return true;
   }

@@ -15,6 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include <vector>
+#include <string>
+
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/pipeline/data_frame.h"

@@ -16,22 +16,24 @@
 #pragma once
 
 #include <limits>
+#include <memory>
+#include <string>
+
+#include "nlohmann/json.hpp"
+
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
-
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_util.h"
-#include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
-#include "nlohmann/json.hpp"
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -54,10 +56,8 @@ class SimControlBase {
   /**
    * @brief Initialization.
    */
-  virtual void Init(
-      bool set_start_point,
-      nlohmann::json start_point_attr,
-      bool use_start_point_position=false) = 0;
+  virtual void Init(bool set_start_point, nlohmann::json start_point_attr,
+                    bool use_start_point_position = false) = 0;
 
   /**
    * @brief Starts running the simulated control algorithm, e.g., publish
@@ -65,18 +65,18 @@ class SimControlBase {
    */
   virtual void Start() = 0;
 
-   /**
-   * @brief Starts running the simulated control algorithm with position, e.g., publish
-   * simulated localization and chassis messages triggered by timer.
+  /**
+   * @brief Starts running the simulated control algorithm with position, e.g.,
+   * publish simulated localization and chassis messages triggered by timer.
    */
-  virtual void Start(double x,double y) = 0;
+  virtual void Start(double x, double y) = 0;
 
   /**
    * @brief Stops the algorithm.
    */
   virtual void Stop() = 0;
 
- /**
+  /**
    * @brief Resets the internal state.
    */
   virtual void Reset() = 0;
@@ -109,10 +109,11 @@ class SimControlBase {
   double start_heading_ = std::numeric_limits<double>::max();
 };
 
- /**
-   * @brief Get SimControl class
-   */
-typedef SimControlBase* create_t(std::string dynamic_name, std::string home_path);
+/**
+ * @brief Get SimControl class
+ */
+typedef SimControlBase* create_t(std::string dynamic_name,
+                                 std::string home_path);
 
 }  // namespace dreamview
 }  // namespace apollo

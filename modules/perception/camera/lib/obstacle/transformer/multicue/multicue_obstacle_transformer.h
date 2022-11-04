@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/obj_mapper.h"

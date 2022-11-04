@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "Eigen/Core"
 

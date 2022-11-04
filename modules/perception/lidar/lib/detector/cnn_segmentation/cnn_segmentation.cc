@@ -160,9 +160,11 @@ bool CNNSegmentation::Init(const StageConfig& stage_config) {
 
   // get cnnseg params
   ACHECK(GetProtoFromFile(cnnseg_config_.param_file(), &cnnseg_param_))
-      << "Failed to parse CNNSegParam config file." << cnnseg_config_.param_file();
+      << "Failed to parse CNNSegParam config file."
+      << cnnseg_config_.param_file();
   ACHECK(GetProtoFromFile(cnnseg_config_.engine_file(), &spp_engine_config_))
-      << "Failed to parse SppEngine config file." << cnnseg_config_.engine_file();
+      << "Failed to parse SppEngine config file."
+      << cnnseg_config_.engine_file();
 
   // init feature parameters
   const FeatureParam& feature_param = cnnseg_param_.feature_param();

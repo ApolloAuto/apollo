@@ -31,15 +31,13 @@ bool CameraDetectionPreprocessor::Init(const StageConfig& stage_config) {
   get_image_data_ =
       pipeline::dynamic_unique_cast<GetImageData>(
           pipeline::PluginFactory::CreatePlugin(
-              plugin_config_map_[PluginType::GET_IMAGE_DATA])
-      );
+              plugin_config_map_[PluginType::GET_IMAGE_DATA]));
   CHECK_NOTNULL(get_image_data_);
 
   resize_and_normalize_ =
       pipeline::dynamic_unique_cast<ReSizeAndNormalize>(
           pipeline::PluginFactory::CreatePlugin(
-              plugin_config_map_[PluginType::RESIZIE_AND_NORMALIZE])
-      );
+              plugin_config_map_[PluginType::RESIZIE_AND_NORMALIZE]));
   CHECK_NOTNULL(resize_and_normalize_);
 
   return true;

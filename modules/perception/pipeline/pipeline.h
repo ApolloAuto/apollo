@@ -20,9 +20,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <utility>
+
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 #include "modules/perception/pipeline/stage.h"
-#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -48,19 +50,18 @@ class Pipeline {
 
   std::shared_ptr<Stage> CreateStage(const StageType& stage_type);
 
-  bool CheckRepeatedStage(const std::string & stage_name);
+  bool CheckRepeatedStage(const std::string& stage_name);
 
  protected:
   std::string name_;
 
   PipelineConfig pipeline_config_;
 
-  std::unordered_map<StageType, StageConfig, std::hash<int>>
-      stage_config_map_;
+  std::unordered_map<StageType, StageConfig, std::hash<int>> stage_config_map_;
 
   std::vector<std::shared_ptr<Stage>> stage_ptrs_;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

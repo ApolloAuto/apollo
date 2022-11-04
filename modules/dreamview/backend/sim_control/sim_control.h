@@ -22,8 +22,6 @@
 
 #include <memory>
 
-#include "cyber/cyber.h"
-
 #include "gtest/gtest_prod.h"
 
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
@@ -31,6 +29,7 @@
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 
+#include "cyber/cyber.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control_interface.h"
@@ -113,7 +112,7 @@ class SimControl : SimControlInterface {
 
   void InitTimerAndIO();
 
-   /**
+  /**
    * @brief Starts the timer to publish simulated localization and chassis
    * messages. Designated Start point for scenario
    */
@@ -121,8 +120,10 @@ class SimControl : SimControlInterface {
 
   void InitStartPoint(double start_velocity, double start_acceleration);
 
-  // use scenario start point to init start point under the simulation condition.
-  void InitStartPoint(double x, double y, double start_velocity, double start_acceleration);
+  // use scenario start point to init start point under the simulation
+  // condition.
+  void InitStartPoint(double x, double y, double start_velocity,
+                      double start_acceleration);
 
   // Reset the start point, which can be a dummy point on the map, a current
   // localization pose, or a start position received from the routing module.

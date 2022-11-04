@@ -18,6 +18,7 @@
 #include <atomic>
 #include <memory>
 #include <string>
+#include <limits>
 
 #include "cyber/cyber.h"
 #include "modules/perception/lidar/app/lidar_obstacle_detection.h"

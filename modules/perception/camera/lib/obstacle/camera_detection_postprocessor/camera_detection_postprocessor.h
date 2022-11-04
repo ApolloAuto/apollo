@@ -15,10 +15,15 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object/camera_get_object.h"
+#include <vector>
+#include <string>
+#include <memory>
+
 #include "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.pb.h"
-#include "modules/perception/pipeline/stage.h"
+
+#include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_get_object/camera_get_object.h"
 #include "modules/perception/pipeline/plugin_factory.h"
+#include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
 namespace perception {
@@ -50,7 +55,6 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
   CameraDetectionPostprocessorConfig camera_detection_postprocessor_config_;
 
   std::unique_ptr<CameraGetObject> camera_get_object_;
-
 };  // class CameraDetectionPostprocessor
 }  // namespace camera
 }  // namespace perception

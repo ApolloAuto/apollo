@@ -107,15 +107,14 @@ void SimControl::InitTimerAndIO() {
       false));
 }
 
-void SimControl::Init(double start_velocity,
-                      double start_acceleration) {
+void SimControl::Init(double start_velocity, double start_acceleration) {
   if (!FLAGS_use_navigation_mode) {
     InitStartPoint(start_velocity, start_acceleration);
   }
 }
 
 void SimControl::InitStartPoint(double x, double y, double start_velocity,
-                                double start_acceleration) {                             
+                                double start_acceleration) {
   TrajectoryPoint point;
   // Use the scenario start point as start point,
   start_point_from_localization_ = false;
@@ -192,9 +191,9 @@ void SimControl::Reset() {
   InternalReset();
 }
 
-void SimControl::Restart(double x, double y){
+void SimControl::Restart(double x, double y) {
   Stop();
-  Start(x,y);
+  Start(x, y);
   return;
 }
 
@@ -290,8 +289,9 @@ void SimControl::Start(double x, double y) {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (!enabled_) {
-    // Do not use localization info. use scenario start point to init start point.
-    InitStartPoint(x,y,0,0);
+    // Do not use localization info. use scenario start point to init start
+    // point.
+    InitStartPoint(x, y, 0, 0);
     InternalReset();
     sim_control_timer_->Start();
     sim_prediction_timer_->Start();

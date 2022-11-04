@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <map>
 
 #include "CivetServer.h"
 
@@ -28,10 +29,10 @@
 #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
+#include "modules/dreamview/backend/plugins/plugin_manager.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#include "modules/dreamview/backend/plugins/plugin_manager.h"
 #if WITH_TELEOP == 1
 #include "modules/dreamview/backend/teleop/teleop.h"
 #endif
@@ -53,9 +54,10 @@ class Dreamview {
 
  private:
   void TerminateProfilingMode();
-  bool PluginCallbackHMI(const std::string& function_name, const nlohmann::json &param_json);
+  bool PluginCallbackHMI(const std::string& function_name,
+                         const nlohmann::json& param_json);
   nlohmann::json HMICallbackSimControl(const std::string& function_name,
-                             const nlohmann::json& param_json);
+                                       const nlohmann::json& param_json);
 
   std::unique_ptr<cyber::Timer> exit_timer_;
 

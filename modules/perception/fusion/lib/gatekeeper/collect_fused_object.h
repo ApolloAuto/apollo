@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 #include "modules/perception/pipeline/stage.h"

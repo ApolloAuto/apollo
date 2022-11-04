@@ -23,17 +23,16 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 namespace {
-std::map<std::string, int> plugin_function_map = {{"UpdateScenarioSetToStatus", 0},{"UpdateRecordToStatus",1},
-{"UpdateDynamicModelToStatus", 2}};
+std::map<std::string, int> plugin_function_map = {
+    {"UpdateScenarioSetToStatus", 0},
+    {"UpdateRecordToStatus", 1},
+    {"UpdateDynamicModelToStatus", 2}};
 std::map<std::string, int> hmi_function_map = {
-    {"SimControlRestart", 0},
-    {"MapServiceReloadMap", 1},
-    {"LoadDynamicModels", 2},
-    {"ChangeDynamicModel", 3},
-    {"DeleteDynamicModel", 4},
-    {"AddDynamicModel",5},
+    {"SimControlRestart", 0},  {"MapServiceReloadMap", 1},
+    {"LoadDynamicModels", 2},  {"ChangeDynamicModel", 3},
+    {"DeleteDynamicModel", 4}, {"AddDynamicModel", 5},
 };
-}
+}  // namespace
 
 namespace apollo {
 namespace dreamview {
@@ -100,9 +99,8 @@ Status Dreamview::Init() {
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), camera_ws_.get(),
-      sim_control_manager_.get(),
-      plugin_ws_.get(), map_service_.get(), perception_camera_updater_.get(),
-      plugin_manager_.get(),
+      sim_control_manager_.get(), plugin_ws_.get(), map_service_.get(),
+      perception_camera_updater_.get(), plugin_manager_.get(),
       FLAGS_routing_from_file));
   point_cloud_updater_.reset(
       new PointCloudUpdater(point_cloud_ws_.get(), sim_world_updater_.get()));
@@ -111,7 +109,7 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addWebSocketHandler("/camera", *camera_ws_);
-  server_->addWebSocketHandler("/plugin",*plugin_ws_);
+  server_->addWebSocketHandler("/plugin", *plugin_ws_);
   server_->addHandler("/image", *image_);
 #if WITH_TELEOP == 1
   teleop_ws_.reset(new WebSocketHandler("Teleop"));
@@ -132,7 +130,7 @@ Status Dreamview::Start() {
   });
   perception_camera_updater_->Start();
   plugin_manager_->Start([this](const std::string& function_name,
-                            const nlohmann::json& param_json) -> bool {
+                                const nlohmann::json& param_json) -> bool {
     return PluginCallbackHMI(function_name, param_json);
   });
 #if WITH_TELEOP == 1
@@ -150,8 +148,8 @@ void Dreamview::Stop() {
   plugin_manager_->Stop();
 }
 
-nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name,
-                                  const nlohmann::json& param_json) {
+nlohmann::json Dreamview::HMICallbackSimControl(
+    const std::string& function_name, const nlohmann::json& param_json) {
   nlohmann::json callback_res = {};
   callback_res["result"] = false;
   if (hmi_function_map.find(function_name) == hmi_function_map.end()) {
@@ -159,25 +157,24 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
     return callback_res;
   }
   std::string dynamic_model_name;
-  switch(hmi_function_map[function_name]) {
+  switch (hmi_function_map[function_name]) {
     case 0: {
       // 解析结果
-      if (param_json.contains("x") &&
-          param_json.contains("y")) {
+      if (param_json.contains("x") && param_json.contains("y")) {
         const double x = param_json["x"];
         const double y = param_json["y"];
         sim_control_manager_->Restart(x, y);
         callback_res["result"] = true;
       }
     } break;
-    case 1:{
+    case 1: {
       map_service_->ReloadMap(true);
-      callback_res["result"]= true;
+      callback_res["result"] = true;
       break;
     }
-    case 2:{
+    case 2: {
       // loadDynamicModels
-      if(sim_control_manager_->IsEnabled()){
+      if (sim_control_manager_->IsEnabled()) {
         nlohmann::json load_res = sim_control_manager_->LoadDynamicModels();
         callback_res["loaded_dynamic_models"] =
             load_res["loaded_dynamic_models"];
@@ -187,7 +184,7 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
       }
       break;
     }
-    case 3:{
+    case 3: {
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
@@ -200,27 +197,29 @@ nlohmann::json Dreamview::HMICallbackSimControl(const std::string& function_name
       }
       break;
     }
-    case 4:{
+    case 4: {
       // 解析结果
-      if (param_json.contains("dynamic_model_name")&&sim_control_manager_->IsEnabled()) {
+      if (param_json.contains("dynamic_model_name") &&
+          sim_control_manager_->IsEnabled()) {
         dynamic_model_name = param_json["dynamic_model_name"];
-        callback_res["result"]=sim_control_manager_->DeleteDynamicModel(dynamic_model_name);
-      }else{
-        AERROR<<"Sim control is not enabled or missing dynamic model name param!";
+        callback_res["result"] =
+            sim_control_manager_->DeleteDynamicModel(dynamic_model_name);
+      } else {
+        AERROR << "Sim control is not enabled or missing dynamic model name "
+                  "param!";
       }
-     break;
+      break;
     }
-    case 5:
-    {
+    case 5: {
       // addDynamicModel
-      if (param_json.contains("dynamic_model_name") && sim_control_manager_->IsEnabled())
-      {
+      if (param_json.contains("dynamic_model_name") &&
+          sim_control_manager_->IsEnabled()) {
         dynamic_model_name = param_json["dynamic_model_name"];
-        callback_res["result"] = sim_control_manager_->AddDynamicModel(dynamic_model_name);
-      }
-      else
-      {
-        AERROR << "Sim control is not enabled or missing dynamic model name param!";
+        callback_res["result"] =
+            sim_control_manager_->AddDynamicModel(dynamic_model_name);
+      } else {
+        AERROR << "Sim control is not enabled or missing dynamic model name "
+                  "param!";
       }
       break;
     }
@@ -237,7 +236,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     AERROR << "Donnot support this callback";
     return false;
   }
-  switch(plugin_function_map[function_name]) {
+  switch (plugin_function_map[function_name]) {
     case 0: {
       // 解析结果
       if (param_json.contains("scenario_set_id") &&
@@ -250,12 +249,12 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
         }
       }
     } break;
-    case 1:{
-      if(param_json.contains("record_id")&&param_json.contains("status")){
+    case 1: {
+      if (param_json.contains("record_id") && param_json.contains("status")) {
         const std::string record_id = param_json["record_id"];
         const std::string record_status = param_json["status"];
-        if(!record_id.empty()&&record_status.empty()){
-          callback_res = hmi_->UpdateRecordToStatus(record_id,record_status);
+        if (!record_id.empty() && record_status.empty()) {
+          callback_res = hmi_->UpdateRecordToStatus(record_id, record_status);
         }
       }
     } break;

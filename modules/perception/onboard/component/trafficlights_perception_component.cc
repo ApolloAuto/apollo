@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <limits>
 #include <map>
 #include <utility>
-#include <unistd.h>
-#include <sys/stat.h>
 
 #include <boost/algorithm/string.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -89,28 +90,25 @@ static int GetGpuId(
 }
 
 static int GetTrafficGpuId(const pipeline::PipelineConfig& pipeline_config) {
-  if (!pipeline_config
-        .traffic_light_config()
-        .trafficlights_perception_config()
-        .has_gpu_id()){
+  if (!pipeline_config.traffic_light_config()
+           .trafficlights_perception_config()
+           .has_gpu_id()) {
     AERROR << "traffic light gpu id not found.";
     return -1;
   }
 
-  int gpu_id = pipeline_config
-                .traffic_light_config()
-                .trafficlights_perception_config()
-                .gpu_id();
+  int gpu_id = pipeline_config.traffic_light_config()
+                   .trafficlights_perception_config()
+                   .gpu_id();
   return gpu_id;
 }
 
-int IsFileExist(const char* path) {
-    return !access(path, F_OK);
-}
+int IsFileExist(const char* path) { return !access(path, F_OK); }
 
-bool TrafficLightsPerceptionComponent::CreateDir(){
+bool TrafficLightsPerceptionComponent::CreateDir() {
   if (!IsFileExist("/apollo/debug_vis")) {
-    int status = mkdir("/apollo/debug_vis", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    int status =
+        mkdir("/apollo/debug_vis", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (!status) {
       return true;
     } else {
@@ -231,19 +229,17 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   trafficlight_config_file =
       GetAbsolutePath(work_root, trafficlight_config_file);
 
-  ACHECK(
-      cyber::common::GetProtoFromFile(
-          trafficlight_config_file, &trafficlight_config))
-      << "failed to load trafficlight config file "
-      << trafficlight_config_file;
+  ACHECK(cyber::common::GetProtoFromFile(trafficlight_config_file,
+                                         &trafficlight_config))
+      << "failed to load trafficlight config file " << trafficlight_config_file;
   return cyber::SUCC;
 }
 
 int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   // init preprocessor
   camera::BaseTLPreprocessor* preprocessor =
-            camera::BaseTLPreprocessorRegisterer::
-            GetInstanceByName(tl_preprocessor_name_);
+      camera::BaseTLPreprocessorRegisterer::GetInstanceByName(
+          tl_preprocessor_name_);
   CHECK_NOTNULL(preprocessor);
   preprocessor_.reset(preprocessor);
 

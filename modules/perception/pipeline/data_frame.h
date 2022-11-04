@@ -20,7 +20,6 @@
 #include "modules/perception/fusion/base/fusion_frame.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 
-
 namespace apollo {
 namespace perception {
 namespace pipeline {
@@ -33,6 +32,6 @@ struct DataFrame {
   fusion::FusionFrame* fusion_frame;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

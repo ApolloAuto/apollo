@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_util.h"
+
 #include <cmath>
 
 namespace apollo {
@@ -76,7 +77,6 @@ double SimControlUtil::normalize(const double value, const double mean,
   double eps = 1e-10;
   return (value - mean) / (std + eps);
 }
-
 
 }  // namespace dreamview
 }  // namespace apollo

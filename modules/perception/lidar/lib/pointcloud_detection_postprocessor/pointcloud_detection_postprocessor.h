@@ -15,6 +15,10 @@
  *****************************************************************************/
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <string>
+
 #include "modules/perception/lidar/lib/pointcloud_detection_postprocessor/pointcloud_get_objects/pointcloud_get_objects.h"
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/stage.h"

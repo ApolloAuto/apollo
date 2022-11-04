@@ -20,7 +20,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
+bool CameraDetectionPostprocessor::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
@@ -42,13 +42,13 @@ bool CameraDetectionPostprocessor::Init(const StageConfig& stage_config) {
   return true;
 }
 
-bool CameraDetectionPostprocessor::Process(DataFrame* data_frame) {
+bool CameraDetectionPostprocessor::Process(DataFrame *data_frame) {
   return true;
 }
 
-bool CameraDetectionPostprocessor::Process(const std::vector<float> &detect_result,
-               const std::vector<base::ObjectSubType> &types,
-               DataFrame *data_frame) {
+bool CameraDetectionPostprocessor::Process(
+    const std::vector<float> &detect_result,
+    const std::vector<base::ObjectSubType> &types, DataFrame *data_frame) {
   if (nullptr == data_frame) {
     AERROR << "Input null data_frame ptr.";
     return false;

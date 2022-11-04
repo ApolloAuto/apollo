@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/perf_util.h"
@@ -181,13 +182,12 @@ bool ObstacleCameraPerception::Init(
   return true;
 }
 
-bool ObstacleCameraPerception::Init(const PipelineConfig& pipeline_config) {
-   return Initialize(pipeline_config);
+bool ObstacleCameraPerception::Init(const PipelineConfig &pipeline_config) {
+  return Initialize(pipeline_config);
 }
 
-bool ObstacleCameraPerception::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
+bool ObstacleCameraPerception::Process(DataFrame *data_frame) {
+  if (data_frame == nullptr) return false;
 
   return InnerProcess(data_frame);
 }

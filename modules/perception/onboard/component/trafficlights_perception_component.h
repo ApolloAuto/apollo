@@ -67,8 +67,8 @@ class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
                       const std::string& camera_name);
 
   void OnReceiveV2XMsg(
-      const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData> v2x_msg);
-  
+      const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData>
+      v2x_msg);
   bool CreateDir();
 
   bool QueryPoseAndSignals(const double ts, camera::CarPose* pose,

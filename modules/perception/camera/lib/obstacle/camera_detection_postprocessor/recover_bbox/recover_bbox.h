@@ -15,6 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include <vector>
+#include <string>
+
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/pipeline/data_frame.h"
@@ -45,8 +48,7 @@ class RecoverBbox : public pipeline::Plugin {
   std::string Name() const override { return name_; }
 
  private:
-
-void recover_bbox(int roi_w, int roi_h, int offset_y,
+  void recover_bbox(int roi_w, int roi_h, int offset_y,
                   std::vector<base::ObjectPtr> *objects);
   int roi_w_;
   int roi_h_;

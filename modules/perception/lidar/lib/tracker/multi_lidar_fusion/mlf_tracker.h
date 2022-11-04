@@ -38,7 +38,7 @@ class MlfTracker : public pipeline::Plugin {
 
  public:
   MlfTracker() = default;
-  MlfTracker(const PluginConfig& plugin_config);
+  explicit MlfTracker(const PluginConfig& plugin_config);
 
   ~MlfTracker() {
     for (auto& filter : filters_) {

@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"

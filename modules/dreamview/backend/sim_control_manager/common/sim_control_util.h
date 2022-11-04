@@ -15,12 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <google/protobuf/text_format.h>
 #include <math.h>
 #include <stdio.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include <google/protobuf/text_format.h>
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -83,7 +85,7 @@ class SimControlUtil {
 
   // delta function
   int delta_function(double value, double threshold) {
-    return int(value > threshold);
+    return static_cast<int>(value > threshold);
   }
 
   // calculate \eta from rise time and peak time

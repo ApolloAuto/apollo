@@ -16,6 +16,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+
 #include <opencv2/opencv.hpp>
 
 #include "modules/perception/pipeline/data_frame.h"

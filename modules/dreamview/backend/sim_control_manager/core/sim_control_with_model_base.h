@@ -16,6 +16,8 @@
 #pragma once
 
 #include <string>
+#include <limits>
+#include <memory>
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

@@ -49,13 +49,12 @@ std::map<string, int> data_type_dict = {{
                                             2,
                                         },
                                         {
-                                          "records",
-                                          3,
-
+                                            "records",
+                                            3,
                                         }};
-}
-namespace apollo {
-namespace dreamview {
+}  // namespace
+namespace apollo {  // namespace apollo
+namespace dreamview {  // namespace dreamview
 PluginManager::PluginManager(WebSocketHandler* plugin_ws)
     : node_(cyber::CreateNode("PluginManager")),
       enabled_(false),
@@ -331,7 +330,7 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordList", &PluginManager::UpdateData);
- // RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
+  // RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -376,7 +375,7 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
       update_data_res = callback_api_("UpdateScenarioSetToStatus", info);
       break;
     }
-    case 2:{
+    case 2: {
       // 下载成功-新增文件+register+本地hmistatus
       // 删除-删除文件+unregister+本地Hmistatus
       update_data_res = callback_api_("UpdateDynamicModelToStatus", info);

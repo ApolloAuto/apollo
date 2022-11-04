@@ -40,7 +40,7 @@ class MlfTrackObjectMatcher : public pipeline::Plugin {
 
  public:
   MlfTrackObjectMatcher() = default;
-  MlfTrackObjectMatcher(const PluginConfig& plugin_config);
+  explicit MlfTrackObjectMatcher(const PluginConfig& plugin_config);
 
   ~MlfTrackObjectMatcher() = default;
 

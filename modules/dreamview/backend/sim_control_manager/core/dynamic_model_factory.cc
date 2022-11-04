@@ -96,7 +96,8 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   // if is already registered
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter != s_dynamic_model_map_.end()) {
-    AERROR<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
+    AERROR << "This dynamic model:  "
+          << dynamic_model_name << " is already registered!";
     return false;
   }
   std::string dm_library_name = dynamic_model_conf.library_name();
@@ -108,15 +109,17 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
     shared_library =
         SharedLibraryPtr(new SharedLibrary(dynamic_model_library_path));
     create_t *create_dynamic_model =
-        (create_t *)shared_library->GetSymbol("create");
+        reinterpret_cast<create_t *>(shared_library->GetSymbol("create"));
     SimControlBase *dynamic_model_ptr =
         create_dynamic_model(dm_dir_name, home_path_);
     if (!dynamic_model_ptr) {
       return false;
     }
     s_dynamic_model_map_[dynamic_model_name] = {};
-    s_dynamic_model_map_[dynamic_model_name].dynamic_model_name = dynamic_model_name;
-    s_dynamic_model_map_[dynamic_model_name].dynamic_model_ptr = dynamic_model_ptr;
+    s_dynamic_model_map_[dynamic_model_name].dynamic_model_name =
+      dynamic_model_name;
+    s_dynamic_model_map_[dynamic_model_name].dynamic_model_ptr =
+      dynamic_model_ptr;
     s_dynamic_model_map_[dynamic_model_name].library_name = dm_library_name;
     auto iter = s_dm_lib_count_.find(dm_library_name);
     if (iter == s_dm_lib_count_.end()) {
@@ -184,8 +187,7 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
   result["loaded_dynamic_models"] = {FLAGS_sim_perfect_control};
   for (auto iter = s_dynamic_model_map_.begin();
        iter != s_dynamic_model_map_.end(); iter++) {
-    if (iter->first != FLAGS_sim_perfect_control)
-    {
+    if (iter->first != FLAGS_sim_perfect_control) {
       result["loaded_dynamic_models"].push_back(iter->first);
     }
   }

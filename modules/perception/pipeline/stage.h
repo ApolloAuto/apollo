@@ -14,17 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #pragma once
 
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
 #include "modules/perception/pipeline/data_frame.h"
 #include "modules/perception/pipeline/plugin.h"
-
-#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -39,7 +38,7 @@ class Stage {
 
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual bool IsEnabled() const = 0;;
+  virtual bool IsEnabled() const = 0;
 
   virtual std::string Name() const = 0;
 
@@ -59,6 +58,6 @@ class Stage {
       plugin_config_map_;
 };
 
-} // namespace pipeline
-} // namespace perception
-} // namespace apollo
+}  // namespace pipeline
+}  // namespace perception
+}  // namespace apollo

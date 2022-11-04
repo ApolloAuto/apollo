@@ -37,9 +37,9 @@
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
+#include "modules/dreamview/backend/plugins/plugin_manager.h"
 #include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
-#include "modules/dreamview/backend/plugins/plugin_manager.h"
 
 /**
  * @namespace apollo::dreamview
@@ -71,7 +71,7 @@ class SimulationWorldUpdater {
                          WebSocketHandler *plugin_ws,
                          const MapService *map_service,
                          PerceptionCameraUpdater *perception_camera_updater,
-                         PluginManager* plugin_manager,
+                         PluginManager *plugin_manager,
                          bool routing_from_file = false);
 
   /**
@@ -123,8 +123,7 @@ class SimulationWorldUpdater {
    */
   bool ConstructDeadJunctionRoutingTask(
       const nlohmann::json &json,
-      apollo::task_manager::DeadEndRoutingTask
-          *dead_end_routing_task);
+      apollo::task_manager::DeadEndRoutingTask *dead_end_routing_task);
 
   bool ValidateCoordinate(const nlohmann::json &json);
 
@@ -150,7 +149,7 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
-    /**
+  /**
    * @brief get point from lanewaypoint in poi or default routings
    * @param lanewaypoint
    * @return json that contains point's coordinate x and y
@@ -206,7 +205,7 @@ class SimulationWorldUpdater {
   std::unique_ptr<cyber::Timer> timer_;
 
   volatile double last_pushed_adc_timestamp_sec_ = 0.0f;
-  
+
   std::unique_ptr<PluginManager> plugin_manager_;
 };
 

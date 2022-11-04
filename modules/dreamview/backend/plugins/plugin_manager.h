@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "modules/dreamview/proto/dv_plugin_msg.pb.h"
 #include "modules/dreamview/proto/plugin_config.pb.h"
@@ -61,7 +62,7 @@ class PluginManager {
   void Start(DvCallback callback_api);
   void Stop();
 
-  bool IsEnabled() const { return true; };
+  bool IsEnabled() const { return true; }
   bool SendMsgToPlugin(const std::string& json_str);
 
  private:

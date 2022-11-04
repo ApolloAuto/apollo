@@ -49,13 +49,10 @@ using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
-    WebSocketHandler *camera_ws,
-    SimControlManager *sim_control_manager,
-    WebSocketHandler *plugin_ws,
-    const MapService *map_service,
+    WebSocketHandler *camera_ws, SimControlManager *sim_control_manager,
+    WebSocketHandler *plugin_ws, const MapService *map_service,
     PerceptionCameraUpdater *perception_camera_updater,
-    PluginManager* plugin_manager,
-    bool routing_from_file)
+    PluginManager *plugin_manager, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
@@ -466,16 +463,16 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
   plugin_ws_->RegisterMessageHandler(
       "PluginRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        if(!plugin_manager_->IsEnabled()){
+        if (!plugin_manager_->IsEnabled()) {
           return;
         }
         auto iter = json.find("data");
-        if(iter == json.end()){
-          AERROR<<"Failed to get plugin msg!";
+        if (iter == json.end()) {
+          AERROR << "Failed to get plugin msg!";
           return;
         }
-        if(!plugin_manager_->SendMsgToPlugin(iter->dump())){
-           AERROR<<"Failed to send msg to plugin";
+        if (!plugin_manager_->SendMsgToPlugin(iter->dump())) {
+          AERROR << "Failed to send msg to plugin";
         }
       });
 }

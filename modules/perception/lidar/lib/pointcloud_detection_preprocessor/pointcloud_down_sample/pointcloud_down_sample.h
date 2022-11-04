@@ -15,6 +15,12 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
+#include <algorithm>
+#include <deque>
+#include <vector>
+#include <string>
+
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/pipeline/data_frame.h"

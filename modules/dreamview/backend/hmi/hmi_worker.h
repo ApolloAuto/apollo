@@ -20,9 +20,13 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
+#include <map>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
+#include "nlohmann/json.hpp"
 
 #include "modules/common_msgs/audio_msgs/audio_event.pb.h"
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
@@ -30,7 +34,6 @@
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "nlohmann/json.hpp"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 
@@ -47,9 +50,8 @@ namespace dreamview {
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
-
-  using DvCallback = std::function<nlohmann::json(const std::string &function_name,
-                                        const nlohmann::json &param_json)>;
+  using DvCallback = std::function<nlohmann::json(
+      const std::string& function_name, const nlohmann::json& param_json)>;
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
   void Start(DvCallback callback_api);
@@ -88,14 +90,18 @@ class HMIWorker {
   // Get current HMI status.
   HMIStatus GetStatus() const;
 
-  bool UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name);
-  bool UpdateScenarioSet(const std::string& scenario_set_id, const std::string& scenario_set_name,ScenarioSet& new_scenario_set);
+  bool UpdateScenarioSetToStatus(const std::string& scenario_set_id,
+                                 const std::string& scenario_set_name);
+  bool UpdateScenarioSet(const std::string& scenario_set_id,
+                         const std::string& scenario_set_name,
+                         ScenarioSet& new_scenario_set);
   bool UpdateDynamicModelToStatus(std::string& dynamic_model_name);
   void UpdateComponentStatus();
   bool UpdateRecordToStatus(const std::string& record_id,
-                      const std::string& record_status);
+                            const std::string& record_status);
 
-  void GetScenarioSetPath(const std::string& scenario_set_id, std::string& scenario_set_path);
+  void GetScenarioSetPath(const std::string& scenario_set_id,
+                          std::string& scenario_set_path);
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
@@ -141,7 +147,6 @@ class HMIWorker {
   void StopRecordPlay();
 
   void ResetComponentStatusTimer();
-
 
   const HMIConfig config_;
 

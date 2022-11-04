@@ -63,7 +63,7 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   return true;
 }
 
-bool SemanticReviser::Init(const StageConfig& stage_config){
+bool SemanticReviser::Init(const StageConfig& stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }

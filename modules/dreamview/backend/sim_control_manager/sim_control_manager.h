@@ -18,9 +18,9 @@
 
 #include <memory>
 #include <string>
+#include <limits> q
 
 #include "cyber/cyber.h"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/core/dynamic_model_factory.h"
@@ -73,7 +73,7 @@ class SimControlManager {
   void Stop();
 
  private:
-  SimControlBase* model_ptr_;
+  SimControlBase *model_ptr_;
   std::string current_dynamic_model_ = "";
   bool enabled_ = false;
 };

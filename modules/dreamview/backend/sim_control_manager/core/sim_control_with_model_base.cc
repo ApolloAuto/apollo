@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_with_model_base.h"
+
 #include "modules/dreamview/backend/map/map_service.h"
 
 namespace apollo {
@@ -32,8 +33,8 @@ using apollo::common::util::FillHeader;
 using apollo::control::ControlCommand;
 using apollo::localization::LocalizationEstimate;
 using apollo::prediction::PredictionObstacles;
-using apollo::routing::RoutingResponse;
 using apollo::routing::RoutingRequest;
+using apollo::routing::RoutingResponse;
 using apollo::sim_control::SimCarStatus;
 using Json = nlohmann::json;
 
@@ -58,7 +59,7 @@ void SimControlWithModelBase::InitTimerAndIO() {
       FLAGS_reader_pending_queue_size;
   prediction_reader_ = node_->CreateReader<PredictionObstacles>(
       FLAGS_prediction_topic,
-      [this](const std::shared_ptr<PredictionObstacles> &obstacles) {
+      [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
         this->OnPredictionObstacles(obstacles);
       });
   control_command_reader_ = node_->CreateReader<ControlCommand>(
@@ -77,7 +78,7 @@ void SimControlWithModelBase::InitTimerAndIO() {
         ADEBUG << "Received routing data: run canbus callback.";
         OnRoutingResponse(*cmd);
       });
-   routing_request_reader_ = node_->CreateReader<RoutingRequest>(
+  routing_request_reader_ = node_->CreateReader<RoutingRequest>(
       FLAGS_routing_request_topic,
       [this](const std::shared_ptr<RoutingRequest>& routing_request) {
         this->OnRoutingRequest(routing_request);
@@ -118,12 +119,13 @@ void SimControlWithModelBase::UpdateGearPosition() {
 }
 
 void SimControlWithModelBase::OnPredictionObstacles(
-    const std::shared_ptr<PredictionObstacles> &obstacles) {
+    const std::shared_ptr<PredictionObstacles>& obstacles) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     return;
   }
-  send_dummy_prediction_ = obstacles->header().module_name() == "SimDMPrediction";
+  send_dummy_prediction_ =
+      obstacles->header().module_name() == "SimDMPrediction";
 }
 
 void SimControlWithModelBase::Start() {
@@ -225,12 +227,12 @@ void SimControlWithModelBase::OnRoutingResponse(
   //   } else if (routing.road_size() > 0) {
   //     auto start_lane = routing.road(0).passage(0).segment(0);
   //     theta =
-  //         map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
+  //         map_service_->GetLaneHeading(start_lane.id(),
+  //         start_lane.start_s());
   //   }
   //   point.set_theta(theta);
   //   SetStartPoint(point);
   // }
-
 }
 
 void SimControlWithModelBase::OnRoutingRequest(
@@ -275,7 +277,8 @@ void SimControlWithModelBase::OnRoutingRequest(
   //   theta = start_heading_;
   // } else if (routing_request.road_size() > 0) {
   //   auto start_lane = routing_request.road(0).passage(0).segment(0);
-  //   theta = map_service_->GetLaneHeading(start_lane.id(), start_lane.start_s());
+  //   theta = map_service_->GetLaneHeading(start_lane.id(),
+  //   start_lane.start_s());
   // }
   // point.set_theta(theta);
   SetStartPoint(point);
