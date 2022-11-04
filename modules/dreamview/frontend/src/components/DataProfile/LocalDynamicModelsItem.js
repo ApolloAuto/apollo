@@ -53,14 +53,14 @@ function LocalDynamicModelItem(props) {
         'local-scenario-set-list-item_selected': currentDynamicModel === item,
       }])}>
         <Radio value={item}>{item}</Radio>
-        {/*暂时去掉动力学模型的删除功能*/}
-        {/*<div*/}
-        {/*  className='local-scenario-set-list-item_delete'*/}
-        {/*  onClick={showDeleteConfirmModal}*/}
-        {/*>*/}
-        {/*  <img className='local-scenario-set-list-item_delete_icon' src={ProfileDeleteIcon}*/}
-        {/*       alt='local-profile-scenario-set-delete' />*/}
-        {/*</div>*/}
+        {/* 暂时去掉动力学模型的删除功能 */}
+        {/* <div */}
+        {/*  className='local-scenario-set-list-item_delete' */}
+        {/*  onClick={showDeleteConfirmModal} */}
+        {/* > */}
+        {/*  <img className='local-scenario-set-list-item_delete_icon' src={ProfileDeleteIcon} */}
+        {/*       alt='local-profile-scenario-set-delete' /> */}
+        {/* </div> */}
       </div>
       <Modal
         wrapClassName='local-scenario-set-delete-confirm-modal'
