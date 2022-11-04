@@ -96,7 +96,7 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   // if is already registered
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter != s_dynamic_model_map_.end()) {
-    AINFO<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
+    AERROR<<"This dynamic model:  "<< dynamic_model_name<<" is already registered!";
     return false;
   }
   std::string dm_library_name = dynamic_model_conf.library_name();
