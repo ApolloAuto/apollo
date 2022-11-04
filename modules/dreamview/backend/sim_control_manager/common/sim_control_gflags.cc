@@ -22,7 +22,7 @@ DEFINE_string(dynamic_model_name, "perfect_control",
               "the name for the selected model");
 
 DEFINE_string(calibration_conf_file,
-              "sim_control/conf/sim_control_lincoln.pb.txt",
+              "sim_control_lincoln.pb.txt",
               "the name for the selected model");
 
 DEFINE_string(fnn_model_path, "sim_control/conf/fnn_model.bin",

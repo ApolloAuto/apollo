@@ -123,7 +123,7 @@ void SimControlWithModelBase::OnPredictionObstacles(
   if (!enabled_) {
     return;
   }
-  send_dummy_prediction_ = obstacles->header().module_name() == "SimMlpPrediction";
+  send_dummy_prediction_ = obstacles->header().module_name() == "SimDMPrediction";
 }
 
 void SimControlWithModelBase::Start() {
@@ -385,7 +385,7 @@ void SimControlWithModelBase::PublishDummyPrediction() {
     if (!send_dummy_prediction_) {
       return;
     }
-    FillHeader("SimMlpPrediction", prediction.get());
+    FillHeader("SimDMPrediction", prediction.get());
   }
   prediction_writer_->Write(prediction);
 }

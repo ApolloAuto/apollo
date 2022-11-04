@@ -34,6 +34,17 @@ cc_library(
 )
 
 cc_library(
+    name = "interpolation_2d",
+    srcs = [
+        "interpolation_2d.cc",
+    ],
+    hdrs = [
+        "interpolation_2d.h",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "sim_control_util",
     srcs = [
         "sim_control_util.cc",
