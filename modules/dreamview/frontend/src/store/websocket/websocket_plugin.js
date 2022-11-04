@@ -49,6 +49,8 @@ export default class PluginWebSocketEndpoint {
             const status = JSON.parse(message.data.info).status;
             if (status === 'OK') {
               this.getScenarioSetList();
+              this.getDynamicsModelList();
+              this.getRecordList();
             }
             STORE.studioConnector.checkCertificate(status);
             break;
@@ -76,6 +78,50 @@ export default class PluginWebSocketEndpoint {
               JSON.parse(message.data.info)?.error_msg,
             );
             break;
+          case 'GetDynamicModelListSuccess':
+            STORE.studioConnector.updateRemoteDynamicsModelList(
+              JSON.parse(message.data.info));
+            break;
+          case 'GetDynamicModelListFail':
+            STORE.studioConnector.updateRemoteDynamicsModelList(
+              JSON.parse(message.data.info)
+            );
+            break;
+          case 'DownloadDynamicModelSuccess':
+            STORE.studioConnector.updateRemoteDynamicsModelStatus(
+              JSON.parse(message.data.info)?.dynamic_model_name,
+              JSON.parse(message.data.info)?.status,
+            );
+            break;
+          case 'DownloadDynamicModelFail':
+            STORE.studioConnector.updateRemoteDynamicsModelStatus(
+              JSON.parse(message.data.info)?.dynamic_model_name,
+              'fail',
+              JSON.parse(message.data.info)?.error_msg,
+            );
+            break;
+          case 'GetRecordsListSuccess':
+            STORE.studioConnector.updateRemoteRecordsList(
+              JSON.parse(message.data.info));
+            break;
+          case 'GetRecordListFail':
+            STORE.studioConnector.updateRemoteRecordsList(
+              JSON.parse(message.data.info)
+            );
+            break;
+            // 下载record成功
+          case 'UpdateRecordToStatus':
+            STORE.studioConnector.updateRemoteRecordStatus(
+              JSON.parse(message.data.info)?.record_id,
+              JSON.parse(message.data.info)?.status,
+            );
+            break;
+          case 'DownloadRecordFail':
+            STORE.studioConnector.updateRemoteRecordStatus(
+              JSON.parse(message.data.info)?.record_id,
+              'fail',
+              JSON.parse(message.data.info)?.error_msg,
+            );
         }
       }
     };
@@ -96,7 +142,6 @@ export default class PluginWebSocketEndpoint {
     }));
     return this;
   }
-
 
   getScenarioSetList() {
     this.websocket.send(JSON.stringify({
@@ -144,5 +189,51 @@ export default class PluginWebSocketEndpoint {
     return this;
   }
 
+  // 获取动力学模型列表
+  getDynamicsModelList() {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'GetDynamicModelList',
+        'source': 'dreamview',
+        'info': '',
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return this;
+  }
 
+  // 下载动力学模型
+  downloadDynamicsModel(modelName) {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'DownloadDynamicModel',
+        'source': 'dreamview',
+        'info': modelName,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return this;
+  }
+
+  // 获取数据包列表
+  getRecordList() {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'GetRecordsList',
+        'source': 'dreamview',
+        'info': '',
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return this;
+  }
 }

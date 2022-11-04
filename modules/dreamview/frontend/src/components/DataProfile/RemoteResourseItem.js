@@ -1,23 +1,24 @@
 import React from 'react';
 import {inject} from 'mobx-react';
 import { Tooltip } from 'antd';
-import { ScenarioSetItemStatus, ScenarioSetItemBtn } from './ScenarioSetItemStatus';
+import { RemoteResourseItemStatus, RemoteResourceItemBtn } from './RemoteResourseItemStatus';
 
 /**
  *
  * @param props {{item:
  * {
- * scenarioSetId: string,
+ * id: string,
  * name: string,
  * status: "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail",
+ * type: '1'|'2'|'3',
  * errorMsg: string
  * }
  * }}
  * @return {JSX.Element}
  * @constructor
  */
-function ScenarioSetItem(props) {
-  const { scenarioSetId, name, status, errorMsg, store } = props.item;
+function RemoteResourseItem(props) {
+  const { id, name, status, errorMsg, type, store } = props.item;
   return (
     <div className='scenario-set-list-item'>
       <Tooltip
@@ -26,13 +27,14 @@ function ScenarioSetItem(props) {
       >
         <div className='scenario-set-list-item_name'>{name}</div>
       </Tooltip>
-      <ScenarioSetItemStatus status={status} errorMsg={errorMsg}/>
-      <ScenarioSetItemBtn
+      <RemoteResourseItemStatus status={status} errorMsg={errorMsg}/>
+      <RemoteResourceItemBtn
         status={status}
-        scenarioSetId={scenarioSetId}
+        type={type}
+        id={id}
         store={store}/>
     </div>
   );
 }
 
-export default inject('store')(ScenarioSetItem);
+export default inject('store')(RemoteResourseItem);

@@ -18,7 +18,17 @@ export default class StudioConnector {
   //                              过期 | 未找到 | 正常
   @observable certificateStatus = 'normal';
 
-  @observable remoteScenarioSelectConditionValue = 'All';
+  // 类型筛选
+  @observable typeConditionValue = 'All';
+
+  // 状态筛选
+  @observable statusConditionValue = 'All';
+
+  // 云端动力学模型数据
+  @observable remoteDynamicModelList = [];
+
+  // 云端播包数据
+  @observable remoteRecordList = [];
 
   /**
    * 同步证书状态
@@ -59,7 +69,45 @@ export default class StudioConnector {
         .map((scenarioSetId) => {
           const scenarioSet = scenarioSetObjects[scenarioSetId];
           return {
-            scenarioSetId, name: scenarioSet.name, status: scenarioSet.status,
+            id: scenarioSetId, name: scenarioSet.name, status: scenarioSet.status, type: 1,
+          };
+        });
+    }
+  }
+
+  /**
+   * 更新云端动力学模型数据
+   * @param dynamicModelObjects {
+   *  {[name:string]: {name: string, status: string}}
+   * | {error_msg: string}
+   * }
+   */
+  @action updateRemoteDynamicsModelList(dynamicModelObjects) {
+    if (!dynamicModelObjects.error_msg) {
+      this.remoteDynamicModelList = Object.keys(dynamicModelObjects)
+        .map((name) => {
+          const dynamicModel = dynamicModelObjects[name];
+          return {
+            id: name, name: dynamicModel.name, status: dynamicModel.status, type: 2,
+          };
+        });
+    }
+  }
+
+  /**
+   * 更新云端数据包数据
+   * @param recordObjects {
+   *   data_list: {name: string, status: string}[],
+   * | {error_msg: string}
+   * }
+   */
+  @action updateRemoteRecordsList(recordObjects) {
+    if (!recordObjects.error_msg) {
+      this.remoteRecordList = Object.keys(recordObjects)
+        .map((name) => {
+          const record = recordObjects[name];
+          return {
+            id: name, name: record.name, status: record.status, type: 3,
           };
         });
     }
@@ -101,7 +149,7 @@ export default class StudioConnector {
 
   @action updatingTheScenarioSetById(scenarioSetId) {
     this.remoteScenarioSetList = this.remoteScenarioSetList.map((item) => {
-      if (item.scenarioSetId === scenarioSetId) {
+      if (item.id === scenarioSetId) {
         item.status = 'updating';
       }
       return item;
@@ -112,18 +160,58 @@ export default class StudioConnector {
    *
    * @param value "All" | "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail"
    */
-  @action updateRemoteScenarioSelectConditionValue(value) {
-    this.remoteScenarioSelectConditionValue = value;
+  @action updateStatusConditionValue(value) {
+    this.statusConditionValue = value;
   }
 
+  /**
+   *
+   * @param value 1|2|3 // 场景集|动力学模型|数据包
+   */
+  @action updateTypeConditionValue(value) {
+    this.typeConditionValue = value;
+  }
+
+  // 云端场景集筛选数据
   @computed get remoteScenarioSetListFiltered() {
-    const { remoteScenarioSelectConditionValue } = this;
-    if (remoteScenarioSelectConditionValue === 'All') {
-      return this.remoteScenarioSetList;
+    const { typeConditionValue, statusConditionValue } = this;
+    // 仅类型状态为1或者全部时候返回云端场景集数据
+    if (typeConditionValue === 'All' || typeConditionValue === '1') {
+      if (statusConditionValue === 'All') {
+        return this.remoteScenarioSetList;
+      }
+      return this.remoteScenarioSetList.filter((item) => {
+        return item.status.indexOf(statusConditionValue) > -1;
+      });
     }
-    return this.remoteScenarioSetList.filter((item) => {
-      return item.status.indexOf(remoteScenarioSelectConditionValue) > -1;
-    });
+  }
+
+  // 云端动力学模型筛选数据
+  @computed get remoteDynamicModelListFiltered() {
+    const { typeConditionValue, statusConditionValue } = this;
+    // 仅类型状态为1或者全部时候返回云端场景集数据
+    if (typeConditionValue === 'All' || typeConditionValue === '2') {
+      if (statusConditionValue === 'All') {
+        return this.remoteDynamicModelList;
+      }
+      return this.remoteDynamicModelList.filter((item) => {
+        return item.status.indexOf(statusConditionValue) > -1;
+      });
+    }
+  }
+
+  // 云端数据包筛选数据
+  @computed get remoteRecordListFiltered() {
+    const { typeConditionValue, statusConditionValue } = this;
+    // 仅类型状态为1或者全部时候返回云端场景集数据
+    if (typeConditionValue === 'All' || typeConditionValue === '3') {
+      if (statusConditionValue === 'All') {
+        return this.remoteRecordList;
+      }
+      return this.remoteRecordList.filter((item) => {
+        return item.status.indexOf(statusConditionValue) > -1;
+      });
+    }
   }
 
   /**
@@ -135,7 +223,43 @@ export default class StudioConnector {
   @action updateRemoteScenarioSetStatus(scenarioSetId, status, errorMsg) {
     if (scenarioSetId) {
       this.remoteScenarioSetList = this.remoteScenarioSetList.map((item) => {
-        if (item.scenarioSetId === scenarioSetId) {
+        if (item.id === scenarioSetId) {
+          item.status = status;
+          item.errorMsg = errorMsg;
+        }
+        return item;
+      });
+    }
+  }
+
+  /**
+   * 更新远端动力学模型状态
+   * @param name string
+   * @param status "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail"
+   * @param errorMsg string
+   */
+  @action updateRemoteDynamicsModelStatus(name, status, errorMsg) {
+    if (name) {
+      this.remoteDynamicModelList = this.remoteDynamicModelList.map((item) => {
+        if (item.id === name) {
+          item.status = status;
+          item.errorMsg = errorMsg;
+        }
+        return item;
+      });
+    }
+  }
+
+  /**
+   * 更新远端数据包状态
+   * @param name string
+   * @param status "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail"
+   * @param errorMsg string
+   */
+  @action updateRemoteRecordStatus(name, status, errorMsg) {
+    if (name) {
+      this.remoteRecordList = this.remoteRecordList.map((item) => {
+        if (item.id === name) {
           item.status = status;
           item.errorMsg = errorMsg;
         }

@@ -1231,6 +1231,11 @@ body {
     padding: 15px 10px 25px 20px;
     background: #1D2226;
 
+    // profile select 选中组
+    .data-profile-card_select_group {
+      display: flex;
+    }
+
     &_select {
       position: relative;
       padding-top: 10px;
@@ -1243,6 +1248,7 @@ body {
         appearance: none;
         padding-right: 32px;
         text-align: right;
+        width: 90px;
       }
       &:after {
         content: "";
