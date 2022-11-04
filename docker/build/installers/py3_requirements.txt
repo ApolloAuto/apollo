@@ -44,3 +44,6 @@ utm
 
 #Github for CI
 pygithub
+
+# Data excel
+xlsxwriter
