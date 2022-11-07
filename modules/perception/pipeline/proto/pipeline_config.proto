@@ -190,7 +190,6 @@ message StageConfig {
     lidar.PointcloudPreprocessorConfig pointcloud_preprocessor_config = 12;
     lidar.MapManagerConfig map_manager_config = 13;
     lidar.ObjectFilterBankConfig object_filter_bank_config = 14;
-    lidar.PointPillarsDetectionConfig pointpillars_detection = 15;
     lidar.MlfEngineConfig mlf_engine_config = 16;
     lidar.FusedClassifierConfig fused_classifier_config = 17;
     lidar.CNNSegConfig cnnseg_config = 18;
