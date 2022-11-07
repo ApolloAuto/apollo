@@ -27,8 +27,8 @@ cc_library(
     name = "base_cipv",
     hdrs = ["base_cipv.h"],
     deps = [
-        "//cyber",
         ":base_init_options",
+        "//cyber",
         "//modules/perception/camera/common",
         "//modules/perception/lib/registerer",
         "@eigen",
@@ -39,11 +39,11 @@ cc_library(
     name = "base_tl_preprocessor",
     hdrs = ["base_tl_preprocessor.h"],
     deps = [
-        "//cyber",
         ":base_init_options",
-        "//modules/perception/lib/registerer",
-        "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
+        "//cyber",
         "//modules/perception/base:traffic_light",
+        "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
+        "//modules/perception/lib/registerer",
     ],
 )
 
@@ -198,6 +198,7 @@ cc_library(
         ":base_calibration_service",
         ":base_calibrator",
         ":base_camera_perception",
+        ":base_cipv",
         ":base_feature_extractor",
         ":base_inference_engine",
         ":base_init_options",
@@ -210,10 +211,9 @@ cc_library(
         ":base_obstacle_tracker",
         ":base_obstacle_transformer",
         ":base_scene_parser",
+        ":base_tl_preprocessor",
         ":base_traffic_light_detector",
         ":base_traffic_light_tracker",
-        ":base_cipv",
-        ":base_tl_preprocessor",
     ],
 )
 

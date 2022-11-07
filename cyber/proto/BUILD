@@ -23,8 +23,8 @@ proto_library(
 py_proto_library(
     name = "topology_change_py_pb2",
     deps = [
-        ":topology_change_proto",
         ":role_attributes_py_pb2",
+        ":topology_change_proto",
     ],
 )
 
@@ -46,8 +46,8 @@ proto_library(
 py_proto_library(
     name = "dag_conf_py_pb2",
     deps = [
-        ":dag_conf_proto",
         ":component_conf_py_pb2",
+        ":dag_conf_proto",
     ],
 )
 
@@ -69,6 +69,7 @@ py_proto_library(
         ":proto_desc_proto",
     ],
 )
+
 cc_proto_library(
     name = "choreography_conf_cc_proto",
     deps = [
@@ -87,6 +88,7 @@ py_proto_library(
         ":choreography_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "record_cc_proto",
     deps = [
@@ -105,6 +107,7 @@ py_proto_library(
         ":record_proto",
     ],
 )
+
 cc_proto_library(
     name = "component_conf_cc_proto",
     deps = [
@@ -139,10 +142,10 @@ proto_library(
     name = "cyber_conf_proto",
     srcs = ["cyber_conf.proto"],
     deps = [
+        ":perf_conf_proto",
+        ":run_mode_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
-        ":run_mode_conf_proto",
-        ":perf_conf_proto",
     ],
 )
 
@@ -150,10 +153,10 @@ py_proto_library(
     name = "cyber_conf_py_pb2",
     deps = [
         ":cyber_conf_proto",
+        ":perf_conf_py_pb2",
+        ":run_mode_conf_py_pb2",
         ":scheduler_conf_py_pb2",
         ":transport_conf_py_pb2",
-        ":run_mode_conf_py_pb2",
-        ":perf_conf_py_pb2",
     ],
 )
 
@@ -175,6 +178,7 @@ py_proto_library(
         ":perf_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "classic_conf_cc_proto",
     deps = [
@@ -193,6 +197,7 @@ py_proto_library(
         ":classic_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "parameter_cc_proto",
     deps = [
@@ -211,6 +216,7 @@ py_proto_library(
         ":parameter_proto",
     ],
 )
+
 cc_proto_library(
     name = "unit_test_cc_proto",
     deps = [
@@ -229,6 +235,7 @@ py_proto_library(
         ":unit_test_proto",
     ],
 )
+
 cc_proto_library(
     name = "scheduler_conf_cc_proto",
     deps = [
@@ -240,17 +247,17 @@ proto_library(
     name = "scheduler_conf_proto",
     srcs = ["scheduler_conf.proto"],
     deps = [
-        ":classic_conf_proto",
         ":choreography_conf_proto",
+        ":classic_conf_proto",
     ],
 )
 
 py_proto_library(
     name = "scheduler_conf_py_pb2",
     deps = [
-        ":scheduler_conf_proto",
-        ":classic_conf_py_pb2",
         ":choreography_conf_py_pb2",
+        ":classic_conf_py_pb2",
+        ":scheduler_conf_proto",
     ],
 )
 
@@ -272,6 +279,7 @@ py_proto_library(
         ":transport_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "qos_profile_cc_proto",
     deps = [
@@ -290,6 +298,7 @@ py_proto_library(
         ":qos_profile_proto",
     ],
 )
+
 cc_proto_library(
     name = "run_mode_conf_cc_proto",
     deps = [
@@ -308,6 +317,7 @@ py_proto_library(
         ":run_mode_conf_proto",
     ],
 )
+
 cc_proto_library(
     name = "role_attributes_cc_proto",
     deps = [
@@ -326,8 +336,8 @@ proto_library(
 py_proto_library(
     name = "role_attributes_py_pb2",
     deps = [
-        ":role_attributes_proto",
         ":qos_profile_py_pb2",
+        ":role_attributes_proto",
     ],
 )
 
@@ -349,4 +359,3 @@ py_proto_library(
         ":clock_proto",
     ],
 )
-

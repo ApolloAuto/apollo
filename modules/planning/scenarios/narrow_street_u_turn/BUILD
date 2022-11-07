@@ -3,6 +3,7 @@ load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(

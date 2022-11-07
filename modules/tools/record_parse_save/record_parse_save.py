@@ -33,7 +33,7 @@ current implementation illustrates sample record file parsing for
 import os
 import sys
 import time
-
+sys.path.append("/home/sxkc/weirong/apollo_7.0/apollo")
 from importlib import import_module
 import yaml
 
@@ -117,6 +117,7 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
 
         for channelname, msg, datatype, timestamp in freader.read_messages():
             if channelname == dest_dict["channel_name"]:
+                print(dest_dict["channel_name"])
                 tstamp = parse_mod.parse_data(channelname, msg, dest_dict['destination_folder'])
                 parse_timestamp.append(tstamp)
 
@@ -131,7 +132,7 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
 
 if __name__ == '__main__':
     cyber.init()
-    parse_dict = read_parameters('modules/tools/record_parse_save/parser_params.yaml')
+    parse_dict = read_parameters('/apollo/modules/tools/record_parse_save/parser_params.yaml')
     dest_dict, parser_func = define_destinations(parse_dict)
     parse_apollo_record(parse_dict, dest_dict, parser_func)
 

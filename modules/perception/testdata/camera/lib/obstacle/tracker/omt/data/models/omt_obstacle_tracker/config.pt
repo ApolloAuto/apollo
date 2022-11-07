@@ -1,0 +1,72 @@
+img_capability: 14
+lost_age: 3
+reserve_age: 5
+weight_same_camera {
+    appearance: 0.45
+    motion: 0.4
+    shape: 0.15
+    overlap: 0.05
+}
+weight_diff_camera {
+    motion: 0.5
+    shape: 0.15
+    overlap: 0.35
+}
+type_change_cost: "type_change_cost"
+border: 20
+target_thresh: 0.6
+correct_type: false
+image_displacement: 50
+abnormal_movement: 0.4
+min_init_height_ratio:17
+target_combine_iou_threshold: 0.6
+target_param {
+    velocity_threshold: 100000
+    velocity_output_delay: 0
+
+    world_center {
+        init_variance: 5.0
+        measure_variance: 0.01
+        process_variance: 4
+    }
+    image_center {
+        init_variance: 2500.0
+        measure_variance: 60.0
+        process_variance: 400.0
+    }
+    image_wh_update_rate : 0.6
+    world_lhw_history: 15
+    height_diff_ratio : 0.2
+    clapping_velocity : true
+    world_state_history: 60
+    min_cached_world_state_history_size : 20
+    min_cached_velocity_size : 25
+    min_cached_position_size : 50
+    calc_avg_position_window_size : 15
+
+    static_speed_threshold : 0.5
+    static_speed_threshold_ped : 0.3
+    min_moving_avg_speed : 1.0
+    min_moving_avg_speed_ped : 0.5
+
+    abnormal_acc_threshold : 6.0
+    abnormal_acc_threshold_ped : 3.0
+
+    abnormal_velocity_heading_angle_threshold : 0.8
+    tracked_life : 3
+    type_filter_var : 0.3
+    large_velocity_ratio : 2.5
+    too_large_velocity_ratio : 1.5
+    mean_filter_window :10
+    direction_filter_ratio : 0.7
+    displacement_theta_var : 0.25
+    velocity_theta_var : 0.5
+    stable_moving_speed : 2.0
+}
+reference{
+    margin : 2
+    min_allow_height : 50
+    area_decay : 0.98
+    down_sampling : 25
+    height_diff_ratio : 0.1
+}

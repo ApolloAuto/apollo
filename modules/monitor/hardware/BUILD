@@ -45,7 +45,7 @@ cc_library(
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
-        ] + if_esd_can([
+    ] + if_esd_can([
         "//modules/drivers/canbus/can_client/esd:esd_can_client",
     ]),
 )

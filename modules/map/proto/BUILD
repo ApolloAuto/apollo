@@ -51,8 +51,8 @@ py_proto_library(
     deps = [
         ":map_geometry_py_pb2",
         ":map_id_py_pb2",
-        ":map_rsu_py_pb2",
         ":map_junction_proto",
+        ":map_rsu_py_pb2",
     ],
 )
 
@@ -417,11 +417,11 @@ proto_library(
         ":map_parking_space_proto",
         ":map_pnc_junction_proto",
         ":map_road_proto",
+        ":map_rsu_proto",
         ":map_signal_proto",
         ":map_speed_bump_proto",
         ":map_stop_sign_proto",
         ":map_yield_sign_proto",
-        ":map_rsu_proto",
     ],
 )
 
@@ -437,10 +437,10 @@ py_proto_library(
         ":map_pnc_junction_py_pb2",
         ":map_proto",
         ":map_road_py_pb2",
+        ":map_rsu_py_pb2",
         ":map_signal_py_pb2",
         ":map_speed_bump_py_pb2",
         ":map_stop_sign_py_pb2",
         ":map_yield_sign_py_pb2",
-        ":map_rsu_py_pb2",
     ],
 )

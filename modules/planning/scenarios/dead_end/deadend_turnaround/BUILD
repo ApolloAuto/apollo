@@ -7,14 +7,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "deadend_turnaround",
     srcs = [
+        "deadend_turnaround_scenario.cc",
         "stage_approaching_turning_point.cc",
         "stage_turning.cc",
-        "deadend_turnaround_scenario.cc",
     ],
     hdrs = [
+        "deadend_turnaround_scenario.h",
         "stage_approaching_turning_point.h",
         "stage_turning.h",
-        "deadend_turnaround_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

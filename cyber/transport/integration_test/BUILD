@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 cc_test(

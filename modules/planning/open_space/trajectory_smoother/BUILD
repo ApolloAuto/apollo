@@ -4,8 +4,13 @@ load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
-PLANNING_FOPENMP = ["-DMODULE_NAME=\\\"planning\\\"","-fopenmp"]
+
+PLANNING_FOPENMP = [
+    "-DMODULE_NAME=\\\"planning\\\"",
+    "-fopenmp",
+]
 
 cc_library(
     name = "dual_variable_warm_start_problem",

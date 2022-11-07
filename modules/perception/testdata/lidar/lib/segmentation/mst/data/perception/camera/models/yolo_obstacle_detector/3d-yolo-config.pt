@@ -1,0 +1,34 @@
+model_param {
+  model_name: "./3d-yolo"
+  model_type: "RTNetInt8"
+  weight_file: "deploy.model"
+  proto_file: "deploy.pt"
+  anchors_file: "anchors.txt"
+  types_file: "types.txt"
+  calibratetable_root: "./3d-yolo"
+  confidence_threshold: 0.4
+  offset_ratio: 0.288889
+  cropped_ratio: 0.711111
+  resized_width: 1440
+  aligned_pixel: 32
+  min_2d_height: 10
+  min_3d_height: 0.1
+  ori_cycle: 2
+  with_box3d: true
+  light_swt_conf_threshold: 0
+  light_vis_conf_threshold: 0
+  with_lights: false
+  with_ratios: false
+  # num_areas: 4
+  border_ratio: 0.01
+}
+net_param {
+  input_blob: "data"
+  feat_blob: "layer7-conv"
+}
+nms_param {
+  type: "NormalNMS"
+  threshold: 0.5
+  sigma: 0.4
+  inter_cls_nms_thresh: 0.6
+}

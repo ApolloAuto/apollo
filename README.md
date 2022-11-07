@@ -43,7 +43,7 @@ software packages and library dependencies of newer versions including:
 2. LibTorch (both CPU and GPU version) bumped to version 1.7.0 accordingly.
 
 We do not expect a disruption to your current work, but to ease your life of
-migration, you would need to: 
+migratation, you would need to: 
 
 1. Update NVIDIA driver on your host to version >= 455.32.
   ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))

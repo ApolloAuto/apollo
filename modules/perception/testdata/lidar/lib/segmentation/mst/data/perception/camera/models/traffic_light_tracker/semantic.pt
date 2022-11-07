@@ -1,0 +1,4 @@
+revise_time_second: 1.5
+blink_threshold_second: 0.55
+hysteretic_threshold_count: 1
+#yellow_blink_threshold_second: 10.0

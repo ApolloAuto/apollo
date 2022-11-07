@@ -6,10 +6,10 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    targets = [
-      ":cyber_bridge",
-    ],
     runtime_dest = "modules/contrib/cyber_bridge",
+    targets = [
+        ":cyber_bridge",
+    ],
     deps = [
         "//cyber:install",
     ],

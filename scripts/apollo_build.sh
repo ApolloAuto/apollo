@@ -264,7 +264,17 @@ function main() {
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"
   fi
-
+  
+  pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
+    pip install \
+    numpy \
+    opencv-python==4.2.0.32 \
+    protobuf==3.17.3 \
+    pygame \
+    pyproj \
+    pyyaml \
+    transforms3d
+    
   success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
 

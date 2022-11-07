@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: short_camera
+child_frame_id: long_camera
+transform:
+  rotation:
+    x: -0.005389246
+    y: 0.01850062
+    z: -0.000099768
+    w: 0.99981511
+  translation:
+    x: 0.275
+    y: 0
+    z: 0

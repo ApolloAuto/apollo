@@ -7,7 +7,7 @@ package(default_visibility = ["//visibility:public"])
 install(
     name = "install",
     targets = [
-      ":cyber_recorder",
+        ":cyber_recorder",
     ],
 )
 

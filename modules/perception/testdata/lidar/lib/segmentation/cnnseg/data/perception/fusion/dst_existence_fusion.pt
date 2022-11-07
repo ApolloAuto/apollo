@@ -1,0 +1,18 @@
+track_object_max_match_distance: 4.0
+
+camera_valid_dist {
+  camera_name: "camera_front_obstacle"
+  valid_dist: 110
+}
+camera_valid_dist {
+  camera_name: "camera_front_narrow"
+  valid_dist: 150
+}
+camera_valid_dist {
+  camera_name: "front_6mm"
+  valid_dist: 110
+}
+camera_valid_dist {
+  camera_name: "front_12mm"
+  valid_dist: 150
+}

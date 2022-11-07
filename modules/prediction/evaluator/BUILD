@@ -20,16 +20,16 @@ cc_library(
         "//modules/prediction/evaluator/cyclist:cyclist_keep_lane_evaluator",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:jointly_prediction_planning_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_map_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:lane_aggregating_evaluator",
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
-        "//modules/prediction/evaluator/vehicle:jointly_prediction_planning_evaluator",
         "//modules/prediction/evaluator/vehicle:vectornet_evaluator",
-        "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction/pipeline:vector_net",
+        "//modules/prediction/proto:prediction_conf_cc_proto",
         "//third_party:libtorch",
     ],
 )
@@ -55,8 +55,8 @@ cc_library(
     name = "evaluator",
     hdrs = ["evaluator.h"],
     deps = [
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "//modules/prediction/container/obstacles:obstacle",
     ],
 )
 

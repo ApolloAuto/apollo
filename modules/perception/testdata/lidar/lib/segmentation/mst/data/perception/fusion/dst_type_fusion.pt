@@ -1,0 +1,39 @@
+camera_params {
+  name: "camera_front_obstacle"
+  valid_dist: 110
+  reliability: 0.95
+  reliability_for_unknown: 0.2
+}
+
+camera_params {
+  name: "camera_front_narrow"
+  valid_dist: 150
+  reliability: 0.5
+  reliability_for_unknown: 0.2
+}
+
+lidar_params {
+  name: "velodyne_64"
+  reliability: 0.5
+  reliability_for_unknown: 0.5
+}
+
+camera_params {
+  name: "front_6mm"
+  valid_dist: 110
+  reliability: 0.95
+  reliability_for_unknown: 0.2
+}
+
+camera_params {
+  name: "front_12mm"
+  valid_dist: 150
+  reliability: 0.5
+  reliability_for_unknown: 0.2
+}
+
+lidar_params {
+  name: "velodyne64"
+  reliability: 0.5
+  reliability_for_unknown: 0.5
+}

@@ -1,14 +1,14 @@
 records:
-    filepath: /apollo/data/record_files/2019-04-22-14-27-05/2019-04-22-14-27-05_records/
+    filepath: /apollo/data/bag/test/
 
-parse: radar
+parse: camera
 # use one of the following options or add more:
   # lidar
   # radar
   # camera
 
 lidar:     # for velodyne vls-128 lidar
-  channel_name: /apollo/sensor/lidar128/PointCloud2
+  channel_name: /apollo/sensor/lidar128/compensator/PointCloud2
   out_folder_extn: _lidar_vls128
   timestamp_file_extn: _lidar_vls128_timestamp.txt
 
@@ -18,6 +18,6 @@ radar:     # for ARS-408 radar mounted in front
   timestamp_file_extn: _radar_conti408_front_timestamp.txt
 
 camera:   # for 6mm camera mounted in front
-  channel_name: /apollo/sensor/camera/front_6mm/image/compressed
+  channel_name: /apollo/sensor/camera/front_6mm/image
   out_folder_extn: _camera_6mm_front
   timestamp_file_extn: _camera_6mm_front_timestamp.txt

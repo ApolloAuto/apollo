@@ -55,6 +55,7 @@ def _output_path(ctx, input_file, strip_prefix = [], warn_foreign = True):
         dest = join_paths("third_party", owner.workspace_name, owner.package, input_file.basename)
     else:
         dest = join_paths(owner.package, input_file.basename)
+
     # print("Installing file {} ({}) which is not in current package".format(input_file.short_path, dest))
     return dest
 

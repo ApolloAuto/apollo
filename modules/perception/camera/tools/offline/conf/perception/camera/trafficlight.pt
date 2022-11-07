@@ -1,0 +1,23 @@
+gpu_id: 0
+detector_param{
+    plugin_param{
+        name: "TrafficLightDetection"
+        root_dir:"/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection"
+        config_file:"detection.pt"
+        }
+}
+detector_param{
+    plugin_param{
+        name: "TrafficLightRecognition"
+        root_dir:"/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+        config_file:"recognition.pt"
+        }
+}
+tracker_param{
+    plugin_param{
+        name: "SemanticReviser"
+        root_dir:"/apollo/modules/perception/production/data/perception/camera/models/traffic_light_tracker"
+        config_file:"semantic.pt"
+        }
+}
+

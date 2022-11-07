@@ -1,0 +1,29 @@
+img_capability: 14
+lost_age: 4
+reserve_age: 6
+weight_appearance: 0.7
+weight_motion: 0.2
+weight_tracklet: 0.1
+weight_overlap: 0.1
+border: 20
+target_thresh: 0.65
+correct_type: false
+target_param {
+    velocity_threshold: 2.0
+    velocity_output_delay: 2
+    world_center {
+        init_variance: 5.0
+        measure_variance: 1.0
+        process_variance: 1.0
+    }
+
+    image_center {
+        init_variance: 2500.0
+        measure_variance: 400.0
+        process_variance: 200.0
+    }
+    image_wh_update_rate : 0.6
+    world_lhw_history: 10
+}
+target_combine_iou_threshold: 0.4
+fusion_target_thresh: 0.45

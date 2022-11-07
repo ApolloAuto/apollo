@@ -5,7 +5,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+
 cuda_library(
     name = "cuda_pnc_util",
     srcs = ["cuda_util.cu"],

@@ -18,12 +18,12 @@ filegroup(
 install(
     name = "install",
     data = [
-      ":runtime_data",
+        ":runtime_data",
     ],
     targets = [
-      ":libudp_bridge_sender_component.so",
-      ":libudp_bridge_receiver_component.so",
-      ":libudp_bridge_multi_receiver_component.so",
+        ":libudp_bridge_sender_component.so",
+        ":libudp_bridge_receiver_component.so",
+        ":libudp_bridge_multi_receiver_component.so",
     ],
     deps = [
         "//cyber:install",

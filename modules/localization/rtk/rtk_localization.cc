@@ -259,7 +259,7 @@ void RTKLocalization::ComposeLocalizationMsg(
       double heading = common::math::QuaternionToHeading(
           pose.orientation().qw(), pose.orientation().qx(),
           pose.orientation().qy(), pose.orientation().qz());
-      mutable_pose->set_heading(heading);
+      mutable_pose->set_heading(heading - M_PI_2);
     }
     // linear velocity
     if (pose.has_linear_velocity()) {

@@ -6,7 +6,7 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "*.py",
-    ])
+    ]),
 )
 
 py_library(

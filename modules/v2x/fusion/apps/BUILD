@@ -8,7 +8,7 @@ install(
     name = "install",
     targets = [
         ":libv2x_fusion_component.so",
-    ]
+    ],
 )
 
 cc_library(

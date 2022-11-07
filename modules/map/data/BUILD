@@ -5,8 +5,8 @@ package(default_visibility = ["//visibility:public"])
 install(
     name = "install",
     data = [
-        ":demo",
         ":borregas_ave",
+        ":demo",
     ],
 )
 
@@ -30,12 +30,12 @@ filegroup(
     name = "demo",
     srcs = glob([
         "demo/**",
-    ])
+    ]),
 )
 
 filegroup(
     name = "borregas_ave",
     srcs = glob([
         "borregas_ave/**",
-    ])
+    ]),
 )

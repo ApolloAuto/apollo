@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,8 +11,8 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//third_party:libtorch",
         "@com_google_protobuf//:protobuf",
-        "@opencv//:imgcodecs",
         "@local_config_cuda//cuda:cudart",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -24,8 +24,8 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//third_party:libtorch",
         "@com_google_protobuf//:protobuf",
-        "@opencv//:imgcodecs",
         "@local_config_cuda//cuda:cudart",
+        "@opencv//:imgcodecs",
     ],
 )
 

@@ -6,10 +6,10 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
+    runtime_dest = "modules/routing/topo_creator",
     targets = [
         ":topo_creator",
     ],
-    runtime_dest = "modules/routing/topo_creator",
 )
 
 cc_library(

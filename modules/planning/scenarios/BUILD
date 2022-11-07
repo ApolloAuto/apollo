@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 cc_library(
@@ -42,6 +43,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/scenarios/bare_intersection/unprotected:bare_intersection_unprotected_scenario",
+        "//modules/planning/scenarios/dead_end/deadend_turnaround",
         "//modules/planning/scenarios/emergency/emergency_pull_over:emergency_pull_over_scenario",
         "//modules/planning/scenarios/emergency/emergency_stop:emergency_stop_scenario",
         "//modules/planning/scenarios/lane_follow",
@@ -54,7 +56,6 @@ cc_library(
         "//modules/planning/scenarios/traffic_light/unprotected_left_turn:traffic_light_unprotected_left_turn_scenario",
         "//modules/planning/scenarios/traffic_light/unprotected_right_turn:traffic_light_unprotected_right_turn_scenario",
         "//modules/planning/scenarios/yield_sign:yield_sign_scenario",
-        "//modules/planning/scenarios/dead_end/deadend_turnaround",
     ],
 )
 

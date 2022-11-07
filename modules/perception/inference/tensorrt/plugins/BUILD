@@ -11,12 +11,12 @@ cc_library(
     srcs = [
         ":dfmb_psroi_align_plugin",
         ":kernels_cuda",
-        ":rcnn_proposal_plugin",
-        ":rpn_proposal_ssd_plugin",
         ":perception_inference_tensorrt_plugins_argmax_cuda",
         ":perception_inference_tensorrt_plugins_leakyrelu_cuda",
         ":perception_inference_tensorrt_plugins_slice_cuda",
         ":perception_inference_tensorrt_plugins_softmax_cuda",
+        ":rcnn_proposal_plugin",
+        ":rpn_proposal_ssd_plugin",
     ],
     hdrs = glob([
         "*.h",
@@ -29,7 +29,6 @@ cc_library(
     ],
 )
 
-
 cuda_library(
     name = "kernels_cuda",
     srcs = [
@@ -37,11 +36,11 @@ cuda_library(
         "nms_cuda.cu",
     ],
     hdrs = ["kernels.h"],
-    alwayslink = True,
     deps = [
         "//modules/perception/base:common",
         "@local_config_cuda//cuda:cudart",
     ],
+    alwayslink = True,
 )
 
 cuda_library(

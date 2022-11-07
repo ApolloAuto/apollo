@@ -16,7 +16,7 @@ install(
         "//modules/drivers/lidar/hesai:install",
         "//modules/drivers/lidar/robosense:install",
         "//modules/drivers/lidar/velodyne:install",
-    ]
+    ],
 )
 
 filegroup(

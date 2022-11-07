@@ -18,7 +18,7 @@ cc_library(
         "//modules/drivers/canbus/can_client/socket:socket_can_client_raw",
         "//modules/drivers/canbus/common:canbus_common",
         "//modules/drivers/canbus/proto:can_card_parameter_cc_proto",
-        ] + if_esd_can([
+    ] + if_esd_can([
         "//modules/drivers/canbus/can_client/esd:esd_can_client",
     ]),
 )

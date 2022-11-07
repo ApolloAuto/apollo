@@ -35,10 +35,10 @@ filegroup(
 install(
     name = "install",
     data = [
-      ":runtime_data",
+        ":runtime_data",
     ],
     targets = [
-      ":libcamera_component.so",
+        ":libcamera_component.so",
     ],
     deps = [
         "//cyber:install",

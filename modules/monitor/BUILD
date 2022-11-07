@@ -44,18 +44,18 @@ cc_library(
 filegroup(
     name = "runtime_data",
     srcs = glob([
-       "dag/*.dag",
-       "launch/*.launch",
+        "dag/*.dag",
+        "launch/*.launch",
     ]),
 )
 
 install(
     name = "install",
-    targets = [
-        ":libmonitor.so",
-    ],
     data = [
         ":runtime_data",
+    ],
+    targets = [
+        ":libmonitor.so",
     ],
     deps = [
         "//cyber:install",

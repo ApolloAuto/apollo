@@ -24,11 +24,11 @@ cc_binary(
 
 install(
     name = "install",
+    runtime_dest = "cyber/examples",
     targets = [
         ":talker",
         ":listener",
     ],
-    runtime_dest = "cyber/examples",
     deps = [
         "//cyber/examples/common_component_example:install",
         "//cyber/examples/timer_component_example:install",

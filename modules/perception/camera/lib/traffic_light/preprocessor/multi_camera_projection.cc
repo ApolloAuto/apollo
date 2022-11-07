@@ -165,6 +165,7 @@ bool MultiCamerasProjection::BoundaryBasedProject(
     pts2d[i] = camera_model->Project(pt3d_cam.cast<float>()).cast<int>();
   }
 
+
   int min_x = std::numeric_limits<int>::max();
   int max_x = std::numeric_limits<int>::min();
   int min_y = std::numeric_limits<int>::max();
@@ -175,6 +176,10 @@ bool MultiCamerasProjection::BoundaryBasedProject(
     min_y = std::min(pt[1], min_y);
     max_y = std::max(pt[1], max_y);
   }
+  
+  int tmp = min_y;
+  min_y = -1*max_y;
+  max_y = -1*tmp;
 
   base::BBox2DI roi(min_x, min_y, max_x, max_y);
   if (OutOfValidRegion(roi, width, height) || roi.Area() == 0) {

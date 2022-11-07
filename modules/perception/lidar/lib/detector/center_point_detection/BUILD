@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,10 +16,10 @@ cc_library(
         "//cyber/common",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
+        "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
-        "//modules/perception/lib/thread",
-        "@centerpoint_infer_op//:centerpoint_infer_op",
+        "@centerpoint_infer_op",
         "@eigen",
         "@local_config_pcl//:pcl",
         "@local_config_tensorrt//:tensorrt",

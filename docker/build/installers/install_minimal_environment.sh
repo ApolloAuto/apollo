@@ -116,7 +116,9 @@ if [[ "${MY_GEO}" == "cn" ]]; then
     pip3_install -i "$PYPI_MIRROR" pip -U
     python3 -m pip config set global.index-url "$PYPI_MIRROR"
 else
-    pip3_install pip -U
+    PYPI_MIRROR="https://pypi.tuna.tsinghua.edu.cn/simple"
+    pip3_install -i "$PYPI_MIRROR" pip -U
+    python3 -m pip config set global.index-url "$PYPI_MIRROR"
 fi
 
 pip3_install -U setuptools

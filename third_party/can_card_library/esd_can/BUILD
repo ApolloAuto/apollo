@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools/platform:build_defs.bzl", "if_esd_can")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])

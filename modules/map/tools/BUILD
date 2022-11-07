@@ -6,16 +6,16 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    targets = [
-      ":map_tool",
-      ":map_xysl",
-      ":refresh_default_end_way_point",
-      ":sim_map_generator",
-      ":proto_map_generator",
-      ":bin_map_generator",
-      ":quaternion_euler",
-    ],
     runtime_dest = "modules/map/tools",
+    targets = [
+        ":map_tool",
+        ":map_xysl",
+        ":refresh_default_end_way_point",
+        ":sim_map_generator",
+        ":proto_map_generator",
+        ":bin_map_generator",
+        ":quaternion_euler",
+    ],
 )
 
 cc_binary(

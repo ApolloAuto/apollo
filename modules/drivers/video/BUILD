@@ -20,7 +20,7 @@ filegroup(
         "conf/*.txt",
         "dag/*.dag",
         "launch/*.launch",
-    ])
+    ]),
 )
 
 cc_binary(

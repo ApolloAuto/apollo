@@ -1,0 +1,16 @@
+publish_if_has_lidar: true
+publish_if_has_radar: true
+publish_if_has_camera: true
+use_camera_3d: true
+
+min_radar_confident_distance: 40
+max_radar_confident_angle: 20
+min_camera_publish_distance: 50
+invisible_period_threshold: 0.001
+toic_threshold: 0.8
+
+use_track_time_pub_strategy: true
+pub_track_time_thresh: 3
+
+existence_threshold: 0.7
+radar_existence_threshold: 0.9

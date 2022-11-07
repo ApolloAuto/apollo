@@ -29,8 +29,8 @@ cc_library(
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_cc_proto",
         "//modules/map/relative_map/proto:navigation_cc_proto",
-        "@com_google_absl//absl/strings",
         "@com_github_google_glog//:glog",
+        "@com_google_absl//absl/strings",
     ],
 )
 

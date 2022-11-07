@@ -2,8 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
+
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
-PREDICTION_FOPENMP_COPTS = ["-DMODULE_NAME=\\\"prediction\\\"","-fopenmp"]
+
+PREDICTION_FOPENMP_COPTS = [
+    "-DMODULE_NAME=\\\"prediction\\\"",
+    "-fopenmp",
+]
 
 cc_library(
     name = "mlp_evaluator",

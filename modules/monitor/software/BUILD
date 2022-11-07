@@ -58,8 +58,8 @@ cc_library(
     deps = [
         ":latency_monitor",
         ":summary_monitor",
-        "//modules/common/latency_recorder/proto:latency_record_cc_proto",
         "//modules/canbus/proto:chassis_detail_cc_proto",
+        "//modules/common/latency_recorder/proto:latency_record_cc_proto",
         "//modules/control/proto:control_cmd_cc_proto",
         "//modules/dreamview/proto:hmi_mode_cc_proto",
         "//modules/drivers/proto:conti_radar_cc_proto",

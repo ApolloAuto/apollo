@@ -46,8 +46,8 @@ cc_library(
     hdrs = ["kalman_filter.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:eigen_defs",
         "@eigen",
-        "//modules/common/util:eigen_defs"
     ],
 )
 

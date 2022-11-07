@@ -9,12 +9,12 @@ cc_library(
         ":base_bipartite_graph_matcher",
         ":base_classifier",
         ":base_ground_detector",
+        ":base_lidar_detector",
+        ":base_lidar_obstacle_tracking",
         ":base_multi_target_tracker",
         ":base_object_filter",
-        ":base_roi_filter",
-        ":base_lidar_detector",
         ":base_pointcloud_preprocessor",
-        ":base_lidar_obstacle_tracking",
+        ":base_roi_filter",
     ],
 )
 
@@ -43,9 +43,9 @@ cc_library(
     hdrs = ["base_lidar_obstacle_detection.h"],
     deps = [
         "//cyber/common:macros",
-        "//modules/perception/lidar/common:lidar_error_code",
-        "//modules/perception/lib/registerer",
         "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/common:lidar_frame",
         "@eigen",
     ],
@@ -56,8 +56,8 @@ cc_library(
     hdrs = ["base_lidar_obstacle_tracking.h"],
     deps = [
         "//cyber/common:macros",
-        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lib/registerer",
+        "//modules/perception/lidar/common:lidar_error_code",
         "//modules/perception/lidar/common:lidar_frame",
     ],
 )
@@ -67,8 +67,8 @@ cc_library(
     hdrs = ["base_pointcloud_preprocessor.h"],
     deps = [
         "//cyber/common:macros",
-        "//modules/perception/lib/registerer",
         "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
     ],
 )

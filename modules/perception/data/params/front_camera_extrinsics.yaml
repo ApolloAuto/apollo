@@ -1,0 +1,19 @@
+#MKZ
+header:
+    seq: 0
+    stamp:
+        secs: 0
+        nsecs: 0
+    frame_id: white_mkz
+child_frame_id: onsemi_obstacle
+transform:
+    rotation:
+        x:  0.4917522
+        y: -0.4917522
+        z: 0.5081139
+        w: -0.5081139
+    translation:
+        x: 1.895
+        y: -0.235
+        z: 1.256   # when Z=0 is ground
+#        z: 0.956  # when Z=0 is the rear wheel axle

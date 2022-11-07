@@ -22,8 +22,8 @@ cc_test(
     srcs = ["dummy_algorithms_test.cc"],
     deps = [
         ":dummy_algorithms",
-        "@com_google_googletest//:gtest_main",
         "//modules/perception/fusion/lib/interface:base_fusion_system",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

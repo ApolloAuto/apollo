@@ -56,7 +56,8 @@ def parse_data(channelname, msg, out_folder):
 
     pcd_time = temp_time[0] + '_' + temp_time1_adj
     pcd_filename = "pcd_" + pcd_time + ".txt"
-
+    print("--------------------------")
+    print(out_folder + pcd_filename)
     with open(out_folder + pcd_filename, 'w') as outfile:
         for item in pcd:
             data = str(item)[1:-1]
