@@ -148,12 +148,16 @@ export default class DataProfile extends React.Component {
     const {
       certificateStatus,
       remoteScenarioSetList,
+      remoteDynamicModelList,
+      remoteRecordList,
       scenarioSet,
       currentScenarioSetId,
       remoteScenarioSetListFiltered,
       remoteDynamicModelListFiltered,
       remoteRecordListFiltered,
     } = store.studioConnector;
+
+    const remoteResourceLength = remoteScenarioSetList.length + remoteDynamicModelList.length + remoteRecordList.length;
 
     const { tabs, currentKey } = this.state;
 
@@ -170,13 +174,13 @@ export default class DataProfile extends React.Component {
                     onChange={this.onTypeSelectChange}
                   >
                     <option value='All'>All</option>
-                    <option value='1'>Scenario profiles</option>
-                    <option value='2'>Dynamic model</option>
-                    <option value='3'>Record profiles</option>
+                    {remoteScenarioSetList.length > 0 && <option value='1'>Scenario profiles</option>}
+                    {remoteDynamicModelList.length > 0 && <option value='2'>Dynamic model</option>}
+                    {remoteRecordList.length > 0 && <option value='3'>Record profiles</option>}
                   </select>
                 </div>
               }
-              {remoteScenarioSetList.length > 0 && (<div className='data-profile-card_select'>
+              {remoteResourceLength > 0 && (<div className='data-profile-card_select'>
                 <select
                   value={store.studioConnector.statusConditionValue}
                   onChange={this.onStatusSelectChange}
