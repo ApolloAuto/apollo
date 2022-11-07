@@ -773,6 +773,10 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
   unsigned int i = 0;
   int len = 0;
 
+  timeval sample_ts_monotonic;
+  timespec current_ts_monotonic;
+  uint64_t sample_ts_monotonic_ns, current_ts_monotonic_ns, diff_ns, sample_in_systme_time_ns;
+
   switch (config_->io_method()) {
     case IO_METHOD_READ:
       len = static_cast<int>(read(fd_, buffers_[0].start, buffers_[0].length));
@@ -825,9 +829,21 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
       assert(buf.index < n_buffers_);
       len = buf.bytesused;
-      raw_image->tv_sec = static_cast<int>(buf.timestamp.tv_sec);
-      raw_image->tv_usec = static_cast<int>(buf.timestamp.tv_usec);
-
+      if(!config_->hardware_trigger()){
+        sample_ts_monotonic.tv_sec = static_cast<int>(buf.timestamp.tv_sec);
+        sample_ts_monotonic.tv_usec = static_cast<int>(buf.timestamp.tv_usec);
+        clock_gettime(CLOCK_MONOTONIC,&current_ts_monotonic);
+        sample_ts_monotonic_ns = static_cast<uint64_t>(sample_ts_monotonic.tv_sec*(1000000000)) + static_cast<uint64_t>(sample_ts_monotonic.tv_usec*(1000));
+        current_ts_monotonic_ns = static_cast<uint64_t>(current_ts_monotonic.tv_sec*(1000000000)) + static_cast<uint64_t>(current_ts_monotonic.tv_nsec);
+        diff_ns = static_cast<uint64_t>(current_ts_monotonic_ns - sample_ts_monotonic_ns);
+        sample_in_systme_time_ns = static_cast<uint64_t>(cyber::Time::Now().ToNanosecond() - diff_ns);
+        raw_image->tv_sec = static_cast<int>((sample_in_systme_time_ns)/1000000000);
+        raw_image->tv_usec = static_cast<int>(((sample_in_systme_time_ns)%1000000000)/1000);
+      }
+      else{
+        raw_image->tv_sec = static_cast<int>(buf.timestamp.tv_sec);
+        raw_image->tv_usec = static_cast<int>(buf.timestamp.tv_usec);
+      }
       {
         cyber::Time image_time(raw_image->tv_sec, 1000 * raw_image->tv_usec);
         uint64_t camera_timestamp = image_time.ToNanosecond();
