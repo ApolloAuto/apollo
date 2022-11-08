@@ -595,6 +595,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "mask_pillars_detection_config_cc_proto",
+    deps = [
+        ":mask_pillars_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "mask_pillars_detection_config_proto",
+    srcs = ["mask_pillars_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "mask_pillars_detection_config_py_pb2",
+    deps = [
+        ":mask_pillars_detection_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "multicue_cc_proto",
     deps = [
         ":multicue_proto",
