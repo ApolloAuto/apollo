@@ -82,6 +82,8 @@ DECLARE_string(resource_scenario_path);
 
 DECLARE_string(resource_dynamic_model_path);
 
+DECLARE_string(dynamic_model_root_path);
+
 DECLARE_string(dynamic_model_library_path);
 
 DECLARE_string(sim_obstacle_stop_command);

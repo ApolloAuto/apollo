@@ -9,7 +9,8 @@ import WS, { PLUGIN_WS } from 'store/websocket';
 import LocalDynamicModelsItem from './LocalDynamicModelsItem';
 import LocalRecordItem from './LocalRecordItem';
 import LocalScenarioSetItem from './LocalScenarioSetItem';
-import { ScenarioCertificateInvalid, ScenarioNoCertificate } from './ScenarioNoCertificate';
+import { ScenarioCertificateInvalid, ScenarioNoCertificate }
+  from './ScenarioNoCertificate';
 import RemoteResourseItem from './RemoteResourseItem';
 
 const RadioGroup = Radio.Group;
@@ -148,12 +149,18 @@ export default class DataProfile extends React.Component {
     const {
       certificateStatus,
       remoteScenarioSetList,
+      remoteDynamicModelList,
+      remoteRecordList,
       scenarioSet,
       currentScenarioSetId,
       remoteScenarioSetListFiltered,
       remoteDynamicModelListFiltered,
       remoteRecordListFiltered,
     } = store.studioConnector;
+
+    const remoteResourceLength = remoteScenarioSetList.length
+      + remoteDynamicModelList.length
+      + remoteRecordList.length;
 
     const { tabs, currentKey } = this.state;
 
@@ -170,13 +177,13 @@ export default class DataProfile extends React.Component {
                     onChange={this.onTypeSelectChange}
                   >
                     <option value='All'>All</option>
-                    <option value='1'>Scenario profiles</option>
-                    <option value='2'>Dynamic model</option>
-                    <option value='3'>Record profiles</option>
+                    {remoteScenarioSetList.length > 0 && <option value='1'>Scenario profiles</option>}
+                    {remoteDynamicModelList.length > 0 && <option value='2'>Dynamic model</option>}
+                    {remoteRecordList.length > 0 && <option value='3'>Record profiles</option>}
                   </select>
                 </div>
               }
-              {remoteScenarioSetList.length > 0 && (<div className='data-profile-card_select'>
+              {remoteResourceLength > 0 && (<div className='data-profile-card_select'>
                 <select
                   value={store.studioConnector.statusConditionValue}
                   onChange={this.onStatusSelectChange}
@@ -197,34 +204,37 @@ export default class DataProfile extends React.Component {
             <div className='scenario-set-list'>
               {certificateStatus === 'expired' && <ScenarioCertificateInvalid />}
               {/*场景集列表*/}
-              {toJS(remoteScenarioSetListFiltered).map((item, index) => {
-                return (
+              {remoteScenarioSetListFiltered &&
+                toJS(remoteScenarioSetListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
               {/*动力学模型列表*/}
-              {toJS(remoteDynamicModelListFiltered).map((item, index) => {
-                return (
+              {remoteDynamicModelListFiltered &&
+                toJS(remoteDynamicModelListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
               {/*数据包列表*/}
-              {toJS(remoteRecordListFiltered).map((item, index) => {
-                return (
+              {remoteRecordListFiltered &&
+                toJS(remoteRecordListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
             </div>
           </div>

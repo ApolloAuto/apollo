@@ -1270,8 +1270,7 @@ void HMIWorker::GetRecordPath(std::string &record_path) {
   record_path = home + FLAGS_resource_record_path;
 }
 
-bool HMIWorker::RePlayRecord(const std::string &record_id) {
-  AERROR << "replay record--start";
+bool HMIWorker::RePlayRecord(const std::string& record_id) {
   std::string record_path;
   GetRecordPath(record_path);
   record_path = record_path + record_id + ".record";
@@ -1280,100 +1279,57 @@ bool HMIWorker::RePlayRecord(const std::string &record_id) {
     AERROR << "Failed to find record!";
     return false;
   }
-  // play the record
-  const std::string play_command =
-      absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
-  // std::string play_command = absl::StrCat("cyber_recorder play -l
-  // -f",record_path);
-  AERROR << "record play command" << play_command;
+  //play the record
+  const std::string play_command = absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
   int ret = std::system(play_command.data());
   if (ret != 0) {
     AERROR << "Failed to start cyber play command";
     return false;
   }
-  AERROR << "replay record--over";
   return true;
 }
-void HMIWorker::StopRecordPlay() {
-  AERROR << "stop record--start";
+void HMIWorker::StopRecordPlay(){
   WLock wlock(status_mutex_);
   { status_.set_current_record_id(""); }
   if (!StopModuleByCommand(FLAGS_cyber_recorder_stop_command)) {
     AERROR << "stop record failed";
   }
-  AERROR << "stop record--over";
   status_changed_ = true;
 }
-void HMIWorker::ChangeRecord(const std::string &record_id) {
-  AERROR << "change record--start";
+void HMIWorker::ChangeRecord(const std::string& record_id){
   StopRecordPlay();
-  AERROR << "change record--record stop";
   {
     RLock rlock(status_mutex_);
-    AERROR << "change record--get rlock success";
     auto status_records = status_.mutable_records();
     if (status_records->find(record_id) == status_records->end()) {
       AERROR << "Cannot change to unknown record!";
       return;
     }
-    AERROR << "change record--start play record";
-    if (!RePlayRecord(record_id)) {
-      AERROR << "Cannot replay a new record!";
-      return;
+    if(!RePlayRecord(record_id)){
+        return;
     }
   }
-  AERROR << "change record--start get wlock";
   WLock wlock(status_mutex_);
-  AERROR << "change record--get wlock success";
   status_.set_current_record_id(record_id);
-  AERROR << "change record--set current record id success";
   status_changed_ = true;
-  AERROR << "change record--status_change success";
   return;
 }
-bool HMIWorker::UpdateRecordToStatus(const std::string &record_id,
-                                     const std::string &record_status) {
-  // 检查当地资源有没有了record文件
-  std::string record_path;
-  GetRecordPath(record_path);
-  record_path = record_path + record_id + ".record";
-  if (!cyber::common::PathExists(record_path)) {
-    AERROR << "record resources has no record!";
-    return false;
-  }
-  // 写入hmi status
-  WLock wlock(status_mutex_);
-  auto record_set = status_.mutable_records();
-  if (record_status == "downloaded") {
-    // record 存储当前状态正常
-    (*record_set)[record_id] = 0;
-  } else {
-    // record 存储当前状态不正常
-    (*record_set)[record_id] = 1;
-  }
-  status_changed_ = true;
-  return true;
-}
-
-bool HMIWorker::LoadRecords() {
-  AERROR << "load record--start";
+bool HMIWorker::LoadRecords(){
   StopRecordPlay();
-  AERROR << "load record--stop record";
   std::string directory_path;
   GetRecordPath(directory_path);
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find records!";
     return false;
   }
-  AERROR << "load record--open dir";
-  DIR *directory = opendir(directory_path.c_str());
-  if (directory == nullptr) {
+  DIR* directory = opendir(directory_path.c_str());
+  if (directory == nullptr)
+  {
     AERROR << "Cannot open record directory" << directory_path;
     return false;
   }
-  struct dirent *file;
-  std::map<std::string, std::int32_t> new_records;
-  AERROR << "load record--start writing to hmi status";
+  struct dirent* file;
+  std::map<std::string,std::int32_t> new_records;
   while ((file = readdir(directory)) != nullptr) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -1383,15 +1339,14 @@ bool HMIWorker::LoadRecords() {
     }
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
-    const std::string local_record_resource = record_id.substr(0, index);
-    new_records[local_record_resource] = 1;
+    if(index != -1 && record_id[0]!='.'){
+      const std::string local_record_resource = record_id.substr(0, index);
+      new_records[local_record_resource] = 1;
+    }
   }
   closedir(directory);
-  AERROR << "load record--close dir";
   {
-    AERROR << "load record--get wlock";
     WLock wlock(status_mutex_);
-    AERROR << "load record--get wlock success";
     auto status_records = status_.mutable_records();
     status_records->clear();
     for (auto iter = new_records.begin(); iter != new_records.end(); iter++) {
@@ -1399,36 +1354,29 @@ bool HMIWorker::LoadRecords() {
     }
     status_changed_ = true;
   }
-  AERROR << "load record--change records finish";
   return true;
 }
 
-void HMIWorker::DeleteRecord(const std::string &record_id) {
-  AERROR << "delete record--stop record";
+void HMIWorker::DeleteRecord(const std::string& record_id){
   StopRecordPlay();
-  AERROR << "delete record--stop record";
   if (record_id.empty()) {
     return;
   }
   std::string record_path;
   GetRecordPath(record_path);
-  record_path = record_path + record_id + ".record";
-  AERROR << "record path " << record_path;
-  if (!cyber::common::PathExists(record_path)) {
-    AERROR << "Failed to find record_path!";
+  record_path = record_path + record_id +".record";
+  if (!cyber::common::PathExists(record_path))
+  {
     return;
   }
   // find the delete record if exist and judge the record whether playing now
   {
     RLock rlock(status_mutex_);
-    auto &status_records = status_.records();
-    if (status_records.find(record_id) == status_records.end()) {
-      AERROR << "Failed to find unknown record!";
+    auto& status_records = status_.records();
+    if(status_records.find(record_id)==status_records.end()){
       return;
     }
-    AERROR << "delete record--change record -id";
-    if (record_id == status_.current_record_id()) {
-      AERROR << "Cannot delete the current record!";
+    if(record_id == status_.current_record_id()){
       return;
     }
   }

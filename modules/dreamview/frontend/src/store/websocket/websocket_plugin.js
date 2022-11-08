@@ -174,13 +174,13 @@ export default class PluginWebSocketEndpoint {
   }
 
   // 下载record
-  downloadRecord() {
+  downloadRecord(id) {
     this.websocket.send(JSON.stringify({
       type: 'PluginRequest',
       data: {
         'name': 'DownloadRecord',
         'source': 'dreamview',
-        'info': '',
+        'info': id,
         'target': 'studio_connector',
         'source_type': 'module',
         'target_type': 'plugins',
