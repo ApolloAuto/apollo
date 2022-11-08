@@ -35,7 +35,7 @@ cc_library(
 install(
     name = "install",
     data_dest = "drivers/addition_data/gnss",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/gnss",
     data = [
         ":runtime_data",
     ],

@@ -7,7 +7,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/lidar/velodyne/driver",
     targets = [
         ":libvelodyne_driver_component.so",
     ],

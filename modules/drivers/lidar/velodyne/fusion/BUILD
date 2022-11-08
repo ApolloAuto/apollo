@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/lidar/velodyne/fusion",
     targets = [
         ":libvelodyne_fusion_component.so",
     ],

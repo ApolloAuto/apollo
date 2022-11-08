@@ -35,7 +35,7 @@ filegroup(
 install(
     name = "install",
     data_dest = "drivers/addition_data/camera",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/camera",
     data = [
       ":runtime_data",
     ],

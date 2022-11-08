@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/tools/image_decompress",
     data_dest = "drivers/addition_data/tools/image_decompress",
     data = [
         ":runtime_data",
