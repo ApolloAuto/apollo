@@ -7,7 +7,7 @@ package(default_visibility = ["//visibility:public"])
 install(
     name = "install",
     data_dest = "drivers/addition_data/conti_radar",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/conti_radar",
     data = [
         ":runtime_data",
     ],

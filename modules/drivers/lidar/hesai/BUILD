@@ -9,7 +9,7 @@ HESAI_COPTS = ['-DMODULE_NAME=\\"hesai\\"']
 install(
     name = "install",
     data_dest = "drivers/addition_data/lidar/hesai",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/lidar/hesai",
     data = [
         ":runtime_data",
     ],

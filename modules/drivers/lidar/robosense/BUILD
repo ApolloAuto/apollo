@@ -9,7 +9,7 @@ ROBOSENSE_COPTS = ['-DMODULE_NAME=\\"robosense\\"']
 install(
     name = "install",
     data_dest = "drivers/addition_data/lidar/robosense",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/lidar/robosense",
     data = [
         ":runtime_data",
     ],

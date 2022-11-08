@@ -18,7 +18,7 @@ cc_binary(
 install(
     name = "install",
     data_dest = "drivers/addition_data/microphone",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/microphone",
     data = [
         ":runtime_data",
     ],

@@ -7,7 +7,7 @@ package(default_visibility = ["//visibility:public"])
 install(
     name = "install",
     data_dest = "drivers/addition_data/video",
-    library_dest = "drivers/lib",
+    library_dest = "drivers/lib/video",
     data = [
         ":runtime_files",
     ],
