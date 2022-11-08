@@ -97,11 +97,10 @@ class HMIWorker {
                          ScenarioSet& new_scenario_set);
   bool UpdateDynamicModelToStatus(std::string& dynamic_model_name);
   void UpdateComponentStatus();
-  bool UpdateRecordToStatus(const std::string& record_id,
-                            const std::string& record_status);
-
-  void GetScenarioSetPath(const std::string& scenario_set_id,
-                          std::string& scenario_set_path);
+  // bool UpdateRecordToStatus(const std::string& record_id,
+  //                     const std::string& record_status);
+  bool LoadRecords();
+  void GetScenarioSetPath(const std::string& scenario_set_id, std::string& scenario_set_path);
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
@@ -128,7 +127,7 @@ class HMIWorker {
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
 
   bool LoadScenarios();
-  bool LoadRecords();
+
   bool LoadDynamicModels();
 
   void DeleteScenarioSet(const std::string& scenario_set_id);

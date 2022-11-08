@@ -236,27 +236,27 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     AERROR << "Donnot support this callback";
     return false;
   }
-  switch (plugin_function_map[function_name]) {
-    case 0: {
-      // 解析结果
-      if (param_json.contains("scenario_set_id") &&
-          param_json.contains("scenario_set_name")) {
-        const std::string scenario_set_id = param_json["scenario_set_id"];
-        const std::string scenario_set_name = param_json["scenario_set_name"];
-        if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
-          callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
-                                                         scenario_set_name);
-        }
+  switch (plugin_function_map[function_name])
+  {
+  case 0:
+  {
+    // 解析结果
+    if (param_json.contains("scenario_set_id") &&
+        param_json.contains("scenario_set_name"))
+    {
+      const std::string scenario_set_id = param_json["scenario_set_id"];
+      const std::string scenario_set_name = param_json["scenario_set_name"];
+      if (!scenario_set_id.empty() && !scenario_set_name.empty())
+      {
+        callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
+                                                       scenario_set_name);
       }
+    }
     } break;
-    case 1: {
-      if (param_json.contains("record_id") && param_json.contains("status")) {
-        const std::string record_id = param_json["record_id"];
-        const std::string record_status = param_json["status"];
-        if (!record_id.empty() && record_status.empty()) {
-          callback_res = hmi_->UpdateRecordToStatus(record_id, record_status);
-        }
-      }
+    case 1:
+    {
+        callback_res = hmi_->UpdateRecordToStatus();
+
     } break;
     case 2: {
       if (param_json.contains("dynamic_model_name")) {
@@ -268,7 +268,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     }
     default:
       break;
-  }
+    }
   return callback_res;
 }
 

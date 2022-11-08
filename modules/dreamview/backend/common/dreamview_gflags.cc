@@ -128,9 +128,11 @@ DEFINE_string(resource_scenario_path,
 DEFINE_string(resource_dynamic_model_path,
     "/.apollo/resources/dynamic_models/models/", "Dynamic Models placement");
 
-DEFINE_string(dynamic_model_library_path,
-    "/.apollo/resources/dynamic_models/library/",
-    "Dynamic Model libs placement");
+DEFINE_string(dynamic_model_root_path,"/.apollo/resources/dynamic_models/","Dynamic Model root directory");
+
+DEFINE_string(dynamic_model_root_path,"/.apollo/resources/dynamic_models/","Dynamic Model root directory");
+
+DEFINE_string(dynamic_model_library_path,"/.apollo/resources/dynamic_models/library/","Dynamic Model libs placement");
 
 DEFINE_string(sim_obstacle_stop_command,
     "pkill -9 -f \"sim_obstacle\" ", "Sim obstacle stop command");
