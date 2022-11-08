@@ -30,9 +30,14 @@ cc_library(
         "//modules/dreamview/backend/sim_control_manager/common:interpolation_2d",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/dreamview/proto:simulation_world_cc_proto",
+<<<<<<< HEAD
         "//modules/dreamview/backend/sim_control_manager/proto:fnn_model_cc_proto",
         "//modules/dreamview/backend/sim_control_manager/proto:sim_control_internal_cc_proto",
         "//modules/dreamview/backend/sim_control_manager/proto:dynamic_model_conf_cc_proto",
+=======
+        #"//modules/dreamview/backend/sim_control_manager/proto:fnn_model_cc_proto",
+         "//modules/dreamview/backend/sim_control_manager/proto:sim_control_internal_cc_proto",
+>>>>>>> f0cf495ab11d063b6408083b2982894c35a5c085
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//modules/common_msgs/planning_msgs:pad_msg_cc_proto",
