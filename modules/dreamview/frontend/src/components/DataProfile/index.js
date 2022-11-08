@@ -9,7 +9,8 @@ import WS, { PLUGIN_WS } from 'store/websocket';
 import LocalDynamicModelsItem from './LocalDynamicModelsItem';
 import LocalRecordItem from './LocalRecordItem';
 import LocalScenarioSetItem from './LocalScenarioSetItem';
-import { ScenarioCertificateInvalid, ScenarioNoCertificate } from './ScenarioNoCertificate';
+import { ScenarioCertificateInvalid, ScenarioNoCertificate }
+  from './ScenarioNoCertificate';
 import RemoteResourseItem from './RemoteResourseItem';
 
 const RadioGroup = Radio.Group;
@@ -157,7 +158,9 @@ export default class DataProfile extends React.Component {
       remoteRecordListFiltered,
     } = store.studioConnector;
 
-    const remoteResourceLength = remoteScenarioSetList.length + remoteDynamicModelList.length + remoteRecordList.length;
+    const remoteResourceLength = remoteScenarioSetList.length
+      + remoteDynamicModelList.length
+      + remoteRecordList.length;
 
     const { tabs, currentKey } = this.state;
 
@@ -201,34 +204,37 @@ export default class DataProfile extends React.Component {
             <div className='scenario-set-list'>
               {certificateStatus === 'expired' && <ScenarioCertificateInvalid />}
               {/*场景集列表*/}
-              {toJS(remoteScenarioSetListFiltered).map((item, index) => {
-                return (
+              {remoteScenarioSetListFiltered &&
+                toJS(remoteScenarioSetListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
               {/*动力学模型列表*/}
-              {toJS(remoteDynamicModelListFiltered).map((item, index) => {
-                return (
+              {remoteDynamicModelListFiltered &&
+                toJS(remoteDynamicModelListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
               {/*数据包列表*/}
-              {toJS(remoteRecordListFiltered).map((item, index) => {
-                return (
+              {remoteRecordListFiltered &&
+                toJS(remoteRecordListFiltered).map((item, index) => {
+                  return (
                   <RemoteResourseItem
                     key={item.id}
                     item={item}
                   />
-                );
-              })
+                  );
+                })
               }
             </div>
           </div>

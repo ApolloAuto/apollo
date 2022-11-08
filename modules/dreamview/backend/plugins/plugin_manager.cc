@@ -252,7 +252,8 @@ bool PluginManager::RegisterPlugins() {
 }
 
 bool PluginManager::CheckPluginStatus(const string& plugin_name) {
-  if (plugins_.find(plugin_name) == plugins_.end()) {
+  if (plugins_.find(plugin_name) == plugins_.end())
+  {
     AERROR << "Failed to register this plugin, cann't check!";
     return false;
   }
@@ -290,7 +291,6 @@ bool PluginManager::CheckPluginStatus(const string& plugin_name) {
 }
 
 bool PluginManager::SendMsgToPlugin(const string& json_str) {
-  AERROR << "send message to plugin start";
   auto plugin_msg = std::make_shared<DvPluginMsg>();
   if (!JsonStringToMessage(json_str, plugin_msg.get()).ok()) {
     AERROR << "Failed to parse DvPluginMsg from json!";
@@ -305,8 +305,10 @@ bool PluginManager::SendMsgToPlugin(const string& json_str) {
     return false;
   }
   const string msg_name = plugin_msg->name();
+
   if (plugins_[plugin_name].plugin_accept_msg.find(msg_name) ==
-      plugins_[plugin_name].plugin_accept_msg.end()) {
+      plugins_[plugin_name].plugin_accept_msg.end())
+  {
     AERROR << "Plugin not accept this msg!";
     return false;
   }
@@ -330,8 +332,8 @@ void PluginManager::RegisterDvSupportApi(const string& api_name,
 void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
-  RegisterDvSupportApi("UpdateRecordList", &PluginManager::UpdateData);
- // RegisterDvSupportApi("DownloadRecordSuccess", &PluginManager::UpdateData);
+  RegisterDvSupportApi("UpdateRecordToStatus", &PluginManager::UpdateData);
+
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -382,10 +384,10 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
       update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
       break;
     }
-    // case 3:{
-    //   update_data_res = callback_api_("UpdateRecordToStatus", info);
-    //   break;
-    // }
+    case 3:{
+      update_data_res = callback_api_("UpdateRecordToStatus", info);
+      break;
+    }
     default:
       break;
   }
