@@ -27,7 +27,7 @@ install(
         "//modules/drivers/canbus/common:install",
         "//modules/drivers/gnss/test:install",
         "//modules/drivers/lidar/hesai:install",
-        # "//modules/drivers/lidar/robosense:install",
+        "//modules/drivers/lidar/robosense:install",
         "//modules/drivers/lidar/velodyne/compensator:install",
         "//modules/drivers/lidar/velodyne/driver:install",
         "//modules/drivers/lidar/velodyne/fusion:install",

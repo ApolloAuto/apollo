@@ -1,0 +1,44 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/libsuteng_driver_component.so"
+    
+    ##################################################
+    #                   drivers                      #
+    ##################################################
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_back_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/lidar16_back.conf"
+      }
+    }
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/lidar16_back.conf"
+        readers {
+          channel: "/apollo/sensor/lidar16/back/Scan"
+        }
+      }
+    }
+}
+
+##################################################
+#                compensation                    #
+##################################################
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/velodyne/compensator/libvelodyne_compensator_component.so"
+
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "robosense16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/back_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
+      }
+    }
+}

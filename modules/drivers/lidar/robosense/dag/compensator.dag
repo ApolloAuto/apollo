@@ -1,0 +1,18 @@
+# Define all coms in DAG streaming.
+
+##################################################
+#                compensation                    #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
+
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "robosense16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/back_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
+      }
+    }
+}
