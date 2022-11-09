@@ -26,8 +26,10 @@ function RemoteResourseItem(props) {
         title={name}
       >
         <div className='scenario-set-list-item_name'>
-          {/*产品确认显示名称去除下划线*/}
-          {name && name.replaceAll('_', ' ')}
+          {/* 产品确认显示名称去除下划线 */}
+          {
+            name && name.replaceAll('_', ' ')
+          }
         </div>
       </Tooltip>
       <RemoteResourseItemStatus status={status} errorMsg={errorMsg}/>
