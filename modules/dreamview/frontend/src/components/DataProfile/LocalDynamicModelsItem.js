@@ -52,7 +52,9 @@ function LocalDynamicModelItem(props) {
       <div className={classNames(['local-scenario-set-list-item', {
         'local-scenario-set-list-item_selected': currentDynamicModel === item,
       }])}>
-        <Radio value={item}>{item}</Radio>
+        <Radio value={item}>
+          {item && item.replaceAll('_', ' ')}
+        </Radio>
         {/* 暂时去掉动力学模型的删除功能 */}
         {/* <div */}
         {/*  className='local-scenario-set-list-item_delete' */}
