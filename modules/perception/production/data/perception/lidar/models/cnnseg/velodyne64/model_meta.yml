@@ -1,0 +1,19 @@
+name: cnnseg64
+date: 2019-05-29
+task_type: 3d_segmentation
+sensor_type: lidar
+framework: paddlepaddle
+model_files:
+  - name: cnnseg.conf
+    size: 318
+  - name: cnnseg_param.conf
+    size: 681
+  - name: deploy.caffemodel
+    size: 11901429
+  - name: deploy.caffemodel.metadata
+    size: 72
+  - name: deploy.prototxt
+    size: 11494
+  - name: engine.conf
+    size: 16
+dataset: ['waymo', 'kitti', 'nusense']

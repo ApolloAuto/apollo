@@ -1,0 +1,15 @@
+name: center_point
+date: 2022-07-22
+task_type: 3d_detection
+sensor_type: lidar
+framework: paddlepaddle
+model_files:
+  - name: centerpoint.pdiparams
+    size: 23088141
+  - name: centerpoint.pdiparams.info
+    size: 32624
+  - name: centerpoint.pdmodel
+    size: 1870057
+  - name: collect_shape_info.pbtxt
+    size: 89099
+dataset: ['waymo', 'kitti', 'nusense']
