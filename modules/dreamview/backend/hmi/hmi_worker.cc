@@ -173,8 +173,8 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
+  ACHECK(!config.modes().empty()) << "No modes config loaded from "
+                                  << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);

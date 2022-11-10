@@ -140,10 +140,10 @@ bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   return true;
 }
 
-void DynamicModelFactory::GetDynamicModelPath(const std::string &dynamic_model_name,
-                                              std::string* path,
-                                              bool get_conf_json) {
-  CHECK_NOTNULL(path);                                            
+void DynamicModelFactory::GetDynamicModelPath(
+    const std::string &dynamic_model_name, std::string *path,
+    bool get_conf_json) {
+  CHECK_NOTNULL(path);
   *path = dynamic_model_local_path_ + dynamic_model_name;
   if (get_conf_json) {
     *path = *path + "/dynamic_model.json";

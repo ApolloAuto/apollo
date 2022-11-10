@@ -37,20 +37,16 @@ using std::string;
 // scenarios: update all scenarios
 namespace {
 std::map<string, int> data_type_dict = {{
-                                            "scenario_set",
-                                            0,
+                                            "scenario_set", 0,
                                         },
                                         {
-                                            "scenarios",
-                                            1,
+                                            "scenarios", 1,
                                         },
                                         {
-                                            "dynamic_model",
-                                            2,
+                                            "dynamic_model", 2,
                                         },
                                         {
-                                            "records",
-                                            3,
+                                            "records", 3,
                                         }};
 }  // namespace
 namespace apollo {     // namespace apollo
