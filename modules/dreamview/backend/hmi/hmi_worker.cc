@@ -783,14 +783,14 @@ void HMIWorker::ChangeScenarioSet(const std::string &scenario_set_id) {
   return;
 }
 
-void HMIWorker::GetScenarioResourcePath(std::string* scenario_resource_path) {
+void HMIWorker::GetScenarioResourcePath(std::string *scenario_resource_path) {
   CHECK_NOTNULL(scenario_resource_path);
   const std::string home = cyber::common::GetEnv("HOME");
   *scenario_resource_path = home + FLAGS_resource_scenario_path;
 }
 
 void HMIWorker::GetScenarioSetPath(const std::string &scenario_set_id,
-                                   std::string* scenario_set_path) {
+                                   std::string *scenario_set_path) {
   CHECK_NOTNULL(scenario_set_path);
   GetScenarioResourcePath(scenario_set_path);
   *scenario_set_path = *scenario_set_path + scenario_set_id;
@@ -983,7 +983,8 @@ bool HMIWorker::UpdateScenarioSetToStatus(
   return true;
 }
 
-bool HMIWorker::UpdateDynamicModelToStatus(const std::string &dynamic_model_name) {
+bool HMIWorker::UpdateDynamicModelToStatus(
+    const std::string &dynamic_model_name) {
   Json param_json({});
   param_json["dynamic_model_name"] = dynamic_model_name;
   Json callback_res = callback_api_("AddDynamicModel", param_json);
@@ -1008,7 +1009,7 @@ bool HMIWorker::UpdateDynamicModelToStatus(const std::string &dynamic_model_name
 
 bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
                                   const std::string &scenario_set_name,
-                                  ScenarioSet* new_scenario_set) {
+                                  ScenarioSet *new_scenario_set) {
   std::string scenario_set_directory_path;
   GetScenarioSetPath(scenario_set_id, &scenario_set_directory_path);
   scenario_set_directory_path = scenario_set_directory_path + "/scenarios/";
@@ -1267,13 +1268,13 @@ void HMIWorker::DeleteDynamicModel(const std::string &dynamic_model_name) {
   return;
 }
 
-void HMIWorker::GetRecordPath(std::string* record_path) {
+void HMIWorker::GetRecordPath(std::string *record_path) {
   CHECK_NOTNULL(record_path);
   const std::string home = cyber::common::GetEnv("HOME");
   *record_path = home + FLAGS_resource_record_path;
 }
 
-bool HMIWorker::RePlayRecord(const std::string& record_id) {
+bool HMIWorker::RePlayRecord(const std::string &record_id) {
   std::string record_path;
   GetRecordPath(&record_path);
   record_path = record_path + record_id + ".record";
@@ -1282,8 +1283,9 @@ bool HMIWorker::RePlayRecord(const std::string& record_id) {
     AERROR << "Failed to find record!";
     return false;
   }
-  //play the record
-  const std::string play_command = absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
+  // play the record
+  const std::string play_command =
+      absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
   int ret = std::system(play_command.data());
   if (ret != 0) {
     AERROR << "Failed to start cyber play command";
@@ -1291,7 +1293,7 @@ bool HMIWorker::RePlayRecord(const std::string& record_id) {
   }
   return true;
 }
-void HMIWorker::StopRecordPlay(){
+void HMIWorker::StopRecordPlay() {
   WLock wlock(status_mutex_);
   { status_.set_current_record_id(""); }
   if (!StopModuleByCommand(FLAGS_cyber_recorder_stop_command)) {
@@ -1299,7 +1301,7 @@ void HMIWorker::StopRecordPlay(){
   }
   status_changed_ = true;
 }
-void HMIWorker::ChangeRecord(const std::string& record_id){
+void HMIWorker::ChangeRecord(const std::string &record_id) {
   StopRecordPlay();
   {
     RLock rlock(status_mutex_);
@@ -1308,8 +1310,8 @@ void HMIWorker::ChangeRecord(const std::string& record_id){
       AERROR << "Cannot change to unknown record!";
       return;
     }
-    if(!RePlayRecord(record_id)){
-        return;
+    if (!RePlayRecord(record_id)) {
+      return;
     }
   }
   WLock wlock(status_mutex_);
@@ -1317,7 +1319,7 @@ void HMIWorker::ChangeRecord(const std::string& record_id){
   status_changed_ = true;
   return;
 }
-bool HMIWorker::LoadRecords(){
+bool HMIWorker::LoadRecords() {
   StopRecordPlay();
   std::string directory_path;
   GetRecordPath(&directory_path);
@@ -1325,14 +1327,13 @@ bool HMIWorker::LoadRecords(){
     AERROR << "Failed to find records!";
     return false;
   }
-  DIR* directory = opendir(directory_path.c_str());
-  if (directory == nullptr)
-  {
+  DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
     AERROR << "Cannot open record directory" << directory_path;
     return false;
   }
-  struct dirent* file;
-  std::map<std::string,std::int32_t> new_records;
+  struct dirent *file;
+  std::map<std::string, std::int32_t> new_records;
   while ((file = readdir(directory)) != nullptr) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -1342,7 +1343,7 @@ bool HMIWorker::LoadRecords(){
     }
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
-    if(index != -1 && record_id[0]!='.'){
+    if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
       new_records[local_record_resource] = 1;
     }
@@ -1360,26 +1361,25 @@ bool HMIWorker::LoadRecords(){
   return true;
 }
 
-void HMIWorker::DeleteRecord(const std::string& record_id){
+void HMIWorker::DeleteRecord(const std::string &record_id) {
   StopRecordPlay();
   if (record_id.empty()) {
     return;
   }
   std::string record_path;
   GetRecordPath(&record_path);
-  record_path = record_path + record_id +".record";
-  if (!cyber::common::PathExists(record_path))
-  {
+  record_path = record_path + record_id + ".record";
+  if (!cyber::common::PathExists(record_path)) {
     return;
   }
   // find the delete record if exist and judge the record whether playing now
   {
     RLock rlock(status_mutex_);
-    auto& status_records = status_.records();
-    if(status_records.find(record_id)==status_records.end()){
+    auto &status_records = status_.records();
+    if (status_records.find(record_id) == status_records.end()) {
       return;
     }
-    if(record_id == status_.current_record_id()){
+    if (record_id == status_.current_record_id()) {
       return;
     }
   }

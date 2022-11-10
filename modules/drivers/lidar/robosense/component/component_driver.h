@@ -19,9 +19,10 @@
 #include <string>
 #include <thread>
 
+#include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/robosense/driver/driver.h"
-#include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/robosense/driver/driver_factory.h"
 
 namespace apollo {

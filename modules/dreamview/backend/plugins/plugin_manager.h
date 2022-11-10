@@ -17,10 +17,10 @@
 #pragma once
 
 #include <deque>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "modules/dreamview/proto/dv_plugin_msg.pb.h"
 #include "modules/dreamview/proto/plugin_config.pb.h"

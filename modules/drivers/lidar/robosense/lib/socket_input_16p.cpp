@@ -163,7 +163,7 @@ bool SocketInput16P::exract_utc_time_from_packet(uint64_t& utc_time_ns,
 int SocketInput16P::get_positioning_data_packet(
     apollo::drivers::suteng::SutengPacket* pkt, bool use_gps_time) {
   while (true) {
-    if (!input_available(POLL_TIMEOUT*5)) {
+    if (!input_available(POLL_TIMEOUT * 5)) {
       return 1;
     }
     // Receive packets that should now be available from the
@@ -195,7 +195,8 @@ int SocketInput16P::get_positioning_data_packet(
         exract_utc_time_from_packet(timestamp_nsec, bytes + 303);
         if (!flags) {
           AINFO << "robo difop first PPS-GPS-timestamp: [" << timestamp_nsec
-                << "] at Cyber-timestamp: [" << apollo::cyber::Time().Now().ToNanosecond() << "]";
+                << "] at Cyber-timestamp: ["
+                << apollo::cyber::Time().Now().ToNanosecond() << "]";
           flags = true;
         }
         pkt->set_stamp(timestamp_nsec);

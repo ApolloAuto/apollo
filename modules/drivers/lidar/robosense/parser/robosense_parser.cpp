@@ -14,14 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/drivers/lidar/robosense/parser/robosense_parser.h"
-#include "modules/drivers/lidar/robosense/parser/robosense16p_parser.h"
-
-#include <pcl/common/time.h>
 
 #include <algorithm>
 #include <fstream>
 
+#include <pcl/common/time.h>
+
 #include "cyber/cyber.h"
+#include "modules/drivers/lidar/robosense/parser/robosense16p_parser.h"
 
 namespace apollo {
 namespace drivers {
@@ -31,8 +31,8 @@ uint64_t RobosenseParser::get_gps_stamp(double current_packet_stamp,
                                         double* previous_packet_stamp,
                                         uint64_t* gps_base_usec) {
   if (std::abs(*previous_packet_stamp - current_packet_stamp) >
-      3599000000) {                                       //微妙 us
-    *gps_base_usec += static_cast<uint64_t>(3600 * 1e6);  //+ 1小时   单位微妙
+      3599000000) {                                       // 微妙 us
+    *gps_base_usec += static_cast<uint64_t>(3600 * 1e6);  // + 1小时   单位微妙
     AINFO << "gps_base+1---current_stamp:" << current_packet_stamp
           << "previous_stamp:" << previous_packet_stamp;
   }
@@ -155,9 +155,9 @@ RobosenseParser* RobosenseParserFactory::create_parser(
     const apollo::drivers::suteng::SutengConfig& config) {
   if (config.model() == apollo::drivers::suteng::VLP16) {
     return new Robosense16Parser(config);
-  } else if (config.model() == apollo::drivers::suteng::Model::HELIOS_16P){
+  } else if (config.model() == apollo::drivers::suteng::Model::HELIOS_16P) {
     return new Robosense16PParser(config);
-  }else {
+  } else {
     AERROR << " invalid model, must be VLP16 or HELIOS_16P";
     return nullptr;
   }
@@ -216,10 +216,10 @@ float RobosenseParser::CalibIntensity(float intensity,
   distance_f = static_cast<float>(alg_dist);
   if (distance_f <= end_of_section1) {
     ref_pwr_temp = INTENSITY_CAL[0][calIdx] *
-                      static_cast<float>(
-                          exp(INTENSITY_CAL[1][calIdx] -
-                              INTENSITY_CAL[2][calIdx] * distance_f / 100.0f)) +
-                  INTENSITY_CAL[3][calIdx];
+                       static_cast<float>(exp(INTENSITY_CAL[1][calIdx] -
+                                              INTENSITY_CAL[2][calIdx] *
+                                                  distance_f / 100.0f)) +
+                   INTENSITY_CAL[3][calIdx];
   } else {
     for (int i = 0; i < order; i++) {
       ref_pwr_temp +=

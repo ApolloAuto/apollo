@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
 #include <unistd.h>
-
 #include <cstdio>
+
+#include <pcap.h>
 
 #include "modules/drivers/lidar/robosense/lib/data_type.h"
 #include "modules/drivers/lidar/robosense/lib/input.h"

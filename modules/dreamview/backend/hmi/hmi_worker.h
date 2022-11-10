@@ -17,11 +17,11 @@
 #pragma once
 
 #include <atomic>
+#include <map>
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
-#include <map>
+#include <vector>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -100,7 +100,8 @@ class HMIWorker {
   // bool UpdateRecordToStatus(const std::string& record_id,
   //                     const std::string& record_status);
   bool LoadRecords();
-  void GetScenarioSetPath(const std::string& scenario_set_id, std::string* scenario_set_path);
+  void GetScenarioSetPath(const std::string& scenario_set_id,
+                          std::string* scenario_set_path);
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();

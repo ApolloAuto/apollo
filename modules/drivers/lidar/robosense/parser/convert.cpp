@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/drivers/lidar/robosense/parser/convert.h"
 
-#include <pcl/common/time.h>
-
 #include <memory>
+
+#include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
 

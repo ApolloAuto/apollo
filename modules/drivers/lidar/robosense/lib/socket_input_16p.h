@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 #pragma once
-#include <pcap.h>
 #include <unistd.h>
-
 #include <cstdio>
+
+#include <pcap.h>
 
 #include "modules/drivers/lidar/robosense/lib/data_type.h"
 #include "modules/drivers/lidar/robosense/lib/input.h"
@@ -41,8 +41,8 @@ class SocketInput16P : public Input {
   int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
                              int time_zone, uint64_t start_time_) {
     return 0;
-  };
-  int get_positioning_data_packtet(const NMEATimePtr& nmea_time) { return 0; };
+  }
+  int get_positioning_data_packtet(const NMEATimePtr& nmea_time) { return 0; }
 
  private:
   int sockfd_;

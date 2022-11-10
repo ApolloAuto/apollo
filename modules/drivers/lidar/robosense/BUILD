@@ -6,11 +6,11 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    data_dest = "drivers/addition_data/lidar/robosense",
-    library_dest = "drivers/lib/lidar/robosense",
     data = [
         ":runtime_data",
     ],
+    data_dest = "drivers/addition_data/lidar/robosense",
+    library_dest = "drivers/lib/lidar/robosense",
     targets = [
         "libsuteng_driver_component.so",
     ],
@@ -46,8 +46,8 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/drivers/lidar/robosense/proto:sensor_suteng_cc_proto",
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
+        "//modules/drivers/lidar/robosense/proto:sensor_suteng_cc_proto",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
         "@local_config_pcl//:pcl",

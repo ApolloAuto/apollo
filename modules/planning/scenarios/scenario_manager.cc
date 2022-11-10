@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "modules/common_msgs/map_msgs/map_lane.pb.h"
 

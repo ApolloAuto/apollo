@@ -53,7 +53,7 @@ std::map<string, int> data_type_dict = {{
                                             3,
                                         }};
 }  // namespace
-namespace apollo {  // namespace apollo
+namespace apollo {     // namespace apollo
 namespace dreamview {  // namespace dreamview
 PluginManager::PluginManager(WebSocketHandler* plugin_ws)
     : node_(cyber::CreateNode("PluginManager")),
@@ -251,8 +251,7 @@ bool PluginManager::RegisterPlugins() {
 }
 
 bool PluginManager::CheckPluginStatus(const string& plugin_name) {
-  if (plugins_.find(plugin_name) == plugins_.end())
-  {
+  if (plugins_.find(plugin_name) == plugins_.end()) {
     AERROR << "Failed to register this plugin, cann't check!";
     return false;
   }
@@ -306,8 +305,7 @@ bool PluginManager::SendMsgToPlugin(const string& json_str) {
   const string msg_name = plugin_msg->name();
 
   if (plugins_[plugin_name].plugin_accept_msg.find(msg_name) ==
-      plugins_[plugin_name].plugin_accept_msg.end())
-  {
+      plugins_[plugin_name].plugin_accept_msg.end()) {
     AERROR << "Plugin not accept this msg!";
     return false;
   }
@@ -332,7 +330,6 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordToStatus", &PluginManager::UpdateData);
-
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -383,7 +380,7 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
       update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
       break;
     }
-    case 3:{
+    case 3: {
       update_data_res = callback_api_("UpdateRecordToStatus", info);
       break;
     }

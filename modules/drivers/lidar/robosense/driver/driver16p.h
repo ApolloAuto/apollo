@@ -37,21 +37,22 @@ namespace robosense {
 
 class Robosense16PDriver : public RobosenseDriver {
  public:
-  Robosense16PDriver(const apollo::drivers::suteng::SutengConfig& robo_config);
+  explicit Robosense16PDriver(
+      const apollo::drivers::suteng::SutengConfig& robo_config);
   ~Robosense16PDriver();
 
   void init();
   bool poll(const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
   void poll_positioning_packet();
   int poll_msop_sync_count(
-    const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+      const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
 
  private:
   std::shared_ptr<SocketInput16P> positioning_input_;
   std::shared_ptr<SocketInput16P> input_16p_;
   std::thread positioning_thread_;
   std::atomic<bool> running_ = {true};
-  apollo::drivers::suteng::SutengPacket positioning_pkts_; // 1hz
+  apollo::drivers::suteng::SutengPacket positioning_pkts_;  // 1hz
 };
 
 }  // namespace robosense
