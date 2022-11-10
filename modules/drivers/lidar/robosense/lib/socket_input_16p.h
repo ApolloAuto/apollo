@@ -37,7 +37,7 @@ class SocketInput16P : public Input {
                              bool use_gps_time);
   int get_positioning_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
                                   bool use_gps_time);
-  bool exract_utc_time_from_packet(uint64_t& utc_time_ns, const uint8_t* bytes);
+  bool exract_utc_time_from_packet(const uint8_t* bytes, uint64_t* utc_time_ns);
   int get_firing_data_packet(apollo::drivers::suteng::SutengPacket* pkt,
                              int time_zone, uint64_t start_time_) {
     return 0;
