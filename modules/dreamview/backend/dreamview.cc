@@ -156,7 +156,6 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     AERROR << "Donnot support this callback";
     return callback_res;
   }
-  std::string dynamic_model_name;
   switch (hmi_function_map[function_name]) {
     case 0: {
       // 解析结果
@@ -188,9 +187,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
         callback_res["result"] =
-            sim_control_manager_->ChangeDynamicModel(dynamic_model_name);
+            sim_control_manager_->ChangeDynamicModel(param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -201,9 +199,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
         callback_res["result"] =
-            sim_control_manager_->DeleteDynamicModel(dynamic_model_name);
+            sim_control_manager_->DeleteDynamicModel(param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -214,9 +211,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // addDynamicModel
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
         callback_res["result"] =
-            sim_control_manager_->AddDynamicModel(dynamic_model_name);
+            sim_control_manager_->AddDynamicModel(param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -260,7 +256,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     } break;
     case 2: {
       if (param_json.contains("dynamic_model_name")) {
-        std::string dynamic_model_name = param_json["dynamic_model_name"];
+        const std::string dynamic_model_name = param_json["dynamic_model_name"];
         if (!dynamic_model_name.empty()) {
           callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
         }

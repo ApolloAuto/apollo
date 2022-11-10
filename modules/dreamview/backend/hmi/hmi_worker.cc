@@ -783,15 +783,17 @@ void HMIWorker::ChangeScenarioSet(const std::string &scenario_set_id) {
   return;
 }
 
-void HMIWorker::GetScenarioResourcePath(std::string &scenario_resource_path) {
+void HMIWorker::GetScenarioResourcePath(std::string* scenario_resource_path) {
+  CHECK_NOTNULL(scenario_resource_path);
   const std::string home = cyber::common::GetEnv("HOME");
-  scenario_resource_path = home + FLAGS_resource_scenario_path;
+  *scenario_resource_path = home + FLAGS_resource_scenario_path;
 }
 
 void HMIWorker::GetScenarioSetPath(const std::string &scenario_set_id,
-                                   std::string &scenario_set_path) {
+                                   std::string* scenario_set_path) {
+  CHECK_NOTNULL(scenario_set_path);
   GetScenarioResourcePath(scenario_set_path);
-  scenario_set_path = scenario_set_path + scenario_set_id;
+  *scenario_set_path = *scenario_set_path + scenario_set_id;
   return;
 }
 
@@ -820,7 +822,7 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     scenario_set_id = status_.current_scenario_set_id();
   }
   std::string scenario_set_path;
-  GetScenarioSetPath(scenario_set_id, scenario_set_path);
+  GetScenarioSetPath(scenario_set_id, &scenario_set_path);
   const std::string scenario_path =
       scenario_set_path + "/scenarios/" + scenario_id + ".json";
   if (!cyber::common::PathExists(scenario_path)) {
@@ -967,7 +969,7 @@ bool HMIWorker::UpdateScenarioSetToStatus(
     const std::string &scenario_set_id, const std::string &scenario_set_name) {
   ScenarioSet new_scenario_set;
   if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
-                         new_scenario_set)) {
+                         &new_scenario_set)) {
     AERROR << "Failed to update scenario_set!";
     return false;
   }
@@ -981,7 +983,7 @@ bool HMIWorker::UpdateScenarioSetToStatus(
   return true;
 }
 
-bool HMIWorker::UpdateDynamicModelToStatus(std::string &dynamic_model_name) {
+bool HMIWorker::UpdateDynamicModelToStatus(const std::string &dynamic_model_name) {
   Json param_json({});
   param_json["dynamic_model_name"] = dynamic_model_name;
   Json callback_res = callback_api_("AddDynamicModel", param_json);
@@ -1006,11 +1008,11 @@ bool HMIWorker::UpdateDynamicModelToStatus(std::string &dynamic_model_name) {
 
 bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
                                   const std::string &scenario_set_name,
-                                  ScenarioSet &new_scenario_set) {
+                                  ScenarioSet* new_scenario_set) {
   std::string scenario_set_directory_path;
-  GetScenarioSetPath(scenario_set_id, scenario_set_directory_path);
+  GetScenarioSetPath(scenario_set_id, &scenario_set_directory_path);
   scenario_set_directory_path = scenario_set_directory_path + "/scenarios/";
-  new_scenario_set.set_scenario_set_name(scenario_set_name);
+  new_scenario_set->set_scenario_set_name(scenario_set_name);
   if (!cyber::common::PathExists(scenario_set_directory_path)) {
     AERROR << "Scenario set has no scenarios!";
     return true;
@@ -1069,7 +1071,7 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
       scenario_name =
           scenario_name + "_" + new_sim_ticket.description_en_tokens(i);
     }
-    ScenarioInfo *scenario_info = new_scenario_set.add_scenarios();
+    ScenarioInfo *scenario_info = new_scenario_set->add_scenarios();
     scenario_info->set_scenario_id(scenario_id);
     scenario_info->set_scenario_name(scenario_name);
     // change scenario json map dir to map name
@@ -1098,7 +1100,7 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
 
 bool HMIWorker::LoadScenarios() {
   std::string directory_path;
-  GetScenarioResourcePath(directory_path);
+  GetScenarioResourcePath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
     return false;
@@ -1136,7 +1138,7 @@ bool HMIWorker::LoadScenarios() {
     const std::string scenario_set_name = user_ads_group_info.name();
     ScenarioSet new_scenario_set;
     if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
-                           new_scenario_set)) {
+                           &new_scenario_set)) {
       AERROR << "Failed to update scenario_set!";
       return false;
     }
@@ -1183,7 +1185,7 @@ void HMIWorker::DeleteScenarioSet(const std::string &scenario_set_id) {
     return;
   }
   std::string directory_path;
-  GetScenarioResourcePath(directory_path);
+  GetScenarioResourcePath(&directory_path);
   directory_path = directory_path + scenario_set_id;
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
@@ -1265,14 +1267,15 @@ void HMIWorker::DeleteDynamicModel(const std::string &dynamic_model_name) {
   return;
 }
 
-void HMIWorker::GetRecordPath(std::string &record_path) {
+void HMIWorker::GetRecordPath(std::string* record_path) {
+  CHECK_NOTNULL(record_path);
   const std::string home = cyber::common::GetEnv("HOME");
-  record_path = home + FLAGS_resource_record_path;
+  *record_path = home + FLAGS_resource_record_path;
 }
 
 bool HMIWorker::RePlayRecord(const std::string& record_id) {
   std::string record_path;
-  GetRecordPath(record_path);
+  GetRecordPath(&record_path);
   record_path = record_path + record_id + ".record";
 
   if (!cyber::common::PathExists(record_path)) {
@@ -1317,7 +1320,7 @@ void HMIWorker::ChangeRecord(const std::string& record_id){
 bool HMIWorker::LoadRecords(){
   StopRecordPlay();
   std::string directory_path;
-  GetRecordPath(directory_path);
+  GetRecordPath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find records!";
     return false;
@@ -1363,7 +1366,7 @@ void HMIWorker::DeleteRecord(const std::string& record_id){
     return;
   }
   std::string record_path;
-  GetRecordPath(record_path);
+  GetRecordPath(&record_path);
   record_path = record_path + record_id +".record";
   if (!cyber::common::PathExists(record_path))
   {

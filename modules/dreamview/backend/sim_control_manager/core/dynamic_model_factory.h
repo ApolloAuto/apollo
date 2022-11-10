@@ -32,9 +32,9 @@ class DynamicModelFactory {
   ~DynamicModelFactory();
   SimControlBase *GetModelType(std::string dynamic_model_name);
   nlohmann::json RegisterDynamicModels();
-  bool RegisterDynamicModel(std::string &dm_name);
-  bool UnregisterDynamicModel(std::string &dynamic_model_name);
-  void GetDynamicModelPath(std::string &dynamic_model_name, std::string &path,
+  bool RegisterDynamicModel(const std::string &dm_name);
+  bool UnregisterDynamicModel(const std::string &dynamic_model_name);
+  void GetDynamicModelPath(const std::string &dynamic_model_name, std::string &path,
                            bool get_conf_json = true);
 
  private:

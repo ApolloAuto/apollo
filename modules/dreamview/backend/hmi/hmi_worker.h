@@ -94,13 +94,13 @@ class HMIWorker {
                                  const std::string& scenario_set_name);
   bool UpdateScenarioSet(const std::string& scenario_set_id,
                          const std::string& scenario_set_name,
-                         ScenarioSet& new_scenario_set);
-  bool UpdateDynamicModelToStatus(std::string& dynamic_model_name);
+                         ScenarioSet* new_scenario_set);
+  bool UpdateDynamicModelToStatus(const std::string& dynamic_model_name);
   void UpdateComponentStatus();
   // bool UpdateRecordToStatus(const std::string& record_id,
   //                     const std::string& record_status);
   bool LoadRecords();
-  void GetScenarioSetPath(const std::string& scenario_set_id, std::string& scenario_set_path);
+  void GetScenarioSetPath(const std::string& scenario_set_id, std::string* scenario_set_path);
 
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
@@ -134,8 +134,8 @@ class HMIWorker {
   void DeleteRecord(const std::string& record_id);
   void DeleteDynamicModel(const std::string& dynamic_model_name);
 
-  void GetScenarioResourcePath(std::string& scenario_resource_path);
-  void GetRecordPath(std::string& record_path);
+  void GetScenarioResourcePath(std::string* scenario_resource_path);
+  void GetRecordPath(std::string* record_path);
 
   bool RePlayRecord(const std::string& record_id);
 

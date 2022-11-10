@@ -39,7 +39,7 @@ class HMI {
   void Start(DvCallback callback_api);
   void Stop();
   bool UpdateScenarioSetToStatus(const std::string& scenario_set_id, const std::string& scenario_set_name);
-  bool UpdateDynamicModelToStatus(std::string& dynamic_model_name);
+  bool UpdateDynamicModelToStatus(const std::string& dynamic_model_name);
   bool UpdateRecordToStatus();
 
  private:

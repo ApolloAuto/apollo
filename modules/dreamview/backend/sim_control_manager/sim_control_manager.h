@@ -41,9 +41,9 @@ class SimControlManager {
   SimControlManager() {}
   bool IsEnabled() const { return enabled_; }
   nlohmann::json LoadDynamicModels();
-  bool AddDynamicModel(std::string &dynamic_model_name);
-  bool ChangeDynamicModel(std::string &dynamic_model_name);
-  bool DeleteDynamicModel(std::string &dynamic_model_name);
+  bool AddDynamicModel(const std::string &dynamic_model_name);
+  bool ChangeDynamicModel(const std::string &dynamic_model_name);
+  bool DeleteDynamicModel(const std::string &dynamic_model_name);
   void ResetDynamicModel();
   void Restart(double x, double y);
   void Reset();

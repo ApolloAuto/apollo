@@ -53,7 +53,7 @@ class PluginManager {
    * Process the information communicated by the dv and the plugin.
    */
   using DvApi = bool (PluginManager::*)(const DvPluginMsg& msg,
-                                        std::string& json_str);
+                                        const std::string& json_str);
   using DvCallback = std::function<bool(const std::string& function_name,
                                         const nlohmann::json& param_json)>;
 
@@ -68,11 +68,11 @@ class PluginManager {
  private:
   bool RegisterPlugins();
   bool RegisterPlugin(const std::shared_ptr<PluginConfig>& plugin_config);
-  auto InitPluginReader(ChannelConf& channel_conf,
+  auto InitPluginReader(const ChannelConf& channel_conf,
                         const std::string& channel_prefix,
                         const std::string& plugin_name)
       -> std::shared_ptr<cyber::Reader<DvPluginMsg>>;
-  auto InitPluginWriterAndMsg(ChannelConf& channel_conf,
+  auto InitPluginWriterAndMsg(const ChannelConf& channel_conf,
                               const std::string& channel_prefix,
                               const std::string& plugin_name)
       -> std::shared_ptr<cyber::Writer<DvPluginMsg>>;
@@ -80,7 +80,7 @@ class PluginManager {
   void RegisterDvSupportApi(const std::string& api_name, const DvApi& api);
   void RegisterDvSupportApis();
   bool ReceiveMsgFromPlugin(const DvPluginMsg& msg);
-  bool UpdateData(const DvPluginMsg& msg, std::string& json_str);
+  bool UpdateData(const DvPluginMsg& msg, const std::string& json_str);
   std::map<std::string, PluginInfo> plugins_;
   std::unique_ptr<cyber::Node> node_;
   bool enabled_;

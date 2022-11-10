@@ -71,7 +71,7 @@ void DynamicModelFactory::RegisterSimPerfectControl() {
   }
 }
 
-bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
+bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   std::string dynamic_model_conf_json_path;
   GetDynamicModelPath(dm_dir_name, dynamic_model_conf_json_path, true);
   if (!cyber::common::PathExists(dynamic_model_conf_json_path)) {
@@ -140,7 +140,7 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   return true;
 }
 
-void DynamicModelFactory::GetDynamicModelPath(std::string &dynamic_model_name,
+void DynamicModelFactory::GetDynamicModelPath(const std::string &dynamic_model_name,
                                               std::string &path,
                                               bool get_conf_json) {
   path = dynamic_model_local_path_ + dynamic_model_name;
@@ -205,7 +205,7 @@ SimControlBase *DynamicModelFactory::GetModelType(
 }
 
 bool DynamicModelFactory::UnregisterDynamicModel(
-    std::string &dynamic_model_name) {
+    const std::string &dynamic_model_name) {
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter == s_dynamic_model_map_.end()) {
     AERROR << "Failed to get " << dynamic_model_name << " related pointer.";

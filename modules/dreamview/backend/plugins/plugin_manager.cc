@@ -85,7 +85,7 @@ void PluginManager::Stop() {
   enabled_ = false;
 }
 
-auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
+auto PluginManager::InitPluginReader(const ChannelConf& channel_conf,
                                      const string& channel_prefix,
                                      const string& plugin_name)
     -> std::shared_ptr<cyber::Reader<DvPluginMsg>> {
@@ -118,7 +118,7 @@ auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
   return reader;
 };
 
-auto PluginManager::InitPluginWriterAndMsg(ChannelConf& channel_conf,
+auto PluginManager::InitPluginWriterAndMsg(const ChannelConf& channel_conf,
                                            const string& channel_prefix,
                                            const string& plugin_name)
     -> std::shared_ptr<cyber::Writer<DvPluginMsg>> {
@@ -353,7 +353,7 @@ bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
   return true;
 }
 
-bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
+bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
   if (!msg.has_info()) {
     AERROR << "Failed to get data type!";
     return false;
