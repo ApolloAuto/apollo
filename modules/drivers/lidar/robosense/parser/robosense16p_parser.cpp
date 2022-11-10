@@ -99,9 +99,11 @@ void Robosense16PParser::unpack_params(
   if (last_difop_time_ < pkt.stamp()) {
     last_difop_time_ = pkt.stamp();
     vertical_angles_16p_t* verti_angles =
-        reinterpret_cast<vertical_angles_16p_t*>(&pkt.data().c_str()[468]);
+        reinterpret_cast<vertical_angles_16p_t*>(
+            const_cast<char*>(&pkt.data().c_str()[468]));
     horizontal_angles_16p_t* hori_angles =
-        reinterpret_cast<horizontal_angles_16p_t*>(&pkt.data().c_str()[564]);
+        reinterpret_cast<horizontal_angles_16p_t*>(
+            const_cast<char*>(&pkt.data().c_str()[564]));
     for (int i = 0; i < SCANS_PER_FIRING; i++) {
       SUTENG_VERT_16P_[i] = parse_angle(verti_angles->angles[i]);
       cor_hori_angles[i] = parse_angle(hori_angles->angles[i]);
