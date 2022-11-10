@@ -73,7 +73,7 @@ void DynamicModelFactory::RegisterSimPerfectControl() {
 
 bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   std::string dynamic_model_conf_json_path;
-  GetDynamicModelPath(dm_dir_name, dynamic_model_conf_json_path, true);
+  GetDynamicModelPath(dm_dir_name, &dynamic_model_conf_json_path, true);
   if (!cyber::common::PathExists(dynamic_model_conf_json_path)) {
     AERROR << "Failed to load Dynamic Model: " << dm_dir_name
            << ". conf file is not exists!";
@@ -140,12 +140,13 @@ bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   return true;
 }
 
-void DynamicModelFactory::GetDynamicModelPath(
-    const std::string &dynamic_model_name, std::string &path,
-    bool get_conf_json) {
-  path = dynamic_model_local_path_ + dynamic_model_name;
+void DynamicModelFactory::GetDynamicModelPath(const std::string &dynamic_model_name,
+                                              std::string* path,
+                                              bool get_conf_json) {
+  CHECK_NOTNULL(path);                                            
+  *path = dynamic_model_local_path_ + dynamic_model_name;
   if (get_conf_json) {
-    path = path + "/dynamic_model.json";
+    *path = *path + "/dynamic_model.json";
   }
   return;
 }
@@ -214,7 +215,7 @@ bool DynamicModelFactory::UnregisterDynamicModel(
   std::string library_name = iter->second.library_name;
   s_dynamic_model_map_.erase(dynamic_model_name);
   std::string dynamic_model_dir;
-  GetDynamicModelPath(dynamic_model_name, dynamic_model_dir, false);
+  GetDynamicModelPath(dynamic_model_name, &dynamic_model_dir, false);
   std::string command = "rm -fr " + dynamic_model_dir;
   // use cyber::common::removeFiles do not support sub-directory
   // use rmdir do not support not empty directory

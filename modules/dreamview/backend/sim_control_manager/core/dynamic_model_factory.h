@@ -34,8 +34,8 @@ class DynamicModelFactory {
   nlohmann::json RegisterDynamicModels();
   bool RegisterDynamicModel(const std::string &dm_name);
   bool UnregisterDynamicModel(const std::string &dynamic_model_name);
-  void GetDynamicModelPath(const std::string &dynamic_model_name,
-                           std::string &path, bool get_conf_json = true);
+  void GetDynamicModelPath(const std::string &dynamic_model_name, std::string* path,
+                           bool get_conf_json = true);
 
  private:
   std::string dynamic_model_local_path_;
