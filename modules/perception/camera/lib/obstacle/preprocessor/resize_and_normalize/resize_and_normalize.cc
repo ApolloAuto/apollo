@@ -41,7 +41,7 @@ bool ReSizeAndNormalize::Init(const PluginConfig &plugin_config) {
   return true;
 }
 
-bool ReSizeAndNormalize::Process(cv::Mat &im, float *image_data_array) {
+bool ReSizeAndNormalize::Process(const cv::Mat &im, float *image_data_array) {
   cv::Mat resized_image;
   Resize(im, resized_height_, resized_width_, &resized_image);
   Normalize(mean_, std_, scale_, &resized_image);
