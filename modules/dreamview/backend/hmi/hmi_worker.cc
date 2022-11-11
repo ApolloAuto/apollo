@@ -933,13 +933,14 @@ void HMIWorker::ChangeScenario(const std::string &scenario_id) {
 }
 
 void HMIWorker::ChangeDynamicModel(const std::string &dynamic_model_name) {
-  {
-    RLock rlock(status_mutex_);
-    // Skip if mode doesn't actually change.
-    if (status_.current_dynamic_model() == dynamic_model_name) {
-      return;
-    }
-  }
+  // To avoid toggle sim control and always choose simulation perfect control
+  // {
+  //   RLock rlock(status_mutex_);
+  //   // Skip if mode doesn't actually change.
+  //   if (status_.current_dynamic_model() == dynamic_model_name) {
+  //     return;
+  //   }
+  // }
   if (dynamic_model_name.empty()) {
     AERROR << "Failed to change empty dynamic model!";
     return;
