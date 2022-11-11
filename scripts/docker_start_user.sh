@@ -86,7 +86,7 @@ function grant_device_permissions() {
   # setup compute device
   [ -e /dev/kfd ] && ! getent group render && \
       echo "render:x:$(stat -c %g /dev/kfd):$1" >> /etc/group
-
+  getent group render && usermod -a -G render $1
   true
 }
 
