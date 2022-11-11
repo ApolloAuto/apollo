@@ -30,6 +30,7 @@ cc_library(
     hdrs = ["abstract_vehicle_factory.h"],
     copts = CANBUS_COPTS,
     deps = [
+        "//cyber",
         "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/drivers/canbus/can_comm:message_manager_base",

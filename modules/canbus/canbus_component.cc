@@ -17,10 +17,13 @@
 #include "modules/canbus/canbus_component.h"
 
 #include "cyber/time/time.h"
+#include "cyber/class_loader/class_loader.h"
+
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
+#include "cyber/common/file.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 
 using apollo::common::ErrorCode;
@@ -28,6 +31,7 @@ using apollo::control::ControlCommand;
 using apollo::cyber::Time;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::guardian::GuardianCommand;
+using apollo::cyber::class_loader::ClassLoader;
 
 namespace apollo {
 namespace canbus {
@@ -57,10 +61,20 @@ bool CanbusComponent::Init() {
   }
   AINFO << "Can client is successfully created.";
 
-  VehicleFactory vehicle_factory;
-  vehicle_factory.RegisterVehicleFactory();
-  auto vehicle_object =
-      vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
+  // VehicleFactory vehicle_factory;
+  // vehicle_factory.RegisterVehicleFactory();
+  // auto vehicle_object =
+  //     vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
+
+  AINFO << "The load vehicle library: " << FLAGS_load_vehicle_library;
+  if (!apollo::cyber::common::PathExists(FLAGS_load_vehicle_library)){
+    AERROR << FLAGS_load_vehicle_library << " No such vehicle library";
+    return false;
+  }
+  ClassLoader loader(FLAGS_load_vehicle_library);
+
+  auto vehicle_object = 
+      loader.CreateClassObj<AbstractVehicleFactory>(FLAGS_load_vehicle_class_name);
   if (!vehicle_object) {
     AERROR << "Failed to create vehicle:";
     return false;

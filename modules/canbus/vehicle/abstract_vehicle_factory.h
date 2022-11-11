@@ -26,6 +26,7 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
+#include "cyber/class_loader/class_loader_register_macro.h"
 
 /**
  * @namespace apollo::canbus
@@ -70,6 +71,9 @@ class AbstractVehicleFactory {
  private:
   VehicleParameter vehicle_parameter_;
 };
+
+#define CYBER_REGISTER_VEHICLEFACTORY(name) \
+  CLASS_LOADER_REGISTER_CLASS(name, AbstractVehicleFactory)
 
 }  // namespace canbus
 }  // namespace apollo

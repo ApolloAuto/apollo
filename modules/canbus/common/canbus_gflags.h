@@ -43,3 +43,7 @@ DECLARE_int32(control_cmd_pending_queue_size);
 
 // enable forward Ultrasonic AEB
 DECLARE_bool(enable_aeb);
+
+// vehicle factory dynamic library path and class name
+DECLARE_string(load_vehicle_library);
+DECLARE_string(load_vehicle_class_name);

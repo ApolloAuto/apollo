@@ -61,5 +61,7 @@ class ChVehicleFactory : public AbstractVehicleFactory {
   CreateMessageManager() override;
 };
 
+CYBER_REGISTER_VEHICLEFACTORY(ChVehicleFactory)
+
 }  // namespace canbus
 }  // namespace apollo
