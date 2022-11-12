@@ -16,14 +16,14 @@
 
 #include "modules/canbus/canbus_component.h"
 
-#include "cyber/time/time.h"
+#include "cyber/common/file.h"
 #include "cyber/class_loader/class_loader.h"
+#include "cyber/time/time.h"
 
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
-#include "cyber/common/file.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 
 using apollo::common::ErrorCode;
@@ -60,11 +60,6 @@ bool CanbusComponent::Init() {
     return false;
   }
   AINFO << "Can client is successfully created.";
-
-  // VehicleFactory vehicle_factory;
-  // vehicle_factory.RegisterVehicleFactory();
-  // auto vehicle_object =
-  //     vehicle_factory.CreateVehicle(canbus_conf_.vehicle_parameter());
 
   AINFO << "The load vehicle library: " << FLAGS_load_vehicle_library;
   if (!apollo::cyber::common::PathExists(FLAGS_load_vehicle_library)){
