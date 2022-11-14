@@ -15,7 +15,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/canbus/common:canbus_common",
-        "//modules/canbus/vehicle:vehicle_factory",
+        "//modules/canbus/vehicle:abstract_vehicle_factory",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/status",

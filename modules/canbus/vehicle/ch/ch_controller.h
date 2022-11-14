@@ -37,7 +37,7 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 
-class ChController final : public VehicleController {
+class ChController final : public VehicleController<::apollo::canbus::Ch> {
  public:
   ChController() {}
 
@@ -45,8 +45,8 @@ class ChController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Ch>* const can_sender,
+      MessageManager<::apollo::canbus::Ch>* const message_manager)
       override;
 
   bool Start() override;

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/ch/proto/ch.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,7 +24,7 @@ namespace canbus {
 namespace ch {
 
 class Controlcommand115 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+                              ::apollo::canbus::Ch> {
  public:
   static const int32_t ID;
 

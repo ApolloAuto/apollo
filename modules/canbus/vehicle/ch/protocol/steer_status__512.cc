@@ -29,14 +29,14 @@ Steerstatus512::Steerstatus512() {}
 const int32_t Steerstatus512::ID = 0x512;
 
 void Steerstatus512::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_steer_status__512()->set_steer_angle_en_sts(
+                           Ch* chassis) const {
+  chassis->mutable_steer_status__512()->set_steer_angle_en_sts(
       steer_angle_en_sts(bytes, length));
-  chassis->mutable_ch()->mutable_steer_status__512()->set_steer_angle_sts(
+  chassis->mutable_steer_status__512()->set_steer_angle_sts(
       steer_angle_sts(bytes, length));
-  chassis->mutable_ch()->mutable_steer_status__512()->set_steer_err(
+  chassis->mutable_steer_status__512()->set_steer_err(
       steer_err(bytes, length));
-  chassis->mutable_ch()->mutable_steer_status__512()->set_sensor_err(
+  chassis->mutable_steer_status__512()->set_sensor_err(
       sensor_err(bytes, length));
   chassis->mutable_check_response()->set_is_eps_online(
       steer_angle_en_sts(bytes, length) == 1);

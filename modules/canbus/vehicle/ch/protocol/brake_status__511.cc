@@ -29,22 +29,22 @@ Brakestatus511::Brakestatus511() {}
 const int32_t Brakestatus511::ID = 0x511;
 
 void Brakestatus511::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_brake_status__511()->set_overspd_env(
+                           Ch* chassis) const {
+  chassis->mutable_brake_status__511()->set_overspd_env(
       overspd_env(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_brake_pedal_en_sts(
+  chassis->mutable_brake_status__511()->set_brake_pedal_en_sts(
       brake_pedal_en_sts(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_brake_pedal_sts(
+  chassis->mutable_brake_status__511()->set_brake_pedal_sts(
       brake_pedal_sts(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_brake_err(
+  chassis->mutable_brake_status__511()->set_brake_err(
       brake_err(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_emergency_btn_env(
+  chassis->mutable_brake_status__511()->set_emergency_btn_env(
       emergency_btn_env(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_front_bump_env(
+  chassis->mutable_brake_status__511()->set_front_bump_env(
       front_bump_env(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_back_bump_env(
+  chassis->mutable_brake_status__511()->set_back_bump_env(
       back_bump_env(bytes, length));
-  chassis->mutable_ch()->mutable_brake_status__511()->set_brake_light_actual(
+  chassis->mutable_brake_status__511()->set_brake_light_actual(
       brake_light_actual(bytes, length));
 
   chassis->mutable_check_response()->set_is_esp_online(

@@ -10,11 +10,25 @@ cc_library(
     srcs = ["ch_vehicle_factory.cc"],
     hdrs = ["ch_vehicle_factory.h"],
     copts = CANBUS_COPTS,
+    alwayslink = True,
     deps = [
         ":ch_controller",
         ":ch_message_manager",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/status",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
+        "//modules/drivers/canbus/can_client:can_client_factory",
+        "//modules/drivers/canbus/can_comm:can_receiver",
+        "//modules/drivers/canbus/can_comm:can_sender",
     ],
+)
+
+cc_binary(
+    name = "libch_vehicle_factory_lib.so",
+    linkshared = True,
+    linkstatic = True,
+    deps = [":ch_vehicle_factory"],
 )
 
 cc_library(
@@ -23,7 +37,7 @@ cc_library(
     hdrs = ["ch_message_manager.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
@@ -63,19 +77,20 @@ cc_test(
     size = "small",
     srcs = ["ch_message_manager_test.cc"],
     deps = [
-        "//modules/canbus/vehicle/ch:ch_message_manager",
+        ":ch_message_manager",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
-    name = "ch_vehicle_factory_test",
-    size = "small",
-    srcs = ["ch_vehicle_factory_test.cc"],
-    deps = [
-        ":ch_vehicle_factory",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+# cc_test(
+#     name = "ch_vehicle_factory_test",
+#     size = "small",
+#     srcs = ["ch_vehicle_factory_test.cc"],
+#     data = ["//modules/canbus:test_data"],
+#     deps = [
+#         ":ch_vehicle_factory",
+#         "@com_google_googletest//:gtest_main",
+#     ],
+# )
 
 cpplint()

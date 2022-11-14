@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/ch/proto/ch.pb.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -49,7 +49,7 @@ class ChControllerTest : public ::testing::Test {
   ChController controller_;
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Ch> sender_;
   ChMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;

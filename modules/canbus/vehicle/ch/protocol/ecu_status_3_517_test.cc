@@ -28,7 +28,7 @@ class Ecustatus3517Test : public ::testing::Test {
 TEST_F(Ecustatus3517Test, General) {
   uint8_t data[8] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x12, 0x13, 0x14};
   int32_t length = 8;
-  ChassisDetail cd;
+  Ch cd;
   Ecustatus3517 ecustatus;
   ecustatus.Parse(data, length, &cd);
 
@@ -41,15 +41,15 @@ TEST_F(Ecustatus3517Test, General) {
   EXPECT_EQ(data[6], 0b00010011);
   EXPECT_EQ(data[7], 0b00010100);
 
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_1(), 2);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_2(), 4);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_3(), 6);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_4(), 8);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_5(), 2);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_1(), 2);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_2(), 4);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_3(), 6);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_4(), 8);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_5(), 2);
   // todo:// check expect 36 or 18 ?
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_6(), 18);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_7(), 38);
-  EXPECT_EQ(cd.ch().ecu_status_3_517().ultrasound_dist_8(), 40);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_6(), 18);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_7(), 38);
+  EXPECT_EQ(cd.ecu_status_3_517().ultrasound_dist_8(), 40);
 }
 
 }  // namespace ch

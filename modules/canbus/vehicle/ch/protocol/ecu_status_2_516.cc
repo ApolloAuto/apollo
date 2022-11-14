@@ -29,18 +29,18 @@ Ecustatus2516::Ecustatus2516() {}
 const int32_t Ecustatus2516::ID = 0x516;
 
 void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_soc(
+                          Ch* chassis) const {
+  chassis->mutable_ecu_status_2_516()->set_battery_soc(
       battery_soc(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_capacity(
+  chassis->mutable_ecu_status_2_516()->set_battery_capacity(
       battery_capacity(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_voltage(
+  chassis->mutable_ecu_status_2_516()->set_battery_voltage(
       battery_voltage(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_current(
+  chassis->mutable_ecu_status_2_516()->set_battery_current(
       battery_current(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_battery_temperature(
+  chassis->mutable_ecu_status_2_516()->set_battery_temperature(
       battery_temperature(bytes, length));
-  chassis->mutable_ch()->mutable_ecu_status_2_516()->set_is_battery_soc_low(
+  chassis->mutable_ecu_status_2_516()->set_is_battery_soc_low(
       battery_soc(bytes, length) <= 15);
 }
 

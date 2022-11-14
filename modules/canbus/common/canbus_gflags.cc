@@ -54,5 +54,5 @@ DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");
 DEFINE_string(load_vehicle_library,
               "/opt/apollo/neo/lib/canbus-dev/vehicle/libch_vehicle_factory.so",
               "Default load vehicle library");
-DEFINE_string(load_vehicle_class_name,
-              "ChVehicleFactory", "Default vehicle factory name");
+DEFINE_string(load_vehicle_class_name, "ChVehicleFactory",
+              "Default vehicle factory name");

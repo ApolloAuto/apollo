@@ -28,7 +28,7 @@ class Throttlestatus510Test : public ::testing::Test {
 TEST_F(Throttlestatus510Test, General) {
   uint8_t data[8] = {0x01, 0x02, 0x01, 0x00, 0x11, 0x12, 0x13, 0x14};
   int32_t length = 8;
-  ChassisDetail cd;
+  Ch cd;
   Throttlestatus510 throttlestatus;
   throttlestatus.Parse(data, length, &cd);
 
@@ -41,10 +41,10 @@ TEST_F(Throttlestatus510Test, General) {
   EXPECT_EQ(data[6], 0b00010011);
   EXPECT_EQ(data[7], 0b00010100);
 
-  EXPECT_EQ(cd.ch().throttle_status__510().throttle_pedal_en_sts(), 1);
-  EXPECT_EQ(cd.ch().throttle_status__510().throttle_pedal_sts(), 2);
-  EXPECT_EQ(cd.ch().throttle_status__510().drive_motor_err(), 1);
-  EXPECT_EQ(cd.ch().throttle_status__510().battery_bms_err(), 0);
+  EXPECT_EQ(cd.throttle_status__510().throttle_pedal_en_sts(), 1);
+  EXPECT_EQ(cd.throttle_status__510().throttle_pedal_sts(), 2);
+  EXPECT_EQ(cd.throttle_status__510().drive_motor_err(), 1);
+  EXPECT_EQ(cd.throttle_status__510().battery_bms_err(), 0);
 }
 
 }  // namespace ch

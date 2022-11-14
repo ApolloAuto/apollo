@@ -33,8 +33,8 @@ Vinresp351d::Vinresp351d() {}
 const int32_t Vinresp351d::ID = 0x51D;
 
 void Vinresp351d::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_vin_resp3_51d()->set_vin17(
+                        Ch* chassis) const {
+  chassis->mutable_vin_resp3_51d()->set_vin17(
       vin17(bytes, length));
 }
 

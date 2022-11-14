@@ -31,14 +31,14 @@ Wheelspeedreport51e::Wheelspeedreport51e() {}
 const int32_t Wheelspeedreport51e::ID = 0x51E;
 
 void Wheelspeedreport51e::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_wheelspeed_report_51e()->set_rr(
+                                Ch* chassis) const {
+  chassis->mutable_wheelspeed_report_51e()->set_rr(
       rr(bytes, length));
-  chassis->mutable_ch()->mutable_wheelspeed_report_51e()->set_rl(
+  chassis->mutable_wheelspeed_report_51e()->set_rl(
       rl(bytes, length));
-  chassis->mutable_ch()->mutable_wheelspeed_report_51e()->set_fr(
+  chassis->mutable_wheelspeed_report_51e()->set_fr(
       fr(bytes, length));
-  chassis->mutable_ch()->mutable_wheelspeed_report_51e()->set_fl(
+  chassis->mutable_wheelspeed_report_51e()->set_fl(
       fl(bytes, length));
 }
 

@@ -36,7 +36,7 @@ cc_library(
     hdrs = ["brake_command_111.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -58,7 +58,7 @@ cc_library(
     hdrs = ["brake_status__511.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -80,7 +80,7 @@ cc_library(
     hdrs = ["ecu_status_1_515.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -102,7 +102,7 @@ cc_library(
     hdrs = ["ecu_status_2_516.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -124,7 +124,7 @@ cc_library(
     hdrs = ["ecu_status_3_517.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -146,7 +146,7 @@ cc_library(
     hdrs = ["ecu_status_4_518.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -158,7 +158,7 @@ cc_library(
     hdrs = ["gear_command_114.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -180,7 +180,7 @@ cc_library(
     hdrs = ["gear_status_514.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -202,7 +202,7 @@ cc_library(
     hdrs = ["steer_command_112.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -224,7 +224,7 @@ cc_library(
     hdrs = ["steer_status__512.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -246,7 +246,7 @@ cc_library(
     hdrs = ["throttle_command_110.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -268,7 +268,7 @@ cc_library(
     hdrs = ["throttle_status__510.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -290,7 +290,7 @@ cc_library(
     hdrs = ["turnsignal_command_113.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -313,7 +313,7 @@ cc_library(
     hdrs = ["turnsignal_status__513.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -335,7 +335,7 @@ cc_library(
     hdrs = ["vehicle_mode_command_116.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -347,7 +347,7 @@ cc_library(
     hdrs = ["vin_resp1_51b.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -359,7 +359,7 @@ cc_library(
     hdrs = ["vin_resp2_51c.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -371,7 +371,7 @@ cc_library(
     hdrs = ["vin_resp3_51d.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
@@ -383,7 +383,7 @@ cc_library(
     hdrs = ["wheelspeed_report_51e.h"],
     copts = CANBUS_COPTS,
     deps = [
-        "//modules/common_msgs/chassis_msgs:chassis_detail_cc_proto",
+        "//modules/canbus/vehicle/ch/proto:ch_cc_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],

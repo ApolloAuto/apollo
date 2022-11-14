@@ -15,8 +15,13 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
+
 #include "gtest/gtest.h"
+
+#include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace canbus {
@@ -24,22 +29,23 @@ namespace canbus {
 class ChVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    VehicleParameter parameter;
-    parameter.set_brand(apollo::common::CH);
-    ch_factory_.SetVehicleParameter(parameter);
+    std::string canbus_conf_file =
+        "modules/canbus/testdata/conf/ch_canbus_conf_test.pb.txt";
+    cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    params_ = canbus_conf_.vehicle_parameter();
+    params_.set_brand(apollo::common::CH);
+    ch_factory_.SetVehicleParameter(params_);
   }
   virtual void TearDown() {}
 
  protected:
   ChVehicleFactory ch_factory_;
+  CanbusConf canbus_conf_;
+  VehicleParameter params_;
 };
 
-TEST_F(ChVehicleFactoryTest, InitVehicleController) {
-  EXPECT_NE(ch_factory_.CreateVehicleController(), nullptr);
-}
-
-TEST_F(ChVehicleFactoryTest, InitMessageManager) {
-  EXPECT_NE(ch_factory_.CreateMessageManager(), nullptr);
+TEST_F(ChVehicleFactoryTest, Init) {
+  EXPECT_EQ(ch_factory_.Init(&canbus_conf_), true);
 }
 
 }  // namespace canbus

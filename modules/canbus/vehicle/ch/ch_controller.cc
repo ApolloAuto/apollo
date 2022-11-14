@@ -17,6 +17,7 @@
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 
 #include <string>
+
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
@@ -42,8 +43,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode ChController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Ch>* const can_sender,
+    MessageManager<::apollo::canbus::Ch>* const message_manager) {
   if (is_initialized_) {
     AINFO << "ChController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -157,7 +158,7 @@ void ChController::Stop() {
 Chassis ChController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Ch chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -167,58 +168,56 @@ Chassis ChController::chassis() {
 
   chassis_.set_driving_mode(driving_mode());
   chassis_.set_error_code(chassis_error_code());
-
   // 3
   chassis_.set_engine_started(true);
   // 4 engine rpm ch has no engine rpm
   // chassis_.set_engine_rpm(0);
   // 5 ch has no wheel spd.
-  if (chassis_detail.ch().has_ecu_status_1_515() &&
-      chassis_detail.ch().ecu_status_1_515().has_speed()) {
+  if (chassis_detail.has_ecu_status_1_515() &&
+      chassis_detail.ecu_status_1_515().has_speed()) {
     chassis_.set_speed_mps(
-        static_cast<float>(chassis_detail.ch().ecu_status_1_515().speed()));
+        static_cast<float>(chassis_detail.ecu_status_1_515().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
-
   // 6 ch has no odometer
   // chassis_.set_odometer_m(0);
   // 7 ch has no fuel. do not set;
   // chassis_.set_fuel_range_m(0);
   // 8 throttle
-  if (chassis_detail.ch().has_throttle_status__510() &&
-      chassis_detail.ch().throttle_status__510().has_throttle_pedal_sts()) {
+  if (chassis_detail.has_throttle_status__510() &&
+      chassis_detail.throttle_status__510().has_throttle_pedal_sts()) {
     chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.ch().throttle_status__510().throttle_pedal_sts()));
+        chassis_detail.throttle_status__510().throttle_pedal_sts()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9 brake
-  if (chassis_detail.ch().has_brake_status__511() &&
-      chassis_detail.ch().brake_status__511().has_brake_pedal_sts()) {
+  if (chassis_detail.has_brake_status__511() &&
+      chassis_detail.brake_status__511().has_brake_pedal_sts()) {
     chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.ch().brake_status__511().brake_pedal_sts()));
+        chassis_detail.brake_status__511().brake_pedal_sts()));
   } else {
     chassis_.set_brake_percentage(0);
   }
   // 10 gear
-  if (chassis_detail.ch().has_gear_status_514() &&
-      chassis_detail.ch().gear_status_514().has_gear_sts()) {
+  if (chassis_detail.has_gear_status_514() &&
+      chassis_detail.gear_status_514().has_gear_sts()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
+    if (chassis_detail.gear_status_514().gear_sts() ==
         Gear_status_514::GEAR_STS_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
+    if (chassis_detail.gear_status_514().gear_sts() ==
         Gear_status_514::GEAR_STS_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
+    if (chassis_detail.gear_status_514().gear_sts() ==
         Gear_status_514::GEAR_STS_DRIVE) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
-    if (chassis_detail.ch().gear_status_514().gear_sts() ==
+    if (chassis_detail.gear_status_514().gear_sts() ==
         Gear_status_514::GEAR_STS_PARK) {
       gear_pos = Chassis::GEAR_PARKING;
     }
@@ -228,24 +227,21 @@ Chassis ChController::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 11 steering
-  if (chassis_detail.ch().has_steer_status__512() &&
-      chassis_detail.ch().steer_status__512().has_steer_angle_sts()) {
+  if (chassis_detail.has_steer_status__512() &&
+      chassis_detail.steer_status__512().has_steer_angle_sts()) {
     chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.ch().steer_status__512().steer_angle_sts() * 100.0 /
+        chassis_detail.steer_status__512().steer_angle_sts() * 100.0 /
         vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
   // 12 battery soc
-  if (chassis_detail.ch().has_ecu_status_2_516() &&
-      chassis_detail.ch().ecu_status_2_516().has_battery_soc()) {
+  if (chassis_detail.has_ecu_status_2_516() &&
+      chassis_detail.ecu_status_2_516().has_battery_soc()) {
     chassis_.set_battery_soc_percentage(
-        chassis_detail.ch().ecu_status_2_516().battery_soc());
+        chassis_detail.ecu_status_2_516().battery_soc());
   }
   // 13
-  if (chassis_detail.has_surround()) {
-    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
-  }
   // 14 give engage_advice based on error_code and battery low soc warn
   if (!chassis_error_mask_ && chassis_.battery_soc_percentage() > 15.0) {
     chassis_.mutable_engage_advice()->set_advice(
@@ -263,8 +259,8 @@ Chassis ChController::chassis() {
   // vin set 17 bits, like LSBN1234567890123 is prased as
   // vin17(L),vin16(S),vin15(B),.....,vin03(1)vin02(2),vin01(3)
   std::string vin = "";
-  if (chassis_detail.ch().has_vin_resp1_51b()) {
-    Vin_resp1_51b vin_51b = chassis_detail.ch().vin_resp1_51b();
+  if (chassis_detail.has_vin_resp1_51b()) {
+    Vin_resp1_51b vin_51b = chassis_detail.vin_resp1_51b();
     vin += vin_51b.vin01();
     vin += vin_51b.vin02();
     vin += vin_51b.vin03();
@@ -274,8 +270,8 @@ Chassis ChController::chassis() {
     vin += vin_51b.vin07();
     vin += vin_51b.vin08();
   }
-  if (chassis_detail.ch().has_vin_resp2_51c()) {
-    Vin_resp2_51c vin_51c = chassis_detail.ch().vin_resp2_51c();
+  if (chassis_detail.has_vin_resp2_51c()) {
+    Vin_resp2_51c vin_51c = chassis_detail.vin_resp2_51c();
     vin += vin_51c.vin09();
     vin += vin_51c.vin10();
     vin += vin_51c.vin11();
@@ -285,17 +281,17 @@ Chassis ChController::chassis() {
     vin += vin_51c.vin15();
     vin += vin_51c.vin16();
   }
-  if (chassis_detail.ch().has_vin_resp3_51d()) {
-    Vin_resp3_51d vin_51d = chassis_detail.ch().vin_resp3_51d();
+  if (chassis_detail.has_vin_resp3_51d()) {
+    Vin_resp3_51d vin_51d = chassis_detail.vin_resp3_51d();
     vin += vin_51d.vin17();
   }
   std::reverse(vin.begin(), vin.end());
   chassis_.mutable_vehicle_id()->set_vin(vin);
 
   // 16 front bumper event
-  if (chassis_detail.ch().has_brake_status__511() &&
-      chassis_detail.ch().brake_status__511().has_front_bump_env()) {
-    if (chassis_detail.ch().brake_status__511().front_bump_env() ==
+  if (chassis_detail.has_brake_status__511() &&
+      chassis_detail.brake_status__511().has_front_bump_env()) {
+    if (chassis_detail.brake_status__511().front_bump_env() ==
         Brake_status__511::FRONT_BUMP_ENV_FRONT_BUMPER_ENV) {
       chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
     } else {
@@ -305,9 +301,9 @@ Chassis ChController::chassis() {
     chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
   }
   // 17 back bumper event
-  if (chassis_detail.ch().has_brake_status__511() &&
-      chassis_detail.ch().brake_status__511().has_back_bump_env()) {
-    if (chassis_detail.ch().brake_status__511().back_bump_env() ==
+  if (chassis_detail.has_brake_status__511() &&
+      chassis_detail.brake_status__511().has_back_bump_env()) {
+    if (chassis_detail.brake_status__511().back_bump_env() ==
         Brake_status__511::BACK_BUMP_ENV_BACK_BUMPER_ENV) {
       chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
     } else {
@@ -315,6 +311,22 @@ Chassis ChController::chassis() {
     }
   } else {
     chassis_.set_back_bumper_event(Chassis::BUMPER_INVALID);
+  }
+  // 18 add checkresponse signal
+  if (chassis_detail.has_brake_status__511() &&
+      chassis_detail.brake_status__511().has_brake_pedal_en_sts()) {
+    chassis_.mutable_check_response()->set_is_esp_online(
+        chassis_detail.brake_status__511().brake_pedal_en_sts() == 1);
+  }
+  if (chassis_detail.has_steer_status__512() &&
+      chassis_detail.steer_status__512().has_steer_angle_en_sts()) {
+    chassis_.mutable_check_response()->set_is_eps_online(
+        chassis_detail.steer_status__512().steer_angle_en_sts() == 1);
+  }
+  if (chassis_detail.has_throttle_status__510() &&
+      chassis_detail.throttle_status__510().has_throttle_pedal_en_sts()) {
+    chassis_.mutable_check_response()->set_is_vcu_online(
+        chassis_detail.throttle_status__510().throttle_pedal_en_sts() == 1);
   }
 
   return chassis_;
@@ -544,18 +556,17 @@ void ChController::ResetVin() {
 void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool ChController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Ch chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_ch()) {
+  if (!chassis_detail.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has NO ch vehicle info."
                       << chassis_detail.DebugString();
     return false;
   }
-  Ch ch = chassis_detail.ch();
   // steer motor fault
-  if (ch.has_steer_status__512()) {
+  if (chassis_detail.has_steer_status__512()) {
     if (Steer_status__512::STEER_ERR_STEER_MOTOR_ERR ==
-        ch.steer_status__512().steer_err()) {
+        chassis_detail.steer_status__512().steer_err()) {
       return true;
     }
     // cancel the sensor err check because of discarding the steer sensor
@@ -565,22 +576,22 @@ bool ChController::CheckChassisError() {
     // }
   }
   // drive error
-  if (ch.has_throttle_status__510()) {
+  if (chassis_detail.has_throttle_status__510()) {
     if (Throttle_status__510::DRIVE_MOTOR_ERR_DRV_MOTOR_ERR ==
-        ch.throttle_status__510().drive_motor_err()) {
+        chassis_detail.throttle_status__510().drive_motor_err()) {
       return true;
     }
     // cancel the battery err check bacause of always causing this error block
     // the vehicle use
     // if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
-    //     ch.throttle_status__510().battery_bms_err()) {
+    //     chassis_detail.throttle_status__510().battery_bms_err()) {
     //   return false;
     // }
   }
   // brake error
-  if (ch.has_brake_status__511()) {
+  if (chassis_detail.has_brake_status__511()) {
     if (Brake_status__511::BRAKE_ERR_BRAKE_SYSTEM_ERR ==
-        ch.brake_status__511().brake_err()) {
+        chassis_detail.brake_status__511().brake_err()) {
       return true;
     }
   }
@@ -658,7 +669,7 @@ void ChController::SecurityDogThreadFunc() {
 
 bool ChController::CheckResponse(const int32_t flags, bool need_wait) {
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Ch chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;

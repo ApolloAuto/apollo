@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/ch/proto/ch.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace ch {
 
 class Brakestatus511 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+                           ::apollo::canbus::Ch> {
  public:
   static const int32_t ID;
   Brakestatus511();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Ch* chassis) const override;
 
  private:
   // config detail: {'bit': 48, 'enum': {0: 'OVERSPD_ENV_NOENV', 1:

@@ -149,6 +149,8 @@ message Chassis {
   optional BumperEvent front_bumper_event = 38;
 
   optional BumperEvent back_bumper_event = 39;
+
+  optional CheckResponse check_response = 40;
 }
 
 message ChassisGPS {
@@ -239,4 +241,15 @@ message Surround {
 
 message License {
   optional string vin = 1 [deprecated = true];
+}
+
+// CheckResponseSignal
+message CheckResponse {
+  optional bool is_eps_online = 1 [default = false];
+  optional bool is_epb_online = 2 [default = false];
+  optional bool is_esp_online = 3 [default = false];
+  optional bool is_vtog_online = 4 [default = false];
+  optional bool is_scu_online = 5 [default = false];
+  optional bool is_switch_online = 6 [default = false];
+  optional bool is_vcu_online = 7 [default = false];
 }

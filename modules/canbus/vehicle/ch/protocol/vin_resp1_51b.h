@@ -18,8 +18,7 @@
 
 #include <string>
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
-
+#include "modules/canbus/vehicle/ch/proto/ch.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -27,12 +26,12 @@ namespace canbus {
 namespace ch {
 
 class Vinresp151b : public ::apollo::drivers::canbus::ProtocolData<
-                        ::apollo::canbus::ChassisDetail> {
+                        ::apollo::canbus::Ch> {
  public:
   static const int32_t ID;
   Vinresp151b();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Ch* chassis) const override;
 
  private:
   // config detail: {'bit': 56, 'description': 'VIN Response', 'is_signed_var':

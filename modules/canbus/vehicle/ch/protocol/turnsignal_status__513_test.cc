@@ -28,7 +28,7 @@ class Turnsignalstatus513Test : public ::testing::Test {
 TEST_F(Turnsignalstatus513Test, General) {
   uint8_t data[8] = {0x01, 0x01, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   int32_t length = 8;
-  ChassisDetail cd;
+  Ch cd;
   Turnsignalstatus513 turnsignalstatus;
   turnsignalstatus.Parse(data, length, &cd);
 
@@ -41,8 +41,8 @@ TEST_F(Turnsignalstatus513Test, General) {
   EXPECT_EQ(data[6], 0b00010011);
   EXPECT_EQ(data[7], 0b00010100);
 
-  EXPECT_EQ(cd.ch().turnsignal_status__513().turn_signal_sts(), 1);
-  EXPECT_EQ(cd.ch().turnsignal_status__513().low_beam_sts(), 1);
+  EXPECT_EQ(cd.turnsignal_status__513().turn_signal_sts(), 1);
+  EXPECT_EQ(cd.turnsignal_status__513().low_beam_sts(), 1);
 }
 
 }  // namespace ch

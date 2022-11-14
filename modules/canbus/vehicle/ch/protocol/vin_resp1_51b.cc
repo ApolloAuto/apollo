@@ -33,22 +33,22 @@ Vinresp151b::Vinresp151b() {}
 const int32_t Vinresp151b::ID = 0x51B;
 
 void Vinresp151b::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin08(
+                        Ch* chassis) const {
+  chassis->mutable_vin_resp1_51b()->set_vin08(
       vin08(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin07(
+  chassis->mutable_vin_resp1_51b()->set_vin07(
       vin07(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin06(
+  chassis->mutable_vin_resp1_51b()->set_vin06(
       vin06(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin05(
+  chassis->mutable_vin_resp1_51b()->set_vin05(
       vin05(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin04(
+  chassis->mutable_vin_resp1_51b()->set_vin04(
       vin04(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin03(
+  chassis->mutable_vin_resp1_51b()->set_vin03(
       vin03(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin02(
+  chassis->mutable_vin_resp1_51b()->set_vin02(
       vin02(bytes, length));
-  chassis->mutable_ch()->mutable_vin_resp1_51b()->set_vin01(
+  chassis->mutable_vin_resp1_51b()->set_vin01(
       vin01(bytes, length));
 }
 
