@@ -702,5 +702,7 @@ function run_bazel() {
   info "${TAB}Disabled:      ${spaces}${YELLOW}${disabled_targets}${NO_COLOR}"
 
   job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=${count} --local_ram_resources=HOST_RAM*0.7"
+  set -x
   bazel ${1,,} ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
+  set +x
 }
