@@ -36,7 +36,7 @@ def parse_data(channelname, msg, out_folder):
     parser images from Apollo record file
     """
     msg_camera = CompressedImage()
-    msg_camera.ParseFromString(str(msg))
+    msg_camera.ParseFromString(msg)
 
     tstamp = msg_camera.measurement_time
 
