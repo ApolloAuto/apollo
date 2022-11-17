@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
+#include "modules/canbus/vehicle/neolix_edu/neolix_edu_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 
@@ -26,27 +26,27 @@
 namespace apollo {
 namespace canbus {
 
-class ChVehicleFactoryTest : public ::testing::Test {
+class Neolix_eduVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/ch_canbus_conf_test.pb.txt";
+        "modules/canbus/testdata/conf/neolix_edu_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
-    params_.set_brand(apollo::common::CH);
-    ch_factory_.SetVehicleParameter(params_);
+    params_.set_brand(apollo::common::NEOLIX);
+    neolix_edu_factory_.SetVehicleParameter(params_);
   }
   virtual void TearDown() {}
 
  protected:
-  ChVehicleFactory ch_factory_;
+  Neolix_eduVehicleFactory neolix_edu_factory_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
 };
 
-TEST_F(ChVehicleFactoryTest, Init) {
+TEST_F(Neolix_eduVehicleFactoryTest, Init) {
   apollo::cyber::Init("vehicle_factory_test");
-  EXPECT_EQ(ch_factory_.Init(&canbus_conf_), true);
+  EXPECT_EQ(neolix_edu_factory_.Init(&canbus_conf_), true);
 }
 
 }  // namespace canbus

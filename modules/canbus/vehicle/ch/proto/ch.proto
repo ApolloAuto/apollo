@@ -408,13 +408,13 @@ message Wheelspeed_report_51e {
 
 // CheckResponseSignal
 message CheckResponseSignal {
-  optional bool is_eps_online = 1 [default = false];   // byd:0x34C qirui:0x505
-  optional bool is_epb_online = 2 [default = false];   // byd:0x218
-  optional bool is_esp_online = 3 [default = false];   // byd:0x122 qirui:0x451
-  optional bool is_vtog_online = 4 [default = false];  // byd:0x242
-  optional bool is_scu_online = 5 [default = false];   // byd:0x35C
-  optional bool is_switch_online = 6 [default = false];  // byd:0x133
-  optional bool is_vcu_online = 7 [default = false];     //  qirui:0x400
+  optional bool is_eps_online = 1 [default = false];
+  optional bool is_epb_online = 2 [default = false];
+  optional bool is_esp_online = 3 [default = false];
+  optional bool is_vtog_online = 4 [default = false];
+  optional bool is_scu_online = 5 [default = false];
+  optional bool is_switch_online = 6 [default = false];
+  optional bool is_vcu_online = 7 [default = false];
 }
 
 message Ch {
