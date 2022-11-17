@@ -241,22 +241,6 @@ export default class RoutingEditor {
       );
       return true;
     }
-    const points = _.isEmpty(routingPoints) ?
-      this.routePoints.map((object) => {
-        object.position.z = 0;
-        const offsetPoint = coordinates.applyOffset(object.position, true);
-        const heading = _.get(object, 'arrowMesh.heading', null);
-        if (_.isNumber(heading)) {
-          offsetPoint.heading = heading;
-        }
-        return offsetPoint;
-      }) : routingPoints.map((point) => {
-        point.z = 0;
-        if (_.isNumber(point.heading)) {
-          return _.pick(point, ['x', 'y', 'z', 'heading']);
-        }
-        return _.pick(point, ['x', 'y', 'z']);
-      });
     if (points.length === 3 && !_.isEmpty(this.deadJunctionInfo)) {
       const deadJunctionIdx = this.determinDeadEndJunctionRequest(points);
       if (deadJunctionIdx !== -1) {
