@@ -14,6 +14,7 @@ cc_library(
         "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:can_sender",

@@ -24,11 +24,10 @@
 #include <unordered_map>
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 
 #include "cyber/common/log.h"
-// #include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
