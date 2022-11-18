@@ -65,7 +65,7 @@ function VehicleListItem(props) {
       }</div>
       <div className='vehicle-list-item_vin'>vin: {item.vin}</div>
       <VehicleListItemStatus status={status} />
-      {/*// 按钮组*/}
+      {/* 按钮组 */}
       <div className='vehicle-list-item_btns'>
         <button className='vehicle-list-item_btns_btn' onClick={handleClick}>Refresh</button>
         <button className='vehicle-list-item_btns_btn' onClick={handleClick}>Upload</button>

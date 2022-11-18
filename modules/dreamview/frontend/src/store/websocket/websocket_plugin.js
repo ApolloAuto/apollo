@@ -42,7 +42,7 @@ export default class PluginWebSocketEndpoint {
       this.initialize();
     };
     this.worker.onmessage = (event) => {
-      if(event.data.type === 'PluginMsg') {
+      if (event.data.type === 'PluginMsg') {
         const message = event.data;
 
         switch (message.data.name) {
@@ -288,7 +288,7 @@ export default class PluginWebSocketEndpoint {
     }));
     return new Promise((resolve, reject) => {
       this.worker.onmessage = (event) => {
-        if(event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
             case 'RefreshVehicleConfigSuccess':
@@ -320,7 +320,7 @@ export default class PluginWebSocketEndpoint {
     }));
     return new Promise((resolve, reject) => {
       this.worker.onmessage = (event) => {
-        if(event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
             case 'ResetVehicleConfigSuccess':
@@ -352,7 +352,7 @@ export default class PluginWebSocketEndpoint {
     }));
     return new Promise((resolve, reject) => {
       this.worker.onmessage = (event) => {
-        if(event.data.type === 'PluginMsg') {
+        if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
             case 'UploadConfigSuccess':
