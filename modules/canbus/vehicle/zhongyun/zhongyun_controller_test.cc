@@ -21,6 +21,7 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/canbus/vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_controller.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -44,7 +45,7 @@ class ZhongyunControllerTest : public ::testing::Test {
 
  protected:
   ZhongyunController controller_;
-  CanSender<ChassisDetail> sender_;
+  CanSender<Zhongyun> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   ZhongyunMessageManager msg_manager_;

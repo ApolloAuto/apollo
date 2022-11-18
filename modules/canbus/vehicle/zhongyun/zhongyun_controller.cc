@@ -41,8 +41,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode ZhongyunController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Zhongyun>* const can_sender,
+    MessageManager<::apollo::canbus::Zhongyun>* const message_manager) {
   if (is_initialized_) {
     AINFO << "ZhongyunController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -145,7 +145,7 @@ void ZhongyunController::Stop() {
 Chassis ZhongyunController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Zhongyun chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 1, 2
@@ -158,26 +158,20 @@ Chassis ZhongyunController::chassis() {
 
   // 3
   chassis_.set_engine_started(true);
-  // if there is not zhongyun, no chassis detail can be retrieved and return
-  if (!chassis_detail.has_zhongyun()) {
-    AERROR << "NO ZHONGYUN chassis information!";
-    return chassis_;
-  }
-  Zhongyun zhy = chassis_detail.zhongyun();
 
   // 4 engine_rpm
-  if (zhy.has_vehicle_state_feedback_2_c4() &&
-      zhy.vehicle_state_feedback_2_c4().has_motor_speed()) {
+  if (chassis_detail.has_vehicle_state_feedback_2_c4() &&
+      chassis_detail.vehicle_state_feedback_2_c4().has_motor_speed()) {
     chassis_.set_engine_rpm(
-        static_cast<float>(zhy.vehicle_state_feedback_2_c4().motor_speed()));
+        static_cast<float>(chassis_detail.vehicle_state_feedback_2_c4().motor_speed()));
   } else {
     chassis_.set_engine_rpm(0);
   }
   // 5 speed_mps
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_speed()) {
+  if (chassis_detail.has_vehicle_state_feedback_c1() &&
+      chassis_detail.vehicle_state_feedback_c1().has_speed()) {
     chassis_.set_speed_mps(
-        static_cast<float>(zhy.vehicle_state_feedback_c1().speed()));
+        static_cast<float>(chassis_detail.vehicle_state_feedback_c1().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -185,25 +179,25 @@ Chassis ZhongyunController::chassis() {
   chassis_.set_fuel_range_m(0);
 
   // 7 acc_pedal
-  if (zhy.has_vehicle_state_feedback_2_c4() &&
-      zhy.vehicle_state_feedback_2_c4().has_driven_torque_feedback()) {
+  if (chassis_detail.has_vehicle_state_feedback_2_c4() &&
+      chassis_detail.vehicle_state_feedback_2_c4().has_driven_torque_feedback()) {
     chassis_.set_throttle_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_2_c4().driven_torque_feedback()));
+        chassis_detail.vehicle_state_feedback_2_c4().driven_torque_feedback()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 8 brake_pedal
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_brake_torque_feedback()) {
+  if (chassis_detail.has_vehicle_state_feedback_c1() &&
+      chassis_detail.vehicle_state_feedback_c1().has_brake_torque_feedback()) {
     chassis_.set_brake_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_c1().brake_torque_feedback()));
+        chassis_detail.vehicle_state_feedback_c1().brake_torque_feedback()));
   } else {
     chassis_.set_brake_percentage(0);
   }
   // 9 gear position
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_gear_state_actual()) {
-    switch (zhy.vehicle_state_feedback_c1().gear_state_actual()) {
+  if (chassis_detail.has_vehicle_state_feedback_c1() &&
+      chassis_detail.vehicle_state_feedback_c1().has_gear_state_actual()) {
+    switch (chassis_detail.vehicle_state_feedback_c1().gear_state_actual()) {
       case Vehicle_state_feedback_c1::GEAR_STATE_ACTUAL_D: {
         chassis_.set_gear_location(Chassis::GEAR_DRIVE);
       } break;
@@ -224,19 +218,19 @@ Chassis ZhongyunController::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 11 steering_percentage
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_steering_actual()) {
+  if (chassis_detail.has_vehicle_state_feedback_c1() &&
+      chassis_detail.vehicle_state_feedback_c1().has_steering_actual()) {
     chassis_.set_steering_percentage(static_cast<float>(
-        zhy.vehicle_state_feedback_c1().steering_actual() * 100.0 /
+        chassis_detail.vehicle_state_feedback_c1().steering_actual() * 100.0 /
         vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
   // 12 epb
-  if (zhy.has_vehicle_state_feedback_c1() &&
-      zhy.vehicle_state_feedback_c1().has_parking_actual()) {
+  if (chassis_detail.has_vehicle_state_feedback_c1() &&
+      chassis_detail.vehicle_state_feedback_c1().has_parking_actual()) {
     chassis_.set_parking_brake(
-        zhy.vehicle_state_feedback_c1().parking_actual() ==
+        chassis_detail.vehicle_state_feedback_c1().parking_actual() ==
         Vehicle_state_feedback_c1::PARKING_ACTUAL_PARKING_TRIGGER);
   } else {
     chassis_.set_parking_brake(false);
@@ -255,6 +249,25 @@ Chassis ZhongyunController::chassis() {
     chassis_.mutable_engage_advice()->set_reason(
         "CANBUS not ready, epb is not released or firmware error!");
   }
+
+  // 14 add checkresponse signal
+  if (chassis_detail.has_enable_state_feedback_c3()) {
+    if (chassis_detail.enable_state_feedback_c3().has_brake_enable_state()) {
+      chassis_.mutable_check_response()->set_is_esp_online(
+          chassis_detail.enable_state_feedback_c3().brake_enable_state() == 1);
+    }
+    if (chassis_detail.enable_state_feedback_c3().has_driven_enable_state() &&
+        chassis_detail.enable_state_feedback_c3().has_gear_enable_actual()) {
+      chassis_.mutable_check_response()->set_is_vcu_online(
+          ((chassis_detail.enable_state_feedback_c3().driven_enable_state() == 1) &&
+           (chassis_detail.enable_state_feedback_c3().gear_enable_actual() == 1)) == 1);
+    }
+    if (chassis_detail.enable_state_feedback_c3().has_steering_enable_state()) {
+      chassis_.mutable_check_response()->set_is_eps_online(
+          chassis_detail.enable_state_feedback_c3().steering_enable_state() == 1);
+    }
+  }
+
   return chassis_;
 }
 
@@ -512,48 +525,48 @@ void ZhongyunController::ResetProtocol() {
 }
 
 bool ZhongyunController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Zhongyun chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_zhongyun()) {
+  if (!chassis_detail.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has NO zhongyun vehicle info."
                       << chassis_detail.DebugString();
     return false;
   }
-  Zhongyun zhy = chassis_detail.zhongyun();
+
   // check steer error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_steering_error_code()) {
-    if (zhy.error_state_e1().steering_error_code() ==
+  if (chassis_detail.has_error_state_e1() &&
+      chassis_detail.error_state_e1().has_steering_error_code()) {
+    if (chassis_detail.error_state_e1().steering_error_code() ==
         Error_state_e1::STEERING_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check ems error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_driven_error_code()) {
-    if (zhy.error_state_e1().driven_error_code() ==
+  if (chassis_detail.has_error_state_e1() &&
+      chassis_detail.error_state_e1().has_driven_error_code()) {
+    if (chassis_detail.error_state_e1().driven_error_code() ==
         Error_state_e1::DRIVEN_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check eps error
-  if (zhy.has_error_state_e1() && zhy.error_state_e1().has_brake_error_code()) {
-    if (zhy.error_state_e1().brake_error_code() ==
+  if (chassis_detail.has_error_state_e1() && chassis_detail.error_state_e1().has_brake_error_code()) {
+    if (chassis_detail.error_state_e1().brake_error_code() ==
         Error_state_e1::BRAKE_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check gear error
-  if (zhy.has_error_state_e1() && zhy.error_state_e1().has_gear_error_msg()) {
-    if (zhy.error_state_e1().gear_error_msg() ==
+  if (chassis_detail.has_error_state_e1() && chassis_detail.error_state_e1().has_gear_error_msg()) {
+    if (chassis_detail.error_state_e1().gear_error_msg() ==
         Error_state_e1::GEAR_ERROR_MSG_ERROR) {
       return true;
     }
   }
   // check parking error
-  if (zhy.has_error_state_e1() &&
-      zhy.error_state_e1().has_parking_error_code()) {
-    if (zhy.error_state_e1().parking_error_code() ==
+  if (chassis_detail.has_error_state_e1() &&
+      chassis_detail.error_state_e1().has_parking_error_code()) {
+    if (chassis_detail.error_state_e1().parking_error_code() ==
         Error_state_e1::PARKING_ERROR_CODE_ERROR) {
       return true;
     }
@@ -635,7 +648,7 @@ bool ZhongyunController::CheckResponse(const int32_t flags, bool need_wait) {
   // for Zhongyun, CheckResponse commonly takes 300ms. We leave a 100ms buffer
   // for it.
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Zhongyun chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;

@@ -15,8 +15,13 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
+
 #include "gtest/gtest.h"
+
+#include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace canbus {
@@ -24,21 +29,24 @@ namespace canbus {
 class ZhongyunVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    VehicleParameter parameter;
-    parameter.set_brand(apollo::common::ZHONGYUN);
-    zhongyun_factory_.SetVehicleParameter(parameter);
+    std::string canbus_conf_file =
+        "modules/canbus/testdata/conf/zhongyun_canbus_conf_test.pb.txt";
+    cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    params_ = canbus_conf_.vehicle_parameter();
+    params_.set_brand(apollo::common::ZHONGYUN);
+    zhongyun_factory_.SetVehicleParameter(params_);
   }
+  virtual void TearDown() {}
 
  protected:
   ZhongyunVehicleFactory zhongyun_factory_;
+  CanbusConf canbus_conf_;
+  VehicleParameter params_;
 };
 
-TEST_F(ZhongyunVehicleFactoryTest, InitVehicleController) {
-  EXPECT_NE(zhongyun_factory_.CreateVehicleController(), nullptr);
-}
-
-TEST_F(ZhongyunVehicleFactoryTest, InitMessageManager) {
-  EXPECT_NE(zhongyun_factory_.CreateMessageManager(), nullptr);
+TEST_F(ZhongyunVehicleFactoryTest, Init) {
+  apollo::cyber::Init("vehicle_factory_test");
+  EXPECT_EQ(zhongyun_factory_.Init(&canbus_conf_), true);
 }
 
 }  // namespace canbus

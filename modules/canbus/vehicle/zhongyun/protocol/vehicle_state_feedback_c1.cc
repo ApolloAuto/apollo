@@ -31,20 +31,16 @@ Vehiclestatefeedbackc1::Vehiclestatefeedbackc1() {}
 const int32_t Vehiclestatefeedbackc1::ID = 0xC1;
 
 void Vehiclestatefeedbackc1::Parse(const std::uint8_t* bytes, int32_t length,
-                                   ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_parking_actual(parking_actual(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_brake_torque_feedback(brake_torque_feedback(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_gear_state_actual(gear_state_actual(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_c1()
-      ->set_steering_actual(steering_actual(bytes, length));
-  chassis->mutable_zhongyun()->mutable_vehicle_state_feedback_c1()->set_speed(
+                                   Zhongyun* chassis) const {
+  chassis->mutable_vehicle_state_feedback_c1()->set_parking_actual(
+      parking_actual(bytes, length));
+  chassis->mutable_vehicle_state_feedback_c1()->set_brake_torque_feedback(
+      brake_torque_feedback(bytes, length));
+  chassis->mutable_vehicle_state_feedback_c1()->set_gear_state_actual(
+      gear_state_actual(bytes, length));
+  chassis->mutable_vehicle_state_feedback_c1()->set_steering_actual(
+      steering_actual(bytes, length));
+  chassis->mutable_vehicle_state_feedback_c1()->set_speed(
       speed(bytes, length) / 3.6);
 }
 

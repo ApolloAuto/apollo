@@ -31,13 +31,11 @@ Vehiclestatefeedback2c4::Vehiclestatefeedback2c4() {}
 const int32_t Vehiclestatefeedback2c4::ID = 0xC4;
 
 void Vehiclestatefeedback2c4::Parse(const std::uint8_t* bytes, int32_t length,
-                                    ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_2_c4()
-      ->set_motor_speed(motor_speed(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_vehicle_state_feedback_2_c4()
-      ->set_driven_torque_feedback(driven_torque_feedback(bytes, length));
+                                    Zhongyun* chassis) const {
+  chassis->mutable_vehicle_state_feedback_2_c4()->set_motor_speed(
+      motor_speed(bytes, length));
+  chassis->mutable_vehicle_state_feedback_2_c4()->set_driven_torque_feedback(
+      driven_torque_feedback(bytes, length));
 }
 
 // config detail: {'name': 'motor_speed', 'offset': 0.0, 'precision': 1.0,

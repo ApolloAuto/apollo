@@ -31,17 +31,16 @@ Errorstatee1::Errorstatee1() {}
 const int32_t Errorstatee1::ID = 0xE1;
 
 void Errorstatee1::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_zhongyun()->mutable_error_state_e1()->set_brake_error_code(
+                         Zhongyun* chassis) const {
+  chassis->mutable_error_state_e1()->set_brake_error_code(
       brake_error_code(bytes, length));
-  chassis->mutable_zhongyun()->mutable_error_state_e1()->set_driven_error_code(
+  chassis->mutable_error_state_e1()->set_driven_error_code(
       driven_error_code(bytes, length));
-  chassis->mutable_zhongyun()
-      ->mutable_error_state_e1()
-      ->set_steering_error_code(steering_error_code(bytes, length));
-  chassis->mutable_zhongyun()->mutable_error_state_e1()->set_parking_error_code(
+  chassis->mutable_error_state_e1()->set_steering_error_code(
+      steering_error_code(bytes, length));
+  chassis->mutable_error_state_e1()->set_parking_error_code(
       parking_error_code(bytes, length));
-  chassis->mutable_zhongyun()->mutable_error_state_e1()->set_gear_error_msg(
+  chassis->mutable_error_state_e1()->set_gear_error_msg(
       gear_error_msg(bytes, length));
 }
 

@@ -15,7 +15,7 @@ limitations under the License.
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -25,7 +25,7 @@ namespace zhongyun {
 using ::apollo::drivers::canbus::MessageManager;
 
 class ZhongyunMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::Zhongyun> {
  public:
   ZhongyunMessageManager();
   virtual ~ZhongyunMessageManager();

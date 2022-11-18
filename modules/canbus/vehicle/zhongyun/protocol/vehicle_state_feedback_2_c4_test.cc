@@ -29,11 +29,11 @@ class Vehiclestatefeedback2c4Test : public ::testing::Test {
 TEST_F(Vehiclestatefeedback2c4Test, reset) {
   Vehiclestatefeedback2c4 feedback_;
   int32_t length = 8;
-  ChassisDetail cd;
+  Zhongyun cd;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   feedback_.Parse(bytes, length, &cd);
-  auto &feedbackinfo = cd.zhongyun().vehicle_state_feedback_2_c4();
+  auto &feedbackinfo = cd.vehicle_state_feedback_2_c4();
   EXPECT_DOUBLE_EQ(feedbackinfo.motor_speed(), 17544);
   EXPECT_DOUBLE_EQ(feedbackinfo.driven_torque_feedback(), 219.3);
 }

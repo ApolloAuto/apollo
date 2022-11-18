@@ -29,11 +29,11 @@ class Enablestatefeedbackc3Test : public ::testing::Test {
 TEST_F(Enablestatefeedbackc3Test, reset) {
   Enablestatefeedbackc3 feedback_;
   int32_t length = 8;
-  ChassisDetail cd;
+  Zhongyun cd;
   uint8_t bytes[8] = {0x01, 0x02, 0x01, 0x02, 0x01, 0x12, 0x13, 0x14};
 
   feedback_.Parse(bytes, length, &cd);
-  auto &feedbackinfo = cd.zhongyun().enable_state_feedback_c3();
+  auto &feedbackinfo = cd.enable_state_feedback_c3();
   EXPECT_DOUBLE_EQ(feedbackinfo.parking_enable_state(), 1);
   EXPECT_DOUBLE_EQ(feedbackinfo.steering_enable_state(), 2);
   EXPECT_DOUBLE_EQ(feedbackinfo.gear_enable_actual(), 1);

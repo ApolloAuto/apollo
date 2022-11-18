@@ -37,7 +37,7 @@ namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class ZhongyunController final : public VehicleController {
+class ZhongyunController final : public VehicleController<::apollo::canbus::Zhongyun> {
  public:
   ZhongyunController() {}
 
@@ -45,8 +45,8 @@ class ZhongyunController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Zhongyun>* const can_sender,
+      MessageManager<::apollo::canbus::Zhongyun>* const message_manager)
       override;
 
   bool Start() override;
