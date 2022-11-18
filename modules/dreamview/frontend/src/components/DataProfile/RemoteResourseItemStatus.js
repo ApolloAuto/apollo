@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import { PLUGIN_WS } from 'store/websocket';
 import { Tooltip } from 'antd';
@@ -6,6 +6,7 @@ import { Tooltip } from 'antd';
 import ProfileUpdatingIcon from 'assets/images/icons/profile_updating.png';
 import ProfileSuccessIcon from 'assets/images/icons/profile_success.png';
 import ProfileFailIcon from 'assets/images/icons/profile_fail.png';
+import LoadingIcon from 'assets/images/icons/loading.png';
 
 /**
  * Show remote scene set download status
@@ -82,7 +83,10 @@ export function RemoteResourseItemStatus(props) {
 export function RemoteResourceItemBtn(props) {
   const { status, id, type, store } = props;
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
   const handleClick = () => {
+    setRefreshing(true);
     if (type === 1) {
       if (status === 'updating') {
         store.studioConnector.updatingTheScenarioSetById(id);
@@ -98,35 +102,51 @@ export function RemoteResourceItemBtn(props) {
     if (type === 3) {
       PLUGIN_WS.downloadRecord(id);
     }
-
   };
 
-  if (status === 'notDownloaded') {
-    return (
-      <div className='scenario-set-list-item_button' onClick={handleClick}>Download</div>
-    );
-  }
+  const BtnFont = useMemo(() => {
+    if (status === 'notDownloaded') {
+      return 'Download';
+    }
 
-  if (status === 'toBeUpdated') {
-    return (
-      <div className='scenario-set-list-item_button' onClick={handleClick}>Update</div>
-    );
-  }
+    if (status === 'toBeUpdated') {
+      return 'Update';
+    }
 
-  if (status === 'updating') {
+    if (status === 'updating') {
+      return 'Cancel';
+    }
+
+    if (status === 'downloaded') {
+      return 'Downloaded';
+    }
+
+    if (status === 'fail') {
+      return 'Retry';
+    }
+
+    return null;
+  }, [status]);
+
+  useEffect(() => {
+    if (refreshing) {
+      setRefreshing(false);
+    }
+  }, [status]);
+
+  if (status !== 'downloaded') {
     return (
-      <div className='scenario-set-list-item_button' onClick={handleClick}>Cancel</div>
+      <div className='scenario-set-list-item_button' onClick={handleClick}>
+        {BtnFont}
+        {refreshing && <i className="scenario-set-list-item_button_refreshing">
+          <img src={LoadingIcon} alt='' />
+        </i>}
+      </div>
     );
   }
 
   if (status === 'downloaded') {
-    return <div className='scenario-set-list-item_button scenario-set-list-item_button_placehold'></div>;
-  }
-
-  if (status === 'fail') {
-    return (
-      <div className='scenario-set-list-item_button' onClick={handleClick}>Retry</div>
-    );
+    return <div className='scenario-set-list-item_button scenario-set-list-item_button_placehold' />;
   }
 
   return null;

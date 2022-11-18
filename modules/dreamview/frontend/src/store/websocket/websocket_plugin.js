@@ -1,5 +1,6 @@
 import STORE from 'store';
 import Worker from 'utils/webworker.js';
+import { action } from 'mobx';
 
 export default class PluginWebSocketEndpoint {
   constructor(serverAddr) {
@@ -122,6 +123,23 @@ export default class PluginWebSocketEndpoint {
               'fail',
               JSON.parse(message.data.info)?.error_msg,
             );
+          case 'GetVehicleInfoSuccess':
+            STORE.studioConnector.updateVehicleInfo(
+              JSON.parse(message.data.info),
+              2,
+            );
+            break;
+          case 'GetVehicleInfoFail':
+            STORE.studioConnector.updateVehicleInfo(
+              JSON.parse(message.data.info),
+              3,
+            );
+            break;
+          case 'RefreshVehicleConfigSuccess':
+            STORE.studioConnector.refreshVehicleConfig(
+              JSON.parse(message.data.info),
+              2,
+            );
         }
       }
     };
@@ -142,6 +160,7 @@ export default class PluginWebSocketEndpoint {
     }));
     return this;
   }
+
 
   getScenarioSetList() {
     this.websocket.send(JSON.stringify({
@@ -174,7 +193,7 @@ export default class PluginWebSocketEndpoint {
   }
 
   // 下载record
-  downloadRecord(id) {
+  downloadRecord() {
     this.websocket.send(JSON.stringify({
       type: 'PluginRequest',
       data: {
@@ -235,5 +254,116 @@ export default class PluginWebSocketEndpoint {
       }
     }));
     return this;
+  }
+
+  getVehicleInfo() {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'GetVehicleInfo',
+        'source': 'dreamview',
+        'info': '',
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return this;
+  }
+
+  /**
+   * refresh vehicle config
+   */
+  refreshVehicleConfig(vehicle_id) {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'RefreshVehicleConfig',
+        'source': 'dreamview',
+        'info': vehicle_id,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.onmessage = (event) => {
+        if(event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'RefreshVehicleConfigSuccess':
+              resolve();
+              break;
+            case 'RefreshVehicleConfigFail':
+              reject();
+              break;
+          }
+        }
+      };
+    });
+  }
+
+  /**
+   * reset vehicle config
+   */
+  resetVehicleConfig(vehicle_id) {
+    this.websocket.send(JSON.stringify({
+      'type': 'PluginRequest',
+      'data': {
+        'name': 'ResetVehicleConfig',
+        'source': 'dreamview',
+        'info': vehicle_id,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins'
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.onmessage = (event) => {
+        if(event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'ResetVehicleConfigSuccess':
+              resolve();
+              break;
+            case 'ResetVehicleConfigFail':
+              reject();
+              break;
+          }
+        }
+      };
+    });
+  }
+
+  /**
+   * upload vehicle config
+   */
+  uploadVehicleConfig(vehicle_id) {
+    this.websocket.send(JSON.stringify({
+      'type': 'PluginRequest',
+      'data': {
+        'name': 'UploadVehicleConfig',
+        'source': 'dreamview',
+        'info': vehicle_id,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins'
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.onmessage = (event) => {
+        if(event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'UploadConfigSuccess':
+              resolve();
+              break;
+            case 'UploadConfigFail':
+              reject();
+              break;
+          }
+        }
+      };
+    });
   }
 }
