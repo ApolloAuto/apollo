@@ -387,15 +387,19 @@ class Renderer {
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
-    return this.routingEditor.sendCycleRoutingRequest
-    (defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+    return this.routingEditor.sendCycleRoutingRequest(
+      defaultRoutingName,
+      points,
+      cycleNumber,
+      this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
 
   sendParkGoRoutingRequest(points, parkTime) {
-    return this.routingEditor.sendParkGoRoutingRequest
-    (points, parkTime, this.adc.mesh.position,
+    return this.routingEditor.sendParkGoRoutingRequest(
+      points, parkTime,
+      this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
