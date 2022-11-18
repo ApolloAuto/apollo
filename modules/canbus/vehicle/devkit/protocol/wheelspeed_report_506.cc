@@ -30,14 +30,14 @@ Wheelspeedreport506::Wheelspeedreport506() {}
 const int32_t Wheelspeedreport506::ID = 0x506;
 
 void Wheelspeedreport506::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_wheelspeed_report_506()->set_rr(
+                                Devkit* chassis) const {
+  chassis->mutable_wheelspeed_report_506()->set_rr(
       rr(bytes, length));
-  chassis->mutable_devkit()->mutable_wheelspeed_report_506()->set_rl(
+  chassis->mutable_wheelspeed_report_506()->set_rl(
       rl(bytes, length));
-  chassis->mutable_devkit()->mutable_wheelspeed_report_506()->set_fr(
+  chassis->mutable_wheelspeed_report_506()->set_fr(
       fr(bytes, length));
-  chassis->mutable_devkit()->mutable_wheelspeed_report_506()->set_fl(
+  chassis->mutable_wheelspeed_report_506()->set_fl(
       fl(bytes, length));
 }
 

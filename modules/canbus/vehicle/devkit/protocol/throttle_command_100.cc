@@ -39,18 +39,16 @@ uint32_t Throttlecommand100::GetPeriod() const {
 }
 
 void Throttlecommand100::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_throttle_command_100()
-      ->set_throttle_en_ctrl(throttle_en_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_throttle_command_100()->set_throttle_acc(
+                               Devkit* chassis) const {
+  chassis->mutable_throttle_command_100()->set_throttle_en_ctrl(
+      throttle_en_ctrl(bytes, length));
+  chassis->mutable_throttle_command_100()->set_throttle_acc(
       throttle_acc(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_throttle_command_100()
-      ->set_throttle_pedal_target(throttle_pedal_target(bytes, length));
-  chassis->mutable_devkit()->mutable_throttle_command_100()->set_speed_target(
+  chassis->mutable_throttle_command_100()->set_throttle_pedal_target(
+      throttle_pedal_target(bytes, length));
+  chassis->mutable_throttle_command_100()->set_speed_target(
       speed_target(bytes, length));
-  chassis->mutable_devkit()->mutable_throttle_command_100()->set_checksum_100(
+  chassis->mutable_throttle_command_100()->set_checksum_100(
       checksum_100(bytes, length));
 }
 

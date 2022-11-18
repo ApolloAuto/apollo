@@ -30,12 +30,12 @@ const int32_t Gearcommand103::ID = 0x103;
 Gearcommand103::Gearcommand103() { Reset(); }
 
 void Gearcommand103::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_gear_command_103()->set_gear_target(
+                           Devkit* chassis) const {
+  chassis->mutable_gear_command_103()->set_gear_target(
       gear_target(bytes, length));
-  chassis->mutable_devkit()->mutable_gear_command_103()->set_gear_en_ctrl(
+  chassis->mutable_gear_command_103()->set_gear_en_ctrl(
       gear_en_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_gear_command_103()->set_checksum_103(
+  chassis->mutable_gear_command_103()->set_checksum_103(
       checksum_103(bytes, length));
 }
 

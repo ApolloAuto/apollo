@@ -30,22 +30,19 @@ Steeringreport502::Steeringreport502() {}
 const int32_t Steeringreport502::ID = 0x502;
 
 void Steeringreport502::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_steering_report_502()
-      ->set_steer_angle_rear_actual(steer_angle_rear_actual(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_steering_report_502()
-      ->set_steer_angle_spd_actual(steer_angle_spd_actual(bytes, length));
-  chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_flt2(
+                              Devkit* chassis) const {
+  chassis->mutable_steering_report_502()->set_steer_angle_rear_actual(
+      steer_angle_rear_actual(bytes, length));
+  chassis->mutable_steering_report_502()->set_steer_angle_spd_actual(
+      steer_angle_spd_actual(bytes, length));
+  chassis->mutable_steering_report_502()->set_steer_flt2(
       steer_flt2(bytes, length));
-  chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_flt1(
+  chassis->mutable_steering_report_502()->set_steer_flt1(
       steer_flt1(bytes, length));
-  chassis->mutable_devkit()->mutable_steering_report_502()->set_steer_en_state(
+  chassis->mutable_steering_report_502()->set_steer_en_state(
       steer_en_state(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_steering_report_502()
-      ->set_steer_angle_actual(steer_angle_actual(bytes, length));
+  chassis->mutable_steering_report_502()->set_steer_angle_actual(
+      steer_angle_actual(bytes, length));
   chassis->mutable_check_response()->set_is_eps_online(
       steer_en_state(bytes, length) == 1);
 }

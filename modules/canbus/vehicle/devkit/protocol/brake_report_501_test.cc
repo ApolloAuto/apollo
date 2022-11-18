@@ -29,7 +29,7 @@ class Brakereport501Test : public ::testing::Test {
 TEST_F(Brakereport501Test, General) {
   uint8_t data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Brakereport501 brakereport;
   brakereport.Parse(data, length, &cd);
 
@@ -42,10 +42,10 @@ TEST_F(Brakereport501Test, General) {
   EXPECT_EQ(data[6], 0b00000000);
   EXPECT_EQ(data[7], 0b00000001);
 
-  EXPECT_EQ(cd.devkit().brake_report_501().brake_pedal_actual(), 85);
-  EXPECT_EQ(cd.devkit().brake_report_501().brake_flt2(), 1);
-  EXPECT_EQ(cd.devkit().brake_report_501().brake_flt1(), 0);
-  EXPECT_EQ(cd.devkit().brake_report_501().brake_en_state(), 1);
+  EXPECT_EQ(cd.brake_report_501().brake_pedal_actual(), 85);
+  EXPECT_EQ(cd.brake_report_501().brake_flt2(), 1);
+  EXPECT_EQ(cd.brake_report_501().brake_flt1(), 0);
+  EXPECT_EQ(cd.brake_report_501().brake_en_state(), 1);
 }
 
 }  // namespace devkit

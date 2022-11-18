@@ -29,7 +29,7 @@ class Gearreport503Test : public ::testing::Test {
 TEST_F(Gearreport503Test, General) {
   uint8_t data[8] = {0x04, 0x01, 0x01, 0x10, 0x90, 0x01, 0x00, 0x01};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Gearreport503 gearreport;
   gearreport.Parse(data, length, &cd);
 
@@ -42,8 +42,8 @@ TEST_F(Gearreport503Test, General) {
   EXPECT_EQ(data[6], 0b00000000);
   EXPECT_EQ(data[7], 0b00000001);
 
-  EXPECT_EQ(cd.devkit().gear_report_503().gear_flt(), 1);
-  EXPECT_EQ(cd.devkit().gear_report_503().gear_actual(), 4);
+  EXPECT_EQ(cd.gear_report_503().gear_flt(), 1);
+  EXPECT_EQ(cd.gear_report_503().gear_actual(), 4);
 }
 
 }  // namespace devkit

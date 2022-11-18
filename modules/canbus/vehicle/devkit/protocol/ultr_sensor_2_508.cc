@@ -30,19 +30,15 @@ Ultrsensor2508::Ultrsensor2508() {}
 const int32_t Ultrsensor2508::ID = 0x508;
 
 void Ultrsensor2508::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_ultr_sensor_2_508()
-      ->set_uiuss9_tof_indirect(uiuss9_tof_indirect(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_ultr_sensor_2_508()
-      ->set_uiuss8_tof_indirect(uiuss8_tof_indirect(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_ultr_sensor_2_508()
-      ->set_uiuss11_tof_indirect(uiuss11_tof_indirect(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_ultr_sensor_2_508()
-      ->set_uiuss10_tof_indirect(uiuss10_tof_indirect(bytes, length));
+                           Devkit* chassis) const {
+  chassis->mutable_ultr_sensor_2_508()->set_uiuss9_tof_indirect(
+      uiuss9_tof_indirect(bytes, length));
+  chassis->mutable_ultr_sensor_2_508()->set_uiuss8_tof_indirect(
+      uiuss8_tof_indirect(bytes, length));
+  chassis->mutable_ultr_sensor_2_508()->set_uiuss11_tof_indirect(
+      uiuss11_tof_indirect(bytes, length));
+  chassis->mutable_ultr_sensor_2_508()->set_uiuss10_tof_indirect(
+      uiuss10_tof_indirect(bytes, length));
 }
 
 // config detail: {'name': 'uiuss9_tof_indirect', 'offset': 0.0, 'precision':

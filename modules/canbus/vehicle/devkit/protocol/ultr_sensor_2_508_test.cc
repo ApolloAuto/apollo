@@ -29,7 +29,7 @@ class Ultrsensor2508Test : public ::testing::Test {
 TEST_F(Ultrsensor2508Test, General) {
   uint8_t data[8] = {0xE2, 0x95, 0x06, 0x58, 0x08, 0xD6, 0x02, 0x44};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Ultrsensor2508 ultrsensor2;
   ultrsensor2.Parse(data, length, &cd);
 
@@ -42,10 +42,10 @@ TEST_F(Ultrsensor2508Test, General) {
   EXPECT_EQ(data[6], 0b00000010);
   EXPECT_EQ(data[7], 0b01000100);
 
-  EXPECT_EQ(cd.devkit().ultr_sensor_2_508().uiuss9_tof_indirect(), 28);
-  EXPECT_EQ(cd.devkit().ultr_sensor_2_508().uiuss8_tof_indirect(), 1000);
-  EXPECT_EQ(cd.devkit().ultr_sensor_2_508().uiuss11_tof_indirect(), 10);
-  EXPECT_EQ(cd.devkit().ultr_sensor_2_508().uiuss10_tof_indirect(), 39);
+  EXPECT_EQ(cd.ultr_sensor_2_508().uiuss9_tof_indirect(), 28);
+  EXPECT_EQ(cd.ultr_sensor_2_508().uiuss8_tof_indirect(), 1000);
+  EXPECT_EQ(cd.ultr_sensor_2_508().uiuss11_tof_indirect(), 10);
+  EXPECT_EQ(cd.ultr_sensor_2_508().uiuss10_tof_indirect(), 39);
 }
 
 }  // namespace devkit

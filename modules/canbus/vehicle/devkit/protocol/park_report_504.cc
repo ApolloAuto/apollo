@@ -30,10 +30,10 @@ Parkreport504::Parkreport504() {}
 const int32_t Parkreport504::ID = 0x504;
 
 void Parkreport504::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_park_report_504()->set_parking_actual(
+                          Devkit* chassis) const {
+  chassis->mutable_park_report_504()->set_parking_actual(
       parking_actual(bytes, length));
-  chassis->mutable_devkit()->mutable_park_report_504()->set_park_flt(
+  chassis->mutable_park_report_504()->set_park_flt(
       park_flt(bytes, length));
 }
 

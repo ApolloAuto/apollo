@@ -36,7 +36,7 @@ namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class DevkitController final : public VehicleController {
+class DevkitController final : public VehicleController<::apollo::canbus::Devkit> {
  public:
   DevkitController() {}
 
@@ -44,8 +44,8 @@ class DevkitController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Devkit>* const can_sender,
+      MessageManager<::apollo::canbus::Devkit>* const message_manager)
       override;
 
   bool Start() override;

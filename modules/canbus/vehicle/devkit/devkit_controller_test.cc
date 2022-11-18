@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/devkit/proto/devkit.pb.h"
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -50,7 +50,7 @@ class DevkitControllerTest : public ::testing::Test {
   DevkitController controller_;
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Devkit> sender_;
   DevkitMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;

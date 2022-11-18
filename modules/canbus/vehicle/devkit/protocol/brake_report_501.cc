@@ -30,14 +30,14 @@ Brakereport501::Brakereport501() {}
 const int32_t Brakereport501::ID = 0x501;
 
 void Brakereport501::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_pedal_actual(
+                           Devkit* chassis) const {
+  chassis->mutable_brake_report_501()->set_brake_pedal_actual(
       brake_pedal_actual(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt2(
+  chassis->mutable_brake_report_501()->set_brake_flt2(
       brake_flt2(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_flt1(
+  chassis->mutable_brake_report_501()->set_brake_flt1(
       brake_flt1(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_report_501()->set_brake_en_state(
+  chassis->mutable_brake_report_501()->set_brake_en_state(
       brake_en_state(bytes, length));
   chassis->mutable_check_response()->set_is_esp_online(
       brake_en_state(bytes, length) == 1);

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/devkit/proto/devkit.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace devkit {
 
 class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
-                              ::apollo::canbus::ChassisDetail> {
+                              ::apollo::canbus::Devkit> {
  public:
   static const int32_t ID;
   Throttlereport500();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Devkit* chassis) const override;
 
  private:
   // config detail: {'name': 'Throttle_Pedal_Actual', 'offset': 0.0,

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/devkit/proto/devkit.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,7 +24,7 @@ namespace canbus {
 namespace devkit {
 
 class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
-                           ::apollo::canbus::ChassisDetail> {
+                           ::apollo::canbus::Devkit> {
  public:
   static const int32_t ID;
 
@@ -33,7 +33,7 @@ class Parkcommand104 : public ::apollo::drivers::canbus::ProtocolData<
   uint32_t GetPeriod() const override;
 
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Devkit* chassis) const override;
 
   void UpdateData(uint8_t* data) override;
 

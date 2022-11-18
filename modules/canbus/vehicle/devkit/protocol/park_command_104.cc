@@ -36,12 +36,12 @@ uint32_t Parkcommand104::GetPeriod() const {
 }
 
 void Parkcommand104::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_park_command_104()->set_park_target(
+                           Devkit* chassis) const {
+  chassis->mutable_park_command_104()->set_park_target(
       park_target(bytes, length));
-  chassis->mutable_devkit()->mutable_park_command_104()->set_park_en_ctrl(
+  chassis->mutable_park_command_104()->set_park_en_ctrl(
       park_en_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_park_command_104()->set_checksum_104(
+  chassis->mutable_park_command_104()->set_checksum_104(
       checksum_104(bytes, length));
 }
 

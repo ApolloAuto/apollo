@@ -30,17 +30,15 @@ Throttlereport500::Throttlereport500() {}
 const int32_t Throttlereport500::ID = 0x500;
 
 void Throttlereport500::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_throttle_report_500()
-      ->set_throttle_pedal_actual(throttle_pedal_actual(bytes, length));
-  chassis->mutable_devkit()->mutable_throttle_report_500()->set_throttle_flt2(
+                              Devkit* chassis) const {
+  chassis->mutable_throttle_report_500()->set_throttle_pedal_actual(
+      throttle_pedal_actual(bytes, length));
+  chassis->mutable_throttle_report_500()->set_throttle_flt2(
       throttle_flt2(bytes, length));
-  chassis->mutable_devkit()->mutable_throttle_report_500()->set_throttle_flt1(
+  chassis->mutable_throttle_report_500()->set_throttle_flt1(
       throttle_flt1(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_throttle_report_500()
-      ->set_throttle_en_state(throttle_en_state(bytes, length));
+  chassis->mutable_throttle_report_500()->set_throttle_en_state(
+      throttle_en_state(bytes, length));
   chassis->mutable_check_response()->set_is_vcu_online(
       throttle_en_state(bytes, length) == 1);
 }

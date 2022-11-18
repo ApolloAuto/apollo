@@ -29,7 +29,7 @@ class Throttlereport500Test : public ::testing::Test {
 TEST_F(Throttlereport500Test, General) {
   uint8_t data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Throttlereport500 throttlereport;
   throttlereport.Parse(data, length, &cd);
 
@@ -42,10 +42,10 @@ TEST_F(Throttlereport500Test, General) {
   EXPECT_EQ(data[6], 0b00000100);
   EXPECT_EQ(data[7], 0b00000101);
 
-  EXPECT_EQ(cd.devkit().throttle_report_500().throttle_pedal_actual(), 65);
-  EXPECT_EQ(cd.devkit().throttle_report_500().throttle_flt2(), 1);
-  EXPECT_EQ(cd.devkit().throttle_report_500().throttle_flt1(), 1);
-  EXPECT_EQ(cd.devkit().throttle_report_500().throttle_en_state(), 3);
+  EXPECT_EQ(cd.throttle_report_500().throttle_pedal_actual(), 65);
+  EXPECT_EQ(cd.throttle_report_500().throttle_flt2(), 1);
+  EXPECT_EQ(cd.throttle_report_500().throttle_flt1(), 1);
+  EXPECT_EQ(cd.throttle_report_500().throttle_en_state(), 3);
 }
 
 }  // namespace devkit

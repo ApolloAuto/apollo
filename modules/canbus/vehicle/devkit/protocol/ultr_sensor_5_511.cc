@@ -30,14 +30,14 @@ Ultrsensor5511::Ultrsensor5511() {}
 const int32_t Ultrsensor5511::ID = 0x511;
 
 void Ultrsensor5511::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss7_tof_direct(
+                           Devkit* chassis) const {
+  chassis->mutable_ultr_sensor_5_511()->set_uiuss7_tof_direct(
       uiuss7_tof_direct(bytes, length));
-  chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss6_tof_direct(
+  chassis->mutable_ultr_sensor_5_511()->set_uiuss6_tof_direct(
       uiuss6_tof_direct(bytes, length));
-  chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss1_tof_direct(
+  chassis->mutable_ultr_sensor_5_511()->set_uiuss1_tof_direct(
       uiuss1_tof_direct(bytes, length));
-  chassis->mutable_devkit()->mutable_ultr_sensor_5_511()->set_uiuss0_tof_direct(
+  chassis->mutable_ultr_sensor_5_511()->set_uiuss0_tof_direct(
       uiuss0_tof_direct(bytes, length));
 }
 

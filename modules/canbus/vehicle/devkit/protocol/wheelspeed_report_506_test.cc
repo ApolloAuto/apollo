@@ -29,7 +29,7 @@ class Wheelspeedreport506Test : public ::testing::Test {
 TEST_F(Wheelspeedreport506Test, General) {
   uint8_t data[8] = {0x07, 0x01, 0x01, 0x02, 0x8A, 0x03, 0x04, 0x05};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Wheelspeedreport506 wheelspeedreport;
   wheelspeedreport.Parse(data, length, &cd);
 
@@ -42,10 +42,10 @@ TEST_F(Wheelspeedreport506Test, General) {
   EXPECT_EQ(data[6], 0b00000100);
   EXPECT_EQ(data[7], 0b00000101);
 
-  EXPECT_EQ(cd.devkit().wheelspeed_report_506().rr(), 1.029);
-  EXPECT_EQ(cd.devkit().wheelspeed_report_506().rl(), 35.331);
-  EXPECT_EQ(cd.devkit().wheelspeed_report_506().fr(), 0.258);
-  EXPECT_EQ(cd.devkit().wheelspeed_report_506().fl(), 1.793);
+  EXPECT_EQ(cd.wheelspeed_report_506().rr(), 1.029);
+  EXPECT_EQ(cd.wheelspeed_report_506().rl(), 35.331);
+  EXPECT_EQ(cd.wheelspeed_report_506().fr(), 0.258);
+  EXPECT_EQ(cd.wheelspeed_report_506().fl(), 1.793);
 }
 
 }  // namespace devkit

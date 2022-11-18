@@ -31,25 +31,21 @@ Bmsreport512::Bmsreport512() {}
 const int32_t Bmsreport512::ID = 0x512;
 
 void Bmsreport512::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_current(
+                         Devkit* chassis) const {
+  chassis->mutable_bms_report_512()->set_battery_current(
       battery_current(bytes, length));
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_voltage(
+  chassis->mutable_bms_report_512()->set_battery_voltage(
       battery_voltage(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_bms_report_512()
-      ->set_battery_soc_percentage(battery_soc_percentage(bytes, length));
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_is_battery_soc_low(
+  chassis->mutable_bms_report_512()->set_battery_soc_percentage(
+      battery_soc_percentage(bytes, length));
+  chassis->mutable_bms_report_512()->set_is_battery_soc_low(
       battery_soc_percentage(bytes, length) <= 15);
-  chassis->mutable_devkit()
-      ->mutable_bms_report_512()
-      ->set_battery_inside_temperature(
+  chassis->mutable_bms_report_512()->set_battery_inside_temperature(
           battery_inside_temperature(bytes, length));
-  chassis->mutable_devkit()->mutable_bms_report_512()->set_battery_flt_low_temp(
+  chassis->mutable_bms_report_512()->set_battery_flt_low_temp(
       battery_flt_low_temp(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_bms_report_512()
-      ->set_battery_flt_over_temp(battery_flt_over_temp(bytes, length));
+  chassis->mutable_bms_report_512()->set_battery_flt_over_temp(
+      battery_flt_over_temp(bytes, length));
 }
 
 // config detail: {'bit': 23, 'description': 'Battery Total Current',

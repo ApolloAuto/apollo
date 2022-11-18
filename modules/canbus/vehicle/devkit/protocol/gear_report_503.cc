@@ -30,10 +30,10 @@ Gearreport503::Gearreport503() {}
 const int32_t Gearreport503::ID = 0x503;
 
 void Gearreport503::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_gear_report_503()->set_gear_flt(
+                          Devkit* chassis) const {
+  chassis->mutable_gear_report_503()->set_gear_flt(
       gear_flt(bytes, length));
-  chassis->mutable_devkit()->mutable_gear_report_503()->set_gear_actual(
+  chassis->mutable_gear_report_503()->set_gear_actual(
       gear_actual(bytes, length));
 }
 

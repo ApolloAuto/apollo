@@ -29,7 +29,7 @@ class Parkreport504Test : public ::testing::Test {
 TEST_F(Parkreport504Test, General) {
   uint8_t data[8] = {0x04, 0x01, 0x01, 0x10, 0x90, 0x01, 0x00, 0x01};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Parkreport504 parkreport;
   parkreport.Parse(data, length, &cd);
 
@@ -42,8 +42,8 @@ TEST_F(Parkreport504Test, General) {
   EXPECT_EQ(data[6], 0b00000000);
   EXPECT_EQ(data[7], 0b00000001);
 
-  EXPECT_EQ(cd.devkit().park_report_504().parking_actual(), 0);
-  EXPECT_EQ(cd.devkit().park_report_504().park_flt(), 1);
+  EXPECT_EQ(cd.park_report_504().parking_actual(), 0);
+  EXPECT_EQ(cd.park_report_504().park_flt(), 1);
 }
 
 }  // namespace devkit

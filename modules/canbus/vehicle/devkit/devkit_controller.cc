@@ -45,8 +45,8 @@ bool emergency_brake = false;
 
 ErrorCode DevkitController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Devkit>* const can_sender,
+    MessageManager<::apollo::canbus::Devkit>* const message_manager) {
   if (is_initialized_) {
     AINFO << "DevkitController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -159,7 +159,7 @@ void DevkitController::Stop() {
 Chassis DevkitController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -175,29 +175,29 @@ Chassis DevkitController::chassis() {
   // 4 engine rpm ch has no engine rpm
   // chassis_.set_engine_rpm(0);
   // 5 wheel spd
-  if (chassis_detail.devkit().has_wheelspeed_report_506()) {
-    if (chassis_detail.devkit().wheelspeed_report_506().has_rr()) {
+  if (chassis_detail.has_wheelspeed_report_506()) {
+    if (chassis_detail.wheelspeed_report_506().has_rr()) {
       chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-          chassis_detail.devkit().wheelspeed_report_506().rr());
+          chassis_detail.wheelspeed_report_506().rr());
     }
-    if (chassis_detail.devkit().wheelspeed_report_506().has_rl()) {
+    if (chassis_detail.wheelspeed_report_506().has_rl()) {
       chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-          chassis_detail.devkit().wheelspeed_report_506().rl());
+          chassis_detail.wheelspeed_report_506().rl());
     }
-    if (chassis_detail.devkit().wheelspeed_report_506().has_fr()) {
+    if (chassis_detail.wheelspeed_report_506().has_fr()) {
       chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-          chassis_detail.devkit().wheelspeed_report_506().fr());
+          chassis_detail.wheelspeed_report_506().fr());
     }
-    if (chassis_detail.devkit().wheelspeed_report_506().has_fl()) {
+    if (chassis_detail.wheelspeed_report_506().has_fl()) {
       chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-          chassis_detail.devkit().wheelspeed_report_506().fl());
+          chassis_detail.wheelspeed_report_506().fl());
     }
   }
   // 6 speed_mps
-  if (chassis_detail.devkit().has_vcu_report_505() &&
-      chassis_detail.devkit().vcu_report_505().has_speed()) {
+  if (chassis_detail.has_vcu_report_505() &&
+      chassis_detail.vcu_report_505().has_speed()) {
     chassis_.set_speed_mps(static_cast<float>(
-        abs(chassis_detail.devkit().vcu_report_505().speed())));
+        abs(chassis_detail.vcu_report_505().speed())));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -206,65 +206,65 @@ Chassis DevkitController::chassis() {
   // 8 no fuel. do not set;
   // chassis_.set_fuel_range_m(0);
   // 9 throttle
-  if (chassis_detail.devkit().has_throttle_report_500() &&
-      chassis_detail.devkit()
+  if (chassis_detail.has_throttle_report_500() &&
+      chassis_detail
           .throttle_report_500()
           .has_throttle_pedal_actual()) {
     chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.devkit().throttle_report_500().throttle_pedal_actual()));
+        chassis_detail.throttle_report_500().throttle_pedal_actual()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // throttle sender cmd
-  if (chassis_detail.devkit().has_throttle_command_100() &&
-      chassis_detail.devkit()
+  if (chassis_detail.has_throttle_command_100() &&
+      chassis_detail
           .throttle_command_100()
           .has_throttle_pedal_target()) {
     chassis_.set_throttle_percentage_cmd(
-        static_cast<float>(chassis_detail.devkit()
+        static_cast<float>(chassis_detail
                                .throttle_command_100()
                                .throttle_pedal_target()));
   } else {
     chassis_.set_throttle_percentage_cmd(0);
   }
   // 10 brake
-  if (chassis_detail.devkit().has_brake_report_501() &&
-      chassis_detail.devkit().brake_report_501().has_brake_pedal_actual()) {
+  if (chassis_detail.has_brake_report_501() &&
+      chassis_detail.brake_report_501().has_brake_pedal_actual()) {
     chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.devkit().brake_report_501().brake_pedal_actual()));
+        chassis_detail.brake_report_501().brake_pedal_actual()));
   } else {
     chassis_.set_brake_percentage(0);
   }
   // brake sender cmd
-  if (chassis_detail.devkit().has_brake_command_101() &&
-      chassis_detail.devkit().brake_command_101().has_brake_pedal_target()) {
+  if (chassis_detail.has_brake_command_101() &&
+      chassis_detail.brake_command_101().has_brake_pedal_target()) {
     chassis_.set_brake_percentage_cmd(static_cast<float>(
-        chassis_detail.devkit().brake_command_101().brake_pedal_target()));
+        chassis_detail.brake_command_101().brake_pedal_target()));
   } else {
     chassis_.set_brake_percentage_cmd(0);
   }
   // 23, previously 11 gear
-  if (chassis_detail.devkit().has_gear_report_503() &&
-      chassis_detail.devkit().gear_report_503().has_gear_actual()) {
+  if (chassis_detail.has_gear_report_503() &&
+      chassis_detail.gear_report_503().has_gear_actual()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.devkit().gear_report_503().gear_actual() ==
+    if (chassis_detail.gear_report_503().gear_actual() ==
         Gear_report_503::GEAR_ACTUAL_INVALID) {
       gear_pos = Chassis::GEAR_INVALID;
     }
-    if (chassis_detail.devkit().gear_report_503().gear_actual() ==
+    if (chassis_detail.gear_report_503().gear_actual() ==
         Gear_report_503::GEAR_ACTUAL_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.devkit().gear_report_503().gear_actual() ==
+    if (chassis_detail.gear_report_503().gear_actual() ==
         Gear_report_503::GEAR_ACTUAL_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.devkit().gear_report_503().gear_actual() ==
+    if (chassis_detail.gear_report_503().gear_actual() ==
         Gear_report_503::GEAR_ACTUAL_DRIVE) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
-    if (chassis_detail.devkit().gear_report_503().gear_actual() ==
+    if (chassis_detail.gear_report_503().gear_actual() ==
         Gear_report_503::GEAR_ACTUAL_PARK) {
       gear_pos = Chassis::GEAR_PARKING;
     }
@@ -273,26 +273,26 @@ Chassis DevkitController::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 12 steering
-  if (chassis_detail.devkit().has_steering_report_502() &&
-      chassis_detail.devkit().steering_report_502().has_steer_angle_actual()) {
+  if (chassis_detail.has_steering_report_502() &&
+      chassis_detail.steering_report_502().has_steer_angle_actual()) {
     chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.devkit().steering_report_502().steer_angle_actual() *
+        chassis_detail.steering_report_502().steer_angle_actual() *
         100.0 / vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
   // steering sender cmd
-  if (chassis_detail.devkit().has_steering_command_102() &&
-      chassis_detail.devkit().steering_command_102().has_steer_angle_target()) {
+  if (chassis_detail.has_steering_command_102() &&
+      chassis_detail.steering_command_102().has_steer_angle_target()) {
     chassis_.set_steering_percentage_cmd(static_cast<float>(
-        chassis_detail.devkit().steering_command_102().steer_angle_target()));
+        chassis_detail.steering_command_102().steer_angle_target()));
   } else {
     chassis_.set_steering_percentage_cmd(0);
   }
   // 13 parking brake
-  if (chassis_detail.devkit().has_park_report_504() &&
-      chassis_detail.devkit().park_report_504().has_parking_actual()) {
-    if (chassis_detail.devkit().park_report_504().parking_actual() ==
+  if (chassis_detail.has_park_report_504() &&
+      chassis_detail.park_report_504().has_parking_actual()) {
+    if (chassis_detail.park_report_504().parking_actual() ==
         Park_report_504::PARKING_ACTUAL_PARKING_TRIGGER) {
       chassis_.set_parking_brake(true);
     } else {
@@ -302,10 +302,10 @@ Chassis DevkitController::chassis() {
     chassis_.set_parking_brake(false);
   }
   // 14 battery soc
-  if (chassis_detail.devkit().has_bms_report_512() &&
-      chassis_detail.devkit().bms_report_512().has_battery_soc_percentage()) {
+  if (chassis_detail.has_bms_report_512() &&
+      chassis_detail.bms_report_512().has_battery_soc_percentage()) {
     chassis_.set_battery_soc_percentage(
-        chassis_detail.devkit().bms_report_512().battery_soc_percentage());
+        chassis_detail.bms_report_512().battery_soc_percentage());
   } else {
     chassis_.set_battery_soc_percentage(0);
   }
@@ -320,15 +320,15 @@ Chassis DevkitController::chassis() {
   // to do(ALL):check your vehicle type, confirm your sonar position because of
   // every vhechle has different sonars assembly.
   // 08 09 10 11
-  if (chassis_detail.devkit().has_ultr_sensor_1_507()) {
+  if (chassis_detail.has_ultr_sensor_1_507()) {
     chassis_.mutable_surround()->set_sonar08(
-        chassis_detail.devkit().ultr_sensor_1_507().uiuss8_tof_direct());
+        chassis_detail.ultr_sensor_1_507().uiuss8_tof_direct());
     chassis_.mutable_surround()->set_sonar09(
-        chassis_detail.devkit().ultr_sensor_1_507().uiuss9_tof_direct());
+        chassis_detail.ultr_sensor_1_507().uiuss9_tof_direct());
     chassis_.mutable_surround()->set_sonar10(
-        chassis_detail.devkit().ultr_sensor_1_507().uiuss10_tof_direct());
+        chassis_detail.ultr_sensor_1_507().uiuss10_tof_direct());
     chassis_.mutable_surround()->set_sonar11(
-        chassis_detail.devkit().ultr_sensor_1_507().uiuss11_tof_direct());
+        chassis_detail.ultr_sensor_1_507().uiuss11_tof_direct());
   } else {
     chassis_.mutable_surround()->set_sonar08(0);
     chassis_.mutable_surround()->set_sonar09(0);
@@ -336,15 +336,15 @@ Chassis DevkitController::chassis() {
     chassis_.mutable_surround()->set_sonar11(0);
   }
   // 2 3 4 5
-  if (chassis_detail.devkit().has_ultr_sensor_3_509()) {
+  if (chassis_detail.has_ultr_sensor_3_509()) {
     chassis_.mutable_surround()->set_sonar02(
-        chassis_detail.devkit().ultr_sensor_3_509().uiuss2_tof_direct());
+        chassis_detail.ultr_sensor_3_509().uiuss2_tof_direct());
     chassis_.mutable_surround()->set_sonar03(
-        chassis_detail.devkit().ultr_sensor_3_509().uiuss3_tof_direct());
+        chassis_detail.ultr_sensor_3_509().uiuss3_tof_direct());
     chassis_.mutable_surround()->set_sonar04(
-        chassis_detail.devkit().ultr_sensor_3_509().uiuss4_tof_direct());
+        chassis_detail.ultr_sensor_3_509().uiuss4_tof_direct());
     chassis_.mutable_surround()->set_sonar05(
-        chassis_detail.devkit().ultr_sensor_3_509().uiuss5_tof_direct());
+        chassis_detail.ultr_sensor_3_509().uiuss5_tof_direct());
   } else {
     chassis_.mutable_surround()->set_sonar02(0);
     chassis_.mutable_surround()->set_sonar03(0);
@@ -352,15 +352,15 @@ Chassis DevkitController::chassis() {
     chassis_.mutable_surround()->set_sonar05(0);
   }
   // 0 1 6 7
-  if (chassis_detail.devkit().has_ultr_sensor_5_511()) {
+  if (chassis_detail.has_ultr_sensor_5_511()) {
     chassis_.mutable_surround()->set_sonar00(
-        chassis_detail.devkit().ultr_sensor_5_511().uiuss0_tof_direct());
+        chassis_detail.ultr_sensor_5_511().uiuss0_tof_direct());
     chassis_.mutable_surround()->set_sonar01(
-        chassis_detail.devkit().ultr_sensor_5_511().uiuss1_tof_direct());
+        chassis_detail.ultr_sensor_5_511().uiuss1_tof_direct());
     chassis_.mutable_surround()->set_sonar06(
-        chassis_detail.devkit().ultr_sensor_5_511().uiuss6_tof_direct());
+        chassis_detail.ultr_sensor_5_511().uiuss6_tof_direct());
     chassis_.mutable_surround()->set_sonar07(
-        chassis_detail.devkit().ultr_sensor_5_511().uiuss7_tof_direct());
+        chassis_detail.ultr_sensor_5_511().uiuss7_tof_direct());
   } else {
     chassis_.mutable_surround()->set_sonar00(0);
     chassis_.mutable_surround()->set_sonar01(0);
@@ -371,8 +371,8 @@ Chassis DevkitController::chassis() {
   // vin set 17 bits, like LSBN1234567890123 is prased as
   // vin17(L),vin16(S),vin15(B),......,vin03(1),vin02(2),vin01(3)
   std::string vin = "";
-  if (chassis_detail.devkit().has_vin_resp1_514()) {
-    Vin_resp1_514 vin_resp1_514 = chassis_detail.devkit().vin_resp1_514();
+  if (chassis_detail.has_vin_resp1_514()) {
+    Vin_resp1_514 vin_resp1_514 = chassis_detail.vin_resp1_514();
     vin += vin_resp1_514.vin00();
     vin += vin_resp1_514.vin01();
     vin += vin_resp1_514.vin02();
@@ -382,8 +382,8 @@ Chassis DevkitController::chassis() {
     vin += vin_resp1_514.vin06();
     vin += vin_resp1_514.vin07();
   }
-  if (chassis_detail.devkit().has_vin_resp2_515()) {
-    Vin_resp2_515 vin_resp2_515 = chassis_detail.devkit().vin_resp2_515();
+  if (chassis_detail.has_vin_resp2_515()) {
+    Vin_resp2_515 vin_resp2_515 = chassis_detail.vin_resp2_515();
     vin += vin_resp2_515.vin08();
     vin += vin_resp2_515.vin09();
     vin += vin_resp2_515.vin10();
@@ -393,16 +393,16 @@ Chassis DevkitController::chassis() {
     vin += vin_resp2_515.vin14();
     vin += vin_resp2_515.vin15();
   }
-  if (chassis_detail.devkit().has_vin_resp3_516()) {
-    Vin_resp3_516 vin_resp3_516 = chassis_detail.devkit().vin_resp3_516();
+  if (chassis_detail.has_vin_resp3_516()) {
+    Vin_resp3_516 vin_resp3_516 = chassis_detail.vin_resp3_516();
     vin += vin_resp3_516.vin16();
   }
   std::reverse(vin.begin(), vin.end());
   chassis_.mutable_vehicle_id()->set_vin(vin);
   // 18 front bumper event
-  if (chassis_detail.devkit().has_vcu_report_505() &&
-      chassis_detail.devkit().vcu_report_505().has_frontcrash_state()) {
-    if (chassis_detail.devkit().vcu_report_505().frontcrash_state() ==
+  if (chassis_detail.has_vcu_report_505() &&
+      chassis_detail.vcu_report_505().has_frontcrash_state()) {
+    if (chassis_detail.vcu_report_505().frontcrash_state() ==
         Vcu_report_505::FRONTCRASH_STATE_CRASH_EVENT) {
       chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
     } else {
@@ -412,9 +412,9 @@ Chassis DevkitController::chassis() {
     chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
   }
   // 19 back bumper event
-  if (chassis_detail.devkit().has_vcu_report_505() &&
-      chassis_detail.devkit().vcu_report_505().has_backcrash_state()) {
-    if (chassis_detail.devkit().vcu_report_505().backcrash_state() ==
+  if (chassis_detail.has_vcu_report_505() &&
+      chassis_detail.vcu_report_505().has_backcrash_state()) {
+    if (chassis_detail.vcu_report_505().backcrash_state() ==
         Vcu_report_505::BACKCRASH_STATE_CRASH_EVENT) {
       chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
     } else {
@@ -422,6 +422,23 @@ Chassis DevkitController::chassis() {
     }
   } else {
     chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+  }
+
+  // 20 add checkresponse signal
+  if (chassis_detail.has_brake_report_501() &&
+      chassis_detail.brake_report_501().has_brake_en_state()) {
+    chassis_.mutable_check_response()->set_is_esp_online(
+        chassis_detail.brake_report_501().brake_en_state() == 1);
+  }
+  if (chassis_detail.has_steering_report_502() && 
+      chassis_detail.steering_report_502().has_steer_en_state()) {
+    chassis_.mutable_check_response()->set_is_eps_online(
+        chassis_detail.steering_report_502().steer_en_state() == 1);
+  }
+  if (chassis_detail.has_throttle_report_500() &&
+      chassis_detail.throttle_report_500().has_throttle_en_state()) {
+    chassis_.mutable_check_response()->set_is_vcu_online(
+        chassis_detail.throttle_report_500().throttle_en_state() == 1);
   }
 
   return chassis_;
@@ -700,59 +717,57 @@ void DevkitController::ResetProtocol() {
 }
 
 bool DevkitController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_devkit()) {
+  if (!chassis_detail.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info."
                       << chassis_detail.DebugString();
     return false;
   }
 
-  Devkit devkit = chassis_detail.devkit();
-
   // steer fault
-  if (devkit.has_steering_report_502()) {
+  if (chassis_detail.has_steering_report_502()) {
     if (Steering_report_502::STEER_FLT1_STEER_SYSTEM_HARDWARE_FAULT ==
-        devkit.steering_report_502().steer_flt1()) {
+        chassis_detail.steering_report_502().steer_flt1()) {
       AERROR_EVERY(100) << "Chassis has steer system fault.";
       return true;
     }
   }
   // drive fault
-  if (devkit.has_throttle_report_500()) {
+  if (chassis_detail.has_throttle_report_500()) {
     if (Throttle_report_500::THROTTLE_FLT1_DRIVE_SYSTEM_HARDWARE_FAULT ==
-        devkit.throttle_report_500().throttle_flt1()) {
+        chassis_detail.throttle_report_500().throttle_flt1()) {
       AERROR_EVERY(100) << "Chassis has drive system fault.";
       return true;
     }
   }
   // brake fault
-  if (devkit.has_brake_report_501()) {
+  if (chassis_detail.has_brake_report_501()) {
     if (Brake_report_501::BRAKE_FLT1_BRAKE_SYSTEM_HARDWARE_FAULT ==
-        devkit.brake_report_501().brake_flt1()) {
+        chassis_detail.brake_report_501().brake_flt1()) {
       AERROR_EVERY(100) << "Chassis has brake system fault.";
       return true;
     }
   }
   // battery soc low
-  if (devkit.has_bms_report_512()) {
-    if (devkit.bms_report_512().is_battery_soc_low()) {
+  if (chassis_detail.has_bms_report_512()) {
+    if (chassis_detail.bms_report_512().is_battery_soc_low()) {
       AERROR_EVERY(100) << "Chassis battery has low soc, please charge.";
       return true;
     }
   }
   // battery over emperature fault
-  if (devkit.has_bms_report_512()) {
+  if (chassis_detail.has_bms_report_512()) {
     if (Bms_report_512::BATTERY_FLT_OVER_TEMP_FAULT ==
-        devkit.bms_report_512().battery_flt_over_temp()) {
+        chassis_detail.bms_report_512().battery_flt_over_temp()) {
       AERROR_EVERY(100) << "Chassis battery has over temperature fault.";
       return true;
     }
   }
   // battery low temperature fault
-  if (devkit.has_bms_report_512()) {
+  if (chassis_detail.has_bms_report_512()) {
     if (Bms_report_512::BATTERY_FLT_LOW_TEMP_FAULT ==
-        devkit.bms_report_512().battery_flt_low_temp()) {
+        chassis_detail.bms_report_512().battery_flt_low_temp()) {
       AERROR_EVERY(100) << "Chassis battery has below low temperature fault.";
       return true;
     }
@@ -845,7 +860,7 @@ void DevkitController::SecurityDogThreadFunc() {
 
 bool DevkitController::CheckResponse(const int32_t flags, bool need_wait) {
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Devkit chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;

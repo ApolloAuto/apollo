@@ -36,21 +36,17 @@ uint32_t Vehiclemodecommand105::GetPeriod() const {
 }
 
 void Vehiclemodecommand105::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_devkit()
-      ->mutable_vehicle_mode_command_105()
-      ->set_turn_light_ctrl(turn_light_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_vehicle_mode_command_105()->set_vin_req(
+                           Devkit* chassis) const {
+  chassis->mutable_vehicle_mode_command_105()->set_turn_light_ctrl(
+      turn_light_ctrl(bytes, length));
+  chassis->mutable_vehicle_mode_command_105()->set_vin_req(
       vin_req(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_vehicle_mode_command_105()
-      ->set_drive_mode_ctrl(drive_mode_ctrl(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_vehicle_mode_command_105()
-      ->set_steer_mode_ctrl(steer_mode_ctrl(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_vehicle_mode_command_105()
-      ->set_checksum_105(checksum_105(bytes, length));
+  chassis->mutable_vehicle_mode_command_105()->set_drive_mode_ctrl(
+      drive_mode_ctrl(bytes, length));
+  chassis->mutable_vehicle_mode_command_105()->set_steer_mode_ctrl(
+      steer_mode_ctrl(bytes, length));
+  chassis->mutable_vehicle_mode_command_105()->set_checksum_105(
+      checksum_105(bytes, length));
 }
 
 void Vehiclemodecommand105::UpdateData(uint8_t* data) {

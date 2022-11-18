@@ -29,7 +29,7 @@ class Bmsreport512Test : public ::testing::Test {
 TEST_F(Bmsreport512Test, General) {
   uint8_t data[8] = {0x01, 0x00, 0x01, 0x03, 0x52, 0x01, 0x00, 0x01};
   int32_t length = 8;
-  ChassisDetail cd;
+  Devkit cd;
   Bmsreport512 bmsreport;
   bmsreport.Parse(data, length, &cd);
 
@@ -42,9 +42,9 @@ TEST_F(Bmsreport512Test, General) {
   EXPECT_EQ(data[6], 0b00000000);
   EXPECT_EQ(data[7], 0b00000001);
 
-  EXPECT_EQ(cd.devkit().bms_report_512().battery_current(), -3174.1);
-  EXPECT_EQ(cd.devkit().bms_report_512().battery_voltage(), 2.56);
-  EXPECT_EQ(cd.devkit().bms_report_512().battery_soc_percentage(), 82);
+  EXPECT_EQ(cd.bms_report_512().battery_current(), -3174.1);
+  EXPECT_EQ(cd.bms_report_512().battery_voltage(), 2.56);
+  EXPECT_EQ(cd.bms_report_512().battery_soc_percentage(), 82);
 }
 
 }  // namespace devkit

@@ -36,16 +36,14 @@ uint32_t Steeringcommand102::GetPeriod() const {
 }
 
 void Steeringcommand102::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_steering_command_102()->set_steer_en_ctrl(
+                               Devkit* chassis) const {
+  chassis->mutable_steering_command_102()->set_steer_en_ctrl(
       steer_en_ctrl(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_steering_command_102()
-      ->set_steer_angle_target(steer_angle_target(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_steering_command_102()
-      ->set_steer_angle_spd_target(steer_angle_spd_target(bytes, length));
-  chassis->mutable_devkit()->mutable_steering_command_102()->set_checksum_102(
+  chassis->mutable_steering_command_102() ->set_steer_angle_target(
+      steer_angle_target(bytes, length));
+  chassis->mutable_steering_command_102()->set_steer_angle_spd_target(
+      steer_angle_spd_target(bytes, length));
+  chassis->mutable_steering_command_102()->set_checksum_102(
       checksum_102(bytes, length));
 }
 

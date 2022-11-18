@@ -36,17 +36,16 @@ uint32_t Brakecommand101::GetPeriod() const {
 }
 
 void Brakecommand101::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_devkit()->mutable_brake_command_101()->set_brake_en_ctrl(
+                               Devkit* chassis) const {
+  chassis->mutable_brake_command_101()->set_brake_en_ctrl(
       brake_en_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_command_101()->set_aeb_en_ctrl(
+  chassis->mutable_brake_command_101()->set_aeb_en_ctrl(
       aeb_en_ctrl(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_command_101()->set_brake_dec(
+  chassis->mutable_brake_command_101()->set_brake_dec(
       brake_dec(bytes, length));
-  chassis->mutable_devkit()
-      ->mutable_brake_command_101()
-      ->set_brake_pedal_target(brake_pedal_target(bytes, length));
-  chassis->mutable_devkit()->mutable_brake_command_101()->set_checksum_101(
+  chassis->mutable_brake_command_101()->set_brake_pedal_target(
+      brake_pedal_target(bytes, length));
+  chassis->mutable_brake_command_101()->set_checksum_101(
       checksum_101(bytes, length));
 }
 
