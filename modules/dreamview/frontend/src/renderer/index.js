@@ -349,8 +349,8 @@ class Renderer {
     }
   }
 
-  addDefaultRouting(routingName, type = 'defaultRouting') {
-    return this.routingEditor.addDefaultRouting(routingName, this.coordinates, type);
+  addDefaultRouting(routingName) {
+    return this.routingEditor.addDefaultRouting(routingName, this.coordinates);
   }
 
   removeInvalidRoutingPoint(pointId, error) {
@@ -391,14 +391,6 @@ class Renderer {
       defaultRoutingName,
       points,
       cycleNumber,
-      this.adc.mesh.position,
-      this.adc.mesh.rotation.y,
-      this.coordinates);
-  }
-
-  sendParkGoRoutingRequest(points, parkTime) {
-    return this.routingEditor.sendParkGoRoutingRequest(
-      points, parkTime,
       this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);

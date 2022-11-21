@@ -12,8 +12,6 @@ export default class RouteEditingManager {
 
     @observable defaultRoutings = {};
 
-    @observable parkAndGoRoutings = {};
-
     @observable defaultRoutingDistanceThreshold = 10.0;
 
     @observable currentPOI = 'none';
@@ -70,8 +68,8 @@ export default class RouteEditingManager {
       }
     }
 
-    @action addDefaultRoutingPoint(defaultRoutingName, isDefaultRouting = true) {
-      const routings = isDefaultRouting ? this.defaultRoutings : this.parkAndGoRoutings;
+    @action addDefaultRoutingPoint(defaultRoutingName) {
+      const routings = this.defaultRoutings;
       if (_.isEmpty(routings)) {
         alert('Failed to get routing, make sure the '
                 + 'routing file under the map data directory.');
@@ -99,35 +97,19 @@ export default class RouteEditingManager {
       }
     }
 
-    @action updateParkAndGoRoutings(data) {
-      if (data.parkAndGoRoutings === undefined) {
-        return;
-      }
-      this.parkAndGoRoutings = {};
-      for (let i = 0; i < data.parkAndGoRoutings.length; ++i) {
-        const parkGoRouting = data.parkAndGoRoutings[i];
-        this.parkAndGoRoutings[parkGoRouting.name] = parkGoRouting.point;
-      }
-    }
-
     addDefaultRoutingPath(message) {
       if (message.data === undefined) {
         return;
       }
       const drouting = message.data;
-      const routingType = message.routingType;
       const waypoints = drouting.waypoint.map(
         point => _.assign({}, point.pose, { heading: point.heading })
       );
-      if (routingType === 'defaultRouting') {
-        this.defaultRoutings[drouting.name] = waypoints;
-      } else {
-        this.parkAndGoRoutings[drouting.name] = waypoints;
-      }
+      this.defaultRoutings[drouting.name] = waypoints;
     }
 
-    addDefaultRouting(routingName, type = 'defaultRouting') {
-      return RENDERER.addDefaultRouting(routingName, type);
+    addDefaultRouting(routingName) {
+      return RENDERER.addDefaultRouting(routingName);
     }
 
     toggleDefaultRoutingMode() {
@@ -167,18 +149,6 @@ export default class RouteEditingManager {
       if (!isNaN(cycleNumber) || !points) {
         const success = RENDERER.sendCycleRoutingRequest
         (this.currentDefaultRouting, points, cycleNumber);
-        if (success) {
-          this.disableRouteEditing();
-        }
-        return success;
-      }
-      return false;
-    }
-
-    sendParkGoRoutingRequest(parkTime) {
-      const points = this.parkAndGoRoutings[this.currentDefaultRouting];
-      if (!isNaN(parkTime) || !points) {
-        const success = RENDERER.sendParkGoRoutingRequest(points, parkTime);
         if (success) {
           this.disableRouteEditing();
         }

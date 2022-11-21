@@ -14,7 +14,6 @@ export default class RealtimeWebSocketEndpoint {
     this.mapLastUpdateTimestamp = 0;
     this.updatePOI = true;
     this.updateDefaultRoutingPoints = true;
-    this.updateParkAndGoRoutings = true;
     this.routingTime = undefined;
     this.currentMode = null;
     this.worker = new Worker();
@@ -109,9 +108,6 @@ export default class RealtimeWebSocketEndpoint {
         case 'DefaultRoutings':
           STORE.routeEditingManager.updateDefaultRoutingPoints(message);
           break;
-        case 'ParkAndGoRoutings':
-          STORE.routeEditingManager.updateParkAndGoRoutings(message);
-          break;
         case 'AddDefaultRoutingPath':
           // used for user-defined routing: default routing,park and go routing
           STORE.routeEditingManager.addDefaultRoutingPath(message);
@@ -173,11 +169,6 @@ export default class RealtimeWebSocketEndpoint {
         if (this.updateDefaultRoutingPoints) {
           this.requestDefaultRoutingPoints();
           this.updateDefaultRoutingPoints = false;
-        }
-        // load park and go routings user defined
-        if (this.updateParkAndGoRoutings) {
-          this.requestParkAndGoRoutings();
-          this.updateParkAndGoRoutings = false;
         }
         if (this.pointcloudWS.isEnabled()) {
           this.pointcloudWS.requestPointCloud();
@@ -284,20 +275,6 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  requestParkGoRouting(start, start_heading, waypoint, end, parkTime) {
-    const request = {
-      type: 'SendParkGoRoutingRequest',
-      start,
-      end,
-      waypoint,
-      parkTime,
-    };
-    if (start_heading) {
-      request.start.heading = start_heading;
-    }
-    this.websocket.send(JSON.stringify(request));
-  }
-
   requestDefaultRoutingEndPoint() {
     this.websocket.send(JSON.stringify({
       type: 'GetDefaultEndPoint',
@@ -307,12 +284,6 @@ export default class RealtimeWebSocketEndpoint {
   requestDefaultRoutingPoints() {
     this.websocket.send(JSON.stringify({
       type: 'GetDefaultRoutings',
-    }));
-  }
-
-  requestParkAndGoRoutings() {
-    this.websocket.send(JSON.stringify({
-      type: 'GetParkAndGoRoutings',
     }));
   }
 
@@ -350,7 +321,6 @@ export default class RealtimeWebSocketEndpoint {
     }));
     this.updatePOI = true;
     this.updateDefaultRoutingPoints = true;
-    this.updateParkAndGoRoutings = true;
   }
 
   changeVehicle(vehicle) {
@@ -551,12 +521,12 @@ export default class RealtimeWebSocketEndpoint {
     this.pointcloudWS = pointcloudws;
   }
 
-  saveDefaultRouting(routingName, points, routingType) {
+  saveDefaultRouting(routingName, points) {
     const request = {
       type: 'SaveDefaultRouting',
       name: routingName,
       point: points,
-      routingType,
+      routingType: 'defaultRouting',
     };
     this.websocket.send(JSON.stringify(request));
   }

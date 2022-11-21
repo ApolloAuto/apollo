@@ -7,12 +7,6 @@ import { IsPointInRectangle } from 'utils/misc';
 import _ from 'lodash';
 import { drawImage, drawRoutingPointArrow, disposeMesh } from 'utils/draw';
 
-// define the min routing points num for different routing type
-const minRoutingPointsNum = {
-  defaultRouting: 1,
-  parkGoRouting: 2,
-};
-
 export default class RoutingEditor {
   constructor() {
     this.routePoints = [];
@@ -267,26 +261,9 @@ export default class RoutingEditor {
     return true;
   }
 
-  // point from default routing/poi/park go routing do not need to apply offset
-  sendParkGoRoutingRequest(routingPoints, parkTime,
-    carOffsetPosition, carHeading, coordinates) {
-    const points = routingPoints.map((point) => {
-      point.z = 0;
-      const offsetPoint = _.pick(point, ['x', 'y', 'z', 'heading']);
-      return offsetPoint;
-    });
-    // always use car position as start position
-    const start = coordinates.applyOffset(carOffsetPosition, true);
-    const start_heading = carHeading;
-    const end = points[points.length - 1];
-    const waypoint = points.slice(0, -1);
-    WS.requestParkGoRouting(start, start_heading, waypoint, end, parkTime);
-    return true;
-  }
-
-  addDefaultRouting(routingName, coordinates, type = 'defaultRouting') {
-    if (this.routePoints.length < minRoutingPointsNum[type]) {
-      alert(`Please provide at least ${minRoutingPointsNum[type]} end point.`);
+  addDefaultRouting(routingName, coordinates) {
+    if (this.routePoints.length < 1) {
+      alert('Please provide at least one end point.');
       return false;
     }
 
@@ -299,7 +276,7 @@ export default class RoutingEditor {
       }
       return point;
     });
-    WS.saveDefaultRouting(routingName, points, type);
+    WS.saveDefaultRouting(routingName, points);
   }
 
   checkCycleRoutingAvailable(cycleRoutingPoints, carPosition, threshold) {
