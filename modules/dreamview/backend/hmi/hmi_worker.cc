@@ -1319,7 +1319,6 @@ void HMIWorker::ChangeRecord(const std::string &record_id) {
   return;
 }
 bool HMIWorker::LoadRecords() {
-  //StopRecordPlay();
   std::string directory_path;
   GetRecordPath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
