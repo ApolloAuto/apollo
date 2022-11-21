@@ -26,8 +26,5 @@ DEFINE_double(plot_size_buffer, 0.2, "the size buffer of parking plot");
 
 DEFINE_double(road_width_buffer, 0.0, "the size buffer of road width");
 
-DEFINE_double(dead_end_destination_threshold, 0.01,
-              "the threshold is used to check to get the destination");
-
 DEFINE_double(search_junction_threshold, 1.0,
               "the threshold is used to search junction a certain range");

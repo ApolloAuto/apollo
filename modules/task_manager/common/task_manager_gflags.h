@@ -26,6 +26,4 @@ DECLARE_double(plot_size_buffer);
 
 DECLARE_double(road_width_buffer);
 
-DECLARE_double(dead_end_destination_threshold);
-
 DECLARE_double(search_junction_threshold);

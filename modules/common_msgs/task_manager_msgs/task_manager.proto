@@ -10,7 +10,6 @@ enum TaskType {
   CYCLE_ROUTING = 0;
   PARKING_ROUTING = 1;
   PARK_GO_ROUTING = 2;
-  DEAD_END_ROUTING = 3;
 }
 
 enum JunctionType {
@@ -19,7 +18,6 @@ enum JunctionType {
   CROSS_ROAD = 2;
   FORK_ROAD = 3;
   MAIN_SIDE = 4;
-  DEAD_END = 5;
 }
 
 message CycleRoutingTask {
@@ -37,11 +35,6 @@ message ParkGoRoutingTask {
   optional apollo.routing.RoutingRequest routing_request = 2;
 }
 
-message DeadEndRoutingTask {
-  optional apollo.routing.RoutingRequest routing_request_in = 2;
-  optional apollo.routing.RoutingRequest routing_request_out = 3;
-}
-
 message Task {
   optional apollo.common.Header header = 1;
   optional string task_name = 2;
@@ -49,5 +42,4 @@ message Task {
   optional CycleRoutingTask cycle_routing_task = 4;
   optional ParkingRoutingTask parking_routing_task = 5;
   optional ParkGoRoutingTask park_go_routing_task = 6;
-  optional DeadEndRoutingTask dead_end_routing_task = 7;
 }

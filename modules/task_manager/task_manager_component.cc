@@ -70,8 +70,7 @@ bool TaskManagerComponent::Init() {
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING &&
-      task->task_type() != DEAD_END_ROUTING) {
+      task->task_type() != PARKING_ROUTING) {
     AERROR << "Task type is not cycle_routing or parking_routing.";
     return false;
   }
