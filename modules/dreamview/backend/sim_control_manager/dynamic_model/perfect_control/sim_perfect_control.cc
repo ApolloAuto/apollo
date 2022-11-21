@@ -82,7 +82,7 @@ void SimPerfectControl::InitTimerAndIO() {
       });
   routing_request_reader_ = node_->CreateReader<RoutingRequest>(
       FLAGS_routing_request_topic,
-      [this](const std::shared_ptr<RoutingRequest>& routing_request) {
+      [this](const std::shared_ptr<RoutingRequest> &routing_request) {
         this->OnRoutingRequest(routing_request);
       });
   routing_response_reader_ = node_->CreateReader<RoutingResponse>(
@@ -110,9 +110,9 @@ void SimPerfectControl::InitTimerAndIO() {
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(new cyber::Timer(
-      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
-      false));
+  sim_prediction_timer_.reset(
+      new cyber::Timer(kSimPredictionIntervalMs,
+                       [this]() { this->PublishDummyPrediction(); }, false));
 }
 
 void SimPerfectControl::Init(bool set_start_point,
@@ -149,8 +149,33 @@ void SimPerfectControl::InitStartPoint(double start_velocity,
   // Use the latest localization position as start point,
   // fall back to a dummy point from map
   localization_reader_->Observe();
-  if (localization_reader_->Empty()) {
-    start_point_from_localization_ = false;
+  start_point_from_localization_ = false;
+  if (!localization_reader_->Empty()) {
+    const auto &localization = localization_reader_->GetLatestObserved();
+    const auto &pose = localization->pose();
+    if (map_service_->PointIsValid(pose.position().x(), pose.position().y())) {
+      point.mutable_path_point()->set_x(pose.position().x());
+      point.mutable_path_point()->set_y(pose.position().y());
+      point.mutable_path_point()->set_z(pose.position().z());
+      point.mutable_path_point()->set_theta(pose.heading());
+      point.set_v(
+          std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+      // Calculates the dot product of acceleration and velocity. The sign
+      // of this projection indicates whether this is acceleration or
+      // deceleration.
+      double projection =
+          pose.linear_acceleration().x() * pose.linear_velocity().x() +
+          pose.linear_acceleration().y() * pose.linear_velocity().y();
+
+      // Calculates the magnitude of the acceleration. Negate the value if
+      // it is indeed a deceleration.
+      double magnitude = std::hypot(pose.linear_acceleration().x(),
+                                    pose.linear_acceleration().y());
+      point.set_a(std::signbit(projection) ? -magnitude : magnitude);
+      start_point_from_localization_ = true;
+    }
+  }
+  if (!start_point_from_localization_) {
     apollo::common::PointENU start_point;
     if (!map_service_->GetStartPoint(&start_point)) {
       AWARN << "Failed to get a dummy start point from map!";
@@ -166,28 +191,6 @@ void SimPerfectControl::InitStartPoint(double start_velocity,
     point.mutable_path_point()->set_theta(theta);
     point.set_v(start_velocity);
     point.set_a(start_acceleration);
-  } else {
-    start_point_from_localization_ = true;
-    const auto &localization = localization_reader_->GetLatestObserved();
-    const auto &pose = localization->pose();
-    point.mutable_path_point()->set_x(pose.position().x());
-    point.mutable_path_point()->set_y(pose.position().y());
-    point.mutable_path_point()->set_z(pose.position().z());
-    point.mutable_path_point()->set_theta(pose.heading());
-    point.set_v(
-        std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
-    // Calculates the dot product of acceleration and velocity. The sign
-    // of this projection indicates whether this is acceleration or
-    // deceleration.
-    double projection =
-        pose.linear_acceleration().x() * pose.linear_velocity().x() +
-        pose.linear_acceleration().y() * pose.linear_velocity().y();
-
-    // Calculates the magnitude of the acceleration. Negate the value if
-    // it is indeed a deceleration.
-    double magnitude = std::hypot(pose.linear_acceleration().x(),
-                                  pose.linear_acceleration().y());
-    point.set_a(std::signbit(projection) ? -magnitude : magnitude);
   }
   SetStartPoint(point);
 }
@@ -271,7 +274,7 @@ void SimPerfectControl::OnRoutingResponse(
 }
 
 void SimPerfectControl::OnRoutingRequest(
-    const std::shared_ptr<RoutingRequest>& routing_request) {
+    const std::shared_ptr<RoutingRequest> &routing_request) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     return;
@@ -279,7 +282,7 @@ void SimPerfectControl::OnRoutingRequest(
 
   CHECK_GE(routing_request->waypoint_size(), 2)
       << "routing should have at least two waypoints";
-  const auto& start_pose = routing_request->waypoint(0).pose();
+  const auto &start_pose = routing_request->waypoint(0).pose();
 
   ClearPlanning();
   TrajectoryPoint point;
@@ -289,10 +292,10 @@ void SimPerfectControl::OnRoutingRequest(
   point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
   double theta = 0.0;
   double s = 0.0;
-  const auto& start_way_point = routing_request->waypoint().Get(0);
+  const auto &start_way_point = routing_request->waypoint().Get(0);
   // If the lane id has been set, set theta as the lane heading.
   if (start_way_point.has_id()) {
-    auto& hdmap = hdmap::HDMapUtil::BaseMap();
+    auto &hdmap = hdmap::HDMapUtil::BaseMap();
     hdmap::Id lane_id = hdmap::MakeMapId(start_way_point.id());
     auto lane = hdmap.GetLaneById(lane_id);
     if (nullptr != lane) {

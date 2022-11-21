@@ -46,6 +46,8 @@ class MapService {
   inline double GetXOffset() const { return x_offset_; }
   inline double GetYOffset() const { return y_offset_; }
 
+  bool PointIsValid(const double x, const double y) const;
+
   void CollectMapElementIds(const apollo::common::PointENU &point,
                             double raidus, MapElementIds *ids) const;
 
