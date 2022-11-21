@@ -29,15 +29,15 @@ class Scuvcu2313Test : public ::testing::Test {
 TEST_F(Scuvcu2313Test, reset) {
   Scuvcu2313 scuvcu2313;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Ge3 chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   scuvcu2313.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqposmax(), 228);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqnegmax(),
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_vcu_2_313().vcu_torqposmax(), 228);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_vcu_2_313().vcu_torqnegmax(),
                    -2796);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqact(), -2928);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_engspd(), 258);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_vcu_2_313().vcu_torqact(), -2928);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_vcu_2_313().vcu_engspd(), 258);
 }
 
 }  // namespace ge3

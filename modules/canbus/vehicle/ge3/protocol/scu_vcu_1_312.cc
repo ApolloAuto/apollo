@@ -29,36 +29,36 @@ Scuvcu1312::Scuvcu1312() {}
 const int32_t Scuvcu1312::ID = 0x312;
 
 void Scuvcu1312::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_elcsysfault(
+                       Ge3* chassis) const {
+  chassis->mutable_scu_vcu_1_312()->set_vcu_elcsysfault(
       vcu_elcsysfault(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_brkpedst(
       vcu_brkpedst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_intidx(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_intidx(
       vcu_intidx(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearintidx(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_gearintidx(
       vcu_gearintidx(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_geardrvmode(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_geardrvmode(
       vcu_geardrvmode(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedact(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_accpedact(
       vcu_accpedact(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_brkpedpst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_brkpedpst(
       vcu_brkpedpst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrng(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_vehrng(
       vcu_vehrng(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_accpedpst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_accpedpst(
       vcu_accpedpst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_vehrdyst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_vehrdyst(
       vcu_vehrdyst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_faultst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_faultst(
       vcu_faultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_drvmode(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_drvmode(
       vcu_drvmode(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearpst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_gearpst(
       vcu_gearpst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearfaultst(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_gearfaultst(
       vcu_gearfaultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_1_312()->set_vcu_gearact(
+  chassis->mutable_scu_vcu_1_312()->set_vcu_gearact(
       vcu_gearact(bytes, length));
   // newcode
   chassis->mutable_check_response()->set_is_vcu_online(

@@ -15,7 +15,7 @@ limitations under the License.
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/ge3/proto/ge3.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -25,7 +25,7 @@ namespace ge3 {
 using ::apollo::drivers::canbus::MessageManager;
 
 class Ge3MessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::Ge3> {
  public:
   Ge3MessageManager();
   virtual ~Ge3MessageManager();

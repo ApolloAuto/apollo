@@ -29,16 +29,16 @@ Scubcs2307::Scubcs2307() {}
 const int32_t Scubcs2307::ID = 0x307;
 
 void Scubcs2307::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspdvd(
+                       Ge3* chassis) const {
+  chassis->mutable_scu_bcs_2_307()->set_bcs_vehspdvd(
       bcs_vehspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_yawrate(
+  chassis->mutable_scu_bcs_2_307()->set_bcs_yawrate(
       bcs_yawrate(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehspd(
+  chassis->mutable_scu_bcs_2_307()->set_bcs_vehspd(
       bcs_vehspd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehlongaccel(
+  chassis->mutable_scu_bcs_2_307()->set_bcs_vehlongaccel(
       bcs_vehlongaccel(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_2_307()->set_bcs_vehlataccel(
+  chassis->mutable_scu_bcs_2_307()->set_bcs_vehlataccel(
       bcs_vehlataccel(bytes, length));
 }
 

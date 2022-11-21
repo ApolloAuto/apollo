@@ -29,14 +29,14 @@ class Scu1301Test : public ::testing::Test {
 TEST_F(Scu1301Test, reset) {
   Scu1301 scu1301;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Ge3 chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   scu1301.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_1_301().vin16(), 2);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_1_301().scu_stopbutst(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_1_301().scu_drvmode(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_1_301().scu_faultst(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_1_301().vin16(), 2);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_1_301().scu_stopbutst(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_1_301().scu_drvmode(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_1_301().scu_faultst(), 0);
 }
 
 }  // namespace ge3

@@ -29,38 +29,38 @@ Scubcs3308::Scubcs3308() {}
 const int32_t Scubcs3308::ID = 0x308;
 
 void Scubcs3308::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheelspdvd(
+                       Ge3* chassis) const {
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rrwheelspdvd(
       bcs_rrwheelspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheeldirectionvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rrwheeldirectionvd(
       bcs_rrwheeldirectionvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rlwheelspdvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rlwheelspdvd(
       bcs_rlwheelspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rlwheeldirectionvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rlwheeldirectionvd(
       bcs_rlwheeldirectionvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_frwheelspdvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_frwheelspdvd(
       bcs_frwheelspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_frwheeldirectionvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_frwheeldirectionvd(
       bcs_frwheeldirectionvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_flwheelspdvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_flwheelspdvd(
       bcs_flwheelspdvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_flwheeldirectionvd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_flwheeldirectionvd(
       bcs_flwheeldirectionvd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheelspd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rrwheelspd(
       bcs_rrwheelspd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rrwheeldirection(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rrwheeldirection(
       bcs_rrwheeldirection(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rlwheelspd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rlwheelspd(
       bcs_rlwheelspd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_rlwheeldirection(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_rlwheeldirection(
       bcs_rlwheeldirection(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_frwheelspd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_frwheelspd(
       bcs_frwheelspd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_frwheeldirection(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_frwheeldirection(
       bcs_frwheeldirection(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_flwheelspd(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_flwheelspd(
       bcs_flwheelspd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcs_3_308()->set_bcs_flwheeldirection(
+  chassis->mutable_scu_bcs_3_308()->set_bcs_flwheeldirection(
       bcs_flwheeldirection(bytes, length));
 }
 

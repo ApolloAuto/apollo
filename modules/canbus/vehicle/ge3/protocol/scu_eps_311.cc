@@ -29,16 +29,16 @@ Scueps311::Scueps311() {}
 const int32_t Scueps311::ID = 0x311;
 
 void Scueps311::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_eps_311()->set_eps_intidx(
+                      Ge3* chassis) const {
+  chassis->mutable_scu_eps_311()->set_eps_intidx(
       eps_intidx(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_eps_311()->set_eps_steeranglespd(
+  chassis->mutable_scu_eps_311()->set_eps_steeranglespd(
       eps_steeranglespd(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_eps_311()->set_eps_steerangle(
+  chassis->mutable_scu_eps_311()->set_eps_steerangle(
       eps_steerangle(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_eps_311()->set_eps_faultst(
+  chassis->mutable_scu_eps_311()->set_eps_faultst(
       eps_faultst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_eps_311()->set_eps_drvmode(
+  chassis->mutable_scu_eps_311()->set_eps_drvmode(
       eps_drvmode(bytes, length));
   // newcode
   chassis->mutable_check_response()->set_is_eps_online(

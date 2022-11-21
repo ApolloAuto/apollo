@@ -29,13 +29,13 @@ Scu1301::Scu1301() {}
 const int32_t Scu1301::ID = 0x301;
 
 void Scu1301::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_1_301()->set_vin16(vin16(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_1_301()->set_scu_stopbutst(
+                    Ge3* chassis) const {
+  chassis->mutable_scu_1_301()->set_vin16(vin16(bytes, length));
+  chassis->mutable_scu_1_301()->set_scu_stopbutst(
       scu_stopbutst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_1_301()->set_scu_drvmode(
+  chassis->mutable_scu_1_301()->set_scu_drvmode(
       scu_drvmode(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_1_301()->set_scu_faultst(
+  chassis->mutable_scu_1_301()->set_scu_faultst(
       scu_faultst(bytes, length));
 }
 

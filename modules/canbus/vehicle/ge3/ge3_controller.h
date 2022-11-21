@@ -34,7 +34,7 @@ namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Ge3Controller final : public VehicleController {
+class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3>  {
  public:
   Ge3Controller() {}
 
@@ -42,8 +42,8 @@ class Ge3Controller final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Ge3>* const can_sender,
+      MessageManager<::apollo::canbus::Ge3>* const message_manager)
       override;
 
   bool Start() override;
@@ -105,7 +105,7 @@ class Ge3Controller final : public VehicleController {
   bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail& chassis);
+  bool CheckSafetyError(const canbus::Ge3& chassis);
 
  private:
   void SecurityDogThreadFunc();

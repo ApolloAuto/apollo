@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/ge3/proto/ge3.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace ge3 {
 
 class Scubcs2307 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::Ge3> {
  public:
   static const int32_t ID;
   Scubcs2307();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Ge3* chassis) const override;
 
  private:
   // config detail: {'description': 'Vehicle speed valid data', 'enum': {0:

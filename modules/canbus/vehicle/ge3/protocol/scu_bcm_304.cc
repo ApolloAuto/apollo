@@ -29,30 +29,30 @@ Scubcm304::Scubcm304() {}
 const int32_t Scubcm304::ID = 0x304;
 
 void Scubcm304::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_vehreversest(
+                      Ge3* chassis) const {
+  chassis->mutable_scu_bcm_304()->set_bcm_vehreversest(
       bcm_vehreversest(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_rightturnlampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_rightturnlampst(
       bcm_rightturnlampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_rearfoglampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_rearfoglampst(
       bcm_rearfoglampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_parkinglampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_parkinglampst(
       bcm_parkinglampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_lowbeamst(
+  chassis->mutable_scu_bcm_304()->set_bcm_lowbeamst(
       bcm_lowbeamst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_leftturnlampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_leftturnlampst(
       bcm_leftturnlampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_keyst(
+  chassis->mutable_scu_bcm_304()->set_bcm_keyst(
       bcm_keyst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_hornst(
+  chassis->mutable_scu_bcm_304()->set_bcm_hornst(
       bcm_hornst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_highbeamst(
+  chassis->mutable_scu_bcm_304()->set_bcm_highbeamst(
       bcm_highbeamst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_hazardlampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_hazardlampst(
       bcm_hazardlampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_frontfoglampst(
+  chassis->mutable_scu_bcm_304()->set_bcm_frontfoglampst(
       bcm_frontfoglampst(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_bcm_304()->set_bcm_brakelightswitchst(
+  chassis->mutable_scu_bcm_304()->set_bcm_brakelightswitchst(
       bcm_brakelightswitchst(bytes, length));
 }
 

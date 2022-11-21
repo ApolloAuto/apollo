@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/canbus/vehicle/ge3/proto/ge3.pb.h"
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -44,7 +45,7 @@ class Ge3ControllerTest : public ::testing::Test {
 
  protected:
   Ge3Controller controller_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Ge3> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   Ge3MessageManager msg_manager_;

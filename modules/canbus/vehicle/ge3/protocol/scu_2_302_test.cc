@@ -29,18 +29,18 @@ class Scu2302Test : public ::testing::Test {
 TEST_F(Scu2302Test, reset) {
   Scu2302 scu2302;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Ge3 chassis_detail;
   uint8_t bytes[8] = {0x4D, 0x47, 0xFF, 0xEE, 0xDD, 0xCC, 0xBB, 0xAA};
 
   scu2302.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin00(), 'M');  // 77
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin01(), 71);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin02(), 255);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin03(), 238);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin04(), 221);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin05(), 204);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin06(), 187);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_2_302().vin07(), 170);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin00(), 'M');  // 77
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin01(), 71);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin02(), 255);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin03(), 238);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin04(), 221);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin05(), 204);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin06(), 187);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_2_302().vin07(), 170);
 }
 
 }  // namespace ge3

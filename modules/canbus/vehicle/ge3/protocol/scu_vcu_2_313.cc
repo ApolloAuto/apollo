@@ -29,14 +29,14 @@ Scuvcu2313::Scuvcu2313() {}
 const int32_t Scuvcu2313::ID = 0x313;
 
 void Scuvcu2313::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqposmax(
+                       Ge3* chassis) const {
+  chassis->mutable_scu_vcu_2_313()->set_vcu_torqposmax(
       vcu_torqposmax(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqnegmax(
+  chassis->mutable_scu_vcu_2_313()->set_vcu_torqnegmax(
       vcu_torqnegmax(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_torqact(
+  chassis->mutable_scu_vcu_2_313()->set_vcu_torqact(
       vcu_torqact(bytes, length));
-  chassis->mutable_ge3()->mutable_scu_vcu_2_313()->set_vcu_engspd(
+  chassis->mutable_scu_vcu_2_313()->set_vcu_engspd(
       vcu_engspd(bytes, length));
 }
 

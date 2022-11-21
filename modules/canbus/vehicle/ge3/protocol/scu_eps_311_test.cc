@@ -29,15 +29,15 @@ class Scueps311Test : public ::testing::Test {
 TEST_F(Scueps311Test, reset) {
   Scueps311 scueps311;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Ge3 chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   scueps311.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_eps_311().eps_intidx(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_eps_311().eps_steeranglespd(), 8);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_eps_311().eps_steerangle(), -702.8);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_eps_311().eps_faultst(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_eps_311().eps_drvmode(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_eps_311().eps_intidx(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_eps_311().eps_steeranglespd(), 8);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_eps_311().eps_steerangle(), -702.8);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_eps_311().eps_faultst(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.scu_eps_311().eps_drvmode(), 1);
 }
 
 }  // namespace ge3
