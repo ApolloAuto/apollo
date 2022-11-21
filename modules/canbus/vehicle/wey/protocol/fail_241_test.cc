@@ -29,15 +29,15 @@ class Fail241Test : public ::testing::Test {
 TEST_F(Fail241Test, reset) {
   Fail241 fail1;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x95, 0x12, 0x13, 0x14};
 
   fail1.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().engfail(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().espfail(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().epbfail(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().shiftfail(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fail_241().epsfail(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fail_241().engfail(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fail_241().espfail(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fail_241().epbfail(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fail_241().shiftfail(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fail_241().epsfail(), 1);
 }
 
 }  // namespace wey

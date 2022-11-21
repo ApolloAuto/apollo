@@ -31,22 +31,22 @@ Vinresp2392::Vinresp2392() {}
 const int32_t Vinresp2392::ID = 0x392;
 
 void Vinresp2392::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin15(
+                        Wey* chassis) const {
+  chassis->mutable_vin_resp2_392()->set_vin15(
       vin15(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin14(
+  chassis->mutable_vin_resp2_392()->set_vin14(
       vin14(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin13(
+  chassis->mutable_vin_resp2_392()->set_vin13(
       vin13(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin12(
+  chassis->mutable_vin_resp2_392()->set_vin12(
       vin12(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin11(
+  chassis->mutable_vin_resp2_392()->set_vin11(
       vin11(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin10(
+  chassis->mutable_vin_resp2_392()->set_vin10(
       vin10(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin09(
+  chassis->mutable_vin_resp2_392()->set_vin09(
       vin09(bytes, length));
-  chassis->mutable_wey()->mutable_vin_resp2_392()->set_vin08(
+  chassis->mutable_vin_resp2_392()->set_vin08(
       vin08(bytes, length));
 }
 

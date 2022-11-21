@@ -31,21 +31,21 @@ Fbs2240::Fbs2240() {}
 const int32_t Fbs2240::ID = 0x240;
 
 void Fbs2240::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fbs2_240()->set_flwheeldirection(
+                    Wey* chassis) const {
+  chassis->mutable_fbs2_240()->set_flwheeldirection(
       flwheeldirection(bytes, length));
-  chassis->mutable_wey()->mutable_fbs2_240()->set_frwheelspd(
+  chassis->mutable_fbs2_240()->set_frwheelspd(
       frwheelspd(bytes, length));
-  chassis->mutable_wey()->mutable_fbs2_240()->set_rlwheeldrivedirection(
+  chassis->mutable_fbs2_240()->set_rlwheeldrivedirection(
       rlwheeldrivedirection(bytes, length));
-  chassis->mutable_wey()->mutable_fbs2_240()->set_rlwheelspd(
+  chassis->mutable_fbs2_240()->set_rlwheelspd(
       rlwheelspd(bytes, length));
-  chassis->mutable_wey()->mutable_fbs2_240()->set_rrwheeldirection(
+  chassis->mutable_fbs2_240()->set_rrwheeldirection(
       rrwheeldirection(bytes, length));
-  chassis->mutable_wey()->mutable_fbs2_240()->set_rrwheelspd(
+  chassis->mutable_fbs2_240()->set_rrwheelspd(
       rrwheelspd(bytes, length));
   // change km/h to m/s
-  chassis->mutable_wey()->mutable_fbs2_240()->set_vehiclespd(
+  chassis->mutable_fbs2_240()->set_vehiclespd(
       vehiclespd(bytes, length) / 3.6);
 }
 

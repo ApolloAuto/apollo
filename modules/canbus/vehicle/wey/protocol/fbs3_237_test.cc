@@ -29,19 +29,19 @@ class Fbs3237Test : public ::testing::Test {
 TEST_F(Fbs3237Test, reset) {
   Fbs3237 fbs3;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0xFE, 0x14};
 
   fbs3.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().engspd(), 4360.5);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().accpedalpos(), 13.3858);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epbswtichposition(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().currentgear(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().eps_streeingmode(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epsdrvinputtrqvalue(),
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().engspd(), 4360.5);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().accpedalpos(), 13.3858);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().epbswtichposition(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().currentgear(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().eps_streeingmode(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().epsdrvinputtrqvalue(),
                    -19.5508);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epsconsumedcurrvalue(), 127);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epscurrmod(), 2);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().epsconsumedcurrvalue(), 127);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs3_237().epscurrmod(), 2);
 }
 
 }  // namespace wey

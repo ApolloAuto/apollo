@@ -31,10 +31,10 @@ Fbs4235::Fbs4235() {}
 const int32_t Fbs4235::ID = 0x235;
 
 void Fbs4235::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fbs4_235()->set_steerwheelangle(
+                    Wey* chassis) const {
+  chassis->mutable_fbs4_235()->set_steerwheelangle(
       steerwheelangle(bytes, length));
-  chassis->mutable_wey()->mutable_fbs4_235()->set_steerwheelspd(
+  chassis->mutable_fbs4_235()->set_steerwheelspd(
       steerwheelspd(bytes, length));
 }
 

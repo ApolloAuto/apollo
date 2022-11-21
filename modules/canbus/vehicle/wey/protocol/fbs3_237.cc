@@ -31,21 +31,21 @@ Fbs3237::Fbs3237() {}
 const int32_t Fbs3237::ID = 0x237;
 
 void Fbs3237::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fbs3_237()->set_engspd(engspd(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_accpedalpos(
+                    Wey* chassis) const {
+  chassis->mutable_fbs3_237()->set_engspd(engspd(bytes, length));
+  chassis->mutable_fbs3_237()->set_accpedalpos(
       accpedalpos(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_epbswtichposition(
+  chassis->mutable_fbs3_237()->set_epbswtichposition(
       epbswtichposition(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_currentgear(
+  chassis->mutable_fbs3_237()->set_currentgear(
       currentgear(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_eps_streeingmode(
+  chassis->mutable_fbs3_237()->set_eps_streeingmode(
       eps_streeingmode(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_epsdrvinputtrqvalue(
+  chassis->mutable_fbs3_237()->set_epsdrvinputtrqvalue(
       epsdrvinputtrqvalue(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_epsconsumedcurrvalue(
+  chassis->mutable_fbs3_237()->set_epsconsumedcurrvalue(
       epsconsumedcurrvalue(bytes, length));
-  chassis->mutable_wey()->mutable_fbs3_237()->set_epscurrmod(
+  chassis->mutable_fbs3_237()->set_epscurrmod(
       epscurrmod(bytes, length));
   // Added for response check
   chassis->mutable_check_response()->set_is_eps_online(

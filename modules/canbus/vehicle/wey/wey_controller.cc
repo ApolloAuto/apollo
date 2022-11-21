@@ -41,8 +41,8 @@ double angle_init = 0;
 
 ErrorCode WeyController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Wey>* const can_sender,
+    MessageManager<::apollo::canbus::Wey>* const message_manager) {
   if (is_initialized_) {
     AINFO << "WeyController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -145,7 +145,7 @@ void WeyController::Stop() {
 Chassis WeyController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -158,26 +158,20 @@ Chassis WeyController::chassis() {
 
   // 3
   chassis_.set_engine_started(true);
-  // if there is not wey, no chassis detail can be retrieved and return
-  if (!chassis_detail.has_wey()) {
-    AERROR << "NO WEY chassis information!";
-    return chassis_;
-  }
-  Wey wey = chassis_detail.wey();
 
   // 4 engine_rpm
-  if (wey.has_fbs3_237() && wey.fbs3_237().has_engspd()) {
-    chassis_.set_engine_rpm(static_cast<float>(wey.fbs3_237().engspd()));
+  if (chassis_detail.has_fbs3_237() && chassis_detail.fbs3_237().has_engspd()) {
+    chassis_.set_engine_rpm(static_cast<float>(chassis_detail.fbs3_237().engspd()));
   } else {
     chassis_.set_engine_rpm(0);
   }
 
   // 5 6
-  if (wey.has_fbs2_240() && wey.fbs2_240().has_vehiclespd() &&
-      wey.has_fbs1_243() && wey.has_status_310()) {
-    Fbs2_240 fbs2_240 = wey.fbs2_240();
-    Fbs1_243 fbs1_243 = wey.fbs1_243();
-    Status_310 status_310 = wey.status_310();
+  if (chassis_detail.has_fbs2_240() && chassis_detail.fbs2_240().has_vehiclespd() &&
+      chassis_detail.has_fbs1_243() && chassis_detail.has_status_310()) {
+    Fbs2_240 fbs2_240 = chassis_detail.fbs2_240();
+    Fbs1_243 fbs1_243 = chassis_detail.fbs1_243();
+    Status_310 status_310 = chassis_detail.status_310();
     // speed_mps
     chassis_.set_speed_mps(static_cast<float>(fbs2_240.vehiclespd()));
     // rr
@@ -260,15 +254,15 @@ Chassis WeyController::chassis() {
   // 7
   chassis_.set_fuel_range_m(0);
   // 8
-  if (wey.has_fbs3_237() && wey.fbs3_237().has_accpedalpos()) {
+  if (chassis_detail.has_fbs3_237() && chassis_detail.fbs3_237().has_accpedalpos()) {
     chassis_.set_throttle_percentage(
-        static_cast<float>(wey.fbs3_237().accpedalpos()));
+        static_cast<float>(chassis_detail.fbs3_237().accpedalpos()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 23, previously 10 gear position
-  if (wey.has_fbs3_237() && wey.fbs3_237().has_currentgear()) {
-    switch (wey.fbs3_237().currentgear()) {
+  if (chassis_detail.has_fbs3_237() && chassis_detail.fbs3_237().has_currentgear()) {
+    switch (chassis_detail.fbs3_237().currentgear()) {
       case Fbs3_237::CURRENTGEAR_D: {
         chassis_.set_gear_location(Chassis::GEAR_DRIVE);
       } break;
@@ -289,20 +283,20 @@ Chassis WeyController::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_NONE);
   }
   // 11
-  if (wey.has_fbs4_235() && wey.fbs4_235().has_steerwheelangle() &&
-      wey.has_status_310() && wey.status_310().has_steerwheelanglesign()) {
-    if (wey.status_310().steerwheelanglesign() ==
+  if (chassis_detail.has_fbs4_235() && chassis_detail.fbs4_235().has_steerwheelangle() &&
+      chassis_detail.has_status_310() && chassis_detail.status_310().has_steerwheelanglesign()) {
+    if (chassis_detail.status_310().steerwheelanglesign() ==
         Status_310::STEERWHEELANGLESIGN_LEFT_POSITIVE) {
       chassis_.set_steering_percentage(
-          static_cast<float>(wey.fbs4_235().steerwheelangle() * 100.0 /
+          static_cast<float>(chassis_detail.fbs4_235().steerwheelangle() * 100.0 /
                              vehicle_params_.max_steer_angle() * M_PI / 180));
-      angle_init = wey.fbs4_235().steerwheelangle();
-    } else if (wey.status_310().steerwheelanglesign() ==
+      angle_init = chassis_detail.fbs4_235().steerwheelangle();
+    } else if (chassis_detail.status_310().steerwheelanglesign() ==
                Status_310::STEERWHEELANGLESIGN_RIGHT_NEGATIVE) {
       chassis_.set_steering_percentage(
-          static_cast<float>(wey.fbs4_235().steerwheelangle() * (-1) * 100.0 /
+          static_cast<float>(chassis_detail.fbs4_235().steerwheelangle() * (-1) * 100.0 /
                              vehicle_params_.max_steer_angle() * M_PI / 180));
-      angle_init = wey.fbs4_235().steerwheelangle() * (-1);
+      angle_init = chassis_detail.fbs4_235().steerwheelangle() * (-1);
     } else {
       chassis_.set_steering_percentage(0);
     }
@@ -311,34 +305,34 @@ Chassis WeyController::chassis() {
   }
 
   // 12
-  if (wey.has_fbs3_237() && wey.fbs3_237().has_epsdrvinputtrqvalue()) {
+  if (chassis_detail.has_fbs3_237() && chassis_detail.fbs3_237().has_epsdrvinputtrqvalue()) {
     chassis_.set_steering_torque_nm(
-        static_cast<float>(wey.fbs3_237().epsdrvinputtrqvalue()));
+        static_cast<float>(chassis_detail.fbs3_237().epsdrvinputtrqvalue()));
   } else {
     chassis_.set_steering_torque_nm(0);
   }
   // 13
-  if (wey.has_status_310() && wey.status_310().has_epbsts()) {
-    chassis_.set_parking_brake(wey.status_310().epbsts() ==
+  if (chassis_detail.has_status_310() && chassis_detail.status_310().has_epbsts()) {
+    chassis_.set_parking_brake(chassis_detail.status_310().epbsts() ==
                                Status_310::EPBSTS_CLOSED);
   } else {
     chassis_.set_parking_brake(false);
   }
   // 14, 15
-  if (wey.has_status_310() && wey.status_310().has_lowbeamsts() &&
-      wey.status_310().lowbeamsts() == Status_310::LOWBEAMSTS_ON) {
+  if (chassis_detail.has_status_310() && chassis_detail.status_310().has_lowbeamsts() &&
+      chassis_detail.status_310().lowbeamsts() == Status_310::LOWBEAMSTS_ON) {
     chassis_.mutable_signal()->set_low_beam(true);
   } else {
     chassis_.mutable_signal()->set_low_beam(false);
   }
   // 16, 17
-  if (wey.has_status_310()) {
-    if (wey.status_310().has_leftturnlampsts() &&
-        wey.status_310().leftturnlampsts() == Status_310::LEFTTURNLAMPSTS_ON) {
+  if (chassis_detail.has_status_310()) {
+    if (chassis_detail.status_310().has_leftturnlampsts() &&
+        chassis_detail.status_310().leftturnlampsts() == Status_310::LEFTTURNLAMPSTS_ON) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_LEFT);
-    } else if (wey.status_310().has_rightturnlampsts() &&
-               wey.status_310().rightturnlampsts() ==
+    } else if (chassis_detail.status_310().has_rightturnlampsts() &&
+               chassis_detail.status_310().rightturnlampsts() ==
                    Status_310::RIGHTTURNLAMPSTS_ON) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_RIGHT);
@@ -351,11 +345,11 @@ Chassis WeyController::chassis() {
         common::VehicleSignal::TURN_NONE);
   }
   // 18
-  if (wey.has_vin_resp1_391() && wey.has_vin_resp2_392() &&
-      wey.has_vin_resp3_393()) {
-    Vin_resp1_391 vin_resp1_391 = wey.vin_resp1_391();
-    Vin_resp2_392 vin_resp2_392 = wey.vin_resp2_392();
-    Vin_resp3_393 vin_resp3_393 = wey.vin_resp3_393();
+  if (chassis_detail.has_vin_resp1_391() && chassis_detail.has_vin_resp2_392() &&
+      chassis_detail.has_vin_resp3_393()) {
+    Vin_resp1_391 vin_resp1_391 = chassis_detail.vin_resp1_391();
+    Vin_resp2_392 vin_resp2_392 = chassis_detail.vin_resp2_392();
+    Vin_resp3_393 vin_resp3_393 = chassis_detail.vin_resp3_393();
     if (vin_resp1_391.has_vin00() && vin_resp1_391.has_vin01() &&
         vin_resp1_391.has_vin02() && vin_resp1_391.has_vin03() &&
         vin_resp1_391.has_vin04() && vin_resp1_391.has_vin05() &&
@@ -403,6 +397,21 @@ Chassis WeyController::chassis() {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
   }
+
+  // 19 add checkresponse signal
+  if (chassis_detail.has_fbs3_237() &&
+      chassis_detail.fbs3_237().has_eps_streeingmode()) {
+    chassis_.mutable_check_response()->set_is_eps_online(
+        chassis_detail.fbs3_237().eps_streeingmode() == 1);
+  }
+  if (chassis_detail.has_status_310() &&
+      chassis_detail.status_310().has_longitudedrivingmode()) {
+    chassis_.mutable_check_response()->set_is_esp_online(
+        chassis_detail.status_310().longitudedrivingmode() == 1);
+    chassis_.mutable_check_response()->set_is_vcu_online(
+        chassis_detail.status_310().longitudedrivingmode() == 1);
+  }
+
   return chassis_;
 }
 
@@ -663,42 +672,42 @@ void WeyController::SetTurningSignal(const ControlCommand& command) {
 void WeyController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool WeyController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
-  if (!chassis_detail.has_wey()) {
+  if (!chassis_detail.has_check_response()) {
     AERROR_EVERY(100) << "ChassisDetail has NO wey vehicle info."
                       << chassis_detail.DebugString();
     return false;
   }
-  Wey wey = chassis_detail.wey();
+
   // check steer error
-  if (wey.has_fail_241()) {
-    if (wey.fail_241().epsfail() == Fail_241::EPSFAIL_FAULT) {
+  if (chassis_detail.has_fail_241()) {
+    if (chassis_detail.fail_241().epsfail() == Fail_241::EPSFAIL_FAULT) {
       return true;
     }
   }
   // check ems error
-  if (wey.has_fail_241()) {
-    if (wey.fail_241().engfail() == Fail_241::ENGFAIL_FAIL) {
+  if (chassis_detail.has_fail_241()) {
+    if (chassis_detail.fail_241().engfail() == Fail_241::ENGFAIL_FAIL) {
       return true;
     }
   }
   // check braking error
-  if (wey.has_fail_241()) {
-    if (wey.fail_241().espfail() == Fail_241::ESPFAIL_FAILURE) {
+  if (chassis_detail.has_fail_241()) {
+    if (chassis_detail.fail_241().espfail() == Fail_241::ESPFAIL_FAILURE) {
       return true;
     }
   }
   // check gear error question
-  if (wey.has_fail_241()) {
-    if (wey.fail_241().shiftfail() ==
+  if (chassis_detail.has_fail_241()) {
+    if (chassis_detail.fail_241().shiftfail() ==
         Fail_241::SHIFTFAIL_TRANSMISSION_P_ENGAGEMENT_FAULT) {
       return true;
     }
   }
   // check parking error
-  if (wey.has_fail_241()) {
-    if (wey.fail_241().epbfail() == Fail_241::EPBFAIL_ERROR) {
+  if (chassis_detail.has_fail_241()) {
+    if (chassis_detail.fail_241().epbfail() == Fail_241::EPBFAIL_ERROR) {
       return true;
     }
   }
@@ -772,7 +781,7 @@ void WeyController::SecurityDogThreadFunc() {
 }
 
 bool WeyController::CheckResponse(const int32_t flags, bool need_wait) {
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;

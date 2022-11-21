@@ -29,16 +29,16 @@ class Fbs2240Test : public ::testing::Test {
 TEST_F(Fbs2240Test, reset) {
   Fbs2240 fbs2;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   fbs2.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().flwheeldirection(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().frwheelspd(), 245.25);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().rlwheeldrivedirection(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().rlwheelspd(), 61.3125);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().rrwheeldirection(), 1);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs2_240().rrwheelspd(), 30.7125);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().flwheeldirection(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().frwheelspd(), 245.25);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().rlwheeldrivedirection(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().rlwheelspd(), 61.3125);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().rrwheeldirection(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs2_240().rrwheelspd(), 30.7125);
 }
 
 }  // namespace wey

@@ -31,8 +31,8 @@ Vinresp3393::Vinresp3393() {}
 const int32_t Vinresp3393::ID = 0x393;
 
 void Vinresp3393::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_vin_resp3_393()->set_vin16(
+                        Wey* chassis) const {
+  chassis->mutable_vin_resp3_393()->set_vin16(
       vin16(bytes, length));
 }
 

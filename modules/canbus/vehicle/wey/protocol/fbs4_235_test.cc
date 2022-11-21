@@ -29,12 +29,12 @@ class Fbs4235Test : public ::testing::Test {
 TEST_F(Fbs4235Test, reset) {
   Fbs4235 fbs4;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x04, 0x03, 0x02, 0x01, 0x11, 0x12, 0x13, 0x14};
 
   fbs4.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs4_235().steerwheelangle(), 38.5);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs4_235().steerwheelspd(), 218.5);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs4_235().steerwheelangle(), 38.5);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs4_235().steerwheelspd(), 218.5);
 }
 
 }  // namespace wey

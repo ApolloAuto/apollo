@@ -31,16 +31,16 @@ Fail241::Fail241() {}
 const int32_t Fail241::ID = 0x241;
 
 void Fail241::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fail_241()->set_engfail(
+                    Wey* chassis) const {
+  chassis->mutable_fail_241()->set_engfail(
       engfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_espfail(
+  chassis->mutable_fail_241()->set_espfail(
       espfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_epbfail(
+  chassis->mutable_fail_241()->set_epbfail(
       epbfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_shiftfail(
+  chassis->mutable_fail_241()->set_shiftfail(
       shiftfail(bytes, length));
-  chassis->mutable_wey()->mutable_fail_241()->set_epsfail(
+  chassis->mutable_fail_241()->set_epsfail(
       epsfail(bytes, length));
 }
 

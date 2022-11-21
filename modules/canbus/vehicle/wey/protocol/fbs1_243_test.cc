@@ -29,15 +29,15 @@ class Fbs1243Test : public ::testing::Test {
 TEST_F(Fbs1243Test, reset) {
   Fbs1243 fbs1;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   fbs1.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs1_243().longitudeacce(), 12.59432);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs1_243().lateralacce(), -13.04542);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs1_243().vehdynyawrate(), -1.0442);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs1_243().flwheelspd(), 34.3125);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs1_243().frwheeldirection(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs1_243().longitudeacce(), 12.59432);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs1_243().lateralacce(), -13.04542);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs1_243().vehdynyawrate(), -1.0442);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs1_243().flwheelspd(), 34.3125);
+  EXPECT_DOUBLE_EQ(chassis_detail.fbs1_243().frwheeldirection(), 0);
 }
 
 }  // namespace wey

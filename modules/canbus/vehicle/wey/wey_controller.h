@@ -37,7 +37,7 @@ namespace apollo {
 namespace canbus {
 namespace wey {
 
-class WeyController final : public VehicleController {
+class WeyController final : public VehicleController<::apollo::canbus::Wey> {
  public:
   WeyController() {}
 
@@ -45,8 +45,8 @@ class WeyController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Wey>* const can_sender,
+      MessageManager<::apollo::canbus::Wey>* const message_manager)
       override;
 
   bool Start() override;

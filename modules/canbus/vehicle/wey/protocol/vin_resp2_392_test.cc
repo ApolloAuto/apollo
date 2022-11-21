@@ -29,18 +29,18 @@ class Vinresp2392Test : public ::testing::Test {
 TEST_F(Vinresp2392Test, reset) {
   Vinresp2392 vin2;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   vin2.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin15(), 136);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin14(), 68);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin13(), 34);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin12(), 17);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin11(), 17);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin10(), 18);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin09(), 19);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp2_392().vin08(), 20);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin15(), 136);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin14(), 68);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin13(), 34);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin12(), 17);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin11(), 17);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin10(), 18);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin09(), 19);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp2_392().vin08(), 20);
 }
 
 }  // namespace wey

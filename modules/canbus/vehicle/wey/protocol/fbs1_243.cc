@@ -31,16 +31,16 @@ Fbs1243::Fbs1243() {}
 const int32_t Fbs1243::ID = 0x243;
 
 void Fbs1243::Parse(const std::uint8_t* bytes, int32_t length,
-                    ChassisDetail* chassis) const {
-  chassis->mutable_wey()->mutable_fbs1_243()->set_longitudeacce(
+                    Wey* chassis) const {
+  chassis->mutable_fbs1_243()->set_longitudeacce(
       longitudeacce(bytes, length));
-  chassis->mutable_wey()->mutable_fbs1_243()->set_lateralacce(
+  chassis->mutable_fbs1_243()->set_lateralacce(
       lateralacce(bytes, length));
-  chassis->mutable_wey()->mutable_fbs1_243()->set_vehdynyawrate(
+  chassis->mutable_fbs1_243()->set_vehdynyawrate(
       vehdynyawrate(bytes, length));
-  chassis->mutable_wey()->mutable_fbs1_243()->set_flwheelspd(
+  chassis->mutable_fbs1_243()->set_flwheelspd(
       flwheelspd(bytes, length));
-  chassis->mutable_wey()->mutable_fbs1_243()->set_frwheeldirection(
+  chassis->mutable_fbs1_243()->set_frwheeldirection(
       frwheeldirection(bytes, length));
 }
 

@@ -29,11 +29,11 @@ class Vinresp3393Test : public ::testing::Test {
 TEST_F(Vinresp3393Test, reset) {
   Vinresp3393 vin3;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Wey chassis_detail;
   uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
   vin3.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp3_393().vin16(), 136);
+  EXPECT_DOUBLE_EQ(chassis_detail.vin_resp3_393().vin16(), 136);
 }
 
 }  // namespace wey
