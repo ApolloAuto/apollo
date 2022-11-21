@@ -549,9 +549,6 @@ class Renderer {
         newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
       );
     }
-    if (!_.isEmpty(extraInfo[1])) {
-      this.routingEditor.setDeadJunctionInfo(extraInfo[1]);
-    }
   }
 
   updatePointCloud(pointCloud) {
