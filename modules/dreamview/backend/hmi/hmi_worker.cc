@@ -43,8 +43,6 @@ DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
 
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 
-DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
-              "Vehicles config path.");
 
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 
@@ -1321,7 +1319,7 @@ void HMIWorker::ChangeRecord(const std::string &record_id) {
   return;
 }
 bool HMIWorker::LoadRecords() {
-  StopRecordPlay();
+  //StopRecordPlay();
   std::string directory_path;
   GetRecordPath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
