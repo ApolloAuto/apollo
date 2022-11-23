@@ -201,7 +201,7 @@ bool Routing::SupplementParkingRequest(
   std::vector<std::string> overlap_object_ids;
   const auto parking_space_id =
       hdmap::MakeMapId(routing_request.parking_info().parking_space_id());
-  GetAllOverlapObjectIds(parking_space_id, overlap_object_ids);
+  GetAllOverlapObjectIds(parking_space_id, &overlap_object_ids);
   for (size_t i = 0; i < 4; i++) {
     double temp_nearest_s;
     double temp_nearest_l;
@@ -293,8 +293,8 @@ bool Routing::SupplementParkingRequest(
 
 void Routing::GetAllOverlapObjectIds(
     const hdmap::Id& parking_spot_id,
-    std::vector<std::string>& object_ids) const {
-  object_ids.clear();
+    std::vector<std::string> *object_ids) const {
+  object_ids->clear();
   auto parking_spot_info = hdmap_->GetParkingSpaceById(parking_spot_id);
   if (nullptr == parking_spot_info) {
     return;
@@ -307,7 +307,7 @@ void Routing::GetAllOverlapObjectIds(
     }
     auto overlap = overlap_info->overlap();
     for (auto object : overlap.object()) {
-      object_ids.emplace_back(object.id().id());
+      object_ids->emplace_back(object.id().id());
     }
   }
 }

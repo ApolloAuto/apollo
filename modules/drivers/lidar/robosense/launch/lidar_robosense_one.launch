@@ -1,0 +1,11 @@
+<!--this file list the modules which will be loaded dynamicly and 
+    their process name to be running in -->
+
+<cyber>
+    <module>
+        <name>lidar_suteng16</name>
+        <dag_conf>/apollo/modules/drivers/lidar/robosense/dag/dag_driver_robo_one.dag</dag_conf>
+        <process_name>cyber_suteng</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

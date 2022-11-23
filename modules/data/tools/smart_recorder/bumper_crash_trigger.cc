@@ -49,7 +49,8 @@ void BumperCrashTrigger::Pull(const cyber::record::RecordMessage& msg) {
         is_back_bumper_trigger = true;
       }
     }
-    bool check_event_trigger = is_front_bumper_trigger || is_back_bumper_trigger;
+    bool check_event_trigger
+        = is_front_bumper_trigger || is_back_bumper_trigger;
 
     if (check_event_trigger && (!previous_check_event_trigger_)) {
       AINFO << "Chassis has crash event.";

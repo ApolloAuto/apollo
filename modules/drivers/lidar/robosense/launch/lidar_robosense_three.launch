@@ -1,0 +1,10 @@
+<cyber>
+    <desc>cyber driver robosense</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>driver_lidar_robosense</name>
+        <dag_conf>/apollo/modules/drivers/lidar/robosense/dag/dag_driver_robo.dag</dag_conf>
+        <process_name>dag_driver_robo_three</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

@@ -37,23 +37,19 @@ using std::string;
 // scenarios: update all scenarios
 namespace {
 std::map<string, int> data_type_dict = {{
-                                            "scenario_set",
-                                            0,
+                                            "scenario_set", 0,
                                         },
                                         {
-                                            "scenarios",
-                                            1,
+                                            "scenarios", 1,
                                         },
                                         {
-                                            "dynamic_model",
-                                            2,
+                                            "dynamic_model", 2,
                                         },
                                         {
-                                            "records",
-                                            3,
+                                            "records", 3,
                                         }};
 }  // namespace
-namespace apollo {  // namespace apollo
+namespace apollo {     // namespace apollo
 namespace dreamview {  // namespace dreamview
 PluginManager::PluginManager(WebSocketHandler* plugin_ws)
     : node_(cyber::CreateNode("PluginManager")),
@@ -85,7 +81,7 @@ void PluginManager::Stop() {
   enabled_ = false;
 }
 
-auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
+auto PluginManager::InitPluginReader(const ChannelConf& channel_conf,
                                      const string& channel_prefix,
                                      const string& plugin_name)
     -> std::shared_ptr<cyber::Reader<DvPluginMsg>> {
@@ -118,7 +114,7 @@ auto PluginManager::InitPluginReader(ChannelConf& channel_conf,
   return reader;
 };
 
-auto PluginManager::InitPluginWriterAndMsg(ChannelConf& channel_conf,
+auto PluginManager::InitPluginWriterAndMsg(const ChannelConf& channel_conf,
                                            const string& channel_prefix,
                                            const string& plugin_name)
     -> std::shared_ptr<cyber::Writer<DvPluginMsg>> {
@@ -251,8 +247,7 @@ bool PluginManager::RegisterPlugins() {
 }
 
 bool PluginManager::CheckPluginStatus(const string& plugin_name) {
-  if (plugins_.find(plugin_name) == plugins_.end())
-  {
+  if (plugins_.find(plugin_name) == plugins_.end()) {
     AERROR << "Failed to register this plugin, cann't check!";
     return false;
   }
@@ -306,8 +301,7 @@ bool PluginManager::SendMsgToPlugin(const string& json_str) {
   const string msg_name = plugin_msg->name();
 
   if (plugins_[plugin_name].plugin_accept_msg.find(msg_name) ==
-      plugins_[plugin_name].plugin_accept_msg.end())
-  {
+      plugins_[plugin_name].plugin_accept_msg.end()) {
     AERROR << "Plugin not accept this msg!";
     return false;
   }
@@ -332,7 +326,6 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateScenarioSetList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordToStatus", &PluginManager::UpdateData);
-
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -353,7 +346,7 @@ bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
   return true;
 }
 
-bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
+bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
   if (!msg.has_info()) {
     AERROR << "Failed to get data type!";
     return false;
@@ -383,7 +376,7 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, string& json_str) {
       update_data_res = callback_api_("UpdateDynamicModelToStatus", info);
       break;
     }
-    case 3:{
+    case 3: {
       update_data_res = callback_api_("UpdateRecordToStatus", info);
       break;
     }

@@ -105,7 +105,7 @@ void MSFLocalization::InitParams() {
 
     AINFO << "Vehile imu file: " << FLAGS_vehicle_imu_file;
     if (LoadImuVehicleExtrinsic(FLAGS_vehicle_imu_file, &qx, &qy, &qz, &qw,
-                                imu_vehicle_translation_)) {
+                                &imu_vehicle_translation_)) {
       imu_vehicle_quat_.x() = qx;
       imu_vehicle_quat_.y() = qy;
       imu_vehicle_quat_.z() = qz;
@@ -385,9 +385,9 @@ bool MSFLocalization::LoadGnssAntennaExtrinsic(
 bool MSFLocalization::LoadImuVehicleExtrinsic(const std::string &file_path,
                                               double *quat_qx, double *quat_qy,
                                               double *quat_qz, double *quat_qw,
-                                              Eigen::Vector3d &translation) {
+                                              Eigen::Vector3d *translation) {
   for (size_t i = 0; i < 3; ++i) {
-    translation[i] = 0.0;
+    (*translation)[i] = 0.0;
   }
   if (!cyber::common::PathExists(file_path)) {
     return false;
@@ -403,9 +403,9 @@ bool MSFLocalization::LoadImuVehicleExtrinsic(const std::string &file_path,
       return false;
     }
     if (config["transform"]["translation"]) {
-      translation[0] = config["transform"]["translation"]["x"].as<double>();
-      translation[1] = config["transform"]["translation"]["y"].as<double>();
-      translation[2] = config["transform"]["translation"]["z"].as<double>();
+      (*translation)[0] = config["transform"]["translation"]["x"].as<double>();
+      (*translation)[1] = config["transform"]["translation"]["y"].as<double>();
+      (*translation)[2] = config["transform"]["translation"]["z"].as<double>();
       return true;
     }
   }

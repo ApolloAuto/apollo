@@ -1,0 +1,18 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/libsuteng_driver_component.so"
+
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/robosense/conf/lidar16_back.conf"
+        readers {
+          channel: "/apollo/sensor/lidar16/back/Scan"
+        }
+      }
+    }
+}

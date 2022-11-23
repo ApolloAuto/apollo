@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,162 +13,183 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/drivers/lidar/robosense/driver/driver.h"
+
+#include <atomic>
+#include <cmath>
+#include <ctime>
+#include <memory>
+#include <string>
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
-using apollo::cyber::Node;
-using apollo::cyber::Writer;
-using apollo::drivers::PointCloud;
-using apollo::drivers::PointXYZIT;
-using apollo::drivers::robosense::RobosenseScan;
-bool RobosenseDriver::Init() {
-  if (node_ == nullptr) {
-    AERROR << "node is nullptr";
-    return false;
-  }
-  scan_writer_ = node_->CreateWriter<RobosenseScan>(conf_.scan_channel());
-  pointcloud_writer_ =
-      node_->CreateWriter<PointCloud>(conf_.pointcloud_channel());
-  if (scan_writer_ == nullptr) {
-    AERROR << "writer:" << conf_.scan_channel()
-           << " create error, check cyber is inited.";
-    return false;
-  }
-  RS_Param param;
-  param.min_distance = conf_.min_distance();
-  param.max_distance = conf_.max_distance();
-  param.start_angle = conf_.start_angle();
-  param.end_angle = conf_.end_angle();
-  param.cut_angle = conf_.cut_angle();
-  param.use_lidar_clock = conf_.use_lidar_clock();
-  param.echo = RS_ECHO_MODE(conf_.echo_mode());
-  if (conf_.model() != "RS16" && conf_.model() != "RS32" &&
-      conf_.model() != "RS128" && conf_.model() != "RSBP") {
-    AERROR << "Wrong input LiDAR Type!";
-    return false;
-  }
-  lidar_decoder_ptr_ =
-      DecoderFactory<PointXYZIT>::createDecoder(conf_.model(), param);
-  lidar_input_ptr_ =
-      std::make_shared<Input>(conf_.msop_port(), conf_.difop_port());
-  lidar_decoder_ptr_->loadCalibrationFile(conf_.calibration_file());
 
-  point_cloud_ptr_.reset(new PointCloud);
-  scan_ptr_.reset(new RobosenseScan);
+RobosenseDriver::RobosenseDriver()
+    : basetime_(0), last_gps_time_(0), last_count_(0) {}
 
-  points_seq_ = 0;
-  scan_seq_ = 0;
-  thread_flag_ = true;
-  lidar_thread_ptr_ = std::make_shared<std::thread>([this] { getPackets(); });
+void RobosenseDriver::set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
+                                                   uint64_t* basetime,
+                                                   bool gps_time) {
+  tm time;
+  memset(&time, 0, sizeof(time));
+
+  time.tm_year = nmea_time->year + (2000 - 1900);
+  time.tm_mon = nmea_time->mon - 1;
+  time.tm_mday = nmea_time->day;
+  time.tm_hour = nmea_time->hour;  //+ config_.time_zone();
+  time.tm_min = 0;
+  time.tm_sec = 0;
+
+  // set last gps time using gps socket packet
+  last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
+
+  AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
+        << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
+        << time.tm_sec;
+
+  uint64_t unix_base = 0;
+  if (!gps_time) {
+    AINFO << "local time--------------------------";
+    unix_base = static_cast<uint64_t>(mktime(&time));
+  } else {
+    AINFO << "gps time---------------------------";
+    unix_base = static_cast<uint64_t>(timegm(&time));
+  }
+  *basetime = unix_base;  //* static_cast<uint64_t>(1e6);
+}
+
+bool RobosenseDriver::set_base_time() {
+  NMEATimePtr nmea_time(new NMEATime);
+  if (config_.use_gps_time()) {
+    while (true) {
+      int rc = input_->get_positioning_data_packtet(nmea_time);
+      if (rc == 0) {
+        break;  // got a full packet
+      }
+      if (rc < 0) {
+        return false;  // end of file reached
+      }
+    }
+  } else {
+    time_t t = time(NULL);
+    struct tm ptm;
+    struct tm* current_time = localtime_r(&t, &ptm);
+    nmea_time->year = current_time->tm_year - 100;
+    nmea_time->mon = current_time->tm_mon + 1;
+    nmea_time->day = current_time->tm_mday;
+    nmea_time->hour = current_time->tm_hour;
+    nmea_time->min = current_time->tm_min;
+    nmea_time->sec = current_time->tm_sec;
+  }
+  set_base_time_from_nmea_time(nmea_time, &basetime_);
+  input_->init(config_.firing_data_port());
   return true;
 }
 
-void RobosenseDriver::getPackets() {
-  while (thread_flag_) {
-    LidarPacketMsg pkt_msg;
-    InputState ret = lidar_input_ptr_->getPacket(pkt_msg.packet.data(), 100);
-    if (ret == INPUT_MSOP) {
-      msop_pkt_queue_.push(pkt_msg);
-      if (msop_pkt_queue_.is_task_finished.load()) {
-        msop_pkt_queue_.is_task_finished.store(false);
-        ThreadPool::getInstance()->commit([this]() { processMsopPackets(); });
+int RobosenseDriver::poll_standard(
+    const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan) {
+  // Since the suteng delivers data at a very high rate, keep
+  // reading and publishing scans as fast as possible.
+  for (int32_t i = 0; i < config_.npackets(); ++i) {
+    while (true) {
+      apollo::drivers::suteng::SutengPacket* packet;
+      // keep reading until full packet received
+      packet = scan->add_firing_pkts();
+      int rc = input_->get_firing_data_packet(packet, i, start_time_);
+      if (rc == 0) {
+        break;  // got a full packet?
       }
-    } else if (ret == INPUT_DIFOP) {
-      difop_pkt_queue_.push(pkt_msg);
-      if (difop_pkt_queue_.is_task_finished.load()) {
-        difop_pkt_queue_.is_task_finished.store(false);
-        ThreadPool::getInstance()->commit([this]() { processDifopPackets(); });
-      }
-    } else if (ret == INPUT_ERROR || ret == INPUT_EXIT ||
-               ret == INPUT_TIMEOUT) {
-      AERROR << "ErrCode_LidarDriverInterrupt";
-    }
-  }
-}
 
-void RobosenseDriver::processMsopPackets() {
-  while (msop_pkt_queue_.m_quque.size() > 0 && thread_flag_) {
-    LidarPacketMsg pkt = msop_pkt_queue_.m_quque.front();
-    std::shared_ptr<int> height_ptr = std::make_shared<int>();
-    void *data_ptr = malloc(PKT_DATA_LENGTH);
-    memcpy(data_ptr, pkt.packet.data(), PKT_DATA_LENGTH);
-    scan_ptr_->add_firing_pkts()->set_data(data_ptr, PKT_DATA_LENGTH);
-    free(data_ptr);
-    msop_pkt_queue_.pop();
-    std::shared_ptr<std::vector<PointXYZIT>> point_vec_ptr =
-        std::make_shared<std::vector<PointXYZIT>>();
-    int ret = 0;
-    if (thread_flag_) {
-      ret = lidar_decoder_ptr_->processMsopPkt(pkt.packet.data(), point_vec_ptr,
-                                               height_ptr);
-    }
-    if (ret == E_DECODE_OK || ret == E_FRAME_SPLIT) {
-      for (auto iter : *point_vec_ptr) {
-        if (std::isnan(iter.x()) || std::isnan(iter.y()) ||
-            std::isnan(iter.z())) {
-          continue;
-        }
-        PointXYZIT *point = point_cloud_ptr_->add_point();
-        point->set_x(iter.x());
-        point->set_y(iter.y());
-        point->set_z(iter.z());
-        point->set_intensity(iter.intensity());
-        point->set_timestamp(iter.timestamp());
-      }
-      if (ret == E_FRAME_SPLIT) {
-        std::shared_ptr<PointCloud> raw_cloud = point_cloud_ptr_;
-        raw_cloud->set_height(*height_ptr);
-        preparePointsMsg(raw_cloud);
-        if (conf_.use_lidar_clock()) {
-          const auto timestamp =
-              raw_cloud->point(static_cast<int>(raw_cloud->point_size()) - 1)
-                  .timestamp();
-          raw_cloud->set_measurement_time(static_cast<double>(timestamp) / 1e9);
-
-          raw_cloud->mutable_header()->set_lidar_timestamp(timestamp);
-        }
-        if (raw_cloud->point_size() != 0) {
-          pointcloud_writer_->Write(raw_cloud);
-        }
-        std::shared_ptr<RobosenseScan> raw_scan = scan_ptr_;
-        prepareLidarScanMsg(raw_scan);
-        scan_writer_->Write(raw_scan);
-        point_cloud_ptr_.reset(new PointCloud);
-        scan_ptr_.reset(new RobosenseScan);
+      if (rc < 0) {
+        return rc;
       }
     }
   }
-  msop_pkt_queue_.is_task_finished.store(true);
+
+  return 0;
 }
 
-void RobosenseDriver::processDifopPackets() {
-  while (difop_pkt_queue_.m_quque.size() > 0 && thread_flag_) {
-    LidarPacketMsg pkt = difop_pkt_queue_.m_quque.front();
-    difop_pkt_queue_.pop();
-    lidar_decoder_ptr_->processDifopPkt(pkt.packet.data());
+int RobosenseDriver::poll_sync_count(
+    const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan,
+    bool main_frame) {
+  static std::atomic_ullong sync_counter(0);
+  int time_zone = config_.time_zone();
+  // apollo::drivers::suteng::SutengPacket* tmp_packet;
+  if (main_frame) {
+    for (int32_t i = 0; i < config_.npackets(); ++i) {
+      while (true) {
+        apollo::drivers::suteng::SutengPacket* packet;
+        // keep reading until full packet received
+        packet = scan->add_firing_pkts();
+        int rc = input_->get_firing_data_packet(packet, time_zone, start_time_);
+        // tmp_packet = packet;
+        if (rc == 0) {
+          break;  // got a full packet?
+        }
+        if (rc < 0) {
+          return rc;
+        }
+      }
+    }
+    sync_counter++;
+  } else {
+    int pk_i = 0;
+    while (scan->firing_pkts_size() < config_.npackets()) {
+      while (true) {
+        apollo::drivers::suteng::SutengPacket* packet;
+        // keep reading until full packet received
+        packet = scan->add_firing_pkts();
+        int rc = input_->get_firing_data_packet(packet, time_zone, start_time_);
+        pk_i++;
+        if (rc == 0) {
+          break;
+        }
+        if (rc < 0) {
+          return rc;
+        }
+      }
+    }
+    last_count_ = sync_counter;
   }
-  difop_pkt_queue_.is_task_finished.store(true);
-}
 
-void RobosenseDriver::prepareLidarScanMsg(std::shared_ptr<RobosenseScan> msg) {
-  msg->mutable_header()->set_sequence_num(++scan_seq_);
-  msg->mutable_header()->set_frame_id(conf_.frame_id());
-  msg->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
-  msg->set_model(conf_.model());
+  return 0;
 }
-void RobosenseDriver::preparePointsMsg(std::shared_ptr<PointCloud> msg) {
-  msg->set_width(msg->point_size() / msg->height());
-  msg->set_is_dense(false);
-  msg->mutable_header()->set_sequence_num(++points_seq_);
-  msg->mutable_header()->set_frame_id(conf_.frame_id());
-  msg->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
-  msg->mutable_header()->set_lidar_timestamp(cyber::Time().Now().ToSecond() *
-                                             kSecondToNanoFactor);
-  const auto timestamp =
-      msg->point(static_cast<int>(msg->point_size()) - 1).timestamp();
-  msg->set_measurement_time(static_cast<double>(timestamp) / 1e9);
+static int ANGLE_HEAD = -36001;  // note: cannot be set to -1, or stack smashing
+static int last_azimuth = ANGLE_HEAD;
+bool RobosenseDriver::cute_angle(
+    apollo::drivers::suteng::SutengPacket* packet) {
+  int azimuth = 256 * packet->data().c_str()[44] + packet->data().c_str()[45];
+  if (azimuth < last_azimuth) {
+    last_azimuth -= 36000;
+  }
+  // Check if currently passing cut angle
+  if (last_azimuth != ANGLE_HEAD && last_azimuth < 1 && azimuth >= 1) {
+    last_azimuth = azimuth;
+    return false;  // Cut angle passed, one full revolution collected
+  }
+  last_azimuth = azimuth;
+  return true;
+}
+void RobosenseDriver::update_gps_top_hour(uint32_t current_time) {
+  if (!flags) {
+    AINFO << "init current_time:" << current_time
+          << ", last_gps_time:" << last_gps_time_;
+    flags = true;
+  }
+  if (last_gps_time_ == 0) {
+    last_gps_time_ = current_time;
+    return;
+  }
+  if (last_gps_time_ > current_time) {
+    if (std::fabs(last_gps_time_ - current_time) > 3599000000) {
+      basetime_ += 3600;
+      AINFO << "update_gps_top_hour. current:" << current_time
+            << ", last time:" << last_gps_time_;
+    }
+  }
+  last_gps_time_ = current_time;
 }
 
 }  // namespace robosense

@@ -240,12 +240,10 @@ bool HMI::UpdateScenarioSetToStatus(const std::string& scenario_set_id,
                                                 scenario_set_name);
 }
 
-bool HMI::UpdateDynamicModelToStatus(std::string& dynamic_model_name) {
+bool HMI::UpdateDynamicModelToStatus(const std::string& dynamic_model_name) {
   return hmi_worker_->UpdateDynamicModelToStatus(dynamic_model_name);
 }
 
-bool HMI::UpdateRecordToStatus(){
-  return hmi_worker_->LoadRecords();
-}
+bool HMI::UpdateRecordToStatus() { return hmi_worker_->LoadRecords(); }
 }  // namespace dreamview
 }  // namespace apollo

@@ -1,0 +1,16 @@
+syntax = "proto2";
+package apollo.drivers.suteng;
+
+// Vehicle parameters shared among several modules.
+// By default, all are measured with the SI units (meters, meters per second,
+// etc.).
+message Lidar {
+  // Car center point is car reference point, i.e., center of rear axle.
+  required string frame_id = 1;
+  required int32 grading = 2;
+  repeated string point = 3;
+}
+
+message LidarsFilter {
+  repeated Lidar lidar = 1;
+}

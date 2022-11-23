@@ -71,9 +71,9 @@ void DynamicModelFactory::RegisterSimPerfectControl() {
   }
 }
 
-bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
+bool DynamicModelFactory::RegisterDynamicModel(const std::string &dm_dir_name) {
   std::string dynamic_model_conf_json_path;
-  GetDynamicModelPath(dm_dir_name, dynamic_model_conf_json_path, true);
+  GetDynamicModelPath(dm_dir_name, &dynamic_model_conf_json_path, true);
   if (!cyber::common::PathExists(dynamic_model_conf_json_path)) {
     AERROR << "Failed to load Dynamic Model: " << dm_dir_name
            << ". conf file is not exists!";
@@ -96,8 +96,8 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   // if is already registered
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter != s_dynamic_model_map_.end()) {
-    AERROR << "This dynamic model:  "
-          << dynamic_model_name << " is already registered!";
+    AERROR << "This dynamic model:  " << dynamic_model_name
+           << " is already registered!";
     return false;
   }
   std::string dm_library_name = dynamic_model_conf.library_name();
@@ -117,9 +117,9 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
     }
     s_dynamic_model_map_[dynamic_model_name] = {};
     s_dynamic_model_map_[dynamic_model_name].dynamic_model_name =
-      dynamic_model_name;
+        dynamic_model_name;
     s_dynamic_model_map_[dynamic_model_name].dynamic_model_ptr =
-      dynamic_model_ptr;
+        dynamic_model_ptr;
     s_dynamic_model_map_[dynamic_model_name].library_name = dm_library_name;
     auto iter = s_dm_lib_count_.find(dm_library_name);
     if (iter == s_dm_lib_count_.end()) {
@@ -140,12 +140,13 @@ bool DynamicModelFactory::RegisterDynamicModel(std::string &dm_dir_name) {
   return true;
 }
 
-void DynamicModelFactory::GetDynamicModelPath(std::string &dynamic_model_name,
-                                              std::string &path,
-                                              bool get_conf_json) {
-  path = dynamic_model_local_path_ + dynamic_model_name;
+void DynamicModelFactory::GetDynamicModelPath(
+    const std::string &dynamic_model_name, std::string *path,
+    bool get_conf_json) {
+  CHECK_NOTNULL(path);
+  *path = dynamic_model_local_path_ + dynamic_model_name;
   if (get_conf_json) {
-    path = path + "/dynamic_model.json";
+    *path = *path + "/dynamic_model.json";
   }
   return;
 }
@@ -181,9 +182,9 @@ nlohmann::json DynamicModelFactory::RegisterDynamicModels() {
     }
   }
 
-// c++ map's traversal order is different from the insertion order.
-// To ensure that the default sim control is in the front,put it before other
-// dynamic models.
+  // c++ map's traversal order is different from the insertion order.
+  // To ensure that the default sim control is in the front,put it before other
+  // dynamic models.
   result["loaded_dynamic_models"] = {FLAGS_sim_perfect_control};
   for (auto iter = s_dynamic_model_map_.begin();
        iter != s_dynamic_model_map_.end(); iter++) {
@@ -205,7 +206,7 @@ SimControlBase *DynamicModelFactory::GetModelType(
 }
 
 bool DynamicModelFactory::UnregisterDynamicModel(
-    std::string &dynamic_model_name) {
+    const std::string &dynamic_model_name) {
   auto iter = s_dynamic_model_map_.find(dynamic_model_name);
   if (iter == s_dynamic_model_map_.end()) {
     AERROR << "Failed to get " << dynamic_model_name << " related pointer.";
@@ -214,7 +215,7 @@ bool DynamicModelFactory::UnregisterDynamicModel(
   std::string library_name = iter->second.library_name;
   s_dynamic_model_map_.erase(dynamic_model_name);
   std::string dynamic_model_dir;
-  GetDynamicModelPath(dynamic_model_name, dynamic_model_dir, false);
+  GetDynamicModelPath(dynamic_model_name, &dynamic_model_dir, false);
   std::string command = "rm -fr " + dynamic_model_dir;
   // use cyber::common::removeFiles do not support sub-directory
   // use rmdir do not support not empty directory

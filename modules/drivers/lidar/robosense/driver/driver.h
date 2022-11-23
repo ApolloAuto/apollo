@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,79 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #pragma once
 #include <memory>
 #include <string>
-#include <thread>
-#include <vector>
 
-#include "modules/drivers/lidar/proto/config.pb.h"
-#include "modules/drivers/lidar/proto/robosense.pb.h"
-#include "modules/drivers/lidar/proto/robosense_config.pb.h"
-#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
+#include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
+#include "modules/drivers/lidar/robosense/proto/sensor_suteng_conf.pb.h"
 
-#include "cyber/cyber.h"
-#include "modules/drivers/lidar/common/driver_factory/driver_base.h"
-#include "modules/drivers/lidar/robosense/decoder/decoder_16.hpp"
-#include "modules/drivers/lidar/robosense/decoder/decoder_factory.hpp"
-#include "modules/drivers/lidar/robosense/driver/utility.h"
-#include "modules/drivers/lidar/robosense/input/input.h"
-#define PKT_DATA_LENGTH 1248
+#include "modules/drivers/lidar/robosense/lib/data_type.h"
+#include "modules/drivers/lidar/robosense/lib/pcap_input.h"
+#include "modules/drivers/lidar/robosense/lib/socket_input.h"
+#include "modules/drivers/lidar/robosense/lib/socket_input_16p.h"
 
 namespace apollo {
 namespace drivers {
 namespace robosense {
-struct alignas(16) LidarPacketMsg {
-  double timestamp = 0.0;
-  std::string frame_id = "";
-  std::array<uint8_t, PKT_DATA_LENGTH> packet{};  ///< lidar single packet
-};
 
-class RobosenseDriver : public lidar::LidarDriver {
+class RobosenseDriver {
  public:
-  RobosenseDriver(const std::shared_ptr<cyber::Node> &node,
-                  const ::apollo::drivers::lidar::config &config)
-      : node_(node), conf_(config.robosense()) {}
-  RobosenseDriver(const std::shared_ptr<cyber::Node> &node, const Config &conf)
-      : node_(node), conf_(conf) {}
-  ~RobosenseDriver() { stop(); }
-  bool Init() override;
+  RobosenseDriver();
+  virtual ~RobosenseDriver() {}
 
- private:
-  void getPackets();
-  void processMsopPackets();
-  void processDifopPackets();
-
- private:
-  std::shared_ptr<cyber::Node> node_ = nullptr;
-  Config conf_;
-  std::shared_ptr<cyber::Writer<RobosenseScan>> scan_writer_ = nullptr;
-  std::shared_ptr<cyber::Writer<PointCloud>> pointcloud_writer_ = nullptr;
-
- private:
-  void prepareLidarScanMsg(std::shared_ptr<RobosenseScan> msg);
-  void preparePointsMsg(std::shared_ptr<PointCloud> msg);
-  void stop() {
-    msop_pkt_queue_.clear();
-    difop_pkt_queue_.clear();
-    if (thread_flag_ == true) {
-      thread_flag_ = false;
-      lidar_thread_ptr_->join();
-    }
+  virtual bool poll(
+      const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan) {
+    return true;
   }
+  virtual void init() = 0;
+  uint64_t start_time() { return start_time_; }
+
+ protected:
+  apollo::drivers::suteng::SutengConfig config_;
+  std::shared_ptr<Input> input_;
+
+  bool flags = false;
+
+  uint64_t basetime_;
+  uint32_t last_gps_time_;
+  uint64_t start_time_;
+  int poll_standard(
+      const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+  int poll_sync_count(
+      const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan,
+      bool main_frame);
+  uint64_t last_count_;
+  bool set_base_time();
+  void set_base_time_from_nmea_time(const NMEATimePtr& nmea_time,
+                                    uint64_t* basetime,
+                                    bool use_gps_time = false);
+  void update_gps_top_hour(unsigned int current_time);
+
+  bool cute_angle(apollo::drivers::suteng::SutengPacket* packet);
+};
+
+class Robosense16Driver : public RobosenseDriver {
+ public:
+  explicit Robosense16Driver(
+      const apollo::drivers::suteng::SutengConfig& robo_config);
+  ~Robosense16Driver();
+
+  void init();
+  bool poll(const std::shared_ptr<apollo::drivers::suteng::SutengScan>& scan);
+  void poll_positioning_packet();
 
  private:
-  Queue<LidarPacketMsg> msop_pkt_queue_;
-  Queue<LidarPacketMsg> difop_pkt_queue_;
-  bool thread_flag_;
-  std::shared_ptr<std::thread> lidar_thread_ptr_;
-  std::shared_ptr<DecoderBase<PointXYZIT>> lidar_decoder_ptr_;
-  std::shared_ptr<Input> lidar_input_ptr_;
-  uint32_t scan_seq_;
-  uint32_t points_seq_;
-  std::shared_ptr<PointCloud> point_cloud_ptr_;
-  std::shared_ptr<RobosenseScan> scan_ptr_;
+  std::shared_ptr<Input> positioning_input_;
+  std::thread positioning_thread_;
+  std::atomic<bool> running_ = {true};
 };
+
 }  // namespace robosense
 }  // namespace drivers
 }  // namespace apollo

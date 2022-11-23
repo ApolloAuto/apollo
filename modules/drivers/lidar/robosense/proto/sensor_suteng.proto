@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package apollo.drivers.suteng;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+enum Model {
+  UNKOWN = 0;
+  HDL64E_S3S = 1;
+  HDL64E_S3D = 2;
+  HDL64E_S2 = 3;
+  HDL32E = 4;
+  VLP16 = 5;
+  HELIOS_16P = 6;
+}
+
+enum Mode {
+  STRONGEST = 1;
+  LAST = 2;
+  DUAL = 3;
+}
+
+message SutengPacket {
+  optional uint64 stamp = 1;
+  required bytes data = 2;
+}
+
+message SutengScan {
+  optional apollo.common.Header header = 1;
+  required Model model = 2;  // Suteng device model
+  required Mode mode = 3;    // Suteng work mode
+
+  repeated SutengPacket firing_pkts = 4;
+
+  // for HDL32 and VLP16
+  repeated SutengPacket positioning_pkts = 5;
+  // Suteng device serial number, corresponds to a specific calibration file
+  optional string sn = 6;
+  required uint64 basetime = 7 [default = 0];
+  optional float temperature = 8;
+}

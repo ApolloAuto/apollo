@@ -8,5 +8,8 @@
 
 - Add RS16, RS32, RS128, RSBP support
 
-  
+## 2022-11-09
+
+### change to a new version robosense driver by neolix
+- support rs16 rs-helios-16
 

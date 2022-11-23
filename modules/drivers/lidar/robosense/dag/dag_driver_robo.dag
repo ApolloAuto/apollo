@@ -1,0 +1,99 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/libsuteng_driver_component.so"
+    
+    ##################################################
+    #                   drivers                      #
+    ##################################################
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_left_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_left.conf"
+      }
+    }
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_right_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_right.conf"
+      }
+    }
+    components {
+      class_name : "CompRoboDriver"
+      config {
+        name : "robo_back_driver"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+      }
+    }
+    ##################################################
+    #                   convert                      #
+    ##################################################
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_left_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_left.conf"
+        readers {
+          #channel: "/sensor/lidar16/left/SutengScan"
+          channel: "/apollo/sensor/lidar16/left/Scan"
+        }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_right_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_right.conf"
+        readers {
+          #channel: "/sensor/suteng16/right/SutengScan"
+          channel: "/apollo/sensor/lidar16/right/Scan"
+        }
+      }
+    }
+    components {
+      class_name : "CompRoboConvert"
+      config {
+        name : "robo_back_convert"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar16_back.conf"
+        readers {
+          #channel: "/sensor/suteng16/back/SutengScan"
+          channel: "/apollo/sensor/lidar16/right/Scan"
+        }
+      }
+    }
+}
+##################################################
+#                   fusion                      #
+##################################################
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/fusion/librobosense_fusion_component.so"
+
+    components {
+      class_name : "PriSecFusionComponent"
+      config {
+        name : "robosense_fusion"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/robo_fusion_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/back/PointCloud2"}
+    }
+  }
+}
+
+
+##################################################
+#                compensation                    #
+##################################################
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
+
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "robosense16_fusion_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/conf/lidar_robo_fusion_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lidar16/fusion/PointCloud2"}
+      }
+    }
+}
+

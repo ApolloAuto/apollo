@@ -66,7 +66,8 @@ bool PointPillarsDetection::Init(const StageConfig& stage_config) {
   }
 
   // ACHECK(stage_config.has_pointpillars_detection());
-  point_pillars_detection_config_ = stage_config.point_pillars_detection_config();
+  point_pillars_detection_config_ =
+      stage_config.point_pillars_detection_config();
 
   point_pillars_ptr_.reset(
       new PointPillars(FLAGS_reproduce_result_mode, FLAGS_score_threshold,
@@ -77,12 +78,10 @@ bool PointPillarsDetection::Init(const StageConfig& stage_config) {
 }
 
 bool PointPillarsDetection::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
+  if (data_frame == nullptr) return false;
 
   LidarFrame* lidar_frame = data_frame->lidar_frame;
-  if (lidar_frame == nullptr)
-    return false;
+  if (lidar_frame == nullptr) return false;
 
   LidarDetectorOptions options;
   bool res = Detect(options, lidar_frame);

@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+package apollo.drivers.suteng;
+
+import "modules/drivers/lidar/robosense/proto/sensor_suteng.proto";
+
+message SutengConfig {
+  required string frame_id = 1;
+  required Model model = 2;
+  required Mode mode = 3;
+  optional string pcap_file = 4;
+  optional int32 npackets = 5;
+  required float rpm = 6;
+  required bool use_gps_time = 7 [default = true];
+  required int32 time_zone = 8 [default = 8];
+  required uint32 firing_data_port = 9;
+  optional uint32 positioning_data_port = 10;
+  required float max_range = 11;
+  required float min_range = 12;
+  optional float max_angle = 13;
+  optional float min_angle = 14;
+  optional float view_direction = 15;
+  optional float view_width = 16;
+  required string calibration_file = 17;
+  required bool organized = 18 [default = false];
+  optional string target_frame_id = 19;
+  optional bool main_frame = 20 [default = false];
+  optional string vehicle_config_path = 21;
+  optional string accurate_vehicle_config_path = 22;
+  optional string lidars_filter_config_path = 23;
+  optional string lidar_extrinsic_file_path = 24;
+  required string scan_channel = 25;
+  required string pc_channel = 26;
+  optional string fusion_channel = 27;
+  optional string compensator_channel = 28;
+}

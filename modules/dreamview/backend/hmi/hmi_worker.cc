@@ -173,8 +173,8 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
+  ACHECK(!config.modes().empty()) << "No modes config loaded from "
+                                  << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
@@ -783,15 +783,17 @@ void HMIWorker::ChangeScenarioSet(const std::string &scenario_set_id) {
   return;
 }
 
-void HMIWorker::GetScenarioResourcePath(std::string &scenario_resource_path) {
+void HMIWorker::GetScenarioResourcePath(std::string *scenario_resource_path) {
+  CHECK_NOTNULL(scenario_resource_path);
   const std::string home = cyber::common::GetEnv("HOME");
-  scenario_resource_path = home + FLAGS_resource_scenario_path;
+  *scenario_resource_path = home + FLAGS_resource_scenario_path;
 }
 
 void HMIWorker::GetScenarioSetPath(const std::string &scenario_set_id,
-                                   std::string &scenario_set_path) {
+                                   std::string *scenario_set_path) {
+  CHECK_NOTNULL(scenario_set_path);
   GetScenarioResourcePath(scenario_set_path);
-  scenario_set_path = scenario_set_path + scenario_set_id;
+  *scenario_set_path = *scenario_set_path + scenario_set_id;
   return;
 }
 
@@ -820,7 +822,7 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     scenario_set_id = status_.current_scenario_set_id();
   }
   std::string scenario_set_path;
-  GetScenarioSetPath(scenario_set_id, scenario_set_path);
+  GetScenarioSetPath(scenario_set_id, &scenario_set_path);
   const std::string scenario_path =
       scenario_set_path + "/scenarios/" + scenario_id + ".json";
   if (!cyber::common::PathExists(scenario_path)) {
@@ -931,13 +933,14 @@ void HMIWorker::ChangeScenario(const std::string &scenario_id) {
 }
 
 void HMIWorker::ChangeDynamicModel(const std::string &dynamic_model_name) {
-  {
-    RLock rlock(status_mutex_);
-    // Skip if mode doesn't actually change.
-    if (status_.current_dynamic_model() == dynamic_model_name) {
-      return;
-    }
-  }
+  // To avoid toggle sim control and always choose simulation perfect control
+  // {
+  //   RLock rlock(status_mutex_);
+  //   // Skip if mode doesn't actually change.
+  //   if (status_.current_dynamic_model() == dynamic_model_name) {
+  //     return;
+  //   }
+  // }
   if (dynamic_model_name.empty()) {
     AERROR << "Failed to change empty dynamic model!";
     return;
@@ -967,7 +970,7 @@ bool HMIWorker::UpdateScenarioSetToStatus(
     const std::string &scenario_set_id, const std::string &scenario_set_name) {
   ScenarioSet new_scenario_set;
   if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
-                         new_scenario_set)) {
+                         &new_scenario_set)) {
     AERROR << "Failed to update scenario_set!";
     return false;
   }
@@ -981,7 +984,8 @@ bool HMIWorker::UpdateScenarioSetToStatus(
   return true;
 }
 
-bool HMIWorker::UpdateDynamicModelToStatus(std::string &dynamic_model_name) {
+bool HMIWorker::UpdateDynamicModelToStatus(
+    const std::string &dynamic_model_name) {
   Json param_json({});
   param_json["dynamic_model_name"] = dynamic_model_name;
   Json callback_res = callback_api_("AddDynamicModel", param_json);
@@ -1006,11 +1010,11 @@ bool HMIWorker::UpdateDynamicModelToStatus(std::string &dynamic_model_name) {
 
 bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
                                   const std::string &scenario_set_name,
-                                  ScenarioSet &new_scenario_set) {
+                                  ScenarioSet *new_scenario_set) {
   std::string scenario_set_directory_path;
-  GetScenarioSetPath(scenario_set_id, scenario_set_directory_path);
+  GetScenarioSetPath(scenario_set_id, &scenario_set_directory_path);
   scenario_set_directory_path = scenario_set_directory_path + "/scenarios/";
-  new_scenario_set.set_scenario_set_name(scenario_set_name);
+  new_scenario_set->set_scenario_set_name(scenario_set_name);
   if (!cyber::common::PathExists(scenario_set_directory_path)) {
     AERROR << "Scenario set has no scenarios!";
     return true;
@@ -1069,7 +1073,7 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
       scenario_name =
           scenario_name + "_" + new_sim_ticket.description_en_tokens(i);
     }
-    ScenarioInfo *scenario_info = new_scenario_set.add_scenarios();
+    ScenarioInfo *scenario_info = new_scenario_set->add_scenarios();
     scenario_info->set_scenario_id(scenario_id);
     scenario_info->set_scenario_name(scenario_name);
     // change scenario json map dir to map name
@@ -1098,7 +1102,7 @@ bool HMIWorker::UpdateScenarioSet(const std::string &scenario_set_id,
 
 bool HMIWorker::LoadScenarios() {
   std::string directory_path;
-  GetScenarioResourcePath(directory_path);
+  GetScenarioResourcePath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
     return false;
@@ -1136,7 +1140,7 @@ bool HMIWorker::LoadScenarios() {
     const std::string scenario_set_name = user_ads_group_info.name();
     ScenarioSet new_scenario_set;
     if (!UpdateScenarioSet(scenario_set_id, scenario_set_name,
-                           new_scenario_set)) {
+                           &new_scenario_set)) {
       AERROR << "Failed to update scenario_set!";
       return false;
     }
@@ -1183,7 +1187,7 @@ void HMIWorker::DeleteScenarioSet(const std::string &scenario_set_id) {
     return;
   }
   std::string directory_path;
-  GetScenarioResourcePath(directory_path);
+  GetScenarioResourcePath(&directory_path);
   directory_path = directory_path + scenario_set_id;
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find scenario_set!";
@@ -1265,22 +1269,24 @@ void HMIWorker::DeleteDynamicModel(const std::string &dynamic_model_name) {
   return;
 }
 
-void HMIWorker::GetRecordPath(std::string &record_path) {
+void HMIWorker::GetRecordPath(std::string *record_path) {
+  CHECK_NOTNULL(record_path);
   const std::string home = cyber::common::GetEnv("HOME");
-  record_path = home + FLAGS_resource_record_path;
+  *record_path = home + FLAGS_resource_record_path;
 }
 
-bool HMIWorker::RePlayRecord(const std::string& record_id) {
+bool HMIWorker::RePlayRecord(const std::string &record_id) {
   std::string record_path;
-  GetRecordPath(record_path);
+  GetRecordPath(&record_path);
   record_path = record_path + record_id + ".record";
 
   if (!cyber::common::PathExists(record_path)) {
     AERROR << "Failed to find record!";
     return false;
   }
-  //play the record
-  const std::string play_command = absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
+  // play the record
+  const std::string play_command =
+      absl::StrCat("nohup cyber_recorder play -l -f ", record_path, " &");
   int ret = std::system(play_command.data());
   if (ret != 0) {
     AERROR << "Failed to start cyber play command";
@@ -1288,7 +1294,7 @@ bool HMIWorker::RePlayRecord(const std::string& record_id) {
   }
   return true;
 }
-void HMIWorker::StopRecordPlay(){
+void HMIWorker::StopRecordPlay() {
   WLock wlock(status_mutex_);
   { status_.set_current_record_id(""); }
   if (!StopModuleByCommand(FLAGS_cyber_recorder_stop_command)) {
@@ -1296,7 +1302,7 @@ void HMIWorker::StopRecordPlay(){
   }
   status_changed_ = true;
 }
-void HMIWorker::ChangeRecord(const std::string& record_id){
+void HMIWorker::ChangeRecord(const std::string &record_id) {
   StopRecordPlay();
   {
     RLock rlock(status_mutex_);
@@ -1305,8 +1311,8 @@ void HMIWorker::ChangeRecord(const std::string& record_id){
       AERROR << "Cannot change to unknown record!";
       return;
     }
-    if(!RePlayRecord(record_id)){
-        return;
+    if (!RePlayRecord(record_id)) {
+      return;
     }
   }
   WLock wlock(status_mutex_);
@@ -1314,22 +1320,21 @@ void HMIWorker::ChangeRecord(const std::string& record_id){
   status_changed_ = true;
   return;
 }
-bool HMIWorker::LoadRecords(){
+bool HMIWorker::LoadRecords() {
   StopRecordPlay();
   std::string directory_path;
-  GetRecordPath(directory_path);
+  GetRecordPath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
     AERROR << "Failed to find records!";
     return false;
   }
-  DIR* directory = opendir(directory_path.c_str());
-  if (directory == nullptr)
-  {
+  DIR *directory = opendir(directory_path.c_str());
+  if (directory == nullptr) {
     AERROR << "Cannot open record directory" << directory_path;
     return false;
   }
-  struct dirent* file;
-  std::map<std::string,std::int32_t> new_records;
+  struct dirent *file;
+  std::map<std::string, std::int32_t> new_records;
   while ((file = readdir(directory)) != nullptr) {
     if (!strcmp(file->d_name, ".") || !strcmp(file->d_name, "..")) {
       continue;
@@ -1339,7 +1344,7 @@ bool HMIWorker::LoadRecords(){
     }
     const std::string record_id = file->d_name;
     const int index = record_id.rfind(".record");
-    if(index != -1 && record_id[0]!='.'){
+    if (index != -1 && record_id[0] != '.') {
       const std::string local_record_resource = record_id.substr(0, index);
       new_records[local_record_resource] = 1;
     }
@@ -1357,26 +1362,25 @@ bool HMIWorker::LoadRecords(){
   return true;
 }
 
-void HMIWorker::DeleteRecord(const std::string& record_id){
+void HMIWorker::DeleteRecord(const std::string &record_id) {
   StopRecordPlay();
   if (record_id.empty()) {
     return;
   }
   std::string record_path;
-  GetRecordPath(record_path);
-  record_path = record_path + record_id +".record";
-  if (!cyber::common::PathExists(record_path))
-  {
+  GetRecordPath(&record_path);
+  record_path = record_path + record_id + ".record";
+  if (!cyber::common::PathExists(record_path)) {
     return;
   }
   // find the delete record if exist and judge the record whether playing now
   {
     RLock rlock(status_mutex_);
-    auto& status_records = status_.records();
-    if(status_records.find(record_id)==status_records.end()){
+    auto &status_records = status_.records();
+    if (status_records.find(record_id) == status_records.end()) {
       return;
     }
-    if(record_id == status_.current_record_id()){
+    if (record_id == status_.current_record_id()) {
       return;
     }
   }

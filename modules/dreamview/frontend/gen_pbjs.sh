@@ -32,11 +32,12 @@ REALTIVE_MAP_PROTOS='../../map/relative_map/proto/*.proto'
 MAP_PROTOS='../../map/proto/*.proto'
 MONITOR_PROTOS='../../common/monitor_log/proto/monitor_log.proto'
 ROUTING_PROTOS='../../routing/proto/routing.proto'
+COMMON_MSGS_PROTOS='../../common_msgs/*/*.proto'
 
 node_modules/protobufjs/bin/pbjs -t json $SIMULATION_PROTO \
     $COMMON_PROTOS $LOCALIZATION_PROTOS $CHASSIS_PROTOS $PLANNING_PROTOS \
     $PERCEPTION_PROTOS $MONITOR_PROTOS $ROUTING_PROTOS $MAP_PROTOS \
-    $PREDICTION_PROTOS $REALTIVE_MAP_PROTOS $AUDIO_PROTO \
+    $PREDICTION_PROTOS $REALTIVE_MAP_PROTOS $AUDIO_PROTO $COMMON_MSGS_PROTOS \
     -o proto_bundle/sim_world_proto_bundle.json
 
 node_modules/protobufjs/bin/pbjs -t json ../proto/point_cloud.proto \
