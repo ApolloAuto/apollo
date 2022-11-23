@@ -15,45 +15,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-"""
-amodel main function
-"""
 
 import argparse
-import logging
+import os
 import sys
+import logging
 
-from model_manage import amodel_install, amodel_remove, amodel_list, amodel_info
+from dataset_converter import convert_dataset
+from pcd_converter import convert_pcd
 
 
 def main(args=sys.argv):
   parser = argparse.ArgumentParser(
-    description="Apollo perception model management tool.",
+    description="nuScenes dataset convert to record tool.",
     prog="main.py")
 
   parser.add_argument(
-    "command", action="store", choices=['list', 'info', 'install', 'remove'],
-    type=str, nargs="?", const="", help="amodel command list.")
+    "-i", "--input", action="store", type=str, required=True,
+    nargs="?", const="", help="Input file or directory.")
   parser.add_argument(
-    "model_name", action="store", type=str, nargs="?", const="",
-    help="model name or install path.")
-  parser.add_argument(
-    "-a", "--all", action="store", type=str, required=False,
-    nargs="?", const="", help="Show all models.")
+    "-o", "--output", action="store", type=str, required=False,
+    nargs="?", const="", help="Output file or directory.")
 
   args = parser.parse_args(args[1:])
   logging.debug(args)
 
-  if args.command == "install":
-    amodel_install(args.model_name)
-  elif args.command == "remove":
-    amodel_remove(args.model_name)
-  elif args.command == "list":
-    amodel_list()
-  elif args.command == "info":
-    amodel_info(args.model_name)
+  if os.path.isdir(args.input):
+    if args.output is None:
+      args.output = '.'
+    convert_dataset(args.input, args.output)
+  elif os.path.isfile(args.input):
+    if args.output is None:
+      args.output = 'result.pcd'
+    convert_pcd(args.input, args.output)
   else:
-    parser.print_help()
+    logging.error("Input error! '{}'".format(args.input))
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
   main()
