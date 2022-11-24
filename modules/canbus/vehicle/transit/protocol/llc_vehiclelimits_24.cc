@@ -31,13 +31,11 @@ Llcvehiclelimits24::Llcvehiclelimits24() {}
 const int32_t Llcvehiclelimits24::ID = 0x24;
 
 void Llcvehiclelimits24::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_transit()
-      ->mutable_llc_vehiclelimits_24()
-      ->set_llc_fbk_maxsteeringangle(llc_fbk_maxsteeringangle(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_vehiclelimits_24()
-      ->set_llc_fbk_maxbrakepercent(llc_fbk_maxbrakepercent(bytes, length));
+                               Transit* chassis) const {
+  chassis->mutable_llc_vehiclelimits_24()->set_llc_fbk_maxsteeringangle(
+      llc_fbk_maxsteeringangle(bytes, length));
+  chassis->mutable_llc_vehiclelimits_24()->set_llc_fbk_maxbrakepercent(
+      llc_fbk_maxbrakepercent(bytes, length));
 }
 
 // config detail: {'description': 'Steering angle feedback', 'offset': 0.0,

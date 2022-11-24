@@ -45,7 +45,7 @@ class TransitControllerTest : public ::testing::Test {
 
  protected:
   TransitController controller_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Transit> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   TransitMessageManager msg_manager_;

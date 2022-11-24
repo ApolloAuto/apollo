@@ -31,38 +31,25 @@ Llcdiagfault620::Llcdiagfault620() {}
 const int32_t Llcdiagfault620::ID = 0x620;
 
 void Llcdiagfault620::Parse(const std::uint8_t* bytes, int32_t length,
-                            ChassisDetail* chassis) const {
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_disengagecounter_brake(
-          llc_disengagecounter_brake(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_disengagecounter_steer(
-          llc_disengagecounter_steer(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_disengagecounter_throttle(
-          llc_disengagecounter_throttle(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_fbk_faultcounter(llc_fbk_faultcounter(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_disengagecounter_button(
-          llc_disengagecounter_button(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_fbk_version_year(llc_fbk_version_year(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_fbk_version_month(llc_fbk_version_month(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_fbk_version_day(llc_fbk_version_day(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_diag_fault_620()
-      ->set_llc_fbk_version_hour(llc_fbk_version_hour(bytes, length));
+                            Transit* chassis) const {
+  chassis->mutable_llc_diag_fault_620()->set_llc_disengagecounter_brake(
+      llc_disengagecounter_brake(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_disengagecounter_steer(
+      llc_disengagecounter_steer(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_disengagecounter_throttle(
+      llc_disengagecounter_throttle(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_fbk_faultcounter(
+      llc_fbk_faultcounter(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_disengagecounter_button(
+      llc_disengagecounter_button(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_fbk_version_year(
+      llc_fbk_version_year(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_fbk_version_month(
+      llc_fbk_version_month(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_fbk_version_day(
+      llc_fbk_version_day(bytes, length));
+  chassis->mutable_llc_diag_fault_620()->set_llc_fbk_version_hour(
+      llc_fbk_version_hour(bytes, length));
 }
 
 // config detail: {'description': 'Counts the number of times that the driver

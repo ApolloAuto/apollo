@@ -17,7 +17,7 @@
 #pragma once
 
 #include "gtest/gtest_prod.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/transit/proto/transit.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -26,12 +26,12 @@ namespace transit {
 
 class Llcmotioncommandfeedback122
     : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+          ::apollo::canbus::Transit> {
  public:
   static const int32_t ID;
   Llcmotioncommandfeedback122();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Transit* chassis) const override;
   FRIEND_TEST(Motioncommandfeedback1_22_test, General);
 
  private:

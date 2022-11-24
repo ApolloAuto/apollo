@@ -31,24 +31,17 @@ Llcmotionfeedback221::Llcmotionfeedback221() {}
 const int32_t Llcmotionfeedback221::ID = 0x21;
 
 void Llcmotionfeedback221::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback2_21()
-      ->set_llc_fbk_vehiclespeed(llc_fbk_vehiclespeed(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback2_21()
-      ->set_llc_motionfeedback2_counter(
-          llc_motionfeedback2_counter(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback2_21()
-      ->set_llc_motionfeedback2_checksum(
-          llc_motionfeedback2_checksum(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback2_21()
-      ->set_llc_fbk_steeringrate(llc_fbk_steeringrate(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_llc_motionfeedback2_21()
-      ->set_llc_fbk_steeringangle(llc_fbk_steeringangle(bytes, length));
+                                 Transit* chassis) const {
+  chassis->mutable_llc_motionfeedback2_21()->set_llc_fbk_vehiclespeed(
+      llc_fbk_vehiclespeed(bytes, length));
+  chassis->mutable_llc_motionfeedback2_21()->set_llc_motionfeedback2_counter(
+      llc_motionfeedback2_counter(bytes, length));
+  chassis->mutable_llc_motionfeedback2_21()->set_llc_motionfeedback2_checksum(
+      llc_motionfeedback2_checksum(bytes, length));
+  chassis->mutable_llc_motionfeedback2_21()->set_llc_fbk_steeringrate(
+      llc_fbk_steeringrate(bytes, length));
+  chassis->mutable_llc_motionfeedback2_21()->set_llc_fbk_steeringangle(
+      llc_fbk_steeringangle(bytes, length));
 }
 
 // config detail: {'name': 'llc_fbk_vehiclespeed', 'offset': 0.0, 'precision':

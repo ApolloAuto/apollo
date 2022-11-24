@@ -44,8 +44,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode TransitController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Transit>* const can_sender,
+    MessageManager<::apollo::canbus::Transit>* const message_manager) {
   if (is_initialized_) {
     AINFO << "TransitController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -162,7 +162,7 @@ void TransitController::Stop() {
 Chassis TransitController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Transit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -175,16 +175,14 @@ Chassis TransitController::chassis() {
 
   // 3
   chassis_.set_engine_started(true);
-  // 4
-  auto& transit = chassis_detail.transit();
 
-  auto& motion20 = transit.llc_motionfeedback1_20();
+  auto& motion20 = chassis_detail.llc_motionfeedback1_20();
   if (motion20.has_llc_fbk_throttleposition()) {
     chassis_.set_throttle_percentage(
         static_cast<float>(motion20.llc_fbk_throttleposition()));
   }
 
-  button_pressed_ = (transit.llc_motionfeedback1_20().llc_fbk_state() ==
+  button_pressed_ = (chassis_detail.llc_motionfeedback1_20().llc_fbk_state() ==
                      Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
 
   if (motion20.has_llc_fbk_brakepercentrear()) {
@@ -212,7 +210,7 @@ Chassis TransitController::chassis() {
     }
   }
 
-  auto& motion21 = transit.llc_motionfeedback2_21();
+  auto& motion21 = chassis_detail.llc_motionfeedback2_21();
   if (motion21.has_llc_fbk_vehiclespeed()) {
     chassis_.set_speed_mps(static_cast<float>(motion21.llc_fbk_vehiclespeed()));
   }
@@ -223,7 +221,7 @@ Chassis TransitController::chassis() {
                            180 / vehicle_params_.max_steer_angle() * 100));
   }
 
-  auto& aux = transit.llc_auxiliaryfeedback_120();
+  auto& aux = chassis_detail.llc_auxiliaryfeedback_120();
   if (aux.has_llc_fbk_turnsignal()) {
     switch (aux.llc_fbk_turnsignal()) {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
@@ -601,13 +599,13 @@ void TransitController::SecurityDogThreadFunc() {
 
 bool TransitController::CheckResponse() {
   // TODO(Udelv): Add separate indicators
-  ChassisDetail chassis_detail;
+  Transit chassis_detail;
   if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
     AERROR_EVERY(100) << "get chassis detail failed.";
     return false;
   }
 
-  auto& motion1_20 = chassis_detail.transit().llc_motionfeedback1_20();
+  auto& motion1_20 = chassis_detail.llc_motionfeedback1_20();
 
   return (motion1_20.llc_fbk_state() ==
               Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED ||
@@ -641,7 +639,7 @@ void TransitController::set_chassis_error_code(
 }
 
 bool TransitController::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail& chassis_detail) {
+    const ::apollo::canbus::Transit& chassis_detail) {
   return true;
 }
 

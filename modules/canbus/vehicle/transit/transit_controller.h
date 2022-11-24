@@ -37,7 +37,7 @@ namespace apollo {
 namespace canbus {
 namespace transit {
 
-class TransitController final : public VehicleController {
+class TransitController final : public VehicleController<::apollo::canbus::Transit> {
  public:
   TransitController() {}
 
@@ -45,8 +45,8 @@ class TransitController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Transit>* const can_sender,
+      MessageManager<::apollo::canbus::Transit>* const message_manager)
       override;
 
   bool Start() override;
@@ -108,7 +108,7 @@ class TransitController final : public VehicleController {
   bool VerifyID() override;
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail& chassis);
+  bool CheckSafetyError(const canbus::Transit& chassis);
 
   void SetLimits() override;
 

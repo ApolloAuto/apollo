@@ -17,7 +17,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/transit/proto/transit.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -26,7 +26,7 @@ namespace transit {
 
 class Adcmotioncontrollimits112
     : public ::apollo::drivers::canbus::ProtocolData<
-          ::apollo::canbus::ChassisDetail> {
+          ::apollo::canbus::Transit> {
  public:
   static const int32_t ID;
 
