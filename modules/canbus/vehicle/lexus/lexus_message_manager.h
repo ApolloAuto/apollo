@@ -15,7 +15,7 @@ limitations under the License.
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -25,7 +25,7 @@ namespace lexus {
 using ::apollo::drivers::canbus::MessageManager;
 
 class LexusMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::Lexus> {
  public:
   LexusMessageManager();
   virtual ~LexusMessageManager();

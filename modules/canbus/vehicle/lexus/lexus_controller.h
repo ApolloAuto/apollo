@@ -25,7 +25,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -47,14 +47,14 @@ namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class LexusController final : public VehicleController {
+class LexusController final : public VehicleController<::apollo::canbus::Lexus> {
  public:
   virtual ~LexusController();
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      CanSender<::apollo::canbus::Lexus>* const can_sender,
+      MessageManager<::apollo::canbus::Lexus>* const message_manager)
       override;
 
   bool Start() override;

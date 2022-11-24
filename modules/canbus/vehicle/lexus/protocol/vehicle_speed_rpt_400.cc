@@ -31,12 +31,11 @@ Vehiclespeedrpt400::Vehiclespeedrpt400() {}
 const int32_t Vehiclespeedrpt400::ID = 0x400;
 
 void Vehiclespeedrpt400::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_vehicle_speed_rpt_400()->set_vehicle_speed(
+                               Lexus* chassis) const {
+  chassis->mutable_vehicle_speed_rpt_400()->set_vehicle_speed(
       vehicle_speed(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_vehicle_speed_rpt_400()
-      ->set_vehicle_speed_valid(vehicle_speed_valid(bytes, length));
+  chassis->mutable_vehicle_speed_rpt_400()->set_vehicle_speed_valid(
+      vehicle_speed_valid(bytes, length));
 }
 
 // config detail: {'name': 'vehicle_speed', 'offset': 0.0, 'precision': 0.01,

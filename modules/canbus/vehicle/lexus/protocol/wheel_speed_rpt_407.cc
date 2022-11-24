@@ -31,19 +31,15 @@ Wheelspeedrpt407::Wheelspeedrpt407() {}
 const int32_t Wheelspeedrpt407::ID = 0x407;
 
 void Wheelspeedrpt407::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_wheel_speed_rpt_407()
-      ->set_wheel_spd_rear_right(wheel_spd_rear_right(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_wheel_speed_rpt_407()
-      ->set_wheel_spd_rear_left(wheel_spd_rear_left(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_wheel_speed_rpt_407()
-      ->set_wheel_spd_front_right(wheel_spd_front_right(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_wheel_speed_rpt_407()
-      ->set_wheel_spd_front_left(wheel_spd_front_left(bytes, length));
+                             Lexus* chassis) const {
+  chassis->mutable_wheel_speed_rpt_407()->set_wheel_spd_rear_right(
+      wheel_spd_rear_right(bytes, length));
+  chassis->mutable_wheel_speed_rpt_407()->set_wheel_spd_rear_left(
+      wheel_spd_rear_left(bytes, length));
+  chassis->mutable_wheel_speed_rpt_407()->set_wheel_spd_front_right(
+      wheel_spd_front_right(bytes, length));
+  chassis->mutable_wheel_speed_rpt_407()->set_wheel_spd_front_left(
+      wheel_spd_front_left(bytes, length));
 }
 
 // config detail: {'name': 'wheel_spd_rear_right', 'offset': 0.0, 'precision':

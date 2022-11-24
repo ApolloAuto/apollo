@@ -20,7 +20,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
@@ -51,7 +51,7 @@ class LexusControllerTest : public ::testing::Test {
   LexusController controller_;
   ControlCommand control_cmd_;
   VehicleSignal vehicle_signal_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Lexus> sender_;
   LexusMessageManager msg_manager_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;

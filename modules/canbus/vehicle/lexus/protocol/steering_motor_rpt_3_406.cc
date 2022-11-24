@@ -31,13 +31,11 @@ Steeringmotorrpt3406::Steeringmotorrpt3406() {}
 const int32_t Steeringmotorrpt3406::ID = 0x406;
 
 void Steeringmotorrpt3406::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_3_406()
-      ->set_torque_output(torque_output(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_3_406()
-      ->set_torque_input(torque_input(bytes, length));
+                                 Lexus* chassis) const {
+  chassis->mutable_steering_motor_rpt_3_406()->set_torque_output(
+      torque_output(bytes, length));
+  chassis->mutable_steering_motor_rpt_3_406()->set_torque_input(
+      torque_input(bytes, length));
 }
 
 // config detail: {'name': 'torque_output', 'offset': 0.0, 'precision': 0.001,

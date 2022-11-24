@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace lexus {
 
 class Detectedobjectrpt411 : public ::apollo::drivers::canbus::ProtocolData<
-                                 ::apollo::canbus::ChassisDetail> {
+                                 ::apollo::canbus::Lexus> {
  public:
   static const int32_t ID;
   Detectedobjectrpt411();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Lexus* chassis) const override;
 
  private:
   // config detail: {'name': 'FRONT_OBJECT_DISTANCE_HIGH_RES', 'offset': 0.0,

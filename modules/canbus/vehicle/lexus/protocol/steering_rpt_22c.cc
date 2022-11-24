@@ -31,28 +31,26 @@ Steeringrpt22c::Steeringrpt22c() {}
 const int32_t Steeringrpt22c::ID = 0x22C;
 
 void Steeringrpt22c::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_vehicle_fault(
+                           Lexus* chassis) const {
+  chassis->mutable_steering_rpt_22c()->set_vehicle_fault(
       vehicle_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_pacmod_fault(
+  chassis->mutable_steering_rpt_22c()->set_pacmod_fault(
       pacmod_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_override_active(
+  chassis->mutable_steering_rpt_22c()->set_override_active(
       override_active(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_rpt_22c()
-      ->set_output_reported_fault(output_reported_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_input_output_fault(
+  chassis->mutable_steering_rpt_22c()->set_output_reported_fault(
+      output_reported_fault(bytes, length));
+  chassis->mutable_steering_rpt_22c()->set_input_output_fault(
       input_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_enabled(
+  chassis->mutable_steering_rpt_22c()->set_enabled(
       enabled(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_rpt_22c()
-      ->set_command_output_fault(command_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_manual_input(
+  chassis->mutable_steering_rpt_22c()->set_command_output_fault(
+      command_output_fault(bytes, length));
+  chassis->mutable_steering_rpt_22c()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_commanded_value(
+  chassis->mutable_steering_rpt_22c()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_rpt_22c()->set_output_value(
+  chassis->mutable_steering_rpt_22c()->set_output_value(
       output_value(bytes, length));
 }
 

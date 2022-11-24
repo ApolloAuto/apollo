@@ -31,36 +31,27 @@ Dashcontrolsleftrpt20c::Dashcontrolsleftrpt20c() {}
 const int32_t Dashcontrolsleftrpt20c::ID = 0x20C;
 
 void Dashcontrolsleftrpt20c::Parse(const std::uint8_t* bytes, int32_t length,
-                                   ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_output_value(output_value(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_commanded_value(commanded_value(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_manual_input(manual_input(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_vehicle_fault(vehicle_fault(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_pacmod_fault(pacmod_fault(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_override_active(override_active(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_output_reported_fault(output_reported_fault(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_input_output_fault(input_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_dash_controls_left_rpt_20c()->set_enabled(
+                                   Lexus* chassis) const {
+  chassis->mutable_dash_controls_left_rpt_20c()->set_output_value(
+      output_value(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_commanded_value(
+      commanded_value(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_manual_input(
+      manual_input(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_vehicle_fault(
+      vehicle_fault(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_pacmod_fault(
+      pacmod_fault(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_override_active(
+      override_active(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_output_reported_fault(
+      output_reported_fault(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_input_output_fault(
+      input_output_fault(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_enabled(
       enabled(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_dash_controls_left_rpt_20c()
-      ->set_command_output_fault(command_output_fault(bytes, length));
+  chassis->mutable_dash_controls_left_rpt_20c()->set_command_output_fault(
+      command_output_fault(bytes, length));
 }
 
 // config detail: {'name': 'output_value', 'enum': {0:

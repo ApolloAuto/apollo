@@ -31,15 +31,11 @@ Detectedobjectrpt411::Detectedobjectrpt411() {}
 const int32_t Detectedobjectrpt411::ID = 0x411;
 
 void Detectedobjectrpt411::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_detected_object_rpt_411()
-      ->set_front_object_distance_high_res(
-          front_object_distance_high_res(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_detected_object_rpt_411()
-      ->set_front_object_distance_low_res(
-          front_object_distance_low_res(bytes, length));
+                                 Lexus* chassis) const {
+  chassis->mutable_detected_object_rpt_411()->set_front_object_distance_high_res(
+      front_object_distance_high_res(bytes, length));
+  chassis->mutable_detected_object_rpt_411()->set_front_object_distance_low_res(
+      front_object_distance_low_res(bytes, length));
 }
 
 // config detail: {'name': 'front_object_distance_high_res', 'offset': 0.0,

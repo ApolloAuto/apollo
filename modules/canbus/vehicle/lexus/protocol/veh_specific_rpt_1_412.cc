@@ -31,10 +31,10 @@ Vehspecificrpt1412::Vehspecificrpt1412() {}
 const int32_t Vehspecificrpt1412::ID = 0x412;
 
 void Vehspecificrpt1412::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_veh_specific_rpt_1_412()->set_shift_pos_2(
+                               Lexus* chassis) const {
+  chassis->mutable_veh_specific_rpt_1_412()->set_shift_pos_2(
       shift_pos_2(bytes, length));
-  chassis->mutable_lexus()->mutable_veh_specific_rpt_1_412()->set_shift_pos_1(
+  chassis->mutable_veh_specific_rpt_1_412()->set_shift_pos_1(
       shift_pos_1(bytes, length));
 }
 

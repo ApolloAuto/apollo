@@ -31,27 +31,21 @@ Latlonheadingrpt40e::Latlonheadingrpt40e() {}
 const int32_t Latlonheadingrpt40e::ID = 0x40E;
 
 void Latlonheadingrpt40e::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_lat_lon_heading_rpt_40e()->set_heading(
+                                Lexus* chassis) const {
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_heading(
       heading(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_longitude_seconds(longitude_seconds(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_longitude_minutes(longitude_minutes(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_longitude_degrees(longitude_degrees(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_latitude_seconds(latitude_seconds(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_latitude_minutes(latitude_minutes(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_lat_lon_heading_rpt_40e()
-      ->set_latitude_degrees(latitude_degrees(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_longitude_seconds(
+      longitude_seconds(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_longitude_minutes(
+      longitude_minutes(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_longitude_degrees(
+      longitude_degrees(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_latitude_seconds(
+      latitude_seconds(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_latitude_minutes(
+      latitude_minutes(bytes, length));
+  chassis->mutable_lat_lon_heading_rpt_40e()->set_latitude_degrees(
+      latitude_degrees(bytes, length));
 }
 
 // config detail: {'name': 'heading', 'offset': 0.0, 'precision': 0.01, 'len':

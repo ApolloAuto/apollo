@@ -31,12 +31,12 @@ Vinrpt414::Vinrpt414() {}
 const int32_t Vinrpt414::ID = 0x414;
 
 void Vinrpt414::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_vin_rpt_414()->set_veh_serial(
+                      Lexus* chassis) const {
+  chassis->mutable_vin_rpt_414()->set_veh_serial(
       veh_serial(bytes, length));
-  chassis->mutable_lexus()->mutable_vin_rpt_414()->set_veh_my_code(
+  chassis->mutable_vin_rpt_414()->set_veh_my_code(
       veh_my_code(bytes, length));
-  chassis->mutable_lexus()->mutable_vin_rpt_414()->set_veh_mfg_code(
+  chassis->mutable_vin_rpt_414()->set_veh_mfg_code(
       veh_mfg_code(bytes, length));
 }
 

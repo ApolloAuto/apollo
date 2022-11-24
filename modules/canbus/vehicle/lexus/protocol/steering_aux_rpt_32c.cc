@@ -31,27 +31,22 @@ Steeringauxrpt32c::Steeringauxrpt32c() {}
 const int32_t Steeringauxrpt32c::ID = 0x32C;
 
 void Steeringauxrpt32c::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_steering_aux_rpt_32c()
-      ->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_aux_rpt_32c()
-      ->set_user_interaction(user_interaction(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_aux_rpt_32c()
-      ->set_rotation_rate_is_valid(rotation_rate_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_aux_rpt_32c()->set_rotation_rate(
+                              Lexus* chassis) const {
+  chassis->mutable_steering_aux_rpt_32c()->set_user_interaction_is_valid(
+      user_interaction_is_valid(bytes, length));
+  chassis->mutable_steering_aux_rpt_32c()->set_user_interaction(
+      user_interaction(bytes, length));
+  chassis->mutable_steering_aux_rpt_32c()->set_rotation_rate_is_valid(
+      rotation_rate_is_valid(bytes, length));
+  chassis->mutable_steering_aux_rpt_32c()->set_rotation_rate(
       rotation_rate(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_aux_rpt_32c()
-      ->set_raw_torque_is_valid(raw_torque_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_aux_rpt_32c()->set_raw_torque(
+  chassis->mutable_steering_aux_rpt_32c()->set_raw_torque_is_valid(
+      raw_torque_is_valid(bytes, length));
+  chassis->mutable_steering_aux_rpt_32c()->set_raw_torque(
       raw_torque(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_aux_rpt_32c()
-      ->set_raw_position_is_valid(raw_position_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_steering_aux_rpt_32c()->set_raw_position(
+  chassis->mutable_steering_aux_rpt_32c()->set_raw_position_is_valid(
+      raw_position_is_valid(bytes, length));
+  chassis->mutable_steering_aux_rpt_32c()->set_raw_position(
       raw_position(bytes, length));
 }
 

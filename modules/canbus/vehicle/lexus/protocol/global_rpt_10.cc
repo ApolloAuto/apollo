@@ -31,31 +31,26 @@ Globalrpt10::Globalrpt10() {}
 const int32_t Globalrpt10::ID = 0x10;
 
 void Globalrpt10::Parse(const std::uint8_t* bytes, int32_t length,
-                        ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_config_fault_active(
+                        Lexus* chassis) const {
+  chassis->mutable_global_rpt_10()->set_config_fault_active(
       config_fault_active(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_global_rpt_10()
-      ->set_pacmod_subsystem_timeout(pacmod_subsystem_timeout(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_pacmod_system_enabled(
+  chassis->mutable_global_rpt_10()->set_pacmod_subsystem_timeout(
+      pacmod_subsystem_timeout(bytes, length));
+  chassis->mutable_global_rpt_10()->set_pacmod_system_enabled(
       pacmod_system_enabled(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_global_rpt_10()
-      ->set_pacmod_system_override_active(
-          pacmod_system_override_active(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_global_rpt_10()
-      ->set_pacmod_system_fault_active(
-          pacmod_system_fault_active(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_veh_can_timeout(
+  chassis->mutable_global_rpt_10()->set_pacmod_system_override_active(
+      pacmod_system_override_active(bytes, length));
+  chassis->mutable_global_rpt_10()->set_pacmod_system_fault_active(
+      pacmod_system_fault_active(bytes, length));
+  chassis->mutable_global_rpt_10()->set_veh_can_timeout(
       veh_can_timeout(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_str_can_timeout(
+  chassis->mutable_global_rpt_10()->set_str_can_timeout(
       str_can_timeout(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_brk_can_timeout(
+  chassis->mutable_global_rpt_10()->set_brk_can_timeout(
       brk_can_timeout(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_usr_can_timeout(
+  chassis->mutable_global_rpt_10()->set_usr_can_timeout(
       usr_can_timeout(bytes, length));
-  chassis->mutable_lexus()->mutable_global_rpt_10()->set_usr_can_read_errors(
+  chassis->mutable_global_rpt_10()->set_usr_can_read_errors(
       usr_can_read_errors(bytes, length));
 }
 

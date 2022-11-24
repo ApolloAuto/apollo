@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace lexus {
 
 class Turnauxrpt330 : public ::apollo::drivers::canbus::ProtocolData<
-                          ::apollo::canbus::ChassisDetail> {
+                          ::apollo::canbus::Lexus> {
  public:
   static const int32_t ID;
   Turnauxrpt330();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Lexus* chassis) const override;
 
  private:
   // config detail: {'name': 'PASS_BLINKER_BULB_ON_IS_VALID', 'offset': 0.0,

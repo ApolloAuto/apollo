@@ -31,32 +31,26 @@ Brakeauxrpt304::Brakeauxrpt304() {}
 const int32_t Brakeauxrpt304::ID = 0x304;
 
 void Brakeauxrpt304::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_brake_aux_rpt_304()
+                           Lexus* chassis) const {
+  chassis->mutable_brake_aux_rpt_304()
       ->set_brake_on_off_is_valid(brake_on_off_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_brake_on_off(
+  chassis->mutable_brake_aux_rpt_304()->set_brake_on_off(
       brake_on_off(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_brake_aux_rpt_304()
-      ->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_user_interaction(
+  chassis->mutable_brake_aux_rpt_304()->set_user_interaction_is_valid(
+      user_interaction_is_valid(bytes, length));
+  chassis->mutable_brake_aux_rpt_304()->set_user_interaction(
       user_interaction(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_brake_aux_rpt_304()
-      ->set_raw_brake_pressure_is_valid(
-          raw_brake_pressure_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_brake_pressure(
+  chassis->mutable_brake_aux_rpt_304()->set_raw_brake_pressure_is_valid(
+      raw_brake_pressure_is_valid(bytes, length));
+  chassis->mutable_brake_aux_rpt_304()->set_raw_brake_pressure(
       raw_brake_pressure(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_brake_aux_rpt_304()
-      ->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_force(
+  chassis->mutable_brake_aux_rpt_304()->set_raw_pedal_force_is_valid(
+      raw_pedal_force_is_valid(bytes, length));
+  chassis->mutable_brake_aux_rpt_304()->set_raw_pedal_force(
       raw_pedal_force(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_brake_aux_rpt_304()
-      ->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_aux_rpt_304()->set_raw_pedal_pos(
+  chassis->mutable_brake_aux_rpt_304()->set_raw_pedal_pos_is_valid(
+      raw_pedal_pos_is_valid(bytes, length));
+  chassis->mutable_brake_aux_rpt_304()->set_raw_pedal_pos(
       raw_pedal_pos(bytes, length));
 }
 

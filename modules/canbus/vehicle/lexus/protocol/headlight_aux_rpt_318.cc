@@ -31,29 +31,22 @@ Headlightauxrpt318::Headlightauxrpt318() {}
 const int32_t Headlightauxrpt318::ID = 0x318;
 
 void Headlightauxrpt318::Parse(const std::uint8_t* bytes, int32_t length,
-                               ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_headlights_mode_is_valid(headlights_mode_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_headlights_mode(headlights_mode(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_fog_lights_on_is_valid(fog_lights_on_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_headlight_aux_rpt_318()->set_fog_lights_on(
+                               Lexus* chassis) const {
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_mode_is_valid(
+      headlights_mode_is_valid(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_mode(
+      headlights_mode(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_fog_lights_on_is_valid(
+      fog_lights_on_is_valid(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_fog_lights_on(
       fog_lights_on(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_headlights_on_bright_is_valid(
-          headlights_on_bright_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_headlights_on_bright(headlights_on_bright(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_headlight_aux_rpt_318()
-      ->set_headlights_on_is_valid(headlights_on_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_headlight_aux_rpt_318()->set_headlights_on(
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_on_bright_is_valid(
+      headlights_on_bright_is_valid(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_on_bright(
+      headlights_on_bright(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_on_is_valid(
+      headlights_on_is_valid(bytes, length));
+  chassis->mutable_headlight_aux_rpt_318()->set_headlights_on(
       headlights_on(bytes, length));
 }
 

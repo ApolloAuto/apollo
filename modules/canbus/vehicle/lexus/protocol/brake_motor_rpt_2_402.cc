@@ -31,14 +31,12 @@ Brakemotorrpt2402::Brakemotorrpt2402() {}
 const int32_t Brakemotorrpt2402::ID = 0x402;
 
 void Brakemotorrpt2402::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_brake_motor_rpt_2_402()
-      ->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_brake_motor_rpt_2_402()
-      ->set_motor_temperature(motor_temperature(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_motor_rpt_2_402()->set_angular_speed(
+                              Lexus* chassis) const {
+  chassis->mutable_brake_motor_rpt_2_402()->set_encoder_temperature(
+      encoder_temperature(bytes, length));
+  chassis->mutable_brake_motor_rpt_2_402()->set_motor_temperature(
+      motor_temperature(bytes, length));
+  chassis->mutable_brake_motor_rpt_2_402()->set_angular_speed(
       angular_speed(bytes, length));
 }
 

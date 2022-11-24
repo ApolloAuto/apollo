@@ -31,26 +31,26 @@ Turnrpt230::Turnrpt230() {}
 const int32_t Turnrpt230::ID = 0x230;
 
 void Turnrpt230::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_vehicle_fault(
+                       Lexus* chassis) const {
+  chassis->mutable_turn_rpt_230()->set_vehicle_fault(
       vehicle_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_pacmod_fault(
+  chassis->mutable_turn_rpt_230()->set_pacmod_fault(
       pacmod_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_override_active(
+  chassis->mutable_turn_rpt_230()->set_override_active(
       override_active(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_output_reported_fault(
+  chassis->mutable_turn_rpt_230()->set_output_reported_fault(
       output_reported_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_input_output_fault(
+  chassis->mutable_turn_rpt_230()->set_input_output_fault(
       input_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_enabled(
+  chassis->mutable_turn_rpt_230()->set_enabled(
       enabled(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_command_output_fault(
+  chassis->mutable_turn_rpt_230()->set_command_output_fault(
       command_output_fault(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_manual_input(
+  chassis->mutable_turn_rpt_230()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_commanded_value(
+  chassis->mutable_turn_rpt_230()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_lexus()->mutable_turn_rpt_230()->set_output_value(
+  chassis->mutable_turn_rpt_230()->set_output_value(
       output_value(bytes, length));
 }
 

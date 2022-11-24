@@ -31,8 +31,8 @@ Yawraterpt40d::Yawraterpt40d() {}
 const int32_t Yawraterpt40d::ID = 0x40D;
 
 void Yawraterpt40d::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_yaw_rate_rpt_40d()->set_yaw_rate(
+                          Lexus* chassis) const {
+  chassis->mutable_yaw_rate_rpt_40d()->set_yaw_rate(
       yaw_rate(bytes, length));
 }
 

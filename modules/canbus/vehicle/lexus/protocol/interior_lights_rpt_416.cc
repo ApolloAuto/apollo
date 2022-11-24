@@ -31,32 +31,23 @@ Interiorlightsrpt416::Interiorlightsrpt416() {}
 const int32_t Interiorlightsrpt416::ID = 0x416;
 
 void Interiorlightsrpt416::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_dim_level_is_valid(dim_level_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_mood_lights_on_is_valid(mood_lights_on_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_rear_dome_lights_on_is_valid(
-          rear_dome_lights_on_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_front_dome_lights_on_is_valid(
-          front_dome_lights_on_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_interior_lights_rpt_416()->set_dim_level(
+                                 Lexus* chassis) const {
+  chassis->mutable_interior_lights_rpt_416()->set_dim_level_is_valid(
+      dim_level_is_valid(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_mood_lights_on_is_valid(
+      mood_lights_on_is_valid(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_rear_dome_lights_on_is_valid(
+      rear_dome_lights_on_is_valid(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_front_dome_lights_on_is_valid(
+      front_dome_lights_on_is_valid(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_dim_level(
       dim_level(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_mood_lights_on(mood_lights_on(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_rear_dome_lights_on(rear_dome_lights_on(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_interior_lights_rpt_416()
-      ->set_front_dome_lights_on(front_dome_lights_on(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_mood_lights_on(
+      mood_lights_on(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_rear_dome_lights_on(
+      rear_dome_lights_on(bytes, length));
+  chassis->mutable_interior_lights_rpt_416()->set_front_dome_lights_on(
+      front_dome_lights_on(bytes, length));
 }
 
 // config detail: {'name': 'dim_level_is_valid', 'offset': 0.0,

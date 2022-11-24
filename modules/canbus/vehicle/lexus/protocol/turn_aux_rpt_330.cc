@@ -31,21 +31,15 @@ Turnauxrpt330::Turnauxrpt330() {}
 const int32_t Turnauxrpt330::ID = 0x330;
 
 void Turnauxrpt330::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_turn_aux_rpt_330()
-      ->set_pass_blinker_bulb_on_is_valid(
-          pass_blinker_bulb_on_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_turn_aux_rpt_330()
-      ->set_pass_blinker_bulb_on(pass_blinker_bulb_on(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_turn_aux_rpt_330()
-      ->set_driver_blinker_bulb_on_is_valid(
-          driver_blinker_bulb_on_is_valid(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_turn_aux_rpt_330()
-      ->set_driver_blinker_bulb_on(driver_blinker_bulb_on(bytes, length));
+                          Lexus* chassis) const {
+  chassis->mutable_turn_aux_rpt_330()->set_pass_blinker_bulb_on_is_valid(
+      pass_blinker_bulb_on_is_valid(bytes, length));
+  chassis->mutable_turn_aux_rpt_330()->set_pass_blinker_bulb_on(
+      pass_blinker_bulb_on(bytes, length));
+  chassis->mutable_turn_aux_rpt_330()->set_driver_blinker_bulb_on_is_valid(
+      driver_blinker_bulb_on_is_valid(bytes, length));
+  chassis->mutable_turn_aux_rpt_330()->set_driver_blinker_bulb_on(
+      driver_blinker_bulb_on(bytes, length));
 }
 
 // config detail: {'name': 'pass_blinker_bulb_on_is_valid', 'offset': 0.0,

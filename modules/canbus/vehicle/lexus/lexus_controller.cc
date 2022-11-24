@@ -42,8 +42,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode LexusController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Lexus>* const can_sender,
+    MessageManager<::apollo::canbus::Lexus>* const message_manager) {
   if (is_initialized_) {
     AINFO << "LexusController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -146,7 +146,7 @@ void LexusController::Stop() {
 Chassis LexusController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Lexus chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -161,20 +161,20 @@ Chassis LexusController::chassis() {
   chassis_.set_engine_started(true);
 
   // 5
-  if (chassis_detail.lexus().has_vehicle_speed_rpt_400() &&
-      chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed()) {
+  if (chassis_detail.has_vehicle_speed_rpt_400() &&
+      chassis_detail.vehicle_speed_rpt_400().has_vehicle_speed()) {
     chassis_.set_speed_mps(static_cast<float>(
-        chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed()));
+        chassis_detail.vehicle_speed_rpt_400().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
 
-  if (chassis_detail.lexus().has_wheel_speed_rpt_407()) {
+  if (chassis_detail.has_wheel_speed_rpt_407()) {
     // TODO(QiL) : No wheel speed valid bit in lexus, so default valid
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(true);
     // chassis_.mutable_wheel_speed()->set_wheel_direction_rr(true);
     chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_rear_right());
+        chassis_detail.wheel_speed_rpt_407().wheel_spd_rear_right());
 
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(true);
     /*
@@ -182,7 +182,7 @@ Chassis LexusController::chassis() {
         chassis_detail.vehicle_spd().wheel_direction_rl());
         */
     chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_rear_left());
+        chassis_detail.wheel_speed_rpt_407().wheel_spd_rear_left());
 
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(true);
     /*
@@ -190,7 +190,7 @@ Chassis LexusController::chassis() {
         chassis_detail.vehicle_spd().wheel_direction_fr());
         */
     chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_front_right());
+        chassis_detail.wheel_speed_rpt_407().wheel_spd_front_right());
 
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(true);
     /*
@@ -198,50 +198,50 @@ Chassis LexusController::chassis() {
         chassis_detail.vehicle_spd().wheel_direction_fl());
         */
     chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-        chassis_detail.lexus().wheel_speed_rpt_407().wheel_spd_front_left());
+        chassis_detail.wheel_speed_rpt_407().wheel_spd_front_left());
   }
 
   // 7
   chassis_.set_fuel_range_m(0);
   // 8
-  if (chassis_detail.lexus().has_accel_rpt_200() &&
-      chassis_detail.lexus().accel_rpt_200().has_output_value()) {
+  if (chassis_detail.has_accel_rpt_200() &&
+      chassis_detail.accel_rpt_200().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
     chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.lexus().accel_rpt_200().output_value() * 100));
+        chassis_detail.accel_rpt_200().output_value() * 100));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
-  if (chassis_detail.lexus().has_brake_rpt_204() &&
-      chassis_detail.lexus().brake_rpt_204().has_output_value()) {
+  if (chassis_detail.has_brake_rpt_204() &&
+      chassis_detail.brake_rpt_204().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
     chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.lexus().brake_rpt_204().output_value() * 100));
+        chassis_detail.brake_rpt_204().output_value() * 100));
   } else {
     chassis_.set_brake_percentage(0);
   }
 
   // 23, previously 10
-  if (chassis_detail.lexus().has_shift_rpt_228() &&
-      chassis_detail.lexus().shift_rpt_228().has_output_value()) {
+  if (chassis_detail.has_shift_rpt_228() &&
+      chassis_detail.shift_rpt_228().has_output_value()) {
     AINFO << "Start reading shift values";
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+    if (chassis_detail.shift_rpt_228().output_value() ==
         Shift_rpt_228::OUTPUT_VALUE_PARK) {
       gear_pos = Chassis::GEAR_PARKING;
     }
 
-    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+    if (chassis_detail.shift_rpt_228().output_value() ==
         Shift_rpt_228::OUTPUT_VALUE_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+    if (chassis_detail.shift_rpt_228().output_value() ==
         Shift_rpt_228::OUTPUT_VALUE_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+    if (chassis_detail.shift_rpt_228().output_value() ==
         Shift_rpt_228::OUTPUT_VALUE_FORWARD_HIGH) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
@@ -253,25 +253,25 @@ Chassis LexusController::chassis() {
 
   // 11
   // TODO(QiL) : verify the unit here.
-  if (chassis_detail.lexus().has_steering_rpt_22c() &&
-      chassis_detail.lexus().steering_rpt_22c().has_output_value()) {
+  if (chassis_detail.has_steering_rpt_22c() &&
+      chassis_detail.steering_rpt_22c().has_output_value()) {
     chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.lexus().steering_rpt_22c().output_value() * 100.0 /
+        chassis_detail.steering_rpt_22c().output_value() * 100.0 /
         vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
 
   // 16, 17
-  if (chassis_detail.lexus().has_turn_rpt_230() &&
-      chassis_detail.lexus().turn_rpt_230().has_output_value() &&
-      chassis_detail.lexus().turn_rpt_230().output_value() !=
+  if (chassis_detail.has_turn_rpt_230() &&
+      chassis_detail.turn_rpt_230().has_output_value() &&
+      chassis_detail.turn_rpt_230().output_value() !=
           Turn_rpt_230::OUTPUT_VALUE_NONE) {
-    if (chassis_detail.lexus().turn_rpt_230().output_value() ==
+    if (chassis_detail.turn_rpt_230().output_value() ==
         Turn_rpt_230::OUTPUT_VALUE_LEFT) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_LEFT);
-    } else if (chassis_detail.lexus().turn_rpt_230().output_value() ==
+    } else if (chassis_detail.turn_rpt_230().output_value() ==
                Turn_rpt_230::OUTPUT_VALUE_RIGHT) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_RIGHT);
@@ -513,7 +513,7 @@ void LexusController::Steer(double angle, double angle_spd) {
 
   const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      ProtocolData<::apollo::canbus::Lexus>::BoundedValue(
           vehicle_params_.min_steer_angle_rate(),
           vehicle_params_.max_steer_angle_rate(),
           vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
@@ -639,7 +639,7 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
   // TODO(Yu) : check whether the current retry_num match the assumed time
   // consumption
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Lexus chassis_detail;
   bool is_accel_enabled = false;
   bool is_brake_enabled = false;
   bool is_steering_enabled = false;
@@ -652,19 +652,19 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
       is_steering_enabled =
-          chassis_detail.lexus().has_steering_rpt_22c() &&
-          chassis_detail.lexus().steering_rpt_22c().has_enabled() &&
-          chassis_detail.lexus().steering_rpt_22c().enabled();
+          chassis_detail.has_steering_rpt_22c() &&
+          chassis_detail.steering_rpt_22c().has_enabled() &&
+          chassis_detail.steering_rpt_22c().enabled();
       check_ok = check_ok && is_steering_enabled;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_brake_enabled = chassis_detail.lexus().has_brake_rpt_204() &&
-                         chassis_detail.lexus().brake_rpt_204().has_enabled() &&
-                         chassis_detail.lexus().brake_rpt_204().enabled();
-      is_accel_enabled = chassis_detail.lexus().has_accel_rpt_200() &&
-                         chassis_detail.lexus().accel_rpt_200().has_enabled() &&
-                         chassis_detail.lexus().accel_rpt_200().enabled();
+      is_brake_enabled = chassis_detail.has_brake_rpt_204() &&
+                         chassis_detail.brake_rpt_204().has_enabled() &&
+                         chassis_detail.brake_rpt_204().enabled();
+      is_accel_enabled = chassis_detail.has_accel_rpt_200() &&
+                         chassis_detail.accel_rpt_200().has_enabled() &&
+                         chassis_detail.accel_rpt_200().enabled();
       check_ok = check_ok && is_brake_enabled && is_accel_enabled;
     }
     if (check_ok) {

@@ -31,16 +31,16 @@ Componentrpt20::Componentrpt20() {}
 const int32_t Componentrpt20::ID = 0x20;
 
 void Componentrpt20::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_component_rpt_20()->set_component_type(
+                           Lexus* chassis) const {
+  chassis->mutable_component_rpt_20()->set_component_type(
       component_type(bytes, length));
-  chassis->mutable_lexus()->mutable_component_rpt_20()->set_component_func(
+  chassis->mutable_component_rpt_20()->set_component_func(
       component_func(bytes, length));
-  chassis->mutable_lexus()->mutable_component_rpt_20()->set_counter(
+  chassis->mutable_component_rpt_20()->set_counter(
       counter(bytes, length));
-  chassis->mutable_lexus()->mutable_component_rpt_20()->set_complement(
+  chassis->mutable_component_rpt_20()->set_complement(
       complement(bytes, length));
-  chassis->mutable_lexus()->mutable_component_rpt_20()->set_config_fault(
+  chassis->mutable_component_rpt_20()->set_config_fault(
       config_fault(bytes, length));
 }
 

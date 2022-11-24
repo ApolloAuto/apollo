@@ -31,8 +31,8 @@ Vehdynamicsrpt413::Vehdynamicsrpt413() {}
 const int32_t Vehdynamicsrpt413::ID = 0x413;
 
 void Vehdynamicsrpt413::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_veh_dynamics_rpt_413()->set_veh_g_forces(
+                              Lexus* chassis) const {
+  chassis->mutable_veh_dynamics_rpt_413()->set_veh_g_forces(
       veh_g_forces(bytes, length));
 }
 

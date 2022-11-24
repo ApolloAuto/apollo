@@ -31,19 +31,16 @@ Mediacontrolscmd120::Mediacontrolscmd120() {}
 const int32_t Mediacontrolscmd120::ID = 0x120;
 
 void Mediacontrolscmd120::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_media_controls_cmd_120()
-      ->set_media_controls_cmd(media_controls_cmd(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_media_controls_cmd_120()
-      ->set_ignore_overrides(ignore_overrides(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_media_controls_cmd_120()
-      ->set_clear_override(clear_override(bytes, length));
-  chassis->mutable_lexus()->mutable_media_controls_cmd_120()->set_clear_faults(
+                                Lexus* chassis) const {
+  chassis->mutable_media_controls_cmd_120()->set_media_controls_cmd(
+      media_controls_cmd(bytes, length));
+  chassis->mutable_media_controls_cmd_120()->set_ignore_overrides(
+      ignore_overrides(bytes, length));
+  chassis->mutable_media_controls_cmd_120()->set_clear_override(
+      clear_override(bytes, length));
+  chassis->mutable_media_controls_cmd_120()->set_clear_faults(
       clear_faults(bytes, length));
-  chassis->mutable_lexus()->mutable_media_controls_cmd_120()->set_enable(
+  chassis->mutable_media_controls_cmd_120()->set_enable(
       enable(bytes, length));
 }
 

@@ -31,10 +31,10 @@ Brakemotorrpt3403::Brakemotorrpt3403() {}
 const int32_t Brakemotorrpt3403::ID = 0x403;
 
 void Brakemotorrpt3403::Parse(const std::uint8_t* bytes, int32_t length,
-                              ChassisDetail* chassis) const {
-  chassis->mutable_lexus()->mutable_brake_motor_rpt_3_403()->set_torque_output(
+                              Lexus* chassis) const {
+  chassis->mutable_brake_motor_rpt_3_403()->set_torque_output(
       torque_output(bytes, length));
-  chassis->mutable_lexus()->mutable_brake_motor_rpt_3_403()->set_torque_input(
+  chassis->mutable_brake_motor_rpt_3_403()->set_torque_input(
       torque_input(bytes, length));
 }
 

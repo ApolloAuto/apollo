@@ -31,13 +31,11 @@ Steeringmotorrpt1404::Steeringmotorrpt1404() {}
 const int32_t Steeringmotorrpt1404::ID = 0x404;
 
 void Steeringmotorrpt1404::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_1_404()
-      ->set_motor_current(motor_current(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_1_404()
-      ->set_shaft_position(shaft_position(bytes, length));
+                                 Lexus* chassis) const {
+  chassis->mutable_steering_motor_rpt_1_404()->set_motor_current(
+      motor_current(bytes, length));
+  chassis->mutable_steering_motor_rpt_1_404()->set_shaft_position(
+      shaft_position(bytes, length));
 }
 
 // config detail: {'name': 'motor_current', 'offset': 0.0, 'precision': 0.001,

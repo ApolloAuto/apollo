@@ -31,21 +31,18 @@ Accelauxrpt300::Accelauxrpt300() {}
 const int32_t Accelauxrpt300::ID = 0x300;
 
 void Accelauxrpt300::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_accel_aux_rpt_300()
-      ->set_user_interaction_is_valid(user_interaction_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_user_interaction(
+                           Lexus* chassis) const {
+  chassis->mutable_accel_aux_rpt_300()->set_user_interaction_is_valid(
+      user_interaction_is_valid(bytes, length));
+  chassis->mutable_accel_aux_rpt_300()->set_user_interaction(
       user_interaction(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_accel_aux_rpt_300()
-      ->set_raw_pedal_force_is_valid(raw_pedal_force_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_force(
+  chassis->mutable_accel_aux_rpt_300()->set_raw_pedal_force_is_valid(
+      raw_pedal_force_is_valid(bytes, length));
+  chassis->mutable_accel_aux_rpt_300()->set_raw_pedal_force(
       raw_pedal_force(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_accel_aux_rpt_300()
-      ->set_raw_pedal_pos_is_valid(raw_pedal_pos_is_valid(bytes, length));
-  chassis->mutable_lexus()->mutable_accel_aux_rpt_300()->set_raw_pedal_pos(
+  chassis->mutable_accel_aux_rpt_300()->set_raw_pedal_pos_is_valid(
+      raw_pedal_pos_is_valid(bytes, length));
+  chassis->mutable_accel_aux_rpt_300()->set_raw_pedal_pos(
       raw_pedal_pos(bytes, length));
 }
 

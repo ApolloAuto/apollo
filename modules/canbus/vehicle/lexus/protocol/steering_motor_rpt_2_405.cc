@@ -31,16 +31,13 @@ Steeringmotorrpt2405::Steeringmotorrpt2405() {}
 const int32_t Steeringmotorrpt2405::ID = 0x405;
 
 void Steeringmotorrpt2405::Parse(const std::uint8_t* bytes, int32_t length,
-                                 ChassisDetail* chassis) const {
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_2_405()
-      ->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_2_405()
-      ->set_motor_temperature(motor_temperature(bytes, length));
-  chassis->mutable_lexus()
-      ->mutable_steering_motor_rpt_2_405()
-      ->set_angular_speed(angular_speed(bytes, length));
+                                 Lexus* chassis) const {
+  chassis->mutable_steering_motor_rpt_2_405()->set_encoder_temperature(
+      encoder_temperature(bytes, length));
+  chassis->mutable_steering_motor_rpt_2_405()->set_motor_temperature(
+      motor_temperature(bytes, length));
+  chassis->mutable_steering_motor_rpt_2_405()->set_angular_speed(
+      angular_speed(bytes, length));
 }
 
 // config detail: {'name': 'encoder_temperature', 'offset': -40.0,
