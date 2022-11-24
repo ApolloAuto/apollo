@@ -34,6 +34,7 @@ cc_library(
         "fusion_camera_detection_component.cc",
         "lane_detection_component.cc",
         "trafficlights_perception_component.cc",
+        "camera_bev_detection_component.cc"
     ],
     hdrs = [
         "camera_obstacle_detection_component.h",
@@ -41,6 +42,7 @@ cc_library(
         "fusion_camera_detection_component.h",
         "lane_detection_component.h",
         "trafficlights_perception_component.h",
+        "camera_bev_detection_component.h"
     ],
     linkopts = ["-lleveldb"],
     copts = PERCEPTION_COPTS,
