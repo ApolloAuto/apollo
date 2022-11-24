@@ -1,0 +1,21 @@
+name: cnnseg16
+date: 2018-10-14
+task_type: 3d_segmentation
+sensor_type: lidar
+framework: paddlepaddle
+model_files:
+  - name: pfe.onnx
+    size: 4125
+  - name: pts_backbone.zip
+    size: 16945051
+  - name: pts_bbox_head.zip
+    size: 121150
+  - name: pts_middle_encoder.zip
+    size: 3763
+  - name: pts_neck.zip
+    size: 2420625
+  - name: pts_voxel_encoder.zip
+    size: 17575
+  - name: rpn.onnx
+    size: 18300546
+dataset: ['waymo', 'kitti', 'nusense']

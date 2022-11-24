@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <pcl/common/time.h>
-
 #include <fstream>
 #include <memory>
 #include <string>
+
+#include <pcl/common/time.h>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/robosense/parser/robosense_parser.h"
@@ -94,7 +94,7 @@ uint64_t Robosense16Parser::get_timestamp(double base_time, float time_offset,
   (void)block_id;
   double t =
       base_time -
-      time_offset;  //时秒 base_time 0-1h us微妙    time_offset 0-1278.72us
+      time_offset;  // 时秒 base_time 0-1h us微妙    time_offset 0-1278.72us
   uint64_t timestamp = Robosense16Parser::get_gps_stamp(
       t, &previous_packet_stamp_,
       &gps_base_usec_);  // gps_base_usec_ gps基准时间 精度s

@@ -18,8 +18,9 @@
 #include <memory>
 
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
-#include "modules/drivers/lidar/robosense/parser/robosense_parser.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
+
+#include "modules/drivers/lidar/robosense/parser/robosense_parser.h"
 
 namespace apollo {
 namespace drivers {

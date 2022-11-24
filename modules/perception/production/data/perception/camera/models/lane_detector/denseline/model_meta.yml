@@ -1,0 +1,15 @@
+name: denseline
+date: 2019-05-29
+task_type: lane_detection
+sensor_type: camera
+framework: paddlepaddle
+model_files:
+  - name: CalibrationTable
+    size: 2096
+  - name: deploy.caffemodel
+    size: 70014328
+  - name: deploy.caffemodel.metadata
+    size: 72
+  - name: deploy.prototxt
+    size: 43589
+dataset: []

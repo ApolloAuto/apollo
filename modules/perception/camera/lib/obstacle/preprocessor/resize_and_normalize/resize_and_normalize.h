@@ -38,7 +38,7 @@ class ReSizeAndNormalize : public pipeline::Plugin {
 
   virtual ~ReSizeAndNormalize() = default;
 
-  bool Process(cv::Mat &im, float *image_data_array);
+  bool Process(const cv::Mat &im, float *image_data_array);
 
   bool Init(const PluginConfig& plugin_config) override;
 

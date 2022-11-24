@@ -20,10 +20,12 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "cyber/cyber.h"
+
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng_conf.pb.h"
+
+#include "cyber/cyber.h"
 
 namespace apollo {
 namespace drivers {

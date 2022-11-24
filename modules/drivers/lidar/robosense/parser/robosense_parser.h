@@ -17,19 +17,22 @@
 #pragma once
 #include <errno.h>
 #include <stdint.h>
+
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
+
 #include "boost/format.hpp"
-#include "modules/drivers/lidar/robosense/lib/calibration.h"
-#include "modules/drivers/lidar/robosense/lib/const_variables.h"
-#include "modules/drivers/lidar/robosense/lib/data_type.h"
 
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/robosense/proto/lidars_filter_config.pb.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng_conf.pb.h"
+
+#include "modules/drivers/lidar/robosense/lib/calibration.h"
+#include "modules/drivers/lidar/robosense/lib/const_variables.h"
+#include "modules/drivers/lidar/robosense/lib/data_type.h"
 
 namespace apollo {
 namespace drivers {

@@ -53,7 +53,7 @@ void SimControlManager::ResetDynamicModel() {
   return;
 }
 
-bool SimControlManager::AddDynamicModel(std::string &dynamic_model_name) {
+bool SimControlManager::AddDynamicModel(const std::string &dynamic_model_name) {
   if (IsEnabled()) {
     auto *model_factory = DynamicModelFactory::Instance();
     return model_factory->RegisterDynamicModel(dynamic_model_name);
@@ -64,7 +64,8 @@ bool SimControlManager::AddDynamicModel(std::string &dynamic_model_name) {
   }
 }
 
-bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name) {
+bool SimControlManager::ChangeDynamicModel(
+    const std::string &dynamic_model_name) {
   auto *model_factory = DynamicModelFactory::Instance();
   auto next_model_ptr_ = model_factory->GetModelType(dynamic_model_name);
   if (!next_model_ptr_) {
@@ -79,7 +80,8 @@ bool SimControlManager::ChangeDynamicModel(std::string &dynamic_model_name) {
   return true;
 }
 
-bool SimControlManager::DeleteDynamicModel(std::string &dynamic_model_name) {
+bool SimControlManager::DeleteDynamicModel(
+    const std::string &dynamic_model_name) {
   auto *model_factory = DynamicModelFactory::Instance();
   return model_factory->UnregisterDynamicModel(dynamic_model_name);
 }

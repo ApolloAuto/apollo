@@ -16,10 +16,9 @@
 
 #include "modules/drivers/lidar/robosense/driver/driver.h"
 
-#include <ctime>
-
 #include <atomic>
 #include <cmath>
+#include <ctime>
 #include <memory>
 #include <string>
 
