@@ -1,6 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,11 +14,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-        #"//third_party/libtorch",
-    ]  + if_gpu(
-        ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(

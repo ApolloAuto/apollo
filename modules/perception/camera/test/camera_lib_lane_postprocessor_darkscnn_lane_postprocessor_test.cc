@@ -169,8 +169,8 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   double yaw_adj = 0;
   double roll_adj = 0;
   std::string visual_camera = "onsemi_obstacle";
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map;
+  EigenMap<std::string, Eigen::Matrix4d> extrinsic_map;
+  EigenMap<std::string, Eigen::Matrix3f> intrinsic_map;
   Eigen::Matrix4d ex_camera2lidar;
   Eigen::Matrix4d ex_lidar2imu;
   Eigen::Matrix3d homography_im2car_;

@@ -147,8 +147,8 @@ void SmokeObstacleDetector::InitSmokeBlob(
 
 bool SmokeObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   gpu_id_ = options.gpu_id;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ = options.base_camera_model;
   ACHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
@@ -201,8 +201,8 @@ bool SmokeObstacleDetector::Init(const StageConfig &stage_config) {
       stage_config.smoke_obstacle_detection_config();
 
   gpu_id_ = smoke_obstacle_detection_config_.gpu_id();
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
 
   base_camera_model_ =
       common::SensorManager::Instance()->GetUndistortCameraModel(

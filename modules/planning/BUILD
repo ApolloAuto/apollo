@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 

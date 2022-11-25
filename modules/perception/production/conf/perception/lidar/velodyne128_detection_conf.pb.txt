@@ -2,7 +2,7 @@ sensor_name: "velodyne128"
 detector_name: "LidarObstacleDetection"
 enable_hdmap: true
 lidar_query_tf_offset: 0
-lidar2novatel_tf2_child_frame_id: "velodyne128"
+lidar2novatel_tf2_child_frame_id: "velodyne64"
 output_channel_name: "/perception/inner/DetectionObjects"
 lidar_detection_conf_dir : "/apollo/modules/perception/pipeline/config"
 lidar_detection_conf_file : "lidar_detection_pipeline.pb.txt"

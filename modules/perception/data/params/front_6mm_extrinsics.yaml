@@ -1,21 +1,17 @@
 header:
   seq: 0
+  frame_id: velodyne64
   stamp:
-    secs: 0
     nsecs: 0
-  frame_id: velodyne128
+    secs: 0
 child_frame_id: front_6mm
 transform:
-  translation:
-    x: 0.580393
-    y: 0.0727572
-    z: -0.211861
   rotation:
-     x: -0.502988
-     y: 0.496432
-     z: -0.507426
-     w: 0.493029
-  euler_angles_degree:
-     pitch: -89.936
-     yaw: -90.45
-     roll: -1.20027
+    w: 0.5
+    x: -0.5
+    y: 0.5
+    z: -0.5
+  translation:
+    x: 0.67
+    y: -0.1
+    z: -0.52

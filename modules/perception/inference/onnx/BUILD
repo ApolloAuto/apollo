@@ -1,5 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -12,9 +13,13 @@ cc_library(
     deps = [
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_lib",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:migraphx",
+    ]),
 )
 
 cc_library(
@@ -27,8 +32,11 @@ cc_library(
         "//cyber",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_lib",
-        "@libtorch_gpu",
-    ],
+    ] + if_cuda([
+        "@libtorch_gpu_cuda",
+    ])+ if_rocm([
+        "@libtorch_gpu_rocm",
+    ])
 )
 
 cpplint()

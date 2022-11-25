@@ -32,7 +32,7 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
       : float_min_(std::numeric_limits<float>::min()) {
     input_dims_.nbDims = in_dims.nbDims;
     CHECK_GT(input_dims_.nbDims, 0);
-    for (int i = 0; i < in_dims.nbDims; i++) {
+    for (int i = 0; i < in_dims.nbDims; ++i) {
       input_dims_.d[i] = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
@@ -57,14 +57,14 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
    * this function is called by the implementations of INetworkDefinition and
    * IBuilder. In particular, it is called prior to any call to initialize().
    */
-  virtual int initialize() { return 0; }
-  virtual void terminate() {}
+  int initialize() override { return 0; }
+  void terminate() override {}
   int getNbOutputs() const override { return 1; }
-  virtual nvinfer1::Dims getOutputDimensions(int index,
-                                             const nvinfer1::Dims *inputs,
-                                             int nbInputDims) {
+  nvinfer1::Dims getOutputDimensions(int index,
+                                     const nvinfer1::Dims *inputs,
+                                     int nbInputDims) override {
     input_dims_ = inputs[0];
-    for (int i = 1; i < input_dims_.nbDims; i++) {
+    for (int i = 1; i < input_dims_.nbDims; ++i) {
       output_dims_.d[i] = input_dims_.d[i];
     }
     return output_dims_;
@@ -74,15 +74,15 @@ class ArgMax1Plugin : public nvinfer1::IPlugin {
                  const nvinfer1::Dims *outputDims, int nbOutputs,
                  int maxBatchSize) override {
     input_dims_ = inputDims[0];
-    for (int i = 1; i < input_dims_.nbDims; i++) {
+    for (int i = 1; i < input_dims_.nbDims; ++i) {
       output_dims_.d[i] = input_dims_.d[i];
     }
   }
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  int enqueue(int batchSize, const void *const *inputs, void **outputs,
+              void *workspace, cudaStream_t stream) override;
 
   size_t getSerializationSize() override { return 0; }
 

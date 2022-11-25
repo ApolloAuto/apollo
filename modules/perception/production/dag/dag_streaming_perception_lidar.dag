@@ -8,7 +8,7 @@ module_config {
       config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_detection_conf.pb.txt"
       flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
       readers {
-        channel: "/apollo/sensor/lidar128/compensator/PointCloud2"
+        channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
       }
     }
   }

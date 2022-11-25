@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -29,8 +29,7 @@ cc_library(
     ],
 )
 
-
-cuda_library(
+gpu_library(
     name = "kernels_cuda",
     srcs = [
         "kernels.cu",
@@ -44,7 +43,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "dfmb_psroi_align_plugin",
     srcs = ["dfmb_psroi_align_plugin.cu"],
     hdrs = ["dfmb_psroi_align_plugin.h"],
@@ -57,7 +56,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "rcnn_proposal_plugin",
     srcs = ["rcnn_proposal_plugin.cu"],
     hdrs = ["rcnn_proposal_plugin.h"],
@@ -69,7 +68,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "rpn_proposal_ssd_plugin",
     srcs = ["rpn_proposal_ssd_plugin.cu"],
     hdrs = ["rpn_proposal_ssd_plugin.h"],
@@ -81,7 +80,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins_slice_cuda",
     srcs = ["slice_plugin.cu"],
     hdrs = ["slice_plugin.h"],
@@ -93,7 +92,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins_argmax_cuda",
     srcs = ["argmax_plugin.cu"],
     hdrs = ["argmax_plugin.h"],
@@ -105,7 +104,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins_softmax_cuda",
     srcs = ["softmax_plugin.cu"],
     hdrs = ["softmax_plugin.h"],
@@ -117,7 +116,7 @@ cuda_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "perception_inference_tensorrt_plugins_leakyrelu_cuda",
     srcs = ["leakyReLU_plugin.cu"],
     hdrs = ["leakyReLU_plugin.h"],

@@ -109,7 +109,7 @@ pushd pcl-pcl-${VERSION}/
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_INSTALL_PREFIX="${SYSROOT_DIR}" \
         -DCMAKE_BUILD_TYPE=Release
-    make -j${THREAD_NUM}
+    make -j${THREAD_NUM} || make
     make install
 popd
 

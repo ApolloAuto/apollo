@@ -54,3 +54,15 @@ cc_library(
         ":imgproc",
     ],
 )
+
+cc_library(
+    name = "calib3d",
+    includes = ["."],
+    linkopts = [
+        "-L/opt/apollo/sysroot/lib",
+        "-lopencv_calib3d",
+    ],
+    deps = [
+        ":core",
+    ],
+)

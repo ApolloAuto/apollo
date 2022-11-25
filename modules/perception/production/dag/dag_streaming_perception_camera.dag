@@ -1,5 +1,5 @@
 module_config {
-  module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_camera.so"
+  module_library : "/opt/apollo/neo/packages/perception-dev/latest/lib/onboard/component/libperception_component_camera.so"
   components {
     class_name : "CameraObstacleDetectionComponent"
     config {

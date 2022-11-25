@@ -41,6 +41,8 @@ function geo_specific_config() {
 
 DOCKER_RUN_CMD="docker run"
 USE_GPU_HOST=0
+USE_AMD_GPU=0
+USE_NVIDIA_GPU=0
 
 function determine_gpu_use_host() {
     if [[ "${HOST_ARCH}" == "aarch64" ]]; then
@@ -49,11 +51,24 @@ function determine_gpu_use_host() {
         fi
     elif [[ "${HOST_ARCH}" == "x86_64" ]]; then
         if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-            warning "No nvidia-smi found. CPU will be used"
+            warning "No nvidia-smi found."
         elif [[ -z "$(nvidia-smi)" ]]; then
-            warning "No GPU device found. CPU will be used."
+            warning "No NVIDIA GPU device found."
         else
+            USE_NVIDIA_GPU=1
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+            warning "No rocm-smi found."
+        elif [[ -z "$(rocm-smi)" ]]; then
+            warning "No AMD GPU device found."
+        else
+            USE_AMD_GPU=1
+        fi
+        if (( $USE_NVIDIA_GPU == 1 )) || (( $USE_AMD_GPU == 1 )); then
             USE_GPU_HOST=1
+        else
+            USE_GPU_HOST=0
+            warning "No any GPU device found. CPU will be used instead."
         fi
     else
         error "Unsupported CPU architecture: ${HOST_ARCH}"
@@ -61,7 +76,7 @@ function determine_gpu_use_host() {
     fi
 
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
+    if (( $USE_NVIDIA_GPU == 1 )); then
         if [[ -x "$(which nvidia-container-toolkit)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
@@ -79,6 +94,8 @@ function determine_gpu_use_host() {
                 "and NVIDIA Container Toolkit as described by: "
             warning "  ${nv_docker_doc}"
         fi
+    elif (( $USE_AMD_GPU == 1 )); then
+        DOCKER_RUN_CMD="docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
     fi
 }
 

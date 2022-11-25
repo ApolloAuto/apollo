@@ -46,9 +46,9 @@ class CenterPointDetection : public BaseLidarDetector {
   bool Detect(const LidarDetectorOptions &options, LidarFrame *frame) override;
 
   bool Init(const StageConfig& stage_config) override;
-
+   
   bool Process(DataFrame* data_frame) override;
-
+   
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }

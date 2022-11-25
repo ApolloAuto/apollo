@@ -23,7 +23,11 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/camera/lib/interface/base_lane_detector.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
+#if GPU_PLATFORM == NVIDIA
+  #include "modules/perception/inference/tensorrt/rt_net.h"
+#elif GPU_PLATFORM == AMD
+  #include "modules/perception/inference/migraphx/mi_net.h"
+#endif
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/pipeline/proto/stage/denseline.pb.h"
 #include "modules/perception/pipeline/stage.h"

@@ -31,7 +31,7 @@ class ImageGpuPreprocessHandler {
   ~ImageGpuPreprocessHandler() { release(); }
 
   inline int set_device(int dev) {
-    BASE_CUDA_CHECK(cudaSetDevice(dev));
+    BASE_GPU_CHECK(cudaSetDevice(dev));
     return 0;
   }
   int init(const std::string &intrinsics_path, int dev);

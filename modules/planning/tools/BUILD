@@ -1,6 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,12 +21,9 @@ cc_binary(
     name = "inference_demo",
     srcs = ["inference_demo.cc"],
     deps = [
-        #"//third_party/libtorch",
+        "//third_party:libtorch",
         "@com_github_gflags_gflags//:gflags",
-    ] + if_gpu(
-        ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+    ],
 )
 
 cpplint()

@@ -71,8 +71,8 @@ class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
 
   virtual ~RPNProposalSSDPlugin() {}
 
-  virtual int initialize() { return 0; }
-  virtual void terminate() {}
+  int initialize() override { return 0; }
+  void terminate() override {}
   int getNbOutputs() const override { return 1; }
 
   nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
@@ -88,8 +88,8 @@ class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  int enqueue(int batchSize, const void *const *inputs, void **outputs,
+              void *workspace, cudaStream_t stream) override;
 
   size_t getSerializationSize() override { return 0; }
 

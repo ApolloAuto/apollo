@@ -18,3 +18,14 @@
 --use_cyber_time=true
 
 --map_dir=/apollo/modules/map/data/sunnyvale
+
+--map_dir=/apollo/modules/map/data/shalun
+
+--map_dir=/apollo/modules/map/data/apollo_virutal_map
+
+--map_dir=/apollo/modules/map/data/borregas_ave
+
+--map_dir=/apollo/modules/map/data/sunnyvale_loop
+
+--pointcloud_topic=/apollo/sensor/velodyne64/compensator/PointCloud2
+

@@ -1,6 +1,6 @@
 extrinsic_file {
     frame_id: "novatel"
-    child_frame_id: "velodyne128"
+    child_frame_id: "velodyne64"
     file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne128_novatel_extrinsics.yaml"
     enable: true
 }
@@ -13,58 +13,25 @@ extrinsic_file {
 }
 
 extrinsic_file {
-    frame_id: "velodyne128"
+    frame_id: "velodyne64"
     child_frame_id: "front_6mm"
     file_path: "/apollo/modules/perception/data/params/front_6mm_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
-    frame_id: "velodyne128"
+    frame_id: "velodyne64"
     child_frame_id: "front_12mm"
     file_path: "/apollo/modules/perception/data/params/front_12mm_extrinsics.yaml"
     enable: true
 }
 
-extrinsic_file {
-    frame_id: "novatel"
-    child_frame_id: "lidar16_front_up"
-    file_path: "/apollo/modules/drivers/lidar/velodyne/params/lidar16_front_up_novatel_extrinsics.yaml"
-    enable: true
-}
 
 extrinsic_file {
-    frame_id: "novatel"
-    child_frame_id: "lidar16_front"
-    file_path: "/apollo/modules/drivers/lidar/velodyne/params/lidar16_front_novatel_extrinsics.yaml"
-    enable: true
-}
-
-extrinsic_file {
-    frame_id: "novatel"
-    child_frame_id: "lidar16_rear_left"
-    file_path: "/apollo/modules/drivers/lidar/velodyne/params/lidar16_rear_left_novatel_extrinsics.yaml"
-    enable: true
-}
-
-extrinsic_file {
-    frame_id: "novatel"
-    child_frame_id: "lidar16_rear_right"
-    file_path: "/apollo/modules/drivers/lidar/velodyne/params/lidar16_rear_right_novatel_extrinsics.yaml"
-    enable: true
-}
-
-extrinsic_file {
-    frame_id: "velodyne128"
+    frame_id: "velodyne64"
     child_frame_id: "radar_front"
     file_path: "/apollo/modules/perception/data/params/radar_front_extrinsics.yaml"
     enable: true
 }
 
-extrinsic_file {
-    frame_id: "velodyne128"
-    child_frame_id: "radar_rear"
-    file_path: "/apollo/modules/perception/data/params/radar_rear_extrinsics.yaml"
-    enable: true
-}
 
