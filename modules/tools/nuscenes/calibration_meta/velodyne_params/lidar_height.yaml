@@ -1,0 +1,4 @@
+vehicle:
+  parameters:
+    height: 0.0
+    height_var: 0.0

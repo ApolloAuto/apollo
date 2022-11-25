@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+'''NuScenes schema class and helper class to read schema data.'''
 
 import json
 import os
@@ -228,4 +229,4 @@ class NuScenes(object):
 
       file_name = sample_data['filename']
       file_path = os.path.join(self.nuscenes_helper.dataset_root, file_name)
-      yield channel, file_path, ego_pose, timestamp
+      yield channel, file_path, ego_pose, calibrated_sensor, timestamp

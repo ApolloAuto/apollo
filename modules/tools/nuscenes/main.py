@@ -21,6 +21,7 @@ import os
 import sys
 import logging
 
+from calibration_converter import convert_calibration
 from dataset_converter import convert_dataset
 from pcd_converter import convert_pcd
 
@@ -32,22 +33,39 @@ def main(args=sys.argv):
 
   parser.add_argument(
     "-i", "--input", action="store", type=str, required=True,
-    nargs="?", const="", help="Input file or directory.")
+    help="Input file or directory.")
   parser.add_argument(
     "-o", "--output", action="store", type=str, required=False,
-    nargs="?", const="", help="Output file or directory.")
+    help="Output file or directory.")
+  parser.add_argument(
+    "-t", "--type", action="store", type=str, required=False,
+    default="rcd", choices=['rcd', 'cal', 'pcd'],
+    help="Conversion type. rcd:record, cal:calibration, pcd:pointcloud")
 
   args = parser.parse_args(args[1:])
   logging.debug(args)
 
-  if os.path.isdir(args.input):
-    if args.output is None:
-      args.output = '.'
-    convert_dataset(args.input, args.output)
-  elif os.path.isfile(args.input):
-    if args.output is None:
-      args.output = 'result.pcd'
-    convert_pcd(args.input, args.output)
+  if args.type == 'rcd':
+    if os.path.isdir(args.input):
+      if args.output is None:
+        args.output = '.'
+      convert_dataset(args.input, args.output)
+    else:
+      logging.error("Pls enter directory! Not '{}'".format(args.input))
+  elif args.type == 'cal':
+    if os.path.isdir(args.input):
+      if args.output is None:
+        args.output = '.'
+      convert_calibration(args.input, args.output)
+    else:
+      logging.error("Pls enter directory! Not '{}'".format(args.input))
+  elif args.type == 'pcd':
+    if os.path.isfile(args.input):
+      if args.output is None:
+        args.output = 'result.pcd'
+      convert_pcd(args.input, args.output)
+    else:
+      logging.error("Pls enter file! Not '{}'".format(args.input))
   else:
     logging.error("Input error! '{}'".format(args.input))
 
