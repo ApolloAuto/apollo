@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+'''Generate apollo record file by nuscenes raw sensor data.'''
 
 import os
 import logging
@@ -29,6 +30,12 @@ from nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
 LOCALIZATION_TOPIC = '/apollo/localization/pose'
 
 def dataset_to_record(nuscenes, record_root_path):
+  """Construct record message and save it as record
+
+  Args:
+      nuscenes (_type_): nuscenes(one scene)
+      record_root_path (str): record file saved path
+  """
   image_builder = ImageBuilder()
   pc_builder = PointCloudBuilder()
   localization_builder = LocalizationBuilder()
@@ -37,7 +44,7 @@ def dataset_to_record(nuscenes, record_root_path):
   record_file_path = os.path.join(record_root_path, record_file_name)
 
   with Record(record_file_path, mode='w') as record:
-    for c, f, ego_pose, t in nuscenes:
+    for c, f, ego_pose, calibrated_sensor, t in nuscenes:
       logging.debug("{}, {}, {}, {}".format(c, f, ego_pose, t))
       pb_msg = None
       if c.startswith('CAM'):
@@ -55,6 +62,12 @@ def dataset_to_record(nuscenes, record_root_path):
         record.write(LOCALIZATION_TOPIC, pb_msg, ego_pose_t*1000)
 
 def convert_dataset(dataset_path, record_path):
+  """Generate apollo record file by nuscenes dataset
+
+  Args:
+      dataset_path (str): nuscenes dataset path
+      record_path (str): record file saved path
+  """
   nuscenes_schema = NuScenesSchema(dataroot=dataset_path)
   n_helper = NuScenesHelper(nuscenes_schema)
 

@@ -1,0 +1,19 @@
+leverarm:
+  primary:
+    offset:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    uncertainty:
+      x: 0.05
+      y: 0.05
+      z: 0.08
+  secondary:
+    offset:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    uncertainty:
+      x: 0.05
+      y: 0.05
+      z: 0.08
