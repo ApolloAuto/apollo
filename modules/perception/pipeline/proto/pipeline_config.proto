@@ -9,6 +9,8 @@ import "modules/perception/pipeline/proto/lidar_detection_config.proto";
 import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
 import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
+import "modules/perception/pipeline/proto/stage/bev_obstacle_detection_config.proto";
+import "modules/perception/pipeline/proto/stage/camera_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/center_point_detection_config.proto";
@@ -122,9 +124,11 @@ enum StageType {
 
   // detectors
   // camera detectors
+  BEV_OBSTACLE_DETECTOR = 20;
   SMOKE_OBSTACLE_DETECTION = 21;
   YOLO_OBSTACLE_DETECTOR = 22;
   YOLOV4_OBSTACLE_DETECTOR = 23;
+
   // lane detectors
   DARKSCNN_LANE_DETECTOR = 24;
   DENSELINE_LANE_DETECTOR = 25;
@@ -182,7 +186,9 @@ message StageConfig {
 
   repeated PluginConfig plugin_config = 3;
 
-  reserved 4 to 9;
+  optional string type = 4;
+
+  reserved 5 to 9;
 
   oneof stage_config {
 
@@ -218,6 +224,8 @@ message StageConfig {
     camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
     camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
     camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
+    camera.BEVObstacleDetectionConfig bev_obstacle_detection_config = 65;
+    camera.CameraDetectorConfig camera_detector_config = 66;
 
     fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;

@@ -139,6 +139,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "camera_detector_config_cc_proto",
+    deps = [
+        ":camera_detector_config_proto",
+    ],
+)
+
+proto_library(
+    name = "camera_detector_config_proto",
+    srcs = ["camera_detector_config.proto"],
+)
+
+py_proto_library(
+    name = "camera_detector_config_py_pb2",
+    deps = [
+        ":camera_detector_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "point_pillars_detection_config_cc_proto",
     deps = [
         ":point_pillars_detection_config_proto",
@@ -329,6 +348,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "bev_detection_config_cc_proto",
+    deps = [
+        ":bev_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "bev_detection_config_proto",
+    srcs = ["bev_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "bev_detection_config_py_pb2",
+    deps = [
+        ":bev_detection_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "denseline_cc_proto",
     deps = [
         ":denseline_proto",
@@ -439,6 +477,25 @@ py_proto_library(
     name = "camera_detection_postprocessor_config_py_pb2",
     deps = [
         ":camera_detection_postprocessor_config_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "bev_obstacle_detection_config_cc_proto",
+    deps = [
+        ":bev_obstacle_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "bev_obstacle_detection_config_proto",
+    srcs = ["bev_obstacle_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "bev_obstacle_detection_config_py_pb2",
+    deps = [
+        ":bev_obstacle_detection_config_proto",
     ],
 )
 

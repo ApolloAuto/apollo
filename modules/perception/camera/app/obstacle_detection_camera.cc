@@ -167,28 +167,21 @@ bool ObstacleDetectionCamera::Init(const PipelineConfig &pipeline_config) {
   std::string work_root = GetCyberWorkRoot();
   // Init detector
 
-  // wxt todo: remove this init to smoke stage
-  SmokeObstacleDetectionConfig smoke_obstacle_det_config =
-      (stage_config_map_.at(StageType::SMOKE_OBSTACLE_DETECTION))
-          .smoke_obstacle_detection_config();
-  std::string config_file =
-      GetAbsolutePath(smoke_obstacle_det_config.root_dir(),
-                      smoke_obstacle_det_config.conf_file());
-  config_file = GetAbsolutePath(work_root, config_file);
-  ACHECK(cyber::common::GetProtoFromFile(config_file, &smoke_param_))
-      << "Read config failed: " << config_file;
-  // ACHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
-
-  // Init detector
-  base::BaseCameraModelPtr model;
-
-  model = common::SensorManager::Instance()->GetUndistortCameraModel(
-      smoke_obstacle_det_config.camera_name());
-
-  auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
-  name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
-      smoke_obstacle_det_config.camera_name(),
-      pinhole->get_intrinsic_params()));
+for (const auto stage_ptr : stage_ptrs_) {
+    if (stage_ptr->stage_config_.type() == "camera_detector") {
+      base::BaseCameraModelPtr model;
+      auto stage_config = stage_ptr->stage_config_;
+      std::string camera_name =
+          stage_config.camera_detector_config().camera_name();
+      model = common::SensorManager::Instance()->GetUndistortCameraModel(
+          camera_name);
+      auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
+      name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
+          camera_name, pinhole->get_intrinsic_params()));
+    } else {
+      continue;
+    }
+  }
 
   // Init tracker
   // Init transformer
