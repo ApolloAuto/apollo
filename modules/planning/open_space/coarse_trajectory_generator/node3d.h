@@ -24,9 +24,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/proto/planner_open_space_config.pb.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
-#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -69,6 +70,8 @@ class Node3d {
   void SetTrajCost(double cost) { traj_cost_ = cost; }
   void SetHeuCost(double cost) { heuristic_cost_ = cost; }
   void SetSteer(double steering) { steering_ = steering; }
+  void SetVisited() { visited_ = true; }
+  bool IsVisited() const { return visited_; }
 
  private:
   static std::string ComputeStringIndex(int x_grid, int y_grid, int phi_grid);
@@ -92,6 +95,7 @@ class Node3d {
   double steering_ = 0.0;
   // true for moving forward and false for moving backward
   bool direction_ = true;
+  bool visited_ = false;
 };
 
 }  // namespace planning
