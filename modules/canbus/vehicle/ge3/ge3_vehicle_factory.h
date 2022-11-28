@@ -57,14 +57,14 @@ class Ge3VehicleFactory : public AbstractVehicleFactory {
   virtual ~Ge3VehicleFactory() = default;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief init vehicle factory
+   * @returns true if successfully initialized
    */
   bool Init(const CanbusConf *canbus_conf) override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief start canclient, cansender, canreceiver, vehicle controller
+   * @returns true if successfully started
    */
   bool Start() override;
 
@@ -75,19 +75,20 @@ class Ge3VehicleFactory : public AbstractVehicleFactory {
   void Stop() override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief update control command
    */
   void UpdateCommand(
       const apollo::control::ControlCommand *control_command) override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief publish chassis messages
+   */
+  Chassis publish_chassis() override;
+
+  /**
+   * @brief publish chassis for vehicle messages
    */
   void PublishChassisDetail() override;
-
-  Chassis publish_chassis() override;
 
  private:
   /**

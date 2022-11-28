@@ -56,15 +56,15 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
    */
   virtual ~ZhongyunVehicleFactory() = default;
 
-/**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+  /**
+   * @brief init vehicle factory
+   * @returns true if successfully initialized
    */
   bool Init(const CanbusConf *canbus_conf) override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief start canclient, cansender, canreceiver, vehicle controller
+   * @returns true if successfully started
    */
   bool Start() override;
 
@@ -75,30 +75,31 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
   void Stop() override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief update control command
    */
   void UpdateCommand(
       const apollo::control::ControlCommand *control_command) override;
 
   /**
-   * @brief create ch vehicle controller
-   * @returns a unique_ptr that points to the created controller
+   * @brief publish chassis messages
+   */
+  Chassis publish_chassis() override;
+
+  /**
+   * @brief publish chassis for vehicle messages
    */
   void PublishChassisDetail() override;
 
-  Chassis publish_chassis() override;
-
  private:
   /**
-   * @brief create ch vehicle controller
+   * @brief create zhongyun vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
   std::unique_ptr<VehicleController<::apollo::canbus::Zhongyun>>
   CreateVehicleController();
 
   /**
-   * @brief create ch message manager
+   * @brief create zhongyun message manager
    * @returns a unique_ptr that points to the created message manager
    */
   std::unique_ptr<MessageManager<::apollo::canbus::Zhongyun>> CreateMessageManager();
