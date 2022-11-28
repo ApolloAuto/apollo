@@ -31,12 +31,12 @@ Accelrpt68::Accelrpt68() {}
 const int32_t Accelrpt68::ID = 0x68;
 
 void Accelrpt68::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_manual_input(
+                       Gem* chassis) const {
+  chassis->mutable_accel_rpt_68()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_commanded_value(
+  chassis->mutable_accel_rpt_68()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_accel_rpt_68()->set_output_value(
+  chassis->mutable_accel_rpt_68()->set_output_value(
       output_value(bytes, length));
 }
 

@@ -30,14 +30,14 @@ class Brakemotorrpt271Test : public ::testing::Test {
 TEST_F(Brakemotorrpt271Test, reset) {
   Brakemotorrpt271 brakermotor2;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   brakermotor2.Parse(bytes, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().brake_motor_rpt_2_71().encoder_temperature(), 218);
+      chassis_detail.brake_motor_rpt_2_71().encoder_temperature(), 218);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().brake_motor_rpt_2_71().motor_temperature(), 732);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().brake_motor_rpt_2_71().angular_speed(),
+      chassis_detail.brake_motor_rpt_2_71().motor_temperature(), 732);
+  EXPECT_DOUBLE_EQ(chassis_detail.brake_motor_rpt_2_71().angular_speed(),
                    286397.20400000003);
 }
 

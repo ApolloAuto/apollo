@@ -31,12 +31,12 @@ Wiperrpt91::Wiperrpt91() {}
 const int32_t Wiperrpt91::ID = 0x91;
 
 void Wiperrpt91::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_wiper_rpt_91()->set_output_value(
+                       Gem* chassis) const {
+  chassis->mutable_wiper_rpt_91()->set_output_value(
       output_value(bytes, length));
-  chassis->mutable_gem()->mutable_wiper_rpt_91()->set_commanded_value(
+  chassis->mutable_wiper_rpt_91()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_wiper_rpt_91()->set_manual_input(
+  chassis->mutable_wiper_rpt_91()->set_manual_input(
       manual_input(bytes, length));
 }
 

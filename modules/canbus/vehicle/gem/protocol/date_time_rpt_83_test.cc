@@ -30,15 +30,15 @@ class Datetimerpt83Test : public ::testing::Test {
 TEST_F(Datetimerpt83Test, reset) {
   Datetimerpt83 datetime;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   datetime.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().time_second(), 18);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().time_minute(), 17);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().time_hour(), 4);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().date_day(), 4);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().date_month(), 3);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().date_time_rpt_83().date_year(), 2001);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().time_second(), 18);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().time_minute(), 17);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().time_hour(), 4);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().date_day(), 4);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().date_month(), 3);
+  EXPECT_DOUBLE_EQ(chassis_detail.date_time_rpt_83().date_year(), 2001);
 }
 
 }  // namespace gem

@@ -31,12 +31,12 @@ Steeringrpt16e::Steeringrpt16e() {}
 const int32_t Steeringrpt16e::ID = 0x6E;
 
 void Steeringrpt16e::Parse(const std::uint8_t* bytes, int32_t length,
-                           ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_manual_input(
+                           Gem* chassis) const {
+  chassis->mutable_steering_rpt_1_6e()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_commanded_value(
+  chassis->mutable_steering_rpt_1_6e()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_steering_rpt_1_6e()->set_output_value(
+  chassis->mutable_steering_rpt_1_6e()->set_output_value(
       output_value(bytes, length));
 }
 

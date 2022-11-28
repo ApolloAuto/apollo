@@ -31,14 +31,14 @@ Brakerpt6c::Brakerpt6c() {}
 const int32_t Brakerpt6c::ID = 0x6C;
 
 void Brakerpt6c::Parse(const std::uint8_t* bytes, int32_t length,
-                       ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_rpt_6c()->set_manual_input(
+                       Gem* chassis) const {
+  chassis->mutable_brake_rpt_6c()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_brake_rpt_6c()->set_commanded_value(
+  chassis->mutable_brake_rpt_6c()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_brake_rpt_6c()->set_output_value(
+  chassis->mutable_brake_rpt_6c()->set_output_value(
       output_value(bytes, length));
-  chassis->mutable_gem()->mutable_brake_rpt_6c()->set_brake_on_off(
+  chassis->mutable_brake_rpt_6c()->set_brake_on_off(
       brake_on_off(bytes, length));
 }
 

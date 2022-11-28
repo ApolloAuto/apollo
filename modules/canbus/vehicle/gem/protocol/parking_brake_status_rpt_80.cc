@@ -31,10 +31,9 @@ Parkingbrakestatusrpt80::Parkingbrakestatusrpt80() {}
 const int32_t Parkingbrakestatusrpt80::ID = 0x80;
 
 void Parkingbrakestatusrpt80::Parse(const std::uint8_t* bytes, int32_t length,
-                                    ChassisDetail* chassis) const {
-  chassis->mutable_gem()
-      ->mutable_parking_brake_status_rpt_80()
-      ->set_parking_brake_enabled(parking_brake_enabled(bytes, length));
+                                    Gem* chassis) const {
+  chassis->mutable_parking_brake_status_rpt_80()->set_parking_brake_enabled(
+      parking_brake_enabled(bytes, length));
 }
 
 // config detail: {'name': 'parking_brake_enabled', 'enum': {0:

@@ -30,15 +30,15 @@ class Steeringrpt16eTest : public ::testing::Test {
 TEST_F(Steeringrpt16eTest, reset) {
   Steeringrpt16e steeringrpt16;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   steeringrpt16.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().manual_input(),
+  EXPECT_DOUBLE_EQ(chassis_detail.steering_rpt_1_6e().manual_input(),
                    0.258);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().commanded_value(),
+  EXPECT_DOUBLE_EQ(chassis_detail.steering_rpt_1_6e().commanded_value(),
                    0.772);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().output_value(),
+  EXPECT_DOUBLE_EQ(chassis_detail.steering_rpt_1_6e().output_value(),
                    4.37);
 }
 

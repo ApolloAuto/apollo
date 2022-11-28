@@ -18,13 +18,14 @@
 
 #include <string>
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/gem/gem_message_manager.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
+#include "cyber/common/file.h"
+#include "modules/canbus/vehicle/gem/gem_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -45,7 +46,7 @@ class GemControllerTest : public ::testing::Test {
 
  protected:
   GemController controller_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<::apollo::canbus::Gem> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   GemMessageManager msg_manager_;

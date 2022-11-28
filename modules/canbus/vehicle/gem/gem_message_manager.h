@@ -15,7 +15,8 @@ limitations under the License.
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/gem/proto/gem.pb.h"
+
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {
@@ -24,8 +25,7 @@ namespace gem {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class GemMessageManager
-    : public MessageManager<::apollo::canbus::ChassisDetail> {
+class GemMessageManager : public MessageManager<::apollo::canbus::Gem> {
  public:
   GemMessageManager();
   virtual ~GemMessageManager();

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/gem/proto/gem.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
@@ -24,12 +24,12 @@ namespace canbus {
 namespace gem {
 
 class Shiftrpt66 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::Gem> {
  public:
   static const int32_t ID;
   Shiftrpt66();
   void Parse(const std::uint8_t* bytes, int32_t length,
-             ChassisDetail* chassis) const override;
+             Gem* chassis) const override;
 
  private:
   // config detail: {'name': 'MANUAL_INPUT', 'enum': {0: 'MANUAL_INPUT_PARK', 1:

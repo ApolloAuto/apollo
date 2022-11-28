@@ -31,18 +31,18 @@ Datetimerpt83::Datetimerpt83() {}
 const int32_t Datetimerpt83::ID = 0x83;
 
 void Datetimerpt83::Parse(const std::uint8_t* bytes, int32_t length,
-                          ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_time_second(
+                          Gem* chassis) const {
+  chassis->mutable_date_time_rpt_83()->set_time_second(
       time_second(bytes, length));
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_time_minute(
+  chassis->mutable_date_time_rpt_83()->set_time_minute(
       time_minute(bytes, length));
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_time_hour(
+  chassis->mutable_date_time_rpt_83()->set_time_hour(
       time_hour(bytes, length));
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_date_day(
+  chassis->mutable_date_time_rpt_83()->set_date_day(
       date_day(bytes, length));
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_date_month(
+  chassis->mutable_date_time_rpt_83()->set_date_month(
       date_month(bytes, length));
-  chassis->mutable_gem()->mutable_date_time_rpt_83()->set_date_year(
+  chassis->mutable_date_time_rpt_83()->set_date_year(
       date_year(bytes, length));
 }
 

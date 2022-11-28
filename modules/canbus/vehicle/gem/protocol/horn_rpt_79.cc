@@ -31,12 +31,12 @@ Hornrpt79::Hornrpt79() {}
 const int32_t Hornrpt79::ID = 0x79;
 
 void Hornrpt79::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_horn_rpt_79()->set_output_value(
+                      Gem* chassis) const {
+  chassis->mutable_horn_rpt_79()->set_output_value(
       output_value(bytes, length));
-  chassis->mutable_gem()->mutable_horn_rpt_79()->set_commanded_value(
+  chassis->mutable_horn_rpt_79()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_horn_rpt_79()->set_manual_input(
+  chassis->mutable_horn_rpt_79()->set_manual_input(
       manual_input(bytes, length));
 }
 

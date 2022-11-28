@@ -31,12 +31,12 @@ Turnrpt64::Turnrpt64() {}
 const int32_t Turnrpt64::ID = 0x64;
 
 void Turnrpt64::Parse(const std::uint8_t* bytes, int32_t length,
-                      ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_turn_rpt_64()->set_manual_input(
+                      Gem* chassis) const {
+  chassis->mutable_turn_rpt_64()->set_manual_input(
       manual_input(bytes, length));
-  chassis->mutable_gem()->mutable_turn_rpt_64()->set_commanded_value(
+  chassis->mutable_turn_rpt_64()->set_commanded_value(
       commanded_value(bytes, length));
-  chassis->mutable_gem()->mutable_turn_rpt_64()->set_output_value(
+  chassis->mutable_turn_rpt_64()->set_output_value(
       output_value(bytes, length));
 }
 

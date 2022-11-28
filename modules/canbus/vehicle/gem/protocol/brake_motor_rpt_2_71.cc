@@ -31,13 +31,12 @@ Brakemotorrpt271::Brakemotorrpt271() {}
 const int32_t Brakemotorrpt271::ID = 0x71;
 
 void Brakemotorrpt271::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_gem()
-      ->mutable_brake_motor_rpt_2_71()
-      ->set_encoder_temperature(encoder_temperature(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_motor_temperature(
+                             Gem* chassis) const {
+  chassis->mutable_brake_motor_rpt_2_71()->set_encoder_temperature(
+      encoder_temperature(bytes, length));
+  chassis->mutable_brake_motor_rpt_2_71()->set_motor_temperature(
       motor_temperature(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_2_71()->set_angular_speed(
+  chassis->mutable_brake_motor_rpt_2_71()->set_angular_speed(
       angular_speed(bytes, length));
 }
 

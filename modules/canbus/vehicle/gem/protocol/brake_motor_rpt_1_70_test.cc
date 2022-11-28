@@ -30,12 +30,12 @@ class Brakemotorrpt170Test : public ::testing::Test {
 TEST_F(Brakemotorrpt170Test, reset) {
   Brakemotorrpt170 brakermotor1;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   brakermotor1.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().brake_motor_rpt_1_70().motor_current(),
+  EXPECT_DOUBLE_EQ(chassis_detail.brake_motor_rpt_1_70().motor_current(),
                    16909.060000000001);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().brake_motor_rpt_1_70().shaft_position(),
+  EXPECT_DOUBLE_EQ(chassis_detail.brake_motor_rpt_1_70().shaft_position(),
                    286397.20400000003);
 }
 

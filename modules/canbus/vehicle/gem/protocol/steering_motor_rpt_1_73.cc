@@ -31,10 +31,10 @@ Steeringmotorrpt173::Steeringmotorrpt173() {}
 const int32_t Steeringmotorrpt173::ID = 0x73;
 
 void Steeringmotorrpt173::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_steering_motor_rpt_1_73()->set_motor_current(
+                                Gem* chassis) const {
+  chassis->mutable_steering_motor_rpt_1_73()->set_motor_current(
       motor_current(bytes, length));
-  chassis->mutable_gem()->mutable_steering_motor_rpt_1_73()->set_shaft_position(
+  chassis->mutable_steering_motor_rpt_1_73()->set_shaft_position(
       shaft_position(bytes, length));
 }
 

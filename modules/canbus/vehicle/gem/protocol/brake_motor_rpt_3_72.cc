@@ -31,10 +31,10 @@ Brakemotorrpt372::Brakemotorrpt372() {}
 const int32_t Brakemotorrpt372::ID = 0x72;
 
 void Brakemotorrpt372::Parse(const std::uint8_t* bytes, int32_t length,
-                             ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_output(
+                             Gem* chassis) const {
+  chassis->mutable_brake_motor_rpt_3_72()->set_torque_output(
       torque_output(bytes, length));
-  chassis->mutable_gem()->mutable_brake_motor_rpt_3_72()->set_torque_input(
+  chassis->mutable_brake_motor_rpt_3_72()->set_torque_input(
       torque_input(bytes, length));
 }
 

@@ -18,6 +18,7 @@
 
 #include <cmath>
 
+#include "modules/canbus/vehicle/gem/proto/gem.pb.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
@@ -31,6 +32,7 @@ namespace apollo {
 namespace canbus {
 namespace gem {
 
+// using ::apollo::canbus::gem;
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
@@ -45,8 +47,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode GemController::Init(
     const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
+    CanSender<::apollo::canbus::Gem>* const can_sender,
+    MessageManager<::apollo::canbus::Gem>* const message_manager) {
   if (is_initialized_) {
     AINFO << "GemController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
@@ -155,7 +157,7 @@ void GemController::Stop() {
 Chassis GemController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -170,10 +172,10 @@ Chassis GemController::chassis() {
   chassis_.set_engine_started(true);
 
   // 5
-  if (chassis_detail.gem().has_vehicle_speed_rpt_6f() &&
-      chassis_detail.gem().vehicle_speed_rpt_6f().has_vehicle_speed()) {
+  if (chassis_detail.has_vehicle_speed_rpt_6f() &&
+      chassis_detail.vehicle_speed_rpt_6f().has_vehicle_speed()) {
     chassis_.set_speed_mps(static_cast<float>(
-        chassis_detail.gem().vehicle_speed_rpt_6f().vehicle_speed()));
+        chassis_detail.vehicle_speed_rpt_6f().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -181,36 +183,36 @@ Chassis GemController::chassis() {
   // 7
   chassis_.set_fuel_range_m(0);
   // 8
-  if (chassis_detail.gem().has_accel_rpt_68() &&
-      chassis_detail.gem().accel_rpt_68().has_output_value()) {
+  if (chassis_detail.has_accel_rpt_68() &&
+      chassis_detail.accel_rpt_68().has_output_value()) {
     chassis_.set_throttle_percentage(
-        static_cast<float>(chassis_detail.gem().accel_rpt_68().output_value()));
+        static_cast<float>(chassis_detail.accel_rpt_68().output_value()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
-  if (chassis_detail.gem().has_brake_rpt_6c() &&
-      chassis_detail.gem().brake_rpt_6c().has_output_value()) {
+  if (chassis_detail.has_brake_rpt_6c() &&
+      chassis_detail.brake_rpt_6c().has_output_value()) {
     chassis_.set_brake_percentage(
-        static_cast<float>(chassis_detail.gem().brake_rpt_6c().output_value()));
+        static_cast<float>(chassis_detail.brake_rpt_6c().output_value()));
   } else {
     chassis_.set_brake_percentage(0);
   }
 
   // 23, previously 10
-  if (chassis_detail.gem().has_shift_rpt_66() &&
-      chassis_detail.gem().shift_rpt_66().has_output_value()) {
+  if (chassis_detail.has_shift_rpt_66() &&
+      chassis_detail.shift_rpt_66().has_output_value()) {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
+    if (chassis_detail.shift_rpt_66().output_value() ==
         Shift_rpt_66::OUTPUT_VALUE_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
+    if (chassis_detail.shift_rpt_66().output_value() ==
         Shift_rpt_66::OUTPUT_VALUE_REVERSE) {
       gear_pos = Chassis::GEAR_REVERSE;
     }
-    if (chassis_detail.gem().shift_rpt_66().output_value() ==
+    if (chassis_detail.shift_rpt_66().output_value() ==
         Shift_rpt_66::OUTPUT_VALUE_FORWARD) {
       gear_pos = Chassis::GEAR_DRIVE;
     }
@@ -222,18 +224,18 @@ Chassis GemController::chassis() {
 
   // 11
   // TODO(QiL) : verify the unit here.
-  if (chassis_detail.gem().has_steering_rpt_1_6e() &&
-      chassis_detail.gem().steering_rpt_1_6e().has_output_value()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.gem().steering_rpt_1_6e().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle()));
+  if (chassis_detail.has_steering_rpt_1_6e() &&
+      chassis_detail.steering_rpt_1_6e().has_output_value()) {
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.steering_rpt_1_6e().output_value() *
+                           100.0 / vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
 
-  if (chassis_detail.gem().has_global_rpt_6a() &&
-      chassis_detail.gem().global_rpt_6a().has_pacmod_status()) {
-    if (chassis_detail.gem().global_rpt_6a().pacmod_status() ==
+  if (chassis_detail.has_global_rpt_6a() &&
+      chassis_detail.global_rpt_6a().has_pacmod_status()) {
+    if (chassis_detail.global_rpt_6a().pacmod_status() ==
         Global_rpt_6a::PACMOD_STATUS_CONTROL_ENABLED) {
       chassis_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
       global_cmd_69_->set_clear_override(
@@ -442,7 +444,7 @@ void GemController::Steer(double angle, double angle_spd) {
   const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
 
   const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      ProtocolData<::apollo::canbus::Gem>::BoundedValue(
           vehicle_params_.min_steer_angle_rate(),
           vehicle_params_.max_steer_angle_rate(),
           vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);

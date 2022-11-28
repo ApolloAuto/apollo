@@ -31,10 +31,10 @@ Steeringmotorrpt375::Steeringmotorrpt375() {}
 const int32_t Steeringmotorrpt375::ID = 0x75;
 
 void Steeringmotorrpt375::Parse(const std::uint8_t* bytes, int32_t length,
-                                ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_steering_motor_rpt_3_75()->set_torque_output(
+                                Gem* chassis) const {
+  chassis->mutable_steering_motor_rpt_3_75()->set_torque_output(
       torque_output(bytes, length));
-  chassis->mutable_gem()->mutable_steering_motor_rpt_3_75()->set_torque_input(
+  chassis->mutable_steering_motor_rpt_3_75()->set_torque_input(
       torque_input(bytes, length));
 }
 

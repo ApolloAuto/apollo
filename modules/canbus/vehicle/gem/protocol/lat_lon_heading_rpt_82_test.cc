@@ -30,23 +30,23 @@ class Latlonheadingrpt82Test : public ::testing::Test {
 TEST_F(Latlonheadingrpt82Test, reset) {
   Latlonheadingrpt82 Latlonheading;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Gem chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   Latlonheading.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().lat_lon_heading_rpt_82().heading(),
+  EXPECT_DOUBLE_EQ(chassis_detail.lat_lon_heading_rpt_82().heading(),
                    48.84);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().longitude_seconds(), 18);
+      chassis_detail.lat_lon_heading_rpt_82().longitude_seconds(), 18);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().longitude_minutes(), 17);
+      chassis_detail.lat_lon_heading_rpt_82().longitude_minutes(), 17);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().longitude_degrees(), 4);
+      chassis_detail.lat_lon_heading_rpt_82().longitude_degrees(), 4);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().latitude_seconds(), 3);
+      chassis_detail.lat_lon_heading_rpt_82().latitude_seconds(), 3);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().latitude_minutes(), 2);
+      chassis_detail.lat_lon_heading_rpt_82().latitude_minutes(), 2);
   EXPECT_DOUBLE_EQ(
-      chassis_detail.gem().lat_lon_heading_rpt_82().latitude_degrees(), 1);
+      chassis_detail.lat_lon_heading_rpt_82().latitude_degrees(), 1);
 }
 
 }  // namespace gem

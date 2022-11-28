@@ -31,8 +31,8 @@ Yawraterpt81::Yawraterpt81() {}
 const int32_t Yawraterpt81::ID = 0x81;
 
 void Yawraterpt81::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_gem()->mutable_yaw_rate_rpt_81()->set_yaw_rate(
+                         Gem* chassis) const {
+  chassis->mutable_yaw_rate_rpt_81()->set_yaw_rate(
       yaw_rate(bytes, length));
 }
 
