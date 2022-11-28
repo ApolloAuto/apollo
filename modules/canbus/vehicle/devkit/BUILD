@@ -18,7 +18,7 @@ cc_library(
     deps = [
         ":devkit_controller",
         ":devkit_message_manager",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
@@ -76,7 +76,7 @@ cc_library(
     copts = CANBUS_COPTS,
     deps = [
         ":devkit_message_manager",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/canbus/proto:canbus_conf_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/canbus/vehicle/devkit/proto:devkit_cc_proto",

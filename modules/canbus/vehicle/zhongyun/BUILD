@@ -14,7 +14,7 @@ cc_library(
     deps = [
         ":zhongyun_controller",
         ":zhongyun_message_manager",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/canbus/vehicle:abstract_vehicle_factory",

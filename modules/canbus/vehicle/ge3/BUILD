@@ -14,7 +14,7 @@ cc_library(
     deps = [
         ":ge3_controller",
         ":ge3_message_manager",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",

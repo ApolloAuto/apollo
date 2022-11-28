@@ -14,7 +14,7 @@ cc_library(
     alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",

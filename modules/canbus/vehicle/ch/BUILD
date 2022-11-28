@@ -14,7 +14,7 @@ cc_library(
     deps = [
         ":ch_controller",
         ":ch_message_manager",
-        "//modules/canbus/common:canbus_common",
+        "//modules/canbus/common:canbus_gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
