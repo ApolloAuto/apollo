@@ -60,6 +60,8 @@ struct CameraFrame {
   std::vector<base::TrafficLightPtr> traffic_lights;
   // camera intrinsics
   Eigen::Matrix3f camera_k_matrix = Eigen::Matrix3f::Identity();
+  // camera extrinsics
+  Eigen::Matrix4d camera_extrinsic = Eigen::Matrix4d::Identity();
   // narrow to obstacle projected_matrix
   Eigen::Matrix3d project_matrix = Eigen::Matrix3d::Identity();
   // camera to world pose

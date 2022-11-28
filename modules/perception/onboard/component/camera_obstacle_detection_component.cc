@@ -725,6 +725,7 @@ int CameraObstacleDetectionComponent::InternalProc(
   // Fill camera frame
   // frame_size != 0, see InitCameraFrames()
   camera_frame.camera2world_pose = camera2world_trans;
+  camera_frame.camera_extrinsic = extrinsic_map_.at(camera_name);
   camera_frame.data_provider = data_providers_map_[camera_name].get();
   camera_frame.data_provider->FillImageData(
       image_height_, image_width_,
