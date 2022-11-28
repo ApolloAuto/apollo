@@ -173,8 +173,8 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  ACHECK(!config.modes().empty()) << "No modes config loaded from "
-                                  << FLAGS_hmi_modes_config_path;
+  ACHECK(!config.modes().empty())
+      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
@@ -591,6 +591,18 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
     WLock wlock(status_mutex_);
     if (status_.current_vehicle() == vehicle_name) {
       return;
+    }
+    try {
+      // try to get vehicle type from calibration data directory
+      // TODO: add vehicle config specs and move to vehicle config
+      const std::string vehicle_type_file_path = *vehicle_dir + "/vehicle_type";
+      std::string vehicle_type_str;
+      cyber::common::GetContent(vehicle_type_file_path, &vehicle_type_str);
+      int vehicle_type = std::stoi(vehicle_type_str);
+      status_.set_current_vehicle_type(vehicle_type);
+    } catch (const std::exception &e) {
+      AWARN << "get vehicle type config failed: " << e.what();
+      status_.clear_current_vehicle_type();
     }
     status_.set_current_vehicle(vehicle_name);
     status_changed_ = true;
