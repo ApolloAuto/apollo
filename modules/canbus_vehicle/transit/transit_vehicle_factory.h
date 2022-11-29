@@ -102,14 +102,16 @@ class TransitVehicleFactory : public AbstractVehicleFactory {
    * @brief create transit message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::Transit>> CreateMessageManager();
+  std::unique_ptr<MessageManager<::apollo::canbus::Transit>>
+  CreateMessageManager();
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<::apollo::canbus::Transit> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Transit> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Transit>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Transit>> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Transit>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Transit>>
       chassis_detail_writer_;

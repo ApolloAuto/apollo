@@ -33,16 +33,20 @@ const int32_t Llcmotioncommandfeedback122::ID = 0x22;
 void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes,
                                         int32_t length,
                                         Transit* chassis) const {
-  chassis->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_steeringanglesetpoint(
-      llc_fbk_steeringanglesetpoint(bytes, length));
-  chassis->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_throttlesetpoint(
-      llc_fbk_throttlesetpoint(bytes, length));
-  chassis->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_brakepercentsetpoint(
-      llc_fbk_brakepercentsetpoint(bytes, length));
-  chassis->mutable_llc_motioncommandfeedback1_22()->set_llc_motioncommandfeedback1_count(
-      llc_motioncommandfeedback1_count(bytes, length));
-  chassis->mutable_llc_motioncommandfeedback1_22()->set_llc_motioncommandfeedback1_check(
-      llc_motioncommandfeedback1_check(bytes, length));
+  chassis->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_steeringanglesetpoint(
+          llc_fbk_steeringanglesetpoint(bytes, length));
+  chassis->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_throttlesetpoint(llc_fbk_throttlesetpoint(bytes, length));
+  chassis->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_brakepercentsetpoint(
+          llc_fbk_brakepercentsetpoint(bytes, length));
+  chassis->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_motioncommandfeedback1_count(
+          llc_motioncommandfeedback1_count(bytes, length));
+  chassis->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_motioncommandfeedback1_check(
+          llc_motioncommandfeedback1_check(bytes, length));
 }
 
 // config detail: {'description': 'Steering angle setpoint (after limits)',
