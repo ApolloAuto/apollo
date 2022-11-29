@@ -37,7 +37,8 @@ namespace apollo {
 namespace canbus {
 namespace transit {
 
-class TransitController final : public VehicleController<::apollo::canbus::Transit> {
+class TransitController final
+    : public VehicleController<::apollo::canbus::Transit> {
  public:
   TransitController() {}
 

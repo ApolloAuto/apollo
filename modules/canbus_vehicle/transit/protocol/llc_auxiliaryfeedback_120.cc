@@ -35,9 +35,9 @@ void Llcauxiliaryfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_inverter(
       llc_fbk_inverter(bytes, length));
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch8(
-    llc_fbk_pdu_ch8(bytes, length));
+      llc_fbk_pdu_ch8(bytes, length));
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch7(
-    llc_fbk_pdu_ch7(bytes, length));
+      llc_fbk_pdu_ch7(bytes, length));
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch6(
       llc_fbk_pdu_ch6(bytes, length));
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_pdu_ch5(
@@ -66,8 +66,9 @@ void Llcauxiliaryfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
       llc_fbk_highbeam(bytes, length));
   chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_ledredon(
       llc_fbk_ledredon(bytes, length));
-  chassis->mutable_llc_auxiliaryfeedback_120()->set_llc_fbk_autonomybuttonpressed(
-      llc_fbk_autonomybuttonpressed(bytes, length));
+  chassis->mutable_llc_auxiliaryfeedback_120()
+      ->set_llc_fbk_autonomybuttonpressed(
+          llc_fbk_autonomybuttonpressed(bytes, length));
 }
 
 // config detail: {'description': 'Inverter enabled', 'offset': 0.0,
