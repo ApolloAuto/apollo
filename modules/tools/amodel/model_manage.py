@@ -236,21 +236,22 @@ def amodel_install(model_path):
 
   # unzip model file
   _, tail = os.path.split(model_path)
-  extract_path = os.path.join(UNZIP_TMP_DIR, tail)
-  is_success = unzip_file(model_path, extract_path)
+  model_name = tail.split('.')[0]
+  is_success = unzip_file(model_path, UNZIP_TMP_DIR)
   if not is_success:
     print("Zip file {} not found.".format(model_path))
     return
 
   # read meta file
   model_meta = ModelMeta()
-  meta_file = os.path.join(extract_path, MODEL_META_FILE)
+  meta_file = os.path.join(UNZIP_TMP_DIR, model_name, MODEL_META_FILE)
   is_success = model_meta.parse_from(meta_file)
   if not is_success:
     print("Meta file {} not found!".format(meta_file))
     return
 
   # install meta file
+  extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
   is_success = install_model(model_meta, extract_path)
   if is_success:
     print("Successed install {}.".format(model_meta.name))
