@@ -14,28 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/ch_message_manager.h"
+#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 
-#include "modules/canbus/vehicle/ch/protocol/throttle_command_110.h"
-#include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
-#include "modules/canbus/vehicle/ch/protocol/steer_command_112.h"
-#include "modules/canbus/vehicle/ch/protocol/turnsignal_command_113.h"
-#include "modules/canbus/vehicle/ch/protocol/gear_command_114.h"
-#include "modules/canbus/vehicle/ch/protocol/vehicle_mode_command_116.h"
+#include "modules/canbus_vehicle/ch/protocol/throttle_command_110.h"
+#include "modules/canbus_vehicle/ch/protocol/brake_command_111.h"
+#include "modules/canbus_vehicle/ch/protocol/steer_command_112.h"
+#include "modules/canbus_vehicle/ch/protocol/turnsignal_command_113.h"
+#include "modules/canbus_vehicle/ch/protocol/gear_command_114.h"
+#include "modules/canbus_vehicle/ch/protocol/vehicle_mode_command_116.h"
 
-#include "modules/canbus/vehicle/ch/protocol/throttle_status__510.h"
-#include "modules/canbus/vehicle/ch/protocol/brake_status__511.h"
-#include "modules/canbus/vehicle/ch/protocol/steer_status__512.h"
-#include "modules/canbus/vehicle/ch/protocol/turnsignal_status__513.h"
-#include "modules/canbus/vehicle/ch/protocol/gear_status_514.h"
-#include "modules/canbus/vehicle/ch/protocol/ecu_status_1_515.h"
-#include "modules/canbus/vehicle/ch/protocol/ecu_status_2_516.h"
-#include "modules/canbus/vehicle/ch/protocol/ecu_status_3_517.h"
-#include "modules/canbus/vehicle/ch/protocol/ecu_status_4_518.h"
-#include "modules/canbus/vehicle/ch/protocol/vin_resp1_51b.h"
-#include "modules/canbus/vehicle/ch/protocol/vin_resp2_51c.h"
-#include "modules/canbus/vehicle/ch/protocol/vin_resp3_51d.h"
-#include "modules/canbus/vehicle/ch/protocol/wheelspeed_report_51e.h"
+#include "modules/canbus_vehicle/ch/protocol/throttle_status__510.h"
+#include "modules/canbus_vehicle/ch/protocol/brake_status__511.h"
+#include "modules/canbus_vehicle/ch/protocol/steer_status__512.h"
+#include "modules/canbus_vehicle/ch/protocol/turnsignal_status__513.h"
+#include "modules/canbus_vehicle/ch/protocol/gear_status_514.h"
+#include "modules/canbus_vehicle/ch/protocol/ecu_status_1_515.h"
+#include "modules/canbus_vehicle/ch/protocol/ecu_status_2_516.h"
+#include "modules/canbus_vehicle/ch/protocol/ecu_status_3_517.h"
+#include "modules/canbus_vehicle/ch/protocol/ecu_status_4_518.h"
+#include "modules/canbus_vehicle/ch/protocol/vin_resp1_51b.h"
+#include "modules/canbus_vehicle/ch/protocol/vin_resp2_51c.h"
+#include "modules/canbus_vehicle/ch/protocol/vin_resp3_51d.h"
+#include "modules/canbus_vehicle/ch/protocol/wheelspeed_report_51e.h"
 
 namespace apollo {
 namespace canbus {

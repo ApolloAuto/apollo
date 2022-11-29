@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
+#include "modules/canbus_vehicle/gem/protocol/brake_cmd_6b.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

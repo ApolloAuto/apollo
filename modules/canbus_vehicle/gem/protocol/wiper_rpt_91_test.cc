@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/wiper_rpt_91.h"
+#include "modules/canbus_vehicle/gem/protocol/wiper_rpt_91.h"
 
 #include "gtest/gtest.h"
 

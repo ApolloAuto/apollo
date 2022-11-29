@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
+#include "modules/canbus_vehicle/gem/protocol/accel_cmd_67.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

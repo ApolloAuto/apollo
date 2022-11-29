@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/vcu_report_505.h"
+#include "modules/canbus_vehicle/devkit/protocol/vcu_report_505.h"
 
 #include "gtest/gtest.h"
 

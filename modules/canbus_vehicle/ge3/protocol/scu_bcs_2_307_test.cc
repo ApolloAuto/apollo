@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ge3/protocol/scu_bcs_2_307.h"
+#include "modules/canbus_vehicle/ge3/protocol/scu_bcs_2_307.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

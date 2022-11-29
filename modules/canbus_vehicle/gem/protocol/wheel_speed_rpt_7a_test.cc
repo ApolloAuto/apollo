@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/wheel_speed_rpt_7a.h"
+#include "modules/canbus_vehicle/gem/protocol/wheel_speed_rpt_7a.h"
 
 #include "gtest/gtest.h"
 

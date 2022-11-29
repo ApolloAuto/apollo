@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/global_rpt_6a.h"
+#include "modules/canbus_vehicle/gem/protocol/global_rpt_6a.h"
 
 #include "glog/logging.h"
 

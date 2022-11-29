@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_3_509.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_3_509.h"
 
 #include "glog/logging.h"
 #include "modules/drivers/canbus/common/byte.h"

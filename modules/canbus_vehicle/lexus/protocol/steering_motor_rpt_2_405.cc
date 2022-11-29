@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/steering_motor_rpt_2_405.h"
+#include "modules/canbus_vehicle/lexus/protocol/steering_motor_rpt_2_405.h"
 
 #include "glog/logging.h"
 

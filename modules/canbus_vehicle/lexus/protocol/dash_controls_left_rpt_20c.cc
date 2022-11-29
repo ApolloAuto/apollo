@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/dash_controls_left_rpt_20c.h"
+#include "modules/canbus_vehicle/lexus/protocol/dash_controls_left_rpt_20c.h"
 
 #include "glog/logging.h"
 

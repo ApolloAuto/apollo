@@ -26,12 +26,12 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/macros.h"
-#include "modules/canbus/vehicle/gem/protocol/accel_cmd_67.h"
-#include "modules/canbus/vehicle/gem/protocol/brake_cmd_6b.h"
-#include "modules/canbus/vehicle/gem/protocol/global_cmd_69.h"
-#include "modules/canbus/vehicle/gem/protocol/shift_cmd_65.h"
-#include "modules/canbus/vehicle/gem/protocol/steering_cmd_6d.h"
-#include "modules/canbus/vehicle/gem/protocol/turn_cmd_63.h"
+#include "modules/canbus_vehicle/gem/protocol/accel_cmd_67.h"
+#include "modules/canbus_vehicle/gem/protocol/brake_cmd_6b.h"
+#include "modules/canbus_vehicle/gem/protocol/global_cmd_69.h"
+#include "modules/canbus_vehicle/gem/protocol/shift_cmd_65.h"
+#include "modules/canbus_vehicle/gem/protocol/steering_cmd_6d.h"
+#include "modules/canbus_vehicle/gem/protocol/turn_cmd_63.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {

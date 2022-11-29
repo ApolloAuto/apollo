@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/cruise_control_buttons_rpt_208.h"
+#include "modules/canbus_vehicle/lexus/protocol/cruise_control_buttons_rpt_208.h"
 
 #include "glog/logging.h"
 

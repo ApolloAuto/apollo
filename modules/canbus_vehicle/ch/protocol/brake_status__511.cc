@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/brake_status__511.h"
+#include "modules/canbus_vehicle/ch/protocol/brake_status__511.h"
 #include "glog/logging.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"

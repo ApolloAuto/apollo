@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/dash_controls_right_cmd_110.h"
+#include "modules/canbus_vehicle/lexus/protocol/dash_controls_right_cmd_110.h"
 
 #include "glog/logging.h"
 

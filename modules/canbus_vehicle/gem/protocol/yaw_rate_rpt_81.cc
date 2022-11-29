@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/yaw_rate_rpt_81.h"
+#include "modules/canbus_vehicle/gem/protocol/yaw_rate_rpt_81.h"
 
 #include "glog/logging.h"
 

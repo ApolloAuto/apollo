@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/ecu_status_4_518.h"
+#include "modules/canbus_vehicle/ch/protocol/ecu_status_4_518.h"
 
 #include "glog/logging.h"
 

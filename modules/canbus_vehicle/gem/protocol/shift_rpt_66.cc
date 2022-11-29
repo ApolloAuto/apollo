@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/shift_rpt_66.h"
+#include "modules/canbus_vehicle/gem/protocol/shift_rpt_66.h"
 
 #include "glog/logging.h"
 

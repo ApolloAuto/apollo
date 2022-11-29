@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/turnsignal_command_113.h"
+#include "modules/canbus_vehicle/ch/protocol/turnsignal_command_113.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

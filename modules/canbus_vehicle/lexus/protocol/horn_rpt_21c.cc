@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/horn_rpt_21c.h"
+#include "modules/canbus_vehicle/lexus/protocol/horn_rpt_21c.h"
 
 #include "glog/logging.h"
 

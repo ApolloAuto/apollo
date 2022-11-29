@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ge3/protocol/scu_vcu_1_312.h"
+#include "modules/canbus_vehicle/ge3/protocol/scu_vcu_1_312.h"
 #include "glog/logging.h"
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"

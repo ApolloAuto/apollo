@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
+#include "modules/canbus_vehicle/devkit/protocol/throttle_command_100.h"
 
 #include "glog/logging.h"
 

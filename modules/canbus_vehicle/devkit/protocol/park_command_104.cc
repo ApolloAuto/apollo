@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
+#include "modules/canbus_vehicle/devkit/protocol/park_command_104.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

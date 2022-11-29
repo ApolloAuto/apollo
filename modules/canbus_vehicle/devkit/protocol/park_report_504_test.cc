@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/park_report_504.h"
+#include "modules/canbus_vehicle/devkit/protocol/park_report_504.h"
 
 #include "gtest/gtest.h"
 

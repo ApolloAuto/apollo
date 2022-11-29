@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ge3/protocol/pc_epb_203.h"
+#include "modules/canbus_vehicle/ge3/protocol/pc_epb_203.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

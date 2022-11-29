@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/parking_brake_status_rpt_80.h"
+#include "modules/canbus_vehicle/gem/protocol/parking_brake_status_rpt_80.h"
 
 #include "glog/logging.h"
 

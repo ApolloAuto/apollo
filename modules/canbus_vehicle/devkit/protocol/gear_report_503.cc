@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/gear_report_503.h"
+#include "modules/canbus_vehicle/devkit/protocol/gear_report_503.h"
 
 #include "glog/logging.h"
 #include "modules/drivers/canbus/common/byte.h"

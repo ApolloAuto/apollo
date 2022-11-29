@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/headlight_rpt_77.h"
+#include "modules/canbus_vehicle/gem/protocol/headlight_rpt_77.h"
 
 #include "glog/logging.h"
 

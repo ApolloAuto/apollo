@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "modules/canbus/vehicle/devkit/proto/devkit.pb.h"
+#include "modules/canbus_vehicle/devkit/proto/devkit.pb.h"
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

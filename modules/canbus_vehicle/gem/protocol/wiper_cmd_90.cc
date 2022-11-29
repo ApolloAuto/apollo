@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/wiper_cmd_90.h"
+#include "modules/canbus_vehicle/gem/protocol/wiper_cmd_90.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/steering_motor_rpt_2_74.h"
+#include "modules/canbus_vehicle/gem/protocol/steering_motor_rpt_2_74.h"
 
 #include "glog/logging.h"
 

@@ -14,28 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
+#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
-#include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
-#include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
-#include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
-#include "modules/canbus/vehicle/devkit/protocol/gear_report_503.h"
-#include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
-#include "modules/canbus/vehicle/devkit/protocol/park_report_504.h"
-#include "modules/canbus/vehicle/devkit/protocol/steering_command_102.h"
-#include "modules/canbus/vehicle/devkit/protocol/steering_report_502.h"
-#include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
-#include "modules/canbus/vehicle/devkit/protocol/throttle_report_500.h"
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_1_507.h"
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_2_508.h"
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_3_509.h"
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_4_510.h"
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_5_511.h"
-#include "modules/canbus/vehicle/devkit/protocol/vcu_report_505.h"
-#include "modules/canbus/vehicle/devkit/protocol/wheelspeed_report_506.h"
+#include "modules/canbus_vehicle/devkit/protocol/bms_report_512.h"
+#include "modules/canbus_vehicle/devkit/protocol/brake_command_101.h"
+#include "modules/canbus_vehicle/devkit/protocol/brake_report_501.h"
+#include "modules/canbus_vehicle/devkit/protocol/gear_command_103.h"
+#include "modules/canbus_vehicle/devkit/protocol/gear_report_503.h"
+#include "modules/canbus_vehicle/devkit/protocol/park_command_104.h"
+#include "modules/canbus_vehicle/devkit/protocol/park_report_504.h"
+#include "modules/canbus_vehicle/devkit/protocol/steering_command_102.h"
+#include "modules/canbus_vehicle/devkit/protocol/steering_report_502.h"
+#include "modules/canbus_vehicle/devkit/protocol/throttle_command_100.h"
+#include "modules/canbus_vehicle/devkit/protocol/throttle_report_500.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_1_507.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_2_508.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_3_509.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_4_510.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_5_511.h"
+#include "modules/canbus_vehicle/devkit/protocol/vcu_report_505.h"
+#include "modules/canbus_vehicle/devkit/protocol/wheelspeed_report_506.h"
 
 namespace apollo {
 namespace canbus {

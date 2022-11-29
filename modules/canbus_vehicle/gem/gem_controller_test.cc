@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/gem_controller.h"
+#include "modules/canbus_vehicle/gem/gem_controller.h"
 
 #include <string>
 
@@ -25,7 +25,7 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/file.h"
-#include "modules/canbus/vehicle/gem/gem_message_manager.h"
+#include "modules/canbus_vehicle/gem/gem_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {

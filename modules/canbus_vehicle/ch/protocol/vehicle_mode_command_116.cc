@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/vehicle_mode_command_116.h"
+#include "modules/canbus_vehicle/ch/protocol/vehicle_mode_command_116.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

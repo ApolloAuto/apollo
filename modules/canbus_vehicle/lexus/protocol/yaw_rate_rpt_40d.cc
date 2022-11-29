@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/yaw_rate_rpt_40d.h"
+#include "modules/canbus_vehicle/lexus/protocol/yaw_rate_rpt_40d.h"
 
 #include "glog/logging.h"
 

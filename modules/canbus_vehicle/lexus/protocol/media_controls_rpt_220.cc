@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/media_controls_rpt_220.h"
+#include "modules/canbus_vehicle/lexus/protocol/media_controls_rpt_220.h"
 
 #include "glog/logging.h"
 

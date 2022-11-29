@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/turn_rpt_230.h"
+#include "modules/canbus_vehicle/lexus/protocol/turn_rpt_230.h"
 
 #include "glog/logging.h"
 

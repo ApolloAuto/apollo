@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
+#include "modules/canbus_vehicle/devkit/protocol/brake_command_101.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/date_time_rpt_83.h"
+#include "modules/canbus_vehicle/gem/protocol/date_time_rpt_83.h"
 
 #include "gtest/gtest.h"
 

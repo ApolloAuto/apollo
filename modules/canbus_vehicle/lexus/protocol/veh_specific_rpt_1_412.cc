@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/veh_specific_rpt_1_412.h"
+#include "modules/canbus_vehicle/lexus/protocol/veh_specific_rpt_1_412.h"
 
 #include "glog/logging.h"
 

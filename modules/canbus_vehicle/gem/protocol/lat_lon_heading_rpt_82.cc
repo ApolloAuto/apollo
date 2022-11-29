@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/lat_lon_heading_rpt_82.h"
+#include "modules/canbus_vehicle/gem/protocol/lat_lon_heading_rpt_82.h"
 
 #include "glog/logging.h"
 

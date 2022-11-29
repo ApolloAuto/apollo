@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/wiper_rpt_234.h"
+#include "modules/canbus_vehicle/lexus/protocol/wiper_rpt_234.h"
 
 #include "glog/logging.h"
 

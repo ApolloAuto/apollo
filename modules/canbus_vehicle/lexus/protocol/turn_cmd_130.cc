@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/turn_cmd_130.h"
+#include "modules/canbus_vehicle/lexus/protocol/turn_cmd_130.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

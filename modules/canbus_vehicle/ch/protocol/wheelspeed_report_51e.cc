@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/wheelspeed_report_51e.h"
+#include "modules/canbus_vehicle/ch/protocol/wheelspeed_report_51e.h"
 
 #include "glog/logging.h"
 

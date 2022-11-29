@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/devkit_controller.h"
+#include "modules/canbus_vehicle/devkit/devkit_controller.h"
 
 #include <string>
 
@@ -23,7 +23,7 @@
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
+#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"

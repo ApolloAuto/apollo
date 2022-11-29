@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/gem/proto/gem.pb.h"
+#include "modules/canbus_vehicle/gem/proto/gem.pb.h"
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

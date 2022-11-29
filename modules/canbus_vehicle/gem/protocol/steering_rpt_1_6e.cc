@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/steering_rpt_1_6e.h"
+#include "modules/canbus_vehicle/gem/protocol/steering_rpt_1_6e.h"
 
 #include "glog/logging.h"
 

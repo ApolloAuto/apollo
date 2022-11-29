@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/headlight_aux_rpt_318.h"
+#include "modules/canbus_vehicle/lexus/protocol/headlight_aux_rpt_318.h"
 
 #include "glog/logging.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/accel_rpt_200.h"
+#include "modules/canbus_vehicle/lexus/protocol/accel_rpt_200.h"
 
 #include "glog/logging.h"
 

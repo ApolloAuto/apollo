@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/steering_report_502.h"
+#include "modules/canbus_vehicle/devkit/protocol/steering_report_502.h"
 
 #include "gtest/gtest.h"
 

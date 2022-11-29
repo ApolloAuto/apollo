@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/date_time_rpt_40f.h"
+#include "modules/canbus_vehicle/lexus/protocol/date_time_rpt_40f.h"
 
 #include "glog/logging.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/control_command_115.h"
+#include "modules/canbus_vehicle/ch/protocol/control_command_115.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

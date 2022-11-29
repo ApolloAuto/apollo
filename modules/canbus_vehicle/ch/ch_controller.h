@@ -26,12 +26,12 @@
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
-#include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
-#include "modules/canbus/vehicle/ch/protocol/gear_command_114.h"
-#include "modules/canbus/vehicle/ch/protocol/steer_command_112.h"
-#include "modules/canbus/vehicle/ch/protocol/throttle_command_110.h"
-#include "modules/canbus/vehicle/ch/protocol/turnsignal_command_113.h"
-#include "modules/canbus/vehicle/ch/protocol/vehicle_mode_command_116.h"
+#include "modules/canbus_vehicle/ch/protocol/brake_command_111.h"
+#include "modules/canbus_vehicle/ch/protocol/gear_command_114.h"
+#include "modules/canbus_vehicle/ch/protocol/steer_command_112.h"
+#include "modules/canbus_vehicle/ch/protocol/throttle_command_110.h"
+#include "modules/canbus_vehicle/ch/protocol/turnsignal_command_113.h"
+#include "modules/canbus_vehicle/ch/protocol/vehicle_mode_command_116.h"
 
 namespace apollo {
 namespace canbus {

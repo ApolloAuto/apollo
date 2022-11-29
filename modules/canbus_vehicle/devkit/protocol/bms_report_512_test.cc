@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/bms_report_512.h"
+#include "modules/canbus_vehicle/devkit/protocol/bms_report_512.h"
 
 #include "gtest/gtest.h"
 

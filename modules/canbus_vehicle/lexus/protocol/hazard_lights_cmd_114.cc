@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/hazard_lights_cmd_114.h"
+#include "modules/canbus_vehicle/lexus/protocol/hazard_lights_cmd_114.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

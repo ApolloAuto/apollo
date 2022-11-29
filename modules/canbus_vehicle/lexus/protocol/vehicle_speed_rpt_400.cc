@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/vehicle_speed_rpt_400.h"
+#include "modules/canbus_vehicle/lexus/protocol/vehicle_speed_rpt_400.h"
 
 #include "glog/logging.h"
 

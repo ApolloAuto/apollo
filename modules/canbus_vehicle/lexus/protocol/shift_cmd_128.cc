@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/shift_cmd_128.h"
+#include "modules/canbus_vehicle/lexus/protocol/shift_cmd_128.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/horn_cmd_78.h"
+#include "modules/canbus_vehicle/gem/protocol/horn_cmd_78.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

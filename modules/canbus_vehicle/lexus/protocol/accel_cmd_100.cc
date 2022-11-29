@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/accel_cmd_100.h"
+#include "modules/canbus_vehicle/lexus/protocol/accel_cmd_100.h"
 
 #include <algorithm>
 

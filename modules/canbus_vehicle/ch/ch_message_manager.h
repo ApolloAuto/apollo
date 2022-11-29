@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/ch/proto/ch.pb.h"
+#include "modules/canbus_vehicle/ch/proto/ch.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {

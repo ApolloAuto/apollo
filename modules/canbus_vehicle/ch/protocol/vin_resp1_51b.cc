@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/vin_resp1_51b.h"
+#include "modules/canbus_vehicle/ch/protocol/vin_resp1_51b.h"
 
 #include <string>
 

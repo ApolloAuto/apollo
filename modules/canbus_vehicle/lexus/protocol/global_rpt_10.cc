@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/global_rpt_10.h"
+#include "modules/canbus_vehicle/lexus/protocol/global_rpt_10.h"
 
 #include "glog/logging.h"
 

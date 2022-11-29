@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/brake_report_501.h"
+#include "modules/canbus_vehicle/devkit/protocol/brake_report_501.h"
 
 #include "gtest/gtest.h"
 

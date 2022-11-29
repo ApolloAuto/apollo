@@ -13,15 +13,15 @@
  *implied. See the License for the specific language governing permissions
  *and limitations under the License.
  *****************************************************************************/
-#include "modules/canbus/vehicle/lexus/lexus_controller.h"
+#include "modules/canbus_vehicle/lexus/lexus_controller.h"
 
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
-#include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
+#include "modules/canbus_vehicle/lexus/proto/lexus.pb.h"
+#include "modules/canbus_vehicle/lexus/lexus_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"

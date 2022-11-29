@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ge3/protocol/pc_eps_204.h"
+#include "modules/canbus_vehicle/ge3/protocol/pc_eps_204.h"
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {

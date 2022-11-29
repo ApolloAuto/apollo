@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/gear_command_114.h"
+#include "modules/canbus_vehicle/ch/protocol/gear_command_114.h"
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {

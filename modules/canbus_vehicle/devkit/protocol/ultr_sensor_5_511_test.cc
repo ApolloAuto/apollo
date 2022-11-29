@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/ultr_sensor_5_511.h"
+#include "modules/canbus_vehicle/devkit/protocol/ultr_sensor_5_511.h"
 
 #include "gtest/gtest.h"
 

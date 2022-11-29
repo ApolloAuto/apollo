@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/dash_controls_right_rpt_210.h"
+#include "modules/canbus_vehicle/lexus/protocol/dash_controls_right_rpt_210.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

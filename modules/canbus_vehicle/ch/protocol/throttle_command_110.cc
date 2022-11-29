@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/ch/protocol/throttle_command_110.h"
+#include "modules/canbus_vehicle/ch/protocol/throttle_command_110.h"
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {

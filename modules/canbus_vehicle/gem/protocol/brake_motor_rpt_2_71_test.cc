@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/brake_motor_rpt_2_71.h"
+#include "modules/canbus_vehicle/gem/protocol/brake_motor_rpt_2_71.h"
 
 #include "gtest/gtest.h"
 

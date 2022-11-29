@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/brake_rpt_6c.h"
+#include "modules/canbus_vehicle/gem/protocol/brake_rpt_6c.h"
 
 #include "gtest/gtest.h"
 

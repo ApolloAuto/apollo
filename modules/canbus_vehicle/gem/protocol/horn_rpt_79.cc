@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/horn_rpt_79.h"
+#include "modules/canbus_vehicle/gem/protocol/horn_rpt_79.h"
 
 #include "glog/logging.h"
 

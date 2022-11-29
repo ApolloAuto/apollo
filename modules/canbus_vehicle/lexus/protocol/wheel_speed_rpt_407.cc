@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/wheel_speed_rpt_407.h"
+#include "modules/canbus_vehicle/lexus/protocol/wheel_speed_rpt_407.h"
 
 #include "glog/logging.h"
 

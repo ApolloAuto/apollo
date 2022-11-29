@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/detected_object_rpt_411.h"
+#include "modules/canbus_vehicle/lexus/protocol/detected_object_rpt_411.h"
 
 #include "glog/logging.h"
 

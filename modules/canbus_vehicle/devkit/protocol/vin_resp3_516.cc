@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/devkit/protocol/vin_resp3_516.h"
+#include "modules/canbus_vehicle/devkit/protocol/vin_resp3_516.h"
 
 #include <string>
 

@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/ge3/proto/ge3.pb.h"
+#include "modules/canbus_vehicle/ge3/proto/ge3.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {

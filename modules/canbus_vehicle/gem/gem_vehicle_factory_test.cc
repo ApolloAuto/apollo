@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
+#include "modules/canbus_vehicle/gem/gem_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/protocol/steering_cmd_6d.h"
+#include "modules/canbus_vehicle/gem/protocol/steering_cmd_6d.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/steering_aux_rpt_32c.h"
+#include "modules/canbus_vehicle/lexus/protocol/steering_aux_rpt_32c.h"
 
 #include "glog/logging.h"
 

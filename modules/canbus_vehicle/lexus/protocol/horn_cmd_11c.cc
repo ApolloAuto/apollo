@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lexus/protocol/horn_cmd_11c.h"
+#include "modules/canbus_vehicle/lexus/protocol/horn_cmd_11c.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 
