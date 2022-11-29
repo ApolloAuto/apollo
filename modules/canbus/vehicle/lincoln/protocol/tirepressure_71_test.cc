@@ -27,7 +27,7 @@ TEST(Tirepressure71Test, General) {
   int32_t length = 8;
 
   Tirepressure71 tire_pressure;
-  ChassisDetail cd;
+  Lincoln cd;
   tire_pressure.Parse(data, length, &cd);
 
   EXPECT_EQ(cd.safety().front_left_tire_press(), 25191);

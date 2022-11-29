@@ -49,8 +49,8 @@ const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 
 ErrorCode LincolnController::Init(
     const VehicleParameter &params,
-    CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
+    CanSender<::apollo::canbus::Lincoln> *const can_sender,
+    MessageManager<::apollo::canbus::Lincoln> *const message_manager) {
   if (is_initialized_) {
     AINFO << "LincolnController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -117,7 +117,7 @@ ErrorCode LincolnController::Init(
   can_sender_->AddMessage(Turnsignal68::ID, turnsignal_68_, false);
 
   // Need to sleep to ensure all messages received
-  AINFO << "Controller is initialized.";
+  AINFO << "LincolnController is initialized.";
 
   gear_tmp_ = Chassis::GEAR_INVALID;
   is_initialized_ = true;
@@ -151,7 +151,7 @@ void LincolnController::Stop() {
 Chassis LincolnController::chassis() {
   chassis_.Clear();
 
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   // 21, 22, previously 1, 2
@@ -477,7 +477,7 @@ void LincolnController::Gear(Chassis::GearPosition ref_gear_position) {
     return;
   }
 
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   const Chassis::GearPosition current_gear_position =
       chassis_detail.gear().gear_state();
@@ -596,7 +596,7 @@ void LincolnController::Steer(double angle, double angle_spd) {
   const double real_angle =
       vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
   const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+      ProtocolData<::apollo::canbus::Lincoln>::BoundedValue(
           vehicle_params_.min_steer_angle_rate() / M_PI * 180,
           vehicle_params_.max_steer_angle_rate() / M_PI * 180,
           vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
@@ -648,7 +648,7 @@ void LincolnController::ResetProtocol() {
 }
 
 bool LincolnController::CheckChassisError() {
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   int32_t error_cnt = 0;
@@ -673,7 +673,7 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.eps().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_brake()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO brake."
+    AERROR_EVERY(100) << "Lincoln has NO brake."
                       << chassis_detail.DebugString();
     return false;
   }
@@ -695,8 +695,7 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.brake().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gas()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gas."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "Lincoln has NO gas." << chassis_detail.DebugString();
     return false;
   }
   // Throttle fault
@@ -715,8 +714,7 @@ bool LincolnController::CheckChassisError() {
       ((chassis_detail.gas().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gear()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gear."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "Lincoln has NO gear." << chassis_detail.DebugString();
     return false;
   }
   // Gear fault
@@ -839,7 +837,7 @@ bool LincolnController::CheckResponse(const int32_t flags, bool need_wait) {
   // for Lincoln, CheckResponse commonly takes 300ms. We leave a 100ms buffer
   // for it.
   int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
@@ -905,7 +903,7 @@ void LincolnController::set_chassis_error_code(
 }
 
 bool LincolnController::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail &chassis_detail) {
+    const ::apollo::canbus::Lincoln &chassis_detail) {
   bool safety_error =
       chassis_detail.safety().is_passenger_door_open() ||
       chassis_detail.safety().is_rearleft_door_open() ||

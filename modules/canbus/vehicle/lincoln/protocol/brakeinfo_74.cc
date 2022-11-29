@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Brakeinfo74::ID = 0x74;
 
 void Brakeinfo74::Parse(const std::uint8_t *bytes, int32_t length,
-                        ChassisDetail *chassis_detail) const {
+                        Lincoln *chassis_detail) const {
   chassis_detail->mutable_brake()->set_brake_torque_req(
       braking_torque_request(bytes, length));
   switch (hill_start_assist_status(bytes, length)) {

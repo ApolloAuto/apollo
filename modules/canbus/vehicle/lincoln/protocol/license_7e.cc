@@ -46,7 +46,7 @@ License7e::License7e()
       parse_success_(false) {}
 
 void License7e::Parse(const std::uint8_t* bytes, int length,
-                      ChassisDetail* chassis_detail) const {
+                      Lincoln* chassis_detail) const {
   if (!parse_success_) {
     switch (mux(bytes, length)) {
       case 0x83:

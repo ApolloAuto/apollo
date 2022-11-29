@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -29,7 +29,7 @@ namespace canbus {
 namespace lincoln {
 
 class License7e : public ::apollo::drivers::canbus::ProtocolData<
-                      ::apollo::canbus::ChassisDetail> {
+                      ::apollo::canbus::Lincoln> {
  private:
   mutable std::string vin_part0_;
   mutable std::string vin_part1_;
@@ -43,7 +43,7 @@ class License7e : public ::apollo::drivers::canbus::ProtocolData<
   static const int32_t ID;
   License7e();
   virtual void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis_detail) const;
+                     Lincoln* chassis_detail) const;
   // config detail: {'name': 'mux', 'offset': 0.0, 'precision': 1.0, 'len': 8,
   // 'f_type': 'value', 'is_signed_var': False, 'physical_range': '[0|0]',
   // 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '""'}

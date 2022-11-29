@@ -29,7 +29,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Wheelspeed6a::ID = 0x6A;
 
 void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
-                         ChassisDetail *chassis_detail) const {
+                         Lincoln *chassis_detail) const {
   // how to set direction
   // what is "valid"
   // front left
@@ -65,7 +65,7 @@ void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
 
 void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
                          const struct timeval &timestamp,
-                         ChassisDetail *chassis_detail) const {
+                         Lincoln *chassis_detail) const {
   chassis_detail->mutable_vehicle_spd()->set_timestamp_sec(
       static_cast<double>(timestamp.tv_sec) +
       static_cast<double>(timestamp.tv_usec) / 1000000.0);

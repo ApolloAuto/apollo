@@ -25,7 +25,7 @@ namespace lincoln {
 TEST(Gear67Test, General) {
   uint8_t data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
-  ChassisDetail cd;
+  Lincoln cd;
   Gear67 gear;
   int32_t state = gear.gear_state(data, 8);
   EXPECT_EQ(state, (data[0] & 0b00000111));

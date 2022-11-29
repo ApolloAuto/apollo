@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Fuellevel72::ID = 0x72;
 
 void Fuellevel72::Parse(const std::uint8_t *bytes, int32_t length,
-                        ChassisDetail *chassis_detail) const {
+                        Lincoln *chassis_detail) const {
   chassis_detail->mutable_battery()->set_fuel_level(fuel_level(bytes, length));
 }
 

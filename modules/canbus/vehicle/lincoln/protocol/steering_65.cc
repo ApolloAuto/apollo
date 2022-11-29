@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Steering65::ID = 0x65;
 
 void Steering65::Parse(const std::uint8_t *bytes, int32_t length,
-                       ChassisDetail *chassis_detail) const {
+                       Lincoln *chassis_detail) const {
   chassis_detail->mutable_eps()->set_steering_angle(
       steering_angle(bytes, length));
   // no steering angle speed
@@ -69,7 +69,7 @@ void Steering65::Parse(const std::uint8_t *bytes, int32_t length,
 
 void Steering65::Parse(const std::uint8_t *bytes, int32_t length,
                        const struct timeval &timestamp,
-                       ChassisDetail *chassis_detail) const {
+                       Lincoln *chassis_detail) const {
   chassis_detail->mutable_eps()->set_timestamp_65(
       static_cast<double>(timestamp.tv_sec) +
       static_cast<double>(timestamp.tv_usec) / 1000000.0);

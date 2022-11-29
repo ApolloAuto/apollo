@@ -22,9 +22,18 @@
 
 #include <memory>
 
+#include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
+#include "cyber/cyber.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/status/status.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/can_comm/can_receiver.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 /**
@@ -48,18 +57,64 @@ class LincolnVehicleFactory : public AbstractVehicleFactory {
   virtual ~LincolnVehicleFactory() = default;
 
   /**
-   * @brief create lincoln vehicle controller
+   * @brief init vehicle factory
+   * @returns true if successfully initialized
+   */
+  bool Init(const CanbusConf *canbus_conf) override;
+
+  /**
+   * @brief start canclient, cansender, canreceiver, vehicle controller
+   * @returns true if successfully started
+   */
+  bool Start() override;
+
+  /**
+   * @brief stop canclient, cansender, canreceiver, vehicle controller
+   */
+  void Stop() override;
+
+  /**
+   * @brief update control command
+   */
+  void UpdateCommand(
+      const apollo::control::ControlCommand *control_command) override;
+
+  /**
+   * @brief publish chassis messages
+   */
+  Chassis publish_chassis() override;
+
+  /**
+   * @brief publish chassis for vehicle messages
+   */
+  void PublishChassisDetail() override;
+
+ private:
+  /**
+   * @brief create Lincoln vehicle controller
    * @returns a unique_ptr that points to the created controller
    */
-  std::unique_ptr<VehicleController> CreateVehicleController() override;
+  std::unique_ptr<VehicleController<::apollo::canbus::Lincoln>>
+  CreateVehicleController();
 
   /**
    * @brief create lincoln message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
-  CreateMessageManager() override;
+  std::unique_ptr<MessageManager<::apollo::canbus::Lincoln>> CreateMessageManager();
+
+  std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
+  std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
+  CanSender<::apollo::canbus::Lincoln> can_sender_;
+  apollo::drivers::canbus::CanReceiver<::apollo::canbus::Lincoln> can_receiver_;
+  std::unique_ptr<MessageManager<::apollo::canbus::Lincoln>> message_manager_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Lincoln>> vehicle_controller_;
+
+  std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Lincoln>>
+      chassis_detail_writer_;
 };
+
+CYBER_REGISTER_VEHICLEFACTORY(LincolnVehicleFactory)
 
 }  // namespace canbus
 }  // namespace apollo

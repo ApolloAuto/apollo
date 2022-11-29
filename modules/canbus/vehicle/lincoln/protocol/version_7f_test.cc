@@ -24,7 +24,7 @@ namespace lincoln {
 
 TEST(Version7fTest, General) {
   int32_t length = 8;
-  ChassisDetail cd;
+  Lincoln cd;
   Version7f version;
 
   uint8_t data[8] = {0x01, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};

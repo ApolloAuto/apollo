@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Gps6d::ID = 0x6D;
 
 void Gps6d::Parse(const std::uint8_t *bytes, int32_t length,
-                  ChassisDetail *chassis_detail) const {
+                  Lincoln *chassis_detail) const {
   chassis_detail->mutable_basic()->set_latitude(latitude(bytes, length));
   chassis_detail->mutable_basic()->set_longitude(longitude(bytes, length));
   chassis_detail->mutable_basic()->set_gps_valid(is_valid(bytes, length));

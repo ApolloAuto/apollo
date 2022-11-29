@@ -31,7 +31,7 @@ TEST_F(Accel6bTest, Parse) {
   Fuellevel72 fuel;
   uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   fuel.Parse(data, length, &chassis_detail);
   EXPECT_DOUBLE_EQ(chassis_detail.battery().fuel_level(), 2737.50876);
   EXPECT_EQ(data[0], 0x61);

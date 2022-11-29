@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Version7f::ID = 0x7f;
 
 void Version7f::Parse(const std::uint8_t *bytes, int32_t length,
-                      ChassisDetail *chassis_detail) const {
+                      Lincoln *chassis_detail) const {
   switch (module_name(bytes, length)) {
     case 0x01:
       chassis_detail->mutable_brake()->set_major_version(

@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Misc69::ID = 0x69;
 
 void Misc69::Parse(const std::uint8_t *bytes, int32_t length,
-                   ChassisDetail *chassis_detail) const {
+                   Lincoln *chassis_detail) const {
   int32_t turn_light_type = turn_signal_status(bytes, length);
   switch (turn_light_type) {
     case 0:

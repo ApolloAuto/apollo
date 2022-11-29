@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Throttle63::ID = 0x63;
 
 void Throttle63::Parse(const std::uint8_t *bytes, int32_t length,
-                       ChassisDetail *chassis_detail) const {
+                       Lincoln *chassis_detail) const {
   chassis_detail->mutable_gas()->set_throttle_input(pedal_input(bytes, length));
   chassis_detail->mutable_gas()->set_throttle_cmd(pedal_cmd(bytes, length));
   chassis_detail->mutable_gas()->set_throttle_output(

@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Gps6f::ID = 0x6F;
 
 void Gps6f::Parse(const std::uint8_t *bytes, int32_t length,
-                  ChassisDetail *chassis_detail) const {
+                  Lincoln *chassis_detail) const {
   chassis_detail->mutable_basic()->set_altitude(altitude(bytes, length));
   chassis_detail->mutable_basic()->set_heading(heading(bytes, length));
   // speed mph -> mps

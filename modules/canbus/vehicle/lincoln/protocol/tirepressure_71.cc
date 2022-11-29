@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Tirepressure71::ID = 0x71;
 
 void Tirepressure71::Parse(const std::uint8_t *bytes, int32_t length,
-                           ChassisDetail *chassis_detail) const {
+                           Lincoln *chassis_detail) const {
   chassis_detail->mutable_safety()->set_front_left_tire_press(
       front_left_tire(bytes, length));
   chassis_detail->mutable_safety()->set_front_right_tire_press(

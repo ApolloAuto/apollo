@@ -25,7 +25,7 @@ namespace lincoln {
 TEST(Gps6dTest, General) {
   uint8_t data[8] = {0x56, 0x52, 0x53, 0x54, 0xF1, 0xF2, 0xF3, 0xF4};
   int32_t length = 8;
-  ChassisDetail cd;
+  Lincoln cd;
   Gps6d gps;
   gps.Parse(data, length, &cd);
 

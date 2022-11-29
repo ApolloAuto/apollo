@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Gear67::ID = 0x67;
 
 void Gear67::Parse(const std::uint8_t *bytes, int32_t length,
-                   ChassisDetail *chassis_detail) const {
+                   Lincoln *chassis_detail) const {
   int32_t gear = gear_state(bytes, length);
   switch (gear) {
     case 0x01:

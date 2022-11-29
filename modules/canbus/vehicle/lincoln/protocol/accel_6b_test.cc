@@ -30,7 +30,7 @@ class Accel6bTest : public ::testing::Test {
 TEST_F(Accel6bTest, Parse) {
   Accel6b acc;
   int32_t length = 8;
-  ChassisDetail chassis_detail;
+  Lincoln chassis_detail;
   uint8_t bytes[8] = {0, 0};
 
   bytes[0] = 0b11111100;

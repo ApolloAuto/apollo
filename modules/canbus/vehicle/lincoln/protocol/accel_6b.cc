@@ -30,7 +30,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Accel6b::ID = 0x6B;
 
 void Accel6b::Parse(const std::uint8_t *bytes, int32_t length,
-                    ChassisDetail *chassis_detail) const {
+                    Lincoln *chassis_detail) const {
   chassis_detail->mutable_vehicle_spd()->set_lat_acc(
       lateral_acceleration(bytes, length));
   chassis_detail->mutable_vehicle_spd()->set_long_acc(

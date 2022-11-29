@@ -30,7 +30,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Brake61::ID = 0x61;
 
 void Brake61::Parse(const std::uint8_t *bytes, int32_t length,
-                    ChassisDetail *chassis_detail) const {
+                    Lincoln *chassis_detail) const {
   chassis_detail->mutable_brake()->set_brake_input(pedal_input(bytes, length));
   chassis_detail->mutable_brake()->set_brake_cmd(pedal_cmd(bytes, length));
   chassis_detail->mutable_brake()->set_brake_output(

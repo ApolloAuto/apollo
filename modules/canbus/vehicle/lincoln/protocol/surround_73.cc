@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Surround73::ID = 0x73;
 
 void Surround73::Parse(const std::uint8_t *bytes, int32_t length,
-                       ChassisDetail *chassis_detail) const {
+                       Lincoln *chassis_detail) const {
   // sonar left
   chassis_detail->mutable_surround()->set_cross_traffic_alert_left(
       is_cross_traffic_alert_left(bytes, length));

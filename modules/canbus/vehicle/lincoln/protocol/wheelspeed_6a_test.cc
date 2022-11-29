@@ -26,7 +26,7 @@ TEST(Wheelspeed6aTest, General) {
   Wheelspeed6a wheelspeed;
   uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   int32_t length = 8;
-  ChassisDetail cd;
+  Lincoln cd;
   struct timeval timestamp;
   gettimeofday(&timestamp, NULL);
   wheelspeed.Parse(data, length, timestamp, &cd);

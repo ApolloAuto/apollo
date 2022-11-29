@@ -23,7 +23,7 @@
 
 #include <sys/time.h>
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
@@ -40,7 +40,7 @@ namespace lincoln {
  * @brief one of the protocol data of lincoln vehicle
  */
 class Steering65 : public ::apollo::drivers::canbus::ProtocolData<
-                       ::apollo::canbus::ChassisDetail> {
+                       ::apollo::canbus::Lincoln> {
  public:
   static const int32_t ID;
 
@@ -51,7 +51,7 @@ class Steering65 : public ::apollo::drivers::canbus::ProtocolData<
    * @param chassis_detail the parsed chassis_detail
    */
   virtual void Parse(const std::uint8_t *bytes, int32_t length,
-                     ChassisDetail *chassis_detail) const;
+                     Lincoln *chassis_detail) const;
 
   /*
    * @brief parse received data
@@ -62,7 +62,7 @@ class Steering65 : public ::apollo::drivers::canbus::ProtocolData<
    */
   virtual void Parse(const std::uint8_t *bytes, int32_t length,
                      const struct timeval &timestamp,
-                     ChassisDetail *chassis_detail) const;
+                     Lincoln *chassis_detail) const;
 
   /**
    * @brief calculate steering angle based on byte array.

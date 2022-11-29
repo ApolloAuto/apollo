@@ -27,7 +27,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Gps6e::ID = 0x6E;
 
 void Gps6e::Parse(const std::uint8_t *bytes, int32_t length,
-                  ChassisDetail *chassis_detail) const {
+                  Lincoln *chassis_detail) const {
   chassis_detail->mutable_basic()->set_year(year(bytes, length));
   chassis_detail->mutable_basic()->set_month(month(bytes, length));
   chassis_detail->mutable_basic()->set_day(day(bytes, length));
