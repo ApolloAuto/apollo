@@ -43,8 +43,6 @@ DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
 
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 
-DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
-              "Vehicles config path.");
 
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 
@@ -1333,7 +1331,6 @@ void HMIWorker::ChangeRecord(const std::string &record_id) {
   return;
 }
 bool HMIWorker::LoadRecords() {
-  StopRecordPlay();
   std::string directory_path;
   GetRecordPath(&directory_path);
   if (!cyber::common::PathExists(directory_path)) {
@@ -1409,6 +1406,30 @@ void HMIWorker::DeleteRecord(const std::string &record_id) {
     return;
   }
   return;
+}
+bool HMIWorker::ReloadVehicles() {
+  AINFO << "load config";
+  HMIConfig config = LoadConfig();
+  std::string msg;
+  AINFO << "serialize new config";
+  config.SerializeToString(&msg);
+
+  WLock wlock(status_mutex_);
+  AINFO << "parse new config";
+  config_.ParseFromString(msg);
+  AINFO << "init status";
+  // status_.clear_modes();
+  // status_.clear_maps();
+  AINFO << "clear vehicles";
+  status_.clear_vehicles();
+  // InitStatus();
+  // Populate vehicles and current_vehicle.
+  AINFO << "reload vehicles";
+  for (const auto& vehicle : config_.vehicles()) {
+    status_.add_vehicles(vehicle.first);
+  }
+  status_changed_ = true;
+  return true;
 }
 
 }  // namespace dreamview

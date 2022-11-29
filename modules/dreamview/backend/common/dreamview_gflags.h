@@ -97,3 +97,5 @@ DECLARE_string(sim_perfect_control);
 DECLARE_string(resource_record_path);
 
 DECLARE_string(cyber_recorder_stop_command);
+
+DECLARE_string(vehicles_config_path);

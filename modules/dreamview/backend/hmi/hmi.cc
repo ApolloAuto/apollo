@@ -245,5 +245,7 @@ bool HMI::UpdateDynamicModelToStatus(const std::string& dynamic_model_name) {
 }
 
 bool HMI::UpdateRecordToStatus() { return hmi_worker_->LoadRecords(); }
+
+bool HMI::UpdateVehicleToStatus() { return hmi_worker_->ReloadVehicles();}
 }  // namespace dreamview
 }  // namespace apollo
