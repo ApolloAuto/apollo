@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/protocol/brake_control_a4.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/brake_control_a4.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

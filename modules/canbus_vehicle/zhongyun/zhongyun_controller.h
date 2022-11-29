@@ -26,11 +26,11 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/brake_control_a4.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/gear_control_a1.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/parking_control_a5.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/steering_control_a2.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/torque_control_a3.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/brake_control_a4.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/gear_control_a1.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/parking_control_a5.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/steering_control_a2.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/torque_control_a3.h"
 
 namespace apollo {
 namespace canbus {

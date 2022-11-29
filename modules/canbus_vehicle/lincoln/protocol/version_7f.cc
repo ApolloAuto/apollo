@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/version_7f.h"
+#include "modules/canbus_vehicle/lincoln/protocol/version_7f.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

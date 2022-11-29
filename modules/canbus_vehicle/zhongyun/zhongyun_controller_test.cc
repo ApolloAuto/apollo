@@ -21,9 +21,9 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/zhongyun/proto/zhongyun.pb.h"
-#include "modules/canbus/vehicle/zhongyun/zhongyun_controller.h"
-#include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
+#include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
+#include "modules/canbus_vehicle/zhongyun/zhongyun_controller.h"
+#include "modules/canbus_vehicle/zhongyun/zhongyun_message_manager.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 

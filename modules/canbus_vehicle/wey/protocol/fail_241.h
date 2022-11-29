@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/wey/proto/wey.pb.h"
+#include "modules/canbus_vehicle/wey/proto/wey.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {

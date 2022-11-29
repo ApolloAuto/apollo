@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include "modules/canbus/vehicle/lincoln/protocol/license_7e.h"
+#include "modules/canbus_vehicle/lincoln/protocol/license_7e.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

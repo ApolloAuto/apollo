@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/protocol/vehicle_state_feedback_2_c4.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/vehicle_state_feedback_2_c4.h"
 
 #include "glog/logging.h"
 

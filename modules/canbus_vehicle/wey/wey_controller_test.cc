@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/wey_controller.h"
+#include "modules/canbus_vehicle/wey/wey_controller.h"
 
 #include <string>
 
@@ -23,8 +23,8 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/wey/proto/wey.pb.h"
-#include "modules/canbus/vehicle/wey/wey_message_manager.h"
+#include "modules/canbus_vehicle/wey/proto/wey.pb.h"
+#include "modules/canbus_vehicle/wey/wey_message_manager.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 

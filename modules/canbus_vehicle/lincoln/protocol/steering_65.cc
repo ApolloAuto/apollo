@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/steering_65.h"
+#include "modules/canbus_vehicle/lincoln/protocol/steering_65.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

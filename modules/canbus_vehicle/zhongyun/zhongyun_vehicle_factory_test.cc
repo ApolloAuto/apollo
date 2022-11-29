@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
+#include "modules/canbus_vehicle/zhongyun/zhongyun_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 
@@ -30,7 +30,7 @@ class ZhongyunVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/zhongyun_canbus_conf_test.pb.txt";
+        "/apollo/modules/canbus_vehicle/zhongyun/testdata/zhongyun_canbus_conf_test.pb.txt";
     cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     params_.set_brand(apollo::common::ZHONGYUN);

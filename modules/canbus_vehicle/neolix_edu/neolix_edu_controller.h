@@ -25,11 +25,11 @@
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_brake_command_46.h"
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_diagnosis_628.h"
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_drive_command_50.h"
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_eps_command_56.h"
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_light_horn_command_310.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_brake_command_46.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_diagnosis_628.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_drive_command_50.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_eps_command_56.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_light_horn_command_310.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {

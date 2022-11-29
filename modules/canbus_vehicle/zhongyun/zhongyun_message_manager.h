@@ -15,7 +15,7 @@ limitations under the License.
 
 #pragma once
 
-#include "modules/canbus/vehicle/zhongyun/proto/zhongyun.pb.h"
+#include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
 namespace apollo {

@@ -24,7 +24,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/canbus/vehicle/zhongyun/proto/zhongyun.pb.h"
+#include "modules/canbus_vehicle/zhongyun/proto/zhongyun.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/cyber.h"

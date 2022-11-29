@@ -13,23 +13,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "modules/canbus/vehicle/wey/wey_message_manager.h"
+#include "modules/canbus_vehicle/wey/wey_message_manager.h"
 
-#include "modules/canbus/vehicle/wey/protocol/ads1_111.h"
-#include "modules/canbus/vehicle/wey/protocol/ads3_38e.h"
-#include "modules/canbus/vehicle/wey/protocol/ads_eps_113.h"
-#include "modules/canbus/vehicle/wey/protocol/ads_req_vin_390.h"
-#include "modules/canbus/vehicle/wey/protocol/ads_shifter_115.h"
+#include "modules/canbus_vehicle/wey/protocol/ads1_111.h"
+#include "modules/canbus_vehicle/wey/protocol/ads3_38e.h"
+#include "modules/canbus_vehicle/wey/protocol/ads_eps_113.h"
+#include "modules/canbus_vehicle/wey/protocol/ads_req_vin_390.h"
+#include "modules/canbus_vehicle/wey/protocol/ads_shifter_115.h"
 
-#include "modules/canbus/vehicle/wey/protocol/fail_241.h"
-#include "modules/canbus/vehicle/wey/protocol/fbs1_243.h"
-#include "modules/canbus/vehicle/wey/protocol/fbs2_240.h"
-#include "modules/canbus/vehicle/wey/protocol/fbs3_237.h"
-#include "modules/canbus/vehicle/wey/protocol/fbs4_235.h"
-#include "modules/canbus/vehicle/wey/protocol/status_310.h"
-#include "modules/canbus/vehicle/wey/protocol/vin_resp1_391.h"
-#include "modules/canbus/vehicle/wey/protocol/vin_resp2_392.h"
-#include "modules/canbus/vehicle/wey/protocol/vin_resp3_393.h"
+#include "modules/canbus_vehicle/wey/protocol/fail_241.h"
+#include "modules/canbus_vehicle/wey/protocol/fbs1_243.h"
+#include "modules/canbus_vehicle/wey/protocol/fbs2_240.h"
+#include "modules/canbus_vehicle/wey/protocol/fbs3_237.h"
+#include "modules/canbus_vehicle/wey/protocol/fbs4_235.h"
+#include "modules/canbus_vehicle/wey/protocol/status_310.h"
+#include "modules/canbus_vehicle/wey/protocol/vin_resp1_391.h"
+#include "modules/canbus_vehicle/wey/protocol/vin_resp2_392.h"
+#include "modules/canbus_vehicle/wey/protocol/vin_resp3_393.h"
 
 namespace apollo {
 namespace canbus {

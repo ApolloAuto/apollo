@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/protocol/fbs2_240.h"
+#include "modules/canbus_vehicle/wey/protocol/fbs2_240.h"
 
 #include "glog/logging.h"
 

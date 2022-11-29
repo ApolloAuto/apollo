@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/wey_controller.h"
+#include "modules/canbus_vehicle/wey/wey_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus/vehicle/wey/wey_message_manager.h"
+#include "modules/canbus_vehicle/wey/wey_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

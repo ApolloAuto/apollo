@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/accel_6b.h"
+#include "modules/canbus_vehicle/lincoln/protocol/accel_6b.h"
 
 #include "glog/logging.h"
 

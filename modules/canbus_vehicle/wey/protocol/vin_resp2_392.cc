@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/protocol/vin_resp2_392.h"
+#include "modules/canbus_vehicle/wey/protocol/vin_resp2_392.h"
 
 #include "glog/logging.h"
 

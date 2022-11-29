@@ -24,7 +24,7 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
+#include "modules/canbus_vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/cyber.h"
