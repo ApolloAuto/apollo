@@ -16,10 +16,7 @@ cc_library(
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
+        "//modules/drivers/canbus:sensor_canbus_lib",
     ],
 )
 

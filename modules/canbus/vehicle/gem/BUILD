@@ -17,9 +17,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus/can_client:can_client_factory",
-        "//modules/drivers/canbus/can_comm:can_receiver",
-        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus:sensor_canbus_lib",
     ],
 )
 

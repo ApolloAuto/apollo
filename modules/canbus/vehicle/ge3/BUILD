@@ -19,9 +19,7 @@ cc_library(
         "//modules/common/status",
         "//modules/canbus/proto:vehicle_parameter_cc_proto",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus/can_client:can_client_factory",
-        "//modules/drivers/canbus/can_comm:can_receiver",
-        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus:sensor_canbus_lib",
     ],
 )
 
