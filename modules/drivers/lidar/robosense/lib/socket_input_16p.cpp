@@ -117,7 +117,7 @@ int SocketInput16P::get_firing_data_packet(
         }
       } else {
         uint64_t timestamp_nsec = 0;
-        exract_utc_time_from_packet(timestamp_nsec, bytes + 20);
+        exract_utc_time_from_packet(bytes + 20, &timestamp_nsec);
 
         pkt->set_stamp(timestamp_nsec);
         if (!flags) {
@@ -134,8 +134,8 @@ int SocketInput16P::get_firing_data_packet(
   return 0;
 }
 
-bool SocketInput16P::exract_utc_time_from_packet(uint64_t& utc_time_ns,
-                                                 const uint8_t* bytes) {
+bool SocketInput16P::exract_utc_time_from_packet(const uint8_t* bytes,
+                                                 uint64_t* utc_time_ns) {
   unsigned int field_index = 0;
 
   time_t tmp_utc_time_sec = 0;
@@ -151,10 +151,10 @@ bool SocketInput16P::exract_utc_time_from_packet(uint64_t& utc_time_ns,
     tmp_utc_time_usec += static_cast<uint64_t>(bytes[field_index]);
   }
 
-  utc_time_ns = static_cast<uint64_t>(tmp_utc_time_usec) * 1e3 +
-                static_cast<uint64_t>((tmp_utc_time_sec)*1e9);  // ns
+  *utc_time_ns = static_cast<uint64_t>(tmp_utc_time_usec) * 1e3 +
+                 static_cast<uint64_t>((tmp_utc_time_sec)*1e9);  // ns
 
-  // AINFO << "Get UTC time [" << utc_time_ns
+  // AINFO << "Get UTC time [" << *utc_time_ns
   //       << "]ns from pkt, sec: " << tmp_utc_time_sec
   //       << " usec:" << tmp_utc_time_usec;
   return true;
@@ -163,7 +163,7 @@ bool SocketInput16P::exract_utc_time_from_packet(uint64_t& utc_time_ns,
 int SocketInput16P::get_positioning_data_packet(
     apollo::drivers::suteng::SutengPacket* pkt, bool use_gps_time) {
   while (true) {
-    if (!input_available(POLL_TIMEOUT*5)) {
+    if (!input_available(POLL_TIMEOUT * 5)) {
       return 1;
     }
     // Receive packets that should now be available from the
@@ -192,10 +192,11 @@ int SocketInput16P::get_positioning_data_packet(
         }
       } else {
         uint64_t timestamp_nsec = 0;
-        exract_utc_time_from_packet(timestamp_nsec, bytes + 303);
+        exract_utc_time_from_packet(bytes + 303, &timestamp_nsec);
         if (!flags) {
           AINFO << "robo difop first PPS-GPS-timestamp: [" << timestamp_nsec
-                << "] at Cyber-timestamp: [" << apollo::cyber::Time().Now().ToNanosecond() << "]";
+                << "] at Cyber-timestamp: ["
+                << apollo::cyber::Time().Now().ToNanosecond() << "]";
           flags = true;
         }
         pkt->set_stamp(timestamp_nsec);

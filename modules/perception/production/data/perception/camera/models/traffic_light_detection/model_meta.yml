@@ -1,0 +1,15 @@
+name: tl_detection
+date: 2021-01-15
+task_type: tl_detection
+sensor_type: camera
+framework: paddlepaddle
+model_files:
+  - name: baidu_iter_140000.caffemodel
+    size: 17462939
+  - name: baidu_iter_140000.caffemodel.metadata
+    size: 83
+  - name: deploy.prototxt
+    size: 43171
+  - name: detection.pt
+    size: 348
+dataset: []

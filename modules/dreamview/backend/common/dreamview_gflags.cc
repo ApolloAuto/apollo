@@ -113,41 +113,44 @@ DEFINE_double(parking_routing_distance_threshold, 20.0,
               "For open space planner parking situation: get the routing"
               "end point based on this threshold.");
 
-DEFINE_string(plugin_path,
-              "/.apollo/dreamview/plugins/", "Plugin placement");
+DEFINE_string(plugin_path, "/.apollo/dreamview/plugins/", "Plugin placement");
 
 DEFINE_string(plugin_config_file_name_suffix, "_plugin_config.pb.txt",
-               "PLugin config file name!");
+              "PLugin config file name!");
 
-DEFINE_string(plugin_channel_prefix,
-    "/apollo/dreamview/plugins/", "plugins must use this as channel prefix");
+DEFINE_string(plugin_channel_prefix, "/apollo/dreamview/plugins/",
+              "plugins must use this as channel prefix");
 
-DEFINE_string(resource_scenario_path,
-    "/.apollo/resources/scenario_sets/", "Scenario set placement");
+DEFINE_string(resource_scenario_path, "/.apollo/resources/scenario_sets/",
+              "Scenario set placement");
 
 DEFINE_string(resource_dynamic_model_path,
-    "/.apollo/resources/dynamic_models/models/", "Dynamic Models placement");
+              "/.apollo/resources/dynamic_models/models/",
+              "Dynamic Models placement");
 
-DEFINE_string(dynamic_model_root_path,"/.apollo/resources/dynamic_models/","Dynamic Model root directory");
+DEFINE_string(dynamic_model_root_path, "/.apollo/resources/dynamic_models/",
+              "Dynamic Model root directory");
 
-DEFINE_string(dynamic_model_library_path,"/.apollo/resources/dynamic_models/library/","Dynamic Model libs placement");
+DEFINE_string(dynamic_model_library_path,
+              "/.apollo/resources/dynamic_models/library/",
+              "Dynamic Model libs placement");
 
-DEFINE_string(sim_obstacle_stop_command,
-    "pkill -9 -f \"sim_obstacle\" ", "Sim obstacle stop command");
+DEFINE_string(sim_obstacle_stop_command, "pkill -9 -f \"sim_obstacle\" ",
+              "Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,
-    "/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle",
-    "sim obstacle binary placement.");
+              "/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle",
+              "sim obstacle binary placement.");
 
 DEFINE_string(gflag_command_arg,
-    " --flagfile=/apollo/modules/common/data/global_flagfile.txt",
-    "sim obstacle need use gflag!");
+              " --flagfile=/apollo/modules/common/data/global_flagfile.txt",
+              "sim obstacle need use gflag!");
 
-DEFINE_string(sim_perfect_control,
-    "Simulation Perfect Control", "sim perfect control!");
+DEFINE_string(sim_perfect_control, "Simulation Perfect Control",
+              "sim perfect control!");
 
-DEFINE_string(resource_record_path,
-    "/.apollo/resources/records/", "Records placement");
+DEFINE_string(resource_record_path, "/.apollo/resources/records/",
+              "Records placement");
 
-DEFINE_string(cyber_recorder_stop_command,
-    "pkill -9 cyber_recorder", "stop play recorder");
+DEFINE_string(cyber_recorder_stop_command, "pkill -9 cyber_recorder",
+              "stop play recorder");

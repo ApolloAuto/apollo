@@ -1247,7 +1247,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
       return false;
     }
     std::vector<routing::LaneSegment> lane_segments;
-    GetAllLaneSegments(*(frame->local_view().routing), lane_segments);
+    GetAllLaneSegments(*(frame->local_view().routing), &lane_segments);
     bool has_found_nearest_lane = false;
     size_t nearest_lane_index = 0;
     for (auto id : overlap_ids) {
@@ -1812,12 +1812,12 @@ void OpenSpaceRoiDecider::GetParkSpotFromMap(
 
 void OpenSpaceRoiDecider::GetAllLaneSegments(
     const routing::RoutingResponse &routing_response,
-    std::vector<routing::LaneSegment> &routing_segments) {
-  routing_segments.clear();
+    std::vector<routing::LaneSegment> *routing_segments) {
+  routing_segments->clear();
   for (const auto &road : routing_response.road()) {
     for (const auto &passage : road.passage()) {
       for (const auto &segment : passage.segment()) {
-        routing_segments.emplace_back(segment);
+        routing_segments->emplace_back(segment);
       }
     }
   }

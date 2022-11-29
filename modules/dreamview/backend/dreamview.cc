@@ -53,9 +53,9 @@ Status Dreamview::Init() {
 
   if (FLAGS_dreamview_profiling_mode &&
       FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_.reset(new cyber::Timer(
-        FLAGS_dreamview_profiling_duration,
-        [this]() { this->TerminateProfilingMode(); }, false));
+    exit_timer_.reset(
+        new cyber::Timer(FLAGS_dreamview_profiling_duration,
+                         [this]() { this->TerminateProfilingMode(); }, false));
 
     exit_timer_->Start();
     AWARN << "============================================================";
@@ -156,7 +156,6 @@ nlohmann::json Dreamview::HMICallbackSimControl(
     AERROR << "Donnot support this callback";
     return callback_res;
   }
-  std::string dynamic_model_name;
   switch (hmi_function_map[function_name]) {
     case 0: {
       // 解析结果
@@ -188,9 +187,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
-        callback_res["result"] =
-            sim_control_manager_->ChangeDynamicModel(dynamic_model_name);
+        callback_res["result"] = sim_control_manager_->ChangeDynamicModel(
+            param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -201,9 +199,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // 解析结果
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
-        callback_res["result"] =
-            sim_control_manager_->DeleteDynamicModel(dynamic_model_name);
+        callback_res["result"] = sim_control_manager_->DeleteDynamicModel(
+            param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -214,9 +211,8 @@ nlohmann::json Dreamview::HMICallbackSimControl(
       // addDynamicModel
       if (param_json.contains("dynamic_model_name") &&
           sim_control_manager_->IsEnabled()) {
-        dynamic_model_name = param_json["dynamic_model_name"];
-        callback_res["result"] =
-            sim_control_manager_->AddDynamicModel(dynamic_model_name);
+        callback_res["result"] = sim_control_manager_->AddDynamicModel(
+            param_json["dynamic_model_name"]);
       } else {
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
@@ -236,31 +232,25 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     AERROR << "Donnot support this callback";
     return false;
   }
-  switch (plugin_function_map[function_name])
-  {
-  case 0:
-  {
-    // 解析结果
-    if (param_json.contains("scenario_set_id") &&
-        param_json.contains("scenario_set_name"))
-    {
-      const std::string scenario_set_id = param_json["scenario_set_id"];
-      const std::string scenario_set_name = param_json["scenario_set_name"];
-      if (!scenario_set_id.empty() && !scenario_set_name.empty())
-      {
-        callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
-                                                       scenario_set_name);
+  switch (plugin_function_map[function_name]) {
+    case 0: {
+      // 解析结果
+      if (param_json.contains("scenario_set_id") &&
+          param_json.contains("scenario_set_name")) {
+        const std::string scenario_set_id = param_json["scenario_set_id"];
+        const std::string scenario_set_name = param_json["scenario_set_name"];
+        if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
+          callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
+                                                         scenario_set_name);
+        }
       }
-    }
     } break;
-    case 1:
-    {
-        callback_res = hmi_->UpdateRecordToStatus();
-
+    case 1: {
+      callback_res = hmi_->UpdateRecordToStatus();
     } break;
     case 2: {
       if (param_json.contains("dynamic_model_name")) {
-        std::string dynamic_model_name = param_json["dynamic_model_name"];
+        const std::string dynamic_model_name = param_json["dynamic_model_name"];
         if (!dynamic_model_name.empty()) {
           callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
         }
@@ -268,7 +258,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     }
     default:
       break;
-    }
+  }
   return callback_res;
 }
 

@@ -205,7 +205,7 @@ class OpenSpaceRoiDecider : public Decider {
    * @param routing_segments The output vector of lane segments.
    */
   void GetAllLaneSegments(const routing::RoutingResponse &routing_response,
-                          std::vector<routing::LaneSegment> &routing_segments);
+                          std::vector<routing::LaneSegment> *routing_segments);
 
  private:
   // @brief parking_spot_id from routing

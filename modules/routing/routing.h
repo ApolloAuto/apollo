@@ -84,7 +84,7 @@ class Routing {
    * spot.
    */
   void GetAllOverlapObjectIds(const hdmap::Id &parking_spot_id,
-                              std::vector<std::string> &lane_ids) const;
+                              std::vector<std::string> *lane_ids) const;
 
  private:
   std::unique_ptr<Navigator> navigator_ptr_;

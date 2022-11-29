@@ -1,0 +1,13 @@
+name: tl_recognition
+date: 2021-01-15
+task_type: tl_recognition
+sensor_type: camera
+framework: paddlepaddle
+model_files:
+  - name: horizontal
+    size: 192
+  - name: quadrate
+    size: 192
+  - name: vertical
+    size: 192
+dataset: ['waymo', 'kitti', 'nusense']

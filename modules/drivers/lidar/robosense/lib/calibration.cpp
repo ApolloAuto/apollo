@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/drivers/lidar/robosense/lib/calibration.h"
+
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -20,8 +22,8 @@
 #include <map>
 #include <string>
 #include <utility>
+
 #include <yaml-cpp/yaml.h>
-#include "modules/drivers/lidar/robosense/lib/calibration.h"
 
 namespace apollo {
 namespace drivers {

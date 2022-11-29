@@ -1,0 +1,25 @@
+name: 3d-yolo
+date: 2019-12-08
+task_type: 3d_detection
+sensor_type: camera
+framework: paddlepaddle
+model_files:
+  - name: CalibrationTable
+    size: 1521
+  - name: anchors.txt
+    size: 181
+  - name: deploy.model
+    size: 0
+  - name: deploy.pt
+    size: 66825
+  - name: expand.txt
+    size: 36
+  - name: feature.pt
+    size: 122
+  - name: model
+    size: 252744
+  - name: params
+    size: 25794185
+  - name: types.txt
+    size: 60
+dataset: ['waymo', 'kitti', 'nusense']

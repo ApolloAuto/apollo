@@ -24,3 +24,11 @@ RUN bash /opt/apollo/installers/install_release_deps.sh
 # RUN bash /opt/apollo/installers/install_geo_adjustment.sh us
 
 RUN bash /opt/apollo/installers/post_install.sh dev
+
+RUN mkdir -p /opt/apollo/neo/data/log && chmod -R 777 /opt/apollo/neo
+
+COPY rcfiles/setup.sh /opt/apollo/neo/   
+
+RUN echo "source /opt/apollo/neo/setup.sh" >> /etc/skel/.bashrc
+
+RUN echo "deb https://apollo-pkg-beta.bj.bcebos.com/neo/beta bionic main" >> /etc/apt/sources.list

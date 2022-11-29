@@ -112,6 +112,7 @@ cc_test(
         "hdmap_common_test.cc",
         "hdmap_impl_test.cc",
     ],
+    tags = ["exclude"],
     data = [
         ":testdata",
         "//modules/common/util",

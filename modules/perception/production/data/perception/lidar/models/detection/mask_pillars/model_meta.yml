@@ -1,0 +1,17 @@
+name: mask_pillars
+date: 2021-07-30
+task_type: 3d_detection
+sensor_type: lidar
+framework: paddlepaddle
+model_files:
+  - name: pts_backbone.zip
+    size: 24832747
+  - name: pts_bbox_head.zip
+    size: 121388
+  - name: pts_middle_encoder.zip
+    size: 3817
+  - name: pts_neck.zip
+    size: 2653909
+  - name: pts_voxel_encoder.zip
+    size: 17510
+dataset: ['waymo', 'kitti', 'nusense']

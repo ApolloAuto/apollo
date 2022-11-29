@@ -86,7 +86,7 @@ class MSFLocalization {
                                 double *uncertainty_z);
   bool LoadImuVehicleExtrinsic(const std::string &file_path, double *quat_qx,
                                double *quat_qy, double *quat_qz,
-                               double *quat_qw, Eigen::Vector3d &translation);
+                               double *quat_qw, Eigen::Vector3d *translation);
   bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
   void CompensateImuVehicleExtrinsic(LocalizationEstimate *local_result);
 

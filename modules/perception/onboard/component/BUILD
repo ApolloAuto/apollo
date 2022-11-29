@@ -42,6 +42,7 @@ cc_library(
         "lane_detection_component.h",
         "trafficlights_perception_component.h",
     ],
+    linkopts = ["-lleveldb"],
     copts = PERCEPTION_COPTS,
     deps = [
         "//cyber",

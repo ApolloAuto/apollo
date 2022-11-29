@@ -19,12 +19,15 @@
 #include <memory>
 #include <string>
 #include <thread>
+
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-#include "cyber/cyber.h"
+
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
-#include "modules/drivers/lidar/robosense/parser/convert.h"
 #include "modules/drivers/lidar/robosense/proto/sensor_suteng.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/drivers/lidar/robosense/parser/convert.h"
 
 namespace apollo {
 namespace drivers {
@@ -90,7 +93,7 @@ class CompRoboConvert : public Component<apollo::drivers::suteng::SutengScan> {
     writer_->Write(point_cloud_send);
 
     if (seq_ % 10 == 0) {
-      AINFO << " total:" << seq_ + 1 << "-RS-cost:" << diff*1e-9
+      AINFO << " total:" << seq_ + 1 << "-RS-cost:" << diff * 1e-9
             << "ms -meta:" << point_cloud_send->header().lidar_timestamp();
     }
     seq_++;

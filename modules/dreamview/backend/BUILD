@@ -74,6 +74,8 @@ cc_binary(
 install(
     name = "install",
     library_dest = "dreamview/lib",
+    data_dest = "dreamview/addition_data/backend",
+    data = ["//modules/dreamview/backend/testdata:testdata"],
     targets = [":libbackend.so"]
 )
 

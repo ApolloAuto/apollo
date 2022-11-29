@@ -55,14 +55,15 @@ class Robosense16PParser : public RobosenseParser {
     cloud->set_width(width);
     int height = cloud->point_size() / cloud->width();
     cloud->set_height(height);
-  };
+  }
   uint32_t GetPointSize() override { return POINT_SIZE; };
   void setup() override;
 
  private:
 #pragma pack(push, 1)
   static constexpr uint32_t POINT_SIZE = 28800;
-  static constexpr float DISTANCE_RESOLUTION_16P = 0.0025f; /**< meters */  // 16p
+  static constexpr float DISTANCE_RESOLUTION_16P = 0.0025f;
+  /**< meters */  // 16p
   static constexpr int SCANS_PER_FIRING = 16;
   static constexpr int FIRINGS_PER_BLOCK = 2;
   static constexpr float DEGREE_TO_RADIAN =
@@ -115,7 +116,7 @@ class Robosense16PParser : public RobosenseParser {
   uint64_t get_timestamp(double base_time, float time_offset,
                          uint16_t laser_block_id) {
     return 0;
-  };
+  }
   void unpack_params(const apollo::drivers::suteng::SutengPacket& pkt);
   float parse_angle(angle_16p_t angle_pkt);
   void unpack_robosense(
@@ -201,7 +202,6 @@ class Robosense16PParser : public RobosenseParser {
        1096.98, 1208.09, 1319.21},
       {99.46, 210.57, 321.68, 432.80, 543.91, 655.02, 766.13, 877.24, 988.36,
        1099.47, 1210.58, 1321.69}};
-
 };
 
 }  // namespace robosense

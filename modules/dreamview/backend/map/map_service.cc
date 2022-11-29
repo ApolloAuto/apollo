@@ -155,6 +155,15 @@ const hdmap::HDMap *MapService::SimMap() const {
 
 bool MapService::MapReady() const { return HDMap() && SimMap(); }
 
+bool MapService::PointIsValid(const double x, const double y) const {
+  MapElementIds ids;
+  PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+  CollectMapElementIds(point, 20, &ids);
+  return (ids.ByteSizeLong() != 0);
+}
+
 void MapService::CollectMapElementIds(const PointENU &point, double radius,
                                       MapElementIds *ids) const {
   if (!MapReady()) {
