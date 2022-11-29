@@ -102,14 +102,17 @@ class ZhongyunVehicleFactory : public AbstractVehicleFactory {
    * @brief create zhongyun message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::Zhongyun>> CreateMessageManager();
+  std::unique_ptr<MessageManager<::apollo::canbus::Zhongyun>>
+  CreateMessageManager();
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<::apollo::canbus::Zhongyun> can_sender_;
-  apollo::drivers::canbus::CanReceiver<::apollo::canbus::Zhongyun> can_receiver_;
+  apollo::drivers::canbus::CanReceiver<::apollo::canbus::Zhongyun>
+      can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Zhongyun>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Zhongyun>> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Zhongyun>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Zhongyun>>
       chassis_detail_writer_;
@@ -119,4 +122,3 @@ CYBER_REGISTER_VEHICLEFACTORY(ZhongyunVehicleFactory)
 
 }  // namespace canbus
 }  // namespace apollo
-

@@ -21,13 +21,11 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/lexus/proto/lexus.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "modules/canbus/vehicle/lexus/protocol/accel_cmd_100.h"
@@ -42,20 +40,21 @@
 #include "modules/canbus/vehicle/lexus/protocol/steering_cmd_12c.h"
 #include "modules/canbus/vehicle/lexus/protocol/turn_cmd_130.h"
 #include "modules/canbus/vehicle/lexus/protocol/wiper_cmd_134.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 namespace apollo {
 namespace canbus {
 namespace lexus {
 
-class LexusController final : public VehicleController<::apollo::canbus::Lexus> {
+class LexusController final
+    : public VehicleController<::apollo::canbus::Lexus> {
  public:
   virtual ~LexusController();
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Lexus>* const can_sender,
-      MessageManager<::apollo::canbus::Lexus>* const message_manager)
-      override;
+      MessageManager<::apollo::canbus::Lexus>* const message_manager) override;
 
   bool Start() override;
 

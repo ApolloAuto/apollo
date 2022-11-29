@@ -163,4 +163,3 @@ WeyVehicleFactory::CreateMessageManager() {
 
 }  // namespace canbus
 }  // namespace apollo
-

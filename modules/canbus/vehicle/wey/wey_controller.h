@@ -19,14 +19,13 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/vehicle/wey/protocol/ads1_111.h"
 #include "modules/canbus/vehicle/wey/protocol/ads3_38e.h"
 #include "modules/canbus/vehicle/wey/protocol/ads_eps_113.h"
@@ -46,8 +45,7 @@ class WeyController final : public VehicleController<::apollo::canbus::Wey> {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Wey>* const can_sender,
-      MessageManager<::apollo::canbus::Wey>* const message_manager)
-      override;
+      MessageManager<::apollo::canbus::Wey>* const message_manager) override;
 
   bool Start() override;
 

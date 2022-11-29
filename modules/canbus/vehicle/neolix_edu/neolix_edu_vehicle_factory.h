@@ -102,14 +102,18 @@ class Neolix_eduVehicleFactory : public AbstractVehicleFactory {
    * @brief create Neolix_edu message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::Neolix_edu>> CreateMessageManager();
+  std::unique_ptr<MessageManager<::apollo::canbus::Neolix_edu>>
+  CreateMessageManager();
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<::apollo::canbus::Neolix_edu> can_sender_;
-  apollo::drivers::canbus::CanReceiver<::apollo::canbus::Neolix_edu> can_receiver_;
-  std::unique_ptr<MessageManager<::apollo::canbus::Neolix_edu>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>> vehicle_controller_;
+  apollo::drivers::canbus::CanReceiver<::apollo::canbus::Neolix_edu>
+      can_receiver_;
+  std::unique_ptr<MessageManager<::apollo::canbus::Neolix_edu>>
+      message_manager_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Neolix_edu>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Neolix_edu>>
       chassis_detail_writer_;

@@ -16,11 +16,12 @@
 
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -255,9 +256,9 @@ Chassis LexusController::chassis() {
   // TODO(QiL) : verify the unit here.
   if (chassis_detail.has_steering_rpt_22c() &&
       chassis_detail.steering_rpt_22c().has_output_value()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.steering_rpt_22c().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle()));
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.steering_rpt_22c().output_value() *
+                           100.0 / vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -651,10 +652,9 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_steering_enabled =
-          chassis_detail.has_steering_rpt_22c() &&
-          chassis_detail.steering_rpt_22c().has_enabled() &&
-          chassis_detail.steering_rpt_22c().enabled();
+      is_steering_enabled = chassis_detail.has_steering_rpt_22c() &&
+                            chassis_detail.steering_rpt_22c().has_enabled() &&
+                            chassis_detail.steering_rpt_22c().enabled();
       check_ok = check_ok && is_steering_enabled;
     }
 

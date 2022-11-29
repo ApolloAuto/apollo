@@ -19,14 +19,13 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/vehicle/zhongyun/protocol/brake_control_a4.h"
 #include "modules/canbus/vehicle/zhongyun/protocol/gear_control_a1.h"
 #include "modules/canbus/vehicle/zhongyun/protocol/parking_control_a5.h"
@@ -37,7 +36,8 @@ namespace apollo {
 namespace canbus {
 namespace zhongyun {
 
-class ZhongyunController final : public VehicleController<::apollo::canbus::Zhongyun> {
+class ZhongyunController final
+    : public VehicleController<::apollo::canbus::Zhongyun> {
  public:
   ZhongyunController() {}
 

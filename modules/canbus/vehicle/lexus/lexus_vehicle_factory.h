@@ -102,14 +102,16 @@ class LexusVehicleFactory : public AbstractVehicleFactory {
    * @brief create lexus message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::Lexus>> CreateMessageManager();
+  std::unique_ptr<MessageManager<::apollo::canbus::Lexus>>
+  CreateMessageManager();
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<::apollo::canbus::Lexus> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Lexus> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Lexus>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Lexus>> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Lexus>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Lexus>>
       chassis_detail_writer_;

@@ -102,14 +102,16 @@ class DevkitVehicleFactory : public AbstractVehicleFactory {
    * @brief create devkit message manager
    * @returns a unique_ptr that points to the created message manager
    */
-  std::unique_ptr<MessageManager<::apollo::canbus::Devkit>> CreateMessageManager();
+  std::unique_ptr<MessageManager<::apollo::canbus::Devkit>>
+  CreateMessageManager();
 
   std::unique_ptr<::apollo::cyber::Node> node_ = nullptr;
   std::unique_ptr<apollo::drivers::canbus::CanClient> can_client_;
   CanSender<::apollo::canbus::Devkit> can_sender_;
   apollo::drivers::canbus::CanReceiver<::apollo::canbus::Devkit> can_receiver_;
   std::unique_ptr<MessageManager<::apollo::canbus::Devkit>> message_manager_;
-  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>> vehicle_controller_;
+  std::unique_ptr<VehicleController<::apollo::canbus::Devkit>>
+      vehicle_controller_;
 
   std::shared_ptr<::apollo::cyber::Writer<::apollo::canbus::Devkit>>
       chassis_detail_writer_;

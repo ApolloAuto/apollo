@@ -26,15 +26,14 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cyber/common/macros.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
+#include "cyber/common/macros.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
 #include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
@@ -55,17 +54,17 @@ namespace lincoln {
  *
  * @brief this class implements the vehicle controller for lincoln vehicle.
  */
-class LincolnController final : public VehicleController<::apollo::canbus::Lincoln> {
+class LincolnController final
+    : public VehicleController<::apollo::canbus::Lincoln> {
  public:
   /**
    * @brief initialize the lincoln vehicle controller.
    * @return init error_code
    */
-  common::ErrorCode Init(
-      const VehicleParameter &params,
-      CanSender<::apollo::canbus::Lincoln> *const can_sender,
-      MessageManager<::apollo::canbus::Lincoln> *const message_manager)
-      override;
+  common::ErrorCode Init(const VehicleParameter &params,
+                         CanSender<::apollo::canbus::Lincoln> *const can_sender,
+                         MessageManager<::apollo::canbus::Lincoln>
+                             *const message_manager) override;
 
   /**
    * @brief start the vehicle controller.

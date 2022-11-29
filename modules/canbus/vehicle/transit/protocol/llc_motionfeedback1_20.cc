@@ -56,8 +56,9 @@ void Llcmotionfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
       llc_fbk_adcrequestautonomy(bytes, length));
   chassis->mutable_llc_motionfeedback1_20()->set_llc_fbk_allowautonomy(
       llc_fbk_allowautonomy(bytes, length));
-  chassis->mutable_llc_motionfeedback1_20()->set_llc_fbk_longitudinalcontrolmode(
-      llc_fbk_longitudinalcontrolmode(bytes, length));
+  chassis->mutable_llc_motionfeedback1_20()
+      ->set_llc_fbk_longitudinalcontrolmode(
+          llc_fbk_longitudinalcontrolmode(bytes, length));
   chassis->mutable_llc_motionfeedback1_20()->set_llc_fbk_state(
       llc_fbk_state(bytes, length));
 }

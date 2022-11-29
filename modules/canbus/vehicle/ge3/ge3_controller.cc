@@ -14,10 +14,12 @@ limitations under the License.
 ==============================================================================*/
 
 #include "modules/canbus/vehicle/ge3/ge3_controller.h"
+
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -205,7 +207,8 @@ Chassis Ge3Controller::chassis() {
     }
   }
 
-  if (chassis_detail.has_scu_bcs_2_307() && chassis_detail.scu_bcs_2_307().has_bcs_vehspd()) {
+  if (chassis_detail.has_scu_bcs_2_307() &&
+      chassis_detail.scu_bcs_2_307().has_bcs_vehspd()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.scu_bcs_2_307().bcs_vehspd()));
   } else {
@@ -217,21 +220,24 @@ Chassis Ge3Controller::chassis() {
   // to avoid confusing, just don't set
   chassis_.set_fuel_range_m(0);
 
-  if (chassis_detail.has_scu_vcu_1_312() && chassis_detail.scu_vcu_1_312().has_vcu_accpedact()) {
+  if (chassis_detail.has_scu_vcu_1_312() &&
+      chassis_detail.scu_vcu_1_312().has_vcu_accpedact()) {
     chassis_.set_throttle_percentage(
         static_cast<float>(chassis_detail.scu_vcu_1_312().vcu_accpedact()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
-  if (chassis_detail.has_scu_bcs_1_306() && chassis_detail.scu_bcs_1_306().has_bcs_brkpedact()) {
+  if (chassis_detail.has_scu_bcs_1_306() &&
+      chassis_detail.scu_bcs_1_306().has_bcs_brkpedact()) {
     chassis_.set_brake_percentage(
         static_cast<float>(chassis_detail.scu_bcs_1_306().bcs_brkpedact()));
   } else {
     chassis_.set_brake_percentage(0);
   }
   // 23, previously 10
-  if (chassis_detail.has_scu_vcu_1_312() && chassis_detail.scu_vcu_1_312().has_vcu_gearact()) {
+  if (chassis_detail.has_scu_vcu_1_312() &&
+      chassis_detail.scu_vcu_1_312().has_vcu_gearact()) {
     switch (chassis_detail.scu_vcu_1_312().vcu_gearact()) {
       case Scu_vcu_1_312::VCU_GEARACT_INVALID: {
         chassis_.set_gear_location(Chassis::GEAR_INVALID);
@@ -257,7 +263,8 @@ Chassis Ge3Controller::chassis() {
   }
 
   // 11
-  if (chassis_detail.has_scu_eps_311() && chassis_detail.scu_eps_311().has_eps_steerangle()) {
+  if (chassis_detail.has_scu_eps_311() &&
+      chassis_detail.scu_eps_311().has_eps_steerangle()) {
     chassis_.set_steering_percentage(
         static_cast<float>(chassis_detail.scu_eps_311().eps_steerangle() /
                            vehicle_params_.max_steer_angle() * M_PI / 1.80));
@@ -266,7 +273,8 @@ Chassis Ge3Controller::chassis() {
   }
 
   // 13
-  if (chassis_detail.has_scu_epb_310() && chassis_detail.scu_epb_310().has_epb_sysst()) {
+  if (chassis_detail.has_scu_epb_310() &&
+      chassis_detail.scu_epb_310().has_epb_sysst()) {
     chassis_.set_parking_brake(chassis_detail.scu_epb_310().epb_sysst() ==
                                Scu_epb_310::EPB_SYSST_APPLIED);
   } else {
@@ -274,7 +282,8 @@ Chassis Ge3Controller::chassis() {
   }
 
   // 14, 15: ge3 light control
-  if (chassis_detail.has_scu_bcm_304() && chassis_detail.scu_bcm_304().has_bcm_highbeamst() &&
+  if (chassis_detail.has_scu_bcm_304() &&
+      chassis_detail.scu_bcm_304().has_bcm_highbeamst() &&
       Scu_bcm_304::BCM_HIGHBEAMST_ACTIVE ==
           chassis_detail.scu_bcm_304().bcm_highbeamst()) {
     if (chassis_.has_signal()) {
@@ -308,8 +317,10 @@ Chassis Ge3Controller::chassis() {
         common::VehicleSignal::TURN_NONE);
   }
   // 18
-  if (chassis_detail.has_scu_bcm_304() && chassis_detail.scu_bcm_304().has_bcm_hornst() &&
-      Scu_bcm_304::BCM_HORNST_ACTIVE == chassis_detail.scu_bcm_304().bcm_hornst()) {
+  if (chassis_detail.has_scu_bcm_304() &&
+      chassis_detail.scu_bcm_304().has_bcm_hornst() &&
+      Scu_bcm_304::BCM_HORNST_ACTIVE ==
+          chassis_detail.scu_bcm_304().bcm_hornst()) {
     chassis_.mutable_signal()->set_horn(true);
   } else {
     chassis_.mutable_signal()->set_horn(false);
@@ -317,7 +328,7 @@ Chassis Ge3Controller::chassis() {
 
   // vin number will be written into KVDB once.
   chassis_.mutable_vehicle_id()->set_vin("");
-  if (chassis_detail.has_scu_1_301() && chassis_detail.has_scu_2_302() && 
+  if (chassis_detail.has_scu_1_301() && chassis_detail.has_scu_2_302() &&
       chassis_detail.has_scu_3_303()) {
     Scu_1_301 scu_1_301 = chassis_detail.scu_1_301();
     Scu_2_302 scu_2_302 = chassis_detail.scu_2_302();
@@ -381,7 +392,7 @@ Chassis Ge3Controller::chassis() {
           apollo::common::EngageAdvice::READY_TO_ENGAGE);
     }
   }
-  
+
   // 19 add checkresponse signal
   if (chassis_detail.has_scu_bcs_1_306() &&
       chassis_detail.scu_bcs_1_306().has_bcs_drvmode()) {
@@ -676,20 +687,23 @@ bool Ge3Controller::CheckChassisError() {
 
   // check steer error
   if (chassis_detail.has_scu_eps_311()) {
-    if (Scu_eps_311::EPS_FAULTST_FAULT == chassis_detail.scu_eps_311().eps_faultst()) {
+    if (Scu_eps_311::EPS_FAULTST_FAULT ==
+        chassis_detail.scu_eps_311().eps_faultst()) {
       return true;
     }
   }
 
   // check vcu error
   if (chassis_detail.has_scu_vcu_1_312() &&
-      Scu_vcu_1_312::VCU_FAULTST_NORMAL != chassis_detail.scu_vcu_1_312().vcu_faultst()) {
+      Scu_vcu_1_312::VCU_FAULTST_NORMAL !=
+          chassis_detail.scu_vcu_1_312().vcu_faultst()) {
     return true;
   }
 
   // check braking error
   if (chassis_detail.has_scu_bcs_1_306()) {
-    if (Scu_bcs_1_306::BCS_FAULTST_FAULT == chassis_detail.scu_bcs_1_306().bcs_faultst()) {
+    if (Scu_bcs_1_306::BCS_FAULTST_FAULT ==
+        chassis_detail.scu_bcs_1_306().bcs_faultst()) {
       return true;
     }
   }
@@ -704,14 +718,16 @@ bool Ge3Controller::CheckChassisError() {
 
   // check parking error
   if (chassis_detail.has_scu_epb_310()) {
-    if (Scu_epb_310::EPB_FAULTST_FAULT == chassis_detail.scu_epb_310().epb_faultst()) {
+    if (Scu_epb_310::EPB_FAULTST_FAULT ==
+        chassis_detail.scu_epb_310().epb_faultst()) {
       return true;
     }
   }
 
   // check the whole vehicle error
   if (chassis_detail.has_scu_1_301()) {
-    if (Scu_1_301::SCU_FAULTST_NORMAL != chassis_detail.scu_1_301().scu_faultst()) {
+    if (Scu_1_301::SCU_FAULTST_NORMAL !=
+        chassis_detail.scu_1_301().scu_faultst()) {
       return true;
     }
   }

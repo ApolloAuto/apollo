@@ -82,8 +82,8 @@ bool TransitVehicleFactory::Init(const CanbusConf *canbus_conf) {
 
   node_ = ::apollo::cyber::CreateNode("chassis_detail");
 
-  chassis_detail_writer_ =
-      node_->CreateWriter<::apollo::canbus::Transit>(FLAGS_chassis_detail_topic);
+  chassis_detail_writer_ = node_->CreateWriter<::apollo::canbus::Transit>(
+      FLAGS_chassis_detail_topic);
 
   return true;
 }

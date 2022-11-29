@@ -187,12 +187,9 @@ Chassis Neolix_eduController::chassis() {
   }
   // 4 SOC
   if (chassis_detail.has_vcu_vehicle_status_report_101() &&
-      chassis_detail
-          .vcu_vehicle_status_report_101()
-          .has_vcu_display_soc()) {
-    chassis_.set_battery_soc_percentage(chassis_detail
-                                            .vcu_vehicle_status_report_101()
-                                            .vcu_display_soc());
+      chassis_detail.vcu_vehicle_status_report_101().has_vcu_display_soc()) {
+    chassis_.set_battery_soc_percentage(
+        chassis_detail.vcu_vehicle_status_report_101().vcu_display_soc());
   } else {
     chassis_.set_battery_soc_percentage(0);
   }
@@ -210,8 +207,7 @@ Chassis Neolix_eduController::chassis() {
   if (chassis_detail.has_vcu_drive_report_52() &&
       chassis_detail.vcu_drive_report_52().has_vcu_real_torque()) {
     chassis_.set_throttle_percentage(
-        chassis_detail.vcu_drive_report_52().vcu_real_torque() *
-        2);
+        chassis_detail.vcu_drive_report_52().vcu_real_torque() * 2);
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -227,19 +223,14 @@ Chassis Neolix_eduController::chassis() {
   // 8 gear
   if (chassis_detail.has_vcu_drive_report_52() &&
       chassis_detail.vcu_drive_report_52().has_vcu_real_shift()) {
-    chassis_.set_gear_location(
-        (apollo::canbus::Chassis_GearPosition)chassis_detail
-            .vcu_drive_report_52()
-            .vcu_real_shift());
+    chassis_.set_gear_location((apollo::canbus::Chassis_GearPosition)
+                                   chassis_detail.vcu_drive_report_52()
+                                       .vcu_real_shift());
   }
   // 9 epb
   if (chassis_detail.has_vcu_brake_report_47() &&
-      chassis_detail
-          .vcu_brake_report_47()
-          .has_vcu_real_parking_status()) {
-    if (chassis_detail
-            .vcu_brake_report_47()
-            .vcu_real_parking_status() == 1) {
+      chassis_detail.vcu_brake_report_47().has_vcu_real_parking_status()) {
+    if (chassis_detail.vcu_brake_report_47().vcu_real_parking_status() == 1) {
       chassis_.set_parking_brake(true);
     } else {
       chassis_.set_parking_brake(false);
@@ -264,12 +255,8 @@ Chassis Neolix_eduController::chassis() {
 
   // 11 bumper event
   if (chassis_detail.has_vcu_brake_report_47() &&
-      chassis_detail
-          .vcu_brake_report_47()
-          .has_vcu_ehb_brake_state()) {
-    if (chassis_detail
-            .vcu_brake_report_47()
-            .vcu_ehb_brake_state() ==
+      chassis_detail.vcu_brake_report_47().has_vcu_ehb_brake_state()) {
+    if (chassis_detail.vcu_brake_report_47().vcu_ehb_brake_state() ==
         Vcu_brake_report_47::VCU_EHB_BUMPER_BRAKE) {
       chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
       chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
@@ -288,7 +275,7 @@ Chassis Neolix_eduController::chassis() {
     chassis_.mutable_check_response()->set_is_esp_online(
         chassis_detail.vcu_brake_report_47().brake_enable_resp() == 1);
   }
-  if (chassis_detail.has_vcu_drive_report_52() && 
+  if (chassis_detail.has_vcu_drive_report_52() &&
       chassis_detail.vcu_drive_report_52().has_drive_enable_resp()) {
     chassis_.mutable_check_response()->set_is_vcu_online(
         chassis_detail.vcu_drive_report_52().drive_enable_resp() == 1);
@@ -296,7 +283,7 @@ Chassis Neolix_eduController::chassis() {
   if (chassis_detail.has_vcu_eps_report_57() &&
       chassis_detail.vcu_eps_report_57().has_drive_enable_resp()) {
     chassis_.mutable_check_response()->set_is_eps_online(
-            chassis_detail.vcu_eps_report_57().drive_enable_resp() == 1);
+        chassis_detail.vcu_eps_report_57().drive_enable_resp() == 1);
   }
 
   return chassis_;

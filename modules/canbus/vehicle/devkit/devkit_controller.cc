@@ -18,12 +18,13 @@
 
 #include <string>
 
+#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/canbus/vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -196,8 +197,8 @@ Chassis DevkitController::chassis() {
   // 6 speed_mps
   if (chassis_detail.has_vcu_report_505() &&
       chassis_detail.vcu_report_505().has_speed()) {
-    chassis_.set_speed_mps(static_cast<float>(
-        abs(chassis_detail.vcu_report_505().speed())));
+    chassis_.set_speed_mps(
+        static_cast<float>(abs(chassis_detail.vcu_report_505().speed())));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -207,9 +208,7 @@ Chassis DevkitController::chassis() {
   // chassis_.set_fuel_range_m(0);
   // 9 throttle
   if (chassis_detail.has_throttle_report_500() &&
-      chassis_detail
-          .throttle_report_500()
-          .has_throttle_pedal_actual()) {
+      chassis_detail.throttle_report_500().has_throttle_pedal_actual()) {
     chassis_.set_throttle_percentage(static_cast<float>(
         chassis_detail.throttle_report_500().throttle_pedal_actual()));
   } else {
@@ -217,13 +216,9 @@ Chassis DevkitController::chassis() {
   }
   // throttle sender cmd
   if (chassis_detail.has_throttle_command_100() &&
-      chassis_detail
-          .throttle_command_100()
-          .has_throttle_pedal_target()) {
-    chassis_.set_throttle_percentage_cmd(
-        static_cast<float>(chassis_detail
-                               .throttle_command_100()
-                               .throttle_pedal_target()));
+      chassis_detail.throttle_command_100().has_throttle_pedal_target()) {
+    chassis_.set_throttle_percentage_cmd(static_cast<float>(
+        chassis_detail.throttle_command_100().throttle_pedal_target()));
   } else {
     chassis_.set_throttle_percentage_cmd(0);
   }
@@ -276,8 +271,8 @@ Chassis DevkitController::chassis() {
   if (chassis_detail.has_steering_report_502() &&
       chassis_detail.steering_report_502().has_steer_angle_actual()) {
     chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.steering_report_502().steer_angle_actual() *
-        100.0 / vehicle_params_.max_steer_angle() * M_PI / 180));
+        chassis_detail.steering_report_502().steer_angle_actual() * 100.0 /
+        vehicle_params_.max_steer_angle() * M_PI / 180));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -430,7 +425,7 @@ Chassis DevkitController::chassis() {
     chassis_.mutable_check_response()->set_is_esp_online(
         chassis_detail.brake_report_501().brake_en_state() == 1);
   }
-  if (chassis_detail.has_steering_report_502() && 
+  if (chassis_detail.has_steering_report_502() &&
       chassis_detail.steering_report_502().has_steer_en_state()) {
     chassis_.mutable_check_response()->set_is_eps_online(
         chassis_detail.steering_report_502().steer_en_state() == 1);

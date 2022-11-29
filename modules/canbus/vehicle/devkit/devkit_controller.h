@@ -20,8 +20,11 @@
 #include <thread>
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/devkit/protocol/brake_command_101.h"
 #include "modules/canbus/vehicle/devkit/protocol/gear_command_103.h"
 #include "modules/canbus/vehicle/devkit/protocol/park_command_104.h"
@@ -29,14 +32,13 @@
 #include "modules/canbus/vehicle/devkit/protocol/throttle_command_100.h"
 #include "modules/canbus/vehicle/devkit/protocol/vehicle_mode_command_105.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/basic_msgs/error_code.pb.h"
-#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace devkit {
 
-class DevkitController final : public VehicleController<::apollo::canbus::Devkit> {
+class DevkitController final
+    : public VehicleController<::apollo::canbus::Devkit> {
  public:
   DevkitController() {}
 
@@ -45,8 +47,7 @@ class DevkitController final : public VehicleController<::apollo::canbus::Devkit
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Devkit>* const can_sender,
-      MessageManager<::apollo::canbus::Devkit>* const message_manager)
-      override;
+      MessageManager<::apollo::canbus::Devkit>* const message_manager) override;
 
   bool Start() override;
 

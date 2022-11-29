@@ -162,8 +162,8 @@ Chassis ZhongyunController::chassis() {
   // 4 engine_rpm
   if (chassis_detail.has_vehicle_state_feedback_2_c4() &&
       chassis_detail.vehicle_state_feedback_2_c4().has_motor_speed()) {
-    chassis_.set_engine_rpm(
-        static_cast<float>(chassis_detail.vehicle_state_feedback_2_c4().motor_speed()));
+    chassis_.set_engine_rpm(static_cast<float>(
+        chassis_detail.vehicle_state_feedback_2_c4().motor_speed()));
   } else {
     chassis_.set_engine_rpm(0);
   }
@@ -180,7 +180,8 @@ Chassis ZhongyunController::chassis() {
 
   // 7 acc_pedal
   if (chassis_detail.has_vehicle_state_feedback_2_c4() &&
-      chassis_detail.vehicle_state_feedback_2_c4().has_driven_torque_feedback()) {
+      chassis_detail.vehicle_state_feedback_2_c4()
+          .has_driven_torque_feedback()) {
     chassis_.set_throttle_percentage(static_cast<float>(
         chassis_detail.vehicle_state_feedback_2_c4().driven_torque_feedback()));
   } else {
@@ -259,12 +260,15 @@ Chassis ZhongyunController::chassis() {
     if (chassis_detail.enable_state_feedback_c3().has_driven_enable_state() &&
         chassis_detail.enable_state_feedback_c3().has_gear_enable_actual()) {
       chassis_.mutable_check_response()->set_is_vcu_online(
-          ((chassis_detail.enable_state_feedback_c3().driven_enable_state() == 1) &&
-           (chassis_detail.enable_state_feedback_c3().gear_enable_actual() == 1)) == 1);
+          ((chassis_detail.enable_state_feedback_c3().driven_enable_state() ==
+            1) &&
+           (chassis_detail.enable_state_feedback_c3().gear_enable_actual() ==
+            1)) == 1);
     }
     if (chassis_detail.enable_state_feedback_c3().has_steering_enable_state()) {
       chassis_.mutable_check_response()->set_is_eps_online(
-          chassis_detail.enable_state_feedback_c3().steering_enable_state() == 1);
+          chassis_detail.enable_state_feedback_c3().steering_enable_state() ==
+          1);
     }
   }
 
@@ -550,14 +554,16 @@ bool ZhongyunController::CheckChassisError() {
     }
   }
   // check eps error
-  if (chassis_detail.has_error_state_e1() && chassis_detail.error_state_e1().has_brake_error_code()) {
+  if (chassis_detail.has_error_state_e1() &&
+      chassis_detail.error_state_e1().has_brake_error_code()) {
     if (chassis_detail.error_state_e1().brake_error_code() ==
         Error_state_e1::BRAKE_ERROR_CODE_ERROR) {
       return true;
     }
   }
   // check gear error
-  if (chassis_detail.has_error_state_e1() && chassis_detail.error_state_e1().has_gear_error_msg()) {
+  if (chassis_detail.has_error_state_e1() &&
+      chassis_detail.error_state_e1().has_gear_error_msg()) {
     if (chassis_detail.error_state_e1().gear_error_msg() ==
         Error_state_e1::GEAR_ERROR_MSG_ERROR) {
       return true;
