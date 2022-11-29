@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_eps_command_56.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_eps_command_56.h"
 
 #include "gtest/gtest.h"
 

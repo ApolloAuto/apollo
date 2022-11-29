@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/protocol/torque_control_a3.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/torque_control_a3.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

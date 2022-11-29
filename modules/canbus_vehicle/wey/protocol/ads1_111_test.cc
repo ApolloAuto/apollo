@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/protocol/ads1_111.h"
+#include "modules/canbus_vehicle/wey/protocol/ads1_111.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

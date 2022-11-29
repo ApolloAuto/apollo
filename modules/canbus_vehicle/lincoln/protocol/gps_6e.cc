@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/gps_6e.h"
+#include "modules/canbus_vehicle/lincoln/protocol/gps_6e.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/wheelspeed_6a.h"
+#include "modules/canbus_vehicle/lincoln/protocol/wheelspeed_6a.h"
 
 #include "gtest/gtest.h"
 

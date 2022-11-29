@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/surround_73.h"
+#include "modules/canbus_vehicle/lincoln/protocol/surround_73.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

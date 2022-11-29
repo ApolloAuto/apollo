@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/neolix_edu/protocol/ads_brake_command_46.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/ads_brake_command_46.h"
 
 #include "gtest/gtest.h"
 

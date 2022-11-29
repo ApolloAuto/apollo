@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
+#include "modules/canbus_vehicle/wey/wey_vehicle_factory.h"
 
 #include "cyber/common/log.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus/vehicle/wey/wey_controller.h"
-#include "modules/canbus/vehicle/wey/wey_message_manager.h"
+#include "modules/canbus_vehicle/wey/wey_controller.h"
+#include "modules/canbus_vehicle/wey/wey_message_manager.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"

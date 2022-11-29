@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/neolix_edu/proto/neolix_edu.pb.h"
+#include "modules/canbus_vehicle/neolix_edu/proto/neolix_edu.pb.h"
 
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 

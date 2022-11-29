@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/protocol/enable_state_feedback_c3.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/enable_state_feedback_c3.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

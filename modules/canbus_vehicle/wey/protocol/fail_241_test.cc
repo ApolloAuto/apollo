@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/protocol/fail_241.h"
+#include "modules/canbus_vehicle/wey/protocol/fail_241.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

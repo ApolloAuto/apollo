@@ -14,18 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
+#include "modules/canbus_vehicle/lincoln/lincoln_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
-#include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
-#include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
-#include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
-#include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
-#include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
+#include "modules/canbus_vehicle/lincoln/lincoln_message_manager.h"
+#include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
+#include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
+#include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
+#include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
+#include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"

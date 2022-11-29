@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =============================================================================*/
 
-#include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
+#include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
 
 #include "gtest/gtest.h"
 

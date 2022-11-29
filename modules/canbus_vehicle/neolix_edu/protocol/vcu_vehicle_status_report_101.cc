@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/neolix_edu/protocol/vcu_vehicle_status_report_101.h"
+#include "modules/canbus_vehicle/neolix_edu/protocol/vcu_vehicle_status_report_101.h"
 
 #include "glog/logging.h"
 

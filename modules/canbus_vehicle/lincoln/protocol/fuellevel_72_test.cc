@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/fuellevel_72.h"
+#include "modules/canbus_vehicle/lincoln/protocol/fuellevel_72.h"
 
 #include "gtest/gtest.h"
 

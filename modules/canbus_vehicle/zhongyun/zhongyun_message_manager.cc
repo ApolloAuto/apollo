@@ -13,18 +13,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
+#include "modules/canbus_vehicle/zhongyun/zhongyun_message_manager.h"
 
-#include "modules/canbus/vehicle/zhongyun/protocol/brake_control_a4.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/gear_control_a1.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/parking_control_a5.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/steering_control_a2.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/torque_control_a3.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/brake_control_a4.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/gear_control_a1.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/parking_control_a5.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/steering_control_a2.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/torque_control_a3.h"
 
-#include "modules/canbus/vehicle/zhongyun/protocol/enable_state_feedback_c3.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/error_state_e1.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/vehicle_state_feedback_2_c4.h"
-#include "modules/canbus/vehicle/zhongyun/protocol/vehicle_state_feedback_c1.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/enable_state_feedback_c3.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/error_state_e1.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/vehicle_state_feedback_2_c4.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/vehicle_state_feedback_c1.h"
 
 namespace apollo {
 namespace canbus {

@@ -28,17 +28,17 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
+#include "modules/canbus_vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 #include "cyber/common/macros.h"
-#include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
-#include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
-#include "modules/canbus/vehicle/lincoln/protocol/steering_64.h"
-#include "modules/canbus/vehicle/lincoln/protocol/throttle_62.h"
-#include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
+#include "modules/canbus_vehicle/lincoln/protocol/brake_60.h"
+#include "modules/canbus_vehicle/lincoln/protocol/gear_66.h"
+#include "modules/canbus_vehicle/lincoln/protocol/steering_64.h"
+#include "modules/canbus_vehicle/lincoln/protocol/throttle_62.h"
+#include "modules/canbus_vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
 /**

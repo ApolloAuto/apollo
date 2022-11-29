@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/zhongyun/protocol/parking_control_a5.h"
+#include "modules/canbus_vehicle/zhongyun/protocol/parking_control_a5.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

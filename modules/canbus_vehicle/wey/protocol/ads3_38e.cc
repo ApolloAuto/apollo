@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/wey/protocol/ads3_38e.h"
+#include "modules/canbus_vehicle/wey/protocol/ads3_38e.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

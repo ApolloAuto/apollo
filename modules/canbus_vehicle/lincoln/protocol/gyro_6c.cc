@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/lincoln/protocol/gyro_6c.h"
+#include "modules/canbus_vehicle/lincoln/protocol/gyro_6c.h"
 
 #include "modules/drivers/canbus/common/byte.h"
 

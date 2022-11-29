@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "modules/canbus/vehicle/lincoln/proto/lincoln.pb.h"
+#include "modules/canbus_vehicle/lincoln/proto/lincoln.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
