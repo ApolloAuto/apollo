@@ -26,7 +26,8 @@ namespace {
 std::map<std::string, int> plugin_function_map = {
     {"UpdateScenarioSetToStatus", 0},
     {"UpdateRecordToStatus", 1},
-    {"UpdateDynamicModelToStatus", 2}};
+    {"UpdateDynamicModelToStatus", 2},
+    {"UpdateVehicleToStatus", 3}};
 std::map<std::string, int> hmi_function_map = {
     {"SimControlRestart", 0},  {"MapServiceReloadMap", 1},
     {"LoadDynamicModels", 2},  {"ChangeDynamicModel", 3},
@@ -255,6 +256,9 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
           callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
         }
       }
+    } break;
+    case 3:{
+      callback_res = hmi_->UpdateVehicleToStatus();
     }
     default:
       break;

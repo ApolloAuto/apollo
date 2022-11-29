@@ -61,16 +61,16 @@ bool TaskManagerComponent::Init() {
   qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+  // Don't send the history message when new readers are found.
   qos->set_durability(
-      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_SYSTEM_DEFAULT);
   request_writer_ = node_->CreateWriter<RoutingRequest>(attr);
   return true;
 }
 
 bool TaskManagerComponent::Proc(const std::shared_ptr<Task>& task) {
   if (task->task_type() != CYCLE_ROUTING &&
-      task->task_type() != PARKING_ROUTING &&
-      task->task_type() != DEAD_END_ROUTING) {
+      task->task_type() != PARKING_ROUTING) {
     AERROR << "Task type is not cycle_routing or parking_routing.";
     return false;
   }

@@ -2,7 +2,7 @@ import { toJS } from 'mobx';
 import { inject, observer } from 'mobx-react';
 import React from 'react';
 
-import { Radio } from 'antd';
+import { Empty, Radio } from 'antd';
 
 import { throttle } from 'lodash';
 import WS, { PLUGIN_WS } from 'store/websocket';
@@ -12,6 +12,7 @@ import LocalScenarioSetItem from './LocalScenarioSetItem';
 import { ScenarioCertificateInvalid, ScenarioNoCertificate }
   from './ScenarioNoCertificate';
 import RemoteResourseItem from './RemoteResourseItem';
+import VehicleListItem from './VehicleListItem';
 
 const RadioGroup = Radio.Group;
 
@@ -37,6 +38,10 @@ export default class DataProfile extends React.Component {
           title: 'Record Profiles',
           key: 'recordProfiles',
         },
+        {
+          title: 'Vehicle Profiles',
+          key: 'vehicleProfiles',
+        },
       ],
     };
   }
@@ -53,6 +58,7 @@ export default class DataProfile extends React.Component {
       if (enableSimControl) {
         WS.getDymaticModelList();
       }
+      PLUGIN_WS.getVehicleInfo();
     }, 300);
   }
 
@@ -142,6 +148,34 @@ export default class DataProfile extends React.Component {
     </div>);
   };
 
+  // 渲染车辆注册
+  renderVehicleProfilesList = () => {
+    const { store } = this.props;
+    const {
+      vehicleInfoList,
+      vehicleUpdateStatus,
+    } = store.studioConnector;
+    return (<div className='remote-vehicle-list'>
+      {/*更新后 没有车辆*/}
+      {(vehicleInfoList.length === 0 && vehicleUpdateStatus !== 0) &&
+        <div className='remote-vehicle-list_empty'>
+        <Empty
+          style={{color: '#fff'}}
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="There is no vehicle under your account."/>
+        </div>}
+      {/*更新后 存在车辆*/}
+        {
+          (vehicleInfoList.length > 0 && vehicleUpdateStatus !== 0) &&
+          vehicleInfoList.map((item) =>
+            <div className='remote-vehicle-list-item-container'>
+              <VehicleListItem value={item.vehicle_id} item={item}/>
+            </div>
+          )
+        }
+    </div>);
+  };
+
   render() {
 
     const { store } = this.props;
@@ -207,10 +241,10 @@ export default class DataProfile extends React.Component {
               {remoteScenarioSetListFiltered &&
                 toJS(remoteScenarioSetListFiltered).map((item, index) => {
                   return (
-                  <RemoteResourseItem
-                    key={item.id}
-                    item={item}
-                  />
+                    <RemoteResourseItem
+                      key={item.id}
+                      item={item}
+                    />
                   );
                 })
               }
@@ -218,10 +252,10 @@ export default class DataProfile extends React.Component {
               {remoteDynamicModelListFiltered &&
                 toJS(remoteDynamicModelListFiltered).map((item, index) => {
                   return (
-                  <RemoteResourseItem
-                    key={item.id}
-                    item={item}
-                  />
+                    <RemoteResourseItem
+                      key={item.id}
+                      item={item}
+                    />
                   );
                 })
               }
@@ -229,10 +263,10 @@ export default class DataProfile extends React.Component {
               {remoteRecordListFiltered &&
                 toJS(remoteRecordListFiltered).map((item, index) => {
                   return (
-                  <RemoteResourseItem
-                    key={item.id}
-                    item={item}
-                  />
+                    <RemoteResourseItem
+                      key={item.id}
+                      item={item}
+                    />
                   );
                 })
               }
@@ -281,6 +315,7 @@ export default class DataProfile extends React.Component {
             {/*dynamic model*/}
             {currentKey === 'dynamicModel' && this.renderDynamicModelList()}
             {currentKey === 'recordProfiles' && this.renderRecordProfilesList()}
+            {currentKey === 'vehicleProfiles' && this.renderVehicleProfilesList()}
           </div>
         </div>
       </div>

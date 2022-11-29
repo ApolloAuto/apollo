@@ -69,18 +69,18 @@ export default class RouteEditingManager {
     }
 
     @action addDefaultRoutingPoint(defaultRoutingName) {
-      if (_.isEmpty(this.defaultRoutings)) {
-        alert("Failed to get default routing, make sure there's "
-                + 'a default routing file under the map data directory.');
+      const routings = this.defaultRoutings;
+      if (_.isEmpty(routings)) {
+        alert('Failed to get routing, make sure the '
+                + 'routing file under the map data directory.');
         return;
       }
-      if (defaultRoutingName === undefined || defaultRoutingName === ''
-            || !(defaultRoutingName in this.defaultRoutings)) {
+      if (!defaultRoutingName || !(defaultRoutingName in routings)) {
         alert('Please select a valid default routing.');
         return;
       }
 
-      RENDERER.addDefaultEndPoint(this.defaultRoutings[defaultRoutingName], false);
+      RENDERER.addDefaultEndPoint(routings[defaultRoutingName]);
     }
 
     @action updateDefaultRoutingPoints(data) {
@@ -102,7 +102,9 @@ export default class RouteEditingManager {
         return;
       }
       const drouting = message.data;
-      const waypoints = drouting.waypoint.map(point => point.pose);
+      const waypoints = drouting.waypoint.map(
+        point => _.assign({}, point.pose, { heading: point.heading })
+      );
       this.defaultRoutings[drouting.name] = waypoints;
     }
 

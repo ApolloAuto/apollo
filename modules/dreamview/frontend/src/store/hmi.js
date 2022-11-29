@@ -106,6 +106,19 @@ export default class HMI {
 
   @observable currentRecordId = '';
 
+  /**
+   *  // 0: 未设置
+   *  // 1: DKIT_LITE
+   *  // 2: DKIT_STANDARD
+   *  // 3: DKIT_ADVANCED_NE_S
+   *  // 4: DKIT_ADVANCED_SNE_R
+   *  // 5: DKIT_LITE_S
+   *  // 6: DKIT_STANDARD_S
+   *  // 7: DKIT_CHALLENGE
+   * @type {number}
+   */
+  @observable current_vehicle_type = 0;
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -243,6 +256,10 @@ export default class HMI {
 
     this.records = newStatus.records;
     this.currentRecordId = newStatus.currentRecordId;
+
+    if (newStatus.current_vehicle_type) {
+      this.current_vehicle_type = newStatus.current_vehicle_type;
+    }
   }
 
   @action update(world) {

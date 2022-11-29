@@ -1,0 +1,143 @@
+.application-guide-modal {
+  color: white;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  h1, h2, h3, h4, h5, h6 {
+    color: white;
+  }
+
+  .application-guide-modal-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .application-guide-modal-content {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 60%;
+    max-height: 80%;
+    overflow: auto;
+    background-color: #010c17;
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 1px 0 #000;
+
+    &.modal-enter {
+      transform: scale(0);
+    }
+
+    &.modal-enter-active {
+      transform: scale(1.1);
+      transition: all 0.2s linear;
+    }
+
+    &.modal-enter-end {
+      transform: scale(1);
+      transition: all 0.1s linear;
+    }
+
+    &.modal-leave {
+      transform: scale(1);
+    }
+
+    &.modal-leave-active {
+      transform: scale(1.1);
+      transition: all 0.1s linear;
+    }
+
+    &.modal-leave-end {
+      transform: scale(0);
+      transition: all 0.2s linear;
+    }
+
+    .application-guide-modal-content-header-title {
+      font-weight: 400;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .application-guide-modal-content-body {
+      font-size: 16px;
+      line-height: 1.5;
+      padding-bottom: 20px;
+
+      h6 {
+        margin: 10px 0;
+      }
+
+      .font-bold {
+        font-weight: bold;
+      }
+
+      .font-EB {
+        color: #EB2E2D;
+      }
+
+      table {
+        padding: 20px;
+        border-collapse: collapse;
+        border: 1px solid #fff;
+        th {
+          background-color: #555;
+          border: 1px solid #fff;
+          padding: 10px;
+        }
+        td {
+          padding: 10px;
+          border: 1px solid #fff;
+
+          &.pl-10 {
+            padding-left: 10px;
+          }
+          &.pl-20 {
+            padding-left: 20px;
+          }
+          &.pl-30 {
+            padding-left: 30px;
+          }
+          &.pl-40 {
+            padding-left: 40px;
+          }
+
+          &.center {
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    .application-guide-modal-btn {
+      position: fixed;
+      bottom: 10%;
+      margin: 0 auto;
+      display: inline-block;
+      letter-spacing: 1px;
+      border-color: #555;
+      border-bottom: 2px solid #1c9063;
+      background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(9, 17, 16, 0.8));
+      cursor: pointer;
+      padding: 10px 20px;
+    }
+  }
+}

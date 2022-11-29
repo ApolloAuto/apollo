@@ -100,6 +100,7 @@ class HMIWorker {
   // bool UpdateRecordToStatus(const std::string& record_id,
   //                     const std::string& record_status);
   bool LoadRecords();
+  bool ReloadVehicles();
   void GetScenarioSetPath(const std::string& scenario_set_id,
                           std::string* scenario_set_path);
 
@@ -148,7 +149,7 @@ class HMIWorker {
 
   void ResetComponentStatusTimer();
 
-  const HMIConfig config_;
+  HMIConfig config_;
 
   // HMI status maintenance.
   HMIStatus status_;
