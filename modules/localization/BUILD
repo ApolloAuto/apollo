@@ -44,7 +44,8 @@ install(
         "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
         "//modules/localization/msf/local_tool/map_creation:install",
-        "//modules/localization/ndt/map_creation:install",   
+        "//modules/localization/ndt/map_creation:install",
+        "//modules/localization/common:install",
         ":testdata"
     ],
 )
