@@ -42,6 +42,7 @@ class HMI {
                                  const std::string &scenario_set_name);
   bool UpdateDynamicModelToStatus(const std::string &dynamic_model_name);
   bool UpdateRecordToStatus();
+  bool UpdateVehicleToStatus();
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.

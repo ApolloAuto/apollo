@@ -40,7 +40,7 @@ data_files {
 }
 data_files {
   source_path: "novatel_localization_extrinsics.yaml"
-  dest_path: "/apollo/modules/localization/msf/params"
+  dest_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
 }
 data_files {
   source_path: "velodyne_params"

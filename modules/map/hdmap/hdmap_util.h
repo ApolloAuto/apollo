@@ -70,6 +70,14 @@ inline std::string DefaultRoutingFile() {
 }
 
 /**
+ * @brief get park and go routings file path from flags.
+ * @return park and routng routings file path
+ */
+inline std::string ParkGoRoutingFile() {
+    return absl::StrCat(FLAGS_map_dir, "_", FLAGS_park_go_routing_filename);
+}
+
+/**
  * @brief create a Map ID given a string.
  * @param id a string id
  * @return a Map ID instance
