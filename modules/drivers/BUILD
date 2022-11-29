@@ -79,13 +79,13 @@ install(
     ],
 )
 
-install_files(
-    name = "pb_tools",
-    dest = "tools",
-    files = [
-        "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
-    ],
-)
+#install_files(
+#    name = "pb_tools",
+#    dest = "tools",
+#    files = [
+#        "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
+#    ],
+#)
 
 install_src_files(
     name = "install_src",

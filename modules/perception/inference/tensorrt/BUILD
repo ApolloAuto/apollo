@@ -77,6 +77,7 @@ cc_test(
     data = [
         "//modules/perception/inference:inference_test_data",
     ],
+    tags = ["exclude"],
     deps = [
         ":rt_net",
         "//modules/perception/inference/utils:inference_util_cuda_lib",

@@ -17,6 +17,7 @@ cc_library(
     name = "can_client_factory",
     srcs = ["can_client_factory.cc"],
     hdrs = ["can_client_factory.h"],
+    alwayslink = True,
     copts = copts_if_esd_can(),
     deps = [
         "//cyber",
@@ -35,6 +36,7 @@ cc_library(
 cc_library(
     name = "can_client",
     hdrs = ["can_client.h"],
+    alwayslink = True,
     deps = [
         "//modules/common/util",
         "//modules/drivers/canbus/common:canbus_common",

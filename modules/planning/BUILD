@@ -7,7 +7,10 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "planning_testdata_install",
-    data_dest = "planning/addition_data",
+    data_dest = if_gpu(
+        "planning-gpu/addition_data",
+        "planning/addition_data"
+    ),
     data = [":planning_testdata"],
 )
 

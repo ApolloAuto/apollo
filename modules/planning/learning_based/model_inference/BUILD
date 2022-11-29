@@ -48,6 +48,7 @@ cc_test(
         "@com_google_googletest//:gtest",
     ],
     linkstatic = True,
+    tags = ["exclude"]
 )
 
 cpplint()

@@ -23,6 +23,7 @@ cc_test(
     name = "rss_decider_test",
     size = "small",
     srcs = ["rss_decider_test.cc"],
+    tags = ["exclude"],
     deps = [
         ":rss_decider",
         "@ad_rss_lib//:ad_rss",

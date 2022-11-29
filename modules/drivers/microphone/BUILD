@@ -25,6 +25,15 @@ install(
     targets = [
         ":libmicrophone_component.so",
     ],
+    deps = [":install_lib_top_level"]
+)
+
+install(
+    name = "install_lib_top_level",
+    library_dest = "drivers/lib",
+    targets = [
+        ":libmicrophone_component.so",
+    ],
 )
 
 filegroup(
