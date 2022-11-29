@@ -52,6 +52,14 @@ cc_binary(
 )
 
 install(
+    name = "testdata",
+    data_dest = "control/addition_data",
+    data = [
+        ":test_data",
+    ],
+)
+
+install(
     name = "install",
     library_dest = "control/lib",
     data_dest = "control",
@@ -66,6 +74,7 @@ install(
     deps = [
         ":pb_control",
         ":pb_hdrs",
+        ":testdata",
         "//modules/control/submodules:install",
         "//modules/control/tools:install",
     ],

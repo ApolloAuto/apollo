@@ -6,6 +6,13 @@ package(default_visibility = ["//visibility:public"])
 
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
+
+install(
+    name = "prediction_testdata_install",
+    data_dest = "prediction/addition_data",
+    data = [":prediction_testdata"],
+)
+
 cc_library(
     name = "prediction_component_lib",
     srcs = ["prediction_component.cc"],
@@ -69,6 +76,7 @@ install(
         "//modules/prediction/pipeline:install",
         "//modules/prediction/common:install",
         "//modules/prediction/submodules:install",
+        ":prediction_testdata_install",
         
     ],
 )

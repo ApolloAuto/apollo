@@ -4,6 +4,19 @@ package(
     default_visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**/*",
+    ]),
+)
+
+install(
+    name = "map_testdata",
+    data_dest = "map/addition_data",
+    data = [":testdata"],
+)
+
 install(
     name = "install",
     data_dest = "map",
@@ -21,6 +34,7 @@ install(
         "//modules/map/hdmap:install",
         "//modules/map/pnc_map:install",
         "//modules/map/relative_map/tools:install",
+        ":map_testdata"
     ],
 )
 

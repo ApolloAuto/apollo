@@ -49,6 +49,14 @@ cc_binary(
 )
 
 install(
+    name = "testdata",
+    data_dest = "canbus/addition_data",
+    data = [
+        ":test_data",
+    ],
+)
+
+install(
     name = "install",
     library_dest = "canbus/lib",
     data_dest = "canbus",
@@ -63,6 +71,7 @@ install(
     deps = [
         ":pb_canbus",
         ":pb_hdrs",
+        ":testdata",
         "//modules/canbus/tools:install",
     ],
 )

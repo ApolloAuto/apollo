@@ -8,6 +8,14 @@ filegroup(
     srcs = glob(["testdata/*"]),
 )
 
+install(
+    name = "testdata",
+    data = [
+        ":localization_testdata"
+    ],
+    data_dest = "localization/addition_data"
+)
+
 filegroup(
     name = "runtime_data",
     srcs = glob([
@@ -37,6 +45,7 @@ install(
         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
         "//modules/localization/msf/local_tool/map_creation:install",
         "//modules/localization/ndt/map_creation:install",   
+        ":testdata"
     ],
 )
 

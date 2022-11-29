@@ -36,6 +36,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common/util",
+        "//modules/map/hdmap/adapter/xml_parser",
         "@com_google_absl//:absl",
         "@proj",
         "@tinyxml2",
