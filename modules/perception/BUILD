@@ -11,6 +11,12 @@ filegroup(
 )
 
 install(
+    name = "perception_testdata_install",
+    data_dest = "perception/addition_data",
+    data = [":perception_testdata"],
+)
+
+install(
     name = "install",
     data_dest = "perception",
     data = [
@@ -30,6 +36,7 @@ install(
         "//modules/perception/camera/tools/offline:install",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:install",
         "//modules/perception/lidar/lib/tracker/semantic_map:install",
+        ":perception_testdata_install"
     ],
 )
 
