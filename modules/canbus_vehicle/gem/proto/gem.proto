@@ -1,0 +1,507 @@
+syntax = "proto2";
+
+package apollo.canbus;
+
+// Gem vehicle starts from here
+// TODO(QiL) : Re-factor needed here
+
+message Global_rpt_6a {
+  // Report Message
+  enum Pacmod_statusType {
+    PACMOD_STATUS_CONTROL_DISABLED = 0;
+    PACMOD_STATUS_CONTROL_ENABLED = 1;
+  }
+  enum Override_statusType {
+    OVERRIDE_STATUS_NOT_OVERRIDDEN = 0;
+    OVERRIDE_STATUS_OVERRIDDEN = 1;
+  }
+  enum Brk_can_timeoutType {
+    BRK_CAN_TIMEOUT_NO_ACTIVE_CAN_TIMEOUT = 0;
+    BRK_CAN_TIMEOUT_ACTIVE_CAN_TIMEOUT = 1;
+  }
+  // [] [0|1]
+  optional Pacmod_statusType pacmod_status = 1;
+  // [] [0|1]
+  optional Override_statusType override_status = 2;
+  // [] [0|1]
+  optional bool veh_can_timeout = 3;
+  // [] [0|1]
+  optional bool str_can_timeout = 4;
+  // [] [0|1]
+  optional Brk_can_timeoutType brk_can_timeout = 5;
+  // [] [0|1]
+  optional bool usr_can_timeout = 6;
+  // [] [0|65535]
+  optional int32 usr_can_read_errors = 7;
+}
+
+message Brake_cmd_6b {
+  // Report Message
+  // [%] [0|1]
+  optional double brake_cmd = 1;
+}
+
+message Brake_rpt_6c {
+  // Report Message
+  enum Brake_on_offType {
+    BRAKE_ON_OFF_OFF = 0;
+    BRAKE_ON_OFF_ON = 1;
+  }
+  // [%] [0|1]
+  optional double manual_input = 1;
+  // [%] [0|1]
+  optional double commanded_value = 2;
+  // [%] [0|1]
+  optional double output_value = 3;
+  // [] [0|1]
+  optional Brake_on_offType brake_on_off = 4;
+}
+
+message Steering_cmd_6d {
+  // Report Message
+  // [radians] [-2147483.648|2147483.647]
+  optional double position_value = 1;
+  // [rad/s] [0|65.535]
+  optional double speed_limit = 2;
+}
+
+message Steering_rpt_1_6e {
+  // Report Message
+  // [rad/s] [-32.768|32.767]
+  optional double manual_input = 1;
+  // [rad/s] [-32.768|32.767]
+  optional double commanded_value = 2;
+  // [rad/s] [-32.768|32.767]
+  optional double output_value = 3;
+}
+
+message Wheel_speed_rpt_7a {
+  // Report Message
+  // [rad/s] [-32768|32767]
+  optional int32 wheel_spd_rear_right = 1;
+  // [rad/s] [-32768|32767]
+  optional int32 wheel_spd_rear_left = 2;
+  // [rad/s] [-32768|32767]
+  optional int32 wheel_spd_front_right = 3;
+  // [rad/s] [-32768|32767]
+  optional int32 wheel_spd_front_left = 4;
+}
+
+message Date_time_rpt_83 {
+  // Report Message
+  // [sec] [0|60]
+  optional int32 time_second = 1;
+  // [min] [0|60]
+  optional int32 time_minute = 2;
+  // [hr] [0|23]
+  optional int32 time_hour = 3;
+  // [dy] [1|31]
+  optional int32 date_day = 4;
+  // [mon] [1|12]
+  optional int32 date_month = 5;
+  // [yr] [2000|2255]
+  optional int32 date_year = 6;
+}
+
+message Brake_motor_rpt_1_70 {
+  // Report Message
+  // [amps] [0|4294967.295]
+  optional double motor_current = 1;
+  // [radians] [-2147483.648|2147483.647]
+  optional double shaft_position = 2;
+}
+
+message Headlight_rpt_77 {
+  // Report Message
+  enum Output_valueType {
+    OUTPUT_VALUE_HEADLIGHTS_OFF = 0;
+    OUTPUT_VALUE_LOW_BEAMS = 1;
+    OUTPUT_VALUE_HIGH_BEAMS = 2;
+  }
+  enum Manual_inputType {
+    MANUAL_INPUT_HEADLIGHTS_OFF = 0;
+    MANUAL_INPUT_LOW_BEAMS = 1;
+    MANUAL_INPUT_HIGH_BEAMS = 2;
+  }
+  enum Commanded_valueType {
+    COMMANDED_VALUE_HEADLIGHTS_OFF = 0;
+    COMMANDED_VALUE_LOW_BEAMS = 1;
+    COMMANDED_VALUE_HIGH_BEAMS = 2;
+  }
+  // [] [0|2]
+  optional Output_valueType output_value = 1;
+  // [] [0|2]
+  optional Manual_inputType manual_input = 2;
+  // [] [0|2]
+  optional Commanded_valueType commanded_value = 3;
+}
+
+message Accel_rpt_68 {
+  // Report Message
+  // [%] [0|1]
+  optional double manual_input = 1;
+  // [%] [0|1]
+  optional double commanded_value = 2;
+  // [%] [0|1]
+  optional double output_value = 3;
+}
+
+message Steering_motor_rpt_3_75 {
+  // Report Message
+  // [N-m] [-2147483.648|2147483.647]
+  optional double torque_output = 1;
+  // [N-m] [-2147483.648|2147483.647]
+  optional double torque_input = 2;
+}
+
+message Turn_cmd_63 {
+  // Report Message
+  enum Turn_signal_cmdType {
+    TURN_SIGNAL_CMD_RIGHT = 0;
+    TURN_SIGNAL_CMD_NONE = 1;
+    TURN_SIGNAL_CMD_LEFT = 2;
+    TURN_SIGNAL_CMD_HAZARD = 3;
+  }
+  // [] [0|3]
+  optional Turn_signal_cmdType turn_signal_cmd = 1;
+}
+
+message Turn_rpt_64 {
+  // Report Message
+  enum Manual_inputType {
+    MANUAL_INPUT_RIGHT = 0;
+    MANUAL_INPUT_NONE = 1;
+    MANUAL_INPUT_LEFT = 2;
+    MANUAL_INPUT_HAZARD = 3;
+  }
+  enum Commanded_valueType {
+    COMMANDED_VALUE_RIGHT = 0;
+    COMMANDED_VALUE_NONE = 1;
+    COMMANDED_VALUE_LEFT = 2;
+    COMMANDED_VALUE_HAZARD = 3;
+  }
+  enum Output_valueType {
+    OUTPUT_VALUE_RIGHT = 0;
+    OUTPUT_VALUE_NONE = 1;
+    OUTPUT_VALUE_LEFT = 2;
+    OUTPUT_VALUE_HAZARD = 3;
+  }
+  // [] [0|3]
+  optional Manual_inputType manual_input = 1;
+  // [] [0|3]
+  optional Commanded_valueType commanded_value = 2;
+  // [] [0|3]
+  optional Output_valueType output_value = 3;
+}
+
+message Shift_cmd_65 {
+  // Report Message
+  enum Shift_cmdType {
+    SHIFT_CMD_PARK = 0;
+    SHIFT_CMD_REVERSE = 1;
+    SHIFT_CMD_NEUTRAL = 2;
+    SHIFT_CMD_FORWARD = 3;
+    SHIFT_CMD_LOW = 4;
+  }
+  // FORWARD_is_also_LOW_on_vehicles_with_LOW/HIGH,_PARK_and_HIGH_only_available_on_certain_Vehicles
+  // [] [0|4]
+  optional Shift_cmdType shift_cmd = 1;
+}
+
+message Shift_rpt_66 {
+  // Report Message
+  enum Manual_inputType {
+    MANUAL_INPUT_PARK = 0;
+    MANUAL_INPUT_REVERSE = 1;
+    MANUAL_INPUT_NEUTRAL = 2;
+    MANUAL_INPUT_FORWARD = 3;
+    MANUAL_INPUT_HIGH = 4;
+  }
+  enum Commanded_valueType {
+    COMMANDED_VALUE_PARK = 0;
+    COMMANDED_VALUE_REVERSE = 1;
+    COMMANDED_VALUE_NEUTRAL = 2;
+    COMMANDED_VALUE_FORWARD = 3;
+    COMMANDED_VALUE_HIGH = 4;
+  }
+  enum Output_valueType {
+    OUTPUT_VALUE_PARK = 0;
+    OUTPUT_VALUE_REVERSE = 1;
+    OUTPUT_VALUE_NEUTRAL = 2;
+    OUTPUT_VALUE_FORWARD = 3;
+    OUTPUT_VALUE_HIGH = 4;
+  }
+  // [] [0|4]
+  optional Manual_inputType manual_input = 1;
+  // [] [0|4]
+  optional Commanded_valueType commanded_value = 2;
+  // [] [0|4]
+  optional Output_valueType output_value = 3;
+}
+
+message Accel_cmd_67 {
+  // Report Message
+  // [%] [0|1]
+  optional double accel_cmd = 1;
+}
+
+message Lat_lon_heading_rpt_82 {
+  // Report Message
+  // [deg] [-327.68|327.67]
+  optional double heading = 1;
+  // [sec] [-128|127]
+  optional int32 longitude_seconds = 2;
+  // [min] [-128|127]
+  optional int32 longitude_minutes = 3;
+  // [deg] [-128|127]
+  optional int32 longitude_degrees = 4;
+  // [sec] [-128|127]
+  optional int32 latitude_seconds = 5;
+  // [min] [-128|127]
+  optional int32 latitude_minutes = 6;
+  // [deg] [-128|127]
+  optional int32 latitude_degrees = 7;
+}
+
+message Global_cmd_69 {
+  // Report Message
+  enum Pacmod_enableType {
+    PACMOD_ENABLE_CONTROL_DISABLED = 0;
+    PACMOD_ENABLE_CONTROL_ENABLED = 1;
+  }
+  enum Clear_overrideType {
+    CLEAR_OVERRIDE_DON_T_CLEAR_ACTIVE_OVERRIDES = 0;
+    CLEAR_OVERRIDE_CLEAR_ACTIVE_OVERRIDES = 1;
+  }
+  enum Ignore_overrideType {
+    IGNORE_OVERRIDE_DON_T_IGNORE_USER_OVERRIDES = 0;
+    IGNORE_OVERRIDE_IGNORE_USER_OVERRIDES = 1;
+  }
+  // [] [0|1]
+  optional Pacmod_enableType pacmod_enable = 1;
+  // [] [0|1]
+  optional Clear_overrideType clear_override = 2;
+  // [] [0|1]
+  optional Ignore_overrideType ignore_override = 3;
+}
+
+message Parking_brake_status_rpt_80 {
+  // Report Message
+  enum Parking_brake_enabledType {
+    PARKING_BRAKE_ENABLED_OFF = 0;
+    PARKING_BRAKE_ENABLED_ON = 1;
+  }
+  // [] [0|1]
+  optional Parking_brake_enabledType parking_brake_enabled = 1;
+}
+
+message Yaw_rate_rpt_81 {
+  // Report Message
+  // [rad/s] [-327.68|327.67]
+  optional double yaw_rate = 1;
+}
+
+message Horn_rpt_79 {
+  // Report Message
+  enum Output_valueType {
+    OUTPUT_VALUE_OFF = 0;
+    OUTPUT_VALUE_ON = 1;
+  }
+  enum Commanded_valueType {
+    COMMANDED_VALUE_OFF = 0;
+    COMMANDED_VALUE_ON = 1;
+  }
+  enum Manual_inputType {
+    MANUAL_INPUT_OFF = 0;
+    MANUAL_INPUT_ON = 1;
+  }
+  // [] [0|1]
+  optional Output_valueType output_value = 1;
+  // [] [0|1]
+  optional Commanded_valueType commanded_value = 2;
+  // [] [0|1]
+  optional Manual_inputType manual_input = 3;
+}
+
+message Horn_cmd_78 {
+  // Report Message
+  enum Horn_cmdType {
+    HORN_CMD_OFF = 0;
+    HORN_CMD_ON = 1;
+  }
+  // [] [0|1]
+  optional Horn_cmdType horn_cmd = 1;
+}
+
+message Wiper_rpt_91 {
+  // Report Message
+  enum Output_valueType {
+    OUTPUT_VALUE_WIPERS_OFF = 0;
+    OUTPUT_VALUE_INTERMITTENT_1 = 1;
+    OUTPUT_VALUE_INTERMITTENT_2 = 2;
+    OUTPUT_VALUE_INTERMITTENT_3 = 3;
+    OUTPUT_VALUE_INTERMITTENT_4 = 4;
+    OUTPUT_VALUE_INTERMITTENT_5 = 5;
+    OUTPUT_VALUE_LOW = 6;
+    OUTPUT_VALUE_HIGH = 7;
+  }
+  enum Commanded_valueType {
+    COMMANDED_VALUE_WIPERS_OFF = 0;
+    COMMANDED_VALUE_INTERMITTENT_1 = 1;
+    COMMANDED_VALUE_INTERMITTENT_2 = 2;
+    COMMANDED_VALUE_INTERMITTENT_3 = 3;
+    COMMANDED_VALUE_INTERMITTENT_4 = 4;
+    COMMANDED_VALUE_INTERMITTENT_5 = 5;
+    COMMANDED_VALUE_LOW = 6;
+    COMMANDED_VALUE_HIGH = 7;
+  }
+  enum Manual_inputType {
+    MANUAL_INPUT_WIPERS_OFF = 0;
+    MANUAL_INPUT_INTERMITTENT_1 = 1;
+    MANUAL_INPUT_INTERMITTENT_2 = 2;
+    MANUAL_INPUT_INTERMITTENT_3 = 3;
+    MANUAL_INPUT_INTERMITTENT_4 = 4;
+    MANUAL_INPUT_INTERMITTENT_5 = 5;
+    MANUAL_INPUT_LOW = 6;
+    MANUAL_INPUT_HIGH = 7;
+  }
+  // [] [0|7]
+  optional Output_valueType output_value = 1;
+  // [] [0|7]
+  optional Commanded_valueType commanded_value = 2;
+  // [] [0|7]
+  optional Manual_inputType manual_input = 3;
+}
+
+message Vehicle_speed_rpt_6f {
+  // Report Message
+  enum Vehicle_speed_validType {
+    VEHICLE_SPEED_VALID_INVALID = 0;
+    VEHICLE_SPEED_VALID_VALID = 1;
+  }
+  // [m/s] [-327.68|327.67]
+  optional double vehicle_speed = 1;
+  // [] [0|1]
+  optional Vehicle_speed_validType vehicle_speed_valid = 2;
+}
+
+message Headlight_cmd_76 {
+  // Report Message
+  enum Headlight_cmdType {
+    HEADLIGHT_CMD_HEADLIGHTS_OFF = 0;
+    HEADLIGHT_CMD_LOW_BEAMS = 1;
+    HEADLIGHT_CMD_HIGH_BEAMS = 2;
+  }
+  // [] [0|2]
+  optional Headlight_cmdType headlight_cmd = 1;
+}
+
+message Steering_motor_rpt_2_74 {
+  // Report Message
+  // [deg C] [-32808|32727]
+  optional int32 encoder_temperature = 1;
+  // [deg C] [-32808|32727]
+  optional int32 motor_temperature = 2;
+  // [rev/s] [-2147483.648|2147483.647]
+  optional double angular_speed = 3;
+}
+
+message Brake_motor_rpt_2_71 {
+  // Report Message
+  // [deg C] [-32808|32727]
+  optional int32 encoder_temperature = 1;
+  // [deg C] [-32808|32727]
+  optional int32 motor_temperature = 2;
+  // [rev/s] [0|4294967.295]
+  optional double angular_speed = 3;
+}
+
+message Steering_motor_rpt_1_73 {
+  // Report Message
+  // [amps] [0|4294967.295]
+  optional double motor_current = 1;
+  // [amps] [-2147483.648|2147483.647]
+  optional double shaft_position = 2;
+}
+
+message Wiper_cmd_90 {
+  // Report Message
+  enum Wiper_cmdType {
+    WIPER_CMD_WIPERS_OFF = 0;
+    WIPER_CMD_INTERMITTENT_1 = 1;
+    WIPER_CMD_INTERMITTENT_2 = 2;
+    WIPER_CMD_INTERMITTENT_3 = 3;
+    WIPER_CMD_INTERMITTENT_4 = 4;
+    WIPER_CMD_INTERMITTENT_5 = 5;
+    WIPER_CMD_LOW = 6;
+    WIPER_CMD_HIGH = 7;
+  }
+  // [] [0|7]
+  optional Wiper_cmdType wiper_cmd = 1;
+}
+
+message Brake_motor_rpt_3_72 {
+  // Report Message
+  // [N-m] [-2147483.648|2147483.647]
+  optional double torque_output = 1;
+  // [N-m] [-2147483.648|2147483.647]
+  optional double torque_input = 2;
+}
+
+message Light {
+  enum TurnLightType {
+    TURN_LIGHT_OFF = 0;
+    TURN_LEFT_ON = 1;
+    TURN_RIGHT_ON = 2;
+    TURN_LIGHT_ON = 3;
+  }
+  enum BeamLampType {
+    BEAM_OFF = 0;
+    HIGH_BEAM_ON = 1;
+    LOW_BEAM_ON = 2;
+  }
+
+  optional TurnLightType turn_light_type = 1;
+  optional BeamLampType beam_lamp_type = 2;
+  optional bool is_brake_lamp_on = 3;
+
+}
+
+message Gem {
+  optional Global_rpt_6a global_rpt_6a = 1;                 // report message
+  optional Brake_cmd_6b brake_cmd_6b = 2;                   // report message
+  optional Brake_rpt_6c brake_rpt_6c = 3;                   // report message
+  optional Steering_cmd_6d steering_cmd_6d = 4;             // report message
+  optional Steering_rpt_1_6e steering_rpt_1_6e = 5;         // report message
+  optional Wheel_speed_rpt_7a wheel_speed_rpt_7a = 6;       // report message
+  optional Date_time_rpt_83 date_time_rpt_83 = 7;           // report message
+  optional Brake_motor_rpt_1_70 brake_motor_rpt_1_70 = 8;   // report message
+  optional Headlight_rpt_77 headlight_rpt_77 = 9;           // report message
+  optional Accel_rpt_68 accel_rpt_68 = 10;                  // report message
+  optional Steering_motor_rpt_3_75 steering_motor_rpt_3_75 =
+      11;                                                   // report message
+  optional Turn_cmd_63 turn_cmd_63 = 12;                    // report message
+  optional Turn_rpt_64 turn_rpt_64 = 13;                    // report message
+  optional Shift_cmd_65 shift_cmd_65 = 14;                  // report message
+  optional Shift_rpt_66 shift_rpt_66 = 15;                  // report message
+  optional Accel_cmd_67 accel_cmd_67 = 16;                  // report message
+  optional Lat_lon_heading_rpt_82 lat_lon_heading_rpt_82 =
+      17;                                                   // report message
+  optional Global_cmd_69 global_cmd_69 = 18;                // report message
+  optional Parking_brake_status_rpt_80 parking_brake_status_rpt_80 =
+      19;                                                   // report message
+  optional Yaw_rate_rpt_81 yaw_rate_rpt_81 = 20;            // report message
+  optional Horn_rpt_79 horn_rpt_79 = 21;                    // report message
+  optional Horn_cmd_78 horn_cmd_78 = 22;                    // report message
+  optional Wiper_rpt_91 wiper_rpt_91 = 23;                  // report message
+  optional Vehicle_speed_rpt_6f vehicle_speed_rpt_6f = 24;  // report message
+  optional Headlight_cmd_76 headlight_cmd_76 = 25;          // report message
+  optional Steering_motor_rpt_2_74 steering_motor_rpt_2_74 =
+      26;                                                   // report message
+  optional Brake_motor_rpt_2_71 brake_motor_rpt_2_71 = 27;  // report message
+  optional Steering_motor_rpt_1_73 steering_motor_rpt_1_73 =
+      28;                                                   // report message
+  optional Wiper_cmd_90 wiper_cmd_90 = 29;                  // report message
+  optional Brake_motor_rpt_3_72 brake_motor_rpt_3_72 = 30;  // report message
+  optional Light light = 31;                          // report message
+}

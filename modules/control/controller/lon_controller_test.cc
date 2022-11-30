@@ -39,7 +39,7 @@ using TrajectoryPb = planning::ADCTrajectory;
 using apollo::common::VehicleStateProvider;
 
 const char data_path[] =
-    "/apollo/modules//control/testdata/longitudinal_controller_test/";
+    "/apollo/modules/control/testdata/longitudinal_controller_test/";
 
 class LonControllerTest : public ::testing::Test, LonController {
  public:

@@ -19,6 +19,8 @@
 namespace apollo {
 namespace canbus {
 
+void AbstractVehicleFactory::UpdateHeartbeat() {}
+
 void AbstractVehicleFactory::SetVehicleParameter(
     const VehicleParameter &vehicle_parameter) {
   vehicle_parameter_ = vehicle_parameter;
