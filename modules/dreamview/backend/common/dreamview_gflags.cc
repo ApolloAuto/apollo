@@ -157,3 +157,4 @@ DEFINE_string(cyber_recorder_stop_command, "pkill -9 cyber_recorder",
 
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
               "Vehicles config path.");
+              

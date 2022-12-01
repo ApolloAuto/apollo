@@ -592,7 +592,7 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
     }
     try {
       // try to get vehicle type from calibration data directory
-      // TODO: add vehicle config specs and move to vehicle config
+      // TODO(jinping): add vehicle config specs and move to vehicle config
       const std::string vehicle_type_file_path = *vehicle_dir + "/vehicle_type";
       std::string vehicle_type_str;
       cyber::common::GetContent(vehicle_type_file_path, &vehicle_type_str);

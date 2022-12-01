@@ -330,7 +330,8 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordToStatus", &PluginManager::UpdateData);
   RegisterDvSupportApi("ResetVehicleConfigSuccess", &PluginManager::UpdateData);
-  RegisterDvSupportApi("RefreshVehicleConfigSuccess", &PluginManager::UpdateData);
+  RegisterDvSupportApi(
+    "RefreshVehicleConfigSuccess", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -385,7 +386,7 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
       update_data_res = callback_api_("UpdateRecordToStatus", info);
       break;
     }
-    case 4:{
+    case 4: {
       update_data_res = callback_api_("UpdateVehicleToStatus", info);
     }
     default:

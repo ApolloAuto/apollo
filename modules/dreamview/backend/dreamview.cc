@@ -257,7 +257,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
         }
       }
     } break;
-    case 3:{
+    case 3: {
       callback_res = hmi_->UpdateVehicleToStatus();
     }
     default:
