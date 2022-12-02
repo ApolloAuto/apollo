@@ -205,14 +205,14 @@ bool CameraBevDetectionComponent::Init() {
   camera_debug_writer_ =
       node_->CreateWriter<apollo::perception::camera::CameraDebug>(
           camera_debug_channel_name_);
-//   if (InitSensorInfo() != cyber::SUCC) {
-//     AERROR << "InitSensorInfo() failed.";
-//     return false;
-//   }
-//   if (InitAlgorithmPlugin() != cyber::SUCC) {
-//     AERROR << "InitAlgorithmPlugin() failed.";
-//     return false;
-//   }
+  if (InitSensorInfo() != cyber::SUCC) {
+    AERROR << "InitSensorInfo() failed.";
+    return false;
+  }
+  if (InitAlgorithmPlugin() != cyber::SUCC) {
+    AERROR << "InitAlgorithmPlugin() failed.";
+    return false;
+  }
   if (InitCameraFrames() != cyber::SUCC) {
     AERROR << "InitCameraFrames() failed.";
     return false;
@@ -341,7 +341,16 @@ void CameraBevDetectionComponent::FillCamMessage(const std::shared_ptr<apollo::d
   
   // Get sensor to world pose from TF
   Eigen::Affine3d camera2world_trans;
+  if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
+          msg_timestamp, &camera2world_trans)) {
+    const std::string err_str =
+        absl::StrCat("failed to get camera to world pose, ts: ", msg_timestamp,
+                     " camera_name: ", camera_name);
+    AERROR << err_str;
+  }
 
+  camera_frame.camera2world_pose = camera2world_trans;
+  camera_frame.camera_extrinsic = extrinsic_map_.at(camera_name);
   camera_frame.data_provider = data_providers_map_[camera_name].get();
   camera_frame.data_provider->FillImageData(
       image_height_, image_width_,
@@ -537,10 +546,10 @@ int CameraBevDetectionComponent::InitConfig() {
   camera_obstacle_perception_conf_file =
       GetAbsolutePath(work_root, camera_obstacle_perception_conf_file);
 
-//   ACHECK(cyber::common::GetProtoFromFile(camera_obstacle_perception_conf_file,
-//                                          &camera_obstacle_detection_config_))
-//       << "failed to load camera obstacle perception config file "
-//       << camera_obstacle_perception_conf_file;
+  ACHECK(cyber::common::GetProtoFromFile(camera_obstacle_perception_conf_file,
+                                         &camera_obstacle_detection_config_))
+      << "failed to load camera obstacle perception config file "
+      << camera_obstacle_perception_conf_file;
   return cyber::SUCC;
 }
 
@@ -624,47 +633,48 @@ int CameraBevDetectionComponent::InitCameraFrames() {
     data_provider_init_options.image_width = image_width_;
     data_provider_init_options.do_undistortion = enable_undistortion_;
     data_provider_init_options.sensor_name = camera_name;
-    // int gpu_id = GetGpuId(camera_obstacle_detection_config_);
-    // if (gpu_id == -1) {
-    //   return cyber::FAIL;
-    // }
-    // data_provider_init_options.device_id = gpu_id;
-    // AINFO << "data_provider_init_options.device_id: "
-    //       << data_provider_init_options.device_id
-    //       << " camera_name: " << camera_name;
+    int gpu_id = GetGpuId(camera_obstacle_detection_config_);
+    if (gpu_id == -1) {
+      return cyber::FAIL;
+    }
+    data_provider_init_options.device_id = gpu_id;
+    AINFO << "data_provider_init_options.device_id: "
+          << data_provider_init_options.device_id
+          << " camera_name: " << camera_name;
 
     std::shared_ptr<camera::DataProvider> data_provider(
         new camera::DataProvider);
-    // data_provider->Init(data_provider_init_options);
+    data_provider->Init(data_provider_init_options);
     data_providers_map_[camera_name] = data_provider;
   }
 
   //  init extrinsic/intrinsic
-//   for (const auto &camera_name : camera_names_) {
-//     base::BaseCameraModelPtr model;
-//     model =
-//         common::SensorManager::Instance()->GetUndistortCameraModel(camera_name);
-//     auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
-//     Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
-//     intrinsic_map_[camera_name] = intrinsic;
-//     AINFO << "#intrinsics of " << camera_name << ": "
-//           << intrinsic_map_[camera_name];
-//     Eigen::Matrix4d extrinsic;
-//     LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" + camera_name +
-//                        "_extrinsics.yaml",
-//                    &extrinsic);
-//     extrinsic_map_[camera_name] = extrinsic;
-//     AINFO << "#extrinsics of " << camera_name << ": "
-//           << extrinsic_map_[camera_name];
-//   }
+  for (const auto &camera_name : camera_names_) {
+    base::BaseCameraModelPtr model;
+    model =
+        common::SensorManager::Instance()->GetUndistortCameraModel(camera_name);
+    auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
+
+    Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
+    intrinsic_map_[camera_name] = intrinsic;
+    AINFO << "#intrinsics of " << camera_name << ": "
+          << intrinsic_map_[camera_name];
+    Eigen::Matrix4d extrinsic;
+    LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" + camera_name +
+                       "_extrinsics.yaml",
+                   &extrinsic);
+    extrinsic_map_[camera_name] = extrinsic;
+    AINFO << "#extrinsics of " << camera_name << ": "
+          << extrinsic_map_[camera_name];
+  }
 
   // Init camera height
-//   for (const auto &camera_name : camera_names_) {
-//     float height = 0.0f;
-//     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
-//                     FLAGS_lidar_sensor_name, default_camera_height_, &height);
-//     camera_height_map_[camera_name] = height;
-//   }
+  for (const auto &camera_name : camera_names_) {
+    float height = 0.0f;
+    SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
+                    FLAGS_lidar_sensor_name, default_camera_height_, &height);
+    camera_height_map_[camera_name] = height;
+  }
 
   for (auto &frame : camera_frames_) {
     frame.track_feature_blob.reset(new base::Blob<float>());

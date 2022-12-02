@@ -1,4 +1,4 @@
-camera_names: "cam_front,cam_front_left,cam_front_right,cam_back_left,cam_back_right,cam_back"
+camera_names: "CAM_FRONT,CAM_FRONT_LEFT,CAM_FRONT_RIGHT,CAM_BACK_LEFT,CAM_BACK_RIGHT,CAM_BACK"
 input_camera_channel_names : "CAM_FRONT,CAM_FRONT_LEFT,CAM_FRONT_RIGHT,CAM_BACK_LEFT,CAM_BACK_RIGHT,CAM_BACK"
 timestamp_offset : 0.0
 camera_obstacle_perception_conf_dir : "/apollo/modules/perception/pipeline/config"

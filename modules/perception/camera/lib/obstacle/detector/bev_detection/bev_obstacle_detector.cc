@@ -93,6 +93,7 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
     const auto camera_frame_temp = (data_frame + i)->camera_frame;
 
     std::shared_ptr<base::Image8U> image_temp = nullptr;
+    image_temp.reset(new base::Image8U(image_height_, image_width_, base::Color::BGR));
     camera_frame_temp->data_provider->GetImage(image_options, image_temp.get());
 
     cv::Mat image_mat(image_height_, image_width_, CV_8UC3,

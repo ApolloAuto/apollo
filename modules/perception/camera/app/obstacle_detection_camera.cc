@@ -16,6 +16,7 @@
 #include "modules/perception/camera/app/obstacle_detection_camera.h"
 
 #include <utility>
+#include <boost/algorithm/string.hpp>
 
 #include "absl/strings/str_cat.h"
 
@@ -173,11 +174,16 @@ for (const auto stage_ptr : stage_ptrs_) {
       auto stage_config = stage_ptr->stage_config_;
       std::string camera_name =
           stage_config.camera_detector_config().camera_name();
-      model = common::SensorManager::Instance()->GetUndistortCameraModel(
-          camera_name);
-      auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
-      name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
-          camera_name, pinhole->get_intrinsic_params()));
+      boost::algorithm::split(camera_names_, camera_name,
+                          boost::algorithm::is_any_of(","));
+    
+      for (size_t i = 0; i < camera_names_.size(); ++i) {
+        model = common::SensorManager::Instance()->GetUndistortCameraModel(
+          camera_names_[i]);
+        auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
+        name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
+          camera_names_[i], pinhole->get_intrinsic_params()));
+      }   
     } else {
       continue;
     }
@@ -218,6 +224,11 @@ bool ObstacleDetectionCamera::Process(DataFrame *data_frame) {
   CameraFrame *frame = data_frame->camera_frame;
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
+  for (size_t i = 1; i < camera_names_.size(); ++i) {
+    CameraFrame *frame = (data_frame + i)->camera_frame;
+    frame->camera_k_matrix =
+      name_intrinsic_map_.at(frame->data_provider->sensor_name());
+  } 
   InnerProcess(data_frame);
 
   if (camera_detection_config_.has_debug_param()) {

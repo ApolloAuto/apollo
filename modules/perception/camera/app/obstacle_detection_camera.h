@@ -77,6 +77,7 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   smoke::SmokeParam smoke_param_;
   std::ofstream out_track_;
   std::ofstream out_pose_;
+  std::vector<std::string> camera_names_;
 
   CameraDetectionConfig camera_detection_config_;
 
