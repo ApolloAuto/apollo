@@ -27,10 +27,10 @@ import zipfile
 
 from model_meta import ModelMeta
 
-
+# APOLLO_ROOT_DIR
 WORKSPACE_PATH = os.getenv('APOLLO_ROOT_DIR', '/apollo')
-
-MODEL_META_FILE = "model_meta.yml"
+# MODEL_META_FILE_NAME
+MODEL_META_FILE_NAME = "apollo_deploy.yaml"
 
 # Install tmp path
 DOWNLOAD_TMP_DIR = "/tmp/"
@@ -41,10 +41,17 @@ MODEL_INSTALL_PATH = {
   "3d_detection_lidar": "modules/perception/production/data/perception/lidar/models/detection",
   "3d_segmentation_lidar": "modules/perception/production/data/perception/lidar/models/cnnseg",
   "3d_detection_camera": "modules/perception/production/data/perception/camera/models/yolo_obstacle_detector",
-  "lane_detection": "modules/perception/production/data/perception/camera/models/lane_detector",
+  "lane_detection_camera": "modules/perception/production/data/perception/camera/models/lane_detector",
   "tl_detection_camera": "modules/perception/production/data/perception/camera/models/traffic_light_detection",
   "tl_recognition_camera": "modules/perception/production/data/perception/camera/models/traffic_light_recognition",
 }
+
+# Frame abbreviation
+FRAMEWORK_ABBREVIATION = {
+  "Caffe": "caffe",
+  "PaddlePaddle": "paddle",
+  "PyTorch": "torch",
+  "TensorFlow": "tf"}
 
 
 '''
@@ -63,20 +70,12 @@ def get_model_metas(model_install_path):
   if not os.path.isdir(model_install_path):
     return model_metas
 
-  # 1. Find MODEL_META_FILE in current directory, if find then return.
-  model_meta = ModelMeta()
-  meta_file = os.path.join(model_install_path, MODEL_META_FILE)
-  is_success = model_meta.parse_from(meta_file)
-  if is_success:
-    model_metas.append(model_meta)
-    return model_metas
-
-  # 2. Find MODEL_META_FILE in child directory.
+  # Find MODEL_META_FILE_NAME in child directories.
   for model_path in os.listdir(model_install_path):
     child_path = os.path.join(model_install_path, model_path)
     if os.path.isdir(child_path):
       model_meta = ModelMeta()
-      meta_file = os.path.join(child_path, MODEL_META_FILE)
+      meta_file = os.path.join(child_path, MODEL_META_FILE_NAME)
       is_success = model_meta.parse_from(meta_file)
       if is_success:
         model_metas.append(model_meta)
@@ -185,10 +184,12 @@ def get_install_path_by_meta(model_meta):
       str: model's install path
   """
   perception_task = "{}_{}".format(model_meta.task_type, model_meta.sensor_type)
+  file_name = "{}_{}".format(model_meta.name,
+      FRAMEWORK_ABBREVIATION[model_meta.framework])
   install_path = os.path.join(
       WORKSPACE_PATH,
       MODEL_INSTALL_PATH[perception_task],
-      model_meta.name)
+      file_name)
   return install_path
 
 def install_model(model_meta, extract_path):
@@ -244,7 +245,7 @@ def amodel_install(model_path):
 
   # read meta file
   model_meta = ModelMeta()
-  meta_file = os.path.join(UNZIP_TMP_DIR, model_name, MODEL_META_FILE)
+  meta_file = os.path.join(UNZIP_TMP_DIR, model_name, MODEL_META_FILE_NAME)
   is_success = model_meta.parse_from(meta_file)
   if not is_success:
     print("Meta file {} not found!".format(meta_file))

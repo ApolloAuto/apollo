@@ -31,14 +31,14 @@ class ModelMeta(object):
       object (_type_): base object
   """
   def __init__(self, name=None, date=None, task_type=None, sensor_type=None,
-      framework=None, model_files=None, dataset=None) -> None:
+      framework=None, model=None, dataset=None) -> None:
     self.name        = name
     self.date        = date
     self.task_type   = task_type
     self.sensor_type = sensor_type
     self.framework   = framework
-    self.model_files = model_files
-    self.dataset    = dataset
+    self.model       = model
+    self.dataset     = dataset
 
     # raw yaml data
     self._raw_modle_meta = None
@@ -62,8 +62,8 @@ class ModelMeta(object):
       self.task_type   = self._raw_modle_meta["task_type"]
       self.sensor_type = self._raw_modle_meta["sensor_type"]
       self.framework   = self._raw_modle_meta["framework"]
-      self.model_files = self._raw_modle_meta["model_files"]
-      self.dataset    = self._raw_modle_meta["dataset"]
+      self.model       = self._raw_modle_meta["model"]
+      self.dataset     = self._raw_modle_meta["dataset"]
     return True
 
   def save_to(self, meta_file_path):

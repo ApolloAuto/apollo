@@ -23,7 +23,11 @@ import argparse
 import logging
 import sys
 
-from model_manage import amodel_install, amodel_remove, amodel_list, amodel_info
+from model_manage import (
+  amodel_install,
+  amodel_remove,
+  amodel_list,
+  amodel_info)
 
 
 def main(args=sys.argv):

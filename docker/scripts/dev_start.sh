@@ -318,20 +318,6 @@ function mount_other_volumes() {
     docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
     volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
 
-    # YOLOV4
-    local yolov4_volume="apollo_yolov4_volume_${USER}"
-    local yolov4_image="${DOCKER_REPO}:yolov4_volume-emergency_detection_model-${TARGET_ARCH}-latest"
-    local yolov4_path="/apollo/modules/perception/camera/lib/obstacle/detector/yolov4/model/"
-    docker_restart_volume "${yolov4_volume}" "${yolov4_image}" "${yolov4_path}"
-    volume_conf="${volume_conf} --volume ${yolov4_volume}:${yolov4_path}"
-
-    # FASTER_RCNN
-    local faster_rcnn_volume="apollo_faster_rcnn_volume_${USER}"
-    local faster_rcnn_image="${DOCKER_REPO}:faster_rcnn_volume-traffic_light_detection_model-${TARGET_ARCH}-latest"
-    local faster_rcnn_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/faster_rcnn_model"
-    docker_restart_volume "${faster_rcnn_volume}" "${faster_rcnn_image}" "${faster_rcnn_path}"
-    volume_conf="${volume_conf} --volume ${faster_rcnn_volume}:${faster_rcnn_path}"
-
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"
