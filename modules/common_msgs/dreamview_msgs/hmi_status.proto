@@ -6,14 +6,14 @@ import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/monitor_msgs/system_status.proto";
 import "modules/common_msgs/basic_msgs/geometry.proto";
 
-message ScenarioInfo{
+message ScenarioInfo {
   optional string scenario_id = 1;
   optional string scenario_name = 2;
   optional string map_name = 3;
   optional apollo.common.Point2D start_point = 4;
 }
 
-message ScenarioSet{
+message ScenarioSet {
   // id 是key
   optional string scenario_set_name = 1;
   repeated ScenarioInfo scenarios = 2;
@@ -49,6 +49,7 @@ message HMIStatus {
   optional string current_scenario_id = 17 [default = ""];
   repeated string dynamic_models = 18;
   optional string current_dynamic_model = 19;
-   optional string current_record_id = 20 [default = ""];
-  map<string,int32> records = 21;
+  optional string current_record_id = 20 [default = ""];
+  map<string, int32> records = 21;
+  optional sint32 current_vehicle_type = 22;
 }

@@ -14,15 +14,12 @@ cc_library(
     alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/canbus/common:canbus_common",
-        "//modules/canbus/vehicle:vehicle_factory",
+        "//modules/canbus/common:canbus_gflags",
+        "//modules/canbus/vehicle:abstract_vehicle_factory",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/status",
-        "//modules/drivers/canbus/can_client",
-        "//modules/drivers/canbus/can_client:can_client_factory",
-        "//modules/drivers/canbus/can_comm:can_receiver",
-        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus:sensor_canbus_lib",
         "//modules/common_msgs/guardian_msgs:guardian_cc_proto",
         "@com_github_gflags_gflags//:gflags",
     ],
@@ -49,6 +46,14 @@ cc_binary(
 )
 
 install(
+    name = "testdata",
+    data_dest = "canbus/addition_data",
+    data = [
+        ":test_data",
+    ],
+)
+
+install(
     name = "install",
     library_dest = "canbus/lib",
     data_dest = "canbus",
@@ -63,6 +68,7 @@ install(
     deps = [
         ":pb_canbus",
         ":pb_hdrs",
+        ":testdata",
         "//modules/canbus/tools:install",
     ],
 )

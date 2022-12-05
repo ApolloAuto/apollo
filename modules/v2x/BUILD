@@ -2,6 +2,20 @@ load("//tools/install:install.bzl", "install", "install_files", "install_src_fil
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "v2x_testdata",
+    srcs = glob(["fusion/test_data/*"]),
+)
+
+install(
+    name = "testdata",
+    data = [
+        ":v2x_testdata"
+    ],
+    data_dest = "v2x/addition_data"
+)
+
+
 install(
     name = "install",
     data_dest = "v2x",
@@ -14,6 +28,7 @@ install(
         "//modules/v2x/fusion/apps:install",
         ":pb_hdrs",
         "//modules/v2x/v2x_proxy/app:install",
+        "testdata"
         
     ],
 )

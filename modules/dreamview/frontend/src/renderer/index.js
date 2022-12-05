@@ -21,8 +21,6 @@ import PointCloud from 'renderer/point_cloud.js';
 
 const _ = require('lodash');
 
-const preventEditTag = ['BUTTON', 'INPUT'];
-
 class Renderer {
   constructor() {
     // Disable antialias for mobile devices.
@@ -81,6 +79,10 @@ class Renderer {
 
     // The route editor
     this.routingEditor = new RoutingEditor();
+    this.routingPoint = null;
+
+    // Distinguish between drawing point and drawing arrow
+    this.startMove = false;
 
     // The GNSS/GPS
     this.gnss = new Gnss();
@@ -146,6 +148,8 @@ class Renderer {
 
     // handler for route editing with mouse down events
     this.onMouseDownHandler = this.editRoute.bind(this);
+    this.onMouseMoveHandler = this.onMouseMoveHandler.bind(this);
+    this.onMouseUpHandler = this.onMouseUpHandler.bind(this);
 
     this.scene.add(ambient);
     this.scene.add(directionalLight);
@@ -312,6 +316,12 @@ class Renderer {
     document.getElementById(this.canvasId).addEventListener('mousedown',
       this.onMouseDownHandler,
       false);
+    document.getElementById(this.canvasId).addEventListener('mouseup',
+      this.onMouseUpHandler,
+      false);
+    document.getElementById(this.canvasId).addEventListener('mousemove',
+      this.onMouseMoveHandler,
+      false);
   }
 
   disableRouteEditing() {
@@ -322,12 +332,20 @@ class Renderer {
       element.removeEventListener('mousedown',
         this.onMouseDownHandler,
         false);
+      element.removeEventListener('mouseup',
+        this.onMouseUpHandler,
+        false);
+      element.removeEventListener('mousemove',
+        this.onMouseMoveHandler,
+        false);
+      this.startMove = false;
+      this.routingPoint = null;
     }
   }
 
   addDefaultEndPoint(points) {
     for (let i = 0; i < points.length; i++) {
-      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene);
+      this.routingEditor.addRoutingPoint(points[i], this.coordinates, this.scene, true);
     }
   }
 
@@ -369,14 +387,19 @@ class Renderer {
   }
 
   sendCycleRoutingRequest(defaultRoutingName, points, cycleNumber) {
-    return this.routingEditor.sendCycleRoutingRequest
-    (defaultRoutingName, points, cycleNumber, this.adc.mesh.position,
+    return this.routingEditor.sendCycleRoutingRequest(
+      defaultRoutingName,
+      points,
+      cycleNumber,
+      this.adc.mesh.position,
       this.adc.mesh.rotation.y,
       this.coordinates);
   }
 
   editRoute(event) {
-    if (event.target && preventEditTag.includes(event.target.tagName)) {
+    // Distinguish between operating on the screen and
+    // selecting points on the screen
+    if (event.target && !_.isEqual('CANVAS', event.target.tagName)) {
       return;
     }
     if (!this.routingEditor.isInEditingMode() || event.button !== THREE.MOUSE.LEFT) {
@@ -388,12 +411,29 @@ class Renderer {
       return;
     }
 
-    const point = this.getGeolocation(event);
-    const selectedParkingSpaceIndex =
-            this.routingEditor.addRoutingPoint(point, this.coordinates, this.scene);
-    if (selectedParkingSpaceIndex !== -1) {
-      this.map.changeSelectedParkingSpaceColor(selectedParkingSpaceIndex);
+    this.routingPoint = this.getGeolocation(event);
+  }
+
+  onMouseMoveHandler(event) {
+    if (this.routingPoint) {
+      this.routingEditor.drawRoutingPointArrow(
+        this.getGeolocation(event), this.routingPoint, this.coordinates, this.scene, this.startMove,
+      );
+      this.startMove = true;
     }
+  }
+
+  onMouseUpHandler() {
+    if (this.routingPoint) {
+      const selectedParkingSpaceIndex = this.routingEditor.addRoutingPoint(
+        this.routingPoint, this.coordinates, this.scene, false,
+      );
+      if (selectedParkingSpaceIndex !== -1) {
+        this.map.changeSelectedParkingSpaceColor(selectedParkingSpaceIndex);
+      }
+    }
+    this.routingPoint = null;
+    this.startMove = false;
   }
 
   // Render one frame. This supports the main draw/render loop.
@@ -500,9 +540,6 @@ class Renderer {
       this.routingEditor.setParkingSpaceInfo(
         newData.parkingSpace, extraInfo[0], this.coordinates, this.scene
       );
-    }
-    if (!_.isEmpty(extraInfo[1])) {
-      this.routingEditor.setDeadJunctionInfo(extraInfo[1]);
     }
   }
 

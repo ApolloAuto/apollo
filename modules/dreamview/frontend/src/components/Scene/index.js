@@ -52,7 +52,7 @@ export default class Scene extends React.Component {
                         && <CycleNumberInput
                             routeEditingManager={routeEditingManager}
                             options={options}
-                      />}
+                        />}
                     {options.showGeo && <Geolocation />}
                 </div>
             </React.Fragment>

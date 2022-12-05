@@ -30,6 +30,49 @@ export default class StudioConnector {
   // 云端播包数据
   @observable remoteRecordList = [];
 
+  // 车辆更新状态 0:未更新 1:更新中 2:更新成功 3:更新失败
+  @observable vehicleUpdateStatus = 0;
+
+  // 车辆信息列表
+  // @observable vehicleInfoList = [
+  //   {
+  //     vehicle_id: '12',
+  //     vin: 'CH0000030',
+  //     vtype: '1',
+  //   },
+  //   {
+  //     vehicle_id: '13',
+  //     vin: 'CH0040000',
+  //     vtype: '2',
+  //   },
+  //   {
+  //     vehicle_id: '142',
+  //     vin: 'CH0000003',
+  //     vtype: '3',
+  //   },
+  //   {
+  //     vehicle_id: '15',
+  //     vin: 'CH0000020',
+  //     vtype: '4',
+  //   },
+  //   {
+  //     vehicle_id: '16',
+  //     vin: 'CH0003000',
+  //     vtype: '5',
+  //   },
+  //   {
+  //     vehicle_id: '17',
+  //     vin: 'CH0000011',
+  //     vtype: '6',
+  //   },
+  //   {
+  //     vehicle_id: '17',
+  //     vin: 'CH0000011',
+  //     vtype: '7',
+  //   },
+  // ];
+  @observable vehicleInfoList = [];
+
   /**
    * 同步证书状态
    * @param status
@@ -266,5 +309,21 @@ export default class StudioConnector {
         return item;
       });
     }
+  }
+
+  /**
+   * 更新车辆信息
+   * @param vehicleInfoList {
+   * [vehicle_id: string]: {vehicle_id: string, vin: string, vtype: string}
+   * }
+   * @param vehicleUpdateStatus 0 | 1 | 2| 3 // 0: 未更新 1: 更新中 2: 更新成功 3: 更新失败
+   */
+  @action updateVehicleInfo(vehicleInfoListObj, vehicleUpdateStatus) {
+    // 更新成功同步车辆信息
+    if (vehicleUpdateStatus === 2) {
+      const vehicleInfoList = Object.values(vehicleInfoListObj);
+      this.vehicleInfoList = vehicleInfoList;
+    }
+    this.vehicleUpdateStatus = vehicleUpdateStatus;
   }
 }

@@ -6,60 +6,6 @@ load("//tools:python_rules.bzl", "py_proto_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "ge3_cc_proto",
-    deps = [
-        ":ge3_proto",
-    ],
-)
-
-proto_library(
-    name = "ge3_proto",
-    srcs = ["ge3.proto"],
-)
-
-py_proto_library(
-    name = "ge3_py_pb2",
-    deps = [
-        ":ge3_proto",
-    ],
-)
-cc_proto_library(
-    name = "wey_cc_proto",
-    deps = [
-        ":wey_proto",
-    ],
-)
-
-proto_library(
-    name = "wey_proto",
-    srcs = ["wey.proto"],
-)
-
-py_proto_library(
-    name = "wey_py_pb2",
-    deps = [
-        ":wey_proto",
-    ],
-)
-cc_proto_library(
-    name = "ch_cc_proto",
-    deps = [
-        ":ch_proto",
-    ],
-)
-
-proto_library(
-    name = "ch_proto",
-    srcs = ["ch.proto"],
-)
-
-py_proto_library(
-    name = "ch_py_pb2",
-    deps = [
-        ":ch_proto",
-    ],
-)
-cc_proto_library(
     name = "chassis_cc_proto",
     deps = [
         ":chassis_proto",
@@ -91,42 +37,6 @@ py_proto_library(
 )
 
 cc_proto_library(
-    name = "zhongyun_cc_proto",
-    deps = [
-        ":zhongyun_proto",
-    ],
-)
-
-proto_library(
-    name = "zhongyun_proto",
-    srcs = ["zhongyun.proto"],
-)
-
-py_proto_library(
-    name = "zhongyun_py_pb2",
-    deps = [
-        ":zhongyun_proto",
-    ],
-)
-cc_proto_library(
-    name = "neolix_edu_cc_proto",
-    deps = [
-        ":neolix_edu_proto",
-    ],
-)
-
-proto_library(
-    name = "neolix_edu_proto",
-    srcs = ["neolix_edu.proto"],
-)
-
-py_proto_library(
-    name = "neolix_edu_py_pb2",
-    deps = [
-        ":neolix_edu_proto",
-    ],
-)
-cc_proto_library(
     name = "chassis_detail_cc_proto",
     deps = [
         ":chassis_detail_proto",
@@ -139,14 +49,6 @@ proto_library(
     deps = [
         "//modules/common_msgs/basic_msgs:vehicle_id_proto",
         ":chassis_proto",
-        ":ch_proto",
-        ":devkit_proto",
-        ":ge3_proto",
-        ":lexus_proto",
-        ":neolix_edu_proto",
-        ":transit_proto",
-        ":wey_proto",
-        ":zhongyun_proto",
     ],
 )
 
@@ -156,68 +58,5 @@ py_proto_library(
         ":chassis_detail_proto",
         "//modules/common_msgs/basic_msgs:vehicle_id_py_pb2",
         ":chassis_py_pb2",
-        ":ch_py_pb2",
-        ":devkit_py_pb2",
-        ":ge3_py_pb2",
-        ":lexus_py_pb2",
-        ":neolix_edu_py_pb2",
-        ":transit_py_pb2",
-        ":wey_py_pb2",
-        ":zhongyun_py_pb2",
-    ],
-)
-
-cc_proto_library(
-    name = "transit_cc_proto",
-    deps = [
-        ":transit_proto",
-    ],
-)
-
-proto_library(
-    name = "transit_proto",
-    srcs = ["transit.proto"],
-)
-
-py_proto_library(
-    name = "transit_py_pb2",
-    deps = [
-        ":transit_proto",
-    ],
-)
-cc_proto_library(
-    name = "lexus_cc_proto",
-    deps = [
-        ":lexus_proto",
-    ],
-)
-
-proto_library(
-    name = "lexus_proto",
-    srcs = ["lexus.proto"],
-)
-
-py_proto_library(
-    name = "lexus_py_pb2",
-    deps = [
-        ":lexus_proto",
-    ],
-)
-cc_proto_library(
-    name = "devkit_cc_proto",
-    deps = [
-        ":devkit_proto",
-    ],
-)
-
-proto_library(
-    name = "devkit_proto",
-    srcs = ["devkit.proto"],
-)
-
-py_proto_library(
-    name = "devkit_py_pb2",
-    deps = [
-        ":devkit_proto",
     ],
 )

@@ -16,7 +16,7 @@ cc_library(
         ":status",
     ],
     visibility = [
-        "//modules/map/hdmap/adapter:__pkg__",
+        "//visibility:public",
     ],
 )
 

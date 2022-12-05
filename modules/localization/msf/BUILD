@@ -4,6 +4,11 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "testdata",
+    srcs = glob(["local_map/test_data/**"])
+)
+
 cc_library(
     name = "msf_localization_component_lib",
     srcs = [
@@ -76,6 +81,8 @@ cc_test(
 install(
     name = "install",
     library_dest = "localization/lib/msf",
+    data = [":testdata"],
+    data_dest = "localization/addition_data/msf",
     targets = [
         ":libmsf_localization_component.so",
     ],

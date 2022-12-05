@@ -22,10 +22,15 @@
 
 #include <memory>
 
-#include "modules/common_msgs/chassis_msgs/chassis_detail.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
+
+#include "cyber/class_loader/class_loader_register_macro.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
+
+using apollo::control::ControlCommand;
 
 /**
  * @namespace apollo::canbus
@@ -49,27 +54,53 @@ class AbstractVehicleFactory {
   virtual ~AbstractVehicleFactory() = default;
 
   /**
-   * @brief the interface of creating a VehicleController class
-   * @returns a unique pointer that points to the created VehicleController
-   * object.
-   */
-  virtual std::unique_ptr<VehicleController> CreateVehicleController() = 0;
-
-  /**
-   * @brief the interface of creating a MessageManager class
-   * @returns a unique pointer that points to the created MessageManager object.
-   */
-  virtual std::unique_ptr<MessageManager<ChassisDetail>>
-  CreateMessageManager() = 0;
-
-  /**
    * @brief set VehicleParameter.
    */
   void SetVehicleParameter(const VehicleParameter &vehicle_paramter);
 
+  /**
+   * @brief init vehicle factory
+   * @returns true if successfully initialized
+   */
+  virtual bool Init(const CanbusConf *canbus_conf) = 0;
+
+  /**
+   * @brief start canclient, cansender, canreceiver, vehicle controller
+   * @returns true if successfully started
+   */
+  virtual bool Start() = 0;
+
+  /**
+   * @brief stop canclient, cansender, canreceiver, vehicle controller
+   */
+  virtual void Stop() = 0;
+
+  /**
+   * @brief update control command
+   */
+  virtual void UpdateCommand(const ControlCommand *control_command) = 0;
+
+  /**
+   * @brief publish chassis messages
+   */
+  virtual Chassis publish_chassis() = 0;
+
+  /**
+   * @brief publish chassis for vehicle messages
+   */
+  virtual void PublishChassisDetail() = 0;
+
+  /**
+   * @brief create cansender heartbeat
+   */
+  virtual void UpdateHeartbeat();
+
  private:
   VehicleParameter vehicle_parameter_;
 };
+
+#define CYBER_REGISTER_VEHICLEFACTORY(name) \
+  CLASS_LOADER_REGISTER_CLASS(name, AbstractVehicleFactory)
 
 }  // namespace canbus
 }  // namespace apollo

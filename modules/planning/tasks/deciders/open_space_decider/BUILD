@@ -49,6 +49,7 @@ cc_test(
         ":open_space_roi_decider",
         "@com_google_googletest//:gtest_main",
     ],
+    tags = ["exclude"]
 )
 
 cc_test(

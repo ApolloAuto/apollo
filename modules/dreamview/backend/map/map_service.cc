@@ -459,10 +459,11 @@ bool MapService::ConstructLaneWayPointWithLaneId(
     return false;
   }
 
+  // Limit s with max value of the length of the lane, or not the laneWayPoint
+  // may be invalid.
   if (s > lane->lane().length()) {
     s = lane->lane().length();
   }
-
 
   laneWayPoint->set_id(id);
   laneWayPoint->set_s(s);
@@ -485,21 +486,17 @@ bool MapService::CheckRoutingPoint(const double x, const double y) const {
   return true;
 }
 
-bool MapService::CheckRoutingPointLaneId(
-    const double x, const double y, std::vector<std::string> idsArr) const {
-  if (idsArr.empty()) {
-    return false;
-  }
+bool MapService::CheckRoutingPointWithHeading(const double x, const double y,
+                                              const double heading) const {
   double s, l;
   LaneInfoConstPtr lane;
-  if (!GetNearestLane(x, y, &lane, &s, &l)) {
+  if (!GetNearestLaneWithHeading(x, y, &lane, &s, &l, heading)) {
     return false;
   }
   if (!CheckRoutingPointLaneType(lane)) {
     return false;
   }
-  return std::find(idsArr.begin(), idsArr.end(), lane->id().id()) !=
-         idsArr.end();
+  return true;
 }
 
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
@@ -577,8 +574,8 @@ size_t MapService::CalculateMapHash(const MapElementIds &ids) const {
   return hash_function(ids.DebugString());
 }
 
-double MapService::GetLaneHeading(const std::string& id_str, double s) {
-  auto* hdmap = HDMap();
+double MapService::GetLaneHeading(const std::string &id_str, double s) {
+  auto *hdmap = HDMap();
   CHECK(hdmap) << "Failed to get hdmap";
 
   Id id;
@@ -589,7 +586,6 @@ double MapService::GetLaneHeading(const std::string& id_str, double s) {
   }
   return 0.0;
 }
-
 
 }  // namespace dreamview
 }  // namespace apollo

@@ -14,7 +14,23 @@ install(
         ":libutil_tool.so",
         ":libapolloutil.so",
     ],
+    deps = [":util_testdata"],
     visibility = ["//visibility:public"],
+)
+
+install(
+    name = "util_testdata",
+    data_dest = "common/addition_data/util",
+    data = [
+        ":util_test_data",
+    ],
+)
+
+filegroup(
+    name = "util_test_data",
+    srcs = glob([
+        "testdata/*",
+    ]),
 )
 
 

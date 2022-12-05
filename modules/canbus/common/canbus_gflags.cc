@@ -49,3 +49,10 @@ DEFINE_int32(control_cmd_pending_queue_size, 10,
 
 // enable forward Ultrasonic AEB
 DEFINE_bool(enable_aeb, true, "Enable forward Ultrasonic AEB");
+
+// vehicle factory dynamic library path and class name
+DEFINE_string(load_vehicle_library,
+              "/opt/apollo/neo/lib/canbus-dev/vehicle/libch_vehicle_factory.so",
+              "Default load vehicle library");
+DEFINE_string(load_vehicle_class_name, "ChVehicleFactory",
+              "Default vehicle factory name");

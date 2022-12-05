@@ -4,16 +4,29 @@ load("//tools:cpplint.bzl", "cpplint")
 
 install(
     name = "install",
-    data_dest = "common/vehicle_model",
     library_dest = "common/lib",
     runtime_dest = "common/bin",
-    data = [
-        ":vehicle_model_config_data",
-    ],
     targets = [
         ":libvehicle_model.so",
     ],
+    deps = ["vehicle_model_data"],
     visibility = ["//visibility:public"],
+)
+
+install(
+    name = "vehicle_model_data",
+    data_dest = "common/addition_data/vehicle_model",
+    data = [
+        ":vehicle_model_config_data",
+        ":vehicle_model_test_data"
+    ],
+)
+
+filegroup(
+    name = "vehicle_model_test_data",
+    srcs = glob([
+        "testdata/*",
+    ]),
 )
 
 
