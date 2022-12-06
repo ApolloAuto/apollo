@@ -7,4 +7,5 @@ message CameraDetectorConfig {
   optional string camera_name = 2;
   optional string root_dir = 3;
   optional string conf_file = 4;
+  optional string lidar_extrinsics_file = 5;
 }

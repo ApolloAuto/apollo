@@ -259,7 +259,7 @@ bool CameraBevDetectionComponent::Proc(
   FillCamMessage(camf_msg, camf_frame, camf_name);
   pipeline::DataFrame data_frame_camf;
   data_frame_camf.camera_frame = &camf_frame;
-  dataframe_ptrs_[0] = data_frame_camf;
+
   
   camfl_reader_->Observe();
   const auto &camfl_msg = camfl_reader_->GetLatestObserved();
@@ -272,7 +272,6 @@ bool CameraBevDetectionComponent::Proc(
   FillCamMessage(camfl_msg, camfl_frame, camfl_name);
   pipeline::DataFrame data_frame_camfl;
   data_frame_camfl.camera_frame = &camfl_frame;
-  dataframe_ptrs_[1] = data_frame_camfl;
  
   camfr_reader_->Observe();
   const auto &camfr_msg = camfr_reader_->GetLatestObserved();
@@ -285,7 +284,6 @@ bool CameraBevDetectionComponent::Proc(
   FillCamMessage(camfr_msg, camfr_frame, camfr_name);
   pipeline::DataFrame data_frame_camfr;
   data_frame_camfr.camera_frame = &camfr_frame;
-  dataframe_ptrs_[2] = data_frame_camfr;
 
   cambl_reader_->Observe();
   const auto &cambl_msg = cambl_reader_->GetLatestObserved();
@@ -296,9 +294,8 @@ bool CameraBevDetectionComponent::Proc(
   camera::CameraFrame &cambl_frame = camera_frames_[3];
   const std::string &cambl_name = camera_names_[3];
   FillCamMessage(cambl_msg, cambl_frame, cambl_name);
-  pipeline::DataFrame data_frame_bl;
-  data_frame_bl.camera_frame = &cambl_frame;
-  dataframe_ptrs_[3] = data_frame_bl;
+  pipeline::DataFrame data_frame_cambl;
+  data_frame_cambl.camera_frame = &cambl_frame;
   
   cambr_reader_->Observe();
   const auto &cambr_msg = cambr_reader_->GetLatestObserved();
@@ -311,7 +308,6 @@ bool CameraBevDetectionComponent::Proc(
   FillCamMessage(cambr_msg, cambr_frame, cambr_name);
   pipeline::DataFrame data_frame_cambr;
   data_frame_cambr.camera_frame = &cambr_frame;
-  dataframe_ptrs_[4] = data_frame_cambr;
   
   if (cambackmsg == nullptr) {
     AERROR << "camera_back msg is not ready!";
@@ -322,8 +318,9 @@ bool CameraBevDetectionComponent::Proc(
   FillCamMessage(cambackmsg, camb_frame, camb_name);
   pipeline::DataFrame data_frame_camb;
   data_frame_camb.camera_frame = &camb_frame;
-  dataframe_ptrs_[5] = data_frame_camb;
   // Run camera perception pipeline
+
+  dataframe_ptrs_ = {data_frame_camf, data_frame_camfr, data_frame_camfl, data_frame_camb, data_frame_cambl, data_frame_cambr};
   
   if (!camera_obstacle_pipeline_->Process(&dataframe_ptrs_[0])) {
     AERROR << "bev_obstacle_pipeline_->Process() failed";

@@ -17,6 +17,8 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -34,12 +36,12 @@ bool BEVObstacleDetector::Detect(const ObstacleDetectorOptions &options,
 }
 
 bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
-  AERROR << "wxt debug: into BEVObstacleDetector::Init";
   if (!Initialize(stage_config)) {
     return false;
   }
-  // ACHECK(stage_config.has_bev_obstacle_detection_config());
-  bev_obstacle_detection_config_ = stage_config.bev_obstacle_detection_config();
+  ACHECK(stage_config.has_camera_detector_config());
+  LoadExtrinsics(stage_config.camera_detector_config().lidar_extrinsics_file(),
+                 &imu2lidar_matrix_rt_);
 
   paddle::AnalysisConfig config;
   config.EnableUseGpu(1000, FLAGS_gpu_id);
@@ -70,7 +72,6 @@ bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
   }
   config.SwitchIrOptim(true);
   predictor_ = paddle_infer::CreatePredictor(config);
-  AERROR << "wxt debug: out BEVObstacleDetector::Init";
   if (nullptr == predictor_) {
     return false;
   }
@@ -79,13 +80,7 @@ bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
 
 bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   DataProvider::ImageOptions image_options;
-  image_options.target_color = base::Color::BGR;
-  /*
-  image_options.crop_roi = base::RectI(
-      0, offset_y_, static_cast<int>(base_camera_model_->get_width()),
-      static_cast<int>(base_camera_model_->get_height()) - offset_y_);
-  image_options.do_crop = true;
-  */
+  image_options.target_color = base::Color::RGB;
 
   Timer timer;
   float scale = 1.0f;
@@ -93,52 +88,44 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
     const auto camera_frame_temp = (data_frame + i)->camera_frame;
 
     std::shared_ptr<base::Image8U> image_temp = nullptr;
-    image_temp.reset(new base::Image8U(image_height_, image_width_, base::Color::BGR));
+    image_temp.reset(
+        new base::Image8U(image_height_, image_width_, base::Color::BGR));
     camera_frame_temp->data_provider->GetImage(image_options, image_temp.get());
 
     cv::Mat image_mat(image_height_, image_width_, CV_8UC3,
                       cv::Scalar(0, 0, 0));
     memcpy(image_mat.data, image_temp->cpu_data(),
            image_temp->total() * sizeof(uint8_t));
-
-    // deal image data
     cv::Mat mat_resized_tmp;
     Resize(image_mat, image_height_resized_, image_width_resized_,
            &mat_resized_tmp);
-
-    // cv::imwrite("/apollo/test.jpg",mat_resized_tmp);
     cv::Mat mat_crop_tmp =
         mat_resized_tmp(cv::Range(130, 450), cv::Range(0, 800));
-
     Normalize(mean_, std_, scale, &mat_crop_tmp);
-
-    // cv::imwrite("/apollo/mat_crop_tmp.jpg",mat_crop_tmp);
     std::vector<float> image_data(1 * 3 * img_height_crop_ * img_width_crop_,
                                   0.0f);
     Mat2Vec(mat_crop_tmp, image_data.data());
-
     images_data_.insert(images_data_.end(), image_data.begin(),
                         image_data.end());
 
-    Eigen::Matrix4f img2lidar_matrix_rt_tmp;
-    const auto &lidar2cam_matrix_rt =
+    const auto &imu2cam_matrix_rt =
         (camera_frame_temp->camera_extrinsic).cast<float>();
-    const auto &cam_intrinstic_matrix_3f = camera_frame_temp->camera_k_matrix;
-    GetImg2LidarMatrix(lidar2cam_matrix_rt, cam_intrinstic_matrix_3f,
-                       &img2lidar_matrix_rt_tmp);
 
+    Eigen::Matrix4f cam_intrinstic_matrix_4f;
+    cam_intrinstic_matrix_4f.setIdentity();
+    cam_intrinstic_matrix_4f.block<3, 3>(0, 0) =
+        camera_frame_temp->camera_k_matrix;
+
+    Eigen::Matrix4f lidar2img_matrix_rt_tmp =
+        imu2lidar_matrix_rt_.inverse().cast<float>() * imu2cam_matrix_rt *
+        cam_intrinstic_matrix_4f;
+    Eigen::Matrix4f img2lidar_matrix_rt_tmp = lidar2img_matrix_rt_tmp.inverse();
+
+    img2lidar_matrix_rt_tmp = img2lidar_matrix_rt_tmp.transpose();
     std::vector<float> img2lidar_vec(
         img2lidar_matrix_rt_tmp.data(),
         img2lidar_matrix_rt_tmp.data() +
             img2lidar_matrix_rt_tmp.rows() * img2lidar_matrix_rt_tmp.cols());
-    AERROR << "WXT DEBUG:" << img2lidar_matrix_rt_tmp.size();
-    std::cout << img2lidar_matrix_rt_tmp << "\n";
-    AERROR << "WXT DEBUG:" << img2lidar_vec.size();
-
-    for (const auto i : img2lidar_vec) {
-      std::cout << i << " ";
-    }
-    std::cout << "\n";
 
     k_data_.insert(k_data_.end(), img2lidar_vec.begin(), img2lidar_vec.end());
   }
@@ -148,34 +135,19 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   std::vector<float> boxes;
   std::vector<float> scores;
   std::vector<int64_t> labels;
-  AERROR << "WXT DEBUG: before inference";
-  AERROR << "WXT DEBUG: k_data_.size: " << k_data_.size();
-  AERROR << "WXT DEBUG: images_data.size:" << images_data_.size();
+  AINFO << "k_data_ size: " << k_data_.size();
+  AINFO << "images_data size:" << images_data_.size();
   Run(predictor_.get(), images_shape_, images_data_, k_shape_, k_data_, &boxes,
       &scores, &labels);
 
+  float score_threshold = 0.2;
+  std::vector<float> out_detections_final;
+  std::vector<int64_t> out_labels_final;
+
+  FilterScore(boxes, labels, scores, score_threshold, &out_detections_final,
+              &out_labels_final);
+
   AINFO << "Inference: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  AERROR << "WXT DEBUG: after inference";
-  AERROR << "boxes: " << std::endl;
-  for (const auto &i : boxes) {
-    std::cout << i << " ";
-  }
-  std::cout << "\n";
-
-  AERROR << "scores: " << std::endl;
-  for (const auto i : scores) {
-    std::cout << i << " ";
-  }
-  std::cout << "\n";
-
-  AERROR << "labels: " << std::endl;
-  for (const auto &i : labels) {
-    std::cout << i << " ";
-  }
-  std::cout << "\n";
-
-  AERROR << "wxt debug: out BEVObstacleDetector::Process";
-
   return true;
 }
 
@@ -317,6 +289,59 @@ void BEVObstacleDetector::Run(
       std::cout << "finish get labels out size: " << out_num << std::endl;
     }
   }
+}
+
+bool BEVObstacleDetector::LoadExtrinsics(const std::string &yaml_file,
+                                         Eigen::Matrix4d *camera_extrinsic) {
+  if (!apollo::cyber::common::PathExists(yaml_file)) {
+    AINFO << yaml_file << " does not exist!";
+    return false;
+  }
+  YAML::Node node = YAML::LoadFile(yaml_file);
+  double qw = 0.0;
+  double qx = 0.0;
+  double qy = 0.0;
+  double qz = 0.0;
+  double tx = 0.0;
+  double ty = 0.0;
+  double tz = 0.0;
+  try {
+    if (node.IsNull()) {
+      AINFO << "Load " << yaml_file << " failed! please check!";
+      return false;
+    }
+    qw = node["transform"]["rotation"]["w"].as<double>();
+    qx = node["transform"]["rotation"]["x"].as<double>();
+    qy = node["transform"]["rotation"]["y"].as<double>();
+    qz = node["transform"]["rotation"]["z"].as<double>();
+    tx = node["transform"]["translation"]["x"].as<double>();
+    ty = node["transform"]["translation"]["y"].as<double>();
+    tz = node["transform"]["translation"]["z"].as<double>();
+  } catch (YAML::InvalidNode &in) {
+    AERROR << "load camera extrisic file " << yaml_file
+           << " with error, YAML::InvalidNode exception";
+    return false;
+  } catch (YAML::TypedBadConversion<double> &bc) {
+    AERROR << "load camera extrisic file " << yaml_file
+           << " with error, YAML::TypedBadConversion exception";
+    return false;
+  } catch (YAML::Exception &e) {
+    AERROR << "load camera extrisic file " << yaml_file
+           << " with error, YAML exception:" << e.what();
+    return false;
+  }
+  camera_extrinsic->setConstant(0);
+  Eigen::Quaterniond q;
+  q.x() = qx;
+  q.y() = qy;
+  q.z() = qz;
+  q.w() = qw;
+  (*camera_extrinsic).block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
+  (*camera_extrinsic)(0, 3) = tx;
+  (*camera_extrinsic)(1, 3) = ty;
+  (*camera_extrinsic)(2, 3) = tz;
+  (*camera_extrinsic)(3, 3) = 1;
+  return true;
 }
 
 }  // namespace camera

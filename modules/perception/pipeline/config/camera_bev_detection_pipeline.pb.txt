@@ -96,8 +96,7 @@ stage_config: {
   camera_detector_config {
     gpu_id: 0
     camera_name: "CAM_FRONT,CAM_FRONT_LEFT,CAM_FRONT_RIGHT,CAM_BACK_LEFT,CAM_BACK_RIGHT,CAM_BACK"
-    root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
-    conf_file: "smoke-config.pt"
+    lidar_extrinsics_file: "/apollo/modules/perception/data/params/velodyne128_novatel_extrinsics.yaml"
   }
 }
 

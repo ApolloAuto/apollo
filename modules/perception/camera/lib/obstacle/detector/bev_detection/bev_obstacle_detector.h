@@ -23,6 +23,7 @@
 #include <opencv2/core.hpp>
 
 #include "paddle/include/paddle_inference_api.h"
+#include "yaml-cpp/yaml.h"
 
 #include "modules/perception/pipeline/proto/stage/bev_obstacle_detection_config.pb.h"
 
@@ -91,9 +92,13 @@ class BEVObstacleDetector : public BaseObstacleDetector {
                           const Eigen::Matrix3f& cam_intrinstic_matrix_3f,
                           Eigen::Matrix4f* img2lidar_matrix_rt);
 
-      private : int gpu_id_ = 0;
+  bool LoadExtrinsics(const std::string& yaml_file,
+                      Eigen::Matrix4d* camera_extrinsic);
+
+ private:
+  int gpu_id_ = 0;
   int frame_array_size_ = 6;
-  int num_output_box_feature_ = 7;
+  int num_output_box_feature_ = 9;
 
   int image_height_ = 900;
   int image_width_ = 1600;
@@ -110,10 +115,11 @@ class BEVObstacleDetector : public BaseObstacleDetector {
   std::vector<int> k_shape_{1, 6, 4, 4};
   std::vector<float> k_data_;
 
+  Eigen::Matrix4d imu2lidar_matrix_rt_;
+
   std::vector<float> mean_{103.530, 116.280, 123.675};
   std::vector<float> std_{57.375, 57.120, 58.395};
 
-  BEVObstacleDetectionConfig bev_obstacle_detection_config_;
   std::shared_ptr<paddle_infer::Predictor> predictor_;
 };
 
