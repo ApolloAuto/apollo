@@ -30,6 +30,7 @@ cc_library(
     name = "canbus_gflags",
     srcs = ["libcanbus_gflags.so"],
     hdrs = ["canbus_gflags.h"],
+    alwayslink = True,
     copts = CANBUS_COPTS,
     deps = [
         "@com_github_gflags_gflags//:gflags",

@@ -69,6 +69,7 @@ install(
         ":pb_canbus",
         ":pb_hdrs",
         ":testdata",
+        "//modules/canbus/common:install",
         "//modules/canbus/tools:install",
     ],
 )
