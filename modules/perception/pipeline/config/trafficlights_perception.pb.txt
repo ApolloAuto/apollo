@@ -22,7 +22,7 @@ stage_config: {
     proto_file:"deploy.prototxt"
     weight_file: "baidu_iter_140000.caffemodel"
     max_batch_size: 1  # only support 1 so far
-    traffic_light_detection_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection"
+    traffic_light_detection_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/tl_detection_caffe"
     gpu_id: 0
   }
 }
@@ -37,8 +37,8 @@ stage_config: {
     model_type: "RTNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "vertical/baidu_iter_250000.caffemodel";
-    proto_file: "vertical/deploy.prototxt";
+    weight_file: "vertical_caffe/baidu_iter_250000.caffemodel";
+    proto_file: "vertical_caffe/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 32;
     classify_resize_height: 96;
@@ -56,8 +56,8 @@ stage_config: {
     model_type: "RTNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "quadrate/baidu_iter_200000.caffemodel";
-    proto_file: "quadrate/deploy.prototxt";
+    weight_file: "quadrate_caffe/baidu_iter_200000.caffemodel";
+    proto_file: "quadrate_caffe/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 64;
     classify_resize_height: 64;
@@ -75,8 +75,8 @@ stage_config: {
     model_type: "RTNet";
     input_blob: "data_org";
     output_blob: "prob";
-    weight_file: "horizontal/baidu_iter_200000.caffemodel";
-    proto_file: "horizontal/deploy.prototxt";
+    weight_file: "horizontal_caffe/baidu_iter_200000.caffemodel";
+    proto_file: "horizontal_caffe/deploy.prototxt";
     classify_threshold: 0.5;
     classify_resize_width: 96;
     classify_resize_height: 32;

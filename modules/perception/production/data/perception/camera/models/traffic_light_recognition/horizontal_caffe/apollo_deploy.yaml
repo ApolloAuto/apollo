@@ -1,0 +1,54 @@
+name: horizontal
+date: 2021-01-15
+task_type: tl_recognition
+sensor_type: camera
+framework: Caffe
+model:
+  inputs:
+  - name: images
+    dtype: float32
+    shape:
+    - 1
+    - 32
+    - 96
+    - 3
+  outputs:
+  - name: box3d
+    dtype: float32
+    shape:
+    - -1
+    - 7
+  - name: label
+    dtype: int32
+    shape:
+    - -1
+  - name: confidence
+    dtype: float32
+    shape:
+    - -1
+  labels:
+  - Car
+  - Cyclist
+  - Pedestrian
+  preprocess:
+  - type: Normalize
+    mean:
+    - 0.485
+    - 0.456
+    - 0.406
+    std:
+    - 0.229
+    - 0.224
+    - 0.225
+  model_files:
+  model_files:
+  - name: baidu_iter_200000.caffemodel
+    type: weight
+    size:
+  - name: baidu_iter_200000.caffemodel.metadata
+    type: others
+    size:
+  - name: deploy.prototxt
+    type: proto
+    size:
+dataset: ''
