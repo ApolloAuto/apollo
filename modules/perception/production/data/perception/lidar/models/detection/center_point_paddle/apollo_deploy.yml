@@ -1,0 +1,52 @@
+name: center_point
+date: 2022-07-22
+task_type: 3d_detection
+sensor_type: lidar
+framework: PaddlePaddle
+model:
+  inputs:
+  - name: data
+    dtype: float32
+    shape:
+    - -1
+    - -1
+  outputs:
+  - name: box3d
+    dtype: float32
+    shape:
+    - -1
+    - 7
+  - name: label
+    dtype: int32
+    shape:
+    - -1
+  - name: confidence
+    dtype: float32
+    shape:
+    - -1
+  labels:
+  - Car
+  - Truck
+  - Bus
+  - Motorcyclist
+  - Cyclist
+  - Pedestrian
+  - Trafficcone
+  preprocess:
+  - type: LoadPointCloud
+    dim: 4
+    use_dim: 4
+  model_files:
+  - name: centerpoint.pdmodel
+    type: model
+    size: 1870057
+  - name: centerpoint.pdiparams
+    type: params
+    size: 23088141
+  - name: centerpoint.pdiparams.info
+    type: others
+    size: 32624
+  - name: collect_shape_info.pbtxt
+    type: others
+    size: 89099
+dataset: KITTI

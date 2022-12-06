@@ -41,23 +41,23 @@ DEFINE_string(work_root, "", "Project work root direcotry.");
 DEFINE_int32(gpu_id, 0, "The id of gpu used for inference.");
 DEFINE_string(pfe_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_voxel_encoder.zip",
+              "models/detection/point_pillars_torch/pts_voxel_encoder.zip",
               "The path of pillars feature extractor torch file.");
 DEFINE_string(scattered_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_middle_encoder.zip",
+              "models/detection/point_pillars_torch/pts_middle_encoder.zip",
               "The path of pillars feature scatter torch file.");
 DEFINE_string(backbone_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_backbone.zip",
+              "models/detection/point_pillars_torch/pts_backbone.zip",
               "The path of pillars backbone torch file.");
 DEFINE_string(fpn_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_neck.zip",
+              "models/detection/point_pillars_torch/pts_neck.zip",
               "The path of pillars fpn torch file.");
 DEFINE_string(bbox_head_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/point_pillars/pts_bbox_head.zip",
+              "models/detection/point_pillars_torch/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
 DEFINE_double(normalizing_factor, 255,
               "Normalize intensity range to [0, 1] by this factor.");
@@ -96,33 +96,33 @@ DEFINE_int32(num_output_box_feature, 7, "Length of output box feature.");
 // lidar_mask_pillars
 DEFINE_string(mask_pfe_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/mask_pillars/pts_voxel_encoder.zip",
+              "models/detection/mask_pillars_torch/pts_voxel_encoder.zip",
               "The path of pillars feature extractor torch file.");
 DEFINE_string(mask_scattered_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/mask_pillars/pts_middle_encoder.zip",
+              "models/detection/mask_pillars_torch/pts_middle_encoder.zip",
               "The path of pillars feature scatter torch file.");
 DEFINE_string(mask_backbone_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/mask_pillars/pts_backbone.zip",
+              "models/detection/mask_pillars_torch/pts_backbone.zip",
               "The path of pillars backbone torch file.");
 DEFINE_string(mask_fpn_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/mask_pillars/pts_neck.zip",
+              "models/detection/mask_pillars_torch/pts_neck.zip",
               "The path of pillars fpn torch file.");
 DEFINE_string(mask_bbox_head_torch_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/mask_pillars/pts_bbox_head.zip",
+              "models/detection/mask_pillars_torch/pts_bbox_head.zip",
               "The path of pillars bbox head torch file.");
 
 // lidar_center_point
 DEFINE_string(center_point_model_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point/centerpoint.pdmodel",
+              "models/detection/center_point_paddle/centerpoint.pdmodel",
               "The path of center point model file.");
 DEFINE_string(center_point_params_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point/centerpoint.pdiparams",
+              "models/detection/center_point_paddle/centerpoint.pdiparams",
               "The path of center point params file.");
 DEFINE_bool(use_trt, true, "True if preprocess in CPU mode.");
 DEFINE_int32(trt_precision, 1,
@@ -138,7 +138,7 @@ DEFINE_int32(collect_shape_info, 1,
              "Whether to collect dynamic shape before using tensorrt");
 DEFINE_string(dynamic_shape_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point/collect_shape_info.pbtxt",
+              "models/detection/center_point_paddle/collect_shape_info.pbtxt",
               "Path of a dynamic shape file for tensorrt");
 
 // emergency detection onnx
