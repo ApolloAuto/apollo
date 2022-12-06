@@ -1,5 +1,5 @@
 <package format="2">
-  <name>canbus-vehicle-neolix_edu</name>
+  <name>canbus-vehicle-neolix-edu</name>
   <version>local</version>
   <description>
     Dynamic loading for canbus module 
