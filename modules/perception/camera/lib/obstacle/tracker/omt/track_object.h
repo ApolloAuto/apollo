@@ -18,12 +18,12 @@
 #include <memory>
 #include <vector>
 
-#include "modules/perception/base/blob.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
 struct alignas(16) TrackObject {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   PatchIndicator indicator;
@@ -31,24 +31,9 @@ struct alignas(16) TrackObject {
   base::BBox2DF projected_box;
   base::ObjectPtr object;
 };
+
 typedef std::shared_ptr<TrackObject> TrackObjectPtr;
 typedef std::vector<TrackObjectPtr> TrackObjectPtrs;
-// struct TrackFeature {
-//   TrackFeature(int frame_id, std::shared_ptr<base::Blob<float>> blob);
-//   int frame_id_;
-//   std::shared_ptr<base::Blob<float>> blob_;
-// };
-// class TrackObjectPool {
-//  public:
-//   void Init(size_t capacity);
-//   void NewObject(TrackObjectPtr *ptr);
-//   void NewObject(TrackObjectPtrs *ptr, int batch_size);
-//   void FreeObject(TrackObjectPtr ptr);
-//   void FreeObject(const TrackObjectPtrs &ptr);
-//  private:
-//   std::queue<TrackObjectPtr> data_;
-//   size_t capacity_;
-// };
 
 }  // namespace camera
 }  // namespace perception

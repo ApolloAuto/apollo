@@ -5,13 +5,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "track_object",
-    srcs = ["track_object.cc"],
     hdrs = ["track_object.h"],
     deps = [
         ":frame_list",
         "//modules/perception/base",
-        "//modules/perception/inference/utils:inference_cuda_util_lib",
-        "//modules/perception/inference/utils:inference_util_lib",
     ],
 )
 
