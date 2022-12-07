@@ -61,7 +61,8 @@ class BEVObstacleDetector : public BaseObstacleDetector {
                    const std::vector<int64_t>& label_preds,
                    const std::vector<float>& scores, float score_threshold,
                    std::vector<float>* box3d_filtered,
-                   std::vector<int64_t>* label_preds_filtered);
+                   std::vector<int64_t>* label_preds_filtered,
+                   std::vector<float>* scores_filtered);
 
   bool IsEnabled() const override { return enable_; }
 
@@ -94,6 +95,15 @@ class BEVObstacleDetector : public BaseObstacleDetector {
 
   bool LoadExtrinsics(const std::string& yaml_file,
                       Eigen::Matrix4d* camera_extrinsic);
+
+  void GetObjects(const std::vector<float>& detections,
+                  const std::vector<int64_t>& labels,
+                  const std::vector<float>& scores,
+                  std::vector<base::ObjectPtr>* objects);
+
+  void fill_bbox3d(const float* bbox, base::ObjectPtr obj);
+
+  base::ObjectSubType GetObjectSubType(const int label);
 
  private:
   int gpu_id_ = 0;

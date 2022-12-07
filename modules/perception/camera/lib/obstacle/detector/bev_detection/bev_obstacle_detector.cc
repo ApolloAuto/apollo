@@ -140,14 +140,17 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   Run(predictor_.get(), images_shape_, images_data_, k_shape_, k_data_, &boxes,
       &scores, &labels);
 
-  float score_threshold = 0.2;
+  AINFO << "Inference: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   std::vector<float> out_detections_final;
   std::vector<int64_t> out_labels_final;
+  std::vector<float> out_scores_final;
 
-  FilterScore(boxes, labels, scores, score_threshold, &out_detections_final,
-              &out_labels_final);
+  FilterScore(boxes, labels, scores, FLAGS_score_threshold,
+              &out_detections_final, &out_labels_final, &out_scores_final);
 
-  AINFO << "Inference: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  GetObjects(out_detections_final, out_labels_final, out_scores_final,
+             &(data_frame->camera_frame->detected_objects));
+
   return true;
 }
 
@@ -193,7 +196,8 @@ void BEVObstacleDetector::FilterScore(
     const std::vector<float> &box3d, const std::vector<int64_t> &label_preds,
     const std::vector<float> &scores, float score_threshold,
     std::vector<float> *box3d_filtered,
-    std::vector<int64_t> *label_preds_filtered) {
+    std::vector<int64_t> *label_preds_filtered,
+    std::vector<float> *scores_filtered) {
   for (size_t i = 0; i < scores.size(); ++i) {
     if (scores.at(i) > score_threshold) {
       box3d_filtered->insert(box3d_filtered->end(),
@@ -201,6 +205,8 @@ void BEVObstacleDetector::FilterScore(
                              box3d.begin() + num_output_box_feature_ * (i + 1));
       label_preds_filtered->insert(label_preds_filtered->end(),
                                    *(label_preds.begin() + i));
+
+      scores_filtered->push_back(scores.at(i));
     }
   }
 }
@@ -342,6 +348,67 @@ bool BEVObstacleDetector::LoadExtrinsics(const std::string &yaml_file,
   (*camera_extrinsic)(2, 3) = tz;
   (*camera_extrinsic)(3, 3) = 1;
   return true;
+}
+
+void BEVObstacleDetector::GetObjects(const std::vector<float> &detections,
+                                     const std::vector<int64_t> &labels,
+                                     const std::vector<float> &scores,
+                                     std::vector<base::ObjectPtr> *objects) {
+  int num_objects = detections.size() / num_output_box_feature_;
+  objects->clear();
+
+  for (int i = 0; i < num_objects; ++i) {
+    float score = scores.at(i);
+    base::ObjectPtr obj = nullptr;
+    obj.reset(new base::Object);
+
+    obj->sub_type = GetObjectSubType(labels.at(i));
+    obj->type = base::kSubType2TypeMap.at(obj->sub_type);
+    obj->type_probs.assign(static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE),
+                           0);
+    obj->sub_type_probs.assign(
+        static_cast<int>(base::ObjectSubType::MAX_OBJECT_TYPE), 0);
+    obj->type_probs[static_cast<int>(obj->type)] = score;
+    obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
+    obj->confidence = score;
+
+    fill_bbox3d(detections.data() + i * num_output_box_feature_, obj);
+
+    objects->push_back(obj);
+  }
+}
+
+void BEVObstacleDetector::fill_bbox3d(const float *bbox, base::ObjectPtr obj) {
+  obj->camera_supplement.local_center[0] = bbox[0];
+  obj->camera_supplement.local_center[1] = bbox[1];
+  obj->camera_supplement.local_center[2] = bbox[2];
+
+  obj->size[0] = bbox[3];
+  obj->size[1] = bbox[4];
+  obj->size[2] = bbox[5];
+
+  obj->camera_supplement.alpha = bbox[6];
+}
+
+base::ObjectSubType BEVObstacleDetector::GetObjectSubType(const int label) {
+  switch (label) {
+    case 0:
+      return base::ObjectSubType::CAR;
+    case 1:
+      return base::ObjectSubType::TRUCK;
+    case 3:
+      return base::ObjectSubType::BUS;
+    case 6:
+      return base::ObjectSubType::MOTORCYCLIST;
+    case 7:
+      return base::ObjectSubType::CYCLIST;
+    case 8:
+      return base::ObjectSubType::PEDESTRIAN;
+    case 9:
+      return base::ObjectSubType::TRAFFICCONE;
+    default:
+      return base::ObjectSubType::UNKNOWN;
+  }
 }
 
 }  // namespace camera
