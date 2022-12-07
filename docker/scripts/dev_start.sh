@@ -318,6 +318,48 @@ function mount_other_volumes() {
     docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
     volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
 
+    #TRAFFIC_LIGHT_DETECTION
+    local tl_detection_volume="apollo_tl_detection_volume_${USER}"
+    local tl_detection_image="${DOCKER_REPO}:traffic_light-detection_caffe_model-${TARGET_ARCH}-latest"
+    local tl_detection_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/tl_detection_caffe"
+    docker_restart_volume "${tl_detection_volume}" "${tl_detection_image}" "${tl_detection_path}"
+    volume_conf="${volume_conf} --volume ${tl_detection_volume}:${tl_detection_path}"
+
+    #TRAFFIC_LIGHT_RECOGNITION
+    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
+    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
+    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/horizontal_caffe"
+    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
+    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
+
+    #TRAFFIC_LIGHT_RECOGNITION
+    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
+    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
+    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/quadrate_caffe"
+    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
+    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
+
+    #TRAFFIC_LIGHT_RECOGNITION
+    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
+    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
+    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/vertical_caffe"
+    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
+    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
+
+    #YOLO_OBSTACLE
+    local yolo_volume="yolo_obstacle_volume_${USER}"
+    local yolo_image="${DOCKER_REPO}:yolo_obstacle_model-${TARGET_ARCH}-latest"
+    local yolo_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/3d-r4-half_caffe"
+    docker_restart_volume "${yolo_volume}" "${yolo_image}" "${yolo_path}"
+    volume_conf="${volume_conf} --volume ${yolo_volume}:${yolo_path}"
+
+    #CNNSEG64
+    local cnnseg_volume="cnnseg_volume_${USER}"
+    local cnnseg_image="${DOCKER_REPO}:cnnseg_caffe_model-${TARGET_ARCH}-latest"
+    local cnnseg_path="/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe"
+    docker_restart_volume "${cnnseg_volume}" "${cnnseg_image}" "${cnnseg_path}"
+    volume_conf="${volume_conf} --volume ${cnnseg_volume}:${cnnseg_path}"
+
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"

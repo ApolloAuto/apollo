@@ -3,7 +3,7 @@ pipeline_type: LIDAR_DETECTION
 stage_type: POINTCLOUD_PREPROCESSOR
 stage_type: POINTCLOUD_DETECTION_PREPROCESSOR
 stage_type: MAP_MANAGER
-stage_type: POINT_PILLARS_DETECTION
+stage_type: CNN_SEGMENTATION
 stage_type: POINTCLOUD_DETECTION_POSTPROCESSOR
 stage_type: OBJECT_BUILDER
 stage_type: OBJECT_FILTER_BANK
@@ -60,11 +60,15 @@ stage_config: {
 }
 
 stage_config: {
-  stage_type: POINT_PILLARS_DETECTION
+  stage_type: CNN_SEGMENTATION
   enabled: true
 
-  point_pillars_detection_config: {
-
+  cnnseg_config: {
+    sensor_name: "velodyne128"
+    param_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_param.conf"
+    proto_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/deploy.prototxt"
+    weight_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/deploy.caffemodel"
+    engine_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/engine.conf"
   }
 }
 
