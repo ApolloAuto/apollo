@@ -148,6 +148,9 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   FilterScore(boxes, labels, scores, FLAGS_score_threshold,
               &out_detections_final, &out_labels_final, &out_scores_final);
 
+  std::vector<float> detections_apollo_frame;
+  Nuscenes2Apollo(out_detections_final, &detections_apollo_frame);
+
   GetObjects(out_detections_final, out_labels_final, out_scores_final,
              &(data_frame->camera_frame->detected_objects));
 
@@ -372,22 +375,51 @@ void BEVObstacleDetector::GetObjects(const std::vector<float> &detections,
     obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
     obj->confidence = score;
 
-    fill_bbox3d(detections.data() + i * num_output_box_feature_, obj);
+    FillBBox3d(detections.data() + i * num_output_box_feature_, obj);
 
     objects->push_back(obj);
   }
 }
 
-void BEVObstacleDetector::fill_bbox3d(const float *bbox, base::ObjectPtr obj) {
+void BEVObstacleDetector::FillBBox3d(const float *bbox, base::ObjectPtr obj) {
   obj->camera_supplement.local_center[0] = bbox[0];
   obj->camera_supplement.local_center[1] = bbox[1];
   obj->camera_supplement.local_center[2] = bbox[2];
-
-  obj->size[0] = bbox[3];
-  obj->size[1] = bbox[4];
+  //size: length, width, height of bbox
+  obj->size[0] = bbox[4];
+  obj->size[1] = bbox[3];
   obj->size[2] = bbox[5];
 
   obj->camera_supplement.alpha = bbox[6];
+}
+
+// bbox_nuscenes to bbox_apollo: Rotate 90 degrees counterclockwise about the
+// z-axis bbox: x, y, z, w, l, h, yaw, vx, vy
+void BEVObstacleDetector::Nuscenes2Apollo(
+    const std::vector<float> &bbox_nuscenes, std::vector<float> *bbox_apollo) {
+  ACHECK(nullptr != bbox_apollo);
+  float x_nuscenes = bbox_nuscenes.at(0);
+  float y_nuscenes = bbox_nuscenes.at(1);
+  float z_nuscenes = bbox_nuscenes.at(2);
+
+  float w = bbox_nuscenes.at(3);
+  float l = bbox_nuscenes.at(4);
+  float h = bbox_nuscenes.at(5);
+
+  Eigen::Vector3f center_nuscenes(x_nuscenes, y_nuscenes, z_nuscenes);
+  Eigen::AngleAxisd rotation_vector(-M_PI / 2, Eigen::Vector3d(0, 0, 1));
+  auto &center_apollo =
+      rotation_vector.matrix().cast<float>() * center_nuscenes;
+  for (int i = 0; i < 3; ++i) {
+    *(bbox_apollo->data() + i) = center_apollo[i];
+  }
+  *(bbox_apollo->data() + 3) = w;
+  *(bbox_apollo->data() + 4) = l;
+  *(bbox_apollo->data() + 5) = h;
+
+  float heading_apollo = bbox_nuscenes.at(6) + M_PI / 2;
+  heading_apollo = std::atan2(sinf(heading_apollo), cosf(heading_apollo));
+  *(bbox_apollo->data() + 6) = heading_apollo;
 }
 
 base::ObjectSubType BEVObstacleDetector::GetObjectSubType(const int label) {

@@ -101,9 +101,12 @@ class BEVObstacleDetector : public BaseObstacleDetector {
                   const std::vector<float>& scores,
                   std::vector<base::ObjectPtr>* objects);
 
-  void fill_bbox3d(const float* bbox, base::ObjectPtr obj);
+  void FillBBox3d(const float* bbox, base::ObjectPtr obj);
 
   base::ObjectSubType GetObjectSubType(const int label);
+
+  void Nuscenes2Apollo(const std::vector<float>& bbox_nuscenes,
+                       std::vector<float>* bbox_apollo);
 
  private:
   int gpu_id_ = 0;
