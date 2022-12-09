@@ -24,10 +24,12 @@ from cyber_record.record import Record
 from record_msg.builder import (
   ImageBuilder,
   PointCloudBuilder,
-  LocalizationBuilder)
+  LocalizationBuilder,
+  TransformBuilder)
 from nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
 
 LOCALIZATION_TOPIC = '/apollo/localization/pose'
+TF_TOPIC= '/tf'
 
 def dataset_to_record(nuscenes, record_root_path):
   """Construct record message and save it as record
@@ -39,6 +41,7 @@ def dataset_to_record(nuscenes, record_root_path):
   image_builder = ImageBuilder()
   pc_builder = PointCloudBuilder()
   localization_builder = LocalizationBuilder()
+  transform_builder = TransformBuilder()
 
   record_file_name = "{}.record".format(nuscenes.scene_token)
   record_file_path = os.path.join(record_root_path, record_file_name)
@@ -60,6 +63,11 @@ def dataset_to_record(nuscenes, record_root_path):
         ego_pose['translation'], ego_pose['rotation'], ego_pose_t/1e6)
       if pb_msg:
         record.write(LOCALIZATION_TOPIC, pb_msg, ego_pose_t*1000)
+
+      pb_msg = transform_builder.build('world', 'localization',
+        ego_pose['translation'], ego_pose['rotation'], ego_pose_t/1e6)
+      if pb_msg:
+        record.write(TF_TOPIC, pb_msg, ego_pose_t*1000)
 
 def convert_dataset(dataset_path, record_path):
   """Generate apollo record file by nuscenes dataset
