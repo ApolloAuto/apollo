@@ -1,5 +1,5 @@
 model_param {
-  model_name: "denseline"
+  model_name: "denseline_caffe"
   model_type: "RTNetInt8"
   weight_file: "deploy.caffemodel"
   proto_file: "deploy.prototxt"

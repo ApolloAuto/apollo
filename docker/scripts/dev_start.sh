@@ -360,6 +360,13 @@ function mount_other_volumes() {
     docker_restart_volume "${cnnseg_volume}" "${cnnseg_image}" "${cnnseg_path}"
     volume_conf="${volume_conf} --volume ${cnnseg_volume}:${cnnseg_path}"
 
+    #LANE_DETECTION
+    local lane_detection_volume="lane_detection_volume_${USER}"
+    local lane_detection_image="${DOCKER_REPO}:lane_detection_model-${TARGET_ARCH}-latest"
+    local lane_detection_path="/apollo/modules/perception/production/data/perception/camera/models/lane_detector/darkSCNN_caffe"
+    docker_restart_volume "${lane_detection_volume}" "${lane_detection_image}" "${lane_detection_path}"
+    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}" 
+
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
         local smoke_volume="apollo_smoke_volume_${USER}"

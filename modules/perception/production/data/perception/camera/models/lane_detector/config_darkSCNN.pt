@@ -1,5 +1,5 @@
 model_param {
-  model_name: "darkSCNN"
+  model_name: "darkSCNN_caffe"
   proto_file: "deploy.prototxt"
   weight_file: "deploy.caffemodel"
   input_offset_y: 312
