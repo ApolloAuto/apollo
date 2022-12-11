@@ -504,7 +504,7 @@ void ControlComponent::ResetAndProduceZeroControlCommand(
   control_command->set_steering_target(0.0);
   control_command->set_steering_rate(0.0);
   control_command->set_speed(0.0);
-  control_command->set_brake(control_conf_.soft_estop_brake());
+  control_command->set_brake(0.0);
   control_command->set_gear_location(Chassis::GEAR_DRIVE);
   controller_agent_.Reset();
   latest_trajectory_.mutable_trajectory_point()->Clear();
