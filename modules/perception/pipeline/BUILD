@@ -124,6 +124,7 @@ cc_library(
     "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
     "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
+    "//modules/perception/camera/lib/obstacle/detector/bev_detection:bev_obstacle_detector",
   ],
 )
 

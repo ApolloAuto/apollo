@@ -19,6 +19,7 @@
 #include "cyber/time/clock.h"
 #include "modules/common/util/map_util.h"
 #include "modules/perception/camera/lib/obstacle/camera_detection_postprocessor/camera_detection_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/detector/bev_detection/bev_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
@@ -202,6 +203,9 @@ std::shared_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
     case StageType::LOCATION_REFINER_OBSTACLE_POSTPROCESSOR:
       stage_ptr.reset(new camera::LocationRefinerObstaclePostprocessor());
       break;
+    case StageType::BEV_OBSTACLE_DETECTOR:
+      stage_ptr.reset(new camera::BEVObstacleDetector());
+      break;   
     default:
       return nullptr;
   }

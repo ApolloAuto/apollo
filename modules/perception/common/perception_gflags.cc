@@ -124,7 +124,7 @@ DEFINE_string(center_point_params_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
               "models/detection/center_point_paddle/centerpoint.pdiparams",
               "The path of center point params file.");
-DEFINE_bool(use_trt, true, "True if preprocess in CPU mode.");
+DEFINE_bool(use_trt, false, "True if preprocess in CPU mode.");
 DEFINE_int32(trt_precision, 1,
              "Precision type of tensorrt, 0: kFloat32, 1: kHalf");
 DEFINE_int32(

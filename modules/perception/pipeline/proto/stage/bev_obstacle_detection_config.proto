@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.perception.camera;
 
-message CameraDetectorConfig {
+message BEVObstacleDetectionConfig {
   optional int32 gpu_id = 1;
   optional string camera_name = 2;
   optional string root_dir = 3;
-  optional string conf_file = 4;
+  optional string conf_file = 4;    
 }
