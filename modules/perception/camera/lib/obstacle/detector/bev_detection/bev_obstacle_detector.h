@@ -16,6 +16,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <vector>
@@ -36,7 +37,8 @@ namespace camera {
 
 class BEVObstacleDetector : public BaseObstacleDetector {
  public:
-  BEVObstacleDetector() : BaseObstacleDetector(){};
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  BEVObstacleDetector() : BaseObstacleDetector() {}
   virtual ~BEVObstacleDetector() = default;
 
   bool Init(const StageConfig& stage_config) override;
@@ -64,9 +66,9 @@ class BEVObstacleDetector : public BaseObstacleDetector {
                    std::vector<int64_t>* label_preds_filtered,
                    std::vector<float>* scores_filtered);
 
-  bool IsEnabled() const override { return enable_; }
+  bool IsEnabled() const override { return enable_;}
 
-  std::string Name() const override { return name_; }
+  std::string Name() const override { return name_;}
 
  private:
   void Run(paddle_infer::Predictor* predictor,
@@ -99,13 +101,16 @@ class BEVObstacleDetector : public BaseObstacleDetector {
   void GetObjects(const std::vector<float>& detections,
                   const std::vector<int64_t>& labels,
                   const std::vector<float>& scores,
-                  std::vector<base::ObjectPtr>* objects);
+                  camera::CameraFrame* camera_frame);
 
-  void FillBBox3d(const float* bbox, base::ObjectPtr obj);
+  void FillBBox3d(const float* bbox, const Eigen::Affine3d& world2cam_pose,
+                  const Eigen::Matrix4d& imu2cam_matrix_rt,
+                  const Eigen::Matrix4d& imu2lidar_matrix_rt,
+                  base::ObjectPtr obj);
 
   base::ObjectSubType GetObjectSubType(const int label);
 
-  void Nuscenes2Apollo(const std::vector<float>& bbox_nuscenes,
+  bool Nuscenes2Apollo(const std::vector<float>& bbox_nuscenes,
                        std::vector<float>* bbox_apollo);
 
  private:
@@ -126,8 +131,31 @@ class BEVObstacleDetector : public BaseObstacleDetector {
   std::vector<int> images_shape_{1, 6, 3, img_height_crop_, img_width_crop_};
   std::vector<float> images_data_;
   std::vector<int> k_shape_{1, 6, 4, 4};
-  std::vector<float> k_data_;
-
+  std::vector<float> k_data_{
+      -1.40307297e-03, 9.07780395e-06,  4.84838307e-01,  -5.43047376e-02,
+      -1.40780103e-04, 1.25770375e-05,  1.04126692e+00,  7.67668605e-01,
+      -1.02884378e-05, -1.41007011e-03, 1.02823459e-01,  -3.07415128e-01,
+      0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00,
+      -9.39000631e-04, -7.65239349e-07, 1.14073277e+00,  4.46270645e-01,
+      1.04998052e-03,  1.91798881e-05,  2.06218868e-01,  7.42717385e-01,
+      1.48074005e-05,  -1.40855671e-03, 7.45946690e-02,  -3.16081315e-01,
+      0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00,
+      -7.0699735e-04,  4.2389297e-07,   -5.5183989e-01,  -5.3276348e-01,
+      -1.2281288e-03,  2.5626015e-05,   1.0212017e+00,   6.1102939e-01,
+      -2.2421273e-05,  -1.4170362e-03,  9.3639769e-02,   -3.0863306e-01,
+      0.0000000e+00,   0.0000000e+00,   0.0000000e+00,   1.0000000e+00,
+      2.2227580e-03,   2.5312484e-06,   -9.7261822e-01,  9.0684637e-02,
+      1.9360810e-04,   2.1347081e-05,   -1.0779887e+00,  -7.9227984e-01,
+      4.3742721e-06,   -2.2310747e-03,  1.0842450e-01,   -2.9406491e-01,
+      0.0000000e+00,   0.0000000e+00,   0.0000000e+00,   1.0000000e+00,
+      5.97175560e-04,  -5.88774265e-06, -1.15893924e+00, -4.49921310e-01,
+      -1.28312141e-03, 3.58297058e-07,  1.48300052e-01,  1.14334166e-01,
+      -2.80917516e-06, -1.41527120e-03, 8.37693438e-02,  -2.36765608e-01,
+      0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  1.00000000e+00,
+      3.6048229e-04,   3.8333174e-06,   7.9871160e-01,   4.3321830e-01,
+      1.3671946e-03,   6.7484652e-06,   -8.4722507e-01,  1.9411178e-01,
+      7.5027779e-06,   -1.4139183e-03,  8.2083985e-02,   -2.4505949e-01,
+      0.0000000e+00,   0.0000000e+00,   0.0000000e+00,   1.0000000e+00};
   Eigen::Matrix4d imu2lidar_matrix_rt_;
 
   std::vector<float> mean_{103.530, 116.280, 123.675};

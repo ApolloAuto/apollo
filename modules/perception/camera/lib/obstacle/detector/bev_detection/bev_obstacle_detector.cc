@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/bev_detection/bev_obstacle_detector.h"
 
+#include<functional>
+
 #include <opencv2/opencv.hpp>
 
 #include "cyber/common/file.h"
@@ -79,9 +81,11 @@ bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
 }
 
 bool BEVObstacleDetector::Process(DataFrame *data_frame) {
+  static int cnt_1 = 0;
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::RGB;
-
+  std::vector<float> images_data;
+  std::vector<float> k_data;
   Timer timer;
   float scale = 1.0f;
   for (int i = 0; i < 6; ++i) {
@@ -96,6 +100,7 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
                       cv::Scalar(0, 0, 0));
     memcpy(image_mat.data, image_temp->cpu_data(),
            image_temp->total() * sizeof(uint8_t));
+
     cv::Mat mat_resized_tmp;
     Resize(image_mat, image_height_resized_, image_width_resized_,
            &mat_resized_tmp);
@@ -105,8 +110,8 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
     std::vector<float> image_data(1 * 3 * img_height_crop_ * img_width_crop_,
                                   0.0f);
     Mat2Vec(mat_crop_tmp, image_data.data());
-    images_data_.insert(images_data_.end(), image_data.begin(),
-                        image_data.end());
+
+    images_data.insert(images_data.end(), image_data.begin(), image_data.end());
 
     const auto &imu2cam_matrix_rt =
         (camera_frame_temp->camera_extrinsic).cast<float>();
@@ -119,6 +124,7 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
     Eigen::Matrix4f lidar2img_matrix_rt_tmp =
         imu2lidar_matrix_rt_.inverse().cast<float>() * imu2cam_matrix_rt *
         cam_intrinstic_matrix_4f;
+
     Eigen::Matrix4f img2lidar_matrix_rt_tmp = lidar2img_matrix_rt_tmp.inverse();
 
     img2lidar_matrix_rt_tmp = img2lidar_matrix_rt_tmp.transpose();
@@ -127,20 +133,21 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
         img2lidar_matrix_rt_tmp.data() +
             img2lidar_matrix_rt_tmp.rows() * img2lidar_matrix_rt_tmp.cols());
 
-    k_data_.insert(k_data_.end(), img2lidar_vec.begin(), img2lidar_vec.end());
+    k_data.insert(k_data.end(), img2lidar_vec.begin(), img2lidar_vec.end());
   }
-
+  ++cnt_1;
   AINFO << "Preprocess: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
   std::vector<float> boxes;
   std::vector<float> scores;
   std::vector<int64_t> labels;
-  AINFO << "k_data_ size: " << k_data_.size();
-  AINFO << "images_data size:" << images_data_.size();
-  Run(predictor_.get(), images_shape_, images_data_, k_shape_, k_data_, &boxes,
+  AINFO << "k_data size: " << k_data.size();
+  AINFO << "images_data size:" << images_data.size();
+  Run(predictor_.get(), images_shape_, images_data, k_shape_, k_data_, &boxes,
       &scores, &labels);
 
   AINFO << "Inference: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+
   std::vector<float> out_detections_final;
   std::vector<int64_t> out_labels_final;
   std::vector<float> out_scores_final;
@@ -148,12 +155,16 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   FilterScore(boxes, labels, scores, FLAGS_score_threshold,
               &out_detections_final, &out_labels_final, &out_scores_final);
 
-  std::vector<float> detections_apollo_frame;
-  Nuscenes2Apollo(out_detections_final, &detections_apollo_frame);
+  AINFO << "images_data size: " << images_data.size();
+  AINFO << "k_data size: " << k_data.size();
 
-  GetObjects(out_detections_final, out_labels_final, out_scores_final,
-             &(data_frame->camera_frame->detected_objects));
+  if (0 != out_detections_final.size()) {
+    std::vector<float> detections_apollo_frame;
+    Nuscenes2Apollo(out_detections_final, &detections_apollo_frame);
 
+    GetObjects(detections_apollo_frame, out_labels_final, out_scores_final,
+               data_frame->camera_frame);
+  }
   return true;
 }
 
@@ -356,7 +367,8 @@ bool BEVObstacleDetector::LoadExtrinsics(const std::string &yaml_file,
 void BEVObstacleDetector::GetObjects(const std::vector<float> &detections,
                                      const std::vector<int64_t> &labels,
                                      const std::vector<float> &scores,
-                                     std::vector<base::ObjectPtr> *objects) {
+                                     camera::CameraFrame *camera_frame) {
+  auto objects = &(camera_frame->detected_objects);
   int num_objects = detections.size() / num_output_box_feature_;
   objects->clear();
 
@@ -375,51 +387,97 @@ void BEVObstacleDetector::GetObjects(const std::vector<float> &detections,
     obj->sub_type_probs[static_cast<int>(obj->sub_type)] = score;
     obj->confidence = score;
 
-    FillBBox3d(detections.data() + i * num_output_box_feature_, obj);
+    FillBBox3d(detections.data() + i * num_output_box_feature_,
+               camera_frame->camera2world_pose, camera_frame->camera_extrinsic,
+               imu2lidar_matrix_rt_, obj);
 
     objects->push_back(obj);
   }
 }
 
-void BEVObstacleDetector::FillBBox3d(const float *bbox, base::ObjectPtr obj) {
+void BEVObstacleDetector::FillBBox3d(const float *bbox,
+                                     const Eigen::Affine3d &world2cam_pose,
+                                     const Eigen::Matrix4d &imu2cam_matrix_rt,
+                                     const Eigen::Matrix4d &imu2lidar_matrix_rt,
+                                     base::ObjectPtr obj) {
   obj->camera_supplement.local_center[0] = bbox[0];
   obj->camera_supplement.local_center[1] = bbox[1];
   obj->camera_supplement.local_center[2] = bbox[2];
-  //size: length, width, height of bbox
+  // size: length, width, height of bbox
   obj->size[0] = bbox[4];
   obj->size[1] = bbox[3];
   obj->size[2] = bbox[5];
 
   obj->camera_supplement.alpha = bbox[6];
-}
+  obj->theta = bbox[6];
 
-// bbox_nuscenes to bbox_apollo: Rotate 90 degrees counterclockwise about the
-// z-axis bbox: x, y, z, w, l, h, yaw, vx, vy
-void BEVObstacleDetector::Nuscenes2Apollo(
+  obj->direction[0] = cosf(bbox[6]);
+  obj->direction[1] = sinf(bbox[6]);
+  obj->direction[2] = 0;
+
+  obj->center(0) = static_cast<double>(obj->camera_supplement.local_center[0]);
+  obj->center(1) = static_cast<double>(obj->camera_supplement.local_center[1]);
+  obj->center(2) = static_cast<double>(obj->camera_supplement.local_center[2]);
+
+  Eigen::Affine3d imu2cam_affine;
+  Eigen::Affine3d imu2lidar_affine;
+  imu2cam_affine.matrix() = imu2cam_matrix_rt;
+  imu2lidar_affine.matrix() = imu2lidar_matrix_rt;
+
+  Eigen::AngleAxisd rotation_vector(M_PI / 2, Eigen::Vector3d(1, 0, 0));
+  Eigen::Matrix4d lidar2cam;
+  lidar2cam.setIdentity();
+  lidar2cam.block<3, 3>(0, 0) = rotation_vector.matrix();
+  Eigen::Affine3d lidar2cam_affine;
+  lidar2cam_affine.matrix() = lidar2cam;
+
+  obj->center = world2cam_pose * imu2cam_affine.inverse() * imu2lidar_affine *
+                lidar2cam_affine * obj->center;
+}
+/*
+bbox_nuscenes to bbox_apollo: Rotate 90 degrees counterclockwise about the
+z-axis
+*/
+// bbox: x, y, z, w, l, h, yaw, vx, vy
+bool BEVObstacleDetector::Nuscenes2Apollo(
     const std::vector<float> &bbox_nuscenes, std::vector<float> *bbox_apollo) {
   ACHECK(nullptr != bbox_apollo);
-  float x_nuscenes = bbox_nuscenes.at(0);
-  float y_nuscenes = bbox_nuscenes.at(1);
-  float z_nuscenes = bbox_nuscenes.at(2);
+  int size = bbox_nuscenes.size() / num_output_box_feature_;
+  for (int i = 0; i < size; ++i) {
+    float x_nuscenes = bbox_nuscenes.at(0 + i * num_output_box_feature_);
+    float y_nuscenes = bbox_nuscenes.at(1 + i * num_output_box_feature_);
+    float z_nuscenes = bbox_nuscenes.at(2 + i * num_output_box_feature_);
 
-  float w = bbox_nuscenes.at(3);
-  float l = bbox_nuscenes.at(4);
-  float h = bbox_nuscenes.at(5);
+    float w = bbox_nuscenes.at(3 + i * num_output_box_feature_);
+    float l = bbox_nuscenes.at(4 + i * num_output_box_feature_);
+    float h = bbox_nuscenes.at(5 + i * num_output_box_feature_);
 
-  Eigen::Vector3f center_nuscenes(x_nuscenes, y_nuscenes, z_nuscenes);
-  Eigen::AngleAxisd rotation_vector(-M_PI / 2, Eigen::Vector3d(0, 0, 1));
-  auto &center_apollo =
-      rotation_vector.matrix().cast<float>() * center_nuscenes;
-  for (int i = 0; i < 3; ++i) {
-    *(bbox_apollo->data() + i) = center_apollo[i];
+    float heading = bbox_nuscenes.at(6 + i * num_output_box_feature_);
+
+    Eigen::Vector3f center_nuscenes(x_nuscenes, y_nuscenes, z_nuscenes);
+    Eigen::AngleAxisd rotation_vector(M_PI / 2, Eigen::Vector3d(1, 0, 0));
+    Eigen::Vector3f center_apollo =
+        rotation_vector.matrix().cast<float>() * center_nuscenes;
+
+    std::vector<float> bbox_apollo_temp(num_output_box_feature_);
+
+    for (int j = 0; j < 3; ++j) {
+      bbox_apollo_temp[j] = center_apollo(j);
+    }
+
+    bbox_apollo_temp[3] = w;
+    bbox_apollo_temp[4] = l;
+    bbox_apollo_temp[5] = h;
+
+    heading -= M_PI / 2;
+    heading = std::atan2(sinf(heading), cosf(heading));
+    heading = -heading;
+
+    bbox_apollo_temp[6] = heading;
+    bbox_apollo->insert(bbox_apollo->end(), bbox_apollo_temp.begin(),
+                        bbox_apollo_temp.end());
   }
-  *(bbox_apollo->data() + 3) = w;
-  *(bbox_apollo->data() + 4) = l;
-  *(bbox_apollo->data() + 5) = h;
-
-  float heading_apollo = bbox_nuscenes.at(6) + M_PI / 2;
-  heading_apollo = std::atan2(sinf(heading_apollo), cosf(heading_apollo));
-  *(bbox_apollo->data() + 6) = heading_apollo;
+  return true;
 }
 
 base::ObjectSubType BEVObstacleDetector::GetObjectSubType(const int label) {
