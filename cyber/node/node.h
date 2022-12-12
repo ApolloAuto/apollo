@@ -150,6 +150,7 @@ class Node {
   auto CreateClient(const std::string& service_name)
       -> std::shared_ptr<Client<Request, Response>>;
 
+  bool DeleteReader(const std::string& channel_name);
   /**
    * @brief Observe all readers' data
    */

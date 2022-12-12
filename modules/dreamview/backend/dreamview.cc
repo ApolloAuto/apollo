@@ -54,9 +54,9 @@ Status Dreamview::Init() {
 
   if (FLAGS_dreamview_profiling_mode &&
       FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_.reset(
-        new cyber::Timer(FLAGS_dreamview_profiling_duration,
-                         [this]() { this->TerminateProfilingMode(); }, false));
+    exit_timer_.reset(new cyber::Timer(
+        FLAGS_dreamview_profiling_duration,
+        [this]() { this->TerminateProfilingMode(); }, false));
 
     exit_timer_->Start();
     AWARN << "============================================================";
@@ -122,14 +122,19 @@ Status Dreamview::Init() {
 
 Status Dreamview::Start() {
   sim_world_updater_->Start();
-  point_cloud_updater_->Start();
+  point_cloud_updater_->Start([this](const std::string& param_string) -> bool {
+    return PointCloudCallback(param_string);
+  });
   hmi_->Start([this](const std::string& function_name,
                      const nlohmann::json& param_json) -> nlohmann::json {
     nlohmann::json ret = HMICallbackSimControl(function_name, param_json);
     ADEBUG << "ret: " << ret.dump();
     return ret;
   });
-  perception_camera_updater_->Start();
+  perception_camera_updater_->Start(
+      [this](const std::string& param_string) -> bool {
+        return PerceptionCameraCallback(param_string);
+      });
   plugin_manager_->Start([this](const std::string& function_name,
                                 const nlohmann::json& param_json) -> bool {
     return PluginCallbackHMI(function_name, param_json);
@@ -257,7 +262,7 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
         }
       }
     } break;
-    case 3:{
+    case 3: {
       callback_res = hmi_->UpdateVehicleToStatus();
     }
     default:
@@ -266,5 +271,16 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
   return callback_res;
 }
 
+bool Dreamview::PerceptionCameraCallback(const std::string& param_string){
+  bool callback_res = false;
+  callback_res = hmi_->UpdateCameraChannelToStatus(param_string);
+  return callback_res;
+}
+
+bool Dreamview::PointCloudCallback(const std::string& param_string){
+  bool callback_res = false;
+  callback_res = hmi_->UpdatePointChannelToStatus(param_string);
+  return callback_res;
+}
 }  // namespace dreamview
 }  // namespace apollo

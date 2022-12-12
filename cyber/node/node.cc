@@ -46,5 +46,12 @@ void Node::ClearData() {
   }
 }
 
+bool Node::DeleteReader(const std::string& channel_name) {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  int result = readers_.erase(channel_name);
+  if (1 == result) return true;
+  return false;
+}
+
 }  // namespace cyber
 }  // namespace apollo

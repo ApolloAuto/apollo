@@ -1,6 +1,8 @@
 syntax = "proto2";
 
 package apollo.dreamview;
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+
 
 message CameraUpdate {
   // The transformation matrix of localization in world coordinate system
@@ -16,4 +18,8 @@ message CameraUpdate {
 
   // Camera image aspect ratio = width / height
   optional double image_aspect_ratio = 4;
+  repeated apollo.perception.BBox2D bbox2d = 5;
+  repeated int32 obstacles_id = 6;
+  repeated int32 obstacles_sub_type = 7;
+  optional double k_image_scale = 8;
 }

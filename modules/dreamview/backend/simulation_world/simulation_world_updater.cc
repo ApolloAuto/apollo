@@ -376,13 +376,13 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
             park_go_routing["point"] = point_list;
             park_go_routing_list.push_back(park_go_routing);
           }
-        //  } else {
-        //   sim_world_service_.PublishMonitorMessage(
-        //       MonitorMessageItem::ERROR,
-        //       "Failed to load park go "
-        //       "routing. Please make sure the "
-        //       "file exists at " +
-        //           ParkGoRoutingFile());
+          //  } else {
+          //   sim_world_service_.PublishMonitorMessage(
+          //       MonitorMessageItem::ERROR,
+          //       "Failed to load park go "
+          //       "routing. Please make sure the "
+          //       "file exists at " +
+          //           ParkGoRoutingFile());
         }
         response["parkAndGoRoutings"] = park_go_routing_list;
         websocket_->SendData(conn, response.dump());
@@ -466,8 +466,8 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           response["routingType"] = json["routingType"];
           websocket_->SendData(conn, response.dump());
         } else {
-          sim_world_service_.PublishMonitorMessage(
-              MonitorMessageItem::ERROR, "Failed to add a routing.");
+          sim_world_service_.PublishMonitorMessage(MonitorMessageItem::ERROR,
+                                                   "Failed to add a routing.");
         }
       });
 
@@ -482,6 +482,44 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         camera_ws_->SendBinaryData(conn, to_send, true);
       });
 
+  camera_ws_->RegisterMessageHandler(
+      "GetCameraChannel",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::vector<std::string> channels;
+        perception_camera_updater_->GetChannelMsg(&channels);
+        Json response({});
+        response["data"]["name"] = "GetCameraChannelListSuccess";
+        for (unsigned int i = 0; i < channels.size(); i++) {
+          response["data"]["info"]["channel"][i] = channels[i];
+        }
+        camera_ws_->SendData(conn, response.dump());
+      });
+  camera_ws_->RegisterMessageHandler(
+      "ChangeCameraChannel",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        if (!perception_camera_updater_->IsEnabled()) {
+          return;
+        }
+        auto channel_info = json.find("data");
+        Json response({});
+        if (channel_info == json.end()) {
+          AERROR << "Cannot  retrieve channel info with unknown channel.";
+          response["type"] = "ChangeCameraChannelFail";
+          camera_ws_->SendData(conn, response.dump());
+          return;
+        }
+        std::string channel =
+            channel_info->dump().substr(1, channel_info->dump().length() - 2);
+        if (perception_camera_updater_->ChangeChannel(channel)) {
+          Json response({});
+          response["type"] = "ChangeCameraChannelSuccess";
+          camera_ws_->SendData(conn, response.dump());
+        } else {
+          AERROR << "Create channel fail.";
+          response["type"] = "ChangeCameraChannelFail";
+          camera_ws_->SendData(conn, response.dump());
+        }
+      });
   plugin_ws_->RegisterMessageHandler(
       "PluginRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
@@ -660,10 +698,10 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
 Json SimulationWorldUpdater::GetConstructRoutingRequestJson(
     const nlohmann::json &start, const nlohmann::json &end) {
-      Json result;
-      result["start"] = start;
-      result["end"] = end;
-      return result;
+  Json result;
+  result["start"] = start;
+  result["end"] = end;
+  return result;
 }
 
 bool SimulationWorldUpdater::ConstructParkingRoutingTask(

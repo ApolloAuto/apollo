@@ -58,7 +58,8 @@ class Dreamview {
                          const nlohmann::json& param_json);
   nlohmann::json HMICallbackSimControl(const std::string& function_name,
                                        const nlohmann::json& param_json);
-
+  bool PerceptionCameraCallback(const std::string& param_string);
+  bool PointCloudCallback(const std::string& param_string);
   std::unique_ptr<cyber::Timer> exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;

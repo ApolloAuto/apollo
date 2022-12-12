@@ -52,4 +52,6 @@ message HMIStatus {
   optional string current_record_id = 20 [default = ""];
   map<string, int32> records = 21;
   optional sint32 current_vehicle_type = 22;
+  optional string current_camera_sensor_channel = 23;
+  optional string current_point_cloud_channel = 24;
 }
