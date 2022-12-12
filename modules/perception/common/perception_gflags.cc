@@ -141,6 +141,16 @@ DEFINE_string(dynamic_shape_file,
               "models/detection/center_point_paddle/collect_shape_info.pbtxt",
               "Path of a dynamic shape file for tensorrt");
 
+// bev petr_v1
+DEFINE_string(bev_model_file,
+              "/apollo/modules/perception/production/data/perception/camera/"
+              "models/petr_v1/petr_inference.pdmodel",
+              "The path of bev model file.");
+DEFINE_string(bev_params_file,
+              "/apollo/modules/perception/production/data/perception/camera/"
+              "models/petr_v1/petr_inference.pdiparams",
+              "The path of bev params file.");
+
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
               "/apollo/modules/perception/camera"

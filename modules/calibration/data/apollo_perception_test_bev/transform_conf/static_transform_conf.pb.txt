@@ -1,0 +1,56 @@
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "velodyne"
+    file_path: "/apollo/modules/drivers/lidar/velodyne/params/velodyne128_novatel_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "localization"
+    child_frame_id: "novatel"
+    file_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_FRONT"
+    file_path: "/apollo/modules/perception/data/params/CAM_FRONT_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_FRONT_RIGHT"
+    file_path: "/apollo/modules/perception/data/params/CAM_FRONT_RIGHT_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_FRONT_LEFT"
+    file_path: "/apollo/modules/perception/data/params/CAM_FRONT_LEFT_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_BACK"
+    file_path: "/apollo/modules/perception/data/params/CAM_BACK_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_BACK_LEFT"
+    file_path: "/apollo/modules/perception/data/params/CAM_BACK_LEFT_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "novatel"
+    child_frame_id: "CAM_BACK_RIGHT"
+    file_path: "/apollo/modules/perception/data/params/CAM_BACK_RIGHT_extrinsics.yaml"
+    enable: true
+}
+

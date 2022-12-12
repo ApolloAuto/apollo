@@ -47,11 +47,7 @@ bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
 
   paddle::AnalysisConfig config;
   config.EnableUseGpu(1000, FLAGS_gpu_id);
-  config.SetModel(
-      "modules/perception/production/data/perception/camera/models/petr_v1/"
-      "petr_inference.pdmodel",
-      "modules/perception/production/data/perception/camera/models/petr_v1/"
-      "petr_inference.pdiparams");
+  config.SetModel(FLAGS_bev_model_file, FLAGS_bev_params_file);
   config.EnableMemoryOptim();
   if (FLAGS_use_trt) {
     paddle::AnalysisConfig::Precision precision;
