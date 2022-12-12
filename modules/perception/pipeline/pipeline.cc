@@ -215,10 +215,6 @@ std::shared_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
   }
 
   if (stage_ptr != nullptr) stage_ptr->Init(stage_config_map_[stage_type]);
-<<<<<<< HEAD
-
-=======
->>>>>>> 9be98e18c8... register omt_bev_tracker to stage
   return stage_ptr;
 }
 
