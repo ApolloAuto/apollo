@@ -52,7 +52,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class CameraBevDetectionComponent : public apollo::cyber::Component<apollo::drivers::Image> {
+class CameraBevDetectionComponent
+    : public apollo::cyber::Component<apollo::drivers::Image> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -60,14 +61,12 @@ class CameraBevDetectionComponent : public apollo::cyber::Component<apollo::driv
   CameraBevDetectionComponent() : seq_num_(0) {}
   ~CameraBevDetectionComponent();
 
-  CameraBevDetectionComponent(const CameraBevDetectionComponent&) =
+  CameraBevDetectionComponent(const CameraBevDetectionComponent&) = delete;
+  CameraBevDetectionComponent& operator=(const CameraBevDetectionComponent&) =
       delete;
-  CameraBevDetectionComponent& operator=(
-      const CameraBevDetectionComponent&) = delete;
 
   bool Init() override;
-  bool Proc(const std::shared_ptr<apollo::drivers::Image>&
-                cambackmsg) override;
+  bool Proc(const std::shared_ptr<apollo::drivers::Image>& cambackmsg) override;
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
                       const std::string& camera_name);
 
@@ -83,9 +82,9 @@ class CameraBevDetectionComponent : public apollo::cyber::Component<apollo::driv
   void SetCameraHeightAndPitch();
   void OnMotionService(const MotionServiceMsgType& message);
 
-  void FillCamMessage(const std::shared_ptr<apollo::drivers::Image> &in_message, 
-      apollo::perception::camera::CameraFrame &camera_frame,
-      const std::string &camera_name);
+  void FillCamMessage(const std::shared_ptr<apollo::drivers::Image>& in_message,
+                      const std::string& camera_name,
+                      apollo::perception::camera::CameraFrame* camera_frame);
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
@@ -130,8 +129,10 @@ class CameraBevDetectionComponent : public apollo::cyber::Component<apollo::driv
   std::vector<std::string> camera_names_;  // camera sensor names
   std::vector<std::string> input_camera_channel_names_;
 
-  std::vector<std::shared_ptr<cyber::Reader<apollo::drivers::Image>>> cam_reader_ptrs_;
-  std::vector<pipeline::DataFrame> dataframe_ptrs_ = std::vector<pipeline::DataFrame>(6);
+  std::vector<std::shared_ptr<cyber::Reader<apollo::drivers::Image>>>
+      cam_reader_ptrs_;
+  std::vector<pipeline::DataFrame> dataframe_ptrs_ =
+      std::vector<pipeline::DataFrame>(6);
 
   // camera name -> SensorInfo
   std::map<std::string, base::SensorInfo> sensor_info_map_;
@@ -189,7 +190,7 @@ class CameraBevDetectionComponent : public apollo::cyber::Component<apollo::driv
   std::string visual_debug_folder_;
   std::string visual_camera_;
 
-  bool output_final_obstacles_ = false;
+  bool output_final_obstacles_ = true;
   std::string output_obstacles_channel_name_;
 
   bool output_camera_debug_msg_ = false;

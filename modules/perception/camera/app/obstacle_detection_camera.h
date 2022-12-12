@@ -19,9 +19,12 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
+
+#include "modules/perception/camera/app/proto/perception.pb.h"
+#include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
 
 #include "cyber/common/macros.h"
-#include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
@@ -35,7 +38,6 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
-#include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
 #include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {

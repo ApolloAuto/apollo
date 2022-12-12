@@ -217,22 +217,22 @@ bool CameraBevDetectionComponent::Init() {
     AERROR << "InitCameraFrames() failed.";
     return false;
   }
-//   if (InitProjectMatrix() != cyber::SUCC) {
-//     AERROR << "InitProjectMatrix() failed.";
-//     return false;
-//   }
-//   if (InitCameraListeners() != cyber::SUCC) {
-//     AERROR << "InitCameraListeners() failed.";
-//     return false;
-//   }
+  //   if (InitProjectMatrix() != cyber::SUCC) {
+  //     AERROR << "InitProjectMatrix() failed.";
+  //     return false;
+  //   }
+  //   if (InitCameraListeners() != cyber::SUCC) {
+  //     AERROR << "InitCameraListeners() failed.";
+  //     return false;
+  //   }
   if (InitBevCameraListeners() != cyber::SUCC) {
     AERROR << "InitBevCameraListeners() failed.";
     return false;
   }
-//   if (InitMotionService() != cyber::SUCC) {
-//     AERROR << "InitMotionService() failed.";
-//     return false;
-//   }
+  //   if (InitMotionService() != cyber::SUCC) {
+  //     AERROR << "InitMotionService() failed.";
+  //     return false;
+  //   }
 
   // SetCameraHeightAndPitch();
 
@@ -246,8 +246,13 @@ bool CameraBevDetectionComponent::Init() {
 }
 
 bool CameraBevDetectionComponent::Proc(
-  const std::shared_ptr<apollo::drivers::Image>&
-                cambackmsg){
+    const std::shared_ptr<apollo::drivers::Image> &cambackmsg) {
+  std::shared_ptr<apollo::perception::PerceptionObstacles> out_message(
+      new (std::nothrow) apollo::perception::PerceptionObstacles);
+  apollo::common::ErrorCode error_code = apollo::common::OK;
+  const double msg_timestamp =
+      cambackmsg->measurement_time() + timestamp_offset_;
+
   camf_reader_->Observe();
   const auto &camf_msg = camf_reader_->GetLatestObserved();
   if (camf_msg == nullptr) {
@@ -256,11 +261,10 @@ bool CameraBevDetectionComponent::Proc(
   }
   camera::CameraFrame &camf_frame = camera_frames_[0];
   const std::string &camf_name = camera_names_[0];
-  FillCamMessage(camf_msg, camf_frame, camf_name);
+  FillCamMessage(camf_msg, camf_name, &camf_frame);
   pipeline::DataFrame data_frame_camf;
   data_frame_camf.camera_frame = &camf_frame;
 
-  
   camfl_reader_->Observe();
   const auto &camfl_msg = camfl_reader_->GetLatestObserved();
   if (camfl_msg == nullptr) {
@@ -269,10 +273,10 @@ bool CameraBevDetectionComponent::Proc(
   }
   camera::CameraFrame &camfl_frame = camera_frames_[1];
   const std::string &camfl_name = camera_names_[1];
-  FillCamMessage(camfl_msg, camfl_frame, camfl_name);
+  FillCamMessage(camfl_msg, camfl_name, &camfl_frame);
   pipeline::DataFrame data_frame_camfl;
   data_frame_camfl.camera_frame = &camfl_frame;
- 
+
   camfr_reader_->Observe();
   const auto &camfr_msg = camfr_reader_->GetLatestObserved();
   if (camfr_msg == nullptr) {
@@ -281,7 +285,7 @@ bool CameraBevDetectionComponent::Proc(
   }
   camera::CameraFrame &camfr_frame = camera_frames_[2];
   const std::string &camfr_name = camera_names_[2];
-  FillCamMessage(camfr_msg, camfr_frame, camfr_name);
+  FillCamMessage(camfr_msg, camfr_name, &camfr_frame);
   pipeline::DataFrame data_frame_camfr;
   data_frame_camfr.camera_frame = &camfr_frame;
 
@@ -293,10 +297,10 @@ bool CameraBevDetectionComponent::Proc(
   }
   camera::CameraFrame &cambl_frame = camera_frames_[3];
   const std::string &cambl_name = camera_names_[3];
-  FillCamMessage(cambl_msg, cambl_frame, cambl_name);
+  FillCamMessage(cambl_msg, cambl_name, &cambl_frame);
   pipeline::DataFrame data_frame_cambl;
   data_frame_cambl.camera_frame = &cambl_frame;
-  
+
   cambr_reader_->Observe();
   const auto &cambr_msg = cambr_reader_->GetLatestObserved();
   if (cambr_msg == nullptr) {
@@ -305,37 +309,55 @@ bool CameraBevDetectionComponent::Proc(
   }
   camera::CameraFrame &cambr_frame = camera_frames_[4];
   const std::string &cambr_name = camera_names_[4];
-  FillCamMessage(cambr_msg, cambr_frame, cambr_name);
+  FillCamMessage(cambr_msg, cambr_name, &cambr_frame);
   pipeline::DataFrame data_frame_cambr;
   data_frame_cambr.camera_frame = &cambr_frame;
-  
+
   if (cambackmsg == nullptr) {
     AERROR << "camera_back msg is not ready!";
     return false;
   }
   camera::CameraFrame &camb_frame = camera_frames_[5];
   const std::string &camb_name = camera_names_[5];
-  FillCamMessage(cambackmsg, camb_frame, camb_name);
+  FillCamMessage(cambackmsg, camb_name, &camb_frame);
   pipeline::DataFrame data_frame_camb;
   data_frame_camb.camera_frame = &camb_frame;
   // Run camera perception pipeline
 
-  dataframe_ptrs_ = {data_frame_camf, data_frame_camfr, data_frame_camfl, data_frame_camb, data_frame_cambl, data_frame_cambr};
-  
+  dataframe_ptrs_ = {data_frame_camf, data_frame_camfr, data_frame_camfl,
+                     data_frame_camb, data_frame_cambl, data_frame_cambr};
+
   if (!camera_obstacle_pipeline_->Process(&dataframe_ptrs_[0])) {
     AERROR << "bev_obstacle_pipeline_->Process() failed";
     return cyber::FAIL;
   }
-  
+
+  auto camera_frame = *(data_frame_camf.camera_frame);
+
+  // process success, make pb msg
+  if (output_final_obstacles_ &&
+      MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
+                      camera_frame.lane_objects, error_code,
+                      out_message.get()) != cyber::SUCC) {
+    AERROR << "MakeProtobufMsg failed ts: " << msg_timestamp;
+    error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_UNKNOWN;
+
+    return cyber::FAIL;
+  }
+
+  if (output_final_obstacles_) {
+    writer_->Write(out_message);
+  }
   return true;
 }
 
-void CameraBevDetectionComponent::FillCamMessage(const std::shared_ptr<apollo::drivers::Image> &in_message, 
-      apollo::perception::camera::CameraFrame &camera_frame,
-      const std::string &camera_name) {
+void CameraBevDetectionComponent::FillCamMessage(
+    const std::shared_ptr<apollo::drivers::Image> &in_message,
+    const std::string &camera_name,
+    apollo::perception::camera::CameraFrame *camera_frame) {
   const double msg_timestamp =
       in_message->measurement_time() + timestamp_offset_;
-  
+
   // Get sensor to world pose from TF
   Eigen::Affine3d camera2world_trans;
   if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
@@ -346,19 +368,18 @@ void CameraBevDetectionComponent::FillCamMessage(const std::shared_ptr<apollo::d
     AERROR << err_str;
   }
 
-  camera_frame.camera2world_pose = camera2world_trans;
-  camera_frame.camera_extrinsic = extrinsic_map_.at(camera_name);
-  camera_frame.data_provider = data_providers_map_[camera_name].get();
-  camera_frame.data_provider->FillImageData(
+  camera_frame->camera2world_pose = camera2world_trans;
+  camera_frame->camera_extrinsic = extrinsic_map_.at(camera_name);
+  camera_frame->data_provider = data_providers_map_[camera_name].get();
+  camera_frame->data_provider->FillImageData(
       image_height_, image_width_,
       reinterpret_cast<const uint8_t *>(in_message->data().data()),
       in_message->encoding());
 
-  camera_frame.frame_id = frame_id_;
-  camera_frame.timestamp = msg_timestamp;
+  camera_frame->frame_id = frame_id_;
+  camera_frame->timestamp = msg_timestamp;
 
   ++frame_id_;
-
 }
 
 void CameraBevDetectionComponent::OnReceiveImage(
@@ -718,7 +739,7 @@ int CameraBevDetectionComponent::InitBevCameraListeners() {
   camf_reader_ =
       node_->CreateReader<apollo::drivers::Image>(camf_reader_config, nullptr);
   ACHECK(camf_reader_ != nullptr);
-//   cam_reader_ptrs_.push_back(camf_reader_);
+  //   cam_reader_ptrs_.push_back(camf_reader_);
 
   cyber::ReaderConfig camfl_reader_config;
   camfl_reader_config.channel_name = input_camera_channel_names_[1];
@@ -726,7 +747,7 @@ int CameraBevDetectionComponent::InitBevCameraListeners() {
   camfl_reader_ =
       node_->CreateReader<apollo::drivers::Image>(camfl_reader_config, nullptr);
   ACHECK(camfl_reader_ != nullptr);
-//   cam_reader_ptrs_.push_back(camfl_reader_);
+  //   cam_reader_ptrs_.push_back(camfl_reader_);
 
   cyber::ReaderConfig camfr_reader_config;
   camfr_reader_config.channel_name = input_camera_channel_names_[2];
@@ -734,7 +755,7 @@ int CameraBevDetectionComponent::InitBevCameraListeners() {
   camfr_reader_ =
       node_->CreateReader<apollo::drivers::Image>(camfr_reader_config, nullptr);
   ACHECK(camfr_reader_ != nullptr);
-//   cam_reader_ptrs_.push_back(camfr_reader_);
+  //   cam_reader_ptrs_.push_back(camfr_reader_);
 
   cyber::ReaderConfig cambl_reader_config;
   cambl_reader_config.channel_name = input_camera_channel_names_[3];
@@ -742,7 +763,7 @@ int CameraBevDetectionComponent::InitBevCameraListeners() {
   cambl_reader_ =
       node_->CreateReader<apollo::drivers::Image>(cambl_reader_config, nullptr);
   ACHECK(cambl_reader_ != nullptr);
-//   cam_reader_ptrs_.push_back(cambl_reader_);
+  //   cam_reader_ptrs_.push_back(cambl_reader_);
 
   cyber::ReaderConfig cambr_reader_config;
   cambr_reader_config.channel_name = input_camera_channel_names_[4];
@@ -750,10 +771,9 @@ int CameraBevDetectionComponent::InitBevCameraListeners() {
   cambr_reader_ =
       node_->CreateReader<apollo::drivers::Image>(cambr_reader_config, nullptr);
   ACHECK(cambr_reader_ != nullptr);
-//   cam_reader_ptrs_.push_back(cambr_reader_);
+  //   cam_reader_ptrs_.push_back(cambr_reader_);
 
   return cyber::SUCC;
-
 }
 
 int CameraBevDetectionComponent::InitMotionService() {
