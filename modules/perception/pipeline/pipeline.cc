@@ -24,6 +24,7 @@
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt2/omt_bev_tracker.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
@@ -205,13 +206,19 @@ std::shared_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::BEV_OBSTACLE_DETECTOR:
       stage_ptr.reset(new camera::BEVObstacleDetector());
-      break;   
+      break;
+    case StageType::OMT_BEV_OBSTACLE_TRACKER:
+      stage_ptr.reset(new camera::OMTBEVTracker());
+      break;
     default:
       return nullptr;
   }
 
   if (stage_ptr != nullptr) stage_ptr->Init(stage_config_map_[stage_type]);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9be98e18c8... register omt_bev_tracker to stage
   return stage_ptr;
 }
 

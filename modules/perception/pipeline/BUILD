@@ -102,6 +102,7 @@ cc_library(
     "//modules/perception/camera/lib/obstacle/detector/smoke:smoke_obstacle_detector",
     "//modules/perception/camera/lib/obstacle/preprocessor:camera_detection_preprocessor",
     "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
+    "//modules/perception/camera/lib/obstacle/tracker/omt2:omt_bev_tracker",
     "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
     "//modules/perception/camera/lib/traffic_light/detector/detection",
     "//modules/perception/camera/lib/traffic_light/detector/recognition",

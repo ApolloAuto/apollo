@@ -1,13 +1,13 @@
-stage_type: OMT_OBSTACLE_TRACKER
+stage_type: OMT_BEV_OBSTACLE_TRACKER
 stage_type: BEV_OBSTACLE_DETECTOR
-stage_type: OMT_OBSTACLE_TRACKER
-stage_type: MULTI_CUE_OBSTACLE_TRANSFORMER
-stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
-stage_type: OMT_OBSTACLE_TRACKER
-stage_type: OMT_OBSTACLE_TRACKER
+stage_type: OMT_BEV_OBSTACLE_TRACKER
+# stage_type: MULTI_CUE_OBSTACLE_TRANSFORMER
+# stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
+stage_type: OMT_BEV_OBSTACLE_TRACKER
+stage_type: OMT_BEV_OBSTACLE_TRACKER
 
 stage_config: {
-  stage_type: OMT_OBSTACLE_TRACKER
+  stage_type: OMT_BEV_OBSTACLE_TRACKER
   enabled: true
   
   omt_param {
@@ -31,7 +31,7 @@ stage_config: {
     correct_type: false
     image_displacement: 50
     abnormal_movement: 0.4
-    min_init_height_ratio:17
+    min_init_height_ratio:1
     target_combine_iou_threshold: 0.6
     target_param {
       velocity_threshold: 100000
@@ -102,7 +102,7 @@ stage_config: {
 
 
 stage_config: {
-  stage_type: OMT_OBSTACLE_TRACKER
+  stage_type: OMT_BEV_OBSTACLE_TRACKER
   enabled: true
   
   omt_param {
@@ -126,7 +126,7 @@ stage_config: {
     correct_type: false
     image_displacement: 50
     abnormal_movement: 0.4
-    min_init_height_ratio:17
+    min_init_height_ratio:1
     target_combine_iou_threshold: 0.6
     target_param {
       velocity_threshold: 100000
@@ -184,28 +184,28 @@ stage_config: {
 }
 
 
+# stage_config: {
+#   stage_type: MULTI_CUE_OBSTACLE_TRANSFORMER
+#   enabled: true
+# 
+#   multicue_param {
+#     min_dimension_val: 0
+#     check_dimension: true
+#   }
+# }
+
+# stage_config: {
+#   stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
+#   enabled: true
+# 
+#   location_refiner_param {
+#     min_dist_to_camera: 30.0
+#     roi_h2bottom_scale: 0.5
+#   }
+# }
+
 stage_config: {
-  stage_type: MULTI_CUE_OBSTACLE_TRANSFORMER
-  enabled: true
-
-  multicue_param {
-    min_dimension_val: 0
-    check_dimension: true
-  }
-}
-
-stage_config: {
-  stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
-  enabled: true
-
-  location_refiner_param {
-    min_dist_to_camera: 30.0
-    roi_h2bottom_scale: 0.5
-  }
-}
-
-stage_config: {
-  stage_type: OMT_OBSTACLE_TRACKER
+  stage_type: OMT_BEV_OBSTACLE_TRACKER
   enabled: true
   
   omt_param {
@@ -229,7 +229,7 @@ stage_config: {
     correct_type: false
     image_displacement: 50
     abnormal_movement: 0.4
-    min_init_height_ratio:17
+    min_init_height_ratio:1
     target_combine_iou_threshold: 0.6
     target_param {
       velocity_threshold: 100000
@@ -287,7 +287,7 @@ stage_config: {
 }
 
 stage_config: {
-  stage_type: OMT_OBSTACLE_TRACKER
+  stage_type: OMT_BEV_OBSTACLE_TRACKER
   enabled: true
   
   omt_param {
@@ -311,7 +311,7 @@ stage_config: {
     correct_type: false
     image_displacement: 50
     abnormal_movement: 0.4
-    min_init_height_ratio:17
+    min_init_height_ratio:1
     target_combine_iou_threshold: 0.6
     target_param {
       velocity_threshold: 100000

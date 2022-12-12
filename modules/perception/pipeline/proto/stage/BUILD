@@ -730,3 +730,22 @@ py_proto_library(
         ":hdmap_roi_filter_config_proto",
     ],
 )
+
+cc_proto_library(
+    name = "omt_bev_cc_proto",
+    deps = [
+        ":omt_bev_proto",
+    ],
+)
+
+proto_library(
+    name = "omt_bev_proto",
+    srcs = ["omt_bev.proto"],
+)
+
+py_proto_library(
+    name = "omt_bev_py_pb2",
+    deps = [
+        ":omt_bev_proto",
+    ],
+)

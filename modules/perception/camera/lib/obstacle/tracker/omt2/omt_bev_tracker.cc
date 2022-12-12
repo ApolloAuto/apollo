@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <functional>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -26,14 +27,13 @@
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/geometry/common.h"
 
-
 namespace apollo {
 namespace perception {
 namespace camera {
 
 using cyber::common::GetAbsolutePath;
 
-bool OMTBEVTracker::Init(const StageConfig &stage_config) {
+bool OMTBEVTracker::Init(const StageConfig& stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
@@ -75,8 +75,8 @@ bool OMTBEVTracker::Init(const StageConfig &stage_config) {
   return true;
 }
 
-bool OMTBEVTracker::Predict(
-    const ObstacleTrackerOptions& options, CameraFrame* frame) {
+bool OMTBEVTracker::Predict(const ObstacleTrackerOptions& options,
+                            CameraFrame* frame) {
   for (auto& target : targets_) {
     target.Predict(frame);
     // todo(zero): proposed_objects not used by detection model
@@ -86,14 +86,13 @@ bool OMTBEVTracker::Predict(
   return true;
 }
 
-float OMTBEVTracker::ScoreAppearance(
-    const Target &target, TrackObjectPtr object) {
+float OMTBEVTracker::ScoreAppearance(const Target& target,
+                                     TrackObjectPtr object) {
   // todo(zero): need tracking feature to cacl
   return 0.0f;
 }
 
-float OMTBEVTracker::ScoreMotion(
-    const Target &target, TrackObjectPtr object) {
+float OMTBEVTracker::ScoreMotion(const Target& target, TrackObjectPtr object) {
   Eigen::Vector4d state = target.world_center.get_state();
   float target_center_x = static_cast<float>(state[0]);
   float target_center_y = static_cast<float>(state[1]);
@@ -106,19 +105,18 @@ float OMTBEVTracker::ScoreMotion(
   return score;
 }
 
-float OMTBEVTracker::ScoreShape(
-    const Target &target, TrackObjectPtr object) {
+float OMTBEVTracker::ScoreShape(const Target& target, TrackObjectPtr object) {
   Eigen::VectorXd shape = target.world_lwh.get_state();
   base::RectF rect(object->projected_box);
 
-  float score = static_cast<float>(
-    (shape[0] - rect.width) * (shape[1] - rect.height) / (shape[0] * shape[1]));
+  float score =
+      static_cast<float>((shape[0] - rect.width) * (shape[1] - rect.height) /
+                         (shape[0] * shape[1]));
 
   return -std::abs(score);
 }
 
-float OMTBEVTracker::ScoreOverlap(
-    const Target &target, TrackObjectPtr object) {
+float OMTBEVTracker::ScoreOverlap(const Target& target, TrackObjectPtr object) {
   Eigen::Vector4d state = target.world_center.get_state();
   Eigen::VectorXd shape = target.world_lwh.get_state();
   base::BBox2DF box_target;
@@ -126,10 +124,10 @@ float OMTBEVTracker::ScoreOverlap(
   double y = state[1];
   double w = shape[0];
   double h = shape[1];
-  box_target.xmin = static_cast<float>(x - w/2);
-  box_target.xmax = static_cast<float>(x + w/2);
-  box_target.ymin = static_cast<float>(y - h/2);
-  box_target.ymax = static_cast<float>(y + h/2);
+  box_target.xmin = static_cast<float>(x - w / 2);
+  box_target.xmax = static_cast<float>(x + w / 2);
+  box_target.ymin = static_cast<float>(y - h / 2);
+  box_target.ymax = static_cast<float>(y + h / 2);
 
   base::BBox2DF& box_object = object->projected_box;
 
@@ -137,9 +135,9 @@ float OMTBEVTracker::ScoreOverlap(
   return iou;
 }
 
-void OMTBEVTracker::GenerateHypothesis(
-    const TrackObjectPtrs& objects, std::vector<Hypothesis>* score_list) {
-  Hypothesis hypo;
+void OMTBEVTracker::GenerateHypothesis(const TrackObjectPtrs& objects,
+                                       std::vector<HypothesisBev>* score_list) {
+  HypothesisBev hypo;
   for (size_t i = 0; i < targets_.size(); ++i) {
     for (size_t j = 0; j < objects.size(); ++j) {
       hypo.target_idx = static_cast<int>(i);
@@ -180,10 +178,9 @@ void OMTBEVTracker::GenerateHypothesis(
   }
 }
 
-int OMTBEVTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
+int OMTBEVTracker::CreateNewTarget(const TrackObjectPtrs& objects) {
   const TemplateMap& kMinTemplateHWL =
       object_template_manager_->MinTemplateHWL();
-
   std::vector<base::RectF> target_rects;
   for (const auto& target : targets_) {
     if (!target.isTracked() || target.isLost()) {
@@ -192,7 +189,6 @@ int OMTBEVTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
     base::RectF target_rect(target[-1]->projected_box);
     target_rects.push_back(target_rect);
   }
-
   int created_count = 0;
   for (size_t i = 0; i < objects.size(); ++i) {
     // todo(zero): OutOfValidRegion
@@ -211,9 +207,13 @@ int OMTBEVTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
     }
 
     const auto& sub_type = objects[i]->object->sub_type;
-    const auto& min_tmplt = kMinTemplateHWL.at(sub_type);
-    if (min_tmplt.empty() ||
-       rect.height > min_tmplt[0] * omt_param_.min_init_height_ratio()) {
+    const std::vector<float>* min_tmplt = nullptr;
+
+    if (kMinTemplateHWL.count(sub_type)) {
+      min_tmplt = &kMinTemplateHWL.at(sub_type);
+    }
+    if (min_tmplt == nullptr ||
+        rect.height > min_tmplt->at(2) * omt_param_.min_init_height_ratio()) {
       Target target(omt_param_.target_param());
       target.Add(objects[i]);
       targets_.push_back(target);
@@ -244,8 +244,8 @@ void OMTBEVTracker::ClearTargets() {
 }
 
 bool OMTBEVTracker::CombineDuplicateTargets() {
-  std::vector<Hypothesis> score_list;
-  Hypothesis hypo;
+  std::vector<HypothesisBev> score_list;
+  HypothesisBev hypo;
   for (size_t i = 0; i < targets_.size(); ++i) {
     if (targets_[i].Size() == 0) {
       continue;
@@ -297,7 +297,8 @@ bool OMTBEVTracker::CombineDuplicateTargets() {
     }
   }
 
-  std::sort(score_list.begin(), score_list.end(), std::greater<Hypothesis>());
+  std::sort(score_list.begin(), score_list.end(),
+            std::greater<HypothesisBev>());
   bool used_target[targets_.size()] = {false};
   for (const auto& pair : score_list) {
     if (used_target[pair.target_idx] || used_target[pair.object_idx]) {
@@ -309,8 +310,8 @@ bool OMTBEVTracker::CombineDuplicateTargets() {
       index1 = pair.object_idx;
       index2 = pair.target_idx;
     }
-    Target &target_save = targets_[index1];
-    Target &target_del = targets_[index2];
+    Target& target_save = targets_[index1];
+    Target& target_del = targets_[index2];
     for (int i = 0; i < target_del.Size(); i++) {
       // no need to change track_id of all objects in target_del
       target_save.Add(target_del[i]);
@@ -356,10 +357,61 @@ void OMTBEVTracker::FindAbnormalTrack(TrackObjectPtrs* track_objects_ptr) {
 }
 
 bool OMTBEVTracker::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
+  if (data_frame == nullptr) {
     return false;
+  }
 
-  CameraFrame* frame = data_frame->camera_frame;
+  CameraFrame* camera_frame = data_frame->camera_frame;
+  ObstacleTrackerOptions tracker_options;
+
+  auto track_state = data_frame->camera_frame->track_state;
+
+  switch (track_state) {
+    case TrackState::Predict: {
+      Predict(tracker_options, camera_frame);
+      data_frame->camera_frame->track_state = TrackState::Associate2D;
+      break;
+    }
+    case TrackState::Associate2D: {
+      Associate2D(tracker_options, camera_frame);
+      data_frame->camera_frame->track_state = TrackState::Associate3D;
+      break;
+    }
+    case TrackState::Associate3D: {
+      Associate3D(tracker_options, camera_frame);
+      data_frame->camera_frame->track_state = TrackState::Track;
+      break;
+    }
+    case TrackState::Track: {
+      Track(tracker_options, camera_frame);
+      data_frame->camera_frame->track_state = TrackState::Predict;
+      break;
+    }
+    default:
+      // do nothing
+      break;
+  }
+
+  return true;
+}
+
+bool OMTBEVTracker::Init(const ObstacleTrackerInitOptions& options) {
+  return true;
+}
+
+bool OMTBEVTracker::Track(const ObstacleTrackerOptions& options,
+                          CameraFrame* frame) {
+  return true;
+}
+
+bool OMTBEVTracker::Associate2D(const ObstacleTrackerOptions& options,
+                                CameraFrame* frame) {
+  return true;
+}
+
+bool OMTBEVTracker::Associate3D(const ObstacleTrackerOptions& options,
+                                CameraFrame* frame) {
+  if (frame == nullptr) return false;
 
   inference::CudaUtil::set_device_id(gpu_id_);
   frame_list_.Add(frame);
@@ -384,18 +436,19 @@ bool OMTBEVTracker::Process(DataFrame* data_frame) {
     track_ptr->object->id = static_cast<int>(i);
     track_ptr->timestamp = frame->timestamp;
     track_ptr->indicator = PatchIndicator(frame->frame_id, static_cast<int>(i),
-        frame->data_provider->sensor_name());
+                                          frame->data_provider->sensor_name());
 
     // todo(zero): world coor！ OBB-box is better, but for now we use AABB-box
     base::BBox2DF box_target;
+
     double x = frame->detected_objects[i]->center[0];
     double y = frame->detected_objects[i]->center[1];
     double l = frame->detected_objects[i]->size[0];
     double w = frame->detected_objects[i]->size[1];
-    box_target.xmin = static_cast<float>(x - w/2);
-    box_target.xmax = static_cast<float>(x + w/2);
-    box_target.ymin = static_cast<float>(y - l/2);
-    box_target.ymax = static_cast<float>(y + l/2);
+    box_target.xmin = static_cast<float>(x - w / 2);
+    box_target.xmax = static_cast<float>(x + w / 2);
+    box_target.ymin = static_cast<float>(y - l / 2);
+    box_target.ymax = static_cast<float>(y + l / 2);
     track_ptr->projected_box = box_target;
     track_objects.push_back(track_ptr);
   }
@@ -403,36 +456,33 @@ bool OMTBEVTracker::Process(DataFrame* data_frame) {
   // todo(zero): reference_
   // reference_.CorrectSize(frame);
 
-  std::vector<Hypothesis> score_list;
+  std::vector<HypothesisBev> score_list;
   GenerateHypothesis(track_objects, &score_list);
 
-  std::sort(score_list.begin(), score_list.end(), std::greater<Hypothesis>());
+  std::sort(score_list.begin(), score_list.end(),
+            std::greater<HypothesisBev>());
   bool used_target[targets_.size()] = {false};
   bool used_object[track_objects.size()] = {false};
   for (const auto& hypo : score_list) {
     int target_idx = hypo.target_idx;
     int object_idx = hypo.object_idx;
-    if (used_target[target_idx] || used_object[object_idx])
-      continue;
+    if (used_target[target_idx] || used_object[object_idx]) continue;
 
     Target& target = targets_[target_idx];
     TrackObjectPtr track_object = track_objects[object_idx];
     target.Add(track_object);
     used_target[target_idx] = true;
     used_object[object_idx] = true;
-    ADEBUG << "Target " << target.id
-           << " match " << track_object->indicator.frame_id
-           << " (" << object_idx << ")" << "at " << hypo.score
-           << " size: " << target.Size();
+    ADEBUG << "Target " << target.id << " match "
+           << track_object->indicator.frame_id << " (" << object_idx << ")"
+           << "at " << hypo.score << " size: " << target.Size();
   }
 
   // Find untracked objects and create new targets
   TrackObjectPtrs untrack_objects;
   for (size_t i = 0; i < track_objects.size(); ++i) {
-    if (!used_object[i])
-      untrack_objects.push_back(track_objects[i]);
+    if (!used_object[i]) untrack_objects.push_back(track_objects[i]);
   }
-
   int new_count = CreateNewTarget(untrack_objects);
   AINFO << "Create " << new_count << " new target";
 
@@ -458,31 +508,12 @@ bool OMTBEVTracker::Process(DataFrame* data_frame) {
     target.Update(frame);
     if (!target.isLost()) {
       frame->tracked_objects.push_back(target[-1]->object);
-      ADEBUG << "Target " << target.id
+      AERROR << "Target " << target.id
              << " velocity: " << target.world_center.get_state().transpose()
              << " % " << target.world_center.variance_.diagonal().transpose()
              << " % " << target[-1]->object->velocity.transpose();
     }
   }
-  return true;
-}
-
-bool OMTBEVTracker::Init(const ObstacleTrackerInitOptions &options) {
-  return true;
-}
-
-bool OMTBEVTracker::Track(
-    const ObstacleTrackerOptions& options, CameraFrame* frame) {
-  return true;
-}
-
-bool OMTBEVTracker::Associate2D(
-    const ObstacleTrackerOptions& options, CameraFrame* frame) {
-  return true;
-}
-
-bool OMTBEVTracker::Associate3D(
-    const ObstacleTrackerOptions& options, CameraFrame* frame) {
   return true;
 }
 

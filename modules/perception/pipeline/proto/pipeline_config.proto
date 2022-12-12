@@ -32,6 +32,7 @@ import "modules/perception/pipeline/proto/stage/ncut_config.proto";
 import "modules/perception/pipeline/proto/stage/object_builder_config.proto";
 import "modules/perception/pipeline/proto/stage/object_filter_bank_config.proto";
 import "modules/perception/pipeline/proto/stage/omt.proto";
+import "modules/perception/pipeline/proto/stage/omt_bev.proto";
 import "modules/perception/pipeline/proto/stage/pbf_tracker_config.proto";
 import "modules/perception/pipeline/proto/stage/point_pillars_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/pointcloud_detection_postprocessor_config.proto";
@@ -160,6 +161,7 @@ enum StageType {
 
 
   // tracker
+  OMT_BEV_OBSTACLE_TRACKER = 119;
   OMT_OBSTACLE_TRACKER = 120;
   SEMANTIC_REVISER = 121;
   CONTI_ARS_TRACKER = 123;
@@ -215,17 +217,18 @@ message StageConfig {
     camera.YoloObstacleDetectorConfig yolo_obstacle_detector_config = 53;
     camera.location_refiner.LocationRefinerParam location_refiner_param = 54;
     camera.omt.OmtParam omt_param = 55;
-    camera.multicue.MulticueParam multicue_param = 56;
-    camera.singlestage.SinglestageParam singlestage_param = 57;
-    camera.darkSCNN.DarkSCNNParam dark_scnn_param = 58;
-    camera.denseline.DenselineParam denseline_param = 59;
-    camera.lane.DarkSCNNLanePostprocessorParam darkscnn_lane_postprocessor_param = 60;
-    camera.lane.LanePostprocessorParam lane_postprocessor_param = 61;
-    camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 62;
-    camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 63;
-    camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 64;
-    camera.BEVObstacleDetectionConfig bev_obstacle_detection_config = 65;
-    camera.CameraDetectorConfig camera_detector_config = 66;
+    camera.omtbev.OmtParam omt_bev_param = 56;
+    camera.multicue.MulticueParam multicue_param = 57;
+    camera.singlestage.SinglestageParam singlestage_param = 58;
+    camera.darkSCNN.DarkSCNNParam dark_scnn_param = 59;
+    camera.denseline.DenselineParam denseline_param = 60;
+    camera.lane.DarkSCNNLanePostprocessorParam darkscnn_lane_postprocessor_param = 61;
+    camera.lane.LanePostprocessorParam lane_postprocessor_param = 62;
+    camera.SmokeObstacleDetectionConfig smoke_obstacle_detection_config = 63;
+    camera.CameraDetectionPostprocessorConfig camera_detection_postprocessor_config = 64;
+    camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 65;
+    camera.BEVObstacleDetectionConfig bev_obstacle_detection_config = 66;
+    camera.CameraDetectorConfig camera_detector_config = 67;
 
     fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;

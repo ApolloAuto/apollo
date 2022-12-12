@@ -16,38 +16,44 @@
 
 #pragma once
 
-#include "modules/common/util/eigen_defs.h"
+#include "modules/perception/pipeline/proto/stage/omt.pb.h"
 
+#include <string>
+#include <vector>
+
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/track_object.h"
-#include "modules/perception/pipeline/proto/stage/omt.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-struct Hypothesis {
+struct HypothesisBev {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   int target_idx;
   int object_idx;
   float score;
-  Hypothesis() : target_idx(-1), object_idx(-1), score(0.0f) {}
-  Hypothesis(int tar_idx, int obj_idx, float score)
+  HypothesisBev() : target_idx(-1), object_idx(-1), score(0.0f) {}
+  HypothesisBev(int tar_idx, int obj_idx, float score)
       : target_idx(tar_idx), object_idx(obj_idx), score(score) {}
 
-  bool operator<(const Hypothesis& other) const { return score < other.score; }
-  bool operator>(const Hypothesis& other) const { return score > other.score; }
+  bool operator<(const HypothesisBev& other) const {
+    return score < other.score;
+  }
+  bool operator>(const HypothesisBev& other) const {
+    return score > other.score;
+  }
 };
-
 
 class OMTBEVTracker : public BaseObstacleTracker {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  bool Init(const ObstacleTrackerInitOptions &options) override;
+  bool Init(const ObstacleTrackerInitOptions& options) override;
 
   // @brief: predict candidate obstales in the new image.
   // @param [in]: options
@@ -74,15 +80,15 @@ class OMTBEVTracker : public BaseObstacleTracker {
   std::string Name() const override { return name_; }
 
  private:
-  float ScoreAppearance(const Target &target, TrackObjectPtr object);
-  float ScoreMotion(const Target &target, TrackObjectPtr object);
-  float ScoreShape(const Target &target, TrackObjectPtr object);
-  float ScoreOverlap(const Target &target, TrackObjectPtr object);
+  float ScoreAppearance(const Target& target, TrackObjectPtr object);
+  float ScoreMotion(const Target& target, TrackObjectPtr object);
+  float ScoreShape(const Target& target, TrackObjectPtr object);
+  float ScoreOverlap(const Target& target, TrackObjectPtr object);
 
-  void GenerateHypothesis(const TrackObjectPtrs &objects,
-                          std::vector<Hypothesis>* score_list);
+  void GenerateHypothesis(const TrackObjectPtrs& objects,
+                          std::vector<HypothesisBev>* score_list);
 
-  int CreateNewTarget(const TrackObjectPtrs &objects);
+  int CreateNewTarget(const TrackObjectPtrs& objects);
 
   void FindAbnormalTrack(TrackObjectPtrs* track_objects_ptr);
 
@@ -97,10 +103,10 @@ class OMTBEVTracker : public BaseObstacleTracker {
   std::vector<std::vector<float>> kTypeAssociatedCost_;
 
   apollo::common::EigenVector<Target> targets_;
- protected:
-  ObjectTemplateManager *object_template_manager_;
-};
 
+ protected:
+  ObjectTemplateManager* object_template_manager_;
+};
 
 }  // namespace camera
 }  // namespace perception
