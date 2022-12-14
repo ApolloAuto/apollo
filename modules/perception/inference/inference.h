@@ -35,19 +35,20 @@ typedef std::map<std::string,
 
 class Inference {
  public:
-  virtual void Infer() = 0;
   Inference() = default;
 
   virtual ~Inference() = default;
 
   virtual bool Init(const std::map<std::string, std::vector<int>> &shapes) = 0;
 
-  void set_max_batch_size(const int &batch_size);
-
-  void set_gpu_id(const int &gpu_id);
+  virtual void Infer() = 0;
 
   virtual std::shared_ptr<apollo::perception::base::Blob<float>> get_blob(
       const std::string &name) = 0;
+
+  void set_max_batch_size(const int &batch_size);
+
+  void set_gpu_id(const int &gpu_id);
 
  protected:
   int max_batch_size_ = 1;
