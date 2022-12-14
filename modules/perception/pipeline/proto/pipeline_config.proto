@@ -10,6 +10,7 @@ import "modules/perception/pipeline/proto/traffic_light_config.proto";
 // stage
 import "modules/perception/pipeline/proto/stage/all_latest_fusion_config.proto";
 import "modules/perception/pipeline/proto/stage/bev_obstacle_detection_config.proto";
+import "modules/perception/pipeline/proto/stage/caddn_detection_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detector_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_postprocessor_config.proto";
 import "modules/perception/pipeline/proto/stage/camera_detection_preprocessor_config.proto";
@@ -129,21 +130,22 @@ enum StageType {
   SMOKE_OBSTACLE_DETECTION = 21;
   YOLO_OBSTACLE_DETECTOR = 22;
   YOLOV4_OBSTACLE_DETECTOR = 23;
+  CADDN_DETECTION = 24;
 
   // lane detectors
-  DARKSCNN_LANE_DETECTOR = 24;
-  DENSELINE_LANE_DETECTOR = 25;
+  DARKSCNN_LANE_DETECTOR = 25;
+  DENSELINE_LANE_DETECTOR = 26;
   // traffic light detectors
-  TRAFFIC_LIGHT_DETECTION = 26;
-  TRAFFIC_LIGHT_RECOGNITION = 27;
+  TRAFFIC_LIGHT_DETECTION = 27;
+  TRAFFIC_LIGHT_RECOGNITION = 28;
   // lidar detectors
-  CNN_SEGMENTATION = 28;
-  MASK_PILLARS_DETECTION = 29;
-  NCUT_SEGMENTATION = 30;
-  POINT_PILLARS_DETECTION = 31;
+  CNN_SEGMENTATION = 29;
+  MASK_PILLARS_DETECTION = 30;
+  NCUT_SEGMENTATION = 31;
+  POINT_PILLARS_DETECTION = 32;
   CENTER_POINT_DETECTION = 33;
   // radar detectors
-  CONTI_ARS_DETECTOR = 32;
+  CONTI_ARS_DETECTOR = 34;
 
   // post processors
   // camera post processors
@@ -229,6 +231,7 @@ message StageConfig {
     camera.CameraDetectionPreprocessorConfig camera_detection_preprocessor_config = 65;
     camera.BEVObstacleDetectionConfig bev_obstacle_detection_config = 66;
     camera.CameraDetectorConfig camera_detector_config = 67;
+    camera.CaddnDetectionConfig caddn_detection_config = 68;
 
     fusion.AllLatestFusionConfig all_latest_fusion_config = 100;
     fusion.ProbabilisticFusionConfig probabilistic_fusion_config = 101;
