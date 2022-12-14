@@ -24,6 +24,7 @@ cc_library(
         "//cyber",
         "//modules/planning/common:planning_gflags",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
+        "//modules/planning/common/util:print_debug_info",
         "@com_google_googletest//:gtest",
     ],
 )

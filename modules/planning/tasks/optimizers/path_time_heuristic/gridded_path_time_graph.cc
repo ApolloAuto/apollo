@@ -31,6 +31,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/print_debug_info.h"
 
 namespace apollo {
 namespace planning {
@@ -176,7 +177,7 @@ Status GriddedPathTimeGraph::InitCostTable() {
           : static_cast<uint32_t>(std::ceil(total_length_s_ / dense_unit_s_)) +
                 1;
   dimension_s_ = dense_dimension_s_ + sparse_dimension_s_;
-
+  PrintCurves debug;
   // Sanity Check
   if (dimension_t_ < 1 || dimension_s_ < 1) {
     const std::string msg = "Dp st cost table size incorrect.";
@@ -193,12 +194,14 @@ Status GriddedPathTimeGraph::InitCostTable() {
     double curr_s = 0.0;
     for (uint32_t j = 0; j < dense_dimension_s_; ++j, curr_s += dense_unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
+      debug.AddPoint("dp_node_points", curr_t, curr_s);
     }
     curr_s = static_cast<double>(dense_dimension_s_ - 1) * dense_unit_s_ +
              sparse_unit_s_;
     for (uint32_t j = dense_dimension_s_; j < cost_table_i.size();
          ++j, curr_s += sparse_unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
+      debug.AddPoint("dp_node_points", curr_t, curr_s);
     }
   }
 
@@ -498,6 +501,14 @@ void GriddedPathTimeGraph::CalculateCostAt(
 Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   double min_cost = std::numeric_limits<double>::infinity();
   const StGraphPoint* best_end_point = nullptr;
+  PrintPoints debug("dp_node_edge");
+  for (const auto& points_vec : cost_table_) {
+      for (const auto& pt : points_vec) {
+          debug.AddPoint(pt.point().t(), pt.point().s());
+      }
+  }
+  // for debug plot
+  // debug.PrintToLog();
   for (const StGraphPoint& cur_point : cost_table_.back()) {
     if (!std::isinf(cur_point.total_cost()) &&
         cur_point.total_cost() < min_cost) {
@@ -523,16 +534,20 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
 
   std::vector<SpeedPoint> speed_profile;
   const StGraphPoint* cur_point = best_end_point;
+  PrintPoints debug_res("dp_result");
   while (cur_point != nullptr) {
     ADEBUG << "Time: " << cur_point->point().t();
     ADEBUG << "S: " << cur_point->point().s();
     ADEBUG << "V: " << cur_point->GetOptimalSpeed();
     SpeedPoint speed_point;
+    debug_res.AddPoint(cur_point->point().t(),cur_point->point().s());
     speed_point.set_s(cur_point->point().s());
     speed_point.set_t(cur_point->point().t());
     speed_profile.push_back(speed_point);
     cur_point = cur_point->pre_point();
   }
+//  for debug plot
+//   debug_res.PrintToLog();
   std::reverse(speed_profile.begin(), speed_profile.end());
 
   static constexpr double kEpsilon = std::numeric_limits<double>::epsilon();

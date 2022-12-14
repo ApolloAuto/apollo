@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/print_debug_info.h"
 
 namespace apollo {
 namespace planning {
@@ -492,6 +493,19 @@ bool STBoundary::GetIndexRange(const std::vector<STPoint>& points,
   }
   return true;
 }
-
+void STBoundary::PrintDebug(std::string name) const{
+    PrintPoints debug(name);
+    if (lower_points_.empty() || upper_points_.empty()) {
+        return;
+    }
+    for (auto pt : lower_points_) {
+        debug.AddPoint(pt.t(), pt.s());
+    }
+    for (auto iter = upper_points_.rbegin(); iter != upper_points_.rend(); iter++) {
+        debug.AddPoint(iter->t(), iter->s());
+    }
+    debug.AddPoint(lower_points_.front().t(), lower_points_.front().s());
+    debug.PrintToLog();
+}
 }  // namespace planning
 }  // namespace apollo

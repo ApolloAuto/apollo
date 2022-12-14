@@ -11,6 +11,7 @@ cc_library(
     hdrs = ["util.h"],
     copts = PLANNING_COPTS,
     deps = [
+        ":print_debug_info",
         "//cyber",
         "//modules/common/util",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -42,6 +43,15 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
+    ],
+)
+
+cc_library(
+    name = "print_debug_info",
+    hdrs = ["print_debug_info.h"],
+    copts = PLANNING_COPTS,
+    deps = [
+        "//cyber",
     ],
 )
 

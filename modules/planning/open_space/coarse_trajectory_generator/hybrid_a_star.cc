@@ -764,6 +764,7 @@ bool HybridAStar::Plan(
   }
   if (!ValidityCheck(end_node_)) {
     AERROR << "end_node in collision with obstacles";
+    AERROR << ssm.str();
     return false;
   }
   double map_time = Clock::NowInSeconds();

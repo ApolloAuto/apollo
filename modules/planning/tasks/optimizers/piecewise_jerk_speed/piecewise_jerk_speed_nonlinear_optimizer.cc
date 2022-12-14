@@ -36,6 +36,7 @@
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
+#include "modules/planning/common/util/print_debug_info.h"
 
 namespace apollo {
 namespace planning {
@@ -323,11 +324,13 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   // using piecewise_jerk_path to fit a curve of speed_ref
   // TODO(Hongyi): move smooth configs to gflags
   double delta_s = 2.0;
+  PrintCurves debug;
   std::vector<double> speed_ref;
   for (int i = 0; i < 100; ++i) {
     double path_s = i * delta_s;
     double limit = speed_limit_.GetSpeedLimitByS(path_s);
     speed_ref.emplace_back(limit);
+    debug.AddPoint("coarse_v_bounds_upper", path_s, limit);
   }
   std::array<double, 3> init_state = {speed_ref[0], 0.0, 0.0};
   PiecewiseJerkPathProblem piecewise_jerk_problem(speed_ref.size(), delta_s,
@@ -364,7 +367,10 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
     double j = (opt_ddx[i] - opt_ddx[i - 1]) / delta_s;
     smoothed_speed_limit.AppendSegment(j, delta_s);
   }
-
+  for (size_t i = 0; i<opt_x.size(); i++) {
+      debug.AddPoint("smooth_v_bounds_upper", i * delta_s, opt_x[i]);
+  }
+//   debug.PrintToLog();
   smoothed_speed_limit_ = smoothed_speed_limit;
 
   return Status::OK();
@@ -377,10 +383,12 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
   const auto& cartesian_path = path_data.discretized_path();
   const double delta_s = 0.5;
   std::vector<double> path_curvature;
+  PrintCurves debug;
   for (double path_s = cartesian_path.front().s();
        path_s < cartesian_path.back().s() + delta_s; path_s += delta_s) {
     const auto& path_point = cartesian_path.Evaluate(path_s);
     path_curvature.push_back(path_point.kappa());
+    debug.AddPoint("sk_corase",path_s, path_point.kappa());
   }
   const auto& path_init_point = cartesian_path.front();
   std::array<double, 3> init_state = {path_init_point.kappa(),
@@ -422,6 +430,10 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
     smoothed_path_curvature.AppendSegment(j, delta_s);
   }
 
+  for (size_t i = 0; i < opt_x.size(); ++i) {
+    debug.AddPoint("sk_smooth",delta_s * i, opt_x[i]);
+  }
+//   debug.PrintToLog();
   smoothed_path_curvature_ = smoothed_path_curvature;
 
   return Status::OK();
@@ -446,7 +458,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
-
+  PrintCurves debug;
   std::vector<double> x_ref;
   for (int i = 0; i < num_of_knots_; ++i) {
     const double curr_t = i * delta_t_;
@@ -454,6 +466,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
     SpeedPoint sp;
     speed_data->EvaluateByTime(curr_t, &sp);
     x_ref.emplace_back(sp.s());
+    debug.AddPoint("dp_st_curve", curr_t, sp.s());
   }
   piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), std::move(x_ref));
 
@@ -469,6 +482,13 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   *distance = piecewise_jerk_problem.opt_x();
   *velocity = piecewise_jerk_problem.opt_dx();
   *acceleration = piecewise_jerk_problem.opt_ddx();
+  for (size_t i = 0 ;i < distance->size(); i++) {
+      const double curr_t = i * delta_t_;
+      debug.AddPoint("warm_start_st", curr_t, distance->at(i));
+      debug.AddPoint("warm_start_vt", curr_t, velocity->at(i));
+      debug.AddPoint("warm_start_at", curr_t, acceleration->at(i));
+  }
+//   debug.PrintToLog();
   return Status::OK();
 }
 
@@ -482,9 +502,12 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
       s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
       total_length_, s_dot_max_, s_ddot_min_, s_ddot_max_, s_dddot_min_,
       s_dddot_max_);
-
+  PrintCurves debug;
   ptr_interface->set_safety_bounds(s_bounds_);
-
+  for (size_t i = 0;i < s_bounds_.size(); i++) {
+      debug.AddPoint("st_bounds_lower", i * delta_t_, s_bounds_[i].first);
+      debug.AddPoint("st_bounds_upper", i * delta_t_, s_bounds_[i].second);
+  }
   // Set weights and reference values
   const auto& config =
       config_.piecewise_jerk_nonlinear_speed_optimizer_config();
@@ -586,7 +609,13 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   }
 
   ptr_interface->get_optimization_results(distance, velocity, acceleration);
-
+  for (size_t i = 0; i < distance->size(); i++) {
+      debug.AddPoint("optimize_st_curve", i * delta_t_, (*distance)[i]);
+      debug.AddPoint("optimize_vt_curve", i * delta_t_, (*velocity)[i]);
+      debug.AddPoint("optimize_at_curve", i * delta_t_, (*acceleration)[i]);
+      debug.AddPoint("optimize_sv_curve", (*distance)[i], (*velocity)[i]);
+  }
+//   debug.PrintToLog();
   return Status::OK();
 }
 }  // namespace planning
