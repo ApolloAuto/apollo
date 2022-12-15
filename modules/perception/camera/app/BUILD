@@ -67,6 +67,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/lib/obstacle/detector/caddn:caddn_obstacle_detector",
         "//modules/perception/camera/lib/obstacle/detector/smoke:smoke_obstacle_detector",
         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
         "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",

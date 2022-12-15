@@ -386,6 +386,25 @@ py_proto_library(
 )
 
 cc_proto_library(
+    name = "caddn_detection_config_cc_proto",
+    deps = [
+        ":caddn_detection_config_proto",
+    ],
+)
+
+proto_library(
+    name = "caddn_detection_config_proto",
+    srcs = ["caddn_detection_config.proto"],
+)
+
+py_proto_library(
+    name = "caddn_detection_config_py_pb2",
+    deps = [
+        ":caddn_detection_config_proto",
+    ],
+)
+
+cc_proto_library(
     name = "pointcloud_detection_preprocessor_config_cc_proto",
     deps = [
         ":pointcloud_detection_preprocessor_config_proto",

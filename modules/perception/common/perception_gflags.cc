@@ -151,6 +151,16 @@ DEFINE_string(bev_params_file,
               "models/petr_v1/petr_inference.pdiparams",
               "The path of bev params file.");
 
+// caddn
+DEFINE_string(caddn_model_file,
+              "/apollo/modules/perception/production/data/perception/camera/"
+              "models/caddn/model.pdmodel",
+              "The path of caddn model file.");
+DEFINE_string(caddn_params_file,
+              "/apollo/modules/perception/production/data/perception/camera/"
+              "models/caddn/model.pdiparams",
+              "The path of caddn params file.");
+
 // emergency detection onnx
 DEFINE_string(onnx_obstacle_detector_model,
               "/apollo/modules/perception/camera"

@@ -126,6 +126,7 @@ cc_library(
     "//modules/perception/pipeline/proto:pipeline_config_cc_proto",
     "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
     "//modules/perception/camera/lib/obstacle/detector/bev_detection:bev_obstacle_detector",
+    "//modules/perception/camera/lib/obstacle/detector/caddn:caddn_obstacle_detector",
   ],
 )
 
