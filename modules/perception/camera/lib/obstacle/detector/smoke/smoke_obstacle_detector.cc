@@ -196,9 +196,9 @@ bool SmokeObstacleDetector::Init(const StageConfig &stage_config) {
     return false;
   }
 
-  ACHECK(stage_config.has_smoke_obstacle_detection_config());
-  smoke_obstacle_detection_config_ =
-      stage_config.smoke_obstacle_detection_config();
+  ACHECK(stage_config.has_camera_detector_config());
+  auto smoke_obstacle_detection_config_ =
+      stage_config.camera_detector_config();
 
   gpu_id_ = smoke_obstacle_detection_config_.gpu_id();
   BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
