@@ -326,18 +326,18 @@ function mount_other_volumes() {
     volume_conf="${volume_conf} --volume ${tl_detection_volume}:${tl_detection_path}"
 
     #TRAFFIC_LIGHT_RECOGNITION
-    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
-    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
-    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/horizontal_caffe"
-    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
-    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
+    local tl_horizontal_volume="apollo_tl_horizontal_volume_${USER}"
+    local tl_horizontal_image="${DOCKER_REPO}:traffic_light-horizontal_caffe_model-${TARGET_ARCH}-latest"
+    local tl_horizontal_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/horizontal_caffe"
+    docker_restart_volume "${tl_horizontal_volume}" "${tl_horizontal_image}" "${tl_horizontal_path}"
+    volume_conf="${volume_conf} --volume ${tl_horizontal_volume}:${tl_horizontal_path}"
 
     #TRAFFIC_LIGHT_RECOGNITION
-    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
-    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
-    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/quadrate_caffe"
-    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
-    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
+    local tl_quadrate_volume="apollo_tl_quadrate_volume_${USER}"
+    local tl_quadrate_image="${DOCKER_REPO}:traffic_light-quadrate_caffe_model-${TARGET_ARCH}-latest"
+    local tl_quadrate_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/quadrate_caffe"
+    docker_restart_volume "${tl_quadrate_volume}" "${tl_quadrate_image}" "${tl_quadrate_path}"
+    volume_conf="${volume_conf} --volume ${tl_quadrate_volume}:${tl_quadrate_path}"
 
     #TRAFFIC_LIGHT_RECOGNITION
     local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
