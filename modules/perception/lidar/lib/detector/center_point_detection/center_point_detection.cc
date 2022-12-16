@@ -100,6 +100,7 @@ bool CenterPointDetection::Init(const StageConfig& stage_config) {
   config.EnableUseGpu(1000, FLAGS_gpu_id);
   config.SetModel(FLAGS_center_point_model_file,
                   FLAGS_center_point_params_file);
+  config.EnableMemoryOptim();
   if (FLAGS_use_trt) {
     paddle::AnalysisConfig::Precision precision;
     if (FLAGS_trt_precision == 0) {

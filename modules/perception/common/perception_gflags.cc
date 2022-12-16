@@ -35,7 +35,8 @@ DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 
 // config_manager
 DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "", "Project work root direcotry.");
+DEFINE_string(work_root, "/apollo/modules/perception/production/",
+              "Project work root direcotry.");
 
 // lidar_point_pillars
 DEFINE_int32(gpu_id, 0, "The id of gpu used for inference.");
@@ -118,11 +119,11 @@ DEFINE_string(mask_bbox_head_torch_file,
 // lidar_center_point
 DEFINE_string(center_point_model_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point_paddle/centerpoint.pdmodel",
+              "models/detection/CenterPoint_paddle/centerpoint.pdmodel",
               "The path of center point model file.");
 DEFINE_string(center_point_params_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point_paddle/centerpoint.pdiparams",
+              "models/detection/CenterPoint_paddle/centerpoint.pdiparams",
               "The path of center point params file.");
 DEFINE_bool(use_trt, false, "True if preprocess in CPU mode.");
 DEFINE_int32(trt_precision, 1,
@@ -138,7 +139,7 @@ DEFINE_int32(collect_shape_info, 1,
              "Whether to collect dynamic shape before using tensorrt");
 DEFINE_string(dynamic_shape_file,
               "/apollo/modules/perception/production/data/perception/lidar/"
-              "models/detection/center_point_paddle/collect_shape_info.pbtxt",
+              "models/detection/CenterPoint_paddle/collect_shape_info.pbtxt",
               "Path of a dynamic shape file for tensorrt");
 
 // bev petr_v1
