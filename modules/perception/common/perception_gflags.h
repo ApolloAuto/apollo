@@ -79,6 +79,10 @@ DECLARE_string(dynamic_shape_file);
 DECLARE_string(bev_model_file);
 DECLARE_string(bev_params_file);
 
+// caddn
+DECLARE_string(caddn_model_file);
+DECLARE_string(caddn_params_file);
+
 // emergency detection onnx
 DECLARE_string(onnx_obstacle_detector_model);
 DECLARE_string(onnx_test_input_path);

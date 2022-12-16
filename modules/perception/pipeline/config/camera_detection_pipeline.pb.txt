@@ -91,8 +91,9 @@ stage_config: {
 stage_config: {
   stage_type: SMOKE_OBSTACLE_DETECTION
   enabled: true
+  type: "camera_detector"
 
-  smoke_obstacle_detection_config {
+  camera_detector_config {
     gpu_id: 0
     camera_name: "front_6mm"
     root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
