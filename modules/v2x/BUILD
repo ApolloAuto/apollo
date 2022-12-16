@@ -35,7 +35,7 @@ install(
 
 install(
     name = "pb_hdrs",
-    data_dest = "guardian/include",
+    data_dest = "v2x/include",
     data = [
         "//modules/v2x/proto:fusion_params_cc_proto",
         "//modules/v2x/proto:v2x_car_status_cc_proto",
