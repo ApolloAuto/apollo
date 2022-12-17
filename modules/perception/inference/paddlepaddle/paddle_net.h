@@ -47,7 +47,6 @@ class PaddleNet : public Inference {
       const std::string& name) override;
 
  protected:
-  bool reshape();
   bool shape(const std::string &name, std::vector<int> *res);
   std::shared_ptr<paddle_infer::Predictor> predictor_;
 

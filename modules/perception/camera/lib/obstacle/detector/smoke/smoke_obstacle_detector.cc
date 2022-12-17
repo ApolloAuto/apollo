@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
 
+#include <opencv2/opencv.hpp>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/perf_util.h"
@@ -92,8 +94,8 @@ bool SmokeObstacleDetector::InitNet(const smoke::SmokeParam &smoke_param,
   // init Net
   auto const &net_param = smoke_param.net_param();
   input_names.push_back(net_param.input_data_blob());
-  input_names.push_back(net_param.input_ratio_blob());
   input_names.push_back(net_param.input_instric_blob());
+  input_names.push_back(net_param.input_ratio_blob());
   output_names.push_back(net_param.det1_loc_blob());
   output_names.push_back(net_param.feat_blob());
 
@@ -266,6 +268,43 @@ bool SmokeObstacleDetector::InitFeatureExtractor(const std::string &root_dir) {
   return true;
 }
 
+bool SmokeObstacleDetector::Preprocessor(const base::Image8U* image,
+    std::shared_ptr<base::Blob<float>> input_blob) {
+  cv::Mat img = cv::Mat(image->rows(), image->cols(), CV_8UC3);
+  memcpy(img.data, image->cpu_data(),
+      image->rows() * image->cols() * image->channels() * sizeof(uint8_t));
+
+  // resize
+  cv::resize(img, img, cv::Size(width_, height_));
+
+  // mean and std
+  img.convertTo(img, CV_32F, 1.0 / 255, 0);
+  std::vector<float> mean_values{0.485, 0.456, 0.406};
+  std::vector<float> std_values{0.229, 0.224, 0.225};
+
+  std::vector<cv::Mat> rgbChannels(3);
+  cv::split(img, rgbChannels);
+  for (int i = 0; i < 3; ++i) {
+    rgbChannels[i].convertTo(rgbChannels[i], CV_32FC1, 1 / std_values[i],
+                             (0.0 - mean_values[i]) / std_values[i]);
+  }
+  cv::merge(rgbChannels, img);
+
+  // from hwc to chw
+  int rows = img.rows;
+  int cols = img.cols;
+  int chs = img.channels();
+
+  // fill input_blob
+  input_blob->Reshape({1, chs, rows, cols});
+  float* input_data = input_blob->mutable_cpu_data();
+  for (int i = 0; i < chs; ++i) {
+    cv::extractChannel(
+        img, cv::Mat(rows, cols, CV_32FC1, input_data + i * rows * cols), i);
+  }
+  return true;
+}
+
 bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
                                    CameraFrame *frame) {
   if (frame == nullptr) {
@@ -280,8 +319,8 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
   auto const &net_param = smoke_param_.net_param();
   auto input_blob = inference_->get_blob(net_param.input_data_blob());
-  auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
-  auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
+  auto input_K_blob = inference_->get_blob(net_param.input_instric_blob());
+  auto input_ratio_blob = inference_->get_blob(net_param.input_ratio_blob());
 
   float *ratio_data = input_ratio_blob->mutable_cpu_data();
   float *K_data = input_K_blob->mutable_cpu_data();
@@ -306,19 +345,22 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
 
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
-  image_options.target_color = base::Color::BGR;
+  image_options.target_color = base::Color::RGB;
   image_options.crop_roi = base::RectI(
       0, offset_y_, static_cast<int>(base_camera_model_->get_width()),
       static_cast<int>(base_camera_model_->get_height()) - offset_y_);
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
   AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
-                       0);
-  AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  // todo(zero): need to delete
+  // inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
+  //                      0);
+  // AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+
+  Preprocessor(image_.get(), input_blob);
 
   AINFO << "Camera type: " << frame->data_provider->sensor_name();
-  /////////////////////////// detection part ///////////////////////////
+
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";
@@ -381,8 +423,11 @@ bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
   const auto &camera_k_matrix = frame->camera_k_matrix.inverse();
   auto const &net_param = smoke_param_.net_param();
   auto input_blob = inference_->get_blob(net_param.input_data_blob());
-  auto input_K_blob = inference_->get_blob(net_param.input_ratio_blob());
-  auto input_ratio_blob = inference_->get_blob(net_param.input_instric_blob());
+  auto input_K_blob = inference_->get_blob(net_param.input_instric_blob());
+  auto input_ratio_blob = inference_->get_blob(net_param.input_ratio_blob());
+
+  input_K_blob->Reshape({1, 3, 3});
+  input_ratio_blob->Reshape({1, 2});
 
   float *ratio_data = input_ratio_blob->mutable_cpu_data();
   float *K_data = input_K_blob->mutable_cpu_data();
@@ -407,19 +452,21 @@ bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
 
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
-  image_options.target_color = base::Color::BGR;
+  image_options.target_color = base::Color::RGB;
   image_options.crop_roi = base::RectI(
       0, offset_y_, static_cast<int>(base_camera_model_->get_width()),
       static_cast<int>(base_camera_model_->get_height()) - offset_y_);
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
   AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
-                       0);
-  AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  // inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
+  //                      0);
+  // AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+
+  Preprocessor(image_.get(), input_blob);
 
   AINFO << "Camera type: " << frame->data_provider->sensor_name();
-  /////////////////////////// detection part ///////////////////////////
+
   inference_->Infer();
   AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
         << "ms";

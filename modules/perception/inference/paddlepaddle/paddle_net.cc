@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <numeric>
+#include <algorithm>
 
 #include "modules/perception/inference/paddlepaddle/paddle_net.h"
 
@@ -33,7 +34,7 @@ PaddleNet::PaddleNet(const std::string& model_file,
 PaddleNet::~PaddleNet() {}
 
 bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
-  paddle::AnalysisConfig config;
+  paddle_infer::Config config;
   config.SetModel(model_file_, params_file_);
 
   if (gpu_id_ >= 0) {
@@ -46,6 +47,29 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
     return false;
   }
 
+  // Check input and output
+  auto input_names = predictor_->GetInputNames();
+  auto output_names = predictor_->GetOutputNames();
+
+  std::vector<std::string> exist_names;
+  for (const std::string& name : input_names_) {
+    if (std::find(input_names.begin(), input_names.end(), name)
+        != input_names.end()) {
+      exist_names.push_back(name);
+    }
+  }
+  input_names_ = exist_names;
+
+  exist_names.clear();
+  for (const std::string& name : output_names_) {
+    if (std::find(output_names.begin(), output_names.end(), name)
+        != output_names.end()) {
+      exist_names.push_back(name);
+    }
+  }
+  output_names_ = exist_names;
+
+  // add blobs
   for (const auto& shape : shapes) {
     auto blob =
         std::make_shared<apollo::perception::base::Blob<float>>(shape.second);
@@ -57,7 +81,14 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
 
 void PaddleNet::Infer() {
   // reshape and get input data from blob to paddle_blob.
-  reshape();
+  for (const auto& name : input_names_) {
+    auto blob = get_blob(name);
+    auto paddle_blob = predictor_->GetInputHandle(name);
+    if (paddle_blob != nullptr && blob != nullptr) {
+      paddle_blob->Reshape(blob->shape());
+      paddle_blob->CopyFromCpu(blob->cpu_data());
+    }
+  }
   // If `out_blob->mutable_cpu_data()` is invoked outside,
   // HEAD will be set to CPU, and `out_blob->mutable_gpu_data()`
   // after `enqueue` will copy data from CPU to GPU,
@@ -81,32 +112,9 @@ void PaddleNet::Infer() {
     if (blob != nullptr && paddle_blob != nullptr) {
       std::vector<int> paddle_blob_shape = paddle_blob->shape();
       blob->Reshape(paddle_blob_shape);
-      int count = std::accumulate(paddle_blob_shape.begin(),
-          paddle_blob_shape.end(), 1, std::multiplies<int>());
-      cudaMemcpy(blob->mutable_gpu_data(),
-        paddle_blob->mutable_data<float>(paddle::PaddlePlace::kGPU),
-        count * sizeof(float), cudaMemcpyDeviceToDevice);
+      paddle_blob->CopyToCpu(blob->mutable_cpu_data());
     }
   }
-}
-
-bool PaddleNet::reshape() {
-  for (const auto& name : input_names_) {
-    auto blob = get_blob(name);
-    auto paddle_blob = predictor_->GetInputHandle(name);
-    if (paddle_blob != nullptr && blob != nullptr) {
-      paddle_blob->Reshape(blob->shape());
-      std::vector<int> paddle_blob_shape = paddle_blob->shape();
-      int count =
-          std::accumulate(paddle_blob_shape.begin(), paddle_blob_shape.end(), 1,
-                          std::multiplies<int>());
-      cudaMemcpy(paddle_blob->mutable_data<float>(paddle::PaddlePlace::kGPU),
-                 blob->gpu_data(), count * sizeof(float),
-                 cudaMemcpyDeviceToDevice);
-    }
-  }
-
-  return true;
 }
 
 bool PaddleNet::shape(const std::string& name, std::vector<int>* res) {
