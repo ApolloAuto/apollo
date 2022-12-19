@@ -46,6 +46,7 @@ export default class Dreamview extends React.Component {
 
     event.preventDefault();
     if (optionName === 'cameraAngle') {
+      // press 'v' to switch camera angle
       options.rotateCameraAngle();
     } else if (
       !options.isSideBarButtonDisabled(optionName, enableHMIButtonsOnly, hmi.inNavigationMode)
