@@ -352,11 +352,8 @@ bool SmokeObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
   AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  // todo(zero): need to delete
-  // inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
-  //                      0);
-  // AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
+  // todo(zero): need to modify to cuda code
   Preprocessor(image_.get(), input_blob);
 
   AINFO << "Camera type: " << frame->data_provider->sensor_name();
@@ -459,10 +456,8 @@ bool SmokeObstacleDetector::Process(DataFrame *data_frame) {
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
   AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  // inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
-  //                      0);
-  // AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
+  // todo(zero): need to modify to cuda code
   Preprocessor(image_.get(), input_blob);
 
   AINFO << "Camera type: " << frame->data_provider->sensor_name();
