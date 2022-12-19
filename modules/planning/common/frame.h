@@ -43,7 +43,7 @@
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"

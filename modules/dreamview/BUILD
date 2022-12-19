@@ -54,6 +54,7 @@ install(
         "//modules/dreamview/backend/map:install",
         "//modules/dreamview/backend:install",
         "//modules/dreamview/backend/sim_control_manager/common:install",
+        "//modules/dreamview/proto:py_pb_dreamview"
     ],
 )
 

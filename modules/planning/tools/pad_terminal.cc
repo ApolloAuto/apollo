@@ -23,7 +23,7 @@
 #include "modules/common/util/message_util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace {
 

@@ -22,6 +22,7 @@
   <depend expose="False">3rd-grpc-dev</depend>
   <depend expose="False">3rd-rules-proto-dev</depend>
   <depend expose="False">3rd-py-dev</depend>
+  <depend expose="False">3rd-gpus-dev</depend>
   <depend expose="False">3rd-bazel-skylib-dev</depend>
 
   <depend repo_name="com_google_protobuf" lib_names="protobuf">3rd-protobuf-dev</depend>

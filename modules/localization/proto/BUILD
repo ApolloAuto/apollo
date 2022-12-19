@@ -2,8 +2,21 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install_files(
+    name = "py_pb_localization",
+    dest = "localization/python/modules/localization/proto",
+    files = [
+        ":measure_py_pb2",
+        ":sins_pva_py_pb2",
+        ":gnss_pnt_result_py_pb2",
+        ":rtk_config_py_pb2",
+        ":localization_config_py_pb2"
+    ]
+)
 
 cc_proto_library(
     name = "measure_cc_proto",

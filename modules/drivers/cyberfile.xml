@@ -30,6 +30,9 @@
   <depend repo_name="ffmpeg" lib_names="avcodec,avformat,swscale,avutil">3rd-ffmpeg-dev</depend>
   <depend repo_name="adv_plat" lib_names="adv_plat">3rd-adv-plat-dev</depend>
 
+  <depend expose="False">3rd-pcl-dev</depend>
+  <depend>libpcap-dev</depend>
+
   <depend>bazel-extend-tools-dev</depend>
   <depend expose="False">3rd-rules-python-dev</depend>
   <depend expose="False">3rd-grpc-dev</depend>

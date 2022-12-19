@@ -2,6 +2,7 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,4 +23,12 @@ py_proto_library(
     deps = [
         ":audio_conf_proto",
     ],
+)
+
+install_files(
+    name = "py_pb_audio",
+    dest = "audio/python/modules/audio/proto",
+    files = [
+        "audio_conf_py_pb2",
+    ]
 )

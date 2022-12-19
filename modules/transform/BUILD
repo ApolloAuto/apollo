@@ -119,6 +119,9 @@ install(
         ":libbuffer.so",
         ":libtransform_broadcaster.so",
     ],
+    deps = [
+        "//modules/transform/proto:py_pb_tf"
+    ]
 )
 
 filegroup(

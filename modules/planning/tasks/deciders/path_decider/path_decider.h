@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {

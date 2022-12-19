@@ -3,8 +3,27 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_grpc_library", "py_proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install_files(
+    name = "py_pb_v2x",
+    dest = "v2x/python/modules/v2x/proto",
+    files = [
+        ":v2x_obstacles_py_pb2",
+        ":v2x_car_status_py_pb2",
+        ":v2x_rsi_py_pb2",
+        ":v2x_service_obu_to_car_py_pb2",
+        ":fusion_params_py_pb2",
+        ":v2x_obu_traffic_light_py_pb2",
+        ":v2x_obu_rsi_py_pb2",
+        ":v2x_service_car_to_obu_py_pb2",
+        ":v2x_monitor_py_pb2",
+        ":v2x_junction_py_pb2",
+        ":v2x_traffic_light_policy_py_pb2"
+    ]
+)
 
 cc_proto_library(
     name = "v2x_obstacles_cc_proto",

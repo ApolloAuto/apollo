@@ -28,7 +28,7 @@
 #include "modules/planning/common/history.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {

@@ -28,8 +28,8 @@ install(
         "//modules/v2x/fusion/apps:install",
         ":pb_hdrs",
         "//modules/v2x/v2x_proxy/app:install",
-        "testdata"
-        
+        "testdata",
+        "//modules/v2x/proto:py_pb_v2x"
     ],
 )
 

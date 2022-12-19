@@ -16,6 +16,9 @@ install(
       ":quaternion_euler",
     ],
     runtime_dest = "modules/map/tools",
+    deps = [
+        "//modules/map/tools/map_datachecker/proto:py_pb_map_tool"
+    ]
 )
 
 cc_binary(

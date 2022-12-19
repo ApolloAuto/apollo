@@ -17,7 +17,7 @@
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 
 #include "gtest/gtest.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

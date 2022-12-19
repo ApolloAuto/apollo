@@ -27,6 +27,11 @@ install(
         "//modules/common/monitor_log:install",
         "//modules/common/util:install",
         "//modules/common/vehicle_state:install",
+        "//modules/common/vehicle_state/proto:py_pb_common_vehicle_state",
+        "//modules/common/vehicle_model/proto:py_pb_common_vehicle_model",
+        "//modules/common/util/testdata:py_pb_common_util",
+        "//modules/common/latency_recorder/proto:py_pb_common_latency_record",
+        "//modules/common/adapters/proto:py_pb_common_adapter"
     ],
 )
 

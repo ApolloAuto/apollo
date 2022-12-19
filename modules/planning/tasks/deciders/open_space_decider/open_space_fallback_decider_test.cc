@@ -20,7 +20,7 @@
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 
 #include "gtest/gtest.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

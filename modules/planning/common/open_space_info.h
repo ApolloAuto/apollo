@@ -26,7 +26,6 @@
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"

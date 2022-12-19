@@ -126,15 +126,16 @@ void ObstacleDetector::Infer() {
                     torch::kFloat32);
 
   std::vector<torch::jit::IValue> torch_inputs;
-  tensor_image = tensor_image.to(device);
-  tensor_image = tensor_image.permute({0, 3, 1, 2}).contiguous();
+  // todo(zero): need to delete, move out
+  // tensor_image = tensor_image.to(device);
+  // tensor_image = tensor_image.permute({0, 3, 1, 2}).contiguous();
 
-  AINFO << tensor_image[0][0].sizes();
-  tensor_image[0][0] = tensor_image[0][0].div_(58.395);
-  tensor_image[0][1] = tensor_image[0][1].div_(57.12);
-  tensor_image[0][2] = tensor_image[0][2].div_(57.375);
+  // AINFO << tensor_image[0][0].sizes();
+  // tensor_image[0][0] = tensor_image[0][0].div_(58.395);
+  // tensor_image[0][1] = tensor_image[0][1].div_(57.12);
+  // tensor_image[0][2] = tensor_image[0][2].div_(57.375);
 
-  torch_inputs.push_back(tensor_image);
+  torch_inputs.push_back(tensor_image.to(device));
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_ratio.to(device)));
 

@@ -46,7 +46,8 @@ install(
         "//modules/localization/msf/local_tool/map_creation:install",
         "//modules/localization/ndt/map_creation:install",
         "//modules/localization/common:install",
-        ":testdata"
+        ":testdata",
+        "//modules/localization/proto:py_pb_localization" 
     ],
 )
 

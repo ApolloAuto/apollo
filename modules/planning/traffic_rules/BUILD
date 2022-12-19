@@ -41,7 +41,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common/util:common_lib",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/proto:traffic_rule_config_cc_proto",
     ],
 )

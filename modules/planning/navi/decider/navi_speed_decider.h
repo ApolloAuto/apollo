@@ -30,7 +30,7 @@
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 #include "modules/planning/navi/decider/navi_speed_ts_graph.h"
 #include "modules/planning/navi/decider/navi_task.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 /**
  * @namespace apollo::planning

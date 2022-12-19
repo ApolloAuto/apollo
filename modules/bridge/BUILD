@@ -31,6 +31,8 @@ install(
     ],
     deps = [
         "//modules/bridge/test:install",
+        "//modules/bridge/proto:py_pb_bridge",
+        "//modules/bridge/common:install", 
     ],
 )
 install(

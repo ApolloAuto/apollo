@@ -72,6 +72,8 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   std::string Name() const override { return name_; }
 
  protected:
+  bool Preprocessor(const base::Image8U* image,
+                    std::shared_ptr<base::Blob<float>> input_blob);
   void LoadInputShape(const smoke::ModelParam &model_param);
   void LoadParam(const smoke::SmokeParam &smoke_param);
   bool InitNet(const smoke::SmokeParam &smoke_param,
