@@ -1,5 +1,6 @@
 import { observable, action } from 'mobx';
 import * as THREE from 'three';
+import { ObstacleTypeColorMap } from 'utils/constant';
 
 export default class CameraData {
     @observable initPosition = observable.map();
@@ -46,6 +47,8 @@ export default class CameraData {
       console.log(data);
       // Camera image
       if (data.image && data.image.length > 0) {
+        // 图片缩放比例
+        const kImageScale = data.kImageScale;
         const imageData = new Uint8Array(data.image);
         const blob = new Blob([imageData], { type: 'image/jpeg' });
         const img = new Image();
@@ -58,18 +61,22 @@ export default class CameraData {
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-            ctx.strokeStyle = 'red';
             data.bbox2d.forEach((bbox, index) => {
               const obstaclesId = data.obstaclesId[index] || '';
+              const obstaclesSubType = data.obstaclesSubType[index] || '';
+
+              ctx.strokeStyle = ObstacleTypeColorMap.get(obstaclesSubType) || 'red';
+
               let {xmin, ymin, xmax, ymax} = bbox;
               if (xmin === ymin === xmax === ymax) {
                 return;
               }
-              [xmin, ymin, xmax, ymax] = [xmin, ymin, xmax, ymax].map((value) => value * 0.6);
+              [xmin, ymin, xmax, ymax] = [xmin, ymin, xmax, ymax]
+                .map((value) => value * kImageScale);
               ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
               ctx.fillStyle = 'white';
               ctx.font = '16px Arial';
-              ctx.fillText(obstaclesId, xmin, ymax);
+              ctx.fillText(`${obstaclesSubType.substring(3)}:${obstaclesId}`, xmin, ymin);
             });
             this.imageSrcData = canvas.toDataURL();
           };
