@@ -193,7 +193,7 @@ export default class PluginWebSocketEndpoint {
   }
 
   // 下载record
-  downloadRecord() {
+  downloadRecord(id) {
     this.websocket.send(JSON.stringify({
       type: 'PluginRequest',
       data: {
