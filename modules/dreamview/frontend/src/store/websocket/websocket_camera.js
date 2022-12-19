@@ -1,6 +1,7 @@
 import STORE from 'store';
 import RENDERER from 'renderer';
 import Worker from 'utils/webworker.js';
+import { safeParseJSON } from 'utils/JSON';
 
 export default class CameraDataWebSocketEndpoint {
   constructor(serverAddr) {
@@ -44,19 +45,64 @@ export default class CameraDataWebSocketEndpoint {
       console.log(`Camera WebSocket connection closed with code: ${event.code}`);
       this.initialize();
     };
+  }
+
+  startCamera() {
     // Request camera data every 100ms.
     clearInterval(this.timer);
     this.timer = setInterval(() => {
       if (this.websocket.readyState === this.websocket.OPEN
-                && STORE.options.showCameraView) {
+        && (STORE.options.showCameraView || STORE.options.showVideo)) {
         this.requestCameraData();
       }
     }, this.cameraDataUpdatePeriodMs);
+    return this;
+  }
+
+  stopCamera() {
+    clearInterval(this.timer);
+    return this;
+  }
+
+  close() {
+    clearInterval(this.timer);
+    this.websocket.close();
+    return this;
   }
 
   requestCameraData() {
     this.websocket.send(JSON.stringify({
       type: 'RequestCameraData',
     }));
+    return this;
+  }
+
+  getCameraChannel() {
+    this.websocket.send(JSON.stringify({
+      type: 'GetCameraChannel',
+    }));
+    return new Promise(
+      (resolve, reject) => {
+        this.websocket.addEventListener('message', (event) => {
+          if (event.data instanceof ArrayBuffer) {
+            return;
+          }
+          const message = safeParseJSON(event?.data);
+          if (message?.data?.name === 'GetCameraChannelListSuccess') {
+            resolve(message?.data?.info?.channel);
+          } else if (message?.data?.name === 'GetCameraChannelListFail') {
+            reject(message?.data);
+          }
+        });
+      }
+    );
+  }
+
+  changeCameraChannel(channel) {
+    this.websocket.send(JSON.stringify({
+      type: 'ChangeCameraChannel',
+      data: channel,
+    }));
+    return this;
   }
 }

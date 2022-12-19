@@ -119,6 +119,12 @@ export default class HMI {
    */
   @observable current_vehicle_type = 0;
 
+  // current camera channel
+  @observable currentCameraSensorChannel = '';
+
+  // current point cloud channel
+  @observable currentPointCloudChannel = '';
+
   @action toggleCoDriverFlag() {
     this.isCoDriver = !this.isCoDriver;
   }
@@ -259,6 +265,14 @@ export default class HMI {
 
     if (newStatus.current_vehicle_type) {
       this.current_vehicle_type = newStatus.current_vehicle_type;
+    }
+
+    if (newStatus.currentCameraSensorChannel) {
+      this.currentCameraSensorChannel = newStatus.currentCameraSensorChannel;
+    }
+
+    if (newStatus.currentPointCloudChannel) {
+      this.currentPointCloudChannel = newStatus.currentPointCloudChannel;
     }
   }
 

@@ -36,7 +36,8 @@ export default [
       perceptionV2xInfo:'V2X',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'prediction',
     title: 'Prediction',
     type: 'checkbox',
@@ -48,7 +49,8 @@ export default [
       predictionInteractiveTag: 'Interactive Tag',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'routing',
     title: 'Routing',
     type: 'checkbox',
@@ -56,7 +58,8 @@ export default [
       routing: 'Routing Line',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'decision',
     title: 'Decision',
     type: 'checkbox',
@@ -65,7 +68,8 @@ export default [
       decisionObstacle: 'Obstacle Decision',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'planning',
     title: 'Planning',
     type: 'checkbox',
@@ -75,7 +79,8 @@ export default [
       rssInfo: 'RSS Info',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'position',
     title: 'Position',
     type: 'checkbox',
@@ -85,7 +90,8 @@ export default [
       positionShadow: 'Shadow',
     },
     supportInOfflineView: true,
-  }, {
+  },
+  {
     id: 'map',
     title: 'Map',
     type: 'checkbox',
