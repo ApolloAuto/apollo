@@ -6,9 +6,9 @@ package(default_visibility = ["//visibility:public"])
 
 install(
     name = "install",
-    library_dest = "cyber/python/internal",
-    data = [":runtime_files"],
-    data_dest = "cyber/python/internal",
+    library_dest = "cyber/python/cyber/python/internal",
+    #data = [":runtime_files"],
+    #data_dest = "cyber/python/internal",
     targets = [
         ":_cyber_wrapper.so",
         ":_cyber_record_wrapper.so",
@@ -16,15 +16,15 @@ install(
         ":_cyber_timer_wrapper.so",
         ":_cyber_parameter_wrapper.so",
     ],
-    rename = {
-        "cyber/python/internal/internal.BUILD": "BUILD"
-    }
+    #rename = {
+    #    "cyber/python/internal/internal.BUILD": "BUILD"
+    #}
 )
 
-filegroup(
-    name = "runtime_files",
-    srcs = ["internal.BUILD"]
-)
+#filegroup(
+#    name = "runtime_files",
+#    srcs = ["internal.BUILD"]
+#)
 
 cc_binary(
     name = "_cyber_wrapper.so",

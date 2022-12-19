@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/box2d.h"

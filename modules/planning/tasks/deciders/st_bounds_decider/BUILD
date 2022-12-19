@@ -47,7 +47,7 @@ cc_library(
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -72,7 +72,7 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )
@@ -100,7 +100,7 @@ cc_library(
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/reference_line",
     ],
 )

@@ -42,3 +42,22 @@ py_proto_library(
         ":qp_problem_proto",
     ],
 )
+
+cc_proto_library(
+    name = "fem_pos_deviation_smoother_config_cc_proto",
+    deps = [
+        ":fem_pos_deviation_smoother_config_proto",
+    ],
+)
+
+proto_library(
+    name = "fem_pos_deviation_smoother_config_proto",
+    srcs = ["fem_pos_deviation_smoother_config.proto"],
+)
+
+py_proto_library(
+    name = "fem_pos_deviation_smoother_config_py_pb2",
+    deps = [
+        ":fem_pos_deviation_smoother_config_proto",
+    ],
+)

@@ -23,7 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
 

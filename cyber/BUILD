@@ -17,7 +17,7 @@ install(
     data = [
         ":.release.bash",
         ":cyber_conf",
-        "//cyber/python/cyber_py3:runtime_files",
+        #"//cyber/python/cyber_py3:runtime_files",
         "//cyber/proto:runtime_files",
         ":cyberfile.xml",
         "cyber.BUILD"
@@ -29,10 +29,11 @@ install(
     library_dest = "cyber/lib",
     rename = {
         "cyber/.release.bash": "setup.bash",
-        "cyber/python/cyber_py3/cyber_py3.BUILD": "BUILD",
+        #"cyber/python/cyber_py3/cyber_py3.BUILD": "BUILD",
         "cyber/proto/py_pb2.BUILD": "BUILD",
     },
     deps = [
+        "//cyber/python/cyber_py3:cyber_python_library",
         "//cyber/proto:pb_cyber",
         "//cyber/proto:cyber_proto_hdrs",
         "//cyber/proto:cyber_proto_so",

@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 
 #include "gtest/gtest.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {

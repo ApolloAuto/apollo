@@ -61,7 +61,7 @@ install(
 
 install_files(
     name = "pb_cyber",
-    dest = "cyber/proto",
+    dest = "python-support/cyber/proto",
     files = [
         ":record_py_pb2",
         ":topology_change_py_pb2",
@@ -309,17 +309,22 @@ cc_so_proto_library(
     srcs = [
         ":unit_test_proto",
     ],
+    deps = ["//modules/common_msgs/basic_msgs:header_cc_proto"]
 )
 
 proto_library(
     name = "unit_test_proto",
     srcs = ["unit_test.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto"
+    ]
 )
 
 py_proto_library(
     name = "unit_test_py_pb2",
     deps = [
         ":unit_test_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2"
     ],
 )
 cc_so_proto_library(

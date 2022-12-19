@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+import "modules/common_msgs/basic_msgs/header.proto";
+
 package apollo.cyber.proto;
 
 message UnitTest {
@@ -18,4 +20,14 @@ message ChatterBenchmark {
   optional uint64 stamp = 1;
   optional uint64 seq = 2;
   optional string content = 3;
+}
+
+message SimpleMessage {
+  optional int32 integer = 1;
+  optional string text = 2;
+  optional apollo.common.Header header = 3;
+}
+
+message SimpleRepeatedMessage {
+  repeated SimpleMessage message = 1;
 }

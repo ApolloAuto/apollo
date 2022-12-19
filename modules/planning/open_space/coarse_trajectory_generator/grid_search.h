@@ -31,7 +31,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
-#include "modules/common_msgs/planning_msgs/planner_open_space_config.pb.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {

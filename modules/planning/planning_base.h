@@ -37,7 +37,7 @@
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planner/planner.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
 /**

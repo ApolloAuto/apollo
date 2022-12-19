@@ -72,8 +72,8 @@ install_src_files(
     deps = [
         ":install_audio_src",
         ":install_audio_hdrs",
-        ":install_audio_model"
-
+        ":install_audio_model",
+        "//modules/audio/proto:py_pb_audio",
     ],
 )
 

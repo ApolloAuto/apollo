@@ -96,7 +96,7 @@ install_src_files(
     name = "install_src",
     deps = [
         ":install_tools_src",
-        #":install_tools_hdrs"
+        ":install_tools_py"
     ],
 )
 
@@ -107,9 +107,9 @@ install_src_files(
     filter = "*",
 )
 
-# install_src_files(
-#     name = "install_tools_hdrs",
-#     src_dir = ["."],
-#     dest = "tools/include",
-#     filter = "*.h",
-# )
+install_src_files(
+    name = "install_tools_py",
+    src_dir = ["."],
+    dest = "tools/python",
+    filter = "*.py",
+)

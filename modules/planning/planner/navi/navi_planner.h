@@ -33,7 +33,7 @@
 #include "modules/planning/navi/decider/navi_task.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 

@@ -17,6 +17,9 @@ install(
     targets = [
         ":librelative_map_component.so",
     ],
+    deps = [
+        "//modules/map/relative_map/proto:py_pb_map"
+    ]
 )
 
 filegroup(

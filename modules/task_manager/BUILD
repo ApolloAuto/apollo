@@ -75,6 +75,7 @@ install(
     ],
     deps = [
         ":pb_hdrs",
+        "//modules/task_manager/proto:py_pb_task_manager"
     ],
 )
 

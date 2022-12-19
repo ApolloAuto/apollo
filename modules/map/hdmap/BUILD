@@ -115,7 +115,7 @@ cc_test(
     tags = ["exclude"],
     data = [
         ":testdata",
-        "//modules/common/util",
+        #"//modules/common/util",
     ],
     deps = [
         ":hdmap",

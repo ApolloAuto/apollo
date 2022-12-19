@@ -24,7 +24,6 @@
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-#include "modules/common_msgs/drivers_msgs/can_card_parameter.pb.h"
 
 #include "cyber/class_loader/class_loader_register_macro.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"

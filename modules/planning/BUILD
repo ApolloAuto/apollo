@@ -78,7 +78,7 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/planner",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/proto:traffic_rule_config_cc_proto",
         "//modules/planning/tasks:task_factory",
     ],
@@ -187,15 +187,19 @@ install(
         
     ] + if_gpu(
         ["planning-gpu.BUILD", "cyberfile_gpu.xml",],
-        ["planning.BUILD", "cyberfile.xml",]
+        ["planning.BUILD", "cyberfile_cpu.xml",]
     ),
-    rename= if_gpu({"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"}, {}),
+    rename= if_gpu(
+        {"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"}, 
+        {"planning/cyberfile_cpu.xml": "cyberfile.xml"}
+    ),
     targets = [
         ":libplanning_component.so",
     ],
     deps = [
         ":pb_planning",
-        ":planning_testdata_install"
+        ":planning_testdata_install",
+        "//modules/planning/proto:py_pb_planning"
     ],
 )
 
@@ -252,6 +256,29 @@ install_src_files(
         "planning/include"
     ),
     filter = "*.h",
+)
+
+install(
+    name = "pb_hdrs",
+    data_dest = "planning/include",
+    data = [
+        "//modules/planning/proto:st_drivable_boundary_py_pb2",
+        "//modules/planning/proto:planning_stats_py_pb2",
+        "//modules/planning/proto:planning_semantic_map_config_py_pb2",
+        "//modules/planning/proto:traffic_rule_config_py_pb2",
+        "//modules/planning/proto:planning_status_py_pb2",
+        "//modules/planning/proto:lattice_structure_py_pb2",
+        "//modules/planning/proto:learning_data_py_pb2",
+        "//modules/planning/proto:auto_tuning_model_input_py_pb2",
+        "//modules/planning/proto:auto_tuning_raw_feature_py_pb2",
+        "//modules/planning/proto:reference_line_smoother_config_py_pb2",
+        "//modules/planning/proto:ipopt_return_status_py_pb2",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_py_pb2",
+        "//modules/planning/proto:open_space_task_config_py_pb2",
+        "//modules/planning/proto:planner_open_space_config_py_pb2",
+        "//modules/planning/proto:task_config_py_pb2",
+        "//modules/planning/proto:planning_config_py_pb2",
+    ],
 )
 
 cpplint()

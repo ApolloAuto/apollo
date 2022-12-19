@@ -37,6 +37,7 @@ install(
         "//modules/drivers/radar/racobit_radar:install",
         "//modules/drivers/radar/ultrasonic_radar:install",
         "//modules/drivers/video/tools/decode_video:install",
+        ":pb_drivers_py"
     ],
 )
 
@@ -57,6 +58,7 @@ install(
     data_dest = "drivers/include",
     data = [
         "//modules/drivers/camera/proto:config_cc_proto",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_py_pb2",
         "//modules/drivers/gnss/proto:config_cc_proto",
         "//modules/drivers/gnss/proto:gnss_status_cc_proto",
         "//modules/drivers/lidar/proto:config_cc_proto",
@@ -79,13 +81,35 @@ install(
     ],
 )
 
-#install_files(
-#    name = "pb_tools",
-#    dest = "tools",
-#    files = [
-#        "//modules/tools/sensor_calibration/proto:extractor_config_py_pb2",
-#    ],
-#)
+install_files(
+    name = "pb_drivers_py",
+    dest = "drivers/python/modules/drivers",
+    files = [
+        "//modules/drivers/camera/proto:config_py_pb2",
+        "//modules/drivers/canbus/proto:sensor_canbus_conf_py_pb2",
+        "//modules/drivers/gnss/proto:config_py_pb2",
+        "//modules/drivers/gnss/proto:gnss_status_py_pb2",
+        "//modules/drivers/lidar/proto:config_py_pb2",
+        "//modules/drivers/lidar/proto:hesai_config_py_pb2",
+        "//modules/drivers/lidar/proto:hesai_py_pb2",
+        "//modules/drivers/lidar/proto:lidar_parameter_py_pb2",
+        "//modules/drivers/lidar/proto:robosense_config_py_pb2",
+        "//modules/drivers/lidar/proto:robosense_py_pb2",
+        "//modules/drivers/lidar/proto:velodyne_py_pb2",
+        "//modules/drivers/lidar/proto:velodyne_config_py_pb2",
+        #"//modules/drivers/lidar/robosense/proto:lidars_filter_config_py_pb2",
+        #"//modules/drivers/lidar/robosense/proto:sensor_suteng_conf_py_pb2",
+        #"//modules/drivers/lidar/robosense/proto:sensor_suteng_py_pb2",
+        "//modules/drivers/microphone/proto:microphone_config_py_pb2",
+        "//modules/drivers/microphone/proto:audio_py_pb2",
+        "//modules/drivers/radar/conti_radar/proto:conti_radar_conf_py_pb2",
+        "//modules/drivers/radar/racobit_radar/proto:racobit_radar_conf_py_pb2",
+        "//modules/drivers/radar/ultrasonic_radar/proto:ultrasonic_radar_conf_py_pb2",
+        "//modules/drivers/smartereye/proto:config_py_pb2",
+        "//modules/drivers/tools/image_decompress/proto:config_py_pb2",
+        "//modules/drivers/video/proto:video_h265cfg_py_pb2"
+    ],
+)
 
 install_src_files(
     name = "install_src",
