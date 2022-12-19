@@ -53,6 +53,7 @@ export default class SensorCamera extends React.Component {
             <div className="card camera">
                 <div className="card-header"><span>Camera View</span>
                   <span className='camera_view_channel_select'>
+                     <span className="arrow" />
                     <select
                       value={hmi.currentCameraSensorChannel}
                       onChange={this.onStatusSelectChange}
