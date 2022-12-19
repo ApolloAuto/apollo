@@ -74,7 +74,7 @@ export default class CameraData {
               [xmin, ymin, xmax, ymax] = [xmin, ymin, xmax, ymax]
                 .map((value) => value * kImageScale);
               ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
-              ctx.fillStyle = 'white';
+              ctx.fillStyle = ObstacleTypeColorMap.get(obstaclesSubType) || 'white';
               ctx.font = '16px Arial';
               ctx.fillText(`${obstaclesSubType.substring(3)}:${obstaclesId}`, xmin, ymin);
             });
