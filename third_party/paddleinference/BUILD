@@ -6,23 +6,24 @@ package(
 
 install(
     name = "install_lib",
-    data_dest = "3rd-paddleinference/lib",
     data = glob([
-        "lib*"
-    ])
+        "lib*",
+    ]),
+    data_dest = "3rd-paddleinference/lib",
 )
+
 install(
     name = "install",
-    data_dest = "3rd-paddleinference",
     data = [
         ":cyberfile.xml",
     ],
+    data_dest = "3rd-paddleinference",
     deps = ["install_lib"],
 )
 
 install_src_files(
     name = "install_src",
-    src_dir = ["."],
     dest = "3rd-paddleinference/src",
     filter = "*",
+    src_dir = ["."],
 )
