@@ -49,7 +49,6 @@ export default class SensorCamera extends React.Component {
       cameraData,
       hmi,
     } = this.props.store;
-    console.log(this.props.store);
     return (
             <div className="card camera">
                 <div className="card-header"><span>Camera View</span>
@@ -58,7 +57,7 @@ export default class SensorCamera extends React.Component {
                       value={hmi.currentCameraSensorChannel}
                       onChange={this.onStatusSelectChange}
                     >
-                       <option key={'none'} value={''}>none</option>
+                       <option key={'请选择channel'} value={''}>- 请选择channel -</option>
                       {
                         this.state.channels.map((channel) => {
                           return (

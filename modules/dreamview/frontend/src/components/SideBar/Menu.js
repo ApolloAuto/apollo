@@ -97,7 +97,7 @@ class MenuItemCheckbox extends React.Component {
                       value={hmi.currentPointCloudChannel}
                       onChange={this.onStatusSelectChange}
                     >
-                       <option key={'none'} value={''}>none</option>
+                       <option key={'none'} value={''}>- 请选择channel -</option>
                       {
                         this.state.channels.map((channel) => {
                           return (
