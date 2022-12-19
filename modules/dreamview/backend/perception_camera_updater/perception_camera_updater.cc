@@ -212,12 +212,8 @@ void PerceptionCameraUpdater::OnImage(
              cv::Size(static_cast<int>(image->width() * kImageScale),
                       static_cast<int>(image->height() * kImageScale)),
              0, 0, cv::INTER_LINEAR);
-
-  cv::imwrite("/home/fanyueqiao/.apollo/image.jpg", mat);
-  cv::imencode(".jpg", mat, image_buffer_, std::vector<int>());
   double next_image_timestamp;
   if (image->has_measurement_time()) {
-    AERROR << "image measurement time:" << image->has_measurement_time();
     next_image_timestamp = image->measurement_time();
   } else {
     next_image_timestamp = image->header().timestamp_sec();
@@ -247,9 +243,8 @@ void PerceptionCameraUpdater::OnObstacles(
   std::lock_guard<std::mutex> lock(obstacle_mutex_);
   bbox2ds.clear();
   obstacle_id.clear();
+  obstacle_sub_type.clear();
   for (const auto &obstacle : obstacles->perception_obstacle()) {
-    AERROR << "SensorMeasurement:" << obstacle.timestamp();
-    AERROR << "tracking time:" << obstacle.tracking_time();
     bbox2ds.push_back(obstacle.bbox2d());
     obstacle_id.push_back(obstacle.id());
     obstacle_sub_type.push_back(obstacle.sub_type());

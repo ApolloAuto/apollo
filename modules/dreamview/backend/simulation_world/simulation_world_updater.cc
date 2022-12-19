@@ -515,7 +515,6 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           response["type"] = "ChangeCameraChannelSuccess";
           camera_ws_->SendData(conn, response.dump());
         } else {
-          AERROR << "Create channel fail.";
           response["type"] = "ChangeCameraChannelFail";
           camera_ws_->SendData(conn, response.dump());
         }

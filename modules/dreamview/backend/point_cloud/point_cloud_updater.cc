@@ -152,7 +152,6 @@ void PointCloudUpdater::RegisterMessageHandlers() {
           response["type"] = "ChangePointCloudChannelSuccess";
           websocket_->SendData(conn, response.dump());
         } else {
-          AERROR << "Create channel fail.";
           response["type"] = "ChangePointCloudChannelFail";
           websocket_->SendData(conn, response.dump());
         }
