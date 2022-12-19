@@ -21,7 +21,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_optimizer.h"
 
 #include "gtest/gtest.h"
-#include "modules/common_msgs/planning_msgs/open_space_task_config.pb.h"
+#include "modules/planning/proto/open_space_task_config.pb.h"
 
 namespace apollo {
 namespace planning {

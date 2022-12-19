@@ -17,7 +17,7 @@ py_binary(
     data = ["default.ini"],
     deps = [
         "//modules/dreamview/proto:hmi_config_py_pb2",
-        "//modules/common_msgs/planning_msgs:planning_config_py_pb2",
+        "//modules/planning/proto:planning_config_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )

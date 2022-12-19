@@ -37,7 +37,7 @@ class VehicleStateProviderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string localization_file =
-        "modules/localization/testdata/3_localization_result_1.pb.txt";
+        "modules/common/vehicle_state/testdata/3_localization_result_1.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_file, &localization_));
     chassis_.set_speed_mps(3.0);
     chassis_.set_gear_location(canbus::Chassis::GEAR_DRIVE);

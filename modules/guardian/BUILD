@@ -47,6 +47,7 @@ install(
     ],
     deps = [
         ":pb_hdrs",
+        "//modules/guardian/proto:py_pb_guardian"
     ],
 )
 

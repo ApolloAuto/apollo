@@ -2,8 +2,23 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install_files(
+    name = "py_pb_prediction",
+    dest = "prediction/python/modules/prediction/proto",
+    files = [
+        ":offline_features_py_pb2",
+        ":fnn_vehicle_model_py_pb2",
+        ":network_model_py_pb2",
+        ":vector_net_py_pb2",
+        ":fnn_model_base_py_pb2",
+        ":prediction_conf_py_pb2",
+        ":network_layers_py_pb2",
+    ]
+)
 
 cc_proto_library(
     name = "offline_features_cc_proto",

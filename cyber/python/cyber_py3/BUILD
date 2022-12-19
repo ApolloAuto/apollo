@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,6 +8,12 @@ filegroup(
     srcs = glob([
         "*.py",
     ]) + ["cyber_py3.BUILD"]
+)
+
+install(
+    name = "cyber_python_library",
+    data = [":runtime_files"],
+    data_dest = "cyber/python/cyber/python/cyber_py3"
 )
 
 py_library(

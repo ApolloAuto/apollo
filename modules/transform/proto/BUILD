@@ -2,8 +2,17 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install_files(
+    name = "py_pb_tf",
+    dest = "transform/python/modules/transform/proto",
+    files = [
+        ":static_transform_conf_py_pb2",
+    ]
+)
 
 cc_proto_library(
     name = "static_transform_conf_cc_proto",

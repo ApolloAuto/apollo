@@ -16,6 +16,7 @@
 
   <depend expose="False">3rd-rules-python-dev</depend>
   <depend expose="False">3rd-grpc-dev</depend>
+  <depend expose="False">3rd-gpus-dev</depend>
   <depend expose="False">3rd-rules-proto-dev</depend>
   <depend expose="False">3rd-bazel-skylib-dev</depend>
   

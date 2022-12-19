@@ -22,7 +22,7 @@ import unittest
 
 from cyber.proto import record_pb2
 from cyber.python.cyber_py3 import record
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber.proto.unit_test_pb2 import SimpleMessage
 
 
 TEST_RECORD_FILE = "/tmp/test02.record"

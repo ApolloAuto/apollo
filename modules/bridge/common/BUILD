@@ -1,7 +1,14 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install(
+    name = "install",
+    targets = ["libbridge_gflags.so"],
+    library_dest = "bridge/lib",
+)
 
 cc_library(
     name = "bridge_buffer",
@@ -9,10 +16,21 @@ cc_library(
     hdrs = ["bridge_buffer.h"],
 )
 
+cc_binary(
+    name = "libbridge_gflags.so",
+    srcs = ["bridge_gflags.cc", "bridge_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
+    linkshared = True,
+    linkstatic = True,  
+)
+
 cc_library(
     name = "bridge_gflags",
-    srcs = ["bridge_gflags.cc"],
+    srcs = [":libbridge_gflags.so"],
     hdrs = ["bridge_gflags.h"],
+    alwayslink = True,
     deps = [
         "@com_github_gflags_gflags//:gflags",
     ],

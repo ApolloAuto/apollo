@@ -11,7 +11,7 @@ cc_library(
     copts = PLANNING_COPTS,
     deps = [
         "//modules/planning/proto:learning_data_cc_proto",
-        "//modules/common_msgs/planning_msgs:task_config_cc_proto",
+        "//modules/planning/proto:task_config_cc_proto",
     ],
 )
 

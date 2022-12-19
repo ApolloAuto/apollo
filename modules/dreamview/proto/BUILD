@@ -2,8 +2,26 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
+
+install_files(
+    name = "py_pb_dreamview",
+    dest = "dreamview/python/modules/dreamview/proto",
+    files = [
+        "camera_update_py_pb2",
+        "hmi_config_py_pb2",
+        "point_cloud_py_pb2",
+        "preprocess_table_py_pb2",
+        "data_collection_table_py_pb2",
+        "hmi_mode_py_pb2",
+        "simulation_world_py_pb2",
+        "plugin_config_py_pb2",
+        "dv_plugin_msg_py_pb2",
+        "scenario_py_pb2",
+    ]
+)
 
 cc_proto_library(
     name = "camera_update_cc_proto",

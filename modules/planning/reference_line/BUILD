@@ -156,7 +156,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common:indexed_queue",
         "//modules/planning/common:planning_context",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
         "//modules/planning/proto:planning_status_cc_proto",
         "//modules/common/configs:config_gflags",
         "@eigen",
@@ -171,7 +171,7 @@ cc_binary(
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 
@@ -180,7 +180,7 @@ cc_binary(
     srcs = ["spiral_smoother_util.cc"],
     deps = [
         ":spiral_reference_line_smoother",
-        "//modules/common_msgs/planning_msgs:planning_config_cc_proto",
+        "//modules/planning/proto:planning_config_cc_proto",
     ],
 )
 

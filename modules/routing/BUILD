@@ -18,6 +18,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/core",
         "//modules/routing/proto:routing_config_cc_proto",
+        "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
     ],
     alwayslink = True,
 )
@@ -68,7 +69,8 @@ install(
         ":pb_hdrs",
         "//modules/routing/topo_creator:install",
         "//modules/routing/tools/routing_tester:install",
-        "//modules/routing/tools:install"
+        "//modules/routing/tools:install",
+        "//modules/routing/proto:py_pb_routing" 
     ],
 )
 

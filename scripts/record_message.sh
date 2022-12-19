@@ -16,16 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-source "${APOLLO_ROOT_DIR}/scripts/apollo_base.sh"
-source "${APOLLO_ROOT_DIR}/cyber/setup.bash"
-
-
 # """
 # Save the full data into /apollo/data/bag/ReusedRecordsPool,
 # which will be cleared every time the smart recorder get started.
 # Meanwhile, restore the messages we are interested in to /apollo/data/bag/<task_id> directory.
 # """
 function start() {
+  local APOLLO_ROOT_DIR="/apollo"
   TIME="$(date +%F-%H-%M-%S)"
   MODULE="smart_recorder"
 

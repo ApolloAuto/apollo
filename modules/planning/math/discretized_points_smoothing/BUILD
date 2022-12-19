@@ -44,7 +44,7 @@ cc_library(
         ":fem_pos_deviation_osqp_interface",
         ":fem_pos_deviation_sqp_osqp_interface",
         "//cyber",
-        "//modules/common_msgs/planning_msgs:fem_pos_deviation_smoother_config_cc_proto",
+        "//modules/planning/proto/math:fem_pos_deviation_smoother_config_cc_proto",
         "@ipopt",
     ],
 )

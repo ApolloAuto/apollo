@@ -14,7 +14,7 @@ cc_library(
         "//modules/common/math",
         "//modules/planning/common:obstacle",
         "//modules/planning/constraint_checker:collision_checker",
-        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
 )
 
@@ -32,7 +32,7 @@ cc_library(
         "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/open_space/coarse_trajectory_generator:node3d",
-        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
         "@adolc",
     ],
 )
@@ -45,7 +45,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
-        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
-        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
     ],
 )
 
@@ -85,7 +85,7 @@ cc_test(
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
-        "//modules/common_msgs/planning_msgs:planner_open_space_config_cc_proto",
+        "//modules/planning/proto:planner_open_space_config_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )

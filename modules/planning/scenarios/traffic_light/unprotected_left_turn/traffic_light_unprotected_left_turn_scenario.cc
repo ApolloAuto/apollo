@@ -27,7 +27,7 @@
 #include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/common_msgs/planning_msgs/planning_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_creep.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_intersection_cruise.h"
