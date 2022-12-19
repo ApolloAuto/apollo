@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-  
+
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
 #include "absl/strings/str_cat.h"

@@ -92,6 +92,7 @@ class MenuItemCheckbox extends React.Component {
                     </div>
                     <span>{title}</span>
                   {id === 'perceptionPointCloud' && <span className='point_cloud_channel_select'>
+                     <span className="arrow" />
                     <select
                       onClick={(e) => e.stopPropagation()}
                       value={hmi.currentPointCloudChannel}

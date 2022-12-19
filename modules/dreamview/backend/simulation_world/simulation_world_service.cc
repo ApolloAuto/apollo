@@ -21,9 +21,9 @@
 #include "absl/strings/str_split.h"
 #include "google/protobuf/util/json_util.h"
 
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/basic_msgs/geometry.pb.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "cyber/common/file.h"

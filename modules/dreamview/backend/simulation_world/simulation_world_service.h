@@ -40,7 +40,6 @@
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-#include "modules/dreamview/proto/simulation_world.pb.h"
 #include "modules/common_msgs/localization_msgs/gps.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/perception_msgs/traffic_light_detection.pb.h"
@@ -49,6 +48,7 @@
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
 #include "modules/common_msgs/storytelling_msgs/story.pb.h"
 #include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
+#include "modules/dreamview/proto/simulation_world.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"

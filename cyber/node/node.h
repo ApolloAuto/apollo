@@ -151,6 +151,8 @@ class Node {
       -> std::shared_ptr<Client<Request, Response>>;
 
   bool DeleteReader(const std::string& channel_name);
+  bool DeleteReader(const ReaderConfig& config);
+  bool DeleteReader(const proto::RoleAttributes& role_attr);
   /**
    * @brief Observe all readers' data
    */

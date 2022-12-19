@@ -121,9 +121,6 @@ void PointCloudUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "GetPointCloudChannel",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // if (!perception_camera_updater_->IsEnabled()) {
-        //   return;
-        // }
         std::vector<std::string> channels;
         GetChannelMsg(&channels);
         Json response({});

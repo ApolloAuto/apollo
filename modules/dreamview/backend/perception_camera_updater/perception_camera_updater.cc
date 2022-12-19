@@ -212,6 +212,7 @@ void PerceptionCameraUpdater::OnImage(
              cv::Size(static_cast<int>(image->width() * kImageScale),
                       static_cast<int>(image->height() * kImageScale)),
              0, 0, cv::INTER_LINEAR);
+  cv::imencode(".jpg", mat, image_buffer_, std::vector<int>());
   double next_image_timestamp;
   if (image->has_measurement_time()) {
     next_image_timestamp = image->measurement_time();

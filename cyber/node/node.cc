@@ -53,5 +53,18 @@ bool Node::DeleteReader(const std::string& channel_name) {
   return false;
 }
 
+bool Node::DeleteReader(const proto::RoleAttributes& role_attr) {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  int result = readers_.erase(role_attr.channel_name());
+  if (1 == result) return true;
+  return false;
+}
+
+bool Node::DeleteReader(const ReaderConfig& config) {
+  std::lock_guard<std::mutex> lg(readers_mutex_);
+  int result = readers_.erase(config.channel_name);
+  if (1 == result) return true;
+  return false;
+}
 }  // namespace cyber
 }  // namespace apollo
