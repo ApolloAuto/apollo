@@ -83,14 +83,14 @@ export default class CameraDataWebSocketEndpoint {
     }));
     return new Promise(
       (resolve, reject) => {
-        this.websocket.addEventListener('message',(event) => {
+        this.websocket.addEventListener('message', (event) => {
           if (event.data instanceof ArrayBuffer) {
             return;
           }
           const message = safeParseJSON(event?.data);
           if (message?.data?.name === 'GetCameraChannelListSuccess') {
             resolve(message?.data?.info?.channel);
-          }else if (message?.data?.name === 'GetCameraChannelListFail') {
+          } else if (message?.data?.name === 'GetCameraChannelListFail') {
             reject(message?.data);
           }
         });
