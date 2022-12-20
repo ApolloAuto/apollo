@@ -84,7 +84,7 @@ def initialize_third_party():
     tinyxml2()
     uuid()
     yaml_cpp()
-    
+
 # Define all external repositories required by
 def apollo_repositories():
     cuda_configure(name = "local_config_cuda")
