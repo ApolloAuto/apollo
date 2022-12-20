@@ -2,7 +2,7 @@
 
 ## Quick Start Guide
 
-[README](./Quick%20Start/README.md) - A hardware and software guide to setting up Apollo, segregated by versions
+[README](./02_Quick%20Start/README.md) - A hardware and software guide to setting up Apollo, segregated by versions
 
 ## Technical Tutorial
 
