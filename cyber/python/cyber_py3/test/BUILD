@@ -7,7 +7,7 @@ py_test(
     deps = [
         "//cyber/proto:record_py_pb2",
         "//cyber/python/cyber_py3:record",
-        "//cyber/proto:unit_test_py_pb2",
+        "//cyber/proto:simple_py_pb2",
     ],
 )
 
@@ -26,7 +26,7 @@ py_test(
     srcs = ["cyber_test.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
-        "//cyber/proto:unit_test_py_pb2",
+        "//cyber/proto:simple_py_pb2",
     ],
 )
 # FIXME(all): parameter_test seems to run forever
