@@ -26,6 +26,7 @@ install_files(
         ":classic_conf_cc_proto_hdrs",
         ":parameter_cc_proto_hdrs",
         ":unit_test_cc_proto_hdrs",
+        ":simple_cc_proto_hdrs",
         ":scheduler_conf_cc_proto_hdrs",
         ":transport_conf_cc_proto_hdrs",
         ":qos_profile_cc_proto_hdrs",
@@ -49,6 +50,7 @@ install(
         ":libclassic_conf_cc_proto.so",
         ":libparameter_cc_proto.so",
         ":libunit_test_cc_proto.so",
+        ":libsimple_cc_proto.so",
         ":libscheduler_conf_cc_proto.so",
         ":libtransport_conf_cc_proto.so",
         ":libqos_profile_cc_proto.so",
@@ -61,7 +63,7 @@ install(
 
 install_files(
     name = "pb_cyber",
-    dest = "python-support/cyber/proto",
+    dest = "cyber/python/cyber/proto",
     files = [
         ":record_py_pb2",
         ":topology_change_py_pb2",
@@ -74,6 +76,7 @@ install_files(
         ":classic_conf_py_pb2",
         ":parameter_py_pb2",
         ":unit_test_py_pb2",
+        ":simple_py_pb2",
         ":scheduler_conf_py_pb2",
         ":transport_conf_py_pb2",
         ":qos_profile_py_pb2",
@@ -327,6 +330,31 @@ py_proto_library(
         "//modules/common_msgs/basic_msgs:header_py_pb2"
     ],
 )
+
+cc_so_proto_library(
+    name = "simple_cc_proto",
+    srcs = [
+        ":simple_proto",
+    ],
+    deps = ["//modules/common_msgs/basic_msgs:header_cc_proto"]
+)
+
+proto_library(
+    name = "simple_proto",
+    srcs = ["simple.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto"
+    ]
+)
+
+py_proto_library(
+    name = "simple_py_pb2",
+    deps = [
+        ":simple_proto",
+        "//modules/common_msgs/basic_msgs:header_py_pb2"
+    ],
+)
+
 cc_so_proto_library(
     name = "scheduler_conf_cc_proto",
     srcs = [
