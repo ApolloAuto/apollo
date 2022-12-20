@@ -2,7 +2,7 @@
 
 ## Quick Start Guide
 
-[README](quickstart/README.md) - A hardware and software guide to setting up Apollo, segregated by versions
+[README](./02_Quick%20Start/README.md) - A hardware and software guide to setting up Apollo, segregated by versions
 
 ## Technical Tutorial
 
@@ -10,11 +10,11 @@
 
 ## Cyber
 
-[README](cyber/README.md) - All you need to know about Apollo Cyber
+[README](./CyberRT/README.md) - All you need to know about Apollo Cyber
 
 ## Specs
 
-[README](specs/README.md) - A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
+[README](./10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/README.md) - A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 
 ## Howto Guides
 
@@ -22,7 +22,7 @@
 
 ## FAQs
 
-[README](FAQs/README.md) - Commonly asked questions about Apollo's setup and modules
+[README](FAQS/README.md) - Commonly asked questions about Apollo's setup and modules
 
 ## Technical Documents
 

@@ -12,8 +12,8 @@ first.
 - You can follow the standard
   [Github approach](https://help.github.com/articles/using-pull-requests/) to
   contribute code. There is also a detailed how-to guide on _How to Create Pull
-  Request_ in both [English](docs/howto/how_to_create_pull_request.md) and
-  [Chinese](docs/howto/how_to_create_pull_request_cn.md).
+  Request_ in both [English](docs/14_Others/%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5/how_to_create_pull_request.md) and
+  [Chinese](docs/14_Others/%E4%BB%A3%E7%A0%81%E5%AE%9E%E8%B7%B5/how_to_create_pull_request_cn.md).
 
 - There are
   [issues with label "help wanted"](https://github.com/ApolloAuto/apollo/issues?utf8=%E2%9C%93&q=label%3A%22Type%3A+Help+wanted%22+)
@@ -73,7 +73,7 @@ recommended to implement the code in a clear and efficient way, and provide
 sufficient comments and documentation. Apollo uses doxygen to help generate
 formatted API Document with command `bash apollo.sh doc generate`. To document
 your code, please follow the guide:
-[How to document code](docs/howto/how_to_document_code.md).
+[How to document code](docs/01_Installation%20Instructions/how_to_document_code.md).
 
 #### Commit Message
 
