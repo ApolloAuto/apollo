@@ -17,17 +17,19 @@
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
 #include <utility>
+#include <vector>
+
+#include "nlohmann/json.hpp"
+#include "pcl/filters/voxel_grid.h"
+#include "yaml-cpp/yaml.h"
+
+#include "modules/dreamview/proto/point_cloud.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/proto/point_cloud.pb.h"
-#include "nlohmann/json.hpp"
-#include "pcl/filters/voxel_grid.h"
-#include "yaml-cpp/yaml.h"
-
 namespace apollo {
 namespace dreamview {
 
@@ -117,20 +119,96 @@ void PointCloudUpdater::RegisterMessageHandlers() {
           }
         }
       });
+  websocket_->RegisterMessageHandler(
+      "GetPointCloudChannel",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        std::vector<std::string> channels;
+        GetChannelMsg(&channels);
+        Json response({});
+        response["data"]["name"] = "GetPointCloudChannelListSuccess";
+        for (unsigned int i = 0; i < channels.size(); i++) {
+          response["data"]["info"]["channel"][i] = channels[i];
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+  websocket_->RegisterMessageHandler(
+      "ChangePointCloudChannel",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        auto channel_info = json.find("data");
+        Json response({});
+        if (channel_info == json.end()) {
+          AERROR << "Cannot  retrieve point cloud channel info with unknown "
+                    "channel.";
+          response["type"] = "ChangePointCloudChannelFail";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        std::string channel =
+            channel_info->dump().substr(1, channel_info->dump().length() - 2);
+        if (ChangeChannel(channel)) {
+          Json response({});
+          response["type"] = "ChangePointCloudChannelSuccess";
+          websocket_->SendData(conn, response.dump());
+        } else {
+          response["type"] = "ChangePointCloudChannelFail";
+          websocket_->SendData(conn, response.dump());
+        }
+      });
 }
 
-void PointCloudUpdater::Start() {
+void PointCloudUpdater::GetChannelMsg(std::vector<std::string> *channels) {
+  enabled_ = true;
+  auto channelManager =
+      apollo::cyber::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
+  std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
+  channelManager->GetWriters(&role_attr_vec);
+  for (auto &role_attr : role_attr_vec) {
+    std::string messageType;
+    messageType = role_attr.message_type();
+    int index = messageType.rfind("PointCloud");
+    int index_sensor = role_attr.channel_name().rfind("sensor");
+    if (index != -1 && index_sensor != -1) {
+      channels->push_back(role_attr.channel_name());
+    }
+  }
+  channels_.clear();
+  channels_ = {channels->begin(), channels->end()};
+}
+
+bool PointCloudUpdater::ChangeChannel(const std::string &channel) {
+  if (curr_channel_name != "") {
+    if (!node_->DeleteReader(curr_channel_name)) {
+      AERROR << "delete reader failed";
+      return false;
+    }
+  }
+  point_cloud_reader_.reset();
+  point_cloud_reader_ = node_->CreateReader<drivers::PointCloud>(
+      channel, [this](const std::shared_ptr<drivers::PointCloud> &msg) {
+        UpdatePointCloud(msg);
+      });
+
+  if (point_cloud_reader_ == nullptr) {
+    return false;
+  }
+  curr_channel_name = channel;
+  bool update_res = false;
+  update_res = callback_api_(channel);
+  if (!update_res) {
+    AERROR << "update current point cloud channel fail";
+    return false;
+  }
+  return true;
+}
+
+void PointCloudUpdater::Start(DvCallback callback_api) {
+  callback_api_ = callback_api;
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &msg) {
         UpdateLocalizationTime(msg);
       });
-  point_cloud_reader_ = node_->CreateReader<drivers::PointCloud>(
-      FLAGS_pointcloud_topic,
-      [this](const std::shared_ptr<drivers::PointCloud> &msg) {
-        UpdatePointCloud(msg);
-      });
-
   LoadLidarHeight(FLAGS_lidar_height_yaml);
 }
 

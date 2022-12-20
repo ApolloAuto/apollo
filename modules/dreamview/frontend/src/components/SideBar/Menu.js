@@ -1,5 +1,5 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import _ from 'lodash';
 
 import RadioItem from 'components/common/RadioItem';
@@ -16,6 +16,8 @@ import mapIcon from 'assets/images/menu/map.png';
 
 import { POINT_CLOUD_WS } from 'store/websocket';
 
+import './style.scss';
+
 const MenuIconMapping = {
   perception: perceptionIcon,
   prediction: predictionIcon,
@@ -27,12 +29,44 @@ const MenuIconMapping = {
   map: mapIcon,
 };
 
-@observer
+@inject('store') @observer
 class MenuItemCheckbox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      channels: [],
+    };
+  }
+
+  componentDidMount() {
+    const {
+      id,
+    } = this.props;
+    if (id === 'perceptionPointCloud') {
+      POINT_CLOUD_WS.getPointCloudChannel().then((channels) => {
+        console.log('channels', channels);
+        this.setState({ channels });
+      });
+    }
+  }
+
+  onStatusSelectChange = (event) => {
+    if (event.target.value) {
+      POINT_CLOUD_WS.changePointCloudChannel(event.target.value);
+    }
+  };
+
   render() {
     const {
-      id, title, optionName, options, isCustomized,
+      id,
+      title,
+      optionName,
+      options,
+      isCustomized,
+      store,
     } = this.props;
+
+    const { hmi } = store;
     return (
             <ul className="item">
                 <li
@@ -57,6 +91,23 @@ class MenuItemCheckbox extends React.Component {
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
                     <span>{title}</span>
+                  {id === 'perceptionPointCloud' && <span className='point_cloud_channel_select'>
+                     <span className="arrow" />
+                    <select
+                      onClick={(e) => e.stopPropagation()}
+                      value={hmi.currentPointCloudChannel}
+                      onChange={this.onStatusSelectChange}
+                    >
+                       <option key={'none'} value={''}>- 请选择channel -</option>
+                      {
+                        this.state.channels.map((channel) => {
+                          return (
+                            <option key={channel} value={channel}>{channel}</option>
+                          );
+                        })
+                      }
+                    </select>
+                  </span>}
                 </li>
             </ul>
     );

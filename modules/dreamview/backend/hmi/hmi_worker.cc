@@ -43,7 +43,6 @@ DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
 
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 
-
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 
 DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
@@ -1425,12 +1424,37 @@ bool HMIWorker::ReloadVehicles() {
   // InitStatus();
   // Populate vehicles and current_vehicle.
   AINFO << "reload vehicles";
-  for (const auto& vehicle : config_.vehicles()) {
+  for (const auto &vehicle : config_.vehicles()) {
     status_.add_vehicles(vehicle.first);
   }
   status_changed_ = true;
   return true;
 }
 
+void HMIWorker::UpdateCameraSensorChannelToStatus(
+    const std::string &channel_name) {
+  {
+    WLock wlock(status_mutex_);
+    if (status_.current_camera_sensor_channel() == channel_name) {
+      AINFO << "Input channel name is current camera sensor channel";
+      return;
+    }
+    status_.set_current_camera_sensor_channel(channel_name);
+    status_changed_ = true;
+  }
+}
+
+void HMIWorker::UpdatePointCloudChannelToStatus(
+    const std::string &channel_name) {
+  {
+    WLock wlock(status_mutex_);
+    if (status_.current_point_cloud_channel() == channel_name) {
+      AINFO << "Input channel name is current camera sensor channel";
+      return;
+    }
+    status_.set_current_point_cloud_channel(channel_name);
+    status_changed_ = true;
+  }
+}
 }  // namespace dreamview
 }  // namespace apollo

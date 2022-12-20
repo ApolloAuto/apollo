@@ -164,7 +164,8 @@ export default class Options {
         const cameraData = MENU_DATA.find((data) => data.id === 'camera');
 
         this.cameraAngleNames = Object.values(cameraData.data);
-        const shouldFilterCameraView = _.get(PARAMETERS, 'cameraAngle.hasCameraView', true);
+        // Default screen shielding shortcut key v switch cameraView
+        const shouldFilterCameraView = _.get(PARAMETERS, 'cameraAngle.hasCameraView', false);
         if (shouldFilterCameraView) {
           this.cameraAngleNames = this.cameraAngleNames.filter((name) => name !== 'CameraView');
         }

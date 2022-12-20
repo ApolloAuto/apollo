@@ -246,6 +246,16 @@ bool HMI::UpdateDynamicModelToStatus(const std::string& dynamic_model_name) {
 
 bool HMI::UpdateRecordToStatus() { return hmi_worker_->LoadRecords(); }
 
-bool HMI::UpdateVehicleToStatus() { return hmi_worker_->ReloadVehicles();}
+bool HMI::UpdateVehicleToStatus() { return hmi_worker_->ReloadVehicles(); }
+
+bool HMI::UpdateCameraChannelToStatus(const std::string& channel_name) {
+  hmi_worker_->UpdateCameraSensorChannelToStatus(channel_name);
+  return true;
+}
+
+bool HMI::UpdatePointChannelToStatus(const std::string& channel_name) {
+  hmi_worker_->UpdatePointCloudChannelToStatus(channel_name);
+  return true;
+}
 }  // namespace dreamview
 }  // namespace apollo

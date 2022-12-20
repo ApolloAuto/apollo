@@ -33,12 +33,16 @@ cc_proto_library(
 proto_library(
     name = "camera_update_proto",
     srcs = ["camera_update.proto"],
+    deps = [
+          "//modules/common_msgs/perception_msgs:perception_obstacle_proto",
+    ],
 )
 
 py_proto_library(
     name = "camera_update_py_pb2",
     deps = [
         ":camera_update_proto",
+         "//modules/common_msgs/perception_msgs:perception_obstacle_py_pb2",
     ],
 )
 cc_proto_library(

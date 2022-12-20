@@ -170,6 +170,7 @@ export default class RealtimeWebSocketEndpoint {
           this.requestDefaultRoutingPoints();
           this.updateDefaultRoutingPoints = false;
         }
+
         if (this.pointcloudWS.isEnabled()) {
           this.pointcloudWS.requestPointCloud();
         }
@@ -547,7 +548,16 @@ export default class RealtimeWebSocketEndpoint {
     this.websocket.send(JSON.stringify(request));
   }
 
-  sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, id, start_heading) {
+  sendParkingRequest(
+    start,
+    waypoint,
+    end,
+    parkingInfo,
+    laneWidth,
+    cornerPoints,
+    id,
+    start_heading
+  ) {
     const request = {
       type: 'SendParkingRoutingRequest',
       start,

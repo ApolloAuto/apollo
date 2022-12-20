@@ -103,7 +103,8 @@ class HMIWorker {
   bool ReloadVehicles();
   void GetScenarioSetPath(const std::string& scenario_set_id,
                           std::string* scenario_set_path);
-
+  void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
+  void UpdatePointCloudChannelToStatus(const std::string& channel_name);
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
   static HMIMode LoadMode(const std::string& mode_config_path);

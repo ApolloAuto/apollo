@@ -22,20 +22,22 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+
 #include "pcl/point_cloud.h"
 #include "pcl/point_types.h"
+
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
-#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-
 /**
  * @namespace apollo::dreamview
  * @brief apollo::dreamview
@@ -60,15 +62,15 @@ class PointCloudUpdater {
                     SimulationWorldUpdater *sim_world_updater);
 
   ~PointCloudUpdater();
-
+  // dreamview callback function
+  using DvCallback = std::function<bool(const std::string &string)>;
   static void LoadLidarHeight(const std::string &file_path);
 
   /**
    * @brief Starts to push PointCloud to frontend.
    */
-  void Start();
+  void Start(DvCallback callback_api);
   void Stop();
-
   // The height of lidar w.r.t the ground.
   static float lidar_height_;
 
@@ -90,11 +92,15 @@ class PointCloudUpdater {
   pcl::PointCloud<pcl::PointXYZ>::Ptr ConvertPCLPointCloud(
       const std::shared_ptr<drivers::PointCloud> &point_cloud);
 
+  void GetChannelMsg(std::vector<std::string> *channels);
+  bool ChangeChannel(const std::string &channel);
   constexpr static float kDefaultLidarHeight = 1.91f;
 
   std::unique_ptr<cyber::Node> node_;
 
   WebSocketHandler *websocket_;
+
+  std::vector<std::string> channels_;
 
   bool enabled_ = false;
 
@@ -112,6 +118,8 @@ class PointCloudUpdater {
   double last_localization_time_ = 0.0;
   SimulationWorldUpdater *simworld_updater_;
   bool enable_voxel_filter_ = false;
+  std::string curr_channel_name = "";
+  DvCallback callback_api_;
 };
 }  // namespace dreamview
 }  // namespace apollo

@@ -1,5 +1,6 @@
 import { observable, action } from 'mobx';
 import * as THREE from 'three';
+import { ObstacleTypeColorMap } from 'utils/constant';
 
 export default class CameraData {
     @observable initPosition = observable.map();
@@ -13,6 +14,8 @@ export default class CameraData {
     @observable initDynamicRotation = observable.map();
 
     @observable deltaDynamicRotation = observable.map();
+
+    @observable cameraChannels = [];
 
     @observable imageSrcData = null;
 
@@ -40,9 +43,46 @@ export default class CameraData {
 
     // The init camera data is being updated per frame
     @action init(data, coordinates) {
+      console.log('camera data');
+      console.log(data);
       // Camera image
       if (data.image && data.image.length > 0) {
-        this.imageSrcData = `data:image/jpeg;base64,${new Buffer(data.image).toString('base64')}`;
+        // 图片缩放比例
+        const kImageScale = data.kImageScale;
+        const imageData = new Uint8Array(data.image);
+        const blob = new Blob([imageData], { type: 'image/jpeg' });
+        const img = new Image();
+        img.src = URL.createObjectURL(blob);
+        // If there are obstacles
+        if (data.bbox2d && data.bbox2d.length > 0) {
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            data.bbox2d.forEach((bbox, index) => {
+              const obstaclesId = data.obstaclesId[index] || '';
+              const obstaclesSubType = data.obstaclesSubType[index] || '';
+
+              ctx.strokeStyle = ObstacleTypeColorMap.get(obstaclesSubType) || 'red';
+
+              let {xmin, ymin, xmax, ymax} = bbox;
+              if (xmin === ymin === xmax === ymax) {
+                return;
+              }
+              [xmin, ymin, xmax, ymax] = [xmin, ymin, xmax, ymax]
+                .map((value) => value * kImageScale);
+              ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
+              ctx.fillStyle = ObstacleTypeColorMap.get(obstaclesSubType) || 'white';
+              ctx.font = '16px Arial';
+              ctx.fillText(`${obstaclesSubType.substring(3)}:${obstaclesId}`, xmin, ymin);
+            });
+            this.imageSrcData = canvas.toDataURL();
+          };
+        } else {
+          this.imageSrcData = URL.createObjectURL(blob);
+        }
       }
 
       this.imageAspectRatio = data.imageAspectRatio;

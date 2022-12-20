@@ -31,8 +31,6 @@ export default class HMISelectors extends React.Component {
       scenarioSetItem => scenarioSetItem.scenarioSetId === currentScenarioSetId
     ) || {};
 
-    console.log('currentScenarioSet', toJS(currentScenarioSet));
-
     return (
             <React.Fragment>
                 <Selector
