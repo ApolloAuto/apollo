@@ -761,26 +761,26 @@ void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
 
   // Reassign relative t and s on stitched_trajectory_result for accurate next
   // frame stitching
-  size_t interpolated_pieces_num =
-      open_space_trajectory_partition_config_.interpolated_pieces_num();
-  if (FLAGS_use_iterative_anchoring_smoother) {
-    interpolated_pieces_num = 1;
-  }
+//   size_t interpolated_pieces_num =
+//       open_space_trajectory_partition_config_.interpolated_pieces_num();
+//   if (FLAGS_use_iterative_anchoring_smoother) {
+//     interpolated_pieces_num = 1;
+//   }
   const size_t unpartitioned_trajectory_size =
       unpartitioned_trajectory_result->size();
-  size_t index_estimate = 0;
-  for (size_t i = 0; i < current_trajectory_index; ++i) {
-    index_estimate += partitioned_trajectories.at(i).first.size();
-  }
-  index_estimate += closest_trajectory_point_index;
-  index_estimate /= interpolated_pieces_num;
-  if (index_estimate >= unpartitioned_trajectory_size) {
-    index_estimate = unpartitioned_trajectory_size - 1;
-  }
-  time_shift =
-      unpartitioned_trajectory_result->at(index_estimate).relative_time();
-  s_shift =
-      unpartitioned_trajectory_result->at(index_estimate).path_point().s();
+//   size_t index_estimate = 0;
+//   for (size_t i = 0; i < current_trajectory_index; ++i) {
+//     index_estimate += partitioned_trajectories.at(i).first.size();
+//   }
+//   index_estimate += closest_trajectory_point_index;
+//   index_estimate /= interpolated_pieces_num;
+//   if (index_estimate >= unpartitioned_trajectory_size) {
+//     index_estimate = unpartitioned_trajectory_size - 1;
+//   }
+//   time_shift =
+//       unpartitioned_trajectory_result->at(index_estimate).relative_time();
+//   s_shift =
+//       unpartitioned_trajectory_result->at(index_estimate).path_point().s();
   for (size_t i = 0; i < unpartitioned_trajectory_size; ++i) {
     TrajectoryPoint* trajectory_point =
         &(unpartitioned_trajectory_result->at(i));

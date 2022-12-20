@@ -336,14 +336,14 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   PiecewiseJerkPathProblem piecewise_jerk_problem(speed_ref.size(), delta_s,
                                                   init_state);
   piecewise_jerk_problem.set_x_bounds(0.0, 50.0);
-  piecewise_jerk_problem.set_dx_bounds(-10.0, 10.0);
-  piecewise_jerk_problem.set_ddx_bounds(-10.0, 10.0);
-  piecewise_jerk_problem.set_dddx_bound(-10.0, 10.0);
+  piecewise_jerk_problem.set_dx_bounds(-100.0, 100.0);
+  piecewise_jerk_problem.set_ddx_bounds(-1000.0, 1000.0);
+  piecewise_jerk_problem.set_dddx_bound(-10000.0, 100000.0);
 
   piecewise_jerk_problem.set_weight_x(0.0);
-  piecewise_jerk_problem.set_weight_dx(10.0);
-  piecewise_jerk_problem.set_weight_ddx(10.0);
-  piecewise_jerk_problem.set_weight_dddx(10.0);
+  piecewise_jerk_problem.set_weight_dx(1.0);
+  piecewise_jerk_problem.set_weight_ddx(1.0);
+  piecewise_jerk_problem.set_weight_dddx(1.0);
 
   piecewise_jerk_problem.set_x_ref(10.0, std::move(speed_ref));
 
