@@ -58,7 +58,7 @@ export default class SensorCamera extends React.Component {
                       value={hmi.currentCameraSensorChannel}
                       onChange={this.onStatusSelectChange}
                     >
-                       <option key={'请选择channel'} value={''}>- 请选择channel -</option>
+                       <option key={'select—Ïchannel'} value={''}>- select channel -</option>
                       {
                         this.state.channels.map((channel) => {
                           return (
