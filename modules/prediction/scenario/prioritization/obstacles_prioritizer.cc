@@ -446,6 +446,9 @@ void ObstaclesPrioritizer::AssignCautionLevelPedestrianInFront(
       obstacles_container->curr_frame_movable_obstacle_ids();
   for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (!obstacle_ptr) {
+      continue;
+    }
     if (!obstacle_ptr->IsPedestrian() || obstacle_ptr->history_size() == 0) {
       continue;
     }

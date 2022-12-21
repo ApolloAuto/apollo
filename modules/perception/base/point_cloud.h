@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <utility>
@@ -23,6 +24,7 @@
 
 #include "Eigen/Dense"
 
+#include "cyber/common/log.h"
 #include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/point.h"
 
@@ -286,6 +288,10 @@ class AttributePointCloud : public PointCloud<PointT> {
                       const PointT point = PointT()) {
     width_ = width;
     height_ = height;
+    if (width_ > 0 && height_ > SIZE_MAX / width_) {
+      AFATAL << "overflow detected.";
+      exit(1);
+    }
     size_t size = width_ * height_;
     points_.assign(size, point);
     points_timestamp_.assign(size, 0.0);

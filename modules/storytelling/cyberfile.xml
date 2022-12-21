@@ -10,7 +10,7 @@
     this module creates one or multiple stories and publishes to `/apollo/storytelling` channel. The main advantage of this module is to fine tune the driving experience and also isolate complex scenarios packaging them into stories that can be subscribed to by other modules like Planning, Control etc. 
   </description>
   
-  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>

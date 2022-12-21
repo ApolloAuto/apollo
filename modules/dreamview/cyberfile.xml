@@ -6,7 +6,7 @@
     other relevant autonomous driving modules, e.g. the vehicle's planning trajectory, car localization, chassis status etc.
   </description>
   
-  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>

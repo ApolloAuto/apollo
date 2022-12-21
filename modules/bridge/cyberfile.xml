@@ -6,7 +6,7 @@
     outside of Apollo by socket. It includes sender and receiver components.
   </description>
   
-  <maintainer email="apollo-maintaner@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
