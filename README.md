@@ -165,8 +165,8 @@ Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabili
 
 ## Installation
 
-* [Hardware installation guide](docs/02_Quick%20Start/apollo_3_5_hardware_system_installation_guide.md)
-* [Software installation guide](docs/02_Quick%20Start/apollo_software_installation_guide.md) - **This step is required**
+* [Hardware installation guide](docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
+* [Software installation guide](docs/01_Installation%20Instructions/apollo_software_installation_guide.md) - **This step is required**
 * [Launch and run Apollo](docs/01_Installation%20Instructions/how_to_launch_and_run_apollo.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
