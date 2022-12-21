@@ -279,7 +279,7 @@ bool SmokeObstacleDetector::Preprocessor(const base::Image8U* image,
 
   // mean and std
   img.convertTo(img, CV_32F, 1.0 / 255, 0);
-  std::vector<float> mean_values{0.485, 0.456, 0.406};
+  std::vector<float> mean_values{0, 0, 0};
   std::vector<float> std_values{0.229, 0.224, 0.225};
 
   std::vector<cv::Mat> rgbChannels(3);
