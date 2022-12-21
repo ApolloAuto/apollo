@@ -1,3 +1,27 @@
+# Release 8.0
+
+Apollo 8.0 is an effort to provide an extensible software framework and complete development cycle for Autonomous Driving developer. Apollo 8.0 introduces easily-reused Package to organize software modules.  Apollo 8.0 integrates the whole process of perception development ,by combining model training service, model deployment tool and end-to-end visual validation tool . And another 3 new deep learning models are incorporated in Apollo 8.0 for perception module. Simulation service is upgraded by integrating local simulator in Dreamview to provide powerful debug tool for PnC developer.
+
+## Major Features and Improvements
+
+* Reusable software Package
+    * Reorganize the modules based on Package to provide the functionality in an easy-to-consume manner
+    * Fast installation experience based on Package, refer to [Installation - Package Method](docs/01_Installation%20Instructions/apollo_software_installation_guide_package_method.md)
+    * Support customizing , publishing and sharing Package
+* Brand New Deep Learning Models
+    * CenterPoint, center-based two-stage 3D obstacle detection model
+    * CaDDN, camera obstacle detection model
+    * BEV PETR, camera obstacle detection model
+* Complete Perception Development Process
+    * Support Paddle3D to provide Model Training service
+    * Provide model deployment tool by normalizing the model meta.
+    * Provide visual validation tool in Dreamview
+* Upgraded PnC Simulation Service
+    * Provide PnC debug tool by integrating local simulator in Dreamview
+    * Support scenario editing online and download in Dreamview
+
+**[Note]** All models and methodologies included in Apollo 8.0 are for research purposes only. Productized and commercial uses of these models are NOT encouraged, and it is at your own risk. Please be cautious to try Apollo 8.0 with enough safety protection mechanism. Your feedback is highly appreciated for us to continuously improve the models.
+
 # Release 7.0
 
 Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabilities for Apollo Perception and Prediction modules. Apollo Studio is introduced in this version, combining with Data Pipeline, to provide a one-stop online development platform to better serve Apollo developers. Apollo 7.0 also publishes the PnC reinforcement learning model training and simulation evaluation service based on previous simulation service.
@@ -50,7 +74,7 @@ Apollo 5.5 enhances the complex urban road autonomous driving capabilities of pr
 * Scenario - Based Planning with a new planning scenarios to support curb-to-curb driving
     * Park-and-go
     * Emergency
-* Prediction Model - Caution Obstacle 
+* Prediction Model - Caution Obstacle
     * Semantic LSTM evaluator
     * Extrapolation predictor
 * Control module

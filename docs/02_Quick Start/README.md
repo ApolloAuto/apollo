@@ -1,5 +1,14 @@
 # Quick Start Guides
 
+## Apollo 8.0
+
+- [Apollo 8.0 quick start](./apollo_8_0_quick_start.md)
+- [Apollo software installation guide - package method](../01_Installation%20Instructions/apollo_software_installation_guide_package_method.md)
+  New method to install apollo
+- [Apollo 3.5 hardware system installation guide](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md) -
+  Since there are no changes in our Hardware setup, please refer to the Apollo
+  3.5 guide
+
 ## Apollo 6.0
 
 - [Apollo 6.0 quick start](./apollo_6_0_quick_start.md)
@@ -80,3 +89,4 @@
 
 - [Apollo software installation guide](../01_Installation%20Instructions/apollo_software_installation_guide.md)
 - [Apollo software installation guide cn](../01_Installation%20Instructions/apollo_software_installation_guide_cn.md)
+- [Apollo software installation guide - package method](../01_Installation%20Instructions/apollo_software_installation_guide_package_method.md)

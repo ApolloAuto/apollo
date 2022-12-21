@@ -43,7 +43,7 @@ software packages and library dependencies of newer versions including:
 2. LibTorch (both CPU and GPU version) bumped to version 1.7.0 accordingly.
 
 We do not expect a disruption to your current work, but to ease your life of
-migration, you would need to: 
+migration, you would need to:
 
 1. Update NVIDIA driver on your host to version >= 455.32.
   ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
@@ -62,9 +62,9 @@ rm -rf /apollo/.cache/{bazel,build,repos}
 
 * The vehicle equipped with the by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
 
-* A machine with a 8-core processor and 16GB memory minimum 
+* A machine with a 8-core processor and 16GB memory minimum
 
-* NVIDIA Turing GPU is strongly recommended 
+* NVIDIA Turing GPU is strongly recommended
 
 * Ubuntu 18.04
 
@@ -80,7 +80,7 @@ rm -rf /apollo/.cache/{bazel,build,repos}
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](docs/02_Quick%20Start/demo_guide/images/Apollo_Roadmap_6_0.png)
+![](docs/02_Quick%20Start/demo_guide/images/Apollo_Roadmap_8_0.png)
 
 [**Apollo 1.0:**](docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_1_0_hardware_system_installation_guide.md)
 
@@ -133,7 +133,7 @@ The car now has 360-degree visibility, along with upgraded perception deep learn
 
 [**Apollo 5.5:**](docs/02_Quick%20Start/apollo_5_5_quick_start.md)
 
-Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. 
+Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving. The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware.
 
 ![](docs/02_Quick%20Start/demo_guide/images/Apollo_5_5_Architecture.png)
 
@@ -148,6 +148,12 @@ Apollo 6.0 incorporates new deep learning models to enhance the capabilities for
 Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabilities for Apollo Perception and Prediction modules. Apollo Studio is introduced in this version, combining with Data Pipeline, to provide a one-stop online development platform to better serve Apollo developers. Apollo 7.0 also publishes the PnC reinforcement learning model training and simulation evaluation service based on previous simulation service.
 
 ![](docs/02_Quick%20Start/demo_guide/images/Apollo_7_0.png)
+
+[**Apollo 8.0:**](docs/02_Quick%20Start/apollo_8_0_quick_start.md)
+
+Apollo 8.0 is an effort to provide an extensible software framework and complete development cycle for Autonomous Driving developer. Apollo 8.0 introduces easily-reused “Package” to organize software modules.  Apollo 8.0 integrates the whole process of perception development ,by combining model training service, model deployment tool and end-to-end visual validation tool . And another 3 new deep learning models are incorporated in Apollo 8.0 for perception module. Simulation service is upgraded by integrating local simulator in Dreamview to provide powerful debug tool for PnC developer.
+
+![](docs/02_Quick%20Start/demo_guide/images/Apollo_8_0.png)
 
 ## Architecture
 
@@ -166,12 +172,14 @@ Apollo 7.0 incorporates 3 brand new deep learning models to enhance the capabili
 ## Installation
 
 * [Hardware installation guide](docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
-* [Software installation guide](docs/01_Installation%20Instructions/apollo_software_installation_guide.md) - **This step is required**
-* [Launch and run Apollo](docs/01_Installation%20Instructions/how_to_launch_and_run_apollo.md)
+* [Software installation guide](docs/01_Installation%20Instructions/apollo_software_installation_guide_package_method.md) - **This step is required**
+* [Launch and run Apollo](docs/03_Package%20Management/launch_and_run_apollo_package_method.md)
 
 Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
 
 ## Quick Starts:
+
+* [Apollo 8.0 QuickStart Guide](docs/02_Quick%20Start/apollo_8_0_quick_start.md)
 
 * [Apollo 6.0 QuickStart Guide](docs/02_Quick%20Start/apollo_6_0_quick_start.md)
 
@@ -193,11 +201,33 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 ## Documents
 
-* [Technical Tutorials](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
+* [Installation Instructions](docs/01_Installation%20Instructions/)
 
-* [How-To Guides](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
+* [Quick Start](docs/02_Quick%20Start/)
 
-* [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
+* [Package Management](docs/03_Package%20Management/)
+
+* [CyberRT](docs/04_CyberRT/)
+
+* [Localization](docs/05_Localization/)
+
+* [Perception](docs/06_Perception/)
+
+* [Prediction](docs/07_Prediction/)
+
+* [Planning](docs/08_Planning/)
+
+* [Decider](docs/09_Decider/)
+
+* [Control](docs/10_Control/)
+
+* [Hardware Integration and Calibration](docs/11_Hardware%20Integration%20and%20Calibration/)
+
+* [Map acquisition](docs/12_Map%20acquisition/)
+
+* [Apollo Tool](docs/13_Apollo%20Tool/)
+
+* [Others](docs/14_Others/)
 
 * [FAQs](docs/15_FAQS/README.md)
 
