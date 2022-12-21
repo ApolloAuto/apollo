@@ -1027,6 +1027,14 @@
                 "currentVehicleType": {
                   "type": "sint32",
                   "id": 22
+                },
+                "currentCameraSensorChannel": {
+                  "type": "string",
+                  "id": 23
+                },
+                "currentPointCloudChannel": {
+                  "type": "string",
+                  "id": 24
                 }
               }
             }
@@ -2034,7 +2042,8 @@
                     "NOT_DEFINED": 0,
                     "PARKING": 1,
                     "PULL_OVER": 2,
-                    "NARROW_STREET_U_TURN": 3
+                    "NARROW_STREET_U_TURN": 3,
+                    "DEAD_END_PRE_STOP": 4
                   }
                 }
               }
@@ -2136,6 +2145,20 @@
                   "options": {
                     "default": 0.2
                   }
+                },
+                "extendRightXBuffer": {
+                  "type": "double",
+                  "id": 16,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "extendLeftXBuffer": {
+                  "type": "double",
+                  "id": 17,
+                  "options": {
+                    "default": 0
+                  }
                 }
               },
               "nested": {
@@ -2145,7 +2168,8 @@
                     "PARKING": 1,
                     "PULL_OVER": 2,
                     "PARK_AND_GO": 3,
-                    "NARROW_STREET_U_TURN": 4
+                    "NARROW_STREET_U_TURN": 4,
+                    "DEAD_END": 5
                   }
                 }
               }
@@ -2239,6 +2263,13 @@
                   "type": "DualVariableConfig",
                   "id": 2
                 },
+                "trajectorySmoother": {
+                  "type": "TrajectorySmoother",
+                  "id": 7,
+                  "options": {
+                    "default": "USE_WARM_START"
+                  }
+                },
                 "distanceApproachTrajectorySmootherConfig": {
                   "type": "DistanceApproachTrajectorySmootherConfig",
                   "id": 3
@@ -2260,6 +2291,15 @@
                 "plannerOpenSpaceConfig": {
                   "type": "PlannerOpenSpaceConfig",
                   "id": 6
+                }
+              },
+              "nested": {
+                "TrajectorySmoother": {
+                  "values": {
+                    "ITERATIVE_ANCHORING_SMOOTHER": 0,
+                    "DISTANCE_APPROACH": 1,
+                    "USE_WARM_START": 2
+                  }
                 }
               }
             },
@@ -2757,13 +2797,6 @@
                     "default": 10
                   }
                 },
-                "trajKappaContraintRatio": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0.7
-                  }
-                },
                 "gridAStarXyResolution": {
                   "type": "double",
                   "id": 15,
@@ -2781,6 +2814,13 @@
                 "sCurveConfig": {
                   "type": "PiecewiseJerkSpeedOptimizerConfig",
                   "id": 17
+                },
+                "trajKappaContraintRatio": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.7
+                  }
                 }
               }
             },
@@ -3819,6 +3859,24 @@
                 }
               }
             },
+            "ScenarioDeadEndTurnAroundConfig": {
+              "fields": {
+                "deadEndStartRange": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
             "ScenarioYieldSignConfig": {
               "fields": {
                 "startYieldSignScenarioDistance": {
@@ -3868,7 +3926,8 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "trafficLightUnprotectedRightTurnConfig",
                     "valetParkingConfig",
-                    "yieldSignConfig"
+                    "yieldSignConfig",
+                    "deadendTurnaroundConfig"
                   ]
                 }
               },
@@ -3932,6 +3991,10 @@
                 "yieldSignConfig": {
                   "type": "ScenarioYieldSignConfig",
                   "id": 15
+                },
+                "deadendTurnaroundConfig": {
+                  "type": "ScenarioDeadEndTurnAroundConfig",
+                  "id": 18
                 },
                 "stageType": {
                   "rule": "repeated",
@@ -6381,6 +6444,157 @@
                 }
               }
             },
+            "FemPosDeviationSmootherConfig": {
+              "fields": {
+                "weightFemPosDeviation": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10000000000
+                  }
+                },
+                "weightRefDeviation": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightPathLength": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "applyCurvatureConstraint": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightCurvatureConstraintSlackVar": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "curvatureConstraint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "useSqp": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "sqpFtol": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.0001
+                  }
+                },
+                "sqpCtol": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.001
+                  }
+                },
+                "sqpPenMaxIter": {
+                  "type": "int32",
+                  "id": 11,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "sqpSubMaxIter": {
+                  "type": "int32",
+                  "id": 12,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "maxIter": {
+                  "type": "int32",
+                  "id": 100,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "timeLimit": {
+                  "type": "double",
+                  "id": 101,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "verbose": {
+                  "type": "bool",
+                  "id": 102,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "scaledTermination": {
+                  "type": "bool",
+                  "id": 103,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "warmStart": {
+                  "type": "bool",
+                  "id": 104,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 200,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 201,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 202,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 203,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 204,
+                  "options": {
+                    "default": 0.1
+                  }
+                }
+              }
+            },
             "QuadraticProgrammingProblem": {
               "fields": {
                 "paramSize": {
@@ -6961,157 +7175,6 @@
                 "vehicleSignal": {
                   "type": "apollo.common.VehicleSignal",
                   "id": 3
-                }
-              }
-            },
-            "FemPosDeviationSmootherConfig": {
-              "fields": {
-                "weightFemPosDeviation": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
-                "weightRefDeviation": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightPathLength": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "applyCurvatureConstraint": {
-                  "type": "bool",
-                  "id": 5,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "weightCurvatureConstraintSlackVar": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "curvatureConstraint": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "useSqp": {
-                  "type": "bool",
-                  "id": 8,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "sqpFtol": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.0001
-                  }
-                },
-                "sqpCtol": {
-                  "type": "double",
-                  "id": 10,
-                  "options": {
-                    "default": 0.001
-                  }
-                },
-                "sqpPenMaxIter": {
-                  "type": "int32",
-                  "id": 11,
-                  "options": {
-                    "default": 10
-                  }
-                },
-                "sqpSubMaxIter": {
-                  "type": "int32",
-                  "id": 12,
-                  "options": {
-                    "default": 100
-                  }
-                },
-                "maxIter": {
-                  "type": "int32",
-                  "id": 100,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "timeLimit": {
-                  "type": "double",
-                  "id": 101,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "verbose": {
-                  "type": "bool",
-                  "id": 102,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "scaledTermination": {
-                  "type": "bool",
-                  "id": 103,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "warmStart": {
-                  "type": "bool",
-                  "id": 104,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 200,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 201,
-                  "options": {
-                    "default": 500
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 202,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 203,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 204,
-                  "options": {
-                    "default": 0.1
-                  }
                 }
               }
             },
@@ -12192,28 +12255,6 @@
                         "BCAN_BAUDRATE_250K": 2,
                         "BCAN_BAUDRATE_150K": 3,
                         "BCAN_BAUDRATE_NUM": 4
-                      }
-                    }
-                  }
-                },
-                "SensorCanbusConf": {
-                  "fields": {
-                    "canCardParameter": {
-                      "type": "apollo.drivers.canbus.CANCardParameter",
-                      "id": 1
-                    },
-                    "enableDebugMode": {
-                      "type": "bool",
-                      "id": 2,
-                      "options": {
-                        "default": false
-                      }
-                    },
-                    "enableReceiverLog": {
-                      "type": "bool",
-                      "id": 3,
-                      "options": {
-                        "default": false
                       }
                     }
                   }
