@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/bev_detection/bev_obstacle_detector.h"
 
-#include<functional>
+#include <functional>
 
 #include <opencv2/opencv.hpp>
 
@@ -89,7 +89,7 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
 
     std::shared_ptr<base::Image8U> image_temp = nullptr;
     image_temp.reset(
-        new base::Image8U(image_height_, image_width_, base::Color::BGR));
+        new base::Image8U(image_height_, image_width_, base::Color::RGB));
     camera_frame_temp->data_provider->GetImage(image_options, image_temp.get());
 
     cv::Mat image_mat(image_height_, image_width_, CV_8UC3,
@@ -147,8 +147,8 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
   std::vector<float> out_detections_final;
   std::vector<int64_t> out_labels_final;
   std::vector<float> out_scores_final;
-
-  FilterScore(boxes, labels, scores, FLAGS_score_threshold,
+  float threshold = 0.8;
+  FilterScore(boxes, labels, scores, threshold,
               &out_detections_final, &out_labels_final, &out_scores_final);
 
   AINFO << "images_data size: " << images_data.size();
@@ -225,45 +225,6 @@ void BEVObstacleDetector::Lidar2cam(const Eigen::Matrix4f &imu2camera,
                                     const Eigen::Matrix4f &imu2lidar,
                                     Eigen::Matrix4f *lidar2camera) {
   *lidar2camera = imu2camera * (imu2lidar.inverse());
-}
-
-void BEVObstacleDetector::GetMatrixRT(
-    const Eigen::Quaterniond &rotation_quaternion,
-    const Eigen::Vector3f &translation, Eigen::Matrix4f *matrix_rt) {
-  ACHECK(nullptr != matrix_rt);
-  Eigen::Matrix3d rotation_matrix = rotation_quaternion.toRotationMatrix();
-  matrix_rt->setIdentity();
-  matrix_rt->block<3, 3>(0, 0) = rotation_matrix.cast<float>();
-  matrix_rt->block<3, 1>(0, 3) = translation;
-}
-
-void BEVObstacleDetector::GetImg2LidarMatrix(
-    const Eigen::Matrix4f &imu2cam_matrix_rt,
-    const Eigen::Matrix3f &cam_intrinstic_matrix_3f,
-    const Eigen::Matrix4f &imu2lidar_matrix_rt,
-    Eigen::Matrix4f *img2lidar_matrix_rt) {
-  ACHECK(nullptr != img2lidar_matrix_rt);
-
-  auto &lidar2cam_matrix_rt =
-      imu2cam_matrix_rt * (imu2lidar_matrix_rt.inverse());
-  Eigen::Matrix4f camera_intrinstic_matrix_4f;
-  camera_intrinstic_matrix_4f.setIdentity();
-  camera_intrinstic_matrix_4f.block<3, 3>(0, 0) = cam_intrinstic_matrix_3f;
-  *img2lidar_matrix_rt =
-      (camera_intrinstic_matrix_4f * lidar2cam_matrix_rt).inverse();
-}
-
-void BEVObstacleDetector::GetImg2LidarMatrix(
-    const Eigen::Matrix4f &lidar2cam_matrix_rt,
-    const Eigen::Matrix3f &cam_intrinstic_matrix_3f,
-    Eigen::Matrix4f *img2lidar_matrix_rt) {
-  ACHECK(nullptr != img2lidar_matrix_rt);
-
-  Eigen::Matrix4f camera_intrinstic_matrix_4f;
-  camera_intrinstic_matrix_4f.setIdentity();
-  camera_intrinstic_matrix_4f.block<3, 3>(0, 0) = cam_intrinstic_matrix_3f;
-  *img2lidar_matrix_rt =
-      (camera_intrinstic_matrix_4f * lidar2cam_matrix_rt).inverse();
 }
 
 void BEVObstacleDetector::Run(
@@ -420,7 +381,7 @@ void BEVObstacleDetector::FillBBox3d(const float *bbox,
   imu2cam_affine.matrix() = imu2cam_matrix_rt;
   imu2lidar_affine.matrix() = imu2lidar_matrix_rt;
 
-  Eigen::AngleAxisd rotation_vector(M_PI / 2, Eigen::Vector3d(1, 0, 0));
+  Eigen::AngleAxisd rotation_vector(-M_PI / 2, Eigen::Vector3d(1, 0, 0));
   Eigen::Matrix4d lidar2cam;
   lidar2cam.setIdentity();
   lidar2cam.block<3, 3>(0, 0) = rotation_vector.matrix();
@@ -429,6 +390,12 @@ void BEVObstacleDetector::FillBBox3d(const float *bbox,
 
   obj->center = world2cam_pose * imu2cam_affine.inverse() * imu2lidar_affine *
                 lidar2cam_affine * obj->center;
+
+  Eigen::Matrix3d world2imu_rotation =
+      (world2cam_pose.matrix() * imu2cam_affine.matrix().inverse())
+          .block<3, 3>(0, 0);
+  auto heading = std::atan2(world2imu_rotation(1, 0), world2imu_rotation(0, 0));
+  obj->theta += (heading + M_PI / 2);
 }
 /*
 bbox_nuscenes to bbox_apollo: Rotate 90 degrees counterclockwise about the

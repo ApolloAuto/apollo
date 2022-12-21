@@ -162,10 +162,10 @@ void Target::Update3D(CameraFrame *frame) {
   auto object = latest_object->object;
   if (!isLost()) {
     Eigen::Vector2d z;
-    z << std::sin(object->theta * 2), std::cos(object->theta * 2);
+    z << std::sin(object->theta), std::cos(object->theta);
     direction.AddMeasure(z);
     z = direction.get_state();
-    float theta = static_cast<float>(std::atan2(z[0], z[1]) / 2.0);
+    float theta = static_cast<float>(std::atan2(z[0], z[1]));
     AINFO << "dir " << id << " " << object->theta << " " << theta;
     object->theta = theta;
     object->direction[0] = static_cast<float>(cos(object->theta));
