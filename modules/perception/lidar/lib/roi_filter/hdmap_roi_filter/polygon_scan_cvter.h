@@ -175,7 +175,7 @@ void PolygonScanCvter<T>::ScanCvt(const T& scan_loc, DirectionMajor dir_major,
     double k = ks[i];
     if (std::isfinite(k)) {
       if ((x >= low_x && x < high_x) || (x <= low_x && x > high_x)) {
-        if (x == low_x) {
+        if (std::fabs(x - low_x) < 1e-6) {
           nodes.push_back(low_y);
           if (is_singular[i]) {
             nodes.push_back(low_y);

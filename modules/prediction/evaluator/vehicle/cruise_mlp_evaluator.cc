@@ -445,9 +445,11 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
   } else {
     Obstacle* forward_obs_ptr =
         obstacles_container->GetObstacle(forward_obstacle.id());
-    const Feature& feature = forward_obs_ptr->latest_feature();
-    feature_values->push_back(feature.length());
-    feature_values->push_back(feature.speed());
+    if (forward_obs_ptr) {
+      const Feature& feature = forward_obs_ptr->latest_feature();
+      feature_values->push_back(feature.length());
+      feature_values->push_back(feature.speed());
+    }
   }
 
   // Set feature values for backward obstacle
@@ -459,9 +461,11 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
   } else {
     Obstacle* backward_obs_ptr =
         obstacles_container->GetObstacle(backward_obstacle.id());
-    const Feature& feature = backward_obs_ptr->latest_feature();
-    feature_values->push_back(feature.length());
-    feature_values->push_back(feature.speed());
+    if (backward_obs_ptr) {
+      const Feature& feature = backward_obs_ptr->latest_feature();
+      feature_values->push_back(feature.length());
+      feature_values->push_back(feature.speed());
+    }
   }
 }
 

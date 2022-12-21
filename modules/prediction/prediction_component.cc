@@ -60,6 +60,9 @@ void PredictionComponent::OfflineProcessFeatureProtoFile(
   for (const Feature& feature : features.feature()) {
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
+    if (!obstacle_ptr) {
+      continue;
+    }
     evaluator_manager_->EvaluateObstacle(obstacle_ptr, obstacles_container_ptr);
   }
 }

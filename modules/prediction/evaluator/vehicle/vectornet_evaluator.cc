@@ -415,6 +415,9 @@ bool VectornetEvaluator::ExtractObstaclesHistory(
   std::vector<std::pair<double, double>> pos_history(20, {0.0, 0.0});
   for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    if (!obstacle) {
+      continue;
+    }
     int target_id = obstacle_ptr->id();
     if (id == target_id) {
       continue;
