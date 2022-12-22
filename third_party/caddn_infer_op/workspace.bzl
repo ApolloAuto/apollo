@@ -10,7 +10,7 @@ def clean_dep(dep):
 def repo():
     http_archive(
         name = "caddn_infer_op",
-        sha256 = "bcb203466d949415a8e88c9df7783243240db5d091b60cd977083b254954a2c0",
+        sha256 = "8cf2f7444de837b80a5a23783dc58f8e372a5eb61f76cbbc543f0c036ecc73ce",
         strip_prefix = "caddn_infer_op",
         urls = [
             "https://apollo-system.bj.bcebos.com/archive/v8.0_bev/caddn_infer_op.tar.gz",
