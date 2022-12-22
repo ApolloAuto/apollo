@@ -23,8 +23,8 @@
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
-#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/devkit/devkit_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -198,7 +198,7 @@ Chassis DevkitController::chassis() {
   if (chassis_detail.has_vcu_report_505() &&
       chassis_detail.vcu_report_505().has_speed()) {
     chassis_.set_speed_mps(
-        static_cast<float>(abs(chassis_detail.vcu_report_505().speed())));
+        std::abs(static_cast<float>(chassis_detail.vcu_report_505().speed())));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -411,12 +411,12 @@ Chassis DevkitController::chassis() {
       chassis_detail.vcu_report_505().has_backcrash_state()) {
     if (chassis_detail.vcu_report_505().backcrash_state() ==
         Vcu_report_505::BACKCRASH_STATE_CRASH_EVENT) {
-      chassis_.set_front_bumper_event(Chassis::BUMPER_PRESSED);
+      chassis_.set_back_bumper_event(Chassis::BUMPER_PRESSED);
     } else {
-      chassis_.set_front_bumper_event(Chassis::BUMPER_NORMAL);
+      chassis_.set_back_bumper_event(Chassis::BUMPER_NORMAL);
     }
   } else {
-    chassis_.set_front_bumper_event(Chassis::BUMPER_INVALID);
+    chassis_.set_back_bumper_event(Chassis::BUMPER_INVALID);
   }
 
   // 20 add checkresponse signal
