@@ -110,8 +110,8 @@ float OMTBEVTracker::ScoreShape(const Target& target, TrackObjectPtr object) {
   base::RectF rect(object->projected_box);
 
   float score =
-      static_cast<float>((shape[0] - rect.width) * (shape[1] - rect.height) /
-                         (shape[0] * shape[1]));
+      static_cast<float>((shape[2] - rect.width) * (shape[1] - rect.height) /
+                         (shape[2] * shape[1]));
 
   return -std::abs(score);
 }
@@ -122,12 +122,12 @@ float OMTBEVTracker::ScoreOverlap(const Target& target, TrackObjectPtr object) {
   base::BBox2DF box_target;
   double x = state[0];
   double y = state[1];
-  double w = shape[0];
-  double h = shape[1];
+  double w = shape[2];
+  double l = shape[1];
   box_target.xmin = static_cast<float>(x - w / 2);
   box_target.xmax = static_cast<float>(x + w / 2);
-  box_target.ymin = static_cast<float>(y - h / 2);
-  box_target.ymax = static_cast<float>(y + h / 2);
+  box_target.ymin = static_cast<float>(y - l / 2);
+  box_target.ymax = static_cast<float>(y + l / 2);
 
   base::BBox2DF& box_object = object->projected_box;
 
@@ -169,7 +169,7 @@ void OMTBEVTracker::GenerateHypothesis(const TrackObjectPtrs& objects,
              << ") sa:" << sa << " sm: " << sm << " ss: " << ss << " so: " << so
              << " score: " << hypo.score;
 
-      if (sm < 0.045 || hypo.score < omt_param_.target_thresh()) {
+      if (sm < 0.01 || hypo.score < omt_param_.target_thresh()) {
         continue;
       }
 
