@@ -103,7 +103,7 @@ export default class Dreamview extends React.Component {
                 </div>
               {
                 // When the current vehicle is dkit series, the safety pop-up is displayed
-                (current_vehicle_type > 0 && current_vehicle_type <= 7) &&
+                (currentVehicleType > 0 && currentVehicleType <= 7) &&
                 <ApplicationGuideModal />}
             </div>
     );
