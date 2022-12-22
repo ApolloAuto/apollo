@@ -117,7 +117,7 @@ export default class HMI {
    *  // 7: DKIT_CHALLENGE
    * @type {number}
    */
-  @observable current_vehicle_type = 0;
+  @observable currentVehicleType = 0;
 
   // current camera channel
   @observable currentCameraSensorChannel = '';
@@ -263,8 +263,8 @@ export default class HMI {
     this.records = newStatus.records;
     this.currentRecordId = newStatus.currentRecordId;
 
-    if (newStatus.current_vehicle_type) {
-      this.current_vehicle_type = newStatus.current_vehicle_type;
+    if (newStatus.currentVehicleType) {
+      this.currentVehicleType = newStatus.currentVehicleType;
     }
 
     if (newStatus.currentCameraSensorChannel) {

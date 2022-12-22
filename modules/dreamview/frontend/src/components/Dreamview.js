@@ -75,7 +75,7 @@ export default class Dreamview extends React.Component {
 
   render() {
     const { dimension, options, hmi } = this.props.store;
-    const { current_vehicle_type } = hmi;
+    const { currentVehicleType } = hmi;
 
     return (
             <div>
