@@ -44,7 +44,7 @@ class MenuItemCheckbox extends React.Component {
     } = this.props;
     if (id === 'perceptionPointCloud') {
       POINT_CLOUD_WS.getPointCloudChannel().then((channels) => {
-        console.log('channels', channels);
+        // console.log('channels', channels);
         this.setState({ channels });
       });
     }

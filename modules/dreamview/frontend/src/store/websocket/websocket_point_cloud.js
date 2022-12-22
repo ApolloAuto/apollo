@@ -81,7 +81,11 @@ export default class PointCloudWebSocketEndpoint {
           }
           const message = safeParseJSON(event.data);
           if (message?.data?.name === 'GetPointCloudChannelListSuccess') {
-            resolve(message?.data?.info?.channel);
+            if (message?.data?.info?.channel) {
+              resolve(message?.data?.info?.channel);
+            } else {
+              reject(message?.data.info);
+            }
           } else if (message?.data?.name === 'GetPointCloudChannelListFail') {
             reject(message?.data.info);
           }
