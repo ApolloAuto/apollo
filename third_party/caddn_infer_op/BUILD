@@ -8,7 +8,7 @@ install(
     name = "install_lib",
     data_dest = "3rd-caddn-infer-op/lib",
     data = [
-        ":libpd_infer_custom_op.so"
+        ":libcaddn_infer_custom_op.so"
     ]
 )
 
