@@ -6,7 +6,7 @@
     Based on a centralized computing model, it is greatly optimized for high concurrency, low latency, and high throughput in autonomous driving.
   </description>
   
-  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>

@@ -2,13 +2,17 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools/install:install.bzl", "install", "install_files")
+load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:python_rules.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
 install_files(
     name = "py_pb_planning",
-    dest = "planning/python/modules/planning/proto",
+    dest = if_gpu(
+        "planning/python/modules/planning/proto", 
+        "planning-gpu/python/modules/planning/proto", 
+    ),
     files = [
         ":st_drivable_boundary_py_pb2",
         ":planning_stats_py_pb2",

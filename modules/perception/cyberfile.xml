@@ -10,7 +10,7 @@
     relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
   </description>
 
-  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
@@ -36,6 +36,7 @@
 
   <depend expose="False">3rd-rules-python-dev</depend>
   <depend expose="False">3rd-centerpoint-infer-op-dev</depend>
+  <depend expose="False">3rd-caddn-infer-op-dev</depend>
   <depend expose="False">3rd-paddleinference-dev</depend>
   <depend expose="False">3rd-tensorrt-dev</depend>
   <depend expose="False">3rd-vtk-dev</depend>

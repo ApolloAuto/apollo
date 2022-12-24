@@ -110,6 +110,6 @@ install_src_files(
 install_src_files(
     name = "install_tools_py",
     src_dir = ["."],
-    dest = "tools/python",
+    dest = "tools/python/modules/tools",
     filter = "*.py",
 )

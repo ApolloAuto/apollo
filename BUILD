@@ -18,6 +18,7 @@ install(
         "//modules/v2x:install",
         "//third_party/centerpoint_infer_op:install",
         "//third_party/paddleinference:install",
+        "//third_party/caddn_infer_op:install",
     ], [
         "//cyber:install",
         "//tools:install",
@@ -47,7 +48,7 @@ install(
         "//modules/third_party_perception:install",
         "//modules/tools:install",
         "//modules/transform:install",
-        #"//scripts:install",
+        "//scripts:install",
         "//third_party/absl:install",
         "//third_party/ad_rss_lib:install",
         "//third_party/boost:install",
@@ -104,6 +105,7 @@ install_src_files(
         "//modules/v2x:install_src",
         "//third_party/centerpoint_infer_op:install_src",
         "//third_party/paddleinference:install_src",
+        "//third_party/caddn_infer_op:install_src",
     ], [
         "//cyber:install_src",
         "//tools:install_src",
