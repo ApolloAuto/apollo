@@ -204,7 +204,7 @@ The cyberfile for planning_customization is shown as follows:
   <description>
    planning_customization
   </description>
-  <maintainer email="AD-platform">AD-platform@baidu.com</maintainer>
+  <maintainer email="apollo-support@baidu.com">apollo-support</maintainer>
   <type>module</type>
   <src_path>//planning_customization</src_path>
   <license>BSD</license>

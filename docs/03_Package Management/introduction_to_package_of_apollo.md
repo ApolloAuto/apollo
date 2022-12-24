@@ -241,7 +241,7 @@ The writing of the dependency information needs to be focused on, such as the cy
   <description>
    example component
   </description>
-  <maintainer email="AD-platform">AD-platform@baidu.com</maintainer>
+  <maintainer email="apollo-support@baidu.com">apollo-support</maintainer>
   <type>module</type>
   <src_path>//example_components</src_path>
   <license>BSD</license>
