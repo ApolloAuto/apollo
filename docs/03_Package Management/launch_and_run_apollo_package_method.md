@@ -66,7 +66,7 @@ vim mkz/cyberfile.xml
   <description>
    mkz is end to end project, providing a quick setup for Apollo.
   </description>
-  <maintainer email="apollo-maintainer@baidu.com">Apollo</maintainer>
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <type>module</type>
   <src_path>//mkz</src_path>
   <license>BSD</license>
