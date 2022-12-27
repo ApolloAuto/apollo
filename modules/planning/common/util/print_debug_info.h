@@ -16,6 +16,7 @@
 
 #pragma once
 #include<vector>
+#include<map>
 #include "cyber/common/log.h"
 
 namespace apollo {
