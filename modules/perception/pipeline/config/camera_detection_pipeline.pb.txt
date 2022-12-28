@@ -95,7 +95,7 @@ stage_config: {
 
   camera_detector_config {
     gpu_id: 0
-    camera_name: "front_6mm"
+    camera_name: "front_6mm,front_12mm"
     root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
     conf_file: "smoke-config.pt"
   }

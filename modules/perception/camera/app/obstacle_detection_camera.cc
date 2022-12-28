@@ -226,9 +226,13 @@ bool ObstacleDetectionCamera::Process(DataFrame *data_frame) {
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
   for (size_t i = 1; i < camera_names_.size(); ++i) {
-    CameraFrame *frame = (data_frame + i)->camera_frame;
-    frame->camera_k_matrix =
-        name_intrinsic_map_.at(frame->data_provider->sensor_name());
+    if (camera_names_.size() == 2) {
+      continue;
+    } else {
+      CameraFrame *frame = (data_frame + i)->camera_frame;
+      frame->camera_k_matrix =
+      name_intrinsic_map_.at(frame->data_provider->sensor_name());
+    }
   }
   InnerProcess(data_frame);
 

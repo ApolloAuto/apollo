@@ -89,6 +89,7 @@ class SmokeObstacleDetector : public BaseObstacleDetector {
   std::vector<base::ObjectSubType> types_;
   std::vector<float> expands_;
   std::vector<float> anchors_;
+  std::vector<std::string> camera_names_;
 
   SmokeNMSParam nms_;
   cudaStream_t stream_ = nullptr;
