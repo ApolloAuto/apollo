@@ -65,10 +65,10 @@ stage_config: {
 
   cnnseg_config: {
     sensor_name: "velodyne128"
-    param_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_param.conf"
-    proto_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/deploy.prototxt"
-    weight_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/deploy.caffemodel"
-    engine_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe/engine.conf"
+    param_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_param.conf"
+    proto_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_caffe/deploy.prototxt"
+    weight_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_caffe/deploy.caffemodel"
+    engine_file: "/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_caffe/engine.conf"
   }
 }
 

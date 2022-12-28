@@ -353,10 +353,10 @@ function mount_other_volumes() {
     docker_restart_volume "${yolo_volume}" "${yolo_image}" "${yolo_path}"
     volume_conf="${volume_conf} --volume ${yolo_volume}:${yolo_path}"
 
-    #CNNSEG64
+    #CNNSEG128
     local cnnseg_volume="cnnseg_volume_${USER}"
     local cnnseg_image="${DOCKER_REPO}:cnnseg_caffe_model-${TARGET_ARCH}-latest"
-    local cnnseg_path="/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg64_caffe"
+    local cnnseg_path="/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_caffe"
     docker_restart_volume "${cnnseg_volume}" "${cnnseg_image}" "${cnnseg_path}"
     volume_conf="${volume_conf} --volume ${cnnseg_volume}:${cnnseg_path}"
 
