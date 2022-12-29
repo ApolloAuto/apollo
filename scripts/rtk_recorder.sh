@@ -27,14 +27,27 @@ function setup() {
 }
 
 function start() {
+  local rtk_recorder_binary
   TIME="$(date +%F_%H_%M)"
   if [ -f ${TOP_DIR}/data/log/garage.csv ]; then
     cp ${TOP_DIR}/data/log/garage.csv ${TOP_DIR}/data/log/garage-${TIME}.csv
   fi
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"
+  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
+    rtk_recorder_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder"
+  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder ]]; then
+    rtk_recorder_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder
+  else
+    rtk_recorder_binary=
+  fi
+
+  if [[ -z $rtk_recorder_binary ]]; then
+    echo "can't fine rtk_recorder"
+    exit -1
+  fi
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
-    ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder
+    ${rtk_recorder_binary}
   fi
 }
 

@@ -22,6 +22,7 @@ install(
     ], [
         "//cyber:install",
         "//tools:install",
+        "//modules/data:install",
         #"//cyber/examples:install",
         #"//docker/scripts:install",
         #"//docs:install",
@@ -110,6 +111,7 @@ install_src_files(
         "//cyber:install_src",
         "//tools:install_src",
         "//modules/common:install_src",
+        "//modules/data:install_src",
         "//modules/common_msgs:install_src",
         "//modules/control:install_src",
         "//modules/dreamview:install_src",

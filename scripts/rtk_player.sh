@@ -27,12 +27,26 @@ function setup() {
 }
 
 function start() {
+  local rtk_player_binary
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_player" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
     pkill -SIGKILL -f rtk_player
   fi
 
-  ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player
+  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
+    rtk_player_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player"
+  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player ]]; then
+    rtk_player_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player
+  else
+    rtk_player_binary=
+  fi
+
+  if [[ -z ${rtk_player_binary} ]]; then
+    echo "can't fine rtk_player"
+    exit -1
+  fi
+
+  ${rtk_player_binary}
 }
 
 function stop() {

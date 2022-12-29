@@ -2,6 +2,7 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
+load("//tools/install:install.bzl", "install", "install_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -52,5 +53,14 @@ py_proto_library(
         "//modules/control/proto:control_conf_py_pb2",
         "//modules/common_msgs/routing_msgs:routing_py_pb2",
     ],
+)
+
+install_files(
+    name = "py_pb_data",
+    dest = "data/python/modules/data/proto",
+    files = [
+        "static_info_py_pb2",
+        "frame_py_pb2"
+    ]
 )
 

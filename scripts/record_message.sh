@@ -28,8 +28,19 @@ function start() {
 
   REUSE_POOL_DIR="${APOLLO_ROOT_DIR}/data/ReusedRecordsPool"
   TASK_EXE_DIR="${APOLLO_ROOT_DIR}/data/${MODULE}/${TIME}"
-  LOG="${APOLLO_ROOT_DIR}/data/log/smart_recorder.out"
+  LOG_DIR="${APOLLO_ROOT_DIR}/data/log"
+  mkdir -p $LOG_DIR
+  sudo chmod -R 777 $LOG_DIR 
+  LOG="${LOG_DIR}/smart_recorder.out"
   RECORD_EXE="${APOLLO_BIN_PREFIX}/modules/data/tools/${MODULE}/${MODULE}"
+  if [[ ! -f ${RECORD_EXE} ]]; then
+    RECORD_EXE="/opt/apollo/neo/packages/apollo-data-dev/latest/bin/tools/${MODULE}/${MODULE}"
+  fi
+
+  if [[ ! -f ${RECORD_EXE} ]]; then
+    echo "can't fine smart_recorder. Have you installed apollo-data-dev?"
+    exit -1
+  fi
 
   NUM_PROCESSES="$(pgrep -f "smart_recorder" | grep -cv '^1$')"
   if [ "${NUM_PROCESSES}" -ne 0 ]; then
