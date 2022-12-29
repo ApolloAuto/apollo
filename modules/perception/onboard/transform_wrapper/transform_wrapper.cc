@@ -37,6 +37,7 @@ DEFINE_double(obs_max_local_pose_extrapolation_latency, 0.15,
               "max local pose extrapolation period in second");
 DEFINE_bool(obs_enable_local_pose_extrapolation, true,
             "use local pose extrapolation");
+DEFINE_bool(hardware_trigger, true, "camera trigger method");
 
 void TransformCache::AddTransform(const StampedTransform& transform) {
   if (transforms_.empty()) {
@@ -251,9 +252,27 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  static_cast<float>(FLAGS_obs_tf2_buff_size),
                                  &err_string)) {
+    apollo::transform::TransformStamped latest_transform;
+    double latest_buffer_time;
+    if (!FLAGS_hardware_trigger) {
+      try {
+        latest_transform = tf2_buffer_->lookupTransform(
+            frame_id, child_frame_id, apollo::cyber::Time(0));
+        latest_buffer_time = latest_transform.header().timestamp_sec();
+      } catch (tf2::TransformException& ex) {
+        AERROR << ex.what();
+        return false;
+      }
+    }
     // In simulation mode, use the latest transform information if query failed.
     if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
       query_time = cyber::Time(0);
+    } else if (!FLAGS_hardware_trigger &&
+               (timestamp - latest_buffer_time < 0.015) &&
+               (timestamp - latest_buffer_time > 0)) {
+      // soft trigger and the latency is within the tolerance range
+      // still lookup by timestamp
+      // query_time = apollo::cyber::Time(0);
     } else {
       AERROR << "Can not find transform. " << FORMAT_TIMESTAMP(timestamp)
              << " frame_id: " << frame_id

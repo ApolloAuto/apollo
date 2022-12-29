@@ -35,6 +35,7 @@ DECLARE_string(obs_sensor2novatel_tf2_frame_id);
 DECLARE_string(obs_novatel2world_tf2_frame_id);
 DECLARE_string(obs_novatel2world_tf2_child_frame_id);
 DECLARE_double(obs_tf2_buff_size);
+DECLARE_bool(hardware_trigger);
 
 struct StampedTransform {
   double timestamp = 0.0;  // in second
