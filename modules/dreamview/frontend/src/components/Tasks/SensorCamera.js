@@ -7,9 +7,9 @@ import './style.scss';
 export class CameraVideo extends React.Component {
   render() {
     return (
-            <div className="camera-video">
-                <img src={this.props.imageSrcData}  alt={'camera sensor'}/>
-            </div>
+      <div className="camera-video">
+        <img src={this.props.imageSrcData} alt={'camera sensor'} />
+      </div>
     );
   }
 }
@@ -50,29 +50,29 @@ export default class SensorCamera extends React.Component {
       hmi,
     } = this.props.store;
     return (
-            <div className="card camera">
-                <div className="card-header"><span>Camera View</span>
-                  <span className='camera_view_channel_select'>
-                     <span className="arrow" />
-                    <select
-                      value={hmi.currentCameraSensorChannel}
-                      onChange={this.onStatusSelectChange}
-                    >
-                       <option key={'select—Ïchannel'} value={''}>- select channel -</option>
-                      {
-                        this.state.channels.map((channel) => {
-                          return (
-                            <option key={channel} value={channel}>{channel}</option>
-                          );
-                        })
-                      }
-                    </select>
-                  </span>
-                </div>
-                <div className="card-content-column">
-                    <CameraVideo imageSrcData={cameraData.imageSrcData}/>
-                </div>
-            </div>
+      <div className="card camera">
+        <div className="card-header"><span>Camera View</span>
+          <span className='camera_view_channel_select'>
+            <span className="arrow" />
+            <select
+              value={hmi.currentCameraSensorChannel}
+              onChange={this.onStatusSelectChange}
+            >
+              <option key={'select—Ïchannel'} value={''}>- select channel -</option>
+              {
+                this.state.channels?.map((channel) => {
+                  return (
+                    <option key={channel} value={channel}>{channel}</option>
+                  );
+                })
+              }
+            </select>
+          </span>
+        </div>
+        <div className="card-content-column">
+          <CameraVideo imageSrcData={cameraData.imageSrcData} />
+        </div>
+      </div>
     );
   }
 }
