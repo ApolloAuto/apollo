@@ -600,6 +600,7 @@ body {
     overflow: hidden;
 
     .monitor-item {
+      color: #fff;
       @include monitor-item-common-properties(calc(100% - 82px));
     }
   }
@@ -766,6 +767,7 @@ body {
       white-space: pre-wrap;
 
       .monitor-item {
+        color: #fff;
         @include monitor-item-common-properties(calc(100% - 80px));
       }
     }
@@ -2198,6 +2200,7 @@ body {
 
 .guide-text {
   .pane-text {
+    color: #fff;
     font-size: 15px;
     text-indent: 30px;
     //padding:10px;
@@ -2219,6 +2222,7 @@ body {
 }
 
 .sensor-configuration-table {
+  color: #fff;
   //margin:20px;
   .camera-message {
     margin-left: 22px;
@@ -2226,6 +2230,7 @@ body {
   }
 
   .sensor-configuration-tr {
+    color: #fff;
     //padding:10px;
     margin-left: 20px;
     margin-top: 10px;
@@ -2247,6 +2252,10 @@ body {
       padding: 5px 15px 0 0;
       //padding-right:20px;
     }
+  }
+
+  input {
+    color: #000;
   }
 }
 
@@ -2284,6 +2293,7 @@ body {
   overflow: hidden;
 
   .monitor-item {
+    color: #fff;
     @include monitor-item-common-properties(calc(100% - 82px));
   }
 }
