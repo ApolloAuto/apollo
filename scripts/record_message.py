@@ -37,6 +37,8 @@ import sys
 
 import psutil
 
+from pathlib import Path
+
 
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
@@ -126,17 +128,32 @@ class Recorder(object):
         which will be cleared every time the smart recorder get started.
         Meanwhile, restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
         """
+        flags_package_management = False
         reuse_pool_dir = os.path.join(disk, 'data', 'ReusedRecordsPool')
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/smart_recorder', task_id)
         print('Recording bag to {}'.format(task_dir))
+        log_dir = '/apollo/data/log'
+        if not Path(log_dir).exists():
+            os.makedirs(log_dir, exist_ok=True)
         log_file = '/apollo/data/log/smart_recorder.out'
         recorder_exe = '/apollo/bazel-bin/modules/data/tools/smart_recorder/smart_recorder'
-        cmd = '''
-            source /apollo/scripts/apollo_base.sh
-            source /apollo/cyber/setup.bash
+        if not Path(recorder_exe).exists():
+            flags_package_management = True
+        recorder_exe = "/opt/apollo/neo/packages/apollo-data-dev/latest/bin/tools/smart_recorder/smart_recorder"
+        if not Path(recorder_exe).exists():
+            print("can't find smart_recorder! Have you installed apollo-data-dev package or built it?")
+            exit(-1)
+        if not flags_package_management:
+            cmd = '''
+                source /apollo/scripts/apollo_base.sh
+                source /apollo/cyber/setup.bash
+                nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
+            '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
+        else:
+            cmd = '''
             nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
-        '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
+            '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
         shell_cmd(cmd)
 
     @staticmethod

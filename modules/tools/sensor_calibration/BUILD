@@ -15,14 +15,14 @@ install(
         ":odom_publisher",
         ":sanity_check",
     ],
-    #deps = ["//modules/tools/sensor_calibration/config:install"]
+    deps = ["//modules/tools/sensor_calibration/config:install"]
 
 )
 
 filegroup(
     name = "runtime_files",
     srcs = glob([
-        "config/**",
+        #"config/**",
         "template/**",
         "*.py",
         "*.sh",

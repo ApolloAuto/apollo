@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "smart_recorder",
     srcs = ["smart_recorder.cc"],
+    linkstatic = True,
     deps = [
         ":post_record_processor",
         ":realtime_record_processor",

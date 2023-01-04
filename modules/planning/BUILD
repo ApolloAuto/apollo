@@ -199,7 +199,8 @@ install(
     deps = [
         ":pb_planning",
         ":planning_testdata_install",
-        "//modules/planning/proto:py_pb_planning"
+        "//modules/planning/proto:py_pb_planning",
+        "//modules/planning/proto:pb_hdrs_planning",
     ],
 )
 

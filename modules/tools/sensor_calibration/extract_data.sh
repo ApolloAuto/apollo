@@ -227,7 +227,7 @@ function main() {
 
   set -e
 
-  local extract_data_bin="/opt/apollo/packages/tools-dev/latest/sensor_calibration/extract_data"
+  local extract_data_bin="/opt/apollo/neo/packages/tools-dev/latest/sensor_calibration/extract_data"
   
   if [[ ! -f "${extract_data_bin}" ]];then
     extract_data_bin="${TOP_DIR}/bazel-bin/modules/tools/sensor_calibration/extract_data"

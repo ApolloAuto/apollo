@@ -32,6 +32,8 @@ filegroup(
         "msf_simple_map_creator.sh",
         "rtk_player.sh",
         "rtk_recorder.sh",
+        "record_message.py",
+        "record_message.sh",
     ],
 )
 

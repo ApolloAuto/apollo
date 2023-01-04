@@ -227,6 +227,12 @@ function run_install() {
         -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
 }
 
+function export_python_path() {
+    if [ `grep -c /opt/apollo/neo/packages/python-support/local ~/.bashrc` -ne 0 ]; then 
+        echo '\nexport PYTHONPATH=/opt/apollo/neo/packages/python-support/local:$PYTHONPATH' >> ~/.bashrc
+    fi
+}
+
 function main() {
     parse_cmdline_args "$@"
 
@@ -259,6 +265,8 @@ function main() {
         generate_apt_pkgs
         ok "Done. Packages list has been writen to ${PKGS_TXT}"
     fi
+    
+    export_python_path
 
     # generate_py_packages
     # resolve_directory_path

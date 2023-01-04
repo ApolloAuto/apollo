@@ -44,9 +44,11 @@ install(
     ],
     targets = [
         ":libstorytelling_component.so",
-        ":pb_hdrs",
         "//modules/storytelling/proto:py_pb_storytelling"
     ],
+    deps = [
+        ":pb_hdrs",
+    ]
 )
 
 install(
