@@ -77,7 +77,8 @@ install(
         ":testdata",
         "//modules/control/submodules:install",
         "//modules/control/tools:install",
-        "//modules/control/proto:py_pb_control"
+        "//modules/control/proto:py_pb_control",
+        "//modules/control/common:install"
     ],
 )
 

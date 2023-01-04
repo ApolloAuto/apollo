@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,9 +18,20 @@ cc_library(
 
 cc_library(
     name = "hysteresis_filter",
-    srcs = ["hysteresis_filter.cc"],
+    srcs = ["libhysteresis_filter.so"],
     hdrs = ["hysteresis_filter.h"],
     copts = CONTROL_COPTS,
+)
+
+cc_binary(
+    name = "libhysteresis_filter.so",
+    srcs = [
+        "hysteresis_filter.cc",
+        "hysteresis_filter.h",
+    ],
+    linkshared = True,
+    linkstatic = True,
+    #copts = CONTROL_COPTS,
 )
 
 cc_library(
@@ -260,6 +272,14 @@ cc_library(
     hdrs = ["dependency_injector.h"],
     deps = [
         "//modules/common/vehicle_state:vehicle_state_provider",
+    ],
+)
+
+install(
+    name = "install",
+    library_dest = "control/lib",
+    targets = [
+        ":libhysteresis_filter.so",
     ],
 )
 

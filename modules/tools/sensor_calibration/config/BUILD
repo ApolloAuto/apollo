@@ -6,7 +6,8 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "*.yaml",
-        "*.config"
+        "*.config",
+        "init_params/*"
     ]),
 )
 

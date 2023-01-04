@@ -4,7 +4,7 @@ cc_library(
     name = "control",
     includes = ["include"],
     hdrs = glob(["include/**/*.h"]),
-    srcs = glob(["lib/**/*.so*"]),
+    srcs = glob(["lib/**/lib*.so*"]),
     include_prefix = "modules/control",
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
