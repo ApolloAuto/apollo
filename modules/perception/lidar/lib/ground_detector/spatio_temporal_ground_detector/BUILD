@@ -7,7 +7,6 @@ cc_library(
     name = "spatio_temporal_ground_detector",
     srcs = ["spatio_temporal_ground_detector.cc"],
     hdrs = ["spatio_temporal_ground_detector.h"],
-    copts = ["-msse4.1"],
     deps = [
         "//cyber",
         "//modules/perception/base",
