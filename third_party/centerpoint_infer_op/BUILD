@@ -6,9 +6,9 @@ package(
 
 install(
     name = "install_lib",
-    data = [
-        ":libpd_infer_custom_op.so",
-    ],
+    data = glob([
+        "lib*.so",
+    ]),
     data_dest = "3rd-centerpoint-infer-op/lib",
 )
 

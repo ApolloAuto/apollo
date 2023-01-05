@@ -7,9 +7,9 @@ package(
 install(
     name = "install_lib",
     data_dest = "3rd-caddn-infer-op/lib",
-    data = [
-        ":libcaddn_infer_custom_op.so"
-    ]
+    data = glob([
+        "lib*.so"
+    ])
 )
 
 install(
