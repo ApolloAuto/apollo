@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 #include "modules/perception/base/blob.h"
 
 namespace apollo {

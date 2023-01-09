@@ -33,6 +33,15 @@ ObstacleDetector::ObstacleDetector(const std::string &net_file,
                                    model_file_(model_file),
                                    output_names_(outputs) {}
 
+ObstacleDetector::ObstacleDetector(const std::string &net_file,
+                                   const std::string &model_file,
+                                   const std::vector<std::string> &outputs,
+                                   const std::vector<std::string> &inputs):
+                                   net_file_(net_file),
+                                   model_file_(model_file),
+                                   output_names_(outputs),
+                                   input_names_(inputs) {}
+
 bool ObstacleDetector::Init(const std::map<std::string,
                             std::vector<int>> &shapes) {
   if (gpu_id_ >= 0) {
@@ -75,8 +84,6 @@ bool ObstacleDetector::Init(const std::map<std::string,
   torch::Tensor tensor_K = torch::from_blob(K.data(), {1, 3, 3});
 
   std::vector<torch::jit::IValue> torch_inputs;
-  // torch_inputs.push_back(std::make_tuple(input_feature_tensor.to(device),
-  //                       tensor_downratio.to(device)));
   torch_inputs.push_back(input_feature_tensor.to(device));
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_downratio.to(device)));
@@ -90,20 +97,22 @@ bool ObstacleDetector::Init(const std::map<std::string,
   return true;
 }
 
-ObstacleDetector::ObstacleDetector(const std::string &net_file,
-                   const std::string &model_file,
-                   const std::vector<std::string> &outputs,
-                   const std::vector<std::string> &inputs):
-                   net_file_(net_file), model_file_(model_file),
-                   output_names_(outputs), input_names_(inputs) {}
-
-std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(
-    const std::string &name) {
+BlobPtr ObstacleDetector::get_blob(const std::string &name) {
   auto iter = blobs_.find(name);
   if (iter == blobs_.end()) {
     return nullptr;
   }
   return iter->second;
+}
+
+bool ObstacleDetector::shape(const std::string &name, std::vector<int> *res) {
+  auto blob = get_blob(name);
+  if (blob == nullptr) {
+    return false;
+  }
+
+  *res = blob->shape();
+  return true;
 }
 
 void ObstacleDetector::Infer() {
@@ -126,15 +135,6 @@ void ObstacleDetector::Infer() {
                     torch::kFloat32);
 
   std::vector<torch::jit::IValue> torch_inputs;
-  // todo(zero): need to delete, move out
-  // tensor_image = tensor_image.to(device);
-  // tensor_image = tensor_image.permute({0, 3, 1, 2}).contiguous();
-
-  // AINFO << tensor_image[0][0].sizes();
-  // tensor_image[0][0] = tensor_image[0][0].div_(58.395);
-  // tensor_image[0][1] = tensor_image[0][1].div_(57.12);
-  // tensor_image[0][2] = tensor_image[0][2].div_(57.375);
-
   torch_inputs.push_back(tensor_image.to(device));
   torch_inputs.push_back(std::make_tuple(tensor_K.to(device),
                                          tensor_ratio.to(device)));
@@ -143,12 +143,15 @@ void ObstacleDetector::Infer() {
   auto outputs = net_.forward(torch_inputs).toTuple()->elements();
   AINFO << "Finished inference";
 
-  for (u_int i = 0; i < output_names_.size(); i++) {
-    torch::Tensor output_tensor = outputs[i].toTensor();
-    std::vector<int64_t> output_size_ = output_tensor.sizes().vec();
-    std::vector<int> output_size(begin(output_size_), end(output_size_));
-    blobs_[output_names_[i]]->Reshape(output_size);
-    blobs_[output_names_[i]]->set_gpu_data(output_tensor.data_ptr<float>());
+  for (size_t i = 0; i < output_names_.size(); ++i) {
+    auto blob = get_blob(output_names_[i]);
+    if (blob != nullptr) {
+      torch::Tensor output_tensor = outputs[i].toTensor();
+      std::vector<int64_t> output_size_ = output_tensor.sizes().vec();
+      std::vector<int> output_size(begin(output_size_), end(output_size_));
+      blob->Reshape(output_size);
+      blob->set_gpu_data(output_tensor.data_ptr<float>());
+    }
   }
 }
 

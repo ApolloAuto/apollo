@@ -30,9 +30,11 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
 class ObstacleDetector : public Inference {
+ public:
+  using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
+
  public:
   ObstacleDetector(const std::string &net_file, const std::string &model_file,
            const std::vector<std::string> &outputs);
