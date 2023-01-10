@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <deque>
 #include <functional>
 #include <map>
 #include <utility>
@@ -31,8 +32,15 @@ namespace common {
 template <class EigenType>
 using EigenVector = std::vector<EigenType, Eigen::aligned_allocator<EigenType>>;
 
+template <class EigenType>
+using EigenDeque = std::deque<EigenType, Eigen::aligned_allocator<EigenType>>;
+
 template <typename T, class EigenType>
 using EigenMap = std::map<T, EigenType, std::less<T>,
+    Eigen::aligned_allocator<std::pair<const T, EigenType>>>;
+
+template <typename T, class EigenType>
+using EigenMultiMap = std::multimap<T, EigenType, std::less<T>,
     Eigen::aligned_allocator<std::pair<const T, EigenType>>>;
 
 using EigenVector3dVec = EigenVector<Eigen::Vector3d>;

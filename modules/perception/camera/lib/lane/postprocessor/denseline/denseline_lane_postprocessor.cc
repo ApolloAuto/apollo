@@ -17,17 +17,20 @@
 
 #include <algorithm>
 
+#include "modules/perception/pipeline/proto/stage/denseline.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
-#include "modules/perception/pipeline/proto/stage/denseline.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 using cyber::common::GetAbsolutePath;
+using apollo::common::EigenVector;
 
 bool DenselineLanePostprocessor::Init(
     const LanePostprocessorInitOptions& options) {
@@ -698,7 +701,7 @@ void DenselineLanePostprocessor::AddImageLaneline(
     return;
   }
   base::LaneLine lane_mark;
-  std::vector<Eigen::Matrix<float, 2, 1>> img_pos_vec(image_point_set_size);
+  EigenVector<Eigen::Matrix<float, 2, 1>> img_pos_vec(image_point_set_size);
   Eigen::Matrix<float, max_poly_order + 1, 1> img_coeff;
   bool is_x_axis = false;
   float r_start = -1;
@@ -775,7 +778,7 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     float x_start = camera_point_set[0].z;
     float x_end = 0.0f;
     Eigen::Matrix<float, max_poly_order + 1, 1> camera_coeff;
-    std::vector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
     for (int i = 0; i < static_cast<int>(camera_point_set.size()); i++) {
       x_end = std::max(camera_point_set[i].z, x_end);
       x_start = std::min(camera_point_set[i].z, x_start);

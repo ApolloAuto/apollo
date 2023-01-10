@@ -27,6 +27,9 @@ namespace lidar {
 
 class Bitmap2D {
  public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   enum class DirectionMajor { XMAJOR = 0, YMAJOR = 1 };
   typedef Eigen::Matrix<size_t, 2, 1> Vec2ui;
   typedef Eigen::Matrix<size_t, 3, 1> Vec3ui;

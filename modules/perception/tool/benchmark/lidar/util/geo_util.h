@@ -123,6 +123,8 @@ struct VisPoint {
   inline float length_squared() const { return x() * x() + y() * y(); }
 
   Eigen::Vector2f point;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 struct Segment {

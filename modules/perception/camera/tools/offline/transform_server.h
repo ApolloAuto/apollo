@@ -22,6 +22,8 @@
 
 #include "Eigen/Geometry"
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -65,6 +67,8 @@ class TransformServer {
     std::string child_frame_id;
     std::string frame_id;
     Eigen::Affine3d transform;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
   std::vector<Transform> tf_;
@@ -74,7 +78,7 @@ class TransformServer {
   std::set<std::string> vertices_;
 
   // multimap from child frame id to frame id
-  std::multimap<std::string, Edge> edges_;
+  apollo::common::EigenMultiMap<std::string, Edge> edges_;
 
   bool FindTransform(const std::string &child_frame_id,
                      const std::string &frame_id, Eigen::Affine3d *transform,

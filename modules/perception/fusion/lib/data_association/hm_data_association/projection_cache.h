@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 
@@ -87,6 +88,10 @@ class ProjectionCacheFrame {
 
 // @brief: project cache
 class ProjectionCache {
+ public:
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
  public:
   ProjectionCache() : measurement_sensor_id_(""), measurement_timestamp_(0.0) {
     // 300,000 pts is 2 times of the size of point cloud of ordinary frame of
@@ -181,7 +186,7 @@ class ProjectionCache {
   std::string measurement_sensor_id_;
   double measurement_timestamp_;
   // project cache memeory
-  std::vector<Eigen::Vector2d> point2ds_;
+  EigenVector<Eigen::Vector2d> point2ds_;
   // cache reference on frames
   std::vector<ProjectionCacheFrame> frames_;
 };  // class ProjectionCache

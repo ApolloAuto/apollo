@@ -356,7 +356,7 @@ bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
 // to decide CIPV.
 bool Cipv::FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
                                    const EgoLane &egolane_ground,
-                                   const Eigen::Affine3d world2camera,
+                                   const Eigen::Affine3d &world2camera,
                                    LineSegment2Df *closted_object_edge,
                                    float *distance) {
   if (debug_level_ >= 2) {
@@ -723,7 +723,7 @@ bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
 // l_lane     r_lane
 bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                    const EgoLane &egolane_ground,
-                                   const Eigen::Affine3d world2camera,
+                                   const Eigen::Affine3d &world2camera,
                                    const bool b_virtual,
                                    float *object_distance) {
   LineSegment2Df closted_object_edge;
@@ -839,7 +839,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
 bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground,
-                             const Eigen::Affine3d world2camera,
+                             const Eigen::Affine3d &world2camera,
                              const bool b_virtual, float *distance) {
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);

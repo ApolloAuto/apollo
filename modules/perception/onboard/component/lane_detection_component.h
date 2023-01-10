@@ -45,8 +45,6 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/motion_service.pb.h"
 
-using apollo::common::EigenMap;
-using apollo::common::EigenVector;
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
 
@@ -61,6 +59,12 @@ typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
 
  public:
   LaneDetectionComponent() : seq_num_(0) {}

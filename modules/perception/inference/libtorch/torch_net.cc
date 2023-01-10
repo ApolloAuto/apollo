@@ -65,7 +65,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   return true;
 }
 
-BlobPtr TorchNet::get_blob(const std::string &name) {
+std::shared_ptr<Blob<float>> TorchNet::get_blob(const std::string &name) {
   auto iter = blobs_.find(name);
   if (iter == blobs_.end()) {
     return nullptr;
@@ -124,7 +124,7 @@ void TorchNet::Infer() {
   for (size_t i = 0; i < output_names_.size(); ++i) {
     auto blob = get_blob(output_names_[i]);
     if (blob != nullptr && i < output.size()) {
-      std::vector<int64_t> output_size = output[i].size().vec();
+      std::vector<int64_t> output_size = output[i].sizes().vec();
       std::vector<int> shape(output_size.begin(), output_size.end());
       blob->Reshape(shape);
       blob->set_gpu_data(output[i].data_ptr<float>());

@@ -26,6 +26,8 @@ namespace lidar {
 struct GroundNode {
   Eigen::Vector4f params;
   float confidence = 0.f;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 class GroundGrid {

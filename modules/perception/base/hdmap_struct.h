@@ -35,7 +35,7 @@ struct alignas(16) LaneBoundary {
   PointCloud<PointD> right_boundary;
 };
 
-struct alignas(16) HdmapStruct {
+struct HdmapStruct {
   apollo::common::EigenVector<RoadBoundary> road_boundary;
   apollo::common::EigenVector<PointCloud<PointD>> road_polygons;
   apollo::common::EigenVector<PointCloud<PointD>> hole_polygons;

@@ -21,8 +21,6 @@
 #include <utility>
 #include <vector>
 
-#include "Eigen/Dense"
-
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"
 

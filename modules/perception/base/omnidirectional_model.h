@@ -55,13 +55,6 @@ class OmnidirectionalCameraDistortionModel : public BaseCameraDistortionModel {
   float affine_[3];  // c, d, e
 };
 
-/* TODO(all): to remove
-typedef std::shared_ptr<OmnidirectionalCameraDistortionModel>
-    OmnidirectionalCameraDistortionModelPtr;
-typedef std::shared_ptr<const OmnidirectionalCameraDistortionModel>
-    OmnidirectionalCameraDistortionModelConstPtr;
-*/
-
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo

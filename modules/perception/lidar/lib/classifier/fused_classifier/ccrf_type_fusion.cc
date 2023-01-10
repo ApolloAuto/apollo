@@ -28,9 +28,6 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::EigenMap;
-using apollo::common::EigenVector;
-
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::base::ObjectType;

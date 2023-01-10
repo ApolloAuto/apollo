@@ -19,6 +19,7 @@
 #include <string>
 
 #include "cyber/common/macros.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
 #include "modules/perception/lib/registerer/registerer.h"
@@ -34,7 +35,7 @@ struct CalibrationServiceInitOptions : public BaseInitOptions {
   double timestamp = 0;
   std::string calibrator_working_sensor_name = "";
   std::string calibrator_method = "";
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map;
 };
 
 struct CalibrationServiceOptions {};

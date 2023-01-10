@@ -137,7 +137,7 @@ bool UndistortionHandler::Release(void) {
 
 void UndistortionHandler::InitUndistortRectifyMap(
     const Eigen::Matrix3f &camera_model,
-    const Eigen::Matrix<float, 5, 1> distortion, const Eigen::Matrix3f &R,
+    const Eigen::Matrix<float, 5, 1> &distortion, const Eigen::Matrix3f &R,
     const Eigen::Matrix3f &new_camera_model, int width, int height,
     base::Blob<float> *d_mapx, base::Blob<float> *d_mapy) {
   float fx = camera_model(0, 0);

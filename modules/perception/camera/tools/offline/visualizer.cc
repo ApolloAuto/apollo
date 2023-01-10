@@ -57,10 +57,11 @@ std::map<base::LaneLinePositionType, cv::Scalar> colormapline = {
     {base::LaneLinePositionType::CURB_LEFT, cyan_color},
     {base::LaneLinePositionType::CURB_RIGHT, yellow_color}};
 
-Eigen::Matrix3d Camera2CarHomograph(Eigen::Matrix3d intrinsic,
-                                    Eigen::Matrix4d extrinsic_camera2lidar,
-                                    Eigen::Matrix4d extrinsic_lidar2imu,
-                                    double pitch_adj) {
+Eigen::Matrix3d Camera2CarHomograph(
+    const Eigen::Matrix3d &intrinsic,
+    const Eigen::Matrix4d &extrinsic_camera2lidar,
+    const Eigen::Matrix4d &extrinsic_lidar2imu,
+    double pitch_adj) {
   AINFO << "intrinsic parameter of camera: " << intrinsic;
   AINFO << "extrinsic parameter of camera to lidar: " << extrinsic_camera2lidar;
   AINFO << "extrinsic parameter of lidar to imu: " << extrinsic_lidar2imu;
@@ -1166,8 +1167,8 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       Eigen::Matrix3d rotate_ry;
       rotate_ry << cos(theta), 0, sin(theta), 0, 1, 0, -sin(theta), 0,
           cos(theta);
-      std::vector<Eigen::Vector3d> p(8);
-      std::vector<Eigen::Vector3d> proj(8);
+      apollo::common::EigenVector<Eigen::Vector3d> p(8);
+      apollo::common::EigenVector<Eigen::Vector3d> proj(8);
       std::vector<cv::Point> p_proj(8);
       p[0] << object->size(0) * 0.5, object->size(2) * 0.5,
           object->size(1) * 0.5;
@@ -1533,7 +1534,7 @@ Eigen::Vector2d Visualizer::image2ground(const std::string &camera_name,
   return p_ground.block(0, 0, 2, 1);
 }
 cv::Point Visualizer::ground2image(const std::string &camera_name,
-                                   Eigen::Vector2d p_ground) {
+                                   const Eigen::Vector2d &p_ground) {
   Eigen::Vector3d p_homo;
 
   p_homo << p_ground(0), p_ground(1), 1;

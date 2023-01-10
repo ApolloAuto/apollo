@@ -42,6 +42,8 @@
 namespace apollo {
 namespace perception {
 namespace onboard {
+
+using apollo::common::EigenMap;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 using ::apollo::cyber::Clock;

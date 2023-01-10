@@ -22,14 +22,14 @@
 
 #include <limits>
 
-#include "modules/common/util/eigen_defs.h"
-
 namespace apollo {
 namespace perception {
 namespace fusion {
 
+using apollo::common::EigenVector;
+
 void GetObjectEightVertices(std::shared_ptr<const base::Object> obj,
-                            std::vector<Eigen::Vector3d>* vertices) {
+                            EigenVector<Eigen::Vector3d>* vertices) {
   vertices->clear();
   vertices->resize(8);
   Eigen::Vector3d center = obj->center;
@@ -73,7 +73,7 @@ bool IsObjectEightVerticesAllBehindCamera(
     const std::shared_ptr<const base::Object>& obj,
     const Eigen::Matrix4d& world2camera_pose,
     base::BaseCameraModelPtr camera_model) {
-  std::vector<Eigen::Vector3d> vertices(8);
+  EigenVector<Eigen::Vector3d> vertices(8);
   GetObjectEightVertices(obj, &vertices);
   Eigen::Vector2d pt2d;
   for (const auto& vertice : vertices) {
@@ -138,9 +138,9 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   } else if (obj_width > kFloatEpsilon && obj_height > kFloatEpsilon &&
              obj_length > kFloatEpsilon) {
     // use object box
-    std::vector<Eigen::Vector3d> box3d_vs(8);
+    EigenVector<Eigen::Vector3d> box3d_vs(8);
     GetObjectEightVertices(sensor_object->GetBaseObject(), &box3d_vs);
-    std::vector<Eigen::Vector2f> box2d_vs;
+    EigenVector<Eigen::Vector2f> box2d_vs;
     box2d_vs.reserve(box3d_vs.size());
     for (const auto& box3d_v : box3d_vs) {
       Eigen::Vector2d pt2d;

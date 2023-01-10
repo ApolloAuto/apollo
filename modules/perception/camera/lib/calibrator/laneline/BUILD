@@ -18,6 +18,7 @@ cc_library(
     name = "lane_struct_for_calib",
     hdrs = ["lane_struct_for_calib.h"],
     deps = [
+        "//modules/common/util:util_tool",
         "@eigen",
     ],
 )

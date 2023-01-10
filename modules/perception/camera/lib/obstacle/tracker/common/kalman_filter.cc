@@ -34,7 +34,7 @@ KalmanFilterConstVelocity::KalmanFilterConstVelocity() {
   inited_ = false;
 }
 
-void KalmanFilterConstVelocity::Init(Eigen::VectorXd x) {
+void KalmanFilterConstVelocity::Init(const Eigen::VectorXd &x) {
   state_ << x(0), x(1), 0, 0;
   inited_ = true;
 }
@@ -93,7 +93,7 @@ void ExtendedKalmanFilter::Init() {
   inited_ = false;
 }
 
-void ExtendedKalmanFilter::Init(Eigen::VectorXd x) {
+void ExtendedKalmanFilter::Init(const Eigen::VectorXd &x) {
   Init();
   state_ << x(0), x(1), 0, x(2);
   inited_ = true;

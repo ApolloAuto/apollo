@@ -16,10 +16,13 @@
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_io.h"
 
 #include "absl/strings/str_split.h"
+#include "modules/common/util/eigen_defs.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
+using apollo::common::EigenVector;
 
 bool ParseOneLaneLine(const std::string &s, LaneLine *lane_line) {
   assert(lane_line != nullptr);
@@ -115,7 +118,7 @@ bool LoadLaneDet(const std::string &filename, EgoLane *ego_lane) {
 bool LoadCamera2WorldTfs(const std::string &filename,
                          std::vector<std::string> *frame_list,
                          std::vector<double> *time_stamps,
-                         std::vector<Eigen::Matrix4d> *camera2world) {
+                         EigenVector<Eigen::Matrix4d> *camera2world) {
   frame_list->clear();
   camera2world->clear();
   std::ifstream fin;

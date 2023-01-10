@@ -134,7 +134,7 @@ bool Frame::load(const std::vector<std::string>& filenames) {
     }
     get_bbox_vertices(gt_objects[i], &gt_objects_box_vertices[i]);
   }
-  auto is_obj_in_roi = [&](const std::vector<Eigen::Vector3d>& vertices,
+  auto is_obj_in_roi = [&](const EigenVector<Eigen::Vector3d>& vertices,
                            const std::vector<PointCloud>& rois) {
     if (vertices.size() < 4) {
       return false;

@@ -22,12 +22,18 @@
 
 #include "Eigen/Dense"
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 namespace common {
 
 template <class CLOUD_IN_TYPE, class CLOUD_OUT_TYPE>
 class ConvexHull2D {
+ public:
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
  public:
   ConvexHull2D() : in_cloud_(nullptr) {
     points_.reserve(1000.0);
@@ -109,7 +115,7 @@ class ConvexHull2D {
   }
 
  private:
-  std::vector<Eigen::Vector2d> points_;
+  EigenVector<Eigen::Vector2d> points_;
   std::vector<std::size_t> polygon_indices_;
   const CLOUD_IN_TYPE* in_cloud_;
 };

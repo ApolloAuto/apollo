@@ -20,8 +20,10 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/macros.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
+
+#include "cyber/common/macros.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
@@ -44,6 +46,9 @@ namespace camera {
 class ObstacleCameraPerception : public BaseCameraPerception {
  public:
   using CameraDetectionConfig = pipeline::CameraDetectionConfig;
+
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
 
  public:
   ObstacleCameraPerception()
@@ -69,7 +74,7 @@ class ObstacleCameraPerception : public BaseCameraPerception {
       const std::map<std::string, float> &name_camera_ground_height_map,
       const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
       const float &pitch_angle_calibrator_working_sensor);
-  void SetIm2CarHomography(Eigen::Matrix3d homography_im2car);
+  void SetIm2CarHomography(const Eigen::Matrix3d &homography_im2car);
   bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
@@ -84,7 +89,7 @@ class ObstacleCameraPerception : public BaseCameraPerception {
   ObjectTemplateManager *object_template_manager_;
 
  private:
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map_;
   std::map<std::string, std::shared_ptr<BaseObstacleDetector>>
       name_detector_map_;
   std::shared_ptr<BaseObstacleTransformer> transformer_;

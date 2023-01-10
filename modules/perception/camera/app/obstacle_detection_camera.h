@@ -25,6 +25,7 @@
 #include "modules/perception/camera/lib/obstacle/detector/smoke/proto/smoke.pb.h"
 
 #include "cyber/common/macros.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
@@ -49,6 +50,9 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   using CameraDetectionConfig = pipeline::CameraDetectionConfig;
   using StageType = pipeline::StageType;
 
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
+
  public:
   ObstacleDetectionCamera() = default;
   ~ObstacleDetectionCamera() = default;
@@ -68,7 +72,7 @@ class ObstacleDetectionCamera final : public BaseCameraPerception {
   ObjectTemplateManager *object_template_manager_;
 
  private:
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map_;
   std::map<std::string, std::shared_ptr<BaseObstacleDetector>>
       name_detector_map_;
   std::shared_ptr<BaseObstacleTransformer> transformer_;

@@ -105,6 +105,9 @@ cc_library(
 cc_library(
     name = "lane_object",
     hdrs = ["lane_object.h"],
+    deps = [
+        "//modules/common/util:util_tool",
+    ],
 )
 
 cc_library(

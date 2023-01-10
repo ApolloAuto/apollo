@@ -29,7 +29,6 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::EigenVector;
 using apollo::cyber::common::GetAbsolutePath;
 
 template <typename T>

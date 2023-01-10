@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/common/geometry/common.h"
@@ -27,11 +28,13 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
+
 // @brief: get object eight vertices
 // @param [in]: object
 // @param [in/out]: vertices
-void GetObjectEightVertices(std::shared_ptr<const base::Object> obj,
-                            std::vector<Eigen::Vector3d>* vertices);
+void GetObjectEightVertices(
+    std::shared_ptr<const base::Object> obj,
+    apollo::common::EigenVector<Eigen::Vector3d>* vertices);
 
 template <typename VectorType>
 bool IsPtInFrustum(const VectorType& pt, double width, double height) {

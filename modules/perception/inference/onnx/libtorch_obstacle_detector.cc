@@ -97,7 +97,8 @@ bool ObstacleDetector::Init(const std::map<std::string,
   return true;
 }
 
-BlobPtr ObstacleDetector::get_blob(const std::string &name) {
+std::shared_ptr<Blob<float>> ObstacleDetector::get_blob(
+    const std::string &name) {
   auto iter = blobs_.find(name);
   if (iter == blobs_.end()) {
     return nullptr;

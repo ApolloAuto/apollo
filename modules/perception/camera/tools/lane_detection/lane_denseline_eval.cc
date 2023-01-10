@@ -17,6 +17,7 @@
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/common/util/perf_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
@@ -133,7 +134,7 @@ int lane_postprocessor_eval() {
     CalibrationServiceInitOptions calibration_service_init_options;
     calibration_service_init_options.calibrator_working_sensor_name =
         "onsmi_obstacle";
-    std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
+    apollo::common::EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map;
     name_intrinsic_map["onsmi_obstacle"] = frame.camera_k_matrix;
     calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
     calibration_service_init_options.calibrator_method = "LaneLineCalibrator";

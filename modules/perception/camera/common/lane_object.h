@@ -21,6 +21,8 @@
 
 #include "Eigen/Eigen"
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 
@@ -57,18 +59,22 @@ struct LaneLineSimple {
   int type;   // solid, broken, double, zigzag, boundary, implicit
   int color;  // yellow, white
   //    eastl::fixed_vector<Point2Df, MAX_LANE_LINE_POINT> line_point;
-  std::vector<Point2Df> line_point;
+  apollo::common::EigenVector<Point2Df> line_point;
 };
 
 // Line segment by two points
 struct LineSegment2Df {
   Point2Df start_point;
   Point2Df end_point;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 struct VanishingPoint {
   Point2Df vanishing_point;
   float distance_traveled;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 // two lane lines used for camera calibration

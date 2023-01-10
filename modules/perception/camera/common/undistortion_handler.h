@@ -34,7 +34,7 @@ class UndistortionHandler {
   bool set_device(int device);
   bool Init(const std::string &sensor_name, int device);
   void InitUndistortRectifyMap(const Eigen::Matrix3f &camera_model,
-                               const Eigen::Matrix<float, 5, 1> distortion,
+                               const Eigen::Matrix<float, 5, 1> &distortion,
                                const Eigen::Matrix3f &R,
                                const Eigen::Matrix3f &new_camera_model,
                                int width, int height, base::Blob<float> *d_mapx,

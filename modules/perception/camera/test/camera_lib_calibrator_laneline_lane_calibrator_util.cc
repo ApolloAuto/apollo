@@ -14,11 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_calibrator_util.h"  // NOLINT
+
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
+using apollo::common::EigenVector;
 
 // void get_vanishing_row_from_pitch(const float k_mat[9], int image_width,
 //                                   int image_height, float cam_pitch,
@@ -93,7 +97,7 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 
 // void sample_pts_given_sp_ep(const float sp[2], const float ep[2],
 //                             int sample_pts, int width, int height,
-//                             std::vector<Eigen::Vector2f> *pts) {
+//                             EigenVector<Eigen::Vector2f> *pts) {
 //   pts->clear();
 //   assert(sample_pts > 1);
 //   if (sample_pts == 2) {
@@ -128,8 +132,8 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 // void gen_lane_pts(int vanishing_row, int image_width, int image_height,
 //                   int nr_lane_pts_left, int nr_lane_pts_right, float
 //                   pricipal_x,
-//                   float shift_x, std::vector<Eigen::Vector2f> *left_pts,
-//                   std::vector<Eigen::Vector2f> *right_pts) {
+//                   float shift_x, EigenVector<Eigen::Vector2f> *left_pts,
+//                   EigenVector<Eigen::Vector2f> *right_pts) {
 //   assert(shift_x * 2 < image_width);
 //   float v_point[2] = {pricipal_x, static_cast<float>(vanishing_row)};
 //   float left_bottom[2] = {shift_x, static_cast<float>(image_height - 2)};
@@ -147,7 +151,7 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 //                          image_height, right_pts);
 // }
 
-void draw_lane_pts(const std::vector<Eigen::Vector2f> &lane_pts,
+void draw_lane_pts(const EigenVector<Eigen::Vector2f> &lane_pts,
                    const cv::Scalar &color, cv::Mat *image) {
   if (image->rows <= 0 || image->cols <= 0) {
     return;

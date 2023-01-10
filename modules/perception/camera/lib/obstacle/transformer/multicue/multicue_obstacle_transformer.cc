@@ -115,8 +115,9 @@ bool MultiCueObstacleTransformer::Process(DataFrame *data_frame) {
 }
 
 void MultiCueObstacleTransformer::SetObjMapperOptions(
-    base::ObjectPtr obj, Eigen::Matrix3f camera_k_matrix, int width_image,
-    int height_image, ObjMapperOptions *obj_mapper_options, float *theta_ray) {
+    base::ObjectPtr obj, const Eigen::Matrix3f &camera_k_matrix,
+    int width_image, int height_image, ObjMapperOptions *obj_mapper_options,
+    float *theta_ray) {
   // prepare bbox2d
   float bbox2d[4] = {
       obj->camera_supplement.box.xmin, obj->camera_supplement.box.ymin,
@@ -240,7 +241,8 @@ int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
 
 void MultiCueObstacleTransformer::FillResults(
     float object_center[3], float dimension_hwl[3], float rotation_y,
-    Eigen::Affine3d camera2world_pose, float theta_ray, base::ObjectPtr obj) {
+    const Eigen::Affine3d &camera2world_pose, float theta_ray,
+    base::ObjectPtr obj) {
   if (obj == nullptr) {
     return;
   }

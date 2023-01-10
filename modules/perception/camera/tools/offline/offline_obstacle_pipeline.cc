@@ -23,7 +23,9 @@
 #include <opencv2/opencv.hpp>
 
 #include "absl/strings/str_split.h"
+
 #include "cyber/common/file.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -35,8 +37,8 @@
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
 #include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
-#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
@@ -154,7 +156,7 @@ int work() {
   }
 
   // Init intrinsic
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> intrinsic_map;
   auto manager = common::SensorManager::Instance();
   for (const auto &camera_name : camera_names) {
     base::BaseCameraModelPtr model;

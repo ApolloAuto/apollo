@@ -14,16 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
+
 #include <vector>
+
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 
 namespace apollo {
 namespace perception {
 namespace benchmark {
 
+using apollo::common::EigenVector;
+
 // get 8 vertices of the 3D bounding box
 bool get_bbox_vertices(const ObjectConstPtr object,
-                       std::vector<Eigen::Vector3d>* vertices);
+                       EigenVector<Eigen::Vector3d>* vertices);
 
 // fill cloud and indices, using center, width/length/height
 bool fill_objects_with_point_cloud(std::vector<ObjectPtr>* objects,

@@ -36,6 +36,9 @@ class HdmapROIFilter : public BaseROIFilter {
   using DirectionMajor = Bitmap2D::DirectionMajor;
   using PolygonDType = base::PolygonDType;
 
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
  public:
   HdmapROIFilter()
       : BaseROIFilter(),
@@ -60,13 +63,13 @@ class HdmapROIFilter : public BaseROIFilter {
  private:
   void TransformFrame(
       const base::PointFCloudPtr& cloud, const Eigen::Affine3d& vel_pose,
-      const apollo::common::EigenVector<base::PolygonDType*>& polygons_world,
-      apollo::common::EigenVector<base::PolygonDType>* polygons_local,
+      const EigenVector<base::PolygonDType*>& polygons_world,
+      EigenVector<base::PolygonDType>* polygons_local,
       base::PointFCloudPtr* cloud_local);
 
   bool FilterWithPolygonMask(
       const base::PointFCloudPtr& cloud,
-      const apollo::common::EigenVector<base::PolygonDType>& map_polygons,
+      const EigenVector<base::PolygonDType>& map_polygons,
       base::PointIndices* roi_indices);
 
   bool Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
@@ -78,8 +81,8 @@ class HdmapROIFilter : public BaseROIFilter {
   double extend_dist_ = 0.0;
   bool no_edge_table_ = false;
   bool set_roi_service_ = false;
-  apollo::common::EigenVector<base::PolygonDType*> polygons_world_;
-  apollo::common::EigenVector<base::PolygonDType> polygons_local_;
+  EigenVector<base::PolygonDType*> polygons_world_;
+  EigenVector<base::PolygonDType> polygons_local_;
   Bitmap2D bitmap_;
   ROIServiceContent roi_service_content_;
 
