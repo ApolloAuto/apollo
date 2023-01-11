@@ -12,5 +12,5 @@ filegroup(
 install(
     name = "install",
     data = [":runtime_files"],
-    data_dest = "tools/sensor_calibration/config/init_parms"
+    data_dest = "tools/sensor_calibration/config/init_params"
 )
