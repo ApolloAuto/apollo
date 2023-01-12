@@ -145,11 +145,11 @@ DEFINE_string(dynamic_shape_file,
 // bev petr_v1
 DEFINE_string(bev_model_file,
               "/apollo/modules/perception/production/data/perception/camera/"
-              "models/petr_v1/petr_inference.pdmodel",
+              "models/yolo_obstacle_detector/PETR_V1_paddle/petr_inference.pdmodel",
               "The path of bev model file.");
 DEFINE_string(bev_params_file,
               "/apollo/modules/perception/production/data/perception/camera/"
-              "models/petr_v1/petr_inference.pdiparams",
+              "models/yolo_obstacle_detector/PETR_V1_paddle/petr_inference.pdiparams",
               "The path of bev params file.");
 
 // caddn

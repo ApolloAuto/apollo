@@ -7,12 +7,45 @@ The obstacle sub-module detects, classifies and tracks obstacles.
 This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
 For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
-Apollo 7.0 Perception has following new features:
+## Model repository
 
- * **SMOKE: Camera-based Obstacle Detection Model**
- * **Mask-Pillars: Lidar-based Obstacle Detection Model**
+| Model               | Model type               | Model download address                                       |
+| ------------------- | ------------------------ | ------------------------------------------------------------ |
+| PETR_V1_paddle      | bev_detection            | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/petrv1.zip |
+| horizontal_torch    | trafficlight_recognition | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/horizontal_torch.zip |
+| quadrate_torch      | trafficlight_recognition | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/quadrate_torch.zip |
+| vertical_torch      | trafficlight_recognition | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/vertical_torch.zip |
+| denseline_caffe     | lane_detection           | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/denseline_caffe.zip |
+| cnnseg16_caffe      | lidar_3d_segmentation    | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/cnnseg16_caffe.zip |
+| cnnseg64_caffe      | lidar_3d_segmentation    | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/cnnseg64_caffe.zip |
+| center_point_paddle | lidar_3d_detection       | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/center_point_paddle.zip |
+| mask_pillars_torch  | lidar_3d_detection       | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/mask_pillars_torch.zip |
+| point_pillars_torch | lidar_3d_detection       | https://apollo-pkg-beta.cdn.bcebos.com/perception_model/point_pillars_torch.zip |
 
-For more detail about new models, please refer to [Camera Perception in Apollo 7.0](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/camera/README.md) and [Lidar Perception in Apollo 7.0](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/lidar/README.md)
+## Record repository
+| Record name       | Verification                                              | Vehicle configuration      | Map            | Size   | Download address                                             |
+| ----------------- | --------------------------------------------------------- | -------------------------- | -------------- | ------ | ------------------------------------------------------------ |
+| bev_test.tar.xz   | bev_detection                                             | Apollo Perception Test Bev | default        | 1.93GB | https://apollo-pkg-beta.cdn.bcebos.com/perception_record/bev_test.tar.xz |
+| sensor_rgb.tar.xz | camera_detection、lidar_detection、trafficlight_detection | Perception Test V1         | Sunnyvale Loop | 4.4GB  | https://apollo-system.bj.bcebos.com/dataset/6.0_edu/sensor_rgb.tar.xz |
+## Remote installation model
+
+Download and install the model in the remote model warehouse to the local through the model deployment tool, for example, download and install PETR_V1_paddle
+
+```python
+python modules/tools/amodel/amodel.py install https://apollo-pkg-beta.cdn.bcebos.com/perception_model/petrv1.zip
+```
+
+Download record verification model PETR_V1_paddle
+
+```bash
+wget https://apollo-pkg-beta.cdn.bcebos.com/perception_record/bev_test.tar.xz
+```
+
+Unzip the downloaded record
+
+```bash
+tar -xvf bev_test.tar.xz
+```
 
 ## Architecture
 
