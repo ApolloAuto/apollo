@@ -47,6 +47,7 @@ Unzip the downloaded record
 tar -xvf bev_test.tar.xz
 ```
 
+Note: bev_test.tar.xz is only used to test the bev algorithm, it's recommended to download data on nuScenes and make it into a record
 ## Architecture
 
 The general architecture of the perception module is shown:
