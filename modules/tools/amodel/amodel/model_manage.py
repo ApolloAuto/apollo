@@ -25,12 +25,12 @@ import requests
 import shutil
 import zipfile
 
-from model_meta import ModelMeta
+from amodel.model_meta import ModelMeta
 
 # APOLLO_ROOT_DIR
 WORKSPACE_PATH = os.getenv('APOLLO_ROOT_DIR', '/apollo')
 # MODEL_META_FILE_NAME
-MODEL_META_FILE_NAME = "apollo_deploy.yaml"
+MODEL_META_FILE_NAME = "apollo_deploy"
 
 # Install tmp path
 DOWNLOAD_TMP_DIR = "/tmp/"
@@ -54,10 +54,25 @@ FRAMEWORK_ABBREVIATION = {
   "TensorFlow": "tf"}
 
 
+def _jion_meta_file(meta_path):
+  """ Get meta file compatible with different suffixes
+
+  Args:
+      meta_path (_type_): meta path
+
+  Returns:
+      _type_: meta file
+  """
+  meta_file = os.path.join(meta_path, "{}.yaml".format(MODEL_META_FILE_NAME))
+  if not os.path.isfile(meta_file):
+    meta_file = os.path.join(meta_path, "{}.yml".format(MODEL_META_FILE_NAME))
+  return meta_file
+
+
 '''
 amodel_list
 '''
-def get_model_metas(model_install_path):
+def _get_model_metas(model_install_path):
   """Get model metas from path
 
   Args:
@@ -75,13 +90,13 @@ def get_model_metas(model_install_path):
     child_path = os.path.join(model_install_path, model_path)
     if os.path.isdir(child_path):
       model_meta = ModelMeta()
-      meta_file = os.path.join(child_path, MODEL_META_FILE_NAME)
+      meta_file = _jion_meta_file(child_path)
       is_success = model_meta.parse_from(meta_file)
       if is_success:
         model_metas.append(model_meta)
   return model_metas
 
-def get_all_model_metas():
+def _get_all_model_metas():
   """Get all model meta list from model install path(MODEL_INSTALL_PATH)
 
   Returns:
@@ -90,11 +105,11 @@ def get_all_model_metas():
   total_model_metas = []
   for _, model_install_path in MODEL_INSTALL_PATH.items():
     absolute_path = os.path.join(WORKSPACE_PATH, model_install_path)
-    model_metas = get_model_metas(absolute_path)
+    model_metas = _get_model_metas(absolute_path)
     total_model_metas.extend(model_metas)
   return total_model_metas
 
-def display_model_list(model_metas):
+def _display_model_list(model_metas):
   """Display all installed models's info
 
   Args:
@@ -119,14 +134,14 @@ def display_model_list(model_metas):
 def amodel_list():
   """amodel list command
   """
-  total_model_metas = get_all_model_metas()
-  display_model_list(total_model_metas)
+  total_model_metas = _get_all_model_metas()
+  _display_model_list(total_model_metas)
 
 
 '''
 amodel_install
 '''
-def is_url(url_str):
+def _is_url(url_str):
   """Check url_str is url
 
   Args:
@@ -137,7 +152,7 @@ def is_url(url_str):
   """
   return url_str.startswith('https://') or url_str.startswith('http://')
 
-def download_from_url(url):
+def _download_from_url(url):
   """Download file from url
 
   Args:
@@ -155,7 +170,7 @@ def download_from_url(url):
         f.write(chunk)
   return download_file
 
-def unzip_file(file_path, extract_path):
+def _unzip_file(file_path, extract_path):
   """Unzip file_path to extract_path
 
   Args:
@@ -174,7 +189,7 @@ def unzip_file(file_path, extract_path):
     zip_ref.extractall(extract_path)
   return True
 
-def get_install_path_by_meta(model_meta):
+def _get_install_path_by_meta(model_meta):
   """Get model's install path by meta info
 
   Args:
@@ -192,7 +207,7 @@ def get_install_path_by_meta(model_meta):
       file_name)
   return install_path
 
-def install_model(model_meta, extract_path):
+def _install_model(model_meta, extract_path):
   """Move model from extract_path to install_path
 
   Args:
@@ -202,11 +217,11 @@ def install_model(model_meta, extract_path):
   Returns:
       bool: success or not
   """
-  install_path = get_install_path_by_meta(model_meta)
-  logging.debug("install_model: {} -> {}".format(extract_path, install_path))
+  install_path = _get_install_path_by_meta(model_meta)
+  logging.debug("_install_model: {} -> {}".format(extract_path, install_path))
 
   if os.path.isdir(install_path):
-    confirm = user_confirmation(
+    confirm = _user_confirmation(
       "Model already exists!!! Do you want to override {}? [y/n]:".format(
         model_meta.name))
     if confirm:
@@ -228,9 +243,9 @@ def amodel_install(model_path):
     return
 
   # download file
-  if is_url(model_path):
+  if _is_url(model_path):
     try:
-      model_path = download_from_url(model_path)
+      model_path = _download_from_url(model_path)
     except Exception as e:
       print("Download {} failed! {}".format(model_path, e))
       return
@@ -238,14 +253,15 @@ def amodel_install(model_path):
   # unzip model file
   _, tail = os.path.split(model_path)
   model_name = tail.split('.')[0]
-  is_success = unzip_file(model_path, UNZIP_TMP_DIR)
+  is_success = _unzip_file(model_path, UNZIP_TMP_DIR)
   if not is_success:
     print("Zip file {} not found.".format(model_path))
     return
 
   # read meta file
   model_meta = ModelMeta()
-  meta_file = os.path.join(UNZIP_TMP_DIR, model_name, MODEL_META_FILE_NAME)
+  meta_path = os.path.join(UNZIP_TMP_DIR, model_name)
+  meta_file = _jion_meta_file(meta_path)
   is_success = model_meta.parse_from(meta_file)
   if not is_success:
     print("Meta file {} not found!".format(meta_file))
@@ -253,7 +269,7 @@ def amodel_install(model_path):
 
   # install meta file
   extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
-  is_success = install_model(model_meta, extract_path)
+  is_success = _install_model(model_meta, extract_path)
   if is_success:
     print("Successed install {}.".format(model_meta.name))
   else:
@@ -263,7 +279,7 @@ def amodel_install(model_path):
 '''
 amodel_remove
 '''
-def remove_model_from_path(model_meta):
+def _remove_model_from_path(model_meta):
   """Remove model
 
   Args:
@@ -272,14 +288,14 @@ def remove_model_from_path(model_meta):
   Returns:
       bool: success or not
   """
-  install_path = get_install_path_by_meta(model_meta)
+  install_path = _get_install_path_by_meta(model_meta)
   logging.debug(install_path)
   if os.path.isdir(install_path):
     shutil.rmtree(install_path)
     return True
   return False
 
-def user_confirmation(question):
+def _user_confirmation(question):
   """Command line confirmation interaction
 
   Args:
@@ -306,13 +322,13 @@ def amodel_remove(model_name):
   Args:
       model_name (str): the model need to remove
   """
-  total_model_metas = get_all_model_metas()
+  total_model_metas = _get_all_model_metas()
   for model_meta in total_model_metas:
     if model_meta.name == model_name:
-      confirm = user_confirmation(
+      confirm = _user_confirmation(
           "Do you want to remove {}? [y/n]:".format(model_name))
       if confirm:
-        is_success = remove_model_from_path(model_meta)
+        is_success = _remove_model_from_path(model_meta)
         if is_success:
           print("Successed remove {}.".format(model_name))
         else:
@@ -327,7 +343,7 @@ def amodel_remove(model_name):
 '''
 amodel_info
 '''
-def display_model_info(model_meta):
+def _display_model_info(model_meta):
   """Display model info
 
   Args:
@@ -341,10 +357,10 @@ def amodel_info(model_name):
   Args:
       model_name (str): model's name
   """
-  total_model_metas = get_all_model_metas()
+  total_model_metas = _get_all_model_metas()
   for model_meta in total_model_metas:
     if model_meta.name == model_name:
-      display_model_info(model_meta)
+      _display_model_info(model_meta)
       return
   # Not found
   print("Not found {}, Please check if the name is correct.".format(model_name))

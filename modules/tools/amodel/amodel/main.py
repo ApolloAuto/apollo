@@ -23,7 +23,7 @@ import argparse
 import logging
 import sys
 
-from model_manage import (
+from amodel.model_manage import (
   amodel_install,
   amodel_remove,
   amodel_list,

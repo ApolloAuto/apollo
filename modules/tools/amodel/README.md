@@ -1,5 +1,11 @@
 ## amodel
-amodel is Apollo's model deployment and management tool.
+`amodel` is Apollo's model deployment and management tool.
+
+## Install
+You can use below command to install `amodel`.
+```python
+pip3 install -t /opt/apollo/python_tools amodel
+```
 
 ## Set environment
 If you are running in Apollo docker, you can skip this step. If you are running outside of docker, the following environment needs to be set up.
@@ -8,7 +14,7 @@ export APOLLO_ROOT_DIR=your_apollo_dir
 ```
 
 ## How to work
-amodel provides the following commands.
+`amodel` provides the following commands:
 - list. Show models installed in Apollo.
 - info. Show details of a model.
 - install. Install the model to Apollo.
@@ -17,7 +23,7 @@ amodel provides the following commands.
 #### List
 You can get the installed models in Apollo through the `list` command.
 ```shell
-$ % python3 modules/tools/amodel/main.py list
+$ amodel list
 Name                |Task_type           |Sensor_type         |Framework           |Date
 mask_pillars        |3d_detection        |lidar               |paddlepaddle        |2021-07-30
 center_point        |3d_detection        |lidar               |paddlepaddle        |2022-07-22
@@ -36,7 +42,7 @@ tl_recognition      |tl_recognition      |camera              |paddlepaddle     
 #### Info
 Then you can use the `info` command to learn more about the details of the model.
 ```shell
-$ apollo % python3 modules/tools/amodel/main.py info point_pillars
+$ amodel info point_pillars
 name: point_pillars
 date: 2020-12-15
 task_type: 3d_detection
@@ -67,13 +73,13 @@ dataset:
 You can deploy the model using the `install` command.
 ```shell
 # Install from local
-python3 modules/tools/amodel/main.py install xxx.zip
+amodel install xxx.zip
 # Install from http
-python3 modules/tools/amodel/main.py install https://xxx.zip
+amodel install https://xxx.zip
 ```
 
 #### Remove
 You can delete models installed in Apollo with the `remove` command.
 ```shell
-python3 modules/tools/amodel/main.py remove point_pillars
+amodel remove point_pillars
 ```

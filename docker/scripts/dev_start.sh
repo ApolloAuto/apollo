@@ -47,6 +47,12 @@ USER_SPECIFIED_MAPS=
 MAP_VOLUMES_CONF=
 OTHER_VOLUMES_CONF=
 
+# Install python tools
+PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
+DEFAULT_PYTHON_TOOLS=(
+  amodel
+)
+
 DEFAULT_MAPS=(
     sunnyvale_big_loop
     sunnyvale_loop
@@ -211,6 +217,10 @@ function setup_devices_and_mount_local_volumes() {
     if [ -d "${apollo_tools}" ]; then
         volumes="${volumes} -v ${apollo_tools}:/tools"
     fi
+    # Mount PYTHON_INSTALL_PATH to apollo docker
+    if [ -d "${PYTHON_INSTALL_PATH}" ]; then
+        volumes="${volumes} -v ${PYTHON_INSTALL_PATH}:${PYTHON_INSTALL_PATH}"
+    fi
 
     local os_release="$(lsb_release -rs)"
     case "${os_release}" in
@@ -365,7 +375,7 @@ function mount_other_volumes() {
     local lane_detection_image="${DOCKER_REPO}:lane_detection_model-${TARGET_ARCH}-latest"
     local lane_detection_path="/apollo/modules/perception/production/data/perception/camera/models/lane_detector/darkSCNN_caffe"
     docker_restart_volume "${lane_detection_volume}" "${lane_detection_image}" "${lane_detection_path}"
-    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}" 
+    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}"
 
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
@@ -377,6 +387,14 @@ function mount_other_volumes() {
     fi
 
     OTHER_VOLUMES_CONF="${volume_conf}"
+}
+
+function install_python_tools() {
+  export PYTHONUSERBASE=${PYTHON_INSTALL_PATH}
+
+  for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
+    pip3 install --user "${tool}"
+  done
 }
 
 function main() {
@@ -414,6 +432,9 @@ function main() {
     mount_map_volumes
     mount_other_volumes
 
+    info "Install python tools ..."
+    install_python_tools
+
     info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
     local local_host="$(hostname)"
@@ -435,6 +456,7 @@ function main() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${DEV_IMAGE}" \
+        -e PYTHON_INSTALL_PATH="${PYTHON_INSTALL_PATH}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \

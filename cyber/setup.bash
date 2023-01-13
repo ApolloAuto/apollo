@@ -27,6 +27,9 @@ for entry in "${mainboard_path}" \
 done
 
 pathprepend ${bazel_bin_path}/cyber/python/internal PYTHONPATH
+# todo(zero): The python version determines the path and needs to be optimized
+pathprepend "${PYTHON_INSTALL_PATH}/lib/python3.6/site-packages" PYTHONPATH
+pathprepend "${PYTHON_INSTALL_PATH}/bin/" PATH
 
 export CYBER_DOMAIN_ID=80
 export CYBER_IP=127.0.0.1
