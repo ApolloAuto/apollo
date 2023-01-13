@@ -38,14 +38,38 @@ sensor_meta {
     orientation: FRONT
 }
 
-#sensor_meta {
-#    name: "onsemi_wide"
-#    type: MONOCULAR_CAMERA
-#    orientation: FRONT
-#}
+sensor_meta {
+    name: "CAM_FRONT"
+    type: MONOCULAR_CAMERA
+    orientation: FRONT
+}
 
-#sensor_meta {
-#    name: "onsemi_traffic"
-#    type: MONOCULAR_CAMERA
-#    orientation: FRONT
-#}
+sensor_meta {
+    name: "CAM_FRONT_LEFT"
+    type: MONOCULAR_CAMERA
+    orientation: LEFT_FORWARD
+}
+
+sensor_meta {
+    name: "CAM_FRONT_RIGHT"
+    type: MONOCULAR_CAMERA
+    orientation: RIGHT_FORWARD
+}
+
+sensor_meta {
+    name: "CAM_BACK_LEFT"
+    type: MONOCULAR_CAMERA
+    orientation: LEFT_BACKWARD
+}
+
+sensor_meta {
+    name: "CAM_BACK_RIGHT"
+    type: MONOCULAR_CAMERA
+    orientation: RIGHT_BACKWARD
+}
+
+sensor_meta {
+    name: "CAM_BACK"
+    type: MONOCULAR_CAMERA
+    orientation: REAR
+}
