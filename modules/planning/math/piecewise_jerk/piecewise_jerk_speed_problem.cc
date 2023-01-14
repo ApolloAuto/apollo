@@ -97,8 +97,8 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
   for (int i = 0; i < n - 1; ++i) {
-    columns[2 * n + i].emplace_back(2 * n + i + 1,
-                                    -2.0 * weight_dddx_ / delta_s_square /
+    columns[2 * n + i + 1].emplace_back(2 * n + i,
+                                    -1.0 * weight_dddx_ / delta_s_square /
                                         (scale_factor_[2] * scale_factor_[2]));
     ++value_index;
   }
