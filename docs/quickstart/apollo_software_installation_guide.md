@@ -82,6 +82,7 @@ From the `/apollo` directory inside Apollo Docker container, type:
 ```bash
 # for AMD gpu this should be run every time after you run
 # dev_start.sh due to a bug.
+# [TODO] fix this bug in RPP
 sudo rm -rf /opt/rocm/rpp
 sudo docker/build/installers/install_rpp.sh
 
