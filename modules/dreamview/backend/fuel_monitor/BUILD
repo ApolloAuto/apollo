@@ -10,7 +10,6 @@ cc_library(
     hdrs = ["fuel_monitor.h"],
     deps = [
         "@com_github_nlohmann_json//:json",
-        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
