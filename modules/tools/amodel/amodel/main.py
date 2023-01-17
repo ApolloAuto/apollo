@@ -37,13 +37,10 @@ def main(args=sys.argv):
 
   parser.add_argument(
     "command", action="store", choices=['list', 'info', 'install', 'remove'],
-    type=str, nargs="?", const="", help="amodel command list.")
+    type=str, nargs="?", const="", default="list", help="amodel command list.")
   parser.add_argument(
     "model_name", action="store", type=str, nargs="?", const="",
     help="model name or install path.")
-  parser.add_argument(
-    "-a", "--all", action="store", type=str, required=False,
-    nargs="?", const="", help="Show all models.")
 
   args = parser.parse_args(args[1:])
   logging.debug(args)
