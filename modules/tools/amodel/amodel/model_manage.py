@@ -235,6 +235,7 @@ def _install_model(model_meta, extract_path):
       return False
 
   shutil.move(extract_path, install_path)
+  print("Installed model in {}.".format(install_path))
   return True
 
 def amodel_install(model_path):
@@ -276,7 +277,7 @@ def amodel_install(model_path):
   extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
   is_success = _install_model(model_meta, extract_path)
   if is_success:
-    logging.info("Successed install {}.".format(model_meta.name))
+    print("Successed install {}.".format(model_meta.name))
   else:
     logging.error("Failed install {}.".format(model_meta.name))
 
@@ -297,6 +298,7 @@ def _remove_model_from_path(model_meta):
   logging.debug(install_path)
   if os.path.isdir(install_path):
     shutil.rmtree(install_path)
+    print("Deleted model in {}.".format(install_path))
     return True
   return False
 
@@ -335,11 +337,11 @@ def amodel_remove(model_name):
       if confirm:
         is_success = _remove_model_from_path(model_meta)
         if is_success:
-          logging.info("Successed remove {}.".format(model_name))
+          print("Successed remove {}.".format(model_name))
         else:
           logging.error("Failed remove {}.".format(model_name))
       else:
-        logging.info("Canceled remove {}.".format(model_name))
+        logging.warn("Canceled remove {}.".format(model_name))
       return
   # Not found
   logging.error("Not found {}, Please check if the name is correct.".format(model_name))
