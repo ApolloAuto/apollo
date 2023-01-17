@@ -14,22 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <numeric>
-#include <algorithm>
-
 #include "modules/perception/inference/paddlepaddle/paddle_net.h"
 
+#include <algorithm>
+#include <numeric>
 
 namespace apollo {
 namespace perception {
 namespace inference {
 
 PaddleNet::PaddleNet(const std::string& model_file,
-            const std::string& params_file,
-            const std::vector<std::string>& outputs,
-            const std::vector<std::string>& inputs)
-            : model_file_(model_file), params_file_(params_file),
-              output_names_(outputs), input_names_(inputs) {}
+                     const std::string& params_file,
+                     const std::vector<std::string>& outputs,
+                     const std::vector<std::string>& inputs)
+    : model_file_(model_file),
+      params_file_(params_file),
+      output_names_(outputs),
+      input_names_(inputs) {}
 
 PaddleNet::~PaddleNet() {}
 
@@ -40,7 +41,7 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
   if (gpu_id_ >= 0) {
     config.EnableUseGpu(MemoryPoolInitSizeMb, gpu_id_);
   }
-
+  config.EnableMemoryOptim();
   config.SwitchIrOptim(true);
   predictor_ = paddle_infer::CreatePredictor(config);
   if (predictor_ == nullptr) {
@@ -53,8 +54,8 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
 
   std::vector<std::string> exist_names;
   for (const std::string& name : input_names_) {
-    if (std::find(input_names.begin(), input_names.end(), name)
-        != input_names.end()) {
+    if (std::find(input_names.begin(), input_names.end(), name) !=
+        input_names.end()) {
       exist_names.push_back(name);
     }
   }
@@ -62,8 +63,8 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
 
   exist_names.clear();
   for (const std::string& name : output_names_) {
-    if (std::find(output_names.begin(), output_names.end(), name)
-        != output_names.end()) {
+    if (std::find(output_names.begin(), output_names.end(), name) !=
+        output_names.end()) {
       exist_names.push_back(name);
     }
   }
@@ -112,7 +113,18 @@ void PaddleNet::Infer() {
     if (blob != nullptr && paddle_blob != nullptr) {
       std::vector<int> paddle_blob_shape = paddle_blob->shape();
       blob->Reshape(paddle_blob_shape);
-      paddle_blob->CopyToCpu(blob->mutable_cpu_data());
+      // label : int64_t
+      if (paddle_blob->type() == paddle_infer::INT64) {
+        ACHECK(1 == paddle_blob_shape.size());
+        std::vector<int64_t> label_i(paddle_blob_shape.at(0));
+        paddle_blob->CopyToCpu(label_i.data());
+        std::vector<float> label_f(label_i.data(),
+                                   label_i.data() + paddle_blob_shape.at(0));
+        memcpy(blob->mutable_cpu_data(), label_f.data(),
+               paddle_blob_shape.at(0) * sizeof(float));
+      } else {
+        paddle_blob->CopyToCpu(blob->mutable_cpu_data());
+      }
     }
   }
 }
@@ -135,7 +147,6 @@ std::shared_ptr<apollo::perception::base::Blob<float>> PaddleNet::get_blob(
   }
   return iter->second;
 }
-
 
 }  // namespace inference
 }  // namespace perception

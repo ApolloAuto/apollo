@@ -16,6 +16,7 @@
 #include "modules/perception/camera/lib/obstacle/detector/bev_detection/bev_obstacle_detector.h"
 
 #include <functional>
+#include <utility>
 
 #include <opencv2/opencv.hpp>
 
@@ -23,6 +24,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/inference/inference_factory.h"
 
 namespace apollo {
 namespace perception {
@@ -32,59 +34,62 @@ bool BEVObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   return true;
 }
 
-bool BEVObstacleDetector::Detect(const ObstacleDetectorOptions &options,
-                                 CameraFrame *frame) {
-  return true;
-}
-
 bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
   ACHECK(stage_config.has_camera_detector_config());
   LoadExtrinsics(stage_config.camera_detector_config().lidar_extrinsics_file(),
-                 &imu2lidar_matrix_rt_);
+                 &lidar2imu_matrix_rt_);
 
-  paddle::AnalysisConfig config;
-  config.EnableUseGpu(1000, FLAGS_gpu_id);
-  config.SetModel(FLAGS_bev_model_file, FLAGS_bev_params_file);
-  config.EnableMemoryOptim();
-  if (FLAGS_use_trt) {
-    paddle::AnalysisConfig::Precision precision;
-    if (FLAGS_trt_precision == 0) {
-      precision = paddle_infer::PrecisionType::kFloat32;
-    } else if (FLAGS_trt_precision == 1) {
-      precision = paddle_infer::PrecisionType::kHalf;
-    } else {
-      AERROR << "Tensorrt type can only support 0 or 1, but recieved is"
-             << FLAGS_trt_precision << "\n";
-      return false;
-    }
-    config.EnableTensorRtEngine(1 << 30, 1, 12, precision, FLAGS_trt_use_static,
-                                false);
-    config.CollectShapeRangeInfo(FLAGS_dynamic_shape_file);
-    // config.EnableTunedTensorRtDynamicShape(FLAGS_dynamic_shape_file, true);
-    if (FLAGS_trt_use_static) {
-      config.SetOptimCacheDir(FLAGS_trt_static_dir);
-    }
-  }
-  config.SwitchIrOptim(true);
-  predictor_ = paddle_infer::CreatePredictor(config);
-  if (nullptr == predictor_) {
+  std::string model_type = "PaddleNet";
+  std::string model_root;
+
+  inference_.reset(inference::CreateInferenceByName(
+      model_type, FLAGS_bev_model_file, FLAGS_bev_params_file,
+      output_blob_names_, input_blob_names_, model_root));
+
+  std::map<std::string, std::vector<int>> shape_map;
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      input_blob_names_.at(0), images_shape_));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      input_blob_names_.at(1), k_shape_));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(0), output_bbox_shape_));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(1), output_score_shape_));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(2), output_label_shape_));
+
+  if (!inference_->Init(shape_map)) {
     return false;
   }
   return true;
 }
 
+bool BEVObstacleDetector::Detect(const ObstacleDetectorOptions &options,
+                                 CameraFrame *frame) {
+  return true;
+}
+
 bool BEVObstacleDetector::Process(DataFrame *data_frame) {
-  static int cnt_1 = 0;
+  auto input_img_blob = inference_->get_blob(input_blob_names_.at(0));
+  auto input_img2lidar_blob = inference_->get_blob(input_blob_names_.at(1));
+  auto output_bbox_blob = inference_->get_blob(output_blob_names_.at(0));
+  auto output_score_blob = inference_->get_blob(output_blob_names_.at(1));
+  auto output_label_blob = inference_->get_blob(output_blob_names_.at(2));
+
+  float *img_data_ptr = input_img_blob->mutable_cpu_data();
+  float *img2lidar_data_ptr = input_img2lidar_blob->mutable_cpu_data();
+
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::RGB;
   std::vector<float> images_data;
   std::vector<float> k_data;
   Timer timer;
   float scale = 1.0f;
-  for (int i = 0; i < 6; ++i) {
+  int camera_cnt = 6;
+  for (int i = 0; i < camera_cnt; ++i) {
     const auto camera_frame_temp = (data_frame + i)->camera_frame;
 
     std::shared_ptr<base::Image8U> image_temp = nullptr;
@@ -108,47 +113,24 @@ bool BEVObstacleDetector::Process(DataFrame *data_frame) {
     Mat2Vec(mat_crop_tmp, image_data.data());
 
     images_data.insert(images_data.end(), image_data.begin(), image_data.end());
-
-    const auto &imu2cam_matrix_rt =
-        (camera_frame_temp->camera_extrinsic).cast<float>();
-
-    Eigen::Matrix4f cam_intrinstic_matrix_4f;
-    cam_intrinstic_matrix_4f.setIdentity();
-    cam_intrinstic_matrix_4f.block<3, 3>(0, 0) =
-        camera_frame_temp->camera_k_matrix;
-
-    Eigen::Matrix4f lidar2img_matrix_rt_tmp =
-        imu2lidar_matrix_rt_.inverse().cast<float>() * imu2cam_matrix_rt *
-        cam_intrinstic_matrix_4f;
-
-    Eigen::Matrix4f img2lidar_matrix_rt_tmp = lidar2img_matrix_rt_tmp.inverse();
-
-    img2lidar_matrix_rt_tmp = img2lidar_matrix_rt_tmp.transpose();
-    std::vector<float> img2lidar_vec(
-        img2lidar_matrix_rt_tmp.data(),
-        img2lidar_matrix_rt_tmp.data() +
-            img2lidar_matrix_rt_tmp.rows() * img2lidar_matrix_rt_tmp.cols());
-
-    k_data.insert(k_data.end(), img2lidar_vec.begin(), img2lidar_vec.end());
   }
-  ++cnt_1;
+
+  memcpy(img_data_ptr, images_data.data(), images_data.size() * sizeof(float));
+  memcpy(img2lidar_data_ptr, k_data_.data(), k_data_.size() * sizeof(float));
+
   AINFO << "Preprocess: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
-  std::vector<float> boxes;
-  std::vector<float> scores;
-  std::vector<int64_t> labels;
-  AINFO << "k_data size: " << k_data.size();
-  AINFO << "images_data size:" << images_data.size();
-  Run(predictor_.get(), images_shape_, images_data, k_shape_, k_data_, &boxes,
-      &scores, &labels);
+  inference_->Infer();
 
   AINFO << "Inference: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+
+  float threshold = 0.8;
 
   std::vector<float> out_detections_final;
   std::vector<int64_t> out_labels_final;
   std::vector<float> out_scores_final;
-  float threshold = 0.8;
-  FilterScore(boxes, labels, scores, threshold,
+
+  FilterScore(output_bbox_blob, output_label_blob, output_score_blob, threshold,
               &out_detections_final, &out_labels_final, &out_scores_final);
 
   AINFO << "images_data size: " << images_data.size();
@@ -203,67 +185,25 @@ void BEVObstacleDetector::Mat2Vec(const cv::Mat &im, float *data) {
 }
 
 void BEVObstacleDetector::FilterScore(
-    const std::vector<float> &box3d, const std::vector<int64_t> &label_preds,
-    const std::vector<float> &scores, float score_threshold,
-    std::vector<float> *box3d_filtered,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &box3d,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &label,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &scores,
+    float score_threshold, std::vector<float> *box3d_filtered,
     std::vector<int64_t> *label_preds_filtered,
     std::vector<float> *scores_filtered) {
-  for (size_t i = 0; i < scores.size(); ++i) {
-    if (scores.at(i) > score_threshold) {
+  const auto bbox_ptr = box3d->cpu_data();
+  const auto label_ptr = label->cpu_data();
+  const auto score_ptr = scores->cpu_data();
+
+  for (int i = 0; i < scores->count(); ++i) {
+    if (score_ptr[i] > score_threshold) {
       box3d_filtered->insert(box3d_filtered->end(),
-                             box3d.begin() + num_output_box_feature_ * i,
-                             box3d.begin() + num_output_box_feature_ * (i + 1));
+                             bbox_ptr + num_output_box_feature_ * i,
+                             bbox_ptr + num_output_box_feature_ * (i + 1));
       label_preds_filtered->insert(label_preds_filtered->end(),
-                                   *(label_preds.begin() + i));
+                                   static_cast<int64_t>(label_ptr[i]));
 
-      scores_filtered->push_back(scores.at(i));
-    }
-  }
-}
-
-void BEVObstacleDetector::Lidar2cam(const Eigen::Matrix4f &imu2camera,
-                                    const Eigen::Matrix4f &imu2lidar,
-                                    Eigen::Matrix4f *lidar2camera) {
-  *lidar2camera = imu2camera * (imu2lidar.inverse());
-}
-
-void BEVObstacleDetector::Run(
-    paddle_infer::Predictor *predictor, const std::vector<int> &images_shape,
-    const std::vector<float> &images_data, const std::vector<int> &k_shape,
-    const std::vector<float> &k_data, std::vector<float> *boxes,
-    std::vector<float> *scores, std::vector<int64_t> *labels) {
-  auto input_names = predictor->GetInputNames();
-  auto in_tensor0 = predictor->GetInputHandle(input_names[0]);
-  in_tensor0->Reshape(images_shape);
-  in_tensor0->CopyFromCpu(images_data.data());
-
-  auto in_tensor1 = predictor->GetInputHandle(input_names[1]);
-  in_tensor1->Reshape(k_shape);
-  in_tensor1->CopyFromCpu(k_data.data());
-
-  // auto start_time = std::chrono::steady_clock::now();
-  ACHECK(predictor->Run());
-  AINFO << "finish run!!!!";
-  auto output_names = predictor->GetOutputNames();
-  for (size_t i = 0; i != output_names.size(); i++) {
-    auto output = predictor->GetOutputHandle(output_names[i]);
-
-    std::vector<int> output_shape = output->shape();
-    int out_num = std::accumulate(output_shape.begin(), output_shape.end(), 1,
-                                  std::multiplies<int>());
-    if (i == 0) {
-      std::cout << "get bbox out size: " << out_num << std::endl;
-      boxes->resize(out_num);
-      output->CopyToCpu(boxes->data());
-    } else if (i == 1) {
-      std::cout << "get scores out size: " << out_num << std::endl;
-      scores->resize(out_num);
-      output->CopyToCpu(scores->data());
-    } else if (i == 2) {
-      std::cout << "get labels out size: " << out_num << std::endl;
-      labels->resize(out_num);
-      output->CopyToCpu(labels->data());
-      std::cout << "finish get labels out size: " << out_num << std::endl;
+      scores_filtered->push_back(score_ptr[i]);
     }
   }
 }
@@ -346,16 +286,16 @@ void BEVObstacleDetector::GetObjects(const std::vector<float> &detections,
 
     FillBBox3d(detections.data() + i * num_output_box_feature_,
                camera_frame->camera2world_pose, camera_frame->camera_extrinsic,
-               imu2lidar_matrix_rt_, obj);
+               lidar2imu_matrix_rt_, obj);
 
     objects->push_back(obj);
   }
 }
 
 void BEVObstacleDetector::FillBBox3d(const float *bbox,
-                                     const Eigen::Affine3d &world2cam_pose,
-                                     const Eigen::Matrix4d &imu2cam_matrix_rt,
-                                     const Eigen::Matrix4d &imu2lidar_matrix_rt,
+                                     const Eigen::Affine3d &cam2world_pose,
+                                     const Eigen::Matrix4d &cam2imu_matrix_rt,
+                                     const Eigen::Matrix4d &lidar2imu_matrix_rt,
                                      base::ObjectPtr obj) {
   obj->camera_supplement.local_center[0] = bbox[0];
   obj->camera_supplement.local_center[1] = bbox[1];
@@ -376,23 +316,23 @@ void BEVObstacleDetector::FillBBox3d(const float *bbox,
   obj->center(1) = static_cast<double>(obj->camera_supplement.local_center[1]);
   obj->center(2) = static_cast<double>(obj->camera_supplement.local_center[2]);
 
-  Eigen::Affine3d imu2cam_affine;
+  Eigen::Affine3d cam2imu_affine;
   Eigen::Affine3d imu2lidar_affine;
-  imu2cam_affine.matrix() = imu2cam_matrix_rt;
-  imu2lidar_affine.matrix() = imu2lidar_matrix_rt;
+  cam2imu_affine.matrix() = cam2imu_matrix_rt;
+  imu2lidar_affine.matrix() = lidar2imu_matrix_rt;
 
   Eigen::AngleAxisd rotation_vector(-M_PI / 2, Eigen::Vector3d(1, 0, 0));
   Eigen::Matrix4d lidar2cam;
   lidar2cam.setIdentity();
   lidar2cam.block<3, 3>(0, 0) = rotation_vector.matrix();
-  Eigen::Affine3d lidar2cam_affine;
-  lidar2cam_affine.matrix() = lidar2cam;
+  Eigen::Affine3d cam2lidar_affine;
+  cam2lidar_affine.matrix() = lidar2cam;
 
-  obj->center = world2cam_pose * imu2cam_affine.inverse() * imu2lidar_affine *
-                lidar2cam_affine * obj->center;
+  obj->center = cam2world_pose * cam2imu_affine.inverse() * imu2lidar_affine *
+                cam2lidar_affine * obj->center;
 
   Eigen::Matrix3d world2imu_rotation =
-      (world2cam_pose.matrix() * imu2cam_affine.matrix().inverse())
+      (cam2world_pose.matrix() * cam2imu_affine.matrix().inverse())
           .block<3, 3>(0, 0);
   auto heading = std::atan2(world2imu_rotation(1, 0), world2imu_rotation(0, 0));
   obj->theta += (heading + M_PI / 2);
