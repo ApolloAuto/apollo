@@ -33,7 +33,7 @@ TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
 
-FAST_MODE="no"
+FAST_MODE="y"
 
 GEOLOC=
 
@@ -45,7 +45,6 @@ VOLUME_VERSION="latest"
 SHM_SIZE="2G"
 USER_SPECIFIED_MAPS=
 MAP_VOLUMES_CONF=
-OTHER_VOLUMES_CONF=
 
 # Install python tools
 PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
@@ -53,6 +52,13 @@ DEFAULT_PYTHON_TOOLS=(
   amodel
 )
 
+# Model
+MODEL_REPOSITORY="https://apollo-pkg-beta.cdn.bcebos.com/perception_model"
+DEFAULT_INSTALL_MODEL=(
+  "${MODEL_REPOSITORY}/cnnseg128_caffe.zip"
+)
+
+# Map
 DEFAULT_MAPS=(
     sunnyvale_big_loop
     sunnyvale_loop
@@ -62,7 +68,6 @@ DEFAULT_MAPS=(
 )
 
 DEFAULT_TEST_MAPS=(
-    sunnyvale_big_loop
     sunnyvale_loop
 )
 
@@ -71,7 +76,7 @@ function show_usage() {
 Usage: $0 [options] ...
 OPTIONS:
     -h, --help             Display this help and exit.
-    -f, --fast             Fast mode without pulling all map volumes.
+    -f, --fast <y|n>       Fast mode without pulling all map volumes and perception models.
     -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
     -l, --local            Use local docker image.
     -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
@@ -87,6 +92,7 @@ function parse_arguments() {
     local custom_dist=""
     local shm_size=""
     local geo=""
+    local fast_mode=""
 
     while [ $# -gt 0 ]; do
         local opt="$1"
@@ -113,7 +119,9 @@ function parse_arguments() {
                 ;;
 
             -f | --fast)
-                FAST_MODE="yes"
+                fast_mode="$1"
+                shift
+                optarg_check_for_opt "${opt}" "${fast_mode}"
                 ;;
 
             -g | --geo)
@@ -153,6 +161,7 @@ function parse_arguments() {
     done # End while loop
 
     [[ -n "${geo}" ]] && GEOLOC="${geo}"
+    [[ -n "${fast_mode}" ]] && FAST_MODE="${fast_mode}"
     [[ -n "${custom_version}" ]] && USER_VERSION_OPT="${custom_version}"
     [[ -n "${custom_dist}" ]] && CUSTOM_DIST="${custom_dist}"
     [[ -n "${shm_size}" ]] && SHM_SIZE="${shm_size}"
@@ -306,7 +315,7 @@ function mount_map_volumes() {
         done
     fi
 
-    if [[ "$FAST_MODE" == "no" ]]; then
+    if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
             restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
@@ -317,84 +326,24 @@ function mount_map_volumes() {
     fi
 }
 
-function mount_other_volumes() {
-    info "Mount other volumes ..."
-    local volume_conf=
-
-    # AUDIO
-    local audio_volume="apollo_audio_volume_${USER}"
-    local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
-    local audio_path="/apollo/modules/audio/data/"
-    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
-    volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
-
-    #TRAFFIC_LIGHT_DETECTION
-    local tl_detection_volume="apollo_tl_detection_volume_${USER}"
-    local tl_detection_image="${DOCKER_REPO}:traffic_light-detection_caffe_model-${TARGET_ARCH}-latest"
-    local tl_detection_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/tl_detection_caffe"
-    docker_restart_volume "${tl_detection_volume}" "${tl_detection_image}" "${tl_detection_path}"
-    volume_conf="${volume_conf} --volume ${tl_detection_volume}:${tl_detection_path}"
-
-    #TRAFFIC_LIGHT_RECOGNITION
-    local tl_horizontal_volume="apollo_tl_horizontal_volume_${USER}"
-    local tl_horizontal_image="${DOCKER_REPO}:traffic_light-horizontal_caffe_model-${TARGET_ARCH}-latest"
-    local tl_horizontal_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/horizontal_caffe"
-    docker_restart_volume "${tl_horizontal_volume}" "${tl_horizontal_image}" "${tl_horizontal_path}"
-    volume_conf="${volume_conf} --volume ${tl_horizontal_volume}:${tl_horizontal_path}"
-
-    #TRAFFIC_LIGHT_RECOGNITION
-    local tl_quadrate_volume="apollo_tl_quadrate_volume_${USER}"
-    local tl_quadrate_image="${DOCKER_REPO}:traffic_light-quadrate_caffe_model-${TARGET_ARCH}-latest"
-    local tl_quadrate_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/quadrate_caffe"
-    docker_restart_volume "${tl_quadrate_volume}" "${tl_quadrate_image}" "${tl_quadrate_path}"
-    volume_conf="${volume_conf} --volume ${tl_quadrate_volume}:${tl_quadrate_path}"
-
-    #TRAFFIC_LIGHT_RECOGNITION
-    local tl_recognition_volume="apollo_tl_recognition_volume_${USER}"
-    local tl_recognition_image="${DOCKER_REPO}:traffic_light-recognition_caffe_model-${TARGET_ARCH}-latest"
-    local tl_recognition_path="/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition/vertical_caffe"
-    docker_restart_volume "${tl_recognition_volume}" "${tl_recognition_image}" "${tl_recognition_path}"
-    volume_conf="${volume_conf} --volume ${tl_recognition_volume}:${tl_recognition_path}"
-
-    #YOLO_OBSTACLE
-    local yolo_volume="yolo_obstacle_volume_${USER}"
-    local yolo_image="${DOCKER_REPO}:yolo_obstacle_model-${TARGET_ARCH}-latest"
-    local yolo_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/3d-r4-half_caffe"
-    docker_restart_volume "${yolo_volume}" "${yolo_image}" "${yolo_path}"
-    volume_conf="${volume_conf} --volume ${yolo_volume}:${yolo_path}"
-
-    #CNNSEG128
-    local cnnseg_volume="cnnseg_volume_${USER}"
-    local cnnseg_image="${DOCKER_REPO}:cnnseg_caffe_model-${TARGET_ARCH}-latest"
-    local cnnseg_path="/apollo/modules/perception/production/data/perception/lidar/models/cnnseg/cnnseg128_caffe"
-    docker_restart_volume "${cnnseg_volume}" "${cnnseg_image}" "${cnnseg_path}"
-    volume_conf="${volume_conf} --volume ${cnnseg_volume}:${cnnseg_path}"
-
-    #LANE_DETECTION
-    local lane_detection_volume="lane_detection_volume_${USER}"
-    local lane_detection_image="${DOCKER_REPO}:lane_detection_model-${TARGET_ARCH}-latest"
-    local lane_detection_path="/apollo/modules/perception/production/data/perception/camera/models/lane_detector/darkSCNN_caffe"
-    docker_restart_volume "${lane_detection_volume}" "${lane_detection_image}" "${lane_detection_path}"
-    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}"
-
-    # SMOKE
-    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-        local smoke_volume="apollo_smoke_volume_${USER}"
-        local smoke_image="${DOCKER_REPO}:smoke_volume-yolo_obstacle_detection_model-${TARGET_ARCH}-latest"
-        local smoke_path="/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/smoke_libtorch_model"
-        docker_restart_volume "${smoke_volume}" "${smoke_image}" "${smoke_path}"
-        volume_conf="${volume_conf} --volume ${smoke_volume}:${smoke_path}"
-    fi
-
-    OTHER_VOLUMES_CONF="${volume_conf}"
-}
-
 function install_python_tools() {
   export PYTHONUSERBASE=${PYTHON_INSTALL_PATH}
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
+    info "Install python tool ${tool} ..."
     pip3 install --user "${tool}"
   done
+}
+
+function install_perception_models() {
+  if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
+    for model_url in ${DEFAULT_INSTALL_MODEL[@]}; do
+        info "Install model ${model_url} ..."
+        amodel install "${model_url}"
+    done
+  else
+    warning "Skip the model installation, if you need to run the perception module, you can manually install."
+  fi
 }
 
 function main() {
@@ -430,10 +379,12 @@ function main() {
     setup_devices_and_mount_local_volumes local_volumes
 
     mount_map_volumes
-    mount_other_volumes
 
-    info "Install python tools ..."
+    info "Installing python tools ..."
     install_python_tools
+
+    info "Installing perception models ..."
+    install_perception_models
 
     info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
@@ -461,7 +412,6 @@ function main() {
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF} \
-        ${OTHER_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \

@@ -23,7 +23,6 @@ import logging
 import os
 import requests
 import shutil
-import zipfile
 
 from amodel.model_meta import ModelMeta
 
@@ -185,8 +184,14 @@ def _unzip_file(file_path, extract_path):
   if os.path.isdir(extract_path):
     shutil.rmtree(extract_path)
 
-  with zipfile.ZipFile(file_path, 'r') as zip_ref:
-    zip_ref.extractall(extract_path)
+  try:
+    shutil.unpack_archive(file_path, extract_path)
+  except ValueError:
+    logging.error("Unsupported unzip format! {}".format(file_path))
+    return False
+  except:
+    logging.error("Unzip file failed! {}".format(file_path))
+    return False
   return True
 
 def _get_install_path_by_meta(model_meta):
@@ -239,7 +244,7 @@ def amodel_install(model_path):
       model_path (str): model's zip file
   """
   if not model_path:
-    print("Input file is empty!!!")
+    logging.error("Input file is empty!!!")
     return
 
   # download file
@@ -247,7 +252,7 @@ def amodel_install(model_path):
     try:
       model_path = _download_from_url(model_path)
     except Exception as e:
-      print("Download {} failed! {}".format(model_path, e))
+      logging.error("Download {} failed! {}".format(model_path, e))
       return
 
   # unzip model file
@@ -255,7 +260,7 @@ def amodel_install(model_path):
   model_name = tail.split('.')[0]
   is_success = _unzip_file(model_path, UNZIP_TMP_DIR)
   if not is_success:
-    print("Zip file {} not found.".format(model_path))
+    logging.error("Model file {} not found.".format(model_path))
     return
 
   # read meta file
@@ -264,16 +269,16 @@ def amodel_install(model_path):
   meta_file = _jion_meta_file(meta_path)
   is_success = model_meta.parse_from(meta_file)
   if not is_success:
-    print("Meta file {} not found!".format(meta_file))
+    logging.error("Meta file {} not found!".format(meta_file))
     return
 
   # install meta file
   extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
   is_success = _install_model(model_meta, extract_path)
   if is_success:
-    print("Successed install {}.".format(model_meta.name))
+    logging.info("Successed install {}.".format(model_meta.name))
   else:
-    print("Failed install {}.".format(model_meta.name))
+    logging.error("Failed install {}.".format(model_meta.name))
 
 
 '''
@@ -330,14 +335,14 @@ def amodel_remove(model_name):
       if confirm:
         is_success = _remove_model_from_path(model_meta)
         if is_success:
-          print("Successed remove {}.".format(model_name))
+          logging.info("Successed remove {}.".format(model_name))
         else:
-          print("Failed remove {}.".format(model_name))
+          logging.error("Failed remove {}.".format(model_name))
       else:
-        print("Canceled remove {}.".format(model_name))
+        logging.info("Canceled remove {}.".format(model_name))
       return
   # Not found
-  print("Not found {}, Please check if the name is correct.".format(model_name))
+  logging.error("Not found {}, Please check if the name is correct.".format(model_name))
 
 
 '''
@@ -363,4 +368,4 @@ def amodel_info(model_name):
       _display_model_info(model_meta)
       return
   # Not found
-  print("Not found {}, Please check if the name is correct.".format(model_name))
+  logging.error("Not found {}, Please check if the name is correct.".format(model_name))
