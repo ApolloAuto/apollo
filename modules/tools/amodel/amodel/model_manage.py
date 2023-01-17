@@ -108,27 +108,31 @@ def _get_all_model_metas():
     total_model_metas.extend(model_metas)
   return total_model_metas
 
-def _display_model_list(model_metas):
+def _display_model_list(model_metas, white_names=[]):
   """Display all installed models's info
 
   Args:
       model_metas (list): all installed models's meta
   """
   # display title
-  print("{:<20}|{:<20}|{:<20}|{:<20}|{:<20}".format(
+  print("{:<5}|{:<20}|{:<20}|{:<15}|{:<20}|{:<20}".format(
+    "ID",
     "Name",
     "Task_type",
     "Sensor_type",
     "Framework",
     "Date"))
   # display content
-  for model_meta in model_metas:
-    print("{:<20}|{:<20}|{:<20}|{:<20}|{:%Y-%m-%d}".format(
-      model_meta.name,
-      model_meta.task_type,
-      model_meta.sensor_type,
-      model_meta.framework,
-      model_meta.date))
+  for index in range(len(model_metas)):
+    model_meta = model_metas[index]
+    if len(white_names) == 0 or (model_meta.name in white_names):
+      print("{:03}|{:<20}|{:<20}|{:<15}|{:<20}|{:%Y-%m-%d}".format(
+        index,
+        model_meta.name,
+        model_meta.task_type,
+        model_meta.sensor_type,
+        model_meta.framework,
+        model_meta.date))
 
 def amodel_list():
   """amodel list command
@@ -248,7 +252,7 @@ def amodel_install(model_path):
     logging.error("Input file is empty!!!")
     return
 
-  # download file
+  # Download file
   if _is_url(model_path):
     try:
       model_path = _download_from_url(model_path)
@@ -256,7 +260,7 @@ def amodel_install(model_path):
       logging.error("Download {} failed! {}".format(model_path, e))
       return
 
-  # unzip model file
+  # Unzip model file
   _, tail = os.path.split(model_path)
   model_name = tail.split('.')[0]
   is_success = _unzip_file(model_path, UNZIP_TMP_DIR)
@@ -264,7 +268,7 @@ def amodel_install(model_path):
     logging.error("Model file {} not found.".format(model_path))
     return
 
-  # read meta file
+  # Read meta file
   model_meta = ModelMeta()
   meta_path = os.path.join(UNZIP_TMP_DIR, model_name)
   meta_file = _jion_meta_file(meta_path)
@@ -273,7 +277,7 @@ def amodel_install(model_path):
     logging.error("Meta file {} not found!".format(meta_file))
     return
 
-  # install meta file
+  # Install meta file
   extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
   is_success = _install_model(model_meta, extract_path)
   if is_success:
@@ -329,22 +333,47 @@ def amodel_remove(model_name):
   Args:
       model_name (str): the model need to remove
   """
+  # Find model index
   total_model_metas = _get_all_model_metas()
-  for model_meta in total_model_metas:
-    if model_meta.name == model_name:
-      confirm = _user_confirmation(
-          "Do you want to remove {}? [y/n]:".format(model_name))
-      if confirm:
-        is_success = _remove_model_from_path(model_meta)
-        if is_success:
-          print("Successed remove {}.".format(model_name))
-        else:
-          logging.error("Failed remove {}.".format(model_name))
-      else:
-        logging.warn("Canceled remove {}.".format(model_name))
+
+  model_id = None
+  if not model_name.isdigit():
+    found_model_names = []
+    found_id = 0
+    for cur_id in range(len(total_model_metas)):
+      model_meta = total_model_metas[cur_id]
+      if model_meta.name == model_name:
+        found_model_names.append(model_meta)
+        found_id = cur_id
+    if len(found_model_names) > 1:
+      _display_model_list(total_model_metas, found_model_names)
+      model_id = input("Which model you want to delete, pls input the model ID!")
+    elif len(found_model_names) == 1:
+      model_id = found_id
+    else:
+      logging.error("Not found {}, Please check if the index is correct.".format(model_name))
       return
-  # Not found
-  logging.error("Not found {}, Please check if the name is correct.".format(model_name))
+
+  # Find model_meta by index
+  if model_id == None:
+    model_id = int(model_name)
+  if model_id < len(total_model_metas):
+    model_meta = total_model_metas[model_id]
+  else:
+    logging.error("Not found {}, Please check if the index is correct.".format(model_name))
+    return
+
+  # Remove model by model_meta
+  confirm = _user_confirmation(
+      "Do you want to remove {}? [y/n]:".format(model_name))
+  if confirm:
+    is_success = _remove_model_from_path(model_meta)
+    if is_success:
+      print("Successed remove {}.".format(model_name))
+    else:
+      logging.error("Failed remove {}.".format(model_name))
+  else:
+    logging.warn("Canceled remove {}.".format(model_name))
 
 
 '''
