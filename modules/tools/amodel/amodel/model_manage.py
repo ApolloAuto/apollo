@@ -126,7 +126,7 @@ def _display_model_list(model_metas, white_names=[]):
   for index in range(len(model_metas)):
     model_meta = model_metas[index]
     if len(white_names) == 0 or (model_meta.name in white_names):
-      print("{:03}|{:<20}|{:<20}|{:<15}|{:<20}|{:%Y-%m-%d}".format(
+      print("{:05}|{:<20}|{:<20}|{:<15}|{:<20}|{:%Y-%m-%d}".format(
         index,
         model_meta.name,
         model_meta.task_type,
@@ -347,33 +347,39 @@ def amodel_remove(model_name):
         found_id = cur_id
     if len(found_model_names) > 1:
       _display_model_list(total_model_metas, found_model_names)
-      model_id = input("Which model you want to delete, pls input the model ID!")
+      input_model_id = input("Which model you want to delete, pls input the model ID!")
+      if not input_model_id.isdigit():
+        logging.error("Please input correct model ID: {}.".format(input_model_id))
+        return
+      model_id = int(input_model_id)
     elif len(found_model_names) == 1:
       model_id = found_id
     else:
-      logging.error("Not found {}, Please check if the index is correct.".format(model_name))
+      logging.error("Not found {}, Please check if the name is correct.".format(model_name))
       return
 
   # Find model_meta by index
   if model_id == None:
     model_id = int(model_name)
+
   if model_id < len(total_model_metas):
     model_meta = total_model_metas[model_id]
   else:
-    logging.error("Not found {}, Please check if the index is correct.".format(model_name))
+    logging.error("Not found {}, Please check if the input is correct.".format(model_name))
     return
 
+  model_name = model_meta.name
   # Remove model by model_meta
   confirm = _user_confirmation(
-      "Do you want to remove {}? [y/n]:".format(model_name))
+      "Do you want to remove model ID:{} Name:{}? [y/n]:".format(model_id, model_name))
   if confirm:
     is_success = _remove_model_from_path(model_meta)
     if is_success:
-      print("Successed remove {}.".format(model_name))
+      print("Successed remove model ID:{} Name:{}.".format(model_id, model_name))
     else:
-      logging.error("Failed remove {}.".format(model_name))
+      logging.error("Failed remove model ID:{} Name:{}.".format(model_id, model_name))
   else:
-    logging.warn("Canceled remove {}.".format(model_name))
+    logging.warn("Canceled remove model ID:{} Name:{}.".format(model_id, model_name))
 
 
 '''
@@ -393,10 +399,38 @@ def amodel_info(model_name):
   Args:
       model_name (str): model's name
   """
+  # Find model index
   total_model_metas = _get_all_model_metas()
-  for model_meta in total_model_metas:
-    if model_meta.name == model_name:
-      _display_model_info(model_meta)
+
+  model_id = None
+  if not model_name.isdigit():
+    found_model_names = []
+    found_id = 0
+    for cur_id in range(len(total_model_metas)):
+      model_meta = total_model_metas[cur_id]
+      if model_meta.name == model_name:
+        found_model_names.append(model_meta)
+        found_id = cur_id
+    if len(found_model_names) > 1:
+      _display_model_list(total_model_metas, found_model_names)
+      input_model_id = input("Which model you want to display, pls input the model ID!")
+      if not input_model_id.isdigit():
+        logging.error("Please input correct model ID: {}.".format(input_model_id))
+        return
+      model_id = int(input_model_id)
+    elif len(found_model_names) == 1:
+      model_id = found_id
+    else:
+      logging.error("Not found {}, Please check if the name is correct.".format(model_name))
       return
-  # Not found
-  logging.error("Not found {}, Please check if the name is correct.".format(model_name))
+
+  # Find model_meta by index
+  if model_id == None:
+    model_id = int(model_name)
+
+  if model_id < len(total_model_metas):
+    model_meta = total_model_metas[model_id]
+    _display_model_info(model_meta)
+  else:
+    logging.error("Not found {}, Please check if the input is correct.".format(model_name))
+    return
