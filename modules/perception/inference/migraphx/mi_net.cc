@@ -1,7 +1,7 @@
 /******************************************************************************
  * Copyright 2022 The Apollo Authors. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+5 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -54,10 +54,10 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-nvinfer1::Dims GetDims(std::vector<size_t> lens, bool remove_batch = true) {
-  nvinfer1::Dims dims;
+Dims GetDims(std::vector<size_t> lens, bool remove_batch = true) {
+  Dims dims;
 
-  // remove batch dimension for compatibility with nvinfer1::Dims
+  // remove batch dimension for compatibility with Dims
   if (remove_batch) lens.erase(lens.begin());
 
   dims.nbDims = lens.size();
@@ -580,7 +580,7 @@ void MINet::addReshapeLayer(const LayerParameter &layer_param,
     auto dim_param = params.shape().dim(i);
 
     // For compatibility with tensorrt inference reffer to:
-    // void nvinfer1::IShuffleLayer::setReshapeDimensions()
+    // void IShuffleLayer::setReshapeDimensions()
     // Ref: https://docs.nvidia.com/deeplearning/tensorrt/api/c_api
 
     int64_t new_dim = -1;
@@ -624,7 +624,7 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
                                    migraphx::module *net, TensorMap *tensor_map,
                                    TensorModifyMap *tensor_modify_map) {
   std::shared_ptr<DFMBPSROIAlignPlugin> plugin;
-  std::vector<nvinfer1::Dims> input_dims;
+  std::vector<Dims> input_dims;
 
   CHECK_GE(nbInputs, 2);
   CHECK_LE(nbInputs, 3);
@@ -640,7 +640,7 @@ void MINet::addDFMBPSROIAlignLayer(const LayerParameter &layer_param,
   dfmb_psroi_align_plugins_.push_back(plugin);
 
   // output dims without batchsize
-  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
   Shape out_shape {
     Shape::float_type,
     {
@@ -681,7 +681,7 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
                                  migraphx::module *net, TensorMap *tensor_map,
                                  TensorModifyMap *tensor_modify_map) {
   std::shared_ptr<RCNNProposalPlugin> plugin;
-  std::vector<nvinfer1::Dims> input_dims;
+  std::vector<Dims> input_dims;
 
   CHECK_EQ(nbInputs, 4);
 
@@ -696,7 +696,7 @@ void MINet::addRCNNProposalLayer(const LayerParameter &layer_param,
   rcnn_proposal_plugins_.push_back(plugin);
 
   // output dims without batchsize
-  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
   Shape out_shape {
     Shape::float_type,
     {
@@ -725,15 +725,15 @@ void MINet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
                                    migraphx::module *net, TensorMap *tensor_map,
                                    TensorModifyMap *tensor_modify_map) {
   std::shared_ptr<RPNProposalSSDPlugin> plugin;
-  std::vector<nvinfer1::Dims> input_dims;
+  std::vector<Dims> input_dims;
 
   CHECK_EQ(nbInputs, 3);
 
   for (int i = 0; i < nbInputs; ++i) {
     auto input_lens = inputs[i]->get_shape().lens();
-    nvinfer1::Dims dims;
+    Dims dims;
 
-    // remove batch size for compatibility with nvinfer1::Dims
+    // remove batch size for compatibility with Dims
     if (i == 0 || i == 1 || i == 2) {
       input_lens.erase(input_lens.begin());
     }
@@ -752,7 +752,7 @@ void MINet::addRPNProposalSSDLayer(const LayerParameter &layer_param,
   rpn_proposal_ssd_plugins_.push_back(plugin);
 
   // output dims without batchsize
-  nvinfer1::Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
+  Dims out_dims = plugin->getOutputDimensions(0, nullptr, 0);
   Shape out_shape {
     Shape::float_type,
     {

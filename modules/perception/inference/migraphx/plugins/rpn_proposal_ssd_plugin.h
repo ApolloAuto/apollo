@@ -28,12 +28,12 @@ namespace inference {
 // TODO(chenjiahao): complete member functions
 // Custom layer for RPNProposalSSD operation, i.e.
 // anchor generation and nms filtering
-class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
+class RPNProposalSSDPlugin : public IPlugin {
  public:
   RPNProposalSSDPlugin(
       const BBoxRegParameter &bbox_reg_param,
       const DetectionOutputSSDParameter &detection_output_ssd_param,
-      nvinfer1::Dims *in_dims) {
+      Dims *in_dims) {
     height_ = in_dims[0].d[1];
     width_ = in_dims[0].d[2];
 
@@ -76,15 +76,15 @@ class RPNProposalSSDPlugin : public nvinfer1::IPlugin {
   void terminate() override {}
   int getNbOutputs() const override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
+  Dims getOutputDimensions(int index, const Dims *inputs,
                                      int nbInputDims) override {
     // TODO(chenjiahao): complete inputs dims assertion
     // TODO(chenjiahao): batch size is hard coded to 1 here
-    return nvinfer1::Dims4(top_n_ * 1, 5, 1, 1);
+    return Dims4(top_n_ * 1, 5, 1, 1);
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
+  void configure(const Dims *inputDims, int nbInputs,
+                 const Dims *outputDims, int nbOutputs,
                  int maxBatchSize) override {}
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }

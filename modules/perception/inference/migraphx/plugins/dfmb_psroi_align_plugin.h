@@ -29,11 +29,11 @@ namespace inference {
 // i.e. DeForMaBle Position Sensitive ROI Align.
 // input0 dims: [C, H, W], input1 dims: [num_rois, 5, 1, 1]
 // input2 dims: [N, C2, H2, W2]
-class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
+class DFMBPSROIAlignPlugin : public IPlugin {
  public:
   DFMBPSROIAlignPlugin(
       const DFMBPSROIAlignParameter &dfmb_psroi_align_parameter,
-      nvinfer1::Dims *in_dims, int nbInputs) {
+      Dims *in_dims, int nbInputs) {
     heat_map_a_ = dfmb_psroi_align_parameter.heat_map_a();
     output_channel_ = dfmb_psroi_align_parameter.output_dim();
     group_height_ = dfmb_psroi_align_parameter.group_height();
@@ -65,7 +65,7 @@ class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
     channels_ = in_dims[0].d[0];
     height_ = in_dims[0].d[1];
     width_ = in_dims[0].d[2];
-    output_dims_ = nvinfer1::Dims4(in_dims[1].d[0], output_channel_,
+    output_dims_ = Dims4(in_dims[1].d[0], output_channel_,
                                    pooled_height_, pooled_width_);
     output_size_ =
         in_dims[1].d[0] * output_channel_ * pooled_height_ * pooled_width_;
@@ -87,14 +87,14 @@ class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
   void terminate() override {}
   int getNbOutputs() const override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
+  Dims getOutputDimensions(int index, const Dims *inputs,
                                      int nbInputDims) override {
     // TODO(chenjiahao): complete input dims assertion
     return output_dims_;
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
+  void configure(const Dims *inputDims, int nbInputs,
+                 const Dims *outputDims, int nbOutputs,
                  int maxBatchSize) override {}
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
@@ -133,7 +133,7 @@ class DFMBPSROIAlignPlugin : public nvinfer1::IPlugin {
   int width_;
   int output_size_;
 
-  nvinfer1::Dims output_dims_;
+  Dims output_dims_;
 };
 
 }  // namespace inference

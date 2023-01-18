@@ -26,12 +26,12 @@ namespace perception {
 namespace inference {
 
 // TODO(chenjiahao): complete member functions
-class RCNNProposalPlugin : public nvinfer1::IPlugin {
+class RCNNProposalPlugin : public IPlugin {
  public:
   RCNNProposalPlugin(
       const BBoxRegParameter &bbox_reg_param,
       const DetectionOutputSSDParameter &detection_output_ssd_param,
-      nvinfer1::Dims *in_dims) {
+      Dims *in_dims) {
     num_rois_ = in_dims[2].d[0];
 
     for (int i = 0; i < 4; ++i) {
@@ -70,15 +70,15 @@ class RCNNProposalPlugin : public nvinfer1::IPlugin {
   void terminate() override {}
   int getNbOutputs() const override { return 1; }
 
-  nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
+  Dims getOutputDimensions(int index, const Dims *inputs,
                                      int nbInputDims) override {
     // TODO(chenjiahao): complete input dims assertion
     // TODO(chenjiahao): batch size is hard coded to 1 here
-    return nvinfer1::Dims4(top_n_ * 1, out_channel_, 1, 1);
+    return Dims4(top_n_ * 1, out_channel_, 1, 1);
   }
 
-  void configure(const nvinfer1::Dims *inputDims, int nbInputs,
-                 const nvinfer1::Dims *outputDims, int nbOutputs,
+  void configure(const Dims *inputDims, int nbInputs,
+                 const Dims *outputDims, int nbOutputs,
                  int maxBatchSize) override {}
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
