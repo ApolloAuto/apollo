@@ -27,8 +27,8 @@ from record_msg.builder import (
   PointCloudBuilder,
   LocalizationBuilder,
   TransformBuilder)
-from nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
-from geometry import Quaternion
+from adataset.nuscenes.nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
+from adataset.nuscenes.geometry import Quaternion
 
 
 LOCALIZATION_TOPIC = '/apollo/localization/pose'

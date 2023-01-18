@@ -26,8 +26,8 @@ from record_msg.builder import (
   PointCloudBuilder,
   LocalizationBuilder,
   TransformBuilder)
-from kitti import KITTISchema, KITTI
-from geometry import Quaternion
+from adataset.kitti.kitti import KITTISchema, KITTI
+from adataset.kitti.geometry import Quaternion
 
 
 LOCALIZATION_TOPIC = '/apollo/localization/pose'

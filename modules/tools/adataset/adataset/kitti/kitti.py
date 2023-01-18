@@ -19,10 +19,10 @@
 import os
 
 
-from common import Message, Pose
-from sensor import Lidar, Camera, IMU
-from geometry import Euler
-from proj_helper import latlon2utm
+from adataset.kitti.common import Message, Pose
+from adataset.kitti.sensor import Lidar, Camera, IMU
+from adataset.kitti.geometry import Euler
+from adataset.kitti.proj_helper import latlon2utm
 
 
 class KITTISchema(object):

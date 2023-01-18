@@ -19,14 +19,15 @@
 
 import os
 import yaml
+import pkgutil
 
 from itertools import chain
 from pathlib import Path
 
-from nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
+from adataset.nuscenes.nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
 
 
-CALIBRATION_META_ROOT = '../calibration_meta'
+CALIBRATION_META_ROOT = 'calibration_meta'
 # Lidar meta
 VELODYNE_PARAMS_PATH = 'velodyne_params'
 LIDAR_NOVATEL_EXTRINSICS = 'lidar_novatel_extrinsics.yaml'
@@ -54,8 +55,9 @@ def load_yaml(file_path):
       dict: yaml object
   """
   content = None
-  with open(file_path, 'r') as f:
-    content = yaml.safe_load(f)
+  # Read from 'package_data'
+  data = pkgutil.get_data('adataset', file_path)
+  content = yaml.safe_load(data)
   return content
 
 
