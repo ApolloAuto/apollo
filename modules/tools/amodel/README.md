@@ -1,22 +1,16 @@
 ## amodel
 `amodel` is Apollo's model deployment and management tool.
 
-## Install
-You can use below command to install `amodel`.
-```python
-pip3 install -t /opt/apollo/python_tools amodel
-```
-
 ## Set environment
 If you are running in Apollo docker, you can skip this step. If you are running outside of docker, the following environment needs to be set up.
 ```shell
-export APOLLO_ROOT_DIR=your_apollo_dir
+source docker/setup_host/host_env.sh
 ```
 
 ## How to work
 `amodel` provides the following commands:
 - list. Show models installed in Apollo.
-- info. Show details of a model.
+- info. Show details of the model.
 - install. Install the model to Apollo.
 - remove. Remove the model from Apollo.
 
@@ -40,7 +34,7 @@ tl_recognition      |tl_recognition      |camera              |paddlepaddle     
 ```
 
 #### Info
-Then you can use the `info` command to learn more about the details of the model.
+Then you can use the `info` command to show the details of the model.
 ```shell
 $ amodel info point_pillars
 name: point_pillars
@@ -70,7 +64,7 @@ dataset:
 ```
 
 #### Install
-You can deploy the model using the `install` command.
+You can deploy the model through the `install` command.
 ```shell
 # Install from local
 amodel install xxx.zip
@@ -79,7 +73,7 @@ amodel install https://xxx.zip
 ```
 
 #### Remove
-You can delete models installed in Apollo with the `remove` command.
+You can delete the model installed in Apollo through the `remove` command.
 ```shell
 amodel remove point_pillars
 ```
