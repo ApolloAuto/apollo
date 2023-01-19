@@ -48,6 +48,7 @@ MAP_VOLUMES_CONF=
 
 # Install python tools
 PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
+PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
 DEFAULT_PYTHON_TOOLS=(
   amodel
 )
@@ -408,6 +409,7 @@ function main() {
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${DEV_IMAGE}" \
         -e PYTHON_INSTALL_PATH="${PYTHON_INSTALL_PATH}" \
+        -e PYTHON_VERSION="${PYTHON_VERSION}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \

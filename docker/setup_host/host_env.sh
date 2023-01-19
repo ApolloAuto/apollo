@@ -19,8 +19,9 @@
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
+PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
 
 source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
 
-pathprepend "${PYTHON_INSTALL_PATH}/lib/python3.6/site-packages" PYTHONPATH
+pathprepend "${PYTHON_INSTALL_PATH}/lib/python${PYTHON_VERSION}/site-packages" PYTHONPATH
 pathprepend "${PYTHON_INSTALL_PATH}/bin/" PATH
