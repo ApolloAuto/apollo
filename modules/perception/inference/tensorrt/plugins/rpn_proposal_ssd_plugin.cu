@@ -118,7 +118,7 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
   float *out_rois = reinterpret_cast<float *>(outputs[0]);
 
   float *host_im_info = new float[batchSize * 6]();
-  BASE_CUDA_CHECK(cudaMemcpyAsync(host_im_info, im_info,
+  BASE_GPU_CHECK(cudaMemcpyAsync(host_im_info, im_info,
                                   batchSize * 6 * sizeof(float),
                                   cudaMemcpyDeviceToHost, stream));
 
@@ -133,7 +133,7 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
   // Using thrust::fill might cause crash
   float *init_out_rois = new float[out_rois_size]();
   std::fill_n(init_out_rois, out_rois_size, -1.0f);
-  BASE_CUDA_CHECK(cudaMemcpyAsync(out_rois, init_out_rois,
+  BASE_GPU_CHECK(cudaMemcpyAsync(out_rois, init_out_rois,
                                   out_rois_size * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
 
@@ -141,7 +141,7 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // reshape to [N, num_anchor, 4]
   float *temp_rpn_bbox_pred;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&temp_rpn_bbox_pred),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&temp_rpn_bbox_pred),
                              rpn_bbox_pred_size * sizeof(float)));
   nthreads = rpn_bbox_pred_size;
   block_size = (nthreads - 1) / thread_size_ + 1;
@@ -151,13 +151,13 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // Normalization
   float *dev_bbox_mean, *dev_bbox_std;
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMalloc(reinterpret_cast<void **>(&dev_bbox_mean), 4 * sizeof(float)));
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMalloc(reinterpret_cast<void **>(&dev_bbox_std), 4 * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_bbox_mean, bbox_mean_, 4 * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_mean, bbox_mean_, 4 * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_bbox_std, bbox_std_, 4 * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_bbox_std, bbox_std_, 4 * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
   repeatedly_mul_cuda(block_size, thread_size_, 0, stream, nthreads,
                       temp_rpn_bbox_pred, temp_rpn_bbox_pred, dev_bbox_std, 4);
@@ -166,22 +166,22 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // generate anchors
   float *anchors, *dev_anchor_heights, *dev_anchor_widths;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&anchors),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&anchors),
                              anchors_size * sizeof(float)));
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMemsetAsync(anchors, 0, anchors_size * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_anchor_heights),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_anchor_heights),
                              num_anchor_per_point_ * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_anchor_widths),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_anchor_widths),
                              num_anchor_per_point_ * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMemsetAsync(
+  BASE_GPU_CHECK(cudaMemsetAsync(
       dev_anchor_heights, 0, num_anchor_per_point_ * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaMemsetAsync(
+  BASE_GPU_CHECK(cudaMemsetAsync(
       dev_anchor_widths, 0, num_anchor_per_point_ * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_anchor_heights, anchor_heights_,
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_anchor_heights, anchor_heights_,
                                   num_anchor_per_point_ * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_anchor_widths, anchor_widths_,
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_anchor_widths, anchor_widths_,
                                   num_anchor_per_point_ * sizeof(float),
                                   cudaMemcpyHostToDevice, stream));
   block_size = (anchors_size - 1) / thread_size_ + 1;
@@ -191,9 +191,9 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // decode bbox
   float *proposals;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&proposals),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&proposals),
                              rpn_bbox_pred_size * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMemsetAsync(proposals, 0,
+  BASE_GPU_CHECK(cudaMemsetAsync(proposals, 0,
                                   rpn_bbox_pred_size * sizeof(float), stream));
   nthreads = batchSize * num_anchor;
   block_size = (nthreads - 1) / thread_size_ + 1;
@@ -211,7 +211,7 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // reshape scores to [N, num_anchor, 2]
   float *temp_scores;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&temp_scores),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&temp_scores),
                              scores_size * sizeof(float)));
   nthreads = scores_size;
   block_size = (nthreads - 1) / thread_size_ + 1;
@@ -222,17 +222,17 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
   // filter boxes according to min_size_mode and threshold_objectness
   float *filtered_proposals, *filtered_scores;
   int *filtered_count;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_proposals),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_proposals),
                              rpn_bbox_pred_size * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_scores),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_scores),
                              batchSize * num_anchor * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_count),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&filtered_count),
                              batchSize * sizeof(int)));
-  BASE_CUDA_CHECK(cudaMemsetAsync(filtered_proposals, 0,
+  BASE_GPU_CHECK(cudaMemsetAsync(filtered_proposals, 0,
                                   rpn_bbox_pred_size * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaMemsetAsync(
+  BASE_GPU_CHECK(cudaMemsetAsync(
       filtered_scores, 0, batchSize * num_anchor * sizeof(float), stream));
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMemsetAsync(filtered_count, 0, batchSize * sizeof(int), stream));
   nthreads = batchSize * num_anchor;
   block_size = (nthreads - 1) / thread_size_ + 1;
@@ -244,13 +244,13 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
                     nullptr, filtered_count);
 
   int *host_filtered_count = new int[batchSize]();
-  BASE_CUDA_CHECK(cudaMemcpyAsync(host_filtered_count, filtered_count,
+  BASE_GPU_CHECK(cudaMemcpyAsync(host_filtered_count, filtered_count,
                                   batchSize * sizeof(int),
                                   cudaMemcpyDeviceToHost, stream));
 
   // descending sort proposals by score
   int *sorted_indexes;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&sorted_indexes),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&sorted_indexes),
                              batchSize * num_anchor * sizeof(int)));
   for (int i = 0; i < batchSize; ++i) {
     thrust::sequence(thrust::device, sorted_indexes + i * num_anchor,
@@ -263,9 +263,9 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
 
   // keep max N candidates
   float *pre_nms_proposals;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&pre_nms_proposals),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&pre_nms_proposals),
                              batchSize * max_candidate_n_ * 4 * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMemsetAsync(
+  BASE_GPU_CHECK(cudaMemsetAsync(
       pre_nms_proposals, 0, batchSize * max_candidate_n_ * 4 * sizeof(float),
       stream));
   nthreads = batchSize * max_candidate_n_;
@@ -289,19 +289,19 @@ int RPNProposalSSDPlugin::enqueue(int batchSize, const void *const *inputs,
   out_rois_num_ = acc_box_num;
 
   // Free cuda memory
-  BASE_CUDA_CHECK(cudaFree(temp_rpn_bbox_pred));
-  BASE_CUDA_CHECK(cudaFree(dev_bbox_mean));
-  BASE_CUDA_CHECK(cudaFree(dev_bbox_std));
-  BASE_CUDA_CHECK(cudaFree(anchors));
-  BASE_CUDA_CHECK(cudaFree(dev_anchor_heights));
-  BASE_CUDA_CHECK(cudaFree(dev_anchor_widths));
-  BASE_CUDA_CHECK(cudaFree(proposals));
-  BASE_CUDA_CHECK(cudaFree(temp_scores));
-  BASE_CUDA_CHECK(cudaFree(filtered_proposals));
-  BASE_CUDA_CHECK(cudaFree(filtered_scores));
-  BASE_CUDA_CHECK(cudaFree(filtered_count));
-  BASE_CUDA_CHECK(cudaFree(sorted_indexes));
-  BASE_CUDA_CHECK(cudaFree(pre_nms_proposals));
+  BASE_GPU_CHECK(cudaFree(temp_rpn_bbox_pred));
+  BASE_GPU_CHECK(cudaFree(dev_bbox_mean));
+  BASE_GPU_CHECK(cudaFree(dev_bbox_std));
+  BASE_GPU_CHECK(cudaFree(anchors));
+  BASE_GPU_CHECK(cudaFree(dev_anchor_heights));
+  BASE_GPU_CHECK(cudaFree(dev_anchor_widths));
+  BASE_GPU_CHECK(cudaFree(proposals));
+  BASE_GPU_CHECK(cudaFree(temp_scores));
+  BASE_GPU_CHECK(cudaFree(filtered_proposals));
+  BASE_GPU_CHECK(cudaFree(filtered_scores));
+  BASE_GPU_CHECK(cudaFree(filtered_count));
+  BASE_GPU_CHECK(cudaFree(sorted_indexes));
+  BASE_GPU_CHECK(cudaFree(pre_nms_proposals));
 
   // Free host memory
   delete[] host_im_info;

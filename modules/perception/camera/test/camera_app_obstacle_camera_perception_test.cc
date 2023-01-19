@@ -135,7 +135,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
         "camera/app/images/" +
         image_name + ".jpg";
     cv::Mat image;
-    image = cv::imread(image_path, cv::IMAGE_COLOR);
+    image = cv::imread(image_path, cv::IMREAD_COLOR);
     ASSERT_TRUE(image.data);
     frame_id++;
     CameraFrame &frame = frame_list[frame_id % FRAME_CAPACITY];

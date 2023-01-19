@@ -464,6 +464,7 @@ void PointPillars::InitTorch() {
 }
 
 void PointPillars::InitTRT() {
+#if GPU_PLATFORM == NVIDIA
   // create a TensorRT model from the onnx model and load it into an engine
   OnnxToTRTModel(pfe_onnx_file_, &pfe_engine_);
   OnnxToTRTModel(rpn_onnx_file_, &rpn_engine_);
@@ -477,11 +478,15 @@ void PointPillars::InitTRT() {
   if (pfe_context_ == nullptr || rpn_context_ == nullptr) {
     AERROR << "Failed to create TensorRT Execution Context.";
   }
+#elif GPU_PLATFORM == AMD
+  assert(0 && "PointPillars::InitTRT() is not implemented yet");
+#endif
 }
 
 void PointPillars::OnnxToTRTModel(
     const std::string& model_file,  // name of the onnx model
     nvinfer1::ICudaEngine** engine_ptr) {
+#if GPU_PLATFORM == NVIDIA
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
 
   // create the builder
@@ -512,6 +517,9 @@ void PointPillars::OnnxToTRTModel(
   network->destroy();
   config->destroy();
   builder->destroy();
+#elif GPU_PLATFORM == AMD
+  assert(0 && "PointPillars::OnnxToTRTModel is not implemented yet");
+#endif
 }
 
 void PointPillars::PreprocessCPU(const float* in_points_array,

@@ -16,7 +16,6 @@
 
 #include "modules/perception/inference/onnx/onnx_obstacle_detector.h"
 
-#include <cuda_runtime_api.h>
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -24,17 +23,6 @@ namespace perception {
 namespace inference {
 
 using apollo::perception::base::Blob;
-
-#define GPU_CHECK(ans) \
-  { GPUAssert((ans), __FILE__, __LINE__); }
-inline void GPUAssert(cudaError_t code, const char* file, int line,
-                      bool abort = true) {
-  if (code != cudaSuccess) {
-    fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file,
-            line);
-    if (abort) exit(code);
-  }
-}
 
 OnnxObstacleDetector::OnnxObstacleDetector(
   const std::string &model_file,
@@ -57,6 +45,7 @@ OnnxObstacleDetector::~OnnxObstacleDetector() {}
 void OnnxObstacleDetector::OnnxToTRTModel(
     const std::string& model_file,  // name of the onnx model
     nvinfer1::ICudaEngine** engine_ptr) {
+#if GPU_PLATFORM == NVIDIA
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kWARNING);
   kBatchSize = 1;
 
@@ -88,6 +77,9 @@ void OnnxObstacleDetector::OnnxToTRTModel(
   network->destroy();
   config->destroy();
   builder->destroy();
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::OnnxToTRTModel() is not implemented yet");
+#endif
 }
 
 void OnnxObstacleDetector::inference() {
@@ -104,6 +96,7 @@ bool OnnxObstacleDetector::Init(const std::map<std::string,
   }
 
   // create execution context from the engine
+#if GPU_PLATFORM == NVIDIA
   context_ = engine_->createExecutionContext();
   if (context_ == nullptr) {
     AERROR << "Fail to create Exceution Context";
@@ -122,6 +115,9 @@ bool OnnxObstacleDetector::Init(const std::map<std::string,
       blobs_.emplace(name, blob);
     }
   }
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::Init() is not implemented yet");
+#endif
   return true;
 }
 

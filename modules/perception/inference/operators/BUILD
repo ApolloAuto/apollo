@@ -1,12 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-cuda_library(
+gpu_library(
     name = "perception_inference_operators_cuda",
     srcs = ["roipooling_layer.cu"],
     hdrs = ["roipooling_layer.h"],
@@ -14,8 +14,11 @@ cuda_library(
         "//modules/perception/base:blob",
         "//modules/perception/inference:layer_lib",
         "@eigen",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(

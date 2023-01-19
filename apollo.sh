@@ -69,23 +69,25 @@ function apollo_env_setup() {
     check_architecture_support
     check_platform_support
     check_minimal_memory_requirement
-    determine_gpu_use_target
+    setup_gpu_support
     determine_esdcan_use
 
-    APOLLO_ENV="${APOLLO_ENV} STAGE=${STAGE}"
+    APOLLO_ENV="STAGE=${STAGE}"
     APOLLO_ENV="${APOLLO_ENV} USE_ESD_CAN=${USE_ESD_CAN}"
     # Add more here ...
 
-    info "Apollo Environment Settings:"
-    info "${TAB}APOLLO_ROOT_DIR: ${APOLLO_ROOT_DIR}"
-    info "${TAB}APOLLO_CACHE_DIR: ${APOLLO_CACHE_DIR}"
-    info "${TAB}APOLLO_IN_DOCKER: ${APOLLO_IN_DOCKER}"
-    info "${TAB}APOLLO_VERSION: ${APOLLO_VERSION}"
+    info "${BLUE}Apollo Environment Settings:${NO_COLOR}"
+    info "${TAB}APOLLO_ROOT_DIR:   ${GREEN}${APOLLO_ROOT_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_CACHE_DIR:  ${GREEN}${APOLLO_CACHE_DIR}${NO_COLOR}"
+    info "${TAB}APOLLO_IN_DOCKER:  ${GREEN}${APOLLO_IN_DOCKER}${NO_COLOR}"
+    info "${TAB}APOLLO_VERSION:    ${GREEN}${APOLLO_VERSION}${NO_COLOR}"
     if "${APOLLO_IN_DOCKER}"; then
-        info "${TAB}DOCKER_IMG: ${DOCKER_IMG##*:}"
+        info "${TAB}DOCKER_IMG:        ${GREEN}${DOCKER_IMG##*:}${NO_COLOR}"
     fi
-    info "${TAB}APOLLO_ENV: ${APOLLO_ENV}"
-    info "${TAB}USE_GPU: USE_GPU_HOST=${USE_GPU_HOST} USE_GPU_TARGET=${USE_GPU_TARGET}"
+    info "${TAB}APOLLO_ENV:        ${GREEN}${APOLLO_ENV}${NO_COLOR}"
+    info "${TAB}USE_GPU_HOST:      ${GREEN}${USE_GPU_HOST}${NO_COLOR}"
+    info "${TAB}USE_GPU_TARGET:    ${GREEN}${USE_GPU_TARGET}${NO_COLOR}"
+    info "${TAB}GPU_PLATFORM:      ${GREEN}${GPU_PLATFORM}${NO_COLOR}"
 
     if [[ -z "${APOLLO_BAZEL_DIST_DIR}" ]]; then
         source "${TOP_DIR}/cyber/setup.bash"
@@ -94,9 +96,7 @@ function apollo_env_setup() {
         mkdir -p "${APOLLO_BAZEL_DIST_DIR}"
     fi
 
-    if [ ! -f "${APOLLO_ROOT_DIR}/.apollo.bazelrc" ]; then
-        env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
-    fi
+    env ${APOLLO_ENV} bash "${APOLLO_ROOT_DIR}/scripts/apollo_config.sh" --noninteractive
 }
 
 #TODO(all): Update node modules
@@ -123,7 +123,11 @@ function _usage() {
     ${BLUE}build_opt [module]${NO_COLOR}: run optimized build.
     ${BLUE}build_cpu [module]${NO_COLOR}: build in CPU mode. Equivalent to 'bazel build --config=cpu'
     ${BLUE}build_gpu [module]${NO_COLOR}: run build in GPU mode. Equivalent to 'bazel build --config=gpu'
+    ${BLUE}build_nvidia [module]${NO_COLOR}: run build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=gpu --config=nvidia'
+    ${BLUE}build_amd [module]${NO_COLOR}: run build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=gpu --config=amd'
     ${BLUE}build_opt_gpu [module]${NO_COLOR}: optimized build in GPU mode. Equivalent to 'bazel build --config=opt --config=gpu'
+    ${BLUE}build_opt_nvidia [module]${NO_COLOR}: optimized build in GPU mode for NVIDIA GPU target. Equivalent to 'bazel build --config=opt --config=gpu --config=nvidia'
+    ${BLUE}build_opt_amd [module]${NO_COLOR}: optimized build in GPU mode for AMD GPU target. Equivalent to 'bazel build --config=opt --config=gpu --config=amd'
     ${BLUE}test [module]${NO_COLOR}: run unittest for cyber (module='cyber') or modules/<module>. If unspecified, test all.
     ${BLUE}coverage [module]${NO_COLOR}: run coverage test for cyber (module='cyber') or modules/<module>. If unspecified, coverage all.
     ${BLUE}lint${NO_COLOR}: run code style check
@@ -149,12 +153,20 @@ function _check_command() {
     python scripts/command_checker.py --name "${name}" --command "${cmd}" --available "${commands}" --helpmsg "${help_msg}"
 }
 
+function check_config_cpu() {
+    if [[ $* == *--config?cpu* ]] ; then
+        export USE_GPU_TARGET="0"
+    fi
+}
+
+
 function main() {
     if [ "$#" -eq 0 ]; then
         _usage
         exit 0
     fi
 
+    check_config_cpu "$@"
     apollo_env_setup
 
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
@@ -183,8 +195,20 @@ function main() {
         build_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=gpu "$@"
             ;;
+        build_nvidia)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=gpu --config=nvidia "$@"
+            ;;
+        build_amd)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=gpu --config=amd "$@"
+            ;;
         build_opt_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "$@"
+            ;;
+        build_opt_nvidia)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu --config=nvidia "$@"
+            ;;
+        build_opt_amd)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu --config=amd "$@"
             ;;
         build_prof)
             env ${APOLLO_ENV} bash "${build_sh}" --config=prof "$@"

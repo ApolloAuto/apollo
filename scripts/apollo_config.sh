@@ -53,15 +53,15 @@ function main() {
       exit 0
       ;;
     -i | --interactive)
-      info "Configure ${mycfg} in interactive mode"
+      info "Configure ${GREEN}${mycfg}${NO_COLOR} in interactive mode"
       run_bootstrap --interactive
-      ok "Successfully configured ${mycfg} in interactive mode."
+      ok "Successfully configured ${GREEN}${mycfg}${NO_COLOR} in interactive mode."
       exit 0
       ;;
     -n | --noninteractive)
-      info "Configure ${mycfg} in non-interactive mode"
+      info "Configure ${GREEN}${mycfg}${NO_COLOR} in non-interactive mode"
       run_bootstrap --interactive false
-      ok "Successfully configured ${mycfg} in non-interactive mode."
+      ok "Successfully configured ${GREEN}${mycfg}${NO_COLOR} in non-interactive mode."
       exit 0
       ;;
     *)

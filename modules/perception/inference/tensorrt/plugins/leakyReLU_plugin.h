@@ -30,7 +30,7 @@ class ReLUPlugin : public nvinfer1::IPlugin {
   ReLUPlugin(const ReLUParameter &param, const nvinfer1::Dims &in_dims) {
     input_dims_.nbDims = in_dims.nbDims;
     CHECK_GT(input_dims_.nbDims, 0);
-    for (int i = 0; i < in_dims.nbDims; i++) {
+    for (int i = 0; i < in_dims.nbDims; ++i) {
       input_dims_.d[i] = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
@@ -39,8 +39,8 @@ class ReLUPlugin : public nvinfer1::IPlugin {
 
   ReLUPlugin() {}
   ~ReLUPlugin() {}
-  virtual int initialize() { return 0; }
-  virtual void terminate() {}
+  int initialize() override { return 0; }
+  void terminate() override {}
   int getNbOutputs() const override { return 1; }
 
   nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
@@ -57,8 +57,8 @@ class ReLUPlugin : public nvinfer1::IPlugin {
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  int enqueue(int batchSize, const void *const *inputs, void **outputs,
+              void *workspace, cudaStream_t stream) override;
 
   size_t getSerializationSize() override { return 0; }
 

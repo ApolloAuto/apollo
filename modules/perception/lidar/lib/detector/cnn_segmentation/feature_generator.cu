@@ -161,13 +161,13 @@ void FeatureGenerator::GenerateGPU(const base::PointFCloudPtr& pc_ptr,
   int block_size = (map_size + kGPUThreadSize - 1) / kGPUThreadSize;
   SetKernel<float>
       <<<block_size, kGPUThreadSize>>>(map_size, -5.f, max_height_data_);
-  BASE_CUDA_CHECK(cudaMemset(mean_height_data_, 0.f, sizeof(float) * map_size));
-  BASE_CUDA_CHECK(cudaMemset(count_data_, 0.f, sizeof(float) * map_size));
-  BASE_CUDA_CHECK(cudaMemset(nonempty_data_, 0.f, sizeof(float) * map_size));
+  BASE_GPU_CHECK(cudaMemset(mean_height_data_, 0.f, sizeof(float) * map_size));
+  BASE_GPU_CHECK(cudaMemset(count_data_, 0.f, sizeof(float) * map_size));
+  BASE_GPU_CHECK(cudaMemset(nonempty_data_, 0.f, sizeof(float) * map_size));
   if (use_intensity_feature_) {
-    BASE_CUDA_CHECK(
+    BASE_GPU_CHECK(
         cudaMemset(top_intensity_data_, 0.f, sizeof(float) * map_size));
-    BASE_CUDA_CHECK(
+    BASE_GPU_CHECK(
         cudaMemset(mean_intensity_data_, 0.f, sizeof(float) * map_size));
   }
 
@@ -175,19 +175,19 @@ void FeatureGenerator::GenerateGPU(const base::PointFCloudPtr& pc_ptr,
   size_t cloud_size = pc_ptr->size();
   if (cloud_size > pc_gpu_size_) {
     // cloud data
-    BASE_CUDA_CHECK(cudaFree(pc_gpu_));
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
+    BASE_GPU_CHECK(cudaFree(pc_gpu_));
+    BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&pc_gpu_),
                                cloud_size * sizeof(base::PointF)));
     pc_gpu_size_ = cloud_size;
     // point2grid
-    BASE_CUDA_CHECK(cudaFree(point2grid_gpu_));
-    BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_),
+    BASE_GPU_CHECK(cudaFree(point2grid_gpu_));
+    BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void**>(&point2grid_gpu_),
                                cloud_size * sizeof(int)));
   }
-  BASE_CUDA_CHECK(cudaMemcpy(pc_gpu_, &(pc_ptr->front()),
+  BASE_GPU_CHECK(cudaMemcpy(pc_gpu_, &(pc_ptr->front()),
                              sizeof(base::PointF) * cloud_size,
                              cudaMemcpyHostToDevice));
-  BASE_CUDA_CHECK(cudaMemcpy(point2grid_gpu_, point2grid.data(),
+  BASE_GPU_CHECK(cudaMemcpy(point2grid_gpu_, point2grid.data(),
                              sizeof(int) * cloud_size, cudaMemcpyHostToDevice));
 
   // compute features
@@ -213,10 +213,10 @@ void FeatureGenerator::GenerateGPU(const base::PointFCloudPtr& pc_ptr,
 
 void FeatureGenerator::ReleaseGPUMemory() {
   if (pc_gpu_ != nullptr) {
-    BASE_CUDA_CHECK(cudaFree(pc_gpu_));
+    BASE_GPU_CHECK(cudaFree(pc_gpu_));
   }
   if (point2grid_gpu_ != nullptr) {
-    BASE_CUDA_CHECK(cudaFree(point2grid_gpu_));
+    BASE_GPU_CHECK(cudaFree(point2grid_gpu_));
   }
 }
 

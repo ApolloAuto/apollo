@@ -133,7 +133,7 @@ void NmsForward(const bool rpn_proposal_output_score,
   int *out_keep_inds = new int[host_filter_count]();
 
   uint64_t *dev_mask = NULL;
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMalloc(&dev_mask, host_filter_count * col_blocks * sizeof(uint64_t)));
 
   nms_kernel<<<blocks, threads, 0, stream>>>(
@@ -142,7 +142,7 @@ void NmsForward(const bool rpn_proposal_output_score,
 
   // postprocess for nms output
   std::vector<uint64_t> host_mask(host_filter_count * col_blocks);
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMemcpyAsync(&host_mask[0], dev_mask,
                       sizeof(uint64_t) * host_filter_count * col_blocks,
                       cudaMemcpyDeviceToHost, stream));
@@ -165,20 +165,20 @@ void NmsForward(const bool rpn_proposal_output_score,
   // gather boxes by kept indexes, and keep top N boxes
   int *dev_keep_inds, *dev_keep_num;
   float *kept_boxes, *kept_scores, *kept_all_probs;
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_keep_inds),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&dev_keep_inds),
                              num_candidate * sizeof(int)));
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMalloc(reinterpret_cast<void **>(&dev_keep_num), sizeof(int)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_boxes),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_boxes),
                              top_n * 4 * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_scores),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_scores),
                              top_n * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_all_probs),
+  BASE_GPU_CHECK(cudaMalloc(reinterpret_cast<void **>(&kept_all_probs),
                              top_n * num_prob * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_keep_inds, out_keep_inds,
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_keep_inds, out_keep_inds,
                                   out_num_to_keep * sizeof(int),
                                   cudaMemcpyHostToDevice, stream));
-  BASE_CUDA_CHECK(cudaMemcpyAsync(dev_keep_num, &out_num_to_keep, sizeof(int),
+  BASE_GPU_CHECK(cudaMemcpyAsync(dev_keep_num, &out_num_to_keep, sizeof(int),
                                   cudaMemcpyHostToDevice, stream));
   int nthreads = top_n;
   int block_size = (nthreads - 1) / NUM_THREADS_MACRO + 1;
@@ -198,12 +198,12 @@ void NmsForward(const bool rpn_proposal_output_score,
 
   *acc_box_num += cur_box_num;
 
-  BASE_CUDA_CHECK(cudaFree(dev_mask));
-  BASE_CUDA_CHECK(cudaFree(dev_keep_inds));
-  BASE_CUDA_CHECK(cudaFree(dev_keep_num));
-  BASE_CUDA_CHECK(cudaFree(kept_boxes));
-  BASE_CUDA_CHECK(cudaFree(kept_scores));
-  BASE_CUDA_CHECK(cudaFree(kept_all_probs));
+  BASE_GPU_CHECK(cudaFree(dev_mask));
+  BASE_GPU_CHECK(cudaFree(dev_keep_inds));
+  BASE_GPU_CHECK(cudaFree(dev_keep_num));
+  BASE_GPU_CHECK(cudaFree(kept_boxes));
+  BASE_GPU_CHECK(cudaFree(kept_scores));
+  BASE_GPU_CHECK(cudaFree(kept_all_probs));
 
   delete[] out_keep_inds;
 }

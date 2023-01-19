@@ -37,7 +37,7 @@ __global__ void cmp(const int nthreads, const float *in_data,
     }
     int c_max = 0;
     float v_max = float_min;
-    for (int c = 0; c < channels; c++) {
+    for (int c = 0; c < channels; ++c) {
       int in_idx = ((n * channels + c) * height + h) * width + w;
       if (v_max < in_data[in_idx]) {
         v_max = in_data[in_idx];

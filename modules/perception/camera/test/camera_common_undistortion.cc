@@ -14,12 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/test/camera_common_undistortion.h"
+#include "modules/perception/camera/common/undistortion_handler.h"
 
-#include <npp.h>
 #include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "yaml-cpp/yaml.h"
+
+#if GPU_PLATFORM == NVIDIA
+  #include <nppi.h>
+#elif GPU_PLATFORM == AMD
+  #include <rppi.h>
+#endif
 
 namespace apollo {
 namespace perception {
@@ -56,8 +62,8 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
 
   _out_size = static_cast<int>(img_size * CHANNEL * sizeof(uint8_t));
   // if input is rgb, its size is same as output's
-  BASE_CUDA_CHECK(cudaMalloc(&_d_rgb, _out_size));
-  BASE_CUDA_CHECK(cudaMalloc(&_d_dst, _out_size));
+  BASE_GPU_CHECK(cudaMalloc(&_d_rgb, _out_size));
+  BASE_GPU_CHECK(cudaMalloc(&_d_dst, _out_size));
 
   cv::Mat_<double> I = cv::Mat_<double>::eye(3, 3);
   cv::Mat map1(_height, _width, CV_32FC1);
@@ -82,12 +88,12 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
     }
   }
 
-  BASE_CUDA_CHECK(cudaMalloc(&_d_mapx, img_size * sizeof(float)));
-  BASE_CUDA_CHECK(cudaMalloc(&_d_mapy, img_size * sizeof(float)));
+  BASE_GPU_CHECK(cudaMalloc(&_d_mapx, img_size * sizeof(float)));
+  BASE_GPU_CHECK(cudaMalloc(&_d_mapy, img_size * sizeof(float)));
 
-  BASE_CUDA_CHECK(cudaMemcpy(_d_mapx, mapx.data(), img_size * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpy(_d_mapx, mapx.data(), img_size * sizeof(float),
                              cudaMemcpyHostToDevice));
-  BASE_CUDA_CHECK(cudaMemcpy(_d_mapy, mapy.data(), img_size * sizeof(float),
+  BASE_GPU_CHECK(cudaMemcpy(_d_mapy, mapy.data(), img_size * sizeof(float),
                              cudaMemcpyHostToDevice));
   _inited = true;
   return 0;
@@ -104,27 +110,26 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
   if (!_inited) {
     return -1;
   }
-
-  BASE_CUDA_CHECK(cudaMemcpy(_d_rgb, src, _in_size, cudaMemcpyHostToDevice));
-
+  BASE_GPU_CHECK(cudaMemcpy(_d_rgb, src, _in_size, cudaMemcpyHostToDevice));
+#if GPU_PLATFORM == NVIDIA
   NppiSize Remapsize;
   NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
   Remapsize.width = _width;
   Remapsize.height = _height;
   NppiRect RemapRect = {0, 0, _width, _height};
-
-  NppStatus eStatusNPP =
-      nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
-                       _d_mapx, (_width * static_cast<int>(sizeof(float))),
-                       _d_mapy, (_width * static_cast<int>(sizeof(float))),
-                       _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
-
+  NppStatus eStatusNPP = NPP_SUCCESS;
+  eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
+                                _d_mapx, (_width * static_cast<int>(sizeof(float))),
+                                _d_mapy, (_width * static_cast<int>(sizeof(float))),
+                                _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
   if (eStatusNPP != NPP_SUCCESS) {
     std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
     return static_cast<int>(eStatusNPP);
   }
-
-  BASE_CUDA_CHECK(cudaMemcpy(dst, _d_dst, _out_size, cudaMemcpyDeviceToHost));
+#elif GPU_PLATFORM == AMD
+  // TODO(B1tway): Add necesssary RPP code
+#endif
+  BASE_GPU_CHECK(cudaMemcpy(dst, _d_dst, _out_size, cudaMemcpyDeviceToHost));
   return 0;
 }
 
@@ -135,19 +140,19 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
  */
 int ImageGpuPreprocessHandler::release(void) {
   if (_d_mapy) {
-    BASE_CUDA_CHECK(cudaFree(_d_mapy));
+    BASE_GPU_CHECK(cudaFree(_d_mapy));
     _d_mapy = nullptr;
   }
   if (_d_mapx) {
-    BASE_CUDA_CHECK(cudaFree(_d_mapx));
+    BASE_GPU_CHECK(cudaFree(_d_mapx));
     _d_mapx = nullptr;
   }
   if (_d_dst) {
-    BASE_CUDA_CHECK(cudaFree(_d_dst));
+    BASE_GPU_CHECK(cudaFree(_d_dst));
     _d_dst = nullptr;
   }
   if (_d_rgb) {
-    BASE_CUDA_CHECK(cudaFree(_d_rgb));
+    BASE_GPU_CHECK(cudaFree(_d_rgb));
     _d_rgb = nullptr;
   }
   _inited = false;

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/platform:build_defs.bzl", "if_gpu")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -45,7 +45,11 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_test(
@@ -59,7 +63,11 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_test(
@@ -73,7 +81,11 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_test(
@@ -87,7 +99,11 @@ cc_test(
     deps = [
         ":emergency_pull_over_scenario",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cpplint()

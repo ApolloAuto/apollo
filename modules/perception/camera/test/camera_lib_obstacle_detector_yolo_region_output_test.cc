@@ -387,9 +387,9 @@ TEST(YoloCameraDetectorTest, nms_test) {
 
     std::vector<int> indices;
     apply_nms_fast(test_objects, scores, 0.1f, 0.5f, 1.0f, 20, &indices);
-    CHECK_EQ(indices.size(), 1);
+    CHECK_EQ(indices.size(), size_t(1));
     apply_nms_fast(test_objects, scores, 0.1f, 0.5f, 0.7f, 20, &indices);
-    CHECK_EQ(indices.size(), 1);
+    CHECK_EQ(indices.size(), size_t(1));
     obj_ped3.xmin = .10f;
     obj_ped3.xmax = .25f;
     obj_ped3.ymin = .32f;
@@ -458,10 +458,10 @@ TEST(YoloCameraDetectorTest, nms_test) {
 
     apply_softnms_fast(test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
                        &empty_indices, true, 0.8f);
-    CHECK_EQ(empty_indices.size(), 0);
+    CHECK_EQ(empty_indices.size(), size_t(0));
     apply_boxvoting_fast(&test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
                          &empty_indices);
-    CHECK_EQ(empty_indices.size(), 0);
+    CHECK_EQ(empty_indices.size(), size_t(0));
   }
 }
 

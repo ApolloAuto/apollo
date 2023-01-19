@@ -34,17 +34,16 @@ TEST(CIPV, cipv_ground_test) {
     homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
         2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
 
-    float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-    float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-    float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-    float average_frame_rate_ = kAverageFrameRate;
-    bool image_based_cipv_ = false;
-    int debug_level = 3;
+    CipvInitOptions cipv_init_options;
+    cipv_init_options.min_laneline_length_for_cipv = kMinLaneLineLengthForCIPV;
+    cipv_init_options.average_lane_width_in_meter = kAverageLaneWidthInMeter;
+    cipv_init_options.max_vehicle_width_in_meter = kMaxVehicleWidthInMeter;
+    cipv_init_options.average_frame_rate = kAverageFrameRate;
+    cipv_init_options.image_based_cipv = false;
+    cipv_init_options.debug_level = 3;
 
     Cipv cipv_;
-    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level);
+    cipv_.Init(homography_im2car_, cipv_init_options);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;
@@ -331,17 +330,16 @@ TEST(CIPV, cipv_image_test) {
     homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
         2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
 
-    float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
-    float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
-    float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
-    float average_frame_rate_ = kAverageFrameRate;
-    bool image_based_cipv_ = true;
-    int debug_level = 3;
+    CipvInitOptions cipv_init_options;
+    cipv_init_options.min_laneline_length_for_cipv = kMinLaneLineLengthForCIPV;
+    cipv_init_options.average_lane_width_in_meter = kAverageLaneWidthInMeter;
+    cipv_init_options.max_vehicle_width_in_meter = kMaxVehicleWidthInMeter;
+    cipv_init_options.average_frame_rate = kAverageFrameRate;
+    cipv_init_options.image_based_cipv = true;
+    cipv_init_options.debug_level = 3;
 
     Cipv cipv_;
-    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level);
+    cipv_.Init(homography_im2car_, cipv_init_options);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;

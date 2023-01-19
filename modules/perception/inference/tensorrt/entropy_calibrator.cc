@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include <cuda_runtime_api.h>
+#include "modules/perception/base/common.h"
 
 namespace nvinfer1 {
 Int8EntropyCalibrator::Int8EntropyCalibrator(

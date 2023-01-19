@@ -30,11 +30,18 @@ load(
     "get_bash_bin",
     "get_cpu_value",
     "get_host_environ",
+    "get_crosstool_verbose",
     "get_python_bin",
     "raw_exec",
     "read_dir",
     "realpath",
+    "make_copy_files_rule",
+    "make_copy_dir_rule",
+    "to_list_of_strings",
+    "flag_enabled",
     "which",
+    "tpl_gpus_path",
+    "tpl_gpus",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -48,20 +55,7 @@ _CUDNN_INSTALL_PATH = "CUDNN_INSTALL_PATH"
 _TF_CUDA_COMPUTE_CAPABILITIES = "TF_CUDA_COMPUTE_CAPABILITIES"
 _TF_CUDA_CONFIG_REPO = "TF_CUDA_CONFIG_REPO"
 _PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
-
-def to_list_of_strings(elements):
-    """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
-
-    This is to be used to put a list of strings into the bzl file templates
-    so it gets interpreted as list of strings in Starlark.
-
-    Args:
-      elements: list of string elements
-
-    Returns:
-      single string of elements wrapped in quotes separated by a comma."""
-    quoted_strings = ["\"" + element + "\"" for element in elements]
-    return ", ".join(quoted_strings)
+_GPU_PLATFORM = "GPU_PLATFORM"
 
 def verify_build_defines(params):
     """Verify all variables that crosstool/BUILD.tpl expects are substituted.
@@ -314,6 +308,17 @@ def compute_capabilities(repository_ctx):
             auto_configure_fail("Invalid compute capability: %s" % capability)
 
     return capabilities
+
+def _nvcc_verbose(repository_ctx):
+    """Returns the environment variable value NVCC_VERBOSE.
+
+    Args:
+        repository_ctx: The repository context.
+
+    Returns:
+        A string containing value of environment variable NVCC_VERBOSE.
+    """
+    return get_host_environ(repository_ctx, "NVCC_VERBOSE", "0")
 
 def lib_name(base_name, cpu_value, version = None, static = False):
     """Constructs the platform-specific name of a library.
@@ -583,15 +588,6 @@ def _get_cuda_config(repository_ctx, find_cuda_config_script):
         config = config,
     )
 
-def _tpl(repository_ctx, tpl, substitutions = {}, out = None):
-    if not out:
-        out = tpl.replace(":", "/")
-    repository_ctx.template(
-        out,
-        Label("//third_party/gpus/%s.tpl" % tpl),
-        substitutions,
-    )
-
 def _file(repository_ctx, label):
     repository_ctx.template(
         label.replace(":", "/"),
@@ -628,7 +624,7 @@ def _create_dummy_repository(repository_ctx):
     cpu_value = get_cpu_value(repository_ctx)
 
     # Set up BUILD file for cuda/.
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:build_defs.bzl",
         {
@@ -637,7 +633,7 @@ def _create_dummy_repository(repository_ctx):
             "%{cuda_gpu_architectures}": "[]",
         },
     )
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:BUILD",
         {
@@ -691,7 +687,7 @@ filegroup(name="cudnn-include")
     repository_ctx.file("cuda/cuda/lib/%s" % lib_name("cusparse", cpu_value))
 
     # Set up cuda_config.h
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:cuda_config.h",
         {
@@ -710,7 +706,7 @@ filegroup(name="cudnn-include")
 
     # Set up cuda_config.py, which is used by gen_build_info to provide
     # static build environment info to the API
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:cuda_config.py",
         _py_tmpl_dict({}),
@@ -726,64 +722,8 @@ filegroup(name="cudnn-include")
     )
     repository_ctx.file("crosstool/BUILD", _DUMMY_CROSSTOOL_BUILD_FILE)
 
-def _norm_path(path):
-    """Returns a path with '/' and remove the trailing slash."""
-    path = path.replace("\\", "/")
-    if path[-1] == "/":
-        path = path[:-1]
-    return path
-
-def make_copy_files_rule(repository_ctx, name, srcs, outs):
-    """Returns a rule to copy a set of files."""
-    cmds = []
-
-    # Copy files.
-    for src, out in zip(srcs, outs):
-        cmds.append('cp -f "%s" "$(location %s)"' % (src, out))
-    outs = [('        "%s",' % out) for out in outs]
-    return """genrule(
-    name = "%s",
-    outs = [
-%s
-    ],
-    cmd = \"""%s \""",
-)""" % (name, "\n".join(outs), " && \\\n".join(cmds))
-
-def make_copy_dir_rule(repository_ctx, name, src_dir, out_dir, exceptions = None):
-    """Returns a rule to recursively copy a directory.
-    If exceptions is not None, it must be a list of files or directories in
-    'src_dir'; these will be excluded from copying.
-    """
-    src_dir = _norm_path(src_dir)
-    out_dir = _norm_path(out_dir)
-    outs = read_dir(repository_ctx, src_dir)
-    post_cmd = ""
-    if exceptions != None:
-        outs = [x for x in outs if not any([
-            x.startswith(src_dir + "/" + y)
-            for y in exceptions
-        ])]
-    outs = [('        "%s",' % out.replace(src_dir, out_dir)) for out in outs]
-
-    # '@D' already contains the relative path for a single file, see
-    # http://docs.bazel.build/versions/master/be/make-variables.html#predefined_genrule_variables
-    out_dir = "$(@D)/%s" % out_dir if len(outs) > 1 else "$(@D)"
-    if exceptions != None:
-        for x in exceptions:
-            post_cmd += " ; rm -fR " + out_dir + "/" + x
-    return """genrule(
-    name = "%s",
-    outs = [
-%s
-    ],
-    cmd = \"""cp -rLf "%s/." "%s/" %s\""",
-)""" % (name, "\n".join(outs), src_dir, out_dir, post_cmd)
-
-def _flag_enabled(repository_ctx, flag_name):
-    return get_host_environ(repository_ctx, flag_name) == "1"
-
 def _use_cuda_clang(repository_ctx):
-    return _flag_enabled(repository_ctx, "TF_CUDA_CLANG")
+    return flag_enabled(repository_ctx, "TF_CUDA_CLANG")
 
 def _tf_sysroot(repository_ctx):
     return get_host_environ(repository_ctx, _TF_SYSROOT, "")
@@ -797,9 +737,6 @@ def _compute_cuda_extra_copts(repository_ctx, compute_capabilities):
         copts.append("--cuda-gpu-arch=%s" % capability)
 
     return str(copts)
-
-def _tpl_path(repository_ctx, filename):
-    return repository_ctx.path(Label("//third_party/gpus/%s.tpl" % filename))
 
 def _basename(repository_ctx, path_str):
     """Returns the basename of a path of type string.
@@ -822,7 +759,7 @@ def _create_local_cuda_repository(repository_ctx):
     # function to be restarted with all previous state being lost. This
     # can easily lead to a O(n^2) runtime in the number of labels.
     # See https://github.com/tensorflow/tensorflow/commit/62bd3534525a036f07d9851b3199d68212904778
-    tpl_paths = {filename: _tpl_path(repository_ctx, filename) for filename in [
+    tpl_paths = {filename: tpl_gpus_path(repository_ctx, filename) for filename in [
         "cuda:build_defs.bzl",
         "crosstool:clang/bin/crosstool_wrapper_driver_is_not_gcc",
         "crosstool:BUILD",
@@ -830,7 +767,7 @@ def _create_local_cuda_repository(repository_ctx):
         "cuda:cuda_config.h",
         "cuda:cuda_config.py",
     ]}
-    tpl_paths["cuda:BUILD"] = _tpl_path(repository_ctx, "cuda:BUILD")
+    tpl_paths["cuda:BUILD"] = tpl_gpus_path(repository_ctx, "cuda:BUILD")
     find_cuda_config_script = repository_ctx.path(Label("//third_party/gpus:find_cuda_config.py.gz.base64"))
 
     cuda_config = _get_cuda_config(repository_ctx, find_cuda_config_script)
@@ -1109,6 +1046,8 @@ def _create_local_cuda_repository(repository_ctx):
             "%{cuda_version}": cuda_config.cuda_version,
             "%{nvcc_path}": nvcc_path,
             "%{gcc_host_compiler_path}": str(cc),
+            "%{crosstool_verbose}": get_crosstool_verbose(repository_ctx),
+            "%{nvcc_verbose}": _nvcc_verbose(repository_ctx),
         }
         repository_ctx.template(
             "crosstool/clang/bin/crosstool_wrapper_driver_is_not_gcc",
@@ -1169,7 +1108,7 @@ def _py_tmpl_dict(d):
 
 def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
     """Creates pointers to a remotely configured repo set up to build with CUDA."""
-    _tpl(
+    tpl_gpus(
         repository_ctx,
         "cuda:build_defs.bzl",
         {
@@ -1250,6 +1189,7 @@ _ENVIRONS = [
     "NVVMIR_LIBRARY_DIR",
     _PYTHON_BIN_PATH,
     "TF_CUDA_PATHS",
+    _GPU_PLATFORM,
 ]
 
 # Note(storypku): Uncomment the following rule iff "--experimental_repo_remote_exec"
