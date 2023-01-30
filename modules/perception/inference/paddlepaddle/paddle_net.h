@@ -29,7 +29,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-constexpr uint64_t MemoryPoolInitSizeMb = 100;
+constexpr uint64_t MemoryPoolInitSizeMb = 1000;
 
 class PaddleNet : public Inference {
  public:

@@ -29,6 +29,7 @@
 #include "modules/perception/pipeline/proto/stage/bev_obstacle_detection_config.pb.h"
 
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
+#include "modules/perception/inference/inference.h"
 #include "modules/perception/pipeline/stage.h"
 
 namespace apollo {
@@ -59,29 +60,19 @@ class BEVObstacleDetector : public BaseObstacleDetector {
 
   void Mat2Vec(const cv::Mat& im, float* data);
 
-  void FilterScore(const std::vector<float>& box3d,
-                   const std::vector<int64_t>& label_preds,
-                   const std::vector<float>& scores, float score_threshold,
-                   std::vector<float>* box3d_filtered,
-                   std::vector<int64_t>* label_preds_filtered,
-                   std::vector<float>* scores_filtered);
+  void FilterScore(
+      const std::shared_ptr<apollo::perception::base::Blob<float>>& box3d,
+      const std::shared_ptr<apollo::perception::base::Blob<float>>& label,
+      const std::shared_ptr<apollo::perception::base::Blob<float>>& scores,
+      float score_threshold, std::vector<float>* box3d_filtered,
+      std::vector<int64_t>* label_preds_filtered,
+      std::vector<float>* scores_filtered);
 
   bool IsEnabled() const override { return enable_; }
 
   std::string Name() const override { return name_; }
 
  private:
-  void Run(paddle_infer::Predictor* predictor,
-           const std::vector<int>& images_shape,
-           const std::vector<float>& images_data,
-           const std::vector<int>& k_shape, const std::vector<float>& k_data,
-           std::vector<float>* boxes, std::vector<float>* scores,
-           std::vector<int64_t>* labels);
-
-  void Lidar2cam(const Eigen::Matrix4f& imu2camera,
-                 const Eigen::Matrix4f& imu2lidar,
-                 Eigen::Matrix4f* lidar2camera);
-
   bool LoadExtrinsics(const std::string& yaml_file,
                       Eigen::Matrix4d* camera_extrinsic);
 
@@ -90,9 +81,9 @@ class BEVObstacleDetector : public BaseObstacleDetector {
                   const std::vector<float>& scores,
                   camera::CameraFrame* camera_frame);
 
-  void FillBBox3d(const float* bbox, const Eigen::Affine3d& world2cam_pose,
-                  const Eigen::Matrix4d& imu2cam_matrix_rt,
-                  const Eigen::Matrix4d& imu2lidar_matrix_rt,
+  void FillBBox3d(const float* bbox, const Eigen::Affine3d& cam2world_pose,
+                  const Eigen::Matrix4d& cam2imu_matrix_rt,
+                  const Eigen::Matrix4d& lidar2imu_matrix_rt,
                   base::ObjectPtr obj);
 
   base::ObjectSubType GetObjectSubType(const int label);
@@ -114,6 +105,14 @@ class BEVObstacleDetector : public BaseObstacleDetector {
 
   double preprocess_time_ = 0.0;
   double inference_time_ = 0.0;
+
+  std::shared_ptr<inference::Inference> inference_;
+
+  // _generated_var_4: bbox   _generated_var_9: score    _generated_var_14:
+  // label
+  std::vector<std::string> output_blob_names_{
+      "_generated_var_4", "_generated_var_9", "_generated_var_14"};
+  std::vector<std::string> input_blob_names_{"images", "img2lidars"};
 
   std::vector<int> images_shape_{1, 6, 3, img_height_crop_, img_width_crop_};
   std::vector<float> images_data_;
@@ -139,8 +138,10 @@ class BEVObstacleDetector : public BaseObstacleDetector {
       0.00006982,  0.21952066,  0.08716113,  -0.00007331, -0.00159836,
       0.18871528,  -0.28457765, 0.,          0.,          0.,
       1.};
-
-  Eigen::Matrix4d imu2lidar_matrix_rt_;
+  std::vector<int> output_bbox_shape_{300, 9};
+  std::vector<int> output_score_shape_{300};
+  std::vector<int> output_label_shape_{300};
+  Eigen::Matrix4d lidar2imu_matrix_rt_;
 
   std::vector<float> mean_{103.530, 116.280, 123.675};
   std::vector<float> std_{57.375, 57.120, 58.395};
