@@ -43,11 +43,10 @@ bool BEVObstacleDetector::Init(const StageConfig &stage_config) {
                  &lidar2imu_matrix_rt_);
 
   std::string model_type = "PaddleNet";
-  std::string model_root;
 
   inference_.reset(inference::CreateInferenceByName(
       model_type, FLAGS_bev_model_file, FLAGS_bev_params_file,
-      output_blob_names_, input_blob_names_, model_root));
+      output_blob_names_, input_blob_names_));
 
   std::map<std::string, std::vector<int>> shape_map;
   shape_map.emplace(std::pair<std::string, std::vector<int>>(

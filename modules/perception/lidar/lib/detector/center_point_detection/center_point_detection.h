@@ -27,6 +27,7 @@
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud.h"
+#include "modules/perception/inference/inference.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/lib/interface/base_lidar_detector.h"
 #include "modules/perception/pipeline/stage.h"
@@ -45,9 +46,9 @@ class CenterPointDetection : public BaseLidarDetector {
 
   bool Detect(const LidarDetectorOptions &options, LidarFrame *frame) override;
 
-  bool Init(const StageConfig& stage_config) override;
+  bool Init(const StageConfig &stage_config) override;
 
-  bool Process(DataFrame* data_frame) override;
+  bool Process(DataFrame *data_frame) override;
 
   bool IsEnabled() const override { return enable_; }
 
@@ -70,27 +71,19 @@ class CenterPointDetection : public BaseLidarDetector {
 
   std::vector<int> GenerateIndices(int start_index, int size, bool shuffle);
 
-  void DoInference(const std::vector<float> &points_data,
-                   const int in_num_points, std::vector<float> *out_detections,
-                   std::vector<int64_t> *out_labels,
-                   std::vector<float> *out_scores);
 
-  void Run(paddle_infer::Predictor *predictor,
-           const std::vector<int> &points_shape,
-           const std::vector<float> &points_data,
-           std::vector<float> *box3d_lidar, std::vector<int64_t> *label_preds,
-           std::vector<float> *scores);
+  void GetObjects(const Eigen::Affine3d &pose,
+                  const std::vector<float> &detections,
+                  const std::vector<int64_t> &labels,
+                  std::vector<std::shared_ptr<base::Object>> *objects);
 
-  void GetObjects(std::vector<std::shared_ptr<base::Object>> *objects,
-                  const Eigen::Affine3d &pose, std::vector<float> *detections,
-                  std::vector<int64_t> *labels);
-
-  void FilterScore(const std::vector<float> *box3d_lidar,
-                    const std::vector<int64_t> *label_preds,
-                    const std::vector<float> *scores,
-                    const float score_threshold,
-                    std::vector<float> *box3d_lidar_final,
-                    std::vector<int64_t> *label_preds_final);
+  void FilterScore(
+      const std::shared_ptr<apollo::perception::base::Blob<float>> &box3d,
+      const std::shared_ptr<apollo::perception::base::Blob<float>> &label,
+      const std::shared_ptr<apollo::perception::base::Blob<float>> &scores,
+      float score_threshold, std::vector<float> *box3d_filtered,
+      std::vector<int64_t> *label_preds_filtered,
+      std::vector<float> *scores_filtered);
 
   base::ObjectSubType GetObjectSubType(int label);
 
@@ -125,6 +118,14 @@ class CenterPointDetection : public BaseLidarDetector {
   const int num_output_box_feature_ = 7;
 
   std::shared_ptr<paddle_infer::Predictor> predictor_;
+
+  std::shared_ptr<inference::Inference> inference_;
+
+  // _generated_var_4: bbox   _generated_var_5: score    _generated_var_6:label
+  std::vector<std::string> output_blob_names_{
+      "_generated_var_4", "_generated_var_5", "_generated_var_6"};
+
+  std::vector<std::string> input_blob_names_{"data"};
 };  // class CenterPointDetection
 
 }  // namespace lidar

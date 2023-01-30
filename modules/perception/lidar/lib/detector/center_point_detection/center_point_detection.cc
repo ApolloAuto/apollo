@@ -19,6 +19,7 @@
 #include <functional>
 #include <numeric>
 #include <random>
+#include <utility>
 
 #include <cuda_runtime_api.h>
 
@@ -27,6 +28,7 @@
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/base/point_cloud_util.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/common/pcl_util.h"
 #include "modules/perception/lidar/lib/detector/center_point_detection/params.h"
@@ -88,53 +90,45 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
   return true;
 }
 
-bool CenterPointDetection::Init(const StageConfig& stage_config) {
+bool CenterPointDetection::Init(const StageConfig &stage_config) {
   if (!Initialize(stage_config)) {
     return false;
   }
 
-  /*
-  num_point_feature
-  */
-  paddle::AnalysisConfig config;
-  config.EnableUseGpu(1000, FLAGS_gpu_id);
-  config.SetModel(FLAGS_center_point_model_file,
-                  FLAGS_center_point_params_file);
-  config.EnableMemoryOptim();
-  if (FLAGS_use_trt) {
-    paddle::AnalysisConfig::Precision precision;
-    if (FLAGS_trt_precision == 0) {
-      precision = paddle_infer::PrecisionType::kFloat32;
-    } else if (FLAGS_trt_precision == 1) {
-      precision = paddle_infer::PrecisionType::kHalf;
-    } else {
-      AERROR << "Tensorrt type can only support 0 or 1, but recieved is"
-             << FLAGS_trt_precision << "\n";
-      return false;
-    }
-    config.EnableTensorRtEngine(1 << 30, 1, 3, precision, FLAGS_trt_use_static,
-                                false);
-    // todo: solve EnableTunedTensorRtDynamicShape
-    config.CollectShapeRangeInfo(FLAGS_dynamic_shape_file);
-    // config.EnableTunedTensorRtDynamicShape(FLAGS_dynamic_shape_file, true);
+  std::string model_type = "PaddleNet";
 
-    if (FLAGS_trt_use_static) {
-      config.SetOptimCacheDir(FLAGS_trt_static_dir);
-    }
+  std::vector<int> data_shape;
+  std::vector<int> output_bbox_shape;
+  std::vector<int> output_score_shape;
+  std::vector<int> output_label_shape;
+
+  inference_.reset(inference::CreateInferenceByName(
+      model_type, FLAGS_center_point_model_file, FLAGS_center_point_params_file,
+      output_blob_names_, input_blob_names_));
+
+  std::map<std::string, std::vector<int>> shape_map;
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      input_blob_names_.at(0), data_shape));
+
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(0), output_bbox_shape));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(1), output_score_shape));
+  shape_map.emplace(std::pair<std::string, std::vector<int>>(
+      output_blob_names_.at(2), output_label_shape));
+
+  if (!inference_->Init(shape_map)) {
+    return false;
   }
-  config.SwitchIrOptim(true);
 
-  predictor_ = paddle_infer::CreatePredictor(config);
   return true;
 }
 
-bool CenterPointDetection::Process(DataFrame* data_frame) {
-  if (data_frame == nullptr)
-    return false;
+bool CenterPointDetection::Process(DataFrame *data_frame) {
+  if (data_frame == nullptr) return false;
 
-  LidarFrame* lidar_frame = data_frame->lidar_frame;
-  if (lidar_frame == nullptr)
-    return false;
+  LidarFrame *lidar_frame = data_frame->lidar_frame;
+  if (lidar_frame == nullptr) return false;
 
   LidarDetectorOptions options;
   bool res = Detect(options, lidar_frame);
@@ -266,21 +260,29 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
   CloudToArray(cur_cloud_ptr_, points_data.data(), FLAGS_normalizing_factor);
   cloud_to_array_time_ = timer.toc(true);
 
+  auto input_data_blob = inference_->get_blob(input_blob_names_.at(0));
+  auto output_bbox_blob = inference_->get_blob(output_blob_names_.at(0));
+  auto output_score_blob = inference_->get_blob(output_blob_names_.at(1));
+  auto output_label_blob = inference_->get_blob(output_blob_names_.at(2));
+
+  std::vector<int> points_shape{num_points, FLAGS_num_point_feature};
+  input_data_blob->Reshape(points_shape);
+  float *data_ptr = input_data_blob->mutable_cpu_data();
+  memcpy(data_ptr, points_data.data(), points_data.size() * sizeof(float));
+
+  inference_->Infer();
+
   // paddle inference
   std::vector<float> out_detections;
   std::vector<int64_t> out_labels;
   std::vector<float> out_scores;
-  std::vector<float> out_detections_final;
-  std::vector<int64_t> out_labels_final;
 
-  DoInference(points_data, num_points, &out_detections, &out_labels,
-              &out_scores);
+  FilterScore(output_bbox_blob, output_label_blob, output_score_blob,
+              FLAGS_score_threshold, &out_detections, &out_labels, &out_scores);
 
-  FilterScore(&out_detections, &out_labels, &out_scores, FLAGS_score_threshold,
-               &out_detections_final, &out_labels_final);
+  GetObjects(frame->lidar2world_pose, out_detections, out_labels,
+             &frame->segmented_objects);
 
-  GetObjects(&frame->segmented_objects, frame->lidar2world_pose,
-             &out_detections_final, &out_labels_final);
   inference_time_ = timer.toc(true);
 
   AINFO << "CenterPoint: "
@@ -339,19 +341,6 @@ void CenterPointDetection::FuseCloud(
   }
 }
 
-void CenterPointDetection::DoInference(const std::vector<float> &points_data,
-                                       const int in_num_points,
-                                       std::vector<float> *out_detections,
-                                       std::vector<int64_t> *out_labels,
-                                       std::vector<float> *out_scores) {
-  // todo: check gpu_id
-  std::vector<int> points_shape;
-  points_shape.push_back(in_num_points);
-  points_shape.push_back(FLAGS_num_point_feature);
-
-  Run(predictor_.get(), points_shape, points_data, out_detections, out_labels,
-      out_scores);
-}
 
 std::vector<int> CenterPointDetection::GenerateIndices(int start_index,
                                                        int size, bool shuffle) {
@@ -368,45 +357,12 @@ std::vector<int> CenterPointDetection::GenerateIndices(int start_index,
   return indices;
 }
 
-void CenterPointDetection::Run(paddle_infer::Predictor *predictor,
-                               const std::vector<int> &points_shape,
-                               const std::vector<float> &points_data,
-                               std::vector<float> *box3d_lidar,
-                               std::vector<int64_t> *label_preds,
-                               std::vector<float> *scores) {
-  auto input_names = predictor->GetInputNames();
-  for (const auto &tensor_name : input_names) {
-    auto in_tensor = predictor->GetInputHandle(tensor_name);
-    if (tensor_name == "data") {
-      in_tensor->Reshape(points_shape);
-      in_tensor->CopyFromCpu(points_data.data());
-    }
-  }
-  ACHECK(predictor->Run());
-
-  auto output_names = predictor->GetOutputNames();
-  for (size_t i = 0; i != output_names.size(); i++) {
-    auto output = predictor->GetOutputHandle(output_names[i]);
-    std::vector<int> output_shape = output->shape();
-    int out_num = std::accumulate(output_shape.begin(), output_shape.end(), 1,
-                                  std::multiplies<int>());
-    if (i == 0) {
-      box3d_lidar->resize(out_num);
-      output->CopyToCpu(box3d_lidar->data());
-    } else if (i == 1) {
-      label_preds->resize(out_num);
-      output->CopyToCpu(label_preds->data());
-    } else if (i == 2) {
-      scores->resize(out_num);
-      output->CopyToCpu(scores->data());
-    }
-  }
-}
 
 void CenterPointDetection::GetObjects(
-    std::vector<std::shared_ptr<Object>> *objects, const Eigen::Affine3d &pose,
-    std::vector<float> *detections, std::vector<int64_t> *labels) {
-  int num_objects = detections->size() / num_output_box_feature_;
+    const Eigen::Affine3d &pose, const std::vector<float> &detections,
+    const std::vector<int64_t> &labels,
+    std::vector<std::shared_ptr<Object>> *objects) {
+  int num_objects = detections.size() / num_output_box_feature_;
 
   objects->clear();
   base::ObjectPool::Instance().BatchGet(num_objects, objects);
@@ -416,13 +372,13 @@ void CenterPointDetection::GetObjects(
     object->id = i;
 
     // no velocity
-    float x = detections->at(i * FLAGS_num_output_box_feature + 0);
-    float y = detections->at(i * FLAGS_num_output_box_feature + 1);
-    float z = detections->at(i * FLAGS_num_output_box_feature + 2);
-    float dx = detections->at(i * FLAGS_num_output_box_feature + 3);
-    float dy = detections->at(i * FLAGS_num_output_box_feature + 4);
-    float dz = detections->at(i * FLAGS_num_output_box_feature + 5);
-    float yaw = detections->at(i * FLAGS_num_output_box_feature + 6);
+    float x = detections.at(i * FLAGS_num_output_box_feature + 0);
+    float y = detections.at(i * FLAGS_num_output_box_feature + 1);
+    float z = detections.at(i * FLAGS_num_output_box_feature + 2);
+    float dx = detections.at(i * FLAGS_num_output_box_feature + 3);
+    float dy = detections.at(i * FLAGS_num_output_box_feature + 4);
+    float dz = detections.at(i * FLAGS_num_output_box_feature + 5);
+    float yaw = detections.at(i * FLAGS_num_output_box_feature + 6);
     // yaw += M_PI / 2;
     yaw = std::atan2(sinf(yaw), cosf(yaw));
     yaw = -yaw;
@@ -471,7 +427,7 @@ void CenterPointDetection::GetObjects(
     object->lidar_supplement.raw_probs.push_back(std::vector<float>(
         static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
     object->lidar_supplement.raw_classification_methods.push_back(Name());
-    object->sub_type = GetObjectSubType(labels->at(i));
+    object->sub_type = GetObjectSubType(labels.at(i));
     object->type = base::kSubType2TypeMap.at(object->sub_type);
     object->lidar_supplement.raw_probs.back()[static_cast<int>(object->type)] =
         1.0f;
@@ -503,18 +459,25 @@ base::ObjectSubType CenterPointDetection::GetObjectSubType(const int label) {
 }
 
 void CenterPointDetection::FilterScore(
-    const std::vector<float> *box3d_lidar,
-    const std::vector<int64_t> *label_preds, const std::vector<float> *scores,
-    const float score_threshold, std::vector<float> *box3d_lidar_final,
-    std::vector<int64_t> *label_preds_final) {
-  for (size_t i = 0; i < scores->size(); i++) {
-    if (scores->at(i) > score_threshold) {
-      box3d_lidar_final->insert(
-          box3d_lidar_final->end(),
-          box3d_lidar->begin() + num_output_box_feature_ * i,
-          box3d_lidar->begin() + num_output_box_feature_ * (i + 1));
-      label_preds_final->insert(label_preds_final->end(),
-                                *(label_preds->begin() + i));
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &box3d,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &label,
+    const std::shared_ptr<apollo::perception::base::Blob<float>> &scores,
+    float score_threshold, std::vector<float> *box3d_filtered,
+    std::vector<int64_t> *label_preds_filtered,
+    std::vector<float> *scores_filtered) {
+  const auto bbox_ptr = box3d->cpu_data();
+  const auto label_ptr = label->cpu_data();
+  const auto score_ptr = scores->cpu_data();
+
+  for (int i = 0; i < scores->count(); ++i) {
+    if (score_ptr[i] > score_threshold) {
+      box3d_filtered->insert(box3d_filtered->end(),
+                             bbox_ptr + num_output_box_feature_ * i,
+                             bbox_ptr + num_output_box_feature_ * (i + 1));
+      label_preds_filtered->insert(label_preds_filtered->end(),
+                                   static_cast<int64_t>(label_ptr[i]));
+
+      scores_filtered->push_back(score_ptr[i]);
     }
   }
 }

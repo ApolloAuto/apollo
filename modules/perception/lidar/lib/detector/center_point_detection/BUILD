@@ -17,6 +17,8 @@ cc_library(
         "//cyber/common",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
+        "//modules/perception/inference:inference_factory",
+        "//modules/perception/inference:inference_lib",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface:base_lidar_detector",
