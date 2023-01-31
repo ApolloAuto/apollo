@@ -74,7 +74,7 @@ class STBoundary : public common::math::Polygon2d {
 
   bool GetBoundarySlopes(const double curr_time, double* ds_upper,
                          double* ds_lower) const;
-
+  void PrintDebug(std::string name) const;
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
   enum class BoundaryType {

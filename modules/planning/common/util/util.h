@@ -28,6 +28,8 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/reference_line_info.h"
 
+#include "modules/planning/common/util/print_debug_info.h"
+
 namespace apollo {
 namespace planning {
 namespace util {

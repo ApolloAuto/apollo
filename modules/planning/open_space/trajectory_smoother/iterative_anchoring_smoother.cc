@@ -52,6 +52,7 @@ IterativeAnchoringSmoother::IterativeAnchoringSmoother(
   center_shift_distance_ =
       ego_length_ / 2.0 - vehicle_param.back_edge_to_center();
   planner_open_space_config_ = planner_open_space_config;
+  AINFO << "config:" << planner_open_space_config_.DebugString();
 }
 
 bool IterativeAnchoringSmoother::Smooth(

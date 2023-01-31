@@ -755,11 +755,12 @@ bool HybridAStar::Plan(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   AINFO << "start node" << sx << "," << sy << "," << sphi;
   AINFO << "end node " << ex << "," << ey << "," << ephi;
+  AINFO << ssm.str();
   if (!ValidityCheck(start_node_)) {
     AERROR << "start_node in collision with obstacles";
     AERROR << start_node_->GetX() << "," << start_node_->GetY() << ","
            << start_node_->GetPhi();
-    AERROR << ssm.str();
+    
     return false;
   }
   if (!ValidityCheck(end_node_)) {

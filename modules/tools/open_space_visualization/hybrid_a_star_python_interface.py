@@ -17,7 +17,8 @@
 ###############################################################################
 
 import math
-
+import ctypes
+from  ctypes import  POINTER
 from ctypes import c_bool
 from ctypes import c_double
 from ctypes import c_int
@@ -25,7 +26,7 @@ from ctypes import c_ushort
 from ctypes import c_void_p
 
 
-lib = cdll.LoadLibrary(
+lib = ctypes.cdll.LoadLibrary(
     '/apollo/bazel-bin/modules/planning/open_space/tools/hybrid_a_star_wrapper_lib.so')
 
 lib.CreatePlannerPtr.argtypes = []

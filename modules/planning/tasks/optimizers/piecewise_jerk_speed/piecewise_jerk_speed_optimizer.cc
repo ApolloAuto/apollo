@@ -30,6 +30,7 @@
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
+#include "modules/planning/common/util/print_debug_info.h"
 
 namespace apollo {
 namespace planning {
@@ -91,7 +92,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
 
   piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(),
                                     reference_line_info_->GetCruiseSpeed());
-
+  PrintCurves print_debug;
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;
   for (int i = 0; i < num_of_knots; ++i) {
@@ -127,6 +128,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
       speed_data->clear();
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    print_debug.AddPoint("st_bounds_lower", curr_t, s_lower_bound);
+    print_debug.AddPoint("st_bounds_upper", curr_t, s_upper_bound);
     s_bounds.emplace_back(s_lower_bound, s_upper_bound);
   }
   piecewise_jerk_problem.set_x_bounds(std::move(s_bounds));
@@ -152,6 +155,12 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
+    print_debug.AddPoint("st_reference_line", curr_t, path_s);
+    print_debug.AddPoint("vt_boundary_lower", curr_t, v_lower_bound);
+    print_debug.AddPoint("sv_boundary_lower", path_s, v_lower_bound);
+    print_debug.AddPoint("sk_curve", path_s, path_point.kappa());
+    print_debug.AddPoint("vt_boundary_upper", curr_t, v_upper_bound);
+    print_debug.AddPoint("sv_boundary_upper", path_s, v_upper_bound);
   }
   piecewise_jerk_problem.set_x_ref(config.ref_s_weight(), std::move(x_ref));
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
@@ -172,6 +181,9 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   for (int i = 0; i < num_of_knots; ++i) {
     ADEBUG << "For t[" << i * delta_t << "], s = " << s[i] << ", v = " << ds[i]
            << ", a = " << dds[i];
+    print_debug.AddPoint("optimize_st_curve", i * delta_t, s[i]);
+    print_debug.AddPoint("optimize_vt_curve", i * delta_t, ds[i]);
+    print_debug.AddPoint("optimize_at_curve", i * delta_t, dds[i]);
   }
   speed_data->clear();
   speed_data->AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
@@ -185,6 +197,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   }
   SpeedProfileGenerator::FillEnoughSpeedPoints(speed_data);
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
+//   print_debug.PrintToLog();
   return Status::OK();
 }
 
