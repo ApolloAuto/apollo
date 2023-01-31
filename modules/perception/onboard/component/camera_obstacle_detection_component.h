@@ -115,6 +115,7 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
  private:
   std::mutex mutex_;
   uint32_t seq_num_;
+  static std::atomic<unsigned int> camera_id_;
 
   std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
@@ -154,6 +155,9 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   int frame_capacity_ = 20;
   int frame_id_ = 0;
   EigenVector<camera::CameraFrame> camera_frames_;
+
+  // camera size
+  unsigned int camera_size_ = 2;
 
   // image info.
   int image_width_ = 1920;
