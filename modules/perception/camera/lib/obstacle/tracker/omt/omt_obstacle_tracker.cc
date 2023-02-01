@@ -95,6 +95,7 @@ bool OMTObstacleTracker::Init(const StageConfig &stage_config) {
   base::BaseCameraModelPtr model =
       common::SensorManager::Instance()->GetUndistortCameraModel(
           omt_param_.camera_name());
+  ACHECK(model != nullptr);
   width_ = model->get_width();
   height_ = model->get_height();
   reference_.Init(omt_param_.reference(), width_, height_);
