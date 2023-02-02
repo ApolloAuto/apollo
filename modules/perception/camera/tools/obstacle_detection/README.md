@@ -8,24 +8,30 @@
 ```
 2. Then run the tool
 ```
-./bazel-bin/modules/perception/camera/tools/obstacle_detection/obstacle_detection
+bash modules/perception/camera/tools/obstacle_detection/run.sh
 ```
 3. Finally, view the results in `/apollo/data`
 ```
 test.jpg  test.txt
 ```
 
-#### Input
+## Input
 The input image data is in the `images` directory. You need to put the test pictures into this directory, and add the picture name in `images\image_test_list.txt`.
 
 The default test image is `images\test.jpg`, and `images\image_test_list.txt` contains the name **test** in it.
 
-#### Output
+## Output
 The output data is in `/apollo/data`, Include text files and image files.
 
 The default test result is `test.jpg  test.txt`.
 
-#### Model config
+## Model config
 The model config file is in `conf\camera_detection_pipeline.pb.txt`, which you can change the model.
 
 The default detection model is `SMOKE_OBSTACLE_DETECTION`.
+
+## Parameters
+`obstacle_detection` supports the following parameters
+- height, Input image height
+- width, Input image width
+- image_ext, Input image format
