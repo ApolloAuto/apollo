@@ -71,6 +71,9 @@ class YoloObstacleDetector : public BaseObstacleDetector {
   bool InitFeatureExtractor(const std::string &root_dir);
 
  private:
+  std::map<std::string, std::shared_ptr<base::BaseCameraModel>>
+      name_basemodel_map_;
+  std::map<std::string, int> offset_y_map_;
   std::shared_ptr<BaseFeatureExtractor> feature_extractor_;
   yolo::YoloParam yolo_param_;
   std::shared_ptr<base::BaseCameraModel> base_camera_model_ = nullptr;
@@ -78,6 +81,7 @@ class YoloObstacleDetector : public BaseObstacleDetector {
   std::vector<base::ObjectSubType> types_;
   std::vector<float> expands_;
   std::vector<float> anchors_;
+  std::vector<std::string> camera_names_;
 
   NMSParam nms_;
   cudaStream_t stream_ = nullptr;

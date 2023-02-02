@@ -100,6 +100,7 @@ cc_library(
     "//modules/common/util:util_tool",
     "//modules/perception/camera/lib/obstacle/camera_detection_postprocessor",
     "//modules/perception/camera/lib/obstacle/detector/smoke:smoke_obstacle_detector",
+    "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
     "//modules/perception/camera/lib/obstacle/preprocessor:camera_detection_preprocessor",
     "//modules/perception/camera/lib/obstacle/tracker/omt:omt_obstacle_tracker",
     "//modules/perception/camera/lib/obstacle/tracker/omt2:omt_bev_tracker",

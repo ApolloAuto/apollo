@@ -22,6 +22,7 @@
 #include "modules/perception/camera/lib/obstacle/detector/bev_detection/bev_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/detector/caddn/caddn_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/detector/smoke/smoke_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/obstacle/preprocessor/camera_detection_preprocessor.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
@@ -183,6 +184,9 @@ std::shared_ptr<Stage> Pipeline::CreateStage(const StageType& stage_type) {
       break;
     case StageType::SMOKE_OBSTACLE_DETECTION:
       stage_ptr.reset(new camera::SmokeObstacleDetector());
+      break;
+    case StageType::YOLO_OBSTACLE_DETECTOR:
+      stage_ptr.reset(new camera::YoloObstacleDetector());
       break;
     case StageType::CAMERA_DETECTION_PREPROCESSOR:
       stage_ptr.reset(new camera::CameraDetectionPreprocessor());

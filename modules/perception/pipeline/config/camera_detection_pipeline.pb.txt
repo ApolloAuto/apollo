@@ -1,5 +1,5 @@
 stage_type: OMT_OBSTACLE_TRACKER
-stage_type: SMOKE_OBSTACLE_DETECTION
+stage_type: YOLO_OBSTACLE_DETECTOR
 stage_type: OMT_OBSTACLE_TRACKER
 stage_type: MULTI_CUE_OBSTACLE_TRANSFORMER
 stage_type: LOCATION_REFINER_OBSTACLE_POSTPROCESSOR
@@ -89,7 +89,7 @@ stage_config: {
 }
 
 stage_config: {
-  stage_type: SMOKE_OBSTACLE_DETECTION
+  stage_type: YOLO_OBSTACLE_DETECTOR
   enabled: true
   type: "camera_detector"
 
@@ -97,7 +97,7 @@ stage_config: {
     gpu_id: 0
     camera_name: "front_6mm,front_12mm"
     root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
-    conf_file: "smoke-config.pt"
+    conf_file: "config.pt"
   }
 }
 
