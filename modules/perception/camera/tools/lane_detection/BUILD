@@ -26,11 +26,15 @@ cc_binary(
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/interface",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/tools/common",
+        "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
         "@com_github_gflags_gflags//:gflags",
-        "@opencv",
+        "@opencv//:imgproc",
     ],
 )
 

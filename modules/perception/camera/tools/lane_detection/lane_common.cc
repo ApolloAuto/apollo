@@ -17,21 +17,20 @@
 
 #include "cyber/common/log.h"
 
+DEFINE_bool(lane_line_debug, true, "draw the lane line result");
+DEFINE_bool(lane_cc_debug, true, "show lane cc image");
+DEFINE_bool(lane_result_output, true, "output the lane result");
+DEFINE_int32(height, 1080, "image height");
+DEFINE_int32(width, 1920, "image width");
+DEFINE_string(image_dir, "./image/", "test image directory");
+DEFINE_string(camera_intrinsics_yaml, "params/front_6mm_intrinsics.yaml",
+              "camera intrinsics_yaml");
 DEFINE_string(list, "test.list", "test file title");
 DEFINE_string(file_title, "", "test file title");
 DEFINE_string(debug_file, "", "debug file title");
 DEFINE_string(save_dir, "./result/", "test file title");
 DEFINE_string(file_ext_name, "", "file extension name");
 DEFINE_string(file_debug_list, "", "file extension name");
-DEFINE_bool(lane_line_debug, false, "draw the lane line result");
-DEFINE_bool(lane_cc_debug, false, "show lane cc image");
-DEFINE_bool(lane_center_debug, false, "draw the lane center result");
-DEFINE_bool(lane_ego_debug, false, "lane ego debug");
-DEFINE_bool(lane_result_output, false, "output the lane result");
-DEFINE_bool(lane_points_output, false, "output the detected lane points");
-DEFINE_string(image_dir, "./image/", "test image directory");
-DEFINE_string(camera_intrinsics_yaml, "params/front_6mm_intrinsics.yaml",
-              "camera intrinsics_yaml");
 
 namespace apollo {
 namespace perception {
@@ -62,6 +61,44 @@ void show_detect_point_set(
       cv::Point draw_point(point_x, point_y);
       cv::circle(draw_mat, draw_point, draw_size, color, 4);
     }
+  }
+  cv::imwrite(save_path, draw_mat);
+}
+
+void show_detect_point_set(
+    const cv::Mat& image,
+    const std::vector<base::Point2DF>& img_laneline_point_set,
+    const std::string& save_path) {
+  cv::Scalar color = cv::Scalar(0, 255, 0);
+  int draw_size = 2;
+
+  cv::Mat draw_mat = image.clone();
+  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
+    const base::Point2DF& point = img_laneline_point_set[i];
+    cv::circle(draw_mat,
+               cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
+               draw_size, color, 4);
+  }
+  cv::imwrite(save_path, draw_mat);
+}
+
+void show_detect_point_set(
+    const cv::Mat& image,
+    const std::vector<base::Point2DF>& img_laneline_point_set,
+    const std::vector<float>& point_score_vec, const std::string& save_path) {
+  cv::Scalar color = cv::Scalar(0, 255, 0);
+  int draw_size = 2;
+
+  cv::Mat draw_mat = image.clone();
+  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
+    const base::Point2DF& point = img_laneline_point_set[i];
+    std::string label = cv::format("%.2f", point_score_vec[i]);
+    cv::putText(draw_mat, label,
+                cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
+                cv::FONT_HERSHEY_PLAIN, 1.0, cv::Scalar(255, 255, 255));
+    cv::circle(draw_mat,
+               cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
+               draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);
 }
@@ -149,7 +186,7 @@ void show_lane_lines(const cv::Mat& image,
     cv::line(draw_ipm, cv::Point(0, y), cv::Point(ipm_width, y),
              cv::Scalar(255, 255, 255));
     std::string label = cv::format("%d", i);
-    cv::putText(draw_ipm, label, cv::Point(x, y), CV_FONT_HERSHEY_COMPLEX_SMALL,
+    cv::putText(draw_ipm, label, cv::Point(x, y), cv::FONT_HERSHEY_PLAIN,
                 1.0, cv::Scalar(255, 255, 255));
   }
   cv::Rect roi(0, 0, ipm_width, ipm_height);
@@ -326,23 +363,6 @@ void output_laneline_to_txt(const std::vector<base::LaneLine>& lane_objects,
   fclose(file_save);
 }
 
-void show_detect_point_set(
-    const cv::Mat& image,
-    const std::vector<base::Point2DF>& img_laneline_point_set,
-    const std::string& save_path) {
-  cv::Scalar color = cv::Scalar(0, 255, 0);
-  int draw_size = 2;
-
-  cv::Mat draw_mat = image.clone();
-  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
-    const base::Point2DF& point = img_laneline_point_set[i];
-    cv::circle(draw_mat,
-               cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
-               draw_size, color, 4);
-  }
-  cv::imwrite(save_path, draw_mat);
-}
-
 void show_neighbor_point_set(
     const cv::Mat& image,
     const std::vector<base::Point2DF>& img_laneline_point_set,
@@ -371,31 +391,11 @@ void show_neighbor_point_set(
     std::string label = cv::format("%d", pass_point_num);
     cv::putText(draw_mat, label,
                 cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
-                CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255, 255, 255));
+                cv::FONT_HERSHEY_PLAIN, 1.0, cv::Scalar(255, 255, 255));
   }
   cv::imwrite(save_path, draw_mat);
 }
 
-void show_detect_point_set(
-    const cv::Mat& image,
-    const std::vector<base::Point2DF>& img_laneline_point_set,
-    const std::vector<float>& point_score_vec, const std::string& save_path) {
-  cv::Scalar color = cv::Scalar(0, 255, 0);
-  int draw_size = 2;
-
-  cv::Mat draw_mat = image.clone();
-  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
-    const base::Point2DF& point = img_laneline_point_set[i];
-    std::string label = cv::format("%.2f", point_score_vec[i]);
-    cv::putText(draw_mat, label,
-                cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
-                CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255, 255, 255));
-    cv::circle(draw_mat,
-               cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
-               draw_size, color, 4);
-  }
-  cv::imwrite(save_path, draw_mat);
-}
 
 }  // namespace camera
 }  // namespace perception

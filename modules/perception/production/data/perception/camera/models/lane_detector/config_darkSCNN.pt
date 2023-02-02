@@ -1,5 +1,6 @@
 model_param {
   model_name: "darkSCNN_caffe"
+  model_type: "RTNet"
   proto_file: "deploy.prototxt"
   weight_file: "deploy.caffemodel"
   input_offset_y: 312
@@ -17,7 +18,6 @@ model_param {
   vpt_mean_dy: -77.284
   vpt_std_dx: 103.109
   vpt_std_dy: 95.273
-  model_type: "RTNet"
 }
 
 net_param {
