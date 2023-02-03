@@ -93,7 +93,7 @@ export default class CameraDataWebSocketEndpoint {
           } else if (message?.data?.name === 'GetCameraChannelListFail') {
             reject(message?.data);
           }
-        });
+        }, { once: true });
       }
     );
   }
