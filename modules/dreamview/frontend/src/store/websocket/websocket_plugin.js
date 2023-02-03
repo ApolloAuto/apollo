@@ -287,7 +287,7 @@ export default class PluginWebSocketEndpoint {
       }
     }));
     return new Promise((resolve, reject) => {
-      this.worker.addEventListener('message',(event) => {
+      this.worker.addEventListener('message', (event) => {
         if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {

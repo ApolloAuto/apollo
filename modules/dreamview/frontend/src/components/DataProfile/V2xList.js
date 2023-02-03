@@ -37,7 +37,7 @@ function V2xList() {
   },[]);
 
   return (<div className='remote-vehicle-list'>
-    {/*更新后 没有存在v2x设备*/}
+    {/* 更新后 没有存在v2x设备 */}
     {(v2xInfoList.length === 0 && v2xUpdateStatus !== 0) &&
       <div className='remote-vehicle-list_empty'>
         <Empty
@@ -45,7 +45,7 @@ function V2xList() {
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description="There is no v2x under your account."/>
       </div>}
-    {/*更新后 存在v2x设备*/}
+    {/* 更新后 存在v2x设备 */}
     {
       (v2xInfoList.length > 0 && v2xUpdateStatus !== 0) &&
       v2xInfoList.map((item) =>
@@ -74,7 +74,7 @@ function V2xListItem(props) {
     const content = event.target.textContent;
     if (content === 'Reset') {
       setStatus('resetting');
-      PLUGIN_WS.refreshV2xConf(item.v2xId).then(() => {
+      PLUGIN_WS.resetV2xConf(item.v2xId).then(() => {
         setStatus('clean');
       },
       () => {
@@ -83,7 +83,7 @@ function V2xListItem(props) {
     }
     if (content === 'Refresh') {
       setStatus('refreshing');
-      PLUGIN_WS.refreshVehicleConfig(item.v2xId).then(() => {
+      PLUGIN_WS.refreshV2xConf(item.v2xId).then(() => {
         setStatus('clean');
       },
       () => {
@@ -92,7 +92,7 @@ function V2xListItem(props) {
     }
     if (content === 'Upload') {
       setStatus('uploading');
-      PLUGIN_WS.uploadVehicleConfig(item.v2xId).then(() => {
+      PLUGIN_WS.uploadV2xConf(item.v2xId).then(() => {
         setStatus('clean');
       },
       () => {
