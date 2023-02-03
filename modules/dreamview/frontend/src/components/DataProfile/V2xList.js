@@ -34,7 +34,7 @@ function V2xList() {
       // 更新完成状态
       setV2xUpdateStatus(1);
     });
-  },[]);
+  }, []);
 
   return (<div className='remote-vehicle-list'>
     {/* 更新后 没有存在v2x设备 */}
