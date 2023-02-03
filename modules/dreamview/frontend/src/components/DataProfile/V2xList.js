@@ -49,7 +49,7 @@ function V2xList() {
     {
       (v2xInfoList.length > 0 && v2xUpdateStatus !== 0) &&
       v2xInfoList.map((item) =>
-        <div className='remote-vehicle-list-item-container'>
+        <div className='remote-vehicle-list-item-container' key={item.v2xId} >
           <V2xListItem value={item.v2xId} item={item}/>
         </div>
       )

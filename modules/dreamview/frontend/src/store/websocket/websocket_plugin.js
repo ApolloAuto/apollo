@@ -31,17 +31,17 @@ export default class PluginWebSocketEndpoint {
       }, 1000);
       return this;
     }
-    this.websocket.onmessage = (event) => {
+    this.websocket.addEventListener('message', (event) => {
       this.worker.postMessage({
         source: 'point_cloud',
         data: event.data,
       });
-    };
+    });
     this.websocket.onclose = (event) => {
       console.log(`WebSocket connection closed with code: ${event.code}`);
       this.initialize();
     };
-    this.worker.onmessage = (event) => {
+    this.worker.addEventListener('message', (event) => {
       if (event.data.type === 'PluginMsg') {
         const message = event.data;
 
@@ -110,7 +110,7 @@ export default class PluginWebSocketEndpoint {
               JSON.parse(message.data.info ?? '{}')
             );
             break;
-            // 下载record成功
+          // 下载record成功
           case 'UpdateRecordToStatus':
             STORE.studioConnector.updateRemoteRecordStatus(
               JSON.parse(message.data.info ?? '{}')?.record_id,
@@ -142,7 +142,7 @@ export default class PluginWebSocketEndpoint {
             );
         }
       }
-    };
+    });
     return this;
   }
 
@@ -300,7 +300,6 @@ export default class PluginWebSocketEndpoint {
           }
         }
       },
-      { once: true }
       );
     });
   }
@@ -334,7 +333,7 @@ export default class PluginWebSocketEndpoint {
           }
         }
       },
-      { once: true }
+
       );
     });
   }
@@ -369,7 +368,7 @@ export default class PluginWebSocketEndpoint {
                 break;
             }
           }
-        }, { once: true });
+        },);
     });
   }
 
@@ -400,7 +399,6 @@ export default class PluginWebSocketEndpoint {
           }
         }
       },
-      { once: true }
       );
     });
   }
@@ -432,7 +430,6 @@ export default class PluginWebSocketEndpoint {
           }
         }
       },
-      { once: true }
       );
     });
   }
@@ -464,7 +461,6 @@ export default class PluginWebSocketEndpoint {
           }
         }
       },
-      { once: true }
       );
     });
   }
@@ -487,16 +483,15 @@ export default class PluginWebSocketEndpoint {
         if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
-            case 'UploadV2xConfSuccess':
+            case 'UploadV2xSuccess':
               resolve();
               break;
-            case 'UploadV2xConfFail':
+            case 'UploadV2xFail':
               reject();
               break;
           }
         }
       },
-      { once: true }
       );
     });
   }
