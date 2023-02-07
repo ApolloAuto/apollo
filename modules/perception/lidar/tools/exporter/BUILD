@@ -12,7 +12,8 @@ cc_library(
         "//modules/perception/lidar/common:pcl_util",
         "//modules/perception/onboard/transform_wrapper",
         "@com_google_absl//:absl",
-        "@opencv",
+        "@opencv//:imgproc",
+        "@opencv//:imgcodecs",
     ],
 )
 
