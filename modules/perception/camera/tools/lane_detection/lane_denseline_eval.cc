@@ -54,8 +54,9 @@ bool SaveLaneCCS(
   std::vector<unsigned char> lane_map;
   std::vector<ConnectedComponent> lane_ccs;
   std::vector<ConnectedComponent> select_lane_ccs;
-  lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
-                                &lane_ccs, &select_lane_ccs);
+  // Todo(daohu527): need fix, denseline only
+  // lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
+  //                               &lane_ccs, &select_lane_ccs);
   std::string save_img_path = absl::StrCat(FLAGS_save_dir, "/",
                                            FLAGS_file_title, "_2_",
                                            FLAGS_file_ext_name, ".jpg");
@@ -70,14 +71,18 @@ bool SaveDetectPointSet(
   std::string save_img_path = absl::StrCat(FLAGS_save_dir, "/",
                                            FLAGS_file_title, "_0_",
                                            FLAGS_file_ext_name, ".jpg");
-  const std::vector<LanePointInfo>& infer_point_set =
-      lane_postprocessor->GetAllInferLinePointSet();
+  // Todo(daohu527): need fix, denseline only
+  const std::vector<LanePointInfo> infer_point_set;
+  // const std::vector<LanePointInfo>& infer_point_set =
+      // lane_postprocessor->GetAllInferLinePointSet();
   show_all_infer_point_set(img, infer_point_set, save_img_path);
 
   save_img_path = absl::StrCat(FLAGS_save_dir, "/", FLAGS_file_title, "_1_",
                                 FLAGS_file_ext_name, ".jpg");
-  const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set =
-      lane_postprocessor->GetLanelinePointSet();
+  // Todo(daohu527): need fix, denseline only
+  const std::vector<std::vector<LanePointInfo>> detect_laneline_point_set;
+  // const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set =
+  //     lane_postprocessor->GetLanelinePointSet();
   show_detect_point_set(img, detect_laneline_point_set, save_img_path);
   AINFO << "detect_laneline_point_set num: "
         << detect_laneline_point_set.size();

@@ -32,7 +32,11 @@ namespace camera {
  * @return true
  * @return false
  */
-bool Visualization(CameraFrame* frame, const std::string& file_name);
+bool CameraVisualization(CameraFrame* frame, const std::string& file_name);
+
+bool TfVisualization(CameraFrame* frame, const std::string& file_name);
+
+bool LaneVisualization(CameraFrame* frame, const std::string& file_name);
 
 }  // namespace camera
 }  // namespace perception

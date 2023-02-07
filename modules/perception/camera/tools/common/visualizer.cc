@@ -35,7 +35,7 @@ static const cv::Scalar kFaceColors[] = {
   cv::Scalar(0, 0, 255),      // red
 };
 
-bool Visualization(CameraFrame* frame, const std::string& file_name) {
+bool CameraVisualization(CameraFrame* frame, const std::string& file_name) {
   cv::Mat cv_img(frame->data_provider->src_height(),
                  frame->data_provider->src_width(),
                  CV_8UC3, cv::Scalar(0, 0, 0));
@@ -106,6 +106,14 @@ bool Visualization(CameraFrame* frame, const std::string& file_name) {
   }
 
   cv::imwrite(file_name.c_str(), cv_img);
+  return true;
+}
+
+bool TfVisualization(CameraFrame* frame, const std::string& file_name) {
+  return true;
+}
+
+bool LaneVisualization(CameraFrame* frame, const std::string& file_name) {
   return true;
 }
 

@@ -1,0 +1,111 @@
+stage_type: TRAFFIC_LIGHT_DETECTION
+stage_type: TRAFFIC_LIGHT_RECOGNITION
+stage_type: SEMANTIC_REVISER
+
+stage_config: {
+  stage_type: TRAFFIC_LIGHT_DETECTION
+  enabled: true
+
+  traffic_light_detection_config: {
+    min_crop_size: 270
+    crop_method: 0
+    mean_r: 122.7717
+    mean_g: 115.9465
+    mean_b: 102.9801
+    is_bgr:true
+    crop_scale: 2.5
+    input_blob_name : "img"
+    im_param_blob_name : "im_info"
+    output_blob_name : "bboxes"
+    model_name: "./"
+    model_type: "RTNet"
+    proto_file:"deploy.prototxt"
+    weight_file: "baidu_iter_140000.caffemodel"
+    max_batch_size: 1  # only support 1 so far
+    traffic_light_detection_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_detection/tl_detection_caffe"
+    gpu_id: 0
+  }
+}
+
+stage_config: {
+  stage_type: TRAFFIC_LIGHT_RECOGNITION
+  enabled: true
+
+  traffic_light_recognition_config: {
+    vertical_model{
+    model_name: "./";
+    model_type: "RTNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "vertical_caffe/baidu_iter_250000.caffemodel";
+    proto_file: "vertical_caffe/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 32;
+    classify_resize_height: 96;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
+    }
+
+    quadrate_model{
+    model_name: "./";
+    model_type: "RTNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "quadrate_caffe/baidu_iter_200000.caffemodel";
+    proto_file: "quadrate_caffe/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 64;
+    classify_resize_height: 64;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
+    }
+
+    horizontal_model{
+    model_name: "./";
+    model_type: "RTNet";
+    input_blob: "data_org";
+    output_blob: "prob";
+    weight_file: "horizontal_caffe/baidu_iter_200000.caffemodel";
+    proto_file: "horizontal_caffe/deploy.prototxt";
+    classify_threshold: 0.5;
+    classify_resize_width: 96;
+    classify_resize_height: 32;
+    mean_r: 69.06;
+    mean_g: 66.58;
+    mean_b: 66.56;
+    is_bgr: true;
+    scale: 0.01
+    traffic_light_recognition_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_recognition"
+    gpu_id: 0
+    }
+  }
+}
+
+stage_config: {
+  stage_type: SEMANTIC_REVISER
+  enabled: true
+
+  semantic_reviser_config: {
+    revise_time_second: 1.5
+    blink_threshold_second: 0.55
+    hysteretic_threshold_count: 1
+    #yellow_blink_threshold_second: 10.0
+    traffic_light_semantic_root_dir: "/apollo/modules/perception/production/data/perception/camera/models/traffic_light_tracker"
+  }
+}
+
+traffic_light_config: {
+  trafficlights_perception_config: {
+  gpu_id: 0
+  }
+}

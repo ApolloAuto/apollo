@@ -99,7 +99,8 @@ bool GetFileListFromFile(
   return true;
 }
 
-bool SaveResult(CameraFrame* frame, const std::string& file_name) {
+bool SaveCameraDetectionResult(
+    CameraFrame* frame, const std::string& file_name) {
   FILE *fp = fopen(file_name.c_str(), "w");
   if (fp == nullptr) {
     AERROR << "Failed to open result file: " << file_name;
@@ -125,6 +126,14 @@ bool SaveResult(CameraFrame* frame, const std::string& file_name) {
   }
 
   fclose(fp);
+  return true;
+}
+
+bool SaveTfDetectionResult(CameraFrame* frame, const std::string& file_name) {
+  return true;
+}
+
+bool SaveLaneDetectionResult(CameraFrame* frame, const std::string& file_name) {
   return true;
 }
 

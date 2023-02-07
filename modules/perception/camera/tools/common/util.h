@@ -90,7 +90,11 @@ bool GetFileListFromFile(
  * @return true
  * @return false
  */
-bool SaveResult(CameraFrame* frame, const std::string& file_name);
+bool SaveCameraDetectionResult(CameraFrame* frame, const std::string& file_name);
+
+bool SaveTfDetectionResult(CameraFrame* frame, const std::string& file_name);
+
+bool SaveLaneDetectionResult(CameraFrame* frame, const std::string& file_name);
 
 }  // namespace camera
 }  // namespace perception
