@@ -9,6 +9,7 @@ cc_library(
     hdrs = ["ncut.h"],
     deps = [
         "//cyber",
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/common:flood_fill",
         "//modules/perception/lidar/lib/detector/ncut_segmentation/common:lr_classifier",

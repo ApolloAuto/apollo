@@ -52,7 +52,7 @@ struct alignas(16) RadarSupplement {
 typedef std::shared_ptr<RadarSupplement> RadarSupplementPtr;
 typedef std::shared_ptr<const RadarSupplement> RadarSupplementConstPtr;
 
-struct alignas(16) CameraSupplement {
+struct CameraSupplement {
   CameraSupplement();
   ~CameraSupplement();
   CameraSupplement(const CameraSupplement& rhs);
@@ -63,6 +63,8 @@ struct alignas(16) CameraSupplement {
   Eigen::Vector2d upper_left;
   // lower-right corner: x2, y2
   Eigen::Vector2d lower_right;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 typedef std::shared_ptr<CameraSupplement> CameraSupplementPtr;

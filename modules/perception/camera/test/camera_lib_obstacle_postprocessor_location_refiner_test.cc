@@ -17,6 +17,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"  // NOLINT
 #include "modules/perception/common/io/io_util.h"
@@ -185,7 +186,7 @@ TEST(LocationRefinedObstaclePostProcessorTestOnlineCalibration,
   Eigen::Matrix3f intrinsic;
   intrinsic << k_mat[0], k_mat[1], k_mat[2], k_mat[3], k_mat[4], k_mat[5],
       k_mat[6], k_mat[7], k_mat[8];
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map;
   name_intrinsic_map.insert(
       std::pair<std::string, Eigen::Matrix3f>("front_12mm", intrinsic));
   CalibrationServiceInitOptions calibration_service_init_options;

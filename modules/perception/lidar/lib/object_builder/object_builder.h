@@ -34,6 +34,8 @@ struct ObjectBuilderInitOptions {};
 
 struct ObjectBuilderOptions {
   Eigen::Vector3d ref_center = Eigen::Vector3d(0, 0, 0);
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 class ObjectBuilder : public pipeline::Stage {

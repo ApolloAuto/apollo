@@ -39,6 +39,8 @@ namespace camera {
 class BEVObstacleDetector : public BaseObstacleDetector {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+ public:
   BEVObstacleDetector() : BaseObstacleDetector() {}
   virtual ~BEVObstacleDetector() = default;
 

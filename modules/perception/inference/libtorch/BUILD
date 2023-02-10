@@ -16,17 +16,4 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "torch_det",
-    srcs = ["torch_det.cc"],
-    hdrs = ["torch_det.h"],
-    deps = [
-        "//modules/perception/inference:inference_lib",
-        "@libtorch_gpu",
-        "@com_google_protobuf//:protobuf",
-        "@opencv//:imgcodecs",
-        "@local_config_cuda//cuda:cudart",
-    ],
-)
-
 cpplint()

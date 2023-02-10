@@ -17,6 +17,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
 #include "modules/perception/common/io/io_util.h"
@@ -25,22 +26,24 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::EigenVector;
+
 TEST(CommonFunctions, poly_fit_error_test) {
   {
     Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = nullptr;
-    std::vector<Eigen::Matrix<float, 2, 1>> pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> pos_vec;
     int order = max_poly_order;
     EXPECT_FALSE(PolyFit(pos_vec, order, coeff));
   }
   {
     Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = nullptr;
-    std::vector<Eigen::Matrix<float, 2, 1>> pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> pos_vec;
     int order = max_poly_order + 1;
     EXPECT_FALSE(PolyFit(pos_vec, order, coeff));
   }
   {
     Eigen::Matrix<float, max_poly_order + 1, 1> coeff;
-    std::vector<Eigen::Matrix<float, 2, 1>> pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> pos_vec;
     int order = max_poly_order;
     for (int i = 0; i < order; i++) {
       Eigen::Matrix<float, 2, 1> pos;
@@ -51,7 +54,7 @@ TEST(CommonFunctions, poly_fit_error_test) {
   }
   {
     Eigen::Matrix<float, max_poly_order + 1, 1> coeff;
-    std::vector<Eigen::Matrix<float, 2, 1>> pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> pos_vec;
     int order = max_poly_order;
     int n = 100;
     for (int i = 0; i < n; i++) {

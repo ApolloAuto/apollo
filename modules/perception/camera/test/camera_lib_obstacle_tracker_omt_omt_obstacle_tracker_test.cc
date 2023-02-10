@@ -18,10 +18,11 @@
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object.h"
@@ -184,8 +185,8 @@ bool LoadExtrinsics(const std::string &yaml_file,
 // @description: get project matrix
 bool GetProjectMatrix(
     const std::string &camera_name,
-    const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
+    const apollo::common::EigenMap<std::string, Eigen::Matrix4d> &extrinsic_map,
+    const apollo::common::EigenMap<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   std::string base_camera_name = FLAGS_base_camera_name;
   if (camera_name == base_camera_name) {
@@ -267,8 +268,8 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   }
 
   // Init extrinsic/intrinsic
-  std::map<std::string, Eigen::Matrix4d> extrinsic_map;
-  std::map<std::string, Eigen::Matrix3f> intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix4d> extrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> intrinsic_map;
   for (int i = 0; i < camera_names.size(); i++) {
     Eigen::Matrix3f intrinsic;
     ASSERT_TRUE(LoadCameraIntrinsics(

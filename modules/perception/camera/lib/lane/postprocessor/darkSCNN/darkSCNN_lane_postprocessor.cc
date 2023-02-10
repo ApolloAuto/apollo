@@ -20,7 +20,6 @@
 #include <utility>
 
 #include "cyber/common/file.h"
-
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/timer.h"
@@ -253,9 +252,9 @@ bool DarkSCNNLanePostprocessor::Process2D(
   time_1 += microseconds_1;
 
   // 2. Remove outliers and Do a ransac fitting
-  std::vector<Eigen::Matrix<float, 4, 1>> coeffs;
-  std::vector<Eigen::Matrix<float, 4, 1>> img_coeffs;
-  std::vector<Eigen::Matrix<float, 2, 1>> selected_xy_points;
+  EigenVector<Eigen::Matrix<float, 4, 1>> coeffs;
+  EigenVector<Eigen::Matrix<float, 4, 1>> img_coeffs;
+  EigenVector<Eigen::Matrix<float, 2, 1>> selected_xy_points;
   coeffs.resize(lane_type_num_);
   img_coeffs.resize(lane_type_num_);
   for (int i = 1; i < lane_type_num_; ++i) {
@@ -485,7 +484,7 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     float x_start = camera_point_set[0].z;
     float x_end = 0.0f;
     Eigen::Matrix<float, max_poly_order + 1, 1> camera_coeff;
-    std::vector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
+    EigenVector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
     for (int i = 0; i < static_cast<int>(camera_point_set.size()); ++i) {
       x_end = std::max(camera_point_set[i].z, x_end);
       x_start = std::min(camera_point_set[i].z, x_start);

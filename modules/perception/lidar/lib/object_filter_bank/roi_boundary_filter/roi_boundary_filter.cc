@@ -24,7 +24,6 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/pipeline/proto/plugin/roi_boundary_filter_config.pb.h"
 
-using apollo::common::EigenVector;
 
 namespace {
 constexpr double kDoubleMax = std::numeric_limits<double>::max();

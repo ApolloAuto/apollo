@@ -45,8 +45,6 @@
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
-using apollo::common::EigenMap;
-using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
@@ -55,6 +53,12 @@ namespace onboard {
 class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
 
  public:
   CameraObstacleDetectionComponent() : seq_num_(0) {}
@@ -111,6 +115,7 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
  private:
   std::mutex mutex_;
   uint32_t seq_num_;
+  static std::atomic<unsigned int> camera_id_;
 
   std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
@@ -150,6 +155,9 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   int frame_capacity_ = 20;
   int frame_id_ = 0;
   EigenVector<camera::CameraFrame> camera_frames_;
+
+  // camera size
+  unsigned int camera_size_ = 2;
 
   // image info.
   int image_width_ = 1920;
@@ -203,7 +211,7 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   base::MotionBufferPtr motion_buffer_;
   const int motion_buffer_size_ = 100;
 
-  // // variables for CIPV
+  // variables for CIPV
   bool enable_cipv_ = false;
   std::unique_ptr<camera::BaseCipv> cipv_;
   camera::CipvInitOptions cipv_init_options_;

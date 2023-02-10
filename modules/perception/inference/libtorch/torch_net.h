@@ -19,7 +19,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 #include <torch/script.h>
 #include <torch/torch.h>
@@ -30,14 +29,13 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
 class TorchNet : public Inference {
  public:
-  TorchNet(const std::string &net_file, const std::string &model_file,
-           const std::vector<std::string> &outputs);
+  using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
-  TorchNet(const std::string &net_file, const std::string &model_file,
+ public:
+  TorchNet(const std::string &model_file,
            const std::vector<std::string> &outputs,
            const std::vector<std::string> &inputs);
 
@@ -54,7 +52,6 @@ class TorchNet : public Inference {
   torch::jit::script::Module net_;
 
  private:
-  std::string net_file_;
   std::string model_file_;
   std::vector<std::string> output_names_;
   std::vector<std::string> input_names_;

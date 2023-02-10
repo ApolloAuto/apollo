@@ -14,38 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "absl/strings/str_cat.h"
 #include "Eigen/Dense"
 #include "gflags/gflags.h"
-#include "pcl/io/pcd_io.h"
-#include "pcl/kdtree/impl/kdtree_flann.hpp"
-#include "pcl/kdtree/kdtree.h"
-#include "pcl/kdtree/kdtree_flann.h"
 
-#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-#include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
+#include "modules/perception/base/object.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
+#include "modules/perception/lidar/app/lidar_obstacle_detection.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
-#include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
+#include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/pcl_util.h"
 
+#include "modules/perception/pipeline/proto/pipeline_config.pb.h"
+
+
+DEFINE_bool(enable_tracking, false, "option to enable tracking");
+DEFINE_bool(use_hdmap, false, "option to enable using hdmap");
+DEFINE_bool(use_tracking_info, false, "option to use tracking info");
+DEFINE_double(min_life_time, -1.0, "minimum track time for output");
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "", "pose path");
 DEFINE_string(output_path, "./output/", "output path");
-DEFINE_bool(enable_tracking, false, "option to enable tracking");
-DEFINE_double(min_life_time, -1.0, "minimum track time for output");
-DEFINE_bool(use_hdmap, false, "option to enable using hdmap");
-DEFINE_bool(use_tracking_info, false, "option to use tracking info");
 DEFINE_string(sensor_name, "velodyne64", "sensor name");
+DEFINE_string(lidar_detection_config_file, "", "");
+DEFINE_string(lidar_tracking_config_file, "", "");
 
 namespace apollo {
 namespace perception {
@@ -60,33 +61,26 @@ class OfflineLidarObstaclePerception {
   ~OfflineLidarObstaclePerception() = default;
 
   bool setup() {
+    // 1. Model config
     FLAGS_config_manager_path = "./conf";
     if (!lib::ConfigManager::Instance()->Init()) {
       AERROR << "Failed to init ConfigManage.";
       return false;
     }
-    lidar_segmentation_.reset(new LidarObstacleSegmentation);
-    if (lidar_segmentation_ == nullptr) {
-      AERROR << "Failed to get LidarObstacleSegmentation instance.";
-      return false;
-    }
-    segment_init_options_.enable_hdmap_input = FLAGS_use_hdmap;
-    segment_init_options_.sensor_name = FLAGS_sensor_name;
-    if (!lidar_segmentation_->Init(segment_init_options_)) {
-      AINFO << "Failed to init LidarObstacleSegmentation.";
-      return false;
-    }
+    // 2. Detection
+    lidar_detection_.reset(new LidarObstacleDetection);
+    ACHECK(cyber::common::GetProtoFromFile(
+              FLAGS_lidar_detection_config_file, &lidar_detection_config_));
+    ACHECK(lidar_detection_->Init(lidar_detection_config_));
+    // 3. Tracking
     lidar_tracking_.reset(new LidarObstacleTracking);
-    if (lidar_tracking_ == nullptr) {
-      AERROR << "Failed to get LidarObstacleTracking instance.";
+    ACHECK(cyber::common::GetProtoFromFile(
+              FLAGS_lidar_tracking_config_file, &lidar_tracking_config_));
+    if (!lidar_tracking_->Init(lidar_tracking_config_)) {
+      AINFO << "Failed to init LidarObstacleTracking.";
       return false;
     }
-    tracking_init_options_.sensor_name = FLAGS_sensor_name;
-    if (!lidar_tracking_->Init(tracking_init_options_)) {
-      AINFO << "Failed to init LidarObstacleSegmentation.";
-      return false;
-    }
-
+    // 4. SensorManager
     if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name,
                                                           &sensor_info_)) {
       AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
@@ -144,20 +138,22 @@ class OfflineLidarObstaclePerception {
         }
       }
       // TODO(shitingmin) undo timestamp.
-      LidarProcessResult segment_result =
-          lidar_segmentation_->Process(segment_options_, frame_.get());
-      if (segment_result.error_code != LidarErrorCode::Succeed) {
-        AINFO << segment_result.log;
+      pipeline::DataFrame data_frame;
+      data_frame.lidar_frame = frame_.get();
+      bool res = lidar_detection_->Process(&data_frame);
+      if (!res) {
+        AERROR << "Lidar detection error!";
         return false;
       }
+
       if (FLAGS_enable_tracking) {
         AINFO << "Enable tracking.";
-        LidarProcessResult tracking_result =
-            lidar_tracking_->Process(tracking_options_, frame_.get());
-        if (tracking_result.error_code != LidarErrorCode::Succeed) {
-          AINFO << tracking_result.log;
+        bool res = lidar_tracking_->Process(&data_frame);
+        if (!res) {
+          AERROR << "Lidar tracking error!";
           return false;
         }
+
         if (FLAGS_use_tracking_info) {
           auto& objects = frame_->segmented_objects;
           auto& result_objects = frame_->tracked_objects;
@@ -316,11 +312,10 @@ class OfflineLidarObstaclePerception {
  protected:
   std::string output_dir_;
   std::shared_ptr<LidarFrame> frame_;
-  LidarObstacleSegmentationInitOptions segment_init_options_;
-  LidarObstacleSegmentationOptions segment_options_;
-  LidarObstacleTrackingInitOptions tracking_init_options_;
-  LidarObstacleTrackingOptions tracking_options_;
-  std::unique_ptr<LidarObstacleSegmentation> lidar_segmentation_;
+  pipeline::PipelineConfig lidar_detection_config_;
+  pipeline::PipelineConfig lidar_tracking_config_;
+
+  std::unique_ptr<LidarObstacleDetection> lidar_detection_;
   std::unique_ptr<LidarObstacleTracking> lidar_tracking_;
   base::SensorInfo sensor_info_;
 };

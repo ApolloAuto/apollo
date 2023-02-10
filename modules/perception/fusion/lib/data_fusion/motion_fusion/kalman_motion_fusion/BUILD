@@ -8,6 +8,7 @@ cc_library(
     srcs = ["kalman_motion_fusion.cc"],
     hdrs = ["kalman_motion_fusion.h"],
     deps = [
+        "//modules/common/util:util_tool",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/geometry:basic",

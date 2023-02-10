@@ -18,6 +18,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
@@ -77,7 +78,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   CalibrationServiceInitOptions calibration_service_init_options;
   calibration_service_init_options.calibrator_working_sensor_name =
       "onsemi_obstacle";
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map;
   name_intrinsic_map["onsemi_obstacle"] = frame.camera_k_matrix;
   calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
   calibration_service_init_options.calibrator_method = "LaneLineCalibrator";

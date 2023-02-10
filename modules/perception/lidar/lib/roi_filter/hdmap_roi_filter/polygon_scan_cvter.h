@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "Eigen/Core"
-#include "Eigen/StdVector"
 
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 
 namespace apollo {
@@ -33,7 +33,7 @@ template <typename T = double>
 class PolygonScanCvter {
  public:
   typedef Eigen::Matrix<T, 2, 1> Point;
-  typedef std::vector<Point, Eigen::aligned_allocator<Point>> Polygon;
+  typedef apollo::common::EigenVector<Point> Polygon;
   typedef std::pair<T, T> IntervalIn;
   typedef std::pair<double, double> IntervalOut;
   typedef std::pair<Point, Point> Segment;

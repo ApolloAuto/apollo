@@ -36,6 +36,7 @@ namespace perception {
 namespace onboard {
 
 using ::apollo::cyber::Clock;
+using apollo::common::EigenMap;
 using apollo::cyber::common::GetAbsolutePath;
 
 static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,

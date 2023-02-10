@@ -38,6 +38,10 @@ namespace lidar {
 
 class NCut {
  public:
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
+ public:
   NCut();
   ~NCut();
   bool Init(const NCutParam& param);
@@ -101,8 +105,8 @@ class NCut {
   int _patch_size;
   cv::Mat _cv_feature_map;
   FloodFill _ff_feature_grid;
-  std::vector<Eigen::MatrixXf> _cluster_skeleton_points;
-  std::vector<Eigen::MatrixXf> _cluster_skeleton_features;
+  EigenVector<Eigen::MatrixXf> _cluster_skeleton_points;
+  EigenVector<Eigen::MatrixXf> _cluster_skeleton_features;
   // merge overlap
   double _overlap_factor;
   // final segments, each vector contains

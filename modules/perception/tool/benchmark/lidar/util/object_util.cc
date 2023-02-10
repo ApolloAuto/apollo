@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/util/object_util.h"
+
 #include <algorithm>
 #include <memory>
 #include <set>
@@ -25,7 +26,7 @@ namespace perception {
 namespace benchmark {
 
 bool get_bbox_vertices(const ObjectConstPtr object,
-                       std::vector<Eigen::Vector3d>* vertices) {
+                       EigenVector<Eigen::Vector3d>* vertices) {
   if (object == nullptr) {
     return false;
   }

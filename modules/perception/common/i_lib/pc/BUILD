@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_aarch64", "if_x86_64")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,6 +21,9 @@ cc_library(
 cc_library(
     name = "i_struct_s",
     hdrs = ["i_struct_s.h"],
+    deps = if_aarch64([
+        "@sse2neon",
+    ]),
 )
 
 cc_library(

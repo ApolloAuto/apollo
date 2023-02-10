@@ -58,7 +58,7 @@ class BaseLanePostprocessor : public pipeline::Stage {
   virtual bool Process3D(const LanePostprocessorOptions& options,
                          CameraFrame* frame) = 0;
 
-  virtual void SetIm2CarHomography(Eigen::Matrix3d homography_im2car) {
+  virtual void SetIm2CarHomography(const Eigen::Matrix3d &homography_im2car) {
     // do nothing
   }
 

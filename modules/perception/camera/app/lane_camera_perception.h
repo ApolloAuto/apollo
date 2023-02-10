@@ -21,6 +21,7 @@
 #include <string>
 
 #include "cyber/common/macros.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/camera/app/proto/perception.pb.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/object_template_manager.h"
@@ -38,6 +39,10 @@ namespace camera {
 
 class LaneCameraPerception final : public BaseCameraPerception {
  public:
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
+
+ public:
   LaneCameraPerception() = default;
   ~LaneCameraPerception() = default;
 
@@ -52,7 +57,7 @@ class LaneCameraPerception final : public BaseCameraPerception {
       const std::map<std::string, float> name_camera_ground_height_map,
       const std::map<std::string, float> name_camera_pitch_angle_diff_map,
       const float &pitch_angle_calibrator_working_sensor);
-  void SetIm2CarHomography(Eigen::Matrix3d homography_im2car);
+  void SetIm2CarHomography(const Eigen::Matrix3d &homography_im2car);
   bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
@@ -64,8 +69,8 @@ class LaneCameraPerception final : public BaseCameraPerception {
   std::string Name() const override { return name_; }
 
  private:
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
-  std::map<std::string, Eigen::Matrix4d> name_extrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map_;
+  EigenMap<std::string, Eigen::Matrix4d> name_extrinsic_map_;
   std::shared_ptr<BaseLaneDetector> lane_detector_;
   std::shared_ptr<BaseLanePostprocessor> lane_postprocessor_;
   std::shared_ptr<BaseCalibrationService> calibration_service_;

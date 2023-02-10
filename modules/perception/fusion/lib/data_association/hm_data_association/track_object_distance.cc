@@ -46,13 +46,13 @@ size_t TrackObjectDistance::s_lidar2camera_projection_vertices_check_pts_num_ =
     20;
 
 void TrackObjectDistance::GetModified2DRadarBoxVertices(
-    const std::vector<Eigen::Vector3d>& radar_box_vertices,
+    const EigenVector<Eigen::Vector3d>& radar_box_vertices,
     const SensorObjectConstPtr& camera,
     const base::BaseCameraModelPtr& camera_intrinsic,
     const Eigen::Matrix4d& world2camera_pose,
-    std::vector<Eigen::Vector2d>* radar_box2d_vertices) {
+    EigenVector<Eigen::Vector2d>* radar_box2d_vertices) {
   const double camera_height = camera->GetBaseObject()->size(2);
-  std::vector<Eigen::Vector3d> modified_radar_box_vertices = radar_box_vertices;
+  EigenVector<Eigen::Vector3d> modified_radar_box_vertices = radar_box_vertices;
   for (size_t i = 0; i < 4; ++i) {
     modified_radar_box_vertices[i + 4].z() =
         modified_radar_box_vertices[i].z() + camera_height;
@@ -141,7 +141,7 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
   bool is_all_lidar_3d_vertices_outside_frustum = false;
   if (cloud.size() > s_lidar2camera_projection_vertices_check_pts_num_) {
     is_all_lidar_3d_vertices_outside_frustum = true;
-    std::vector<Eigen::Vector3d> lidar_box_vertices;
+    EigenVector<Eigen::Vector3d> lidar_box_vertices;
     GetObjectEightVertices(lidar->GetBaseObject(), &lidar_box_vertices);
     for (size_t i = 0; i < lidar_box_vertices.size(); ++i) {
       Eigen::Vector3d& vt = lidar_box_vertices[i];
@@ -546,9 +546,9 @@ float TrackObjectDistance::ComputeRadarCamera(
   Eigen::Vector4d local_pt = static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
       world2camera_pose *
       Eigen::Vector4d(radar_ct[0], radar_ct[1], radar_ct[2], 1.0));
-  std::vector<Eigen::Vector3d> radar_box_vertices;
+  EigenVector<Eigen::Vector3d> radar_box_vertices;
   GetObjectEightVertices(radar->GetBaseObject(), &radar_box_vertices);
-  std::vector<Eigen::Vector2d> radar_box2d_vertices;
+  EigenVector<Eigen::Vector2d> radar_box2d_vertices;
   GetModified2DRadarBoxVertices(radar_box_vertices, camera, camera_model,
                                 world2camera_pose, &radar_box2d_vertices);
   // compute similarity

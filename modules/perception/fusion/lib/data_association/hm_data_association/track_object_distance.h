@@ -16,11 +16,9 @@
 #pragma once
 
 #include <string>
-#include <vector>
-
-#include "Eigen/StdVector"
 
 #include "cyber/common/macros.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/fusion_log.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
@@ -41,6 +39,12 @@ struct TrackObjectDistanceOptions {
 };  // struct TrackedObjectDistanceOptions
 
 class TrackObjectDistance {
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
  public:
   TrackObjectDistance() = default;
   ~TrackObjectDistance() = default;
@@ -150,11 +154,11 @@ class TrackObjectDistance {
                            const Eigen::Vector3d& ref_pos, const int range,
                            Eigen::Vector3d* polygon_ct);
   void GetModified2DRadarBoxVertices(
-      const std::vector<Eigen::Vector3d>& radar_box_vertices,
+      const EigenVector<Eigen::Vector3d>& radar_box_vertices,
       const SensorObjectConstPtr& camera,
       const base::BaseCameraModelPtr& camera_intrinsic,
       const Eigen::Matrix4d& world2camera_pose,
-      std::vector<Eigen::Vector2d>* radar_box2d_vertices);
+      EigenVector<Eigen::Vector2d>* radar_box2d_vertices);
   ProjectionCacheObject* BuildProjectionCacheObject(
       const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera,
       const base::BaseCameraModelPtr& camera_model,

@@ -26,7 +26,6 @@
 #include "modules/perception/pipeline/proto/stage/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
-using apollo::common::EigenVector;
 
 namespace apollo {
 namespace perception {
@@ -43,7 +42,7 @@ class ObstacleReference {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   void Init(const omt::ReferenceParam &ref_param, float width, float height);
   void UpdateReference(const CameraFrame *frame,
-                       const EigenVector<Target> &targets);
+                       const apollo::common::EigenVector<Target> &targets);
   void CorrectSize(CameraFrame *frame);
 
  private:

@@ -69,7 +69,7 @@ class SingleStageObstacleTransformer : public BaseObstacleTransformer {
  private:
   int MatchTemplates(base::ObjectSubType sub_type, float *dimension_hwl);
   void FillResults(float object_center[3], float dimension_hwl[3],
-                   float rotation_y, Eigen::Affine3d camera2world_pose,
+                   float rotation_y, const Eigen::Affine3d &camera2world_pose,
                    float theta_ray, base::ObjectPtr obj);
   float CenterPointFromBbox(const float *bbox, const float *hwl,
                             float ry, float *center, float *center2d,

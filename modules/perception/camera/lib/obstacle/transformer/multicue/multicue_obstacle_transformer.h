@@ -55,13 +55,14 @@ class MultiCueObstacleTransformer : public BaseObstacleTransformer {
   std::string Name() const override { return name_; }
 
  private:
-  void SetObjMapperOptions(base::ObjectPtr obj, Eigen::Matrix3f camera_k_matrix,
+  void SetObjMapperOptions(base::ObjectPtr obj,
+                           const Eigen::Matrix3f &camera_k_matrix,
                            int width_image, int height_image,
                            ObjMapperOptions *obj_mapper_options,
                            float *theta_ray);
   int MatchTemplates(base::ObjectSubType sub_type, float *dimension_hwl);
   void FillResults(float object_center[3], float dimension_hwl[3],
-                   float rotation_y, Eigen::Affine3d camera2world_pose,
+                   float rotation_y, const Eigen::Affine3d &camera2world_pose,
                    float theta_ray, base::ObjectPtr obj);
 
  private:

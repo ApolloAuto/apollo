@@ -207,8 +207,7 @@ bool SmokeObstacleDetector::Init(const StageConfig &stage_config) {
   BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
   BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
 
-  std::string camera_name =
-          smoke_obstacle_detection_config_.camera_name();
+  std::string camera_name = smoke_obstacle_detection_config_.camera_name();
   boost::algorithm::split(camera_names_, camera_name,
                               boost::algorithm::is_any_of(","));
   base_camera_model_ =
@@ -226,29 +225,15 @@ bool SmokeObstacleDetector::Init(const StageConfig &stage_config) {
   const auto &model_param = smoke_param_.model_param();
   std::string model_root = GetAbsolutePath(
       smoke_obstacle_detection_config_.root_dir(), model_param.model_name());
-  std::string anchors_file =
-      GetAbsolutePath(model_root, model_param.anchors_file());
-  std::string types_file =
-      GetAbsolutePath(model_root, model_param.types_file());
-  std::string expand_file =
-      GetAbsolutePath(model_root, model_param.expand_file());
+
   LoadInputShape(model_param);
   LoadParam(smoke_param_);
   min_dims_.min_2d_height /= static_cast<float>(height_);
 
-  if (!LoadAnchors(anchors_file, &anchors_)) {
-    return false;
-  }
-  if (!LoadTypes(types_file, &types_)) {
-    return false;
-  }
-  if (!LoadExpand(expand_file, &expands_)) {
-    return false;
-  }
-  ACHECK(expands_.size() == types_.size());
   if (!InitNet(smoke_param_, model_root)) {
     return false;
   }
+
   InitSmokeBlob(smoke_param_.net_param());
   if (!InitFeatureExtractor(model_root)) {
     return false;

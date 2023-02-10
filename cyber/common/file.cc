@@ -111,6 +111,10 @@ bool GetProtoFromBinaryFile(const std::string &file_name,
 
 bool GetProtoFromFile(const std::string &file_name,
                       google::protobuf::Message *message) {
+  if (!PathExists(file_name)) {
+    AERROR << "File does not exist! " << file_name;
+    return false;
+  }
   // Try the binary parser first if it's much likely a binary proto.
   static const std::string kBinExt = ".bin";
   if (std::equal(kBinExt.rbegin(), kBinExt.rend(), file_name.rbegin())) {

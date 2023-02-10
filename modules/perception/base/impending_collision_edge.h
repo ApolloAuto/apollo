@@ -20,11 +20,13 @@
 
 #include "Eigen/Core"
 
+#include "modules/common/util/eigen_defs.h"
+
 namespace apollo {
 namespace perception {
 namespace base {
 
-struct alignas(16) ImpendingCollisionEdge {
+struct ImpendingCollisionEdge {
   // edge id per frame
   int id = 0;
 
@@ -32,7 +34,7 @@ struct alignas(16) ImpendingCollisionEdge {
   double tracking_time = 0.0;
 
   // points of the edge
-  std::vector<Eigen::Vector3d> points;
+  apollo::common::EigenVector<Eigen::Vector3d> points;
 };
 
 // TODO(all): to remove

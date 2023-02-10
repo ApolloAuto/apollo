@@ -32,7 +32,7 @@ class KalmanFilterConstVelocity {
  public:
   KalmanFilterConstVelocity();
 
-  void Init(Eigen::VectorXd);
+  void Init(const Eigen::VectorXd &x);
 
   void Predict(float delta_t);
 
@@ -107,7 +107,7 @@ class ExtendedKalmanFilter {
   ExtendedKalmanFilter() : inited_(false) {}
   void Init();
 
-  void Init(Eigen::VectorXd);
+  void Init(const Eigen::VectorXd &x);
 
   void Predict(float delta_t);
 
@@ -136,8 +136,6 @@ class ExtendedKalmanFilter {
 
 class FirstOrderRCLowPassFilter {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
- public:
   FirstOrderRCLowPassFilter() : alpha_(0), inited_(false) {}
   void SetAlpha(float alpha);
   void AddMeasure(const Eigen::VectorXd &z);
@@ -150,8 +148,6 @@ class FirstOrderRCLowPassFilter {
 };
 
 class MaxNMeanFilter {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  public:
   MaxNMeanFilter() : index_(0), window_(1) {}
   void SetWindow(int window);
@@ -169,8 +165,6 @@ class MaxNMeanFilter {
 };
 
 class MeanFilter {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  public:
   MeanFilter() : index_(0), window_(1) {}
   void SetWindow(int window);

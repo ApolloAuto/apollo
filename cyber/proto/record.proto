@@ -50,6 +50,15 @@ message SingleMessage {
   optional bytes content = 3;
 }
 
+message MapInfo {
+  optional string name = 1;
+  optional string version = 2;
+}
+
+message VehicleInfo {
+  optional string name = 1;
+}
+
 message Header {
   optional uint32 major_version = 1;
   optional uint32 minor_version = 2;
@@ -66,6 +75,8 @@ message Header {
   optional bool is_complete = 13 [default = false];
   optional uint64 chunk_raw_size = 14;
   optional uint64 segment_raw_size = 15;
+  optional MapInfo map_info = 16;
+  optional VehicleInfo vehicle_info = 17;
 }
 
 message Channel {

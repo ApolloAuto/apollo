@@ -107,8 +107,7 @@ void CollectFusedObject::CollectObjectsByTrack(
                             camera_measurements.size() +
                             radar_measurements.size();
   obj->fusion_supplement.on_use = true;
-  std::vector<base::SensorObjectMeasurement>& measurements =
-      obj->fusion_supplement.measurements;
+  auto& measurements = obj->fusion_supplement.measurements;
   measurements.resize(num_measurements);
 
   // fill measurements

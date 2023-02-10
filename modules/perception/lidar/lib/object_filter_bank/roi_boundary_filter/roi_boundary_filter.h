@@ -35,6 +35,9 @@ class ROIBoundaryFilter : public BaseObjectFilter {
  public:
   using PluginConfig = pipeline::PluginConfig;
 
+  template <class EigenType>
+  using EigenVector = apollo::common::EigenVector<EigenType>;
+
  public:
   ROIBoundaryFilter() { name_ = "ROIBoundaryFilter"; }
 
@@ -79,8 +82,7 @@ class ROIBoundaryFilter : public BaseObjectFilter {
  private:
   FRIEND_TEST(ROIBoundaryFilterTest, roi_boundary_filter_test);
 
-  apollo::common::EigenVector<apollo::perception::base::PointDCloud>
-      polygons_in_world_;
+  EigenVector<apollo::perception::base::PointDCloud> polygons_in_world_;
   std::vector<bool> objects_cross_roi_;
   std::vector<bool> objects_valid_flag_;
   // params

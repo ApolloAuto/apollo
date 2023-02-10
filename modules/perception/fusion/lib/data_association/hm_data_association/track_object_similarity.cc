@@ -209,7 +209,7 @@ double ComputeRadarCameraYSimilarity(const double velo_ct_y,
 double ComputeRadarCameraHSimilarity(
     const SensorObjectConstPtr& radar, const SensorObjectConstPtr& camera,
     const double size_y,
-    const std::vector<Eigen::Vector2d>& radar_box2d_vertices,
+    const EigenVector<Eigen::Vector2d>& radar_box2d_vertices,
     const HSimilarityParams& params) {
   const double camera_height = camera->GetBaseObject()->size(2);
   double height_similarity = params.initial_similarity_;
@@ -234,7 +234,7 @@ double ComputeRadarCameraHSimilarity(
 }
 double ComputeRadarCameraWSimilarity(
     const SensorObjectConstPtr& radar, const double width, const double size_x,
-    const std::vector<Eigen::Vector2d>& radar_box2d_vertices,
+    const EigenVector<Eigen::Vector2d>& radar_box2d_vertices,
     const WSimilarityParams& params) {
   std::vector<double> radar_box2d_xs = {
       radar_box2d_vertices[0].x(), radar_box2d_vertices[1].x(),

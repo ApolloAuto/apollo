@@ -74,6 +74,8 @@ struct DetectorOptions {
   Eigen::Vector3f car_linear_speed = Eigen::Vector3f::Zero();
   Eigen::Vector3f car_angular_speed = Eigen::Vector3f::Zero();
   base::HdmapStructPtr roi = nullptr;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 class BaseDetector {

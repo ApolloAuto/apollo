@@ -50,7 +50,6 @@ cc_library(
     hdrs = ["inference_factory.h"],
     deps = [
         ":inference_lib",
-        "//modules/perception/inference/libtorch:torch_det",
         "//modules/perception/inference/libtorch:torch_net",
         "//modules/perception/inference/onnx:libtorch_obstacle_detector",
         "//modules/perception/inference/paddlepaddle:paddle_net",

@@ -186,7 +186,7 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
 }
 
 void LaneCameraPerception::SetIm2CarHomography(
-    Eigen::Matrix3d homography_im2car) {
+    const Eigen::Matrix3d &homography_im2car) {
   if (calibration_service_ == nullptr) {
     AERROR << "Calibraion service is not available";
     return;

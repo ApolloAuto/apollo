@@ -16,6 +16,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
 #include "modules/perception/common/io/io_util.h"
@@ -37,7 +38,7 @@ TEST(OnlineCalibrationServiceTest, online_calibration_service_test) {
 
   // service
   CalibrationServiceInitOptions options;
-  std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
+  apollo::common::EigenMap<std::string, Eigen::Matrix3f> name_intrinsic_map;
   name_intrinsic_map.insert(
       std::pair<std::string, Eigen::Matrix3f>("onsemi_obstacle", intrinsic));
   options.name_intrinsic_map = name_intrinsic_map;

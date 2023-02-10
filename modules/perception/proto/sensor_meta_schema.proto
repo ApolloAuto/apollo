@@ -4,17 +4,18 @@ package apollo.perception;
 message SensorMeta {
   enum SensorType {
     UNKNOWN_SENSOR_TYPE = -1;
-    VELODYNE_64 = 0;
-    VELODYNE_32 = 1;
-    VELODYNE_16 = 2;
-    LDLIDAR_4 = 3;
-    LDLIDAR_1 = 4;
-    SHORT_RANGE_RADAR = 5;
-    LONG_RANGE_RADAR = 6;
-    MONOCULAR_CAMERA = 7;
-    STEREO_CAMERA = 8;
-    ULTRASONIC = 9;
-    VELODYNE_128 = 10;
+    VELODYNE_128 = 0;
+    VELODYNE_64 = 1;
+    VELODYNE_32 = 2;
+    VELODYNE_16 = 3;
+    LDLIDAR_4 = 4;
+    LDLIDAR_1 = 5;
+    SHORT_RANGE_RADAR = 6;
+    LONG_RANGE_RADAR = 7;
+    MONOCULAR_CAMERA = 8;
+    STEREO_CAMERA = 9;
+    ULTRASONIC = 10;
+    
   }
 
   enum SensorOrientation {

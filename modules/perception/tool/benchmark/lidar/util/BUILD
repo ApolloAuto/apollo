@@ -35,6 +35,16 @@ cc_library(
 )
 
 cc_library(
+    name = "object_util",
+    srcs = ["object_util.cc"],
+    hdrs = ["object_util.h"],
+    deps = [
+        ":object",
+        "//modules/common/util:util_tool",
+    ],
+)
+
+cc_library(
     name = "geo_util",
     srcs = ["geo_util.cc"],
     hdrs = ["geo_util.h"],

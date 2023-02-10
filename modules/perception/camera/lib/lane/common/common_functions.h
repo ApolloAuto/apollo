@@ -16,17 +16,21 @@
 #pragma once
 
 #include <vector>
-
 #include <limits>
 
 #include "Eigen/Core"
+
 #include "cyber/common/log.h"
+#include "modules/common/util/eigen_defs.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/point.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
+using apollo::common::EigenVector;
+
 typedef std::vector<base::Point3DF> Point3DSet;
 typedef std::vector<base::Point2DF> Point2DSet;
 
@@ -44,7 +48,7 @@ struct LanePointInfo {
 };
 // fit polynomial function with QR decomposition (using Eigen 3)
 template <typename Dtype>
-bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
+bool PolyFit(const EigenVector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
              const int& order,
              Eigen::Matrix<Dtype, max_poly_order + 1, 1>* coeff,
              const bool& is_x_axis = true) {
@@ -109,8 +113,8 @@ bool PolyEval(const Dtype& x, int order,
 
 // @brief: ransac fitting to estimate the coefficients of linear system
 template <typename Dtype>
-bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
-                   std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
+bool RansacFitting(const EigenVector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
+                   EigenVector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
                    Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
                    const int N = 5,
                    const Dtype inlier_thres = static_cast<Dtype>(0.1)) {
@@ -189,7 +193,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
   if (static_cast<Dtype>(max_inliers) / n < good_lane_ratio) return false;
 
-  // std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
+  // EigenVector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
   // pos_vec.clear();
   for (int i = 0; i < n; ++i) {
     Dtype y = pos_vec[i](0) * pos_vec[i](0) * (*coeff)(2) +

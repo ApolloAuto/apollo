@@ -16,6 +16,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/util:util_tool",
         "//modules/perception/tool/benchmark/lidar/util:benchmark_util",
     ],
 )

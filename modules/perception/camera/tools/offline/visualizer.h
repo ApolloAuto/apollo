@@ -30,7 +30,7 @@
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/proto/motion_service.pb.h"
 
-using apollo::common::EigenMap;
+
 
 namespace apollo {
 namespace perception {
@@ -39,6 +39,9 @@ namespace camera {
 class Visualizer {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  template <typename T, class EigenType>
+  using EigenMap = apollo::common::EigenMap<T, EigenType>;
 
  public:
   bool Init(const std::vector<std::string> &camera_names,
@@ -71,7 +74,7 @@ class Visualizer {
   cv::Point world_point_to_bigimg(const Eigen::Vector4f &p);
   Eigen::Vector2d image2ground(const std::string &camera_name, cv::Point p_img);
   cv::Point ground2image(const std::string &camera_name,
-                         Eigen::Vector2d p_ground);
+                         const Eigen::Vector2d &p_ground);
   std::string type_to_string(const apollo::perception::base::ObjectType type);
   std::string sub_type_to_string(
       const apollo::perception::base::ObjectSubType type);
@@ -107,8 +110,8 @@ class Visualizer {
   bool write_out_img_ = false;
   bool cv_imshow_img_ = true;
   // homograph between image and ground plane
-  std::map<std::string, Eigen::Matrix3d> homography_image2ground_;
-  std::map<std::string, Eigen::Matrix3d> homography_ground2image_;
+  EigenMap<std::string, Eigen::Matrix3d> homography_image2ground_;
+  EigenMap<std::string, Eigen::Matrix3d> homography_ground2image_;
 
  private:
   std::map<std::string, cv::Mat> camera_image_;
@@ -147,8 +150,8 @@ class Visualizer {
   int roi_start_ = 312;
   int roi_width_ = 1920;
 
-  std::map<std::string, Eigen::Vector2d> vp1_;
-  std::map<std::string, Eigen::Vector2d> vp2_;
+  EigenMap<std::string, Eigen::Vector2d> vp1_;
+  EigenMap<std::string, Eigen::Vector2d> vp2_;
 
   std::vector<std::string> camera_names_;
   std::string visual_camera_ = "front_6mm";

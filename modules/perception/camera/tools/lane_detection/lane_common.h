@@ -18,29 +18,25 @@
 #include <string>
 #include <vector>
 
-#include <opencv2/opencv.hpp>
+#include "gflags/gflags.h"
+#include "opencv2/opencv.hpp"
 
 #include "modules/perception/base/lane_struct.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
 
+DECLARE_bool(lane_line_debug);
+DECLARE_bool(lane_cc_debug);
+DECLARE_bool(lane_result_output);
+DECLARE_int32(height);
+DECLARE_int32(width);
 DECLARE_string(list);
 DECLARE_string(file_title);
 DECLARE_string(debug_file);
 DECLARE_string(save_dir);
 DECLARE_string(file_ext_name);
 DECLARE_string(file_debug_list);
-DECLARE_bool(lane_line_debug);
-DECLARE_bool(lane_cc_debug);
-#if 0
-DECLARE_bool(lane_center_debug);
-DECLARE_bool(lane_ego_debug);
-#endif
-DECLARE_bool(lane_result_output);
-#if 0
-DECLARE_bool(lane_points_output);
 DECLARE_string(image_dir);
-#endif
 DECLARE_string(camera_intrinsics_yaml);
 
 namespace apollo {
@@ -51,6 +47,16 @@ void show_detect_point_set(
     const cv::Mat& image,
     const std::vector<std::vector<LanePointInfo>>& detect_laneline_point_set,
     const std::string& save_path);
+
+void show_detect_point_set(
+    const cv::Mat& image,
+    const std::vector<base::Point2DF>& img_laneline_point_set,
+    const std::string& save_path);
+
+void show_detect_point_set(
+    const cv::Mat& image,
+    const std::vector<base::Point2DF>& img_laneline_point_set,
+    const std::vector<float>& point_score_vec, const std::string& save_path);
 
 void show_all_infer_point_set(const cv::Mat& image,
                               const std::vector<LanePointInfo>& infer_point_set,
@@ -67,6 +73,12 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
                    const std::vector<ConnectedComponent>& lane_ccs,
                    const std::vector<ConnectedComponent>& select_lane_ccs,
                    const std::string& save_path);
+
+void show_neighbor_point_set(
+    const cv::Mat& image,
+    const std::vector<base::Point2DF>& img_laneline_point_set,
+    const std::vector<int>& neighbor_point_info, const std::string& save_path);
+
 //
 //  save the lane line and points to json format
 void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
