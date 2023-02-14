@@ -15,7 +15,7 @@ function V2xList() {
   /**
    * @type {{
    *  v2xId: string,
-   *  obu_number: string,
+   *  obu_in: string,
    *  }[]}
    */
   const [v2xInfoList, setV2xInfoList] = useState([]);
@@ -62,7 +62,7 @@ function V2xListItem(props) {
   /**
    * @type {{
    *  v2xId: string,
-   *  obu_number: string,
+   *  obu_in: string,
    *  }}
    */
   const { item } = props;
@@ -103,7 +103,7 @@ function V2xListItem(props) {
   return (
     <div className='vehicle-list-item'>
       <div className='vehicle-list-item_name'>{
-        item.obu_number
+        item.obu_in
       }</div>
       <V2xListItemStatus status={status} />
       {/* 按钮组 */}
