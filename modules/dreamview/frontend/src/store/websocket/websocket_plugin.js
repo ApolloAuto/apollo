@@ -31,23 +31,23 @@ export default class PluginWebSocketEndpoint {
       }, 1000);
       return this;
     }
-    this.websocket.onmessage = (event) => {
+    this.websocket.addEventListener('message', (event) => {
       this.worker.postMessage({
         source: 'point_cloud',
         data: event.data,
       });
-    };
+    });
     this.websocket.onclose = (event) => {
       console.log(`WebSocket connection closed with code: ${event.code}`);
       this.initialize();
     };
-    this.worker.onmessage = (event) => {
+    this.worker.addEventListener('message', (event) => {
       if (event.data.type === 'PluginMsg') {
         const message = event.data;
 
         switch (message.data.name) {
           case 'StudioConnectorCertStatus':
-            const status = JSON.parse(message.data.info).status;
+            const status = JSON.parse(message.data.info ?? '{}').status;
             if (status === 'OK') {
               this.getScenarioSetList();
               this.getDynamicsModelList();
@@ -58,91 +58,91 @@ export default class PluginWebSocketEndpoint {
           // Get Scenario Set Info Success
           case 'GetScenarioSetListSuccess':
             STORE.studioConnector.updateRemoteScenarioSetList(
-              JSON.parse(message.data.info));
+              JSON.parse(message.data.info ?? '{}'));
             break;
           // Get Scenario Set Info Failed
           case 'GetScenarioSetListFail':
             STORE.studioConnector.updateRemoteScenarioSetList(
-              JSON.parse(message.data.info)
+              JSON.parse(message.data.info ?? '{}')
             );
             break;
           case 'DownloadScenarioSetSuccess':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info)?.scenario_set_id,
-              JSON.parse(message.data.info)?.status,
+              JSON.parse(message.data.info ?? '{}')?.scenario_set_id,
+              JSON.parse(message.data.info ?? '{}')?.status,
             );
             break;
           case 'DownloadScenarioSetFail':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info)?.scenario_set_id,
+              JSON.parse(message.data.info ?? '{}')?.scenario_set_id,
               'fail',
-              JSON.parse(message.data.info)?.error_msg,
+              JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
             break;
           case 'GetDynamicModelListSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelList(
-              JSON.parse(message.data.info));
+              JSON.parse(message.data.info ?? '{}'));
             break;
           case 'GetDynamicModelListFail':
             STORE.studioConnector.updateRemoteDynamicsModelList(
-              JSON.parse(message.data.info)
+              JSON.parse(message.data.info ?? '{}')
             );
             break;
           case 'DownloadDynamicModelSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info)?.dynamic_model_name,
-              JSON.parse(message.data.info)?.status,
+              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
+              JSON.parse(message.data.info ?? '{}')?.status,
             );
             break;
           case 'DownloadDynamicModelFail':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info)?.dynamic_model_name,
+              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
               'fail',
-              JSON.parse(message.data.info)?.error_msg,
+              JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
             break;
           case 'GetRecordsListSuccess':
             STORE.studioConnector.updateRemoteRecordsList(
-              JSON.parse(message.data.info));
+              JSON.parse(message.data.info ?? '{}'));
             break;
           case 'GetRecordListFail':
             STORE.studioConnector.updateRemoteRecordsList(
-              JSON.parse(message.data.info)
+              JSON.parse(message.data.info ?? '{}')
             );
             break;
-            // 下载record成功
+          // 下载record成功
           case 'UpdateRecordToStatus':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info)?.record_id,
-              JSON.parse(message.data.info)?.status,
+              JSON.parse(message.data.info ?? '{}')?.record_id,
+              JSON.parse(message.data.info ?? '{}')?.status,
             );
             break;
           case 'DownloadRecordFail':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info)?.record_id,
+              JSON.parse(message.data.info ?? '{}')?.record_id,
               'fail',
-              JSON.parse(message.data.info)?.error_msg,
+              JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
           case 'GetVehicleInfoSuccess':
             STORE.studioConnector.updateVehicleInfo(
-              JSON.parse(message.data.info),
+              JSON.parse(message.data.info ?? '{}'),
               2,
             );
             break;
           case 'GetVehicleInfoFail':
             STORE.studioConnector.updateVehicleInfo(
-              JSON.parse(message.data.info),
+              JSON.parse(message.data.info ?? '{}'),
               3,
             );
             break;
           case 'RefreshVehicleConfigSuccess':
             STORE.studioConnector.refreshVehicleConfig(
-              JSON.parse(message.data.info),
+              JSON.parse(message.data.info ?? '{}'),
               2,
             );
         }
       }
-    };
+    });
     return this;
   }
 
@@ -287,7 +287,7 @@ export default class PluginWebSocketEndpoint {
       }
     }));
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = (event) => {
+      this.worker.addEventListener('message', (event) => {
         if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
@@ -299,7 +299,8 @@ export default class PluginWebSocketEndpoint {
               break;
           }
         }
-      };
+      },
+      );
     });
   }
 
@@ -319,7 +320,7 @@ export default class PluginWebSocketEndpoint {
       }
     }));
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = (event) => {
+      this.worker.addEventListener('message', (event) => {
         if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
@@ -331,7 +332,9 @@ export default class PluginWebSocketEndpoint {
               break;
           }
         }
-      };
+      },
+
+      );
     });
   }
 
@@ -351,19 +354,145 @@ export default class PluginWebSocketEndpoint {
       }
     }));
     return new Promise((resolve, reject) => {
-      this.worker.onmessage = (event) => {
+      this.worker.addEventListener(
+        'message',
+        (event) => {
+          if (event.data.type === 'PluginMsg') {
+            const message = event.data;
+            switch (message.data.name) {
+              case 'UploadConfigSuccess':
+                resolve();
+                break;
+              case 'UploadConfigFail':
+                reject();
+                break;
+            }
+          }
+        },);
+    });
+  }
+
+  /** GetV2xInfo */
+  getV2xInfo() {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'GetV2xInfo',
+        'source': 'dreamview',
+        'info': '',
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.addEventListener('message', (event) => {
         if (event.data.type === 'PluginMsg') {
           const message = event.data;
           switch (message.data.name) {
-            case 'UploadConfigSuccess':
+            case 'GetV2xInfoSuccess':
+              resolve(JSON.parse(message.data.info ?? '{}'));
+              break;
+            case 'GetV2xInfoFail':
+              reject(JSON.parse(message.data.info ?? '{}'));
+              break;
+          }
+        }
+      },
+      );
+    });
+  }
+
+  /** RefreshV2xConf */
+  refreshV2xConf(v2xId) {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'RefreshV2xConf',
+        'source': 'dreamview',
+        'info': v2xId,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.addEventListener('message', (event) => {
+        if (event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'RefreshV2xConfSuccess':
               resolve();
               break;
-            case 'UploadConfigFail':
+            case 'RefreshV2xConfFail':
               reject();
               break;
           }
         }
-      };
+      },
+      );
+    });
+  }
+
+  /** ResetV2xConf */
+  resetV2xConf(v2xId) {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'ResetV2xConf',
+        'source': 'dreamview',
+        'info': v2xId,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.addEventListener('message', (event) => {
+        if (event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'ResetV2xConfSuccess':
+              resolve();
+              break;
+            case 'ResetV2xConfFail':
+              reject();
+              break;
+          }
+        }
+      },
+      );
+    });
+  }
+
+  /** UploadV2xConf */
+  uploadV2xConf(v2xId) {
+    this.websocket.send(JSON.stringify({
+      type: 'PluginRequest',
+      data: {
+        'name': 'UploadV2xConf',
+        'source': 'dreamview',
+        'info': v2xId,
+        'target': 'studio_connector',
+        'source_type': 'module',
+        'target_type': 'plugins',
+      }
+    }));
+    return new Promise((resolve, reject) => {
+      this.worker.addEventListener('message', (event) => {
+        if (event.data.type === 'PluginMsg') {
+          const message = event.data;
+          switch (message.data.name) {
+            case 'UploadV2xSuccess':
+              resolve();
+              break;
+            case 'UploadV2xFail':
+              reject();
+              break;
+          }
+        }
+      },
+      );
     });
   }
 }

@@ -2263,13 +2263,6 @@
                   "type": "DualVariableConfig",
                   "id": 2
                 },
-                "trajectorySmoother": {
-                  "type": "TrajectorySmoother",
-                  "id": 7,
-                  "options": {
-                    "default": "USE_WARM_START"
-                  }
-                },
                 "distanceApproachTrajectorySmootherConfig": {
                   "type": "DistanceApproachTrajectorySmootherConfig",
                   "id": 3
@@ -2291,15 +2284,6 @@
                 "plannerOpenSpaceConfig": {
                   "type": "PlannerOpenSpaceConfig",
                   "id": 6
-                }
-              },
-              "nested": {
-                "TrajectorySmoother": {
-                  "values": {
-                    "ITERATIVE_ANCHORING_SMOOTHER": 0,
-                    "DISTANCE_APPROACH": 1,
-                    "USE_WARM_START": 2
-                  }
                 }
               }
             },
@@ -7751,6 +7735,33 @@
         },
         "audio": {
           "nested": {
+            "AudioDetection": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "isSiren": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "movingResult": {
+                  "type": "apollo.audio.MovingResult",
+                  "id": 3,
+                  "options": {
+                    "default": "UNKNOWN"
+                  }
+                },
+                "position": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "sourceDegree": {
+                  "type": "double",
+                  "id": 5
+                }
+              }
+            },
             "MovingResult": {
               "values": {
                 "UNKNOWN": 0,
@@ -7814,33 +7825,6 @@
                 "pose": {
                   "type": "apollo.localization.Pose",
                   "id": 7
-                }
-              }
-            },
-            "AudioDetection": {
-              "fields": {
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 1
-                },
-                "isSiren": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "movingResult": {
-                  "type": "apollo.audio.MovingResult",
-                  "id": 3,
-                  "options": {
-                    "default": "UNKNOWN"
-                  }
-                },
-                "position": {
-                  "type": "apollo.common.Point3D",
-                  "id": 4
-                },
-                "sourceDegree": {
-                  "type": "double",
-                  "id": 5
                 }
               }
             }
@@ -8742,6 +8726,639 @@
         },
         "canbus": {
           "nested": {
+            "Chassis": {
+              "fields": {
+                "engineStarted": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "engineRpm": {
+                  "type": "float",
+                  "id": 4,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "speedMps": {
+                  "type": "float",
+                  "id": 5,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "odometerM": {
+                  "type": "float",
+                  "id": 6,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "fuelRangeM": {
+                  "type": "int32",
+                  "id": 7
+                },
+                "throttlePercentage": {
+                  "type": "float",
+                  "id": 8,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "brakePercentage": {
+                  "type": "float",
+                  "id": 9,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "steeringPercentage": {
+                  "type": "float",
+                  "id": 11,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "steeringTorqueNm": {
+                  "type": "float",
+                  "id": 12,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "parkingBrake": {
+                  "type": "bool",
+                  "id": 13
+                },
+                "highBeamSignal": {
+                  "type": "bool",
+                  "id": 14,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "lowBeamSignal": {
+                  "type": "bool",
+                  "id": 15,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "leftTurnSignal": {
+                  "type": "bool",
+                  "id": 16,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "rightTurnSignal": {
+                  "type": "bool",
+                  "id": 17,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "horn": {
+                  "type": "bool",
+                  "id": 18,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "wiper": {
+                  "type": "bool",
+                  "id": 19
+                },
+                "disengageStatus": {
+                  "type": "bool",
+                  "id": 20,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "drivingMode": {
+                  "type": "DrivingMode",
+                  "id": 21,
+                  "options": {
+                    "default": "COMPLETE_MANUAL"
+                  }
+                },
+                "errorCode": {
+                  "type": "ErrorCode",
+                  "id": 22,
+                  "options": {
+                    "default": "NO_ERROR"
+                  }
+                },
+                "gearLocation": {
+                  "type": "GearPosition",
+                  "id": 23
+                },
+                "steeringTimestamp": {
+                  "type": "double",
+                  "id": 24
+                },
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 25
+                },
+                "chassisErrorMask": {
+                  "type": "int32",
+                  "id": 26,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "signal": {
+                  "type": "apollo.common.VehicleSignal",
+                  "id": 27
+                },
+                "chassisGps": {
+                  "type": "ChassisGPS",
+                  "id": 28
+                },
+                "engageAdvice": {
+                  "type": "apollo.common.EngageAdvice",
+                  "id": 29
+                },
+                "wheelSpeed": {
+                  "type": "WheelSpeed",
+                  "id": 30
+                },
+                "surround": {
+                  "type": "Surround",
+                  "id": 31
+                },
+                "license": {
+                  "type": "License",
+                  "id": 32,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "vehicleId": {
+                  "type": "apollo.common.VehicleID",
+                  "id": 33
+                },
+                "batterySocPercentage": {
+                  "type": "int32",
+                  "id": 34,
+                  "options": {
+                    "default": -1
+                  }
+                },
+                "throttlePercentageCmd": {
+                  "type": "float",
+                  "id": 35,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "brakePercentageCmd": {
+                  "type": "float",
+                  "id": 36,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "steeringPercentageCmd": {
+                  "type": "float",
+                  "id": 37,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "frontBumperEvent": {
+                  "type": "BumperEvent",
+                  "id": 38
+                },
+                "backBumperEvent": {
+                  "type": "BumperEvent",
+                  "id": 39
+                },
+                "checkResponse": {
+                  "type": "CheckResponse",
+                  "id": 40
+                }
+              },
+              "nested": {
+                "DrivingMode": {
+                  "values": {
+                    "COMPLETE_MANUAL": 0,
+                    "COMPLETE_AUTO_DRIVE": 1,
+                    "AUTO_STEER_ONLY": 2,
+                    "AUTO_SPEED_ONLY": 3,
+                    "EMERGENCY_MODE": 4
+                  }
+                },
+                "ErrorCode": {
+                  "values": {
+                    "NO_ERROR": 0,
+                    "CMD_NOT_IN_PERIOD": 1,
+                    "CHASSIS_ERROR": 2,
+                    "CHASSIS_ERROR_ON_STEER": 6,
+                    "CHASSIS_ERROR_ON_BRAKE": 7,
+                    "CHASSIS_ERROR_ON_THROTTLE": 8,
+                    "CHASSIS_ERROR_ON_GEAR": 9,
+                    "MANUAL_INTERVENTION": 3,
+                    "CHASSIS_CAN_NOT_IN_PERIOD": 4,
+                    "UNKNOWN_ERROR": 5
+                  }
+                },
+                "GearPosition": {
+                  "values": {
+                    "GEAR_NEUTRAL": 0,
+                    "GEAR_DRIVE": 1,
+                    "GEAR_REVERSE": 2,
+                    "GEAR_PARKING": 3,
+                    "GEAR_LOW": 4,
+                    "GEAR_INVALID": 5,
+                    "GEAR_NONE": 6
+                  }
+                },
+                "BumperEvent": {
+                  "values": {
+                    "BUMPER_INVALID": 0,
+                    "BUMPER_NORMAL": 1,
+                    "BUMPER_PRESSED": 2
+                  }
+                }
+              }
+            },
+            "ChassisGPS": {
+              "fields": {
+                "latitude": {
+                  "type": "double",
+                  "id": 1
+                },
+                "longitude": {
+                  "type": "double",
+                  "id": 2
+                },
+                "gpsValid": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "year": {
+                  "type": "int32",
+                  "id": 4
+                },
+                "month": {
+                  "type": "int32",
+                  "id": 5
+                },
+                "day": {
+                  "type": "int32",
+                  "id": 6
+                },
+                "hours": {
+                  "type": "int32",
+                  "id": 7
+                },
+                "minutes": {
+                  "type": "int32",
+                  "id": 8
+                },
+                "seconds": {
+                  "type": "int32",
+                  "id": 9
+                },
+                "compassDirection": {
+                  "type": "double",
+                  "id": 10
+                },
+                "pdop": {
+                  "type": "double",
+                  "id": 11
+                },
+                "isGpsFault": {
+                  "type": "bool",
+                  "id": 12
+                },
+                "isInferred": {
+                  "type": "bool",
+                  "id": 13
+                },
+                "altitude": {
+                  "type": "double",
+                  "id": 14
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 15
+                },
+                "hdop": {
+                  "type": "double",
+                  "id": 16
+                },
+                "vdop": {
+                  "type": "double",
+                  "id": 17
+                },
+                "quality": {
+                  "type": "GpsQuality",
+                  "id": 18
+                },
+                "numSatellites": {
+                  "type": "int32",
+                  "id": 19
+                },
+                "gpsSpeed": {
+                  "type": "double",
+                  "id": 20
+                }
+              }
+            },
+            "GpsQuality": {
+              "values": {
+                "FIX_NO": 0,
+                "FIX_2D": 1,
+                "FIX_3D": 2,
+                "FIX_INVALID": 3
+              }
+            },
+            "WheelSpeed": {
+              "fields": {
+                "isWheelSpdRrValid": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionRr": {
+                  "type": "WheelSpeedType",
+                  "id": 2,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdRr": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdRlValid": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionRl": {
+                  "type": "WheelSpeedType",
+                  "id": 5,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdRl": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdFrValid": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionFr": {
+                  "type": "WheelSpeedType",
+                  "id": 8,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdFr": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "isWheelSpdFlValid": {
+                  "type": "bool",
+                  "id": 10,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "wheelDirectionFl": {
+                  "type": "WheelSpeedType",
+                  "id": 11,
+                  "options": {
+                    "default": "INVALID"
+                  }
+                },
+                "wheelSpdFl": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              },
+              "nested": {
+                "WheelSpeedType": {
+                  "values": {
+                    "FORWARD": 0,
+                    "BACKWARD": 1,
+                    "STANDSTILL": 2,
+                    "INVALID": 3
+                  }
+                }
+              }
+            },
+            "Sonar": {
+              "fields": {
+                "range": {
+                  "type": "double",
+                  "id": 1
+                },
+                "translation": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "rotation": {
+                  "type": "apollo.common.Quaternion",
+                  "id": 3
+                }
+              }
+            },
+            "Surround": {
+              "fields": {
+                "crossTrafficAlertLeft": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "crossTrafficAlertLeftEnabled": {
+                  "type": "bool",
+                  "id": 2
+                },
+                "blindSpotLeftAlert": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "blindSpotLeftAlertEnabled": {
+                  "type": "bool",
+                  "id": 4
+                },
+                "crossTrafficAlertRight": {
+                  "type": "bool",
+                  "id": 5
+                },
+                "crossTrafficAlertRightEnabled": {
+                  "type": "bool",
+                  "id": 6
+                },
+                "blindSpotRightAlert": {
+                  "type": "bool",
+                  "id": 7
+                },
+                "blindSpotRightAlertEnabled": {
+                  "type": "bool",
+                  "id": 8
+                },
+                "sonar00": {
+                  "type": "double",
+                  "id": 9
+                },
+                "sonar01": {
+                  "type": "double",
+                  "id": 10
+                },
+                "sonar02": {
+                  "type": "double",
+                  "id": 11
+                },
+                "sonar03": {
+                  "type": "double",
+                  "id": 12
+                },
+                "sonar04": {
+                  "type": "double",
+                  "id": 13
+                },
+                "sonar05": {
+                  "type": "double",
+                  "id": 14
+                },
+                "sonar06": {
+                  "type": "double",
+                  "id": 15
+                },
+                "sonar07": {
+                  "type": "double",
+                  "id": 16
+                },
+                "sonar08": {
+                  "type": "double",
+                  "id": 17
+                },
+                "sonar09": {
+                  "type": "double",
+                  "id": 18
+                },
+                "sonar10": {
+                  "type": "double",
+                  "id": 19
+                },
+                "sonar11": {
+                  "type": "double",
+                  "id": 20
+                },
+                "sonarEnabled": {
+                  "type": "bool",
+                  "id": 21
+                },
+                "sonarFault": {
+                  "type": "bool",
+                  "id": 22
+                },
+                "sonarRange": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 23,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "sonar": {
+                  "rule": "repeated",
+                  "type": "Sonar",
+                  "id": 24
+                }
+              }
+            },
+            "License": {
+              "fields": {
+                "vin": {
+                  "type": "string",
+                  "id": 1,
+                  "options": {
+                    "deprecated": true
+                  }
+                }
+              }
+            },
+            "CheckResponse": {
+              "fields": {
+                "isEpsOnline": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isEpbOnline": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isEspOnline": {
+                  "type": "bool",
+                  "id": 3,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isVtogOnline": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isScuOnline": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isSwitchOnline": {
+                  "type": "bool",
+                  "id": 6,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "isVcuOnline": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                }
+              }
+            },
             "ChassisDetail": {
               "fields": {
                 "carType": {
@@ -10761,639 +11378,6 @@
                 "brakeMotorRpt_3_72": {
                   "type": "Brake_motor_rpt_3_72",
                   "id": 30
-                }
-              }
-            },
-            "Chassis": {
-              "fields": {
-                "engineStarted": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "engineRpm": {
-                  "type": "float",
-                  "id": 4,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "speedMps": {
-                  "type": "float",
-                  "id": 5,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "odometerM": {
-                  "type": "float",
-                  "id": 6,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "fuelRangeM": {
-                  "type": "int32",
-                  "id": 7
-                },
-                "throttlePercentage": {
-                  "type": "float",
-                  "id": 8,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "brakePercentage": {
-                  "type": "float",
-                  "id": 9,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "steeringPercentage": {
-                  "type": "float",
-                  "id": 11,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "steeringTorqueNm": {
-                  "type": "float",
-                  "id": 12,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "parkingBrake": {
-                  "type": "bool",
-                  "id": 13
-                },
-                "highBeamSignal": {
-                  "type": "bool",
-                  "id": 14,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "lowBeamSignal": {
-                  "type": "bool",
-                  "id": 15,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "leftTurnSignal": {
-                  "type": "bool",
-                  "id": 16,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "rightTurnSignal": {
-                  "type": "bool",
-                  "id": 17,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "horn": {
-                  "type": "bool",
-                  "id": 18,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "wiper": {
-                  "type": "bool",
-                  "id": 19
-                },
-                "disengageStatus": {
-                  "type": "bool",
-                  "id": 20,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "drivingMode": {
-                  "type": "DrivingMode",
-                  "id": 21,
-                  "options": {
-                    "default": "COMPLETE_MANUAL"
-                  }
-                },
-                "errorCode": {
-                  "type": "ErrorCode",
-                  "id": 22,
-                  "options": {
-                    "default": "NO_ERROR"
-                  }
-                },
-                "gearLocation": {
-                  "type": "GearPosition",
-                  "id": 23
-                },
-                "steeringTimestamp": {
-                  "type": "double",
-                  "id": 24
-                },
-                "header": {
-                  "type": "apollo.common.Header",
-                  "id": 25
-                },
-                "chassisErrorMask": {
-                  "type": "int32",
-                  "id": 26,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "signal": {
-                  "type": "apollo.common.VehicleSignal",
-                  "id": 27
-                },
-                "chassisGps": {
-                  "type": "ChassisGPS",
-                  "id": 28
-                },
-                "engageAdvice": {
-                  "type": "apollo.common.EngageAdvice",
-                  "id": 29
-                },
-                "wheelSpeed": {
-                  "type": "WheelSpeed",
-                  "id": 30
-                },
-                "surround": {
-                  "type": "Surround",
-                  "id": 31
-                },
-                "license": {
-                  "type": "License",
-                  "id": 32,
-                  "options": {
-                    "deprecated": true
-                  }
-                },
-                "vehicleId": {
-                  "type": "apollo.common.VehicleID",
-                  "id": 33
-                },
-                "batterySocPercentage": {
-                  "type": "int32",
-                  "id": 34,
-                  "options": {
-                    "default": -1
-                  }
-                },
-                "throttlePercentageCmd": {
-                  "type": "float",
-                  "id": 35,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "brakePercentageCmd": {
-                  "type": "float",
-                  "id": 36,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "steeringPercentageCmd": {
-                  "type": "float",
-                  "id": 37,
-                  "options": {
-                    "default": null
-                  }
-                },
-                "frontBumperEvent": {
-                  "type": "BumperEvent",
-                  "id": 38
-                },
-                "backBumperEvent": {
-                  "type": "BumperEvent",
-                  "id": 39
-                },
-                "checkResponse": {
-                  "type": "CheckResponse",
-                  "id": 40
-                }
-              },
-              "nested": {
-                "DrivingMode": {
-                  "values": {
-                    "COMPLETE_MANUAL": 0,
-                    "COMPLETE_AUTO_DRIVE": 1,
-                    "AUTO_STEER_ONLY": 2,
-                    "AUTO_SPEED_ONLY": 3,
-                    "EMERGENCY_MODE": 4
-                  }
-                },
-                "ErrorCode": {
-                  "values": {
-                    "NO_ERROR": 0,
-                    "CMD_NOT_IN_PERIOD": 1,
-                    "CHASSIS_ERROR": 2,
-                    "CHASSIS_ERROR_ON_STEER": 6,
-                    "CHASSIS_ERROR_ON_BRAKE": 7,
-                    "CHASSIS_ERROR_ON_THROTTLE": 8,
-                    "CHASSIS_ERROR_ON_GEAR": 9,
-                    "MANUAL_INTERVENTION": 3,
-                    "CHASSIS_CAN_NOT_IN_PERIOD": 4,
-                    "UNKNOWN_ERROR": 5
-                  }
-                },
-                "GearPosition": {
-                  "values": {
-                    "GEAR_NEUTRAL": 0,
-                    "GEAR_DRIVE": 1,
-                    "GEAR_REVERSE": 2,
-                    "GEAR_PARKING": 3,
-                    "GEAR_LOW": 4,
-                    "GEAR_INVALID": 5,
-                    "GEAR_NONE": 6
-                  }
-                },
-                "BumperEvent": {
-                  "values": {
-                    "BUMPER_INVALID": 0,
-                    "BUMPER_NORMAL": 1,
-                    "BUMPER_PRESSED": 2
-                  }
-                }
-              }
-            },
-            "ChassisGPS": {
-              "fields": {
-                "latitude": {
-                  "type": "double",
-                  "id": 1
-                },
-                "longitude": {
-                  "type": "double",
-                  "id": 2
-                },
-                "gpsValid": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "year": {
-                  "type": "int32",
-                  "id": 4
-                },
-                "month": {
-                  "type": "int32",
-                  "id": 5
-                },
-                "day": {
-                  "type": "int32",
-                  "id": 6
-                },
-                "hours": {
-                  "type": "int32",
-                  "id": 7
-                },
-                "minutes": {
-                  "type": "int32",
-                  "id": 8
-                },
-                "seconds": {
-                  "type": "int32",
-                  "id": 9
-                },
-                "compassDirection": {
-                  "type": "double",
-                  "id": 10
-                },
-                "pdop": {
-                  "type": "double",
-                  "id": 11
-                },
-                "isGpsFault": {
-                  "type": "bool",
-                  "id": 12
-                },
-                "isInferred": {
-                  "type": "bool",
-                  "id": 13
-                },
-                "altitude": {
-                  "type": "double",
-                  "id": 14
-                },
-                "heading": {
-                  "type": "double",
-                  "id": 15
-                },
-                "hdop": {
-                  "type": "double",
-                  "id": 16
-                },
-                "vdop": {
-                  "type": "double",
-                  "id": 17
-                },
-                "quality": {
-                  "type": "GpsQuality",
-                  "id": 18
-                },
-                "numSatellites": {
-                  "type": "int32",
-                  "id": 19
-                },
-                "gpsSpeed": {
-                  "type": "double",
-                  "id": 20
-                }
-              }
-            },
-            "GpsQuality": {
-              "values": {
-                "FIX_NO": 0,
-                "FIX_2D": 1,
-                "FIX_3D": 2,
-                "FIX_INVALID": 3
-              }
-            },
-            "WheelSpeed": {
-              "fields": {
-                "isWheelSpdRrValid": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "wheelDirectionRr": {
-                  "type": "WheelSpeedType",
-                  "id": 2,
-                  "options": {
-                    "default": "INVALID"
-                  }
-                },
-                "wheelSpdRr": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "isWheelSpdRlValid": {
-                  "type": "bool",
-                  "id": 4,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "wheelDirectionRl": {
-                  "type": "WheelSpeedType",
-                  "id": 5,
-                  "options": {
-                    "default": "INVALID"
-                  }
-                },
-                "wheelSpdRl": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "isWheelSpdFrValid": {
-                  "type": "bool",
-                  "id": 7,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "wheelDirectionFr": {
-                  "type": "WheelSpeedType",
-                  "id": 8,
-                  "options": {
-                    "default": "INVALID"
-                  }
-                },
-                "wheelSpdFr": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "isWheelSpdFlValid": {
-                  "type": "bool",
-                  "id": 10,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "wheelDirectionFl": {
-                  "type": "WheelSpeedType",
-                  "id": 11,
-                  "options": {
-                    "default": "INVALID"
-                  }
-                },
-                "wheelSpdFl": {
-                  "type": "double",
-                  "id": 12,
-                  "options": {
-                    "default": 0
-                  }
-                }
-              },
-              "nested": {
-                "WheelSpeedType": {
-                  "values": {
-                    "FORWARD": 0,
-                    "BACKWARD": 1,
-                    "STANDSTILL": 2,
-                    "INVALID": 3
-                  }
-                }
-              }
-            },
-            "Sonar": {
-              "fields": {
-                "range": {
-                  "type": "double",
-                  "id": 1
-                },
-                "translation": {
-                  "type": "apollo.common.Point3D",
-                  "id": 2
-                },
-                "rotation": {
-                  "type": "apollo.common.Quaternion",
-                  "id": 3
-                }
-              }
-            },
-            "Surround": {
-              "fields": {
-                "crossTrafficAlertLeft": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "crossTrafficAlertLeftEnabled": {
-                  "type": "bool",
-                  "id": 2
-                },
-                "blindSpotLeftAlert": {
-                  "type": "bool",
-                  "id": 3
-                },
-                "blindSpotLeftAlertEnabled": {
-                  "type": "bool",
-                  "id": 4
-                },
-                "crossTrafficAlertRight": {
-                  "type": "bool",
-                  "id": 5
-                },
-                "crossTrafficAlertRightEnabled": {
-                  "type": "bool",
-                  "id": 6
-                },
-                "blindSpotRightAlert": {
-                  "type": "bool",
-                  "id": 7
-                },
-                "blindSpotRightAlertEnabled": {
-                  "type": "bool",
-                  "id": 8
-                },
-                "sonar00": {
-                  "type": "double",
-                  "id": 9
-                },
-                "sonar01": {
-                  "type": "double",
-                  "id": 10
-                },
-                "sonar02": {
-                  "type": "double",
-                  "id": 11
-                },
-                "sonar03": {
-                  "type": "double",
-                  "id": 12
-                },
-                "sonar04": {
-                  "type": "double",
-                  "id": 13
-                },
-                "sonar05": {
-                  "type": "double",
-                  "id": 14
-                },
-                "sonar06": {
-                  "type": "double",
-                  "id": 15
-                },
-                "sonar07": {
-                  "type": "double",
-                  "id": 16
-                },
-                "sonar08": {
-                  "type": "double",
-                  "id": 17
-                },
-                "sonar09": {
-                  "type": "double",
-                  "id": 18
-                },
-                "sonar10": {
-                  "type": "double",
-                  "id": 19
-                },
-                "sonar11": {
-                  "type": "double",
-                  "id": 20
-                },
-                "sonarEnabled": {
-                  "type": "bool",
-                  "id": 21
-                },
-                "sonarFault": {
-                  "type": "bool",
-                  "id": 22
-                },
-                "sonarRange": {
-                  "rule": "repeated",
-                  "type": "double",
-                  "id": 23,
-                  "options": {
-                    "packed": false
-                  }
-                },
-                "sonar": {
-                  "rule": "repeated",
-                  "type": "Sonar",
-                  "id": 24
-                }
-              }
-            },
-            "License": {
-              "fields": {
-                "vin": {
-                  "type": "string",
-                  "id": 1,
-                  "options": {
-                    "deprecated": true
-                  }
-                }
-              }
-            },
-            "CheckResponse": {
-              "fields": {
-                "isEpsOnline": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isEpbOnline": {
-                  "type": "bool",
-                  "id": 2,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isEspOnline": {
-                  "type": "bool",
-                  "id": 3,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isVtogOnline": {
-                  "type": "bool",
-                  "id": 4,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isScuOnline": {
-                  "type": "bool",
-                  "id": 5,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isSwitchOnline": {
-                  "type": "bool",
-                  "id": 6,
-                  "options": {
-                    "default": false
-                  }
-                },
-                "isVcuOnline": {
-                  "type": "bool",
-                  "id": 7,
-                  "options": {
-                    "default": false
-                  }
                 }
               }
             }
@@ -13854,6 +13838,82 @@
             },
             "gnss": {
               "nested": {
+                "Gnss": {
+                  "fields": {
+                    "header": {
+                      "type": "apollo.common.Header",
+                      "id": 1
+                    },
+                    "measurementTime": {
+                      "type": "double",
+                      "id": 2
+                    },
+                    "velocityLatency": {
+                      "type": "float",
+                      "id": 3,
+                      "options": {
+                        "default": 0
+                      }
+                    },
+                    "position": {
+                      "type": "apollo.common.PointLLH",
+                      "id": 4
+                    },
+                    "positionStdDev": {
+                      "type": "apollo.common.Point3D",
+                      "id": 5
+                    },
+                    "linearVelocity": {
+                      "type": "apollo.common.Point3D",
+                      "id": 6
+                    },
+                    "linearVelocityStdDev": {
+                      "type": "apollo.common.Point3D",
+                      "id": 7
+                    },
+                    "numSats": {
+                      "type": "int32",
+                      "id": 8
+                    },
+                    "type": {
+                      "type": "Type",
+                      "id": 9
+                    },
+                    "solutionStatus": {
+                      "type": "uint32",
+                      "id": 10
+                    },
+                    "positionType": {
+                      "type": "uint32",
+                      "id": 11
+                    }
+                  },
+                  "nested": {
+                    "Type": {
+                      "values": {
+                        "INVALID": 0,
+                        "PROPAGATED": 1,
+                        "SINGLE": 2,
+                        "PSRDIFF": 3,
+                        "PPP": 4,
+                        "RTK_FLOAT": 5,
+                        "RTK_INTEGER": 6
+                      }
+                    }
+                  }
+                },
+                "RawData": {
+                  "fields": {
+                    "header": {
+                      "type": "apollo.common.Header",
+                      "id": 1
+                    },
+                    "data": {
+                      "type": "bytes",
+                      "id": 2
+                    }
+                  }
+                },
                 "SolutionStatus": {
                   "values": {
                     "SOL_COMPUTED": 0,
@@ -14008,82 +14068,6 @@
                     "gpsGlonassUsedMask": {
                       "type": "uint32",
                       "id": 23
-                    }
-                  }
-                },
-                "Gnss": {
-                  "fields": {
-                    "header": {
-                      "type": "apollo.common.Header",
-                      "id": 1
-                    },
-                    "measurementTime": {
-                      "type": "double",
-                      "id": 2
-                    },
-                    "velocityLatency": {
-                      "type": "float",
-                      "id": 3,
-                      "options": {
-                        "default": 0
-                      }
-                    },
-                    "position": {
-                      "type": "apollo.common.PointLLH",
-                      "id": 4
-                    },
-                    "positionStdDev": {
-                      "type": "apollo.common.Point3D",
-                      "id": 5
-                    },
-                    "linearVelocity": {
-                      "type": "apollo.common.Point3D",
-                      "id": 6
-                    },
-                    "linearVelocityStdDev": {
-                      "type": "apollo.common.Point3D",
-                      "id": 7
-                    },
-                    "numSats": {
-                      "type": "int32",
-                      "id": 8
-                    },
-                    "type": {
-                      "type": "Type",
-                      "id": 9
-                    },
-                    "solutionStatus": {
-                      "type": "uint32",
-                      "id": 10
-                    },
-                    "positionType": {
-                      "type": "uint32",
-                      "id": 11
-                    }
-                  },
-                  "nested": {
-                    "Type": {
-                      "values": {
-                        "INVALID": 0,
-                        "PROPAGATED": 1,
-                        "SINGLE": 2,
-                        "PSRDIFF": 3,
-                        "PPP": 4,
-                        "RTK_FLOAT": 5,
-                        "RTK_INTEGER": 6
-                      }
-                    }
-                  }
-                },
-                "RawData": {
-                  "fields": {
-                    "header": {
-                      "type": "apollo.common.Header",
-                      "id": 1
-                    },
-                    "data": {
-                      "type": "bytes",
-                      "id": 2
                     }
                   }
                 },
@@ -16530,6 +16514,139 @@
         },
         "hdmap": {
           "nested": {
+            "Projection": {
+              "fields": {
+                "proj": {
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "Header": {
+              "fields": {
+                "version": {
+                  "type": "bytes",
+                  "id": 1
+                },
+                "date": {
+                  "type": "bytes",
+                  "id": 2
+                },
+                "projection": {
+                  "type": "Projection",
+                  "id": 3
+                },
+                "district": {
+                  "type": "bytes",
+                  "id": 4
+                },
+                "generation": {
+                  "type": "bytes",
+                  "id": 5
+                },
+                "revMajor": {
+                  "type": "bytes",
+                  "id": 6
+                },
+                "revMinor": {
+                  "type": "bytes",
+                  "id": 7
+                },
+                "left": {
+                  "type": "double",
+                  "id": 8
+                },
+                "top": {
+                  "type": "double",
+                  "id": 9
+                },
+                "right": {
+                  "type": "double",
+                  "id": 10
+                },
+                "bottom": {
+                  "type": "double",
+                  "id": 11
+                },
+                "vendor": {
+                  "type": "bytes",
+                  "id": 12
+                }
+              }
+            },
+            "Map": {
+              "fields": {
+                "header": {
+                  "type": "Header",
+                  "id": 1
+                },
+                "crosswalk": {
+                  "rule": "repeated",
+                  "type": "Crosswalk",
+                  "id": 2
+                },
+                "junction": {
+                  "rule": "repeated",
+                  "type": "Junction",
+                  "id": 3
+                },
+                "lane": {
+                  "rule": "repeated",
+                  "type": "Lane",
+                  "id": 4
+                },
+                "stopSign": {
+                  "rule": "repeated",
+                  "type": "StopSign",
+                  "id": 5
+                },
+                "signal": {
+                  "rule": "repeated",
+                  "type": "Signal",
+                  "id": 6
+                },
+                "yield": {
+                  "rule": "repeated",
+                  "type": "YieldSign",
+                  "id": 7
+                },
+                "overlap": {
+                  "rule": "repeated",
+                  "type": "Overlap",
+                  "id": 8
+                },
+                "clearArea": {
+                  "rule": "repeated",
+                  "type": "ClearArea",
+                  "id": 9
+                },
+                "speedBump": {
+                  "rule": "repeated",
+                  "type": "SpeedBump",
+                  "id": 10
+                },
+                "road": {
+                  "rule": "repeated",
+                  "type": "Road",
+                  "id": 11
+                },
+                "parkingSpace": {
+                  "rule": "repeated",
+                  "type": "ParkingSpace",
+                  "id": 12
+                },
+                "pncJunction": {
+                  "rule": "repeated",
+                  "type": "PNCJunction",
+                  "id": 13
+                },
+                "rsu": {
+                  "rule": "repeated",
+                  "type": "RSU",
+                  "id": 14
+                }
+              }
+            },
             "ClearArea": {
               "fields": {
                 "id": {
@@ -17122,139 +17239,6 @@
                   "rule": "repeated",
                   "type": "PassageGroup",
                   "id": 4
-                }
-              }
-            },
-            "Projection": {
-              "fields": {
-                "proj": {
-                  "type": "string",
-                  "id": 1
-                }
-              }
-            },
-            "Header": {
-              "fields": {
-                "version": {
-                  "type": "bytes",
-                  "id": 1
-                },
-                "date": {
-                  "type": "bytes",
-                  "id": 2
-                },
-                "projection": {
-                  "type": "Projection",
-                  "id": 3
-                },
-                "district": {
-                  "type": "bytes",
-                  "id": 4
-                },
-                "generation": {
-                  "type": "bytes",
-                  "id": 5
-                },
-                "revMajor": {
-                  "type": "bytes",
-                  "id": 6
-                },
-                "revMinor": {
-                  "type": "bytes",
-                  "id": 7
-                },
-                "left": {
-                  "type": "double",
-                  "id": 8
-                },
-                "top": {
-                  "type": "double",
-                  "id": 9
-                },
-                "right": {
-                  "type": "double",
-                  "id": 10
-                },
-                "bottom": {
-                  "type": "double",
-                  "id": 11
-                },
-                "vendor": {
-                  "type": "bytes",
-                  "id": 12
-                }
-              }
-            },
-            "Map": {
-              "fields": {
-                "header": {
-                  "type": "Header",
-                  "id": 1
-                },
-                "crosswalk": {
-                  "rule": "repeated",
-                  "type": "Crosswalk",
-                  "id": 2
-                },
-                "junction": {
-                  "rule": "repeated",
-                  "type": "Junction",
-                  "id": 3
-                },
-                "lane": {
-                  "rule": "repeated",
-                  "type": "Lane",
-                  "id": 4
-                },
-                "stopSign": {
-                  "rule": "repeated",
-                  "type": "StopSign",
-                  "id": 5
-                },
-                "signal": {
-                  "rule": "repeated",
-                  "type": "Signal",
-                  "id": 6
-                },
-                "yield": {
-                  "rule": "repeated",
-                  "type": "YieldSign",
-                  "id": 7
-                },
-                "overlap": {
-                  "rule": "repeated",
-                  "type": "Overlap",
-                  "id": 8
-                },
-                "clearArea": {
-                  "rule": "repeated",
-                  "type": "ClearArea",
-                  "id": 9
-                },
-                "speedBump": {
-                  "rule": "repeated",
-                  "type": "SpeedBump",
-                  "id": 10
-                },
-                "road": {
-                  "rule": "repeated",
-                  "type": "Road",
-                  "id": 11
-                },
-                "parkingSpace": {
-                  "rule": "repeated",
-                  "type": "ParkingSpace",
-                  "id": 12
-                },
-                "pncJunction": {
-                  "rule": "repeated",
-                  "type": "PNCJunction",
-                  "id": 13
-                },
-                "rsu": {
-                  "rule": "repeated",
-                  "type": "RSU",
-                  "id": 14
                 }
               }
             },
