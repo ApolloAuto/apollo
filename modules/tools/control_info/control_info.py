@@ -1031,9 +1031,7 @@ if __name__ == "__main__":
         description='Process and analyze control and planning data')
     parser.add_argument('--bag', type=str, help='use Rosbag')
     parser.add_argument('--path', type=str, help='path for bag files')
-
     args = parser.parse_args()
-
     fig, axarr = plt.subplots()
     controlinfo = ControlInfo(axarr)
 
@@ -1108,24 +1106,11 @@ if __name__ == "__main__":
             pathv_sheet.write(0, 0, "timestamp_sec", book_format)
 
         controlinfo.read_bag(args.bag)
-
     else:
-        cyber.init()
-        # rospy.init_node('control_info', anonymous=True)
-        node = cyber.Node("rtk_recorder")
-        planningsub = node.create_reader('/apollo/planning',
-                                         planning_pb2.ADCTrajectory,
-                                         controlinfo.callback_planning)
-        localizationsub = node.create_reader(
-            '/apollo/localization/pose', localization_pb2.LocalizationEstimate,
-            controlinfo.callback_localization)
-        controlsub = node.create_reader('/apollo/control',
-                                        control_cmd_pb2.ControlCommand,
-                                        controlinfo.callback_control)
-        canbussub = node.create_reader('/apollo/canbus/chassis',
-                                       chassis_pb2.Chassis,
-                                       controlinfo.callback_canbus)
-        raw_input("Press Enter To Stop")
+        #create datafile
+        excel_name = 'data.xlsx'
+        book = xlsxwriter.Workbook(excel_name)
+        book_format = book.add_format({'align': 'center', 'text_wrap': True})
 
     controlinfo.Print_len()
     # controlinfo.show_longitudinal()

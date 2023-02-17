@@ -38,7 +38,7 @@ function start() {
   fi
 
   if [[ ! -f ${RECORD_EXE} ]]; then
-    echo "can't fine smart_recorder. Have you installed apollo-data-dev?"
+    echo "can't find smart_recorder. Have you installed apollo-data-dev?"
     exit -1
   fi
 
