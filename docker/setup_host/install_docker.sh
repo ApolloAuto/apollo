@@ -23,11 +23,11 @@ ARCH="$(uname -m)"
 ##==============================================================##
 BOLD='\033[1m'
 RED='\033[0;31m'
-WHITE='\033[34m'
+BLUE='\033[0;34m'
 NO_COLOR='\033[0m'
 
 function info() {
-  (echo >&2 -e "[${WHITE}${BOLD}INFO${NO_COLOR}] $*")
+  (echo >&2 -e "[${BLUE}${BOLD}INFO${NO_COLOR}] $*")
 }
 
 function error() {
