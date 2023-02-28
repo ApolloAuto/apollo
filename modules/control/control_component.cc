@@ -162,7 +162,10 @@ Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
   Status status = CheckInput(&local_view_);
   // check data
-  if (!status.ok()) {
+  // if (!status.ok()) 
+    auto car_speed = local_view_.trajectory().trajectory_point(0);
+  if(car_speed.v() > 14)
+  {
     AERROR_EVERY(100) << "Control input data failed: "
                       << status.error_message();
     control_command->mutable_engage_advice()->set_advice(
