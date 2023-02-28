@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: novatel
+child_frame_id: CAM_BACK
+transform:
+  translation:
+    x: 0.0283260309358
+    y: 0.00345136761476
+    z: 1.57910346144
+  rotation:
+    x: -0.49740249788611096
+    y: -0.4941850223835201
+    z: 0.5045496097725578
+    w: 0.5037872666382278

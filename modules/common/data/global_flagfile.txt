@@ -21,3 +21,5 @@
 
 --map_dir=/apollo/modules/map/data/sunnyvale_big_loop
 
+
+--map_dir=/apollo/modules/map/data/demo
