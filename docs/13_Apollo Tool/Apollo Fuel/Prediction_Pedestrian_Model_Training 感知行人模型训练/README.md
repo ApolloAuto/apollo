@@ -3,7 +3,7 @@
 
 ## Overview
 
-Prediction Pedestrian Model Treaining Service is a cloud based service to train a prediction model for pedestrian from the data you provide, to better fit the pedestrian behavior in your environment.
+Prediction Pedestrian Model Training Service is a cloud based service to train a prediction model for pedestrian from the data you provide, to better fit the pedestrian behavior in your environment.
 
 ## Prerequisites
 

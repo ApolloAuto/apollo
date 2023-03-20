@@ -9,7 +9,7 @@ the Authors of Apollo borrowed CUDA support for Bazel from
 
 ## Status
 
-Support upto CUDA Toolkit 11.1 and cuDNN8
+Support up to CUDA Toolkit 11.1 and cuDNN8
 
 ## How to generate `find_cuda_config.py.gz.base64`
 

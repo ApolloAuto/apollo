@@ -6,7 +6,7 @@ In Apollo 7.0, a new camera-based obstacle detection model is provided which is 
 
 ## Architecture
 Here we mainly focus on our modifications based on SMOKE,  more details about SMOKE please refer to the paper.
-- The deformable convolution is replaced by normal convolution, becuase it can not been converted to onnx or libtorch when deployed on autonomous vehicles.
+- The deformable convolution is replaced by normal convolution, because it can not been converted to onnx or libtorch when deployed on autonomous vehicles.
 
 - The 3D center point is replaced by the center of 2D bounding box and an offset between 2D center and 3D center points. This modification is based on the observation that obstacles are filtered out because the 3D center points of truncated obstacles may appear outside the image. To achieve this, we add a head to predict the offset between 2D center and 3D center points.
 
@@ -58,7 +58,7 @@ We trained model on the waymo open source dataset. Firstly, we used the conversi
 
 </div>
 
-The visualize on waymo image data as follwos：
+The visualize on waymo image data as follows:
 
 <div align=center>
 <img src="../../../docs/specs/images/3d_obstacle_perception/smoke_example.png" alt="图片名称" width="40%" />

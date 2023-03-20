@@ -12,7 +12,7 @@ A thread pool is helpful when you want to minimize time of loading and destroyin
 
 Features:
 - standard c++ language, tested to compile on MS Visual Studio 2013 (2012?), gcc 4.8.2 and mingw 4.8.1(with posix threads)
-- simple but effiecient solution, one header only, no need to compile a binary library
+- simple but efficient solution, one header only, no need to compile a binary library
 - query the number of idle threads and resize the pool dynamically
 - one API to push to the thread pool any collable object: lambdas, functors, functions, result of bind expression
 - collable objects with variadic number of parameters plus index of the thread running the object

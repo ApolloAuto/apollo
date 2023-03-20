@@ -73,7 +73,7 @@ you can refer to
 
 ## What's the function of sim_control in the backend of dreamview
 
-It simulates a SDC's control module, and moves the car based on planning result.
+It simulates the control module which moves the car based on planning result.
 This is a really convenient way to visualize and test planning module
 
 ---

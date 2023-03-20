@@ -1,7 +1,7 @@
 # NDT-based Lidar Localization
 
 ## Introduction
-  NDT-based lidar localization provide a straightforward, flexible method which combile inspva information and lidar pointcloud to achieve high localization accuracy.
+  NDT-based lidar localization provide a straightforward, flexible method which combine inspva information and lidar pointcloud to achieve high localization accuracy.
 
   Currently this localization method only works for x86_64 platform
 

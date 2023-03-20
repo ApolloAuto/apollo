@@ -4,7 +4,7 @@
 The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
 Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
 
-In **Apollo 5.5**, the Prediction module introduces a new model - **Caution Obstacle**. Together with aggressively emphasizing on caution when proceeding to a junction, this model will now scan all obstacles that have entered the junction as long as computing resources permit. The Semantic LSTM Evaluator and the Extrapolation Predictor have also been introduced in Apolo 5.5 to support the Caution Obstacle model.
+In **Apollo 5.5**, the Prediction module introduces a new model - **Caution Obstacle**. Together with aggressively emphasizing on caution when proceeding to a junction, this model will now scan all obstacles that have entered the junction as long as computing resources permit. The Semantic LSTM Evaluator and the Extrapolation Predictor have also been introduced in Apollo 5.5 to support the Caution Obstacle model.
 
 ```
 Note:
