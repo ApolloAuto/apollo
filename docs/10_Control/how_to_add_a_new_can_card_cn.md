@@ -142,3 +142,17 @@ can_card_parameter {
 }
 ... ...
 ```
+
+如果您使用雷达，比如Apollo中的Conti雷达，您需要同时修改canbus配置文件。
+
+更新 `/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt`
+
+```txt
+... ...
+can_card_parameter {
+  brand:EXAMPLE_CAN
+  type: PCI_CARD // suppose the new can card is PCI_CARD
+  channel_id: CHANNEL_ID_ZERO // suppose the new can card has CHANNEL_ID_ZERO
+}
+... ...
+```
