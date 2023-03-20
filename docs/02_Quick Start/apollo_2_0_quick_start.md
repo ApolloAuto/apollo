@@ -24,7 +24,7 @@ for the steps to install the hardware components and the system software, as wel
 
 ## Dreamview Usage Table
 
-For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
+For questions regarding Dreamview icons refer to the [Dreamview Usage Table](https://github.com/ApolloAuto/apollo/blob/r2.5.0/docs/specs/dreamview_usage_table.md).
 
 ## Onboard Test
 
@@ -42,7 +42,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
 
 5. Select Vehicle and Map.
 
-    Note: You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
+    Note: You'll be required to setup profile before doing anything else. Click the dropdown menu to select your HDMap and vehicle in use. The list are defined in [HMI config file](https://github.com/ApolloAuto/apollo/blob/r2.5.0/modules/dreamview/conf/hmi.conf).
 
     Note: It's also possible to change the profile on the right panel of the HMI, but just remember to click "Reset All" on the top-right corner to restart the system.
 
@@ -53,7 +53,7 @@ For questions regarding Dreamview icons refer to the [Dreamview Usage Table]( ht
     ![](images/dreamview_setup.png)
 
     Go to **Module Controller** tab, check if all modules and hardware are ready. (Note: In your offline environment, the hardware modules such as GPS, CANBus, Velodyne, Camera and Radar cannot be brought up.) (Note:You may need to drive around a bit to get a good GPS signal.)
-    ![](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/dreamview_module_controller.png?raw=true)
+    ![](./images/dreamview_module_controller.png)
 
 7. Under Default Routing select your desired route.
 8. Under Tasks click Start Auto. (Note: Be cautious when starting autonomous driving, you should now be in autonomous mode.)

@@ -32,7 +32,7 @@ apollo已经预定义了点云的消息格式，所以只需要为新lidar定义
 	  repeated bytes raw_data = 5;               // raw scan data
 	}
 	```
-在velodyne驱动中，其扫描数据消息定义为[VelodyneScan](../../modules/drivers/lidar/velodyne/proto/velodyne.proto#L29).
+在velodyne驱动中，其扫描数据消息定义为[VelodyneScan](../../modules/drivers/lidar/proto/velodyne.proto#L29).
 
 #### 3. 读取原始数据
 
@@ -55,7 +55,7 @@ class DriverComponent : public Component<> {
   	while (apollo::cyber::Ok()) {
   	  // poll data from port xxx
   	  // ...
-  	  austo scan = std::make_shared<ScanData>();
+  	  auto scan = std::make_shared<ScanData>();
   	  // pack ScanData
   	  // ...
   	  writer_.write(scan);
@@ -96,7 +96,7 @@ class ParserComponent : public Component<ScanData> {
   bool Proc(const std::shared_ptr<ScanData>& scan_msg) override {
     // get a pointcloud object from objects pool
   	auto point_cloud_out = point_cloud_pool_->GetObject();
-  	// clear befor using
+  	// clear before using
   	point_cloud_out->clear();
   	// parse scan data and generate pointcloud
   	parser_->parse(scan_msg, point_cloud_out);

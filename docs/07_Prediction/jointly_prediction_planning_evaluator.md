@@ -38,7 +38,7 @@ The trajectories of AV and all obstacles are represented as polylines in the for
 After that, map elements are extracted from HDMap files. As elements of lane/road/junction/crosswalk are depicted in points in HD map, they are conveniently processed as polylines.
 
 ### VectorNet
-The polyline features are first extracted from a subgraph network and further fed into a globalgraph network (GCN) to encode contextual information.
+The polyline features are first extracted from a subgraph network and further fed into a global graph network to encode contextual information.
 
 ## Decoder
 Our decoder implementation mainly follows the [TNT](https://arxiv.org/abs/2008.08294) paper. There are three steps in TNT. For more details, please refer to the original paper.

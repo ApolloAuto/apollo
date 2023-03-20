@@ -13,9 +13,9 @@
 
 规划模块的运动总体流程图如下：
 
-![总体流程图](../images/task/lane_follow.png)
+![总体流程图](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+总体流程图以[lane follow](../../modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
 
 Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
@@ -40,7 +40,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 代码的运行流程如下图。
 
-![流程图](../images/task/rule_based_stop_decider/rule_based_stop_decider.png)
+![流程图](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/rule_based_stop_decider/rule_based_stop_decider.png)
 
 代码结构比较清楚：
 
@@ -68,7 +68,7 @@ apollo::common::Status RuleBasedStopDecider::Process(
 
 - Stop on side pass
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/stop_on_side_pass.png)
+![StopOnSidePass](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/rule_based_stop_decider/stop_on_side_pass.png)
 
 代码如下：
 
@@ -127,7 +127,7 @@ void RuleBasedStopDecider::StopOnSidePass(
 
 - Check lane change Urgency
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/check_lane_change_urgency.png)
+![StopOnSidePass](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/rule_based_stop_decider/check_lane_change_urgency.png)
 
 检查紧急换道，代码如下：
 
@@ -191,7 +191,7 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
 
 - Add path end stop
 
-![StopOnSidePass](../images/task/rule_based_stop_decider/add_path_end_stop.png)
+![StopOnSidePass](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/rule_based_stop_decider/add_path_end_stop.png)
 
 在道路的尽头添加stop fence。代码如下：
 

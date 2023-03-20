@@ -15,7 +15,7 @@ Please ensure your apollo version is 8.0.
 5. Select the required scenario to complete the scenario Set Adding.
 ![Diagram](./images/add_scenario_set.png)
 ### Step 2 Install the Dreamview Plug-in
-1. Click **Persional Information** in the upper right corner on Apollo Studio. 
+1. Click **Personal Information** in the upper right corner on Apollo Studio. 
 ![Diagram](./images/user_info.png)
 2. Choose **Service Rights** > **Simulation**.
 3. Click **Generate** in the **Plugin Installation** to generate the Dreamview plug-in.
@@ -23,7 +23,7 @@ Please ensure your apollo version is 8.0.
 4. Copy the link of the plug-in and install it to the local environment.
 ![Diagram](./images/plug_in_installation.png)
 ### Step 3. Download Sencario Set to the Local Environment
-1. Start Dreamview in your local environmen [http://localhost:8888](http://localhost:8888).
+1. Start Dreamview in your local environment [http://localhost:8888](http://localhost:8888).
 2. Enable **Sim Control** in **Tasks**.
 ![Diagram](./images/dreamview_index.png)
 ### Step 4. Choose a Scenario

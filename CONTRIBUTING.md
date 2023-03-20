@@ -59,7 +59,7 @@ You can use command `bash apollo.sh test` to run all unit tests.
   `yapf -i --style='{based_on_style: google}' foo.py` to format a file foo.py.
 
 - **Apollo best coding practice**: Please also refer to
-  [Apollo Best Coding Practice](docs/technical_tutorial/apollo_best_coding_practice.md)
+  [Apollo Best Coding Practice](docs/14_Others/代码实践/apollo_best_coding_practice.md)
   for more coding practice disciplines.
 
 - **BUILD file coding style** : you can use command

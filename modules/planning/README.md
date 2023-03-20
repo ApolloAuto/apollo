@@ -136,7 +136,7 @@ Bare intersection is a scenario designated to an intersection without either a S
 
 ### Park
 
-The Apollo team is proud to introduce Open Space Planner, a new planning algorithm that can be used for several use cases especially the parking scenario. To learn more about Open Space Planner, please refer to [Open Space Planner Algorithm](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Open_Space_Planner.md)
+The Apollo team is proud to introduce Open Space Planner, a new planning algorithm that can be used for several use cases especially the parking scenario. To learn more about Open Space Planner, please refer to [Open Space Planner Algorithm](../../docs/08_Planning/Open_Space_Planner.md)
 
 #### Valet
 

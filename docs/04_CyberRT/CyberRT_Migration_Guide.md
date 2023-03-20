@@ -46,7 +46,7 @@ We can find the mapping easily from the 2 file snippets. For example, `pb_talker
 
 ### Proto
 
-Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder.
+Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber RT, it's as simple as adding the target proto file path concatenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder.
 
 ```python
 cc_proto_library(

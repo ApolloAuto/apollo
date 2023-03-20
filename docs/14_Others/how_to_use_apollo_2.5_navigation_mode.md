@@ -6,23 +6,23 @@ Apollo is well received and highly commended by developers in the field of auton
 
 Relative map is the newest feature to be introduced in Apollo 2.5. From the architectural level, the relative map module is the middle layer linking the HDMap to the Perception module and the Planning module as seen in the image below. The relative map module generates real-time maps based on the vehicle’s coordinate system (the format is in the same format as HDMaps). The module also outputs reference lines for the Planning module to use. From the angle of developers, a navigation mode based on relative maps enables developers to implement real-vehicle road tests. As a result, barriers to development have been significantly reduced.
 
-![Software OverView](../demo_guide/images/Software_Overview.png)
+![Software OverView](../02_Quick%20Start/demo_guide/images/Software_Overview.png)
 
 The basic idea behind the navigation mode is:
 * Record the driving path of a manually driven vehicle on a desired path
 * Use Apollo tools to process the original path and obtain a smoothed out path (navigation line). This path is then used to
   * Replace the global route given by the routing module
-  * Serve as the reference line for the planning modulefor generating the relative map.
+  * Serve as the reference line for the planning module for generating the relative map.
   * In addition, the path can also be used in combination with the HDMap to replace the lane reference line in the HDMap (by default, the HDMap uses the lane centerline as the reference. However, this method may not suit certain circumstances where using the vehicle's actual navigation line instead could be a more effective solution).
 * A driver drives the vehicle to the starting point of a desired path, then selects the navigation mode and enables relevant modules in Dreamview. After the above configuration, the vehicle needs to be switched to autonomous driving status and run in this status.
-* While travelling in the autonomous mode, the perception module’s camera will dynamically detect obstacles and road boundaries, while the map module’s relative map sub-module generates a relative map in real time (using a relative coordinate system with the current position of the vehicle as the origin), based on the recorded path (navigation line) and the road boundaries. With the relative map created by the map module and obstacle information created by the perception module, the planning module will dynamically output a local driving path to the control module for execution.
+* While traveling in the autonomous mode, the perception module’s camera will dynamically detect obstacles and road boundaries, while the map module’s relative map sub-module generates a relative map in real time (using a relative coordinate system with the current position of the vehicle as the origin), based on the recorded path (navigation line) and the road boundaries. With the relative map created by the map module and obstacle information created by the perception module, the planning module will dynamically output a local driving path to the control module for execution.
 * At present, the navigation mode only supports single-lane driving. It can perform tasks such as acceleration and deceleration, car following, slowing down and stopping before obstacles, or nudge obstacles within the lane width. Subsequent versions will see further improvements to support multi-lane driving and traffic lights/signs detection.
 
 This article fully explains the build of Apollo 2.5, navigation line data collection and production, front-end compilation and configuration of Dreamview, and navigation mode usage, etc. Hopefully this will bring convenience to developers when properly using Apollo 2.5.
 
 ## 1. Building the Apollo 2.5 environment
 
-First, download the Apollo 2.5 source code from GitHub website. This can be done by either using git command or getting the compressed package directly from the web page. There are two options to build Apollo after downloading the source code to an appropriate directory: 1. in Visual Studio Code (recommended); 2. by using the command line. Of course, the common prerequisite is that Docker has already been successfully installed on your computer. You can use the script file [`install_docker.sh`](../../docker/scripts/install_docker.sh) to  install Docker firstly.
+First, download the Apollo 2.5 source code from GitHub website. This can be done by either using git command or getting the compressed package directly from the web page. There are two options to build Apollo after downloading the source code to an appropriate directory: 1. in Visual Studio Code (recommended); 2. by using the command line. Of course, the common prerequisite is that Docker has already been successfully installed on your computer. You can use the script file [`install_docker.sh`](https://github.com/ApolloAuto/apollo/blob/r2.5.0/docker/setup_host/install_docker.sh) to  install Docker firstly.
 
 ### 1.1 Build with the Visual Studio Code
 
@@ -82,7 +82,7 @@ Import the pre-specified Apollo file into the in-car IPC, enter Docker (follow s
 ``` bash
 bash scripts/bootstrap.sh
 ```
-Open [http://localhost:8888](http://localhost:8888) in a Chrome or Firfox browser (do not use proxy), and enter the Dreamview interface:
+Open [http://localhost:8888](http://localhost:8888) in a Chrome or Firefox browser (do not use proxy), and enter the Dreamview interface:
 
 ![img](images/navigation_mode/dreamview_interface.png)
 

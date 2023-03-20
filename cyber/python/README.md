@@ -46,7 +46,7 @@ py_binary(
 ```
 
 **Note**: Like C++, Python code is also managed by Bazel starting from Apollo 6.0.
-Please refer to [How to Build and Run Python Apps in Apollo](../../docs/howto/how_to_build_and_run_python_app.md) for more on that.
+Please refer to [How to Build and Run Python Apps in Apollo](../../docs/14_Others/how_to_build_and_run_python_app.md) for more on that.
 
 ## Step 3: Build and run the demo program
 

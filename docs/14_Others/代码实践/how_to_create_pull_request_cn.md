@@ -87,7 +87,7 @@ git push -f -u origin my_dev
 
 通过点击您的 Apollo 克隆 GitHub 页（通常
 为https://github.com/YOUR_USERNAME/apollo) 上的"Pull Request" 按钮新建从
-"YOUR_USERNAME/apollo:my_dev" 到 "Apolloauto/apollo:master" 的代码合并请求。
+"YOUR_USERNAME/apollo:my_dev" 到 "ApolloAuto/apollo:master" 的代码合并请求。
 
 可参
 考[GitHub 页：创建合并请求](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)

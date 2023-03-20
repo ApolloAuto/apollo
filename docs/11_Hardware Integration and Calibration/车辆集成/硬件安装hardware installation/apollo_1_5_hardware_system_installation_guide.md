@@ -615,7 +615,7 @@ A customized mounting structure is required to successfully mount an HDL64E S3 L
 
 #### Wiring
 
-Each HDL-64E S3 LiDAR includes a cablebundle to connect the LiDAR to power supply, computer (Ethernet for data transfer, and serial port for LiDAR configuration) and GPS timesync source. 
+Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to power supply, computer (Ethernet for data transfer, and serial port for LiDAR configuration) and GPS timesync source. 
 
 ![LiDAR_Cable](images/HDL64_Cable_whitened_labeled.png)
 
@@ -631,7 +631,7 @@ Each HDL-64E S3 LiDAR includes a cablebundle to connect the LiDAR to power suppl
 
    ![HDL64_Power_Cable](images/HDL64_PowerCable.jpg)
 
-3. Conection to IPC
+3. Connection to IPC
 
    The connection to IPC is through an ethernet cable. Plug the ethernet connector in the cable bundle into an ethernet port on the IPC
 
@@ -711,7 +711,7 @@ Follow these steps:
 
      ![ipc_power_RB](images/ipc_power_RB.png)
 
-     Secondly, connect the two cables of 12 VDC input to the power panel in the vehicle. If the size of the wire is too thick, the wire should be splitted to several wires and connect to corresponding ports, respectively.
+     Secondly, connect the two cables of 12 VDC input to the power panel in the vehicle. If the size of the wire is too thick, the wire should be split to several wires and connect to corresponding ports, respectively.
 
      ![warning](images/warning_icon.png)This step is necessary. If the input voltage goes below the required limit. It is highly probable to cause system failure.
 

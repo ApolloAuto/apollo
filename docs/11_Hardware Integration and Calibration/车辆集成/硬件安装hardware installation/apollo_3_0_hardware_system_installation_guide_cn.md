@@ -42,16 +42,16 @@
  
     - **车辆**：
      
-      - [工业级PC](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/IPC/Nuvo-6108GC_Installation_Guide_cn.md)
-      - [全球定位系统（GPS）](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README_cn.md)
-      - [惯性计算单元（IMU）](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README_cn.md)
+      - [工业级PC](../%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/IPC/Nuvo-6108GC_Installation_Guide_cn.md)
+      - [全球定位系统（GPS）](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README_cn.md)
+      - [惯性计算单元（IMU）](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Navigation/README_cn.md)
       - 区域网络控制卡（CAN）
       - GPS天线
       - GPS接收器
-      - [激光雷达（LiDAR）](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/README.md)
-      - [摄像机](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Camera/README.md)
-      - [雷达](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Radar/README.md)
-      - [Apollo传感器单元（ASU）](../../../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide_cn.md)
+      - [激光雷达（LiDAR）](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/README.md)
+      - [摄像机](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Camera/README.md)
+      - [雷达](../../../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Radar/README.md)
+      - [Apollo传感器单元（ASU）](../%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Apollo_Sensor_Unit/Apollo_Sensor_Unit_Installation_Guide_cn.md)
       
     - **Software**: 
       - Ubuntu Linux
@@ -113,7 +113,7 @@
     - 安装或替换硬盘驱动器
     - 安装为IPC加电的组件
 - 为IPC安装软件：
-    - Unbuntu Linux
+    - Ubuntu Linux
     - Apollo内核
     - NVIDIA GPU驱动
     
@@ -134,7 +134,7 @@
     
 #### 先决条件
 
-**![warning_icon](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/warning_icon.png)注意**：在将主要部件（GPS天线，IPC和GPS接收器）安装在车辆之前，必须按照先决条件列表所述执行必要修改。 列表中所述强制性更改的部分，不属于本文档的范围。
+**![warning_icon](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/images/warning_icon.png)注意**：在将主要部件（GPS天线，IPC和GPS接收器）安装在车辆之前，必须按照先决条件列表所述执行必要修改。 列表中所述强制性更改的部分，不属于本文档的范围。
 
 先决条件为：
 
@@ -149,9 +149,9 @@
 
 以下两图中标明了三个主要组件（GPS天线，IPC，GPS接收器和LiDAR）在车辆上的安装位置：
 
-![major_component_side_view](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/Hardware_overview.png)
+![major_component_side_view](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/demo_guide/images/Hardware_overview.png)
 
-![major_component_rear_view](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/images/Car_Rearview.png)
+![major_component_rear_view](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/images/Car_Rearview.png)
 
 ## 额外安装任务
 

@@ -28,7 +28,7 @@
 
 ##### 在本教程中，你需要如下准备
 
-- 下载并编译Apollo最新源码（[Howto](https://github.com/ApolloAuto/apollo/tree/master/docs/demo_guide)）
+- 下载并编译Apollo最新源码（[Howto](https://github.com/ApolloAuto/apollo/tree/r2.5.0/docs/demo_guide)）
 
 - 下载 [Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag)
 

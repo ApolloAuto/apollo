@@ -139,7 +139,7 @@ using ObjectConstPtr = std::shared_ptr<const Object>;
 
 ## Implement the class `NewFusionSystem`
 
-To ensure the new system could function properly, `NewFusionSystem` should at least override the interface Init(), Fuse(), Name() defined in `base_fusion_system`. Init() is resposible for config loading, class member initialization, etc. And Fuse() will implement the basic logic of system. A concrete `NewFusionSystem.cc` example is shown：
+To ensure the new system could function properly, `NewFusionSystem` should at least override the interface Init(), Fuse(), Name() defined in `base_fusion_system`. Init() is responsible for config loading, class member initialization, etc. And Fuse() will implement the basic logic of system. A concrete `NewFusionSystem.cc` example is shown：
 
 ```c++
 namespace apollo {

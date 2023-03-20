@@ -14,7 +14,7 @@ as camera and radar components.
 ## Architecture
 
 The processing flow of lidar perception module is shown below:
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+![](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/specs/images/lidar_perception_data_flow.png)
 
 ## PointPillars Detection Model
 

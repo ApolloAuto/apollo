@@ -6,7 +6,7 @@ June 27, 2018
 
 Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for commercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
 
- * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
+ * **CIPV(Closest In-Path Vehicle) detection and Tailgating**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
@@ -41,7 +41,7 @@ Deep Network ingests an image and provides two detection outputs, lane lines and
 ### Object Detection/Tracking
 In a traffic setting, there are two kinds of objects: stationary objects and dynamic objects. Stationary objects include lane lines, traffic lights, and thousands of traffic signs written in different languages. Other than driving, there are multiple landmarks on the road mostly for visual localization including street lamps, barriers, bridge on top of the road, or any other skyline construction. Among all those objects, Apollo 3.0 will detect only lane lines.
 
-Among dynamic objects, Apollo can detect passenger vehicles, trucks, cyclists, pedestrians, or any other object including animals on the road. Apollo can also categorize objects based on which lane the object is in. The most important object is CIPV (closest in path vehicle or object). In order of importance, objects present in neighbouring lanes fall in the second category.
+Among dynamic objects, Apollo can detect passenger vehicles, trucks, cyclists, pedestrians, or any other object including animals on the road. Apollo can also categorize objects based on which lane the object is in. The most important object is CIPV (closest in path vehicle or object). In order of importance, objects present in neighboring lanes fall in the second category.
 
 #### 2D-to-3D Bounding Box
 
@@ -92,7 +92,7 @@ The input of Planning and Control modules will be quite different with that of t
 	- Classification type: car, truck, bike, pedestrian
 	- Drops: trajectory of an object
 
-The world coordinate systen is used as ego-coordinate in 3D where the rear center axle is an origin.
+The world coordinate system is used as ego-coordinate in 3D where the rear center axle is an origin.
 
 ## References
 [1] J Redmon, S Divvala, R Girshick, A Farhadi, "You only look once: Unified, real-time object detection," CVPR 2016

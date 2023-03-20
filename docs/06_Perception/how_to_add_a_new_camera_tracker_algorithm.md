@@ -108,11 +108,11 @@ struct CameraFrame {
 
 ## Implement the class `NewObstacleTracker`
 
-To ensure the new tracker could function properly, `NewObstacleTracker` should at least override the interface Init(), Track(), Name() defined in `base_obstacle_tracker` Init() is resposible for config loading, class member initialization, etc. And Track() will implement the basic logic of algorithm. A concrete `NewObstacleTracker.cc` example is shown：
+To ensure the new tracker could function properly, `NewObstacleTracker` should at least override the interface Init(), Track(), Name() defined in `base_obstacle_tracker` Init() is responsible for config loading, class member initialization, etc. And Track() will implement the basic logic of algorithm. A concrete `NewObstacleTracker.cc` example is shown：
 
 ```
 Note：Currently, the algorithm pipeline has not been encapsulated into the Track() function of base_obstacle_tracker.h. 
-Therefore, all the virtual interface should be re-writen.
+Therefore, all the virtual interface should be re-written.
 ```
 
 ```c++

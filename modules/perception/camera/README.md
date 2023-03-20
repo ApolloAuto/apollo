@@ -43,11 +43,11 @@ $$ -->
 
 The final network structure is shown below
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/camera_network.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/camera_network.png" alt="图片名称" width="60%" />
 </div>
 
 ## Training
-We trained model on the waymo open source dataset. Firstly, we used the conversion tool provided by the mmdetction3d framework to convert the waymo data into Kitti format. For specific operations, please refer to the [open mmlab documentation](https://github.com/open-mmlab/mmdetection3d/blob/master/docs/datasets/waymo_det.md). We only saved the front camera (image_ 0) data. Data conversion will take up a lot of space. Please ensure that your disk has enough space. After converting waymo data into Kitti format, we only need to make a few adjustments to the code to train and test. The test results on the waymo validation set are shown in the following table:
+We trained model on the waymo open source dataset. Firstly, we used the conversion tool provided by the mmdetction3d framework to convert the waymo data into Kitti format. For specific operations, please refer to the [open mmlab documentation](https://github.com/open-mmlab/mmdetection3d/blob/47285b3f1e9dba358e98fcd12e523cfd0769c876/docs/en/datasets/waymo_det.md). We only saved the front camera (image_ 0) data. Data conversion will take up a lot of space. Please ensure that your disk has enough space. After converting waymo data into Kitti format, we only need to make a few adjustments to the code to train and test. The test results on the waymo validation set are shown in the following table:
 
 <div align=center>
 
@@ -61,7 +61,7 @@ We trained model on the waymo open source dataset. Firstly, we used the conversi
 The visualize on waymo image data as follows:
 
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/smoke_example.png" alt="图片名称" width="40%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/smoke_example.png" alt="图片名称" width="40%" />
 </div>
 
 At the same time, we provide the paddle-version model code with the training code together with the Baidu PaddlePaddle team. Please refer to the [SMOKE-Paddle](https://github.com/PaddlePaddle/models/tree/develop/PaddleCV/3d_vision/SMOKE) for more details.

@@ -18,7 +18,7 @@ Obstacle:
 As we can see clearly from above structure, each component has its own abstract class member `base_XXX_detector`. Different derived detector algorithms inherit `base_XXX_detector` and implement their main flows to complete the deployment. Next, we will take `base_obstacle_detector` as an example to introduce how to add a new camera detector algorithm. You could also refer to this document if you want to add traffic light detector or lane detector.
 
 
-Apollo has provided three camera detector algorithms in Obstacle Detection -- Smoke，Yolo, YoloV4. All of them could be easily changed or replaced by other algorithms. The input of algorithm should be preprocessed image data, while the output should be obastacle object data. This document will introduce how to add a new camera detector algorithm, the basic task sequence is listed below：
+Apollo has provided three camera detector algorithms in Obstacle Detection -- Smoke，Yolo, YoloV4. All of them could be easily changed or replaced by other algorithms. The input of algorithm should be preprocessed image data, while the output should be obstacle object data. This document will introduce how to add a new camera detector algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_obstacle_detector` 
 2. Implement the class `NewObstacleDetector`
@@ -105,7 +105,7 @@ struct CameraFrame {
 
 ## Implement the class `NewObstacleDetector`
 
-To ensure the new detector could function properly, `NewObstacleDetector` should at least override the interface Init(), Detect(), Name() defined in `base_obstacle_detector` Init() is resposible for config loading, class member initialization, etc. And Detect() will implement the basic logic of algorithm. A concrete `NewObstacleDetector.cc` example is shown：
+To ensure the new detector could function properly, `NewObstacleDetector` should at least override the interface Init(), Detect(), Name() defined in `base_obstacle_detector` Init() is responsible for config loading, class member initialization, etc. And Detect() will implement the basic logic of algorithm. A concrete `NewObstacleDetector.cc` example is shown：
 
 ```c++
 namespace apollo {

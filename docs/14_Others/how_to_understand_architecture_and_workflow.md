@@ -1,7 +1,7 @@
 HOW TO UNDERSTAND ARCHITECTURE AND WORKFLOW
 ===========================================
 
-## Fundamentals to understand AplloAuto - core
+## Fundamentals to understand ApolloAuto - core
 
 Autonomous vehicles \(AV\) dynamics are controlled by the planning engine through the Controller Area Network bus \(CAN bus\). The software reads data from hardware registers and writes them back just like we would in Assembly language. For high-precision computation, the Localization, Perception and Planning modules function as independent
 input sources, while output sources work together though the Peer2Peer (P2P) protocol. P2P is supported by the RPC network application.
@@ -62,7 +62,7 @@ ros::Publisher pub = h.advertise<generated_msg_format_cls>("topic_name", q_size)
 cb here is a callback executed when Linux kernel IO is ready. With these signatures bearing in mind, we can quickly analyze ApolloAuto
 module structures before diving deep into core modules implementation.
 
-#### apolloauto modules structure
+#### ApolloAuto modules structure
 
 I have conducted full research about it but I cannot show you all of them. ApolloAuto modules/common/ provide basic micros to control ros::spin for each
 module and /modules/common/adaptor contains the most information on how a topic is registered. Every module will be registered from the [point](https://github.com/yiakwy/apollo/blob/master/modules/common/adapters/adapter_manager.cc#L50)

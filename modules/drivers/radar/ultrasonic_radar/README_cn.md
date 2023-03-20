@@ -17,4 +17,4 @@ source scripts/apollo_base.sh
 **topic name**: /apollo/sensor/ultrasonic_radar
 **data type**:  apollo::drivers::Ultrasonic
 **channel ID**: CHANNEL_ID_THREE
-**proto file**: [modules/drivers/proto/ultrasonic_radar.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/ultrasonic_radar.proto)
+**proto file**: [modules/drivers/proto/ultrasonic_radar.proto](../../../../modules/common_msgs/sensor_msgs/ultrasonic_radar.proto)

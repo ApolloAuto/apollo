@@ -375,7 +375,7 @@ GPS-IMU 组件的 GPS 接收器、天线使用的是 **NovAtel GPS-703-GGG-HV**�
 
 步骤如下：
 
-1. 创建一个可以引导启动的 Ubantu Linux USB 闪存驱动器：
+1. 创建一个可以引导启动的 Ubuntu Linux USB 闪存驱动器：
 
    下载 Ubuntu（或 Xubuntu 等分支版本），并按照在线说明创建可引导启动的 USB 闪存
    驱动器。
@@ -422,7 +422,7 @@ sudo apt-get install linux-generic-lts-xenial
 
 你可以依照如下步骤获取、安装预编译的内核。
 
-1. 从 realease 文件夹下载发布的包
+1. 从 release 文件夹下载发布的包
 
 ```
 https://github.com/ApolloAuto/apollo-kernel/releases

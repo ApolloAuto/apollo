@@ -18,7 +18,7 @@ This Quick Start Guide focuses on the new features. For general Apollo concepts,
 
 ## Emergency Audio Detection
 
-Apollo currently integrates emergency vehicle detection through audio devices. Microphones are installed on the vehicle to collect audio signals around the autonomous vehicle, and the recorded soundtracks will be analized and processed to detect emergency vehicles in the surroundings. The module detail is [here](../../modules/audio).
+Apollo currently integrates emergency vehicle detection through audio devices. Microphones are installed on the vehicle to collect audio signals around the autonomous vehicle, and the recorded soundtracks will be analyzed and processed to detect emergency vehicles in the surroundings. The module detail is [here](../../modules/audio).
 
 ## New Deep Learning Models
 
@@ -27,7 +27,7 @@ Apollo integrates new deep learning models including obstacle detection with Poi
 ## Hardware and Software Installation
 
 The Hardware setup for Apollo 6.0 remains the same as Apollo 3.5, please refer to
-[Apollo 3.5 Hardware and System Installation Guide](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
+[Apollo 3.5 Hardware and System Installation Guide](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
 for the steps to install the hardware components and the system software, as well as
 [Apollo Software Installation Guide](../01_Installation%20Instructions/apollo_software_installation_guide.md).
 
@@ -47,7 +47,7 @@ For questions regarding Dreamland and the scenario editor, please visit our [Dre
 
 4. Launch DreamView
 
-   Open URL <http://localhost:8888> to launch  Dreamview web service onyour host
+   Open URL <http://localhost:8888> to launch  Dreamview web service on your host
 
    ![launch_dreamview](images/dreamview_2_5.png)
 

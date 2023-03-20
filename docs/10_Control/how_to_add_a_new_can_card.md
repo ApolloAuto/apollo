@@ -143,7 +143,7 @@ can_card_parameter {
 ... ...
 ```
 
-If you use radar, like Conti radar in apollo, its' canbus configuration file should alse be modified. Update `/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt`
+If you use radar, like Conti radar in apollo, its' canbus configuration file should also be modified. Update `/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt`
 
 ```txt
 ... ...

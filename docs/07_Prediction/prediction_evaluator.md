@@ -27,12 +27,12 @@ The list of available evaluators include:
 
 # Where is the code
 
-Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules/prediction/evaluator).
+Please refer [prediction evaluator](../../modules/prediction/evaluator).
 
 # Code Reading
 
-## Solcial interaction evaluator
-1. The evaluator uses social LSTM to predict short-term trajectroy for pedestrians with caution level. In the code, the evaluator is named by pedestrain interaction evalutor.
+## Social interaction evaluator
+1. The evaluator uses social LSTM to predict short-term trajectory for pedestrians with caution level. In the code, the evaluator is named by pedestrian interaction evaluator.
 
 2. Extract features from obstacles.
 
@@ -55,12 +55,12 @@ Please refer [prediction evaluator](https://github.com/ApolloAuto/apollo/modules
 3. Get predicted trajectory with different parameters for different types of obstacles.
 
 ## Junction map evaluator
-1. Only care about obstalces at intersections. Obstacles are not closed to any junction exit cannot be evaluated by this evaluator. 
+1. Only care about obstacles at intersections. Obstacles are not closed to any junction exit cannot be evaluated by this evaluator. 
 
 2. Take the obstacle as the center and the orientation as the reference direction, 12 fan-shaped areas are divided.
   ![Diagram](images/prediction_evaluator_fig_1.png)
 
-3. Since the juction exit is associated with these 12 fan-shaped areas, the probability can be calculated by solving the fan-shaped areas classification problem.
+3. Since the junction exit is associated with these 12 fan-shaped areas, the probability can be calculated by solving the fan-shaped areas classification problem.
 
 4. Assign all lane sequence probability.
 

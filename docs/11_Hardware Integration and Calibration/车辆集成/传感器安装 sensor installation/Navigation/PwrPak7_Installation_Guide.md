@@ -38,7 +38,7 @@ Follow these steps:
 
 ### Configuring the PwrPak7
 
-Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuraion file in NovAtel Connect.
+Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuration file in NovAtel Connect.
 
 For PwrPak7:
 

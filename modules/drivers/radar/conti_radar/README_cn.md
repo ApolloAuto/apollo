@@ -21,4 +21,4 @@ source scripts/apollo_base.sh
 **topic name**: /apollo/sensor/conti_radar
 **data type**:  apollo::drivers::ContiRadar
 **channel ID**: CHANNEL_ID_ONE
-**proto file**: [modules/drivers/proto/conti_radar.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/conti_radar.proto)
+**proto file**: [modules/drivers/proto/conti_radar.proto](../../../common_msgs/sensor_msgs/conti_radar.proto)

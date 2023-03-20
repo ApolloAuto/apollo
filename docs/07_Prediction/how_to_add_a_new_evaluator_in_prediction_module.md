@@ -9,7 +9,7 @@ Please follow the steps to add a new evaluator named `NewEvaluator`.
 2. Define a class that inherits `Evaluator`
 3. Implement the class `NewEvaluator`
 4. Update prediction conf
-5. Upate the evaluator manager
+5. Update the evaluator manager
 
 ### Define a class that inherits `Evaluator`
 Create a new file named `new_evaluator.h` in the folder  `modules/prediction/evaluator/vehicle`. And define it like this:
@@ -79,8 +79,8 @@ obstacle_conf {
 }
 ```
 
-### Step 5: Upate the evaluator manager
-Update `CreateEvluator( ... )` like this:
+### Step 5: Update the evaluator manager
+Update `CreateEvaluator( ... )` like this:
 ```cpp
   case ObstacleConf::NEW_EVALUATOR: {
       evaluator_ptr.reset(new NewEvaluator());

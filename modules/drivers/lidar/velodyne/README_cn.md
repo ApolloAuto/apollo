@@ -13,15 +13,15 @@ velodyne驱动是以component的形式实现的，包含了:
 1. 数据包
   channel: /apollo/sensor/lidar128/Scan
   type: apollo::drivers::velodyne::VelodyneScan
-  proto: [modules/drivers/lidar/velodyne/proto/velodyne.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/lidar/velodyne/proto/velodyne.proto)
+  proto: [modules/drivers/lidar/proto/velodyne.proto](../proto/velodyne.proto)
 2. 原始点云
   channel: /apollo/sensor/lidar128/PointCloud2
   type: apollo::drivers::PointCloud
-  proto: [modules/drivers/proto/pointcloud.proto]https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/pointcloud.proto
+  proto: [modules/drivers/proto/pointcloud.proto](../../../common_msgs/sensor_msgs/pointcloud.proto)
 3. 补偿点云
   channel: /apollo/sensor/lidar128/compensator/PointCloud2
   type: apollo::drivers::PointCloud
-  proto: [modules/drivers/proto/pointcloud.proto]https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/pointcloud.proto
+  proto: [modules/drivers/proto/pointcloud.proto](../../../common_msgs/sensor_msgs/pointcloud.proto)
 
 ### 坐标系
 * world

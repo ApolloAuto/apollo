@@ -30,7 +30,7 @@ which has a structure as following.
   ......
 ```
 
-For each external denpendency library, there is a seperate folder that contains
+For each external dependency library, there is a separate folder that contains
 a `BUILD` file with the contents of:
 
 ```python
@@ -88,7 +88,7 @@ def repo():
     )
 ```
 
-[yaml.BUILD](../../third_party/yaml_cpp/yaml.BUILD):
+[yaml.BUILD](../../third_party/yaml_cpp/yaml_cpp.BUILD):
 
 ```python
 load("@rules_cc//cc:defs.bzl", "cc_library")

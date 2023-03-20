@@ -420,7 +420,7 @@ c. 连接电源：
 #### 安装Ubuntu Linux
 步骤如下：
 
-1. 创建一个可以引导启动的Ubantu Linux USB闪存驱动器：
+1. 创建一个可以引导启动的Ubuntu Linux USB闪存驱动器：
 
     下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
 
@@ -465,7 +465,7 @@ c. 连接电源：
 
 你可以依照如下步骤获取、安装预编译的内核。
 
-1. 从realease文件夹下载发布的包
+1. 从release文件夹下载发布的包
 ```
 https://github.com/ApolloAuto/apollo-kernel/releases
 ```
@@ -774,7 +774,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 
 Apollo 2.5的地图制作服务已经向公众开放。为了获得地图创建所需的数据，需要在车辆上安装附加的VLP-16激光雷达。LiDAR的目的是收集HDL-64 S3 激光雷达FOV上方的物体的点云信息，例如交通信号灯和标志。它需要一个定制的机架安装VLP-16激光雷达在车辆顶部。下图显示了可以选择的配置之一。![VLP_16_installation](images/VLP16_install_configuration.jpg)
 
-In this specific configuration, the VLP-16 LiDAR is mounted with an upward tilt of 20±2°. The power cable of the VLP-16 is connected to the DataSpeed power panel. The ethernet connection is connected to the IPC (possibly through an ethernet switch). Similar to HDL-64 S3 LiDAR, the VLP-16 GPRMC and PPS input from the GPS receiver. Ideally, additional hardware should be installed to duplicate the GPRMC and PPS signal from the GPS receiver send to HDL-64 and VLP-16 respectively. However, a simple Y-split cable may also provide adequate signal for both LiDAR's. To distingush from the HDL-64 S3 LiDAR, please follow the VLP-16 manual and use the webpage interface to configure the IP of VLP-16 to 192.168.20.14, the data port to 2369, and the telemetry port to 8309. The pinout for the signal input from GPS receiver can also be found in the manual if you need customized cable.
+In this specific configuration, the VLP-16 LiDAR is mounted with an upward tilt of 20±2°. The power cable of the VLP-16 is connected to the DataSpeed power panel. The ethernet connection is connected to the IPC (possibly through an ethernet switch). Similar to HDL-64 S3 LiDAR, the VLP-16 GPRMC and PPS input from the GPS receiver. Ideally, additional hardware should be installed to duplicate the GPRMC and PPS signal from the GPS receiver send to HDL-64 and VLP-16 respectively. However, a simple Y-split cable may also provide adequate signal for both LiDAR's. To distinguish from the HDL-64 S3 LiDAR, please follow the VLP-16 manual and use the webpage interface to configure the IP of VLP-16 to 192.168.20.14, the data port to 2369, and the telemetry port to 8309. The pinout for the signal input from GPS receiver can also be found in the manual if you need customized cable.
 
 ![online_icon](images/online_icon.png)VLP-16 Manual can be found on this webpage:
 
@@ -788,13 +788,13 @@ Apollo参考设计建议使用三个不同焦距的摄像头：两个6毫米镜�
 
 - 这两个摄像机都应该朝着前进方向。视场（FOV）应尽量远离障碍物。
 
-- ![Cameras_lock_screw](./images/LI-Camera-OnVehicle.png)
+- ![Cameras_lock_screw](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/LI-Camera-OnVehicle.png)
 
 - 25毫米焦距的照相机应该向上倾斜大约两度。调整后，25毫米相机应该能够观察到100米外有红路灯的交叉路口的停车线。
 
 - 新出厂的摄像头的镜片不在最好的聚焦位置。通过调整镜片的焦距来找到正确的位置，找到远处目标物体的清晰图像。一个好的图像目标是交通标志或街道标志内的FOV。调整焦点后，使用锁紧螺丝来固定镜头的位置。
 
-  ![Cameras_lock_screw](./images/LI-Camera-LockScrew.png)
+  ![Cameras_lock_screw](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/LI-Camera-LockScrew.png)
 
 - 使用USB 3.0连接相机（USB 3.0 Micro-B）和IPC（USB 3.0 type A），并用螺钉来加固连接。
 
@@ -807,7 +807,7 @@ Apollo参考设计建议使用三个不同焦距的摄像头：两个6毫米镜�
 
 雷达需要一个匹配的机械机架安装在前保险杠上。安装后，要求雷达朝向驱动方向，稍微向上倾斜不超过2度。
 
-![Radar Installations](./images/Radar_OnVehicle.png)
+![Radar Installations](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/Radar_OnVehicle.png)
 
 带有雷达的电缆需要被路由到汽车的后部，并连接到ESD CAN卡的CAN1信道。 
 

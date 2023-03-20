@@ -35,7 +35,7 @@ Some features include:
 
 1. To use the PaddlePaddle model for Camera Obstacle Detector, set `camera_obstacle_perception_conf_file` to `obstacle_paddle.pt` in the following [configuration file](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt)
 
-2. To use the PaddlePaddle model for LiDAR Obstacle Detector, set `use_paddle` to `true` in the following [configuration file](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/production/data/perception/lidar/models/cnnseg/velodyne128/cnnseg.conf)
+2. To use the PaddlePaddle model for LiDAR Obstacle Detector, set `use_paddle` to `true` in the following [configuration file](https://github.com/ApolloAuto/apollo/blob/r5.0.0/modules/perception/production/data/perception/lidar/models/cnnseg/velodyne128/cnnseg.conf)
 
 ### Online sensor calibration service
 

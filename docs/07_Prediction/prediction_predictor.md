@@ -20,15 +20,15 @@ Here, we mainly introduce three typical predictors，extrapolation predictor, mo
 
 # Where is the code
 
-Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules/prediction/predictor).
+Please refer [prediction predictor](../../modules/prediction/predictor).
 
 # Code Reading
 
 ## Extrapolation predictor
-1. This predictor is used to extend the Semantic LSTM evaluator's results to creat a long-term trajectroy(which is 8 sec).
+1. This predictor is used to extend the Semantic LSTM evaluator's results to create a long-term trajectory(which is 8 sec).
 
 2. There are two main kinds of extrapolation, extrapolate by lane and extrapolate by free move.
-     1. Base on a search radium and an angle threshold, which can be changed in perdiction config, we get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator.
+     1. Base on a search radium and an angle threshold, which can be changed in prediction config, we get most likely lane that best matches the short-term predicted trajectory obtained from Semantic LSTM evaluator.
      ```cpp
             LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
                                                      const int num_tail_point);
@@ -67,7 +67,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
 ## Move sequence predictor
 1. Obstacle moves along the lanes by its kinetic pattern.
 
-2. Ingore those lane sequences with lower probability.
+2. Ignore those lane sequences with lower probability.
  ```cpp  
     void FilterLaneSequences(
         const Feature& feature, const std::string& lane_id,
@@ -80,7 +80,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
     bool SupposedToStop(const Feature& feature, const double stop_distance,
                         double* acceleration); 
      ```
-     1. If ADC is about to stop, we produce trajectroy with constant-acceleration module.
+     1. If ADC is about to stop, we produce trajectory with constant-acceleration module.
       ```cpp
         void DrawConstantAccelerationTrajectory(
             const Obstacle& obstacle, const LaneSequence& lane_sequence,
@@ -95,7 +95,7 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
             std::vector<apollo::common::TrajectoryPoint>* points);  
      ```
 ## Interaction predictor
-1. Compute the likelihood to create posterier prediction results after all evaluators have run. This predictor was created for caution level obstacles.
+1. Compute the likelihood to create posterior prediction results after all evaluators have run. This predictor was created for caution level obstacles.
 
 2. Sampling ADC trajectory at a fixed interval(which can be changed in prediction gflag file).
  ```cpp
@@ -103,18 +103,18 @@ Please refer [prediction predictor](https://github.com/ApolloAuto/apollo/modules
       const ADCTrajectoryContainer* adc_trajectory_container,
       const double time_resolution);
  ```
-3. Compute trajectory cost for each short-term predicted trajectory. The trajectory cost is weighted cost from different trajectory evluation metrics, such as acceleration, centripetal acceleration and collsion cost, which can be written in the following form: 
+3. Compute trajectory cost for each short-term predicted trajectory. The trajectory cost is weighted cost from different trajectory evaluation metrics, such as acceleration, centripetal acceleration and collision cost, which can be written in the following form: 
  ```
     total_cost = w_acc * cost_acc + w_centri * cost_centri + w_collision * cost_collision
  ```
-Note that, the collsion cost is calucalated by the distance between ADC and obstacles.
+Note that, the collision cost is calculated by the distance between ADC and obstacles.
  ```cpp
     double ComputeTrajectoryCost(
         const Obstacle& obstacle, const LaneSequence& lane_sequence,
         const double acceleration,
         const ADCTrajectoryContainer* adc_trajectory_container);
  ```
-4. We use the following equration to compute the likelihood for each short-term predicted trajectory.
+4. We use the following equation to compute the likelihood for each short-term predicted trajectory.
 
  ```
     likelihood = exp (-alpha * total_cost), the alpha can be changed in prediction gflag file.
@@ -122,7 +122,7 @@ Note that, the collsion cost is calucalated by the distance between ADC and obst
  ```cpp
     double ComputeLikelihood(const double cost);
  ```
-5. Base on the likelihood, we get the posterier prediction results.
+5. Base on the likelihood, we get the posterior prediction results.
  ```cpp
     double ComputePosterior(const double prior, const double likelihood);
  ```

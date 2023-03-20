@@ -15,7 +15,7 @@
 #### 1.添加模型文件
 - 将训练好的模型文件存放于`modules/perception/production/data/perception/lidar/models/detection/xxx`目录下。
 #### 2.添加新的 Lidar Detector
-- 参考[how_to_add_a_new_lidar_detector_algorithm](../../docs/howto/how_to_add_a_new_lidar_detector_algorithm_cn.md)，创建一个新的Lidar Detector。
+- 参考[how_to_add_a_new_lidar_detector_algorithm](../../docs/06_Perception/how_to_add_a_new_camera_detector_algorithm_cn.md)，创建一个新的Lidar Detector。
 #### 3.修改Lidar Detector以适配新的Lidar Detection模型
 #### 4.创建并初始化predictor
 
@@ -71,7 +71,7 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
 - 将训练好的模型文件存放于`modules/perception/production/data/perception/camera/models/yolo_obstacle_detector/xxx`目录下。
 
 #### 2.添加新的Camera Detector
-- 参考[how_to_add_a_new_camera_detector_algorithm](../../docs/howto/how_to_add_a_new_camera_detector_algorithm_cn.md)，创建一个新的Camera Detector。
+- 参考[how_to_add_a_new_camera_detector_algorithm](../../docs/06_Perception/how_to_add_a_new_camera_detector_algorithm_cn.md)，创建一个新的Camera Detector。
 
 #### 3.修改Camera Detector以适配新的Camera Detection模型
 - 根据模型结构修改对应的proto文件：Camera Detector通过`blob`数据结构来管理和存储模型的输入和输出数据。用户需要根据模型结构，在该模型对应的proto文件中添加和对应的输入输出项，可参考`smoke.proto`文件的`NetworkParam`字段，并添加对应的proto配置文件，参考`smoke-config.pt`。

@@ -4,11 +4,11 @@
 
 Apollo planning is scenario based, where each driving case is treated as a different driving scenario.
 
-Open space decider is used to process related infomation and provide information for subsequent optimizers. 
+Open space decider is used to process related information and provide information for subsequent optimizers. 
 
 # Where is the code
 
-Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.cc).
+Please refer [open space decider](../../modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.cc).
 
 # Code Reading
 
@@ -36,13 +36,13 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                         const std::array<common::math::Vec2d, 4> &vertices);
     ```
 
-    4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coorinates, according to the relative position and parking direction(inward or outward) to set parking end pose.
+    4. Get parking spot(left top \ left down \ right down \ right top) points info, convert parking spot points coordinates to vehicle coordinates, according to the relative position and parking direction(inward or outward) to set parking end pose.
 
     ```cpp  
         void SetParkingSpotEndPose(
             Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
     ```  
-    5. Get parking boundary: convert parking spot points coordinates to vehicle coorinates and get points' projections on reference line.
+    5. Get parking boundary: convert parking spot points coordinates to vehicle coordinates and get points' projections on reference line.
     
     ```cpp
         bool GetParkingBoundary(Frame *const frame,
@@ -55,7 +55,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
        
        Search key points(the point on the left/right lane boundary is close to a curb corner) and anchor points(a start/end point or the point on path with large curvatures) in this roi range. 
        
-       Those key points and anchor points are called boundary points. The line segements between those points are called roi parking boundarys. 
+       Those key points and anchor points are called boundary points. The line segments between those points are called roi parking boundaries. 
     
     ```cpp
         void GetRoadBoundary(
@@ -70,7 +70,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
             std::vector<double> *left_lane_road_width,
             std::vector<double> *right_lane_road_width);
     ```
-    7. Fuse line segements: remove repeat points of roi parking boundary to meet the requirements of open space algorithm.
+    7. Fuse line segments: remove repeat points of roi parking boundary to meet the requirements of open space algorithm.
 
     ```cpp
         bool FuseLineSegments(
@@ -93,7 +93,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
     ```                                                   
   - IN PARK AND GO STAGE (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO)
 
-    1. The main process is same as parking stage, set orgin from adc -> set park and go end pose -> get park and go boundary. 
+    1. The main process is same as parking stage, set origin from adc -> set park and go end pose -> get park and go boundary. 
 
     ```cpp
           void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
@@ -108,7 +108,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
                                 std::vector<std::vector<common::math::Vec2d>>
                                 *const roi_parking_boundary);
     ```
-2. By calling ```formulateboundaryconstraints()``` to gather vertice needed by warm start and distance approach, then transform vertices into the form of Ax > b.
+2. By calling ```FormulateBoundaryConstraints()``` to gather vertices needed by warm start and distance approach, then transform vertices into the form of Ax > b.
 
 ```cpp
     bool FormulateBoundaryConstraints(
@@ -159,13 +159,13 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
 ## Open space fallback decider 
 1. Input: obstacles info \ vehicle info \ road info \ parking space info.
 
-2. Base on the prdicted trajectory of obstacles, the bounding box info of obstacles in each time interval is obtained, then we add it into predicted_bounding_rectangles.
+2. Base on the predicted trajectory of obstacles, the bounding box info of obstacles in each time interval is obtained, then we add it into predicted_bounding_rectangles.
 ```cpp
     void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles,
                                    std::vector<std::vector<common::math::Box2d>>&
                                    predicted_bounding_rectangles);
 ```
-3. By calling ```IsCollisonFreeTrajectory()``` to determine whether it will intersect with obstacles.
+3. By calling ```IsCollisionFreeTrajectory()``` to determine whether it will intersect with obstacles.
 ```cpp
     bool IsCollisionFreeTrajectory(
         const TrajGearPair& trajectory_pb,
@@ -173,7 +173,7 @@ Please refer [open space decider](https://github.com/ApolloAuto/apollo/modules/p
         predicted_bounding_rectangles,
         size_t* current_idx, size_t* first_collision_idx);
 ```
-4. If ADC trajectroy is collision free, the chosen partitioned trajectory can be used directly, otherwise a fallback trajectroy base on current partition trajectroy will be gererated, which leads ADC stop inside safety distance.
+4. If ADC trajectory is collision free, the chosen partitioned trajectory can be used directly, otherwise a fallback trajectory base on current partition trajectory will be generated, which leads ADC stop inside safety distance.
 
 5. Return process status.    
 

@@ -12,7 +12,7 @@ highly optimized for performance, latency, and data throughput.
 
 - During years of development of autonomous driving technologies, we have
   learned a lot from our previous experience with Apollo. In autonomous driving
-  scenarious, we need an effective centralized computing model, with demands for
+  scenarios, we need an effective centralized computing model, with demands for
   high performance, including high concurrency, low latency and high
   throughput。
 

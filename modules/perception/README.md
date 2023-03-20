@@ -17,10 +17,10 @@ For more detail about new models, please refer to [Camera Perception in Apollo 7
 ## Architecture
 
 The general architecture of the perception module is shown:
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_sensor_based.png)
+![](https://github.com/ApolloAuto/apollo/blob/r3.5.0/docs/specs/images/Apollo3.5_perception_sensor_based.png)
 
 The detailed perception modules are displayed below.
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo6.0_perception_detail.png)
+![](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/specs/images/Apollo6.0_perception_detail.png)
 
 ## Input
 
@@ -46,7 +46,7 @@ The perception module outputs are:
 
 2. To run the perception module with CUDA acceleration, install the exact same version of the Nvidia driver in the docker image that is installed on your host machine, and then build Apollo with the GPU option (i.e., using `./apollo.sh build_opt_gpu`).
 
-    See [How to Run Perception Module on Your Local Computer](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_perception_module_on_your_local_computer.md).
+    See [How to Run Perception Module on Your Local Computer](https://github.com/ApolloAuto/apollo/tree/r3.5.0/docs/howto/how_to_run_perception_module_on_your_local_computer.md).
 
 3. This module contains a redistribution in binary form of a modified version of [caffe](https://github.com/BVLC/caffe).
 A copy of the caffe's original copyright statement is included below:

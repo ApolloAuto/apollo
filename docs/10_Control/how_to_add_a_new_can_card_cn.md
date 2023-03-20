@@ -131,7 +131,7 @@ message CANCardParameter {
   ... ... 
 }
 ```
-Update `/modules/canbus/conf/canbus_conf.pb.txt`
+更新 `/modules/canbus/conf/canbus_conf.pb.txt`
 
 ```txt
 ... ... 

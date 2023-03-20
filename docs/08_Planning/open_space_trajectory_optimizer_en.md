@@ -83,8 +83,8 @@ Please refer [open_space_trajectory_optimizer.cc](https://github.com/ApolloAuto/
     ```
 
 5. When FLAGS_enable_parallel_trajectory_smoothing is true, the optimization process is as follows: 
-   1. Trajectorypartition() function is used to segment the initial trajectory.
-   2. Use loadhybridastarresultineigen() function to store the partitioned trajetory into xws and UWS respectively.
+   1. TrajectoryPartition() function is used to segment the initial trajectory.
+   2. Use LoadHybridAstarResultInEigen() function to store the partitioned trajectory into xws and UWS respectively.
    3. Set the initial information(a,V) of each trajectory.
    4. the initial information of the first trajectory is the end point of the stitching trajectory.
    5. In the next trajectory, the initial information is set to zero. At the start of the trajectory, the vehicle is stationary. 
@@ -93,7 +93,7 @@ Please refer [open_space_trajectory_optimizer.cc](https://github.com/ApolloAuto/
         return Status(ErrorCode::PLANNING_ERROR, "Hybrid Astar partition failed");
     }
     ```
-6. Use combinetrajectories() function to integrate the parameter information after segmented optimization.
+6. Use CombineTrajectories() function to integrate the parameter information after segmented optimization.
    ``` cpp
    CombineTrajectories(xWS_vec, uWS_vec, state_result_ds_vec,
                        control_result_ds_vec, time_result_ds_vec,
@@ -111,12 +111,12 @@ Please refer [open_space_trajectory_optimizer.cc](https://github.com/ApolloAuto/
                                &(state_result_ds(2, i)));
   }
    ```
-8. The trajectory information is loaded by loadtrajectory() function. Because the current optimization does not consider the end point control state, the end-point control state of the trajectory is processed (Steer = 0, a = 0).
+8. The trajectory information is loaded by LoadTrajectory() function. Because the current optimization does not consider the end point control state, the end-point control state of the trajectory is processed (Steer = 0, a = 0).
     ``` cpp
     LoadTrajectory(state_result_ds, control_result_ds, time_result_ds)
     ```
 
-9. Output: Optput is optimized trajectory information.
+9. Output: Output is optimized trajectory information.
 
 
 # Algorithm Detail

@@ -17,7 +17,7 @@ There are two steps in the installation process:
  - Clone Apollo 3.5 Github code on both of IPCs
 
 ### Clone and install linux PTP
-  Install PTP utility and synchorize the system time on both of IPCs.
+  Install PTP utility and synchronize the system time on both of IPCs.
 
   ```sh
     git clone https://github.com/richardcochran/linuxptp.git

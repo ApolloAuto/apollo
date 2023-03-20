@@ -9,11 +9,11 @@ Apollo (`/apollo/cyber/python/examples/`).
 The samples provided here illustrate cases for, parsing data from:
 
 - lidar: based on
-  [Velodyne VLS-128](../../../docs/specs/Lidar/VLS_128_Installation_Guide.md)
+  [Velodyne VLS-128](../../../docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Lidar/VLS_128_Installation_Guide.md)
 - radar: based on
-  [Continental ARS-408-21](../../../docs/specs/Radar/Continental_ARS408-21_Radar_Installation_Guide.md)
+  [Continental ARS-408-21](../../../docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Radar/Continental_ARS408-21_Radar_Installation_Guide.md)
 - camera: based on
-  [Leopard Imaging Inc's Camera - LI-USB30-AZ023WDRB](../../../docs/specs/Camera/Leopard_Camera_LI-USB30-AZ023WDR__Installation_Guide.md)
+  [Leopard Imaging Inc's Camera - LI-USB30-AZ023WDRB](../../../docs/11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E4%BC%A0%E6%84%9F%E5%99%A8%E5%AE%89%E8%A3%85%20sensor%20installation/Camera/Leopard_Camera_LI-USB30-AZ023WDR__Installation_Guide.md)
 
 #### Files and functions:
 
@@ -46,7 +46,7 @@ The files/functions provided are as follows:
 
 - It is assumed that the user is within Apollo docker environment and has
   successfully built it. Please check documentation on
-  [Build Apollo](../../../docs/howto/how_to_launch_and_run_apollo.md) if
+  [Build Apollo](../../../docs/01_Installation%20Instructions/how_to_launch_and_run_apollo.md) if
   required.
 - Modify parameters specified within `parser_params.yaml` to serve your purpose.
 - After correct parameters are specified in the YAML file, run parser function

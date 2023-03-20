@@ -71,7 +71,7 @@ ps -e | grep ndt_localization
  - localization.WARNING : WARNING级别的log信息
  - localization.ERROR : ERROR级别的log信息
  - localization.out : 标准输出重定向文件
- - localizaiton.flags : 启动localization模块使用的配置
+ - localization.flags : 启动localization模块使用的配置
 
 ## 4. 播放演示record
 ```

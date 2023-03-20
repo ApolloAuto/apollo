@@ -4,11 +4,11 @@
 
 Apollo planning is scenario based, where each driving use case is treated as a different driving scenario.
 
-Open space trajectory partition task is used to partition and optimize stiched trajectroy obtained from open space trajectory provider task.
+Open space trajectory partition task is used to partition and optimize stitched trajectory obtained from open space trajectory provider task.
 
 # Where is the code
 
-Please refer [open space trajectory parition](https://github.com/ApolloAuto/apollo/modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.cc).
+Please refer [open space trajectory parition](../../modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.cc).
 
 # Code Reading
 
@@ -21,12 +21,12 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
         DiscretizedTrajectory* interpolated_trajectory);
     ```
 3. According to the heading angle and traking angle, the gear shift point can be determined.
-   Use ```std::vector<TrajGearPair>``` to store gear infomation and trajectory points, then partition trajectory into a group of trajectories from the gear shift point.
+   Use ```std::vector<TrajGearPair>``` to store gear information and trajectory points, then partition trajectory into a group of trajectories from the gear shift point.
     ```cpp
     void PartitionTrajectory(const DiscretizedTrajectory& trajectory,
                              std::vector<TrajGearPair>* partitioned_trajectories);       
     ```
-4. If replan due to fallback stop, the position init staus will be set to false.
+4. If replan due to fallback stop, the position init status will be set to false.
    
    When replan success, we use ```AdjustRelativeTimeAndS()``` to adjust partitioned trajectories obtained from step 3.
     ```cpp
@@ -71,7 +71,7 @@ Please refer [open space trajectory parition](https://github.com/ApolloAuto/apol
     ```
    4. When there is no need for ADC to switch to next trajectory, use IOU info mentioned above to find the closest trajectory point(the biggest IOU point) to follow.
 
-   5. If the closest trajectory point doesn't belong to current trajectory or couldn't find closest trajectory point due to some unnormal cases, we use ```UseFailSafeSearch()``` to get a safe trajectory to follow.
+   5. If the closest trajectory point doesn't belong to current trajectory or couldn't find closest trajectory point due to some abnormal cases, we use ```UseFailSafeSearch()``` to get a safe trajectory to follow.
 
       When using this function, we only care about distance between path end point and ADC enter point to find the search range, no more limitation on angle difference.
     ```cpp

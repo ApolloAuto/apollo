@@ -10,7 +10,7 @@ Apollo CI will run the following steps:
 1. Lint your code including .cc, .h, .py, BUILD, etc
 1. Run all unit tests
 
-So it's recommended that the following commands should be run before commiting
+So it's recommended that the following commands should be run before committing
 your code.
 
 ```
@@ -34,7 +34,7 @@ Now you are in our CI system, enter `Build Log` to see detailed fail log.
 ![lint](images/lint.png)
 
 This is due to lint error. Apollo adopted Google coding style, so the header
-files shoud be in the suggested order. If you can't find the suggestion, please
+files should be in the suggested order. If you can't find the suggestion, please
 turn the log up and seek carefully.
 
 ### Error: "FAIL: //modules/perception/base:blob_test"

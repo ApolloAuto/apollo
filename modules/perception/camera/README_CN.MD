@@ -40,7 +40,7 @@ $$ -->
 
 最终网络结构图如下所示
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/camera_network.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/camera_network.png" alt="图片名称" width="60%" />
 </div>
 
 ## 训练

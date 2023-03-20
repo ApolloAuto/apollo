@@ -4,7 +4,7 @@
 
 Apollo planning is scenario based, where each driving use case is treated as a different driving scenario.
 
-There are three scenairos, park and go, pull over and valet parking, which related to park planning.
+There are three scenarios, park and go, pull over and valet parking, which related to park planning.
 
 1. park and go: the park and go scenario was designed to handle curb side parking, planning a new trajectory to the next destination and then driving along that trajectory. This scenario is extremely useful in situations like curb-side delivery or passenger pickup or drop-off. 
 
@@ -14,7 +14,7 @@ There are three scenairos, park and go, pull over and valet parking, which relat
 
 # Where is the code
 
-Please refer [park](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park/) & [park and go](https://github.com/ApolloAuto/apollo/modules/planning/scenarios/park_and_go/).
+Please refer [park](../../modules/planning/scenarios/park/) & [park and go](../../modules/planning/scenarios/park_and_go/).
 
 # Code Reading
 
@@ -25,7 +25,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
 2. check stage:
  
-   1. In check stage, by calling ```checkadcreadytocruise()```to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements.
+   1. In check stage, by calling ```CheckADCReadyToCruise()```to check whether ADC's gear info, ADC's velocity, obstacle position, ADC's heading and ADC's lateral station meet the requirements.
    ```cpp
         bool CheckADCReadyToCruise(
             const common::VehicleStateProvider* vehicle_state_provider, Frame* frame,
@@ -69,7 +69,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
         bool ExecuteTaskOnReferenceLine(
             const common::TrajectoryPoint& planning_start_point, Frame* frame);         
    ```
-   2. Then we check whether the lateral distacne between ADC and target line within the threshold.
+   2. Then we check whether the lateral distance between ADC and target line within the threshold.
    ```cpp
         ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
             const ReferenceLineInfo& reference_line_info);
@@ -92,7 +92,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
 
       2. Otherwise we add a stop fence for adc to pause at a better position.
 
-      3. However, if we can't find a suitable new stop fence, approach stage is finished and we switch to retry appoach parking stage. 
+      3. However, if we can't find a suitable new stop fence, approach stage is finished and we switch to retry approach parking stage. 
      ```cpp
           PullOverStatus CheckADCPullOverPathPoint(
                const ReferenceLineInfo& reference_line_info,
@@ -103,7 +103,7 @@ All three scenarios contain specific stages, the function of scenarios are reali
    3. Then we check whether adc parked properly.
       1. If ADC pass the destination or park properly, approach stage is finished and pull over scenario is done.
 
-      2. If adc park failed, approach stage is finished and we switch to retry appoach parking stage.
+      2. If adc park failed, approach stage is finished and we switch to retry approach parking stage.
      ```cpp
         PullOverStatus CheckADCPullOver(
             const common::VehicleStateProvider* vehicle_state_provider,

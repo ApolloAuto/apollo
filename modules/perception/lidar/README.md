@@ -19,7 +19,7 @@ In order to improve the recall of the network, we introduce a pillar-level super
 
 The network structure of the final FPN is shown in the figure below
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/lidar_network.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/lidar_network.png" alt="图片名称" width="60%" />
 </div>
 
 ## Results
@@ -43,7 +43,7 @@ We apply the MMDetection3D framework for training. On the KITTI validation set, 
 
 The detection visualization on KITTI data of PointPillars and our model are shown as below. It can be seen that our model has better detection performance. We can see that truncated and occluded vehicles are recalled by our model.
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/lidar_detection_compare.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/lidar_detection_compare.png" alt="图片名称" width="60%" />
 </div>
 
 

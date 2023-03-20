@@ -19,7 +19,7 @@ This guide provides the following information:
 
 ## Overview
 
-The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.For LiDAR-GNSS calibration, please refer to the [LiDAR-IMU calibration guide](../../10Hardware%20Integration%20and%20Calibration/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/apollo_lidar_imu_calibration_guide.md). Velodyne HDL-64 users can also use the calibration service in Apollo 1.5.
+The new calibration tools in Apollo 2.0 (Camera-to-Camera Calibration, Camera-to-LiDAR Calibration, and Radar-to-Camera Calibration) are provided by an onboard executable program.For LiDAR-GNSS calibration, please refer to the [LiDAR-IMU calibration guide](apollo_lidar_imu_calibration_guide.md). Velodyne HDL-64 users can also use the calibration service in Apollo 1.5.
 The benefit in using these tools is that they reduce the amount of work that the user must do. The user only has to start the corresponding calibration program, and the calibration work is performed and completes in real time. The user can then verify the calibration results, which are provided as `.yaml` files.
 
 ## Preparation
@@ -92,7 +92,7 @@ The following is an example of an initial extrinsic file of Camera-to-LiDAR, whe
 
 ### Calibration Site
 
-Because the Camera-to-LiDAR Calibration method is used in natual environment, a good location can significantly improve the accuracy of the calibration. It is recommended that you select a calibration site that includes objects such as trees, poles, street lights, traffic signs, stationary objects, and clear traffic lines. 
+Because the Camera-to-LiDAR Calibration method is used in natural environment, a good location can significantly improve the accuracy of the calibration. It is recommended that you select a calibration site that includes objects such as trees, poles, street lights, traffic signs, stationary objects, and clear traffic lines. 
 
 Figure 1 is an example of a good choice for a calibration site: 
 

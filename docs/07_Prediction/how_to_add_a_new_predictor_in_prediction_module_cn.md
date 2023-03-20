@@ -77,7 +77,7 @@ obstacle_conf {
 ```
 
 ### 更新预测器管理器（Predictor manager）
-更新 `CreateEvluator( ... )` 如下:
+更新 `CreateEvaluator( ... )` 如下:
 ```cpp
   case ObstacleConf::NEW_PREDICTOR: {
       predictor_ptr.reset(new NewPredictor());
@@ -170,7 +170,7 @@ obstacle_conf {
 ```
 
 ### 更新预测器管理器（Predictor manager）
-更新 `CreateEvluator( ... )` 如下:
+更新 `CreateEvaluator( ... )` 如下:
 ```cpp
   case ObstacleConf::NEW_PREDICTOR: {
       predictor_ptr.reset(new NewPredictor());

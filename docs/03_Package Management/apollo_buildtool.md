@@ -6,7 +6,7 @@ Apollo buildtool is a command line tool, providing functions such as compiling, 
 
 ## Installation
 
-buildtool currently only supports running in the Apollo container environment. If you haven't started the container, you can use apollo enviromnent tool: **aem** to start or enter an Apollo container environment. Or you can also use the traditional way: Apollo scripts setup.
+buildtool currently only supports running in the Apollo container environment. If you haven't started the container, you can use apollo environment tool: **aem** to start or enter an Apollo container environment. Or you can also use the traditional way: Apollo scripts setup.
 The Apollo container environment has pre-installed Apollo core and Apollo buildtool. When you enter the container,  you can enter the following command to check whether buildtool has been installed correctly:
 
 ```shell

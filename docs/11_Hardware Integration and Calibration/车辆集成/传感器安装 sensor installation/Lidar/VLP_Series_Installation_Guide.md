@@ -7,7 +7,7 @@ This guide covers the installation procedure of Puck(VLP16), Puck LITE, Puck Hig
 You can connect to the LiDAR via an interface box which is included in the package.
 
 
-Since the interface box was first introduced with the **HDL32** product line, this installation guide also works for HDL32 Lidars alongwith the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32. 
+Since the interface box was first introduced with the **HDL32** product line, this installation guide also works for HDL32 Lidars along with the following [modification](https://github.com/ApolloAuto/apollo/commit/df37d2c79129434fb90353950a65671278a4229e#diff-cb9767ab272f7dc5b3e0d870a324be51). However, please note that you would need to change the intrinsics for HDL32. 
 
 #### Mounting
 
@@ -23,7 +23,7 @@ A customized mounting structure(s) is required to successfully mount a Puck Seri
 
   Connect the interface box to the IPC using the ethernet cable provided in the cable bundle.
 
-* **Connectionto the GPS**
+* **Connection to the GPS**
 
    The LiDARs in the PUCK series require the recommended minimum specific GPS/Transit data (GPRMC) and Pulse Per Second (PPS) signal to synchronize to the GPS time. A customized connection is needed to establish the communication between the GPS receiver and the LiDAR. Please read your GPS manual for information on how to output those signals.  
 

@@ -5,7 +5,7 @@
 Since there is no native CUDA support in Bazel (Ref:
 [Bazel Issue #6578: Native CUDA Support](https://github.com/bazelbuild/bazel/issues/6578)),
 the Authors of Apollo borrowed CUDA support for Bazel from
-[TensorFlow](https://https://github.com/tensorflow/tensorflow) project.
+[TensorFlow](https://github.com/tensorflow/tensorflow) project.
 
 ## Status
 

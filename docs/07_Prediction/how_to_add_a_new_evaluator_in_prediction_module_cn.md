@@ -80,7 +80,7 @@ obstacle_conf {
 ```
 
 ### 更新评估器管理
-按照如下方式更新`CreateEvluator( ... )` :
+按照如下方式更新`CreateEvaluator( ... )` :
 ```cpp
   case ObstacleConf::NEW_EVALUATOR: {
       evaluator_ptr.reset(new NewEvaluator());
