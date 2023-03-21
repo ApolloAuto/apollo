@@ -281,7 +281,7 @@ class Node(object):
     # @param request_data_type the request message type.
     # @param response_data_type the response message type.
     #
-    # @return the client object.
+    # @return return the client object.
     def create_client(self, name, request_data_type, response_data_type):
         datatype = request_data_type.DESCRIPTOR.full_name
         c = _CYBER.PyNode_create_client(self.node, name,
@@ -306,7 +306,7 @@ class Node(object):
         return 0
 
     ##
-    # @brief create client for the c/s.
+    # @brief create service for the c/s.
     #
     # @param name the service name.
     # @param req_data_type the request message type.
