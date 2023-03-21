@@ -239,7 +239,7 @@ class Node(object):
     # i.e. fn(data, args)
     # @param args additional arguments to pass to the callback
     #
-    # @return return the writer object.
+    # @return return the reader object.
     def create_reader(self, name, data_type, callback, args=None):
         """
         create a channel reader for receive message from another channel.
