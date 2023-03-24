@@ -64,8 +64,52 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   bool traffic_light_no_right_turn_on_red = false;
   PathOverlap* current_traffic_light_overlap = nullptr;
 
+  const auto overlap_ids = GetContext()->current_traffic_light_overlap_ids;
+  const auto traffic_light_detection = frame->local_view().traffic_light;
+  
+  if (traffic_light_detection == nullptr) {
+    // no traffic light detection
+    return Stage::RUNNING;
+  }
+
+  std::vector<std::string> detected_overlap_ids;
+  for(const auto& traffic_light : traffic_light_detection->traffic_light()) {
+    // iterate through all detected traffic lights
+    if (std::find(
+      overlap_ids.begin(), overlap_ids.end(), traffic_light.id())
+      != overlap_ids.end()
+    ){
+      // if the detected traffic light is in overlap_ids
+      // add it to detected_overlap_ids
+      detected_overlap_ids.push_back(traffic_light.id());
+    }
+  }
+
+  if (detected_overlap_ids.size() != 0) {
+    // Only if there is any detected overlap traffic light, mark un-detected ones as done
+    // so their stop fence can be removed.
+    for (const auto& traffic_light_overlap_id : overlap_ids) {
+      if (std::find(
+        detected_overlap_ids.begin(),
+        detected_overlap_ids.end(),
+        traffic_light_overlap_id
+      ) == detected_overlap_ids.end()) {
+        // if an overlapping id is not in detected_overlap_ids
+        // it means the traffic light is not detected
+        // add it to done_traffic_light_overlap_id so its stop fence can be removed
+        injector_->planning_context()
+          ->mutable_planning_status()
+          ->mutable_traffic_light()
+          ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
+      }
+    }
+  } else {
+    // If no traffic light is detected, return RUNNING
+    return Stage::RUNNING;
+  }
+
   for (const auto& traffic_light_overlap_id :
-       GetContext()->current_traffic_light_overlap_ids) {
+       detected_overlap_ids) {
     // get overlap along reference line
     current_traffic_light_overlap = scenario::util::GetOverlapOnReferenceLine(
         reference_line_info, traffic_light_overlap_id,
