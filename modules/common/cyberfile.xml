@@ -4,7 +4,7 @@
   <description>
     This module contains code that is not specific to any module but is useful for the functioning of Apollo.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -13,7 +13,7 @@
 
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/common</src_path>
-  
+
   <depend expose="False">3rd-rules-python-dev</depend>
   <depend expose="False">3rd-grpc-dev</depend>
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>

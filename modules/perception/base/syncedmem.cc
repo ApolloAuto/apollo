@@ -77,7 +77,7 @@ SyncedMemory::SyncedMemory(bool use_cuda)
       device_(-1) {
 #if USE_GPU == 1
 #ifdef PERCEPTION_DEBUG
-  BASE_CUDA_CHECK(cudaGetDevice(&device_));
+  BASE_GPU_CHECK(cudaGetDevice(&device_));
 #endif
 #endif
 }
@@ -93,7 +93,7 @@ SyncedMemory::SyncedMemory(size_t size, bool use_cuda)
       device_(-1) {
 #if USE_GPU == 1
 #ifdef PERCEPTION_DEBUG
-  BASE_CUDA_CHECK(cudaGetDevice(&device_));
+  BASE_GPU_CHECK(cudaGetDevice(&device_));
 #endif
 #endif
 }
@@ -106,7 +106,7 @@ SyncedMemory::~SyncedMemory() {
 
 #if USE_GPU == 1
   if (gpu_ptr_ && own_gpu_data_) {
-    BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
+    BASE_GPU_CHECK(cudaFree(gpu_ptr_));
   }
 #endif  // USE_GPU
 }
@@ -130,7 +130,7 @@ inline void SyncedMemory::to_cpu() {
         PerceptionMallocHost(&cpu_ptr_, size_, cpu_malloc_use_cuda_);
         own_cpu_data_ = true;
       }
-      BASE_CUDA_CHECK(cudaMemcpy(cpu_ptr_, gpu_ptr_, size_, cudaMemcpyDefault));
+      BASE_GPU_CHECK(cudaMemcpy(cpu_ptr_, gpu_ptr_, size_, cudaMemcpyDefault));
       head_ = SYNCED;
 #else
       NO_GPU;
@@ -147,17 +147,17 @@ inline void SyncedMemory::to_gpu() {
 #if USE_GPU == 1
   switch (head_) {
     case UNINITIALIZED:
-      BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
-      BASE_CUDA_CHECK(cudaMemset(gpu_ptr_, 0, size_));
+      BASE_GPU_CHECK(cudaMalloc(&gpu_ptr_, size_));
+      BASE_GPU_CHECK(cudaMemset(gpu_ptr_, 0, size_));
       head_ = HEAD_AT_GPU;
       own_gpu_data_ = true;
       break;
     case HEAD_AT_CPU:
       if (gpu_ptr_ == nullptr) {
-        BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+        BASE_GPU_CHECK(cudaMalloc(&gpu_ptr_, size_));
         own_gpu_data_ = true;
       }
-      BASE_CUDA_CHECK(cudaMemcpy(gpu_ptr_, cpu_ptr_, size_, cudaMemcpyDefault));
+      BASE_GPU_CHECK(cudaMemcpy(gpu_ptr_, cpu_ptr_, size_, cudaMemcpyDefault));
       head_ = SYNCED;
       break;
     case HEAD_AT_GPU:
@@ -202,7 +202,7 @@ void SyncedMemory::set_gpu_data(void* data) {
 #if USE_GPU == 1
   ACHECK(data);
   if (own_gpu_data_) {
-    BASE_CUDA_CHECK(cudaFree(gpu_ptr_));
+    BASE_GPU_CHECK(cudaFree(gpu_ptr_));
   }
   gpu_ptr_ = data;
   head_ = HEAD_AT_GPU;
@@ -236,11 +236,11 @@ void SyncedMemory::async_gpu_push(const cudaStream_t& stream) {
   check_device();
   CHECK_EQ(head_, HEAD_AT_CPU);
   if (gpu_ptr_ == nullptr) {
-    BASE_CUDA_CHECK(cudaMalloc(&gpu_ptr_, size_));
+    BASE_GPU_CHECK(cudaMalloc(&gpu_ptr_, size_));
     own_gpu_data_ = true;
   }
   const cudaMemcpyKind put = cudaMemcpyHostToDevice;
-  BASE_CUDA_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
+  BASE_GPU_CHECK(cudaMemcpyAsync(gpu_ptr_, cpu_ptr_, size_, put, stream));
   // Assume caller will synchronize on the stream before use
   head_ = SYNCED;
 }
@@ -254,7 +254,7 @@ void SyncedMemory::check_device() {
   CHECK_EQ(device, device_);
   if (gpu_ptr_ && own_gpu_data_) {
     cudaPointerAttributes attributes;
-    BASE_CUDA_CHECK(cudaPointerGetAttributes(&attributes, gpu_ptr_));
+    BASE_GPU_CHECK(cudaPointerGetAttributes(&attributes, gpu_ptr_));
     CHECK_EQ(attributes.device, device_);
   }
 #endif

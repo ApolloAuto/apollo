@@ -23,7 +23,7 @@ install(
         "//modules/common/kv_db:install",
         "//modules/common/latency_recorder:install",
         "//modules/common/math:install",
-	"//modules/common/status:install",
+	    "//modules/common/status:install",
         "//modules/common/monitor_log:install",
         "//modules/common/util:install",
         "//modules/common/vehicle_state:install",

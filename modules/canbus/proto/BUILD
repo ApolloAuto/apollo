@@ -61,7 +61,7 @@ install_files(
     dest = "canbus/python/modules/canbus/proto",
     files = [
         ":vehicle_parameter_py_pb2",
-        ":canbus_conf_py_pb2" 
+        ":canbus_conf_py_pb2"
     ]
 )
 

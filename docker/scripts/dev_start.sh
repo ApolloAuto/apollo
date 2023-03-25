@@ -33,6 +33,10 @@ TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
 USER_VERSION_OPT=
 
+ROCM_DOCKER_REPO="rocmapollo/apollo"
+VERSION_ROCM_X86_64="dev-x86_64-rocm-18.04-20221027_0916"
+TESTING_VERSION_ROCM_X86_64="dev-x86_64-rocm-18.04-testing"
+
 FAST_MODE="no"
 
 GEOLOC=
@@ -153,14 +157,20 @@ function parse_arguments() {
 }
 
 function determine_dev_image() {
+    local docker_repo="${DOCKER_REPO}"
     local version="$1"
     # If no custom version specified
     if [[ -z "${version}" ]]; then
         if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-            if [[ "${CUSTOM_DIST}" == "testing" ]]; then
-                version="${TESTING_VERSION_X86_64}"
-            else
-                version="${VERSION_X86_64}"
+            if [[ ${USE_AMD_GPU} == 1 ]]; then
+                docker_repo="${ROCM_DOCKER_REPO}"
+                version="${VERSION_ROCM_X86_64}"
+            elif (($USE_NVIDIA_GPU == 1)) || (($USE_GPU_HOST == 0)); then
+                if [[ "${CUSTOM_DIST}" == "testing" ]]; then
+                    version="${TESTING_VERSION_X86_64}"
+                else
+                    version="${VERSION_X86_64}"
+                fi
             fi
         elif [[ "${TARGET_ARCH}" == "aarch64" ]]; then
             version="${VERSION_AARCH64}"
@@ -169,7 +179,7 @@ function determine_dev_image() {
             exit 3
         fi
     fi
-    DEV_IMAGE="${DOCKER_REPO}:${version}"
+    DEV_IMAGE="${docker_repo}:${version}"
 }
 
 function check_host_environment() {
@@ -365,7 +375,7 @@ function mount_other_volumes() {
     local lane_detection_image="${DOCKER_REPO}:lane_detection_model-${TARGET_ARCH}-latest"
     local lane_detection_path="/apollo/modules/perception/production/data/perception/camera/models/lane_detector/darkSCNN_caffe"
     docker_restart_volume "${lane_detection_volume}" "${lane_detection_image}" "${lane_detection_path}"
-    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}" 
+    volume_conf="${volume_conf} --volume ${lane_detection_volume}:${lane_detection_path}"
 
     # SMOKE
     if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
@@ -389,6 +399,12 @@ function main() {
         check_agreement
     fi
 
+    info "Determine whether host GPU is available ..."
+    determine_gpu_use_host
+    info "USE_GPU_HOST: ${USE_GPU_HOST}"
+    info "USE_AMD_GPU: ${USE_AMD_GPU}"
+    info "USE_NVIDIA_GPU: ${USE_NVIDIA_GPU}"
+
     determine_dev_image "${USER_VERSION_OPT}"
     geo_specific_config "${GEOLOC}"
 
@@ -403,10 +419,6 @@ function main() {
 
     info "Remove existing Apollo Development container ..."
     remove_container_if_exists ${DEV_CONTAINER}
-
-    info "Determine whether host GPU is available ..."
-    determine_gpu_use_host
-    info "USE_GPU_HOST: ${USE_GPU_HOST}"
 
     local local_volumes=
     setup_devices_and_mount_local_volumes local_volumes

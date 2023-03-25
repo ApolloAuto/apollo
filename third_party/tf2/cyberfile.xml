@@ -4,7 +4,7 @@
   <description>
     Apollo packaged tf2 Lib.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -14,5 +14,5 @@
 
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/tf2</src_path>
-  
+
 </package>

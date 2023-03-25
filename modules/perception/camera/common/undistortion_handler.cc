@@ -17,9 +17,7 @@
 
 #include <vector>
 
-#if USE_GPU == 1
-#include <npp.h>
-#endif
+#include "modules/perception/camera/common/image_data_operations.h"
 
 #include "Eigen/Dense"
 
@@ -94,40 +92,7 @@ bool UndistortionHandler::Handle(const base::Image8U &src_img,
     return false;
   }
 
-  NppiInterpolationMode remap_mode = NPPI_INTER_LINEAR;
-  NppiSize image_size;
-  image_size.width = width_;
-  image_size.height = height_;
-  NppiRect remap_roi = {0, 0, width_, height_};
-
-  NppStatus status;
-  int d_map_step = static_cast<int>(d_mapx_.shape(1) * sizeof(float));
-  switch (src_img.channels()) {
-    case 1:
-      status = nppiRemap_8u_C1R(
-          src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
-          d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
-          dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);
-      break;
-    case 3:
-      status = nppiRemap_8u_C3R(
-          src_img.gpu_data(), image_size, src_img.width_step(), remap_roi,
-          d_mapx_.gpu_data(), d_map_step, d_mapy_.gpu_data(), d_map_step,
-          dst_img->mutable_gpu_data(), dst_img->width_step(), image_size,
-          remap_mode);
-      break;
-    default:
-      AERROR << "Invalid number of channels: " << src_img.channels();
-      return false;
-  }
-
-  if (status != NPP_SUCCESS) {
-    AERROR << "NPP_CHECK_NPP - status = " << status;
-    return false;
-  }
-
-  return true;
+  return imageRemap(src_img, dst_img, width_, height_, d_mapx_, d_mapy_);
 }
 
 bool UndistortionHandler::Release(void) {

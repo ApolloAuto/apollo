@@ -252,19 +252,11 @@ function run_bazel_build() {
 }
 
 function main() {
-  if ! "${APOLLO_IN_DOCKER}"; then
-    error "The build operation must be run from within docker container"
-    exit 1
-  fi
   parse_cmdline_arguments "$@"
-  determine_cpu_or_gpu_build
-
-  run_bazel_build
-
+  run_bazel "Build"
   if [ -z "${SHORTHAND_TARGETS}" ]; then
     SHORTHAND_TARGETS="apollo"
   fi
-
   success "Done building ${SHORTHAND_TARGETS}. Enjoy!"
 }
 

@@ -4,7 +4,7 @@
   <description>
     Compared with previous versions, Apollo 7.0 adds a  new dead end scenario, adds the "three-point turn",  increases vehicle driving in and out ability, and expands the operation boundary of the urban road network. The "three-point turn" function is based on the open space planner framework and includes the following parts: scene conversion of dead ends, construction of open space ROI, and "three-point turn" trajectory planning.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -44,5 +44,5 @@
   <depend expose="False">3rd-gpus-dev</depend>
 
   <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
-  
+
 </package>

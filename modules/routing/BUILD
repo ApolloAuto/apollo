@@ -70,7 +70,7 @@ install(
         "//modules/routing/topo_creator:install",
         "//modules/routing/tools/routing_tester:install",
         "//modules/routing/tools:install",
-        "//modules/routing/proto:py_pb_routing" 
+        "//modules/routing/proto:py_pb_routing"
     ],
 )
 
@@ -112,5 +112,5 @@ install_src_files(
     src_dir = ["."],
     dest = "routing/include",
     filter = "*.h",
-) 
+)
 cpplint()

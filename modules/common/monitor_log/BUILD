@@ -21,7 +21,7 @@ cc_binary(
     deps = [
         ":monitor_log_buffer",
         ":monitor_logger",
-	"//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
+	    "//modules/common_msgs/monitor_msgs:monitor_log_cc_proto",
     ],
 )
 

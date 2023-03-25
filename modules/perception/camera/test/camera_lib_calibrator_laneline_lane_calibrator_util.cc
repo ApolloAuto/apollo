@@ -56,7 +56,7 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
   int yl = vanishing_row;
   int xr = w - 1;
   int yr = vanishing_row;
-  cv::line(*image, cvPoint(xl, yl), cvPoint(xr, yr), color, 1);
+  cv::line(*image, cv::Point(xl, yl), cv::Point(xr, yr), color, 1);
   return true;
 }
 
@@ -155,7 +155,7 @@ void draw_lane_pts(const std::vector<Eigen::Vector2f> &lane_pts,
   for (auto &pt : lane_pts) {
     int xc = common::IRound(pt(0));
     int yc = common::IRound(pt(1));
-    cv::circle(*image, cvPoint(xc, yc), 3, color);
+    cv::circle(*image, cv::Point(xc, yc), 3, color);
   }
 }
 

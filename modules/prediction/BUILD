@@ -77,7 +77,7 @@ install(
         "//modules/prediction/common:install",
         "//modules/prediction/submodules:install",
         ":prediction_testdata_install",
-        "//modules/prediction/proto:py_pb_prediction", 
+        "//modules/prediction/proto:py_pb_prediction",
     ],
 )
 

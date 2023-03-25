@@ -1,10 +1,10 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cuda_library(
+gpu_library(
     name = "similar_cuda",
     srcs = ["similar.cu"],
     hdrs = ["similar.h"],
@@ -13,8 +13,11 @@ cuda_library(
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/camera/common:util",
         "//modules/perception/inference/utils:inference_gemm_lib",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(

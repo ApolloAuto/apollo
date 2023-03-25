@@ -1,7 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_gpu", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
@@ -261,14 +260,18 @@ cc_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "planning_block",
     srcs = ["planning_block.cu"],
     hdrs = ["planning_block.h"],
     deps = [
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_test(
@@ -294,7 +297,11 @@ cc_test(
         ":distance_approach_ipopt_cuda_interface",
         "//cyber",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
     linkstatic = True,
 )
 
@@ -308,7 +315,11 @@ cc_test(
         ":distance_approach_problem",
         "//cyber",
         "@com_google_googletest//:gtest_main",
-    ] + if_gpu(["@local_config_cuda//cuda:cudart"]),
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
     linkstatic = True,
 )
 
