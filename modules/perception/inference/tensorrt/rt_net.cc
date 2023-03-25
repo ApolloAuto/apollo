@@ -59,7 +59,7 @@ namespace inference {
 void RTNet::ConstructMap(const LayerParameter &layer_param,
                          nvinfer1::ILayer *layer, TensorMap *tensor_map,
                          TensorModifyMap *tensor_modify_map) {
-  for (int i = 0; i < layer_param.top_size(); i++) {
+  for (int i = 0; i < layer_param.top_size(); ++i) {
     std::string top_name = layer_param.top(i);
     TensorModifyMap::iterator it;
     it = tensor_modify_map->find(top_name);
@@ -150,12 +150,12 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
 #if LOAD_DEBUG
   auto tmp_out_dims = convLayer->getOutput(0)->getDimensions();
   std::string dim_string = "input: ";
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; ++i) {
     absl::StrAppend(&dim_string, " ",
                     convLayer->getInput(0)->getDimensions().d[i]);
   }
   absl::StrAppend(&dim_string, " | output: ");
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; ++i) {
     absl::StrAppend(&dim_string, " ", tmp_out_dims.d[i]);
   }
   AINFO << layer_param.name() << dim_string;
@@ -195,7 +195,7 @@ void RTNet::addDeconvLayer(const LayerParameter &layer_param,
 
 #if LOAD_DEBUG
   std::string dim_string = "input: ";
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; ++i) {
     absl::StrAppend(&dim_string, " ", inputs[0]->getDimensions().d[i]);
   }
   absl::StrAppend(&dim_string, " | output: ");
@@ -247,9 +247,9 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
 
 #if LOAD_DEBUG
   std::string dim_string = "";
-  for (int i = 0; i < nbInputs; i++) {
+  for (int i = 0; i < nbInputs; ++i) {
     auto dim_tmp = inputs[i]->getDimensions();
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; ++i) {
       absl::StrAppend(&dim_string, " ", dim_tmp.d[i]);
     }
     AINFO << layer_param.name() << ": " << layer_param.bottom(i) << " "
@@ -349,7 +349,7 @@ void RTNet::addScaleLayer(const LayerParameter &layer_param,
   } else {
     ACHECK(weight_map->find(layer_param.name().c_str()) != weight_map->end());
     for (size_t i = 0; i < (*weight_map)[layer_param.name().c_str()].size();
-         i++) {
+         ++i) {
       lw[i] = (*weight_map)[layer_param.name().c_str()][i];
     }
   }
@@ -622,9 +622,9 @@ bool RTNet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
     AFATAL << "open file " << model_file << " failed";
     return false;
   }
-  for (int i = 0; i < net.layer_size(); i++) {
+  for (int i = 0; i < net.layer_size(); ++i) {
     std::vector<nvinfer1::Weights> lw;
-    for (int j = 0; j < net.layer(i).blobs_size(); j++) {
+    for (int j = 0; j < net.layer(i).blobs_size(); ++j) {
       // val memory will be released when deconstructor is called
       auto blob = &(net.layer(i).blobs(j));
       CHECK_EQ(blob->double_data_size(), 0);
@@ -654,14 +654,14 @@ void RTNet::mergeBN(int index, LayerParameter *layer_param) {
   auto epsilon = layer_param->batch_norm_param().eps();
   if (index == 0) {
     const BlobProto *var = (layer_param->mutable_blobs(index + 1));
-    for (int k = 0; k < size; k++) {
+    for (int k = 0; k < size; ++k) {
       auto data = blob->data(k);
       blob->set_data(
           k, static_cast<float>(-data * scale_factor /
                                 sqrt(var->data(k) * scale_factor + epsilon)));
     }
   } else if (index == 1) {
-    for (int k = 0; k < size; k++) {
+    for (int k = 0; k < size; ++k) {
       blob->set_data(k, 1.0f / static_cast<float>(sqrt(
                                    blob->data(k) * scale_factor + epsilon)));
     }
@@ -672,7 +672,7 @@ nvinfer1::Weights RTNet::loadLayerWeights(const float *data, int size) {
   std::shared_ptr<float> val;
   val.reset(new float[size]);
   weights_mem_.push_back(val);
-  for (int k = 0; k < size; k++) {
+  for (int k = 0; k < size; ++k) {
     val.get()[k] = data[k];
   }
   wt.values = val.get();
@@ -684,7 +684,7 @@ nvinfer1::Weights RTNet::loadLayerWeights(float data, int size) {
   std::shared_ptr<float> val;
   val.reset(new float[size]);
   weights_mem_.push_back(val);
-  for (int k = 0; k < size; k++) {
+  for (int k = 0; k < size; ++k) {
     val.get()[k] = data;
   }
   wt.values = val.get();
@@ -771,7 +771,7 @@ bool RTNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     AINFO << "must use gpu mode";
     return false;
   }
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
   // stream will only be destoried for gpu_id_ >= 0
   cudaStreamCreate(&stream_);
 
@@ -824,7 +824,7 @@ bool RTNet::addInput(const TensorDimsMap &tensor_dims_map,
       auto shape = shapes.at(dims_pair.first);
       if (static_cast<int>(shape.size()) == dims_pair.second.nbDims + 1) {
         max_batch_size_ = std::max(max_batch_size_, shape[0]);
-        for (int i = 0; i < dims_pair.second.nbDims; i++) {
+        for (int i = 0; i < dims_pair.second.nbDims; ++i) {
           dims_pair.second.d[i] = shape[i + 1];
         }
       }
@@ -849,7 +849,7 @@ void RTNet::parse_with_api(
   addInput(tensor_dims_map, shapes, &tensor_map);
   for (auto layer_param : order) {
     std::vector<nvinfer1::ITensor *> inputs;
-    for (int j = 0; j < layer_param.bottom_size(); j++) {
+    for (int j = 0; j < layer_param.bottom_size(); ++j) {
       CHECK_NOTNULL(tensor_map[tensor_modify_map_[layer_param.bottom(j)]]);
       inputs.push_back(tensor_map[tensor_modify_map_[layer_param.bottom(j)]]);
     }
@@ -877,7 +877,7 @@ RTNet::~RTNet() {
     delete calibrator_;
   }
   if (gpu_id_ >= 0) {
-    BASE_CUDA_CHECK(cudaStreamDestroy(stream_));
+    BASE_GPU_CHECK(cudaStreamDestroy(stream_));
     network_->destroy();
     builder_->destroy();
     context_->destroy();
@@ -888,8 +888,8 @@ RTNet::~RTNet() {
 }
 
 void RTNet::Infer() {
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamSynchronize(stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamSynchronize(stream_));
   for (auto name : input_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
@@ -909,7 +909,7 @@ void RTNet::Infer() {
     }
   }
   context_->enqueue(max_batch_size_, &buffers_[0], stream_, nullptr);
-  BASE_CUDA_CHECK(cudaStreamSynchronize(stream_));
+  BASE_GPU_CHECK(cudaStreamSynchronize(stream_));
 
   for (auto name : output_names_) {
     auto blob = get_blob(name);

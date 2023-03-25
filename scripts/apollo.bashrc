@@ -34,13 +34,15 @@ export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export TAB="    " # 4 spaces
 
+export GPU_SETUP_COMPLETED
+
 source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
 
 : ${VERBOSE:=yes}
 
 BOLD='\033[1m'
 RED='\033[0;31m'
-BLUE='\033[0;34m'
+BLUE='\033[1;34;48m'
 GREEN='\033[32m'
 WHITE='\033[34m'
 YELLOW='\033[33m'
@@ -91,25 +93,60 @@ function fail() {
 
 function determine_gpu_use_target() {
   local arch="$(uname -m)"
+  local gpu_platform="UNKNOWN"
   local use_gpu=0
-
-  if [[ "${arch}" == "aarch64" ]]; then
-    if lsmod | grep -q nvgpu; then
-      if ldconfig -p | grep -q cudart; then
-        use_gpu=1
+  local nv=0
+  local amd=0
+  local need_cuda=0
+  local need_rocm=0
+  if [[ "$USE_GPU_TARGET" != "0" ]]; then
+      if [[ "${arch}" == "aarch64" ]]; then
+        if lsmod | grep -q nvgpu; then
+          if ldconfig -p | grep -q cudart; then
+            use_gpu=1
+          fi
+        fi
+      else ## x86_64 mode
+        # Check the existence of nvidia-smi and rocm-smi
+        if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+          nv=1
+          info ${YELLOW}"No nvidia-smi found."${NO_COLOR}
+        elif [[ -z "$(nvidia-smi)" ]]; then
+          nv=2
+          info ${YELLOW}"No NVIDIA GPU device found."${NO_COLOR}
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+          amd=1
+          info ${YELLOW}"No rocm-smi found."${NO_COLOR}
+        elif [[ -z "$(rocm-smi)" ]]; then
+          amd=2
+          info ${YELLOW}"No AMD GPU device found."${NO_COLOR}
+        fi
+        if (( $nv == 0 )); then
+          use_gpu=1
+          need_cuda=1
+          gpu_platform="NVIDIA"
+          info ${GREEN}"NVIDIA GPU device found."${NO_COLOR}
+        elif (( $amd == 0 )); then
+          use_gpu=1
+          need_rocm=1
+          gpu_platform="AMD"
+        else
+          gpu_platform="UNKNOWN"
+          warning ${YELLOW}"No any GPU device found."${NO_COLOR}
+        fi
+        if (( $amd == 0 )); then
+          info ${GREEN}"AMD GPU device found."${NO_COLOR}
+        fi
+        if (( $nv == 0)) && (( $amd == 0 )); then
+          info ${GREEN}"NVIDIA GPU device is chosen for the build."${NO_COLOR}
+        fi
       fi
-    fi
-  else ## x86_64 mode
-    # Check the existence of nvidia-smi
-    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-      warning "nvidia-smi not found. CPU will be used."
-    elif [[ -z "$(nvidia-smi)" ]]; then
-      warning "No GPU device found. CPU will be used."
-    else
-      use_gpu=1
-    fi
   fi
+  export TF_NEED_CUDA="${need_cuda}"
+  export TF_NEED_ROCM="${need_rocm}"
   export USE_GPU_TARGET="${use_gpu}"
+  export GPU_PLATFORM="${gpu_platform}"
 }
 
 function file_ext() {
@@ -271,25 +308,24 @@ function optarg_check_for_opt() {
 }
 
 function setup_gpu_support() {
-  if [ -e /usr/local/cuda/ ]; then
-    pathprepend /usr/local/cuda/bin
-  fi
-
-  determine_gpu_use_target
-
-  # TODO(infra): revisit this for CPU builds on GPU capable machines
-  local dev="cpu"
-  if [ "${USE_GPU_TARGET}" -gt 0 ]; then
-    dev="gpu"
-  fi
-
-  local torch_path="/usr/local/libtorch_${dev}/lib"
-  if [ -d "${torch_path}" ]; then
-    # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
-    pathprepend ${torch_path} LD_LIBRARY_PATH
+  if [ -z "${GPU_SETUP_COMPLETED}" ]; then
+    GPU_SETUP_COMPLETED=1
+    if [ -e /usr/local/cuda/ ]; then
+      pathprepend /usr/local/cuda/bin
+    fi
+    determine_gpu_use_target
+    local dev="cpu"
+    if [ "${USE_GPU_TARGET}" -gt 0 ]; then
+      dev="gpu"
+    fi
+    local torch_path="/usr/local/libtorch_${dev}/lib"
+    if [ -d "${torch_path}" ]; then
+      # Runtime default: for ./bazel-bin/xxx/yyy to work as expected
+      pathprepend ${torch_path} LD_LIBRARY_PATH
+    fi
   fi
 }
 
 if ${APOLLO_IN_DOCKER} ; then
-    setup_gpu_support
+  setup_gpu_support
 fi

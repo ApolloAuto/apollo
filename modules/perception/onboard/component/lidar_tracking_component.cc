@@ -139,7 +139,7 @@ bool LidarTrackingComponent::InternalProc(
   // track_options.sensor_name = sensor_name;
   // lidar::LidarProcessResult ret =
   //     tracker_->Process(track_options, lidar_frame.get());
-  // PERF_BLOCK_END_WITH_INDICATOR(sensor_name,"recognition_1::track_obstacle");
+  // PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "recognition_1::track_obstacle");
   // if (ret.error_code != lidar::LidarErrorCode::Succeed) {
   //   out_message->error_code_ =
   //       apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;

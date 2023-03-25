@@ -3,17 +3,17 @@
 ## Build Apollo
 
 First check to make sure you are in development docker container before you
-proceed. Make sure nVidia GPU is available and that you have installed the
-appropriate nVidia driver if you want to run the entire system. You could still
-proceed with the next few steps if no nVidia GPU is available, the system will
-run without perception as it was CUDA-based.
+proceed. Make sure nVidia/AMD GPU is available and that you have installed the
+appropriate nVidia/ROCm driver if you want to run the entire system. You could still
+proceed with the next few steps if no GPU is available, the system will
+run without perception as it was CUDA/HIP-based.
 
 ```
 # Make sure you start up clean
 ./apollo.sh clean
 
-# This will build the full system and requires nVidia GPU with nVidia drivers
-# loaded. If no GPU is availabe, please run "./apollo.sh build_opt" instead.
+# This will build the full system and requires nVidia/AMD GPU with nVidia/AMD
+# drivers loaded. If no GPU is availabe, please run "./apollo.sh build_opt" instead.
 ./apollo.sh build_opt_gpu
 ```
 

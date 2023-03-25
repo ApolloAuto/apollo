@@ -9,7 +9,7 @@ stage_type: OMT_OBSTACLE_TRACKER
 stage_config: {
   stage_type: OMT_OBSTACLE_TRACKER
   enabled: true
-  
+
   omt_param {
     img_capability: 14
     lost_age: 3
@@ -105,7 +105,7 @@ stage_config: {
 stage_config: {
   stage_type: OMT_OBSTACLE_TRACKER
   enabled: true
-  
+
   omt_param {
     img_capability: 14
     lost_age: 3
@@ -208,7 +208,7 @@ stage_config: {
 stage_config: {
   stage_type: OMT_OBSTACLE_TRACKER
   enabled: true
-  
+
   omt_param {
     img_capability: 14
     lost_age: 3
@@ -290,7 +290,7 @@ stage_config: {
 stage_config: {
   stage_type: OMT_OBSTACLE_TRACKER
   enabled: true
-  
+
   omt_param {
     img_capability: 14
     lost_age: 3

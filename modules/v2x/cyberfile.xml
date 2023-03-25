@@ -4,7 +4,7 @@
   <description>
     Apollo v2x module.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -25,6 +25,6 @@
   <depend repo_name="boost">3rd-boost-dev</depend>
   <depend repo_name="com_google_absl" lib_names="absl">3rd-absl-dev</depend>
   <depend repo_name="eigen">3rd-eigen3-dev</depend>
-  
+
 
 </package>

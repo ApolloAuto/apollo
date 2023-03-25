@@ -39,7 +39,7 @@ function run_cpp_lint() {
     cpp_dirs="${cpp_dirs} modules"
   fi
   for prey in $(find ${cpp_dirs} -name BUILD \
-    | xargs grep -l -E 'cc_library|cc_test|cc_binary|cuda_library' \
+    | xargs grep -l -E 'cc_library|cc_test|cc_binary|gpu_library' \
     | xargs grep -L 'cpplint()'); do
     warning "unattended BUILD file found: ${prey}. Add cpplint() automatically."
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' "${prey}"

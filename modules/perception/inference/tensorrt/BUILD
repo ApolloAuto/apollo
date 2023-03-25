@@ -98,6 +98,7 @@ cc_library(
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
         "@opencv//:imgcodecs",
+        "//modules/perception/base:common",
     ],
 )
 

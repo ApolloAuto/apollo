@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -24,7 +24,12 @@ cc_library(
         "@centerpoint_infer_op",
         "@eigen",
         "@local_config_pcl//:pcl",
+    ] + if_cuda([
         "@local_config_tensorrt//:tensorrt",
+    ])+ if_rocm([
+        "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:migraphx",
+    ])+ [
         "@paddleinference//:paddleinference_lib",
     ],
     alwayslink = True,

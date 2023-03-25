@@ -56,6 +56,7 @@ class CameraDetectionPostprocessor : public pipeline::Stage {
 
   std::unique_ptr<CameraGetObject> camera_get_object_;
 };  // class CameraDetectionPostprocessor
+
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo

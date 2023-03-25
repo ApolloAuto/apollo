@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -184,13 +184,13 @@ install(
     ),
     data = [
         ":runtime_data",
-        
+
     ] + if_gpu(
         ["planning-gpu.BUILD", "cyberfile_gpu.xml",],
         ["planning.BUILD", "cyberfile_cpu.xml",]
     ),
     rename= if_gpu(
-        {"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"}, 
+        {"planning-gpu/cyberfile_gpu.xml": "cyberfile.xml"},
         {"planning/cyberfile_cpu.xml": "cyberfile.xml"}
     ),
     targets = [

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//third_party/gpus:common.bzl", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -50,8 +51,11 @@ cc_library(
         ":syncedmem",
         "//cyber",
         "@com_google_absl//:absl",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+    ]),
 )
 
 cc_test(
@@ -62,8 +66,11 @@ cc_test(
         ":blob",
         "//modules/perception/base/test:test_helper",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(
@@ -112,8 +119,11 @@ cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_test(
@@ -123,8 +133,11 @@ cc_test(
     deps = [
         ":common",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+    ]),
 )
 
 cc_library(
@@ -367,8 +380,11 @@ cc_library(
     deps = [
         ":common",
         "//cyber",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+    ]),
 )
 
 cc_test(
@@ -379,8 +395,11 @@ cc_test(
         ":syncedmem",
         "//modules/perception/base/test:test_helper",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(

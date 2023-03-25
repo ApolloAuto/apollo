@@ -29,18 +29,18 @@ class SLICEPlugin : public nvinfer1::IPlugin {
  public:
   SLICEPlugin(const SliceParameter &param, const nvinfer1::Dims &in_dims) {
     CHECK_GT(param.slice_point_size(), 0);
-    for (int i = 0; i < param.slice_point_size(); i++) {
+    for (int i = 0; i < param.slice_point_size(); ++i) {
       slice_point_.push_back(param.slice_point(i));
     }
     axis_ = std::max(param.axis() - 1, 0);
     input_dims_.nbDims = in_dims.nbDims;
     CHECK_GT(input_dims_.nbDims, 0);
-    for (int i = 0; i < in_dims.nbDims; i++) {
+    for (int i = 0; i < in_dims.nbDims; ++i) {
       input_dims_.d[i] = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
 
-    for (size_t i = 0; i < slice_point_.size(); i++) {
+    for (size_t i = 0; i < slice_point_.size(); ++i) {
       if (i == 0) {
         out_slice_dims_.push_back(slice_point_[i]);
       } else {
@@ -52,8 +52,8 @@ class SLICEPlugin : public nvinfer1::IPlugin {
   }
   SLICEPlugin() {}
   ~SLICEPlugin() {}
-  virtual int initialize() { return 0; }
-  virtual void terminate() {}
+  int initialize() override { return 0; }
+  void terminate() override {}
   int getNbOutputs() const override {
     return static_cast<int>(slice_point_.size()) + 1;
   }
@@ -72,8 +72,8 @@ class SLICEPlugin : public nvinfer1::IPlugin {
 
   size_t getWorkspaceSize(int maxBatchSize) const override { return 0; }
 
-  virtual int enqueue(int batchSize, const void *const *inputs, void **outputs,
-                      void *workspace, cudaStream_t stream);
+  int enqueue(int batchSize, const void *const *inputs, void **outputs,
+              void *workspace, cudaStream_t stream) override;
 
   size_t getSerializationSize() override { return 0; }
 

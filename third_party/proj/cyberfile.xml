@@ -4,7 +4,7 @@
   <description>
     Apollo packaged proj Lib.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -13,5 +13,5 @@
 
   <type>third-binary</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/proj</src_path>
-  
+
 </package>

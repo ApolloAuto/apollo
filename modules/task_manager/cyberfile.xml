@@ -4,7 +4,7 @@
   <description>
     Apollo task_manager module.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -18,7 +18,7 @@
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
   <depend lib_names="protobuf" repo_name="com_google_protobuf">3rd-protobuf-dev</depend>
   <depend expose="False">3rd-rules-proto-dev</depend>
-  
+
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/task_manager</src_path>
 
 </package>

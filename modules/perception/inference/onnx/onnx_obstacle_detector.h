@@ -23,9 +23,11 @@
 #include <utility>
 #include <vector>
 
-#include "NvInfer.h"
-#include "NvOnnxParser.h"
-#include "NvInferVersion.h"
+#if GPU_PLATFORM == NVIDIA
+  #include "NvInfer.h"
+  #include "NvOnnxParser.h"
+  #include "NvInferVersion.h"
+#endif
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/inference/inference.h"
@@ -37,6 +39,7 @@ namespace inference {
 using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
 // Logger for TensorRT info/warning/errors
+#if GPU_PLATFORM == NVIDIA
 class Logger : public nvinfer1::ILogger {
  public:
   explicit Logger(Severity severity = Severity::kWARNING)
@@ -68,6 +71,13 @@ class Logger : public nvinfer1::ILogger {
 
   Severity reportable_severity;
 };
+#elif GPU_PLATFORM == AMD
+  class Logger {};
+namespace nvinfer1 {
+  class ICudaEngine {};
+  class IExecutionContext {};
+}  // namespace nvinfer1
+#endif
 
 class OnnxObstacleDetector : public Inference {
  public:

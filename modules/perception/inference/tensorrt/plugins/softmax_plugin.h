@@ -26,7 +26,7 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
  public:
   SoftmaxPlugin(const SoftmaxParameter &param, nvinfer1::Dims in_dims) {
     input_dims_.nbDims = in_dims.nbDims;
-    for (int i = 0; i < in_dims.nbDims; i++) {
+    for (int i = 0; i < in_dims.nbDims; ++i) {
       input_dims_.d[i] = in_dims.d[i];
       input_dims_.type[i] = in_dims.type[i];
     }
@@ -35,11 +35,11 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
     CHECK_LE(axis_ + 1, input_dims_.nbDims);
 
     inner_num_ = 1;
-    for (int i = axis_ + 1; i < input_dims_.nbDims; i++) {
+    for (int i = axis_ + 1; i < input_dims_.nbDims; ++i) {
       inner_num_ *= input_dims_.d[i];
     }
     outer_num_ = 1;
-    for (int i = 0; i < axis_; i++) {
+    for (int i = 0; i < axis_; ++i) {
       outer_num_ *= input_dims_.d[i];
     }
     cudnnCreateTensorDescriptor(&input_desc_);
@@ -52,12 +52,12 @@ class SoftmaxPlugin : public nvinfer1::IPlugin {
     cudnnDestroyTensorDescriptor(input_desc_);
     cudnnDestroyTensorDescriptor(output_desc_);
   }
-  virtual int initialize() {
+  int initialize() override {
     cudnnCreate(&cudnn_);  // initialize cudnn and cublas
     cublasCreate(&cublas_);
     return 0;
   }
-  virtual void terminate() {
+  void terminate() override {
     cublasDestroy(cublas_);
     cudnnDestroy(cudnn_);
   }

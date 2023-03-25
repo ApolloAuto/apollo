@@ -2,10 +2,10 @@
   <name>cyber</name>
   <version>local</version>
   <description>
-    Apollo Cyber RT is an open source, high performance runtime framework designed specifically for autonomous driving scenarios. 
+    Apollo Cyber RT is an open source, high performance runtime framework designed specifically for autonomous driving scenarios.
     Based on a centralized computing model, it is greatly optimized for high concurrency, low latency, and high throughput in autonomous driving.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -14,7 +14,7 @@
 
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//cyber</src_path>
-  
+
   <depend so_names="ncurses" repo_name="ncurses5">libncurses5-dev</depend>
   <depend so_names="uuid" repo_name="uuid">libuuid1</depend>
 

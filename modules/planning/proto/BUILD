@@ -10,8 +10,8 @@ package(default_visibility = ["//visibility:public"])
 install_files(
     name = "py_pb_planning",
     dest = if_gpu(
-        "planning-gpu/python/modules/planning/proto", 
-        "planning/python/modules/planning/proto", 
+        "planning-gpu/python/modules/planning/proto",
+        "planning/python/modules/planning/proto",
     ),
     files = [
         ":st_drivable_boundary_py_pb2",
@@ -36,8 +36,8 @@ install_files(
 install_files(
     name = "pb_hdrs_planning",
     dest = if_gpu(
-        "planning-gpu/include/proto", 
-        "planning/include/proto", 
+        "planning-gpu/include/proto",
+        "planning/include/proto",
     ),
     files = [
         ":st_drivable_boundary_cc_proto",
@@ -57,7 +57,7 @@ install_files(
         ":open_space_task_config_cc_proto",
         ":planner_open_space_config_cc_proto",
         ":task_config_cc_proto",
-        ":planning_config_cc_proto", 
+        ":planning_config_cc_proto",
     ]
 )
 
