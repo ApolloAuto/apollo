@@ -47,7 +47,7 @@ install(
         "//modules/localization/ndt/map_creation:install",
         "//modules/localization/common:install",
         ":testdata",
-        "//modules/localization/proto:py_pb_localization" 
+        "//modules/localization/proto:py_pb_localization"
     ],
 )
 
@@ -59,7 +59,7 @@ install(
         "//modules/localization/proto:localization_config_cc_proto",
         "//modules/localization/proto:measure_cc_proto",
         "//modules/localization/proto:rtk_config_cc_proto",
-        "//modules/localization/proto:sins_pva_cc_proto", 
+        "//modules/localization/proto:sins_pva_cc_proto",
     ],
 )
 

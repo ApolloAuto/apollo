@@ -22,7 +22,22 @@
 
 #include "NvCaffeParser.h"
 #include "NvInfer.h"
-#include <cudnn.h>
+#if GPU_PLATFORM == NVIDIA
+  #include <cudnn.h>
+#elif GPU_PLATFORM == AMD
+  #include <miopen/miopen.h>
+  #define CUDNN_DATA_FLOAT miopenFloat
+  #define CUDNN_SOFTMAX_ACCURATE MIOPEN_SOFTMAX_ACCURATE
+  #define CUDNN_SOFTMAX_MODE_CHANNEL MIOPEN_SOFTMAX_MODE_CHANNEL
+  #define cudnnCreate miopenCreate
+  #define cudnnCreateTensorDescriptor miopenCreateTensorDescriptor
+  #define cudnnDestroy miopenDestroy
+  #define cudnnDestroyTensorDescriptor miopenDestroyTensorDescriptor
+  #define cudnnHandle_t miopenHandle_t
+  #define cudnnSetStream miopenSetStream
+  #define cudnnSetTensor4dDescriptorEx miopenSet4dTensorDescriptorEx
+  #define cudnnTensorDescriptor_t miopenTensorDescriptor_t
+#endif
 
 #include "modules/perception/proto/rt.pb.h"
 

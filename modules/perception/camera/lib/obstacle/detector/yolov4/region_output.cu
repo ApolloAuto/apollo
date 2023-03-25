@@ -56,10 +56,10 @@ __host__ __device__ float jaccard_overlap_gpu(const float *bbox1,
       bbox2[3] < bbox1[1]) {
     return float(0.);  // NOLINT
   } else {
-    const float inter_xmin = max(bbox1[0], bbox2[0]);
-    const float inter_ymin = max(bbox1[1], bbox2[1]);
-    const float inter_xmax = min(bbox1[2], bbox2[2]);
-    const float inter_ymax = min(bbox1[3], bbox2[3]);
+    const float inter_xmin = fmaxf(bbox1[0], bbox2[0]);
+    const float inter_ymin = fmaxf(bbox1[1], bbox2[1]);
+    const float inter_xmax = fminf(bbox1[2], bbox2[2]);
+    const float inter_ymax = fminf(bbox1[3], bbox2[3]);
 
     const float inter_width = inter_xmax - inter_xmin;
     const float inter_height = inter_ymax - inter_ymin;
@@ -102,10 +102,10 @@ __global__ void get_object_kernel(
     float cx = (w + sigmoid_gpu(loc_data[offset_loc + 0])) / width;
     float cy = (h + sigmoid_gpu(loc_data[offset_loc + 1])) / height;
     float hw =
-        exp(max(minExpPower, min(loc_data[offset_loc + 2], maxExpPower))) *
+        exp(fmaxf(minExpPower, fminf(loc_data[offset_loc + 2], maxExpPower))) *
         anchor_data[2 * c] / width * 0.5;
     float hh =
-        exp(max(minExpPower, min(loc_data[offset_loc + 3], maxExpPower))) *
+        exp(fmaxf(minExpPower, fminf(loc_data[offset_loc + 3], maxExpPower))) *
         anchor_data[2 * c + 1] / height * 0.5;
 
     float max_prob = 0.f;

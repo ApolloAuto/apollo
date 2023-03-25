@@ -4,7 +4,7 @@
   <description>
     Apollo packaged yaml-cpp Lib.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -13,5 +13,5 @@
 
   <type>third-wrapper</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/yaml_cpp</src_path>
-  
+
 </package>

@@ -4,7 +4,7 @@
   <description>
     Canbus accepts and executes control module commands and collects the car's chassis status as feedback to control.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

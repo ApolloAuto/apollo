@@ -2,14 +2,14 @@
   <name>storytelling</name>
   <version>local</version>
   <description>
-    Storytelling is a global and high-level Scenario Manager to help coordinate cross-module actions. In order to safely 
-    operate the autonomous vehicle on urban roads, complex planning scenarios are needed to ensure safe driving. 
+    Storytelling is a global and high-level Scenario Manager to help coordinate cross-module actions. In order to safely
+    operate the autonomous vehicle on urban roads, complex planning scenarios are needed to ensure safe driving.
     These complex scenarios may involve different modules to ensure proper maneuvering. In order to avoid a sequential
     based approach to such scenarios, a new isolated scenario manager, the "Storytelling" module was created. This module
     creates stories which are complex scenarios that would trigger multiple modules' actions. Per some predefined rules,
-    this module creates one or multiple stories and publishes to `/apollo/storytelling` channel. The main advantage of this module is to fine tune the driving experience and also isolate complex scenarios packaging them into stories that can be subscribed to by other modules like Planning, Control etc. 
+    this module creates one or multiple stories and publishes to `/apollo/storytelling` channel. The main advantage of this module is to fine tune the driving experience and also isolate complex scenarios packaging them into stories that can be subscribed to by other modules like Planning, Control etc.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -25,6 +25,6 @@
   <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
 
   <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
-  
+
 
 </package>

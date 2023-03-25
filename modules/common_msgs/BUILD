@@ -120,8 +120,8 @@ install_files(
     dest = "common-msgs/python/modules/common_msgs",
     files = [
         "//modules/common_msgs/audio_msgs:audio_common_py_pb2",
-        "//modules/common_msgs/audio_msgs:audio_event_py_pb2", 
-        "//modules/common_msgs/audio_msgs:audio_py_pb2",  
+        "//modules/common_msgs/audio_msgs:audio_event_py_pb2",
+        "//modules/common_msgs/audio_msgs:audio_py_pb2",
         "//modules/common_msgs/chassis_msgs:chassis_detail_py_pb2",
         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
         "//modules/common_msgs/config_msgs:vehicle_config_py_pb2",

@@ -64,11 +64,11 @@ rm -rf /apollo/.cache/{bazel,build,repos}
 
 * A machine with a 8-core processor and 16GB memory minimum
 
-* NVIDIA Turing GPU is strongly recommended
+* NVIDIA Turing GPU / AMD GFX9/RDNA/CDNA GPU is strongly recommended
 
 * Ubuntu 18.04
 
-* NVIDIA driver version 455.32.00 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us))
+* NVIDIA driver version 455.32.00 and above ([Web link](https://www.nvidia.com/Download/index.aspx?lang=en-us)) or [ROCm v5.1](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1/page/Prerequisite_Actions.html) and above.
 
 * Docker-CE version 19.03 and above ([Official doc](https://docs.docker.com/engine/install/ubuntu/))
 

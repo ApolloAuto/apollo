@@ -15,7 +15,7 @@ install_files(
         "lat_controller_conf_py_pb2",
         "mpc_controller_conf_py_pb2",
         "control_conf_py_pb2",
-        "gain_scheduler_conf_py_pb2", 
+        "gain_scheduler_conf_py_pb2",
         "calibration_table_py_pb2",
         "preprocessor_py_pb2",
         "lon_controller_conf_py_pb2",

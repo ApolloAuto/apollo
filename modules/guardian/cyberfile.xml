@@ -4,7 +4,7 @@
   <description>
     Apollo guardian module.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -24,5 +24,5 @@
   <depend expose="False">3rd-bazel-skylib-dev</depend>
   <depend expose="False">3rd-rules-proto-dev</depend>
   <depend expose="False">3rd-py-dev</depend>
-  
+
 </package>

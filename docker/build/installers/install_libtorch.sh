@@ -57,21 +57,49 @@ ok "Successfully installed libtorch_cpu ${VERSION}"
 
 ##============================================================##
 # libtorch_gpu
-if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
-    VERSION="1.7.0-2"
-    CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
-    PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
-else # AArch64
-    VERSION="1.6.0-1"
-    PKG_NAME="libtorch_gpu-1.6.0-1-linux-aarch64.tar.gz"
-    CHECKSUM="eeb5a223d9dbe40fe96f16e6711c49a3777cea2c0a8da2445d63e117fdad0385"
+
+determine_gpu_use_host
+if [[ "${USE_NVIDIA_GPU}" -eq 1 ]]; then
+    # libtorch_gpu nvidia
+    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        VERSION="1.7.0-2"
+        CHECKSUM="b64977ca4a13ab41599bac8a846e8782c67ded8d562fdf437f0e606cd5a3b588"
+        PKG_NAME="libtorch_gpu-${VERSION}-cu111-linux-x86_64.tar.gz"
+    else # AArch64
+        VERSION="1.6.0-1"
+        PKG_NAME="libtorch_gpu-1.6.0-1-linux-aarch64.tar.gz"
+        CHECKSUM="eeb5a223d9dbe40fe96f16e6711c49a3777cea2c0a8da2445d63e117fdad0385"
+    fi
+
+    DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+
+    tar xzf "${PKG_NAME}"
+    mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu/
+elif [[ "${USE_AMD_GPU}" -eq 1 ]]; then
+    if [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        PKG_NAME="libtorch_amd.tar.gz"
+        FILE_ID="1UMzACmxzZD8KVitEnSk-BhXa38Kkl4P-"
+    else # AArch64
+        error "AMD libtorch for ${TARGET_ARCH} not ready. Exiting..."
+        exit 1
+    fi
+    DOWNLOAD_LINK="https://docs.google.com/uc?export=download&id=${FILE_ID}"
+    wget --load-cookies /tmp/cookies.txt \
+        "https://docs.google.com/uc?export=download&confirm=
+            $(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies \
+            --no-check-certificate ${DOWNLOAD_LINK} \
+            -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=${FILE_ID}" \
+        -O "${PKG_NAME}" && rm -rf /tmp/cookies.txt
+
+    tar xzf "${PKG_NAME}"
+    mv "${PKG_NAME%.tar.gz}/libtorch" /usr/local/libtorch_gpu/
+    mv "${PKG_NAME%.tar.gz}/libtorch_deps/libamdhip64.so.4" /opt/rocm/hip/lib/
+    mv "${PKG_NAME%.tar.gz}/libtorch_deps/libmagma.so" /opt/apollo/sysroot/lib/
+    mv "${PKG_NAME%.tar.gz}/libtorch_deps/"* /usr/local/lib/
+    rm -r "${PKG_NAME%.tar.gz}"
+    ldconfig
 fi
-
-DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
-download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
-
-tar xzf "${PKG_NAME}"
-mv "${PKG_NAME%.tar.gz}" /usr/local/libtorch_gpu
 
 # Cleanup
 rm -f "${PKG_NAME}"

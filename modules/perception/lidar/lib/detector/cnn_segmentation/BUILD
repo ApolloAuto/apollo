@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,7 +17,11 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory",
         "//modules/perception/inference:inference_lib",
+    ] + if_cuda([
         "//modules/perception/inference/tensorrt:rt_net",
+    ]) + if_rocm([
+        "//modules/perception/inference/migraphx:mi_net",
+    ]) + [
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
@@ -57,7 +61,7 @@ cc_library(
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "feature_generator_cuda",
     srcs = ["feature_generator.cu"],
     hdrs = ["feature_generator.h"],
@@ -67,8 +71,11 @@ cuda_library(
         "//modules/perception/lidar/lib/detector/cnn_segmentation/proto:cnnseg_param_cc_proto",
         "@com_google_googletest//:gtest",
         "@eigen",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 cc_library(

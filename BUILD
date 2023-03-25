@@ -133,7 +133,7 @@ install_src_files(
         "//modules/prediction:install_src",
         "//modules/storytelling:install_src",
         "//modules/third_party_perception:install_src",
-        "//modules/tools:install_src",  
+        "//modules/tools:install_src",
         "//third_party/absl:install_src",
         "//third_party/boost:install_src",
         "//third_party/civetweb:install_src",

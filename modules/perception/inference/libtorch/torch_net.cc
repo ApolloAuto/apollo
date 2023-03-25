@@ -15,8 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/inference/libtorch/torch_net.h"
-
-#include <c10/cuda/CUDACachingAllocator.h>
+#include "modules/perception/inference/inference.h"
 
 #include "cyber/common/log.h"
 
@@ -102,7 +101,7 @@ void TorchNet::Infer() {
   torch::Tensor output = net_.forward({tensor_image}).toTensor();
   torch::Tensor prob = torch::softmax(output, 1);
   blobs_[output_names_[0]]->data()->set_gpu_data(prob.data_ptr());
-  c10::cuda::CUDACachingAllocator::emptyCache();
+  emptyCache();
 }
 
 

@@ -88,7 +88,7 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   CHECK_NOTNULL(inference_.get());
 
   gpu_id_ = cnnseg_param_.has_gpu_id() ? cnnseg_param_.gpu_id() : -1;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
   inference_->set_gpu_id(gpu_id_);  // inference sets CPU mode when -1
 
   std::map<std::string, std::vector<int>> input_shapes;
@@ -194,7 +194,7 @@ bool CNNSegmentation::Init(const StageConfig& stage_config) {
   CHECK_NOTNULL(inference_.get());
 
   gpu_id_ = cnnseg_param_.has_gpu_id() ? cnnseg_param_.gpu_id() : -1;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
   inference_->set_gpu_id(gpu_id_);  // inference sets CPU mode when -1
 
   std::map<std::string, std::vector<int>> input_shapes;

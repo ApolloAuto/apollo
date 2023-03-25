@@ -38,6 +38,8 @@ import re
 import subprocess
 import sys
 
+from distutils.util import (strtobool)
+
 # pylint: disable=g-import-not-at-top
 try:
     from shutil import which
@@ -48,7 +50,9 @@ except ImportError:
 _DEFAULT_CUDA_VERSION = '10'
 _DEFAULT_CUDNN_VERSION = '7'
 _DEFAULT_TENSORRT_VERSION = '7'
+_DEFAULT_MIGRAPHX_VERSION = '2'
 _DEFAULT_CUDA_COMPUTE_CAPABILITIES = '3.7,5.2,6.0,6.1,7.0,7.2,7.5'
+_DEFAULT_ROCM_COMPUTE_CAPABILITIES = 'gfx900,gfx906'
 _DEFAULT_PYTHON_LIB_PATH = '/usr/lib/python3/dist-packages'
 
 _DEFAULT_PROMPT_ASK_ATTEMPTS = 3
@@ -63,6 +67,16 @@ _APOLLO_DOCKER_STAGE = "dev"
 
 _INTERACTIVE_MODE = True
 
+class color:
+    GREEN = '\033[32m'
+    RED = '\033[0;31m'
+    BLUE = '\033[1;34;48m'
+    YELLOW = '\033[33m'
+    NO_COLOR = '\033[0m'
+
+_INFO = '[' + color.BLUE + 'INFO' + color.NO_COLOR + '] '
+_WARNING = color.YELLOW + '[WARNING] ' + color.NO_COLOR
+_ERROR = '[' + color.RED + 'ERROR' + color.NO_COLOR + '] '
 
 class UserInputError(Exception):
     pass
@@ -225,16 +239,16 @@ def setup_python_non_interactively(environ_cp):
     # Get PYTHON_BIN_PATH, default is the current running python.
     python_bin_path = sys.executable
     if not os.path.exists(python_bin_path):
-        print('Invalid python path: {} cannot be found.'.format(
+        print((_ERROR + 'Invalid python path: {} cannot be found.').format(
             python_bin_path))
         sys.exit(1)
     if not os.path.isfile(python_bin_path) or not os.access(
             python_bin_path, os.X_OK):
-        print('{} is not executable.'.format(python_bin_path))
+        print((_ERROR + '{} is not executable.').format(python_bin_path))
         sys.exit(1)
     python_major_version = get_python_major_version(python_bin_path)
     if python_major_version != '3':
-        print('Python 2 was Retired on April 2020. Use Python 3 instead.')
+        print(_ERROR + 'Python 2 was retired on April 2020. Use Python 3 instead.')
         sys.exit(1)
 
     environ_cp['PYTHON_BIN_PATH'] = python_bin_path
@@ -242,8 +256,8 @@ def setup_python_non_interactively(environ_cp):
     python_lib_path = environ_cp.get('PYTHON_LIB_PATH')
     if not python_lib_path:
         python_lib_paths = get_python_path(environ_cp, python_bin_path)
-        print('Found possible Python library paths:\n  %s' %
-              '\n  '.join(python_lib_paths))
+        print(_INFO + ('Found possible ' + color.GREEN + 'Python' + color.NO_COLOR + ' library paths:\n       %s') %
+              '\n       '.join(python_lib_paths))
         if _DEFAULT_PYTHON_LIB_PATH in python_lib_paths:
             default_python_lib_path = _DEFAULT_PYTHON_LIB_PATH
         else:
@@ -280,24 +294,24 @@ def setup_python_interactively(environ_cp):
                 python_bin_path, os.X_OK):
             break
         elif not os.path.exists(python_bin_path):
-            print('Invalid python path: {} cannot be found.'.format(
+            print((_ERROR + 'Invalid python path: {} cannot be found.').format(
                 python_bin_path))
         else:
-            print('{} is not executable.  Is it the python binary?'.format(
+            print((_ERROR + '{} is not executable.  Is it the python binary?').format(
                 python_bin_path))
         environ_cp['PYTHON_BIN_PATH'] = ''
 
     python_major_version = get_python_major_version(python_bin_path)
     if python_major_version != '3':
-        print('Python 2 was Retired on April 2020. Use Python 3 instead.')
+        print(_ERROR + 'Python 2 was Retired on April 2020. Use Python 3 instead.')
         sys.exit(1)
 
     # Get PYTHON_LIB_PATH
     python_lib_path = environ_cp.get('PYTHON_LIB_PATH')
     if not python_lib_path:
         python_lib_paths = get_python_path(environ_cp, python_bin_path)
-        print('Found possible Python library paths:\n  %s' %
-              '\n  '.join(python_lib_paths))
+        print(_INFO + ('Found possible Python library paths:\n       %s') %
+              '\n       '.join(python_lib_paths))
         default_python_lib_path = python_lib_paths[0]
         python_lib_path = get_input(
             'Please input the desired Python library path to use.  '
@@ -408,7 +422,7 @@ def get_var(environ_cp,
                 print(no_reply)
                 var = False
         else:
-            print('Invalid selection: {}'.format(user_input_origin))
+            print((_ERROR + 'Invalid selection: {}').format(user_input_origin))
     return var
 
 
@@ -447,7 +461,7 @@ def check_bazel_version(min_version):
         The bazel version detected.
     """
     if which('bazel') is None:
-        print('Cannot find bazel. Please install bazel first.')
+        print(_ERROR + 'Cannot find bazel. Please install bazel first.')
         sys.exit(0)
 
     stderr = open(os.devnull, 'wb')
@@ -461,15 +475,14 @@ def check_bazel_version(min_version):
 
     # Check if current bazel version can be detected properly.
     if not curr_version_int:
-        print('WARNING: current bazel installation is not a release version.')
-        print('Make sure you are running at least bazel %s' % min_version)
+        print(_WARNING + 'Current bazel installation is not a release version.')
+        print('          Make sure you are running at least bazel %s' % min_version)
         return curr_version
 
-    print('You have bazel %s installed.' % curr_version)
+    print((_INFO + 'You have ' + color.GREEN + 'bazel %s' + color.NO_COLOR + ' installed.') % curr_version)
 
     if curr_version_int < min_version_int:
-        print(
-            'Please upgrade your bazel installation to version %s or higher' % min_version)
+        print((_ERROR + 'Please upgrade your bazel installation to version %s or higher') % min_version)
         sys.exit(1)
     return curr_version
 
@@ -586,7 +599,7 @@ def set_gcc_host_compiler_path(environ_cp):
             ask_for_var='Please specify which gcc should be used by nvcc as the host compiler.',
             check_success=os.path.exists,
             resolve_symlinks=True,
-            error_msg='Invalid gcc path. %s cannot be found.',
+            error_msg=_ERROR + 'Invalid gcc path. %s cannot be found.',
         )
 
     write_action_env_to_bazelrc('GCC_HOST_COMPILER_PATH',
@@ -692,6 +705,21 @@ def set_tensorrt_version(environ_cp):
     environ_cp['TF_TENSORRT_VERSION'] = tf_tensorrt_version
 
 
+def set_migraphx_version(environ_cp):
+    """Set TF_MIGRAPHX_VERSION."""
+    if not int(environ_cp.get('TF_NEED_MIGRAPHX', False)):
+        return
+
+    ask_migraphx_version = (
+        'Please specify the MIGraphX version you want to use. '
+        '[Leave empty to default to MIGraphX %s]: '
+    ) % _DEFAULT_MIGRAPHX_VERSION
+    tf_migraphx_version = get_from_env_or_user_or_default(
+        environ_cp, 'TF_MIGRAPHX_VERSION', ask_migraphx_version,
+        _DEFAULT_MIGRAPHX_VERSION)
+    environ_cp['TF_MIGRAPHX_VERSION'] = tf_migraphx_version
+
+
 def set_nccl_version(environ_cp):
     """Set TF_NCCL_VERSION."""
     if 'TF_NCCL_VERSION' in environ_cp:
@@ -723,6 +751,31 @@ def get_native_cuda_compute_capabilities(environ_cp):
             pattern = re.compile('[0-9]*\\.[0-9]*')
             output = [pattern.search(x) for x in output if 'Capability' in x]
             output = ','.join(x.group() for x in output if x is not None)
+        except subprocess.CalledProcessError:
+            output = ''
+    else:
+        output = ''
+    return output
+
+
+def get_native_rocm_compute_capabilities(environ_cp):
+    """Get native rocm compute capabilities.
+
+    Args:
+      environ_cp: copy of the os.environ.
+
+    Returns:
+      string of native rocm compute capabilities , separated by comma.
+      (e.g. "gfx000,gfx906")
+    """
+    device_query_bin = os.path.join(
+        environ_cp.get('ROCM_TOOLKIT_PATH'), 'bin/rocm_agent_enumerator')
+    if os.path.isfile(device_query_bin) and os.access(device_query_bin,
+                                                      os.X_OK):
+        try:
+            output = run_shell(device_query_bin).split('\n')
+
+            output = ','.join(output)
         except subprocess.CalledProcessError:
             output = ''
     else:
@@ -777,15 +830,13 @@ def set_cuda_compute_capabilities(environ_cp):
         for compute_capability in tf_cuda_compute_capabilities.split(','):
             m = re.match('[0-9]+.[0-9]+', compute_capability)
             if not m:
-                print('Invalid compute capability: %s' % compute_capability)
+                print((_ERROR + 'Invalid compute capability: %s') % compute_capability)
                 all_valid = False
             else:
                 ver = float(m.group(0))
                 if ver < 3.5:
-                    print(
-                        'ERROR: We only supports CUDA compute capabilities 3.7 '
-                        'and higher. Please re-specify the list of compute '
-                        'capabilities excluding version %s.' % ver)
+                    print((_ERROR + 'We only supports CUDA compute capabilities 3.7 and higher.'
+                        '        Please re-specify the list of compute capabilities excluding version %s.') % ver)
                     all_valid = False
 
         if all_valid:
@@ -798,6 +849,21 @@ def set_cuda_compute_capabilities(environ_cp):
     environ_cp['TF_CUDA_COMPUTE_CAPABILITIES'] = tf_cuda_compute_capabilities
     write_action_env_to_bazelrc('TF_CUDA_COMPUTE_CAPABILITIES',
                                 tf_cuda_compute_capabilities)
+
+
+def set_rocm_compute_capabilities(environ_cp):
+    """Set TF_ROCM_COMPUTE_CAPABILITIES."""
+    native_rocm_compute_capabilities = get_native_rocm_compute_capabilities(
+        environ_cp)
+    if native_rocm_compute_capabilities:
+        tf_rocm_compute_capabilities = native_rocm_compute_capabilities
+    else:
+        tf_rocm_compute_capabilities = _DEFAULT_ROCM_COMPUTE_CAPABILITIES
+    # Set TF_ROCM_COMPUTE_CAPABILITIES
+    environ_cp['TF_ROCM_COMPUTE_CAPABILITIES'] = tf_rocm_compute_capabilities
+    write_action_env_to_bazelrc('TF_ROCM_COMPUTE_CAPABILITIES',
+                                tf_rocm_compute_capabilities)
+    return
 
 
 def set_other_cuda_vars(environ_cp):
@@ -827,34 +893,80 @@ def validate_cuda_config(environ_cp):
 
     if proc.wait():
         # Errors from find_cuda_config.py were sent to stderr.
-        print('Asking for detailed CUDA configuration...\n')
+        print(_INFO + 'Asking for detailed CUDA configuration...\n')
         return False
 
     config = dict(
         tuple(line.decode('ascii').rstrip().split(': '))
         for line in proc.stdout)
 
-    print('Found CUDA %s in:' % config['cuda_version'])
-    print('    %s' % config['cuda_library_dir'])
-    print('    %s' % config['cuda_include_dir'])
+    print((_INFO + 'Found ' + color.GREEN + 'CUDA %s' + color.NO_COLOR + ' in:') % config['cuda_version'])
+    print('       %s' % config['cuda_library_dir'])
+    print('       %s' % config['cuda_include_dir'])
 
-    print('Found cuDNN %s in:' % config['cudnn_version'])
-    print('    %s' % config['cudnn_library_dir'])
-    print('    %s' % config['cudnn_include_dir'])
+    print((_INFO + 'Found ' + color.GREEN + 'cuDNN %s' + color.NO_COLOR + ' in:') % config['cudnn_version'])
+    print('       %s' % config['cudnn_library_dir'])
+    print('       %s' % config['cudnn_include_dir'])
 
     if 'tensorrt_version' in config:
-        print('Found TensorRT %s in:' % config['tensorrt_version'])
-        print('    %s' % config['tensorrt_library_dir'])
-        print('    %s' % config['tensorrt_include_dir'])
+        print((_INFO + 'Found ' + color.GREEN + 'TensorRT %s' + color.NO_COLOR + ' in:') % config['tensorrt_version'])
+        print('       %s' % config['tensorrt_library_dir'])
+        print('       %s' % config['tensorrt_include_dir'])
 
     if config.get('nccl_version', None):
-        print('Found NCCL %s in:' % config['nccl_version'])
-        print('    %s' % config['nccl_library_dir'])
-        print('    %s' % config['nccl_include_dir'])
-
-    print('\n')
+        print((_INFO + 'Found ' + color.GREEN + 'NCCL %s' + color.NO_COLOR + ' in:') % config['nccl_version'])
+        print('       %s' % config['nccl_library_dir'])
+        print('       %s' % config['nccl_include_dir'])
 
     environ_cp['CUDA_TOOLKIT_PATH'] = config['cuda_toolkit_path']
+    return True
+
+
+def validate_rocm_config(environ_cp):
+    """Run find_rocm_config.py and return r_toolkit_path, or None."""
+
+    find_rocm_script = os.path.join(
+        _APOLLO_ROOT_DIR,
+        'third_party/gpus/find_rocm_config.py')
+    proc = subprocess.Popen(
+        [environ_cp['PYTHON_BIN_PATH'], find_rocm_script],
+        stdout=subprocess.PIPE,
+        env=environ_cp)
+
+    if proc.wait():
+        # Errors from find_rocm_config.py were sent to stderr.
+        print(_INFO + 'Asking for detailed ROCM configuration...\n')
+        return False
+
+    config = dict(
+        tuple(line.decode('ascii').rstrip().split(': '))
+        for line in proc.stdout)
+
+    print((_INFO + 'Found ' + color.GREEN + 'ROCm %s' + color.NO_COLOR + ' in:') % config['rocm_version_number'])
+    print('       %s' % config['rocm_toolkit_path'])
+    print('       %s' % config['rocm_header_path'])
+
+    print((_INFO + 'Found ' + color.GREEN + 'HIP %s' + color.NO_COLOR + ' in:') % config['hipruntime_version_number'])
+    print('       %s' % config['hipruntime_library_dir'])
+    print('       %s' % config['hipruntime_include_dir'])
+
+    print((_INFO + 'Found ' + color.GREEN + 'hipBLAS %s' + color.NO_COLOR + ' in:') % config['hipblas_version_number'])
+    print('       %s' % config['hipblas_library_dir'])
+    print('       %s' % config['hipblas_include_dir'])
+
+    print((_INFO + 'Found ' + color.GREEN + 'rocBLAS %s' + color.NO_COLOR + ' in:') % config['rocblas_version_number'])
+    print('       %s' % config['rocblas_library_dir'])
+    print('       %s' % config['rocblas_include_dir'])
+
+    print((_INFO + 'Found ' + color.GREEN + 'MIOpen %s' + color.NO_COLOR + ' in:') % config['miopen_version_number'])
+    print('       %s' % config['miopen_library_dir'])
+    print('       %s' % config['miopen_include_dir'])
+
+    print((_INFO + 'Found ' + color.GREEN + 'MIGraphX %s' + color.NO_COLOR + ' in:') % config['migraphx_version_number'])
+    print('       %s' % config['migraphx_library_dir'])
+    print('       %s' % config['migraphx_include_dir'])
+
+    environ_cp['ROCM_TOOLKIT_PATH'] = config['rocm_toolkit_path']
     return True
 
 
@@ -892,7 +1004,6 @@ def setup_cuda_family_config_interactively(environ_cp):
         set_cudnn_version(environ_cp)
         set_tensorrt_version(environ_cp)
         set_nccl_version(environ_cp)
-
         set_cuda_paths(environ_cp)
 
     else:
@@ -904,7 +1015,7 @@ def setup_cuda_family_config_interactively(environ_cp):
 
 def setup_cuda_family_config_non_interactively(environ_cp):
     if not validate_cuda_config(environ_cp):
-        print("Cannot validate_cuda_config non-interactively. Aborting ...")
+        print(_ERROR + "Cannot validate_cuda_config non-interactively. Aborting ...")
         sys.exit(1)
 
     cuda_env_names = [
@@ -934,7 +1045,32 @@ def setup_cuda_family_config(environ_cp):
         setup_cuda_family_config_interactively(environ_cp)
 
 
-def set_other_build_config():
+def setup_rocm_family_config(environ_cp):
+    """Setup ROCm/hip/hipblas/rocblas/miopen action env."""
+    if not validate_rocm_config(environ_cp):
+        print(_ERROR + "Cannot validate_rocm_config non-interactively. Aborting ...")
+        sys.exit(1)
+
+    rocm_env_names = [
+        'TF_ROCM_VERSION',
+        'TF_HIPBLAS_VERSION',
+        'TF_ROCBLAS_VERSION',
+        'TF_HIP_VERSION',
+        'TF_MIOPEN_VERSION',
+        # Items below are for backwards compatibility
+        'ROCM_TOOLKIT_PATH',
+        'HIP_INSTALL_PATH',
+        'HIPBLAS_INSTALL_PATH',
+        'ROCBLAS_INSTALL_PATH',
+        'MIOPEN_INSTALL_PATH'
+        'MIGRAPHX_INSTALL_PATH'
+    ]
+    for name in rocm_env_names:
+        if name in environ_cp:
+            write_action_env_to_bazelrc(name, environ_cp[name])
+
+
+def set_other_build_cuda_config(environ_cp):
     build_text = """
 # This config refers to building with CUDA available.
 build:using_cuda --define=using_cuda=true
@@ -950,7 +1086,26 @@ build:tensorrt --action_env TF_NEED_TENSORRT=1
     with open(_APOLLO_BAZELRC, 'a') as f:
         f.write(build_text)
 
-    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
+
+def set_other_build_rocm_config(environ_cp):
+    build_text = """
+# This config refers to building with ROCm available.
+build:using_rocm --define=using_rocm=true
+build:using_rocm --action_env TF_NEED_ROCM=1
+build:using_rocm --crosstool_top=@local_config_rocm//crosstool:toolchain
+
+# This config refers to building ROCm with hipcc.
+build:rocm --config=using_rocm
+build:rocm --define=using_rocm_hipcc=true
+
+build:migraphx --action_env TF_NEED_MIGRAPHX=1
+"""
+    with open(_APOLLO_BAZELRC, 'a') as f:
+        f.write(build_text)
+
+
+def set_tensorrt_config(environ_cp):
+    global _APOLLO_DOCKER_STAGE
 
 
 def main():
@@ -1001,27 +1156,37 @@ def main():
     setup_common_dirs(environ_cp)
     setup_python(environ_cp)
 
-    environ_cp['TF_NEED_CUDA'] = '1'
-    # build:gpu --config=using_cuda
-    write_to_bazelrc('build:gpu --config=cuda')
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        write_to_bazelrc('build:gpu --config=cuda')
+    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        write_to_bazelrc('build:gpu --config=rocm')
 
     if _APOLLO_DOCKER_STAGE == "dev":
-        environ_cp['TF_NEED_TENSORRT'] = '1'
-        write_to_bazelrc('build:gpu --config=tensorrt')
+        if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+            environ_cp['TF_NEED_TENSORRT'] = '1'
+            write_to_bazelrc('build:gpu --config=tensorrt')
+        if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+            environ_cp['TF_NEED_MIGRAPHX'] = '1'
+            write_to_bazelrc('build:gpu --config=migraphx')
 
     write_blank_line_to_bazelrc()
+    set_gcc_host_compiler_path(environ_cp)
+    write_blank_line_to_bazelrc()
 
-    setup_cuda_family_config(environ_cp)
+    if strtobool(environ_cp.get('TF_NEED_CUDA', 'False')):
+        setup_cuda_family_config(environ_cp)
+        set_cuda_compute_capabilities(environ_cp)
+        set_other_cuda_vars(environ_cp)
+        set_other_build_cuda_config(environ_cp)
+    if strtobool(environ_cp.get('TF_NEED_ROCM', 'False')):
+        setup_rocm_family_config(environ_cp)
+        set_rocm_compute_capabilities(environ_cp)
+        set_other_build_rocm_config(environ_cp)
 
-    set_cuda_compute_capabilities(environ_cp)
+    write_build_var_to_bazelrc('teleop', 'WITH_TELEOP')
     if not _APOLLO_INSIDE_DOCKER and 'LD_LIBRARY_PATH' in environ_cp:
         write_action_env_to_bazelrc('LD_LIBRARY_PATH',
                                     environ_cp.get('LD_LIBRARY_PATH'))
-
-    # Set up which gcc nvcc should use as the host compiler
-    set_gcc_host_compiler_path(environ_cp)
-    set_other_cuda_vars(environ_cp)
-    set_other_build_config()
 
 
 if __name__ == '__main__':

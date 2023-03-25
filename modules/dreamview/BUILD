@@ -48,7 +48,7 @@ install(
     targets = ["dreamview"],
     deps = [
         ":pb_dreamview",
-        ":pb_hdrs", 
+        ":pb_hdrs",
         "//modules/dreamview/backend/common:install",
         "//modules/dreamview/backend/hmi:install",
         "//modules/dreamview/backend/map:install",

@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/install:install.bzl", "install")
 
@@ -15,15 +15,20 @@ install(
     visibility = ["//visibility:public"],
 )
 
-cuda_library(
+gpu_library(
     name = "cuda_pnc_util",
     srcs = ["cuda_util.cu"],
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
         "//modules/common/math",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hipblas",
+    ]),
     tags = ["exclude"]
 )
 
@@ -38,10 +43,15 @@ cc_test(
     deps = [
         "//modules/common/math",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hipblas",
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hip",
+    ]),
     tags = ["exclude"],
     linkstatic = True,
 )

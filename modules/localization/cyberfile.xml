@@ -6,7 +6,7 @@
     -  The RTK (Real Time Kinematic) based method which incorporates GPS and IMU (Inertial Measurement Unit) information
     - The  multi-sensor fusion method which incorporates GPS, IMU, and LiDAR information.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -35,7 +35,7 @@
   <depend expose="False">3rd-bazel-skylib-dev</depend>
   <depend expose="False">3rd-rules-proto-dev</depend>
   <depend expose="False">3rd-py-dev</depend>
-  
+
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/localization</src_path>
 

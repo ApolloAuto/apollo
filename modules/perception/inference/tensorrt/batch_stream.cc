@@ -85,7 +85,7 @@ void BatchStream::skip(int skipCount) {
   }
 
   int x = mBatchCount;
-  for (int i = 0; i < skipCount; i++) {
+  for (int i = 0; i < skipCount; ++i) {
     next();
   }
   mBatchCount = x;

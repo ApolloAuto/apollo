@@ -100,8 +100,8 @@ __global__ void DFMBPSROIAlignForward(
 
     const Dtype *offset_bottom_data =
         bottom_data + (roi_batch_ind * channels) * height * width;
-    for (int ih = 0; ih < sample_per_part; ih++) {
-      for (int iw = 0; iw < sample_per_part; iw++) {
+    for (int ih = 0; ih < sample_per_part; ++ih) {
+      for (int iw = 0; iw < sample_per_part; ++iw) {
         Dtype w = wstart + (iw + 0.5) * sub_bin_size_w;
         Dtype h = hstart + (ih + 0.5) * sub_bin_size_h;
         // bilinear interpolation
@@ -151,9 +151,9 @@ int DFMBPSROIAlignPlugin::enqueue(int batchSize, const void *const *inputs,
   int channels_each_class =
       no_trans_ ? output_channel_ : output_channel_ / num_classes_;
 
-  BASE_CUDA_CHECK(
+  BASE_GPU_CHECK(
       cudaMemsetAsync(top_data, 0, output_size_ * sizeof(float), stream));
-  BASE_CUDA_CHECK(cudaDeviceSynchronize());
+  BASE_GPU_CHECK(cudaDeviceSynchronize());
 
   int block_size = (output_size_ - 1) / thread_size_ + 1;
   DFMBPSROIAlignForward<<<block_size, thread_size_, 0, stream>>>(

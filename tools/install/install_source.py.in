@@ -65,7 +65,7 @@ def setup_cyberfile(cyberfile_path, replace=True, dev=False, dbg=False, gpu=Fals
     name = root.find("name")
     old_name = name.text
     name.text = get_pkg_real_name(name.text, dev, dbg, gpu)
-    
+
     for dep in root.findall("depend"):
         if dep.get("condition"):
             if not eval(dep.get("condition")):
@@ -148,7 +148,7 @@ def fix_configs_in_pkg():
         for c_d in conf_dirs:
             full_c_d = prefix + d + c_d
             replace_config_dir(full_c_d, prefix, pkg_module_dict)
-            
+
 
 
 def install_src(src, dst, filter):
