@@ -1,9 +1,6 @@
 # Macros for building CUDA code.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
-def if_cuda(if_true, if_false = []):
-    """Shorthand for select()'ing on whether we're building with CUDA.
-
 def cuda_extra_copts():
     return %{cuda_extra_copts}
 
@@ -54,6 +51,3 @@ def cuda_header_library(
         **kwargs
     )
 
-def cuda_library(copts = [], **kwargs):
-    """Wrapper over cc_library which adds default CUDA options."""
-    cc_library(copts = cuda_default_copts() + copts, **kwargs)
