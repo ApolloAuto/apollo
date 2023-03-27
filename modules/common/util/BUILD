@@ -164,7 +164,6 @@ cc_library(
         "@com_google_absl//:absl",
         "@com_google_protobuf//:protobuf",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_test(

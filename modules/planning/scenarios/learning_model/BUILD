@@ -27,11 +27,9 @@ cc_library(
         "//cyber",
         "//modules/common/util:util_tool",
         "//modules/planning/scenarios:scenario",
-        "//modules/planning/common:frame",
-    ] + if_gpu(
-        ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+        "@eigen",
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(

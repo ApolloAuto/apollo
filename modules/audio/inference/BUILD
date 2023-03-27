@@ -1,6 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,13 +21,10 @@ cc_library(
         "//cyber",
         "//modules/common/math",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
-        #"//third_party/libtorch",
+        "//third_party:libtorch",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
-    ] + if_gpu(
-        ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+    ],
 )
 
 cc_library(
@@ -38,11 +34,8 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/audio/common:audio_gflags",
-        #"//third_party/libtorch",
-    ] + if_gpu(
-        ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+        "//third_party:libtorch",
+    ],
 )
 
 # cc_test(
