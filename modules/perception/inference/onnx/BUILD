@@ -32,8 +32,11 @@ cc_library(
         "//cyber",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/inference:inference_lib",
-        "@libtorch_gpu",
-    ],
+    ] + if_cuda([
+        "@libtorch_gpu_cuda",
+    ])+ if_rocm([
+        "@libtorch_gpu_rocm",
+    ])
 )
 
 cpplint()
