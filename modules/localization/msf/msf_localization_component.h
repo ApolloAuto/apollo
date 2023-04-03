@@ -97,6 +97,7 @@ class LocalizationMsgPublisher {
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
+  bool broadcast_tf_use_system_clock = false;
   apollo::transform::TransformBroadcaster tf2_broadcaster_;
 
   std::string lidar_local_topic_ = "";

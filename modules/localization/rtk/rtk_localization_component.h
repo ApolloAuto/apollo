@@ -72,6 +72,7 @@ class RTKLocalizationComponent final
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
+  bool broadcast_tf_use_system_clock = false;
   std::unique_ptr<apollo::transform::TransformBroadcaster> tf2_broadcaster_;
 
   std::unique_ptr<RTKLocalization> localization_;

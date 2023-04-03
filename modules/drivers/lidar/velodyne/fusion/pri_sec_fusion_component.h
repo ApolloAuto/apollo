@@ -50,14 +50,14 @@ class PriSecFusionComponent : public Component<PointCloud> {
 
  private:
   bool Fusion(std::shared_ptr<PointCloud> target,
-              std::shared_ptr<PointCloud> source);
+              const std::shared_ptr<PointCloud> source);
   bool IsExpired(const std::shared_ptr<PointCloud>& target,
                  const std::shared_ptr<PointCloud>& source);
   bool QueryPoseAffine(const std::string& target_frame_id,
                        const std::string& source_frame_id,
                        Eigen::Affine3d* pose);
   void AppendPointCloud(std::shared_ptr<PointCloud> point_cloud,
-                        std::shared_ptr<PointCloud> point_cloud_add,
+                        const std::shared_ptr<PointCloud> point_cloud_add,
                         const Eigen::Affine3d& pose);
 
   FusionConfig conf_;

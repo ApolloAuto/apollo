@@ -53,6 +53,9 @@ bool RTKLocalizationComponent::InitConfig() {
   gps_status_topic_ = rtk_config.gps_status_topic();
   broadcast_tf_frame_id_ = rtk_config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = rtk_config.broadcast_tf_child_frame_id();
+  if (rtk_config.has_broadcast_tf_use_system_clock()) {
+    broadcast_tf_use_system_clock = rtk_config.broadcast_tf_use_system_clock();
+  }
 
   localization_->InitConfig(rtk_config);
 
@@ -106,7 +109,12 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   apollo::transform::TransformStamped tf2_msg;
 
   auto mutable_head = tf2_msg.mutable_header();
-  mutable_head->set_timestamp_sec(localization.measurement_time());
+  if (!broadcast_tf_use_system_clock) {
+    mutable_head->set_timestamp_sec(localization.measurement_time());
+  } else {
+    mutable_head->set_timestamp_sec(cyber::Time::Now().ToSecond());
+  }
+  
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 

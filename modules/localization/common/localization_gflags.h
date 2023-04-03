@@ -94,6 +94,7 @@ DECLARE_bool(enable_lidar_localization);
 DECLARE_string(lidar_topic);
 DECLARE_string(broadcast_tf_frame_id);
 DECLARE_string(broadcast_tf_child_frame_id);
+DECLARE_bool(broadcast_tf_use_system_clock);
 
 // imu vehicle extrinsic
 DECLARE_string(vehicle_imu_file);

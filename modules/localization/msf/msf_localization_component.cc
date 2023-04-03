@@ -114,6 +114,8 @@ bool LocalizationMsgPublisher::InitConfig() {
   localization_topic_ = FLAGS_localization_topic;
   broadcast_tf_frame_id_ = FLAGS_broadcast_tf_frame_id;
   broadcast_tf_child_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
+  broadcast_tf_use_system_clock = FLAGS_broadcast_tf_use_system_clock;
+
   lidar_local_topic_ = FLAGS_localization_lidar_topic;
   gnss_local_topic_ = FLAGS_localization_gnss_topic;
   localization_status_topic_ = FLAGS_localization_msf_status;
@@ -142,7 +144,12 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
   apollo::transform::TransformStamped tf2_msg;
 
   auto mutable_head = tf2_msg.mutable_header();
-  mutable_head->set_timestamp_sec(localization.measurement_time());
+  if (!broadcast_tf_use_system_clock) {
+    mutable_head->set_timestamp_sec(localization.measurement_time());
+  } else {
+    mutable_head->set_timestamp_sec(localization.header().timestamp_sec());
+  }
+  
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 

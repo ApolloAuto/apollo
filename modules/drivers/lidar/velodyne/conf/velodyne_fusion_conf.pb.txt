@@ -8,3 +8,9 @@ input_channel: [
 
 # wait time after main channel receive msg, unit second
 wait_time_s: 0.02
+
+# if measurement time using system clock, default as false
+#use_system_clock: false
+
+# the target frame id, if not configured, use the main lidar frame as default
+#target_frame_id: "lidar16_top"

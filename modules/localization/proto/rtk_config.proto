@@ -10,6 +10,7 @@ message Config {
   optional string gps_status_topic = 12;
   optional string broadcast_tf_frame_id = 4;
   optional string broadcast_tf_child_frame_id = 5;
+  optional bool broadcast_tf_use_system_clock = 13;
   optional int32 imu_list_max_size = 6;
   optional double gps_imu_time_diff_threshold = 7;
   optional double map_offset_x = 8;

@@ -37,6 +37,8 @@ message FusionConfig {
   optional string fusion_channel = 3;
   repeated string input_channel = 4;
   optional float wait_time_s = 5;
+  optional string target_frame_id = 6;
+  optional bool use_system_clock = 7;
 }
 
 message CompensatorConfig {

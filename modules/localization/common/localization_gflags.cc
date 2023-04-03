@@ -120,6 +120,7 @@ DEFINE_string(lidar_topic, "/apollo/sensor/lidar128/compensator/PointCloud2",
 DEFINE_string(broadcast_tf_frame_id, "world", "world frame id in tf");
 DEFINE_string(broadcast_tf_child_frame_id, "localization",
               "localization frame id in tf");
+DEFINE_bool(broadcast_tf_use_system_clock, false, "tf use system clock");
 // imu vehicle extrinsic
 DEFINE_string(vehicle_imu_file,
               "/apollo/modules/localization/msf/params"
