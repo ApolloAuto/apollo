@@ -450,7 +450,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     std::vector<HybridAStartResult> partition_trajectories;
     if (!hybridA_ptr->TrajectoryPartition(hybrid_astar_result,
                                           &partition_trajectories)) {
-        AERROR<<"TrajectoryPartition failed";
+        AERROR << "TrajectoryPartition failed";
         *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
       return false;
     }
@@ -603,7 +603,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                            &state_result_ds, &control_result_ds,
                            &time_result_ds, &dual_l_result_ds,
                            &dual_n_result_ds, dual_total, ipopt_total)) {
-        AERROR<<"DistanceSmoothing failed";
+        AERROR << "DistanceSmoothing failed";
         *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
       return false;
     }

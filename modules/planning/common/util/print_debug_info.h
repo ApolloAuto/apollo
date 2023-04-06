@@ -15,17 +15,21 @@
  *****************************************************************************/
 
 #pragma once
-#include<vector>
-#include<map>
+
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
 
 class PrintPoints {
-public:
-    PrintPoints(){}
-    PrintPoints(std::string id):id_(id){}
+ public:
+    PrintPoints() {}
+    explicit PrintPoints(std::string id) : id_(id) {}
     void set_id(std::string id) {
         id_ = id;
     }
@@ -35,21 +39,21 @@ public:
 
     void PrintToLog() {
         std::stringstream ssm;
-        ssm<<"print_"<<id_<<":";
-        for (size_t i = 0;i < points.size(); i++) {
-            ssm<<std::fixed<<"("<<points[i].first<<", "<<points[i].second<<");";
+        ssm << "print_" << id_ << ":";
+        for (size_t i = 0; i < points.size(); i++) {
+            ssm << std::fixed << "(" << points[i].first << ", "
+                << points[i].second << ");";
         }
-        AINFO<<ssm.str();
+        AINFO << ssm.str();
     }
 
-private:
+ private:
     std::string id_;
-    std::vector<std::pair<double,double>> points;
-
+    std::vector<std::pair<double, double>> points;
 };
 
 class PrintCurves {
-public:
+ public:
     void AddPoint(std::string key, double x, double y) {
         if (curve_map_.count(key) == 0) {
             curve_map_[key] = PrintPoints(key);
@@ -57,12 +61,14 @@ public:
         curve_map_[key].AddPoint(x, y);
     }
      void PrintToLog() {
-        for (auto iter = curve_map_.begin(); iter != curve_map_.end(); iter++ ) {
+        for (auto iter = curve_map_.begin(); iter != curve_map_.end();
+             iter++ ) {
             iter->second.PrintToLog();
         }
     }
-private:
+ private:
     std::map<std::string, PrintPoints> curve_map_;
 };
+
 }  // namespace planning
 }  // namespace apollo

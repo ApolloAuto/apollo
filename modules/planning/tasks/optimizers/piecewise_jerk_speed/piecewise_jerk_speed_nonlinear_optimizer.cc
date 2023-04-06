@@ -367,7 +367,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
     double j = (opt_ddx[i] - opt_ddx[i - 1]) / delta_s;
     smoothed_speed_limit.AppendSegment(j, delta_s);
   }
-  for (size_t i = 0; i<opt_x.size(); i++) {
+  for (size_t i = 0; i < opt_x.size(); i++) {
       debug.AddPoint("smooth_v_bounds_upper", i * delta_s, opt_x[i]);
   }
 //   debug.PrintToLog();
@@ -388,7 +388,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
        path_s < cartesian_path.back().s() + delta_s; path_s += delta_s) {
     const auto& path_point = cartesian_path.Evaluate(path_s);
     path_curvature.push_back(path_point.kappa());
-    debug.AddPoint("sk_corase",path_s, path_point.kappa());
+    debug.AddPoint("sk_corase", path_s, path_point.kappa());
   }
   const auto& path_init_point = cartesian_path.front();
   std::array<double, 3> init_state = {path_init_point.kappa(),
@@ -431,7 +431,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
   }
 
   for (size_t i = 0; i < opt_x.size(); ++i) {
-    debug.AddPoint("sk_smooth",delta_s * i, opt_x[i]);
+    debug.AddPoint("sk_smooth", delta_s * i, opt_x[i]);
   }
 //   debug.PrintToLog();
   smoothed_path_curvature_ = smoothed_path_curvature;
@@ -482,7 +482,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   *distance = piecewise_jerk_problem.opt_x();
   *velocity = piecewise_jerk_problem.opt_dx();
   *acceleration = piecewise_jerk_problem.opt_ddx();
-  for (size_t i = 0 ;i < distance->size(); i++) {
+  for (size_t i = 0 ; i < distance->size(); i++) {
       const double curr_t = i * delta_t_;
       debug.AddPoint("warm_start_st", curr_t, distance->at(i));
       debug.AddPoint("warm_start_vt", curr_t, velocity->at(i));
@@ -504,7 +504,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
       s_dddot_max_);
   PrintCurves debug;
   ptr_interface->set_safety_bounds(s_bounds_);
-  for (size_t i = 0;i < s_bounds_.size(); i++) {
+  for (size_t i = 0; i < s_bounds_.size(); i++) {
       debug.AddPoint("st_bounds_lower", i * delta_t_, s_bounds_[i].first);
       debug.AddPoint("st_bounds_upper", i * delta_t_, s_bounds_[i].second);
   }

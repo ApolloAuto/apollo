@@ -540,7 +540,7 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
     ADEBUG << "S: " << cur_point->point().s();
     ADEBUG << "V: " << cur_point->GetOptimalSpeed();
     SpeedPoint speed_point;
-    debug_res.AddPoint(cur_point->point().t(),cur_point->point().s());
+    debug_res.AddPoint(cur_point->point().t(), cur_point->point().s());
     speed_point.set_s(cur_point->point().s());
     speed_point.set_t(cur_point->point().t());
     speed_profile.push_back(speed_point);

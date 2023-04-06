@@ -55,8 +55,9 @@ bool SaveLaneCCS(
   std::vector<ConnectedComponent> lane_ccs;
   std::vector<ConnectedComponent> select_lane_ccs;
   // Todo(daohu527): need fix, denseline only
-  // lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
-  //                               &lane_ccs, &select_lane_ccs);
+  // lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width,
+  //                                &lane_map_height,
+  //                                &lane_ccs, &select_lane_ccs);
   std::string save_img_path = absl::StrCat(FLAGS_save_dir, "/",
                                            FLAGS_file_title, "_2_",
                                            FLAGS_file_ext_name, ".jpg");
@@ -94,9 +95,9 @@ bool lane_postprocessor_eval() {
   // 1.1 Initialize lane detector
   LaneDetectorInitOptions init_options;
   init_options.conf_file = "config_darkSCNN.pt";
-  init_options.root_dir = "modules/perception/production/data/perception/camera/models/lane_detector";
+  init_options.root_dir = "modules/perception/production/data/perception/camera/models/lane_detector"; // NOLINT
   base::BrownCameraDistortionModel model;
-  if (!common::LoadBrownCameraIntrinsic("modules/perception/data/params/front_6mm_intrinsics.yaml",
+  if (!common::LoadBrownCameraIntrinsic("modules/perception/data/params/front_6mm_intrinsics.yaml", // NOLINT
                                         &model)) {
     AERROR << "LoadBrownCameraIntrinsic Error!";
     return -1;
@@ -113,7 +114,7 @@ bool lane_postprocessor_eval() {
   LanePostprocessorInitOptions postprocessor_init_options;
   postprocessor_init_options.detect_config_root = init_options.root_dir;
   postprocessor_init_options.detect_config_name = init_options.conf_file;
-  postprocessor_init_options.root_dir = "modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN";
+  postprocessor_init_options.root_dir = "modules/perception/production/data/perception/camera/models/lane_postprocessor/darkSCNN"; // NOLINT
   postprocessor_init_options.conf_file = "config.pt";
   lane_postprocessor->Init(postprocessor_init_options);
 

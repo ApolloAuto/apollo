@@ -26,3 +26,5 @@ write_visual_img : false
 enable_cipv : false
 debug_level : 0
 camera_size : 2
+output_obstacles_camera_name : "front_6mm"
+enable_output_camera : true

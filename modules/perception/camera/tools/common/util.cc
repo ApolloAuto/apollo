@@ -89,7 +89,7 @@ bool GetFileListFromFile(
   }
 
   std::string line;
-  while(std::getline(in, line)) {
+  while (std::getline(in, line)) {
     if (!line.empty()) {
       file_list->push_back(line);
     }

@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+
+#include <utility>
 #include <boost/algorithm/string.hpp>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
 #include "modules/common/util/perf_util.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
@@ -38,10 +39,8 @@ void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   int resized_width = model_param.resized_width();
   int aligned_pixel = model_param.aligned_pixel();
   // inference input shape
-  //TODO: need to optimization
   for (size_t i = 0; i < camera_names_.size(); ++i) {
-    base_camera_model_ = 
-        name_basemodel_map_.at(camera_names_[i]);
+    base_camera_model_ = name_basemodel_map_.at(camera_names_[i]);
     int image_height = static_cast<int>(base_camera_model_->get_height());
     int image_width = static_cast<int>(base_camera_model_->get_width());
 
@@ -49,19 +48,19 @@ void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
         static_cast<int>(offset_ratio * static_cast<float>(image_height) + .5f);
     float roi_ratio = cropped_ratio * static_cast<float>(image_height) /
                       static_cast<float>(image_width);
-    width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-            aligned_pixel;
+    width_ = static_cast<int>(resized_width + aligned_pixel / 2) /
+        aligned_pixel * aligned_pixel;
     height_ = static_cast<int>(static_cast<float>(width_) * roi_ratio +
                               static_cast<float>(aligned_pixel) / 2.0f) /
               aligned_pixel * aligned_pixel;
     offset_y_map_.insert(
-        std::pair<std::string, int>(camera_names_[i], offset_y_));  
+        std::pair<std::string, int>(camera_names_[i], offset_y_));
     AINFO << "image_height=" << image_height << ", "
           << "image_width=" << image_width << ", "
           << "roi_ratio=" << roi_ratio;
     AINFO << "offset_y=" << offset_y_ << ", height=" << height_
           << ", width=" << width_;
-  } 
+  }
 }
 
 void YoloObstacleDetector::LoadParam(const yolo::YoloParam &yolo_param) {
@@ -319,7 +318,7 @@ bool YoloObstacleDetector::Init(const StageConfig& stage_config) {
           yolo_obstacle_detector_config_.camera_name();
   boost::algorithm::split(camera_names_, camera_name,
                               boost::algorithm::is_any_of(","));
-                              
+
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     std::shared_ptr<base::BaseCameraModel> base_model_ptr =
         common::SensorManager::Instance()->GetUndistortCameraModel(
@@ -388,7 +387,7 @@ bool YoloObstacleDetector::Process(DataFrame* data_frame) {
   auto input_blob = inference_->get_blob(yolo_param_.net_param().input_blob());
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
-  base_camera_model_ = 
+  base_camera_model_ =
       name_basemodel_map_.at(frame->data_provider->sensor_name());
   offset_y_ = offset_y_map_.at(frame->data_provider->sensor_name());
   image_options.target_color = base::Color::BGR;

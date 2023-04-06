@@ -1946,13 +1946,15 @@ void PathBoundsDecider::RecordDebugInfo(
   // Insert the transformed PathData into the simulator display.
   auto* ptr_display_path_1 =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_display_path_1->set_name(std::string("planning_path_boundary_1_")+debug_name);
+  ptr_display_path_1->set_name(
+      std::string("planning_path_boundary_1_") + debug_name);
   ptr_display_path_1->mutable_path_point()->CopyFrom(
       {left_path_data.discretized_path().begin(),
        left_path_data.discretized_path().end()});
   auto* ptr_display_path_2 =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_display_path_2->set_name(std::string("planning_path_boundary_2_")+debug_name);
+  ptr_display_path_2->set_name(
+      std::string("planning_path_boundary_2_") + debug_name);
   ptr_display_path_2->mutable_path_point()->CopyFrom(
       {right_path_data.discretized_path().begin(),
        right_path_data.discretized_path().end()});

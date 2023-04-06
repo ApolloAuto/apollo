@@ -90,7 +90,8 @@ bool GetFileListFromFile(
  * @return true
  * @return false
  */
-bool SaveCameraDetectionResult(CameraFrame* frame, const std::string& file_name);
+bool SaveCameraDetectionResult(CameraFrame* frame,
+                               const std::string& file_name);
 
 bool SaveTfDetectionResult(CameraFrame* frame, const std::string& file_name);
 

@@ -760,7 +760,6 @@ bool HybridAStar::Plan(
     AERROR << "start_node in collision with obstacles";
     AERROR << start_node_->GetX() << "," << start_node_->GetY() << ","
            << start_node_->GetPhi();
-    
     return false;
   }
   if (!ValidityCheck(end_node_)) {
