@@ -51,12 +51,13 @@ if [ ! -f /apollo/LICENSE ]; then
   APOLLO_IN_DOCKER=false
   APOLLO_PATH="/opt/apollo/neo"
   APOLLO_ROOT_DIR=${APOLLO_PATH}/packages
-  
+
   if [ -f /.dockerenv ]; then
     APOLLO_IN_DOCKER=true
   fi
 
   export APOLLO_PATH
+  export APOLLO_DIST_PREFIX_PATH=${APOLLO_DIST_PREFIX_PATH:=$APOLLO_PATH}
   export APOLLO_ROOT_DIR=${APOLLO_PATH}/packages
   export CYBER_PATH=${APOLLO_ROOT_DIR}/cyber
   export APOLLO_IN_DOCKER

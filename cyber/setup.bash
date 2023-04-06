@@ -4,6 +4,7 @@ source ${TOP_DIR}/scripts/apollo.bashrc
 
 export APOLLO_BAZEL_DIST_DIR="${APOLLO_CACHE_DIR}/distdir"
 export CYBER_PATH="${APOLLO_ROOT_DIR}/cyber"
+export APOLLO_DIST_PREFIX_PATH="${APOLLO_DIST_PREFIX_PATH:=${APOLLO_ROOT_DIR}/output}"
 
 bazel_bin_path="${APOLLO_ROOT_DIR}/bazel-bin"
 mainboard_path="${bazel_bin_path}/cyber/mainboard"
