@@ -60,10 +60,24 @@ class PriSecFusionComponent : public Component<PointCloud> {
                         const std::shared_ptr<PointCloud> point_cloud_add,
                         const Eigen::Affine3d& pose);
 
+  /**
+   * @brief Get lidar point real timestamp.
+   * if not use system clock, return raw timestamp directly,
+   * else return the result of adding raw timestamp and offset time.
+   * 
+   * @param timestamp The point raw timestamp.
+   * 
+   * @return The new timestamp in nanoseconds.
+   */
+  uint64_t GetPointTimestamp(const uint64_t& timestamp);
+
   FusionConfig conf_;
   apollo::transform::Buffer* buffer_ptr_ = nullptr;
   std::shared_ptr<Writer<PointCloud>> fusion_writer_;
   std::vector<std::shared_ptr<Reader<PointCloud>>> readers_;
+
+  // lidar to system clock offset nanoseconds
+  int64_t lidar_system_offset_ns_ = 0;
 };
 
 CYBER_REGISTER_COMPONENT(PriSecFusionComponent)
