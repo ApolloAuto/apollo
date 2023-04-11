@@ -180,9 +180,9 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
       const auto smoother_start_timestamp = std::chrono::system_clock::now();
       if (FLAGS_use_iterative_anchoring_smoother) {
             if (!GenerateDecoupledTraj(
-                    xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
-                    &state_result_ds_vec[i], &control_result_ds_vec[i],
-                    &time_result_ds_vec[i])) {
+                    xWS_vec[i], last_time_u(1, 0), init_v,
+                    obstacles_vertices_vec, &state_result_ds_vec[i],
+                    &control_result_ds_vec[i], &time_result_ds_vec[i])) {
             AERROR << "Smoother fail at " << i << "th trajectory";
             AERROR << i << "th trajectory size is " << xWS_vec[i].cols();
             return Status(
@@ -196,18 +196,18 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                     .count();
             if (!GenerateDistanceApproachTraj(
                     xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
-                    obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
-                    init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
-                    &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
+                    obstacles_A, obstacles_b, obstacles_vertices_vec,
+                    last_time_u, init_v, &state_result_ds_vec[i],
+                    &control_result_ds_vec[i], &time_result_ds_vec[i],
+                    &l_warm_up_vec[i], &n_warm_up_vec[i],
                     &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
-                    
             AERROR << "Smoother fail at " << i
                     << "th trajectory with index starts from 0";
             AERROR << i << "th trajectory size is " << xWS_vec[i].cols();
             AERROR << "State matrix: " << xWS_vec[i];
             AERROR << "Control matrix: " << uWS_vec[i];
             return Status(ErrorCode::PLANNING_ERROR,
-                            "distance approach smoothing problem failed to solve");
+                      "distance approach smoothing problem failed to solve");
             }
             const auto end_system_timestamp =
                 std::chrono::duration<double>(

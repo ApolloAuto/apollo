@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/tools/common/visualizer.h"
 
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iostream>

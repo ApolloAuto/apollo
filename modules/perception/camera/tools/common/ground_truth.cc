@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/tools/common/ground_truth.h"
 
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <iostream>

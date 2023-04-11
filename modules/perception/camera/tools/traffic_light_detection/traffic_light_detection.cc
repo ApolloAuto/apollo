@@ -30,11 +30,11 @@
 DEFINE_int32(height, 1080, "image height");
 DEFINE_int32(width, 1920, "image width");
 DEFINE_string(dest_dir, "./data", "output dir");
-DEFINE_string(root_dir, "/apollo/modules/perception/camera/tools/traffic_light_detection", "image root dir");
+DEFINE_string(root_dir, "/apollo/modules/perception/camera/tools/traffic_light_detection", "image root dir"); // NOLINT
 DEFINE_string(image_ext, ".jpg", "extension of image name");
-DEFINE_string(test_list, "/apollo/modules/perception/camera/tools/traffic_light_detection/images/image_test_list.txt", "test image list");
-DEFINE_string(tf_conf_file, "/apollo/modules/perception/camera/tools/traffic_light_detection/conf/trafficlights_perception.pb.txt", "Traffic light perception config file");
-DEFINE_string(camera_intrinsics, "/apollo/modules/perception/camera/tools/obstacle_detection/params/onsemi_obstacle_intrinsics.yaml", "Camera intrinsic file");
+DEFINE_string(test_list, "/apollo/modules/perception/camera/tools/traffic_light_detection/images/image_test_list.txt", "test image list"); // NOLINT
+DEFINE_string(tf_conf_file, "/apollo/modules/perception/camera/tools/traffic_light_detection/conf/trafficlights_perception.pb.txt", "Traffic light perception config file"); // NOLINT
+DEFINE_string(camera_intrinsics, "/apollo/modules/perception/camera/tools/obstacle_detection/params/onsemi_obstacle_intrinsics.yaml", "Camera intrinsic file"); // NOLINT
 
 namespace apollo {
 namespace perception {

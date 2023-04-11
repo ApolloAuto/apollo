@@ -159,6 +159,10 @@ class CameraObstacleDetectionComponent : public apollo::cyber::Component<> {
   // camera size
   unsigned int camera_size_ = 2;
 
+  // final output camera name
+  std::string output_obstacles_camera_name_;
+  bool enable_output_camera_;
+
   // image info.
   int image_width_ = 1920;
   int image_height_ = 1080;

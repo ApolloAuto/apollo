@@ -19,6 +19,7 @@
 #include <limits>
 #include <map>
 #include <utility>
+#include <vector>
 
 #include <boost/format.hpp>
 

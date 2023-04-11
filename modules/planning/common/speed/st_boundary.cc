@@ -493,7 +493,8 @@ bool STBoundary::GetIndexRange(const std::vector<STPoint>& points,
   }
   return true;
 }
-void STBoundary::PrintDebug(std::string name) const{
+
+void STBoundary::PrintDebug(std::string name) const {
     PrintPoints debug(name);
     if (lower_points_.empty() || upper_points_.empty()) {
         return;
@@ -501,7 +502,8 @@ void STBoundary::PrintDebug(std::string name) const{
     for (auto pt : lower_points_) {
         debug.AddPoint(pt.t(), pt.s());
     }
-    for (auto iter = upper_points_.rbegin(); iter != upper_points_.rend(); iter++) {
+    for (auto iter = upper_points_.rbegin(); iter != upper_points_.rend();
+         iter++) {
         debug.AddPoint(iter->t(), iter->s());
     }
     debug.AddPoint(lower_points_.front().t(), lower_points_.front().s());
