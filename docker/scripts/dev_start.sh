@@ -37,6 +37,9 @@ USER_VERSION_OPT=
 FAST_MODE="n"
 
 GEOLOC=
+TIMEZONE_CN=(
+  "Time zone: Asia/Shanghai (CST, +0800)"
+)
 
 USE_LOCAL_IMAGE=0
 CUSTOM_DIST=
@@ -213,6 +216,18 @@ function check_target_arch() {
     exit 1
 }
 
+function check_timezone_cn() {
+    # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone=$(timedatectl | grep "Time zone" | xargs)
+
+    for tz in "${TIMEZONE_CN[@]}"; do
+        if [[ "${time_zone}" == "${tz}" ]]; then
+            GEOLOC="cn"
+            return 0
+        fi
+    done
+}
+
 function setup_devices_and_mount_local_volumes() {
     local __retval="$1"
 
@@ -369,6 +384,8 @@ function main() {
     fi
 
     determine_dev_image "${USER_VERSION_OPT}"
+
+    [[ -z "${GEOLOC}" ]] && check_timezone_cn
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
