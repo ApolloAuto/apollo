@@ -62,6 +62,10 @@ dataset:
 - kitti
 - nusense
 ```
+Also you can use the model's ID
+```shell
+amodel info 12  # 12 is point_pillars's ID
+```
 
 #### Install
 You can deploy the model through the `install` command.
@@ -76,4 +80,6 @@ amodel install https://xxx.zip
 You can delete the model installed in Apollo through the `remove` command.
 ```shell
 amodel remove point_pillars
+// or
+amodel remove 12  # 12 is point_pillars's ID
 ```

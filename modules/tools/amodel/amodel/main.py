@@ -41,12 +41,15 @@ def main(args=sys.argv):
   parser.add_argument(
     "model_name", action="store", type=str, nargs="?", const="",
     help="model name or install path.")
+  parser.add_argument(
+    "-s", "--skip", action="store", type=bool, required=False, nargs='?',
+    const=True, help="Skip install when model exist.")
 
   args = parser.parse_args(args[1:])
   logging.debug(args)
 
   if args.command == "install":
-    amodel_install(args.model_name)
+    amodel_install(args.model_name, args.skip)
   elif args.command == "remove":
     amodel_remove(args.model_name)
   elif args.command == "list":

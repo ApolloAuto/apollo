@@ -23,6 +23,8 @@ import logging
 import os
 import requests
 import shutil
+import sys
+from pathlib import Path
 
 from amodel.model_meta import ModelMeta
 
@@ -126,7 +128,7 @@ def _display_model_list(model_metas, white_names=[]):
   for index in range(len(model_metas)):
     model_meta = model_metas[index]
     if len(white_names) == 0 or (model_meta.name in white_names):
-      print("{:05}|{:<20}|{:<20}|{:<15}|{:<20}|{:%Y-%m-%d}".format(
+      print("{:<5}|{:<20}|{:<20}|{:<15}|{:<20}|{:%Y-%m-%d}".format(
         index,
         model_meta.name,
         model_meta.task_type,
@@ -155,6 +157,12 @@ def _is_url(url_str):
   """
   return url_str.startswith('https://') or url_str.startswith('http://')
 
+def _progress(prefix, cur, total):
+  bar_size = 50
+  cur_p = int(cur / total * bar_size)
+  print("{}[{}{}] {}/{}".format(prefix, "#"*cur_p, "."*(bar_size - cur_p),
+      cur, total), end='\r', file=sys.stdout, flush=True)
+
 def _download_from_url(url):
   """Download file from url
 
@@ -166,11 +174,22 @@ def _download_from_url(url):
   """
   local_filename = url.split('/')[-1]
   download_file = os.path.join(DOWNLOAD_TMP_DIR, local_filename)
+
+  # File is cached
+  if Path(download_file).is_file():
+    logging.warn(
+      "File downloaded before! use cached file in {}".format(download_file))
+    return download_file
+
   with requests.get(url, stream=True) as r:
     r.raise_for_status()
+    chunk_size = 8192
+    total_length = int(r.headers.get('content-length', 0)) // chunk_size
     with open(download_file, 'wb') as f:
-      for chunk in r.iter_content(chunk_size=8192):
+      for index, chunk in enumerate(r.iter_content(chunk_size)):
         f.write(chunk)
+        _progress("Downloading:", index, total_length)
+    print()
   return download_file
 
 def _unzip_file(file_path, extract_path):
@@ -216,7 +235,7 @@ def _get_install_path_by_meta(model_meta):
       file_name)
   return install_path
 
-def _install_model(model_meta, extract_path):
+def _install_model(model_meta, extract_path, skip_install):
   """Move model from extract_path to install_path
 
   Args:
@@ -229,7 +248,12 @@ def _install_model(model_meta, extract_path):
   install_path = _get_install_path_by_meta(model_meta)
   logging.debug("_install_model: {} -> {}".format(extract_path, install_path))
 
+  # Model exists
   if os.path.isdir(install_path):
+    if skip_install:
+      logging.warn(
+        "Skipped install, model already exist in {}.".format(install_path))
+      return True
     confirm = _user_confirmation(
       "Model already exists!!! Do you want to override {}? [y/n]:".format(
         model_meta.name))
@@ -242,7 +266,7 @@ def _install_model(model_meta, extract_path):
   print("Installed model in {}.".format(install_path))
   return True
 
-def amodel_install(model_path):
+def amodel_install(model_path, skip_install = False):
   """amodel install command
 
   Args:
@@ -279,10 +303,8 @@ def amodel_install(model_path):
 
   # Install meta file
   extract_path = os.path.join(UNZIP_TMP_DIR, model_name)
-  is_success = _install_model(model_meta, extract_path)
-  if is_success:
-    print("Successed install {}.".format(model_meta.name))
-  else:
+  is_success = _install_model(model_meta, extract_path, skip_install)
+  if not is_success:
     logging.error("Failed install {}.".format(model_meta.name))
 
 

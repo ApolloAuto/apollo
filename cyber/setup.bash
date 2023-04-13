@@ -27,7 +27,6 @@ for entry in "${mainboard_path}" \
 done
 
 pathprepend ${bazel_bin_path}/cyber/python/internal PYTHONPATH
-# todo(zero): The python version determines the path and needs to be optimized
 pathprepend "${PYTHON_INSTALL_PATH}/lib/python${PYTHON_VERSION}/site-packages" PYTHONPATH
 pathprepend "${PYTHON_INSTALL_PATH}/bin/" PATH
 
