@@ -64,9 +64,8 @@ DEFAULT_INSTALL_MODEL=(
   "${MODEL_REPOSITORY}/quadrate_caffe.zip"
   "${MODEL_REPOSITORY}/vertical_caffe.zip"
   "${MODEL_REPOSITORY}/darkSCNN_caffe.zip"
-  "${MODEL_REPOSITORY}/cnnseg128_caffe.zip"
+  "${MODEL_REPOSITORY}/cnnseg16_caffe.zip"
   "${MODEL_REPOSITORY}/3d-r4-half_caffe.zip"
-  "${MODEL_REPOSITORY}/smoke_torch.zip"
 )
 
 # Map
