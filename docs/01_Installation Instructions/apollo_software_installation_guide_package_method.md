@@ -16,7 +16,7 @@ To update the software after installation:
 
 ```shell
 sudo apt-get update
-sudp apt-get upgrade
+sudo apt-get upgrade
 ```
 
 > Note: To complete the update, you need to ensure that you can access the network.
