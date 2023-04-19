@@ -119,7 +119,7 @@ grpc::Status GrpcServerImpl::SendV2xTrafficLight(
   }
   traffic_light_condition_.notify_one();
   auto cur_junction_id = request->intersection_id();
-  ADEBUG << "recieved the junction id " << cur_junction_id;
+  ADEBUG << "received the junction id " << cur_junction_id;
   response->set_status(true);
   return Status::OK;
 }

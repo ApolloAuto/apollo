@@ -225,7 +225,7 @@ message LearningDataFrame {
   // ADC past trajectory
   repeated ADCTrajectoryPoint adc_trajectory_point = 10;
 
-  // Learning ouputs
+  // Learning outputs
   optional LearningOutput output = 11;
 }
 

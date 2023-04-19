@@ -420,7 +420,7 @@ int PathReferenceDecider::IsPointWithinPathBounds(
   }
   if (idx_after == 0) {
     // consider as a valid point if the starting point is before path bound
-    // begining point
+    // beginning point
     return idx_after;
   } else {
     ADEBUG << "idx_after[" << idx_after << "] point_l[" << point_sl.l() << "]";

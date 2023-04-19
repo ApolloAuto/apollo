@@ -249,7 +249,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
              << state_result_ds_vec[i].cols();
     }
 
-    // Retrive the trajectory in one piece
+    // Retrieve the trajectory in one piece
     CombineTrajectories(xWS_vec, uWS_vec, state_result_ds_vec,
                         control_result_ds_vec, time_result_ds_vec,
                         l_warm_up_vec, n_warm_up_vec, dual_l_result_ds_vec,
