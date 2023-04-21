@@ -35,7 +35,7 @@ from modules.common_msgs.perception_msgs.perception_obstacle_pb2 import Percepti
 
 
 _s_seq_num = 0
-_s_delta_t = 0.1
+_s_delta_t = 0.3
 _s_epsilon = 1e-8
 
 
@@ -100,7 +100,8 @@ def load_descrptions(files):
                     trace = obstacle.get('trace', [])
                     for i in range(1, len(trace)):
                         if same_point(trace[i], trace[i - 1]):
-                            print('same trace point found in obstacle: %s' % obstacle["id"])
+                            print('same trace point found in obstacle: %s' %
+                                  obstacle["id"])
                             return None
                     objects.append(obstacle)
             else:  # Default case. handles only one obstacle
@@ -108,7 +109,8 @@ def load_descrptions(files):
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):
                     if same_point(trace[i], trace[i - 1]):
-                        print('same trace point found in obstacle: %s' % obstacle["id"])
+                        print('same trace point found in obstacle: %s' %
+                              obstacle["id"])
                         return None
                 objects.append(obstacle)
 
@@ -232,6 +234,11 @@ def linear_project_perception(description, prev_perception):
             perception.theta = math.atan2(trace[i][1] - trace[i - 1][1],
                                           trace[i][0] - trace[i - 1][0])
 
+            perception.velocity.x = description["speed"] * \
+                math.cos(perception.theta)
+            perception.velocity.y = description["speed"] * \
+                math.sin(perception.theta)
+
             perception.ClearField("polygon_point")
             perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
                                                              perception.length, perception.width))
@@ -269,12 +276,12 @@ def perception_publisher(perception_channel, files, period):
     Publisher
     """
     cyber.init()
-    node = cyber.Node("perception")
+    node = cyber.Node("perception_gen")
     writer = node.create_writer(perception_channel, PerceptionObstacles)
+
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period)  # 10Hz
+    sleep_time = 1.0 / period  #Hz
     global _s_delta_t
-    _s_delta_t = period
     perception = None
     while not cyber.is_shutdown():
         perception = generate_perception(perception_description, perception)
