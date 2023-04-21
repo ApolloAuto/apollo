@@ -92,7 +92,7 @@ public:
   InvalidArgumentException(const std::string errorDescription) : tf2::TransformException(errorDescription) { ; };
 };
 
-/** \brief An exception class to notify that a timeout has occured
+/** \brief An exception class to notify that a timeout has occurred
  * 
  * 
  */

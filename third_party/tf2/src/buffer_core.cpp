@@ -1416,7 +1416,7 @@ std::string BufferCore::_allFramesAsDot(double current_time) const {
   TransformStorage temp;
 
   if (frames_.size() == 1) {
-    mstream << "\"no tf data recieved\"";
+    mstream << "\"no tf data received\"";
   }
   mstream.precision(3);
   mstream.setf(std::ios::fixed, std::ios::floatfield);
