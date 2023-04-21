@@ -197,7 +197,7 @@ class CanAgent {
         start = Time::Now().ToMicrosecond();
         first = false;
       }
-      if (ret != ErrorCode::OK || len == 0) {
+      if (ret != ErrorCode::OK) {
         // AINFO << "channel:" << param->conf.channel_id()
         //      << ", recv frame:failed, code:" << ret;
         AINFO << "recv error:" << ret;

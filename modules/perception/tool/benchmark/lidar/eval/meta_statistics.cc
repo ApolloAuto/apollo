@@ -196,8 +196,7 @@ void compute_ap_aos(
       static_cast<unsigned int>(cumulated_match_num_per_conf.size());
 
   bool with_aos = false;
-  if (aos != nullptr &&
-      cumulated_orientation_similarity_per_conf.size() == confidence_dim) {
+  if (cumulated_orientation_similarity_per_conf.size() == confidence_dim) {
     with_aos = true;
     *aos = 0.0;
   }
