@@ -56,7 +56,7 @@ bool MlfTrackObjectDistance::Init(
   for (int i = 0; i < config.foreground_weights_size(); ++i) {
     const auto& fgws = config.foreground_weights(i);
     const std::string& name = fgws.sensor_name_pair();
-    std::vector<float> weights(7, 0.f);
+    std::vector<float> weights(8, 0.f);
     weights[0] = fgws.location_dist_weight();
     weights[1] = fgws.direction_dist_weight();
     weights[2] = fgws.bbox_size_dist_weight();
