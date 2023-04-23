@@ -759,7 +759,7 @@ index 8c9f45c..745f756 100644
 --- a/src/cpp/rtps/reader/FragmentedChangePitStop.h
 +++ b/src/cpp/rtps/reader/FragmentedChangePitStop.h
 @@ -105,7 +105,7 @@ namespace eprosima
-                  * @return If a CacheChange_t is completed with new incomming fragments, this will be returned.
+                  * @return If a CacheChange_t is completed with new incoming fragments, this will be returned.
                   * In other case nullptr is returned.
                   */
 -                CacheChange_t* process(CacheChange_t* incoming_change, uint32_t sampleSize, uint32_t fragmentStartingNum);
@@ -803,7 +803,7 @@ index abf81b3..baca4c8 100644
              }
  #endif
 -
-             // Fragments manager has to process incomming fragments.
+             // Fragments manager has to process incoming fragments.
              // If CacheChange_t is completed, it will be returned;
 -            CacheChange_t* change_completed = fragmentedChangePitStop_->process(change_to_add, sampleSize, fragmentStartingNum);
 -
@@ -881,7 +881,7 @@ index a1b919d..fc0ef06 100644
      }
 @@ -232,7 +234,9 @@ bool StatelessReader::processDataFragMsg(CacheChange_t *incomingChange, uint32_t
  
-             // Fragments manager has to process incomming fragments.
+             // Fragments manager has to process incoming fragments.
              // If CacheChange_t is completed, it will be returned;
 -            CacheChange_t* change_completed = fragmentedChangePitStop_->process(incomingChange, sampleSize, fragmentStartingNum);
 +            bool has_hole = false;

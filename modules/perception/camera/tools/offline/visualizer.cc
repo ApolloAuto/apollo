@@ -227,7 +227,7 @@ bool Visualizer::Init_all_info_single_camera(
 
   reset_key();
 
-  all_camera_recieved_ = 0x0;
+  all_camera_received_ = 0x0;
 
   return true;
 }
@@ -1446,11 +1446,11 @@ void Visualizer::ShowResult_all_info_single_camera(
   // copy visual results into visualization panel
   if (cv_imshow_img_) {
     if (camera_name == camera_names_[0]) {
-      all_camera_recieved_ |= 0x1;
+      all_camera_received_ |= 0x1;
     } else if (camera_name == camera_names_[1]) {
-      all_camera_recieved_ |= 0x2;
+      all_camera_received_ |= 0x2;
     }
-    if (all_camera_recieved_ == 0x3) {
+    if (all_camera_received_ == 0x3) {
       if (camera_name == visual_camera_) {
         draw_range_circle();
         draw_selected_image_boundary(small_w_, small_h_,
@@ -1477,9 +1477,9 @@ void Visualizer::ShowResult_all_info_single_camera(
           AINFO << "snapshot is saved at " << path;
           cv::imwrite(path, bigimg);
         }
-        all_camera_recieved_ = 0x0;
+        all_camera_received_ = 0x0;
       }  // if (camera_name == visual_camera)
-    }    // if (all_camera_recieved_ == 0x3)
+    }    // if (all_camera_received_ == 0x3)
   }      // if (cv_imshow_img_)
 }
 

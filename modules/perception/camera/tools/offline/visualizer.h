@@ -201,7 +201,7 @@ class Visualizer {
   double speed_limit_ = 1.0;  // in m/s
   unsigned int lane_step_num_ = 20;
   Cipv cipv_;
-  unsigned int all_camera_recieved_ = 0;
+  unsigned int all_camera_received_ = 0;
 };
 
 }  // namespace camera

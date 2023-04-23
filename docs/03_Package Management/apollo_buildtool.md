@@ -328,7 +328,7 @@ List the direct dependencies of the requested package:
 
 ```shell
 $ buildtool info planning-dev
-[buildtool] INFO Reconfigure apollo enviroment setup
+[buildtool] INFO Reconfigure apollo environment setup
 [buildtool] INFO Compile parameters:
 [buildtool] INFO   using gpu: False
 [buildtool] INFO   using debug mode: False
@@ -350,7 +350,7 @@ List all dependencies of the requested package:
 
 ```shell
 $ buildtool info --with-indirect planning-dev
-[buildtool] INFO Reconfigure apollo enviroment setup
+[buildtool] INFO Reconfigure apollo environment setup
 [buildtool] INFO Compile parameters:
 [buildtool] INFO   using gpu: False
 [buildtool] INFO   using debug mode: False
@@ -373,7 +373,7 @@ List the dependency information of the package source code in the specified path
 
 ```shell
 $ buildtool info --directory example_components/
-[buildtool] INFO Reconfigure apollo enviroment setup
+[buildtool] INFO Reconfigure apollo environment setup
 [buildtool] INFO Compile parameters:
 [buildtool] INFO   using gpu: False
 [buildtool] INFO   using debug mode: False

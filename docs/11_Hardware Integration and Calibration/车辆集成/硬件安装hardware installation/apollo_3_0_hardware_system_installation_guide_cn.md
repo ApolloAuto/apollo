@@ -162,4 +162,4 @@
 
 ## 后续步骤
 
-当完成车辆的的硬件安装后，参考[Apollo 快速入门指南](../../../02_Quick%20Start/apollo_3_0_quick_start_cn.md)以获取完整的软件安装步骤。
+当完成车辆的硬件安装后，参考[Apollo 快速入门指南](../../../02_Quick%20Start/apollo_3_0_quick_start_cn.md)以获取完整的软件安装步骤。

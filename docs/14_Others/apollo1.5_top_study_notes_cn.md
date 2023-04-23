@@ -4,7 +4,7 @@
 ## 代码分析
 主要文件： main.cc，apollo_app.cc，apollo_app.h。
 ### mian.c文件
-文件中只有一行代码：APOLLO_MAIN(apollo::localization::Localization) ，使用宏APOLLO_MAIN，开启了Localization节点，这里localization节点开始运行，这里的的节点与ros中的node概念一致，相当于一个进程。
+文件中只有一行代码：APOLLO_MAIN(apollo::localization::Localization) ，使用宏APOLLO_MAIN，开启了Localization节点，这里localization节点开始运行，这里的节点与ros中的node概念一致，相当于一个进程。
 
 ### APOLLO_MAIN宏解析：
  * APOLLO_MAIN宏定义位于"modules/common/apollo_app.h"文件。

@@ -39,7 +39,7 @@ bool CenterPointDetection::Init(const LidarDetectorInitOptions &options) {
     } else if (FLAGS_trt_precision == 1) {
       precision = paddle_infer::PrecisionType::kHalf;
     } else {
-      AERROR << "Tensorrt type can only support 0 or 1, but recieved is"
+      AERROR << "Tensorrt type can only support 0 or 1, but received is"
              << FLAGS_trt_precision << "\n";
       return false;
     }

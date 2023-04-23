@@ -135,7 +135,7 @@ class BaseMapNode {
    */
   virtual unsigned int LoadBinary(FILE* file);
   /**@brief Create the binary. Serialization of the object.
-   * @param <return> The the used size of binary is returned.
+   * @param <return> The used size of binary is returned.
    */
   virtual unsigned int CreateBinary(FILE* file) const;
   /**@brief Get the binary size of the object. */
