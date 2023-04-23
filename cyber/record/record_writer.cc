@@ -69,7 +69,7 @@ void RecordWriter::Close() {
 bool RecordWriter::SplitOutfile() {
   file_writer_.reset(new RecordFileWriter());
   if (file_index_ > 99999) {
-    AWARN << "More than 99999 record files had been recored, will restart "
+    AWARN << "More than 99999 record files had been recorded, will restart "
           << "counting from 0.";
     file_index_ = 0;
   }

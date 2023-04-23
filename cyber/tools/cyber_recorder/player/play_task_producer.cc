@@ -180,7 +180,7 @@ bool PlayTaskProducer::UpdatePlayParam() {
     return false;
   }
   if (play_param_.preload_time_s == 0) {
-    AINFO << "preload time is zero, we will use defalut value: "
+    AINFO << "preload time is zero, we will use default value: "
           << kPreloadTimeSec << " seconds.";
     play_param_.preload_time_s = kPreloadTimeSec;
   }

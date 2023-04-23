@@ -36,7 +36,7 @@ using apollo::cyber::proto::ParamType;
  * @class Parameter
  * @brief A `Parameter` holds an apollo::cyber::proto::Param,
  * It's more human-readable, you can use basic-value type and Protobuf values
- * to construct a paramter. Parameter is identified by their `name`,
+ * to construct a parameter. Parameter is identified by their `name`,
  * and you can get Parameter content by call value()
  */
 class Parameter {
@@ -52,14 +52,14 @@ class Parameter {
   explicit Parameter(const Parameter& parameter);
 
   /**
-   * @brief construct with paramter's name
+   * @brief construct with parameter's name
    *
    * @param name Parameter name
    */
   explicit Parameter(const std::string& name);
 
   /**
-   * @brief construct with paramter's name and bool value type
+   * @brief construct with parameter's name and bool value type
    *
    * @param name Parameter name
    * @param bool_value bool value
@@ -67,7 +67,7 @@ class Parameter {
   Parameter(const std::string& name, const bool bool_value);
 
   /**
-   * @brief construct with paramter's name and int value type
+   * @brief construct with parameter's name and int value type
    *
    * @param name Parameter name
    * @param int_value int value
@@ -75,7 +75,7 @@ class Parameter {
   Parameter(const std::string& name, const int int_value);
 
   /**
-   * @brief construct with paramter's name and int value type
+   * @brief construct with parameter's name and int value type
    *
    * @param name Parameter name
    * @param int_value int value
@@ -83,7 +83,7 @@ class Parameter {
   Parameter(const std::string& name, const int64_t int_value);
 
   /**
-   * @brief construct with paramter's name and float value type
+   * @brief construct with parameter's name and float value type
    *
    * @param name Parameter name
    * @param float_value float value
@@ -91,7 +91,7 @@ class Parameter {
   Parameter(const std::string& name, const float float_value);
 
   /**
-   * @brief construct with paramter's name and double value type
+   * @brief construct with parameter's name and double value type
    *
    * @param name Parameter name
    * @param double_value double value
@@ -99,7 +99,7 @@ class Parameter {
   Parameter(const std::string& name, const double double_value);
 
   /**
-   * @brief construct with paramter's name and string value type
+   * @brief construct with parameter's name and string value type
    *
    * @param name Parameter name
    * @param string_value string value
@@ -107,7 +107,7 @@ class Parameter {
   Parameter(const std::string& name, const std::string& string_value);
 
   /**
-   * @brief construct with paramter's name and char* value type
+   * @brief construct with parameter's name and char* value type
    *
    * @param name Parameter name
    * @param string_value char* value
@@ -157,7 +157,7 @@ class Parameter {
   inline ParamType Type() const;
 
   /**
-   * @brief Get Paramter's type name, i.e.
+   * @brief Get Parameter's type name, i.e.
    * INT,DOUBLE,STRING or protobuf message's fullname
    *
    * @return std::string the Parameter's type name
@@ -165,7 +165,7 @@ class Parameter {
   inline std::string TypeName() const;
 
   /**
-   * @brief Get Paramter's descriptor, only work on protobuf types
+   * @brief Get Parameter's descriptor, only work on protobuf types
    *
    * @return std::string the Parameter's type name
    */
@@ -179,7 +179,7 @@ class Parameter {
   inline const std::string Name() const;
 
   /**
-   * @brief Get Paramter as a bool value
+   * @brief Get Parameter as a bool value
    *
    * @return true result
    * @return false result
@@ -187,21 +187,21 @@ class Parameter {
   inline bool AsBool() const;
 
   /**
-   * @brief Get Paramter as an int64_t value
+   * @brief Get Parameter as an int64_t value
    *
    * @return int64_t int64 type result
    */
   inline int64_t AsInt64() const;
 
   /**
-   * @brief et Paramter as a double value
+   * @brief et Parameter as a double value
    *
    * @return double type result
    */
   inline double AsDouble() const;
 
   /**
-   * @brief Get Paramter as a string value
+   * @brief Get Parameter as a string value
    *
    * @return const std::string Parameter's string expression
    */
@@ -215,7 +215,7 @@ class Parameter {
   std::string DebugString() const;
 
   /**
-   * @brief Translate paramter value as a protobuf::Message
+   * @brief Translate parameter value as a protobuf::Message
    *
    * @tparam ValueType type of the value
    * @return std::enable_if<
@@ -229,7 +229,7 @@ ValueType>::type protobuf::Message type result
   value() const;
 
   /**
-   * @brief Translate paramter value to int type
+   * @brief Translate parameter value to int type
    *
    * @tparam ValueType type of the value
    * @return std::enable_if<std::is_integral<ValueType>::value &&
@@ -243,7 +243,7 @@ ValueType>::type int type result
   value() const;
 
   /**
-   * @brief Translate paramter value to bool type
+   * @brief Translate parameter value to bool type
    *
    * @tparam ValueType type of the value
    * @return std::enable_if<std::is_floating_point<ValueType>::value,
@@ -255,7 +255,7 @@ ValueType>::type floating type result
   value() const;
 
   /**
-   * @brief Translate paramter value to string type
+   * @brief Translate parameter value to string type
    *
    * @tparam ValueType type of the value
    * @return std::enable_if<std::is_convertible<ValueType, std::string>::value,
@@ -267,7 +267,7 @@ const std::string&>::type string type result
   value() const;
 
   /**
-   * @brief Translate paramter value to bool type
+   * @brief Translate parameter value to bool type
    *
    * @tparam ValueType type of the value
    * @return std::enable_if<std::is_same<ValueType, bool>::value, bool>::type

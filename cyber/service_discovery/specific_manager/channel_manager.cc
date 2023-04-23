@@ -326,7 +326,7 @@ void ChannelManager::ScanMessageType(const ChangeMsg& msg) {
       AERROR << "newly added " << role_type << "(belongs to node["
              << msg.role_attr().node_name() << "])"
              << "'s message type[" << msg.role_attr().message_type()
-             << "] does not match the exsited writer(belongs to node["
+             << "] does not match the existed writer(belongs to node["
              << w_attr.node_name() << "])'s message type["
              << w_attr.message_type() << "].";
     }
@@ -340,7 +340,7 @@ void ChannelManager::ScanMessageType(const ChangeMsg& msg) {
       AERROR << "newly added " << role_type << "(belongs to node["
              << msg.role_attr().node_name() << "])"
              << "'s message type[" << msg.role_attr().message_type()
-             << "] does not match the exsited reader(belongs to node["
+             << "] does not match the existed reader(belongs to node["
              << r_attr.node_name() << "])'s message type["
              << r_attr.message_type() << "].";
     }

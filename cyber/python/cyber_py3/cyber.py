@@ -366,7 +366,7 @@ class ChannelUtils(object):
     # @param channel_name channel name.
     # @param sleep_s wait time for topo discovery.
     #
-    # @return return the messsage type of this channel.
+    # @return return the message type of this channel.
     def get_msgtype(channel_name, sleep_s=2):
         return _CYBER.PyChannelUtils_get_msg_type(channel_name, sleep_s)
 
