@@ -38,7 +38,7 @@ enum LdwSoftStatus {
 enum LdwWarningGrade {
   LDW_WARNING_LOW = 0;
   LDW_WARNING_NORMAL = 1;
-  LDW_WARNING_HIGHT = 2;
+  LDW_WARNING_HEIGHT = 2;
 }
 
 message LdwLaneBoundary {
@@ -132,7 +132,7 @@ message OutputObstacle {
   optional RecognitionType obstacletype = 9;
 
   //(pixel) the average disparity of an obstacle with adding infDisp: avgDisp =
-  //BF_VALUE/avgDitance+infDis
+  //BF_VALUE/avgDistance+infDis
   optional float avgdisp = 10;
   //(m) the average Z distance of single obstacle rectangle
   optional float avgdistancez = 11;

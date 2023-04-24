@@ -480,7 +480,7 @@ void TransitController::Steer(double angle, double angle_spd) {
           : 0;
 
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
-  // TODO(QiL) : re-enable the angle_spd ajustment
+  // TODO(QiL) : re-enable the angle_spd adjustment
 }
 
 void TransitController::SetEpbBreak(const ControlCommand& command) {

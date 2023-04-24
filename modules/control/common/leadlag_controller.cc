@@ -24,7 +24,7 @@ namespace apollo {
 namespace control {
 
 double LeadlagController::Control(const double error, const double dt) {
-  // check if the c2d transform passed during the initilization
+  // check if the c2d transform passed during the initialization
   if (!transfromc2d_enabled_) {
     TransformC2d(dt);
     if (!transfromc2d_enabled_) {

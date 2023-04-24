@@ -156,7 +156,7 @@ class VehicleController {
 
   /**
    * @brief Response to vehicle ID request.
-   * @return true if vehicle ID is successfully responsed.
+   * @return true if vehicle ID is successfully responded.
    */
   virtual bool VerifyID() = 0;
 
@@ -169,7 +169,7 @@ class VehicleController {
   common::VehicleParam vehicle_params_;
   CanSender<SensorType> *can_sender_ = nullptr;
   MessageManager<SensorType> *message_manager_ = nullptr;
-  bool is_initialized_ = false;  // own by derviative concrete controller
+  bool is_initialized_ = false;  // own by derivative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command
   std::mutex mode_mutex_;  // only use in this base class

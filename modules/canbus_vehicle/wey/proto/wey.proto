@@ -573,7 +573,7 @@ message Ads3_38e {
   optional EmergencylightonType emergencylighton = 7;
   // Open the front fog light [] [0|1]
   optional FfoglamponType ffoglampon = 8;
-  // Open the rear fog ligh [] [0|1]
+  // Open the rear fog light [] [0|1]
   optional RfoglamponType rfoglampon = 9;
   // Open the brake light [] [0|1]
   optional BrakelightType brakelight = 10;

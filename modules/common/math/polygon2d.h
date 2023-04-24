@@ -264,7 +264,7 @@ class Polygon2d {
    * @param other_polygon The target polygon. To compute its overlap with
    *        this polygon.
    * @return A value between 0.0 and 1.0, meaning no intersection to fully
-   * overlaping
+   * overlapping
    */
   double ComputeIoU(const Polygon2d &other_polygon) const;
 

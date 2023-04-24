@@ -112,10 +112,10 @@ class Aebsystemstate11 : public ::apollo::drivers::canbus::ProtocolData<
   int aeb_livecounter_rear(const std::uint8_t* bytes,
                            const int32_t length) const;
 
-  // config detail: {'name': 'AEB_Cheksum', 'offset': 0.0, 'precision': 1.0,
+  // config detail: {'name': 'AEB_Checksum', 'offset': 0.0, 'precision': 1.0,
   // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
   // 'type': 'int', 'order': 'motorola', 'physical_unit': 'bit'}
-  int aeb_cheksum(const std::uint8_t* bytes, const int32_t length) const;
+  int aeb_checksum(const std::uint8_t* bytes, const int32_t length) const;
 };
 
 }  // namespace neolix_edu

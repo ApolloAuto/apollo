@@ -581,7 +581,7 @@ bool ChController::CheckChassisError() {
         chassis_detail.throttle_status__510().drive_motor_err()) {
       return true;
     }
-    // cancel the battery err check bacause of always causing this error block
+    // cancel the battery err check because of always causing this error block
     // the vehicle use
     // if (Throttle_status__510::BATTERY_BMS_ERR_BATTERY_ERR ==
     //     chassis_detail.throttle_status__510().battery_bms_err()) {

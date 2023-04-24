@@ -40,7 +40,7 @@ class Brakereport501 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'description': 'Brake system communication fault', 'enum':
   // {0: 'BRAKE_FLT2_NO_FAULT', 1:
-  // 'BRAKE_FLT2_BRAKE_SYSTEM_COMUNICATION_FAULT'}, 'precision': 1.0, 'len': 8,
+  // 'BRAKE_FLT2_BRAKE_SYSTEM_COMMUNICATION_FAULT'}, 'precision': 1.0, 'len': 8,
   // 'name': 'Brake_FLT2', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}

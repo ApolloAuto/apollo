@@ -38,7 +38,7 @@ enum GnssType {
 // type of pseudo-range
 enum PseudoType {
   CODE_UNKNOWN = 0;
-  CORSE_CODE = 1;
+  COURSE_CODE = 1;
   PRECISION_CODE = 2;
 }
 

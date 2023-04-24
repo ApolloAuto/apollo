@@ -1,6 +1,6 @@
 {
     "linux_distribution": "Ubuntu 18.04.5 LTS",
-    "kernal": "Linux 5.4.0-42-generic",
+    "kernel": "Linux 5.4.0-42-generic",
     "arch": "x86_64",
     "image": "registry.baidubce.com/apollo/apollo-env-gpu:0.0.4-dev",
     "apollo_distribution": "neo",

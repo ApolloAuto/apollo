@@ -86,7 +86,7 @@ void uniform_slice(const T start, const T end, uint32_t num,
 }
 
 /**
- * calculate the distance beteween Point u and Point v, which are all have
+ * calculate the distance between Point u and Point v, which are all have
  * member function x() and y() in XY dimension.
  * @param u one point that has member function x() and y().
  * @param b one point that has member function x() and y().
@@ -141,7 +141,7 @@ class FunctionInfo {
 };
 
 template <typename T, size_t count>
-bool ExcuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
+bool ExecuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
   for (size_t i = 0; i < count; i++) {
     if ((obj->*(fun_list[i].function_))() != apollo::cyber::SUCC) {
       AERROR << fun_list[i].fun_name_ << " failed.";
@@ -152,7 +152,7 @@ bool ExcuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
 }
 
 #define EXEC_ALL_FUNS(type, obj, list) \
-  ExcuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
+  ExecuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
 
 template <typename A, typename B>
 std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {

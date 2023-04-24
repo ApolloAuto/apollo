@@ -31,7 +31,7 @@ namespace common {
 namespace {
 
 // Self-maintained sqlite instance.
-class SqliteWraper {
+class SqliteWrapper {
  public:
   static int Callback(void *data, int argc, char **argv, char **col_name) {
     if (data != nullptr) {
@@ -41,7 +41,7 @@ class SqliteWraper {
     return 0;
   }
 
-  SqliteWraper() {
+  SqliteWrapper() {
     // Open DB.
     if (sqlite3_open(FLAGS_kv_db_path.c_str(), &db_) != 0) {
       AERROR << "Can't open Key-Value database: " << sqlite3_errmsg(db_);
@@ -58,7 +58,7 @@ class SqliteWraper {
     }
   }
 
-  ~SqliteWraper() { Release(); }
+  ~SqliteWrapper() { Release(); }
 
   bool SQL(std::string_view sql, std::string *value = nullptr) {
     AINFO << "Executing SQL: " << sql;
@@ -90,20 +90,20 @@ class SqliteWraper {
 }  // namespace
 
 bool KVDB::Put(std::string_view key, std::string_view value) {
-  SqliteWraper sqlite;
+  SqliteWrapper sqlite;
   return sqlite.SQL(
       absl::StrCat("INSERT OR REPLACE INTO key_value (key, value) VALUES ('",
                    key, "', '", value, "');"));
 }
 
 bool KVDB::Delete(std::string_view key) {
-  SqliteWraper sqlite;
+  SqliteWrapper sqlite;
   return sqlite.SQL(
       absl::StrCat("DELETE FROM key_value WHERE key='", key, "';"));
 }
 
 std::optional<std::string> KVDB::Get(std::string_view key) {
-  SqliteWraper sqlite;
+  SqliteWrapper sqlite;
   std::string value;
   const bool ret = sqlite.SQL(
       absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
