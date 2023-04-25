@@ -1,12 +1,12 @@
 # How to Save and Load Apollo Docker Images
 
-Considering that Apollo Docker images are usually serveral Gigabytes in size,
+Considering that Apollo Docker images are usually several Gigabytes in size,
 you can pull them over WIFI or other stable Internet connections, and then
-copy the relavant images to vehicle.
+copy the relevant images to vehicle.
 
 ## Save Docker Images
 
-After you have pulled the relavant Docker image, you can save it as a tarball
+After you have pulled the relevant Docker image, you can save it as a tarball
 by running the following command:
 
 ```bash

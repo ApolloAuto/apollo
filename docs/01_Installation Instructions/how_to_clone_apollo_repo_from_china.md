@@ -19,7 +19,7 @@ as a good start.
 git clone https://gitee.com/ApolloAuto/apollo.git
 ```
 
-This step takes only serveral minutes, as the download rate can reach up-to >
+This step takes only several minutes, as the download rate can reach up-to >
 10MiB/s tested on my machine with
 
 the following console log:
