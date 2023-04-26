@@ -54,14 +54,14 @@ void VehicleModel::RearCenteredKinematicBicycleModel(
       dt = countdown_time + dt;
       finish_flag = true;
     }
-    double intermidiate_phi =
+    double intermediate_phi =
         cur_phi + 0.5 * dt * cur_v * cur_vehicle_state.kappa();
     next_phi =
         cur_phi + dt * (cur_v + 0.5 * dt * cur_a) * cur_vehicle_state.kappa();
     next_x =
-        cur_x + dt * (cur_v + 0.5 * dt * cur_a) * std::cos(intermidiate_phi);
+        cur_x + dt * (cur_v + 0.5 * dt * cur_a) * std::cos(intermediate_phi);
     next_y =
-        cur_y + dt * (cur_v + 0.5 * dt * cur_a) * std::sin(intermidiate_phi);
+        cur_y + dt * (cur_v + 0.5 * dt * cur_a) * std::sin(intermediate_phi);
 
     next_v = cur_v + dt * cur_a;
     cur_x = next_x;

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file verion_7f.h
+ * @file version_7f.h
  * @brief the class of Version7f (for lincoln vehicle)
  */
 

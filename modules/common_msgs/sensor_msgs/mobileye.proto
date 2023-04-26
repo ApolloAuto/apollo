@@ -104,7 +104,7 @@ message Next_76d {
 message Details_739 {
   optional int32 obstacle_id = 1;
   optional double obstacle_pos_x = 2;
-  optional int32 reseved_2 = 3;
+  optional int32 reserved_2 = 3;
   optional double obstacle_pos_y = 4;
   optional int32 blinker_info = 5;
   optional int32 cut_in_and_out = 6;

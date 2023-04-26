@@ -43,7 +43,7 @@ bool SirenDetection::Evaluate(const std::vector<std::vector<double>>& signals) {
     return false;
   }
   if (signals[0].size() != 72000) {
-    AERROR << "signals[0].size() = " << signals[0].size() << ", skiping!";
+    AERROR << "signals[0].size() = " << signals[0].size() << ", skipping!";
     return false;
   }
   torch::Tensor audio_tensor = torch::empty(4 * 1 * 72000);

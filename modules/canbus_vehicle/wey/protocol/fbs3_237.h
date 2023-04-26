@@ -47,7 +47,7 @@ class Fbs3237 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'EPB Switch position information', 'enum':
   // {0: 'EPBSWTICHPOSITION_NEUTRAL', 1: 'EPBSWTICHPOSITION_RELEASE',
   // 2: 'EPBSWTICHPOSITION_APPLY', 3: 'EPBSWTICHPOSITION_RESERVED1'},
-  // 'precision': 1.0, 'len': 2, 'name': 'EPBSwtichPosition', 'is_signed_var':
+  // 'precision': 1.0, 'len': 2, 'name': 'EPBSwitchPosition', 'is_signed_var':
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 31, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Fbs3_237::EpbswtichpositionType epbswtichposition(const std::uint8_t* bytes,

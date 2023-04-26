@@ -524,12 +524,12 @@ TEST(Polygon2dTest, Overlap) {
     const double w2 = RandomDouble(1, 5);
     Box2d box1({x1, y1}, heading1, l1, w1);
     Box2d box2({x2, y2}, heading2, l2, w2);
-    Box2d shrinked_box2({x2, y2}, heading2, l2 - 0.2, w2 - 0.2);
+    Box2d shrunk_box2({x2, y2}, heading2, l2 - 0.2, w2 - 0.2);
     Box2d extended_box2({x2, y2}, heading2, l2 + 0.2, w2 + 0.2);
     if (!box1.HasOverlap(extended_box2)) {
       EXPECT_FALSE(
           Polygon2d(box1).ComputeOverlap(Polygon2d(box2), &overlap_polygon));
-    } else if (box1.HasOverlap(shrinked_box2)) {
+    } else if (box1.HasOverlap(shrunk_box2)) {
       EXPECT_TRUE(
           Polygon2d(box1).ComputeOverlap(Polygon2d(box2), &overlap_polygon));
     }

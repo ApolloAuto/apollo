@@ -27,7 +27,7 @@ UDPBridgeMultiReceiverComponent::UDPBridgeMultiReceiverComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool UDPBridgeMultiReceiverComponent::Init() {
-  AINFO << "UDP bridge multi :receiver init, startin...";
+  AINFO << "UDP bridge multi :receiver init, starting...";
   apollo::bridge::UDPBridgeReceiverRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";

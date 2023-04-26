@@ -3,7 +3,7 @@
 ## Introduction
 Smart Recorder is targeting to reduce the recording data size.  Instead of recording all the topics all the time, it selectively records by the following way.
 
-1. All the small topics all the time.  These include "/apollo/localization/pose", "/apollo/canbus/chassis" and so on, which are samll in size.
+1. All the small topics all the time.  These include "/apollo/localization/pose", "/apollo/canbus/chassis" and so on, which are small in size.
 2. Large topics only in specified scenarios.  These include sensor data include all "PointCloud" and "Camera" topics, which are large in size.  The specific scenarios are configurable, as well as the time range for recording when the specified scenario occurs.
 
 

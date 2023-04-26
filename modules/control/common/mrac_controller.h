@@ -98,14 +98,14 @@ class MracController {
   void EstimateInitialGains(const common::LatencyParam &latency_param);
 
   /**
-   * @brief execute the reference state interation with respect to the designed
+   * @brief execute the reference state interaction with respect to the designed
    inputs in discrete-time form, with the bilinear transform (trapezoidal
    integration) method
    */
   void UpdateReference();
 
   /**
-   * @brief execute the adaption interation with respect to the designed law in
+   * @brief execute the adaption interaction with respect to the designed law in
    discrete-time form, with the bilinear transform (trapezoidal integration)
    method
    * @param law_adp adaptive law at k and k-1 steps

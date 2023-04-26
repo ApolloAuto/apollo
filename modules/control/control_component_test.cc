@@ -129,7 +129,7 @@ bool ControlComponentTest::FeedTestData() {
   if (!FLAGS_test_pad_file.empty()) {
     if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message_)) {
-      AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
+      AERROR << "Failed to load PadMessage from file " << FLAGS_test_data_dir
              << FLAGS_test_pad_file;
       return false;
     }

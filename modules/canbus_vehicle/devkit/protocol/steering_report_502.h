@@ -48,7 +48,7 @@ class Steeringreport502 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'bit': 23, 'description': 'Steer system communication
   // fault', 'enum': {0: 'STEER_FLT2_NO_FAULT', 1:
-  // 'STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT'}, 'is_signed_var': False,
+  // 'STEER_FLT2_STEER_SYSTEM_COMMUNICATION_FAULT'}, 'is_signed_var': False,
   // 'len': 8, 'name': 'Steer_FLT2', 'offset': 0.0, 'order': 'motorola',
   // 'physical_range': '[0|255]', 'physical_unit': '', 'precision': 1.0, 'type':
   // 'enum'}
