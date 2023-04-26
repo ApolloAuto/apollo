@@ -41,7 +41,7 @@ class Throttlereport500 : public ::apollo::drivers::canbus::ProtocolData<
 
   // config detail: {'description': 'Drive system communication fault', 'enum':
   // {0: 'THROTTLE_FLT2_NO_FAULT', 1:
-  // 'THROTTLE_FLT2_DRIVE_SYSTEM_COMMUNICATION_FAULT'}, 'precision': 1.0, 'len':
+  // 'THROTTLE_FLT2_DRIVE_SYSTEM_COMUNICATION_FAULT'}, 'precision': 1.0, 'len':
   // 8, 'name': 'Throttle_FLT2', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 23, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}

@@ -134,7 +134,7 @@ message Throttle_report_500 {
 // Report Message
   enum Throttle_flt2Type {
     THROTTLE_FLT2_NO_FAULT = 0;
-    THROTTLE_FLT2_DRIVE_SYSTEM_COMMUNICATION_FAULT = 1;
+    THROTTLE_FLT2_DRIVE_SYSTEM_COMUNICATION_FAULT = 1;
   }
   enum Throttle_flt1Type {
     THROTTLE_FLT1_NO_FAULT = 0;
@@ -160,7 +160,7 @@ message Brake_report_501 {
 // Report Message
   enum Brake_flt2Type {
     BRAKE_FLT2_NO_FAULT = 0;
-    BRAKE_FLT2_BRAKE_SYSTEM_COMMUNICATION_FAULT = 1;
+    BRAKE_FLT2_BRAKE_SYSTEM_COMUNICATION_FAULT = 1;
   }
   enum Brake_flt1Type {
     BRAKE_FLT1_NO_FAULT = 0;
@@ -186,7 +186,7 @@ message Steering_report_502 {
 // Report Message
   enum Steer_flt2Type {
     STEER_FLT2_NO_FAULT = 0;
-    STEER_FLT2_STEER_SYSTEM_COMMUNICATION_FAULT = 1;
+    STEER_FLT2_STEER_SYSTEM_COMUNICATION_FAULT = 1;
   }
   enum Steer_flt1Type {
     STEER_FLT1_NO_FAULT = 0;
