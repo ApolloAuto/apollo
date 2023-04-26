@@ -101,7 +101,7 @@ message Scenario {
     optional State initial_state = 5;
     repeated State state_group = 6;
   }
-  // The overriden traffic lights behavior
+  // The overridden traffic lights behavior
   repeated TL traffic_lights = 24;
 
   // The scenario should be run in one of the modes.

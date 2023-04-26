@@ -33,7 +33,7 @@
 // How to Use:
 // 1)  Use PERF_FUNCTION to compute time cost of function execution as follows:
 //      void MyFunc() {
-//          PERF_FUNCION();
+//          PERF_FUNCTION();
 //          // do somethings.
 //      }
 //  Console log:

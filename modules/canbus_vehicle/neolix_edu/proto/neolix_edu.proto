@@ -34,7 +34,7 @@ message Aeb_systemstate_11 {
   // [] [0|15]
   optional int32 aeb_livecounter_rear = 13;
   // [bit] [0|255]
-  optional int32 aeb_cheksum = 14;
+  optional int32 aeb_checksum = 14;
 }
 
 message Vcu_vehicle_fault_response_201 {

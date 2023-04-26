@@ -259,7 +259,7 @@ common::math::Vec2d TrajectoryAnalyzer::ComputeCOMPosition(
   Eigen::Vector3d pos_vec(path_point.x(), path_point.y(), path_point.z());
   // Transform original position with vector v
   Eigen::Vector3d com_pos_3d = v + pos_vec;
-  // Return transfromed x and y
+  // Return transformed x and y
   return common::math::Vec2d(com_pos_3d[0], com_pos_3d[1]);
 }
 

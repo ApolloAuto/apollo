@@ -33,7 +33,7 @@ namespace control {
 /**
 * @class LeadlagController
 * @brief A lead/lag controller for speed and steering
-using defualt integral hold
+using default integral hold
 */
 class LeadlagController {
  public:

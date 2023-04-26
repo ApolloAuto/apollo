@@ -58,8 +58,8 @@ void Aebsystemstate11::Parse(const std::uint8_t* bytes, int32_t length,
       pas_b4_stop(bytes, length));
   chassis->mutable_aeb_systemstate_11()->set_aeb_livecounter_rear(
     aeb_livecounter_rear(bytes, length));
-  chassis->mutable_aeb_systemstate_11()->set_aeb_cheksum(
-      aeb_cheksum(bytes, length));
+  chassis->mutable_aeb_systemstate_11()->set_aeb_checksum(
+      aeb_checksum(bytes, length));
 }
 
 // config detail: {'description': '0x00:read only;0x01:brake enable', 'offset':
@@ -231,10 +231,10 @@ int Aebsystemstate11::aeb_livecounter_rear(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'name': 'aeb_cheksum', 'offset': 0.0, 'precision': 1.0,
+// config detail: {'name': 'aeb_checksum', 'offset': 0.0, 'precision': 1.0,
 // 'len': 8, 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 63,
 // 'type': 'int', 'order': 'motorola', 'physical_unit': 'bit'}
-int Aebsystemstate11::aeb_cheksum(const std::uint8_t* bytes,
+int Aebsystemstate11::aeb_checksum(const std::uint8_t* bytes,
                                   int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);

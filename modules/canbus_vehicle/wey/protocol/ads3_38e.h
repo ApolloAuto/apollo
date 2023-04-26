@@ -100,7 +100,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_unit': ''}
   Ads338e* set_ffoglampon(Ads3_38e::FfoglamponType ffoglampon);
 
-  // config detail: {'description': 'Open the rear fog ligh', 'enum':
+  // config detail: {'description': 'Open the rear fog light', 'enum':
   // {0: 'RFOGLAMPON_TURN_OFF', 1: 'RFOGLAMPON_TURN_ON'}, 'precision': 1.0,
   // 'len': 1, 'name': 'RFogLampON', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',
@@ -205,7 +205,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_unit': ''}
   void set_p_ffoglampon(uint8_t* data, Ads3_38e::FfoglamponType ffoglampon);
 
-  // config detail: {'description': 'Open the rear fog ligh', 'enum':
+  // config detail: {'description': 'Open the rear fog light', 'enum':
   // {0: 'RFOGLAMPON_TURN_OFF', 1: 'RFOGLAMPON_TURN_ON'}, 'precision': 1.0,
   // 'len': 1, 'name': 'RFogLampON', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',

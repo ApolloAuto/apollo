@@ -316,7 +316,7 @@ bool ControlComponent::Proc() {
   }
 
   {
-    // TODO(SHU): to avoid redundent copy
+    // TODO(SHU): to avoid redundant copy
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
     local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
