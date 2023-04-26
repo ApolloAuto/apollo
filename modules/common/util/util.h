@@ -141,7 +141,7 @@ class FunctionInfo {
 };
 
 template <typename T, size_t count>
-bool ExecuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
+bool ExcuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
   for (size_t i = 0; i < count; i++) {
     if ((obj->*(fun_list[i].function_))() != apollo::cyber::SUCC) {
       AERROR << fun_list[i].fun_name_ << " failed.";
@@ -152,7 +152,7 @@ bool ExecuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
 }
 
 #define EXEC_ALL_FUNS(type, obj, list) \
-  ExecuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
+  ExcuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
 
 template <typename A, typename B>
 std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {
