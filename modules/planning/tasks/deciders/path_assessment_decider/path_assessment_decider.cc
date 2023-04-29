@@ -731,9 +731,7 @@ void PathAssessmentDecider::SetPathPointType(
           // The path point is within the reference_line's lane.
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::IN_LANE;
-          if (is_prev_point_out_lane) {
-            is_prev_point_out_lane = false;
-          }
+          is_prev_point_out_lane = false;
         }
       }
     } else {

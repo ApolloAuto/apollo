@@ -109,9 +109,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
         adc_low_road_right_segments_.back().second = path_pt_s;
       }
     } else if (path_pt_type == PathData::PathPointType::IN_LANE) {
-      if (!is_adc_low_road_right_beginning) {
-        is_adc_low_road_right_beginning = true;
-      }
+      is_adc_low_road_right_beginning = true;
     }
   }
 
