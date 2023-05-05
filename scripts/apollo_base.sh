@@ -676,7 +676,7 @@ function run_bazel() {
 
   local sp="    "
   local spaces="    "
-  local count=$(nproc)
+  local count=$(echo "scale=0; ($(nproc) * 0.8) / 1" | bc)
   if [ "$1" == "Coverage" ]; then
     count="$(($(nproc) / 2))"
     spaces="       "
