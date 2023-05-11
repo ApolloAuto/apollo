@@ -57,7 +57,7 @@ class BaseTrafficLightTracker : public pipeline::Stage {
 
   virtual bool Process(DataFrame* data_frame) = 0;
 
-  virtual bool IsEnabled() const = 0;;
+  virtual bool IsEnabled() const = 0;
 
   virtual std::string Name() const = 0;
 
