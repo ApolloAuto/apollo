@@ -94,7 +94,7 @@ FLAGS = flags.FLAGS
 
 class Extractor(object):
     def __init__(self):
-        self.node = cyber.Node("sendor_calibration_preprocessor")
+        self.node = cyber.Node("sensor_calibration_preprocessor")
         self.writer = self.node.create_writer("/apollo/dreamview/progress",
                                               preprocess_table_pb2.Progress, 6)
         self.config = extractor_config_pb2.DataExtractionConfig()

@@ -18,12 +18,13 @@
 #include <memory>
 #include <string>
 
+#include "modules/perception/onboard/proto/lidar_component_config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/inner_component_messages/lidar_inner_component_messages.h"
-#include "modules/perception/onboard/proto/lidar_component_config.pb.h"
 #include "modules/perception/pipeline/pipeline.h"
 
 namespace apollo {
