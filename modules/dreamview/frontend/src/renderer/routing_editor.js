@@ -192,20 +192,14 @@ export default class RoutingEditor {
     const index = _.isEmpty(this.routePoints) ?
       -1 : this.isPointInParkingSpace(this.routePoints[this.routePoints.length - 1].position);
     const points = _.isEmpty(routingPoints) ?
-      this.routePoints.map(object =>
-        this.handleRoutingPointObject(object, coordinates, 'position'))
-      : routingPoints.map((point) => {
+      this.routePoints.map((object) => {
+        object.position.z = 0;
+        return coordinates.applyOffset(object.position, true);
+      }) : routingPoints.map((point) => {
         point.z = 0;
-        return _.pick(point, ['x', 'y', 'z', 'heading']);
+        return _.pick(point, ['x', 'y', 'z']);
       });
     const parkingRoutingRequest = (index !== -1);
-    if (parkingRoutingRequest) {
-      const { id } = this.parkingSpaceInfo[index];
-      const parkingSpaceId = _.get(id, 'id');
-      WS.sendParkingRequest(parkingSpaceId);
-      // WS.sendParkingRequest(start, waypoint, end, parkingInfo, laneWidth, cornerPoints, laneId);
-      return true;
-    }
     const start = (points.length > 1) ? points[0]
       : coordinates.applyOffset(carOffsetPosition, true);
     // If the starting point comes from routePoints
