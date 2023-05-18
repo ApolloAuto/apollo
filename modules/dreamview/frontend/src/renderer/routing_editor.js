@@ -197,7 +197,7 @@ export default class RoutingEditor {
         return coordinates.applyOffset(object.position, true);
       }) : routingPoints.map((point) => {
         point.z = 0;
-        return _.pick(point, ['x', 'y', 'z']);
+        return _.pick(point, ['x', 'y', 'z', 'heading']);
       });
     const parkingRoutingRequest = (index !== -1);
     const start = (points.length > 1) ? points[0]
