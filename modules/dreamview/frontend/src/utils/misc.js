@@ -96,53 +96,6 @@ export function IsPointInRectangle(points, p) {
   return isPointIn;
 }
 
-function directionVectorDotProduct(p1, p2) {
-  // The same direction :p1·p2 >0 The opposite direction: <0
-  return p1.x * p2.x + p1.y * p2.y;
-}
-
 export function getPointDistance(p1, p2) {
   return Math.hypot(p1.x - p2.x, p1.y - p2.y);
-}
-
-function getPointInFrontOf(points, p, vector) {
-  return _.findIndex(points, point =>
-    directionVectorDotProduct({
-      x: point.x - p.x,
-      y: point.y - p.y
-    }, vector) > 0);
-}
-
-function getPointBehind(points, p, vector) {
-  return _.findLastIndex(points, point =>
-    directionVectorDotProduct({
-      x: p.x - point.x,
-      y: p.y - point.y
-    }, vector) > 0);
-}
-
-export function getInFrontOfPointIndexDistanceApart(threshold, points, p, vector = null) {
-  let index = _.isEmpty(vector) ? 0 : getPointInFrontOf(points, p, vector);
-  if (index !== -1) {
-    while (index <= points.length - 1) {
-      if (getPointDistance(p, points[index]) >= threshold) {
-        break;
-      }
-      index++;
-    }
-  }
-  return index;
-}
-
-export function getBehindPointIndexDistanceApart(threshold, points, p, vector = null) {
-  let index = _.isEmpty(vector) ? points.length - 1 : getPointBehind(points, p, vector);
-  if (index !== -1) {
-    while (index >= 0) {
-      if (getPointDistance(p, points[index]) >= threshold) {
-        break;
-      }
-      index--;
-    }
-  }
-  return index;
 }
