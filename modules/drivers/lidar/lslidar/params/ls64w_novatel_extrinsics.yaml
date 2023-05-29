@@ -1,0 +1,17 @@
+header:
+  seq: 0
+  stamp:
+    secs: 1598864145
+    nsecs: 0
+  frame_id: novatel
+transform:
+  rotation:
+    x: -0.03002220039113074
+    y: -0.03153447400805393
+    z: 0.4900925455685196
+    w: 0.870582300079021
+  translation:
+    x: 0.5137241988598309
+    y: 0.5743627411243659
+    z: 0.3108987234285666
+child_frame_id: lslidarCH64w

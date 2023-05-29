@@ -1,0 +1,38 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/driver/liblslidar_driver_component.so"
+
+    components {
+      class_name : "LslidarDriverComponent"
+      config {
+        name : "lslidar_driver_ch32"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH32_conf.pb.txt"
+      }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/parser/liblslidar_convert_component.so"
+
+    components {
+      class_name : "LslidarConvertComponent"
+      config {
+        name : "lslidar_convert_ch32"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH32_conf.pb.txt"
+        readers {channel: "/apollo/sensor/lslidarCH32/Scan"}
+      }
+    }
+}
+
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/lidar/lslidar/compensator/liblslidar_compensator_component.so"
+    components {
+      class_name : "CompensatorComponent"
+      config {
+        name : "lslidarCH32_compensator"
+        config_file_path : "/apollo/modules/drivers/lidar/lslidar/conf/lslidarCH32_compensator.pb.txt"
+        readers {channel: "/apollo/sensor/lslidarCH32/PointCloud2"}
+      }
+    }
+}
+
+
