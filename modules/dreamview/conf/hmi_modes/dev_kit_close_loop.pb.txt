@@ -94,6 +94,16 @@ modules {
     }
   }
 }
+modules {
+  key: "V2X"
+  value: {
+    start_command: "nohup /apollo/bazel-bin/modules/v2x/v2x_proxy/app/v2x --flagfile=/apollo/modules/v2x/conf/v2x.conf &"
+    stop_command: "pkill -f \"v2x --flagfile\""
+    process_monitor_config {
+      command_keywords: "v2x --flagfile"
+    }
+  }
+}
 monitored_components {
   key: "Recorder"
   value: {
@@ -129,16 +139,15 @@ monitored_components {
 monitored_components {
   key: "Localization"
   value: {
-    # Special LocalizationMonitor.
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
+    }
+    channel {
+      name: "/apollo/localization/pose"
+    }
   }
 }
-# Disbale ESD-CAN for a while as in some cars we are using B-CAN.
-# monitored_components {
-#   key: "ESD-CAN"
-#   value: {
-#     # Special EsdCanMonitor.
-#   }
-# }
 monitored_components {
   key: "Lidar 16"
   value: {
