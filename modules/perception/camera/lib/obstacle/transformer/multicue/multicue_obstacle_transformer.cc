@@ -154,12 +154,12 @@ void MultiCueObstacleTransformer::SetObjMapperOptions(
   }
 
   memcpy(obj_mapper_options->bbox, bbox2d, sizeof(float) * 4);
-  memcpy(obj_mapper_options->hwl, dimension_hwl, sizeof(float) * 3);
   obj_mapper_options->ry = rotation_y;
   obj_mapper_options->is_veh = (obj->type == base::ObjectType::VEHICLE);
   obj_mapper_options->check_dimension = multicue_param_.check_dimension();
   obj_mapper_options->type_min_vol_index =
       MatchTemplates(sub_type, dimension_hwl);
+  memcpy(obj_mapper_options->hwl, dimension_hwl, sizeof(float) * 3);
 
   ADEBUG << "#2D-to-3D for one obj:";
   ADEBUG << "Obj pred ry:" << rotation_y;
