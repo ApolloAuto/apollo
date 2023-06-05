@@ -1,0 +1,29 @@
+model: LSLIDAR_C1_V4
+device_ip: "192.168.1.200"
+msop_port: 2368
+difop_port: 2369
+return_mode: 1
+degree_mode: 2        #2: 均匀2度校准两列  1://均匀1.33度校准两列
+distance_unit: 0.4
+packet_size: 1212
+time_synchronization: true
+add_multicast: false
+group_ip: "224.1.1.2"
+rpm: 600                      #雷达转速     10hz:600rpm, 20hz:1200rpm, 5hz:300rpm
+convert_channel_name: "/apollo/sensor/lslidar1v4/PointCloud2"
+frame_id: "lslidar16"
+scan_channel: "/apollo/sensor/lslidar1v4/Scan"
+min_range: 0.15
+max_range: 150.0
+config_vert: true
+scan_start_angle: 0.0
+scan_end_angle: 36000.0
+#要屏蔽的矩形区域参数
+bottom_left_x: 0.0             #左下 x值
+bottom_left_y: 0.0             #左下 y值
+top_right_x: 0.0               #右上 x值
+top_right_y: 0.0               #右上 y值
+
+#calibration: false
+#calibration_file: "/apollo/modules/drivers/lidar/lslidar/params/LS16_calibration.yaml"
+pcap_path: ""                    #读取pcap包，测试时使用，连接雷达的时候，将此值设置为空
