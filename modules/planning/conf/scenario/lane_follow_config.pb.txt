@@ -15,8 +15,8 @@ stage_config: {
   task_type: SPEED_HEURISTIC_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  #task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
-  task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  #task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   task_type: RSS_DECIDER
 
   task_config: {
@@ -28,9 +28,6 @@ stage_config: {
 
   task_config: {
     task_type: PATH_REUSE_DECIDER
-    path_reuse_decider_config {
-      reuse_path: false
-    }
   }
 
   task_config: {
