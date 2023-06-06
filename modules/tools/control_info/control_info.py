@@ -788,6 +788,11 @@ class ControlInfo(object):
                         self.cary,
                         color='red',
                         label='localization pose')
+        self.axarr.plot(self.carx,
+                        self.cary,
+                        'ro',
+                        markersize=5,
+                        label='localization pose dot')
         self.axarr.plot(self.planning_pathx,
                         self.planning_pathy,
                         color='green',

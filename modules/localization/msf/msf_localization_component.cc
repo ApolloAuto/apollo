@@ -149,7 +149,7 @@ void LocalizationMsgPublisher::PublishPoseBroadcastTF(
   } else {
     mutable_head->set_timestamp_sec(localization.header().timestamp_sec());
   }
-  
+
   mutable_head->set_frame_id(broadcast_tf_frame_id_);
   tf2_msg.set_child_frame_id(broadcast_tf_child_frame_id_);
 

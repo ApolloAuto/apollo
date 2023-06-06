@@ -52,7 +52,7 @@ bool PriSecFusionComponent::Proc(
     target->set_measurement_time(target->header().timestamp_sec());
   }
 
-  if (conf_.has_target_frame_id() 
+  if (conf_.has_target_frame_id()
       && conf_.target_frame_id() != target->header().frame_id()) {
     target->mutable_header()->set_frame_id(conf_.target_frame_id());
     target->clear_point();
