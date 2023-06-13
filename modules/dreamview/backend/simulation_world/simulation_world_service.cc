@@ -30,6 +30,7 @@
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/polygon2d.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
@@ -261,6 +262,14 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
   auto_driving_car->set_height(vehicle_param.height());
   auto_driving_car->set_width(vehicle_param.width());
   auto_driving_car->set_length(vehicle_param.length());
+  auto_driving_car->set_front_edge_to_center(
+      vehicle_param.front_edge_to_center());
+  auto_driving_car->set_back_edge_to_center(
+      vehicle_param.back_edge_to_center());
+  auto_driving_car->set_right_edge_to_center(
+      vehicle_param.left_edge_to_center());
+  auto_driving_car->set_left_edge_to_center(
+      vehicle_param.right_edge_to_center());
 }
 
 void SimulationWorldService::InitReaders() {
@@ -418,6 +427,26 @@ void SimulationWorldService::UpdateLatencies() {
   UpdateLatency("control", control_command_reader_.get());
 }
 
+void SimulationWorldService::UpdateADCBoundingbox(double x, double y) {
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
+  auto_driving_car->clear_polygon_point();
+  double right_x = x + auto_driving_car->left_edge_to_center();
+  double left_x = x - auto_driving_car->right_edge_to_center();
+  double top_y = y + auto_driving_car->front_edge_to_center();
+  double bottom_y = y - auto_driving_car->back_edge_to_center();
+  PolygonPoint *top_left_corner = auto_driving_car->add_polygon_point();
+  PolygonPoint *top_right_corner = auto_driving_car->add_polygon_point();
+  PolygonPoint *bottom_right_corner = auto_driving_car->add_polygon_point();
+  PolygonPoint *bottom_left_corner = auto_driving_car->add_polygon_point();
+  top_left_corner->set_x(left_x);
+  top_left_corner->set_y(top_y);
+  top_right_corner->set_x(right_x);
+  top_right_corner->set_y(top_y);
+  bottom_left_corner->set_x(left_x);
+  bottom_left_corner->set_y(bottom_y);
+  bottom_right_corner->set_x(right_x);
+  bottom_right_corner->set_y(bottom_y);
+}
 void SimulationWorldService::GetWireFormatString(
     double radius, std::string *sim_world,
     std::string *sim_world_with_planning_data) {
@@ -483,6 +512,10 @@ void SimulationWorldService::UpdateSimulationWorld(
   // message header. It is done on both the SimulationWorld object
   // itself and its auto_driving_car() field.
   auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  // updates bounding box with postion
+  UpdateADCBoundingbox(pose.position().x() + map_service_->GetXOffset(),
+                       pose.position().y() + map_service_->GetYOffset());
   ready_to_push_.store(true);
 }
 
@@ -584,6 +617,7 @@ Object &SimulationWorldService::CreateWorldObjectIfAbsent(
     SetObstacleType(obstacle.type(), obstacle.sub_type(), &world_obj);
     SetObstacleSensorMeasurements(obstacle, &world_obj);
     SetObstacleSource(obstacle, &world_obj);
+    SetObstacleDistanceToAdc(obstacle, &world_obj);
   }
   return obj_map_[id];
 }
@@ -670,6 +704,26 @@ void SimulationWorldService::SetObstacleSource(
     world_object->mutable_v2x_info()->CopyFrom(obstacle.v2x_info());
   }
   return;
+}
+
+void SimulationWorldService::SetObstacleDistanceToAdc(
+    const apollo::perception::PerceptionObstacle &obstacle,
+    Object *world_object) {
+  if (world_object == nullptr) {
+    return;
+  }
+  std::vector<apollo::common::math::Vec2d> obstacle_points;
+  std::vector<apollo::common::math::Vec2d> adc_polygon_points;
+  for (auto &polygon_pt : world_object->polygon_point()) {
+    obstacle_points.emplace_back(polygon_pt.x(), polygon_pt.y());
+  }
+  for (auto &polygon_pt : world_.auto_driving_car().polygon_point()) {
+    adc_polygon_points.emplace_back(polygon_pt.x(), polygon_pt.y());
+  }
+  world_object->clear_distance_to_adc();
+  world_object->set_distance_to_adc(std::fabs(
+      apollo::common::math::Polygon2d(obstacle_points)
+          .DistanceTo(apollo::common::math::Polygon2d(adc_polygon_points))));
 }
 
 template <>

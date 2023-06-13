@@ -187,6 +187,12 @@ class SimulationWorldService {
       Object *world_object);
   void SetObstacleSource(const apollo::perception::PerceptionObstacle &obstacle,
                          Object *world_object);
+  /**
+   * @brief Set the distance beetween the auto driving car polygon and the obstacle polygon.
+  */
+  void SetObstacleDistanceToAdc(
+      const apollo::perception::PerceptionObstacle &obstacle,
+      Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
   void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);
@@ -300,6 +306,17 @@ class SimulationWorldService {
    * a module.
    */
   void UpdateLatencies();
+
+  /**
+   *  @brief auto driving car boundingbox with localization and map offset
+   *  use a rectangle to represent the bounding box of the auto driving car.
+   * eg:
+   *   top_left_corner.x = position.x + map_xoffset /
+   *   + auto_driving_car->right_edge_to_center
+   *   top_left_corner.y = position.y + map_yoffset /
+   *   + auto_driving_car->front_edge_to_center
+   */
+  void UpdateADCBoundingbox(double x, double y);
 
   template <typename Points>
   void DownsampleSpeedPointsByInterval(const Points &points,

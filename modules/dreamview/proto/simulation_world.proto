@@ -86,6 +86,7 @@ message Object {
   optional double longitude = 5;
   optional double position_x = 6;
   optional double position_y = 7;
+
   optional double length = 8 [default = 2.8];
   optional double width = 9 [default = 1.4];
   optional double height = 10 [default = 1.8];
@@ -133,8 +134,13 @@ message Object {
     DISENGAGE_AUTO_SPEED_ONLY = 5;
     DISENGAGE_CHASSIS_ERROR = 6;
   };
+  optional double front_edge_to_center = 45;
+  optional double back_edge_to_center = 46;
+  optional double left_edge_to_center = 47;
+  optional double right_edge_to_center = 48;
 
   optional DisengageType disengage_type = 28;
+
 
   enum Type {
     UNKNOWN = 0;
@@ -162,6 +168,9 @@ message Object {
       [default = HOST_VEHICLE];  // source type
   // v2x use case info
   optional apollo.perception.V2XInformation v2x_info = 37;
+
+  // distance info 
+  optional double distance_to_adc = 41; // perception obstacle distance to adc 
 }
 
 message DelaysInMs {
