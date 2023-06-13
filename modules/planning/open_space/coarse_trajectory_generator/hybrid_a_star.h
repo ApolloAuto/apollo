@@ -68,7 +68,8 @@ class HybridAStar {
                            std::vector<HybridAStartResult>* partitioned_result);
 
  private:
-  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
+  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
+    std::shared_ptr<Node3d>& candidate_final_node);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node);
   // check Reeds Shepp path collision and validity
@@ -118,6 +119,7 @@ class HybridAStar {
   double max_forward_acc_ = 0.0;
   double max_reverse_acc_ = 0.0;
   double max_acc_jerk_ = 0.0;
+  double arc_length_ = 0.0;
   std::vector<double> XYbounds_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
@@ -126,16 +128,17 @@ class HybridAStar {
       obstacles_linesegments_vec_;
 
   struct cmp {
-    bool operator()(const std::pair<std::string, double>& left,
-                    const std::pair<std::string, double>& right) const {
+    bool operator()(const std::pair<std::shared_ptr<Node3d>, double>& left,
+                    const std::pair<std::shared_ptr<Node3d>, double>& right) const {
       return left.second >= right.second;
     }
   };
-  std::priority_queue<std::pair<std::string, double>,
-                      std::vector<std::pair<std::string, double>>, cmp>
-      open_pq_;
-  std::unordered_map<std::string, std::shared_ptr<Node3d>> open_set_;
-  std::unordered_map<std::string, std::shared_ptr<Node3d>> close_set_;
+  std::priority_queue<
+      std::pair<std::shared_ptr<Node3d>, double>,
+      std::vector<std::pair<std::shared_ptr<Node3d>, double>>,
+      cmp> open_pq_;
+  std::unordered_set<std::string> open_set_;
+  std::unordered_set<std::string> close_set_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
   std::unique_ptr<GridSearch> grid_a_star_heuristic_generator_;
 };
