@@ -66,7 +66,7 @@ Status VehicleStateProvider::Update(
     vehicle_state_.set_steering_percentage(chassis.steering_percentage());
   }
 
-  static constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 0.1;
   if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
   } else {
