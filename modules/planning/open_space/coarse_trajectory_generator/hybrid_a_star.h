@@ -25,12 +25,12 @@
 #include <queue>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/time/clock.h"
@@ -69,7 +69,7 @@ class HybridAStar {
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
-    std::shared_ptr<Node3d>& candidate_final_node);
+                         std::shared_ptr<Node3d>* candidate_final_node);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node);
   // check Reeds Shepp path collision and validity
@@ -128,15 +128,16 @@ class HybridAStar {
       obstacles_linesegments_vec_;
 
   struct cmp {
-    bool operator()(const std::pair<std::shared_ptr<Node3d>, double>& left,
-                    const std::pair<std::shared_ptr<Node3d>, double>& right) const {
+    bool operator()(
+        const std::pair<std::shared_ptr<Node3d>, double>& left,
+        const std::pair<std::shared_ptr<Node3d>, double>& right) const {
       return left.second >= right.second;
     }
   };
-  std::priority_queue<
-      std::pair<std::shared_ptr<Node3d>, double>,
-      std::vector<std::pair<std::shared_ptr<Node3d>, double>>,
-      cmp> open_pq_;
+  std::priority_queue<std::pair<std::shared_ptr<Node3d>, double>,
+                      std::vector<std::pair<std::shared_ptr<Node3d>, double>>,
+                      cmp>
+      open_pq_;
   std::unordered_set<std::string> open_set_;
   std::unordered_set<std::string> close_set_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;

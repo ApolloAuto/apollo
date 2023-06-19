@@ -21,7 +21,7 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
 #include <limits>
-
+#include <unordered_set>
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
@@ -103,7 +103,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
 
 bool HybridAStar::AnalyticExpansion(
     std::shared_ptr<Node3d> current_node,
-    std::shared_ptr<Node3d>& candidate_final_node) {
+    std::shared_ptr<Node3d>* candidate_final_node) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
       std::make_shared<ReedSheppPath>();
   if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
@@ -114,7 +114,7 @@ bool HybridAStar::AnalyticExpansion(
     return false;
   }
   // load the whole RSP as nodes and add to the close set
-  candidate_final_node = LoadRSPinCS(reeds_shepp_to_check, current_node);
+  *candidate_final_node = LoadRSPinCS(reeds_shepp_to_check, current_node);
   return true;
 }
 
@@ -785,7 +785,7 @@ bool HybridAStar::Plan(
     open_pq_.pop();
     const double rs_start_time = Clock::NowInSeconds();
     std::shared_ptr<Node3d> final_node = nullptr;
-    if (AnalyticExpansion(current_node, final_node)) {
+    if (AnalyticExpansion(current_node, &final_node)) {
       if (final_node_ == nullptr ||
           final_node_->GetTrajCost() > final_node->GetTrajCost()) {
         ADEBUG << "get result" << final_node->GetTrajCost();
