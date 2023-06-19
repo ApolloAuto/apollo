@@ -273,6 +273,9 @@ bool PathReuseDecider::IsCollisionFree(
   }
   const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
+  if (history_path.empty()) {
+    return false;
+  }
   // path end point
   common::SLPoint path_end_position_sl;
   common::math::Vec2d path_end_position = {history_path.back().x(),

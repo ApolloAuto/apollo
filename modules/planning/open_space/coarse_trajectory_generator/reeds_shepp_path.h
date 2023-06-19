@@ -43,6 +43,7 @@ struct ReedSheppPath {
   std::vector<double> segs_lengths;
   std::vector<char> segs_types;
   double total_length = 0.0;
+  double cost = 0.0;
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> phi;
@@ -130,6 +131,10 @@ class ReedShepp {
   common::VehicleParam vehicle_param_;
   PlannerOpenSpaceConfig planner_open_space_config_;
   double max_kappa_;
+  double traj_forward_penalty_;
+  double traj_back_penalty_;
+  double traj_gear_switch_penalty_;
+  double traj_steer_penalty_;
 };
 }  // namespace planning
 }  // namespace apollo

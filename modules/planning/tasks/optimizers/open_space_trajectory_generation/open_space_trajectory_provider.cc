@@ -108,28 +108,16 @@ Status OpenSpaceTrajectoryProvider::Process() {
   // Get stitching trajectory from last frame
   const common::VehicleState vehicle_state = frame_->vehicle_state();
   auto* previous_frame = injector_->frame_history()->Latest();
-  // Use complete raw trajectory from last frame for stitching purpose
   std::vector<TrajectoryPoint> stitching_trajectory;
-  if (!IsVehicleStopDueToFallBack(
+  bool is_stop_due_to_fallback = false;
+  if (previous_frame &&
+      IsVehicleStopDueToFallBack(
           previous_frame->open_space_info().fallback_flag(), vehicle_state)) {
-    const auto& previous_planning =
-        previous_frame->open_space_info().stitched_trajectory_result();
-    const auto& previous_planning_header =
-        previous_frame->current_frame_planned_trajectory()
-            .header()
-            .timestamp_sec();
-    const double planning_cycle_time = FLAGS_open_space_planning_period;
-    PublishableTrajectory last_frame_complete_trajectory(
-        previous_planning_header, previous_planning);
-    std::string replan_reason;
-    const double start_timestamp = Clock::NowInSeconds();
-    stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-        vehicle_state, start_timestamp, planning_cycle_time,
-        FLAGS_open_space_trajectory_stitching_preserved_length, true,
-        &last_frame_complete_trajectory, &replan_reason);
-    need_replan = !replan_reason.empty();
-  } else {
-    AINFO << "Replan due to fallback stop";
+    is_stop_due_to_fallback = true;
+  }
+  if (!is_planned_ || is_stop_due_to_fallback) {
+    AINFO << "need to fallback is_planned" << is_planned_
+          << "is_stop_due_to_fallback" << is_stop_due_to_fallback;
     const double planning_cycle_time =
         1.0 / static_cast<double>(FLAGS_planning_loop_rate);
     stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
@@ -164,10 +152,11 @@ Status OpenSpaceTrajectoryProvider::Process() {
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
       if (need_replan || !injector_->planning_context()
-                                                   ->mutable_planning_status()
-                                                   ->mutable_open_space()
-                                                   ->position_init()) {
+                              ->mutable_planning_status()
+                              ->mutable_open_space()
+                              ->position_init()) {
         data_ready_.store(true);
+        is_planned_ = true;
       } else {
         data_ready_.store(false);
         AINFO << "SKIP BECAUSE HAS PLAN";

@@ -32,6 +32,14 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
                             .traj_kappa_contraint_ratio() /
                         vehicle_param_.steer_ratio()) /
                vehicle_param_.wheel_base();
+  traj_forward_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_forward_penalty();
+  traj_back_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_back_penalty();
+  traj_gear_switch_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_gear_switch_penalty();
+  traj_steer_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_steer_penalty();
   AINFO << "max kappa: " << max_kappa_;
   AINFO_IF(FLAGS_enable_parallel_hybrid_a) << "parallel REEDShepp";
 }
@@ -67,14 +75,42 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
     return false;
   }
 
-  double optimal_path_length = std::numeric_limits<double>::infinity();
+  double start_dire = 1;
+  if (start_node->GetDirec() == false) start_dire = -1;
+
   size_t optimal_path_index = 0;
   size_t paths_size = all_possible_paths.size();
+  double min_cost = std::numeric_limits<double>::max();
   for (size_t i = 0; i < paths_size; ++i) {
-    if (all_possible_paths.at(i).total_length > 0 &&
-        all_possible_paths.at(i).total_length < optimal_path_length) {
+    double cost = 0;
+    auto& path = all_possible_paths[i];
+    for (size_t j = 0; j < path.segs_lengths.size(); j++) {
+      if (path.segs_types[j] == 'S') {
+        if (path.segs_lengths[j] < 0)
+          cost += -path.segs_lengths[j] * traj_back_penalty_;
+        else
+          cost += path.segs_lengths[j] * traj_forward_penalty_;
+      } else {
+        if (path.segs_lengths[j] < 0)
+          cost +=
+              -path.segs_lengths[j] * traj_steer_penalty_ * traj_back_penalty_;
+        else
+          cost += path.segs_lengths[j] * traj_steer_penalty_ *
+                  traj_forward_penalty_;
+      }
+      if (j > 0 && path.segs_lengths[j] * path.segs_lengths[j - 1] < 0) {
+        cost += cost + traj_gear_switch_penalty_;
+      }
+      if (j == 0 && start_dire * path.segs_lengths[j] < 0) {
+        cost += cost + traj_gear_switch_penalty_;
+      }
+      if (std::fabs(path.segs_lengths[j]) < 2.0) {
+        cost += 50;
+      }
+    }
+    if (cost < min_cost) {
       optimal_path_index = i;
-      optimal_path_length = all_possible_paths.at(i).total_length;
+      min_cost = cost;
     }
   }
 
@@ -88,8 +124,9 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                end_node->GetX()) > 1e-3 ||
       std::abs(all_possible_paths[optimal_path_index].y.back() -
                end_node->GetY()) > 1e-3 ||
-      std::abs(all_possible_paths[optimal_path_index].phi.back() -
-               end_node->GetPhi()) > 1e-3) {
+      common::math::NormalizeAngle(
+          all_possible_paths[optimal_path_index].phi.back() -
+          end_node->GetPhi()) > 1e-3) {
     ADEBUG << "RSP end position not right";
     for (size_t i = 0;
          i < all_possible_paths[optimal_path_index].segs_types.size(); ++i) {
@@ -104,6 +141,7 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
            << end_node->GetY() << ", " << end_node->GetPhi();
     return false;
   }
+  (*optimal_path).cost = min_cost;
   (*optimal_path).x = all_possible_paths[optimal_path_index].x;
   (*optimal_path).y = all_possible_paths[optimal_path_index].y;
   (*optimal_path).phi = all_possible_paths[optimal_path_index].phi;
