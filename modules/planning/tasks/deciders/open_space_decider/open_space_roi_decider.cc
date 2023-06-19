@@ -252,8 +252,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
                            parking_depth_buffer);
 
     } else {
-      end_y = left_down.y() - (std::max(-top_to_down_distance / 4.0,
-                                        vehicle_params_.back_edge_to_center()) +
+      end_y = left_down.y() - (vehicle_params_.back_edge_to_center()+
                                parking_depth_buffer);
     }
   } else {
@@ -263,8 +262,7 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
                                     vehicle_params_.front_edge_to_center()) +
                            parking_depth_buffer);
     } else {
-      end_y = left_down.y() + (std::max(top_to_down_distance / 4.0,
-                                        vehicle_params_.back_edge_to_center()) +
+      end_y = left_down.y() + (vehicle_params_.back_edge_to_center() +
                                parking_depth_buffer);
     }
   }
@@ -272,12 +270,6 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
     double parllel_park_end_x_buffer =
         config_.open_space_roi_decider_config().parallel_park_end_x_buffer();
     // Check the validity of parllel_park_end_x_buffer
-    double max_parllel_park_end_x_buffer =
-        (std::abs(left_top.x() - right_top.x()) - vehicle_params_.length()) /
-        2.0;
-    if (parllel_park_end_x_buffer > max_parllel_park_end_x_buffer) {
-      parllel_park_end_x_buffer = max_parllel_park_end_x_buffer;
-    }
 
     parking_spot_heading = (left_down - right_down).Angle();
     end_y = (left_top.y() + left_down.y()) / 2.0;
