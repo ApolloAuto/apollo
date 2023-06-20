@@ -230,3 +230,7 @@ data_files {
   source_path: "v2x_conf"
   dest_path: "/apollo/modules/v2x/conf"
 }
+data_files {
+  source_path: "perception_model_conf"
+  dest_path: "/apollo/modules/perception/production/data/perception"
+}
