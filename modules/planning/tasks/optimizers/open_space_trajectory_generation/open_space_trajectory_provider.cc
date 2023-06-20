@@ -115,7 +115,11 @@ Status OpenSpaceTrajectoryProvider::Process() {
           previous_frame->open_space_info().fallback_flag(), vehicle_state)) {
     is_stop_due_to_fallback = true;
   }
-  if (!is_planned_ || is_stop_due_to_fallback) {
+  if (!is_planned_ || is_stop_due_to_fallback ||
+      !injector_->planning_context()
+           ->mutable_planning_status()
+           ->mutable_open_space()
+           ->position_init()) {
     AINFO << "need to fallback is_planned" << is_planned_
           << "is_stop_due_to_fallback" << is_stop_due_to_fallback;
     const double planning_cycle_time =
@@ -139,7 +143,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
       return Status(ErrorCode::OK, "Parking finished");
     }
 
-    {
+    if (need_replan) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.stitching_trajectory = stitching_trajectory;
       thread_data_.end_pose = open_space_info.open_space_end_pose();
@@ -151,16 +155,12 @@ Status OpenSpaceTrajectoryProvider::Process() {
       thread_data_.obstacles_vertices_vec =
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
-      if (need_replan || !injector_->planning_context()
-                              ->mutable_planning_status()
-                              ->mutable_open_space()
-                              ->position_init()) {
-        data_ready_.store(true);
-        is_planned_ = true;
-      } else {
-        data_ready_.store(false);
-        AINFO << "SKIP BECAUSE HAS PLAN";
-      }
+      data_ready_.store(true);
+      is_planned_ = true;
+    } else {
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
+      data_ready_.store(false);
+      AINFO << "SKIP BECAUSE HAS PLAN";
     }
 
     // Check vehicle state
