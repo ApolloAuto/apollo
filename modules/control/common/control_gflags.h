@@ -80,3 +80,7 @@ DECLARE_bool(enable_gear_drive_negative_speed_protection);
 DECLARE_bool(use_control_submodules);
 
 DECLARE_bool(use_acceleration_lookup_limit);
+
+DECLARE_bool(use_preview_reference_check);
+
+DECLARE_double(steer_cmd_interval);

@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "cyber/time/time.h"
@@ -276,39 +277,54 @@ Status LonController::ComputeControlCommand(
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
       FLAGS_enable_slope_offset * debug->slope_offset_compensation();
-  debug->set_is_full_stop(false);
-  GetPathRemain(debug);
 
+  // Check the steer command in reverse trajectory if the current steer target
+  // is larger than previous target, free the acceleration command, wait for
+  // the current steer target
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::UNKNOWN) &&
-      std::abs(cmd->steering_target() - chassis->steering_percentage()) > 20) {
+      std::abs(cmd->steering_target() - chassis->steering_percentage()) >
+          FLAGS_steer_cmd_interval) {
     acceleration_cmd = 0;
-    ADEBUG << "Steering not reached";
-    debug->set_is_full_stop(true);
+    ADEBUG << "Steer cmd interval is larger than " << FLAGS_steer_cmd_interval;
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
   }
 
+  debug->set_is_full_stop(false);
+  GetPathRemain(debug);
   // At near-stop stage, replace the brake control command with the standstill
   // acceleration if the former is even softer than the latter
-  if (((trajectory_message_->trajectory_type() ==
-        apollo::planning::ADCTrajectory::NORMAL) ||
-       (trajectory_message_->trajectory_type() ==
-        apollo::planning::ADCTrajectory::SPEED_FALLBACK)) &&
-      ((std::fabs(debug->preview_acceleration_reference()) <=
-            control_conf_->max_acceleration_when_stopped() &&
+  if ((trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::NORMAL) ||
+      (trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::SPEED_FALLBACK) ||
+      (trajectory_message_->trajectory_type() ==
+       apollo::planning::ADCTrajectory::UNKNOWN)) {
+    if (FLAGS_use_preview_reference_check &&
+        (std::fabs(debug->preview_acceleration_reference()) <=
+         control_conf_->max_acceleration_when_stopped()) &&
         std::fabs(debug->preview_speed_reference()) <=
-            vehicle_param_.max_abs_speed_when_stopped()) ||
-       std::abs(debug->path_remain()) <
-           control_conf_->max_path_remain_when_stopped())) {
+            vehicle_param_.max_abs_speed_when_stopped()) {
+      debug->set_is_full_stop(true);
+      ADEBUG << "Into full stop within preview acc and reference speed, "
+             << "is_full_stop is " << debug->is_full_stop();
+    }
+    if (std::abs(debug->path_remain()) <
+        control_conf_->max_path_remain_when_stopped()) {
+      debug->set_is_full_stop(true);
+      ADEBUG << "Into full stop within path remain, "
+             << "is_full_stop is " << debug->is_full_stop();
+    }
+  }
+
+  if (debug->is_full_stop()) {
     acceleration_cmd =
         (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
             ? std::max(acceleration_cmd,
                        -lon_controller_conf.standstill_acceleration())
             : std::min(acceleration_cmd,
                        lon_controller_conf.standstill_acceleration());
-    ADEBUG << "Stop location reached";
-    debug->set_is_full_stop(true);
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
   }
@@ -543,7 +559,7 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
       auto &current_trajectory_point =
           trajectory_message_->trajectory_point(stop_index);
-      if (current_trajectory_point.v() < kSpeedThreshold &&
+      if (current_trajectory_point.v() > -kSpeedThreshold &&
           current_trajectory_point.a() < kBackwardAccThreshold &&
           current_trajectory_point.a() > 0.0) {
         break;
@@ -551,6 +567,7 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
       ++stop_index;
     }
   }
+  ADEBUG << "stop_index is, " << stop_index;
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
     if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
