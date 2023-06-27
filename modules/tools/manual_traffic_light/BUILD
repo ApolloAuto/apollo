@@ -33,6 +33,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
