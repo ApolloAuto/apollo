@@ -721,9 +721,11 @@ void SimulationWorldService::SetObstacleDistanceToAdc(
     adc_polygon_points.emplace_back(polygon_pt.x(), polygon_pt.y());
   }
   world_object->clear_distance_to_adc();
-  world_object->set_distance_to_adc(std::fabs(
+  if (obstacle_points.size() > 2 && adc_polygon_points.size() > 2) {
+    world_object->set_distance_to_adc(std::fabs(
       apollo::common::math::Polygon2d(obstacle_points)
           .DistanceTo(apollo::common::math::Polygon2d(adc_polygon_points))));
+  }
 }
 
 template <>
