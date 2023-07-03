@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "cyber/data/channel_buffer.h"
@@ -43,26 +44,11 @@ struct VisitorConfig {
 template <typename T>
 using BufferType = CacheBuffer<std::shared_ptr<T>>;
 
-template <typename M0, typename M1 = NullType, typename M2 = NullType,
-          typename M3 = NullType>
+template <typename ...M>
 class DataVisitor : public DataVisitorBase {
  public:
   explicit DataVisitor(const std::vector<VisitorConfig>& configs)
-      : buffer_m0_(configs[0].channel_id,
-                   new BufferType<M0>(configs[0].queue_size)),
-        buffer_m1_(configs[1].channel_id,
-                   new BufferType<M1>(configs[1].queue_size)),
-        buffer_m2_(configs[2].channel_id,
-                   new BufferType<M2>(configs[2].queue_size)),
-        buffer_m3_(configs[3].channel_id,
-                   new BufferType<M3>(configs[3].queue_size)) {
-    DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
-    DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
-    DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
-    DataDispatcher<M3>::Instance()->AddBuffer(buffer_m3_);
-    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
-    data_fusion_ = new fusion::AllLatest<M0, M1, M2, M3>(
-        buffer_m0_, buffer_m1_, buffer_m2_, buffer_m3_);
+  : DataVisitor(configs, std::make_index_sequence<sizeof...(M)>{}) {
   }
 
   ~DataVisitor() {
@@ -72,9 +58,8 @@ class DataVisitor : public DataVisitorBase {
     }
   }
 
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,    // NOLINT
-                std::shared_ptr<M2>& m2, std::shared_ptr<M3>& m3) {  // NOLINT
-    if (data_fusion_->Fusion(&next_msg_index_, m0, m1, m2, m3)) {
+  bool TryFetch(std::shared_ptr<M>& ...m) {                         // NOLINT
+    if (data_fusion_->Fusion(&next_msg_index_, m...)) {
       next_msg_index_++;
       return true;
     }
@@ -82,96 +67,35 @@ class DataVisitor : public DataVisitorBase {
   }
 
  private:
-  fusion::DataFusion<M0, M1, M2, M3>* data_fusion_ = nullptr;
-  ChannelBuffer<M0> buffer_m0_;
-  ChannelBuffer<M1> buffer_m1_;
-  ChannelBuffer<M2> buffer_m2_;
-  ChannelBuffer<M3> buffer_m3_;
-};
-
-template <typename M0, typename M1, typename M2>
-class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
- public:
-  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
-      : buffer_m0_(configs[0].channel_id,
-                   new BufferType<M0>(configs[0].queue_size)),
-        buffer_m1_(configs[1].channel_id,
-                   new BufferType<M1>(configs[1].queue_size)),
-        buffer_m2_(configs[2].channel_id,
-                   new BufferType<M2>(configs[2].queue_size)) {
-    DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
-    DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
-    DataDispatcher<M2>::Instance()->AddBuffer(buffer_m2_);
-    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
+  template<size_t ...N>
+  explicit DataVisitor(const std::vector<VisitorConfig>& configs, std::index_sequence<N...>)
+  : buffers_ (std::make_tuple(
+                ChannelBuffer<M>(configs[N].channel_id, 
+                                 new BufferType<M>(configs[N].queue_size)) ...)) {
+    {
+      int dummy[] = {(DataDispatcher<M>::Instance()->AddBuffer(std::get<N>(buffers_)), 0)...};
+      (void)dummy;
+    }
+    data_notifier_->AddNotifier(std::get<0>(buffers_).channel_id(), notifier_);
     data_fusion_ =
-        new fusion::AllLatest<M0, M1, M2>(buffer_m0_, buffer_m1_, buffer_m2_);
+        new fusion::AllLatest<M...>(std::get<N>(buffers_)...);
   }
 
-  ~DataVisitor() {
-    if (data_fusion_) {
-      delete data_fusion_;
-      data_fusion_ = nullptr;
-    }
-  }
-
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,  // NOLINT
-                std::shared_ptr<M2>& m2) {                         // NOLINT
-    if (data_fusion_->Fusion(&next_msg_index_, m0, m1, m2)) {
-      next_msg_index_++;
-      return true;
-    }
-    return false;
-  }
-
- private:
-  fusion::DataFusion<M0, M1, M2>* data_fusion_ = nullptr;
-  ChannelBuffer<M0> buffer_m0_;
-  ChannelBuffer<M1> buffer_m1_;
-  ChannelBuffer<M2> buffer_m2_;
-};
-
-template <typename M0, typename M1>
-class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
- public:
-  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
-      : buffer_m0_(configs[0].channel_id,
-                   new BufferType<M0>(configs[0].queue_size)),
-        buffer_m1_(configs[1].channel_id,
-                   new BufferType<M1>(configs[1].queue_size)) {
-    DataDispatcher<M0>::Instance()->AddBuffer(buffer_m0_);
-    DataDispatcher<M1>::Instance()->AddBuffer(buffer_m1_);
-    data_notifier_->AddNotifier(buffer_m0_.channel_id(), notifier_);
-    data_fusion_ = new fusion::AllLatest<M0, M1>(buffer_m0_, buffer_m1_);
-  }
-
-  ~DataVisitor() {
-    if (data_fusion_) {
-      delete data_fusion_;
-      data_fusion_ = nullptr;
-    }
-  }
-
-  bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1) {  // NOLINT
-    if (data_fusion_->Fusion(&next_msg_index_, m0, m1)) {
-      next_msg_index_++;
-      return true;
-    }
-    return false;
-  }
-
- private:
-  fusion::DataFusion<M0, M1>* data_fusion_ = nullptr;
-  ChannelBuffer<M0> buffer_m0_;
-  ChannelBuffer<M1> buffer_m1_;
+  std::tuple<ChannelBuffer<M> ...> buffers_;
+  fusion::DataFusion<M ...>* data_fusion_ = nullptr;
 };
 
 template <typename M0>
-class DataVisitor<M0, NullType, NullType, NullType> : public DataVisitorBase {
+class DataVisitor<M0>: public DataVisitorBase {
  public:
   explicit DataVisitor(const VisitorConfig& configs)
       : buffer_(configs.channel_id, new BufferType<M0>(configs.queue_size)) {
     DataDispatcher<M0>::Instance()->AddBuffer(buffer_);
     data_notifier_->AddNotifier(buffer_.channel_id(), notifier_);
+  }
+
+  explicit DataVisitor(const std::vector<VisitorConfig>& configs)
+      : DataVisitor(configs[0]) {
   }
 
   DataVisitor(uint64_t channel_id, uint32_t queue_size)

@@ -28,7 +28,7 @@
 namespace apollo {
 namespace cyber {
 
-template <typename M0, typename M1, typename M2, typename M3>
+template <typename M0, typename ...M>
 class Component;
 class TimerComponent;
 
@@ -43,7 +43,7 @@ class TimerComponent;
  */
 class Node {
  public:
-  template <typename M0, typename M1, typename M2, typename M3>
+  template <typename M0, typename ...M>
   friend class Component;
   friend class TimerComponent;
   friend bool Init(const char*);
