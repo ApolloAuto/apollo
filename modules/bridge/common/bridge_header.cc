@@ -53,14 +53,19 @@ bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
       i -= static_cast<int>(sizeof(HType) + sizeof(bsize) + size + 3);
       continue;
     }
-    size_t value_size = 0;
+
     for (int j = 0; j < Header_Tail; j++) {
       if (type == header_item[j]->GetType()) {
-        cursor = header_item[j]->DiserializeItem(cursor, &value_size);
+        size_t value_size = 0;
+        cursor = header_item[j]->DiserializeItem(cursor, static_cast<size_t>(i),
+                                                 &value_size);
+        i -= static_cast<int>(value_size);
+        if (cursor == nullptr) {
+          return false;
+        }
         break;
       }
     }
-    i -= static_cast<int>(value_size);
   }
   return true;
 }
