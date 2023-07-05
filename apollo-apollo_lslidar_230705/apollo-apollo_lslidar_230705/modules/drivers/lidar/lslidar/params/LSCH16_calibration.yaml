@@ -1,0 +1,67 @@
+lasers:
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 0, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 1, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 2, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 3, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 4, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 5, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 6, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 7, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 8, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 9, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 10, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 11, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 12, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 13, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 14, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 15, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+
+num_lasers: 16
