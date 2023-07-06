@@ -1,0 +1,131 @@
+lasers:
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 0, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.27925268031909273,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 1, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.26179938779914944,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 2, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.24434609527920614,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 3, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.22689280275926285,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 4, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.20943951023931955,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 5, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.19198621771937625, 
+vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 6, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.17453292519943296,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 7, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.15707963267948966,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 8, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.13962634015954637,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 9, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.12217304763960307,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 10, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.10471975511965977,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 11, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.08726646259971647,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 12, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.06981317007977318,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 13, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.05235987755982989,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 14, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: -0.03490658503988659,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 15, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: -0.01745329251994329,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 16, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.0,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 17, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.01745329251994329,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 18, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.03490658503988659,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 19, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.05235987755982989,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 20, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.06981317007977318,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 21, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.08726646259971647,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 22, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.10471975511965977,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 23, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.12217304763960307,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 24, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.13962634015954637,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 25, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.15707963267948966,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 26, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.17453292519943296,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 27, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.19198621771937625,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 28, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.20943951023931955,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 29, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.22689280275926285,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 30, max_intensity: 255,
+  min_intensity: 0, rot_correction: -0.0, vert_correction: 0.24434609527920614,
+  vert_offset_correction: 0.0}
+- {dist_correction: 0.0, dist_correction_x: 0.0, dist_correction_y: 0.0, focal_distance: 0.0,
+  focal_slope: 0.0, horiz_offset_correction: 0.0, laser_id: 31, max_intensity: 255,
+  min_intensity: 0, rot_correction: 0.0, vert_correction: 0.26179938779914944,
+  vert_offset_correction: 0.0}
+
+num_lasers: 32
