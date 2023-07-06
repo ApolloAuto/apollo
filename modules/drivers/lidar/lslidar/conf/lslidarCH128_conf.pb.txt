@@ -1,0 +1,23 @@
+model: LSLIDAR_CH128
+device_ip: "192.168.1.102"
+msop_port: 2368
+difop_port: 2369
+packet_size: 1206
+time_synchronization: false
+add_multicast: false
+group_ip: "224.1.1.2"
+rpm: 600
+convert_channel_name: "/apollo/sensor/lslidarCH128/PointCloud2"
+frame_id: "lslidarCH128"
+scan_channel: "/apollo/sensor/lslidarCH128/Scan"
+min_range: 0.15
+max_range: 150.0
+calibration: false
+calibration_file: "/apollo/modules/drivers/lidar/lslidar/params/LSCH128_calibration.yaml"
+
+#要屏蔽的矩形区域参数
+bottom_left_x: 0.0             #左下 x值
+bottom_left_y: 0.0             #左下 y值
+top_right_x: 0.0               #右上 x值
+top_right_y: 0.0               #右上 y值
+pcap_path: ""    #读取pcap包，测试时使用，连接雷达的时候，将此值设置为空

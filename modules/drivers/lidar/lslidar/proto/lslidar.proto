@@ -1,0 +1,40 @@
+syntax = "proto2";
+
+package apollo.drivers.lslidar;
+
+// import "modules/common/proto/header.proto"; 
+import "modules/common_msgs/basic_msgs/header.proto";
+
+
+enum Model {
+  UNKOWN = 0;
+  LSLIDAR16P = 1;
+  LSLIDAR32P = 2;
+  LSLIDAR401 = 3;       //401 废弃不用
+  LSLIDAR_CH16 = 4;
+  LSLIDAR_CH32 = 5;
+  LSLIDAR_CH64 = 6;
+  LSLIDAR_CH64w = 7;
+  LSLIDAR_CH120 = 8;
+  LSLIDAR_CH128 = 9;
+  LSLIDAR_CH128X1 = 10;
+  LSLIDAR_C32_V4 = 11;
+  LSLIDAR_C16_V4 = 12;
+  LSLIDAR_C8_V4 = 13;
+  LSLIDAR_C1_V4 = 14;
+  LSLIDAR_LS128S2 = 15;
+}
+
+message LslidarPacket {
+  optional uint64 stamp = 1;
+  optional bytes data = 2;
+}
+
+message LslidarScan {
+  optional apollo.common.Header header = 1;
+  optional Model model = 2;  
+  repeated LslidarPacket firing_pkts = 3;
+  repeated LslidarPacket difop_pkts = 4;
+  optional string sn = 5;
+  optional uint64 basetime = 6 [default = 0];
+}
