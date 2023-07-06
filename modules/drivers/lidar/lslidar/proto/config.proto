@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package apollo.drivers.lslidar;
+
+import "modules/drivers/lidar/lslidar/proto/lslidar.proto";
+
+message Config {
+  optional Model model = 1;
+  optional string device_ip = 2 [default = "192.168.1.200"];
+  optional uint32 msop_port = 3;
+  optional uint32 difop_port = 4;
+  optional uint32 return_mode = 5;
+  optional uint32 degree_mode = 6;
+  optional float distance_unit = 7;
+  optional bool time_synchronization = 8; 
+  optional bool add_multicast = 9; 
+  optional string group_ip = 10 [default = "224.1.1.2"];
+  optional uint32 rpm = 11;
+  optional string convert_channel_name = 12;
+  optional uint32 time_zone = 13;
+  optional string frame_id = 14;
+  optional string scan_channel = 15;
+  optional float min_range = 16;
+  optional float max_range = 17;
+  optional bool config_vert = 18;
+  optional bool print_vert = 19;
+  optional float scan_start_angle =20;
+  optional float scan_end_angle = 21;
+  optional bool calibration = 22;
+  optional int32 npackets = 23;
+  optional string calibration_file = 24;
+  optional uint32 packet_size = 25;
+  optional uint32 vertical_angle = 26;
+  optional float bottom_left_x = 27;
+  optional float bottom_left_y = 28;
+  optional float top_right_x = 29;
+  optional float top_right_y = 30;
+  optional string pcap_path = 31;
+}
+
+message CompensatorConfig {
+  optional string output_channel = 1;
+  optional float transform_query_timeout = 2 [default = 0.02];
+  optional string world_frame_id = 3 [default = "world"];
+  optional string target_frame_id = 4;
+  optional uint32 point_cloud_size = 5;
+}
