@@ -9,7 +9,7 @@ packet_size: 1206
 time_synchronization: false
 add_multicast: false
 group_ip: "224.1.1.2"
-rpm: 600                   #雷达转速     10hz:600rpm, 20hz:1200rpm, 5hz:300rpm
+rpm: 300                   #雷达转速     10hz:600rpm, 20hz:1200rpm, 5hz:300rpm
 convert_channel_name: "/apollo/sensor/lslidar32/PointCloud2"
 frame_id: "lslidar32"
 scan_channel: "/apollo/sensor/lslidar32/Scan"

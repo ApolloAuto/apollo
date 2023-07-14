@@ -17,13 +17,13 @@
 
 #include <memory>
 #include <string>
-#include <thread>
-
-#include "cyber/cyber.h"
-
-#include "modules/drivers/lidar/lslidar/driver/driver.h"
+#include <mutex>
 #include "modules/drivers/lidar/lslidar/proto/config.pb.h"
 #include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
+
+#include "cyber/cyber.h"
+#include "modules/common/util/message_util.h"
+#include "modules/drivers/lidar/lslidar/driver/driver.h"
 
 namespace apollo {
 namespace drivers {
@@ -44,13 +44,13 @@ class LslidarDriverComponent : public Component<> {
   bool Init() override;
 
  private:
-
   void device_poll();
   volatile bool runing_;  ///< device thread is running
   uint32_t seq_ = 0;
   std::shared_ptr<std::thread> device_thread_;
   std::shared_ptr<LslidarDriver> dvr_;  ///< driver implementation class
-  std::shared_ptr<apollo::cyber::Writer<apollo::drivers::lslidar::LslidarScan>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::drivers::lslidar::LslidarScan>>
+      writer_;
 };
 
 CYBER_REGISTER_COMPONENT(LslidarDriverComponent)

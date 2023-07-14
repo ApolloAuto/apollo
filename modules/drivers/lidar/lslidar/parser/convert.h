@@ -19,11 +19,12 @@
 #include <memory>
 #include <string>
 
-//#include "modules/drivers/proto/pointcloud.pb.h"
+// #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
-#include "modules/drivers/lidar/lslidar/parser/lslidar_parser.h"
 #include "modules/drivers/lidar/lslidar/proto/config.pb.h"
 #include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
+
+#include "modules/drivers/lidar/lslidar/parser/lslidar_parser.h"
 
 namespace apollo {
 namespace drivers {
@@ -42,8 +43,9 @@ class Convert {
   void init(const Config& lslidar_config);
 
   // convert lslidar data to pointcloud and public
-  void ConvertPacketsToPointcloud(const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-                                  std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out);
+  void ConvertPacketsToPointcloud(
+      const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
+      std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out);
 
  private:
   // RawData class for converting data to point cloud

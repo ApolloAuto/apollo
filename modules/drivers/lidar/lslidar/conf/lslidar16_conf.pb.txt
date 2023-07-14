@@ -1,7 +1,7 @@
 model: LSLIDAR16P
-device_ip: "192.168.1.200"
-msop_port: 2368
-difop_port: 2369
+device_ip: "192.168.1.201"
+msop_port: 2370
+difop_port: 2371
 return_mode: 1
 degree_mode: 2        #2: 均匀2度校准两列  1://均匀1.33度校准两列
 distance_unit: 0.25

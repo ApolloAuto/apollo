@@ -40,11 +40,11 @@ void Convert::init(const Config& lslidar_config) {
 void Convert::ConvertPacketsToPointcloud(
     const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
     std::shared_ptr<apollo::drivers::PointCloud> point_cloud) {
-  
-  AINFO_EVERY(100) << "Converting scan msg seq " << scan_msg->header().sequence_num();
-  
+  AINFO_EVERY(100) << "Converting scan msg seq "
+                   << scan_msg->header().sequence_num();
+
   parser_->GeneratePointcloud(scan_msg, point_cloud);
- 
+
   if (point_cloud == nullptr || point_cloud->point().empty()) {
     AERROR << "point cloud has no point";
     return;

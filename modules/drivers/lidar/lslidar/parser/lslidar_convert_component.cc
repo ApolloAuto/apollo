@@ -14,20 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-#include <string>
-#include <thread>
-
-#include "cyber/cyber.h"
 #include "modules/drivers/lidar/lslidar/parser/lslidar_convert_component.h"
 
 namespace apollo {
 namespace drivers {
 namespace lslidar {
 
-static void my_handler(int sig) {
-  exit(-1);
-}
+static void my_handler(int sig) { exit(-1); }
 
 bool LslidarConvertComponent::Init() {
   signal(SIGINT, my_handler);
@@ -39,11 +32,13 @@ bool LslidarConvertComponent::Init() {
 
   conv_.reset(new Convert());
   conv_->init(lslidar_config);
-  
-  writer_ = node_->CreateWriter<apollo::drivers::PointCloud>(lslidar_config.convert_channel_name());
-  point_cloud_pool_.reset(new CCObjectPool<apollo::drivers::PointCloud>(pool_size_));
+
+  writer_ = node_->CreateWriter<apollo::drivers::PointCloud>(
+      lslidar_config.convert_channel_name());
+  point_cloud_pool_.reset(
+      new CCObjectPool<apollo::drivers::PointCloud>(pool_size_));
   point_cloud_pool_->ConstructAll();
-  
+
   for (int i = 0; i < pool_size_; i++) {
     auto point_cloud = point_cloud_pool_->GetObject();
     if (point_cloud == nullptr) {
@@ -59,8 +54,8 @@ bool LslidarConvertComponent::Init() {
 
 bool LslidarConvertComponent::Proc(
     const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg) {
-   
-  std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out = point_cloud_pool_->GetObject();
+  std::shared_ptr<apollo::drivers::PointCloud> point_cloud_out =
+      point_cloud_pool_->GetObject();
   if (point_cloud_out == nullptr) {
     AWARN << "poin cloud pool return nullptr, will be create new.";
     point_cloud_out = std::make_shared<apollo::drivers::PointCloud>();
@@ -76,8 +71,7 @@ bool LslidarConvertComponent::Proc(
   point_cloud_out->Clear();
   conv_->ConvertPacketsToPointcloud(scan_msg, point_cloud_out);
   uint64_t time2 = apollo::cyber::Time().Now().ToNanosecond();
-  AINFO << "process pointcloud time: " <<(time2-time1)/1000000000.0;
-
+  AINFO << "process pointcloud time: " << (time2 - time1) / 1000000000.0;
 
   if (point_cloud_out == nullptr || point_cloud_out->point().empty()) {
     AWARN << "point_cloud_out convert is empty.";

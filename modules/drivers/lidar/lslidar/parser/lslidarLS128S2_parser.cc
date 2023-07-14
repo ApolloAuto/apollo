@@ -45,7 +45,7 @@ LslidarLS128S2Parser::LslidarLS128S2Parser(const Config &config)
 
 void LslidarLS128S2Parser::GeneratePointcloud(
     const std::shared_ptr<LslidarScan> &scan_msg,
-    std::shared_ptr<PointCloud> &out_msg) {
+    const std::shared_ptr<PointCloud> &out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->mutable_header()->set_timestamp_sec(scan_msg->basetime() /
                                                1000000000.0);
@@ -200,8 +200,7 @@ void LslidarLS128S2Parser::Unpack(int num, const LslidarPacket &pkt,
         int iChannelNumber = iTempAngle >> 6;     // 左移六位 通道号
         int iSymmbol = (iTempAngle >> 5) & 0x01;  // 左移五位 符号位
         double fAngle_V = 0.0;
-        if (1 == iSymmbol)  // 符号位 0：正数 1：负数
-        {
+        if (1 == iSymmbol) {  // 符号位 0：正数 1：负数
           int iAngle_V =
               msop_ptr[point_idx + 3] + (msop_ptr[point_idx + 2] << 8);
 
@@ -259,8 +258,7 @@ void LslidarLS128S2Parser::Unpack(int num, const LslidarPacket &pkt,
         int iChannelNumber = iTempAngle >> 6;     // 左移六位 通道号
         int iSymmbol = (iTempAngle >> 5) & 0x01;  // 左移五位 符号位
         double fAngle_V = 0.0;
-        if (1 == iSymmbol)  // 符号位 0：正数 1：负数
-        {
+        if (1 == iSymmbol) {  // 符号位 0：正数 1：负数
           int iAngle_V =
               msop_ptr[point_idx + 3] + (msop_ptr[point_idx + 2] << 8);
 
@@ -326,8 +324,8 @@ int LslidarLS128S2Parser::convertCoordinate(
     fAngle_H += 360.0;
   }
 
-  int table_index_V = int(fGalvanometrtAngle * 100) % 36000;
-  int table_index_H = int(fAngle_H * 100) % 36000;
+  int table_index_V = static_cast<int>(fGalvanometrtAngle * 100) % 36000;
+  int table_index_H = static_cast<int>(fAngle_H * 100) % 36000;
 
   double fAngle_R0 =
       cos30 * cos_mirror_angle[lidardata.channel_number % 4] *
@@ -408,8 +406,8 @@ int LslidarLS128S2Parser::convertCoordinate(
     fAngle_H += 360.0;
   }
 
-  int table_index_V = int(fGalvanometrtAngle * 100) % 36000;
-  int table_index_H = int(fAngle_H * 100) % 36000;
+  int table_index_V = static_cast<int>(fGalvanometrtAngle * 100) % 36000;
+  int table_index_H = static_cast<int>(fAngle_H * 100) % 36000;
 
   double fAngle_R0 =
       cos30 * cos_mirror_angle[lidardata.channel_number % 4] *
@@ -464,8 +462,7 @@ int LslidarLS128S2Parser::convertCoordinate(
   return 0;
 }
 
-void LslidarLS128S2Parser::Order(std::shared_ptr<PointCloud> cloud) {
-}
+void LslidarLS128S2Parser::Order(std::shared_ptr<PointCloud> cloud) {}
 
 }  // namespace lslidar
 }  // namespace drivers

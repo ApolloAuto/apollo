@@ -53,7 +53,7 @@ Lslidar16Parser::Lslidar16Parser(const Config &config)
 
 void Lslidar16Parser::GeneratePointcloud(
     const std::shared_ptr<LslidarScan> &scan_msg,
-    std::shared_ptr<PointCloud> &out_msg) {
+    const std::shared_ptr<PointCloud> &out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->mutable_header()->set_timestamp_sec(scan_msg->basetime() /
                                                1000000000.0);
@@ -79,7 +79,8 @@ void Lslidar16Parser::GeneratePointcloud(
           vert_angle = vert_angle - 65535;
         }
 
-        scan_altitude[i] = ((float)vert_angle / 100.f) * DEG_TO_RAD;
+        scan_altitude[i] =
+            (static_cast<float>(vert_angle) / 100.f) * DEG_TO_RAD;
         if (2 == config_.degree_mode()) {
           if (scan_altitude[i] != 0) {
             if (fabs(scan_altitude_original_2[i] - scan_altitude[i]) *
@@ -112,7 +113,8 @@ void Lslidar16Parser::GeneratePointcloud(
           vert_angle = vert_angle - 65535;
         }
 
-        scan_altitude[i] = ((float)vert_angle / 100.f) * DEG_TO_RAD;
+        scan_altitude[i] =
+            (static_cast<float>(vert_angle) / 100.f) * DEG_TO_RAD;
 
         if (2 == config_.degree_mode()) {
           if (scan_altitude[i] != 0) {
@@ -143,8 +145,6 @@ void Lslidar16Parser::GeneratePointcloud(
   size_t packets_size = scan_msg->firing_pkts_size();
   packet_number_ = packets_size;
   block_num = 0;
-
-  AERROR << "packets_size:" << packets_size;
 
   for (size_t i = 0; i < packets_size; ++i) {
     Unpack(scan_msg->firing_pkts(static_cast<int>(i)), out_msg, i);
@@ -186,7 +186,6 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
   const raw_packet_t *raw = (const raw_packet_t *)pkt.data().c_str();
 
   if (!config_.time_synchronization()) {
-    
     packet_end_time = pkt.stamp();
   } else {
     packet_end_time = pkt.stamp();
@@ -200,8 +199,7 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
                                  raw->blocks[block].rotation_1);
 
     if (2 == config_.return_mode()) {
-      if (block < (BLOCKS_PER_PACKET - 2))  // 12
-      {
+      if (block < (BLOCKS_PER_PACKET - 2)) {
         int azi1, azi2;
         azi1 = 256 * raw->blocks[block + 2].rotation_2 +
                raw->blocks[block + 2].rotation_1;
@@ -217,8 +215,7 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
         azimuth_diff = static_cast<float>((36000 + azi1 - azi2) % 36000);
       }
     } else {
-      if (block < (BLOCKS_PER_PACKET - 1))  // 12
-      {
+      if (block < (BLOCKS_PER_PACKET - 1)) {
         int azi1, azi2;
         azi1 = 256 * raw->blocks[block + 1].rotation_2 +
                raw->blocks[block + 1].rotation_1;
@@ -272,7 +269,8 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
           distance2 = distance2 + corrections.dist_correction;
 
         // The offset calibration
-        float arg_horiz = (float)azimuth_corrected_f * ROTATION_RESOLUTION;
+        float arg_horiz =
+            static_cast<float>(azimuth_corrected_f * ROTATION_RESOLUTION);
         arg_horiz = arg_horiz > 360 ? (arg_horiz - 360) : arg_horiz;
         float arg_horiz_orginal = (14.67 - arg_horiz) * M_PI / 180;
 
@@ -286,7 +284,7 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
           } else {  // fist packet
             point_time = current_packet_time;
           }
-         
+
         } else {
           // modify
           if (previous_packet_time > 1e-6) {
@@ -325,11 +323,11 @@ void Lslidar16Parser::Unpack(const LslidarPacket &pkt,
         } else {
           PointXYZIT *point = pc->add_point();
           point->set_timestamp(point_time);
-          
+
           point->set_intensity(intensity);
 
           if (config_.calibration()) {
-            ComputeCoords(distance2, corrections,
+            ComputeCoords(distance2, &corrections,
                           static_cast<uint16_t>(azimuth_corrected), point);
 
           } else {

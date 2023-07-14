@@ -19,14 +19,13 @@
 #include <deque>
 #include <memory>
 #include <string>
-#include <thread>
+
+#include "modules/drivers/lidar/lslidar/proto/config.pb.h"
+#include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
-
 #include "modules/drivers/lidar/lslidar/parser/convert.h"
-#include "modules/drivers/lidar/lslidar/proto/config.pb.h"
-#include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
 
 namespace apollo {
 namespace drivers {
@@ -39,15 +38,18 @@ using apollo::cyber::base::CCObjectPool;
 using apollo::drivers::PointCloud;
 using apollo::drivers::lslidar::LslidarScan;
 
-class LslidarConvertComponent : public Component<apollo::drivers::lslidar::LslidarScan> {
+class LslidarConvertComponent
+    : public Component<apollo::drivers::lslidar::LslidarScan> {
  public:
   bool Init() override;
-  bool Proc(const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg) override;
+  bool Proc(const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>&
+                scan_msg) override;
 
  private:
   std::shared_ptr<Writer<apollo::drivers::PointCloud>> writer_;
   std::unique_ptr<Convert> conv_ = nullptr;
-  std::shared_ptr<CCObjectPool<apollo::drivers::PointCloud>> point_cloud_pool_ = nullptr;
+  std::shared_ptr<CCObjectPool<apollo::drivers::PointCloud>> point_cloud_pool_ =
+      nullptr;
   int pool_size_ = 8;
 };
 

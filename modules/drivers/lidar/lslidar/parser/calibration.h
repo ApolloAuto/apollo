@@ -27,8 +27,13 @@
 
 #pragma once
 
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <limits>
 #include <map>
 #include <string>
+#include <utility>
 
 namespace apollo {
 namespace drivers {

@@ -53,10 +53,11 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <thread>
 
+#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 #include "modules/drivers/lidar/lslidar/proto/config.pb.h"
 #include "modules/drivers/lidar/lslidar/proto/lslidar.pb.h"
-#include "modules/common_msgs/sensor_msgs/pointcloud.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/drivers/lidar/lslidar/parser/calibration.h"
@@ -173,21 +174,24 @@ const int ORDER_16[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 const int ORDER_32[32] = {0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10,
                           11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
                           22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
-
-static const double scan_altitude_original_A[32] = {  // 1	v2.6
+// 1,v2.6
+static const double scan_altitude_original_A[32] = {
     -16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1,
     0,   1,   2,   3,   4,   5,   6,   7,  8,  9,  10, 11, 12, 13, 14, 15};
 
-static const double scan_altitude_original_A3[32] = {  // 1	v3.0
+// 1,v3.0
+static const double scan_altitude_original_A3[32] = {
     -16, 0, -15, 1, -14, 2,  -13, 3,  -12, 4,  -11, 5,  -10, 6,  -9, 7,
     -8,  8, -7,  9, -6,  10, -5,  11, -4,  12, -3,  13, -2,  14, -1, 15};
 
-static const double scan_altitude_original_C[32] = {  // 0.33	v2.6
+// 0.33,v2.6
+static const double scan_altitude_original_C[32] = {
     -18,  -15,   -12,  -10,   -8,    -7, -6,    -5, -4,    -3.33, -2.66,
     -3,   -2.33, -2,   -1.33, -1.66, -1, -0.66, 0,  -0.33, 0.33,  0.66,
     1.33, 1,     1.66, 2,     3,     4,  6,     8,  11,    14};
 
-static const double scan_altitude_original_C3[32] = {  // 0.33	v3.0
+// 0.33,v3.0
+static const double scan_altitude_original_C3[32] = {
     -18,   -1, -15,   -0.66, -12,  -0.33, -10,   0,     -8,    0.33, -7,
     0.66,  -6, 1,     -5,    1.33, -4,    1.66,  -3.33, 2,     -3,   3,
     -2.66, 4,  -2.33, 6,     -2,   8,     -1.66, 11,    -1.33, 14};
@@ -216,7 +220,6 @@ static const double c32_90_vertical_angle[32] = {
     8.591,  30.429, 52.798, 74.274, 11.494, 33.191, 55.596, 77.074,
     14.324, 36.008, 58.26,  79.938, 17.096, 38.808, 60.87,  82.884,
     19.824, 41.603, 63.498, 85.933, 22.513, 44.404, 66.144, 89.105};
-
 
 static const double c16_vertical_angle[16] = {
     -16, 0, -14, 2, -12, 4, -10, 6, -8, 8, -6, 10, -4, 12, -2, 14};
@@ -472,7 +475,7 @@ class LslidarParser {
    */
   virtual void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg) = 0;
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg) = 0;
   virtual void setup();
 
   // Order point cloud fod IDL by lslidar model
@@ -502,14 +505,13 @@ class LslidarParser {
 
   bool is_scan_valid(int rotation, float distance);
 
-  void ComputeCoords(const float& raw_distance, LaserCorrection& corrections,
+  void ComputeCoords(const float& raw_distance,
+                     LaserCorrection* corrections,
                      const uint16_t rotation, PointXYZIT* point);
 
   void ComputeCoords2(int Laser_ring, int Type, const float& raw_distance,
-                      LaserCorrection& corrections, const double rotation,
+                      LaserCorrection* corrections, const double rotation,
                       PointXYZIT* point);
-
-
 };  // class LslidarParser
 
 class Lslidar16Parser : public LslidarParser {
@@ -519,7 +521,7 @@ class Lslidar16Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -543,7 +545,7 @@ class Lslidar32Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -579,7 +581,7 @@ class LslidarCXV4Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<apollo::drivers::lslidar::LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
   bool checkPacketValidity(const RawPacket_C32* packet);
@@ -611,7 +613,6 @@ class LslidarCXV4Parser : public LslidarParser {
   int lidar_number_;
   bool is_new_c32w_;
   bool is_get_scan_altitude_;
-
 };  // class LslidarCXV4Parser
 
 class Lslidar401Parser : public LslidarParser {
@@ -621,7 +622,7 @@ class Lslidar401Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -644,7 +645,7 @@ class LslidarCH16Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -669,7 +670,7 @@ class LslidarCH32Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -694,7 +695,7 @@ class LslidarCH64Parser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -719,7 +720,7 @@ class LslidarCH64wParser : public LslidarParser {
 
   void GeneratePointcloud(
       const std::shared_ptr<LslidarScan>& scan_msg,
-      std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
+      const std::shared_ptr<apollo::drivers::PointCloud>& out_msg);
   void Order(std::shared_ptr<apollo::drivers::PointCloud> cloud);
 
  private:
@@ -748,7 +749,7 @@ class LslidarCH120Parser : public LslidarParser {
   ~LslidarCH120Parser() {}
 
   void GeneratePointcloud(const std::shared_ptr<LslidarScan>& scan_msg,
-                          std::shared_ptr<PointCloud>& out_msg);
+                          const std::shared_ptr<PointCloud>& out_msg);
   void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
@@ -772,7 +773,7 @@ class LslidarCH128Parser : public LslidarParser {
   ~LslidarCH128Parser() {}
 
   void GeneratePointcloud(const std::shared_ptr<LslidarScan>& scan_msg,
-                          std::shared_ptr<PointCloud>& out_msg);
+                          const std::shared_ptr<PointCloud>& out_msg);
   void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
@@ -798,7 +799,7 @@ class LslidarCH128X1Parser : public LslidarParser {
   ~LslidarCH128X1Parser() {}
 
   void GeneratePointcloud(const std::shared_ptr<LslidarScan>& scan_msg,
-                          std::shared_ptr<PointCloud>& out_msg);
+                          const std::shared_ptr<PointCloud>& out_msg);
   void Order(std::shared_ptr<PointCloud> cloud);
 
  private:
@@ -821,7 +822,7 @@ class LslidarLS128S2Parser : public LslidarParser {
   ~LslidarLS128S2Parser() {}
 
   void GeneratePointcloud(const std::shared_ptr<LslidarScan>& scan_msg,
-                          std::shared_ptr<PointCloud>& out_msg);
+                          const std::shared_ptr<PointCloud>& out_msg);
   void Order(std::shared_ptr<PointCloud> cloud);
 
   int convertCoordinate(const struct Firing_LS128S2& lidardata);
