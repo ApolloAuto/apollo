@@ -74,5 +74,5 @@ different due to frontend code changes.)
 ### Congrats!
 
 You have successfully built Apollo! Now you can revisit
-[Apollo Readme](../../README.md) for additional guidelines on the neccessary
+[Apollo Readme](../../README.md) for additional guidelines on the necessary
 hardware setup.

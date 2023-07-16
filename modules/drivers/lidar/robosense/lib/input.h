@@ -37,7 +37,7 @@ static const size_t POSITIONING_DATA_PACKET_SIZE =
 static const size_t ETHERNET_HEADER_SIZE = 42;
 static const int PCAP_FILE_END = -1;
 static const int SOCKET_TIMEOUT = -2;
-static const int RECIEVE_FAIL = -3;
+static const int RECEIVE_FAIL = -3;
 
 /** @brief Pure virtual suteng input base class */
 class Input {

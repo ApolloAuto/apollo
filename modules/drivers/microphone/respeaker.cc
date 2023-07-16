@@ -24,7 +24,7 @@ PaError err;
 
 // Helper functions
 void report_error(PaError err, const std::string &func_name) {
-  AERROR << "an error occured while calling " << func_name;
+  AERROR << "an error occurred while calling " << func_name;
   AERROR << "error number: " << err;
   AERROR << "error message: " << Pa_GetErrorText(err);
 }

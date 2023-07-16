@@ -30,7 +30,7 @@ which has a structure as following.
   ......
 ```
 
-For each external denpendency library, there is a seperate folder that contains
+For each external denpendency library, there is a separate folder that contains
 a `BUILD` file with the contents of:
 
 ```python

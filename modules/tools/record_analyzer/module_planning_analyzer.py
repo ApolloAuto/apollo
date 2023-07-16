@@ -201,7 +201,7 @@ class PlannigAnalyzer:
         # reference line
         v2_results["reference_line"] = self.reference_line.get()
 
-        # output final reuslts
+        # output final results
         print(json.dumps(v2_results))
 
     def plot_path(self, plt, adc_trajectory):

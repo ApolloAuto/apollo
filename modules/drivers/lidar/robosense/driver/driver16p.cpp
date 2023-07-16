@@ -80,7 +80,7 @@ bool Robosense16PDriver::poll(
     return false;  // read the end of pcap file, return false stop poll;
   }
 
-  if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
+  if (poll_result == SOCKET_TIMEOUT || poll_result == RECEIVE_FAIL) {
     return false;  // poll again
   }
 

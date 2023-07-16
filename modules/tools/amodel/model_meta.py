@@ -41,7 +41,7 @@ class ModelMeta(object):
     self.dataset     = dataset
 
     # raw yaml data
-    self._raw_modle_meta = None
+    self._raw_model_meta = None
 
   def parse_from(self, meta_file_path):
     """Parse model meta from yaml file
@@ -55,15 +55,15 @@ class ModelMeta(object):
     if not os.path.isfile(meta_file_path):
       return False
     with open(meta_file_path, 'r') as meta_fp:
-      self._raw_modle_meta = yaml.safe_load(meta_fp)
-      logging.debug(self._raw_modle_meta)
-      self.name        = self._raw_modle_meta["name"]
-      self.date        = self._raw_modle_meta["date"]
-      self.task_type   = self._raw_modle_meta["task_type"]
-      self.sensor_type = self._raw_modle_meta["sensor_type"]
-      self.framework   = self._raw_modle_meta["framework"]
-      self.model       = self._raw_modle_meta["model"]
-      self.dataset     = self._raw_modle_meta["dataset"]
+      self._raw_model_meta = yaml.safe_load(meta_fp)
+      logging.debug(self._raw_model_meta)
+      self.name        = self._raw_model_meta["name"]
+      self.date        = self._raw_model_meta["date"]
+      self.task_type   = self._raw_model_meta["task_type"]
+      self.sensor_type = self._raw_model_meta["sensor_type"]
+      self.framework   = self._raw_model_meta["framework"]
+      self.model       = self._raw_model_meta["model"]
+      self.dataset     = self._raw_model_meta["dataset"]
     return True
 
   def save_to(self, meta_file_path):
@@ -73,7 +73,7 @@ class ModelMeta(object):
         meta_file_path (str): Meta yaml file
     """
     with open(meta_file_path, 'w') as meta_fp:
-      yaml.safe_dump(self._raw_modle_meta, meta_fp, sort_keys=False)
+      yaml.safe_dump(self._raw_model_meta, meta_fp, sort_keys=False)
 
   def __str__(self) -> str:
     """Model meta string
@@ -81,4 +81,4 @@ class ModelMeta(object):
     Returns:
         str: Model meta content
     """
-    return yaml.safe_dump(self._raw_modle_meta, sort_keys=False)
+    return yaml.safe_dump(self._raw_model_meta, sort_keys=False)
