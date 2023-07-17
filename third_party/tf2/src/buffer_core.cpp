@@ -840,7 +840,7 @@ bool BufferCore::canTransform(const std::string& target_frame,
         *error_msg += std::string("canTransform: source_frame " + source_frame +
                                   " does not exist.");
       }
-      if (source_id == 0) {
+      if (fixed_id == 0) {
         if (target_id == 0 || source_id == 0) {
           *error_msg += std::string(" ");
         }

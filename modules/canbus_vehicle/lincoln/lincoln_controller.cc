@@ -487,8 +487,7 @@ void LincolnController::Gear(Chassis::GearPosition ref_gear_position) {
 
   // Need to request neutral gear first if current gear location is not neutral
   // or none
-  if (ref_gear_position != current_gear_position &&
-      current_gear_position != Chassis::GEAR_NEUTRAL &&
+  if (current_gear_position != Chassis::GEAR_NEUTRAL &&
       current_gear_position != Chassis::GEAR_NONE) {
     gear_tmp_ = Chassis::GEAR_NEUTRAL;
   } else if (current_gear_position == Chassis::GEAR_NEUTRAL) {
