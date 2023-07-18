@@ -252,7 +252,7 @@ std::pair<double, double> TrajectoryStitcher::ComputePositionProjection(
 
   std::pair<double, double> frenet_sd;
   frenet_sd.first = v.InnerProd(n) + p.path_point().s();
-  frenet_sd.second = v.CrossProd(n);
+  frenet_sd.second = n.CrossProd(v);
   return frenet_sd;
 }
 
