@@ -171,7 +171,7 @@ class STObstaclesProcessor {
    * @return A list of available s gaps for ADC to go.
    */
   std::vector<std::pair<double, double>> FindSGaps(
-      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      const std::vector<std::tuple<bool, double, double, double, std::string>>&
           obstacle_t_edges,
       double s_min, double s_max);
 
@@ -202,7 +202,7 @@ class STObstaclesProcessor {
 
   // A vector of sorted obstacle's t-edges:
   //  (is_starting_t, t, s_min, s_max, obs_id).
-  std::vector<std::tuple<int, double, double, double, std::string>>
+  std::vector<std::tuple<bool, double, double, double, std::string>>
       obs_t_edges_;
   int obs_t_edges_idx_;
 

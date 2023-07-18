@@ -44,7 +44,7 @@ using apollo::common::math::Vec2d;
 
 namespace {
 // ObsTEdge contains: (is_starting_t, t, s_min, s_max, obs_id).
-using ObsTEdge = std::tuple<int, double, double, double, std::string>;
+using ObsTEdge = std::tuple<bool, double, double, double, std::string>;
 }  // namespace
 
 void STObstaclesProcessor::Init(const double planning_distance,
@@ -321,7 +321,7 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
   std::vector<ObsTEdge> new_t_edges;
   while (obs_t_edges_idx_ < static_cast<int>(obs_t_edges_.size()) &&
          std::get<1>(obs_t_edges_[obs_t_edges_idx_]) <= t) {
-    if (std::get<0>(obs_t_edges_[obs_t_edges_idx_]) == 0 &&
+    if (std::get<0>(obs_t_edges_[obs_t_edges_idx_]) == false &&
         std::get<1>(obs_t_edges_[obs_t_edges_idx_]) == t) {
       break;
     }
@@ -333,7 +333,7 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
 
   // For st-boundaries that disappeared before t, remove them.
   for (const auto& obs_t_edge : new_t_edges) {
-    if (std::get<0>(obs_t_edge) == 0) {
+    if (std::get<0>(obs_t_edge) == false) {
       ADEBUG << "Obstacle id: " << std::get<4>(obs_t_edge)
              << " is leaving st-graph.";
       if (obs_id_to_decision_.count(std::get<4>(obs_t_edge)) != 0) {
@@ -398,7 +398,7 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
     ADEBUG << "For obstacle id: " << std::get<4>(obs_t_edge)
            << ", its s-range = [" << std::get<2>(obs_t_edge) << ", "
            << std::get<3>(obs_t_edge) << "]";
-    if (std::get<0>(obs_t_edge) == 1) {
+    if (std::get<0>(obs_t_edge) == true) {
       if (std::get<2>(obs_t_edge) >= s_max) {
         ADEBUG << "  Apparently, it should be yielded.";
         obs_id_to_decision_[std::get<4>(obs_t_edge)] =
@@ -697,30 +697,30 @@ bool STObstaclesProcessor::IsADCOverlappingWithObstacle(
 
 std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
     const std::vector<ObsTEdge>& obstacle_t_edges, double s_min, double s_max) {
-  std::vector<std::pair<double, int>> obs_s_edges;
+  std::vector<std::pair<double, bool>> obs_s_edges;
   for (auto obs_t_edge : obstacle_t_edges) {
-    obs_s_edges.emplace_back(std::get<2>(obs_t_edge), 1);
-    obs_s_edges.emplace_back(std::get<3>(obs_t_edge), 0);
+    obs_s_edges.emplace_back(std::get<2>(obs_t_edge), true);
+    obs_s_edges.emplace_back(std::get<3>(obs_t_edge), false);
   }
-  // obs_s_edges.emplace_back(std::numeric_limits<double>::lowest(), 1);
-  obs_s_edges.emplace_back(s_min, 0);
-  obs_s_edges.emplace_back(s_max, 1);
-  // obs_s_edges.emplace_back(std::numeric_limits<double>::max(), 0);
-  std::sort(
-      obs_s_edges.begin(), obs_s_edges.end(),
-      [](const std::pair<double, int>& lhs, const std::pair<double, int>& rhs) {
-        if (lhs.first != rhs.first) {
-          return lhs.first < rhs.first;
-        } else {
-          return lhs.second > rhs.second;
-        }
-      });
+  // obs_s_edges.emplace_back(std::numeric_limits<double>::lowest(), true);
+  obs_s_edges.emplace_back(s_min, false);
+  obs_s_edges.emplace_back(s_max, true);
+  // obs_s_edges.emplace_back(std::numeric_limits<double>::max(), false);
+  std::sort(obs_s_edges.begin(), obs_s_edges.end(),
+            [](const std::pair<double, bool>& lhs,
+               const std::pair<double, bool>& rhs) {
+              if (lhs.first != rhs.first) {
+                return lhs.first < rhs.first;
+              } else {
+                return lhs.second > rhs.second;
+              }
+            });
 
   std::vector<std::pair<double, double>> s_gaps;
   int num_st_obs = 1;
   double prev_open_s = 0.0;
   for (auto obs_s_edge : obs_s_edges) {
-    if (obs_s_edge.second == 1) {
+    if (obs_s_edge.second == true) {
       num_st_obs++;
       if (num_st_obs == 1) {
         s_gaps.emplace_back(prev_open_s, obs_s_edge.first);
