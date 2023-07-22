@@ -26,18 +26,18 @@ in Apollo 5.0!
    `Scenario Management` or using the
    [following link](https://azure.apollo.auto/scenario-management/scenario-editor)
 
-   ![](images/se_location1.png)
+   ![](images/images/se_location1.png)
 
 3. Once inside, you will have to complete the form on the screen as seen in the
    image below. As this app is in Beta testing, it is not open to all our
    developers.
 
-   ![](../specs/images/form.png)
+   ![](%E4%BA%91%E5%B9%B3%E5%8F%B0Apollo%20Studio/images/form.png)
 
 4. You should receive the following activation confirmation via email within 3
    business days:
 
-![](../specs/images/email.png)
+![](%E4%BA%91%E5%B9%B3%E5%8F%B0Apollo%20Studio/images/email.png)
 
 ## Using Scenario Editor
 
@@ -46,12 +46,12 @@ Congratulations! You are now ready to use our scenario editor.
 1. The first step is to select a map. Currently, we offer 2 maps - Sunnyvale and
    San Mateo
 
-   ![](images/se_map.png)
+   ![](images/images/se_map.png)
 
 2. Once a map has been selected, you will have access to the editor pane on the
    right along with other tools as seen below:
 
-   ![](images/se_tools.png)
+   ![](images/images/se_tools.png)
 
 You can navigate through the map using your arrow keys. Alternatively, you can
 right-click the mouse and drag it to move the map. If you are using a trackpad,
@@ -66,25 +66,25 @@ The 4 General action tools can be found on the bottom right corner of the map.
    there exists the Zoom tool to help you zoom in and out of the map in case you
    do not have a trackpad ready.
 
-   ![](images/se_zoom1.png)
+   ![](images/images/se_zoom1.png)
 
 2. **Re-center tool**: this tool allows you to locate your ego-car on the map
    even if you have moved away
 
-   ![](images/se_center1.png)
+   ![](images/images/se_center1.png)
 
 3. **Ruler tool**: this tool allows you to measure the distance between two
    points. This tool is extremely useful when calculating the distance between
    the ego-car and obstacles or traffic lights on the map.
 
-   ![](images/se_ruler.png) ![](images/se_distance.png)
+   ![](images/images/se_ruler.png) ![](images/images/se_distance.png)
 
 4. **Add Route tool**: this tool can be used both for the ego-car as well as the
    obstacles you set in its path. For the ego-car you can only set its
    destination, but for obstacles, you can set multiple points that define their
    driving behavior.
 
-   ![](images/se_addroute.png)
+   ![](images/images/se_addroute.png)
 
 ### Configuration Tools
 
@@ -92,7 +92,7 @@ There are 4 types of configurations that you will need to set up in order to
 create a scenario, three of which are listed on the left-side of the map -
 General, Ego-car and Participants (Obstacles) and the last one is Traffic Light
 
-![](images/se_config.png)
+![](images/images/se_config.png)
 
 #### General Configuration
 
@@ -116,12 +116,12 @@ placed, a form should appear on the right-hand side of the map, which allows you
 to configure the Ego car to set its speed, acceleration, along with your desired
 destination.
 
-![](images/se_ego.png)
+![](images/images/se_ego.png)
 
 The Ego car's heading can also be set by dragging the arrow linked to the ego
 car
 
-![](images/heading.png)
+![](images/images/heading.png)
 
 ```
 Note:
@@ -133,7 +133,7 @@ coordinates will then appear on the right-hand attribute's window. You can drag
 the end point flag to change the ego car’s end point location. The “End point”
 coordinates will be automatically updated accordingly.
 
-![](images/endpoints1.png)
+![](images/images/endpoints1.png)
 
 Finally, you can always come back and edit the existing attributes of the ego
 car by clicking on the ego car on the map. This will open its attributes tab in
@@ -152,7 +152,7 @@ Once you have finalized the heading and position of your participant, you can
 start working on specific details mentioned in the form - type, length, speed
 and motion type.
 
-![](images/obstacle.png)
+![](images/images/obstacle.png)
 
 In the Basic Information section, you will notice an auto-generated ID along
 with a description textbox. You could give your participant a suitable ID as
@@ -176,7 +176,7 @@ If you select mobile instead, you would need to set its `Trigger Type`. Once you
 have completed your mobile participant setup, click on the `add route point`
 button to set the participant's trajectory points as seen in the image below.
 
-![](images/se_addroute.png)
+![](images/images/se_addroute.png)
 
 You can set a single destination, or add several points in between. You will
 also be able to add speed and change the speed of your participant on the form
@@ -188,11 +188,11 @@ back to your participant, you can use the `Re-center tool` (which is similar to
 the General Action re-center tool), but this re-center tool only works for your
 participants.
 
-![](images/center2.png)
+![](images/images/center2.png)
 
 Your final participant screen should appear as follows:
 
-![](images/final_obs.png)
+![](images/images/final_obs.png)
 
 #### Traffic Light Configuration
 
@@ -206,7 +206,7 @@ However, you will need to select a trigger type for the traffic light:
   ego car and the light
 - **Time** - the light will be triggered by the scenario run time
 
-![](images/traffic_light.png)
+![](images/images/traffic_light.png)
 
 You will also be required to set the `Initial State` of the traffic light. And
 once your trigger type is set, you will also be required to complete the
@@ -228,14 +228,14 @@ The minimum requirements of saving a scenario are to configure all required attr
 1. To locate and run your scenario requires you to trigger a `New Task` under
    `Task Management`
 
-![](images/new_scenario.png)
+![](images/images/new_scenario.png)
 
 2. click on `Select Scenarios`
 
-![](images/select_scenario.png)
+![](images/images/select_scenario.png)
 
 3. You can then search for your newly created scenario. An easy way to filter
    your private scenarios is to perform an instance search for your username in
    the `Search scenarios` field.
 
-![](images/instance.png)
+![](images/images/instance.png)

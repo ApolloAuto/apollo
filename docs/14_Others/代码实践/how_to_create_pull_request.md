@@ -91,7 +91,7 @@ git push -f -u origin my_dev
 
 ## Step 8: Generate a pull request
 
-Create a new pull request between "Apolloauto/apollo:master" and
+Create a new pull request between "ApolloAuto/apollo:master" and
 "YOUR_USERNAME/apollo:my_dev" by clicking the "Pull Request" button on
 [your forked Apollo repo page](https://github.com/YOUR_USERNAME/apollo) on
 GitHub.

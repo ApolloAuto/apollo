@@ -1,7 +1,7 @@
 # How to add a new lidar tracker algorithm
 
 The processing flow of lidar perception module is shown below: ：
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/lidar_perception_data_flow.png)
 
 The tracker algorithm introduced by this document is located at Recognition Component listed below. Current architecture of Recognition Component is shown：
 ![lidar recognition](images/lidar_recognition.png)
@@ -89,7 +89,7 @@ struct LidarFrame {
 
 ## Implement the class `NewLidarTracker`
 
-To ensure the new tracker could function properly, `NewLidarTracker` should at least override the interface Init(), Track(), Name() defined in `base_multi_target_tracker`. Init() is resposible for config loading, class member initialization, etc. And Track() will implement the basic logic of algorithm. A concrete `NewLidarTracker.cc` example is shown：
+To ensure the new tracker could function properly, `NewLidarTracker` should at least override the interface Init(), Track(), Name() defined in `base_multi_target_tracker`. Init() is responsible for config loading, class member initialization, etc. And Track() will implement the basic logic of algorithm. A concrete `NewLidarTracker.cc` example is shown：
 
 ```c++
 namespace apollo {
@@ -167,6 +167,6 @@ Follow the following steps to add config and param proto file for the new tracke
 
 ## Update lidar_obstacle_tracking.conf
 
-To use your new lidar tracker algorithm in Apollo，you need to modify the value of `multi_target_tracker` to your tracker's name in `lidar_obstacle_tracking.conf` located in corresponding sensor folder in `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline`
+To use your new lidar tracker algorithm in Apollo，you need to modify the value of `multi_target_tracker` to your tracker's name in `lidar_obstacle_tracking.conf` located in corresponding sensor folder in `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline`
 
 Once you finished the above modifications, you new tracker should take effect in Apollo.

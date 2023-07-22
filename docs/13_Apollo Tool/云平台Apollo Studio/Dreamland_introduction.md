@@ -80,7 +80,7 @@ Logsim is extracted from real world data using our sensors. They are more realis
 Dreamland platform offers a number of features that you could explore to help you accelerate your autonomous driving testing and deployment.
 1. **User Manual** - This section includes documentation to help you get up and running with Dreamland.
     - [Quickstart](https://azure.apollo.auto/user-manual/quick-start): This section will walk you through testing your build using our APIs and also how to manage and edit existing scenarios.
-    - [Scenario Editor](): The scenario editor is a new feature to be launched in Apollo 5.0 which enables our developers to create their own scenarios to test niche aspects of their algorithm. In order to use this feature, you will have to comeplete the form on the screen as seen in the image below:
+    - [Scenario Editor](): The scenario editor is a new feature to be launched in Apollo 5.0 which enables our developers to create their own scenarios to test niche aspects of their algorithm. In order to use this feature, you will have to compete the form on the screen as seen in the image below:
 
         ![](images/form.png)
 
@@ -100,7 +100,7 @@ Dreamland platform offers a number of features that you could explore to help yo
 
 ![](images/Dreamland_sm.png)
 
-4. **Task Management:** Like Scenario Editor, Task Management is also a service offering currently in beta testing and open only to selective partners. In order to use this feature, you will have to comeplete the form on the screen and request for activation.
+4. **Task Management:** Like Scenario Editor, Task Management is also a service offering currently in beta testing and open only to selective partners. In order to use this feature, you will have to complete the form on the screen and request for activation.
 The Task Management tab is extremely useful when testing any one particular type of scenario like side pass or U-turns. It helps test your algorithms against very specific test cases.
 
 Within the Task Management page, you can run a `New Task` to test your personal Apollo github repository against a list of scenarios. You will receive a summary of the task which highlights if the build passed or not, along with the passing rate of both worldsim and logsim scenarios and finally the total miles tested virtually. You can also view the number of failed scenarios along with a description detailing the failed timestamp and the grading metric which failed. Finally, you can run the comparison tool to check how your build performed versus previous builds.

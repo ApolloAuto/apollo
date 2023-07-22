@@ -212,4 +212,4 @@ Initial release of Apollo implements autonomous GPS waypoint following.
 * Include debugging tools in `modules/tools/`
 
 ## Autonomous Driving Capabilities
-Vehicles with this version do **NOT** perceive obstacles in close promixity. Neither can they drive on public roads or areas without GPS signals.
+Vehicles with this version do **NOT** perceive obstacles in close proximity. Neither can they drive on public roads or areas without GPS signals.

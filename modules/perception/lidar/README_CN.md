@@ -1,7 +1,7 @@
 # 激光雷达感知
 
 ## 介绍
-在Apollo7.0版本中我们提供了一种新的激光雷达障碍物检测模型Mask-Pillars，在Pointpillars的基础上做了两个方向的改进。首先，在主干网络的编码部分(encoder)引入了residual attention模块，用来学习mask信息并以残差（residual）的方式增强特征映射。第二种是在主干网络的解码部分（decoder)后利用pillar-level数据进行监督，这部分只在训练阶段执行。pillar-level训练数据根据前景障碍物pillars的分布生成。从实验验证结果看，Mask-Pillars在Kitti和Waymo数据集上比PointPillars具有更高的性能，尤其是对于障碍物的召回率。
+在Apollo7.0版本中我们提供了一种新的激光雷达障碍物检测模型Mask-Pillars，在Pointpillars的基础上做了两个方向的改进。首先，在主干网络的编码部分(encoder)引入了residual attention模块，用来学习mask信息并以残差（residual）的方式增强特征映射。第二种是在主干网络的解码部分（decoder)后利用pillar-level数据进行监督，这部分只在训练阶段执行。pillar-level训练数据根据前景障碍物pillars的分布生成。从实验验证结果看，Mask-Pillars在Kitti和Waymo数据集上比PointPillars具有更高的性能，尤其是对于障碍物的召回率。
 
 ## 结构
 这里我们主要针对在Pointpillars基础上进行的改进：
@@ -19,7 +19,7 @@ $$
 
 最终FPN部分的网络结构如下图所示
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/lidar_network.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/lidar_network.png" alt="图片名称" width="60%" />
 </div>
 
 ## 结果
@@ -43,7 +43,7 @@ $$
 
 我们将PointPillars和我们模型在KITTI数据集上的检测结果进行了可视化，如下图所示。从图中可以看出我们的模型具有更好的检出效果。可以看到，我们的模型可以召回被截断和阻挡的车辆：
 <div align=center>
-<img src="../../../docs/specs/images/3d_obstacle_perception/lidar_detection_compare.png" alt="图片名称" width="60%" />
+<img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/lidar_detection_compare.png" alt="图片名称" width="60%" />
 </div>
 
 

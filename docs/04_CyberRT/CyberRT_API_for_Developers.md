@@ -515,7 +515,7 @@ Cyber log library is built on top of glog. The following header files need to be
 
 Default global config path: cyber/setup.bash
 
-The configs below could be modified by devloper:
+The configs below could be modified by developer:
 
 ```
 export GLOG_log_dir=/apollo/data/log
@@ -719,8 +719,8 @@ bool TimertestComponent::Proc() {
 
 Use timertestcomponent as example:
 
-- Build: bazel build cyber/examples/timer_component_smaple/…
-- Run: mainboard -d cyber/examples/timer_component_smaple/timer.dag
+- Build: bazel build cyber/examples/timer_component_example/…
+- Run: mainboard -d cyber/examples/timer_component_example/timer.dag
 
 ### Precautions
 

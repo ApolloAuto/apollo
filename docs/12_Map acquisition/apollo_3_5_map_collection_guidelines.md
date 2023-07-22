@@ -11,11 +11,11 @@ In order to proceed with Data collection, we need to use a single 16-Line LiDAR 
 
 #### Installation of VLP-16 lidar
 
-In Apollo 2.5, map creation services became a part of Apollo Open Source project. To acquire the data necessary for map creation, one would need to install an additional VLP-16 LiDAR on the vehicle. The purpose of this LiDAR is to collect point cloud information for objects above the FOV of the HDL-64 S3 LiDAR, such as traffic lights and signs. It requires a customized rack to mount the VLP-16 Lidar on top of the vehicle. The figure below shows one of the possible configurations: ![VLP_16_installation](images/lidar_mount1.jpeg)
+In Apollo 2.5, map creation services became a part of Apollo Open Source project. To acquire the data necessary for map creation, one would need to install an additional VLP-16 LiDAR on the vehicle. The purpose of this LiDAR is to collect point cloud information for objects above the FOV of the HDL-64 S3 LiDAR, such as traffic lights and signs. It requires a customized rack to mount the VLP-16 Lidar on top of the vehicle. The figure below shows one of the possible configurations: ![VLP_16_installation](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/quickstart/images/lidar_mount1.jpeg)
 
 Another possible mounting is:
 
-![VLP_16_installation](images/lidar_mount.jpeg)
+![VLP_16_installation](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/quickstart/images/lidar_mount.jpeg)
 
 
 In this specific configuration, the VLP-16 LiDAR is mounted with an upward tilt of **20±2°**. The power cable of the VLP-16 is connected to the DataSpeed power panel. The ethernet connection is connected to the IPC (possibly through an ethernet switch). Similar to HDL-64 S3 LiDAR, the VLP-16 GPRMC and PPS receive input from the GPS receiver. Ideally, additional hardware should be installed to duplicate the GPRMC and PPS signal from the GPS receiver sent to HDL-64 and VLP-16 respectively. However, a simple Y-split cable may also provide adequate signal for both LiDARs. To distinguish from the HDL-64 S3 LiDAR, please follow the VLP-16 manual and configure the IP of VLP-16 to **192.168.20.14**, the data port to **2369**, and the telemetry port to **8309**. The pinout for the signal input from GPS receiver can also be found in the manual if you need customized cable.
@@ -29,7 +29,7 @@ For additional reference, please visit: [http://velodynelidar.com/vlp-16.html](h
 
 ### Calibration requirement
 
-Refer to the [Apollo Sensor Calibration Guide](../Perception/multiple_lidar_gnss_calibration_guide.md)
+Refer to the [Apollo Sensor Calibration Guide](../06_Perception/multiple_lidar_gnss_calibration_guide.md)
 for Sensor Calibration information.
 
 ### Additional requirements

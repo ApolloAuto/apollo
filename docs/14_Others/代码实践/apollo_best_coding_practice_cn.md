@@ -39,15 +39,15 @@
    可运行 `./apollo.sh format <path/to/BUILD>` 来修复 BUILD 文件的格式问题。
 
 1. 总体上，Apollo 遵循
-   [Google C++风格指南](https://google.github.io/styleguide/cppguide.html).
-   通过运行`scripts/clang_format.sh <path/to/cpp/dirs/or/files>` 或
-   `./apollo.sh format -c <path/to/cpp/dirs/or/files>` 命令可修复
-   C++代码风格问题。
+   [Google C++风格指南](https://google.github.io/styleguide/cppguide.html). 通过
+   运行`scripts/clang_format.sh <path/to/cpp/dirs/or/files>` 或
+   `./apollo.sh format -c <path/to/cpp/dirs/or/files>` 命令可修复 C++代码风格问
+   题。
 
 1. 确保简单且一致的函数签名。注释中请不要出现中文。
 
    ```C++
-   // 1. For input objects, const reference guarantes that it is valid, while
+   // 1. For input objects, const reference guarantees that it is valid, while
    //    pointers might be NULL or wild. Don't give others the chance to break
    //    you.
    // 2. For input scalars, just pass by value, which gives better locality and
@@ -58,7 +58,7 @@
    void FooBar(const InputObjectType& input1, const InputScalaType input2, ...,
                OutputType* output1, ...);
 
-   // RVO machanism will help you avoid unnecessary object copy.
+   // RVO mechanism will help you avoid unnecessary object copy.
    // See https://en.wikipedia.org/wiki/Copy_elision#Return_value_optimization
    OutputType FooBar(const InputType& input);
    ```

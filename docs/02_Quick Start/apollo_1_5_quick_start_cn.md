@@ -16,7 +16,7 @@
 
 4. 选择车辆和地图
 
-    单击右上角下拉菜单选择车辆和地图。这个列表是在[HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/hmi/conf/config.pb.txt)中定义的。
+    单击右上角下拉菜单选择车辆和地图。这个列表是在[HMI config file](https://github.com/ApolloAuto/apollo/blob/r1.5.0/modules/hmi/conf/config.pb.txt)中定义的。
 
     *注意：你也可以在HMI的右侧界面来更改个人配置。只要记得点击右上角的“Reset All”来重启系统就好*
 

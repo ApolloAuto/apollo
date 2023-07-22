@@ -781,13 +781,13 @@ The Apollo reference design recommends using three cameras with different focal 
 
 - All the cameras should face forward to the driving direction. The field of view (FOV) should be kept free from obstructions as much as possible.
 
-- ![Cameras_lock_screw](./images/LI-Camera-OnVehicle.png)
+- ![Cameras_lock_screw](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/LI-Camera-OnVehicle.png)
 
 - The camera with the 25 mm focal length should be tilted up by about two degrees. After you make this adjustment, the 25 mm camera should be able to observe the traffic light from 100 m away to the stop line at the intersection.
 
 - The lenses of the cameras, out of the package, are not in the optimal position. Set up the correct position by adjusting the focus of the lens to form a sharp image of a target object at a distance. A good target to image is a traffic sign or a street sign within the FOV. After adjusting the focus, use the lock screw to secure the position of the lens.
 
-  ![Cameras_lock_screw](./images/LI-Camera-LockScrew.png)
+  ![Cameras_lock_screw](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/LI-Camera-LockScrew.png)
 
 - Use USB 3.0 Cables to connect the cameras (USB 3.0 Micro-B) and the IPC(USB 3.0 type A), and then use screws to secure the connection.
 
@@ -800,7 +800,7 @@ This section provides descriptions of the installation procedure of Continental 
 
 The radar requires a matching mechanical rack to mount on the front bumper. After the installation, it is required that the radar faces towards the driving direction and slightly tilts up by no more than two degrees. 
 
-![Radar Installations](./images/Radar_OnVehicle.png)
+![Radar Installations](https://github.com/ApolloAuto/apollo/blob/v2.5.0/docs/quickstart/images/Radar_OnVehicle.png)
 
 The cable that comes with the radar needs to be routed to the back of the car and connected to the CAN1 channel of the ESD CAN card.
 

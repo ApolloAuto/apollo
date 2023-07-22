@@ -48,7 +48,7 @@ For the HDMap ROI filter, the data interface for HDMap is defined by a set of po
 
 To determine an input point, whether inside or outside the ROI, Apollo adopts a grid-wise LUT that quantifies the ROI into a birds-eye view 2D grid. As shown in Figure 1, this LUT covers a rectangle region, bounded by a predefined spatial range around the general view from above in the boundary of HDMap. Then it represents the affiliation with the ROI for each cell of the grid (i.e., 1/0 represents it is inside/outside the ROI). For computational efficiency, Apollo uses a scan line algorithm and bitmap encoding to construct the ROI LUT.
 
-<div align=center><img src="images/3d_obstacle_perception/roi_lookup_table.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/roi_lookup_table.png"></div>
 <div align=center>Figure 1 Illustration of ROI lookup table (LUT)</div>
 
 The blue lines indicate the boundary of HDMap ROI, including road surfaces and junctions. The red solid dot represents the origin of the local coordinate system corresponding to the LiDAR sensor location. The 2D grid is composed of 8×8 cells that are shown as green squares. The cells inside the ROI are blue-filled squares while the ones outside the ROI are yellow-filled squares.
@@ -140,7 +140,7 @@ The FCNN is composed of three layers:
 The feature encoder takes the channel feature image as input and successively down-samples its spatial resolution with increasing feature abstraction. Then the feature decoder gradually up-samples the encoded
 feature image to the spatial resolution of the input 2D grid, which can recover the spatial details of the feature image to facilitate the cell-wise obstacle attribute prediction. The down-sampling and up-sampling operations are implemented in terms of stacked convolution/devolution layers with non-linear activation (i.e., ReLu) layers.
 
-<div align=center><img src="images/3d_obstacle_perception/FCNN-with-class.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/FCNN-with-class.png"></div>
 
 <div align=center>Figure 2 The FCNN for cell-wise obstacle prediction</div>
 
@@ -160,7 +160,7 @@ As shown in Figure 3, each cell is a node of the graph and the directed edge is 
 
 Given this graph, Apollo adopts a compressed Union Find algorithm to efficiently find the connected components, each of which is a candidate obstacle object cluster. The objectness is the probability of being a valid object for one individual cell.  So Apollo defines the non-object cells as the ones with the objectness of less than 0.5. Thus, Apollo filters out the empty cells and non-object ones for each candidate object cluster.
 
-<div align=center><img src="images/3d_obstacle_perception/obstacle_clustering.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/obstacle_clustering.png"></div>
 
 <div align=center>Figure 3 Illustration of obstacle clustering</div>
 
@@ -210,7 +210,7 @@ The object builder component establishes a bounding box for the detected obstacl
 The idea behind the algorithm is to find the all areas given an edge of the polygon point. In the following example, if AB is the edge, Apollo projects other polygon points onto AB and establishes the pair of
 intersections that has the maximum distance. That’s one of the edges belonging to the bounding box. Then it is straightforward to obtain the other edge of the bounding box. By iterating all edges in the polygon, as shown in Figure 4, Apollo determines a 6-edge bounding box. Apollo then selects the solution that has the minimum area as the final bounding box.
 
-<div align=center><img src="images/3d_obstacle_perception/object_building.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/object_building.png"></div>
 
 <div align=center>Figure 4 Illustration of MinBox Object Builder</div>
 
@@ -240,7 +240,7 @@ Additionally, there are some important parameters of distance weights that are u
 
 Given the association distance matrix, as shown in Figure 5, Apollo constructs a bipartite graph and uses the Hungarian algorithm to find the best detection-to-track matching via minimizing the distance cost. It solves the assignment problem within O(n\^3) time complexity. To boost computing performance, the Hungarian algorithm is implemented after cutting the original bipartite graph into subgraphs, by deleting vertices with a distance greater than a reasonable maximum distance threshold.
 
-<div align=center><img src="images/3d_obstacle_perception/bipartite_graph_matching.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/bipartite_graph_matching.png"></div>
 
 <div align=center>Figure 5 Illustration of Bipartite Graph Matching</div>
 
@@ -262,7 +262,7 @@ The original Kalman Filter updates its states without distinguishing the quality
 
 A high-level workflow of HM object tracker is given in Figure 6.
 
-<div align=center><img src="images/3d_obstacle_perception/hm_object_tracker.png"></div>
+<div align=center><img src="https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/3d_obstacle_perception/hm_object_tracker.png"></div>
 
 <div align=center>Figure 6 Workflow of HM Object Tracker</div>
 

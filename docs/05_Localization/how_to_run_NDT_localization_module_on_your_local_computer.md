@@ -98,7 +98,7 @@ In /apollo/data/log directory, you can see the localization log files.
 - localization.WARNING : WARNING log
 - localization.ERROR : ERROR log
 - localization.out : Redirect standard output
-- localizaiton.flags : A backup of configuration file
+- localization.flags : A backup of configuration file
 
 ## 4. Play record bag
 
@@ -107,7 +107,7 @@ cd DATA_PATH/bag
 cyber_recorder play -f *.record
 ```
 
-Open another ternimal and log in the docker environment, then execute:
+Open another terminal and log in the docker environment, then execute:
 
 ```
 cyber_monitor
@@ -147,7 +147,7 @@ If everything is fine, you should see this on screen.
 
 ## 6. Stop localization module
 
-You can stop localizaiton module by
+You can stop localization module by
 
 ```
 ./scripts/ndt_localization.sh stop

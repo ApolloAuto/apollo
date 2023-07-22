@@ -1,7 +1,7 @@
 # 如何添加新的lidar检测算法
 
 Perception中的lidar数据流如下：
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/lidar_perception_data_flow.png)
 
 本篇文档所介绍的lidar检测算法位于图中的Detection Component中。当前Detection Component的架构如下：
 ![lidar detection high-level](images/lidar_detection_1.png)
@@ -177,6 +177,6 @@ PERCEPTION_REGISTER_LIDARDETECTOR(NewLidarDetector); //注册新的lidar_detecto
 
 ## 更新 lidar_obstacle_detection.conf
 
-要使用Apollo系统中的新lidar检测算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_detection.conf` 文件的 `detector` 字段值改为 "NewLidarDetector"
+要使用Apollo系统中的新lidar检测算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline` 中的对应传感器的 `lidar_obstacle_detection.conf` 文件的 `detector` 字段值改为 "NewLidarDetector"
 
 在完成以上步骤后，您的新lidar检测算法便可在Apollo系统中生效。

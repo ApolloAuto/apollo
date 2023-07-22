@@ -6,7 +6,7 @@ The Predictor generates the predicted trajectory for each obstacle. Here, let's 
 2. Implement the class `NewPredictor`
 3. Add a new predictor type in proto `prediction_conf.proto`
 4. Update prediction_conf
-5. Upate the Predictor manager
+5. Update the Predictor manager
 
 ## Steps to add a new predictor
 The following steps will add a Predictor `NewPredictor`.
@@ -72,8 +72,8 @@ obstacle_conf {
 }
 ```
 
-### Upate Predictor manager
-Update `CreateEvluator( ... )` like this:
+### Update Predictor manager
+Update `CreateEvaluator( ... )` like this:
 ```cpp
   case ObstacleConf::NEW_PREDICTOR: {
       predictor_ptr.reset(new NewPredictor());

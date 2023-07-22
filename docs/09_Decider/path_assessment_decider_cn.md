@@ -18,9 +18,9 @@
 
 规划模块的运动总体流程图如下：
 
-![总体流程图](../images/task/lane_follow.png)
+![总体流程图](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/lane_follow.png)
 
-总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
+总体流程图以[lane follow](../../modules/planning/conf/scenario/lane_follow_hybrid_config.pb.txt)场景为例子进行说明。task的主要功能位于`Process`函数中。
 
 Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
@@ -44,7 +44,7 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 代码主体流程如下图：
 
-![流程图](../images/task/path_assessment/path_assessment.png)
+![流程图](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/technical_documents/images/task/path_assessment/path_assessment.png)
 
 ## 路径重复使用
 
@@ -241,7 +241,8 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 更新必要信息：
 
 1.更新adc前方静态障碍物的信息
-2.更新自车道使用信息3.更新旁车道的方向
+2.更新自车道使用信息
+3.更新旁车道的方向
 (1) 根据PathDeciderStatus是RIGHT_BORROW或LEFT_BORROW判断是从左侧借道，还是从右侧借道
 
 # 路径排序算法解析
@@ -275,10 +276,10 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
 
 `ComparePathData(lhs, rhs, …)`
 
-路径排序：（道路评估的优劣通过排序获得）
+路径排序：（道路评估的优劣通过排序获得
 - 1.空的路径永远排在后面
 - 2.regular > fallback
-- 3.如果self-lane有一个存在，选择那个。如果都存在，选择较长的.如果长度接近，选择self-lane如果self-lane都不存在，选择较长的路径
+- 3.如果self-lane有一个存在，选择那个。如果都存在，选择较长的.如果长度接近，选择self-lane。如果self-lane都不存在，选择较长的路径
 - 4.如果路径长度接近，且都要借道:
     - (1) 都要借逆向车道，选择距离短的
     - (2) 针对具有两个借道方向的情况:
@@ -286,4 +287,4 @@ Fig.1的具体运行过程可以参考[path_bounds_decider]()。
       + 无障碍物，根据adc的位置选择借道方向
     - (3) 路径长度相同，相邻车道都是前向的，选择较早返回自车道的路径
     - (4) 如果路径长度相同，前向借道，返回自车道时间相同，选择从左侧借道的路径
-- 5.最后如果两条路径相同，则 lhs is not < rhl排序之后：选择最优路径，即第一个路径
+- 5.最后如果两条路径相同，则 lhs is not < rhl。排序之后：选择最优路径，即第一个路径

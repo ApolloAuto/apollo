@@ -47,7 +47,7 @@
 1. Simple and unified function signature.
 
    ```C++
-   // 1. For input objects, const reference guarantes that it is valid, while
+   // 1. For input objects, const reference guarantees that it is valid, while
    //    pointers might be NULL or wild. Don't give others the chance to break
    //    you.
    // 2. For input scalars, just pass by value, which gives better locality and
@@ -58,7 +58,7 @@
    void FooBar(const InputObjectType& input1, const InputScalaType input2, ...,
                OutputType* output1, ...);
 
-   // RVO machanism will help you avoid unnecessary object copy.
+   // RVO mechanism will help you avoid unnecessary object copy.
    // See https://en.wikipedia.org/wiki/Copy_elision#Return_value_optimization
    OutputType FooBar(const InputType& input);
    ```

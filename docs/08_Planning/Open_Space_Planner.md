@@ -18,7 +18,7 @@ Once the data is in place, Open Space planner is triggered as seen in the image 
 
 ### Searching - Based Planning
 
-In step 1, a raw trajectory is generated for the ego-car. This stage applies vehicle kinemetic model in algorithm to create the raw trajectory with a series of distance equidistant points as seen in the image below.
+In step 1, a raw trajectory is generated for the ego-car. This stage applies vehicle kinematic model in algorithm to create the raw trajectory with a series of distance equidistant points as seen in the image below.
 The red line represents the raw trajectory output from Hybrid A*, which is sent to the next step, Optimization to calculate the green smoothened line.
 
 ![](images/os_step1.png)

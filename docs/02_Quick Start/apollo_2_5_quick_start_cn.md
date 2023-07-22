@@ -23,7 +23,7 @@
    ![](images/dreamview_2_5_setup_profile.png)
 
    单击右上角下拉菜单选择车辆和地图。这个列表是在
-   [HMI config file](ttps://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf)
+   [HMI config file](https://github.com/ApolloAuto/apollo/blob/r2.5.0/modules/dreamview/conf/hmi.conf)
    中定义的。
 
 1. 启动所有模块

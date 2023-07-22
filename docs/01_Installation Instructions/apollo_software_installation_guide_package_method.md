@@ -27,7 +27,7 @@ Apollo relies on Docker 19.03+. To install the Docker engine, see [install Docke
 
 ## Step 2: Install Apollo environment manager tool
 
-The Apollo environemnt manager tool is a command line tool for developers to manage and launch apollo environment containers.
+The Apollo environment manager tool is a command line tool for developers to manage and launch apollo environment containers.
 
 ### 1. Add apt source
 

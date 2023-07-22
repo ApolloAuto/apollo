@@ -27,7 +27,7 @@ Please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAut
         thread_init_flag_ = true;
     }
     ```
-4. Whether vehicle is stoped due to fallback is determined by the IsVehicleStopDueToFallBack() function. This determines the final trajectory planning.
+4. Whether vehicle is stopped due to fallback is determined by the IsVehicleStopDueToFallBack() function. This determines the final trajectory planning.
 5. If vehicle is stopped due to fallback, replan stitching trajectory by ComputeReinitStitchingTrajectory() function. If not, replan stitching trajectory by ComputeStitchingTrajectory(), please refer to [trajectory_stitcher.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/common/trajectory_stitcher.cc).
 6. Generate trajectory depends on the FLAGS_enable_open_space_planner_thread. A stop trajectory is generated in the following cases:
    1. Planning thread is stopped. 
@@ -36,7 +36,7 @@ Please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAut
    4. Previous frame planning failed. 
    5. If the trajectory can be updated normally, the optimized trajectory is output normally. 
 
-7. Output: the optput is final trajectory information.
+7. Output: the output is final trajectory information.
 
 # Algorithm Detail
     ``` cpp
@@ -69,7 +69,7 @@ Please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAut
       3. Not in autopilot mode. 
       4. The number of points in the previous frame is zero. 
       5. The current time is less than the trajectory start time of the previous frame.
-      6. The current time is more than the trajetory end time of the previous frame.
+      6. The current time is more than the trajectory end time of the previous frame.
       7. The matching path point is empty. 
       8. The horizontal and vertical deviation of the projection point is greater than the threshold. 
     2. Stitch trajectory according to the planning period and the position of the projection point.
@@ -81,7 +81,7 @@ Please refer to [open_space_trajectory_provider.cc](https://github.com/ApolloAut
     ```
     The function is used to initialize stitching trajectory and get the initial point. 
 1. Parameter: The planned cycle time and vehicle state
-2. Introduction: The function can get the diffrent initial point based on the different logic.
+2. Introduction: The function can get the different initial point based on the different logic.
 3. Process detail:
    1. When the vehicle speed and acceleration are less than the threshold, the message of initial point is from vehicle state.           2. When the vehicle speed and acceleration satisfy the threshold, the vehicle state is calculated based on the kinematics model.
 

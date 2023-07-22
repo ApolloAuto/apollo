@@ -25,7 +25,7 @@
  * prediction.cc和prediction.h:
 	  * Name()函数：返回节点名字prediction。
 	  * Init()函数：
-        * 使用配置文件prediction_conf.pb.txt设置prediction_conf_，主要设置preditor的产生的通道类型。
+        * 使用配置文件prediction_conf.pb.txt设置prediction_conf_，主要设置predictor的产生的通道类型。
         * 使用配置文件adapter.conf设置adapter_conf_，设置节点话题类型。
         * 初始化AdapterManager，定义nodehandle和话题。
         * 初始化ContainerManager，每一个接受话题创建一个Container，用于接受话题数据。

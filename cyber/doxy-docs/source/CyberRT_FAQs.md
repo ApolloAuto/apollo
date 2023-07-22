@@ -9,7 +9,7 @@ Apollo's Cyber RT is an open source runtime framework designed specifically for 
 
 ## Why did we decide to work on a new runtime framework?
 
-- During years of development of autonomous driving technologies, we have learned a lot from our previous experience with Apollo. In autonomous driving scenarious, we need an effective centralized computing model, with demands for high performance,  including high concurrency, low latency and high throughput。
+- During years of development of autonomous driving technologies, we have learned a lot from our previous experience with Apollo. In autonomous driving scenarios, we need an effective centralized computing model, with demands for high performance,  including high concurrency, low latency and high throughput。
 
 - The industry is evolving, so does Apollo. Going forward, Apollo has already moved from development to productization, with volume deployments in the real world, we see the demands for the highest robustness and high performance. That’s why we spent years of building Apollo Cyber RT, which addresses that requirements of autonomous driving solutions.
 
@@ -48,7 +48,7 @@ We will continue to support previous Apollo releases (3.0 and before) based on R
 
 ## Will Apollo Cyber RT affect regular code development?
 
-If you have not modified anything at runtime framework layer and have only worked on Apollo's module code base, you will not be affected by the introduction of our new runtime framework as most of time you would only need to re-interface the access of the input and output data. Additional documents are under [cyber](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/) with more details.
+If you have not modified anything at runtime framework layer and have only worked on Apollo's module code base, you will not be affected by the introduction of our new runtime framework as most of time you would only need to re-interface the access of the input and output data. Additional documents are under [cyber](https://github.com/ApolloAuto/apollo/tree/master/docs/04_CyberRT/) with more details.
 
 ---
 

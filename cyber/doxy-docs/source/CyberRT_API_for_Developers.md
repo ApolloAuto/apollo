@@ -516,7 +516,7 @@ Cyber log library is built on top of glog. The following header files need to be
 
 Default global config path: cyber/setup.bash
 
-The configs below could be modified by devloper:
+The configs below could be modified by developer:
 
 ```
 export GLOG_log_dir=/apollo/data/log

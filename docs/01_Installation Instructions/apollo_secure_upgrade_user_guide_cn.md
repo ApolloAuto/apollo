@@ -9,7 +9,7 @@
 3. 加密信息被安全合理的保护
 4. 服务器针对不同的设备提供不同的授权
 5. 防止攻击者利用服务器的应答对设备实施重传攻击
-6. 支持多个平台（Ubuntu 14, Centos 6, Centos 7 and Andorid）
+6. 支持多个平台（Ubuntu 14, Centos 6, Centos 7 and Android）
 
 ## 更新流程
 

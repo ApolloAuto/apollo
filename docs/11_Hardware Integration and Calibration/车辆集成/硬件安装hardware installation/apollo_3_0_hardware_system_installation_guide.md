@@ -155,7 +155,7 @@ The list of prerequisites are as follows:
 
 The following two diagrams indicate the locations of where the three major components (GPS Antenna, IPC, GPS Receiver and LiDAR) should be installed on the vehicle:
 
-![major_component_side_view](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/Hardware_overview.png)
+![major_component_side_view](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/demo_guide/images/Hardware_overview.png)
 
 ![major_component_rear_view](images/Car_Rearview.png)
 

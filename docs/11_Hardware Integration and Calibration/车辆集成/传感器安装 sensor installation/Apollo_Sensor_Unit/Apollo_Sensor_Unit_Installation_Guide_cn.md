@@ -38,7 +38,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
 
    主电源来自于车辆电池9V ~ 36V, 120W
 
-   ![conn-DTF13-2P](images/conn-DTF13-2P.jpeg)
+   ![conn-DTF13-2P](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/Apollo_Sensor_Unit/images/conn-DTF13-2P.jpeg)
 
    |MFR|MPN|Description|
    |---------------|--------|-----------|
@@ -82,7 +82,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
 
    定制的8 Pin接头为需要同步输出的传感器例如激光雷达、摄像机等提供了3种PPS/GPRMC输出序列。
 
-   ![1376350-2](images/1376350-2.jpeg)
+   ![1376350-2](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/Apollo_Sensor_Unit/images/1376350-2.jpeg)
 
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |

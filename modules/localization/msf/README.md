@@ -48,7 +48,7 @@
   `map_folder`: destination folder for map.
 
   After running this script, you will get a localization map in map_folder, which contains a "config.xml" and "map" folder。
-Actually, in this script, we first create lossless map and then convert lossless map to lossy map which losses some not essential message and has smaller size. The lossless map is also avaliable.
+Actually, in this script, we first create lossless map and then convert lossless map to lossy map which losses some not essential message and has smaller size. The lossless map is also available.
 
 ## Visualization Tool
   We provide a simple online visualization tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localization.conf is used to enable the online visualization tool.

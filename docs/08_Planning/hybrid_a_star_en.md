@@ -1,7 +1,7 @@
 # GENERATE COARSE TRAJECTORY IN THE OPEN SPACE
 
 # Introduction
-The goal of htbrid_a_star is to generate the coarse trajectory in the open space. Hybrid_a_star contains node3d， grid_search， reeds_shepp_path and hybrid_a_star. hybrid_a_star is the most important component generating the coarse trajectory and call the grid_search and reeds_shepp_path.
+The goal of hybrid_a_star is to generate the coarse trajectory in the open space. Hybrid_a_star contains node3d， grid_search， reeds_shepp_path and hybrid_a_star. hybrid_a_star is the most important component generating the coarse trajectory and call the grid_search and reeds_shepp_path.
 
 # Where is the code
 Please refer to [hybrid a star.cc](https://github.com/ApolloAuto/apollo/tree/master/modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.cc)
@@ -54,7 +54,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
    ``` cpp
    bool HybridAStar::GetResult(HybridAStartResult* result)
    ```
-6. Output: The optput is partial trajectory information, which include x,y,phi,v,a,steer,s.
+6. Output: The output is partial trajectory information, which include x,y,phi,v,a,steer,s.
 
 # Algorithm Detail
    ``` cpp
@@ -64,7 +64,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
 1. Parameter: the input parameter is node which same as node3d. 
 2. Introduction: the function is used to check for collisions. 
 3. Process detail: 
-   1. Boundary range judgment. If the x and y of node exceed the range of the corresponding x and y of boundary, then return false,         reprents invalid. 
+   1. Boundary range judgment. If the x and y of node exceed the range of the corresponding x and y of boundary, then return false,         represents invalid. 
    2. Boundary overlap judgment. If the bounding box of vehicle overlaps any line segment, then return false. Judge the overlap by          whether the line and box intersect.
 
     ``` cpp
@@ -73,7 +73,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
                                    const std::vector<std::vector<common::math::LineSegment2d>> &obstacles_linesegments_vec) 
     ```
     the function is used to generate dp map by dynamic programming, please refer (https://github.com/ApolloAuto/apollo/blob/master/modules/planning/open_space/coarse_trajectory_generator/grid_search.cc)
-1. Parameter: ex and ey are the postion of goal point, XYbounds_ is the boundary of x and y, obstacles_linesegments_ is the line            segments which is composed of boundary point.
+1. Parameter: ex and ey are the position of goal point, XYbounds_ is the boundary of x and y, obstacles_linesegments_ is the line            segments which is composed of boundary point.
 2. Introduction: the function is used to generate the dp map
 3. Process detail: 
    1. Grid the XYbounds_ according to grid resolution, then get the max grid.
@@ -82,7 +82,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
     ``` cpp
     bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node)
     ```
-    The function is used to check if an analystic curve could be connected from current configuration to the end configuration without collision. if so, search ends.
+    The function is used to check if an analytic curve could be connected from current configuration to the end configuration without collision. if so, search ends.
 1. Parameter: current node is start point of planning.
 2. introduction: the function based on the reeds shepp method which is a geometric algorithm composed of arc and line. Reeds shepp is       used for search acceleration. 
 3. Process detail:
@@ -93,7 +93,7 @@ The input HybridAStar::Plan() is called by the open_space_trajectory_provider.cc
     ``` cpp
     bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node)
     ```
-    The funtion is used to generate next node based on the current node.
+    The function is used to generate next node based on the current node.
 1. Parameter: the current node of the search and the next node serial number 
 2. Introduction: the next node is calculated based on steering wheel uniform sampling and vehicle kinematics.
 3. Process detail: 

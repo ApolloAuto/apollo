@@ -12,7 +12,7 @@ don't need to install low-latency/real-time kernels described here at all.
 
 ## Ubuntu Low-Latency Kernel
 
-Ubuntu low-latency kernel (availabe in Ubuntu repository) is completely capable
+Ubuntu low-latency kernel (available in Ubuntu repository) is completely capable
 of low- to no- latency for running Apollo in the vehicle. Preempt optimization
 is enabled in its kernel configuration, and latency as low as 0.1 millisecond
 can and has been achieved using it.
@@ -69,7 +69,7 @@ straightforward.
 
 **Note**
 
-> You may need to regist and sign CUDA EULA to download Nvidia packages.
+> You may need to register and sign CUDA EULA to download Nvidia packages.
 
 For example, below is the instructions installing Nvidia driver on x86_64 Ubuntu
 18.04.5 with the "deb[local]" approach:

@@ -13,7 +13,7 @@ can be easily integrated to make the upgrade process more secure and robust.
 3. Cryptographic resources are protected properly.
 4. Server provides customized authorizations to different devices.
 5. Prevent attackers utilizing the server’s response to replay attack devices.
-6. Multiple platforms (Ubuntu 14, Centos 6, Centos 7 and Andorid) are supported.
+6. Multiple platforms (Ubuntu 14, Centos 6, Centos 7 and Android) are supported.
 
 ## Upgrade Procedure
 
@@ -138,7 +138,7 @@ output para:
 ### 3. Additional Information
 
 1. SDK uses standard PEM certificates.
-2. Before using SDK, users need to generate two seperate chains of certificate
+2. Before using SDK, users need to generate two separate chains of certificate
    for server and device.
 3. Certificates from the server certificate chain are deployed to server and
    make sure they cannot sign other certificates.

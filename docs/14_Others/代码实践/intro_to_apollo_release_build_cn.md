@@ -46,7 +46,7 @@ ldd bazel-bin/modules/planning/libplanning_component.so
 ，再利用`patchelf --force-rpath --set-rpath` 来修改其 RPATH 设置。
 
 欲要更深入了解，请参考：
-[tools/install/install.bzl](../../tools/install/install.bzl)。
+[tools/install/install.bzl](../../../tools/install/install.bzl)。
 
 ## 如何执行 Release Build 构建
 
@@ -87,7 +87,7 @@ bash docker/scripts/runtime_start.sh -g cn
 bash docker/scripts/runtime_into.sh
 ```
 
-启动 Dreaview：
+启动 Dreamview：
 
 ```bash
 ./scripts/bootstrap.sh
@@ -113,7 +113,7 @@ install(
 ```
 
 这是规划模块自身的 BUILD 文件
-[modules/planning/BUILD](../../modules/planning/BUILD):
+[modules/planning/BUILD](../../../modules/planning/BUILD):
 
 ```python
 filegroup(
@@ -148,7 +148,7 @@ install(
 ## `install`规则的参数列表
 
 `install`规则定义在
-[tools/install/install.bzl](../../tools/install/install.bzl):
+[tools/install/install.bzl](../../../tools/install/install.bzl):
 
 ```python
 install = rule(

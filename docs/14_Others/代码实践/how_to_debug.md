@@ -76,7 +76,7 @@ the Dreamview interface. The following is an example of debugging the
 
 ![enable simcontrol](images/build_debug/enable_simcontrol.png)
 
-- Click on the `Module Controler` tab on the left toolbar and select the
+- Click on the `Module Controller` tab on the left toolbar and select the
   `Routing` and `Planning` options as shown below:
 
 ![start routing and planning](images/build_debug/start_routing_and_planning.png)

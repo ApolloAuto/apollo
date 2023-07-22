@@ -6,7 +6,7 @@
 ## 软硬件环境准备
 
 1、硬件安装方法参
-见[Apollo 2.5 硬件安装指南](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
+见[Apollo 2.5 硬件安装指南](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 2、软件安装方法参
 见[Apollo 软件安装指南](../01_Installation%20Instructions/apollo_software_installation_guide.md)

@@ -28,13 +28,13 @@ rostopic echo /apollo/sensor/gnss/ins_stat
 的参照物有平整的建筑立面、路灯和电线杆以及路沿等。若标定质量较差，则会使拼接点云
 出现一些模糊、重影的效果。图 1 是两张不同标定质量的拼接点云对比。
 
-![](../quickstart/images/calibration/lidar_calibration/good_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/quickstart/images/calibration/lidar_calibration/good_calib.png)
 
 <p align="center">
 (a)
 </p>
 
-![](../quickstart/images/calibration/lidar_calibration/poor_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/quickstart/images/calibration/lidar_calibration/poor_calib.png)
 
 <p align="center">
 (b)

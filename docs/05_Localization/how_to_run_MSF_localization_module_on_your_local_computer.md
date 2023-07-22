@@ -51,7 +51,7 @@ In /apollo/data/log directory, you can see the localization log files.
  - localization.WARNING : WARNING log
  - localization.ERROR : ERROR log
  - localization.out : Redirect standard output
- - localizaiton.flags : A backup of configuration file
+ - localization.flags : A backup of configuration file
 
 ## 5. Play cyber records
 ```

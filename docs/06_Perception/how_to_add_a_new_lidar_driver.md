@@ -31,7 +31,7 @@ Please refer to the [manuals of Apollo Cyber RT](../04_CyberRT/README.md).
 
 #### 2. Define message for raw data
 
-Apollo already define the format of pointcloud. For new lidar, you only need to define the protobuf message for the raw scannning data. Those raw data will be used for archive and offline development. Compared to processed pointcloud data, raw data saves a lot of storage spaces for long term. The new message of the scan data can be define as below:
+Apollo already define the format of pointcloud. For new lidar, you only need to define the protobuf message for the raw scanning data. Those raw data will be used for archive and offline development. Compared to processed pointcloud data, raw data saves a lot of storage spaces for long term. The new message of the scan data can be define as below:
 
 ```c++
 // a scan message sample
@@ -45,7 +45,7 @@ message ScanData {
 }
 ```
 
-In velodyne driver, the scan data message is define as [VelodyneScan](../../modules/drivers/lidar/velodyne/proto/velodyne.proto#L29).
+In velodyne driver, the scan data message is define as [VelodyneScan](../../modules/drivers/lidar/proto/velodyne.proto#L29).
 
 #### 3. Access the raw data
 
@@ -98,7 +98,7 @@ message PointXYZIT {
 }
 ```
 
-Then you need to create a new ParserComponent，which inherits Components templates with ScanData. ParserComponent takes ScanData as input, then generates pointcloud message and sents it out.
+Then you need to create a new ParserComponent，which inherits Components templates with ScanData. ParserComponent takes ScanData as input, then generates pointcloud message and sends it out.
 
 ```c++
 ...
@@ -111,7 +111,7 @@ class ParserComponent : public Component<ScanData> {
   bool Proc(const std::shared_ptr<ScanData>& scan_msg) override {
     // get a pointcloud object from objects pool
   	auto point_cloud_out = point_cloud_pool_->GetObject();
-  	// clear befor using
+  	// clear before using
   	point_cloud_out->clear();
   	// parse scan data and generate pointcloud
   	parser_->parse(scan_msg, point_cloud_out);

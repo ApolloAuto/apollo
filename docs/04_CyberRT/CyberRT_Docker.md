@@ -57,4 +57,4 @@ Or run with `--config=opt` for an optimized build/test.
 ./apollo.sh test --config=opt cyber
 ```
 
-You should be able to see that all the testcases passed.
+You should be able to see that all the test cases passed.

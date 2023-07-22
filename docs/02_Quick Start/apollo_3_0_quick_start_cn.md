@@ -40,7 +40,7 @@
 
    ![dreamview_2_5_setup_profile](images/dreamview_2_5_setup_profile.png)
 
-   附注：在进行任何测试前会要求使用者设置参数。点击下拉列表并选择想要使用的导航模式，高清地图和车辆。该列表数据在[HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf)中定义。
+   附注：在进行任何测试前会要求使用者设置参数。点击下拉列表并选择想要使用的导航模式，高清地图和车辆。该列表数据在[HMI config file](https://github.com/ApolloAuto/apollo/blob/r2.5.0/modules/dreamview/conf/hmi.conf)中定义。
 
    附注：允许使用者在HMI的右侧面板中更改参数，但是需要点击右上角的Reset All按钮重启该系统以使参数生效。
 

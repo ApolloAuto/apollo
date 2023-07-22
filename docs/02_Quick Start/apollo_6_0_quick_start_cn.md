@@ -19,7 +19,7 @@ Apollo集成了新的深度学习模型，包括使用PointPillars进行障碍�
 
 ## 硬件和软件安装
 
-Apollo 6.0的硬件设置与Apollo 3.5相同，请参阅[Apollo 3.5 硬件与系统安装指南](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)获取安装硬件组件的步骤，参阅[Apollo软件安装指南](../01_Installation%20Instructions/apollo_software_installation_guide_cn.md)获取软件安装步骤。
+Apollo 6.0的硬件设置与Apollo 3.5相同，请参阅[Apollo 3.5 硬件与系统安装指南](../11_Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)获取安装硬件组件的步骤，参阅[Apollo软件安装指南](../01_Installation%20Instructions/apollo_software_installation_guide_cn.md)获取软件安装步骤。
 
 ## Dreamview的使用
 

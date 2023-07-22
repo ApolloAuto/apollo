@@ -15,7 +15,7 @@ Please refer [code](https://github.com/ApolloAuto/apollo/blob/master/modules/pla
 SpeedBoundsDecider is a derived class whose base class is Decider. Thus, when task::Execute() is called in the task list, the Process() in SpeedBoundsDecider is actually doing the processing.
 
 1. Input.
-While the input params of the unified api are frame and reference_line_info, the information needed to caculate st_graph includes PathData/ReferenceLine/PathDecision and PlanningStartPoint from frame. 
+While the input params of the unified api are frame and reference_line_info, the information needed to calculate st_graph includes PathData/ReferenceLine/PathDecision and PlanningStartPoint from frame. 
 2. Process.
 - 2.1 Map obstacles into st graph
 `if (boundary_mapper.ComputeSTBoundary(path_decision).code() == ErrorCode::PLANNING_ERROR) {}` Here it goes through every obstacle to generate ST graph. Specifically, this function will fine-tune boundary if longitudinal decision has been made. After that each st_boundary of obstacles is pushed in to a boundaries vector.

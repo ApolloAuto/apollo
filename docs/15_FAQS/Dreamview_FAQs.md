@@ -23,7 +23,7 @@ So if you can not access Dreamview, please check:
 
 ## Dreamview does not open up if I install more than 1 version of Apollo?
 
-This issue occured because of port conflict error. Even though you setup two
+This issue occurred because of port conflict error. Even though you setup two
 different docker environments, both of them are still trying to use port 8888 on
 your machine, therefore causing a port conflict issue. If you'd like to run both
 versions at the same time, please make sure different ports are set.
@@ -73,7 +73,7 @@ you can refer to
 
 ## What's the function of sim_control in the backend of dreamview
 
-It simulates a SDC's control module, and moves the car based on planning result.
+It simulates the control module which moves the car based on planning result.
 This is a really convenient way to visualize and test planning module
 
 ---

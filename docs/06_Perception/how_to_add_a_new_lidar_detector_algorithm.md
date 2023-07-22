@@ -1,7 +1,7 @@
 # How to add a new lidar detector algorithm
 
 The processing flow of lidar perception module is shown below:
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/lidar_perception_data_flow.png)
 
 The detector algorithm introduced by this document is located at Detection Component listed below. Current architecture of Detection Component is shown：
 ![lidar detection high-level](images/lidar_detection_1.png)
@@ -9,7 +9,7 @@ The detector algorithm introduced by this document is located at Detection Compo
 
 As we can see from above structure, lidar detector algorithm, such as PointPillars, is the derived class of `base_lidar_detector` which acts as a abstract class member of `base_lidar_obstacle_detection` located in Detection Component. Next, We will introduce how to add a new lidar detector algorithm.
 
-Apollo has provided two lidar detector algorithms -- PointPillars and CNN （NCut will no longer be updated）. Both of them could be easily changed or replaced by other algorithms. The input of algorithm should be original points cloud data, while the output should be obastacle object data. This document will introduce how to add a new lidar detector algorithm, the basic task sequence is listed below：
+Apollo has provided two lidar detector algorithms -- PointPillars and CNN （NCut will no longer be updated）. Both of them could be easily changed or replaced by other algorithms. The input of algorithm should be original points cloud data, while the output should be obstacle object data. This document will introduce how to add a new lidar detector algorithm, the basic task sequence is listed below：
 
 1. Define a class that inherits `base_lidar_detector`
 2. Implement the class `NewLidarDetector`
@@ -91,7 +91,7 @@ struct LidarFrame {
 
 ## Implement the class `NewLidarDetector`
 
-To ensure the new detector could function properly, `NewLidarDetector` should at least override the interface Init(), Detect(), Name() defined in `base_lidar_detector`. Init() is resposible for config loading, class member initialization, etc. And Detect() will implement the basic logic of algorithm. A concrete `NewLidarDetector.cc` example is shown：
+To ensure the new detector could function properly, `NewLidarDetector` should at least override the interface Init(), Detect(), Name() defined in `base_lidar_detector`. Init() is responsible for config loading, class member initialization, etc. And Detect() will implement the basic logic of algorithm. A concrete `NewLidarDetector.cc` example is shown：
 
 ```c++
 namespace apollo {
@@ -177,6 +177,6 @@ Follow the following steps to add config and param proto file for the new detect
 
 ## Update lidar_obstacle_detection.conf
 
-To use your new lidar detector algorithm in Apollo，you need to modify the value of `detector` to your detector's name in `lidar_obstacle_detection.conf` located in corresponding sensor folder in `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline`
+To use your new lidar detector algorithm in Apollo，you need to modify the value of `detector` to your detector's name in `lidar_obstacle_detection.conf` located in corresponding sensor folder in `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline`
 
 Once you finished the above modifications, you new detector should take effect in Apollo.

@@ -69,7 +69,7 @@ This section provides the instructions to run the Apollo 1.0 Demo on Vehicle.
     ![](images/ipc_power_on.png)
 - Power-on the modem by pressing and holding the power button until the lights turn on.
 - Set up the network configuration for the IPC: static IP (for example, 192.168.10.6), subnet mask (for example, 255.255.255.0), and gateway (for example, 192.168.10.1)
-   - Configurate your DNS server IP (for example, 8.8.8.8).
+   - Configure your DNS server IP (for example, 8.8.8.8).
    - Use a tablet to access **Settings** and connect to MKZ wifi:
 
    ![](images/ipad_config_wifi.png)

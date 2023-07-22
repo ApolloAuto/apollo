@@ -16,9 +16,9 @@ PiecewiseJerkSpeedNonlinearOptimizer is a derived class whose base class is Spee
 1. Input.  
 The input includes PathData and initial TrajectoryPoint.
 2. Process.  
-- Snaity Check. This ensures speed_data is not null and Speed Optimizer does not receive empty path data.
+- Sanity Check. This ensures speed_data is not null and Speed Optimizer does not receive empty path data.
 - `const auto problem_setups_status = SetUpStatesAndBounds(path_data, *speed_data);` The qp problem is initialized here. The next code line will clear speed_data if it fails.
-- `const auto qp_smooth_status = OptimizeByQP(speed_data, &distance, &velocity, &acceleration);` It sloves the QP problem and the distance/velocity/acceleration are achieved. Still, speed_data is cleared if it fails.
+- `const auto qp_smooth_status = OptimizeByQP(speed_data, &distance, &velocity, &acceleration);` It solves the QP problem and the distance/velocity/acceleration are achieved. Still, speed_data is cleared if it fails.
 - `const bool speed_limit_check_status = CheckSpeedLimitFeasibility();` It checks first point of speed limit. Then the following four steps are processed: 1)Smooth Path Curvature 2)SmoothSpeedLimit 3)Optimize By NLP 4)Record speed_constraint
 - Add s/t/v/a/jerk into speed_data and add enough zeros to avoid fallback
 3. Output.  

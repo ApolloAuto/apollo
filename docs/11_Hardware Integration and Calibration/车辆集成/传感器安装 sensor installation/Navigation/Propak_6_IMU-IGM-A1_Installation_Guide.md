@@ -62,7 +62,7 @@ Follow these steps:
 
 ### Configuring the GPS and IMU
 
-Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuraion file in NovAtel Connect.
+Configure the GPS and IMU as shown below. This process can be done either by keying in the commands, or by loading batch configuration file in NovAtel Connect.
 
 ```
 WIFICONFIG STATE OFF

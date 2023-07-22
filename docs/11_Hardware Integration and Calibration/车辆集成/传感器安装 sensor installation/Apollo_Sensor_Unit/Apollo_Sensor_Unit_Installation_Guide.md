@@ -38,7 +38,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
    The main power is from vehicle battery, 9V ~ 36V, 120W.
 
-   ![conn-DTF13-2P](images/conn-DTF13-2P.jpeg)
+   ![conn-DTF13-2P](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/Apollo_Sensor_Unit/images/conn-DTF13-2P.jpeg)
 
    |MFR|MPN|Description|
    |---------------|--------|-----------|
@@ -84,7 +84,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
    ASU forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors that need to be synchronized, such as LiDARs, etc.
 
-   ![1376350-2](images/1376350-2.jpeg)
+   ![1376350-2](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/Apollo_Sensor_Unit/images/1376350-2.jpeg)
 
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |

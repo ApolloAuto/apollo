@@ -1,7 +1,7 @@
 # 如何添加新的lidar匹配算法
 
 Perception中的lidar数据流如下：
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/lidar_perception_data_flow.png)
+![](https://github.com/ApolloAuto/apollo/blob/r7.0.0/docs/specs/images/lidar_perception_data_flow.png)
 
 本篇文档所介绍的lidar检测算法位于图中的Recognition Component中。当前Recognition Component的架构如下：
 ![lidar recognition](images/lidar_recognition.png)
@@ -167,6 +167,6 @@ PERCEPTION_REGISTER_MULTITARGET_TRACKER(NewLidarTracker); //注册新的lidar_tr
 
 ## 更新 lidar_obstacle_tracking.conf
 
-要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 字段值改为 "NewLidarTracker"
+要使用Apollo系统中的新lidar匹配算法，需要将 `modules/perception/production/data/perception/lidar/models/lidar_obstacle_pipeline` 中的对应传感器的 `lidar_obstacle_tracking.conf` 文件的 `multi_target_tracker` 字段值改为 "NewLidarTracker"
 
 在完成以上步骤后，您的新lidar匹配算法便可在Apollo系统中生效。

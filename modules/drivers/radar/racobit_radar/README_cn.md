@@ -21,4 +21,4 @@ source scripts/apollo_base.sh
 **topic name**: /apollo/sensor/racobit_radar
 **data type**:  apollo::drivers::RacobitRadar
 **channel ID**: CHANNEL_ID_ONE
-**proto file**: [modules/drivers/proto/racobit_radar.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/proto/racobit_radar.proto)
+**proto file**: [modules/drivers/proto/racobit_radar.proto](../../../../modules/common_msgs/sensor_msgs/racobit_radar.proto)

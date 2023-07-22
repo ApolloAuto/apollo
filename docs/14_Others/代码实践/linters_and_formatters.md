@@ -82,7 +82,7 @@ which will auto-format Bazel `WORKSPACE` file under `$APOLLO_ROOT_DIR`,
 
 Note:
 
-> `./apollo.sh format` can also work outside Docker if relavant tools installed
+> `./apollo.sh format` can also work outside Docker if relevant tools installed
 > properly.
 
 ## Conclusion
