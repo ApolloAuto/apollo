@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_IO_POLL_DATA_H_
-#define CYBER_IO_POLL_DATA_H_
+#include <assert.h>
+#include <sys/timerfd.h>
+#include <stdint.h>
 
-#include <sys/epoll.h>
-
-#include <cstdint>
-#include <functional>
+#include "cyber/io/poll_handler.h"
+#include "cyber/io/timer.h"
 
 namespace apollo {
 namespace cyber {
 namespace io {
 
-struct PollResponse {
-  explicit PollResponse(uint32_t e = 0) : events(e) {}
-
-  uint32_t events;
-};
-
-struct PollRequest {
-  int fd = -1;
-  uint32_t events = 0;
-  int timeout_ms = -1;
-  std::function<void(const PollResponse&)> callback = nullptr;
-};
-
-struct PollCtrlParam {
-  int operation;
-  int fd;
-  epoll_event event;
-  std::function<void()> callback = nullptr;
-};
+void Timer::WaitFor(const std::chrono::microseconds& duration) {
+  auto micro = duration.count();
+  itimerspec timer_spec;
+  timer_spec.it_interval.tv_sec = 0;
+  timer_spec.it_interval.tv_nsec = 0;
+  timer_spec.it_value.tv_sec = micro / 1000000;
+  timer_spec.it_value.tv_nsec = (micro % 1000000) * 1000;
+  int timer_fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
+  assert(timer_fd >= 0);
+  int rc = timerfd_settime(timer_fd, 0, &timer_spec, nullptr);
+  ACHECK(rc == 0);
+  PollHandler poll_handler(timer_fd);
+  ACHECK(poll_handler.Block(-1, true));
+  poll_handler.Unblock([timer_fd]() {
+    ACHECK(close(timer_fd) == 0);
+  });
+}
 
 }  // namespace io
 }  // namespace cyber
 }  // namespace apollo
-
-#endif  // CYBER_IO_POLL_DATA_H_

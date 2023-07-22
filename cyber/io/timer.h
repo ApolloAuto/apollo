@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2021 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_IO_POLL_DATA_H_
-#define CYBER_IO_POLL_DATA_H_
+#ifndef CYBER_IO_TIMER_H_
+#define CYBER_IO_TIMER_H_
 
-#include <sys/epoll.h>
-
-#include <cstdint>
-#include <functional>
+#include <chrono>
 
 namespace apollo {
 namespace cyber {
 namespace io {
 
-struct PollResponse {
-  explicit PollResponse(uint32_t e = 0) : events(e) {}
-
-  uint32_t events;
-};
-
-struct PollRequest {
-  int fd = -1;
-  uint32_t events = 0;
-  int timeout_ms = -1;
-  std::function<void(const PollResponse&)> callback = nullptr;
-};
-
-struct PollCtrlParam {
-  int operation;
-  int fd;
-  epoll_event event;
-  std::function<void()> callback = nullptr;
+class Timer final {
+ public:
+  static void WaitFor(const std::chrono::microseconds& duration);
 };
 
 }  // namespace io
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_IO_POLL_DATA_H_
+#endif  // CYBER_IO_TIMER_H_

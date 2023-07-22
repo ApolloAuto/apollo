@@ -82,7 +82,10 @@ bool Poller::Register(const PollRequest& req) {
   return true;
 }
 
-bool Poller::Unregister(const PollRequest& req) {
+bool Poller::Unregister(
+  const PollRequest& req,
+  const std::function<void()>& callback
+) {
   if (is_shutdown_.load()) {
     return false;
   }
@@ -103,6 +106,7 @@ bool Poller::Unregister(const PollRequest& req) {
     PollCtrlParam ctrl_param;
     ctrl_param.operation = EPOLL_CTL_DEL;
     ctrl_param.fd = req.fd;
+    ctrl_param.callback = callback;
     ctrl_params_[ctrl_param.fd] = ctrl_param;
   }
 
@@ -275,6 +279,10 @@ void Poller::HandleChanges() {
     if (epoll_ctl(epoll_fd_, item.operation, item.fd, &item.event) != 0 &&
         errno != EBADF) {
       AERROR << "epoll ctl failed, " << strerror(errno);
+      return;
+    }
+    if (item.callback != nullptr) {
+      item.callback();
     }
   }
 }
