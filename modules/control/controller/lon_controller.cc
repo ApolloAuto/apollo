@@ -386,7 +386,7 @@ Status LonController::ComputeControlCommand(
   if (FLAGS_enable_csv_debug && speed_log_file_ != nullptr) {
     fprintf(speed_log_file_,
             "%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f,"
-            "%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %d,\r\n",
+            "%.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %.6f, %d,\r\n",
             debug->station_reference(), debug->station_error(),
             station_error_limited, debug->preview_station_error(),
             debug->speed_reference(), debug->speed_error(),
