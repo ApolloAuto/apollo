@@ -430,8 +430,10 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
         std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
         config_.open_space_roi_decider_config().roi_line_segment_min_angle();
-    last_check_point_heading = check_point_heading;
-
+    if (is_center_lane_heading_change) {
+      last_check_point_heading = check_point_heading;
+    }
+    
     ADEBUG << "is is_center_lane_heading_change: "
            << is_center_lane_heading_change;
     // Check if the current center-lane checking-point is start point || end
