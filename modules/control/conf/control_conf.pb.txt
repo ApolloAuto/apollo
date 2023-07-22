@@ -12,6 +12,7 @@ steer_angle_rate: 100
 enable_gain_scheduler: true
 set_steer_limit: true
 enable_slope_offset: false
+enable_persistent_estop: false
 
 control_period: 0.01
 trajectory_period: 0.1
