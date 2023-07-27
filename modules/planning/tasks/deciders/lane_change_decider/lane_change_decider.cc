@@ -366,9 +366,9 @@ bool LaneChangeDecider::IsClearToChangeLane(
 }
 
 bool LaneChangeDecider::IsPerceptionBlocked(
-    const ReferenceLineInfo& reference_line_info,
-    const double search_beam_length, const double search_beam_radius_intensity,
-    const double search_range, const double is_block_angle_threshold) {
+  const ReferenceLineInfo& reference_line_info,
+  const double search_beam_length, const double search_beam_radius_intensity,
+  const double search_range, const double is_block_angle_threshold) {
   const auto& vehicle_state = reference_line_info.vehicle_state();
   const common::math::Vec2d adv_pos(vehicle_state.x(), vehicle_state.y());
   const double adv_heading = vehicle_state.heading();
@@ -384,6 +384,13 @@ bool LaneChangeDecider::IsPerceptionBlocked(
       ADEBUG << "skip one virtual obstacle";
       continue;
     }
+    double left_most_angle =
+      common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
+    double right_most_angle =
+      common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
+    bool right_most_found = false;
+
+
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     for (double search_angle = 0.0; search_angle < search_range;
          search_angle += search_beam_radius_intensity) {
