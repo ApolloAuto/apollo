@@ -175,9 +175,17 @@ class Recorder(object):
 
         self.record_task(disk_to_use, record_all)
 
+    """
+    Notes on the extended regex argument used for pkill -f/pgrep -f below:
+    - Use "^[^ ]*" so that there's a match only if "cyber_recorder record" appears at the end of the first word on the
+      command line. This prevents matching its appearance in this startup script.
+    - Use " +" in case someone accidentally uses more than one space to separate "cyber_recorder" and "record".
+    - Use "(\$| )" so as to only match the cyber_recorder command "record" and not ones that might only start with t.
+    """
+
     def stop(self):
         """Stop recording."""
-        shell_cmd('pkill --signal {} -f "cyber_recorder record"'.format(
+        shell_cmd('pkill --signal {} -f "^[^ ]*cyber_recorder +record(\$| )"'.format(
             self.args.stop_signal))
 
     def record_task(self, disk, record_all):
@@ -208,9 +216,8 @@ class Recorder(object):
     @staticmethod
     def is_running():
         """Test if the given process running."""
-        _, stdout, _ = shell_cmd('pgrep -f "cyber_recorder record" | grep -cv \'^1$\'', False)
-        # If stdout is the pgrep command itself, no such process is running.
-        return stdout.strip() != '1' if stdout else False
+        _, stdout, _ = shell_cmd('pgrep -c -f "^[^ ]*cyber_recorder +record(\$| )"', False)
+        return stdout.strip() != '0' if stdout else False
 
 
 def main():
