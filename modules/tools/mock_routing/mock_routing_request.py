@@ -57,7 +57,7 @@ def main():
     waypoint.id = '1-1'
     waypoint.s = 80
 
-    writer = node.create_writer('/apollo/routing_request',
+    writer = node.create_writer('/apollo/raw_routing_request',
                                 routing_pb2.RoutingRequest)
     time.sleep(2.0)
     print("routing_request", routing_request)

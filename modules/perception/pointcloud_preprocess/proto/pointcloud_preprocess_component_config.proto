@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message PointCloudPreprocessComponentConfig {
+  optional string sensor_name = 1;
+  optional double lidar_query_tf_offset = 2;
+  optional string lidar2novatel_tf2_child_frame_id = 3;
+  optional string output_channel_name = 4;
+  optional perception.PluginParam plugin_param = 5;
+}

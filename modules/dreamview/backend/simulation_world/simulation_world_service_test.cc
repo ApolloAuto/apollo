@@ -477,7 +477,7 @@ TEST_F(SimulationWorldServiceTest, UpdateRouting) {
 
   BlockerManager::Instance()->Observe();
   sim_world_service_->UpdateWithLatestObserved(
-      sim_world_service_->routing_response_reader_.get());
+      sim_world_service_->planning_command_reader_.get());
 
   auto& world = sim_world_service_->world_;
   EXPECT_EQ(world.routing_time(), 1234.5);

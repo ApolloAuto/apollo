@@ -2,31 +2,32 @@
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("//tools:python_rules.bzl", "py_proto_library")
-load("//tools:cc_so_proto_rules.bzl", "cc_so_proto_library")
-load("//tools/install:install.bzl", "install", "install_files")
+# load("//tools:cc_so_proto_rules.bzl", "cc_so_proto_library")
+# load("//tools/install:install.bzl", "install", "install_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 
-install_files(
-    name = "cyber_examples_proto_hdrs",
-    dest = "cyber/include/proto",
-    files = [
-        ":examples_cc_proto_hdrs",
-    ],
-)
+# install_files(
+#     name = "cyber_examples_proto_hdrs",
+#     dest = "cyber/include/proto",
+#     files = [
+#         ":examples_cc_proto_hdrs",
+#     ],
+# )
 
-install(
-    name = "cyber_examples_proto_so",
-    library_dest = "cyber/lib",
-    targets = [
-        ":libexamples_cc_proto.so",
-    ],
-)
+# install(
+#     name = "cyber_examples_proto_so",
+#     library_dest = "cyber/lib",
+#     targets = [
+#         ":libexamples_cc_proto.so",
+#     ],
+# )
 
-cc_so_proto_library(
+cc_proto_library(
     name = "examples_cc_proto",
-    srcs = [
+    deps = [
         ":examples_proto",
     ],
 )
@@ -42,3 +43,5 @@ py_proto_library(
         ":examples_proto",
     ],
 )
+
+apollo_package()

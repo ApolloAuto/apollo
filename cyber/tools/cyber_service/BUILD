@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -13,8 +14,9 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "cyber/bin",
-    targets = [":cyber_service"]
-)
+# install(
+#     name = "install",
+#     py_dest = "cyber/bin",
+#     targets = [":cyber_service"]
+# )
+apollo_package()

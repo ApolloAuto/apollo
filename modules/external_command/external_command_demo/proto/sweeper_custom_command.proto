@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+message SweeperCustomCommand {
+  // If turn on the brush to start sweeping.
+  optional bool is_turn_on_brush = 1 [default = false];
+  // The rotation speed of sweeping speed.
+  optional double sweeping_speed = 2;
+}

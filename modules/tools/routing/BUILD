@@ -1,17 +1,18 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    py_dest = "tools/routing",
-    targets = [
-        ":debug_passage_region",
-        ":debug_route",
-        ":road_show",
-    ],
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/routing",
+#     targets = [
+#         ":debug_passage_region",
+#         ":debug_route",
+#         ":road_show",
+#     ],
+# )
 
 py_binary(
     name = "debug_passage_region",
@@ -64,3 +65,5 @@ py_library(
         "//modules/tools/common:proto_utils",
     ],
 )
+
+apollo_package()

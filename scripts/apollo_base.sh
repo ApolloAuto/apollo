@@ -55,8 +55,11 @@ function setup_device_for_aarch64() {
     if ! ip link show type can | grep "${socket_can_dev}" &>/dev/null; then
       warning "No SocketCAN device named ${socket_can_dev}."
     else
-      sudo ip link set can0 type can bitrate 500000
-      sudo ip link set can0 up
+      sudo modprobe can
+      sudo modprobe can_raw
+      sudo modprobe mttcan
+      sudo ip link set "${socket_can_dev}" type can bitrate 500000 sjw 4 berr-reporting on loopback off
+      sudo ip link set up "${socket_can_dev}"
     fi
   else
     warning "ip command not found."

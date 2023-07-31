@@ -29,8 +29,9 @@
 #include "nlohmann/json.hpp"
 
 #include "modules/dreamview/proto/simulation_world.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
-#include "modules/map/pnc_map/pnc_map.h"
+#include "modules/map/pnc_map/path.h"
 
 /**
  * @namespace apollo::dreamview
@@ -51,8 +52,9 @@ class MapService {
   void CollectMapElementIds(const apollo::common::PointENU &point,
                             double raidus, MapElementIds *ids) const;
 
-  bool GetPathsFromRouting(const apollo::routing::RoutingResponse &routing,
-                           std::vector<apollo::hdmap::Path> *paths) const;
+  bool GetPathsFromRouting(
+      const apollo::routing::RoutingResponse &routing,
+      std::vector<apollo::hdmap::Path> *paths) const;
 
   // The returned value is of a hdmap::Map proto. This
   // makes it easy to convert to a JSON object and to send to the
@@ -86,8 +88,8 @@ class MapService {
 
   bool CheckRoutingPoint(const double x, const double y) const;
 
-  bool CheckRoutingPointWithHeading(
-    const double x, const double y, const double heading) const;
+  bool CheckRoutingPointWithHeading(const double x, const double y,
+                                    const double heading) const;
 
   bool CheckRoutingPointLaneType(apollo::hdmap::LaneInfoConstPtr lane) const;
 
@@ -96,7 +98,7 @@ class MapService {
 
   size_t CalculateMapHash(const MapElementIds &ids) const;
 
-  double GetLaneHeading(const std::string& id_str, double s);
+  double GetLaneHeading(const std::string &id_str, double s);
 
  private:
   void UpdateOffsets();
@@ -109,8 +111,9 @@ class MapService {
                                  double *nearest_s, double *nearest_l,
                                  const double heading) const;
 
-  bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
-                              std::vector<apollo::hdmap::Path> *paths) const;
+  bool CreatePathsFromRouting(
+      const routing::RoutingResponse &routing,
+      std::vector<apollo::hdmap::Path> *paths) const;
 
   bool AddPathFromPassageRegion(const routing::Passage &passage_region,
                                 std::vector<apollo::hdmap::Path> *paths) const;

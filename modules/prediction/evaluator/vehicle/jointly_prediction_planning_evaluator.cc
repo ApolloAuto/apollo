@@ -27,6 +27,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/evaluator/warm_up/warm_up.h"
 
 namespace apollo {
 namespace prediction {
@@ -581,11 +582,8 @@ void JointlyPredictionPlanningEvaluator::LoadModel() {
        std::move(polyline_id.to(device_))});
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {X_value, std::move(adc_trajectory.to(device_))}));
-  // Run inference twice to avoid very slow first inference later
-  torch_default_output_tensor_ =
-      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
-  torch_default_output_tensor_ =
-      torch_vehicle_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
+  // Warm up to avoid very slow first inference later
+  WarmUp(torch_inputs, &torch_vehicle_model_, &torch_default_output_tensor_);
 }
 
 }  // namespace prediction

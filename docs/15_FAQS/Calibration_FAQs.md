@@ -40,13 +40,13 @@ is shown.
 Figure 1 shows the comparison between the stitched point clouds with good (a)
 and insufficient(b) calibration quality.
 
-![](../quickstart/images/calibration/lidar_calibration/good_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/quickstart/images/calibration/lidar_calibration/good_calib.png)
 
 <p align="center">
 (a)
 </p>
 
-![](../quickstart/images/calibration/lidar_calibration/poor_calib.png)
+![](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/quickstart/images/calibration/lidar_calibration/poor_calib.png)
 
 <p align="center">
 (b)

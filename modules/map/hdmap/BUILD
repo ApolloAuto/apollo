@@ -1,18 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
-install(
-    name = "install",
-    library_dest = "map/lib",
-    targets = [
-        ":libhdmap.so",
-        ":libhdmap_util.so"
-        ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "map/lib",
+#     targets = [
+#         ":libhdmap.so",
+#         ":libhdmap_util.so"
+#         ],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "libhdmap.so",
@@ -49,15 +50,20 @@ cc_library(
         "hdmap.h",
         "hdmap_common.h",
         "hdmap_impl.h",
+        "hdmap_util.h",
     ],
     copts = MAP_COPTS,
     deps = [
         "//cyber",
         "//modules/common_msgs/map_msgs:map_cc_proto",
+        "//modules/common_msgs/planning_msgs:navigation_cc_proto",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/util:util_tool",
         "//modules/map/hdmap/adapter:opendrive_adapter",
+        "@com_google_absl//:absl",
+        "@com_github_google_glog//:glog",
+        "@eigen",
     ],
     visibility = ["//visibility:public"],
 )
@@ -142,4 +148,5 @@ cc_test(
     linkstatic = True,
 )
 
+apollo_package()
 cpplint()

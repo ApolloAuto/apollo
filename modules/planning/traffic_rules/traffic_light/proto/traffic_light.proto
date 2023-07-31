@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// TrafficLightConfig
+
+message TrafficLightConfig {
+  // Flag if processing of traffic light is enabled.
+  optional bool enabled = 1 [default = true];
+  // Safty stop distance(m) to the stop line of the traffic light.
+  optional double stop_distance = 2 [default = 1.0];  // meter
+  // If the deceleration needed for ego-vehicle to stop in front of the traffic
+  // light it too big > "max_stop_deceleration", which means it is too late to
+  // stop, the red traffic light will be ignored and ego-vehicle will move on.
+  optional double max_stop_deceleration = 3 [default = 4.0];
+}

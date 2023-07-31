@@ -24,22 +24,23 @@ namespace apollo {
 namespace routing {
 
 class RoutingComponent final
-    : public ::apollo::cyber::Component<RoutingRequest> {
+    : public ::apollo::cyber::Component<routing::RoutingRequest> {
  public:
   RoutingComponent() = default;
   ~RoutingComponent() = default;
 
  public:
   bool Init() override;
-  bool Proc(const std::shared_ptr<RoutingRequest>& request) override;
+  bool Proc(
+      const std::shared_ptr<routing::RoutingRequest>& request) override;
 
  private:
-  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>> response_writer_ =
-      nullptr;
-  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
+  std::shared_ptr<::apollo::cyber::Writer<routing::RoutingResponse>>
+      response_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<routing::RoutingResponse>>
       response_history_writer_ = nullptr;
   Routing routing_;
-  std::shared_ptr<RoutingResponse> response_ = nullptr;
+  std::shared_ptr<routing::RoutingResponse> response_ = nullptr;
   std::unique_ptr<::apollo::cyber::Timer> timer_;
   std::mutex mutex_;
 };

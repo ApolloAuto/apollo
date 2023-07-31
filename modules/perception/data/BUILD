@@ -1,18 +1,16 @@
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    data_dest = "perception/data",
-    data = [
-        ":runtime_data",
-    ],
+filegroup(
+    name = "data_files",
+    srcs = glob([
+        "flag/**",
+        "params/**",
+        "perception/**",
+    ])
 )
 
-filegroup(
-    name = "runtime_data",
-    srcs = glob([
-        "params/*.yaml",
-    ]),
-)
+apollo_package()
+cpplint()

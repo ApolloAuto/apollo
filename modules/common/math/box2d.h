@@ -64,6 +64,19 @@ class Box2d {
         const double width);
 
   /**
+   * @brief Constructor which takes the point on the axis, front length, back
+   * length, heading, and width.
+   * @param center The center of the rectangular bounding box.
+   * @param heading The angle between the x-axis and the heading-axis,
+   *        measured counter-clockwise.
+   * @param front_length The length from the start point to the given point.
+   * @param back_length The length from the end point to the given point.
+   * @param width The size of the axis perpendicular to the heading-axis.
+   */
+  Box2d(const Vec2d &point, double heading, double front_length,
+        double back_length, double width);
+
+  /**
    * @brief Constructor which takes the heading-axis and the width of the box
    * @param axis The heading-axis
    * @param width The width of the box, which is taken perpendicularly
@@ -168,7 +181,7 @@ class Box2d {
    * @brief Getter of the corners of the box
    * @param corners The vector where the corners are listed
    */
-  std::vector<Vec2d> GetAllCorners() const;
+  const std::vector<Vec2d> &GetAllCorners() const;
 
   /**
    * @brief Tests points for membership in the box

@@ -1,0 +1,143 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message BacksideVehicleConfig {
+  // obstacle vehicle behind ego-vehicle should not be ignored if its lateral
+  // projection to reference line has intersection with [-backside_lane_width,
+  // backside_lane_width].
+  optional double backside_lane_width = 1 [default = 4.0];
+}
+
+message CrosswalkConfig {
+  // Safty stop distance from stop line of crosswalk.
+  optional double stop_distance = 1 [default = 1.0];  // meter
+  // If it is safe for obstacle collision and the stop deceleration calculted
+  // to stop in front of crosswalk stop line is too big(>
+  // max_stop_deceleration), ignore the deceleration to keep comfortable driving
+  // feeling.
+  optional double max_stop_deceleration = 2 [default = 4.0];
+  // If the front edge of ego-vehicle has passed the crosswalk stop line over
+  // "min_pass_s_distance", it can be considered as passed the crosswalk.
+  optional double min_pass_s_distance = 3 [default = 1.0];  // meter
+  // expand crosswalk by "expand_s_distance" for pedestrian/bicycle detection.
+  optional double expand_s_distance = 5 [default = 2.0];  // meter
+  // If obstacle is not far enough(lateral distance < "stop_strict_l_distance"),
+  // it should be taken care and ego-vehicle may stop in front of it.
+  optional double stop_strict_l_distance = 6 [default = 4.0];  // meter
+  // If obstacle is far enough(lateral distance > "stop_loose_l_distance"), it
+  // can be ignored and ego-vehicle has no need to stop in front of it.
+  optional double stop_loose_l_distance = 7 [default = 5.0];  // meter
+  // ego-vehicle can move on and ignore the bicycles/pedestrians if
+  // bicycles/pedestrians remain static longer than "stop_timeout".
+  optional double stop_timeout = 8 [default = 10.0];  // second
+}
+
+message DestinationConfig {
+  // Safty stop distance from destination line.
+  optional double stop_distance = 1 [default = 0.5];  // meter
+}
+
+message KeepClearConfig {
+  // Flag if "keep-clear-zone" function is enabled.
+  optional bool enable_keep_clear_zone = 1 [default = true];
+  // Flag if junction is checked at the same time.
+  optional bool enable_junction = 2 [default = true];
+  // If the front edge of ego-vehicle has passed "keep-clear-zone" over
+  // "min_pass_s_distance", it can be considered as having passed
+  // "keep-clear-zone".
+  optional double min_pass_s_distance = 3 [default = 2.0];  // meter
+  // tolerance distance to align pnc_junction boundary with stop_line of traffic
+  // sign(s).
+  // If the distance between the start position of the traffic sign and the pnc
+  // junction < "align_with_traffic_sign_tolerance", take the start position of
+  // the traffic sign as that of the pnc junction.
+  optional double align_with_traffic_sign_tolerance = 4
+      [default = 4.5];  // meter
+}
+
+message ReferenceLineEndConfig {
+  // Safty stop distance from reference line end.
+  optional double stop_distance = 1 [default = 0.5];  // meter
+  // If ego-vehicle is within a distance of "min_reference_line_remain_length"
+  // with the reference line end, a stop obstacle will be built at the reference
+  // line end to stop ego-vehicle.
+  optional double min_reference_line_remain_length = 2 [default = 50.0];
+}
+
+message ReroutingConfig {
+  // should not rerouting more frequent than this number.
+  optional double cooldown_time = 1 [default = 3.0];  // seconds
+  // If the distance between ego-vehicle and the end route point >
+  // "prepare_rerouting_time * speed", there is no need to reroute yet.
+  optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
+}
+
+message StopSignConfig {
+  // Flag if processing of stop sign is enabled.
+  optional bool enabled = 1 [default = true];
+  // Safty stop distance(m) to the stop line of the stop sign.
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
+message TrafficLightConfig {
+  // Flag if processing of traffic light is enabled.
+  optional bool enabled = 1 [default = true];
+  // Safty stop distance(m) to the stop line of the traffic light.
+  optional double stop_distance = 2 [default = 1.0];  // meter
+  // If the deceleration needed for ego-vehicle to stop in front of the traffic
+  // light it too big > "max_stop_deceleration", which means it is too late to
+  // stop, the red traffic light will be ignored and ego-vehicle will move on.
+  optional double max_stop_deceleration = 3 [default = 4.0];
+}
+
+message YieldSignConfig {
+  // Flag if processing of yield sign is enabled.
+  optional bool enabled = 1 [default = true];
+  // Safty stop distance(m) to the stop line of the yield sign.
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
+// Overall interface of traffic rules.
+message TrafficRuleConfig {
+  enum RuleId {
+    BACKSIDE_VEHICLE = 1;
+    CROSSWALK = 2;
+    DESTINATION = 3;
+    KEEP_CLEAR = 4;
+    REFERENCE_LINE_END = 5;
+    REROUTING = 6;
+    STOP_SIGN = 7;
+    TRAFFIC_LIGHT = 8;
+    YIELD_SIGN = 9;
+  }
+  optional RuleId rule_id = 1;
+  optional bool enabled = 2;
+  oneof config {
+    // Rule for other vehicle at backside of ego-vehicle.
+    BacksideVehicleConfig backside_vehicle = 3;
+    // Rule for pedestrian crossing.
+    CrosswalkConfig crosswalk = 4;
+    // Rule for destination, when vehicle is near the destination, build stop
+    // decision near the destination.
+    DestinationConfig destination = 5;
+    // Rule for area where ego-vehicle cannot park or stop.
+    KeepClearConfig keep_clear = 6;
+    // Rule for reference line end, create a virtual stop wall at the end of
+    // reference line.
+    ReferenceLineEndConfig reference_line_end = 7;
+    // Rule for rerouting, judge the condition for rerouting and send rerouint
+    // request.
+    ReroutingConfig rerouting = 8;
+    // Rule for stop sign, build stop decision before the stop sign.
+    StopSignConfig stop_sign = 9;
+    // Rule for traffic light, build stop decision when traffic light is red.
+    TrafficLightConfig traffic_light = 10;
+    // Rule for yield, build stop decision before the yield sign.
+    YieldSignConfig yield_sign = 11;
+  }
+}
+
+message TrafficRuleConfigs {
+  repeated TrafficRuleConfig config = 1;
+}

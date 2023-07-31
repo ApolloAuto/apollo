@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -21,12 +22,13 @@ cc_binary(
     ],
 )
 
-install(
-    name = "install",
-    runtime_dest = "localization/bin",
-    targets = [
-        ":ndt_map_creator",
-    ],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "localization/bin",
+#     targets = [
+#         ":ndt_map_creator",
+#     ],
+# )
 
+apollo_package()
 cpplint()

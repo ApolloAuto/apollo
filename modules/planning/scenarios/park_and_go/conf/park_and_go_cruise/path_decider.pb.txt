@@ -1,0 +1,1 @@
+static_obstacle_buffer: 0.2

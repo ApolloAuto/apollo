@@ -1,19 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
-
-install(
-    name = "install",
-    library_dest = "map/lib",
-    targets = [":libpnc_map.so"],
-    visibility = ["//visibility:public"],
-)
 
 cuda_library(
     name = "cuda_pnc_util",
@@ -48,7 +42,7 @@ cc_test(
 
 cc_library(
     name = "path",
-    srcs = ["path.cc"],
+    srcs = [":libpath.so"],
     hdrs = ["path.h"],
     copts = PLANNING_COPTS,
     deps = [
@@ -62,11 +56,45 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "libpath.so",
+    srcs = ["path.cc", "path.h"],
+    linkshared = True,
+    linkstatic = True,
+    copts = PLANNING_COPTS,
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
+        "//modules/common/math",
+        "//modules/common/util:util_tool",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/hdmap",
+        "@com_google_absl//:absl",
+    ],
+)
+
+cc_binary(
+    name = "libroute_segments.so",
+    srcs = ["route_segments.cc", "route_segments.h"],
+    linkshared = True,
+    linkstatic = True,
+    copts = MAP_COPTS,
+    deps = [
+        ":path",
+        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common/util",
+        "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
+        "//modules/map/hdmap",
+    ],
+)
+
 cc_library(
     name = "route_segments",
-    srcs = ["route_segments.cc"],
+    srcs = [":libroute_segments.so"],
     hdrs = ["route_segments.h"],
     copts = MAP_COPTS,
+    alwayslink = True,
     deps = [
         ":path",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
@@ -80,8 +108,9 @@ cc_library(
 cc_binary(
     name = "libpnc_map.so",
     srcs = [
-        "pnc_map.cc",
-        "pnc_map.h",
+        "pnc_map_base.cc",
+        "pnc_map_base.h",
+        "path.h",
     ],
     linkshared = True,
     linkstatic = True,
@@ -89,49 +118,33 @@ cc_binary(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        ":path",
         ":route_segments",
-        "//cyber",
-        "//modules/common_msgs/map_msgs:map_id_cc_proto",
-        "//modules/common_msgs/routing_msgs:routing_cc_proto",
-        "//modules/common/configs:config_gflags",
-        "//modules/common/util:util_tool",
+        "//modules/common_msgs/planning_msgs:planning_command_cc_proto",
         "//modules/common/util",
+        "//modules/common/configs:config_gflags",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
-        "//modules/map/hdmap:hdmap_util",
-        "//modules/map/hdmap",
-        "@com_google_absl//:absl",
-        "@com_google_googletest//:gtest",
-        "@com_google_protobuf//:protobuf",
     ],
 )
 
 cc_library(
     name = "pnc_map",
-    srcs = ["libpnc_map.so"],
+    srcs = [":libpnc_map.so"],
     hdrs = [
+        "pnc_map_base.h",
         "path.h",
-        "pnc_map.h",
         "route_segments.h",
     ],
+    alwayslink = True,
+    linkstatic = True,
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber",
-        "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",
-        "//modules/common_msgs/map_msgs:map_lane_cc_proto",
-        "//modules/common_msgs/routing_msgs:routing_cc_proto",
-        "//modules/common/configs:config_gflags",
-        "//modules/common/math",
-        "//modules/common/util:util_tool",
+        ":route_segments",
+        "//modules/common_msgs/planning_msgs:planning_command_cc_proto",
         "//modules/common/util",
+        "//modules/common/configs:config_gflags",
         "//modules/common/vehicle_state/proto:vehicle_state_cc_proto",
-        "//modules/map/hdmap:hdmap_util",
-        "//modules/map/hdmap",
-        "@com_google_absl//:absl",
-        "@com_google_googletest//:gtest",
-        "@com_google_protobuf//:protobuf",
     ],
 )
 
@@ -155,28 +168,12 @@ cc_test(
 )
 
 cc_test(
-    name = "pnc_map_test",
-    size = "small",
-    srcs = ["pnc_map_test.cc"],
-    data = [
-        ":testdata",
-        "//modules/map/data:map_sunnyvale_loop",
-    ],
-    deps = [
-        ":pnc_map",
-        "//modules/common/util",
-        "@com_google_googletest//:gtest_main",
-    ],
-    linkstatic = True,
-)
-
-cc_test(
     name = "route_segments_test",
     size = "small",
     srcs = ["route_segments_test.cc"],
     data = [
         ":testdata",
-        "//modules/map/data:map_sunnyvale_loop",
+        "//modules/map:map_data",
     ],
     deps = [
         ":route_segments",
@@ -185,4 +182,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -34,6 +34,8 @@
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/dreamview_msgs/hmi_status.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/external_command_msgs/action_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 
@@ -121,7 +123,8 @@ class HMIWorker {
 
   // Change current mode, launch, map, vehicle and driving mode.
   void ChangeMode(const std::string& mode_name);
-  bool ChangeMap(const std::string& map_name);
+  bool ChangeMap(const std::string& map_name,
+                 bool restart_dynamic_model = true);
   void ChangeVehicle(const std::string& vehicle_name);
   void ChangeScenarioSet(const std::string& scenario_set_id);
   void ChangeRecord(const std::string& record_id);
@@ -171,7 +174,10 @@ class HMIWorker {
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
-  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
+  std::shared_ptr<
+      apollo::cyber::Client<apollo::external_command::ActionCommand,
+                            apollo::external_command::CommandStatus>>
+      action_command_client_;
   std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;

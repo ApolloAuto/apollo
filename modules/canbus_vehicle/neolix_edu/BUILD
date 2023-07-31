@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -104,39 +105,39 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-neolix-edu/lib",
-    data_dest = "canbus-vehicle-neolix-edu",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-neolix-edu.BUILD",
-    ],
-    targets = [
-        ":libneolix_edu_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_neolix_edu",
-        ":pb_hdrs",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus-vehicle-neolix-edu/lib",
+#     data_dest = "canbus-vehicle-neolix-edu",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus-vehicle-neolix-edu.BUILD",
+#     ],
+#     targets = [
+#         ":libneolix_edu_vehicle_factory_lib.so",
+#     ],
+#     deps = [
+#         ":pb_neolix_edu",
+#         ":pb_hdrs",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-neolix-edu/include",
-    data = [
-        "//modules/canbus_vehicle/neolix_edu/proto:neolix_edu_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus-vehicle-neolix-edu/include",
+#     data = [
+#         "//modules/canbus_vehicle/neolix_edu/proto:neolix_edu_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_neolix_edu",
-    dest = "canbus-vehicle-neolix-edu",
-    files = [
-        "//modules/canbus_vehicle/neolix_edu/proto:neolix_edu_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_neolix_edu",
+#     dest = "canbus-vehicle-neolix-edu",
+#     files = [
+#         "//modules/canbus_vehicle/neolix_edu/proto:neolix_edu_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -145,26 +146,27 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_neolix_edu_src",
-        ":install_neolix_edu_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_neolix_edu_src",
+#         ":install_neolix_edu_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_neolix_edu_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-neolix-edu/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_neolix_edu_src",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-neolix-edu/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_neolix_edu_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-neolix-edu/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_neolix_edu_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-neolix-edu/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

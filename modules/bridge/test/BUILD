@@ -1,18 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "bridge/bin",
-    targets = [
-        ":bridge_receiver_test",
-        ":bridge_sender_test",
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "bridge/bin",
+#     targets = [
+#         ":bridge_receiver_test",
+#         ":bridge_sender_test",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "bridge_receiver_test",
@@ -33,4 +34,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

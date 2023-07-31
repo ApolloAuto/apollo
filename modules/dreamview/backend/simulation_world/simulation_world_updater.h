@@ -29,8 +29,10 @@
 
 #include "absl/strings/str_cat.h"
 
-#include "modules/common_msgs/routing_msgs/poi.pb.h"
 #include "modules/common_msgs/task_manager_msgs/task_manager.pb.h"
+#include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/valet_parking_command.pb.h"
+#include "modules/common_msgs/external_command_msgs/action_command.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -38,6 +40,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/plugins/plugin_manager.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/dreamview/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
@@ -93,33 +96,32 @@ class SimulationWorldUpdater {
   void OnTimer();
 
   /**
-   * @brief The function to construct a routing request from the given json,
+   * @brief The function to construct a LaneFollowCommand from the given json,
    * @param json that contains start, end, and waypoints
-   * @param routing_request
-   * @return True if routing request is constructed successfully
+   * @param lane_follow_command
+   * @return True if LaneFollowCommand is constructed successfully
    */
-  bool ConstructRoutingRequest(
+  bool ConstructLaneFollowCommand(
       const nlohmann::json &json,
-      apollo::routing::RoutingRequest *routing_request);
+      apollo::external_command::LaneFollowCommand *lane_follow_command);
 
-    /**
+  /**
+   * @brief The function to construct a ValetParkingCommand from the given json,
+   * @param json that contains parking info
+   * @param valet_parking_command
+   * @return True if ValetParkingCommand is constructed successfully
+   */
+  bool ConstructValetParkingCommand(
+      const nlohmann::json &json,
+      apollo::external_command::ValetParkingCommand *valet_parking_command);
+
+  /**
    * @brief get json which construct routing request needs
    * @param json that contains start point,json that contains end point
    * @return json that contains start point,end point without waypoint
    */
-  nlohmann::json GetConstructRoutingRequestJson(
-      const nlohmann::json &start, const nlohmann::json &end);
-
-  /**
-   * @brief The function to construct a parking routing task from the given
-   * json,
-   * @param json that contains start, end, waypoint, parking info, lane width,
-   * @param parking_routing_task
-   * @return True if parking routing task is constructed successfully
-   */
-  bool ConstructParkingRoutingTask(
-      const nlohmann::json &json,
-      apollo::task_manager::ParkingRoutingTask *parking_routing_task);
+  nlohmann::json GetConstructRoutingRequestJson(const nlohmann::json &start,
+                                                const nlohmann::json &end);
 
   /**
    * @brief The function to construct a lane waypoint from the given json,
@@ -127,9 +129,9 @@ class SimulationWorldUpdater {
    * @param lanewaypoint, description
    * @return True if lane waypoint is constructed successfully
    */
-  bool ConstructLaneWayPoint(
-      const nlohmann::json &point,
-      apollo::routing::LaneWaypoint *laneWayPoint, std::string description);
+  bool ConstructLaneWayPoint(const nlohmann::json &point,
+                             apollo::routing::LaneWaypoint *laneWayPoint,
+                             std::string description);
 
   bool ValidateCoordinate(const nlohmann::json &json);
 
@@ -209,6 +211,8 @@ class SimulationWorldUpdater {
   volatile double last_pushed_adc_timestamp_sec_ = 0.0f;
 
   std::unique_ptr<PluginManager> plugin_manager_;
+
+  uint64_t command_id_;
 };
 
 }  // namespace dreamview

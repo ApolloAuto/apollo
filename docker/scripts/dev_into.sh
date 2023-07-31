@@ -16,9 +16,43 @@
 # limitations under the License.
 ###############################################################################
 DOCKER_USER="${USER}"
-DEV_CONTAINER="apollo_dev_${USER}"
+DEV_CONTAINER_PREFIX='apollo_dev_'
+DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
+
+function parse_arguments {
+    local container_name=''
+
+    while [ $# -gt 0 ]; do
+        local opt="$1"
+        shift
+        case "${opt}" in
+            -n | --name)
+                container_name="$1"
+                shift
+                ;;
+
+            --user)
+                export CUSTOM_USER="$1"
+                shift
+                ;;
+        esac
+    done
+
+    [[ ! -z "${container_name}" ]] && DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${container_name}"
+    [[ ! -z "${CUSTOM_USER}" ]] && DOCKER_USER="${CUSTOM_USER}"
+}
+
+function restart_stopped_container {
+    if docker ps -f status=exited -f name="${DEV_CONTAINER}" | grep "${DEV_CONTAINER}"; then
+        docker start "${DEV_CONTAINER}"
+    fi
+}
 
 xhost +local:root 1>/dev/null 2>&1
+
+parse_arguments "$@"
+
+restart_stopped_container
 
 docker exec \
     -u "${DOCKER_USER}" \

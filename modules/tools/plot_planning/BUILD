@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -148,24 +149,26 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/plot_planning",
-    targets = [
-        ":speed_dsteering_data",
-        ":plot_speed_steering",
-        ":plot_speed_jerk",
-        ":plot_planning_speed",
-        ":plot_planning_acc",
-        ":plot_chassis_acc",
-        ":plot_acc_jerk",
-        ":planning_speed",
-        ":imu_speed_jerk",
-        ":imu_speed_acc",
-        ":imu_speed",
-        ":imu_av_curvature",
-        ":imu_angular_velocity",
-        ":imu_acc",
-        ":chassis_speed",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/plot_planning",
+#     targets = [
+#         ":speed_dsteering_data",
+#         ":plot_speed_steering",
+#         ":plot_speed_jerk",
+#         ":plot_planning_speed",
+#         ":plot_planning_acc",
+#         ":plot_chassis_acc",
+#         ":plot_acc_jerk",
+#         ":planning_speed",
+#         ":imu_speed_jerk",
+#         ":imu_speed_acc",
+#         ":imu_speed",
+#         ":imu_av_curvature",
+#         ":imu_angular_velocity",
+#         ":imu_acc",
+#         ":chassis_speed",
+#     ]
+# )
+
+apollo_package()

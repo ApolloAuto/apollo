@@ -1,0 +1,8 @@
+start_pull_over_scenario_distance: 50.0
+pull_over_min_distance_buffer: 10.0
+max_distance_stop_search: 25.0
+max_s_error_to_end_point: 0.5
+max_l_error_to_end_point: 1.0
+max_theta_error_to_end_point: 0.2
+pass_destination_threshold: 15.0
+max_distance_error_to_end_point: 0.2

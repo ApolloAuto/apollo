@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
@@ -62,7 +63,9 @@ cc_library(
     deps = [
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "//modules/prediction/evaluator/warm_up",
     ],
 )
 
+apollo_package()
 cpplint()

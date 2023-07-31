@@ -1,13 +1,14 @@
 load("@rules_python//python:defs.bzl", "py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "py_files",
-    srcs = glob([
-        "*.py",
-    ]),
-)
+# filegroup(
+#     name = "py_files",
+#     srcs = glob([
+#         "*.py",
+#     ]),
+# )
 
 py_library(
     name = "logger",
@@ -44,3 +45,5 @@ py_library(
     name = "file_utils",
     srcs = ["file_utils.py"],
 )
+
+apollo_package()

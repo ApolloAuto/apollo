@@ -1,0 +1,20 @@
+camera_name: "camera_rear"
+timestamp_offset: 0.0
+postprocessor_param {
+  plugin_param {
+    name: "LocationRefinerPostprocessor"
+    config_path: "perception/camera_location_refinement/data"
+    config_file: "location_refiner.pb.txt"
+  }
+}
+calibration_service_param {
+  calibrator_method: "LaneLineCalibrator"
+  plugin_param {
+    name: "OnlineCalibrationService"
+  }
+}
+channel {
+  input_camera_channel_name: "/perception/inner/location_estimation2"
+  output_obstacles_channel_name: "/perception/inner/location_refinement2"
+}
+lane_calibration_working_sensor_name: "camera_rear"

@@ -19,7 +19,8 @@
 # Fail on first error.
 set -e
 
-BUILD_TYPE="${1:-download}"
+BUILD_TYPE="${1:-download}"; shift
+LSB_RELEASE="${1:-18.04}"; shift
 
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
@@ -39,7 +40,7 @@ apt_get_update_and_install \
 # 2) libxkbcommonX required by `ldd /usr/local/qt5/plugins/platforms/libqxcb.so`
 
 if [ "${TARGET_ARCH}" = "aarch64" ]; then
-    bash ${CURR_DIR}/install_qt5_qtbase.sh "${BUILD_TYPE}"
+    bash ${CURR_DIR}/install_qt5_qtbase.sh "${BUILD_TYPE}" "${LSB_RELEASE}"
     exit 0
 fi
 

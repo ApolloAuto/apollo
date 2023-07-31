@@ -189,6 +189,17 @@ export default class RoutingEditor {
     return offsetPoint;
   }
 
+  setStartPoint(coordinates) {
+    if (this.routePoints.length === 0) {
+      alert('Please provide one point.');
+      return false;
+    }
+    const points = this.routePoints.map(object =>
+      this.handleRoutingPointObject(object, coordinates, 'position'));
+    WS.setStartPoint(points[0]);
+    return true;
+  }
+
   sendRoutingRequest(carOffsetPosition, carHeading, coordinates, routingPoints) {
     // point from routingPoints no need to apply offset
     // parking routing request vs common routing request
@@ -241,7 +252,9 @@ export default class RoutingEditor {
     // it will bring its own heading information, no need to pass start_heading
     const start_heading = (points.length > 1) ? null : carHeading;
     const end = points[points.length - 1];
-    const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
+    // the re-position and routing function have been seprated
+    // (deprecated): const waypoint = (points.length > 1) ? points.slice(1, -1) : [];
+    const waypoint = points.slice(0, -1);
     WS.requestRoute(start, start_heading, waypoint, end, this.parkingInfo);
     return true;
   }

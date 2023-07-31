@@ -1,26 +1,27 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    runtime_dest = "common/bin",
-    targets = [
-        ":libvehicle_model.so",
-    ],
-    deps = ["vehicle_model_data"],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "common/lib",
+#     runtime_dest = "common/bin",
+#     targets = [
+#         ":libvehicle_model.so",
+#     ],
+#     deps = ["vehicle_model_data"],
+#     visibility = ["//visibility:public"],
+# )
 
-install(
-    name = "vehicle_model_data",
-    data_dest = "common/addition_data/vehicle_model",
-    data = [
-        ":vehicle_model_config_data",
-        ":vehicle_model_test_data"
-    ],
-)
+# install(
+#     name = "vehicle_model_data",
+#     data_dest = "common/addition_data/vehicle_model",
+#     data = [
+#         ":vehicle_model_config_data",
+#         ":vehicle_model_test_data"
+#     ],
+# )
 
 filegroup(
     name = "vehicle_model_test_data",
@@ -87,4 +88,6 @@ filegroup(
     name = "vehicle_model_config_data",
     srcs = ["conf/vehicle_model_config.pb.txt"],
 )
+
+apollo_package()
 cpplint()

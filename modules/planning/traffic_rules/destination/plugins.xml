@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/destination/libdestination.so">
+    <class type="apollo::planning::Destination" base_class="apollo::planning::TrafficRule"></class>
+</library>

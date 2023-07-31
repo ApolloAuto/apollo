@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/backside_vehicle/libbackside_vehicle.so">
+    <class type="apollo::planning::BacksideVehicle" base_class="apollo::planning::TrafficRule"></class>
+</library>

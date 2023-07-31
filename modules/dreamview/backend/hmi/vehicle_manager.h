@@ -18,9 +18,9 @@
 
 #include <string>
 
-#include "cyber/common/macros.h"
-
 #include "modules/dreamview/proto/hmi_config.pb.h"
+
+#include "cyber/common/macros.h"
 
 /**
  * @namespace apollo::dreamview
@@ -35,6 +35,9 @@ class VehicleManager {
   const std::string& GetVehicleDataPath() const;
 
  private:
+  bool UseVehicleUseCopyMode(const std::string& vehicle_data_path);
+  bool UseVehicleUseSymlinkMode(const std::string& vehicle_data_path);
+
   std::string vehicle_data_path_;
   VehicleData vehicle_data_;
 

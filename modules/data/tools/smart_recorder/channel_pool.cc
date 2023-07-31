@@ -43,8 +43,6 @@ ChannelPool::ChannelPool() {
                      FLAGS_planning_trajectory_topic,
                      FLAGS_prediction_topic,
                      FLAGS_relative_map_topic,
-                     FLAGS_routing_request_topic,
-                     FLAGS_routing_response_topic,
                      FLAGS_routing_response_history_topic,
                      FLAGS_gnss_best_pose_topic,
                      FLAGS_imu_topic,

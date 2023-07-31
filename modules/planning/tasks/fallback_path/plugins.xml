@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/fallback_path/libfallback_path.so">
+    <class type="apollo::planning::FallbackPath" base_class="apollo::planning::Task"></class>
+</library>

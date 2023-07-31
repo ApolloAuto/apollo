@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/audio/libaudio_component.so"
+    module_library : "modules/audio/libaudio_component.so"
     components {
         class_name : "AudioComponent"
         config {

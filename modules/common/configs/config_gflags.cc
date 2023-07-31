@@ -92,3 +92,5 @@ DEFINE_double(replan_lateral_distance_threshold, 0.5,
               "The lateral distance threshold of replan");
 DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
               "The longitudinal distance threshold of replan");
+DEFINE_double(replan_time_threshold, 7.0,
+              "The time threshold of replan");

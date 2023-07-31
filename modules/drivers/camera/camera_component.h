@@ -46,10 +46,13 @@ class CameraComponent : public Component<> {
   void run();
 
   std::shared_ptr<Writer<Image>> writer_ = nullptr;
+  std::shared_ptr<Writer<Image>> raw_writer_ = nullptr;
   std::unique_ptr<UsbCam> camera_device_;
   std::shared_ptr<Config> camera_config_;
   CameraImagePtr raw_image_ = nullptr;
+  CameraImagePtr raw_image_for_compress_ = nullptr;
   std::vector<std::shared_ptr<Image>> pb_image_buffer_;
+  std::vector<std::shared_ptr<Image>> raw_image_buffer_;
   uint32_t spin_rate_ = 200;
   uint32_t device_wait_ = 2000;
   int index_ = 0;

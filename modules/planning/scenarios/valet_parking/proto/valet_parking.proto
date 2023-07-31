@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioValetParkingConfig {
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+  optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+}

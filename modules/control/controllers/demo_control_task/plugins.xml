@@ -1,0 +1,3 @@
+<library path="modules/control/controllers/demo_control_task/libdemo_control_task.so">
+    <class type="apollo::control::DemoControlTask" base_class="apollo::control::ControlTask"></class>
+</library>

@@ -1,14 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_transport_shm_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
+# filegroup(
+#     name = "cyber_transport_shm_hdrs",
+#     srcs = glob([
+#         "*.h",
+#     ]),
+# )
 
 cc_library(
     name = "block",
@@ -149,4 +150,5 @@ cc_test(
     linkstatic = True,
 )
 
+apollo_package()
 cpplint()

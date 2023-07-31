@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -49,3 +50,5 @@ py_binary(
     name = "preprocessing",
     srcs = ["preprocessing.py"],
 )
+
+apollo_package()

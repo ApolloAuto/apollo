@@ -32,8 +32,15 @@ PY_CALLBACK_TYPE = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 PY_CALLBACK_TYPE_T = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 
 # init vars
+APOLLO_DISTRIBUTION_HOME = os.environ.get('APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
 wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                 '../internal'))
+if not os.path.exists(wrapper_lib_path):
+    wrapper_lib_path = wrapper_lib_path.replace(
+        os.path.join(APOLLO_DISTRIBUTION_HOME, "python"), "")
+    wrapper_lib_path = os.path.join(
+        APOLLO_DISTRIBUTION_HOME, "lib", wrapper_lib_path)
+
 sys.path.append(wrapper_lib_path)
 
 _CYBER = importlib.import_module('_cyber_wrapper')

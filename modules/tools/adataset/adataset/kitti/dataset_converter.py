@@ -18,7 +18,7 @@
 '''Generate apollo record file by kitti raw sensor data.'''
 
 import logging
-import numpy as np
+import math
 
 from cyber_record.record import Record
 from record_msg.builder import (
@@ -27,26 +27,15 @@ from record_msg.builder import (
   LocalizationBuilder,
   TransformBuilder)
 from adataset.kitti.kitti import KITTISchema, KITTI
-from adataset.kitti.geometry import Quaternion
+from adataset.kitti.geometry import Quaternion, Euler, rotation_matrix_to_euler
+from adataset.kitti.params import (
+  kitti2apollo_lidar,
+)
 
 
 LOCALIZATION_TOPIC = '/apollo/localization/pose'
 TF_TOPIC= '/tf'
 
-
-# Need to convert to apollo coordinate system
-imu_to_velo = np.array(
-    [[ 9.999976e-01, 7.553071e-04,-2.035826e-03,-8.086759e-01],
-     [-7.854027e-04, 9.998898e-01,-1.482298e-02, 3.195559e-01],
-     [ 2.024406e-03, 1.482454e-02, 9.998881e-01,-7.997231e-01],
-     [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
-
-kitti_to_apollo = np.array([[ 0.0000000, 1.0000000, 0.0000000, 0.0000000],
-                            [-1.0000000, 0.0000000, 0.0000000, 0.0000000],
-                            [ 0.0000000, 0.0000000, 1.0000000, 0.0000000],
-                            [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
-
-LIDAR_TRANSFORM = np.matmul(np.linalg.inv(imu_to_velo), kitti_to_apollo)
 
 def dataset_to_record(kitti, record_root_path):
   """Construct record message and save it as record
@@ -71,7 +60,7 @@ def dataset_to_record(kitti, record_root_path):
         pb_msg = image_builder.build(f, 'camera', 'bgr8', t)
         channel_name = "/apollo/sensor/camera/{}/image".format(c)
       elif c.startswith('velodyne'):
-        pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t, LIDAR_TRANSFORM)
+        pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t, kitti2apollo_lidar)
         channel_name = "/apollo/sensor/{}/compensator/PointCloud2".format(c)
 
       if pb_msg:
@@ -82,13 +71,17 @@ def dataset_to_record(kitti, record_root_path):
         quat = Quaternion(rotation[0], rotation[1], rotation[2], rotation[3])
         heading = quat.to_euler().yaw
 
+        # Apollo coordinate system conversion
+        world_to_imu_q = Euler(0, 0, -math.pi/2).to_quaternion()
+        quat *= world_to_imu_q
+
         pb_msg = localization_builder.build(
-          ego_pose.translation, ego_pose.rotation, heading, t)
+          ego_pose.translation, [quat.w, quat.x, quat.y, quat.z], heading, t)
         if pb_msg:
           record.write(LOCALIZATION_TOPIC, pb_msg, int(t*1e9))
 
         pb_msg = transform_builder.build('world', 'localization',
-          ego_pose.translation, ego_pose.rotation, t)
+          ego_pose.translation, [quat.w, quat.x, quat.y, quat.z], t)
         if pb_msg:
           record.write(TF_TOPIC, pb_msg, int(t*1e9))
 

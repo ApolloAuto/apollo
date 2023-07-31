@@ -40,10 +40,9 @@ using apollo::common::util::FillHeader;
 using apollo::cyber::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
+using apollo::planning::PlanningCommand;
 using apollo::prediction::PredictionObstacles;
 using apollo::relative_map::NavigationInfo;
-using apollo::routing::RoutingResponse;
-using apollo::routing::RoutingRequest;
 using Json = nlohmann::json;
 
 namespace {
@@ -80,15 +79,10 @@ void SimPerfectControl::InitTimerAndIO() {
       [this](const std::shared_ptr<ADCTrajectory> &trajectory) {
         this->OnPlanning(trajectory);
       });
-  routing_request_reader_ = node_->CreateReader<RoutingRequest>(
-      FLAGS_routing_request_topic,
-      [this](const std::shared_ptr<RoutingRequest> &routing_request) {
-        this->OnRoutingRequest(routing_request);
-      });
-  routing_response_reader_ = node_->CreateReader<RoutingResponse>(
-      FLAGS_routing_response_topic,
-      [this](const std::shared_ptr<RoutingResponse> &routing) {
-        this->OnRoutingResponse(routing);
+  planning_command_reader_ = node_->CreateReader<PlanningCommand>(
+      FLAGS_planning_command,
+      [this](const std::shared_ptr<PlanningCommand> &planning_command) {
+        this->OnPlanningCommand(planning_command);
       });
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
       FLAGS_navigation_topic,
@@ -110,9 +104,9 @@ void SimPerfectControl::InitTimerAndIO() {
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(
-      new cyber::Timer(kSimPredictionIntervalMs,
-                       [this]() { this->PublishDummyPrediction(); }, false));
+  sim_prediction_timer_.reset(new cyber::Timer(
+      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
+      false));
 }
 
 void SimPerfectControl::Init(bool set_start_point,
@@ -141,6 +135,19 @@ void SimPerfectControl::InitStartPoint(double x, double y,
   point.set_v(start_velocity);
   point.set_a(start_acceleration);
   SetStartPoint(point);
+}
+
+void SimPerfectControl::ReSetPoinstion(double x, double y, double heading) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  TrajectoryPoint point;
+  point.mutable_path_point()->set_x(x);
+  point.mutable_path_point()->set_y(y);
+  // z use default 0
+  point.mutable_path_point()->set_z(0);
+  point.mutable_path_point()->set_theta(heading);
+  AINFO << "start point:" << point.DebugString();
+  SetStartPoint(point);
+  InternalReset();
 }
 
 void SimPerfectControl::InitStartPoint(double start_velocity,
@@ -218,7 +225,6 @@ void SimPerfectControl::Stop() {
 
 void SimPerfectControl::InternalReset() {
   current_routing_header_.Clear();
-  re_routing_triggered_ = false;
   send_dummy_prediction_ = true;
   ClearPlanning();
 }
@@ -240,78 +246,37 @@ void SimPerfectControl::OnReceiveNavigationInfo(
   }
 }
 
-void SimPerfectControl::OnRoutingResponse(
-    const std::shared_ptr<RoutingResponse> &routing) {
+void SimPerfectControl::OnPlanningCommand(
+    const std::shared_ptr<PlanningCommand> &planning_command) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     return;
   }
+  current_routing_header_ = planning_command->header();
+  AINFO << "planning_command: " << planning_command->DebugString();
 
-  CHECK_GE(routing->routing_request().waypoint_size(), 2)
-      << "routing should have at least two waypoints";
+  if (planning_command->lane_follow_command()
+          .routing_request()
+          .is_start_pose_set()) {
+    auto lane_follow_command = planning_command->mutable_lane_follow_command();
+    const auto &start_pose =
+        lane_follow_command->routing_request().waypoint(0).pose();
+    ClearPlanning();
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(start_pose.x());
+    point.mutable_path_point()->set_y(start_pose.y());
+    point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
+    point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
+    double theta = 0.0;
+    double s = 0.0;
 
-  current_routing_header_ = routing->header();
-
-  // // If this is from a planning re-routing request, or the start point has
-  // // been
-  // // initialized by an actual localization pose, don't reset the start point.
-  // re_routing_triggered_ =
-  //     routing->routing_request().header().module_name() == "planning";
-  // if (!re_routing_triggered_ && !start_point_from_localization_) {
-  //   ClearPlanning();
-  //   TrajectoryPoint point;
-  //   point.mutable_path_point()->set_x(start_pose.x());
-  //   point.mutable_path_point()->set_y(start_pose.y());
-  //   point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
-  //   point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
-  //   double theta = 0.0;
-  //   double s = 0.0;
-  //   map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-  //                                         &theta, &s);
-  //   point.mutable_path_point()->set_theta(theta);
-  //   SetStartPoint(point);
-  // }
-}
-
-void SimPerfectControl::OnRoutingRequest(
-    const std::shared_ptr<RoutingRequest> &routing_request) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (!enabled_) {
-    return;
-  }
-
-  CHECK_GE(routing_request->waypoint_size(), 2)
-      << "routing should have at least two waypoints";
-  const auto &start_pose = routing_request->waypoint(0).pose();
-
-  ClearPlanning();
-  TrajectoryPoint point;
-  point.mutable_path_point()->set_x(start_pose.x());
-  point.mutable_path_point()->set_y(start_pose.y());
-  point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
-  point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
-  double theta = 0.0;
-  double s = 0.0;
-  const auto &start_way_point = routing_request->waypoint().Get(0);
-  // If the lane id has been set, set theta as the lane heading.
-  if (start_way_point.has_id()) {
-    auto &hdmap = hdmap::HDMapUtil::BaseMap();
-    hdmap::Id lane_id = hdmap::MakeMapId(start_way_point.id());
-    auto lane = hdmap.GetLaneById(lane_id);
-    if (nullptr != lane) {
-      theta = lane->Heading(start_way_point.s());
-    } else {
-      map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                            &theta, &s);
-    }
-  } else {
     // Find the lane nearest to the start pose and get its heading as theta.
     map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
                                           &theta, &s);
-  }
 
-  point.mutable_path_point()->set_theta(theta);
-  SetStartPoint(point);
+    point.mutable_path_point()->set_theta(theta);
+    SetStartPoint(point);
+  }
 }
 
 void SimPerfectControl::OnPredictionObstacles(
@@ -370,8 +335,7 @@ void SimPerfectControl::OnPlanning(
 
   // Reset current trajectory and the indices upon receiving a new trajectory.
   // The routing SimPerfectControl owns must match with the one Planning has.
-  if (re_routing_triggered_ ||
-      IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
+  if (IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
     current_trajectory_ = trajectory;
     prev_point_index_ = 0;
     next_point_index_ = 0;
@@ -475,7 +439,6 @@ void SimPerfectControl::PublishChassis(double cur_speed,
 void SimPerfectControl::PublishLocalization(const TrajectoryPoint &point) {
   auto localization = std::make_shared<LocalizationEstimate>();
   FillHeader("SimPerfectControl", localization.get());
-
   auto *pose = localization->mutable_pose();
   auto prev = prev_point_.path_point();
   auto next = next_point_.path_point();
@@ -532,7 +495,6 @@ void SimPerfectControl::PublishLocalization(const TrajectoryPoint &point) {
 
   TransformToVRF(pose->linear_acceleration(), pose->orientation(),
                  pose->mutable_linear_acceleration_vrf());
-
   localization_writer_->Write(localization);
 
   adc_position_.set_x(pose->position().x());

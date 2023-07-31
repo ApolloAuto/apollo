@@ -104,15 +104,15 @@ bool GetProtoFromFile(const std::string &file_name,
                       google::protobuf::Message *message);
 
 /**
- * @brief Parses the content of the json file specified by the file_name as ascii
- *        representation of protobufs, and merges the parsed content to the
+ * @brief Parses the content of the json file specified by the file_name as
+ * ascii representation of protobufs, and merges the parsed content to the
  *        proto.
  * @param file_name The name of the file to parse whose content.
  * @param message The proto to carry the parsed content in the specified file.
  * @return If the action is successful.
  */
 bool GetProtoFromJsonFile(const std::string &file_name,
-                           google::protobuf::Message *message);
+                          google::protobuf::Message *message);
 
 /**
  * @brief Get file content as string.
@@ -135,6 +135,8 @@ std::string GetAbsolutePath(const std::string &prefix,
  * @return If the path exists.
  */
 bool PathExists(const std::string &path);
+
+bool PathIsAbsolute(const std::string &path);
 
 /**
  * @brief Check if the directory specified by directory_path exists
@@ -201,8 +203,43 @@ bool RemoveAllFiles(const std::string &directory_path);
 std::vector<std::string> ListSubPaths(const std::string &directory_path,
                                       const unsigned char d_type = DT_DIR);
 
+/**
+ * @brief Find path with pattern
+ * @param base_path search root
+ * @param patt pattern to compare with entry->d_name for filter
+ * @param d_type entry type for filter
+ * @param recursive search directory recursively
+ * @param result_list a vector reference for storing the search result
+ * @return the result count
+ */
+size_t FindPathByPattern(const std::string &base_path, const std::string &patt,
+                         const unsigned char d_type, const bool recursive,
+                         std::vector<std::string> *result_list);
+
+/**
+ * @brief get directory name of path
+ * @param path
+ * @return dirname of path
+ */
+std::string GetDirName(const std::string &path);
+
 std::string GetFileName(const std::string &path,
                         const bool remove_extension = false);
+
+/**
+ * @brief get file path,
+ * if path is an absolute path, use the path directly,
+ * if path is an relative path and exists, use the relative path directly,
+ * else use the first path that exists in the environment variable.
+ *
+ * @param path input file path string.
+ * @param env_var environment var string.
+ * @param file_path the output file path.
+ *
+ * @return if no valid path found, return false.
+ */
+bool GetFilePathWithEnv(const std::string &path, const std::string &env_var,
+                        std::string *file_path);
 
 std::string GetCurrentPath();
 
@@ -212,6 +249,22 @@ bool DeleteFile(const std::string &filename);
 bool GetType(const std::string &filename, FileType *type);
 
 bool CreateDir(const std::string &dir);
+
+template <typename T>
+bool LoadConfig(const std::string &relative_path, T *config) {
+  CHECK_NOTNULL(config);
+  // todo: get config base relative path
+  std::string actual_config_path;
+  if (!GetFilePathWithEnv(relative_path, "APOLLO_CONF_PATH",
+                          &actual_config_path)) {
+    AERROR << "conf file [" << relative_path
+           << "] is not found in APOLLO_CONF_PATH";
+    return false;
+  }
+  AINFO << "load conf file: " << actual_config_path;
+  return GetProtoFromFile(actual_config_path, config);
+}
+
 }  // namespace common
 }  // namespace cyber
 }  // namespace apollo

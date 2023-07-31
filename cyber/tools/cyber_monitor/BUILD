@@ -1,16 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "cyber/bin",
-    targets = [
-        ":cyber_monitor",
-    ],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "cyber/bin",
+#     targets = [
+#         ":cyber_monitor",
+#     ],
+# )
 
 cc_binary(
     name = "cyber_monitor",
@@ -86,4 +87,5 @@ cc_library(
     hdrs = ["screen.h"],
 )
 
+apollo_package()
 cpplint()

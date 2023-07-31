@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message TrafficLight {
+  optional string tl_tf2_frame_id = 1 [default = "world"];
+  optional string tl_tf2_child_frame_id = 2
+      [default = "perception_localization_100hz"];
+  optional double tf2_timeout_second = 3 [default = 0.01];
+  optional string camera_names = 4 [default = "front_6mm,front_12mm"];
+  optional string camera_channel_names = 5
+      [default =
+           "/apollo/sensor/camera/front_6mm,/apollo/sensor/camera/front_12mm"];
+  optional double tl_image_timestamp_offset = 6 [default = 0.0];
+  optional int32 max_process_image_fps = 7 [default = 8];
+  optional double query_tf_interval_seconds = 8 [default = 0.3];
+  optional double valid_hdmap_interval = 9 [default = 1.5];
+  optional double image_sys_ts_diff_threshold = 10 [default = 0.5];
+  optional double sync_interval_seconds = 11 [default = 0.5];
+  optional int32 default_image_border_size = 12 [default = 100];
+  optional perception.PluginParam plugin_param = 13;
+  optional int32 gpu_id = 14 [default = 0];
+  optional string proposal_output_channel_name = 15
+      [default = "/perception/inner/Detection"];
+}

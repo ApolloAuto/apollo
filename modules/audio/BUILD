@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -41,61 +42,55 @@ filegroup(
 # Data->Models:
 # modules/audio/data/torch_siren_detection_model.pt
 
-install(
-    name = "install",
-    library_dest = "audio/lib",
-    data_dest = "audio",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":audio.BUILD",
-    ],
-    targets = [
-        ":libaudio_component.so",
-    ],
-    deps = [
-        ":pb_hdrs",
-        "//modules/audio/tools:install",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "audio/lib",
+#     data_dest = "audio",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":audio.BUILD",
+#     ],
+#     targets = [
+#         ":libaudio_component.so",
+#     ],
+#     deps = [
+#         ":pb_hdrs",
+#         "//modules/audio/tools:install",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "audio/include",
-    data = [
-        "//modules/audio/proto:audio_conf_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "audio/include",
+#     data = [
+#         "//modules/audio/proto:audio_conf_cc_proto",
+#     ],
+# )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_audio_src",
-        ":install_audio_hdrs",
-        ":install_audio_model",
-        "//modules/audio/proto:py_pb_audio",
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_audio_src",
+#         ":install_audio_hdrs",
+#         "//modules/audio/proto:py_pb_audio",
+#     ],
+# )
 
-install_src_files(
-    name = "install_audio_src",
-    src_dir = ["."],
-    dest = "audio/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_audio_src",
+#     src_dir = ["."],
+#     dest = "audio/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_audio_model",
-    src_dir = ["data"],
-    dest = "audio/data",
-    filter = "*"
-)
+# install_src_files(
+#     name = "install_audio_hdrs",
+#     src_dir = ["."],
+#     dest = "audio/include",
+#     filter = "*.h",
+# )
 
-install_src_files(
-    name = "install_audio_hdrs",
-    src_dir = ["."],
-    dest = "audio/include",
-    filter = "*.h",
-)
+apollo_package()
 
 cpplint()

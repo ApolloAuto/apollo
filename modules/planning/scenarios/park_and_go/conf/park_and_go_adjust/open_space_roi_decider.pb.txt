@@ -1,0 +1,7 @@
+roi_type: PARK_AND_GO
+roi_line_segment_min_angle: 0.15
+roi_line_segment_length: 0.2
+perception_obstacle_buffer: 0.5
+end_pose_s_distance: 10.0
+roi_longitudinal_range_start : 10.0
+roi_longitudinal_range_end : 20.0

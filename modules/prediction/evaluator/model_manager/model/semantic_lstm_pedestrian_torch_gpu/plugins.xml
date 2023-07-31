@@ -1,0 +1,3 @@
+<library path="modules/prediction/evaluator/model_manager/model/semantic_lstm_pedestrian_torch_gpu/libmodel.so">
+    <class type="apollo::prediction::SemanticLstmPedestrianGpuTorch" base_class="apollo::prediction::ModelBase"></class>
+</library>

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -50,40 +51,41 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    library_dest = "monitor/lib",
-    data_dest = "monitor",
-    targets = [
-        ":libmonitor.so",
-    ],
-    data = [
-       ":runtime_data",
-        ":cyberfile.xml",
-        ":monitor.BUILD",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "monitor/lib",
+#     data_dest = "monitor",
+#     targets = [
+#         ":libmonitor.so",
+#     ],
+#     data = [
+#        ":runtime_data",
+#         ":cyberfile.xml",
+#         ":monitor.BUILD",
+#     ],
+# )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_monitor_src",
-        ":install_monitor_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_monitor_src",
+#         ":install_monitor_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_monitor_src",
-    src_dir = ["."],
-    dest = "monitor/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_monitor_src",
+#     src_dir = ["."],
+#     dest = "monitor/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_monitor_hdrs",
-    src_dir = ["."],
-    dest = "monitor/include",
-    filter = "*.h",
-) 
+# install_src_files(
+#     name = "install_monitor_hdrs",
+#     src_dir = ["."],
+#     dest = "monitor/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

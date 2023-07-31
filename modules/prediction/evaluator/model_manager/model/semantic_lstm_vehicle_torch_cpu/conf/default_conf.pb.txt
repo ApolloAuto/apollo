@@ -1,0 +1,1 @@
+model_path: "/apollo/modules/prediction/evaluator/model_manager/model/semantic_lstm_vehicle_torch_cpu/data/semantic_lstm_vehicle_cpu_model.pt"

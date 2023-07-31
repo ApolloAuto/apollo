@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/crosswalk/libcrosswalk.so">
+    <class type="apollo::planning::Crosswalk" base_class="apollo::planning::TrafficRule"></class>
+</library>

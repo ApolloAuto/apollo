@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -83,39 +84,39 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-transit/lib",
-    data_dest = "canbus-vehicle-transit",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-transit.BUILD",
-    ],
-    targets = [
-        ":libtransit_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_transit",
-        ":pb_hdrs",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus-vehicle-transit/lib",
+#     data_dest = "canbus-vehicle-transit",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus-vehicle-transit.BUILD",
+#     ],
+#     targets = [
+#         ":libtransit_vehicle_factory_lib.so",
+#     ],
+#     deps = [
+#         ":pb_transit",
+#         ":pb_hdrs",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-transit/include",
-    data = [
-        "//modules/canbus_vehicle/transit/proto:transit_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus-vehicle-transit/include",
+#     data = [
+#         "//modules/canbus_vehicle/transit/proto:transit_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_transit",
-    dest = "canbus-vehicle-transit",
-    files = [
-        "//modules/canbus_vehicle/transit/proto:transit_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_transit",
+#     dest = "canbus-vehicle-transit",
+#     files = [
+#         "//modules/canbus_vehicle/transit/proto:transit_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -124,26 +125,27 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_transit_src",
-        ":install_transit_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_transit_src",
+#         ":install_transit_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_transit_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-transit/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_transit_src",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-transit/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_transit_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-transit/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_transit_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-transit/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

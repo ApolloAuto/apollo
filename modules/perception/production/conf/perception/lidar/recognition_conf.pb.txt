@@ -1,4 +1,0 @@
-main_sensor_name: "velodyne128"
-output_channel_name: "/perception/inner/PrefusedObjects"
-lidar_tracking_conf_dir: "/apollo/modules/perception/pipeline/config"
-lidar_tracking_conf_file: "lidar_tracking_pipeline.pb.txt"

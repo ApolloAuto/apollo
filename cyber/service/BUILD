@@ -1,14 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_service_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
+# filegroup(
+#     name = "cyber_service_hdrs",
+#     srcs = glob([
+#         "*.h",
+#     ]),
+# )
 
 cc_library(
     name = "client",
@@ -37,4 +38,5 @@ cc_library(
     hdrs = ["service_base.h"],
 )
 
+apollo_package()
 cpplint()

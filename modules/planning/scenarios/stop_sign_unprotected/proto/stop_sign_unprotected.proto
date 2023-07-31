@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/planning/planning_base/scenario_base/proto/creep_stage.proto";
+
+message ScenarioStopSignUnprotectedConfig {
+  optional double start_stop_sign_scenario_distance = 1
+      [default = 5.0];  // meter
+  optional double watch_vehicle_max_valid_stop_distance = 2
+      [default = 5.0];                                          // meter
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  optional float stop_duration_sec = 4 [default = 1.0];         // sec
+  optional double min_pass_s_distance = 5 [default = 3.0];      // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];          // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];        // sec
+  optional CreepStageConfig creep_stage_config = 8;
+}

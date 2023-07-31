@@ -7,7 +7,7 @@ startup --batch_cpu_scheduling
 startup --host_jvm_args="-XX:-UseParallelGC"
 
 fetch --experimental_multi_threaded_digest=true
-query --experimental_multi_threaded_digest=true
+# query --experimental_multi_threaded_digest=true
 
 # +------------------------------------------------------------+
 # | Common Options                                             |
@@ -47,12 +47,12 @@ build --define=use_fast_cpp_protos=true
 
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
-build:opt -c opt
+build:opt -c opt --cxxopt=-fPIC
 
 #build --config=optimize
 # Instruction set optimizations
-#build:optimize --copt=-march=native
-#build:optimize --host_copt=-march=native
+build:optimize --copt=-march=native
+build:optimize --host_copt=-march=native
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures
@@ -86,7 +86,7 @@ test --test_output=errors
 test:unit_test --test_verbose_timeout_warnings
 
 # use --copt=-mavx2
-test --copt=-mavx2
+test --copt=-march=native
 
 coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
 # coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"

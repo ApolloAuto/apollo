@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,8 +10,8 @@ filegroup(
 )
 
 py_binary(
-    name = "main",
-    srcs = ["main.py"],
+    name = "plot_trajectory",
+    srcs = ["plot_trajectory.py"],
     data = [
         "//modules/tools/planning/plot_trajectory/example_data",
     ],
@@ -27,11 +28,13 @@ py_library(
     srcs = ["mkz_polygon.py"],
 )
 
-install(
-    name = "install",
-    data_dest = "tools/planning/plot_trajectory",
-    py_dest = "tools/planning/plot_trajectory",
-    targets = [
-        ":main",
-    ]
-)
+# install(
+#     name = "install",
+#     data_dest = "tools/planning/plot_trajectory",
+#     py_dest = "tools/planning/plot_trajectory",
+#     targets = [
+#         ":main",
+#     ]
+# )
+
+apollo_package()

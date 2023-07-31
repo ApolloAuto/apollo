@@ -163,6 +163,13 @@ class PoseParser(GpsParser):
 
         return True
 
+    def get_timestamps(self, msg):
+        """
+        get timestamps from localization estimate channel
+        """
+        loc_est = self._msg_parser
+        loc_est.ParseFromString(msg.message)
+        return loc_est.header.timestamp_sec * 1e9
 
 class PointCloudParser(SensorMessageParser):
     """
@@ -242,6 +249,15 @@ class PointCloudParser(SensorMessageParser):
         # TODO(gchen-Apollo): add saint check
         return True
 
+    def get_timestamps(self, msg):
+        """
+        get timestamps from  sensor/lidar/pointcloud2 channel
+        """
+        pointcloud = self._msg_parser
+        pointcloud.ParseFromString(msg.message)
+        if len(pointcloud.point):
+            return pointcloud.point[0].timestamp
+        return 0
 
 class ImageParser(SensorMessageParser):
     """

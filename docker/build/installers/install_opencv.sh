@@ -21,10 +21,10 @@ set -e
 CURR_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 . ${CURR_DIR}/installer_base.sh
 
-if ldconfig -p | grep -q libopencv_core; then
-    info "OpenCV was already installed"
-    exit 0
-fi
+# if ldconfig -p | grep -q libopencv_core; then
+#     info "OpenCV was already installed"
+#     exit 0
+# fi
 
 WORKHORSE="$1"
 if [ -z "${WORKHORSE}" ]; then

@@ -24,12 +24,11 @@
 #include <unordered_map>
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
-
-#include "cyber/common/log.h"
 #include "modules/common_msgs/basic_msgs/error_code.pb.h"
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/external_command_msgs/chassis_command.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -89,7 +88,8 @@ class VehicleController {
    * @return error_code
    */
   virtual common::ErrorCode Update(const control::ControlCommand &command);
-
+  virtual common::ErrorCode Update(
+      const external_command::ChassisCommand &command);
   /**
    * @brief set vehicle to appointed driving mode.
    * @param driving mode to be appointed.
@@ -148,11 +148,33 @@ class VehicleController {
    * @brief set Electrical Park Brake
    */
   virtual void SetEpbBreak(const control::ControlCommand &command) = 0;
-  virtual void SetBeam(const control::ControlCommand &command) = 0;
-  virtual void SetHorn(const control::ControlCommand &command) = 0;
-  virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
-
   virtual void SetLimits() {}
+
+  /*
+   * @brief Handle user-defined chassis actions
+   */
+  virtual common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand &command) = 0;
+
+  /*
+   * @brief Handle Apollo chassis actions
+   */
+  virtual void HandleVehicleSignal(const common::VehicleSignal &signal) {
+    if (signal.has_high_beam() || signal.has_low_beam()) SetBeam(signal);
+    if (signal.has_horn()) SetHorn(signal);
+    if (signal.has_turn_signal()) SetTurningSignal(signal);
+  }
+
+  virtual void SetBeam(const common::VehicleSignal &signal) = 0;
+  virtual void SetHorn(const common::VehicleSignal &signal) = 0;
+  virtual void SetTurningSignal(const common::VehicleSignal &signal) = 0;
+
+  /**
+   * @brief calculate and return the chassis.
+   * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
+   */
+  virtual common::VehicleSignal ProcessCommandChange(
+      const common::VehicleSignal &signal, common::VehicleSignal *last_command);
 
   /**
    * @brief Response to vehicle ID request.
@@ -165,6 +187,8 @@ class VehicleController {
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
 
  protected:
+  common::VehicleSignal last_chassis_command_;
+  common::VehicleSignal last_control_command_;
   canbus::VehicleParameter params_;
   common::VehicleParam vehicle_params_;
   CanSender<SensorType> *can_sender_ = nullptr;
@@ -177,6 +201,7 @@ class VehicleController {
 
 using common::ErrorCode;
 using control::ControlCommand;
+using external_command::ChassisCommand;
 
 template <typename SensorType>
 Chassis::DrivingMode VehicleController<SensorType>::driving_mode() {
@@ -273,7 +298,6 @@ ErrorCode VehicleController<SensorType>::Update(
           mode = Chassis::COMPLETE_AUTO_DRIVE;
           break;
         }
-        case control::DrivingAction::STOP:
         case control::DrivingAction::RESET: {
           // In COMPLETE_MANUAL mode
           break;
@@ -316,12 +340,77 @@ ErrorCode VehicleController<SensorType>::Update(
        driving_mode() == Chassis::AUTO_SPEED_ONLY ||
        driving_mode() == Chassis::AUTO_STEER_ONLY) &&
       control_command.has_signal()) {
-    SetHorn(control_command);
-    SetTurningSignal(control_command);
-    SetBeam(control_command);
+    HandleVehicleSignal(
+        ProcessCommandChange(control_command.signal(), &last_control_command_));
   }
 
   return ErrorCode::OK;
+}
+
+template <typename SensorType>
+ErrorCode VehicleController<SensorType>::Update(
+    const ChassisCommand &chassis_command) {
+  if (!is_initialized_) {
+    AERROR << "Controller is not initialized.";
+    return ErrorCode::CANBUS_ERROR;
+  }
+
+  if ((driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+       driving_mode() == Chassis::AUTO_SPEED_ONLY ||
+       driving_mode() == Chassis::AUTO_STEER_ONLY) &&
+      chassis_command.has_basic_signal()) {
+    HandleVehicleSignal(ProcessCommandChange(chassis_command.basic_signal(),
+                                             &last_chassis_command_));
+  }
+
+  if (chassis_command.has_custom_operation()) {
+    auto result = HandleCustomOperation(chassis_command);
+    if (result != ErrorCode::OK) {
+      return result;
+    }
+  }
+
+  return ErrorCode::OK;
+}
+
+template <typename SensorType>
+common::VehicleSignal VehicleController<SensorType>::ProcessCommandChange(
+    const common::VehicleSignal &vehicle_signal,
+    common::VehicleSignal *last_command) {
+  common::VehicleSignal vehicle_signal_end;
+  if (vehicle_signal.has_high_beam()) {
+    if ((last_command->has_high_beam() &&
+         last_command->high_beam() != vehicle_signal.has_high_beam()) ||
+        !last_command->has_high_beam()) {
+      vehicle_signal_end.set_high_beam(vehicle_signal.high_beam());
+    }
+  }
+
+  if (vehicle_signal.has_low_beam()) {
+    if ((last_command->has_low_beam() &&
+         last_command->low_beam() != vehicle_signal.has_low_beam()) ||
+        !last_command->has_low_beam()) {
+      vehicle_signal_end.set_low_beam(vehicle_signal.low_beam());
+    }
+  }
+
+  if (vehicle_signal.has_horn()) {
+    if ((last_command->has_horn() &&
+         last_command->horn() != vehicle_signal.horn()) ||
+        !last_command->horn()) {
+      vehicle_signal_end.set_horn(vehicle_signal.horn());
+    }
+  }
+
+  if (vehicle_signal.has_turn_signal()) {
+    if ((last_command->has_turn_signal() &&
+         last_command->turn_signal() != vehicle_signal.turn_signal()) ||
+        !last_command->turn_signal()) {
+      vehicle_signal_end.set_turn_signal(vehicle_signal.turn_signal());
+    }
+  }
+  *last_command = vehicle_signal_end;
+  return vehicle_signal_end;
 }
 
 }  // namespace canbus

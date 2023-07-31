@@ -26,6 +26,8 @@ ARCH="$(uname -m)"
 : ${USE_ESD_CAN:=false}
 USE_GPU=-1
 
+ENABLE_PROFILER=true
+
 CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
@@ -45,17 +47,10 @@ function _determine_perception_disabled() {
   fi
 }
 
-function _determine_localization_disabled() {
-  if [ "${ARCH}" != "x86_64" ]; then
-    # Skip msf for non-x86_64 platforms
-    DISABLED_TARGETS="${disabled} except //modules/localization/msf/..."
-  fi
-}
-
 function _determine_planning_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
     DISABLED_TARGETS="${DISABLED_TARGETS} \
-        except //modules/planning/open_space/trajectory_smoother:planning_block"
+        except //modules/planning/planning_base/open_space/trajectory_smoother:planning_block"
   fi
 }
 
@@ -69,7 +64,6 @@ function _determine_map_disabled() {
 function determine_disabled_targets() {
   if [ "$#" -eq 0 ]; then
     _determine_drivers_disabled
-    _determine_localization_disabled
     _determine_perception_disabled
     _determine_planning_disabled
     _determine_map_disabled
@@ -81,9 +75,6 @@ function determine_disabled_targets() {
     case "${component}" in
       drivers)
         _determine_drivers_disabled
-        ;;
-      localization)
-        _determine_localization_disabled
         ;;
       perception)
         _determine_perception_disabled
@@ -228,6 +219,11 @@ function run_bazel_build() {
     CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
   fi
 
+  # Add profiler
+  if $ENABLE_PROFILER; then
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define ENABLE_PROFILER=${ENABLE_PROFILER}"
+  fi
+
   CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
 
   local build_targets
@@ -247,7 +243,7 @@ function run_bazel_build() {
   info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
   info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  local job_args="--copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
+  local job_args="--copt=-march=native --host_copt=-march=native --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
   bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
 }
 

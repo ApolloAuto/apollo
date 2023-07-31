@@ -157,3 +157,17 @@ DEFINE_string(cyber_recorder_stop_command, "pkill -9 cyber_recorder",
 
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
               "Vehicles config path.");
+
+DEFINE_bool(
+    vehicle_changed_use_copy_mode, true,
+    "change vehicle use copy mode if set to true, else use symlink mode");
+
+DEFINE_string(lane_follow_command_topic, "/apollo/external_command/lane_follow",
+              "Lane follow command topic name.");
+
+DEFINE_string(valet_parking_command_topic,
+              "/apollo/external_command/valet_parking",
+              "Valet parking command topic name.");
+
+DEFINE_string(action_command_topic, "/apollo/external_command/action",
+              "Action command topic name.");

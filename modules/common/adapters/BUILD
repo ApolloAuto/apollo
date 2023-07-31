@@ -1,17 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
-
-install(
-    name = "install",
-    library_dest = "common/lib",
-    data_dest = "common",
-    targets = [
-        ":libadapter_gflags.so",
-    ],
-    deps = ["//modules/common/adapters/proto:install"],
-    visibility = ["//visibility:public"],
-)
+load("//tools:apollo_package.bzl", "apollo_package")
 
 cc_binary(
     name = "libadapter_gflags.so",
@@ -37,4 +26,5 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+apollo_package()
 cpplint()

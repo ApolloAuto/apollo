@@ -17,6 +17,8 @@
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/point_factory.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
@@ -24,84 +26,80 @@
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
-apollo::common::util::Factory<
-    StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-               const std::shared_ptr<DependencyInjector>& injector)>
-    ParkAndGoScenario::s_stage_factory_;
+using apollo::hdmap::HDMapUtil;
 
-void ParkAndGoScenario::Init() {
+bool ParkAndGoScenario::Init(std::shared_ptr<DependencyInjector> injector,
+                             const std::string& name) {
   if (init_) {
-    return;
+    return true;
   }
 
-  Scenario::Init();
+  if (!Scenario::Init(injector, name)) {
+    AERROR << "failed to init scenario" << Name();
+    return false;
+  }
 
-  if (!GetScenarioConfig()) {
-    AERROR << "fail to get scenario specific config";
-    return;
+  if (!Scenario::LoadConfig<apollo::planning::ScenarioParkAndGoConfig>(
+          &context_.scenario_config)) {
+    AERROR << "fail to get config of scenario" << Name();
+    return false;
   }
 
   init_ = true;
-}
-
-void ParkAndGoScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      StageType::PARK_AND_GO_CHECK,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new ParkAndGoStageCheck(config, injector);
-      });
-  s_stage_factory_.Register(
-      StageType::PARK_AND_GO_ADJUST,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new ParkAndGoStageAdjust(config, injector);
-      });
-  s_stage_factory_.Register(
-      StageType::PARK_AND_GO_PRE_CRUISE,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new ParkAndGoStagePreCruise(config, injector);
-      });
-  s_stage_factory_.Register(
-      StageType::PARK_AND_GO_CRUISE,
-      [](const ScenarioConfig::StageConfig& config,
-         const std::shared_ptr<DependencyInjector>& injector) -> Stage* {
-        return new ParkAndGoStageCruise(config, injector);
-      });
-}
-
-std::unique_ptr<Stage> ParkAndGoScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config,
-    const std::shared_ptr<DependencyInjector>& injector) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config, injector);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
-  return ptr;
-}
-
-bool ParkAndGoScenario::GetScenarioConfig() {
-  if (!config_.has_park_and_go_config()) {
-    AERROR << "miss scenario specific config";
-    return false;
-  }
-  context_.scenario_config.CopyFrom(config_.park_and_go_config());
   return true;
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
+bool ParkAndGoScenario::IsTransferable(const Scenario* const other_scenario,
+                                       const Frame& frame) {
+  if (!frame.local_view().planning_command->has_lane_follow_command()) {
+    return false;
+  }
+  if (other_scenario == nullptr || frame.reference_line_info().empty()) {
+    return false;
+  }
+  bool park_and_go = false;
+  const auto& scenario_config = context_.scenario_config;
+  const auto vehicle_state_provider = injector_->vehicle_state();
+  common::VehicleState vehicle_state = vehicle_state_provider->vehicle_state();
+  auto adc_point = common::util::PointFactory::ToPointENU(vehicle_state);
+  // TODO(SHU) might consider gear == GEAR_PARKING
+  double adc_speed = vehicle_state_provider->linear_velocity();
+  double s = 0.0;
+  double l = 0.0;
+  const double max_abs_speed_when_stopped =
+      common::VehicleConfigHelper::Instance()
+          ->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+
+  hdmap::LaneInfoConstPtr lane;
+
+  // check ego vehicle distance to destination
+  const auto routing_end = frame.local_view().end_lane_way_point;
+  if (nullptr == routing_end) {
+    return false;
+  }
+  common::SLPoint dest_sl;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
+  reference_line.XYToSL(routing_end->pose(), &dest_sl);
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
+  const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
+  ADEBUG << "adc_distance_to_dest:" << adc_distance_to_dest;
+  // if vehicle is static, far enough to destination and (off-lane or not on
+  // city_driving lane)
+  if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&
+      adc_distance_to_dest > scenario_config.min_dist_to_dest() &&
+      (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+           adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s,
+           &l) != 0 ||
+       lane->lane().type() != hdmap::Lane::CITY_DRIVING)) {
+    park_and_go = true;
+  }
+  return park_and_go;
+}
+
 }  // namespace planning
 }  // namespace apollo

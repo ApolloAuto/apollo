@@ -1,16 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
+# load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "drivers/bin",
-    targets = [
-      ":video2jpg",
-    ],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "drivers/bin",
+#     targets = [
+#       ":video2jpg",
+#     ],
+# )
 
 cc_binary(
     name = "video2jpg",
@@ -43,4 +44,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

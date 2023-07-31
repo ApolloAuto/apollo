@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,6 +18,7 @@ cc_library(
         "//modules/dreamview/backend/sim_control_manager/core:dynamic_model_factory",
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_base",
         "//modules/common/configs:config_gflags",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "@com_github_nlohmann_json//:json",
     ],
 )
@@ -36,4 +38,5 @@ cc_library(
 #     ],
 # )
 
+apollo_package()
 cpplint()

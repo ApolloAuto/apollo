@@ -32,8 +32,8 @@ else
     MAP_DIR=$3
 fi
 
-/apollo/bazel-bin/modules/planning/pipeline/record_to_learning_data \
-    --flagfile=/apollo/modules/planning/conf/planning.conf \
+/apollo/bazel-bin/modules/planning/planning_base/pipeline/record_to_learning_data \
+    --flagfile=/apollo/modules/planning/planning_base/conf/planning.conf \
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --planning_offline_learning=true \
     --planning_offline_bags=${SRC_DIR} \

@@ -25,11 +25,17 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 MY_GEO=$1; shift
 ARCH="$(uname -m)"
 
+LSB_RELEASE=$1; shift
+
 ##----------------------------##
 ##  APT sources.list settings |
 ##----------------------------##
 
 if [[ "${ARCH}" == "x86_64" ]]; then
+    if [[ "${LSB_RELEASE}" == "20.04" ]]; then
+        echo "currently apollo x86_64 image does not support ubuntu 22.04"
+        exit -1
+    fi
     if [[ "${MY_GEO}" == "cn" ]]; then
         cp -f "${RCFILES_DIR}/sources.list.cn.x86_64" /etc/apt/sources.list
         # sed -i 's/nvidia.com/nvidia.cn/g' /etc/apt/sources.list.d/nvidia-ml.list
@@ -37,8 +43,10 @@ if [[ "${ARCH}" == "x86_64" ]]; then
         sed -i 's/archive.ubuntu.com/us.archive.ubuntu.com/g' /etc/apt/sources.list
     fi
 else # aarch64
-    if [[ "${MY_GEO}" == "cn" ]]; then
-        cp -f "${RCFILES_DIR}/sources.list.cn.aarch64" /etc/apt/sources.list
+    if [[ ! "${LSB_RELEASE}" == "20.04" ]]; then
+        if [[ "${MY_GEO}" == "cn" ]]; then
+            cp -f "${RCFILES_DIR}/sources.list.cn.aarch64" /etc/apt/sources.list
+        fi
     fi
 fi
 

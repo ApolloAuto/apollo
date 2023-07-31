@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,26 +16,76 @@ cc_binary(
     ],
 )
 
-install(
-    name = "install",
-    data_dest = "drivers/addition_data/microphone",
-    library_dest = "drivers/lib/microphone",
-    data = [
-        ":runtime_data",
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_drivers_microphone_src",
+#         ":install_drivers_microphone_hdrs"
+#     ],
+# )
+
+# install_src_files(
+#     name = "install_drivers_microphone_src",
+#     src_dir = ["."],
+#     dest = "drivers-microphone/src",
+#     filter = "*",
+# )
+
+# install_src_files(
+#     name = "install_drivers_microphone_hdrs",
+#     src_dir = ["."],
+#     dest = "drivers-microphone/include",
+#     filter = "*.h",
+# )
+
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "drivers-microphone/include",
+#     data = [
+#         "//modules/drivers/microphone/proto:audio_cc_proto",
+#         "//modules/drivers/microphone/proto:microphone_config_cc_proto",
+#     ],
+# )
+
+# install_files(
+#     name = "pb_drivers_microphone_py",
+#     dest = "drivers-microphone/python/modules/drivers/microphone",
+#     files = [
+#         "//modules/drivers/microphone/proto:microphone_config_py_pb2",
+#         "//modules/drivers/microphone/proto:audio_py_pb2",
+#     ],
+# )
+
+filegroup(
+    name = "package_data",
+    srcs = [
+        ":cyberfile.xml",
+        ":drivers-microphone.BUILD",
     ],
-    targets = [
-        ":libmicrophone_component.so",
-    ],
-    deps = [":install_lib_top_level"]
 )
 
-install(
-    name = "install_lib_top_level",
-    library_dest = "drivers/lib",
-    targets = [
-        ":libmicrophone_component.so",
-    ],
-)
+# install(
+#     name = "install_package_data",
+#     data_dest = "drivers-microphone",
+#     data = ["package_data"],
+# )
+
+# install(
+#     name = "install",
+#     data_dest = "drivers-microphone/addition_data",
+#     library_dest = "drivers-microphone/lib",
+#     data = [
+#         ":runtime_data",
+#     ],
+#     targets = [
+#         ":libmicrophone_component.so",
+#     ],
+#     deps = [
+#         ":pb_hdrs",
+#         ":pb_drivers_microphone_py",
+#         ":install_package_data",
+#     ]
+# )
 
 filegroup(
     name = "runtime_data",
@@ -72,4 +123,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

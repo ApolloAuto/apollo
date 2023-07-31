@@ -30,20 +30,21 @@ def gen_report_header(car_type, protocol, output_dir):
     """
         doc string:
     """
-    report_header_tpl_file = "template/report_protocol.h.tpl"
+    report_header_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/report_protocol.h.tpl"
     FMT = get_tpl_fmt(report_header_tpl_file)
     report_header_file = output_dir + "%s.h" % protocol["name"]
     with open(report_header_file, 'w') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
         fmt_val["car_type_upper"] = car_type.upper()
+        fmt_val["car_type_capitalize"] = car_type.capitalize()
         fmt_val["protocol_name_upper"] = protocol["name"].upper()
         fmt_val["classname"] = protocol["name"].replace('_', '').capitalize()
         func_declare_list = []
         for var in protocol["vars"]:
             fmt = """
-  // config detail: %s
-  %s %s(const std::uint8_t* bytes, const int32_t length) const;"""
+    // config detail: %s
+    %s %s(const std::uint8_t* bytes, const int32_t length) const;"""
             returntype = var["type"]
             if var["type"] == "enum":
                 returntype = protocol["name"].capitalize(
@@ -58,12 +59,13 @@ def gen_report_cpp(car_type, protocol, output_dir):
     """
         doc string:
     """
-    report_cpp_tpl_file = "template/report_protocol.cc.tpl"
+    report_cpp_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/report_protocol.cc.tpl"
     FMT = get_tpl_fmt(report_cpp_tpl_file)
     report_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(report_cpp_file, 'w') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
+        fmt_val["car_type_capitalize"] = car_type.capitalize()
         fmt_val["protocol_name_lower"] = protocol["name"]
         classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
@@ -75,6 +77,7 @@ def gen_report_cpp(car_type, protocol, output_dir):
         set_var_to_protocol_list = []
         func_impl_list = []
         for var in protocol["vars"]:
+            # print ("var is ", var)
             var["name"] = var["name"].lower()
 
             returntype = var["type"]
@@ -94,9 +97,9 @@ def gen_report_cpp(car_type, protocol, output_dir):
             impl = impl + "}"
 
             func_impl_list.append(impl)
-            proto_set_fmt = "  chassis->mutable_%s()->mutable_%s()->set_%s(%s(bytes, length));"
+            proto_set_fmt = "  chassis->mutable_%s()->set_%s(%s(bytes, length));"
             func_name = var["name"]
-            proto_set = proto_set_fmt % (car_type, protocol["name"], var["name"],
+            proto_set = proto_set_fmt % (protocol["name"], var["name"],
                                          func_name)
             set_var_to_protocol_list.append(proto_set)
         fmt_val["set_var_to_protocol_list"] = "\n".join(
@@ -161,13 +164,14 @@ def gen_control_header(car_type, protocol, output_dir):
     """
         doc string:
     """
-    control_header_tpl_file = "template/control_protocol.h.tpl"
+    control_header_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/control_protocol.h.tpl"
     FMT = get_tpl_fmt(control_header_tpl_file)
     control_header_file = output_dir + "%s.h" % protocol["name"]
     with open(control_header_file, 'w') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["car_type_upper"] = car_type.upper()
+        fmt_val["car_type_cap"] = car_type.capitalize()
         fmt_val["protocol_name_upper"] = protocol["name"].upper()
         classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
@@ -365,7 +369,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
     """
         doc string:
     """
-    control_cpp_tpl_file = "template/control_protocol.cc.tpl"
+    control_cpp_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/control_protocol.cc.tpl"
     FMT = get_tpl_fmt(control_cpp_tpl_file)
     control_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(control_cpp_file, 'w') as fp:
@@ -425,11 +429,12 @@ def gen_build_file(car_type, work_dir):
     """
         doc string:
     """
-    build_tpl_file = "template/protocol_BUILD.tpl"
+    build_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/protocol_BUILD.tpl"
     fmt = get_tpl_fmt(build_tpl_file)
     with open(work_dir + "BUILD", "w") as build_fp:
         fmt_var = {}
         fmt_var["car_type"] = car_type.lower()
+        fmt_var["car_type_lower"] = car_type.lower()
         build_fp.write(fmt % fmt_var)
 
 
@@ -445,6 +450,8 @@ def gen_protocols(protocol_conf_file, protocol_dir):
         protocols = content["protocols"]
         car_type = content["car_type"]
         for p_name in protocols:
+            # print ("p_name is ", p_name)
+            # p_name is message id
             protocol = protocols[p_name]
 
             if protocol["protocol_type"] == "report":

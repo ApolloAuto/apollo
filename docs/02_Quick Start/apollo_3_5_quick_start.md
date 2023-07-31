@@ -18,13 +18,13 @@ The Apollo 3.5 Quick Start Guide focuses on new features available in Apollo
 
 For the vehicle's onboard testing make sure you have calibrated all the sensors.
 For sensor calibration, please refer to
-[Apollo 2.0 Sensor Calibration Guide](../10Hardware%20Integration%20and%20Calibration/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/apollo_2_0_sensor_calibration_guide.md)
+[Apollo 2.0 Sensor Calibration Guide](../11Hardware%20Integration%20and%20Calibration/%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A0%87%E5%AE%9A/apollo_2_0_sensor_calibration_guide.md)
 before you proceed.
 
 ## Hardware and Software Installation
 
 Please refer to
-[Apollo 3.5 Hardware and System Installation Guide](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
+[Apollo 3.5 Hardware and System Installation Guide](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E9%9B%86%E6%88%90/%E7%A1%AC%E4%BB%B6%E5%AE%89%E8%A3%85hardware%20installation/apollo_3_5_hardware_system_installation_guide.md)
 for the steps to install the hardware components and the system software, as
 well as
 [Apollo Software Installation Guide](../01_Installation%20Instructions/apollo_software_installation_guide.md).

@@ -1,4 +1,5 @@
 load("@com_github_grpc_grpc//bazel:generate_cc.bzl", "generate_cc")
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 
 def cc_so_proto_library(name,
                     srcs = [],
@@ -49,7 +50,12 @@ def cc_so_proto_library(name,
       visibility = ["//visibility:public"],
       **kwargs
   )
-  native.filegroup(
+  # native.filegroup(
+  #   name = export_hdr_target,
+  #   srcs = [":" + codegen_target],
+  # )
+
+  cc_proto_library(
     name = export_hdr_target,
-    srcs = [":" + codegen_target],
-)
+    deps = srcs,
+  )

@@ -2,11 +2,11 @@
 
 ### Note:
 
-1. Please refer to [Apply_BOS_Account](../../Apollo_Fuel/apply_bos_account_cn.md) for account setup before you can use the service.
+1. Please refer to [Apply_BOS_Account](../apply_bos_account_cn.md) for account setup before you can use the service.
 
 2. New service entrance point available at [Apollo Dreamland](http://bce.apollo.auto)
 
-3. Chinese version tailing for D-kit is available at [Vehicle_Calibration_Online_cn.md](../../D-kit/Waypoint_Following/vehicle_calibration_online_cn.md)
+3. Chinese version tailing for D-kit is available at [Vehicle_Calibration_Online_cn.md](https://github.com/ApolloAuto/apollo/tree/r7.0.0/docs/Apollo_Fuel/Vehicle_Calibration_Online)
 
 vehicle calibration system automatically generates calibration table for different vehicle models. It includes three parts: a frontend data collection monitor system, a data pipeline upload/download tool for uploading collected data and downloading generated calibration tables, and a visualization tool for performance evaluation.
 

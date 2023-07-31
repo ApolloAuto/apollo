@@ -1,19 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(
     default_visibility = ["//visibility:public"],
 )
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    targets = [
-        ":libstatus.so",
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "common/lib",
+#     targets = [
+#         ":libstatus.so",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_library(
     name = "status",
@@ -49,4 +50,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

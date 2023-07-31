@@ -7,16 +7,17 @@ import removeAllIcon from 'assets/images/routing/remove_all.png';
 import removeLastIcon from 'assets/images/routing/remove_last.png';
 import sendRouteIcon from 'assets/images/routing/send_request.png';
 import addPoiIcon from 'assets/images/routing/add_poi.png';
+import positionIcon from 'assets/images/menu/position.png';
 import inDefaultRoutingModeIcon from 'assets/images/routing/in_default_routing_mode.png';
 import exitDefaultRoutingModeIcon from 'assets/images/routing/exit_default_routing_mode.png';
 
 class RouteEditingButton extends React.Component {
   render() {
-    const { label, icon, onClick, disabled } = this.props;
+    const { label, icon, onClick, disabled, iconStyle } = this.props;
 
     return (
             <button onClick={onClick} className="button" disabled={disabled}>
-                <img src={icon} />
+                <img src={icon} style={iconStyle} />
                 <span>{label}</span>
             </button>
     );
@@ -74,6 +75,16 @@ export default class RouteEditingMenu extends React.Component {
                             routeEditingManager.removeAllRoutingPoints();
                           }
                           routeEditingManager.toggleDefaultRoutingMode();
+                        }}
+                    />
+                    <RouteEditingButton
+                        label="Set Position"
+                        icon={positionIcon}
+                        iconStyle={{ width: '24px', height: '24px' }}
+                        onClick={() => {
+                          if (routeEditingManager.setStartPoint()) {
+                            routeEditingManager.removeAllRoutingPoints();
+                          }
                         }}
                     />
                     <EditingTip />

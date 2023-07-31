@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -94,39 +95,39 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-wey/lib",
-    data_dest = "canbus-vehicle-wey",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-wey.BUILD",
-    ],
-    targets = [
-        ":libwey_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_wey",
-        ":pb_hdrs",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus-vehicle-wey/lib",
+#     data_dest = "canbus-vehicle-wey",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus-vehicle-wey.BUILD",
+#     ],
+#     targets = [
+#         ":libwey_vehicle_factory_lib.so",
+#     ],
+#     deps = [
+#         ":pb_wey",
+#         ":pb_hdrs",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-wey/include",
-    data = [
-        "//modules/canbus_vehicle/wey/proto:wey_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus-vehicle-wey/include",
+#     data = [
+#         "//modules/canbus_vehicle/wey/proto:wey_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_wey",
-    dest = "canbus-vehicle-wey",
-    files = [
-        "//modules/canbus_vehicle/wey/proto:wey_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_wey",
+#     dest = "canbus-vehicle-wey",
+#     files = [
+#         "//modules/canbus_vehicle/wey/proto:wey_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -135,26 +136,27 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_wey_src",
-        ":install_wey_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_wey_src",
+#         ":install_wey_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_wey_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-wey/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_wey_src",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-wey/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_wey_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-wey/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_wey_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-wey/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

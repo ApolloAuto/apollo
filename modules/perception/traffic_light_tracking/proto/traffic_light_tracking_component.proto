@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package apollo.perception.trafficlight;
+
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message TrackingParam {
+  optional perception.PluginParam plugin_param = 1;
+  optional string traffic_light_output_channel_name = 2;
+  optional string v2x_trafficlights_input_channel_name = 3;
+}

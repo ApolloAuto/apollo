@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,7 +8,7 @@ py_library(
     name = "distance_approach_python_interface",
     srcs = ["distance_approach_python_interface.py"],
     data = [
-        "//modules/planning/open_space/tools:distance_approach_problem_wrapper_lib.so",
+        "//modules/planning/planning_base/open_space/tools:distance_approach_problem_wrapper_lib.so",
     ],
 )
 
@@ -23,7 +24,7 @@ py_library(
     name = "hybrid_a_star_python_interface",
     srcs = ["hybrid_a_star_python_interface.py"],
     data = [
-        "//modules/planning/open_space/tools:hybrid_a_star_wrapper_lib.so",
+        "//modules/planning/planning_base/open_space/tools:hybrid_a_star_wrapper_lib.so",
     ],
 )
 
@@ -39,7 +40,7 @@ py_library(
     name = "open_space_roi_interface",
     srcs = ["open_space_roi_interface.py"],
     data = [
-        "//modules/planning/open_space/tools:open_space_roi_wrapper_lib.so",
+        "//modules/planning/planning_base/open_space/tools:open_space_roi_wrapper_lib.so",
     ],
 )
 
@@ -51,13 +52,15 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/open_space_visualization",
-    targets = [
-        ":open_space_roi_interface",
-        ":hybrid_a_star_python_interface",
-        ":distance_approach_python_interface",
-        ":distance_approach_visualizer",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/open_space_visualization",
+#     targets = [
+#         ":open_space_roi_interface",
+#         ":hybrid_a_star_python_interface",
+#         ":distance_approach_python_interface",
+#         ":distance_approach_visualizer",
+#     ]
+# )
+
+apollo_package()

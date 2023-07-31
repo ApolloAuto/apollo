@@ -14,6 +14,7 @@ message AgentConfig {
     PEDESTRIAN = 2;
     UNKNOWN_UNMOVABLE = 3;
     UNKNOWN_MOVABLE = 4;
+    BIG_TRUCK = 5;
   }
   optional Type type = 6;
 

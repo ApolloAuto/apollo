@@ -79,8 +79,9 @@ int BinarySearchCheckValidSIndex(const std::vector<T>& sorted_vec, int index,
   }
   double start_s = sorted_vec[index].StartS();
   double end_s = sorted_vec[index].EndS();
-
-  if (start_s <= value_s && end_s >= value_s) {
+  static const double distance_error = 0.02;
+  if (start_s <= value_s + distance_error &&
+      end_s >= value_s - distance_error) {
     return index;
   }
   return -1;

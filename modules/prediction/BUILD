@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -7,11 +8,11 @@ package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
 
-install(
-    name = "prediction_testdata_install",
-    data_dest = "prediction/addition_data",
-    data = [":prediction_testdata"],
-)
+# install(
+#     name = "prediction_testdata_install",
+#     data_dest = "prediction/addition_data",
+#     data = [":prediction_testdata"],
+# )
 
 cc_library(
     name = "prediction_component_lib",
@@ -59,62 +60,62 @@ cc_binary(
     deps = [":prediction_component_lib"],
 )
 
-install(
-    name = "install",
-    library_dest = "prediction/lib",
-    data_dest = "prediction",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":prediction.BUILD",
-    ],
-    targets = [
-        ":libprediction_component.so",
-    ],
-    deps = [
-        ":pb_hdrs",
-        "//modules/prediction/pipeline:install",
-        "//modules/prediction/common:install",
-        "//modules/prediction/submodules:install",
-        ":prediction_testdata_install",
-        "//modules/prediction/proto:py_pb_prediction", 
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "prediction/lib",
+#     data_dest = "prediction",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":prediction.BUILD",
+#     ],
+#     targets = [
+#         ":libprediction_component.so",
+#     ],
+#     deps = [
+#         ":pb_hdrs",
+#         "//modules/prediction/pipeline:install",
+#         "//modules/prediction/common:install",
+#         "//modules/prediction/submodules:install",
+#         ":prediction_testdata_install",
+#         "//modules/prediction/proto:py_pb_prediction", 
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "prediction/include",
-    data = [
-        "//modules/prediction/proto:fnn_model_base_cc_proto",
-        "//modules/prediction/proto:fnn_vehicle_model_cc_proto",
-        "//modules/prediction/proto:network_layers_cc_proto",
-        "//modules/prediction/proto:network_model_cc_proto",
-        "//modules/prediction/proto:offline_features_cc_proto",
-        "//modules/prediction/proto:prediction_conf_cc_proto",
-        "//modules/prediction/proto:vector_net_cc_proto",
-    ],
-)
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_prediction_src",
-        ":install_prediction_hdrs"
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "prediction/include",
+#     data = [
+#         "//modules/prediction/proto:fnn_model_base_cc_proto",
+#         "//modules/prediction/proto:fnn_vehicle_model_cc_proto",
+#         "//modules/prediction/proto:network_layers_cc_proto",
+#         "//modules/prediction/proto:network_model_cc_proto",
+#         "//modules/prediction/proto:offline_features_cc_proto",
+#         "//modules/prediction/proto:prediction_conf_cc_proto",
+#         "//modules/prediction/proto:vector_net_cc_proto",
+#     ],
+# )
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_prediction_src",
+#         ":install_prediction_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_prediction_src",
-    src_dir = ["."],
-    dest = "prediction/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_prediction_src",
+#     src_dir = ["."],
+#     dest = "prediction/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_prediction_hdrs",
-    src_dir = ["."],
-    dest = "prediction/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_prediction_hdrs",
+#     src_dir = ["."],
+#     dest = "prediction/include",
+#     filter = "*.h",
+# )
 
 filegroup(
     name = "runtime_data",
@@ -148,4 +149,5 @@ filegroup(
     srcs = glob(["testdata/**"]),
 )
 
+apollo_package()
 cpplint()

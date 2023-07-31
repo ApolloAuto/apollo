@@ -1,16 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "v2x/bin",
-    targets = [
-        ":v2x",
-    ]
-)
+# install(
+#     name = "install",
+#     runtime_dest = "v2x/bin",
+#     targets = [
+#         ":v2x",
+#     ]
+# )
 
 cc_library(
     name = "utils",
@@ -75,4 +76,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

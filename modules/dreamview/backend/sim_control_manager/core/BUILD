@@ -1,5 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -46,6 +47,8 @@ cc_library(
         "//modules/dreamview/backend/sim_control_manager/common:sim_control_util",
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_base",
         "//modules/dreamview/backend/sim_control_manager/dynamic_model/perfect_control:sim_perfect_control",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_command_cc_proto",
     ],
     alwayslink = True,
 )
@@ -65,7 +68,10 @@ cc_library(
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_base",
         "//modules/dreamview/backend/sim_control_manager/core:sim_control_with_model_base",
         "//modules/dreamview/backend/sim_control_manager/proto:dynamic_model_conf_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_command_cc_proto",
     ],
 )
 
+apollo_package()
 cpplint()

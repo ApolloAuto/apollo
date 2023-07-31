@@ -1,28 +1,29 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    py_dest = "tools/rosbag",
-    targets = [
-        ":audio_event_record",
-        ":body_sensation_evaluation",
-        ":channel_size_stats",
-        ":drive_event",
-        ":dump_gpsbin",
-        ":dump_planning",
-        ":dump_record",
-        ":dump_road_test_log",
-        ":extract_trajectory",
-        ":sample_pnc_topics",
-        ":stat_mileage",
-        ":stat_static_info",
-        ":tf_stats",
-        ":transcribe",
-    ],
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/rosbag",
+#     targets = [
+#         ":audio_event_record",
+#         ":body_sensation_evaluation",
+#         ":channel_size_stats",
+#         ":drive_event",
+#         ":dump_gpsbin",
+#         ":dump_planning",
+#         ":dump_record",
+#         ":dump_road_test_log",
+#         ":extract_trajectory",
+#         ":sample_pnc_topics",
+#         ":stat_mileage",
+#         ":stat_static_info",
+#         ":tf_stats",
+#         ":transcribe",
+#     ],
+# )
 
 py_binary(
     name = "audio_event_record",
@@ -68,8 +69,8 @@ py_binary(
 )
 
 py_binary(
-    name = "dump_gpsbin",
-    srcs = ["dump_gpsbin.py"],
+    name = "ros_dump_gpsbin",
+    srcs = ["ros_dump_gpsbin.py"],
     deps = [
         "//cyber/python/cyber_py3:cyber",
         "//cyber/python/cyber_py3:record",
@@ -166,3 +167,5 @@ py_binary(
         "//modules/tools/common:proto_utils",
     ],
 )
+
+apollo_package()

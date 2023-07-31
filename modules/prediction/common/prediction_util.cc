@@ -280,6 +280,11 @@ void GenerateFreeMoveTrajectoryPoints(
     }
 
     // update state
+    if (!FLAGS_free_move_predict_with_accelerate) {
+      acc_x = 0.0;
+      acc_y = 0.0;
+    }
+
     (*state)(2, 0) = v_x;
     (*state)(3, 0) = v_y;
     (*state)(4, 0) = acc_x;

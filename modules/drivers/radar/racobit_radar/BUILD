@@ -1,20 +1,41 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install", "install_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    data_dest = "drivers/addition_data/racobit_radar",
-    library_dest = "drivers/lib/racobit_radar",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        ":libracobit_radar_canbus_component.so",
-    ],
-)
+# install(
+#     name = "install",
+#     data_dest = "drivers-radar/addition_data/racobit_radar",
+#     library_dest = "drivers-radar/lib/racobit_radar",
+#     data = [
+#         ":runtime_data",
+#     ],
+#     targets = [
+#         ":libracobit_radar_canbus_component.so",
+#     ],
+#     deps = [
+#         "pb_hdrs",
+#         "pb_drivers_radar_py", 
+#     ]
+# )
+
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "drivers-radar/include",
+#     data = [
+#         "//modules/drivers/radar/racobit_radar/proto:racobit_radar_conf_cc_proto",
+#     ],
+# )
+
+# install_files(
+#     name = "pb_drivers_radar_py",
+#     dest = "drivers-radar/python/modules/drivers/radar",
+#     files = [
+#         "//modules/drivers/radar/racobit_radar/proto:racobit_radar_conf_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -79,4 +100,5 @@ cc_binary(
     deps = [":racobit_radar_canbus_lib"],
 )
 
+apollo_package()
 cpplint()

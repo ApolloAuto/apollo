@@ -1,0 +1,14 @@
+path_optimizer_config {
+  l_weight: 1.0
+  dl_weight: 20.0
+  ddl_weight: 1000.0
+  dddl_weight: 50000.0
+  lateral_derivative_bound_default: 2.0
+}
+pull_over_destination_to_adc_buffer: 25.0
+pull_over_destination_to_pathend_buffer: 4.0
+pull_over_road_edge_buffer: 0.15
+pull_over_approach_lon_distance_adjust_factor: 1.6
+pull_over_weight: 10
+pull_over_direction: RIGHT_SIDE
+pull_over_position: DESTINATION

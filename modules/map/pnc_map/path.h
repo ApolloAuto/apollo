@@ -24,9 +24,9 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/map/hdmap/hdmap.h"
 
 namespace apollo {
 namespace hdmap {
@@ -256,6 +256,10 @@ class Path {
                                         double* min_distance) const;
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral) const;
+
+  bool GetProjectionWithWarmStartS(const common::math::Vec2d& point,
+                                   double* accumulate_s, double* lateral) const;
+
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral, double* distance) const;
 
@@ -380,6 +384,17 @@ class Path {
   std::vector<PathOverlap> pnc_junction_overlaps_;
   std::vector<PathOverlap> clear_area_overlaps_;
   std::vector<PathOverlap> speed_bump_overlaps_;
+
+ private:
+  /**
+   * @brief Find the segment index nearest to target_s.
+   * @param left_index The start index to search.
+   * @param right_index The end index to search.
+   * @param target_s The target s.
+   * @param mid_index Output result.
+   */
+  void FindIndex(int left_index, int right_index, double target_s,
+                 int* mid_index) const;
 };
 
 }  // namespace hdmap

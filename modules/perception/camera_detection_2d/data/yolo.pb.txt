@@ -1,0 +1,142 @@
+info {
+  name: "3d-r4-half_caffe"
+  version: "2019-06-27"
+  dataset: "KITTI"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: TensorRT
+
+  proto_file {
+    file: "deploy.pt"
+  }
+  weight_file {
+    file: "deploy.model"
+  }
+  anchors_file {
+    file: "anchors.txt"
+  }
+  types_file {
+    file: "types.txt"
+  }
+  expand_file {
+    file: "expand.txt"
+  }
+  calibration_file {
+    file: "CalibrationTable"
+  }
+  inputs {
+    name: "data"
+  }
+  outputs {
+    name: "loc_pred"
+  }
+  outputs {
+    name: "obj_pred"
+  }
+  outputs {
+    name: "cls_pred"
+  }
+  outputs {
+    name: "ori_pred"
+  }
+  outputs {
+    name: "dim_pred"
+  }
+  outputs {
+    name: "conv3_3"
+  }
+  outputs {
+    name: "detect1_ori_conf_pred"
+  }
+  outputs {
+    name: "detect2_loc_pred"
+  }
+  outputs {
+    name: "detect2_obj_pred"
+  }
+  outputs {
+    name: "detect2_cls_pred"
+  }
+  outputs {
+    name: "detect2_ori_conf_pred"
+  }
+  outputs {
+    name: "detect2_ori_pred"
+  }
+  outputs {
+    name: "detect2_dim_pred"
+  }
+  outputs {
+    name: "detect3_loc_pred"
+  }
+  outputs {
+    name: "detect3_obj_pred"
+  }
+  outputs {
+    name: "detect3_cls_pred"
+  }
+  outputs {
+    name: "detect3_ori_conf_pred"
+  }
+  outputs {
+    name: "detect3_ori_pred"
+  }
+  outputs {
+    name: "detect3_dim_pred"
+  }
+  outputs {
+    name: "lof_pred"
+  }
+  outputs {
+    name: "lor_pred"
+  }
+  outputs {
+    name: "brvis_pred"
+  }
+  outputs {
+    name: "brswt_pred"
+  }
+  outputs {
+    name: "ltvis_pred"
+  }
+  outputs {
+    name: "ltswt_pred"
+  }
+  outputs {
+    name: "rtvis_pred"
+  }
+  outputs {
+    name: "rtswt_pred"
+  }
+  outputs {
+    name: "area_id_pred"
+  }
+  outputs {
+    name: "vis_pred"
+  }
+  outputs {
+    name: "cut_pred"
+  }
+}
+offset_ratio: 0.288889
+cropped_ratio: 0.711111
+resized_width: 1440
+aligned_pixel: 32
+confidence_threshold: 0.4
+light_vis_conf_threshold: 0
+light_swt_conf_threshold: 0
+min_dims {
+  min_2d_height: 10
+  min_3d_height: 0.1
+}
+ori_cycle: 2
+with_box3d: true
+with_lights: true
+with_ratios: false
+border_ratio: 0.01
+nms_param {
+  type: "NormalNMS"
+  threshold: 0.5
+  sigma: 0.4
+  inter_cls_nms_thresh: 0.6
+}

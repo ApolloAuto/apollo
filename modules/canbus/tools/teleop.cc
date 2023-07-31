@@ -21,14 +21,14 @@
 #include <memory>
 #include <thread>
 
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/message_util.h"
@@ -88,16 +88,16 @@ const uint32_t KEYCODE_SETL1 = 0x4C;  // 'L'
 const uint32_t KEYCODE_SETL2 = 0x6C;  // 'l'
 
 // change action
-const uint32_t KEYCODE_MODE1 = 0x4D;   // 'M'
-const uint32_t KEYCODE_MODE2 = 0x6D;   // 'm'
+const uint32_t KEYCODE_MODE1 = 0x4D;  // 'M'
+const uint32_t KEYCODE_MODE2 = 0x6D;  // 'm'
 
 // emergency stop
 const uint32_t KEYCODE_ESTOP1 = 0x45;  // 'E'
 const uint32_t KEYCODE_ESTOP2 = 0x65;  // 'e'
 
 // help
-const uint32_t KEYCODE_HELP1 = 0x48;   // 'H'
-const uint32_t KEYCODE_HELP2 = 0x68;   // 'h'
+const uint32_t KEYCODE_HELP1 = 0x48;  // 'H'
+const uint32_t KEYCODE_HELP2 = 0x68;  // 'h'
 
 class Teleop {
  public:
@@ -123,10 +123,8 @@ class Teleop {
     printf("                     5 GEAR_INVALID\n");
     printf("                     6 GEAR_NONE\n");
     printf("\n-----------------------------------------------------------\n");
-    printf("Throttle/Speed up:  [%c]     |  \n",
-           KEYCODE_UP1);
-    printf("Brake/Speed down:   [%c]     |  \n",
-           KEYCODE_DN1);
+    printf("Throttle/Speed up:  [%c]     |  \n", KEYCODE_UP1);
+    printf("Brake/Speed down:   [%c]     |  \n", KEYCODE_DN1);
     printf("Steer LEFT:         [%c]     |  Steer RIGHT:        [%c]\n",
            KEYCODE_LF1, KEYCODE_RT1);
     printf("Parking Brake:      [%c]     |  Emergency Stop      [%c]\n",

@@ -1,16 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    library_dest = "drivers/lib",
-    targets = [
-      ":libcanbus_common.so",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "drivers/lib",
+#     targets = [
+#       ":libcanbus_common.so",
+#     ],
+# )
 
 cc_binary(
     name = "libcanbus_common.so",
@@ -49,4 +50,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

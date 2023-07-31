@@ -18,21 +18,22 @@
   <depend so_names="ncurses" repo_name="ncurses5">libncurses5-dev</depend>
   <depend so_names="uuid" repo_name="uuid">libuuid1</depend>
 
-  <depend expose="False">3rd-rules-python-dev</depend>
-  <depend expose="False">3rd-grpc-dev</depend>
-  <depend expose="False">3rd-rules-proto-dev</depend>
-  <depend expose="False">3rd-py-dev</depend>
-  <depend expose="False">3rd-gpus-dev</depend>
-  <depend expose="False">3rd-bazel-skylib-dev</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
 
-  <depend repo_name="com_google_protobuf" lib_names="protobuf">3rd-protobuf-dev</depend>
-  <depend repo_name="fastrtps">3rd-fastrtps-dev</depend>
-  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog-dev</depend>
-  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
-  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
-  <depend expose="False">3rd-cpplint-dev</depend>
-  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
-  <depend repo_name="com_github_nlohmann_json" lib_names="single_json,json">3rd-nlohmann-json-dev</depend>
-  <depend>bazel-extend-tools-dev</depend>
+  <depend repo_name="com_google_protobuf" lib_names="protobuf">3rd-protobuf</depend>
+  <depend repo_name="fastrtps">3rd-fastrtps</depend>
+  <depend repo_name="com_github_google_glog" lib_names="glog">3rd-glog</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend expose="False">3rd-cpplint</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="com_github_nlohmann_json" lib_names="single_json,json">3rd-nlohmann-json</depend>
+  <depend repo_name="tinyxml2" lib_names="tinyxml2">libtinyxml2-dev</depend>
+  <depend>bazel-extend-tools</depend>
 
 </package>

@@ -32,9 +32,8 @@ using apollo::common::math::QuaternionToHeading;
 using apollo::common::util::FillHeader;
 using apollo::control::ControlCommand;
 using apollo::localization::LocalizationEstimate;
+using apollo::planning::PlanningCommand;
 using apollo::prediction::PredictionObstacles;
-using apollo::routing::RoutingRequest;
-using apollo::routing::RoutingResponse;
 using apollo::sim_control::SimCarStatus;
 using Json = nlohmann::json;
 
@@ -62,28 +61,17 @@ void SimControlWithModelBase::InitTimerAndIO() {
       [this](const std::shared_ptr<PredictionObstacles>& obstacles) {
         this->OnPredictionObstacles(obstacles);
       });
+  planning_command_reader_ = node_->CreateReader<PlanningCommand>(
+      FLAGS_planning_command,
+      [this](const std::shared_ptr<PlanningCommand>& planning_command) {
+        this->OnPlanningCommand(planning_command);
+      });
   control_command_reader_ = node_->CreateReader<ControlCommand>(
       control_cmd_reader_config,
       [this](const std::shared_ptr<ControlCommand>& cmd) {
         ADEBUG << "Received control data: run canbus callback.";
         OnControlCommand(*cmd);
       });
-  // Setup routing callback.
-  cyber::ReaderConfig routing_reader_config;
-  routing_reader_config.channel_name = FLAGS_routing_response_topic;
-  routing_reader_config.pending_queue_size = FLAGS_reader_pending_queue_size;
-  routing_reader_ = node_->CreateReader<RoutingResponse>(
-      routing_reader_config,
-      [this](const std::shared_ptr<RoutingResponse>& cmd) {
-        ADEBUG << "Received routing data: run canbus callback.";
-        OnRoutingResponse(*cmd);
-      });
-  routing_request_reader_ = node_->CreateReader<RoutingRequest>(
-      FLAGS_routing_request_topic,
-      [this](const std::shared_ptr<RoutingRequest>& routing_request) {
-        this->OnRoutingRequest(routing_request);
-      });
-
   // Setup localization callback.
   cyber::ReaderConfig localization_reader_config;
   localization_reader_config.channel_name = FLAGS_localization_topic;
@@ -163,6 +151,19 @@ void SimControlWithModelBase::Start(double x, double y) {
   }
 }
 
+void SimControlWithModelBase::ReSetPoinstion(double x, double y,
+                                             double heading) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  SimCarStatus point;
+  point.set_x(x);
+  point.set_y(y);
+  // z use default 0
+  point.set_z(0);
+  point.set_theta(heading);
+  SetStartPoint(point);
+  InternalReset();
+}
+
 void SimControlWithModelBase::Stop() {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -194,94 +195,34 @@ void SimControlWithModelBase::OnControlCommand(
   control_cmd_ = control_cmd;
 }
 
-void SimControlWithModelBase::OnRoutingResponse(
-    const RoutingResponse& routing) {
+void SimControlWithModelBase::OnPlanningCommand(
+    const std::shared_ptr<PlanningCommand>& planning_command) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!enabled_) {
     return;
   }
+  current_routing_header_ = planning_command->header();
+  AINFO << "planning_command: " << planning_command->DebugString();
 
-  CHECK_GE(routing.routing_request().waypoint_size(), 2)
-      << "routing should have at least two waypoints";
-
-  current_routing_header_ = routing.header();
-  // If this is from a planning re-routing request, or the start point has been
-  // initialized by an actual localization pose, don't reset the start point.
-  // re_routing_triggered_ =
-  //     routing.routing_request().header().module_name() == "planning";
-  // if (!re_routing_triggered_ && !start_point_from_localization_) {
-  //   CHECK_GE(routing.routing_request().waypoint_size(), 2)
-  //       << "routing should have at least two waypoints";
-  //   current_routing_header_ = routing.header();
-  //   const auto& start_pose = routing.routing_request().waypoint(0).pose();
-  //   SimCarStatus point;
-  //   point.set_x(start_pose.x());
-  //   point.set_y(start_pose.y());
-  //   point.set_acceleration_s(start_acceleration_);
-  //   point.set_speed(start_velocity_);
-  //   // Use configured heading if available, otherwise find heading based on
-  //   // first lane in routing response
-  //   double theta = 0.0;
-  //   if (start_heading_ < std::numeric_limits<double>::max()) {
-  //     theta = start_heading_;
-  //   } else if (routing.road_size() > 0) {
-  //     auto start_lane = routing.road(0).passage(0).segment(0);
-  //     theta =
-  //         map_service_->GetLaneHeading(start_lane.id(),
-  //         start_lane.start_s());
-  //   }
-  //   point.set_theta(theta);
-  //   SetStartPoint(point);
-  // }
-}
-
-void SimControlWithModelBase::OnRoutingRequest(
-    const std::shared_ptr<RoutingRequest>& routing_request) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (!enabled_) {
-    return;
-  }
-
-  CHECK_GE(routing_request->waypoint_size(), 2)
-      << "routing should have at least two waypoints";
-  const auto& start_pose = routing_request->waypoint(0).pose();
-
-  SimCarStatus point;
-  point.set_x(start_pose.x());
-  point.set_y(start_pose.y());
-  point.set_acceleration_s(start_acceleration_);
-  point.set_speed(start_velocity_);
-  // Use configured heading if available, otherwise find heading based on
-  // first lane in routing response
-  double theta = 0.0;
-  double s = 0.0;
-  const auto& start_way_point = routing_request->waypoint().Get(0);
-  // If the lane id has been set, set theta as the lane heading.
-  if (start_way_point.has_id()) {
-    auto& hdmap = hdmap::HDMapUtil::BaseMap();
-    hdmap::Id lane_id = hdmap::MakeMapId(start_way_point.id());
-    auto lane = hdmap.GetLaneById(lane_id);
-    if (nullptr != lane) {
-      theta = lane->Heading(start_way_point.s());
-    } else {
-      map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
-                                            &theta, &s);
-    }
-  } else {
+  if (planning_command->lane_follow_command()
+          .routing_request()
+          .is_start_pose_set()) {
+    auto lane_follow_command = planning_command->mutable_lane_follow_command();
+    const auto& start_pose =
+        lane_follow_command->routing_request().waypoint(0).pose();
+    SimCarStatus point;
+    point.set_x(start_pose.x());
+    point.set_y(start_pose.y());
+    point.set_acceleration_s(start_acceleration_);
+    point.set_speed(start_velocity_);
+    double theta = 0.0;
+    double s = 0.0;
     // Find the lane nearest to the start pose and get its heading as theta.
     map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
                                           &theta, &s);
+    point.set_theta(theta);
+    SetStartPoint(point);
   }
-  point.set_theta(theta);
-  // if (start_heading_ < std::numeric_limits<double>::max()) {
-  //   theta = start_heading_;
-  // } else if (routing_request.road_size() > 0) {
-  //   auto start_lane = routing_request.road(0).passage(0).segment(0);
-  //   theta = map_service_->GetLaneHeading(start_lane.id(),
-  //   start_lane.start_s());
-  // }
-  // point.set_theta(theta);
-  SetStartPoint(point);
 }
 
 void SimControlWithModelBase::SetStartPoint(const SimCarStatus& point) {
@@ -297,10 +238,10 @@ void SimControlWithModelBase::InitStartPoint(nlohmann::json start_point_attr,
   start_heading_ = start_point_attr["start_heading"];
   SimCarStatus point;
   localization_reader_->Observe();
+  start_point_from_localization_ = false;
   if (use_start_point_position) {
     // add start point position for dynamic model
     // new add feature to keep same with simcontrol
-    start_point_from_localization_ = false;
     point.set_x(start_point_attr["x"]);
     point.set_y(start_point_attr["y"]);
     // z use default 0
@@ -313,36 +254,54 @@ void SimControlWithModelBase::InitStartPoint(nlohmann::json start_point_attr,
     point.set_speed(start_velocity_);
     point.set_acceleration_s(start_acceleration_);
   } else {
-    if (localization_reader_->Empty()) {
-      // Routing will provide all other pose info
-      start_point_from_localization_ = false;
+    if (!localization_reader_->Empty()) {
+      const auto& pose = localization_reader_->GetLatestObserved()->pose();
+      auto x = pose.position().x();
+      auto y = pose.position().y();
+      auto z = pose.position().z();
+      if (map_service_->PointIsValid(x, y)) {
+        point.set_x(x);
+        point.set_y(y);
+        point.set_z(z);
+        point.set_theta(pose.heading());
+        point.set_speed(
+            std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
+        // Calculates the dot product of acceleration and velocity. The sign
+        // of this projection indicates whether this is acceleration or
+        // deceleration.
+        double projection =
+            pose.linear_acceleration().x() * pose.linear_velocity().x() +
+            pose.linear_acceleration().y() * pose.linear_velocity().y();
+
+        // Calculates the magnitude of the acceleration. Negate the value if
+        // it is indeed a deceleration.
+        double magnitude = std::hypot(pose.linear_acceleration().x(),
+                                      pose.linear_acceleration().y());
+        point.set_acceleration_s(std::signbit(projection) ? -magnitude
+                                                          : magnitude);
+        // Set init gear to neutral position
+        point.set_gear_position(0);
+        start_point_from_localization_ = true;
+      }
+    }
+    if (!start_point_from_localization_) {
+      apollo::common::PointENU start_point;
+      if (!map_service_->GetStartPoint(&start_point)) {
+        AWARN << "Failed to get a dummy start point from map!";
+        return;
+      }
+      point.set_x(start_point.x());
+      point.set_y(start_point.y());
+      point.set_z(start_point.z());
+      double theta = 0.0;
+      double s = 0.0;
+      map_service_->GetPoseWithRegardToLane(start_point.x(), start_point.y(),
+                                            &theta, &s);
+      point.set_theta(theta);
       point.set_speed(start_velocity_);
       point.set_acceleration_s(start_acceleration_);
-    } else {
-      start_point_from_localization_ = true;
-      const auto& pose = localization_reader_->GetLatestObserved()->pose();
-
-      point.set_x(pose.position().x());
-      point.set_y(pose.position().y());
-      point.set_z(pose.position().z());
-      point.set_theta(pose.heading());
-      point.set_speed(
-          std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
-      // Calculates the dot product of acceleration and velocity. The sign
-      // of this projection indicates whether this is acceleration or
-      // deceleration.
-      double projection =
-          pose.linear_acceleration().x() * pose.linear_velocity().x() +
-          pose.linear_acceleration().y() * pose.linear_velocity().y();
-
-      // Calculates the magnitude of the acceleration. Negate the value if
-      // it is indeed a deceleration.
-      double magnitude = std::hypot(pose.linear_acceleration().x(),
-                                    pose.linear_acceleration().y());
-      point.set_acceleration_s(std::signbit(projection) ? -magnitude
-                                                        : magnitude);
-      // Set init gear to neutral position
-      point.set_gear_position(0);
+      AINFO << "start point from map default point"
+            << " x: " << start_point.x() << " y: " << start_point.y();
     }
   }
   SetStartPoint(point);

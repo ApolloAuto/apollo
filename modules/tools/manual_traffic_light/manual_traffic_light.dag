@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-  module_library : "/apollo/bazel-bin/modules/tools/manual_traffic_light/libmanual_traffic_light_component.so"
+  module_library : "modules/tools/manual_traffic_light/libmanual_traffic_light_component.so"
   timer_components {
     class_name : "ManualTrafficLight"
     config {

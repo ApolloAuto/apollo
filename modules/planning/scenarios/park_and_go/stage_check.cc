@@ -16,43 +16,47 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
+#include "cyber/common/log.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/scenarios/park_and_go/context.h"
+#include "modules/planning/scenarios/park_and_go/util.h"
+
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus ParkAndGoStageCheck::Process(
+StageResult ParkAndGoStageCheck::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Check";
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(context_);
 
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
   ADCInitStatus();
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
-  bool plan_ok = ExecuteTaskOnOpenSpace(frame);
-  if (!plan_ok) {
+  StageResult result = ExecuteTaskOnOpenSpace(frame);
+  if (result.HasError()) {
     AERROR << "ParkAndGoStageAdjust planning error";
-    return StageStatus::ERROR;
+    return result.SetStageStatus(StageStatusType::ERROR);
   }
 
-  bool ready_to_cruise = scenario::util::CheckADCReadyToCruise(
-      injector_->vehicle_state(), frame, scenario_config_);
+  bool ready_to_cruise =
+      CheckADCReadyToCruise(injector_->vehicle_state(), frame,
+                            GetContextAs<ParkAndGoContext>()->scenario_config);
   return FinishStage(ready_to_cruise);
 }
 
-Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
+StageResult ParkAndGoStageCheck::FinishStage(const bool success) {
   if (success) {
-    next_stage_ = StageType::PARK_AND_GO_CRUISE;
+    next_stage_ = "PARK_AND_GO_CRUISE";
   } else {
-    next_stage_ = StageType::PARK_AND_GO_ADJUST;
+    next_stage_ = "PARK_AND_GO_ADJUST";
   }
   injector_->planning_context()
       ->mutable_planning_status()
       ->mutable_park_and_go()
       ->set_in_check_stage(false);
-  return Stage::FINISHED;
+  return StageResult(StageStatusType::FINISHED);
 }
 
 void ParkAndGoStageCheck::ADCInitStatus() {
@@ -70,7 +74,5 @@ void ParkAndGoStageCheck::ADCInitStatus() {
   park_and_go_status->set_in_check_stage(true);
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

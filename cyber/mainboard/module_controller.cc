@@ -21,6 +21,7 @@
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/component/component_base.h"
+#include "cyber/plugin_manager/plugin_manager.h"
 
 namespace apollo {
 namespace cyber {
@@ -39,21 +40,22 @@ bool ModuleController::LoadAll() {
   const std::string current_path = common::GetCurrentPath();
   const std::string dag_root_path = common::GetAbsolutePath(work_root, "dag");
   std::vector<std::string> paths;
+  if (!args_.GetDisablePluginsAutoLoad()) {
+    apollo::cyber::plugin_manager::PluginManager::Instance()
+        ->LoadInstalledPlugins();
+  }
+  for (auto& plugin_description : args_.GetPluginDescriptionList()) {
+    apollo::cyber::plugin_manager::PluginManager::Instance()->LoadPlugin(
+        plugin_description);
+  }
   for (auto& dag_conf : args_.GetDAGConfList()) {
-    std::string module_path = "";
-    if (dag_conf == common::GetFileName(dag_conf)) {
-      // case dag conf argument var is a filename
-      module_path = common::GetAbsolutePath(dag_root_path, dag_conf);
-    } else if (dag_conf[0] == '/') {
-      // case dag conf argument var is an absolute path
-      module_path = dag_conf;
-    } else {
-      // case dag conf argument var is a relative path
-      module_path = common::GetAbsolutePath(current_path, dag_conf);
-      if (!common::PathExists(module_path)) {
-        module_path = common::GetAbsolutePath(work_root, dag_conf);
-      }
+    std::string module_path = dag_conf;
+    if (!common::GetFilePathWithEnv(dag_conf, "APOLLO_DAG_PATH",
+                                    &module_path)) {
+      AERROR << "no dag conf [" << dag_conf << "] found!";
+      return false;
     }
+    AINFO << "mainboard: use dag conf " << module_path;
     total_component_nums += GetComponentNum(module_path);
     paths.emplace_back(std::move(module_path));
   }
@@ -72,21 +74,15 @@ bool ModuleController::LoadAll() {
 }
 
 bool ModuleController::LoadModule(const DagConfig& dag_config) {
-  const std::string work_root = common::WorkRoot();
-
   for (auto module_config : dag_config.module_config()) {
     std::string load_path;
-    if (module_config.module_library().front() == '/') {
-      load_path = module_config.module_library();
-    } else {
-      load_path =
-          common::GetAbsolutePath(work_root, module_config.module_library());
-    }
-
-    if (!common::PathExists(load_path)) {
-      AERROR << "Path does not exist: " << load_path;
+    if (!common::GetFilePathWithEnv(module_config.module_library(),
+                                    "APOLLO_LIB_PATH", &load_path)) {
+      AERROR << "no module library [" << module_config.module_library()
+             << "] found!";
       return false;
     }
+    AINFO << "mainboard: use module library " << load_path;
 
     class_loader_manager_.LoadLibrary(load_path);
 

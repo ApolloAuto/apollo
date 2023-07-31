@@ -99,3 +99,11 @@ DECLARE_string(resource_record_path);
 DECLARE_string(cyber_recorder_stop_command);
 
 DECLARE_string(vehicles_config_path);
+
+DECLARE_bool(vehicle_changed_use_copy_mode);
+
+DECLARE_string(lane_follow_command_topic);
+
+DECLARE_string(valet_parking_command_topic);
+
+DECLARE_string(action_command_topic);

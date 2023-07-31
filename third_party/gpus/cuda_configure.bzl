@@ -394,6 +394,13 @@ def _find_libs(repository_ctx, check_cuda_libs_script, cuda_config):
             version = None,
             static = False,
         ),
+        "nvidia_ml": _check_cuda_lib_params(
+            "nvidia-ml",
+            cpu_value,
+            cuda_config.config["cuda_library_dir"] + stub_dir,
+            version = None,
+            static = False,
+        ),
         "cudart": _check_cuda_lib_params(
             "cudart",
             cpu_value,
@@ -642,6 +649,7 @@ def _create_dummy_repository(repository_ctx):
         "cuda:BUILD",
         {
             "%{cuda_driver_lib}": lib_name("cuda", cpu_value),
+            "%{nvidia_ml_lib}": lib_name("nvidia-ml", cpu_value),
             "%{cudart_static_lib}": lib_name(
                 "cudart_static",
                 cpu_value,
@@ -1013,6 +1021,7 @@ def _create_local_cuda_repository(repository_ctx):
         tpl_paths["cuda:BUILD"],
         {
             "%{cuda_driver_lib}": _basename(repository_ctx, cuda_libs["cuda"]),
+            "%{nvidia_ml_lib}": _basename(repository_ctx, cuda_libs["nvidia_ml"]),
             "%{cudart_static_lib}": _basename(repository_ctx, cuda_libs["cudart_static"]),
             "%{cudart_static_linkopt}": _cudart_static_linkopt(cuda_config.cpu_value),
             "%{cudart_lib}": _basename(repository_ctx, cuda_libs["cudart"]),

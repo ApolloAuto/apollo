@@ -1,30 +1,31 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    data_dest = "common",
-    runtime_dest = "common/bin",
-    targets = [
-        ":libutil_tool.so",
-        ":libapolloutil.so",
-    ],
-    deps = [":util_testdata"],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "common/lib",
+#     data_dest = "common",
+#     runtime_dest = "common/bin",
+#     targets = [
+#         ":libutil_tool.so",
+#         ":libapolloutil.so",
+#     ],
+#     deps = [":util_testdata"],
+#     visibility = ["//visibility:public"],
+# )
 
-install(
-    name = "util_testdata",
-    data_dest = "common/addition_data/util",
-    data = [
-        ":util_test_data",
-    ],
-)
+# install(
+#     name = "util_testdata",
+#     data_dest = "common/addition_data/util",
+#     data = [
+#         ":util_test_data",
+#     ],
+# )
 
 filegroup(
     name = "util_test_data",
@@ -349,4 +350,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

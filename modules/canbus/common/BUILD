@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-install(
-    name = "install",
-    library_dest = "canbus/lib",
-    targets = [":libcanbus_gflags.so"],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus/lib",
+#     targets = [":libcanbus_gflags.so"],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "libcanbus_gflags.so",
@@ -37,4 +38,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

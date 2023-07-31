@@ -1,0 +1,37 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// PiecewiseJerkNonlinearSpeedOptimizerConfig
+
+message PiecewiseJerkNonlinearSpeedOptimizerConfig {
+  // Driving comfort weights
+  optional double acc_weight = 1 [default = 500.0];
+  optional double jerk_weight = 2 [default = 100.0];
+  optional double lat_acc_weight = 3 [default = 500.0];
+
+  // Minimal traversal time weight
+  optional double s_potential_weight = 4 [default = 10.0];
+
+  // Preferred cruising speed weight
+  optional double ref_v_weight = 5 [default = 10.0];
+
+  // Optional reference speed profile weight
+  optional double ref_s_weight = 6 [default = 10.0];
+
+  // Task specific end point weight
+  optional double end_s_weight = 7 [default = 10.0];
+  optional double end_v_weight = 8 [default = 10.0];
+  optional double end_a_weight = 9 [default = 10.0];
+
+  // soft safety boundary constraint violation weight
+  optional double soft_s_bound_weight = 10 [default = 10.0];
+
+  // Solver settings
+  optional bool use_warm_start = 100 [default = true];
+  // True to penalize speed optimization result to be close to dp guide line
+  optional bool use_smoothed_dp_guide_line = 101 [default = false];
+  // False to disallow soft bound in nonlinear speed opt
+  optional bool use_soft_bound_in_nonlinear_speed_opt = 102 [default = true];
+}

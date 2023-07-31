@@ -1,8 +1,0 @@
-syntax = "proto2";
-
-package apollo.perception.pipeline;
-
-
-message LidarDetectionConfig {
-  optional string sensor_name = 1;
-}

@@ -1,0 +1,3 @@
+<library path="modules/planning/scenarios/yield_sign/libyield_sign_scenario.so">
+    <class type="apollo::planning::YieldSignScenario" base_class="Scenario"></class>
+</library>

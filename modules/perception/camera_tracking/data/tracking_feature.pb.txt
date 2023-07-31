@@ -1,0 +1,14 @@
+feat_stride: 32
+feat_blob_name: "conv4_3"
+feat_blob_shape: 1
+feat_blob_shape: 64
+feat_blob_shape: 160
+feat_blob_shape: 240
+extractor {
+    feat_type: ROIPooling
+    roi_pooling_param{
+        pooled_h: 3
+        pooled_w: 3
+        use_floor: true
+    }
+}

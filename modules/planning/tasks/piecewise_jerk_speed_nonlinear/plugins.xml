@@ -1,0 +1,3 @@
+<library path="modules/planning/tasks/piecewise_jerk_speed_nonlinear/libpiecewise_jerk_speed_nonlinear_optimizer.so">
+    <class type="apollo::planning::PiecewiseJerkSpeedNonlinearOptimizer" base_class="apollo::planning::Task"></class>
+</library>

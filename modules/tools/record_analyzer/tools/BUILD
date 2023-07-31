@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,11 +27,13 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/record_analyzer/tools",
-    targets = [
-        ":perception_obstacle_sender",
-        ":dump_message",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/record_analyzer/tools",
+#     targets = [
+#         ":perception_obstacle_sender",
+#         ":dump_message",
+#     ]
+# )
+
+apollo_package()

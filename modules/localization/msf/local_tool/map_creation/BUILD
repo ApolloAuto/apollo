@@ -1,18 +1,19 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
+# load("//tools/install:install.bzl", "install")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "localization/bin",
-    targets = [
-        ":lossless_map_creator",
-        ":lossless_map_to_lossy_map",
-        ":poses_interpolator",
-    ],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "localization/bin",
+#     targets = [
+#         ":lossless_map_creator",
+#         ":lossless_map_to_lossy_map",
+#         ":poses_interpolator",
+#     ],
+# )
 
 cc_binary(
     name = "lossless_map_creator",
@@ -51,4 +52,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

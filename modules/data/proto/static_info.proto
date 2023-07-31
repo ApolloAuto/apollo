@@ -5,7 +5,7 @@ package apollo.data;
 import "modules/canbus/proto/canbus_conf.proto";
 import "modules/common_msgs/chassis_msgs/chassis.proto";
 import "modules/common_msgs/config_msgs/vehicle_config.proto";
-import "modules/control/proto/control_conf.proto";
+// import "modules/control/proto/control_conf.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
 
 message VehicleInfo {
@@ -26,7 +26,7 @@ message VehicleInfo {
   optional apollo.canbus.License license = 4 [deprecated = true];
   optional apollo.canbus.CanbusConf canbus_conf = 5;
   optional apollo.common.VehicleConfig vehicle_config = 6;
-  optional apollo.control.ControlConf control_config = 7;
+  // optional apollo.control.ControlConf control_config = 7;
 }
 
 message EnvironmentInfo {

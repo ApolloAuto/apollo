@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -22,6 +23,7 @@ cc_library(
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
         "//modules/common_msgs/prediction_msgs:scenario_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
         "@com_google_googletest//:gtest",
     ],
 )
@@ -41,4 +43,5 @@ cc_test(
     linkstatic = True,
 )
 
+apollo_package()
 cpplint()

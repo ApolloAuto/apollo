@@ -1,25 +1,26 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    targets = [
-      ":map_tool",
-      ":map_xysl",
-      ":refresh_default_end_way_point",
-      ":sim_map_generator",
-      ":proto_map_generator",
-      ":bin_map_generator",
-      ":quaternion_euler",
-    ],
-    runtime_dest = "modules/map/tools",
-    deps = [
-        "//modules/map/tools/map_datachecker/proto:py_pb_map_tool"
-    ]
-)
+# install(
+#     name = "install",
+#     targets = [
+#       ":map_tool",
+#       ":map_xysl",
+#       ":refresh_default_end_way_point",
+#       ":sim_map_generator",
+#       ":proto_map_generator",
+#       ":bin_map_generator",
+#       ":quaternion_euler",
+#     ],
+#     runtime_dest = "modules/map/tools",
+#     deps = [
+#         "//modules/map/tools/map_datachecker/proto:py_pb_map_tool"
+#     ]
+# )
 
 cc_binary(
     name = "map_tool",
@@ -103,4 +104,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

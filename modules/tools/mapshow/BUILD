@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,13 +29,15 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    data = [":readme"],
-    data_dest = "tools/mapshow",
-    py_dest = "tools/mapshow",
-    targets = [
-        "mapshow",
-        "roadshow",
-    ]
-)
+# install(
+#     name = "install",
+#     data = [":readme"],
+#     data_dest = "tools/mapshow",
+#     py_dest = "tools/mapshow",
+#     targets = [
+#         "mapshow",
+#         "roadshow",
+#     ]
+# )
+
+apollo_package()

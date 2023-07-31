@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -49,19 +50,21 @@ filegroup(
     ],
 )
 
-install(
-    name = "install",
-    data = [
-        ":conf",
-    ],
-    # We want to install channel_*_writer into runtime_dest
-    # rather than bin/
-    runtime_dest = "cyber/examples/common_component_example",
-    targets = [
-        ":channel_prediction_writer",
-        ":channel_test_writer",
-        ":libcommon_component_example.so",
-    ],
-)
+# install(
+#     name = "install",
+#     data = [
+#         ":conf",
+#     ],
+#     # We want to install channel_*_writer into runtime_dest
+#     # rather than bin/
+#     runtime_dest = "cyber/examples/common_component_example",
+#     targets = [
+#         ":channel_prediction_writer",
+#         ":channel_test_writer",
+#         ":libcommon_component_example.so",
+#     ],
+# )
+
+apollo_package()
 
 cpplint()

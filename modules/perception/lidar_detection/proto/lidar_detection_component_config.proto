@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message LidarDetectionComponentConfig {
+  optional string output_channel_name = 1;
+  optional string sensor_name = 2;
+  optional string detector = 3;
+  optional bool use_object_builder = 4;
+  optional PluginParam plugin_param = 5;
+}

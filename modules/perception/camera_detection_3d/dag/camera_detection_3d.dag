@@ -1,0 +1,14 @@
+module_config {
+    module_library : "modules/perception/camera_detection_3d/libcamera_detection_3d_component_camera.so"
+
+    components {
+      class_name : "CameraDetection3dComponent"
+      config {
+        name : "CameraDetection3dComponent"
+        config_file_path : "/apollo/modules/perception/camera_detection_3d/conf/camera_detection_3d_config.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/front_6mm/image"
+        }
+      }
+    }
+}

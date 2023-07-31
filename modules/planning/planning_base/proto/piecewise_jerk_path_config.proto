@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PiecewiseJerkPathConfig {
+  optional double l_weight = 1 [default = 1.0];
+  optional double dl_weight = 2 [default = 100.0];
+  optional double ddl_weight = 3 [default = 1000.0];
+  optional double dddl_weight = 4 [default = 10000.0];
+  optional double path_reference_l_weight = 5 [default = 0.0];
+  optional double weight_end_state_l = 6 [default = 1000.0];
+  optional double weight_end_state_dl = 7 [default = 0.0];
+  optional double weight_end_state_ddl = 8 [default = 0.0];
+  // the default value for lateral derivative bound
+  optional double lateral_derivative_bound_default = 9 [default = 2.0];
+  optional int64 max_iteration =  10 [default = 4000];
+}

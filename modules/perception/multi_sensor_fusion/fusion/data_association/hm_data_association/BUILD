@@ -1,0 +1,132 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "chi_squared_cdf",
+    hdrs = [
+        "chi_squared_cdf_1_0.0500_0.999900.h",
+        "chi_squared_cdf_2_0.0500_0.999900.h",
+    ],
+)
+
+cc_library(
+    name = "hm_tracks_objects_match",
+    srcs = ["hm_tracks_objects_match.cc"],
+    hdrs = ["hm_tracks_objects_match.h"],
+    deps = [
+        ":track_object_distance",
+        "//modules/perception/common/algorithm/graph:gated_hungarian_bigraph_matcher",
+        "//modules/perception/common/algorithm/graph:secure_matrix",
+        "//modules/perception/multi_sensor_fusion/base:scene",
+        "//modules/perception/multi_sensor_fusion/interface",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "probabilities",
+    srcs = ["probabilities.cc"],
+    hdrs = ["probabilities.h"],
+)
+
+cc_library(
+    name = "projection_cache",
+    hdrs = ["projection_cache.h"],
+    deps = [
+        "//modules/common/math",
+    ],
+)
+
+cc_library(
+    name = "track_object_distance",
+    srcs = ["track_object_distance.cc"],
+    hdrs = ["track_object_distance.h"],
+    deps = [
+        ":chi_squared_cdf",
+        ":probabilities",
+        ":projection_cache",
+        ":track_object_similarity",
+        "//modules/common/util:util_tool",
+        "//modules/perception/common/base:base_type",
+        "//modules/perception/common/base:camera",
+        "//modules/perception/common/base:point_cloud",
+        "//modules/perception/common/algorithm/geometry:camera_homography",
+        "//modules/perception/common/algorithm/sensor_manager",
+        "//modules/perception/multi_sensor_fusion/base:fusion_log",
+        "//modules/perception/multi_sensor_fusion/base:sensor",
+        "//modules/perception/multi_sensor_fusion/base:sensor_data_manager",
+        "//modules/perception/multi_sensor_fusion/base:track",
+        "//modules/perception/multi_sensor_fusion/common:camera_util",
+    ],
+)
+
+cc_library(
+    name = "track_object_similarity",
+    srcs = ["track_object_similarity.cc"],
+    hdrs = ["track_object_similarity.h"],
+    deps = [
+        ":chi_squared_cdf",
+        ":probabilities",
+        ":projection_cache",
+        "//modules/common/util:util_tool",
+        "//modules/perception/multi_sensor_fusion/base:fusion_log",
+        "//modules/perception/multi_sensor_fusion/base:sensor",
+        "//modules/perception/multi_sensor_fusion/common:camera_util",
+    ],
+)
+
+cc_test(
+    name = "hm_data_association_test",
+    size = "small",
+    srcs = ["hm_data_association_test.cc"],
+    deps = [
+        ":probabilities",
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
+        "//modules/perception/common/base:frame",
+        "//modules/perception/common/algorithm/sensor_manager",
+        "//modules/perception/multi_sensor_fusion/base:sensor",
+        "//modules/perception/multi_sensor_fusion/base:track",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "track_object_distance_test",
+    size = "small",
+    srcs = ["track_object_distance_test.cc"],
+    deps = [
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
+        "//modules/perception/common/base:frame",
+        "//modules/perception/common/base:point_cloud",
+        "//modules/perception/common/algorithm/sensor_manager",
+        "//modules/perception/multi_sensor_fusion/base:sensor",
+        "//modules/perception/multi_sensor_fusion/base:track",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "track_object_test",
+    size = "small",
+    srcs = ["track_object_test.cc"],
+    copts = ["-fno-access-control"],
+    deps = [
+        ":hm_tracks_objects_match",
+        "//modules/perception/common/base:frame",
+        "//modules/perception/common/base:point_cloud",
+        "//modules/perception/common/algorithm/sensor_manager",
+        "//modules/perception/multi_sensor_fusion/base:sensor",
+        "//modules/perception/multi_sensor_fusion/base:track",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_package()
+cpplint()

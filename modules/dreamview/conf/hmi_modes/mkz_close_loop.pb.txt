@@ -8,7 +8,8 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
     dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
-    dag_files: "/apollo/modules/planning/dag/planning.dag"
+    dag_files: "/apollo/modules/planning/planning_base/dag/planning.dag"
+    dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
     dag_files: "/apollo/modules/storytelling/dag/storytelling.dag"
     dag_files: "/apollo/modules/routing/dag/routing.dag"
@@ -20,7 +21,7 @@ cyber_modules {
   key: "Controller"
   value: {
     dag_files: "/apollo/modules/canbus/dag/canbus.dag"
-    dag_files: "/apollo/modules/control/dag/control.dag"
+    dag_files: "/apollo/modules/control/control_component/dag/control.dag"
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"
     process_group: "control_sched"
   }

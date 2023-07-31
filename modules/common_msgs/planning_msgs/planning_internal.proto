@@ -11,9 +11,9 @@ import "modules/common_msgs/localization_msgs/localization.proto";
 import "modules/common_msgs/perception_msgs/traffic_light_detection.proto";
 import "modules/common_msgs/planning_msgs/decision.proto";
 import "modules/common_msgs/planning_msgs/navigation.proto";
-import "modules/common_msgs/planning_msgs/scenario_type.proto";
 import "modules/common_msgs/planning_msgs/sl_boundary.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -132,8 +132,8 @@ message DpPolyGraphDebug {
 }
 
 message ScenarioDebug {
-  optional apollo.planning.ScenarioType scenario_type = 1;
-  optional apollo.planning.StageType stage_type = 2;
+  optional string scenario_type = 1;
+  optional string stage_type = 2;
   optional string msg = 3;
 }
 

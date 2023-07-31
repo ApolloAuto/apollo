@@ -1,0 +1,3 @@
+<library path="modules/planning/traffic_rules/reference_line_end/libreference_line_end.so">
+    <class type="apollo::planning::ReferenceLineEnd" base_class="apollo::planning::TrafficRule"></class>
+</library>

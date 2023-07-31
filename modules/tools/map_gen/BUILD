@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -52,15 +53,17 @@ py_binary(
     ],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/map_gen",
-    targets = [
-        "add_signal",
-        "extract_path",
-        "map_gen_single_lane",
-        "map_gen_two_lanes_right_ext",
-        "map_gen",
-    ]
+# install(
+#     name = "install",
+#     py_dest = "tools/map_gen",
+#     targets = [
+#         "add_signal",
+#         "extract_path",
+#         "map_gen_single_lane",
+#         "map_gen_two_lanes_right_ext",
+#         "map_gen",
+#     ]
 
-)
+# )
+
+apollo_package()

@@ -1,0 +1,14 @@
+module_config {
+    module_library : "modules/perception/camera_tracking/libcamera_tracking_component_camera.so"
+
+    components {
+      class_name : "CameraTrackingComponent"
+      config {
+        name : "CameraTrackingComponent"
+        config_file_path : "/apollo/modules/perception/camera_tracking/conf/camera_tracking_config.pb.txt"
+        readers {
+          channel: "/perception/inner/location_refinement"
+        }
+      }
+    }
+}

@@ -57,6 +57,13 @@ cc_library(
 )
 
 cc_library(
+    name = "nvidia_ml",
+    hdrs = ["cuda/include/nvml.h"],
+    strip_include_prefix = "cuda/include",
+    srcs = ["cuda/lib/%{nvidia_ml_lib}"],
+)
+
+cc_library(
     name = "cudart",
     srcs = ["cuda/lib/%{cudart_lib}"],
     data = ["cuda/lib/%{cudart_lib}"],

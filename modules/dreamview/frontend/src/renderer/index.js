@@ -380,6 +380,10 @@ class Renderer {
     }
   }
 
+  setStartPoint() {
+    return this.routingEditor.setStartPoint(this.coordinates);
+  }
+
   sendRoutingRequest(points = []) {
     return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
       this.adc.mesh.rotation.y,

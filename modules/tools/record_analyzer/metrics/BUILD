@@ -1,4 +1,5 @@
 load("@rules_python//python:defs.bzl", "py_library")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -31,3 +32,5 @@ py_library(
     name = "reference_line",
     srcs = ["reference_line.py"],
 )
+
+apollo_package()

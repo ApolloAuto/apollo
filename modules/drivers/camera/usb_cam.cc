@@ -37,10 +37,9 @@
 #include <cmath>
 #include <string>
 
-#ifndef __aarch64__
 #include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
-#endif
+
 #include "modules/drivers/camera/usb_cam.h"
 
 #define __STDC_CONSTANT_MACROS
@@ -95,6 +94,7 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
   frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
   // now max fps 30, we use an appox time 0.9 to drop image.
   frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
+
 
   return true;
 }
@@ -226,7 +226,8 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
   }
 }
 
-bool UsbCam::poll(const CameraImagePtr& raw_image) {
+bool UsbCam::poll(const CameraImagePtr& raw_image, 
+                  const CameraImagePtr& sensor_raw_image) {
   raw_image->is_new = 0;
   // free memory in this struct desturctor
   memset(raw_image->image, 0, raw_image->image_size * sizeof(char));
@@ -258,7 +259,7 @@ bool UsbCam::poll(const CameraImagePtr& raw_image) {
     reconnect();
   }
 
-  int get_new_image = read_frame(raw_image);
+  int get_new_image = read_frame(raw_image, sensor_raw_image);
 
   if (!get_new_image) {
     return false;
@@ -430,7 +431,6 @@ bool UsbCam::init_device(void) {
   return true;
 }
 
-#ifndef __aarch64__
 bool UsbCam::set_adv_trigger() {
   AINFO << "Trigger enable, dev:" << config_->camera_dev()
         << ", fps:" << config_->trigger_fps()
@@ -445,7 +445,6 @@ bool UsbCam::set_adv_trigger() {
   }
   return true;
 }
-#endif
 
 int UsbCam::xioctl(int fd, int request, void* arg) {
   int r = 0;
@@ -768,7 +767,8 @@ bool UsbCam::stop_capturing(void) {
   return true;
 }
 
-bool UsbCam::read_frame(CameraImagePtr raw_image) {
+bool UsbCam::read_frame(CameraImagePtr raw_image, 
+                        CameraImagePtr sensor_raw_image) {
   struct v4l2_buffer buf;
   unsigned int i = 0;
   int len = 0;
@@ -800,7 +800,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       }
 
       process_image(buffers_[0].start, len, raw_image);
-
+      if(sensor_raw_image->image != nullptr) {
+        memcpy(sensor_raw_image->image, buffers_[0].start, len);
+      }
       break;
 
     case IO_METHOD_MMAP:
@@ -826,7 +828,6 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
             return false;
         }
       }
-
       assert(buf.index < n_buffers_);
       len = buf.bytesused;
       if(!config_->hardware_trigger()){
@@ -884,6 +885,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
                << ", dev: " << config_->camera_dev();
       } else {
         process_image(buffers_[buf.index].start, len, raw_image);
+        if(sensor_raw_image->image != nullptr) {
+          memcpy(sensor_raw_image->image, buffers_[buf.index].start, len);
+        }
       }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
@@ -926,6 +930,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       assert(i < n_buffers_);
       len = buf.bytesused;
       process_image(reinterpret_cast<void*>(buf.m.userptr), len, raw_image);
+      if(sensor_raw_image->image != nullptr) {
+        memcpy(sensor_raw_image->image, reinterpret_cast<void*>(buf.m.userptr), len);
+      }
 
       if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
         AERROR << "VIDIOC_QBUF";
@@ -963,14 +970,8 @@ bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
     if (config_->output_type() == YUYV) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {
-#ifdef __aarch64__
-      convert_yuv_to_rgb_buffer((unsigned char*)src,
-                                (unsigned char*)dest->image, dest->width,
-                                dest->height);
-#else
       yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
                    dest->width * dest->height);
-#endif
     } else {
       AERROR << "unsupported output format:" << config_->output_type();
       return false;
@@ -1088,61 +1089,6 @@ void UsbCam::reconnect() {
   uninit_device();
   close_device();
 }
-
-#ifdef __aarch64__
-int UsbCam::convert_yuv_to_rgb_pixel(int y, int u, int v) {
-  unsigned int pixel32 = 0;
-  unsigned char* pixel = (unsigned char*)&pixel32;
-  int r, g, b;
-  r = (int)((double)y + (1.370705 * ((double)v - 128.0)));
-  g = (int)((double)y - (0.698001 * ((double)v - 128.0)) -
-            (0.337633 * ((double)u - 128.0)));
-  b = (int)((double)y + (1.732446 * ((double)u - 128.0)));
-  if (r > 255) r = 255;
-  if (g > 255) g = 255;
-  if (b > 255) b = 255;
-  if (r < 0) r = 0;
-  if (g < 0) g = 0;
-  if (b < 0) b = 0;
-  pixel[0] = (unsigned char)r;
-  pixel[1] = (unsigned char)g;
-  pixel[2] = (unsigned char)b;
-  return pixel32;
-}
-
-int UsbCam::convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
-                                      unsigned int width, unsigned int height) {
-  unsigned int in, out = 0;
-  unsigned int pixel_16;
-  unsigned char pixel_24[3];
-  unsigned int pixel32;
-  int y0, u, y1, v;
-
-  for (in = 0; in < width * height * 2; in += 4) {
-    pixel_16 =
-        yuv[in + 3] << 24 | yuv[in + 2] << 16 | yuv[in + 1] << 8 | yuv[in + 0];
-    y0 = (pixel_16 & 0x000000ff);
-    u = (pixel_16 & 0x0000ff00) >> 8;
-    y1 = (pixel_16 & 0x00ff0000) >> 16;
-    v = (pixel_16 & 0xff000000) >> 24;
-    pixel32 = convert_yuv_to_rgb_pixel(y0, u, v);
-    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
-    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
-    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
-    rgb[out++] = pixel_24[0];
-    rgb[out++] = pixel_24[1];
-    rgb[out++] = pixel_24[2];
-    pixel32 = convert_yuv_to_rgb_pixel(y1, u, v);
-    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
-    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
-    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
-    rgb[out++] = pixel_24[0];
-    rgb[out++] = pixel_24[1];
-    rgb[out++] = pixel_24[2];
-  }
-  return 0;
-}
-#endif
 
 }  // namespace camera
 }  // namespace drivers

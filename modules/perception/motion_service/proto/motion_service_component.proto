@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.onboard;
+
+message MotionServiceComponent {
+  optional string camera_names = 1 [default = "front_6mm"];
+  optional string input_camera_channel_names = 2
+      [default = "/apollo/sensor/camera/front_6mm/image"];
+  optional string input_localization_channel_name = 3
+      [default = "/apollo/localization/pose"];
+  optional string output_topic_channel_name = 4
+      [default = "/apollo/perception/motion_service"];
+}

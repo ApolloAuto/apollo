@@ -1,0 +1,68 @@
+ts: 0.01
+brake_minimum_action: 0.0
+throttle_minimum_action: 0.0
+speed_controller_input_limit: 2.5
+station_error_limit: 2.5
+preview_window: 20.0
+standstill_acceleration: -1.5
+enable_reverse_leadlag_compensation: false
+use_preview_reference_check: true
+steer_cmd_interval: 20.0
+enable_speed_station_preview: false
+enable_slope_offset: false
+use_acceleration_lookup_limit: false
+use_steering_check: true
+pedestrian_stop_time: 15
+standstill_narmal_acceleration: -0.02
+station_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.3
+  kp: 0.3 
+  ki: 0.0
+  kd: 0.0
+}
+low_speed_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.3
+  kp: 0.4
+  ki: 0.2
+  kd: 0.0
+}
+high_speed_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.3
+  kp: 0.5
+  ki: 0.0005
+  kd: 0.1
+}
+switch_speed: 1.0
+switch_speed_window: 0.0
+reverse_station_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.5
+  kp: 0.3
+  ki: 0.2
+  kd: 0.0
+}
+reverse_speed_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 0.5
+  kp: 0.3
+  ki: 0.2
+  kd: 0.0
+}
+reverse_station_leadlag_conf {
+  innerstate_saturation_level: 1000
+  alpha: 1.0
+  beta: 0.8
+  tau: 0.0
+}
+reverse_speed_leadlag_conf {
+  innerstate_saturation_level: 1000
+  alpha: 1.0
+  beta: 1.0
+  tau: 0.0
+}
+pitch_angle_filter_conf {
+  cutoff_freq: 5
+}

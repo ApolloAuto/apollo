@@ -1,0 +1,1 @@
+outside_roi_filter_distance: 0.0

@@ -32,6 +32,7 @@ std::map<std::string, int> hmi_function_map = {
     {"SimControlRestart", 0},  {"MapServiceReloadMap", 1},
     {"LoadDynamicModels", 2},  {"ChangeDynamicModel", 3},
     {"DeleteDynamicModel", 4}, {"AddDynamicModel", 5},
+    {"RestartDynamicModel", 6},
 };
 }  // namespace
 
@@ -223,6 +224,13 @@ nlohmann::json Dreamview::HMICallbackSimControl(
         AERROR << "Sim control is not enabled or missing dynamic model name "
                   "param!";
       }
+      break;
+    }
+    case 6: {
+      // restart dynamic model
+      map_service_->ReloadMap(true);
+      sim_control_manager_->Restart();
+      callback_res["result"] = true;
       break;
     }
     default:

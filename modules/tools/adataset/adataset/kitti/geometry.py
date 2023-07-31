@@ -146,3 +146,6 @@ class Quaternion(object):
     y = self.w * other.y - self.x * other.z + self.y * other.w + self.z * other.x
     z = self.w * other.z + self.x * other.y - self.y * other.x + self.z * other.w
     return Quaternion(w, x, y, z)
+
+  def __str__(self) -> str:
+    return "w: {}, x: {}, y: {}, z: {}".format(self.w, self.x, self.y, self.z)

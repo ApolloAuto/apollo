@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 
-install(
-    name = "install",
-    library_dest = "drivers/lib/lidar/velodyne/driver",
-    targets = [
-        ":libvelodyne_driver_component.so",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "drivers/lib/lidar/velodyne/driver",
+#     targets = [
+#         ":libvelodyne_driver_component.so",
+#     ],
+# )
 
 cc_binary(
     name = "libvelodyne_driver_component.so",
@@ -56,4 +57,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

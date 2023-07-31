@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -95,39 +96,39 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-lincoln/lib",
-    data_dest = "canbus-vehicle-lincoln",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-lincoln.BUILD",
-    ],
-    targets = [
-        ":liblincoln_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_lincoln",
-        ":pb_hdrs",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus-vehicle-lincoln/lib",
+#     data_dest = "canbus-vehicle-lincoln",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus-vehicle-lincoln.BUILD",
+#     ],
+#     targets = [
+#         ":liblincoln_vehicle_factory_lib.so",
+#     ],
+#     deps = [
+#         ":pb_lincoln",
+#         ":pb_hdrs",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-lincoln/include",
-    data = [
-        "//modules/canbus_vehicle/lincoln/proto:lincoln_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus-vehicle-lincoln/include",
+#     data = [
+#         "//modules/canbus_vehicle/lincoln/proto:lincoln_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_lincoln",
-    dest = "canbus-vehicle-lincoln",
-    files = [
-        "//modules/canbus_vehicle/lincoln/proto:lincoln_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_lincoln",
+#     dest = "canbus-vehicle-lincoln",
+#     files = [
+#         "//modules/canbus_vehicle/lincoln/proto:lincoln_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -136,26 +137,28 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_lincoln_src",
-        ":install_lincoln_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_lincoln_src",
+#         ":install_lincoln_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_lincoln_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-lincoln/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_lincoln_src",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-lincoln/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_lincoln_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-lincoln/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_lincoln_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-lincoln/include",
+#     filter = "*.h",
+# )
+
+apollo_package()
 
 cpplint()

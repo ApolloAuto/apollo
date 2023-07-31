@@ -1,0 +1,3 @@
+<library path="modules/planning/scenarios/traffic_light_unprotected_right_turn/libtraffic_light_unprotected_right_turn_scenario.so">
+    <class type="apollo::planning::TrafficLightUnprotectedRightTurnScenario" base_class="Scenario"></class>
+</library>

@@ -1,15 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    library_dest = "tools/lib",
-    targets = [":libfake_prediction_component.so"],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "tools/lib",
+#     targets = [":libfake_prediction_component.so"],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "libfake_prediction_component.so",
@@ -24,4 +25,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

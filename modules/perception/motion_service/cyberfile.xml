@@ -1,0 +1,31 @@
+<package format="2">
+  <name>perception-motion-service</name>
+  <version>local</version>
+  <description>
+    The perception module incorporates the capability of using multiple cameras, radars (front and rear) and
+    LiDARs to recognize obstacles and fuse their individual tracks to obtain a final track list.
+    The obstacle sub-module detects, classifies and tracks obstacles.
+    This sub-module also predicts obstacle motion and position information (e.g., heading and velocity).
+    For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane
+    relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
+  </description>
+
+  <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
+  <license>Apache License 2.0</license>
+  <url type="website">https://www.apollo.auto/</url>
+  <url type="repository">https://github.com/ApolloAuto/apollo</url>
+  <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
+
+  <type>module</type>
+  <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/motion_service</src_path>
+
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+
+  <depend>libtinyxml2-dev</depend>
+  <depend>libleveldb-dev</depend>
+  <depend>libnuma-dev</depend>
+  <depend>3rd-magma</depend>
+
+</package>

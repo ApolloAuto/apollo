@@ -20,12 +20,23 @@
 import os
 import yaml
 import pkgutil
+import numpy as np
 
-from itertools import chain
 from pathlib import Path
 
 from adataset.nuscenes.nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
-
+from adataset.nuscenes.geometry import (
+  Euler,
+  Quaternion,
+  euler_to_rotation_matrix,
+  rotation_matrix_to_euler
+)
+from adataset.nuscenes.params import (
+  apollo2nuscenes_lidar,
+  apollo2nuscenes_camera,
+  nuscenes2apollo_imu,
+  apollo2nuscenes_radar,
+)
 
 CALIBRATION_META_ROOT = 'calibration_meta'
 # Lidar meta
@@ -44,6 +55,12 @@ CAMERA_FRAME_ID = 'novatel'
 RADAR_FRAME_ID = 'novatel'
 LIDAR_FRAME_ID = 'novatel'
 
+
+def _construct_transform(rotation, translation):
+  transform = np.identity(4)
+  transform[:3, :3] = rotation
+  transform[:3, 3] = translation
+  return transform
 
 def load_yaml(file_path):
   """Read content from yaml
@@ -72,20 +89,21 @@ def save_yaml(file_path, content):
     yaml.safe_dump(content, f, sort_keys=False)
 
 
-def gen_camera_params(camera_name, calibrated_sensor, calibration_file_path):
+def gen_camera_extrinsics(child_frame_id, frame_id, calibrated_sensor,
+        calibration_file_path):
   """Generate camera extrinsic and intrinsic file
 
   Args:
       camera_name (str): camera name
-      calibrated_sensor (_type_): nuscenes calibrated_sensor json object
+      calibrated_sensor (_type_): kitti calibrated_sensor json object
       calibration_file_path (str): saved path
   """
   # 1. Generate extrinsics
   camera_meta_extrinsics = os.path.join(
     CALIBRATION_META_ROOT, CAMERA_PARAMS_PATH, CAMERA_EXTRINSICS)
   camera_extrinsics = load_yaml(camera_meta_extrinsics)
-  camera_extrinsics['header']['frame_id'] = CAMERA_FRAME_ID
-  camera_extrinsics['child_frame_id'] = camera_name
+  camera_extrinsics['header']['frame_id'] = frame_id
+  camera_extrinsics['child_frame_id'] = child_frame_id
   camera_extrinsics['transform']['translation']['x'] = calibrated_sensor['translation'][0]
   camera_extrinsics['transform']['translation']['y'] = calibrated_sensor['translation'][1]
   camera_extrinsics['transform']['translation']['z'] = calibrated_sensor['translation'][2]
@@ -94,33 +112,46 @@ def gen_camera_params(camera_name, calibrated_sensor, calibration_file_path):
   camera_extrinsics['transform']['rotation']['y'] = calibrated_sensor['rotation'][2]
   camera_extrinsics['transform']['rotation']['z'] = calibrated_sensor['rotation'][3]
 
-  file_name = CAMERA_EXTRINSICS.replace('camera', camera_name)
+  file_name = CAMERA_EXTRINSICS.replace('camera', child_frame_id)
   file_path = os.path.join(calibration_file_path, CAMERA_PARAMS_PATH)
   Path(file_path).mkdir(parents=True, exist_ok=True)
 
   camera_extrinsics_file = os.path.join(file_path, file_name)
   save_yaml(camera_extrinsics_file, camera_extrinsics)
 
+
+def gen_camera_intrinsics(camera_name, calibrated_sensor, calibration_file_path):
+  """Generate camera extrinsic and intrinsic file
+
+  Args:
+      camera_name (str): camera name
+      calibrated_sensor (_type_): kitti calibrated_sensor json object
+      calibration_file_path (str): saved path
+  """
   # 2. Generate intrinsics
   camera_meta_intrinsics = os.path.join(
     CALIBRATION_META_ROOT, CAMERA_PARAMS_PATH, CAMERA_INTRINSICS)
   camera_intrinsics = load_yaml(camera_meta_intrinsics)
 
-  raw_camera_intrinsic = calibrated_sensor['camera_intrinsic']
   camera_intrinsics['header']['frame_id'] = CAMERA_FRAME_ID
-  camera_intrinsics['K'] = list(chain.from_iterable(raw_camera_intrinsic))
+  if 'height' in calibrated_sensor:
+    camera_intrinsics['height'] = calibrated_sensor['height']
+  if 'width' in calibrated_sensor:
+    camera_intrinsics['width'] = calibrated_sensor['width']
 
-  # Todo(zero): need to complete
-  # camera_intrinsics['D'] =
+  camera_intrinsics['K'] = list(calibrated_sensor['K'])
+  # camera_intrinsics['D'] = list(calibrated_sensor['D'])
   # camera_intrinsics['R'] =
   # camera_intrinsics['P'] =
 
   file_name = CAMERA_INTRINSICS.replace('camera', camera_name)
+  file_path = os.path.join(calibration_file_path, CAMERA_PARAMS_PATH)
   camera_intrinsics_file = os.path.join(file_path, file_name)
   save_yaml(camera_intrinsics_file, camera_intrinsics)
 
 
-def gen_radar_params(radar_name, calibrated_sensor, calibration_file_path):
+def gen_radar_params(child_frame_id, frame_id, calibrated_sensor,
+        calibration_file_path):
   """Generate radar extrinsic file
 
   Args:
@@ -131,8 +162,8 @@ def gen_radar_params(radar_name, calibrated_sensor, calibration_file_path):
   radar_meta_extrinsics = os.path.join(
     CALIBRATION_META_ROOT, RADAR_PARAMS_PATH, RADAR_EXTRINSICS)
   radar_extrinsics = load_yaml(radar_meta_extrinsics)
-  radar_extrinsics['header']['frame_id'] = RADAR_FRAME_ID
-  radar_extrinsics['child_frame_id'] = radar_name
+  radar_extrinsics['header']['frame_id'] = frame_id
+  radar_extrinsics['child_frame_id'] = child_frame_id
   radar_extrinsics['transform']['translation']['x'] = calibrated_sensor['translation'][0]
   radar_extrinsics['transform']['translation']['y'] = calibrated_sensor['translation'][1]
   radar_extrinsics['transform']['translation']['z'] = calibrated_sensor['translation'][2]
@@ -141,7 +172,7 @@ def gen_radar_params(radar_name, calibrated_sensor, calibration_file_path):
   radar_extrinsics['transform']['rotation']['y'] = calibrated_sensor['rotation'][2]
   radar_extrinsics['transform']['rotation']['z'] = calibrated_sensor['rotation'][3]
 
-  file_name = RADAR_EXTRINSICS.replace('radar', radar_name)
+  file_name = RADAR_EXTRINSICS.replace('radar', child_frame_id)
   file_path = os.path.join(calibration_file_path, RADAR_PARAMS_PATH)
   Path(file_path).mkdir(parents=True, exist_ok=True)
 
@@ -149,7 +180,8 @@ def gen_radar_params(radar_name, calibrated_sensor, calibration_file_path):
   save_yaml(radar_extrinsics_file, radar_extrinsics)
 
 
-def gen_velodyne_params(lidar_name, calibrated_sensor, calibration_file_path):
+def gen_velodyne_params(child_frame_id, frame_id, calibrated_sensor,
+        calibration_file_path):
   """Generate lidar extrinsic file
 
   Args:
@@ -160,8 +192,8 @@ def gen_velodyne_params(lidar_name, calibrated_sensor, calibration_file_path):
   lidar_meta_extrinsics = os.path.join(
     CALIBRATION_META_ROOT, VELODYNE_PARAMS_PATH, LIDAR_NOVATEL_EXTRINSICS)
   lidar_extrinsics = load_yaml(lidar_meta_extrinsics)
-  lidar_extrinsics['header']['frame_id'] = LIDAR_FRAME_ID
-  lidar_extrinsics['child_frame_id'] = lidar_name
+  lidar_extrinsics['header']['frame_id'] = frame_id
+  lidar_extrinsics['child_frame_id'] = child_frame_id
   lidar_extrinsics['transform']['translation']['x'] = calibrated_sensor['translation'][0]
   lidar_extrinsics['transform']['translation']['y'] = calibrated_sensor['translation'][1]
   lidar_extrinsics['transform']['translation']['z'] = calibrated_sensor['translation'][2]
@@ -170,12 +202,78 @@ def gen_velodyne_params(lidar_name, calibrated_sensor, calibration_file_path):
   lidar_extrinsics['transform']['rotation']['y'] = calibrated_sensor['rotation'][2]
   lidar_extrinsics['transform']['rotation']['z'] = calibrated_sensor['rotation'][3]
 
-  file_name = LIDAR_NOVATEL_EXTRINSICS.replace('lidar', lidar_name)
+  file_name = LIDAR_NOVATEL_EXTRINSICS.replace('lidar', child_frame_id)
   file_path = os.path.join(calibration_file_path, VELODYNE_PARAMS_PATH)
   Path(file_path).mkdir(parents=True, exist_ok=True)
 
   lidar_novatel_extrinsics = os.path.join(file_path, file_name)
   save_yaml(lidar_novatel_extrinsics, lidar_extrinsics)
+
+
+def process_calib_velo_to_imu(channel, calibrated_sensor, calibration_file_path):
+  qw, qx, qy, qz = calibrated_sensor['rotation']
+  q = Quaternion(qw, qx, qy, qz)
+  euler = q.to_euler()
+  r_matrix = euler_to_rotation_matrix(euler.roll, euler.pitch, euler.yaw)
+  # Apollo coordinate system conversion
+  # lidar2imu * n_lidar = n_imu
+  # lidar2imu * apollo2n_lidar * apollo_lidar = apollo2n_imu * apollo_imu
+  lidar2imu = _construct_transform(r_matrix, calibrated_sensor['translation'])
+  velo_to_imu = nuscenes2apollo_imu @ lidar2imu @ apollo2nuscenes_lidar
+
+  r_matrix = velo_to_imu[:3, :3]
+  roll, pitch, yaw = rotation_matrix_to_euler(r_matrix)
+  q = Euler(roll, pitch, yaw).to_quaternion()
+  calibrated_sensor['rotation'] = [q.w, q.x, q.y, q.z]
+  calibrated_sensor['translation'] = velo_to_imu[:3, 3].tolist()
+  gen_velodyne_params(channel, LIDAR_FRAME_ID, calibrated_sensor, calibration_file_path)
+
+
+def process_calib_cam_to_imu(channel, calibrated_sensor, calibration_file_path):
+  # 1. camera extrinsics
+  qw, qx, qy, qz = calibrated_sensor['rotation']
+  q = Quaternion(qw, qx, qy, qz)
+  euler = q.to_euler()
+  r_matrix = euler_to_rotation_matrix(euler.roll, euler.pitch, euler.yaw)
+  # Apollo coordinate system conversion
+  # cam2imu * n_cam = n_imu
+  # cam2imu * apollo2n_cam * apollo_cam = apollo2n_imu * apollo_imu
+  cam2imu = _construct_transform(r_matrix, calibrated_sensor['translation'])
+  cam_to_imu = nuscenes2apollo_imu @ cam2imu @ apollo2nuscenes_camera
+
+  r_matrix = cam_to_imu[:3,:3]
+  roll, pitch, yaw = rotation_matrix_to_euler(r_matrix)
+  q = Euler(roll, pitch, yaw).to_quaternion()
+  calibrated_sensor['rotation'] = [q.w, q.x, q.y, q.z]
+  calibrated_sensor['translation'] = cam_to_imu[:3, 3].tolist()
+  gen_camera_extrinsics(channel, CAMERA_FRAME_ID, calibrated_sensor,
+      calibration_file_path)
+
+  # 2. camera intrinsic
+  calibrated_sensor['width'] = 1600
+  calibrated_sensor['height'] = 900
+
+  calibrated_sensor['K'] = calibrated_sensor['camera_intrinsic']
+  gen_camera_intrinsics(channel, calibrated_sensor, calibration_file_path)
+
+
+def process_calib_radar_to_imu(channel, calibrated_sensor, calibration_file_path):
+  qw, qx, qy, qz = calibrated_sensor['rotation']
+  q = Quaternion(qw, qx, qy, qz)
+  euler = q.to_euler()
+  r_matrix = euler_to_rotation_matrix(euler.roll, euler.pitch, euler.yaw)
+  # Apollo coordinate system conversion
+  # radar2imu * n_radar = n_imu
+  # radar2imu * apollo2n_radar * apollo_radar = apollo2n_imu * apollo_imu
+  radar2imu = _construct_transform(r_matrix, calibrated_sensor['translation'])
+  radar_to_imu = nuscenes2apollo_imu @ radar2imu @ apollo2nuscenes_radar
+
+  r_matrix = radar_to_imu[:3, :3]
+  roll, pitch, yaw = rotation_matrix_to_euler(r_matrix)
+  q = Euler(roll, pitch, yaw).to_quaternion()
+  calibrated_sensor['rotation'] = [q.w, q.x, q.y, q.z]
+  calibrated_sensor['translation'] = radar_to_imu[:3, 3].tolist()
+  gen_radar_params(channel, RADAR_FRAME_ID, calibrated_sensor, calibration_file_path)
 
 
 def gen_sensor_calibration(calibrations, calibration_file_path):
@@ -186,12 +284,12 @@ def gen_sensor_calibration(calibrations, calibration_file_path):
       calibration_file_path (str): saved path
   """
   for channel, calibrated_sensor in calibrations.items():
-    if channel.startswith('CAM'):
-      gen_camera_params(channel, calibrated_sensor, calibration_file_path)
-    elif channel.startswith('LIDAR'):
-      gen_velodyne_params(channel, calibrated_sensor, calibration_file_path)
+    if channel.startswith('LIDAR'):
+      process_calib_velo_to_imu(channel, calibrated_sensor, calibration_file_path)
+    elif channel.startswith('CAM'):
+      process_calib_cam_to_imu(channel, calibrated_sensor, calibration_file_path)
     elif channel.startswith('RADAR'):
-      gen_radar_params(channel, calibrated_sensor, calibration_file_path)
+      process_calib_radar_to_imu(channel, calibrated_sensor, calibration_file_path)
     else:
       print("Unsupported sensor: {}".format(channel))
 

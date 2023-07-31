@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>external_command_process</name>
+        <dag_conf>/apollo/modules/external_command/process_component/dag/external_command_process.dag</dag_conf>
+        <process_name>external_command_process</process_name>
+    </module>
+</cyber>

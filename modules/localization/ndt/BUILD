@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -76,12 +77,13 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "localization/lib/ndt",
-    targets = [
-        ":libndt_localization_component.so",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "localization/lib/ndt",
+#     targets = [
+#         ":libndt_localization_component.so",
+#     ],
+# )
 
+apollo_package()
 cpplint()

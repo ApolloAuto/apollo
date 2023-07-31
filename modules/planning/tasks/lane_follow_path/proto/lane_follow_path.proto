@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+import "modules/planning/planning_base/proto/piecewise_jerk_path_config.proto";
+
+package apollo.planning;
+
+message LaneFollowPathConfig {
+  //whether to extend path bound including adc bound
+  optional bool is_extend_lane_bounds_to_include_adc = 1;
+  //whether to extend adc bound buffer
+  optional double extend_buffer = 2;
+  optional PiecewiseJerkPathConfig path_optimizer_config = 3;
+}

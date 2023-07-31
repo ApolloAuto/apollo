@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/localization/msf/libmsf_localization_component.so"
+    module_library : "modules/localization/msf/libmsf_localization_component.so"
 
     components {
       class_name : "MSFLocalizationComponent"

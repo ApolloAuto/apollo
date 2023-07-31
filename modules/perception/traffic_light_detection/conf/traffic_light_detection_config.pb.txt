@@ -1,0 +1,7 @@
+gpu_id: 0
+plugin_param {
+  name: "TrafficLightDetection"
+  config_path: "perception/traffic_light_detection/data"
+  config_file: "detection_caffe.pb.txt"
+}
+detection_output_channel_name:"/perception/inner/Retection"

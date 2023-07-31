@@ -1,0 +1,10 @@
+<cyber>
+    <desc>cyber modules list config</desc>
+    <version>1.0.0</version>
+    <module>
+        <name>traffic_light_tracking</name>
+        <dag_conf>/apollo/modules/perception/traffic_light_tracking/dag/traffic_light_tracking.dag</dag_conf>
+        <process_name>traffic_light_tracking</process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

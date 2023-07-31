@@ -1,6 +1,7 @@
 syntax = "proto2";
 package apollo.control;
 
+import "google/protobuf/any.proto";
 import "modules/common_msgs/basic_msgs/drive_state.proto";
 import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/basic_msgs/pnc_point.proto";
@@ -108,6 +109,13 @@ message SimpleLongitudinalDebug {
   optional apollo.common.TrajectoryPoint current_reference_point = 33;
   optional apollo.common.TrajectoryPoint preview_reference_point = 34;
   optional double acceleration_lookup_limit = 35;
+  optional double vehicle_pitch = 36;
+  optional bool is_epb_brake = 37;
+  optional double current_steer_interval = 38;
+  optional bool is_wait_steer = 39;
+  optional bool is_stop_reason_by_destination = 40;
+  optional bool is_stop_reason_by_prdestrian = 41;
+  optional bool is_full_stop_soft = 42;
 }
 
 message SimpleLateralDebug {

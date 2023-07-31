@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/radar/conti_radar/libconti_radar.so"
+    module_library : "modules/drivers/radar/conti_radar/libconti_radar.so"
     components {
         class_name : "ContiRadarCanbusComponent"
         config {

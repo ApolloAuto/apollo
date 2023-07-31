@@ -35,6 +35,7 @@ g_pwd = os.getcwd()
 g_script_name = os.path.basename(sys.argv[0]).split(".")[0]
 g_process_pid = os.getpid()
 g_process_name = g_script_name + "_" + str(g_process_pid)
+g_default_respawn_limit = 3
 
 cyber_path = os.getenv('CYBER_PATH')
 
@@ -84,7 +85,6 @@ logger.addHandler(console)
 
 def exit_handler():
     stop()
-    os.chdir(g_pwd)
     logger.info('cyber_launch exit.')
 
 
@@ -112,21 +112,25 @@ def module_monitor(mod):
 
 class ProcessWrapper(object):
 
-    def __init__(self, binary_path, dag_num, dag_list, process_name,
-                 process_type, sched_name, exception_handler=''):
+    def __init__(self, binary_path, dag_num, dag_list, plugin_list, process_name, process_type,
+                 sched_name, extra_args_list, exception_handler='', respawn_limit=g_default_respawn_limit):
         self.time_of_death = None
         self.started = False
         self.binary_path = binary_path
         self.dag_num = dag_num
         self.dag_list = dag_list
+        self.plugin_list = plugin_list
         self.name = process_name
         self.sched_name = sched_name
+        self.extra_args_list = extra_args_list
         self.process_type = process_type
         self.popen = None
         self.exit_code = None
         self.args = []
         self.pid = -1
         self.exception_handler = exception_handler
+        self.respawn_limit = respawn_limit
+        self.respawn_cnt = 0
 
     def wait(self):
         if self.started:
@@ -143,12 +147,17 @@ class ProcessWrapper(object):
             for i in self.dag_list:
                 args_list.append('-d')
                 args_list.append(i)
+            for i in self.plugin_list:
+                args_list.append('--plugin')
+                args_list.append(i)
             if len(self.name) != 0:
                 args_list.append('-p')
                 args_list.append(self.name)
             if len(self.sched_name) != 0:
                 args_list.append('-s')
                 args_list.append(self.sched_name)
+            if len(self.extra_args_list) != 0:
+                args_list.extend(self.extra_args_list)
 
         self.args = args_list
 
@@ -160,7 +169,7 @@ class ProcessWrapper(object):
             return 2
         else:
             if self.popen.pid == 0 or self.popen.returncode is not None:
-                logger.error('Start process [%s] failed.' % self.name)
+                logger.error('Start process [%s] failed.', self.name)
                 return 2
 
         th = threading.Thread(target=module_monitor, args=(self, ))
@@ -168,8 +177,7 @@ class ProcessWrapper(object):
         th.start()
         self.started = True
         self.pid = self.popen.pid
-        logger.info('Start process [%s] successfully. pid: %d' %
-                    (self.name, self.popen.pid))
+        logger.info('Start process [%s] successfully. pid: %d', self.name, self.popen.pid)
         logger.info('-' * 120)
         return 0
 
@@ -227,11 +235,9 @@ class ProcessMonitor(object):
         @type  p: L{Process}
         """
         if self.has_process(p.name):
-            logger.error(
-                'Cannot add process due to duplicate name "%s".' % p.name)
+            logger.error('Cannot add process due to duplicate name "%s".', p.name)
         elif self.is_shutdown:
-            logger.error(
-                'Cannot add process [%s] due to monitor has been stopped.' % p.name)
+            logger.error('Cannot add process [%s] due to monitor has been stopped.', p.name)
         else:
             self.procs.append(p)
 
@@ -251,26 +257,21 @@ class ProcessMonitor(object):
         for pw in self.procs:
             if self.is_shutdown:
                 break
-            if pw.process_type == 'binary':
+            if pw.is_alive():
                 continue
-            try:
-                if not pw.is_alive():
-                    if pw.exception_handler == "respawn":
-                        logger.warning(
-                            'child process [%s][%d] exit, respawn!' % (pw.name, pw.pid))
-                        result = pw.start()
-                        if result != 0:
-                            logger.error(
-                                'respawn process [%s] failed, stop all!' % (pw.name))
-                            stop()
-                    elif pw.exception_handler == "exit":
-                        logger.warning(
-                            'child process [%s][%d] exit, stop all' % (pw.name, pw.pid))
-                        stop()
+            if pw.exception_handler == "respawn":
+                if pw.respawn_cnt < pw.respawn_limit:
+                    logger.warning('child process [%s][%d] exit, respawn!', pw.name, pw.pid)
+                    pw.start()
+                    pw.respawn_cnt += 1
+                else:
                     dead_cnt += 1
-            except Exception:
+            elif pw.exception_handler == "exit":
+                logger.warning('child process [%s][%d] exit, stop all', pw.name, pw.pid)
+                # stop and exit
+                stop()
+            else:
                 dead_cnt += 1
-                traceback.print_exc()
         if dead_cnt > 0:
             self.dead_cnt = dead_cnt
             if self.dead_cnt == len(self.procs):
@@ -300,13 +301,42 @@ class ProcessMonitor(object):
 
         for p in self.procs:
             if p.is_alive():
-                logger.warning('Waiting for [%s][%s] exit.' % (p.name, p.pid))
+                logger.warning('Waiting for [%s][%s] exit.', p.name, p.pid)
                 p.wait()
                 logger.info(
-                    'Process [%s] has been stopped. dag_file: %s' % (p.name, p.dag_list))
+                    'Process [%s] has been stopped. dag_file: %s', p.name, p.dag_list)
         # Reset members
         self.procs = []
         self.dead_cnt = 0
+
+
+def get_param_value(module, key, default_value=''):
+    """
+    Get param value by key from xml conf reader.
+    @param module: xml module section
+    @param key: param name
+    @param default_value: if not found key, return the default value
+    """
+    value = module.find(key)
+    if value is None or value.text is None:
+        return default_value
+    return value.text.strip()
+
+
+def get_param_list(module, key):
+    """
+    Get param list info by key from xml conf reader.
+    @param module: xml module section
+    @param key: param name
+    """
+    l = []
+    for v in module.findall(key):
+        if v.text is None:
+            continue
+        value = v.text.strip()
+        if value:
+            l.append(value)
+    return l
 
 
 def start(launch_file=''):
@@ -323,13 +353,13 @@ def start(launch_file=''):
         if os.path.exists(os.path.join(g_pwd, launch_file)):
             launch_file = os.path.join(g_pwd, launch_file)
         else:
-            logger.error('Cannot find launch file: %s ' % launch_file)
+            logger.error('Cannot find launch file: %s ', launch_file)
             sys.exit(1)
-    logger.info('Launch file [%s]' % launch_file)
+    logger.info('Launch file [%s]', launch_file)
     logger.info('=' * 120)
 
     if not os.path.isfile(launch_file):
-        logger.error('Launch xml file %s does not exist' % launch_file)
+        logger.error('Launch xml file %s does not exist', launch_file)
         sys.exit(1)
 
     try:
@@ -337,121 +367,54 @@ def start(launch_file=''):
     except Exception:
         logger.error('Parse xml failed. illegal xml!')
         sys.exit(1)
-    total_dag_num = 0
-    dictionary = {}
-    dag_dict = {}
-    root1 = tree.getroot()
-    for module in root1.findall('module'):
-        process_name = module.find('process_name').text
-        process_type = module.find('type')
-        if process_type is None:
-            process_type = 'library'
-        else:
-            process_type = process_type.text
-            if process_type is None:
-                process_type = 'library'
-            process_type = process_type.strip()
-        if process_type != 'binary':
-            dag_list = []
-            for dag_conf in module.findall('dag_conf'):
-                if dag_conf.text is None:
-                    continue
-                dag = dag_conf.text.strip()
-                if len(dag) > 0:
-                    dag_list.append(dag)
-            if len(dag_list) == 0:
-                logger.error('Library dag conf is null')
-                continue
-            else:
-                total_dag_num += len(dag_list)
 
-            if process_name is None:
-                process_name = 'mainboard_default_' + str(os.getpid())
-            process_name = process_name.strip()
-            if str(process_name) in dictionary:
-                dictionary[str(process_name)] += 1
-            else:
-                dictionary[str(process_name)] = 1
-            if str(process_name) not in dag_dict:
-                dag_dict[str(process_name)] = dag_list
-            else:
-                dag_dict[str(process_name)].extend(dag_list)
-
-    process_list = []
     root = tree.getroot()
+    # set environment
     for env in root.findall('environment'):
         for var in env.getchildren():
             os.environ[var.tag] = str(var.text)
+    # start each process
     for module in root.findall('module'):
-        module_name = module.find('name').text
-        dag_conf = module.find('dag_conf').text
-        process_name = module.find('process_name').text
-        sched_name = module.find('sched_name')
-        process_type = module.find('type')
-        exception_handler = module.find('exception_handler')
-        if process_type is None:
-            process_type = 'library'
+        module_name = get_param_value(module, 'name')
+        process_name = get_param_value(module, 'process_name', 'mainboard_default_' + str(os.getpid()))
+        sched_name = get_param_value(module, 'sched_name', 'CYBER_DEFAULT')
+        process_type = get_param_value(module, 'type', 'library')
+        exception_handler = get_param_value(module, 'exception_handler')
+        respawn_limit_txt = get_param_value(module, 'respawn_limit')
+        if respawn_limit_txt.isnumeric():
+            respawn_limit = int(respawn_limit_txt)
         else:
-            process_type = process_type.text
-            if process_type is None:
-                process_type = 'library'
-            process_type = process_type.strip()
+            respawn_limit = g_default_respawn_limit
+        logger.info('Load module [%s] %s: [%s] [%s] conf, exception_handler: [%s], respawn_limit: [%d]',
+                    module_name, process_type, process_name, sched_name, exception_handler, respawn_limit)
 
-        if sched_name is None:
-            sched_name = "CYBER_DEFAULT"
-        else:
-            sched_name = sched_name.text
-
-        if process_name is None:
-            process_name = 'mainboard_default_' + str(os.getpid())
-        dag_list = []
-        for dag_conf in module.findall('dag_conf'):
-            if dag_conf.text is None:
+        if process_type == 'binary':
+            if len(process_name) == 0:
+                logger.error('Start binary failed. Binary process_name is null.')
                 continue
-            dag = dag_conf.text.strip()
-            if len(dag) > 0:
-                dag_list.append(dag)
-        if module_name is None:
-            module_name = ''
-        if exception_handler is None:
-            exception_handler = ''
+            pw = ProcessWrapper(process_name.split()[0], 0, [""], [], process_name, process_type,
+                                sched_name, [], exception_handler, respawn_limit)
+        # Default is library
         else:
-            exception_handler = exception_handler.text
-        module_name = module_name.strip()
-        process_name = process_name.strip()
-        sched_name = sched_name.strip()
-        exception_handler = exception_handler.strip()
-
-        logger.info('Load module [%s] %s: [%s] [%s] conf: [%s] exception_handler: [%s]' %
-                    (module_name, process_type, process_name, sched_name, ', '.join(dag_list),
-                     exception_handler))
-
-        if process_name not in process_list:
-            if process_type == 'binary':
-                if len(process_name) == 0:
-                    logger.error(
-                        'Start binary failed. Binary process_name is null.')
-                    continue
-                pw = ProcessWrapper(
-                    process_name.split()[0], 0, [
-                        ""], process_name, process_type,
-                    exception_handler)
-            # Default is library
-            else:
-                pw = ProcessWrapper(
-                    g_binary_name, 0, dag_dict[
-                        str(process_name)], process_name,
-                    process_type, sched_name, exception_handler)
-            result = pw.start()
-            if result != 0:
-                logger.error(
-                    'Start manager [%s] failed. Stop all!' % process_name)
-                stop()
-            pmon.register(pw)
-            process_list.append(process_name)
+            dag_list = get_param_list(module, 'dag_conf')
+            if not dag_list:
+                logger.error('module [%s] library dag conf is null.', module_name)
+                continue
+            plugin_list = get_param_list(module, 'plugin')
+            extra_args_list = []
+            extra_args = module.attrib.get('extra_args')
+            if extra_args is not None:
+                extra_args_list = extra_args.split()
+            pw = ProcessWrapper(g_binary_name, 0, dag_list, plugin_list, process_name, process_type,
+                                sched_name, extra_args_list, exception_handler, respawn_limit)
+        result = pw.start()
+        if result != 0:
+            logger.error('Start manager [%s] failed. Stop all!', process_name)
+            stop()
+        pmon.register(pw)
 
     # No module in xml
-    if not process_list:
+    if not pmon.procs:
         logger.error("No module was found in xml config.")
         return
     all_died = pmon.run()
@@ -499,10 +462,8 @@ def main():
     Main function
     """
     if cyber_path is None:
-        logger.error(
-            'Error: environment variable CYBER_PATH not found, set environment first.')
+        logger.error('Error: environment variable CYBER_PATH not found, set environment first.')
         sys.exit(1)
-    os.chdir(cyber_path)
     parser = argparse.ArgumentParser(description='cyber launcher')
     subparsers = parser.add_subparsers(help='sub-command help')
 

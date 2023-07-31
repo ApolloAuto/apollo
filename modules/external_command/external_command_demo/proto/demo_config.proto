@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.external_command_demo;
+
+message DemoConfig {
+  // Left path width for Sending PathFollowCommand.
+  optional double left_path_width = 1 [default = 2.0];
+  // Right path width for Sending PathFollowCommand.
+  optional double right_path_width = 2  [default = 2.0];
+  // Target speed for Motion command.
+  optional double target_speed = 3 [default = 2.0];
+  // Minimum distance error between location record. 
+  optional double min_distance_error = 4 [default = 1.0];
+}

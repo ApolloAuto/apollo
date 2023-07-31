@@ -1,0 +1,11 @@
+module_config {
+    module_library : "modules/perception/msg_adapter/libmsg_adapter_component.so"
+
+    components {
+      class_name : "MsgAdapterComponent"
+      config {
+        name : "MsgAdapterComponent"
+        flag_file_path: "/apollo/modules/perception/data/flag/perception_common.flag"
+      }
+    }
+}

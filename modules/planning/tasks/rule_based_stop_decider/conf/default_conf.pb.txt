@@ -1,0 +1,8 @@
+max_adc_stop_speed: 0.5
+max_valid_stop_distance: 1.0
+search_beam_length: 20.0
+search_beam_radius_intensity: 0.08
+search_range: 3.14
+is_block_angle_threshold: 0.5
+enable_lane_change_urgency_checking: false
+short_path_length_threshold: 20.0

@@ -1,22 +1,23 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 HESAI_COPTS = ['-DMODULE_NAME=\\"hesai\\"']
 
-install(
-    name = "install",
-    data_dest = "drivers/addition_data/lidar/hesai",
-    library_dest = "drivers/lib/lidar/hesai",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        "libhesai_driver_component.so",
-    ],
-)
+# install(
+#     name = "install",
+#     data_dest = "drivers-lidar/addition_data/hesai",
+#     library_dest = "drivers-lidar/lib/lidar/hesai",
+#     data = [
+#         ":runtime_data",
+#     ],
+#     targets = [
+#         "libhesai_driver_component.so",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -132,4 +133,5 @@ cc_library(
     hdrs = ["common/const_var.h"],
 )
 
+apollo_package()
 cpplint()

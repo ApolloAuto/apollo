@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message DemoControlTaskConf{
+  optional double bound_acc = 1;  
+}

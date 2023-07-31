@@ -1,20 +1,27 @@
 #! /usr/bin/env bash
 set -e
 
+# INSTALL_TARGETS=(//modules/external_command/external_command_demo:install //modules/external_command/process_component:install //modules/external_command/old_routing_adapter:install //modules/common_msgs:install  //modules/v2x:install //cyber:install //modules/data:install //modules/audio:install //modules/bridge:install //modules/calibration:install //modules/canbus:install //modules/canbus_vehicle/ch:install //modules/canbus_vehicle/devkit:install //modules/canbus_vehicle/ge3:install //modules/canbus_vehicle/gem:install //modules/canbus_vehicle/lexus:install //modules/canbus_vehicle/lincoln:install //modules/canbus_vehicle/neolix_edu:install //modules/canbus_vehicle/transit:install //modules/canbus_vehicle/wey:install //modules/canbus_vehicle/zhongyun:install //modules/common:install //modules/contrib/cyber_bridge:install //modules/control/control_component:install //modules/planning/planning_base:install //modules/dreamview:install //modules/drivers/camera:install //modules/drivers/canbus:install //modules/drivers/gnss:install //modules/drivers/lidar:install //modules/drivers/microphone:install //modules/drivers/radar:install //modules/drivers/smartereye:install //modules/drivers/tools/image_decompress:install //modules/drivers/video:install //modules/guardian:install //modules/localization:install //modules/map:install //modules/monitor:install //modules/prediction:install //modules/routing:install //modules/storytelling:install //modules/task_manager:install //modules/third_party_perception:install //modules/tools:install //modules/transform:install //third_party/rtklib:install //modules/control/control_component:install)
+# SUBDIR_TARGETS=(modules/planning/pnc_map modules/control/controllers modules/external_command/command_processor modules/planning/traffic_rules modules/perception modules/planning/tasks modules/planning/scenarios modules/control/controllers)
+SUBDIR_TARGETS=(modules/perception)
+INSTALL_TARGETS=()
+
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
 
 export OPT_APOLLO="$(dirname "${APOLLO_SYSROOT_DIR}")"
-export PREFIX_DIR=/opt/apollo/neo/packages/
+export PREFIX_DIR="${PREFIX_DIR:=${APOLLO_DISTRIBUTION_HOME}}"
 
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5"
+BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5 --cxxopt=-fPIC"
 SHORTHAND_TARGETS=
 CMDLINE_OPTIONS=
 INSTALL_OPTIONS=
 USE_GPU=-1
+LEGACY_RELEASE=0
+USER_INPUT_PREFIX=
 
 function _usage() {
     info "Usage: $0 <module>(Can be empty) [Options]"
@@ -23,9 +30,8 @@ function _usage() {
     info "${TAB} -l, --list         Print the list of installed files; don't install anything"
     info "${TAB} -c, --clean        Ensure clean install by removing prefix dir if exist before installing"
     info "${TAB} -r, --resolve      Also resolve APT packages on which this release build depends"
+    info "${TAB} --legacy           Legacy way to release apollo output"
     info "${TAB} -h, --help         Show this message and exit"
-    info "${TAB} --gpu              Running GPU build"
-    info "${TAB} --cpu              Running CPU build"
 }
 
 function _check_arg_for_opt() {
@@ -47,9 +53,13 @@ function parse_cmdline_args() {
             -p | --prefix)
                 _check_arg_for_opt "${opt}" "$1"
                 prefix_dir="$1"; shift
+                USER_INPUT_PREFIX="${prefix_dir}"
                 ;;
             -l | --list)
                 LIST_ONLY=1
+                ;;
+            --legacy)
+                LEGACY_RELEASE=1
                 ;;
             -r | --resolve)
                 RESOLVE_DEPS=1
@@ -61,12 +71,7 @@ function parse_cmdline_args() {
                 _usage
                 exit 0
                 ;;
-            --cpu)
-                USE_GPU=0
-                ;;
-            --gpu)
-                USE_GPU=1
-                ;;
+
             *)
                 remained_args="${remained_args} ${opt}"
                 ;;
@@ -97,7 +102,7 @@ function determine_cpu_or_gpu_build() {
 
   if [ "${USE_GPU}" -eq 1 ]; then
     CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
-    INSTALL_OPTIONS=" --gpu ${INSTALL_OPTIONS}"
+    # INSTALL_OPTIONS=" --gpu ${INSTALL_OPTIONS}"
 
     ok "Running GPU build."
   else
@@ -217,24 +222,89 @@ function resolve_directory_path() {
 }
 
 function run_install() {
-    local install_targets
-    install_targets="$(determine_release_targets ${SHORTHAND_TARGETS})"
-    bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${install_targets} \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    local install_target=()
+    local install_src_target=()
+    # local search_install_targets=`bazel query 'attr(name, install, //modules/... except //modules/perception2/...)' 2>/dev/null`
+    # local serach_install_3rd_targets=`bazel query 'attr(name, install, //third_party/rtklib/...)' 2>/dev/null`
     
-    # install files copy from source code.
-    bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install_src \
-        -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+    # search_install_targets+=(${search_install_3rd_targets[@]})
+
+    # for instance in ${search_install_targets[*]}; do
+    # instance_list=(${instance//:/ })
+    # if [[ ${instance_list[1]} == install ]]; then
+    #     install_target[${#install_target[*]}]=${instance}
+    # elif [[ ${instance_list[1]} == install_src ]]; then
+    #     install_src_target[${#install_src_target[*]}]=${instance}
+    # fi
+    # done
+
+    for d in ${SUBDIR_TARGETS[*]}; do
+        sub_dirs=`ls ${d}`
+        for dir in ${sub_dirs[*]}; do
+            if [[ ${dir} == BUILD ]]; then
+                continue
+            elif [[ ${dir} == README.md ]]; then
+                continue
+            elif [[ ${dir} == production ]]; then
+                continue
+            elif [[ ${dir} == camera_overlap_filter ]]; then
+                continue
+            elif [[ ${dir} == hdmap_based_proposal ]]; then
+                continue
+            elif [[ ${dir} == launch ]]; then
+                continue
+            fi
+            INSTALL_TARGETS[${#INSTALL_TARGETS[*]}]="//${d}/${dir}:install"
+        done
+    done
+
+    if [[ "${LEGACY_RELEASE}" -gt 0 ]]; then
+        bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install \
+            -- ${install_opts} ${INSTALL_OPTIONS} ${PREFIX_DIR}
+    else
+
+        for target in ${INSTALL_TARGETS[*]}; do
+            bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
+                -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+        done
+
+        for target in ${INSTALL_TARGETS[*]}; do
+            bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
+                -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+	    done
+
+        # install files copy from source code.
+        # for target in ${install_src_target[*]}; do
+        #     bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
+        #         -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+        # done
+
+        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install \
+        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+
+        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install \
+        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+
+        # # install files copy from source code.
+        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install_src \
+        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}" 
+    
+    fi
+
 }
 
 function export_python_path() {
-    if [ `grep -c /opt/apollo/neo/packages/python-support/local ~/.bashrc` -ne 0 ]; then 
+    if [ `grep -c /opt/apollo/neo/packages/python-support/local ~/.bashrc` -ne 0 ]; then
         echo '\nexport PYTHONPATH=/opt/apollo/neo/packages/python-support/local:$PYTHONPATH' >> ~/.bashrc
     fi
 }
 
 function main() {
     parse_cmdline_args "$@"
+
+    # force to use gpu build to release package
+    USE_GPU=1
+    determine_cpu_or_gpu_build
 
     local install_opts=
     if [[ "${LIST_ONLY}" -gt 0 ]]; then
@@ -244,10 +314,13 @@ function main() {
         install_opts="${install_opts} --pre_clean"
     fi
 
-    determine_cpu_or_gpu_build
+    if [[ "${LEGACY_RELEASE}" -gt 0 ]]; then
+        PREFIX_DIR=${prefix_dir:="${PWD}/output"}
+        install_opts="${install_opts} --legacy"
+    fi
 
     run_install
-
+    
     if [[ "${LIST_ONLY}" -gt 0 ]]; then
         return
     fi
@@ -265,11 +338,13 @@ function main() {
         generate_apt_pkgs
         ok "Done. Packages list has been writen to ${PKGS_TXT}"
     fi
-    
+
     export_python_path
 
-    # generate_py_packages
-    # resolve_directory_path
+    if [[ "${LEGACY_RELEASE}" -gt 0 ]]; then 
+        generate_py_packages
+        resolve_directory_path
+    fi
 }
 
 main "$@"

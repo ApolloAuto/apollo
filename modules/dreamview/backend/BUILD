@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 load("//tools/platform:build_defs.bzl", "copts_if_teleop", "if_teleop")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -71,12 +72,12 @@ cc_binary(
     ] + if_teleop(["//modules/dreamview/backend/teleop"]),
 )
 
-install(
-    name = "install",
-    library_dest = "dreamview/lib",
-    data_dest = "dreamview/addition_data/backend",
-    data = ["//modules/dreamview/backend/testdata:testdata"],
-    targets = [":libbackend.so"]
-)
-
+# install(
+#     name = "install",
+#     library_dest = "dreamview/lib",
+#     data_dest = "dreamview/addition_data/backend",
+#     data = ["//modules/dreamview/backend/testdata:testdata"],
+#     targets = [":libbackend.so"]
+# )
+apollo_package()
 cpplint()

@@ -55,6 +55,11 @@ using apollo::common::util::FillHeader;
 using apollo::control::ControlCommand;
 using apollo::cyber::Clock;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::external_command::CommandStatus;
+using apollo::external_command::LaneFollowCommand;
+using apollo::external_command::ValetParkingCommand;
+using apollo::external_command::ActionCommandType;
+using apollo::external_command::ActionCommand;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 using apollo::hdmap::Path;
@@ -69,6 +74,7 @@ using apollo::perception::V2XInformation;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
+using apollo::planning::PlanningCommand;
 using apollo::planning_internal::PlanningData;
 using apollo::prediction::ObstacleInteractiveTag;
 using apollo::prediction::ObstaclePriority;
@@ -76,7 +82,6 @@ using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::relative_map::MapMsg;
 using apollo::relative_map::NavigationInfo;
-using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using apollo::storytelling::Stories;
 using apollo::task_manager::Task;
@@ -264,10 +269,8 @@ SimulationWorldService::SimulationWorldService(const MapService *map_service,
 }
 
 void SimulationWorldService::InitReaders() {
-  routing_request_reader_ =
-      node_->CreateReader<RoutingRequest>(FLAGS_routing_request_topic);
-  routing_response_reader_ =
-      node_->CreateReader<RoutingResponse>(FLAGS_routing_response_topic);
+  planning_command_reader_ =
+      node_->CreateReader<PlanningCommand>(FLAGS_planning_command);
   chassis_reader_ = node_->CreateReader<Chassis>(FLAGS_chassis_topic);
   gps_reader_ = node_->CreateReader<Gps>(FLAGS_gps_topic);
   localization_reader_ =
@@ -318,25 +321,17 @@ void SimulationWorldService::InitReaders() {
 void SimulationWorldService::InitWriters() {
   navigation_writer_ =
       node_->CreateWriter<NavigationInfo>(FLAGS_navigation_topic);
-
-  {  // configure QoS for routing request writer
-    apollo::cyber::proto::RoleAttributes routing_request_attr;
-    routing_request_attr.set_channel_name(FLAGS_routing_request_topic);
-    auto qos = routing_request_attr.mutable_qos_profile();
-    // only keeps the last message in history
-    qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
-    // reliable transfer
-    qos->set_reliability(
-        apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-    // Don't send the history message when new readers are found.
-    qos->set_durability(
-        apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_SYSTEM_DEFAULT);
-    routing_request_writer_ =
-        node_->CreateWriter<RoutingRequest>(routing_request_attr);
-  }
-
+  lane_follow_command_client_ =
+      node_->CreateClient<LaneFollowCommand, CommandStatus>(
+          FLAGS_lane_follow_command_topic);
+  valet_parking_command_client_ =
+      node_->CreateClient<ValetParkingCommand, CommandStatus>(
+          FLAGS_valet_parking_command_topic);
+  action_command_client_ =
+      node_->CreateClient<ActionCommand, CommandStatus>(
+          FLAGS_action_command_topic);
   routing_response_writer_ =
-      node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+      node_->CreateWriter<RoutingResponse>("/apollo/routing_response");
   task_writer_ = node_->CreateWriter<Task>(FLAGS_task_topic);
 }
 
@@ -362,7 +357,7 @@ void SimulationWorldService::Update() {
 
   UpdateMonitorMessages();
 
-  UpdateWithLatestObserved(routing_response_reader_.get(), false);
+  UpdateWithLatestObserved(planning_command_reader_.get(), false);
   UpdateWithLatestObserved(chassis_reader_.get());
   UpdateWithLatestObserved(gps_reader_.get());
   UpdateWithLatestObserved(localization_reader_.get());
@@ -1156,7 +1151,8 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
-    const RoutingResponse &routing_response) {
+    const PlanningCommand &planning_command) {
+  auto routing_response = planning_command.lane_follow_command();
   {
     boost::shared_lock<boost::shared_mutex> reader_lock(route_paths_mutex_);
     if (world_.has_routing_time() &&
@@ -1350,8 +1346,7 @@ void SimulationWorldService::UpdateMonitorMessages() {
 void SimulationWorldService::DumpMessages() {
   DumpMessageFromReader(chassis_reader_.get());
   DumpMessageFromReader(prediction_obstacle_reader_.get());
-  DumpMessageFromReader(routing_request_reader_.get());
-  DumpMessageFromReader(routing_response_reader_.get());
+  DumpMessageFromReader(planning_command_reader_.get());
   DumpMessageFromReader(localization_reader_.get());
   DumpMessageFromReader(planning_reader_.get());
   DumpMessageFromReader(control_command_reader_.get());
@@ -1368,10 +1363,22 @@ void SimulationWorldService::PublishNavigationInfo(
   navigation_writer_->Write(navigation_info);
 }
 
-void SimulationWorldService::PublishRoutingRequest(
-    const std::shared_ptr<RoutingRequest> &routing_request) {
-  FillHeader(FLAGS_dreamview_module_name, routing_request.get());
-  routing_request_writer_->Write(routing_request);
+void SimulationWorldService::PublishLaneFollowCommand(
+    const std::shared_ptr<LaneFollowCommand> &lane_follow_command) {
+  FillHeader(FLAGS_dreamview_module_name, lane_follow_command.get());
+  lane_follow_command_client_->SendRequest(lane_follow_command);
+}
+
+void SimulationWorldService::PublishValetParkingCommand(
+    const std::shared_ptr<ValetParkingCommand> &valet_parking_command) {
+  FillHeader(FLAGS_dreamview_module_name, valet_parking_command.get());
+  valet_parking_command_client_->SendRequest(valet_parking_command);
+}
+
+void SimulationWorldService::PublishActionCommand(
+    const std::shared_ptr<ActionCommand> &action_command) {
+  FillHeader(FLAGS_dreamview_module_name, action_command.get());
+  action_command_client_->SendRequest(action_command);
 }
 
 void SimulationWorldService::PublishTask(const std::shared_ptr<Task> &task) {

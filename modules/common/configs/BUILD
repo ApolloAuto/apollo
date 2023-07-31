@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    data_dest = "common",
-    targets = [
-        ":libconfig_gflags.so",
-        ":libvehicle_config_helper.so",
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "common/lib",
+#     data_dest = "common",
+#     targets = [
+#         ":libconfig_gflags.so",
+#         ":libvehicle_config_helper.so",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "libconfig_gflags.so",
@@ -89,4 +90,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -1,0 +1,3 @@
+<library path="modules/planning/scenarios/pull_over/libpull_over_scenario.so">
+    <class type="apollo::planning::PullOverScenario" base_class="Scenario"></class>
+</library>

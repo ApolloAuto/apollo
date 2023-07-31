@@ -17,11 +17,10 @@
 #include "modules/canbus_vehicle/neolix_edu/neolix_edu_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/neolix_edu/neolix_edu_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/neolix_edu/neolix_edu_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -30,6 +29,7 @@ namespace canbus {
 namespace neolix_edu {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -452,25 +452,31 @@ void Neolix_eduController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void Neolix_eduController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode Neolix_eduController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void Neolix_eduController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.low_beam()) {
     // None
   } else {
     // None
   }
 }
 
-void Neolix_eduController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void Neolix_eduController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void Neolix_eduController::SetTurningSignal(const ControlCommand& command) {
+void Neolix_eduController::SetTurningSignal(
+    const VehicleSignal& vehicle_signal) {
   // None
 }
 

@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
-install(
-    name = "install",
-    library_dest = "common/lib",
-    data_dest = "common",
-    runtime_dest = "common/bin",
-    targets = [
-        ":libvehicle_state_provider.so",
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "common/lib",
+#     data_dest = "common",
+#     runtime_dest = "common/bin",
+#     targets = [
+#         ":libvehicle_state_provider.so",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
 package(default_visibility = ["//visibility:public"])
 
@@ -69,5 +70,14 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+filegroup(
+    name = "test_data",
+    srcs = glob([
+        "testdata/*",
+    ]),
+)
+
+apollo_package()
 
 cpplint()

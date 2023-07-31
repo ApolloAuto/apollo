@@ -1,4 +1,5 @@
 package(default_visibility = ["//visibility:public"])
+load("//tools:apollo_package.bzl", "apollo_package")
 
 filegroup(
     name = "testdata",
@@ -6,3 +7,5 @@ filegroup(
         "*",
     ]),
 )
+
+apollo_package()

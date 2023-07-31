@@ -29,7 +29,7 @@ For additional reference, please visit: [http://velodynelidar.com/vlp-16.html](h
 
 ### Calibration requirement
 
-Refer to the [Apollo Sensor Calibration Guide](../Perception/multiple_lidar_gnss_calibration_guide.md)
+Refer to the [Apollo Sensor Calibration Guide](../06_Perception/multiple_lidar_gnss_calibration_guide.md)
 for Sensor Calibration information.
 
 ### Additional requirements

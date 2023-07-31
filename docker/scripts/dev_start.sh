@@ -21,19 +21,20 @@ source "${CURR_DIR}/docker_base.sh"
 CACHE_ROOT_DIR="${APOLLO_ROOT_DIR}/.cache"
 
 DOCKER_REPO="apolloauto/apollo"
-DEV_CONTAINER="apollo_dev_${USER}"
+DEV_CONTAINER_PREFIX='apollo_dev_'
+DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 DEV_INSIDE="in-dev-docker"
 
 SUPPORTED_ARCHS=(x86_64 aarch64)
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20221124_1708"
+VERSION_X86_64="dev-x86_64-18.04-20230724_1143"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-VERSION_AARCH64="dev-aarch64-18.04-20201218_0030"
+VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
 USER_VERSION_OPT=
 
-FAST_MODE="y"
+FAST_MODE="no"
 
 GEOLOC=
 
@@ -45,10 +46,10 @@ VOLUME_VERSION="latest"
 SHM_SIZE="2G"
 USER_SPECIFIED_MAPS=
 MAP_VOLUMES_CONF=
+OTHER_VOLUMES_CONF=
 
 # Install python tools
-PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
-PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
+source docker/setup_host/host_env.sh
 DEFAULT_PYTHON_TOOLS=(
   amodel
 )
@@ -56,10 +57,17 @@ DEFAULT_PYTHON_TOOLS=(
 # Model
 MODEL_REPOSITORY="https://apollo-pkg-beta.cdn.bcebos.com/perception_model"
 DEFAULT_INSTALL_MODEL=(
+  "${MODEL_REPOSITORY}/tl_detection_caffe.zip"
+  "${MODEL_REPOSITORY}/horizontal_caffe.zip"
+  "${MODEL_REPOSITORY}/quadrate_caffe.zip"
+  "${MODEL_REPOSITORY}/vertical_caffe.zip"
+  "${MODEL_REPOSITORY}/darkSCNN_caffe.zip"
   "${MODEL_REPOSITORY}/cnnseg128_caffe.zip"
+  "${MODEL_REPOSITORY}/3d-r4-half_caffe.zip"
+  "${MODEL_REPOSITORY}/smoke_torch.zip"
 )
+CROSS_PLATFORM_FLAG=0
 
-# Map
 DEFAULT_MAPS=(
     sunnyvale_big_loop
     sunnyvale_loop
@@ -69,6 +77,7 @@ DEFAULT_MAPS=(
 )
 
 DEFAULT_TEST_MAPS=(
+    sunnyvale_big_loop
     sunnyvale_loop
 )
 
@@ -76,16 +85,26 @@ function show_usage() {
     cat <<EOF
 Usage: $0 [options] ...
 OPTIONS:
-    -h, --help             Display this help and exit.
-    -f, --fast <y|n>       Fast mode without pulling all map volumes and perception models.
-    -g, --geo <us|cn|none> Pull docker image from geolocation specific registry mirror.
-    -l, --local            Use local docker image.
-    -t, --tag <TAG>        Specify docker image with tag <TAG> to start.
-    -d, --dist             Specify Apollo distribution(stable/testing)
-    --shm-size <bytes>     Size of /dev/shm . Passed directly to "docker run"
-    -y                     Agree to Apollo License Agreement non-interactively.
-    stop                   Stop all running Apollo containers.
+    -h, --help                    Display this help and exit
+    -f, --fast                    Fast mode without pulling all map volumes
+    -g, --geo <us|cn|none>        Pull docker image from geolocation specific registry mirror
+    -l, --local                   Use local docker image
+    -t, --tag <TAG>               Specify docker image with tag <TAG> to start
+    -d, --dist                    Specify Apollo distribution(stable/testing)
+    -c, --cross-platform <arch>   Run a cross-platform image
+    --shm-size <bytes>            Size of /dev/shm, passed directly to "docker run"
+    -y                            Agree to Apollo License Agreement non-interactively
+    stop                          Stop all running Apollo containers
 EOF
+}
+
+function cross_platform_setup() {
+    info "Setup qemu user static..."
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes -c yes > /dev/null
+    if [[ ! $? -eq 0 ]]; then
+        error "Qemu setup failed! Please report this issue to Apollo team."
+        exit -1
+    fi
 }
 
 function parse_arguments() {
@@ -106,6 +125,21 @@ function parse_arguments() {
                 custom_version="$1"
                 shift
                 optarg_check_for_opt "${opt}" "${custom_version}"
+                ;;
+
+            -c | --cross-platform)
+                custom_arch="$1"
+                shift
+                if [[ "$TARGET_ARCH" == "aarch64" && "$custom_arch" == "x86_64" ]]; then
+                    error "Run x86_64 image on aarch64 currently is not supported!"
+                    exit -1
+                fi
+                if [[ ! "$TARGET_ARCH" ==  "$custom_arch" ]]; then
+                    CROSS_PLATFORM_FLAG=1
+                fi 
+                TARGET_ARCH="$custom_arch"
+                check_target_arch 
+                cross_platform_setup
                 ;;
 
             -d | --dist)
@@ -133,6 +167,30 @@ function parse_arguments() {
 
             -l | --local)
                 USE_LOCAL_IMAGE=1
+                ;;
+
+            --user)
+                export CUSTOM_USER="$1"
+                shift
+                ;;
+
+            --uid)
+                export CUSTOM_UID="$1"
+                shift
+                ;;
+
+            --group)
+                export CUSTOM_GROUP="$1"
+                shift
+                ;;
+            --gid)
+                export CUSTOM_GID="$1"
+                shift
+                ;;
+
+            -n | --name)
+                DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${1}"
+                shift
                 ;;
 
             --shm-size)
@@ -197,12 +255,15 @@ function check_host_environment() {
 
 function check_target_arch() {
     local arch="${TARGET_ARCH}"
+    local support_arch=""
     for ent in "${SUPPORTED_ARCHS[@]}"; do
+        support_arch="$support_arch $ent"
         if [[ "${ent}" == "${TARGET_ARCH}" ]]; then
             return 0
         fi
     done
     error "Unsupported target architecture: ${TARGET_ARCH}."
+    error "Current Apollo support architecture:$support_arch."
     exit 1
 }
 
@@ -226,10 +287,6 @@ function setup_devices_and_mount_local_volumes() {
     local apollo_tools="${APOLLO_ROOT_DIR}/../apollo-tools"
     if [ -d "${apollo_tools}" ]; then
         volumes="${volumes} -v ${apollo_tools}:/tools"
-    fi
-    # Mount PYTHON_INSTALL_PATH to apollo docker
-    if [ -d "${PYTHON_INSTALL_PATH}" ]; then
-        volumes="${volumes} -v ${PYTHON_INSTALL_PATH}:${PYTHON_INSTALL_PATH}"
     fi
 
     local os_release="$(lsb_release -rs)"
@@ -283,7 +340,7 @@ function docker_restart_volume() {
     info "Create volume ${volume} from image: ${image}"
     docker_pull "${image}"
     docker volume rm "${volume}" >/dev/null 2>&1
-    docker run -v "${volume}":"${path}" --rm "${image}" true
+    docker run -v "${volume}":"${path}" --rm "${image}" true > /dev/null
 }
 
 function restart_map_volume_if_needed() {
@@ -291,6 +348,8 @@ function restart_map_volume_if_needed() {
     local map_version="$2"
     local map_volume="apollo_map_volume-${map_name}_${USER}"
     local map_path="/apollo/modules/map/data/${map_name}"
+    # some map image does not support aarch64, force to use image of x86_64
+    local TARGET_ARCH="x86_64"
 
     if [[ ${MAP_VOLUMES_CONF} == *"${map_volume}"* ]]; then
         info "Map ${map_name} has already been included."
@@ -316,7 +375,7 @@ function mount_map_volumes() {
         done
     fi
 
-    if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
+    if [[ "$FAST_MODE" == "no" ]]; then
         for map_name in ${DEFAULT_MAPS[@]}; do
             restart_map_volume_if_needed "${map_name}" "${VOLUME_VERSION}"
         done
@@ -327,12 +386,30 @@ function mount_map_volumes() {
     fi
 }
 
+function mount_other_volumes() {
+    info "Mount other volumes ..."
+    local volume_conf=
+    local TARGET_ARCH="x86_64"
+
+    # AUDIO
+    local audio_volume="apollo_audio_volume_${USER}"
+    local audio_image="${DOCKER_REPO}:data_volume-audio_model-${TARGET_ARCH}-latest"
+    local audio_path="/apollo/modules/audio/data/"
+    docker_restart_volume "${audio_volume}" "${audio_image}" "${audio_path}"
+    volume_conf="${volume_conf} --volume ${audio_volume}:${audio_path}"
+    OTHER_VOLUMES_CONF="${volume_conf}"
+}
+
 function install_python_tools() {
   export PYTHONUSERBASE=${PYTHON_INSTALL_PATH}
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
     info "Install python tool ${tool} ..."
     pip3 install --user "${tool}"
+    if [ $? -ne 0 ]; then
+        error "Failed to install ${tool}"
+        exit 1
+    fi
   done
 }
 
@@ -340,7 +417,7 @@ function install_perception_models() {
   if [ "$FAST_MODE" == "n" ] || [ "$FAST_MODE" == "no" ]; then
     for model_url in ${DEFAULT_INSTALL_MODEL[@]}; do
         info "Install model ${model_url} ..."
-        amodel install "${model_url}"
+        amodel install "${model_url}" -s
     done
   else
     warning "Skip the model installation, if you need to run the perception module, you can manually install."
@@ -380,6 +457,7 @@ function main() {
     setup_devices_and_mount_local_volumes local_volumes
 
     mount_map_volumes
+    mount_other_volumes
 
     info "Installing python tools ..."
     install_python_tools
@@ -391,16 +469,18 @@ function main() {
 
     local local_host="$(hostname)"
     local display="${DISPLAY:-:0}"
-    local user="${USER}"
-    local uid="$(id -u)"
-    local group="$(id -g -n)"
-    local gid="$(id -g)"
+    local user="${CUSTOM_USER-$USER}"
+    local uid="${CUSTOM_UID-$(id -u)}"
+    local group="${CUSTOM_GROUP-$(id -g -n)}"
+    local gid="${CUSTOM_GID-$(id -g)}"
 
     set -x
 
     ${DOCKER_RUN_CMD} -itd \
         --privileged \
         --name "${DEV_CONTAINER}" \
+        --label "owner=${USER}" \
+        -e CROSS_PLATFORM="${CROSS_PLATFORM_FLAG}"\
         -e DISPLAY="${display}" \
         -e DOCKER_USER="${user}" \
         -e USER="${user}" \
@@ -408,12 +488,11 @@ function main() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${DEV_IMAGE}" \
-        -e PYTHON_INSTALL_PATH="${PYTHON_INSTALL_PATH}" \
-        -e PYTHON_VERSION="${PYTHON_VERSION}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
         ${MAP_VOLUMES_CONF} \
+        ${OTHER_VOLUMES_CONF} \
         ${local_volumes} \
         --net host \
         -w /apollo \
@@ -433,6 +512,7 @@ function main() {
     set +x
 
     postrun_start_user "${DEV_CONTAINER}"
+    postrun_cross_platfrom_download "${DEV_CONTAINER}" "${CROSS_PLATFORM_FLAG}" 
 
     ok "Congratulations! You have successfully finished setting up Apollo Dev Environment."
     ok "To login into the newly created ${DEV_CONTAINER} container, please run the following command:"

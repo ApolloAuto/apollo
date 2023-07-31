@@ -22,8 +22,8 @@
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/ch/ch_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -31,6 +31,7 @@ namespace apollo {
 namespace canbus {
 namespace ch {
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -485,22 +486,27 @@ void ChController::Steer(double angle, double angle_spd) {
 
 void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {
+ErrorCode ChController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void ChController::SetBeam(const VehicleSignal& vehicle_signal) {
   // Set low beam
-  if (command.signal().low_beam()) {
+  if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     turnsignal_command_113_->set_low_beam_cmd(
         Turnsignal_command_113::LOW_BEAM_CMD_ON);
-  } else {
+  } else if (vehicle_signal.has_low_beam() && !vehicle_signal.low_beam()) {
     turnsignal_command_113_->set_low_beam_cmd(
         Turnsignal_command_113::LOW_BEAM_CMD_OFF);
   }
 }
 
-void ChController::SetHorn(const ControlCommand& command) {}
+void ChController::SetHorn(const VehicleSignal& vehicle_signal) {}
 
-void ChController::SetTurningSignal(const ControlCommand& command) {
+void ChController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     turnsignal_command_113_->set_turn_signal_cmd(
         Turnsignal_command_113::TURN_SIGNAL_CMD_LEFT);

@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.perception.lidar;
+
+message LidarOutputComponentConfig {
+  optional string output_channel_name = 1;
+}

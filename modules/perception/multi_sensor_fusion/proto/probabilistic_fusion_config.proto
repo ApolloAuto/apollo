@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.perception.fusion;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message ProbabilisticFusionConfig {
+  optional bool use_lidar = 1 [default = true];
+  optional bool use_radar = 2 [default = true];
+  optional bool use_camera = 3 [default = true];
+  optional perception.PluginParam tracker_param = 4;
+  optional perception.PluginParam data_association_param = 5;
+  optional perception.PluginParam gatekeeper_param = 6;
+  repeated string prohibition_sensors = 7;
+
+  // initialization for static members in base/track.h
+  optional double max_lidar_invisible_period = 8 [default = 0.25];
+  optional double max_radar_invisible_period = 9 [default = 0.50];
+  optional double max_camera_invisible_period = 10 [default = 0.75];
+
+  // initialization for static members in base/sensor.h
+  optional int64 max_cached_frame_num = 11 [default = 50];
+}

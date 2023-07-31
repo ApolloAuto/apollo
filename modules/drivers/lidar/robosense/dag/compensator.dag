@@ -5,7 +5,7 @@
 ##################################################
 
 module_config {
-    module_library : "/apollo/bazel-bin/modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
+    module_library : "modules/drivers/lidar/robosense/compensator/librobosense_compensator_component.so"
 
     components {
       class_name : "CompensatorComponent"

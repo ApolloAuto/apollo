@@ -19,7 +19,7 @@
 
 import os
 import logging
-import numpy as np
+import math
 
 from cyber_record.record import Record
 from record_msg.builder import (
@@ -28,18 +28,17 @@ from record_msg.builder import (
   LocalizationBuilder,
   TransformBuilder)
 from adataset.nuscenes.nuscenes import NuScenesSchema, NuScenesHelper, NuScenes
-from adataset.nuscenes.geometry import Quaternion
-
+from adataset.nuscenes.geometry import (
+  Euler,
+  Quaternion,
+)
+from adataset.nuscenes.params import (
+  nuscenes2apollo_lidar,
+)
 
 LOCALIZATION_TOPIC = '/apollo/localization/pose'
 TF_TOPIC= '/tf'
 
-
-# Need to convert to apollo coordinate system, for nuscenes is 90 degrees
-LIDAR_TRANSFORM = np.array([[ 0.0020333, 0.9997041, 0.0242417, 0.9437130],
-                            [-0.9999805, 0.0021757,-0.0058486, 0.0000000],
-                            [-0.0058997,-0.0242294, 0.9996890, 1.8402300],
-                            [ 0.0000000, 0.0000000, 0.0000000, 1.0000000]])
 
 def dataset_to_record(nuscenes, record_root_path):
   """Construct record message and save it as record
@@ -64,7 +63,7 @@ def dataset_to_record(nuscenes, record_root_path):
         pb_msg = image_builder.build(f, 'camera', 'rgb8', t/1e6)
         channel_name = "/apollo/sensor/camera/{}/image".format(c)
       elif c.startswith('LIDAR'):
-        pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t/1e6, LIDAR_TRANSFORM)
+        pb_msg = pc_builder.build_nuscenes(f, 'velodyne', t/1e6, nuscenes2apollo_lidar)
         channel_name = "/apollo/sensor/{}/compensator/PointCloud2".format(c)
 
       if pb_msg:
@@ -74,14 +73,19 @@ def dataset_to_record(nuscenes, record_root_path):
       quat = Quaternion(rotation[0], rotation[1], rotation[2], rotation[3])
       heading = quat.to_euler().yaw
 
+      # Apollo coordinate system conversion
+      world_to_imu_q = Euler(0, 0, -math.pi/2).to_quaternion()
+      quat *= world_to_imu_q
       ego_pose_t = ego_pose['timestamp']
       pb_msg = localization_builder.build(
-        ego_pose['translation'], ego_pose['rotation'], heading, ego_pose_t/1e6)
+        ego_pose['translation'], [quat.w, quat.x, quat.y, quat.z], heading,
+        ego_pose_t/1e6)
       if pb_msg:
         record.write(LOCALIZATION_TOPIC, pb_msg, ego_pose_t*1000)
 
       pb_msg = transform_builder.build('world', 'localization',
-        ego_pose['translation'], ego_pose['rotation'], ego_pose_t/1e6)
+        ego_pose['translation'], [quat.w, quat.x, quat.y, quat.z],
+        ego_pose_t/1e6)
       if pb_msg:
         record.write(TF_TOPIC, pb_msg, ego_pose_t*1000)
 

@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,17 +18,19 @@ py_binary(
     data = ["default.ini"],
     deps = [
         "//modules/dreamview/proto:hmi_config_py_pb2",
-        "//modules/planning/proto:planning_config_py_pb2",
+        "//modules/planning/planning_base/proto:planning_config_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )
 
-install(
-    name = "install",
-    data = [":readme"],
-    data_dest = "tools/navigation/config",
-    py_dest = "tools/navigation/config",
-    targets = [
-        "navi_config",
-    ]
-)
+# install(
+#     name = "install",
+#     data = [":readme"],
+#     data_dest = "tools/navigation/config",
+#     py_dest = "tools/navigation/config",
+#     targets = [
+#         "navi_config",
+#     ]
+# )
+
+apollo_package()

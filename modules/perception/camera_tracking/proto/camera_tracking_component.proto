@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+import "modules/perception/common/proto/plugin_param.proto";
+
+message CameraTrackingComponentConfig {
+  optional string output_channel_name = 1;
+  optional perception.PluginParam plugin_param = 2;
+  optional int32 image_width = 3 [default = 1980];
+  optional int32 image_height = 4 [default = 1080];
+  optional int32 gpu_id = 5 [default = 0];
+  optional string feature_path = 6;
+  optional string feature_file = 7;
+}

@@ -27,7 +27,9 @@
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/planning_msgs/navigation.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 #include "cyber/cyber.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -74,6 +76,11 @@ class SimPerfectControl final : public SimControlBase {
   void Stop() override;
 
   /**
+   * @brief Set vehicle position.
+   */
+  void ReSetPoinstion(double x, double y, double heading) override;
+
+  /**
    * @brief Resets the internal state.
    */
   void Reset() override;
@@ -83,10 +90,9 @@ class SimPerfectControl final : public SimControlBase {
  private:
   void OnPlanning(
       const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
-  void OnRoutingResponse(
-      const std::shared_ptr<apollo::routing::RoutingResponse> &routing);
-  void OnRoutingRequest(
-      const std::shared_ptr<apollo::routing::RoutingRequest> &routing_request);
+  void OnPlanningCommand(
+      const std::shared_ptr<apollo::planning::PlanningCommand>
+          &planning_command);
   void OnReceiveNavigationInfo(
       const std::shared_ptr<apollo::relative_map::NavigationInfo>
           &navigation_info);
@@ -141,15 +147,12 @@ class SimPerfectControl final : public SimControlBase {
       localization_reader_;
   std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
       planning_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
-      routing_response_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
-      routing_request_reader_;
   std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
       navigation_reader_;
   std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
       prediction_reader_;
-
+  std::shared_ptr<cyber::Reader<apollo::planning::PlanningCommand>>
+      planning_command_reader_;
   std::shared_ptr<cyber::Writer<apollo::localization::LocalizationEstimate>>
       localization_writer_;
   std::shared_ptr<cyber::Writer<apollo::canbus::Chassis>> chassis_writer_;
@@ -175,9 +178,6 @@ class SimPerfectControl final : public SimControlBase {
 
   // Whether there's a planning received after the most recent routing.
   bool received_planning_ = false;
-
-  // Whether planning has requested a re-routing.
-  bool re_routing_triggered_ = false;
 
   // Whether start point is initialized from actual localization data
   bool start_point_from_localization_ = false;

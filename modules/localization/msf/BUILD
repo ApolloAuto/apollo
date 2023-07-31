@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -35,6 +36,7 @@ cc_library(
         "//modules/common_msgs/sensor_msgs:heading_cc_proto",
         "//modules/common_msgs/sensor_msgs:imu_cc_proto",
         "//modules/localization/common:localization_gflags",
+        "//modules/localization/common:gnss_compensator",
         "//modules/localization/msf/common/util",
         "//modules/localization/msf/local_integ",
         "//modules/localization/msf/local_pyramid_map/base_map",
@@ -78,22 +80,23 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "localization/lib/msf",
-    data = [":testdata"],
-    data_dest = "localization/addition_data/msf",
-    targets = [
-        ":libmsf_localization_component.so",
-    ],
-    deps = [
-        "//modules/localization/msf/local_tool/map_creation:install",
-        "//modules/localization/msf/local_tool/data_extraction:install",
-        "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
-        "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
-        #"//modules/localization/msf/local_tool/ndt_mapping:install",
-        "//modules/localization/msf/params:install",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "localization/lib/msf",
+#     data = [":testdata"],
+#     data_dest = "localization/addition_data/msf",
+#     targets = [
+#         ":libmsf_localization_component.so",
+#     ],
+#     deps = [
+#         "//modules/localization/msf/local_tool/map_creation:install",
+#         "//modules/localization/msf/local_tool/data_extraction:install",
+#         "//modules/localization/msf/local_tool/local_visualization/offline_visual:install",
+#         "//modules/localization/msf/local_tool/local_visualization/online_visual:install",
+#         #"//modules/localization/msf/local_tool/ndt_mapping:install",
+#         "//modules/localization/msf/params:install",
+#     ],
+# )
 
+apollo_package()
 cpplint()

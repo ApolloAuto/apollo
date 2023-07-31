@@ -1,23 +1,24 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    data = ["runtime_files"],
-    data_dest = "tools/sensor_calibration",
-    py_dest = "tools/sensor_calibration",
-    targets = [
-        ":extract_data",
-        ":extract_static_data",
-        ":ins_stat_publisher",
-        ":odom_publisher",
-        ":sanity_check",
-    ],
-    deps = ["//modules/tools/sensor_calibration/config:install"]
+# install(
+#     name = "install",
+#     data = ["runtime_files"],
+#     data_dest = "tools/sensor_calibration",
+#     py_dest = "tools/sensor_calibration",
+#     targets = [
+#         ":extract_data",
+#         ":extract_static_data",
+#         ":ins_stat_publisher",
+#         ":odom_publisher",
+#         ":sanity_check",
+#     ],
+#     deps = ["//modules/tools/sensor_calibration/config:install"]
 
-)
+# )
 
 filegroup(
     name = "runtime_files",
@@ -115,3 +116,5 @@ py_binary(
         "//modules/tools/common:file_utils",
     ],
 )
+
+apollo_package()

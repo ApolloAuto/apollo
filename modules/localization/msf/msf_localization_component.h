@@ -24,6 +24,7 @@
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
 
+#include "modules/localization/common/gnss_compensator.h"
 #include "modules/localization/msf/msf_localization.h"
 
 #include "modules/common_msgs/sensor_msgs/gnss_best_pose.pb.h"
@@ -90,6 +91,8 @@ class LocalizationMsgPublisher {
 
  private:
   std::shared_ptr<cyber::Node> node_;
+
+  LocalizationGnssCompensator* localization_gnss_compensator_;
 
   std::string localization_topic_ = "";
   std::shared_ptr<cyber::Writer<LocalizationEstimate>> localization_talker_ =

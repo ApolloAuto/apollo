@@ -1,0 +1,129 @@
+ts: 0.01
+cf: 155494.663
+cr: 155494.663
+mass_fl: 520
+mass_fr: 520
+mass_rl: 520
+mass_rr: 520
+eps: 0.01
+matrix_q: 3.0
+matrix_q: 0.0
+matrix_q: 35
+matrix_q: 0.0
+matrix_q: 50.0
+matrix_q: 10.0
+matrix_r: 3.25
+matrix_r: 1.0
+cutoff_freq: 10
+mean_filter_window_size: 10
+max_iteration: 150
+max_lateral_acceleration: 5.0
+standstill_acceleration: -0.3
+brake_minimum_action: 0.0
+throttle_minimum_action: 0.0
+enable_mpc_feedforward_compensation: false
+lat_err_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 0.4
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 0.3
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.2
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.1
+  }
+}
+heading_err_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 0.5
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 0.4
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.35
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.35
+  }
+}
+feedforwardterm_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 0.7
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 0.05
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 0.0
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 0.0
+  }
+}
+steer_weight_gain_scheduler {
+  scheduler {
+    speed: 2.5
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 5.0
+    ratio: 1.0
+  }
+  scheduler {
+    speed: 10.0
+    ratio: 1.1
+  }
+  scheduler {
+    speed: 15.0
+    ratio: 1.1
+  }
+  scheduler {
+    speed: 20.0
+    ratio: 1.35
+  }
+  scheduler {
+    speed: 25.0
+    ratio: 1.55
+  }
+}
+

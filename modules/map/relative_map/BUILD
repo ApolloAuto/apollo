@@ -1,26 +1,27 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
 
-install(
-    name = "install",
-    data_dest = "map/addition_data/relative_map",
-    library_dest = "map/lib",
-    data = [
-        ":relative_map_conf",
-        ":testdata",
-    ],
-    targets = [
-        ":librelative_map_component.so",
-    ],
-    deps = [
-        "//modules/map/relative_map/proto:py_pb_map"
-    ]
-)
+# install(
+#     name = "install",
+#     data_dest = "map/addition_data/relative_map",
+#     library_dest = "map/lib",
+#     data = [
+#         ":relative_map_conf",
+#         ":testdata",
+#     ],
+#     targets = [
+#         ":librelative_map_component.so",
+#     ],
+#     deps = [
+#         "//modules/map/relative_map/proto:py_pb_map"
+#     ]
+# )
 
 filegroup(
     name = "relative_map_conf",
@@ -116,4 +117,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

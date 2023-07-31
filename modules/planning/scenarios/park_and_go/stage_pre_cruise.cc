@@ -18,52 +18,50 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/common.h"
-#include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/planning_context.h"
+#include "modules/planning/planning_base/common/util/common.h"
+#include "modules/planning/scenarios/park_and_go/context.h"
+#include "modules/planning/scenarios/park_and_go/util.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 using apollo::common::TrajectoryPoint;
 
-Stage::StageStatus ParkAndGoStagePreCruise::Process(
+StageResult ParkAndGoStagePreCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Pre Cruise";
   CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(context_);
 
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
+  const ScenarioParkAndGoConfig& scenario_config =
+      GetContextAs<ParkAndGoContext>()->scenario_config;
 
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
-  bool plan_ok = ExecuteTaskOnOpenSpace(frame);
-  if (!plan_ok) {
+  StageResult result = ExecuteTaskOnOpenSpace(frame);
+  if (result.HasError()) {
     AERROR << "ParkAndGoStagePreCruise planning error";
-    return StageStatus::ERROR;
+    return result.SetStageStatus(StageStatusType::ERROR);
   }
   // const bool ready_to_cruise =
-  //     scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  //     CheckADCReadyToCruise(frame, scenario_config_);
   auto vehicle_status = injector_->vehicle_state();
   ADEBUG << vehicle_status->steering_percentage();
 
   if ((std::fabs(vehicle_status->steering_percentage()) <
-       scenario_config_.max_steering_percentage_when_cruise()) &&
-      scenario::util::CheckADCReadyToCruise(injector_->vehicle_state(), frame,
-                                            scenario_config_)) {
+       scenario_config.max_steering_percentage_when_cruise()) &&
+      CheckADCReadyToCruise(injector_->vehicle_state(), frame,
+                            scenario_config)) {
     return FinishStage();
   }
-  return StageStatus::RUNNING;
+  return result.SetStageStatus(StageStatusType::RUNNING);
 }
 
-Stage::StageStatus ParkAndGoStagePreCruise::FinishStage() {
-  next_stage_ = StageType::PARK_AND_GO_CRUISE;
-  return Stage::FINISHED;
+StageResult ParkAndGoStagePreCruise::FinishStage() {
+  next_stage_ = "PARK_AND_GO_CRUISE";
+  return StageResult(StageStatusType::FINISHED);
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

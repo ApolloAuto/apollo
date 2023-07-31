@@ -70,7 +70,7 @@ The list of available evaluators include:
 
 * **Vectornet LSTM evaluator**: this evaluator is used in place of Semantic LSTM evaluator to generate short term trajectory points for "Caution" tagged obstacles. More detail is in [vectornet lstm evaluator readme](https://github.com/ApolloAuto/apollo/docs/technical_documents/vectornet_lstm_evaluator.md).
 
-* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_documents/jointly_prediction_planning_evaluator.md).
+* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/technical_documents/jointly_prediction_planning_evaluator.md).
 
 ### Predictor
 

@@ -17,11 +17,10 @@
 #include "modules/canbus_vehicle/transit/transit_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/transit/transit_message_manager.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -31,6 +30,7 @@ namespace canbus {
 namespace transit {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -491,10 +491,15 @@ void TransitController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void TransitController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode TransitController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void TransitController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.has_high_beam() && vehicle_signal.high_beam()) {
     adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(true);
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     adc_auxiliarycontrol_110_->set_adc_cmd_lowbeam(true);
   } else {
     adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(false);
@@ -502,17 +507,17 @@ void TransitController::SetBeam(const ControlCommand& command) {
   }
 }
 
-void TransitController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void TransitController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     adc_auxiliarycontrol_110_->set_adc_cmd_horn(true);
   } else {
     adc_auxiliarycontrol_110_->set_adc_cmd_horn(false);
   }
 }
 
-void TransitController::SetTurningSignal(const ControlCommand& command) {
+void TransitController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
         Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT);

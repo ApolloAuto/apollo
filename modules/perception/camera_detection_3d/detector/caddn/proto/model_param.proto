@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.camera.caddn;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional common.Normalize normalize = 3;
+  optional float score_threshold = 4;
+}

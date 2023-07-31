@@ -1,14 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    targets = ["libbridge_gflags.so"],
-    library_dest = "bridge/lib",
-)
+# install(
+#     name = "install",
+#     targets = ["libbridge_gflags.so"],
+#     library_dest = "bridge/lib",
+# )
 
 cc_library(
     name = "bridge_buffer",
@@ -103,4 +104,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -65,6 +65,23 @@ Box2d::Box2d(const Vec2d &center, const double heading, const double length,
   InitCorners();
 }
 
+Box2d::Box2d(const Vec2d &point, double heading, double front_length,
+             double back_length, double width)
+    : length_(front_length + back_length),
+      width_(width),
+      half_length_(length_ / 2.0),
+      half_width_(width / 2.0),
+      heading_(heading),
+      cos_heading_(cos(heading)),
+      sin_heading_(sin(heading)) {
+  CHECK_GT(length_, -kMathEpsilon);
+  CHECK_GT(width_, -kMathEpsilon);
+  double delta_length = (front_length - back_length) / 2.0;
+  center_ = Vec2d(point.x() + cos_heading_ * delta_length,
+                  point.y() + sin_heading_ * delta_length);
+  InitCorners();
+}
+
 Box2d::Box2d(const LineSegment2d &axis, const double width)
     : center_(axis.center()),
       length_(axis.length()),
@@ -127,7 +144,7 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   *corners = corners_;
 }
 
-std::vector<Vec2d> Box2d::GetAllCorners() const { return corners_; }
+const std::vector<Vec2d> &Box2d::GetAllCorners() const { return corners_; }
 
 bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
@@ -328,7 +345,15 @@ void Box2d::RotateFromCenter(const double rotate_angle) {
 
 void Box2d::Shift(const Vec2d &shift_vec) {
   center_ += shift_vec;
-  InitCorners();
+  for (size_t i = 0; i < 4; ++i) {
+    corners_[i] += shift_vec;
+  }
+  for (auto &corner : corners_) {
+    max_x_ = std::fmax(corner.x(), max_x_);
+    min_x_ = std::fmin(corner.x(), min_x_);
+    max_y_ = std::fmax(corner.y(), max_y_);
+    min_y_ = std::fmin(corner.y(), min_y_);
+  }
 }
 
 void Box2d::LongitudinalExtend(const double extension_length) {

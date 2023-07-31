@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -16,6 +17,7 @@ cc_library(
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
+        "//modules/common_msgs/external_command_msgs:chassis_command_cc_proto",
         "//modules/drivers/canbus:sensor_canbus_lib",
     ],
 )
@@ -33,4 +35,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

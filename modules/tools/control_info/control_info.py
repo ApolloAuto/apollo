@@ -89,8 +89,11 @@ class ControlInfo(object):
         self.gear_location = []
 
         self.is_full_stop = []
+        self.is_full_stop_soft = []
         self.path_remain = []
         self.pid_saturation_status = []
+        self.is_stop_reason_by_prdestrian = []
+        self.is_stop_reason_by_destination = []
 
         self.heading_error = []
         self.lateral_error = []
@@ -237,7 +240,10 @@ class ControlInfo(object):
         self.calibration_value.append(
             entity.debug.simple_lon_debug.calibration_value)
         self.is_full_stop.append(entity.debug.simple_lon_debug.is_full_stop)
+        self.is_full_stop_soft.append(entity.debug.simple_lon_debug.is_full_stop_soft)
         self.path_remain.append(entity.debug.simple_lon_debug.path_remain)
+        self.is_stop_reason_by_destination.append(entity.debug.simple_lon_debug.is_stop_reason_by_destination)
+        self.is_stop_reason_by_prdestrian.append(entity.debug.simple_lon_debug.is_stop_reason_by_prdestrian)
         self.pid_saturation_status.append(
             entity.debug.simple_lon_debug.pid_saturation_status)
         self.acc_open.append(
@@ -418,6 +424,7 @@ class ControlInfo(object):
         ax[0].set_xlabel('Time-s')
 
         ax[1].plot(self.controltime, self.is_full_stop, label='is_full_stop')
+        ax[1].plot(self.controltime, self.is_full_stop_soft, label='is_full_stop_soft')
         ax[1].plot(self.controltime,
                    self.pid_saturation_status,
                    label='pid_saturation_status')
@@ -535,19 +542,28 @@ class ControlInfo(object):
         ax[1, 1].set_xlabel('Time-s')
 
         ax[1, 2].plot(self.controltime, self.is_full_stop, label='is_full_stop')
+        ax[1, 2].plot(self.controltime,
+                      self.is_full_stop_soft,
+                      label='is_full_stop_soft')
         ax[1, 2].plot(self.canbustime,
                       self.gear_location,
                       label='gear_location')
         ax[1, 2].plot(self.planningtime,
                       self.trajectory_gear,
                       label='trajectory_gear')
+        # ax[1, 2].plot(self.controltime,
+        #               self.is_stop_reason_by_destination,
+        #               label='is_stop_reason_by_destination')
+        # ax[1, 2].plot(self.controltime,
+        #               self.is_stop_reason_by_prdestrian,
+        #               label='is_stop_reason_by_prdestrian')
         # ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
         # ax[1, 2].plot(self.controltime, self.Driving_mode, label='Driving_mode')
         # ax[1, 2].plot(self.controltime,
         #               self.drivingAction,
         #               label='drivingAction')
         # ax[1, 2].plot(self.planningtime, self.numpoints_sum, label='numpoints')
-        # ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
+        ax[1, 2].plot(self.controltime, self.path_remain, label='path_remain')
         # ax[1, 2].plot(self.planningtime,
         #               self.trajectory_type,
         #               label='trajectory_type')
@@ -659,7 +675,7 @@ class ControlInfo(object):
                       label='lateral_error')
         ax[0, 0].plot(self.controltime,
                       self.heading_error_feedback,
-                      label='lateral_error_feedback')
+                      label='heading_error_feedback')
         ax[0, 0].plot(self.controltime,
                       self.lateral_error_feedback,
                       label='lateral_error_feedback')
@@ -788,6 +804,11 @@ class ControlInfo(object):
                         self.cary,
                         color='red',
                         label='localization pose')
+        self.axarr.plot(self.carx,
+                        self.cary,
+                        'ro',
+                        markersize=5,
+                        label='localization pose dot')
         self.axarr.plot(self.planning_pathx,
                         self.planning_pathy,
                         color='green',

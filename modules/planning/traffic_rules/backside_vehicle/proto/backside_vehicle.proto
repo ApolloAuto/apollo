@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// BacksideVehicleConfig
+
+message BacksideVehicleConfig {
+  // obstacle vehicle behind ego-vehicle should not be ignored if its lateral
+  // projection to reference line has intersection with [-backside_lane_width,
+  // backside_lane_width].
+  optional double backside_lane_width = 1 [default = 4.0];
+}

@@ -27,7 +27,7 @@ from ctypes import c_void_p
 
 
 lib = ctypes.cdll.LoadLibrary(
-    '/apollo/bazel-bin/modules/planning/open_space/tools/hybrid_a_star_wrapper_lib.so')
+    '/apollo/bazel-bin/modules/planning/planning_base/open_space/tools/hybrid_a_star_wrapper_lib.so')
 
 lib.CreatePlannerPtr.argtypes = []
 lib.CreatePlannerPtr.restype = c_void_p

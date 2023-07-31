@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// ReroutingConfig
+
+message ReroutingConfig {
+  // should not rerouting more frequent than this number.
+  optional double cooldown_time = 1 [default = 3.0];  // seconds
+  // If the distance between ego-vehicle and the end route point >
+  // "prepare_rerouting_time * speed", there is no need to reroute yet.
+  optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
+}

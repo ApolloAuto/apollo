@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.perception.camera.smoke;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional common.Normalize normalize = 3;
+  optional OffsetRatio offset_ratio = 4;
+  optional float confidence_threshold = 5;
+  optional MinDims min_dims = 6;
+  optional int32 ori_cycle = 7;
+  optional float border_ratio = 8;
+}
+
+message OffsetRatio {
+  optional float x = 1;
+  optional float y = 2;
+}
+
+message MinDims {
+  optional float min_2d_height = 1;
+  optional float min_3d_height = 2;
+  optional float min_3d_width = 3;
+  optional float min_3d_length = 4;
+}

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -22,20 +23,20 @@ cc_binary(
     ],
 )
 
-install(
-    name = "install",
-    targets = [
-        ":talker",
-        ":listener",
-    ],
-    runtime_dest = "cyber/examples",
-    deps = [
-        "//cyber/examples/common_component_example:install",
-        "//cyber/examples/timer_component_example:install",
-        "//cyber/examples/proto:cyber_examples_proto_hdrs",
-        "//cyber/examples/proto:cyber_examples_proto_so",
-    ],
-)
+# install(
+#     name = "install",
+#     targets = [
+#         ":talker",
+#         ":listener",
+#     ],
+#     runtime_dest = "cyber/examples",
+#     deps = [
+#         "//cyber/examples/common_component_example:install",
+#         "//cyber/examples/timer_component_example:install",
+#         "//cyber/examples/proto:cyber_examples_proto_hdrs",
+#         "//cyber/examples/proto:cyber_examples_proto_so",
+#     ],
+# )
 
 cc_binary(
     name = "paramserver",
@@ -63,4 +64,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+import "modules/common_msgs/external_command_msgs/geometry.proto";
+import "modules/common_msgs/external_command_msgs/lane_segment.proto";
+
+message ValetParkingCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  // If the start pose is set as the first point of "way_point".
+  optional bool is_start_pose_set = 3 [default = false];
+  // The points between "start_pose" and "end_pose".
+  repeated Pose way_point = 4;
+  // The lane segments which should not be passed by.
+  repeated LaneSegment blacklisted_lane = 5;
+  // The road which should not be passed by.
+  repeated string blacklisted_road = 6;
+  // The id of the parking spot on the map.
+  required string parking_spot_id = 7;
+  // Expected speed when executing this command. If "target_speed" > maximum
+  // speed of the vehicle, use maximum speed of the vehicle instead. If it is
+  // not given, the default target speed of system will be used.
+  optional double target_speed = 8;
+}

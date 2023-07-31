@@ -14,17 +14,17 @@
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/v2x</src_path>
 
-  <depend type="binary" repo_name="cyber">cyber-dev</depend>
-  <depend type="binary" repo_name="common" lib_names="common">common-dev</depend>
-  <depend repo_name="common-msgs" lib_names="common-msgs">common-msgs-dev</depend>
-  <depend>bazel-extend-tools-dev</depend>
-  <depend type="binary" repo_name="map" lib_names="map">map-dev</depend>
-  <depend type="binary" repo_name="perception" lib_names="perception">perception-dev</depend>
-  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags-dev</depend>
-  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest-dev</depend>
-  <depend repo_name="boost">3rd-boost-dev</depend>
-  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl-dev</depend>
-  <depend repo_name="eigen">3rd-eigen3-dev</depend>
+  <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="common" lib_names="common">common</depend>
+  <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
+  <depend>bazel-extend-tools</depend>
+  <depend type="binary" repo_name="map" lib_names="map">map</depend>
+  <depend type="binary" repo_name="perception-common">perception-common</depend>
+  <depend repo_name="com_github_gflags_gflags" lib_names="gflags">3rd-gflags</depend>
+  <depend repo_name="com_google_googletest" lib_names="gtest,gtest_main">3rd-gtest</depend>
+  <depend repo_name="boost">3rd-boost</depend>
+  <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
+  <depend repo_name="eigen">3rd-eigen3</depend>
   
 
 </package>

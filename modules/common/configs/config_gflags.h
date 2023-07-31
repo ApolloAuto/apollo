@@ -61,3 +61,4 @@ DECLARE_bool(enable_map_reference_unify);
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_double(replan_lateral_distance_threshold);
 DECLARE_double(replan_longitudinal_distance_threshold);
+DECLARE_double(replan_time_threshold);

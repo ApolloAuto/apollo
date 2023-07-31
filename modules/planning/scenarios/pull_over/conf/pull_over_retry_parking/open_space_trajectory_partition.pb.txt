@@ -1,0 +1,5 @@
+heading_offset_to_midpoint: 0.79
+lateral_offset_to_midpoint: 0.5
+longitudinal_offset_to_midpoint: 0.2
+vehicle_box_iou_threshold_to_midpoint: 0.8
+linear_velocity_threshold_on_ego: 0.2

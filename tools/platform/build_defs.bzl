@@ -42,3 +42,8 @@ def if_esd_can(if_true, if_false = []):
 def copts_if_esd_can():
     return if_esd_can(["-DUSE_ESD_CAN=1"], ["-DUSE_ESD_CAN=0"])
 
+def if_profiler():
+    return select({
+        "//tools/platform:enable_profiler": ["-DENABLE_PROFILER=1"],
+        "//conditions:default": ["-DENABLE_PROFILER=0"],
+    })

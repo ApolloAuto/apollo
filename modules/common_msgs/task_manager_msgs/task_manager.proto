@@ -3,8 +3,8 @@ syntax = "proto2";
 package apollo.task_manager;
 
 import "modules/common_msgs/basic_msgs/header.proto";
-import "modules/common_msgs/map_msgs/map_parking_space.proto";
 import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/external_command_msgs/lane_follow_command.proto";
 
 enum TaskType {
   CYCLE_ROUTING = 0;
@@ -22,7 +22,7 @@ enum JunctionType {
 
 message CycleRoutingTask {
   optional int32 cycle_num = 1;
-  optional apollo.routing.RoutingRequest routing_request = 2;
+  optional apollo.external_command.LaneFollowCommand lane_follow_command = 2;
 }
 
 message ParkingRoutingTask {

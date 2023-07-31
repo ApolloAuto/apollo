@@ -14,7 +14,7 @@ message ScenarioInfo {
 }
 
 message ScenarioSet {
-  // id 是key
+  // id is key
   optional string scenario_set_name = 1;
   repeated ScenarioInfo scenarios = 2;
 }

@@ -1,0 +1,16 @@
+type_fusion_param {
+  name: "DstTypeFusion"
+  config_path: "perception/multi_sensor_fusion/data"
+  config_file: "dst_type_fusion.pb.txt"
+}
+motion_fusion_param {
+  name: "KalmanMotionFusion"
+}
+shape_fusion_param {
+  name: "PbfShapeFusion"
+}
+existence_fusion_param {
+  name: "DstExistenceFusion"
+  config_path: "perception/multi_sensor_fusion/data"
+  config_file: "dst_existence_fusion.pb.txt"
+}

@@ -31,6 +31,10 @@ DECLARE_string(localization_config_file);
 
 DECLARE_bool(enable_gps_imu_interprolate);
 
+DECLARE_bool(enable_gps_imu_compensate);
+
+DECLARE_int32(gps_imu_compensate_ns_tolerance);
+
 DECLARE_bool(enable_watchdog);
 
 DECLARE_double(gps_time_delay_tolerance);

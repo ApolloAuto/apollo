@@ -24,7 +24,6 @@
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
-
 #include "cyber/class_loader/class_loader_register_macro.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -78,6 +77,11 @@ class AbstractVehicleFactory {
    * @brief update control command
    */
   virtual void UpdateCommand(const ControlCommand *control_command) = 0;
+
+  /**
+   * @brief update chassis command
+   */
+  virtual void UpdateCommand(const ChassisCommand *chassis_command) = 0;
 
   /**
    * @brief publish chassis messages

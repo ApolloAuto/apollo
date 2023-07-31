@@ -1,0 +1,9 @@
+tracking_time_window: 0.06
+matcher_param {
+  name: "HMMatcher"
+  config_path: "perception/radar_detection/data"
+  config_file: "hm_matcher.pb.txt"
+}
+chosen_filter: "AdaptiveKalmanFilter"
+tracked_times_threshold: 3
+use_filter: false

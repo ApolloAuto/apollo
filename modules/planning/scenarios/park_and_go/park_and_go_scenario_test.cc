@@ -20,15 +20,12 @@
 
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 
+#include "gtest/gtest.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace park_and_go {
 
 class ParkAndGoTest : public ::testing::Test {
  public:
@@ -39,12 +36,12 @@ class ParkAndGoTest : public ::testing::Test {
 };
 
 TEST_F(ParkAndGoTest, VerifyConf) {
-  ScenarioConfig config;
+  ScenarioParkAndGoConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_park_and_go_config_file, &config));
+      "/apollo/modules/planning/scenarios/park_and_go/conf/"
+      "scenario_conf.pb.txt",
+      &config));
 }
 
-}  // namespace park_and_go
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

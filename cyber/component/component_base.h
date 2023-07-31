@@ -71,19 +71,22 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
 
   void LoadConfigFiles(const ComponentConfig& config) {
     if (!config.config_file_path().empty()) {
-      if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
-                                                    config.config_file_path());
-      } else {
+      if (!common::GetFilePathWithEnv(config.config_file_path(),
+                                      "APOLLO_CONF_PATH", &config_file_path_)) {
+        AERROR << "conf file [" << config.config_file_path() << "] not found!";
         config_file_path_ = config.config_file_path();
+      } else {
+        AINFO << "use config file: " << config_file_path_;
       }
     }
 
     if (!config.flag_file_path().empty()) {
       std::string flag_file_path = config.flag_file_path();
-      if (flag_file_path[0] != '/') {
-        flag_file_path =
-            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
+      if (!common::GetFilePathWithEnv(config.flag_file_path(),
+                                      "APOLLO_FLAG_PATH", &flag_file_path)) {
+        AERROR << "flag file [" << config.flag_file_path() << "] not found!";
+      } else {
+        AINFO << "use flag file: " << flag_file_path;
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
@@ -91,19 +94,22 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
 
   void LoadConfigFiles(const TimerComponentConfig& config) {
     if (!config.config_file_path().empty()) {
-      if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
-                                                    config.config_file_path());
-      } else {
+      if (!common::GetFilePathWithEnv(config.config_file_path(),
+                                      "APOLLO_CONF_PATH", &config_file_path_)) {
+        AERROR << "conf file [" << config.config_file_path() << "] not found!";
         config_file_path_ = config.config_file_path();
+      } else {
+        AINFO << "use config file: " << config_file_path_;
       }
     }
 
     if (!config.flag_file_path().empty()) {
       std::string flag_file_path = config.flag_file_path();
-      if (flag_file_path[0] != '/') {
-        flag_file_path =
-            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
+      if (!common::GetFilePathWithEnv(config.flag_file_path(),
+                                      "APOLLO_FLAG_PATH", &flag_file_path)) {
+        AERROR << "flag file [" << config.flag_file_path() << "] not found!";
+      } else {
+        AINFO << "use flag file: " << flag_file_path;
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -36,12 +37,13 @@ cc_binary(
     deps = [":online_visualizer_component_lib"],
 )
 
-install(
-    name = "install",
-    library_dest = "localization/lib/msf/local_tool/local_visualization/online_visual",
-    targets = [
-        ":online_visualizer_compenont.so",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "localization/lib/msf/local_tool/local_visualization/online_visual",
+#     targets = [
+#         ":online_visualizer_compenont.so",
+#     ],
+# )
 
+apollo_package()
 cpplint()

@@ -30,19 +30,15 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/ego_info.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
-#include "modules/planning/tasks/deciders/path_decider/path_decider.h"
-#include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
-#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
+#include "modules/planning/planning_base/common/ego_info.h"
+#include "modules/planning/planning_base/common/frame.h"
+#include "modules/planning/planning_base/common/planning_gflags.h"
+#include "modules/planning/planning_base/constraint_checker/constraint_checker.h"
+#include "modules/planning/planning_base/task_base/task.h"
+#include "modules/planning/planning_base/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace lane_follow {
 
 using apollo::common::ErrorCode;
 using apollo::common::SLPoint;
@@ -56,11 +52,6 @@ constexpr double kPathOptimizationFallbackCost = 2e4;
 constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
-
-LaneFollowStage::LaneFollowStage(
-    const ScenarioConfig::StageConfig& config,
-    const std::shared_ptr<DependencyInjector>& injector)
-    : Stage(config, injector) {}
 
 void LaneFollowStage::RecordObstacleDebugInfo(
     ReferenceLineInfo* reference_line_info) {
@@ -90,15 +81,19 @@ void LaneFollowStage::RecordObstacleDebugInfo(
   }
 }
 
-Stage::StageStatus LaneFollowStage::Process(
+StageResult LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  if (frame->reference_line_info().empty()) {
+    return StageResult(StageStatusType::FINISHED);
+  }
+
   bool has_drivable_reference_line = false;
 
   ADEBUG << "Number of reference lines:\t"
          << frame->mutable_reference_line_info()->size();
 
   unsigned int count = 0;
-
+  StageResult result;
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     // TODO(SHU): need refactor
     if (count++ == frame->mutable_reference_line_info()->size()) {
@@ -112,45 +107,35 @@ Stage::StageStatus LaneFollowStage::Process(
       break;
     }
 
-    auto cur_status =
+    result =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
 
-    if (cur_status.ok()) {
-      if (reference_line_info.IsChangeLanePath()) {
-        ADEBUG << "reference line is lane change ref.";
-        ADEBUG << "FLAGS_enable_smarter_lane_change: "
-               << FLAGS_enable_smarter_lane_change;
-        if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            (LaneChangeDecider::IsClearToChangeLane(&reference_line_info) ||
-             FLAGS_enable_smarter_lane_change)) {
-          // If the path and speed optimization succeed on target lane while
-          // under smart lane-change or IsClearToChangeLane under older version
-          has_drivable_reference_line = true;
-          reference_line_info.SetDrivable(true);
-          LaneChangeDecider::UpdatePreparationDistance(
-              true, frame, &reference_line_info, injector_->planning_context());
-          ADEBUG << "\tclear for lane change";
-        } else {
-          LaneChangeDecider::UpdatePreparationDistance(
-              false, frame, &reference_line_info,
-              injector_->planning_context());
-          reference_line_info.SetDrivable(false);
-          ADEBUG << "\tlane change failed";
-        }
-      } else {
+    if (!result.HasError()) {
+      if (!reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is NOT lane change ref.";
         has_drivable_reference_line = true;
+        continue;
+      }
+      if (reference_line_info.Cost() < kStraightForwardLineCost) {
+        // If the path and speed optimization succeed on target lane while
+        // under smart lane-change or IsClearToChangeLane under older version
+        has_drivable_reference_line = true;
+        reference_line_info.SetDrivable(true);
+      } else {
+        reference_line_info.SetDrivable(false);
+        ADEBUG << "\tlane change failed";
       }
     } else {
       reference_line_info.SetDrivable(false);
     }
   }
 
-  return has_drivable_reference_line ? StageStatus::RUNNING
-                                     : StageStatus::ERROR;
+  return has_drivable_reference_line
+             ? result.SetStageStatus(StageStatusType::RUNNING)
+             : result.SetStageStatus(StageStatusType::ERROR);
 }
 
-Status LaneFollowStage::PlanOnReferenceLine(
+StageResult LaneFollowStage::PlanOnReferenceLine(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
   if (!reference_line_info->IsChangeLanePath()) {
@@ -160,11 +145,11 @@ Status LaneFollowStage::PlanOnReferenceLine(
   ADEBUG << "Current reference_line_info is IsChangeLanePath: "
          << reference_line_info->IsChangeLanePath();
 
-  auto ret = Status::OK();
-  for (auto* task : task_list_) {
+  StageResult ret;
+  for (auto task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
 
-    ret = task->Execute(frame, reference_line_info);
+    ret.SetTaskStatus(task->Execute(frame, reference_line_info));
 
     const double end_timestamp = Clock::NowInSeconds();
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
@@ -173,9 +158,9 @@ Status LaneFollowStage::PlanOnReferenceLine(
     ADEBUG << task->Name() << " time spend: " << time_diff_ms << " ms.";
     RecordDebugInfo(reference_line_info, task->Name(), time_diff_ms);
 
-    if (!ret.ok()) {
+    if (ret.IsTaskError()) {
       AERROR << "Failed to run tasks[" << task->Name()
-             << "], Error message: " << ret.error_message();
+             << "], Error message: " << ret.GetTaskStatus().error_message();
       break;
     }
 
@@ -191,7 +176,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
   // check path and speed results for path or speed fallback
   reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
-  if (!ret.ok()) {
+  if (ret.IsTaskError()) {
     PlanFallbackTrajectory(planning_start_point, frame, reference_line_info);
   }
 
@@ -201,7 +186,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
           planning_start_point.path_point().s(), &trajectory)) {
     const std::string msg = "Fail to aggregate planning trajectory.";
     AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return ret.SetStageStatus(StageStatusType::ERROR, msg);
   }
 
   // determine if there is a destination on reference line.
@@ -248,13 +233,14 @@ Status LaneFollowStage::PlanOnReferenceLine(
         ConstraintChecker::Result::VALID) {
       const std::string msg = "Current planning trajectory is not valid.";
       AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      return ret.SetStageStatus(StageStatusType::ERROR, msg);
     }
   }
 
   reference_line_info->SetTrajectory(trajectory);
   reference_line_info->SetDrivable(true);
-  return Status::OK();
+  ret.SetStageStatus(StageStatusType::RUNNING);
+  return ret;
 }
 
 void LaneFollowStage::PlanFallbackTrajectory(
@@ -287,7 +273,8 @@ void LaneFollowStage::PlanFallbackTrajectory(
 
   AERROR << "Speed fallback due to algorithm failure";
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeed(injector_->ego_info());
+      SpeedProfileGenerator::GenerateFallbackSpeed(
+          injector_->ego_info(), FLAGS_speed_fallback_distance);
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
@@ -381,7 +368,5 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
   return sl_point;
 }
 
-}  // namespace lane_follow
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

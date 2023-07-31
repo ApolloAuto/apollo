@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
 
 DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt",
               "file name to dump routing response.");
@@ -39,8 +39,9 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  auto cast_writer = cast_node->CreateWriter<apollo::routing::RoutingResponse>(
-      FLAGS_routing_response_topic);
+  auto cast_writer =
+      cast_node->CreateWriter<apollo::routing::RoutingResponse>(
+          "/apollo/raw_routing_response");
   Rate rate(1.0);
   while (apollo::cyber::OK()) {
     apollo::common::util::FillHeader("routing", &routing_response);

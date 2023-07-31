@@ -1,0 +1,2 @@
+enable_rss_fallback: false
+rss_max_front_obstacle_distance: 3000.0

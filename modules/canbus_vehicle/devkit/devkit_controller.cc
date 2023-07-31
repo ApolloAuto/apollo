@@ -19,7 +19,6 @@
 #include <string>
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/common/canbus_gflags.h"
@@ -33,6 +32,7 @@ namespace canbus {
 namespace devkit {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -645,27 +645,30 @@ void DevkitController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void DevkitController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode DevkitController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void DevkitController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.low_beam()) {
+    // None
+  }
+}
+
+void DevkitController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void DevkitController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
-    // None
-  } else {
-    // None
-  }
-}
-
-void DevkitController::SetTurningSignal(const ControlCommand& command) {
+void DevkitController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     vehicle_mode_command_105_->set_turn_light_ctrl(
         Vehicle_mode_command_105::TURN_LIGHT_CTRL_LEFT_TURNLAMP_ON);

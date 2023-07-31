@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package apollo.external_command;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message SpeedCommand {
+  optional apollo.common.Header header = 1;
+  // Unique identification for command.
+  optional int64 command_id = 2 [default = -1];
+  oneof linear_speed {
+    // Replace the target speed of current motion command with this new target
+    // speed.
+    double target_speed = 3;
+    // Multiple the target speed in current motion command with the factor. The
+    // factor should be in range [0, 1.0].
+    double target_speed_factor = 4;
+    // Restore the target speed with the initial value(The default configured
+    // target speed or set in motion command).
+    bool is_restore_target_speed = 5;
+  }
+}

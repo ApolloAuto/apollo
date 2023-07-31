@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
-PYTHON_INSTALL_PATH="/opt/apollo/python_tools"
+PYTHON_USER_BASE=$(python3 -c 'import site; print(site.USER_BASE)')
+PYTHON_INSTALL_PATH="${PYTHON_USER_BASE}/apollo/tools"
 PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
 
 source ${APOLLO_ROOT_DIR}/scripts/common.bashrc

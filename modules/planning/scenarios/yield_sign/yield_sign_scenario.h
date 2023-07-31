@@ -25,18 +25,18 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "modules/planning/scenarios/yield_sign/proto/yield_sign.pb.h"
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/factory.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/planning_base/scenario_base/scenario.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace yield_sign {
 
 // stage context
-struct YieldSignContext {
+struct YieldSignContext : public ScenarioContext {
   ScenarioYieldSignConfig scenario_config;
   std::vector<std::string> current_yield_sign_overlap_ids;
   double creep_start_time = 0.0;
@@ -44,34 +44,28 @@ struct YieldSignContext {
 
 class YieldSignScenario : public Scenario {
  public:
-  YieldSignScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context,
-                    const std::shared_ptr<DependencyInjector>& injector)
-      : Scenario(config, context, injector) {}
+  bool Init(std::shared_ptr<DependencyInjector> injector,
+            const std::string& name) override;
 
-  void Init() override;
+  /**
+   * @brief Get the scenario context.
+   */
+  YieldSignContext* GetContext() override { return &context_; }
 
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config,
-      const std::shared_ptr<DependencyInjector>& injector);
+  bool IsTransferable(const Scenario* const other_scenario,
+                      const Frame& frame) override;
 
-  YieldSignContext* GetContext() { return &context_; }
+  bool Exit(Frame* frame) override;
 
- private:
-  static void RegisterStages();
-  bool GetScenarioConfig();
+  bool Enter(Frame* frame) override;
 
  private:
-  static apollo::common::util::Factory<
-      StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config,
-                 const std::shared_ptr<DependencyInjector>& injector)>
-      s_stage_factory_;
   bool init_ = false;
   YieldSignContext context_;
 };
 
-}  // namespace yield_sign
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::YieldSignScenario,
+                                     Scenario)
+
 }  // namespace planning
 }  // namespace apollo

@@ -29,9 +29,6 @@
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/util/string_util.h"
 
-// https://nacto.org/publication/urban-street-design-guide/street-design-elements/lane-width/
-DEFINE_double(default_lane_width, 3.048, "default lane width is about 10 feet");
-
 namespace apollo {
 namespace hdmap {
 
@@ -372,14 +369,19 @@ void Path::InitPoints() {
     Vec2d heading;
     if (i + 1 >= num_points_) {
       heading = path_points_[i] - path_points_[i - 1];
+      heading.Normalize();
     } else {
       segments_.emplace_back(path_points_[i], path_points_[i + 1]);
       heading = path_points_[i + 1] - path_points_[i];
+      float heading_length = heading.Length();
       // TODO(All): use heading.length when all adjacent lanes are guarantee to
       // be connected.
-      s += heading.Length();
+      s += heading_length;
+      // Normalize "heading".
+      if (heading_length > 0.0) {
+        heading /= heading_length;
+      }
     }
-    heading.Normalize();
     unit_directions_.push_back(heading);
   }
   length_ = s;
@@ -437,36 +439,38 @@ void Path::InitWidth() {
   road_right_width_.clear();
   road_right_width_.reserve(num_sample_points_);
 
-  double s = 0;
+  double sample_s = 0;
+  double segment_end_s = -1.0;
+  double segment_start_s = -1.0;
+  double waypoint_s = 0.0;
+  double left_width = 0.0;
+  double right_width = 0.0;
+  const LaneWaypoint* cur_waypoint = nullptr;
+  bool is_reach_to_end = false;
+  int path_point_index = 0;
   for (int i = 0; i < num_sample_points_; ++i) {
-    const MapPathPoint point = GetSmoothPoint(s);
-    if (point.lane_waypoints().empty()) {
-      lane_left_width_.push_back(FLAGS_default_lane_width / 2.0);
-      lane_right_width_.push_back(FLAGS_default_lane_width / 2.0);
-
-      road_left_width_.push_back(FLAGS_default_lane_width / 2.0);
-      road_right_width_.push_back(FLAGS_default_lane_width / 2.0);
-      AWARN << "path point:" << point.DebugString() << " has invalid width.";
-    } else {
-      const LaneWaypoint waypoint = point.lane_waypoints()[0];
-      CHECK_NOTNULL(waypoint.lane);
-
-      double lane_left_width = 0.0;
-      double lane_right_width = 0.0;
-      waypoint.lane->GetWidth(waypoint.s, &lane_left_width, &lane_right_width);
-      lane_left_width_.push_back(lane_left_width - waypoint.l);
-      lane_right_width_.push_back(lane_right_width + waypoint.l);
-
-      double road_left_width = 0.0;
-      double road_right_width = 0.0;
-      waypoint.lane->GetRoadWidth(waypoint.s, &road_left_width,
-                                  &road_right_width);
-      road_left_width_.push_back(road_left_width - waypoint.l);
-      road_right_width_.push_back(road_right_width + waypoint.l);
+    // Find the segment at the position of "sample_s".
+    while (segment_end_s < sample_s && !is_reach_to_end) {
+      const auto& cur_point = path_points_[path_point_index];
+      cur_waypoint = &(cur_point.lane_waypoints()[0]);
+      CHECK_NOTNULL(cur_waypoint->lane);
+      segment_start_s = accumulated_s_[path_point_index];
+      segment_end_s = segment_start_s + segments_[path_point_index].length();
+      if (++path_point_index >= num_points_) {
+        is_reach_to_end = true;
+      }
     }
-    s += kSampleDistance;
+    // Find the width of the way point at the position of "sample_s".
+    waypoint_s = cur_waypoint->s + sample_s - segment_start_s;
+    cur_waypoint->lane->GetWidth(waypoint_s, &left_width, &right_width);
+    lane_left_width_.push_back(left_width - cur_waypoint->l);
+    lane_right_width_.push_back(right_width + cur_waypoint->l);
+    cur_waypoint->lane->GetRoadWidth(waypoint_s, &left_width, &right_width);
+    road_left_width_.push_back(left_width - cur_waypoint->l);
+    road_right_width_.push_back(right_width + cur_waypoint->l);
+    sample_s += kSampleDistance;
   }
-
+  // Check the width array size.
   auto num_sample_points = static_cast<size_t>(num_sample_points_);
   CHECK_EQ(lane_left_width_.size(), num_sample_points);
   CHECK_EQ(lane_right_width_.size(), num_sample_points);
@@ -642,7 +646,7 @@ InterpolatedIndex Path::GetIndexFromS(double s) const {
                   ? std::min(num_points_, last_point_index_[next_sample_id] + 1)
                   : num_points_);
   while (low + 1 < high) {
-    const int mid = (low + high) / 2;
+    const int mid = (low + high) >> 1;
     if (accumulated_s_[mid] <= s) {
       low = mid;
     } else {
@@ -729,6 +733,61 @@ bool Path::GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                          double* lateral) const {
   double distance = 0.0;
   return GetProjection(point, accumulate_s, lateral, &distance);
+}
+
+bool Path::GetProjectionWithWarmStartS(const common::math::Vec2d& point,
+                                       double* accumulate_s,
+                                       double* lateral) const {
+  if (segments_.empty()) {
+    return false;
+  }
+  if (accumulate_s == nullptr || lateral == nullptr) {
+    return false;
+  }
+  if (*accumulate_s < 0.0) {
+    *accumulate_s = 0.0;
+  } else if (*accumulate_s > length()) {
+    *accumulate_s = length();
+  }
+  CHECK_GE(num_points_, 2);
+  double warm_start_s = *accumulate_s;
+  // Find the segment at the position of "accumulate_s".
+  int left_index = 0;
+  int right_index = num_segments_;
+  int mid_index = 0;
+  // Find the segment with projection of the given point on it.
+  while (right_index > left_index + 1) {
+    FindIndex(left_index, right_index, warm_start_s, &mid_index);
+    const auto& segment = segments_[mid_index];
+    const auto& start_point = segment.start();
+    double delta_x = point.x() - start_point.x();
+    double delta_y = point.y() - start_point.y();
+    const auto& unit_direction = segment.unit_direction();
+    double proj = delta_x * unit_direction.x() + delta_y * unit_direction.y();
+    *accumulate_s = accumulated_s_[mid_index] + proj;
+    *lateral = unit_direction.x() * delta_y - unit_direction.y() * delta_x;
+    if (proj > 0.0) {
+      if (proj < segment.length()) {
+        return true;
+      }
+      if (mid_index == right_index) {
+        *accumulate_s = accumulated_s_[mid_index];
+        return true;
+      }
+      left_index = mid_index + 1;
+    } else {
+      if (mid_index == left_index) {
+        *accumulate_s = accumulated_s_[mid_index];
+        return true;
+      }
+      if (std::abs(proj) < segments_[mid_index - 1].length()) {
+        return true;
+      }
+      right_index = mid_index - 1;
+    }
+    warm_start_s = segment.length() + proj;
+  }
+  return true;
 }
 
 bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
@@ -1288,6 +1347,23 @@ bool PathApproximation::OverlapWith(const Path& path, const Box2d& box,
     }
   }
   return false;
+}
+
+void Path::FindIndex(int left_index, int right_index, double target_s,
+                     int* mid_index) const {
+  // Find the segment index with binary search
+  while (right_index > left_index + 1) {
+    *mid_index = ((left_index + right_index) >> 1);
+    if (accumulated_s_[*mid_index] < target_s) {
+      left_index = *mid_index;
+      continue;
+    }
+    if (accumulated_s_[*mid_index - 1] > target_s) {
+      right_index = *mid_index - 1;
+      continue;
+    }
+    return;
+  }
 }
 
 }  // namespace hdmap

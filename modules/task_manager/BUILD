@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -18,6 +19,9 @@ cc_library(
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/task_manager/common:task_manager_gflags",
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/external_command_msgs:lane_follow_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
     ],
     alwayslink = True,
 )
@@ -50,6 +54,9 @@ cc_library(
         "//cyber",
         "//modules/task_manager/proto:task_manager_config_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/external_command_msgs:lane_follow_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
     ],
     alwayslink = True,
 )
@@ -61,53 +68,53 @@ cc_binary(
     deps = [":task_manager_component_lib"],
 )
 
-install(
-    name = "install",
-    data_dest = "task-manager",
-    library_dest = "task-manager/lib",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":task-manager.BUILD",
-    ],
-    targets = [
-        ":libtask_manager_component.so",
-    ],
-    deps = [
-        ":pb_hdrs",
-        "//modules/task_manager/proto:py_pb_task_manager"
-    ],
-)
+# install(
+#     name = "install",
+#     data_dest = "task-manager",
+#     library_dest = "task-manager/lib",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":task-manager.BUILD",
+#     ],
+#     targets = [
+#         ":libtask_manager_component.so",
+#     ],
+#     deps = [
+#         ":pb_hdrs",
+#         "//modules/task_manager/proto:py_pb_task_manager"
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "task-manager/include",
-    data = [
-        "//modules/task_manager/proto:task_manager_config_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "task-manager/include",
+#     data = [
+#         "//modules/task_manager/proto:task_manager_config_cc_proto",
+#     ],
+# )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_task_manager_src",
-        ":install_task_manager_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_task_manager_src",
+#         ":install_task_manager_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_task_manager_src",
-    src_dir = ["."],
-    dest = "task-manager/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_task_manager_src",
+#     src_dir = ["."],
+#     dest = "task-manager/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_task_manager_hdrs",
-    src_dir = ["."],
-    dest = "task-manager/include",
-    filter = "*.h",
-) 
+# install_src_files(
+#     name = "install_task_manager_hdrs",
+#     src_dir = ["."],
+#     dest = "task-manager/include",
+#     filter = "*.h",
+# ) 
 
 filegroup(
     name = "runtime_data",
@@ -118,4 +125,5 @@ filegroup(
     ]),
 )
 
+apollo_package()
 cpplint()

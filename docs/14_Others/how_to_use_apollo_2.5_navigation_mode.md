@@ -6,7 +6,7 @@ Apollo is well received and highly commended by developers in the field of auton
 
 Relative map is the newest feature to be introduced in Apollo 2.5. From the architectural level, the relative map module is the middle layer linking the HDMap to the Perception module and the Planning module as seen in the image below. The relative map module generates real-time maps based on the vehicle’s coordinate system (the format is in the same format as HDMaps). The module also outputs reference lines for the Planning module to use. From the angle of developers, a navigation mode based on relative maps enables developers to implement real-vehicle road tests. As a result, barriers to development have been significantly reduced.
 
-![Software OverView](../demo_guide/images/Software_Overview.png)
+![Software OverView](../02_Quick%20Start/demo_guide/images/Software_Overview.png)
 
 The basic idea behind the navigation mode is:
 * Record the driving path of a manually driven vehicle on a desired path

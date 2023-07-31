@@ -95,7 +95,7 @@ lat_controller_conf {
 ### 纵控制器的调谐
 纵向控制器由级联的PID控制器组成，该控制器包括一个站控制器和一个具有不同速度增益的高速/低速控制器。Apollo管理开环和闭环的调谐通过：
 
-- 开环: 校准表生成。请参阅[how_to_update_vehicle_calibration.md](../10Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E6%A0%87%E5%AE%9A/how_to_update_vehicle_calibration.md)的详细步骤
+- 开环: 校准表生成。请参阅[how_to_update_vehicle_calibration.md](../11Hardware%20Integration%20and%20Calibration/%E8%BD%A6%E8%BE%86%E6%A0%87%E5%AE%9A/how_to_update_vehicle_calibration.md)的详细步骤
 - 闭环: 基于高速控制器->低速控制器->站控制器的顺序。
 
 #### 高/低速控制器的调谐

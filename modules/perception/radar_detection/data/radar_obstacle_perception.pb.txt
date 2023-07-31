@@ -1,0 +1,11 @@
+detector_param {
+  name: "ContiArsDetector"
+}
+roi_filter_param {
+  name: "HdmapRadarRoiFilter"
+}
+tracker_param {
+  name: "ContiArsTracker"
+  config_path: "perception/radar_detection/data"
+  config_file: "conti_ars_tracker.pb.txt"
+}

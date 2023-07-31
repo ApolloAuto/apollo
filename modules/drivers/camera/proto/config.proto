@@ -42,16 +42,26 @@ message Config {
   optional uint32 trigger_internal = 21 [default = 0];
   optional uint32 trigger_fps = 22 [default = 30];
   optional string channel_name = 23;
+  optional string raw_channel_name = 24 [default = "/apollo/sensor/camera/raw/default"];
   // wait time when camera select timeout
-  optional uint32 device_wait_ms = 24 [default = 2000];
+  optional uint32 device_wait_ms = 25 [default = 2000];
   // camera select spin time
-  optional uint32 spin_rate = 25 [default = 200];
-  optional OutputType output_type = 26;
+  optional uint32 spin_rate = 26 [default = 200];
+  optional OutputType output_type = 27;
 
   message CompressConfig {
     optional string output_channel = 1;
     optional uint32 image_pool_size = 2 [default = 20];
+    optional uint32 width = 3 [default = 1920];
+    optional uint32 height = 4 [default = 1080];
   }
-  optional CompressConfig compress_conf = 27;
-  optional bool hardware_trigger = 28 [default = true];
+  optional CompressConfig compress_conf = 28;
+  optional bool hardware_trigger = 29 [default = true];
+
+  message TimeCompensatorConfig {
+    optional bool enable_compensator = 1 [default = false];
+    optional string compensator_fnode = 2 [default = ""];
+  }
+  optional TimeCompensatorConfig time_compensator_conf = 30;
+  optional bool arm_gpu_acceleration = 31 [default = false];
 }

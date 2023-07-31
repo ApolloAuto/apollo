@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.perception.camera.yolov3;
+
+import "modules/perception/common/proto/model_info.proto";
+import "modules/perception/common/proto/model_process.proto";
+
+message ModelParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
+  optional common.Normalize normalize = 3;
+
+  optional float confidence_threshold = 4;
+  optional int32 output_object_num = 5;
+  optional int32 output_object_size = 6;
+  optional bool with_box3d = 7;
+  optional float border_ratio = 8;
+  optional NMSParam nms_param = 9;
+}
+
+message NMSParam {
+  optional string type = 1 [default = "NormalNMS"];
+  optional float threshold = 2 [default = 0.5];
+  optional float sigma = 3 [default = 0.4];
+  optional float inter_cls_conf_thresh = 4 [default = 0.1];
+  optional float inter_cls_nms_thresh = 5 [default = 1.0];
+}

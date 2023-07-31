@@ -30,8 +30,8 @@ import hybrid_a_star_visualizer
 
 random.seed(99999)
 rand_num = 1000
-original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
-optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config_-8_4.pb.txt"
+original_file_path = "/apollo/modules/planning/planning_base/conf/planner_open_space_config.pb.txt"
+optimal_file_path = "/apollo/modules/planning/planning_base/conf/optimal_planner_open_space_config_-8_4.pb.txt"
 # tunning_object = "coarse_trajectory"
 tunning_object = "smooth_trajectory"
 

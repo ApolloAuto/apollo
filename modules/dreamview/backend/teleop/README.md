@@ -60,15 +60,15 @@ As you would expect for Apollo, most messages are communicated via cyber channel
 - The backend process is not implemented or provided by Dreamview. Users can implement their own application for video streaming with their choice of programming language and library. Then they can make use of the [daemon_cmd.proto](proto/daemon_cmd.proto) and the corresponding function `SendVideoStreamCmd` in [teleop.cc](teleop.cc#L420) to start/stop the video streaming process.
 
 #### Send Emergency Stop Command
-- When "Stop" button is clicked, a pad message with `DrivingAction` of `STOP`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/proto/pad_msg.proto), will be published by **Dreamview**.
+- When "Stop" button is clicked, a pad message with `DrivingAction` of `STOP`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_base/proto/pad_msg.proto), will be published by **Dreamview**.
 - Upon receiving a pad message with `DrivingAction` of `STOP`, **Planning** module will execute **emergency stop** by abruptly braking and stopping at the current position.
 
 #### Send Emergency Pull-over Command
-- When "Pull Over" button is clicked, a pad message with `DrivingAction` of `PULL_OVER`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/proto/pad_msg.proto), will be published by **Dreamview**.
+- When "Pull Over" button is clicked, a pad message with `DrivingAction` of `PULL_OVER`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_base/proto/pad_msg.proto), will be published by **Dreamview**.
 - Upon receiving a pad message with `DrivingAction` of `PULL_OVER`, **Planning** module will execute **emergency pull-over** by safely pulling over as soon as possible.
 
 #### Send Resume Cruise Command
-- When "Resume Cruise" button is clicked, a pad message with `DrivingAction` of `RESUME_CRUISE`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/proto/pad_msg.proto), will be published by **Dreamview**.
+- When "Resume Cruise" button is clicked, a pad message with `DrivingAction` of `RESUME_CRUISE`, defined by Protobuf message `PadMessage` in [pad_msg.proto](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/planning_base/proto/pad_msg.proto), will be published by **Dreamview**.
 - Upon receiving a pad message with `DrivingAction` of `RESUME_CRUISE`, **Planning** module will **resume cruising** based on the current routing.
 
 

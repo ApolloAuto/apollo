@@ -1,5 +1,5 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/third_party_perception/libthird_party_perception_component.so"
+    module_library : "modules/third_party_perception/libthird_party_perception_component.so"
     timer_components {
         class_name : "ThirdPartyPerceptionComponent"
         config {

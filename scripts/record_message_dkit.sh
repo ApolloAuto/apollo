@@ -23,6 +23,7 @@
 # """
 function start() {
   local APOLLO_ROOT_DIR="/apollo"
+  local APOLLO_BIN_PREFIX="${APOLLO_ROOT_DIR}/bazel-bin"
   TIME="$(date +%F-%H-%M-%S)"
   MODULE="smart_recorder"
 

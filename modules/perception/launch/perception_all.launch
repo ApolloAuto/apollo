@@ -1,0 +1,36 @@
+<cyber>
+<module>
+    <name>perception</name>
+    <process_name>perception</process_name>
+    <!-- perception -->
+    <dag_conf>/apollo/modules/perception/lidar_output/dag/lidar_fusion_output.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_detection_2d/dag/camera_detection_2d_front.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_front.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_front.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_tracking/dag/camera_tracking_front.dag</dag_conf>
+
+    <dag_conf>/apollo/modules/perception/camera_detection_2d/dag/camera_detection_2d_rear.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_rear.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_rear.dag</dag_conf>
+    <dag_conf>/apollo/modules/perception/camera_tracking/dag/camera_tracking_rear.dag</dag_conf>
+
+    <dag_conf>/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag</dag_conf>
+
+    <dag_conf>/apollo/modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag</dag_conf>
+
+
+    <!-- drivers -->
+    <!-- <dag_conf>/apollo/modules/drivers/camera/dag/dev_kit_camera.dag</dag_conf> -->
+</module>
+
+<!-- <module>
+    <dag_conf>/apollo/modules/drivers/lidar/dag/lidar.dag</dag_conf>
+</module> -->
+
+<module>
+    <name>predict</name>
+    <process_name>predict</process_name>
+    <dag_conf>/apollo/modules/prediction/dag/prediction.dag</dag_conf>
+</module>
+
+</cyber>

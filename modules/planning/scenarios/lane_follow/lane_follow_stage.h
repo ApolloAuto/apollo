@@ -25,31 +25,23 @@
 #include <vector>
 
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-#include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/planning/reference_line/reference_line.h"
-#include "modules/planning/reference_line/reference_point.h"
-#include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/scenarios/stage.h"
-#include "modules/planning/tasks/task.h"
+#include "cyber/plugin_manager/plugin_manager.h"
+#include "modules/common/status/status.h"
+#include "modules/planning/planning_base/common/reference_line_info.h"
+#include "modules/planning/planning_base/reference_line/reference_line.h"
+#include "modules/planning/planning_base/reference_line/reference_point.h"
+#include "modules/planning/planning_base/scenario_base/stage.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace lane_follow {
 
 class LaneFollowStage : public Stage {
  public:
-  LaneFollowStage(const ScenarioConfig::StageConfig& config,
-                  const std::shared_ptr<DependencyInjector>& injector);
-
-  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+  StageResult Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;
 
-  common::Status PlanOnReferenceLine(
+  StageResult PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
 
@@ -68,13 +60,9 @@ class LaneFollowStage : public Stage {
                             const ReferenceLine& reference_line) const;
 
   void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
-
- private:
-  ScenarioConfig config_;
-  std::unique_ptr<Stage> stage_;
 };
 
-}  // namespace lane_follow
-}  // namespace scenario
+CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::LaneFollowStage, Stage)
+
 }  // namespace planning
 }  // namespace apollo

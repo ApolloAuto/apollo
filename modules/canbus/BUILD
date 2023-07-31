@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -45,51 +46,51 @@ cc_binary(
     ],
 )
 
-install(
-    name = "testdata",
-    data_dest = "canbus/addition_data",
-    data = [
-        ":test_data",
-    ],
-)
+# install(
+#     name = "testdata",
+#     data_dest = "canbus/addition_data",
+#     data = [
+#         ":test_data",
+#     ],
+# )
 
-install(
-    name = "install",
-    library_dest = "canbus/lib",
-    data_dest = "canbus",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus.BUILD",
-    ],
-    targets = [
-        ":libcanbus_component.so",
-    ],
-    deps = [
-        ":pb_canbus",
-        ":pb_hdrs",
-        ":testdata",
-        "//modules/canbus/common:install",
-        "//modules/canbus/tools:install",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus/lib",
+#     data_dest = "canbus",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus.BUILD",
+#     ],
+#     targets = [
+#         ":libcanbus_component.so",
+#     ],
+#     deps = [
+#         ":pb_canbus",
+#         ":pb_hdrs",
+#         ":testdata",
+#         "//modules/canbus/common:install",
+#         "//modules/canbus/tools:install",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus/include",
-    data = [
-        "//modules/canbus/proto:canbus_conf_cc_proto",
-        "//modules/canbus/proto:vehicle_parameter_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus/include",
+#     data = [
+#         "//modules/canbus/proto:canbus_conf_cc_proto",
+#         "//modules/canbus/proto:vehicle_parameter_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_canbus",
-    dest = "canbus",
-    files = [
-        "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_canbus",
+#     dest = "canbus",
+#     files = [
+#         "//modules/common_msgs/chassis_msgs:chassis_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -107,26 +108,27 @@ filegroup(
     srcs = glob(["testdata/**"]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_canbus_src",
-        ":install_canbus_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_canbus_src",
+#         ":install_canbus_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_canbus_src",
-    src_dir = ["."],
-    dest = "canbus/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_canbus_src",
+#     src_dir = ["."],
+#     dest = "canbus/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_canbus_hdrs",
-    src_dir = ["."],
-    dest = "canbus/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_canbus_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

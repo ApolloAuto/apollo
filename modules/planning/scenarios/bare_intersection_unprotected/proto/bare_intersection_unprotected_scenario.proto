@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioBareIntersectionUnprotectedConfig {
+  optional double start_bare_intersection_scenario_distance = 1
+      [default = 25.0];  // meter
+  // explicit stop while waiting
+  optional bool enable_explicit_stop = 2 [default = false];
+  optional double min_pass_s_distance = 3 [default = 3.0];       // meter
+  optional double approach_cruise_speed = 4 [default = 6.7056];  // m/s (15 mph)
+  optional double stop_distance = 5 [default = 0.5];             // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];           // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];         // sec
+}

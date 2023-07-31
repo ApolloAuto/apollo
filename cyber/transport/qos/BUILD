@@ -1,13 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
-filegroup(
-    name = "cyber_transport_qos_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-    visibility = ["//visibility:public"],
-)
+# filegroup(
+#     name = "cyber_transport_qos_hdrs",
+#     srcs = glob([
+#         "*.h",
+#     ]),
+#     visibility = ["//visibility:public"],
+# )
 
 cc_library(
     name = "qos",
@@ -26,4 +27,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

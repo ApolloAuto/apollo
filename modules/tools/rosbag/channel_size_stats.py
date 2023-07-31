@@ -47,8 +47,6 @@ class ChannelSizeStats(object):
         '/apollo/perception/traffic_light',
         #        '/apollo/planning',
         '/apollo/prediction',
-        '/apollo/routing_request',
-        '/apollo/routing_response',
         '/apollo/localization/pose',
         '/apollo/sensor/camera/front_6mm/image/compressed',
         '/apollo/sensor/lidar128/compensator/PointCloud2'

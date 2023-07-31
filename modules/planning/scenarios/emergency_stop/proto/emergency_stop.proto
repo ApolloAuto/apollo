@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message ScenarioEmergencyStopConfig {
+  optional double max_stop_deceleration = 1 [default = 6.0];
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}

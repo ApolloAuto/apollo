@@ -49,7 +49,7 @@ def gen(conf):
         return
 
     # gen proto
-    proto_dir = output_dir + "proto/"
+    proto_dir = output_dir + "vehicle/" + car_type.lower() + "/" + "proto/"
     gen_proto_file(protocol_conf_file, proto_dir)
 
     # gen protocol

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -15,33 +16,33 @@ filegroup(
     ]),
 )
 
-install(
-    name = "install",
-    library_dest = "bridge/lib",
-    data_dest = "bridge",
-    data = [
-      ":runtime_data",
-      "cyberfile.xml",
-      "bridge.BUILD"
-    ],
-    targets = [
-      ":libudp_bridge_sender_component.so",
-      ":libudp_bridge_receiver_component.so",
-      ":libudp_bridge_multi_receiver_component.so",
-    ],
-    deps = [
-        "//modules/bridge/test:install",
-        "//modules/bridge/proto:py_pb_bridge",
-        "//modules/bridge/common:install", 
-    ],
-)
-install(
-    name = "pb_hdrs",
-    data_dest = "bridge/include",
-    data = [
-        "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "bridge/lib",
+#     data_dest = "bridge",
+#     data = [
+#       ":runtime_data",
+#       "cyberfile.xml",
+#       "bridge.BUILD"
+#     ],
+#     targets = [
+#       ":libudp_bridge_sender_component.so",
+#       ":libudp_bridge_receiver_component.so",
+#       ":libudp_bridge_multi_receiver_component.so",
+#     ],
+#     deps = [
+#         "//modules/bridge/test:install",
+#         "//modules/bridge/proto:py_pb_bridge",
+#         "//modules/bridge/common:install", 
+#     ],
+# )
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "bridge/include",
+#     data = [
+#         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
+#     ],
+# )
 
 cc_library(
     name = "udp_bridge",
@@ -129,26 +130,27 @@ cc_test(
     ],
     linkstatic = True,
 )
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_bridge_src",
-        ":install_bridge_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_bridge_src",
+#         ":install_bridge_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_bridge_src",
-    src_dir = ["."],
-    dest = "bridge/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_bridge_src",
+#     src_dir = ["."],
+#     dest = "bridge/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_bridge_hdrs",
-    src_dir = ["."],
-    dest = "bridge/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_bridge_hdrs",
+#     src_dir = ["."],
+#     dest = "bridge/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

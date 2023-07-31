@@ -1,14 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_event_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
+# filegroup(
+#     name = "cyber_event_hdrs",
+#     srcs = glob([
+#         "*.h",
+#     ]),
+# )
 
 cc_library(
     name = "perf_event_cache",
@@ -33,4 +34,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

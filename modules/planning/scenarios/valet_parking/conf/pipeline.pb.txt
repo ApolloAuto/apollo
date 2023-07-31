@@ -1,0 +1,70 @@
+stage: {
+  name: "VALET_PARKING_APPROACHING_PARKING_SPOT"
+  type: "StageApproachingParkingSpot"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_PRE_STOP_DECIDER"
+    type: "OpenSpacePreStopDecider"
+  }
+  task {
+    name: "LANE_FOLLOW_PATH"
+    type: "LaneFollowPath"
+  }
+  task {
+    name: "LANE_BORROW_PATH"
+    type: "LaneBorrowPath"
+  }
+  task {
+    name: "FALLBACK_PATH"
+    type: "FallbackPath"
+  }
+  task {
+    name: "PATH_DECIDER"
+    type: "PathDecider"
+  }
+  task {
+    name: "RULE_BASED_STOP_DECIDER"
+    type: "RuleBasedStopDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_PRIORI_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "SPEED_HEURISTIC_OPTIMIZER"
+    type: "PathTimeHeuristicOptimizer"
+  }
+  task {
+    name: "SPEED_DECIDER"
+    type: "SpeedDecider"
+  }
+  task {
+    name: "SPEED_BOUNDS_FINAL_DECIDER"
+    type: "SpeedBoundsDecider"
+  }
+  task {
+    name: "PIECEWISE_JERK_SPEED"
+    type: "PiecewiseJerkSpeedOptimizer"
+  }
+}
+stage: {
+  name: "VALET_PARKING_PARKING"
+  type: "StageParking"
+  enabled: true
+  task {
+    name: "OPEN_SPACE_ROI_DECIDER"
+    type: "OpenSpaceRoiDecider"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_PROVIDER"
+    type: "OpenSpaceTrajectoryProvider"
+  }
+  task {
+    name: "OPEN_SPACE_TRAJECTORY_PARTITION"
+    type: "OpenSpaceTrajectoryPartition"
+  }
+  task {
+    name: "OPEN_SPACE_FALLBACK_DECIDER"
+    type: "OpenSpaceFallbackDecider"
+  }
+}

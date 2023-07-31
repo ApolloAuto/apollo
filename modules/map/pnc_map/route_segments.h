@@ -24,9 +24,9 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/common_msgs/basic_msgs/pnc_point.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/pnc_map/path.h"
@@ -199,6 +199,13 @@ class RouteSegments : public std::vector<LaneSegment> {
                                 const routing::LaneWaypoint &waypoint);
 
   static double Length(const RouteSegments &segments);
+  std::string DebugString() {
+    std::stringstream ss;
+    for (auto iter = begin(); iter != end(); ++iter) {
+      ss << iter->DebugString() << ";";
+    }
+    return ss.str();
+  }
 
  private:
   LaneWaypoint route_end_waypoint_;

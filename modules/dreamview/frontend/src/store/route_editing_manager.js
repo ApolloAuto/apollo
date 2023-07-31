@@ -132,6 +132,10 @@ export default class RouteEditingManager {
       RENDERER.removeAllRoutingPoints();
     }
 
+    setStartPoint() {
+      return RENDERER.setStartPoint();
+    }
+
     sendRoutingRequest(inNavigationMode, defaultRoutingName = '') {
       if (!inNavigationMode) {
         const success = _.isEmpty(defaultRoutingName) ? RENDERER.sendRoutingRequest()

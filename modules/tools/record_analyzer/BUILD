@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,8 +20,8 @@ py_library(
 )
 
 py_binary(
-    name = "main",
-    srcs = ["main.py"],
+    name = "record_analyzer",
+    srcs = ["record_analyzer.py"],
     deps = [
         ":lidar_endtoend_analyzer",
         ":module_control_analyzer",
@@ -64,16 +65,18 @@ py_library(
     ],
 )
 
-install(
-    name = "install",
-    data = [":readme"],
-    data_dest = "tools/record_analyzer",
-    py_dest = "tools/record_analyzer",
-    targets = [
-        ":main",
-    ],
-    deps = [
-        "//modules/tools/record_analyzer/tools:install",
-        "//modules/tools/record_analyzer/common:install",
-    ]
-)
+# install(
+#     name = "install",
+#     data = [":readme"],
+#     data_dest = "tools/record_analyzer",
+#     py_dest = "tools/record_analyzer",
+#     targets = [
+#         ":main",
+#     ],
+#     deps = [
+#         "//modules/tools/record_analyzer/tools:install",
+#         "//modules/tools/record_analyzer/common:install",
+#     ]
+# )
+
+apollo_package()

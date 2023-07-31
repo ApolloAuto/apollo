@@ -17,7 +17,6 @@
 #include "modules/canbus_vehicle/wey/wey_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/wey/wey_message_manager.h"
@@ -29,6 +28,7 @@ namespace canbus {
 namespace wey {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -650,10 +650,15 @@ void WeyController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void WeyController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode WeyController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void WeyController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.has_high_beam() && vehicle_signal.high_beam()) {
     ads3_38e_->set_highbeamton(Ads3_38e::HIGHBEAMTON_TURN_ON);
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     ads3_38e_->set_dippedbeamon(Ads3_38e::DIPPEDBEAMON_TURN_ON);
   } else {
     ads3_38e_->set_highbeamton(Ads3_38e::HIGHBEAMTON_TURN_OFF);
@@ -661,17 +666,17 @@ void WeyController::SetBeam(const ControlCommand& command) {
   }
 }
 
-void WeyController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void WeyController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     ads3_38e_->set_hornon(Ads3_38e::HORNON_TURN_ON);
   } else {
     ads3_38e_->set_hornon(Ads3_38e::HORNON_TURN_OFF);
   }
 }
 
-void WeyController::SetTurningSignal(const ControlCommand& command) {
+void WeyController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     ads3_38e_->set_turnllighton(Ads3_38e::TURNLLIGHTON_TURN_LEFT_ON);
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {

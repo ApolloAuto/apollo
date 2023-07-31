@@ -1,22 +1,80 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CAMERA_COPTS = ['-DMODULE_NAME=\\"camera\\"']
 
-install(
-    name = "install",
-    data_dest = "drivers/addition_data/smartereye",
-    library_dest = "drivers/lib/smartereye",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        ":libsmartereye_component.so",
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_drivers_smartereye_src",
+#         ":install_drivers_smartereye_hdrs"
+#     ],
+# )
+
+# install_src_files(
+#     name = "install_drivers_smartereye_src",
+#     src_dir = ["."],
+#     dest = "drivers-smartereye/src",
+#     filter = "*",
+# )
+
+# install_src_files(
+#     name = "install_drivers_smartereye_hdrs",
+#     src_dir = ["."],
+#     dest = "drivers-smartereye/include",
+#     filter = "*.h",
+# )
+
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "drivers-smartereye/include",
+#     data = [
+#         "//modules/drivers/smartereye/proto:config_cc_proto",
+#     ],
+# )
+
+# install_files(
+#     name = "pb_drivers_smartereye_py",
+#     dest = "drivers-smartereye/python/modules/drivers/smartereye",
+#     files = [
+#         "//modules/drivers/smartereye/proto:config_py_pb2",
+#     ],
+# )
+
+filegroup(
+    name = "package_data",
+    srcs = [
+        ":cyberfile.xml",
+        ":drivers-smartereye.BUILD",
     ],
 )
+
+# install(
+#     name = "install_package_data",
+#     data_dest = "drivers-smartereye",
+#     data = ["package_data"],
+# )
+
+# install(
+#     name = "install",
+#     data_dest = "drivers-smartereye/addition_data",
+#     library_dest = "drivers-smartereye/lib",
+#     data = [
+#         ":runtime_data",
+#     ],
+#     targets = [
+#         ":libsmartereye_component.so",
+#     ],
+#     deps = [
+#         ":pb_hdrs", 
+#         ":pb_drivers_smartereye_py",
+#         "install_package_data"
+#     ]
+# )
 
 filegroup(
     name = "runtime_data",
@@ -97,4 +155,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

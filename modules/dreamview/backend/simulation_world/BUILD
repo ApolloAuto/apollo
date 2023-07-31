@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,6 +36,12 @@ cc_library(
         "//modules/common_msgs/prediction_msgs:prediction_obstacle_cc_proto",
         "//modules/common_msgs/storytelling_msgs:story_cc_proto",
         "//modules/common_msgs/task_manager_msgs:task_manager_cc_proto",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/external_command_msgs:lane_follow_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
+        "//modules/common_msgs/external_command_msgs:valet_parking_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:action_command_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_command_cc_proto",
         "@com_github_nlohmann_json//:json",
         "@com_google_absl//:absl",
     ],
@@ -74,8 +81,14 @@ cc_library(
         "//modules/dreamview/backend/plugins:plugin_manager",
         "//modules/dreamview/backend/sim_control_manager:sim_control_manager",
         "//modules/dreamview/backend/sim_control",
+        "//modules/common_msgs/routing_msgs:routing_cc_proto",
+        "//modules/common_msgs/external_command_msgs:lane_follow_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:valet_parking_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:action_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "@boost",
     ],
 )
 
+apollo_package()
 cpplint()

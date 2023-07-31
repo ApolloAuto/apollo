@@ -1,0 +1,13 @@
+camera_name: "camera_front"
+timestamp_offset: 0.0
+plugin_param {
+  name: "YoloObstacleDetector"
+  config_path: "perception/camera_detection_2d/data"
+  config_file: "yolo.pb.txt"
+}
+enable_undistortion: false
+channel {
+  input_camera_channel_name: "/apollo/sensor/camera/front/image"
+  output_obstacles_channel_name: "/perception/inner/Detection"
+}
+gpu_id: 0

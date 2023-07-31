@@ -1,5 +1,5 @@
 module_config {
-    module_library: "/apollo/bazel-bin/modules/bridge/libudp_bridge_multi_receiver_component.so"
+    module_library: "modules/bridge/libudp_bridge_multi_receiver_component.so"
 
     components {
 

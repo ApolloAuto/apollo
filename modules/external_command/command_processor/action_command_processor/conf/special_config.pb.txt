@@ -1,0 +1,3 @@
+pull_over_scenario_name: "EMERGENCY_PULL_OVER"
+stop_scenario_name: "EMERGENCY_STOP"
+minimun_non_zero_speed: 0.1

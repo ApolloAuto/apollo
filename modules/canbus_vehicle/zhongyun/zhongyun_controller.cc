@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/canbus_vehicle/zhongyun/zhongyun_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -29,6 +28,7 @@ namespace canbus {
 namespace zhongyun {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -501,25 +501,30 @@ void ZhongyunController::SetEpbBreak(const ControlCommand& command) {
   }
 }
 
-void ZhongyunController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+ErrorCode ZhongyunController::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
+
+void ZhongyunController::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.high_beam()) {
     // None
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.low_beam()) {
     // None
   } else {
     // None
   }
 }
 
-void ZhongyunController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void ZhongyunController::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     // None
   } else {
     // None
   }
 }
 
-void ZhongyunController::SetTurningSignal(const ControlCommand& command) {
+void ZhongyunController::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
   // None
 }

@@ -96,8 +96,10 @@ class TeleopService {
       local_daemon_cmd_writer_;
 
   // planning driving actions  and feedback
-  std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
-      pad_message_writer_;
+  std::shared_ptr<
+      apollo::cyber::Client<apollo::external_command::ActionCommand,
+                            apollo::external_command::CommandStatus>>
+      action_command_client_;
   void UpdatePlanning(
       const std::shared_ptr<apollo::planning::ADCTrajectory> &msg);
 #endif

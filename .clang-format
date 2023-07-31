@@ -12,6 +12,9 @@ IncludeCategories:
   # Miscelaneous system libraries
   - Regex:       '<(immintrin.h|malloc.h|wait.h|x86intrin.h|cuda.*)>'
     Priority:    3
+  # third-party libraries
+  - Regex:       '<(tinyxml2.h)>'
+    Priority:    3
   # C standard libraries
   - Regex:       '<(arpa/|netinet/|net/if|sys/)?[^\./]*\.h>'
     Priority:    1

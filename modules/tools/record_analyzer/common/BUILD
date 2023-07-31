@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -41,10 +42,12 @@ py_library(
     srcs = ["statistical_analyzer.py"],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/record_analyzer/common",
-    targets = [
-        ":frechet_distance",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/record_analyzer/common",
+#     targets = [
+#         ":frechet_distance",
+#     ]
+# )
+
+apollo_package()

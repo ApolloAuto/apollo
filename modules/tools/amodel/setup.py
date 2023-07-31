@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="amodel",
-    version="0.1.1",
+    version="0.2.0",
     author="apollo-team",
     author_email="apollo-support@baidu.com",
     description="Apollo's model deployment and management tool",

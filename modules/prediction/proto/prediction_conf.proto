@@ -65,4 +65,26 @@ message TopicConf {
 message PredictionConf {
   optional TopicConf topic_conf = 1;
   repeated ObstacleConf obstacle_conf = 2;
+  optional EvaluatorModelConf evaluator_model_conf = 3;
+}
+
+message ModelConf {
+  optional string model_path = 1;
+}
+
+message EvaluatorModelConf {
+  repeated Model model = 1;
+}
+
+message Model {
+  enum Backend {
+    GPU = 1;
+    CPU = 2;
+  }
+
+  optional ObstacleConf.EvaluatorType evaluator_type = 1;
+  optional apollo.perception.PerceptionObstacle.Type obstacle_type = 2;
+  optional Backend backend = 3;
+  optional string type = 4;
+  optional int32 priority = 5;
 }

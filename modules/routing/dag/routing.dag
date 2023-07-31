@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
 module_config {
-    module_library : "/apollo/bazel-bin/modules/routing/librouting_component.so"
+    module_library : "modules/routing/librouting_component.so"
     components {
         class_name : "RoutingComponent"
         config {
@@ -9,7 +9,7 @@ module_config {
             flag_file_path: "/apollo/modules/routing/conf/routing.conf"
             readers: [
                 {
-                    channel: "/apollo/routing_request"
+                    channel: "/apollo/raw_routing_request"
                     qos_profile: {
                         depth : 10
                     }

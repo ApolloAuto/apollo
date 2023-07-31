@@ -15,9 +15,16 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <limits>
 #include <memory>
+#include <string>
+
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/planning_msgs/planning_command.pb.h"
+#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
+#include "modules/common_msgs/routing_msgs/routing.pb.h"
+#include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -27,15 +34,10 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/common_msgs/prediction_msgs/prediction_obstacle.pb.h"
-#include "modules/common_msgs/routing_msgs/routing.pb.h"
+#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview/backend/sim_control_manager/core/sim_control_base.h"
-#include "modules/dreamview/backend/sim_control_manager/proto/sim_control_internal.pb.h"
-#include "modules/dreamview/backend/map/map_service.h"
 
 /**
  * @namespace apollo::dreamview
@@ -63,6 +65,11 @@ class SimControlWithModelBase : public SimControlBase {
 
   void Start(double x, double y) override;
 
+  /**
+   * @brief Set vehicle position.
+   */
+  void ReSetPoinstion(double x, double y, double heading) override;
+
   void Stop() override;
 
   /**
@@ -80,11 +87,12 @@ class SimControlWithModelBase : public SimControlBase {
   void InternalReset();
 
   void OnControlCommand(const apollo::control::ControlCommand& control_command);
-  void OnRoutingResponse(const apollo::routing::RoutingResponse& routing);
-  void OnRoutingRequest(
-      const std::shared_ptr<apollo::routing::RoutingRequest> &routing_request);
+  void OnPlanningCommand(
+      const std::shared_ptr<apollo::planning::PlanningCommand>&
+          planning_command);
   void OnPredictionObstacles(
-    const std::shared_ptr<apollo::prediction::PredictionObstacles> &obstacles);
+      const std::shared_ptr<apollo::prediction::PredictionObstacles>&
+          obstacles);
 
   virtual void SetStartPoint(const ::apollo::sim_control::SimCarStatus& point);
 
@@ -99,10 +107,8 @@ class SimControlWithModelBase : public SimControlBase {
 
   std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>
       control_command_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
-      routing_reader_;
-  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
-      routing_request_reader_;
+  std::shared_ptr<cyber::Reader<apollo::planning::PlanningCommand>>
+      planning_command_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
@@ -142,7 +148,7 @@ class SimControlWithModelBase : public SimControlBase {
 
   // Whether to send dummy predictions
   bool send_dummy_prediction_ = true;
-  MapService *map_service_;
+  MapService* map_service_;
 };
 
 }  // namespace dreamview

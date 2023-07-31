@@ -1,4 +1,5 @@
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
@@ -25,31 +26,33 @@ cc_binary(
     deps = [":rtklib"]
 )
 
-install(
-    name = "install",
-    data_dest = "3rd-rtklib",
-    library_dest = "3rd-rtklib/lib",
-    data = [
-        ":cyberfile.xml",
-        ":3rd-rtklib.BUILD"
-    ],
-    targets = ["librtklib.so"]
-)
+# install(
+#     name = "install",
+#     data_dest = "3rd-rtklib",
+#     library_dest = "3rd-rtklib/lib",
+#     data = [
+#         ":cyberfile.xml",
+#         ":3rd-rtklib.BUILD"
+#     ],
+#     targets = ["librtklib.so"]
+# )
 
-install_src_files(
-    name = "headers",
-    src_dir = ["."],
-    dest = "3rd-rtklib/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "headers",
+#     src_dir = ["."],
+#     dest = "3rd-rtklib/include",
+#     filter = "*.h",
+# )
 
 
-install_src_files(
-    name = "install_src",
-    src_dir = ["."],
-    dest = "3rd-rtklib/src",
-    filter = "*",
-    deps = [
-        ":headers",
-    ]
-)
+# install_src_files(
+#     name = "install_src",
+#     src_dir = ["."],
+#     dest = "3rd-rtklib/src",
+#     filter = "*",
+#     deps = [
+#         ":headers",
+#     ]
+# )
+
+apollo_package()

@@ -1,6 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools/platform:build_defs.bzl", "if_gpu", "if_aarch64")
 
 package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
@@ -25,15 +27,15 @@ cc_binary(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "prediction/lib",
-    targets = [
-        ":libprediction_gflags.so",
-        ":libprediction_system_gflags.so"
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "prediction/lib",
+#     targets = [
+#         ":libprediction_gflags.so",
+#         ":libprediction_system_gflags.so"
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
 cc_binary(
     name = "libprediction_system_gflags.so",
@@ -283,6 +285,21 @@ cc_library(
         "//modules/common_msgs/prediction_msgs:feature_cc_proto",
         "@opencv//:highgui",
         "@opencv//:imgcodecs",
+    ] + if_aarch64([":affine_transform"]),
+)
+
+cc_library(
+    name = "affine_transform",
+    srcs = ["affine_transform.cc"],
+    hdrs = ["affine_transform.h"],
+    copts = PREDICTION_COPTS,
+    deps = [
+        "//cyber",
+        "prediction_system_gflags",
+        "prediction_gflags",
+        "@npp",
+        "@opencv//:highgui",
+        "@opencv//:imgcodecs",
     ],
 )
 
@@ -291,4 +308,5 @@ cc_library(
     hdrs = ["prediction_constants.h"],
 )
 
+apollo_package()
 cpplint()

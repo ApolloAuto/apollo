@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "copts_if_teleop", "if_teleop")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,7 +19,8 @@ cc_library(
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
-        "//modules/common_msgs/planning_msgs:pad_msg_cc_proto",
+        "//modules/common_msgs/external_command_msgs:action_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "@com_github_nlohmann_json//:json",
     ] + if_teleop([
         "//modules/teleop/modem/proto:modem_info_cc_proto",
@@ -43,4 +45,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

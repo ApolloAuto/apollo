@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -83,39 +84,39 @@ cc_test(
     ],
 )
 
-install(
-    name = "install",
-    library_dest = "canbus-vehicle-lexus/lib",
-    data_dest = "canbus-vehicle-lexus",
-    data = [
-        ":runtime_data",
-        ":cyberfile.xml",
-        ":canbus-vehicle-lexus.BUILD",
-    ],
-    targets = [
-        ":liblexus_vehicle_factory_lib.so",
-    ],
-    deps = [
-        ":pb_lexus",
-        ":pb_hdrs",
-    ],
-)
+# install(
+#     name = "install",
+#     library_dest = "canbus-vehicle-lexus/lib",
+#     data_dest = "canbus-vehicle-lexus",
+#     data = [
+#         ":runtime_data",
+#         ":cyberfile.xml",
+#         ":canbus-vehicle-lexus.BUILD",
+#     ],
+#     targets = [
+#         ":liblexus_vehicle_factory_lib.so",
+#     ],
+#     deps = [
+#         ":pb_lexus",
+#         ":pb_hdrs",
+#     ],
+# )
 
-install(
-    name = "pb_hdrs",
-    data_dest = "canbus-vehicle-lexus/include",
-    data = [
-        "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
-    ],
-)
+# install(
+#     name = "pb_hdrs",
+#     data_dest = "canbus-vehicle-lexus/include",
+#     data = [
+#         "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
+#     ],
+# )
 
-install_files(
-    name = "pb_lexus",
-    dest = "canbus-vehicle-lexus",
-    files = [
-        "//modules/canbus_vehicle/lexus/proto:lexus_py_pb2",
-    ],
-)
+# install_files(
+#     name = "pb_lexus",
+#     dest = "canbus-vehicle-lexus",
+#     files = [
+#         "//modules/canbus_vehicle/lexus/proto:lexus_py_pb2",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -124,26 +125,27 @@ filegroup(
     ]),
 )
 
-install_src_files(
-    name = "install_src",
-    deps = [
-        ":install_lexus_src",
-        ":install_lexus_hdrs"
-    ],
-)
+# install_src_files(
+#     name = "install_src",
+#     deps = [
+#         ":install_lexus_src",
+#         ":install_lexus_hdrs"
+#     ],
+# )
 
-install_src_files(
-    name = "install_lexus_src",
-    src_dir = ["."],
-    dest = "canbus-vehicle-lexus/src",
-    filter = "*",
-)
+# install_src_files(
+#     name = "install_lexus_src",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-lexus/src",
+#     filter = "*",
+# )
 
-install_src_files(
-    name = "install_lexus_hdrs",
-    src_dir = ["."],
-    dest = "canbus-vehicle-lexus/include",
-    filter = "*.h",
-)
+# install_src_files(
+#     name = "install_lexus_hdrs",
+#     src_dir = ["."],
+#     dest = "canbus-vehicle-lexus/include",
+#     filter = "*.h",
+# )
 
+apollo_package()
 cpplint()

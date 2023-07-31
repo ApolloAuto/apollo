@@ -1,14 +1,15 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "cyber_class_loader_utility_hdrs",
-    srcs = glob([
-        "*.h",
-    ]),
-)
+# filegroup(
+#     name = "cyber_class_loader_utility_hdrs",
+#     srcs = glob([
+#         "*.h",
+#     ]),
+# )
 
 cc_library(
     name = "class_factory",
@@ -29,4 +30,5 @@ cc_library(
     alwayslink = True,
 )
 
+apollo_package()
 cpplint()

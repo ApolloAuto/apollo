@@ -16,10 +16,9 @@ limitations under the License.
 #include "modules/canbus_vehicle/ge3/ge3_controller.h"
 
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
-
 #include "cyber/time/time.h"
-#include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/canbus_vehicle/ge3/ge3_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -28,6 +27,7 @@ namespace canbus {
 namespace ge3 {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::VehicleSignal;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
@@ -637,12 +637,16 @@ void Ge3Controller::SetEpbBreak(const ControlCommand& command) {
     pc_epb_203_->set_pc_epbreq(Pc_epb_203::PC_EPBREQ_RELEASE);
   }
 }
+ErrorCode Ge3Controller::HandleCustomOperation(
+    const external_command::ChassisCommand& command) {
+  return ErrorCode::OK;
+}
 
-void Ge3Controller::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
+void Ge3Controller::SetBeam(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.has_high_beam() && vehicle_signal.high_beam()) {
     pc_bcm_201_->set_pc_lowbeamreq(Pc_bcm_201::PC_LOWBEAMREQ_NOREQ);
     pc_bcm_201_->set_pc_highbeamreq(Pc_bcm_201::PC_HIGHBEAMREQ_REQ);
-  } else if (command.signal().low_beam()) {
+  } else if (vehicle_signal.has_low_beam() && vehicle_signal.low_beam()) {
     pc_bcm_201_->set_pc_lowbeamreq(Pc_bcm_201::PC_LOWBEAMREQ_REQ);
     pc_bcm_201_->set_pc_highbeamreq(Pc_bcm_201::PC_HIGHBEAMREQ_NOREQ);
   } else {
@@ -651,17 +655,17 @@ void Ge3Controller::SetBeam(const ControlCommand& command) {
   }
 }
 
-void Ge3Controller::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
+void Ge3Controller::SetHorn(const VehicleSignal& vehicle_signal) {
+  if (vehicle_signal.horn()) {
     pc_bcm_201_->set_pc_hornreq(Pc_bcm_201::PC_HORNREQ_REQ);
   } else {
     pc_bcm_201_->set_pc_hornreq(Pc_bcm_201::PC_HORNREQ_NOREQ);
   }
 }
 
-void Ge3Controller::SetTurningSignal(const ControlCommand& command) {
+void Ge3Controller::SetTurningSignal(const VehicleSignal& vehicle_signal) {
   // Set Turn Signal
-  auto signal = command.signal().turn_signal();
+  auto signal = vehicle_signal.turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     pc_bcm_201_->set_pc_leftturnlampreq(Pc_bcm_201::PC_LEFTTURNLAMPREQ_REQ);
     pc_bcm_201_->set_pc_rightturnlampreq(Pc_bcm_201::PC_RIGHTTURNLAMPREQ_NOREQ);

@@ -19,22 +19,22 @@
 #include <memory>
 #include <thread>
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/common_msgs/basic_msgs/error_code.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus_vehicle/ge3/protocol/pc_bcm_201.h"
 #include "modules/canbus_vehicle/ge3/protocol/pc_bcs_202.h"
 #include "modules/canbus_vehicle/ge3/protocol/pc_epb_203.h"
 #include "modules/canbus_vehicle/ge3/protocol/pc_eps_204.h"
 #include "modules/canbus_vehicle/ge3/protocol/pc_vcu_205.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common_msgs/basic_msgs/error_code.pb.h"
-#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 
 namespace apollo {
 namespace canbus {
 namespace ge3 {
 
-class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3>  {
+class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3> {
  public:
   Ge3Controller() {}
 
@@ -43,8 +43,7 @@ class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3>  {
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
       CanSender<::apollo::canbus::Ge3>* const can_sender,
-      MessageManager<::apollo::canbus::Ge3>* const message_manager)
-      override;
+      MessageManager<::apollo::canbus::Ge3>* const message_manager) override;
 
   bool Start() override;
 
@@ -96,11 +95,12 @@ class Ge3Controller final : public VehicleController<::apollo::canbus::Ge3>  {
   void Steer(double angle, double angle_spd) override;
 
   // set Electrical Park Brake
-  void SetEpbBreak(const ::apollo::control::ControlCommand& command) override;
-  void SetBeam(const ::apollo::control::ControlCommand& command) override;
-  void SetHorn(const ::apollo::control::ControlCommand& command) override;
-  void SetTurningSignal(
-      const ::apollo::control::ControlCommand& command) override;
+  void SetEpbBreak(const control::ControlCommand& command) override;
+  common::ErrorCode HandleCustomOperation(
+      const external_command::ChassisCommand& command) override;
+  void SetBeam(const common::VehicleSignal& signal) override;
+  void SetHorn(const common::VehicleSignal& signal) override;
+  void SetTurningSignal(const common::VehicleSignal& signal) override;
 
   bool VerifyID() override;
   void ResetProtocol();

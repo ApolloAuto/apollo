@@ -301,9 +301,10 @@ void PrintDebugInfo(const std::string& road_id,
 }
 
 bool ResultGenerator::GeneratePassageRegion(
-    const std::string& map_version, const RoutingRequest& request,
+    const std::string& map_version, const routing::RoutingRequest& request,
     const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager, RoutingResponse* const result) {
+    const TopoRangeManager& range_manager,
+    routing::RoutingResponse* const result) {
   if (!GeneratePassageRegion(nodes, range_manager, result)) {
     return false;
   }
@@ -316,7 +317,8 @@ bool ResultGenerator::GeneratePassageRegion(
 
 bool ResultGenerator::GeneratePassageRegion(
     const std::vector<NodeWithRange>& nodes,
-    const TopoRangeManager& range_manager, RoutingResponse* const result) {
+    const TopoRangeManager& range_manager,
+    routing::RoutingResponse* const result) {
   std::vector<PassageInfo> passages;
   if (!ExtractBasicPassages(nodes, &passages)) {
     return false;
@@ -332,23 +334,23 @@ void ResultGenerator::AddRoadSegment(
     const std::vector<PassageInfo>& passages,
     const std::pair<std::size_t, std::size_t>& start_index,
     const std::pair<std::size_t, std::size_t>& end_index,
-    RoutingResponse* result) {
+    routing::RoutingResponse* result) {
   auto* road = result->add_road();
 
   road->set_id(passages[start_index.first].nodes[start_index.second].RoadId());
   for (std::size_t i = start_index.first;
-      i <= end_index.first && i < passages.size(); ++i) {
+       i <= end_index.first && i < passages.size(); ++i) {
     auto* passage = road->add_passage();
     const size_t node_start_index =
-        (i == start_index.first ?
-        std::max((std::size_t)0, start_index.second) : 0);
+        (i == start_index.first ? std::max((std::size_t)0, start_index.second)
+                                : 0);
     const auto node_begin_iter = passages[i].nodes.cbegin() + node_start_index;
-    ADEBUG<< "start node: " << node_begin_iter->LaneId() << ": "
+    ADEBUG << "start node: " << node_begin_iter->LaneId() << ": "
            << node_begin_iter->StartS() << "; " << node_begin_iter->EndS();
     const size_t node_end_index =
-         (i == end_index.first ?
-         std::min(end_index.second, passages[i].nodes.size() - 1) :
-         passages[i].nodes.size() - 1);
+        (i == end_index.first
+             ? std::min(end_index.second, passages[i].nodes.size() - 1)
+             : passages[i].nodes.size() - 1);
     const auto node_last_iter = passages[i].nodes.cbegin() + node_end_index;
     ADEBUG << "last node: " << node_last_iter->LaneId() << ": "
            << node_last_iter->StartS() << "; " << node_last_iter->EndS();
@@ -365,7 +367,8 @@ void ResultGenerator::AddRoadSegment(
 }
 
 void ResultGenerator::CreateRoadSegments(
-    const std::vector<PassageInfo>& passages, RoutingResponse* result) {
+    const std::vector<PassageInfo>& passages,
+    routing::RoutingResponse* result) {
   ACHECK(!passages.empty()) << "passages empty";
   NodeWithRange fake_node_range(passages.front().nodes.front());
   bool in_change_lane = false;
@@ -386,12 +389,12 @@ void ResultGenerator::CreateRoadSegments(
       } else {
         if (in_change_lane) {
           ADEBUG << "start_index(" << start_index.first << ", "
-                 << start_index.second
-                 << ") end_index(" << i << ", " << j - 1 << ")";
+                 << start_index.second << ") end_index(" << i << ", " << j - 1
+                 << ")";
           AddRoadSegment(passages, start_index, {i, j - 1}, result);
         }
-        ADEBUG << "start_index(" << i << ", " << j
-               << ") end_index(" << i << ", " << j << ")";
+        ADEBUG << "start_index(" << i << ", " << j << ") end_index(" << i
+               << ", " << j << ")";
         AddRoadSegment(passages, {i, j}, {i, j}, result);
         in_change_lane = false;
       }

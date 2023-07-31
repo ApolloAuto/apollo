@@ -20,6 +20,7 @@
 #include "cyber/time/time.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/util/message_util.h"
+#include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 #include <iomanip>
 #include <sstream>
@@ -31,12 +32,13 @@ using Json = nlohmann::json;
 using apollo::cyber::Time;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DrivingAction;
-using apollo::planning::PadMessage;
 using apollo::planning::ScenarioConfig;
 using ::google::protobuf::util::MessageToJsonString;
 using modules::teleop::daemon::DaemonCmd;
 using modules::teleop::daemon::DaemonRpt;
 using modules::teleop::modem::ModemInfo;
+using apollo::external_command::ActionCommand;
+using apollo::external_command::CommandStatus;
 
 // modem ids
 const std::string modem0_id = "0";
@@ -124,7 +126,9 @@ void TeleopService::Start() {
         UpdateOperatorDaemonRpt(msg);
       });
 
-  pad_message_writer_ = node_->CreateWriter<PadMessage>(planning_pad_channel);
+  action_command_client_ =
+      node_->CreateClient<apollo::external_command::ActionCommand,
+                          CommandStatus>(FLAGS_action_command_topic);
 }
 
 void TeleopService::RegisterMessageHandlers() {
@@ -471,23 +475,23 @@ void TeleopService::SendMicStreamCmd(bool start_stop) {
 
 void TeleopService::SendResumeCruiseCmd() {
   AINFO << "Resume cruise";
-  PadMessage pad_msg;
-  pad_msg.set_action(DrivingAction::RESUME_CRUISE);
-  pad_message_writer_->Write(pad_msg);
+  auto command = std::make_shared<ActionCommand>();
+  command->set_command(apollo::external_command::ActionCommandType::START);
+  action_command_client_->SendRequest(command);
 }
 
 void TeleopService::SendPullOverCmd() {
   AINFO << "Pull over";
-  PadMessage pad_msg;
-  pad_msg.set_action(DrivingAction::PULL_OVER);
-  pad_message_writer_->Write(pad_msg);
+  auto command = std::make_shared<ActionCommand>();
+  command->set_command(apollo::external_command::ActionCommandType::PULL_OVER);
+  action_command_client_->SendRequest(command);
 }
 
 void TeleopService::SendEstopCmd() {
   AINFO << "EStop";
-  PadMessage pad_msg;
-  pad_msg.set_action(DrivingAction::STOP);
-  pad_message_writer_->Write(pad_msg);
+  auto command = std::make_shared<ActionCommand>();
+  command->set_command(apollo::external_command::ActionCommandType::STOP);
+  action_command_client_->SendRequest(command);
 }
 
 void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
@@ -499,9 +503,9 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
   }
   auto scenario_type = msg->debug().planning_data().scenario().scenario_type();
 
-  bool pulled_over = scenario_type == ScenarioType::PULL_OVER;
-  bool autonomy_resumed = scenario_type == ScenarioConfig::PARK_AND_GO;
-  bool e_stopped = scenario_type == ScenarioType::EMERGENCY_PULL_OVER;
+  bool pulled_over = scenario_type == "PULL_OVER";
+  bool autonomy_resumed = scenario_type == "PARK_AND_GO";
+  bool e_stopped = scenario_type == "EMERGENCY_PULL_OVER";
 
   bool sendPullOver = false;
   bool sendStop = false;

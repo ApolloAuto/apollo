@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
@@ -45,4 +46,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

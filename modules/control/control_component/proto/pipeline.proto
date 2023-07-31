@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+import "modules/control/control_component/proto/plugin_declare_info.proto";
+
+package apollo.control;
+
+message ControlPipeline {
+    // The contained controller list of the controller pipeline.
+    repeated PluginDeclareInfo controller = 1;
+}

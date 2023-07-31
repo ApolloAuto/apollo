@@ -1,0 +1,30 @@
+info {
+  name: "feature_caffe"
+  version: "2019-06-27"
+  dataset: "Custom"
+  task_type: CustomTask
+  sensor_type: Camera
+  framework: TensorRT
+
+  proto_file {
+    file: "deploy_new.pt"
+  }
+  weight_file {
+    file: "deploy_new.caffemodel"
+  }
+  inputs {
+    name: "roi_feature"
+    shape: 1
+    shape: 1920
+    shape: 1080
+    shape: 3
+  }
+  outputs {
+    name: "conv3_3"
+  }
+}
+resize {
+  width: 1920
+  height: 1080
+}
+offset_ratio: 0.288889

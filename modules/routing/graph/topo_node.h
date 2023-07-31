@@ -21,8 +21,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "modules/routing/graph/topo_range.h"
 #include "modules/routing/proto/topo_graph.pb.h"
+#include "modules/routing/graph/topo_range.h"
 
 namespace apollo {
 namespace routing {

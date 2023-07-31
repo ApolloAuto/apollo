@@ -148,7 +148,7 @@ data_files {
 }
 data_files {
   source_path: "planning_conf"
-  dest_path: "/apollo/modules/planning/conf"
+  dest_path: "/apollo/modules/planning/planning_base/conf"
 }
 data_files {
   source_path: "localization_conf"

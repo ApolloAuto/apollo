@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.perception.radar;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message RadarComponentConfig {
+  optional string radar_name = 1;
+  optional string tf_child_frame_id = 2;
+  optional double radar_forward_distance = 3;
+  optional perception.PluginParam preprocessor_param = 4;
+  optional perception.PluginParam perception_param = 5;
+  optional string odometry_channel_name = 7;
+  optional string output_channel_name = 8;
+}

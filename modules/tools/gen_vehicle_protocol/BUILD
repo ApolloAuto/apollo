@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -34,16 +35,16 @@ py_binary(
     srcs = ["gen_vehicle_controller_and_manager.py"],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/gen_vehicle_protocol",
-    data_dest = "tools/gen_vehicle_protocol",
-    data = [":data"],
-    targets = [
-        ":gen",
-    ]
+# install(
+#     name = "install",
+#     py_dest = "tools/gen_vehicle_protocol",
+#     data_dest = "tools/gen_vehicle_protocol",
+#     data = [":data"],
+#     targets = [
+#         ":gen",
+#     ]
 
-)
+# )
 
 filegroup(
     name = "data",
@@ -51,3 +52,5 @@ filegroup(
         "*.yml",
     ]) + ["README.md"] + glob(["template/*"]),
 )
+
+apollo_package()

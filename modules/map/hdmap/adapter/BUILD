@@ -1,13 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
+# load("//tools/install:install.bzl", "install")
 
-install(
-    name = "install",
-    library_dest = "map/lib",
-    targets = [":libopendrive_adapter.so"],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     library_dest = "map/lib",
+#     targets = [":libopendrive_adapter.so"],
+#     visibility = ["//visibility:public"],
+# )
 cc_binary(
     name = "libopendrive_adapter.so",
     srcs = [
@@ -61,4 +62,5 @@ cc_library(
     linkstatic = True,
 )
 
+apollo_package()
 cpplint()

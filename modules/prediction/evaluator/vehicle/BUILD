@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/platform:build_defs.bzl", "if_gpu")
+load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools/platform:build_defs.bzl", "if_gpu", "if_aarch64")
 
 package(default_visibility = ["//visibility:public"])
 PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
@@ -76,6 +77,8 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         #"//third_party/libtorch",
+        # "//miodules/common/adapters/proto:adapter_config_proto_lib",
+        "//modules/common/adapters:adapter_gflags",
     ]  + if_gpu(
         ["@libtorch_gpu"],
         ["@libtorch_cpu"],
@@ -197,10 +200,10 @@ cc_library(
         "//modules/prediction/evaluator",
         #"//third_party/libtorch",
         "@eigen",
+        "//modules/prediction/evaluator/model_manager",
     ] + if_gpu(
         ["@libtorch_gpu"],
-        ["@libtorch_cpu"],
-    ),
+        ["@libtorch_cpu"],)
 )
 
 cc_library(
@@ -240,4 +243,5 @@ cc_library(
     ),
 )
 
+apollo_package()
 cpplint()

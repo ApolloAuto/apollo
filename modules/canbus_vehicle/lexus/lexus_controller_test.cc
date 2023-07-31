@@ -15,15 +15,15 @@
  *****************************************************************************/
 #include "modules/canbus_vehicle/lexus/lexus_controller.h"
 
-#include "cyber/common/file.h"
 #include "gtest/gtest.h"
+#include "cyber/common/file.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/canbus_vehicle/lexus/proto/lexus.pb.h"
-#include "modules/canbus_vehicle/lexus/lexus_message_manager.h"
 #include "modules/common_msgs/basic_msgs/vehicle_signal.pb.h"
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/canbus_vehicle/lexus/lexus_message_manager.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
@@ -76,9 +76,9 @@ TEST_F(LexusControllerTest, Status) {
   controller_.Init(params_, &sender_, &msg_manager_);
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   EXPECT_EQ(controller_.Update(control_cmd_), ErrorCode::OK);
-  controller_.SetHorn(control_cmd_);
-  controller_.SetBeam(control_cmd_);
-  controller_.SetTurningSignal(control_cmd_);
+  controller_.SetHorn(control_cmd_.signal());
+  controller_.SetBeam(control_cmd_.signal());
+  controller_.SetTurningSignal(control_cmd_.signal());
   EXPECT_FALSE(controller_.CheckChassisError());
   EXPECT_EQ(controller_.chassis_error_code(), Chassis::NO_ERROR);
 }

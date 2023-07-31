@@ -29,7 +29,7 @@
 
     * RNN评估器：用RNN模型计算概率
 
-    * 预测规划交互评估器：可以参考 [预测规划交互评估器简介](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_documents/jointly_prediction_planning_evaluator_cn.md).
+    * 预测规划交互评估器：可以参考 [预测规划交互评估器简介](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/technical_documents/jointly_prediction_planning_evaluator_cn.md).
 
 * 预测器
 

@@ -66,7 +66,11 @@ function determine_gpu_use_host() {
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
             if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
-                DOCKER_RUN_CMD="docker run --gpus all"
+                if [[ "${HOST_ARCH}" == "aarch64" ]]; then
+                    DOCKER_RUN_CMD="docker run --runtime nvidia"
+                else
+                    DOCKER_RUN_CMD="docker run --gpus all"
+                fi
             else
                 warning "Please upgrade to docker-ce 19.03+ to access GPU from container."
                 USE_GPU_HOST=0
@@ -93,25 +97,44 @@ function remove_container_if_exists() {
 
 function postrun_start_user() {
     local container="$1"
-    if [ "${USER}" != "root" ]; then
+    if [ "${CUSTOM_USER-$USER}" != "root" ]; then
         docker exec -u root "${container}" \
             bash -c '/apollo/scripts/docker_start_user.sh'
     fi
 }
 
+function postrun_cross_platfrom_download() {
+    local container="$1"
+    local flag="$2"
+    if [[ "$flag" -eq 1 ]]; then
+        download_tegra_lib "${container}"
+    fi 
+}
+
+function download_tegra_lib() {
+    local container="$1"
+    local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
+    info "download external library for cross-compilation..."
+    docker exec -u root "${container}" \
+        bash -c "cd ~ && wget -nv ${tegra_lib_url} && tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null" 
+}
+
 function stop_all_apollo_containers() {
     local force="$1"
     local running_containers
-    running_containers="$(docker ps -a --format '{{.Names}}')"
+    # add a special field `...` as a separator
+    running_containers=($(docker inspect \
+      $(docker ps -q) \
+      --format '{{or .Config.Labels.owner "-"}}...{{.Name}}'))
     for container in ${running_containers[*]}; do
-        if [[ "${container}" =~ apollo_.*_${USER} ]]; then
-            #printf %-*s 70 "Now stop container: ${container} ..."
-            #printf "\033[32m[DONE]\033[0m\n"
-            #printf "\033[31m[FAILED]\033[0m\n"
-            info "Now stop container ${container} ..."
-            if docker stop "${container}" >/dev/null; then
+        owner="${container%%...*}"
+        name="${container##*...}"
+        # only stop containers created by current user
+        if [[ ("${owner}" == "${USER}") && ("${name}" =~ apollo_.*) ]]; then
+            info "Now stop container ${name} ..."
+            if docker stop "${name}" >/dev/null; then
                 if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-                    docker rm -f "${container}" 2>/dev/null
+                    docker rm -f "${name}" 2>/dev/null
                 fi
                 info "Done."
             else

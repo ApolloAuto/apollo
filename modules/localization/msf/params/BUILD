@@ -1,14 +1,15 @@
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    data_dest = "localization/addition_data/msf/params",
-    data = [
-        ":runtime_data",
-    ],
-)
+# install(
+#     name = "install",
+#     data_dest = "localization/addition_data/msf/params",
+#     data = [
+#         ":runtime_data",
+#     ],
+# )
 
 filegroup(
     name = "runtime_data",
@@ -19,3 +20,4 @@ filegroup(
         "*.yaml",
     ]),
 )
+apollo_package()

@@ -50,8 +50,6 @@ def dump_bag(in_bag, out_dir):
     topic_name_map = {
         "/apollo/localization/pose": ["localization", None],
         "/apollo/canbus/chassis": ["chassis", None],
-        "/apollo/routing_response": ["routing", None],
-        "/apollo/routing_resquest": ["routing_request", None],
         "/apollo/perception/obstacles": ["perception", None],
         "/apollo/prediction": ["prediction", None],
         "/apollo/planning": ["planning", None],

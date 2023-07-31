@@ -1,23 +1,24 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    data = ["runtime_files"],
-    data_dest = "tools/vehicle_calibration",
-    py_dest = "tools/vehicle_calibration",
-    targets = [
-        ":data_collector",
-        ":plot_data",
-        ":plot_grid",
-        ":plot_results",
-        ":preprocess",
-        ":process_data",
-        ":result2pb",
-    ]
-)
+# install(
+#     name = "install",
+#     data = ["runtime_files"],
+#     data_dest = "tools/vehicle_calibration",
+#     py_dest = "tools/vehicle_calibration",
+#     targets = [
+#         ":data_collector",
+#         ":plot_data",
+#         ":plot_grid",
+#         ":plot_results",
+#         ":preprocess",
+#         ":process_data",
+#         ":result2pb",
+#     ]
+# )
 
 py_binary(
     name = "data_collector",
@@ -77,8 +78,8 @@ py_binary(
     name = "result2pb",
     srcs = ["result2pb.py"],
     deps = [
-        "//modules/control/proto:calibration_table_py_pb2",
-        "//modules/control/proto:control_conf_py_pb2",
+        # "//modules/control/proto:calibration_table_py_pb2",
+        # "//modules/control/proto:control_conf_py_pb2",
         "//modules/tools/common:proto_utils",
     ],
 )
@@ -102,3 +103,5 @@ filegroup(
         "*.sh",
     ]),
 )
+
+apollo_package()

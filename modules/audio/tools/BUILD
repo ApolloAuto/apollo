@@ -1,30 +1,31 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "audio/bin",
-    targets = [
-        ":audio_offline_processing",
-    ],
-    visibility = ["//visibility:public"],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "audio/bin",
+#     targets = [
+#         ":audio_offline_processing",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
 
-py_binary(
-    name = "audiosaver",
-    srcs = ["audiosaver.py"],
-    deps = [
-        "//cyber/python/cyber_py3:cyber",
-        "//modules/common_msgs/basic_msgs:header_py_pb2",
-        "//modules/drivers/microphone/proto:audio_py_pb2",
-        "//modules/drivers/microphone/proto:microphone_config_py_pb2",
-    ],
-    tags = ["exclude"]
-)
+# py_binary(
+#     name = "audiosaver",
+#     srcs = ["audiosaver.py"],
+#     deps = [
+#         "//cyber/python/cyber_py3:cyber",
+#         "//modules/common_msgs/basic_msgs:header_py_pb2",
+#         "//modules/drivers/microphone/proto:audio_py_pb2",
+#         "//modules/drivers/microphone/proto:microphone_config_py_pb2",
+#     ],
+#     tags = ["exclude"]
+# )
 
 cc_binary(
     name = "audio_offline_processing",
@@ -47,4 +48,5 @@ cc_binary(
     ],
 )
 
+apollo_package()
 cpplint()

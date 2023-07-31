@@ -1,25 +1,26 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    library_dest = "cyber/python/cyber/python/internal",
-    #data = [":runtime_files"],
-    #data_dest = "cyber/python/internal",
-    targets = [
-        ":_cyber_wrapper.so",
-        ":_cyber_record_wrapper.so",
-        ":_cyber_time_wrapper.so",
-        ":_cyber_timer_wrapper.so",
-        ":_cyber_parameter_wrapper.so",
-    ],
-    #rename = {
-    #    "cyber/python/internal/internal.BUILD": "BUILD"
-    #}
-)
+# install(
+#     name = "install",
+#     library_dest = "cyber/python/cyber/python/internal",
+#     #data = [":runtime_files"],
+#     #data_dest = "cyber/python/internal",
+#     targets = [
+#         ":_cyber_wrapper.so",
+#         ":_cyber_record_wrapper.so",
+#         ":_cyber_time_wrapper.so",
+#         ":_cyber_timer_wrapper.so",
+#         ":_cyber_parameter_wrapper.so",
+#     ],
+#     #rename = {
+#     #    "cyber/python/internal/internal.BUILD": "BUILD"
+#     #}
+# )
 
 #filegroup(
 #    name = "runtime_files",
@@ -164,4 +165,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

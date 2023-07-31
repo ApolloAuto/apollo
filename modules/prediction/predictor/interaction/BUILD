@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,7 +12,8 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//modules/common/adapters/proto:adapter_config_cc_proto",
+        "//modules/common/adapters:adapter_gflags",
+        # "//modules/common/adapters/proto:adapter_config_proto_lib",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor/sequence:sequence_predictor",
@@ -33,4 +35,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

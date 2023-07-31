@@ -43,6 +43,8 @@ import sys
 
 import psutil
 
+APOLLO_ENV_ROOT = os.getenv("APOLLO_ENV_WORKROOT") or "/apollo"
+APOLLO_RUNTIME_PATH = os.getenv("APOLLO_RUNTIME_PATH") or "/apollo"
 
 LARGE_TOPICS = [
     '/apollo/sensor/camera/front_12mm/image',
@@ -130,9 +132,12 @@ class DiskManager(object):
         for disk in psutil.disk_partitions():
             if not disk.mountpoint.startswith('/media/'):
                 continue
+            available_size = DiskManager.disk_avail_size(disk.mountpoint)
+            if available_size <= 0:
+                continue
             disks.append({
                 'mountpoint': disk.mountpoint,
-                'available_size': DiskManager.disk_avail_size(disk.mountpoint),
+                'available_size': available_size,
                 'is_nvme': disk.mountpoint.startswith('/media/apollo/internal_nvme'),
             })
         # Prefer NVME disks and then larger disks.
@@ -143,8 +148,11 @@ class DiskManager(object):
     @staticmethod
     def disk_avail_size(disk_path):
         """Get disk available size."""
-        statvfs = os.statvfs(disk_path)
-        return statvfs.f_frsize * statvfs.f_bavail
+        try:
+            statvfs = os.statvfs(disk_path)
+            return statvfs.f_frsize * statvfs.f_bavail
+        except Exception as e:
+            return 0
 
 
 class Recorder(object):
@@ -167,7 +175,7 @@ class Recorder(object):
         record_all = self.args.all or (
             len(disks) > 0 and disks[0]['is_nvme'] and not self.args.small)
         # Use the best disk, or fallback '/apollo' if none available.
-        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
+        disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else APOLLO_ENV_ROOT
 
         # Record small topics to quickly copy and process
         if record_all:
@@ -190,7 +198,7 @@ class Recorder(object):
 
         topics_str = "--all"
 
-        log_file = '/apollo/data/log/apollo_record.out'
+        log_file = APOLLO_ENV_ROOT + '/data/log/apollo_record.out'
         if not record_all:
             log_file += "_s"
             topics_str += " -k {}".format(' -k '.join(list(LARGE_TOPICS)))
@@ -198,11 +206,12 @@ class Recorder(object):
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
         cmd = '''
-            cd "{}"
-            source /apollo/scripts/apollo_base.sh
-            source /apollo/cyber/setup.bash
-            nohup cyber_recorder record {} >{} 2>&1 &
-        '''.format(task_dir, topics_str, log_file)
+            cd "{task_dir}"
+            source {apollo_runtime_path}/scripts/apollo_base.sh
+            source {apollo_runtime_path}/cyber/setup.bash
+            nohup cyber_recorder record {topics_str} >{log_file} 2>&1 &
+        '''.format(task_dir=task_dir, apollo_runtime_path=APOLLO_RUNTIME_PATH,
+                   topics_str=topics_str, log_file=log_file)
         shell_cmd(cmd)
 
     @staticmethod

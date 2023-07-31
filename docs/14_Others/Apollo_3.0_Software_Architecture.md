@@ -40,7 +40,7 @@ Changes to Apollo 3.0:
 
 The prediction module estimates the future motion trajectories for all the perceived obstacles. The output prediction message wraps the perception information. Prediction subscribes to both localization and perception obstacle messages as shown below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/prediction.png)
+![img](images/prediction.png)
 
 When a localization update is received, the prediction module updates its internal status. The actual prediction is triggered when perception sends out its published perception obstacle message.
 
@@ -50,17 +50,17 @@ The localization module aggregates various data to locate the autonomous vehicle
 
 The first localization method is RTK-based, with a timer-based callback function `OnTimer`, as shown below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/localization.png)
+![img](images/localization.png)
 
 The other localization method is the Multiple Sensor Fusion (MSF) method, where a bunch of event-triggered callback functions are registered, as shown  below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/localization_2.png)
+![img](images/localization_2.png)
 
 ## Routing
 
 The routing module needs to know the routing start point and routing end point, to compute the passage lanes and roads. Usually the routing start point is the autonomous vehicle location. The important data interface is an event triggered function called `OnRoutingRequest`, in which `RoutingResponse` is computed and published as shown below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/routing.png)
+![img](images/routing.png)
 
 ## Planning
 
@@ -72,29 +72,29 @@ Then, the planning module takes the routing output. Under certain scenarios, the
 
 Finally, the planning module needs to know the location (Localization: where I am) as well as the current autonomous vehicle information (Chassis: what is my status).  The planning module is also triggered by a fixed frequency, and the main data interface is the `OnTimer` callback function that invokes the `RunOnce` function.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/planning_1.png)
+![img](images/planning_1.png)
 
-The data dependencies such as chassis, localization, traffic light, and prediction are managed through the `AdapterManager` class. The core software modules are similarly managed.  For example, localization is managed through `AdapterManager::GetLocalization()` as shown below.![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/planning_2.png)
+The data dependencies such as chassis, localization, traffic light, and prediction are managed through the `AdapterManager` class. The core software modules are similarly managed.  For example, localization is managed through `AdapterManager::GetLocalization()` as shown below.![img](images/planning_2.png)
 
 ## Control
 
 As described in the planning module, control takes the planned trajectory as input, and generates the control command to pass to CanBus.  It has three main data interfaces: OnPad, OnMonitor, and OnTimer.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/control_1.png)
+![img](images/control_1.png)
 
 The `OnPad` and `OnMonitor` are routine interactions with the PAD-based human interface and simulations. The main data interface is the `OnTimer` interface, which periodically produces the actual control commands as shown below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/control_2.png)
+![img](images/control_2.png)
 
 ## CanBus
 
 The CanBus has two data interfaces as shown below.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_1.png)
+![img](images/canbus_1.png)
 
 The first data interface is a timer-based publisher with the callback function `OnTimer`. This data interface periodically publishes the chassis information as well as chassis details, if enabled.
 
-![img](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/canbus_2.png)
+![img](images/canbus_2.png)
 
 The second data interface is an event-based publisher with a callback function `OnControlCommand`, which is triggered when the CanBus module receives control commands.
 

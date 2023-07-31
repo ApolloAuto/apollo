@@ -32,6 +32,18 @@ export APOLLO_IN_DOCKER="${APOLLO_IN_DOCKER}"
 export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
+export APOLLO_DAG_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin"
+export APOLLO_CONF_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_FLAG_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_MODEL_PATH="${APOLLO_ROOT_DIR}/modules/perception/data/models"
+
+export APOLLO_DISTRIBUTION_HOME="${APOLLO_DISTRIBUTION_HOME:=/opt/apollo/neo}"
+export APOLLO_PLUGIN_INDEX_PATH="${APOLLO_DISTRIBUTION_HOME}/share/cyber_plugin_index"
+export APOLLO_PLUGIN_SEARCH_IN_BAZEL_OUTPUT=1
+export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ROOT_DIR}"
+export APOLLO_PLUGIN_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin:${APOLLO_DISTRIBUTION_HOME}/lib/plugins"
+
 export TAB="    " # 4 spaces
 
 source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
@@ -93,20 +105,25 @@ function determine_gpu_use_target() {
   local arch="$(uname -m)"
   local use_gpu=0
 
-  if [[ "${arch}" == "aarch64" ]]; then
-    if lsmod | grep -q nvgpu; then
-      if ldconfig -p | grep -q cudart; then
+  if [[ -f "/.cross-platform" ]]; then
+    # cross platform building, force to use gpu mode
+    use_gpu=1
+  else
+    if [[ "${arch}" == "aarch64" ]]; then
+      if lsmod | grep -q nvgpu; then
+        if ldconfig -p | grep -q cudart; then
+          use_gpu=1
+        fi
+      fi
+    else ## x86_64 mode
+      # Check the existence of nvidia-smi
+      if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+        warning "nvidia-smi not found. CPU will be used."
+      elif [[ -z "$(nvidia-smi)" ]]; then
+        warning "No GPU device found. CPU will be used."
+      else
         use_gpu=1
       fi
-    fi
-  else ## x86_64 mode
-    # Check the existence of nvidia-smi
-    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-      warning "nvidia-smi not found. CPU will be used."
-    elif [[ -z "$(nvidia-smi)" ]]; then
-      warning "No GPU device found. CPU will be used."
-    else
-      use_gpu=1
     fi
   fi
   export USE_GPU_TARGET="${use_gpu}"
@@ -221,8 +238,8 @@ function run() {
     "${@}" || exit $?
   else
     local errfile="${APOLLO_ROOT_DIR}/.errors.log"
-    echo "${@}" >"${errfile}"
-    if ! "${@}" >>"${errfile}" 2>&1; then
+    echo "${@}" > "${errfile}"
+    if ! "${@}" >> "${errfile}" 2>&1; then
       local exitcode=$?
       cat "${errfile}" 1>&2
       exit $exitcode
@@ -232,21 +249,21 @@ function run() {
 
 #commit_id=$(git log -1 --pretty=%H)
 function git_sha1() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
-    git rev-parse --short HEAD 2>/dev/null || true
+    git rev-parse --short HEAD 2> /dev/null || true
   fi
 }
 
 function git_date() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git log -1 --pretty=%ai | cut -d " " -f 1 || true
   fi
 }
 
 function git_branch() {
-  if [ -x "$(which git 2>/dev/null)" ] &&
+  if [ -x "$(which git 2> /dev/null)" ] &&
     [ -d "${APOLLO_ROOT_DIR}/.git" ]; then
     git rev-parse --abbrev-ref HEAD
   else
@@ -265,8 +282,8 @@ function optarg_check_for_opt() {
   local opt="$1"
   local optarg="$2"
   if [[ -z "${optarg}" || "${optarg}" =~ ^-.* ]]; then
-      error "Missing parameter for ${opt}. Exiting..."
-      exit 3
+    error "Missing parameter for ${opt}. Exiting..."
+    exit 3
   fi
 }
 
@@ -290,6 +307,9 @@ function setup_gpu_support() {
   fi
 }
 
-if ${APOLLO_IN_DOCKER} ; then
-    setup_gpu_support
+if ${APOLLO_IN_DOCKER}; then
+  setup_gpu_support
+
+  # add dreamview path
+  pathprepend ${APOLLO_ROOT_DIR}/bazel-bin/modules/dreamview
 fi

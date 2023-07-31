@@ -1,17 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "copts_if_esd_can", "if_esd_can")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
-    runtime_dest = "drivers/bin",
-    targets = [
-      ":can_client_tool",
-    ],
-)
+# install(
+#     name = "install",
+#     runtime_dest = "drivers/bin",
+#     targets = [
+#       ":can_client_tool",
+#     ],
+# )
 
 cc_library(
     name = "can_client_factory",
@@ -66,4 +67,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

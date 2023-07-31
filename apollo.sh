@@ -186,6 +186,12 @@ function main() {
         build_opt_gpu)
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "$@"
             ;;
+        build_opt_gpu_pnc)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=opt --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
+            ;;        
+        build_pnc)
+            env ${APOLLO_ENV} bash "${build_sh}" --config=dbg --config=gpu "cyber planning prediction control routing dreamview external_command tools common_msgs"
+            ;;
         build_prof)
             env ${APOLLO_ENV} bash "${build_sh}" --config=prof "$@"
             ;;

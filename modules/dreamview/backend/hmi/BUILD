@@ -1,20 +1,28 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
 DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
-install(
-    name = "install",
-    library_dest = "dreamview/lib",
-    runtime_dest = "dreamview/bin",
-    targets = [
-        ":libhmi_worker.so",
-        ":vehicle_manager_main",
-    ],
-    visibility = ["//visibility:public"],
+# install(
+#     name = "install",
+#     library_dest = "dreamview/lib",
+#     runtime_dest = "dreamview/bin",
+#     targets = [
+#         ":libhmi_worker.so",
+#         ":vehicle_manager_main",
+#     ],
+#     visibility = ["//visibility:public"],
+# )
+
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**/*",
+    ]),
 )
 
 cc_library(
@@ -26,6 +34,7 @@ cc_library(
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/proto:hmi_config_cc_proto",
+        "//modules/dreamview/backend/common:dreamview_gflags",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_absl//:absl",
     ],
@@ -94,7 +103,9 @@ cc_binary(
         "//modules/common_msgs/audio_msgs:audio_event_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_event_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
+        "//modules/common_msgs/external_command_msgs:action_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/common_msgs/monitor_msgs:system_status_cc_proto",
         "//modules/common/adapters:adapter_gflags",
@@ -122,23 +133,31 @@ cc_library(
     hdrs = ["hmi_worker.h"],
     copts = DREAMVIEW_COPTS,
     deps = [
+        ":vehicle_manager",
         "//cyber",
         "//cyber/proto:dag_conf_cc_proto",
         "//modules/common_msgs/audio_msgs:audio_event_cc_proto",
         "//modules/common_msgs/basic_msgs:drive_event_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common_msgs/control_msgs:pad_msg_cc_proto",
+        "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
+        "//modules/common_msgs/monitor_msgs:system_status_cc_proto",
+        "//modules/common_msgs/external_command_msgs:action_command_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/kv_db",
         "//modules/common/util:util_tool",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/fuel_monitor:data_collection_monitor",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_gflags",
+        "//modules/dreamview/backend/fuel_monitor:fuel_monitor_manager",
+        "//modules/dreamview/backend/fuel_monitor:preprocess_monitor",
         "//modules/dreamview/proto:hmi_config_cc_proto",
         "//modules/common_msgs/dreamview_msgs:hmi_status_cc_proto",
-        "//modules/dreamview/proto:hmi_mode_cc_proto",
+        "//modules/dreamview/proto:scenario_cc_proto",
         "//modules/dreamview/proto:record_cc_proto",
+        "//modules/dreamview/proto:hmi_mode_cc_proto",
         "@boost",
         "@com_google_absl//:absl",
     ],
@@ -154,4 +173,5 @@ cc_test(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -1,5 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
 load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
+# load("//tools:apollo_package.bzl", "apollo_package")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -76,3 +77,4 @@ install_src_files(
     dest = "3rd-tf2/include",
     filter = "*",
 )
+# apollo_package()

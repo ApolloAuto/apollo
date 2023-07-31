@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+//////////////////////////////////
+// LearningModelInferenceTaskConfig
+
+message LearningModelInferenceTaskConfig {
+  enum ModelType {
+    CNN = 1;
+    CNN_LSTM = 2;
+  }
+  optional ModelType model_type = 1;
+  optional string cpu_model_file = 2;
+  optional string gpu_model_file = 3;
+  optional bool use_cuda = 4 [default = true];
+  // delta_t depends on the model output, not a configurable value here
+  optional double trajectory_delta_t = 5 [default = 0.2];  // second
+  optional bool allow_empty_learning_based_data = 6 [default = false];
+  optional bool allow_empty_output_trajectory = 7 [default = false];
+}

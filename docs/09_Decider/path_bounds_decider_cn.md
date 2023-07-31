@@ -19,7 +19,7 @@
 
 规划模块的运动总体流程图如下：
 
-![总体流程图](../images/task/lane_follow.png)
+![总体流程图](images/lane_follow.png)
 
 总体流程图以[lane follow](https://github.com/ApolloAuto/apollo/blob/r6.0.0/modules/planning/conf/scenario/lane_follow_config.pb.txt)场景为例子进行说明。这里只说明主体的流程，不涉及到所有细节。task的主要功能位于`Process`函数中。
 
@@ -41,7 +41,7 @@
 
 ## 类关系
 
-![path_bounds_decider_task](../images/task/path_bounds_decider/task.png)
+![path_bounds_decider_task](images/task.png)
 
 ### （1）继承关系
 
@@ -335,7 +335,7 @@ using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
 
 Fig.2是路径边界决策的流程图。
 
-![path_bounds_decider](../images/task/path_bounds_decider/path_bounds_decider.png)
+![path_bounds_decider](images/path_bounds_decider.png)
 
 在**Process**方法中，分四种场景对路径边界进行计算，按照处理的顺序分别是：fallback，pull-over，lane-change，regular。
 其中regular场景根据是否借道又分为LEFT_BORROW, NO_BORROW, RIGHT_BORROW。
@@ -346,7 +346,7 @@ fallback场景的path bounds一定会生成，另外三种看情况，都是需�
 
 ## 1.fallback
 
-![fallback](../images/task/path_bounds_decider/fallback.png)
+![fallback](images/fallback.png)
 
 
 fallback场景生成过程如上图所示。
@@ -459,7 +459,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
 ## 2.pull over
 
-![pull_over](../images/task/path_bounds_decider/pull_over.png)
+![pull_over](images/pull_over.png)
 
 ### （1）GetBoundaryFromRoads
 与`GetBoundaryFromLanesAndADC`不同，`GetBoundaryFromRoads`函数根据道路信息计算出边界:
@@ -563,7 +563,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
 
 ## 3.lane change
 
-![lane_change](../images/task/path_bounds_decider/lane_change.png)
+![lane_change](images/lane_change.png)
 
 代码流程如下：
 
@@ -680,7 +680,7 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
 
 ## 4.Regular
 
-![lane_change](../images/task/path_bounds_decider/regular.png)
+![lane_change](images/regular.png)
 
 代码流程如下：
 

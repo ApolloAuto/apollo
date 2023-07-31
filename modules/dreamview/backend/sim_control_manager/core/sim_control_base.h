@@ -48,6 +48,7 @@ namespace dreamview {
  */
 class SimControlBase {
  public:
+  virtual ~SimControlBase() {}
   /**
    * @brief Main logic of the simulated control algorithm.
    */
@@ -70,6 +71,11 @@ class SimControlBase {
    * publish simulated localization and chassis messages triggered by timer.
    */
   virtual void Start(double x, double y) = 0;
+
+  /**
+   * @brief Set vehicle position.
+   */
+  virtual void ReSetPoinstion(double x, double y, double heading) = 0;
 
   /**
    * @brief Stops the algorithm.

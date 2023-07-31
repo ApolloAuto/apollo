@@ -93,6 +93,14 @@ void SimControlManager::Start() {
   }
 }
 
+void SimControlManager::ReSetPoinstion(double x, double y, double heading) {
+  if (!IsEnabled() || !model_ptr_) {
+    AERROR << "Sim control is invalid,Failed to ReSetPoinstion!";
+  }
+  model_ptr_->ReSetPoinstion(x, y, heading);
+  return;
+}
+
 void SimControlManager::Restart(double x, double y) {
   // reset start point for dynamic model.
   if (!IsEnabled() || !model_ptr_) {
@@ -100,6 +108,17 @@ void SimControlManager::Restart(double x, double y) {
   }
   model_ptr_->Stop();
   model_ptr_->Start(x, y);
+  return;
+}
+
+void SimControlManager::Restart() {
+  // reset start point for dynamic model.
+  if (!IsEnabled() || !model_ptr_) {
+    AERROR << "Sim control is invalid,Failed to restart!";
+    return;
+  }
+  model_ptr_->Stop();
+  model_ptr_->Start();
   return;
 }
 

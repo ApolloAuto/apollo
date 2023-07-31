@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-
+load("//tools:apollo_package.bzl", "apollo_package")
 
 cc_library(
     name = "xml_parser",
@@ -148,4 +148,5 @@ cc_library(
     ],
 )
 
+apollo_package()
 cpplint()

@@ -1,5 +1,6 @@
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
-load("//tools/install:install.bzl", "install")
+# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -33,10 +34,12 @@ py_library(
     srcs = ["xyitem.py"],
 )
 
-install(
-    name = "install",
-    py_dest = "tools/realtime_plot",
-    targets = [
-        ":realtime_plot",
-    ]
-)
+# install(
+#     name = "install",
+#     py_dest = "tools/realtime_plot",
+#     targets = [
+#         ":realtime_plot",
+#     ]
+# )
+
+apollo_package()

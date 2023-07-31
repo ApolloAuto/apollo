@@ -8,7 +8,7 @@ import "modules/common_msgs/basic_msgs/pnc_point.proto";
 import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
 import "modules/common_msgs/planning_msgs/planning_internal.proto";
 import "modules/common_msgs/prediction_msgs/feature.proto";
-import "modules/common_msgs/routing_msgs/routing.proto";
+import "modules/common_msgs/routing_msgs/geometry.proto";
 
 // Next-id: 4
 message PolygonPoint {
