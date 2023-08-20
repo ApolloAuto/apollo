@@ -87,6 +87,10 @@ class ProtobufFactory {
   google::protobuf::Message* GenerateMessageByType(
       const std::string& type) const;
 
+  // Find a descriptor by FileDescriptorProto. Returns nullptr if not found.
+  const Descriptor* FindMessageTypeByFile(
+      const FileDescriptorProto& file_desc_proto);
+
   // Find a top-level message type by name. Returns nullptr if not found.
   const Descriptor* FindMessageTypeByName(const std::string& type) const;
 
