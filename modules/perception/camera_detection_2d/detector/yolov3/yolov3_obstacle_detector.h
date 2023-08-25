@@ -15,13 +15,18 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <algorithm>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/perception/camera_detection_2d/detector/yolov3/proto/model_param.pb.h"
-#include "modules/perception/common/base/blob.h"
 
-#include "modules/perception/camera_detection_2d/interface/base_obstacle_detector.h"
+#include "modules/perception/common/base/blob.h"
+#include "modules/perception/common/inference/inference.h"
+#include "modules/perception/common/interface/base_obstacle_detector.h"
 #include "modules/perception/common/onboard/inner_component_messages/camera_detection_component_messages.h"
 
 namespace apollo {
@@ -80,11 +85,30 @@ class Yolov3ObstacleDetector : public BaseObstacleDetector {
   * @return None
   */
   void LoadParam(const yolov3::ModelParam &model_param);
+  /**
+   * @brief Load yolo3D libtorch model params from model file
+   *
+   * @param image
+   * @param obj
+   */
+  void Yolo3DInference(const base::Image8U *image, base::ObjectPtr obj);
+  /**
+   * @brief Init model inference
+   *
+   * @param model_info
+   * @param model_path
+   * @return true
+   * @return false
+   */
+  bool Init3DNetwork(const common::ModelInfo &model_info,
+                     const std::string &model_path);
 
  private:
   ObstacleDetectorInitOptions options_;
   yolov3::ModelParam model_param_;
   yolov3::NMSParam nms_;
+
+  std::shared_ptr<inference::Inference> net_3D_;
 
   int gpu_id_ = 0;
   cudaStream_t stream_ = nullptr;

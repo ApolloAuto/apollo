@@ -1,43 +1,27 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-# filegroup(
-#     name = "cyber_task_hdrs",
-#     srcs = glob([
-#         "*.h",
-#     ]),
-# )
-
-cc_library(
-    name = "task",
-    hdrs = ["task.h"],
+apollo_cc_library(
+    name = "cyber_task",
+    hdrs = ["task.h", "task_manager.h"],
+    srcs = ["task_manager.cc"],
+    copts = ["-faligned-new"],
     deps = [
-        ":task_manager",
+        "//cyber/scheduler:cyber_scheduler",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "task_test",
     size = "small",
     srcs = ["task_test.cc"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
     linkstatic = True,
-)
-
-cc_library(
-    name = "task_manager",
-    srcs = ["task_manager.cc"],
-    hdrs = ["task_manager.h"],
-    copts = ["-faligned-new"],
-    deps = [
-        "//cyber/scheduler:scheduler_factory",
-    ],
 )
 
 apollo_package()

@@ -219,6 +219,8 @@ class Obstacle {
   void CheckLaneBlocking(const ReferenceLine& reference_line);
   bool IsLaneChangeBlocking() const { return is_lane_change_blocking_; }
   void SetLaneChangeBlocking(const bool is_distance_clear);
+  common::math::Polygon2d GetObstacleTrajectoryPolygon(
+      const common::TrajectoryPoint& point) const;
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);

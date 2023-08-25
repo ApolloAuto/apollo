@@ -1,10 +1,9 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+apollo_cc_library(
     name = "ndt_lidar_locator",
     srcs = ["lidar_locator_ndt.cc"],
     hdrs = [
@@ -20,9 +19,7 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/util:util_tool",
         "//modules/localization/common:localization_gflags",
-        "//modules/localization/msf/common/util",
-        "//modules/localization/msf/local_pyramid_map/ndt_map",
-        "//modules/localization/msf/local_pyramid_map/ndt_map:ndt_map_pool",
+        "//modules/localization/msf:apollo_localization_msf",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_github_google_glog//:glog",
         "@eigen",
@@ -37,7 +34,7 @@ filegroup(
     ]),
 )
 
-cc_test(
+apollo_cc_test(
     name = "ndt_lidar_locator_test",
     size = "large",
     timeout = "short",
@@ -46,12 +43,12 @@ cc_test(
     deps = [
         ":ndt_lidar_locator",
         "//cyber",
-        "//modules/localization/msf/common/io:common_io",
+        "//modules/localization/msf:apollo_localization_msf",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "ndt_solver_test",
     size = "large",
     timeout = "short",
@@ -60,7 +57,7 @@ cc_test(
     deps = [
         ":ndt_lidar_locator",
         "//cyber",
-        "//modules/localization/msf/common/io:common_io",
+        "//modules/localization/msf:apollo_localization_msf",
         "@com_google_googletest//:gtest_main",
     ],
 )

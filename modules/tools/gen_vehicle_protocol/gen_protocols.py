@@ -26,11 +26,11 @@ import sys
 import yaml
 
 
-def gen_report_header(car_type, protocol, output_dir):
+def gen_report_header(car_type, protocol, output_dir, protocol_template_dir):
     """
         doc string:
     """
-    report_header_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/report_protocol.h.tpl"
+    report_header_tpl_file = protocol_template_dir + "report_protocol.h.tpl"
     FMT = get_tpl_fmt(report_header_tpl_file)
     report_header_file = output_dir + "%s.h" % protocol["name"]
     with open(report_header_file, 'w') as h_fp:
@@ -55,11 +55,11 @@ def gen_report_header(car_type, protocol, output_dir):
         h_fp.write(FMT % fmt_val)
 
 
-def gen_report_cpp(car_type, protocol, output_dir):
+def gen_report_cpp(car_type, protocol, output_dir, protocol_template_dir):
     """
         doc string:
     """
-    report_cpp_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/report_protocol.cc.tpl"
+    report_cpp_tpl_file = protocol_template_dir + "report_protocol.cc.tpl"
     FMT = get_tpl_fmt(report_cpp_tpl_file)
     report_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(report_cpp_file, 'w') as fp:
@@ -160,11 +160,11 @@ def gen_parse_value_impl(var, byte_info):
     return impl
 
 
-def gen_control_header(car_type, protocol, output_dir):
+def gen_control_header(car_type, protocol, output_dir, protocol_template_dir):
     """
         doc string:
     """
-    control_header_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/control_protocol.h.tpl"
+    control_header_tpl_file = protocol_template_dir + "control_protocol.h.tpl"
     FMT = get_tpl_fmt(control_header_tpl_file)
     control_header_file = output_dir + "%s.h" % protocol["name"]
     with open(control_header_file, 'w') as h_fp:
@@ -178,9 +178,12 @@ def gen_control_header(car_type, protocol, output_dir):
         declare_public_func_list = []
         declare_private_func_list = []
         declare_private_var_list = []
+        declare_private_parse_func_list = []
 
         fmtpub = "\n  // config detail: %s\n  %s* set_%s(%s %s);"
         fmtpri = "\n  // config detail: %s\n  void set_p_%s(uint8_t* data, %s %s);"
+        fmtparse = """
+  %s %s(const std::uint8_t* bytes, const int32_t length) const;"""
         for var in protocol["vars"]:
             returntype = var["type"]
             if var["type"] == "enum":
@@ -195,9 +198,12 @@ def gen_control_header(car_type, protocol, output_dir):
 
             private_var = "  %s %s_;" % (returntype, var["name"].lower())
 
+            private_parse_declare = fmtparse % (returntype, var["name"].lower())
+
             declare_private_var_list.append(private_var)
             declare_public_func_list.append(public_func_declare)
             declare_private_func_list.append(private_func_declare)
+            declare_private_parse_func_list.append(private_parse_declare)
 
         fmt_val["declare_public_func_list"] = "\n".join(
             declare_public_func_list)
@@ -205,6 +211,8 @@ def gen_control_header(car_type, protocol, output_dir):
             declare_private_func_list)
         fmt_val["declare_private_var_list"] = "\n".join(
             declare_private_var_list)
+        fmt_val["declare_private_parse_func_list"] = "\n".join(
+            declare_private_parse_func_list)
         h_fp.write(FMT % fmt_val)
 
 
@@ -365,16 +373,17 @@ void %(classname)s::set_p_%(var_name)s(uint8_t* data,
     return impl + "}\n"
 
 
-def gen_control_cpp(car_type, protocol, output_dir):
+def gen_control_cpp(car_type, protocol, output_dir, protocol_template_dir):
     """
         doc string:
     """
-    control_cpp_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/control_protocol.cc.tpl"
+    control_cpp_tpl_file = protocol_template_dir + "control_protocol.cc.tpl"
     FMT = get_tpl_fmt(control_cpp_tpl_file)
     control_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(control_cpp_file, 'w') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
+        fmt_val["car_type_capitalize"] = car_type.capitalize()
         fmt_val["protocol_name_lower"] = protocol["name"]
         protocol_id = int(protocol["id"].upper(), 16)
         if protocol_id > 2048:
@@ -387,6 +396,8 @@ def gen_control_cpp(car_type, protocol, output_dir):
         set_private_var_list = []
         set_private_var_init_list = []
         set_func_impl_list = []
+        set_parse_var_to_protocol_list = []
+        set_parse_func_impl_list = []
         for var in protocol["vars"]:
             func_impl = gen_control_value_func_impl(classname, var, protocol)
             set_func_impl_list.append(func_impl)
@@ -408,10 +419,36 @@ def gen_control_cpp(car_type, protocol, output_dir):
 
             set_private_var_init_list.append("  %s_ = %s;" %
                                              (var["name"].lower(), init_val))
+            proto_set_fmt = "  chassis->mutable_%s()->set_%s(%s(bytes, length));"
+            func_name = var["name"].lower()
+            proto_set = proto_set_fmt % (protocol["name"], var["name"].lower(),
+                                         func_name)
+            set_parse_var_to_protocol_list.append(proto_set)
+
+            var["name"] = var["name"].lower()
+            returntype = var["type"]
+            if var["type"] == "enum":
+                returntype = protocol["name"].capitalize(
+                ) + "::" + var["name"].capitalize() + "Type"
+            # gen parse func top
+            fmt = """
+%s %s::%s(const std::uint8_t* bytes, int32_t length) const {"""
+            impl = fmt % (returntype, classname, var["name"])
+
+            byte_info = get_byte_info(var)
+            impl = impl + gen_parse_value_impl(var, byte_info)
+
+            impl = impl + gen_report_value_offset_precision(var, protocol)
+            impl = impl + "}"
+
+            set_parse_func_impl_list.append(impl)
+
         fmt_val["set_private_var_list"] = "\n".join(set_private_var_list)
         fmt_val["set_private_var_init_list"] = "\n".join(
             set_private_var_init_list)
         fmt_val["set_func_impl_list"] = "\n".join(set_func_impl_list)
+        fmt_val["set_parse_var_to_protocol_list"] = "\n".join(set_parse_var_to_protocol_list)
+        fmt_val["set_parse_func_impl_list"] = "\n".join(set_parse_func_impl_list)
         fp.write(FMT % fmt_val)
 
 
@@ -425,11 +462,11 @@ def get_tpl_fmt(tpl_file):
     return fmt
 
 
-def gen_build_file(car_type, work_dir):
+def gen_build_file(car_type, work_dir, protocol_template_dir):
     """
         doc string:
     """
-    build_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/protocol_BUILD.tpl"
+    build_tpl_file = protocol_template_dir + "protocol_BUILD.tpl"
     fmt = get_tpl_fmt(build_tpl_file)
     with open(work_dir + "BUILD", "w") as build_fp:
         fmt_var = {}
@@ -438,7 +475,7 @@ def gen_build_file(car_type, work_dir):
         build_fp.write(fmt % fmt_var)
 
 
-def gen_protocols(protocol_conf_file, protocol_dir):
+def gen_protocols(protocol_conf_file, protocol_dir, protocol_template_dir):
     """
         doc string:
     """
@@ -455,15 +492,15 @@ def gen_protocols(protocol_conf_file, protocol_dir):
             protocol = protocols[p_name]
 
             if protocol["protocol_type"] == "report":
-                gen_report_header(car_type, protocol, protocol_dir)
-                gen_report_cpp(car_type, protocol, protocol_dir)
+                gen_report_header(car_type, protocol, protocol_dir, protocol_template_dir)
+                gen_report_cpp(car_type, protocol, protocol_dir, protocol_template_dir)
             elif protocol["protocol_type"] == "control":
-                gen_control_header(car_type, protocol, protocol_dir)
-                gen_control_cpp(car_type, protocol, protocol_dir)
+                gen_control_header(car_type, protocol, protocol_dir, protocol_template_dir)
+                gen_control_cpp(car_type, protocol, protocol_dir, protocol_template_dir)
 
             else:
                 print("Unknown protocol_type:%s" % protocol["protocol_type"])
-        gen_build_file(car_type, protocol_dir)
+        gen_build_file(car_type, protocol_dir, protocol_template_dir)
 
 
 def gen_esd_can_extended(str):
@@ -487,6 +524,10 @@ if __name__ == "__main__":
 
     protocol_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower(
     ) + "/protocol/"
+    output_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower() + \
+        "/"
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)
-    gen_protocols(protocol_conf, protocol_dir)
+
+    protocol_template_dir = sys.path[0] + "/template/"
+    gen_protocols(protocol_conf, protocol_dir, protocol_template_dir)

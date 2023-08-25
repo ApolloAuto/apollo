@@ -109,7 +109,7 @@ def gen_checkresponse(pb_fp):
   optional bool is_switch_online = 6 [default = false];\n\
   optional bool is_vcu_online = 7 [default = false];\n}\n")
 
-def gen_proto_file(config_file, work_dir):
+def gen_proto_file(config_file, work_dir, template_dir):
     """
         config_file: the config file is generated with dbc
         work_dir: the protobuf file will be output
@@ -143,7 +143,7 @@ def gen_proto_file(config_file, work_dir):
                 pb_var_seq = pb_var_seq + 1
             pb_fp.write("optional CheckResponseSignal check_response = 100;\n")
             pb_fp.write("}\n")
-            gen_build_file(car_type, work_dir)
+            gen_build_file(car_type, work_dir, template_dir)
             # update_detail_pb(car_type)
 
 def get_tpl_fmt(tpl_file):
@@ -155,11 +155,11 @@ def get_tpl_fmt(tpl_file):
     fmt = "".join(fmt)
     return fmt
 
-def gen_build_file(car_type, work_dir):
+def gen_build_file(car_type, work_dir, template_dir):
     """
         doc string:
     """
-    build_tpl_file = "/apollo/modules/tools/gen_vehicle_protocol/template/proto_BUILD.tpl"
+    build_tpl_file = template_dir + "proto_BUILD.tpl"
     fmt = get_tpl_fmt(build_tpl_file)
     with open(work_dir + "BUILD", "w") as build_fp:
         fmt_var = {}
@@ -177,4 +177,5 @@ if __name__ == "__main__":
     car_type = conf["car_type"]
 
     work_dir = conf["output_dir"] + "vehicle/" + car_type.lower() + "/" + "proto/"
-    gen_proto_file(protocol_conf, work_dir)
+    template_dir = sys.path[0] + "/template/"
+    gen_proto_file(protocol_conf, work_dir, template_dir)

@@ -42,7 +42,13 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
       planner_open_space_config_.warm_start_config().traj_steer_penalty();
   traj_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
                                    .traj_steer_change_penalty();
+  traj_short_length_penalty_ = planner_open_space_config_.warm_start_config()
+                                   .traj_short_length_penalty();
+  traj_expected_shortest_length_ =
+      planner_open_space_config_.warm_start_config()
+          .traj_expected_shortest_length();
   AINFO << "max kappa: " << max_kappa_;
+  AINFO << "traj_short_length_penalty_: " << traj_short_length_penalty_;
   AINFO_IF(FLAGS_enable_parallel_hybrid_a) << "parallel REEDShepp";
 }
 
@@ -91,17 +97,26 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
         std::atan(vehicle_param_.wheel_base() / steering_radius * 2.0) *
         traj_steer_change_penalty_;
     for (size_t j = 0; j < path.segs_lengths.size(); j++) {
-      if (path.segs_lengths[j] < 0) {
-        cost += -path.segs_lengths[j] * traj_back_penalty_ / max_kappa_;
-      } else {
-        cost += path.segs_lengths[j] * traj_forward_penalty_ / max_kappa_;
-      }
       if (path.segs_types[j] != 'S') {
         cost += std::fabs(path.segs_lengths[j]) * (traj_steer_penalty_) /
                 max_kappa_ * path.radius;
         if (j > 0 && (path.segs_types[j - 1] != 'S') &&
             (path.segs_types[j - 1] != path.segs_types[j])) {
           cost += steer_change_penalty_cost;
+        }
+        if (std::fabs(path.segs_lengths[j]) / max_kappa_ * path.radius <
+            traj_expected_shortest_length_) {
+          cost += traj_short_length_penalty_;
+        }
+      } else {
+        if (path.segs_lengths[j] < 0) {
+          cost += -path.segs_lengths[j] * traj_back_penalty_ / max_kappa_;
+        } else {
+          cost += path.segs_lengths[j] * traj_forward_penalty_ / max_kappa_;
+        }
+        if (std::fabs(path.segs_lengths[j]) / max_kappa_ <
+            traj_expected_shortest_length_) {
+          cost += traj_short_length_penalty_;
         }
       }
 

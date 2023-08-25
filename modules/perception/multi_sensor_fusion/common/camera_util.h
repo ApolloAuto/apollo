@@ -35,6 +35,16 @@ void GetObjectEightVertices(
     std::shared_ptr<const base::Object> obj,
     apollo::common::EigenVector<Eigen::Vector3d>* vertices);
 
+/**
+ * @brief Is point lies in the frustum
+ *
+ * @tparam VectorType
+ * @param pt point
+ * @param width
+ * @param height
+ * @return true
+ * @return false
+ */
 template <typename VectorType>
 bool IsPtInFrustum(const VectorType& pt, double width, double height) {
   if (pt[0] < 0 || pt[0] > width || pt[1] < 0 || pt[1] > height) {
@@ -43,6 +53,15 @@ bool IsPtInFrustum(const VectorType& pt, double width, double height) {
   return true;
 }
 
+/**
+ * @brief Calculate augmented IOU BBox
+ *
+ * @tparam Type
+ * @param box1
+ * @param box2
+ * @param augmented_buffer
+ * @return Type
+ */
 template <typename Type>
 Type CalculateAugmentedIOUBBox(const base::BBox2D<Type>& box1,
                                const base::BBox2D<Type>& box2,

@@ -28,6 +28,14 @@ class KalmanFilter : public BaseFilter {
   KalmanFilter();
   ~KalmanFilter() = default;
 
+  /**
+   * @brief
+   *
+   * @param initial_belief_states
+   * @param initial_uncertainty
+   * @return true
+   * @return false
+   */
   bool Init(const Eigen::VectorXd &initial_belief_states,
             const Eigen::MatrixXd &initial_uncertainty);
 

@@ -72,6 +72,9 @@ class ExternalCommandWrapperDemo final : public apollo::cyber::TimerComponent {
 
   void CheckCommandStatus(const uint64_t command_id);
 
+  void SendFreespaceCommand(
+      const std::vector<apollo::external_command::Point>& way_points,
+      const apollo::external_command::Pose& end);
   static void ReadPathFromPathRecord(
       const std::string& record_file,
       google::protobuf::RepeatedPtrField<apollo::external_command::Point>*

@@ -1,155 +1,124 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
+load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "rt_legacy",
-    hdrs = ["rt_legacy.h"],
+cuda_library(
+    name = "apollo_perception_common_inference_tensorrt_plugins",
     alwayslink = True,
-)
-
-cc_library(
-    name = "rt_common",
-    srcs = ["rt_common.cc"],
-    hdrs = ["rt_common.h"],
-    alwayslink = True,
-    deps = [
-        "//cyber",
-        "//modules/perception/common/base:common",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "@com_google_absl//:absl",
-        "@local_config_cuda//cuda:cudnn_header",
-        "//modules/perception/common/inference/tensorrt:rt_legacy",
-        "@local_config_tensorrt//:tensorrt",
+    srcs = [
+        "plugins/kernels.cu",
+        "plugins/nms_cuda.cu",
+        "plugins/dfmb_psroi_align_plugin.cu",
+        "plugins/rcnn_proposal_plugin.cu",
+        "plugins/rpn_proposal_ssd_plugin.cu",
+        "plugins/slice_plugin.cu",
+        "plugins/argmax_plugin.cu",
+        "plugins/softmax_plugin.cu",
+        "plugins/leakyReLU_plugin.cu"
     ],
-)
-
-cc_test(
-    name = "rt_common_test",
-    size = "small",
-    srcs = ["rt_common_test.cc"],
-    deps = [
-        ":rt_common",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "rt_utils",
-    srcs = ["rt_utils.cc"],
-    hdrs = ["rt_utils.h"],
-    alwayslink = True,
-    deps = [
-        "//cyber",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "@local_config_tensorrt//:tensorrt",
-        "//modules/perception/common/inference/tensorrt:rt_legacy",
-    ],
-)
-
-cc_test(
-    name = "rt_utils_test",
-    size = "small",
-    srcs = ["rt_utils_test.cc"],
-    deps = [
-        ":rt_utils",
-        "@com_google_googletest//:gtest_main",
-    ],
-    linkstatic = True,
-)
-
-cc_library(
-    name = "rt_net",
-    srcs = ["rt_net.cc"],
-    alwayslink = True,
     hdrs = [
-        "entropy_calibrator.h",
-        "rt_net.h",
+        "plugins/kernels.h",
+        "plugins/dfmb_psroi_align_plugin.h",
+        "plugins/rcnn_proposal_plugin.h",
+        "plugins/rpn_proposal_ssd_plugin.h",
+        "plugins/slice_plugin.h",
+        "plugins/argmax_plugin.h",
+        "plugins/softmax_plugin.h",
+        "plugins/leakyReLU_plugin.h",
     ],
     deps = [
-        ":batch_stream",
-        ":entropy_calibrator",
-        ":rt_common",
-        ":rt_utils",
-        "//cyber",
-        "//modules/perception/common/base",
-        "//modules/perception/common/inference:inference_lib",
-        "//modules/perception/common/inference/tensorrt/plugins:perception_inference_tensorrt_plugins",
-        "@com_google_protobuf//:protobuf",
+        "@eigen",
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_cuda//cuda:cudnn",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv//:imgcodecs",
-        "//modules/perception/common/inference/tensorrt:rt_legacy",
+        "//cyber",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        ":apollo_perception_inference_rt_common",
     ],
 )
 
-cc_test(
-    name = "rt_net_test",
+apollo_cc_test(
+    name = "slice_plugin_test",
     size = "small",
-    srcs = ["rt_net_test.cc"],
-    data = [
-        "//modules/perception/common/inference:inference_test_data",
-    ],
-    tags = ["exclude"],
+    srcs = ["plugins/slice_plugin_test.cc"],
     deps = [
-        ":rt_net",
-        "//modules/perception/common/inference/utils:inference_util_cuda_lib",
-        "@atlas//:cblas",
+        ":apollo_perception_common_inference_tensorrt_plugins",
         "@com_google_googletest//:gtest_main",
     ],
     linkstatic = True,
 )
 
-cc_library(
-    name = "entropy_calibrator",
-    srcs = ["entropy_calibrator.cc"],
-    hdrs = ["entropy_calibrator.h"],
-    alwayslink = True,
+apollo_cc_test(
+    name = "argmax_plugin_test",
+    size = "small",
+    srcs = ["plugins/argmax_plugin_test.cc"],
     deps = [
-        ":batch_stream",
-        ":rt_utils",
+        ":apollo_perception_common_inference_tensorrt_plugins",
+        "@com_google_googletest//:gtest_main",
+        "@local_config_cuda//cuda:cublas",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_library(
+    name = "apollo_perception_inference_rt_common",
+    hdrs = [
+        "rt_legacy.h",
+        "rt_common.h",
+        "rt_utils.h",
+        "batch_stream.h",
+        "entropy_calibrator.h",
+    ],
+    srcs = [
+        "rt_common.cc",
+        "batch_stream.cc",
+        "rt_utils.cc",
+        "entropy_calibrator.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "@local_config_cuda//cuda:cudnn_header",
+        "@local_config_tensorrt//:tensorrt",
+        "//modules/perception/common/proto:rt_cc_proto",
+        "//modules/perception/common/inference:inference_lib",
         "@com_google_protobuf//:protobuf",
         "@local_config_cuda//cuda:cudart",
-        "@local_config_tensorrt//:tensorrt",
         "@opencv//:imgcodecs",
-        "//modules/perception/common/inference/tensorrt:rt_legacy",
-    ],
+        "@com_google_absl//:absl",
+        "@local_config_cuda//cuda:cuda_headers",
+    ]
 )
 
-cc_test(
-    name = "entropy_calibrator_test",
-    size = "small",
-    srcs = ["entropy_calibrator_test.cc"],
-    copts = ["-fno-access-control"],
-    data = [
-        "//modules/perception/common/inference:inference_test_data",
+apollo_cc_library(
+    name = "apollo_perception_inference_rt_net",
+    hdrs = [
+        "rt_net.h",
     ],
-    deps = [
-        ":entropy_calibrator",
-        "@com_google_googletest//:gtest_main",
+    srcs = [
+        "rt_net.cc",
     ],
-    linkstatic = True,
-)
-
-cc_library(
-    name = "batch_stream",
-    srcs = ["batch_stream.cc"],
-    hdrs = ["batch_stream.h"],
-    alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "@com_google_absl//:absl",
-        "@com_google_protobuf//:protobuf",
-        "@opencv//:imgcodecs",
-        "@local_config_cuda//cuda:cuda_headers",
-        "//modules/perception/common/inference/tensorrt:rt_legacy",
+        ":apollo_perception_inference_rt_common",
+        ":apollo_perception_common_inference_tensorrt_plugins",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "@local_config_cuda//cuda:cudnn_header",
         "@local_config_tensorrt//:tensorrt",
-    ],
+        "//modules/perception/common/proto:rt_cc_proto",
+        "//modules/perception/common/inference:inference_lib",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_cuda//cuda:cudart",
+        "@opencv//:imgcodecs",
+        "@com_google_absl//:absl",
+        "@local_config_cuda//cuda:cuda_headers",
+    ]
 )
 
-cc_test(
+apollo_cc_test(
     name = "batch_stream_test",
     size = "small",
     srcs = ["batch_stream_test.cc"],
@@ -157,11 +126,64 @@ cc_test(
     data = [
         "//modules/perception/common/inference:inference_test_data",
     ],
+    linkstatic = True,
     deps = [
-        ":batch_stream",
+        ":apollo_perception_inference_rt_common",
         "@com_google_googletest//:gtest_main",
     ],
+)
+
+apollo_cc_test(
+    name = "entropy_calibrator_test",
+    size = "small",
+    srcs = ["entropy_calibrator_test.cc"],
+    copts = ["-fno-access-control"],
+    data = [
+        "//modules/perception/common/inference:inference_test_data",
+    ],
     linkstatic = True,
+    deps = [
+        ":apollo_perception_inference_rt_common",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "rt_net_test",
+    size = "small",
+    srcs = ["rt_net_test.cc"],
+    data = [
+        "//modules/perception/common/inference:inference_test_data",
+    ],
+    linkstatic = True,
+    tags = ["exclude"],
+    deps = [
+        ":apollo_perception_inference_rt_net",
+        "//modules/perception/common/inference:apollo_perception_common_inference",
+        "@atlas//:cblas",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "rt_utils_test",
+    size = "small",
+    srcs = ["rt_utils_test.cc"],
+    linkstatic = True,
+    deps = [
+        ":apollo_perception_inference_rt_common",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "rt_common_test",
+    size = "small",
+    srcs = ["rt_common_test.cc"],
+    deps = [
+        ":apollo_perception_inference_rt_common",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 apollo_package()

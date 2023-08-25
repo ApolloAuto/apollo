@@ -60,8 +60,14 @@ _cc_proto_clean_rule = rule(
 
 def _get_real_dep_label(dep):
     if not package_path.startswith("@@"):
-        if dep.startswith("//{}".format(package_path)) or dep.startswith(":"):
+        if dep.startswith(":"):
             return dep
+        elif dep.startswith("//{}".format(package_path)):
+            replace_prefix = dep.replace("//{}".format(package_path), "")
+            if len(replace_prefix) == 0 or replace_prefix[0] == "/" or replace_prefix[0] == ":":
+                return dep
+            else:
+                return "{}{}".format("@apollo_src", dep) 
         else:
             return "{}{}".format("@apollo_src", dep)
     return dep
@@ -92,6 +98,8 @@ def proto_library(tags = [], **kwargs):
     source_env = False
 
     rule_name = kwargs["name"]
+    if not rule_name.endswith("proto"):
+        fail("The name of the proto_library instance must end with \"proto\", e.g. \"example_proto\".")
     proto_rule_name = "_%s" % kwargs["name"]
     cc_proto_rule_name = "_%s_cc_proto" % rule_name
     py_proto_rule_name = _to_py_target(rule_name)
@@ -181,6 +189,7 @@ def proto_library(tags = [], **kwargs):
         name = cc_bin_rule_name,
         linkshared = True,
         linkstatic = True,
+        tags = ["export_library", rule_name],
         # srcs = [":%s_clean" % (cc_proto_rule_name,)],
         # srcs = [":%s" % cc_lib_rule_name],
         deps = ["@com_google_protobuf//:protobuf"] + external_cc_deps + [cc_lib_rule_name], 

@@ -62,7 +62,7 @@ install_src_files(
         no_match_error = "Please Build with a Linux aarch64 or x86_64 platform",
     ),
     dest = "3rd-can-card-library/lib",
-    filter = "*.so",
+    filter = "*.so*",
 )
 
 install_src_files(

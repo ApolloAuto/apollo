@@ -115,8 +115,7 @@ bool LatController::LoadControlConf() {
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = lat_based_lqr_controller_conf_.max_lateral_acceleration();
   low_speed_bound_ = lat_based_lqr_controller_conf_.switch_speed();
-  low_speed_window_ =
-      lat_based_lqr_controller_conf_.switch_speed_window();
+  low_speed_window_ = lat_based_lqr_controller_conf_.switch_speed_window();
 
   const double mass_fl = lat_based_lqr_controller_conf_.mass_fl();
   const double mass_fr = lat_based_lqr_controller_conf_.mass_fr();
@@ -174,8 +173,8 @@ void LatController::InitializeFilters() {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
-  common::LpfCoefficients(
-      ts_, lat_based_lqr_controller_conf_.cutoff_freq(), &den, &num);
+  common::LpfCoefficients(ts_, lat_based_lqr_controller_conf_.cutoff_freq(),
+                          &den, &num);
   digital_filter_.set_coefficients(den, num);
   lateral_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
       lat_based_lqr_controller_conf_.mean_filter_window_size()));
@@ -185,7 +184,7 @@ void LatController::InitializeFilters() {
 
 Status LatController::Init(std::shared_ptr<DependencyInjector> injector) {
   if (!ControlTask::LoadConfig<LatBaseLqrControllerConf>(
-        &lat_based_lqr_controller_conf_)) {
+          &lat_based_lqr_controller_conf_)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "failed to load lat control_conf");
@@ -259,15 +258,14 @@ Status LatController::Init(std::shared_ptr<DependencyInjector> injector) {
   LoadLatGainScheduler();
   LogInitParameters();
 
-  enable_leadlag_ = lat_based_lqr_controller_conf_
-                        .enable_reverse_leadlag_compensation();
+  enable_leadlag_ =
+      lat_based_lqr_controller_conf_.enable_reverse_leadlag_compensation();
   if (enable_leadlag_) {
     leadlag_controller_.Init(
         lat_based_lqr_controller_conf_.reverse_leadlag_conf(), ts_);
   }
 
-  enable_mrac_ =
-      lat_based_lqr_controller_conf_.enable_steer_mrac_control();
+  enable_mrac_ = lat_based_lqr_controller_conf_.enable_steer_mrac_control();
   if (enable_mrac_) {
     mrac_controller_.Init(lat_based_lqr_controller_conf_.steer_mrac_conf(),
                           vehicle_param_.steering_latency_param(), ts_);
@@ -465,8 +463,7 @@ Status LatController::ComputeControlCommand(
       lat_based_lqr_controller_conf_.reverse_matrix_q_size();
   if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE) {
     for (int i = 0; i < reverse_q_param_size; ++i) {
-      matrix_q_(i, i) =
-          lat_based_lqr_controller_conf_.reverse_matrix_q(i);
+      matrix_q_(i, i) = lat_based_lqr_controller_conf_.reverse_matrix_q(i);
     }
   } else {
     for (int i = 0; i < q_param_size; ++i) {
@@ -505,7 +502,7 @@ Status LatController::ComputeControlCommand(
   // Augment the feedback control on lateral error at the desired speed domain
   if (enable_leadlag_) {
     if (lat_based_lqr_controller_conf_
-        .enable_feedback_augment_on_high_speed() ||
+            .enable_feedback_augment_on_high_speed() ||
         std::fabs(vehicle_state->linear_velocity()) < low_speed_bound_) {
       steer_angle_feedback_augment =
           leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
@@ -544,9 +541,8 @@ Status LatController::ComputeControlCommand(
   // Re-compute the steering command if the MRAC control is enabled, with steer
   // angle limitation and steer rate limitation
   if (enable_mrac_) {
-    const int mrac_model_order = lat_based_lqr_controller_conf_
-                                     .steer_mrac_conf()
-                                     .mrac_model_order();
+    const int mrac_model_order =
+        lat_based_lqr_controller_conf_.steer_mrac_conf().mrac_model_order();
     Matrix steer_state = Matrix::Zero(mrac_model_order, 1);
     steer_state(0, 0) = chassis->steering_percentage();
     if (mrac_model_order > 1) {
@@ -596,7 +592,7 @@ Status LatController::ComputeControlCommand(
   // Check if the steer is locked and hence the previous steer angle should be
   // executed
   if (std::abs(vehicle_state->linear_velocity()) <
-      lat_based_lqr_controller_conf_.lock_steer_speed() &&
+          lat_based_lqr_controller_conf_.lock_steer_speed() &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
@@ -779,7 +775,7 @@ void LatController::ComputeLateralErrors(
   } else {
     if (FLAGS_use_navigation_mode &&
         !lat_based_lqr_controller_conf_
-            .enable_navigation_mode_position_update()) {
+             .enable_navigation_mode_position_update()) {
       target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
           Clock::NowInSeconds() + query_relative_time_);
     } else {

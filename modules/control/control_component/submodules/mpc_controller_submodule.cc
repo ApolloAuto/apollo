@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/control/control_component/submodules/mpc_controller_submodule.h"
-#include "cyber/plugin_manager/plugin_manager.h"
 
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
@@ -32,9 +32,9 @@ using apollo::common::Status;
 using apollo::common::StatusPb;
 using apollo::common::VehicleStateProvider;
 using apollo::cyber::Clock;
+using apollo::cyber::plugin_manager::PluginManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::cyber::plugin_manager::PluginManager;
 
 MPCControllerSubmodule::MPCControllerSubmodule()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
@@ -49,7 +49,7 @@ bool MPCControllerSubmodule::Init() {
   injector_ = std::make_shared<DependencyInjector>();
 
   mpc_controller_ = PluginManager::Instance()->CreateInstance<ControlTask>(
-        "apollo::control::MPCController");
+      "apollo::control::MPCController");
 
   if (!mpc_controller_->Init(injector_).ok()) {
     monitor_logger_buffer_.ERROR(

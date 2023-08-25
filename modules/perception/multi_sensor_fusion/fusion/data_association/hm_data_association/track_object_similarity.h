@@ -85,7 +85,7 @@ double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
 double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
                                const ProjectionCacheObject* object,
                                const base::BBox2DF& camera_bbox);
-// @brief: calculate the x/y/h/w/3d similarity between radar and camera
+// @brief: calculate the x similarity between radar and camera
 // @return the similarity which belongs to [0, 1].
 // @key idea:
 // 1. compute the difference on x/y/h/w/3d
@@ -95,23 +95,68 @@ double ComputeRadarCameraXSimilarity(const double velo_ct_x,
                                      const double camera_ct_x,
                                      const double size_x,
                                      const XSimilarityParams& params);
+/**
+ * @brief calculate the y similarity between radar and camera
+ *
+ * @param velo_ct_y
+ * @param camera_ct_y
+ * @param size_y
+ * @param params
+ * @return double
+ */
 double ComputeRadarCameraYSimilarity(const double velo_ct_y,
                                      const double camera_ct_y,
                                      const double size_y,
                                      const YSimilarityParams& params);
+/**
+ * @brief calculate the h similarity between radar and camera
+ *
+ * @param radar
+ * @param camera
+ * @param size_y
+ * @param radar_box2d_vertices
+ * @param params
+ * @return double
+ */
 double ComputeRadarCameraHSimilarity(
     const SensorObjectConstPtr& radar, const SensorObjectConstPtr& camera,
     const double size_y,
     const EigenVector<Eigen::Vector2d>& radar_box2d_vertices,
     const HSimilarityParams& params);
+/**
+ * @brief calculate the w similarity between radar and camera
+ *
+ * @param radar
+ * @param width
+ * @param size_x
+ * @param radar_box2d_vertices
+ * @param params
+ * @return double
+ */
 double ComputeRadarCameraWSimilarity(
     const SensorObjectConstPtr& radar, const double width, const double size_x,
     const EigenVector<Eigen::Vector2d>& radar_box2d_vertices,
     const WSimilarityParams& params);
+/**
+ * @brief calculate the loc similarity between radar and camera
+ *
+ * @param radar_ct
+ * @param camera
+ * @param world2camera_pose
+ * @param params
+ * @return double
+ */
 double ComputeRadarCameraLocSimilarity(const Eigen::Vector3d& radar_ct,
                                        const SensorObjectConstPtr& camera,
                                        const Eigen::Matrix4d& world2camera_pose,
                                        const LocSimilarityParams& params);
+/**
+ * @brief calculate the velocity similarity between radar and camera
+ *
+ * @param radar
+ * @param camera
+ * @return double
+ */
 double ComputeRadarCameraVelocitySimilarity(const SensorObjectConstPtr& radar,
                                             const SensorObjectConstPtr& camera);
 

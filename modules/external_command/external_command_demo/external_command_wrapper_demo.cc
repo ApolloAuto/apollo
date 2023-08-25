@@ -158,6 +158,30 @@ bool ExternalCommandWrapperDemo::Proc() {
             command_id_string.end());
         uint64_t id = std::atoi(command_id_string.c_str());
         CheckCommandStatus(id);
+      } else if (input_command_string == "free1") {
+        apollo::external_command::Pose end_pose;
+        end_pose.set_x(437556.02);
+        end_pose.set_y(4432540.34);
+        end_pose.set_heading(1.8);
+        std::vector<apollo::external_command::Point> way_points;
+        apollo::external_command::Point point1;
+        apollo::external_command::Point point2;
+        apollo::external_command::Point point3;
+        apollo::external_command::Point point4;
+        point1.set_x(437536.29);
+        point1.set_y(4432560.69);
+        point2.set_x(437536.29);
+        point2.set_y(4432510.69);
+        point3.set_x(437576.29);
+        point3.set_y(4432510.69);
+        point4.set_x(437576.29);
+        point4.set_y(4432560.69);
+        way_points.emplace_back(point1);
+        way_points.emplace_back(point2);
+        way_points.emplace_back(point3);
+        way_points.emplace_back(point4);
+
+        SendFreespaceCommand(way_points, end_pose);
       } else {
         std::cout << "Invalid input!" << std::endl;
       }
@@ -341,6 +365,29 @@ void ExternalCommandWrapperDemo::SendLaneFollowCommand(
   std::cout << "Sending lane follow command: " << command->DebugString()
             << std::endl;
   auto response = lane_follow_command_client_->SendRequest(command);
+  if (nullptr == response) {
+    std::cout << "Command sending failed, please check the service is on!\n"
+              << std::endl;
+  } else {
+    std::cout << "******Finish sending command.******\n" << std::endl;
+  }
+}
+
+void ExternalCommandWrapperDemo::SendFreespaceCommand(
+    const std::vector<apollo::external_command::Point>& way_points,
+    const apollo::external_command::Pose& end) {
+  auto command = std::make_shared<apollo::external_command::FreeSpaceCommand>();
+  FillCommandHeader(command);
+  // Copy way_points
+  auto roi_point = command->mutable_drivable_roi();
+  for (const auto& point : way_points) {
+    roi_point->add_point()->CopyFrom(point);
+  }
+  // Copy end point
+  command->mutable_parking_spot_pose()->CopyFrom(end);
+  std::cout << "Sending lane follow command: " << command->DebugString()
+            << std::endl;
+  auto response = free_space_command_client_->SendRequest(command);
   if (nullptr == response) {
     std::cout << "Command sending failed, please check the service is on!\n"
               << std::endl;

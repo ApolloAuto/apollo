@@ -25,6 +25,7 @@
 #include <unordered_map>
 
 #include "modules/planning/planning_base/scenario_base/proto/scenario_pipeline.pb.h"
+
 #include "cyber/common/file.h"
 #include "modules/planning/planning_base/common/dependency_injector.h"
 #include "modules/planning/planning_base/scenario_base/process_result.h"
@@ -119,7 +120,7 @@ class Scenario {
 
 template <typename T>
 bool Scenario::LoadConfig(T* config) {
-  return apollo::cyber::common::GetProtoFromFile(config_path_, config);
+  return apollo::cyber::common::LoadConfig<T>(config_path_, config);
 }
 
 }  // namespace planning

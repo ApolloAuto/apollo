@@ -66,11 +66,13 @@ using apollo::cyber::proto::DagConfig;
 using apollo::dreamview::SimTicket;
 using apollo::dreamview::UserAdsGroup;
 using apollo::external_command::ActionCommand;
+using apollo::external_command::LaneFollowCommand;
 using apollo::external_command::CommandStatus;
 using apollo::localization::LocalizationEstimate;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
+using google::protobuf::util::JsonStringToMessage;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
 using Json = nlohmann::json;
@@ -282,6 +284,9 @@ void HMIWorker::InitReadersAndWriters() {
   status_writer_ = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
   action_command_client_ = node_->CreateClient<ActionCommand, CommandStatus>(
       FLAGS_action_command_topic);
+  lane_follow_command_client_ =
+      node_->CreateClient<LaneFollowCommand, CommandStatus>(
+          FLAGS_lane_follow_command_topic);
   audio_event_writer_ =
       node_->CreateWriter<AudioEvent>(FLAGS_audio_event_topic);
   drive_event_writer_ =
@@ -939,6 +944,46 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
       return false;
     }
   }
+
+  // wait simcontrol restart
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  apollo::simulation::Scenario scenario;
+  std::ifstream ifs(scenario_path);
+  CHECK(ifs.is_open()) << "Failed to open file: " << scenario_path;
+  Json json;
+  ifs >> json;
+  ifs.close();
+  google::protobuf::util::JsonParseOptions options;
+  options.ignore_unknown_fields = true;
+  google::protobuf::util::Status dump_status;
+  if (!JsonStringToMessage(json["scenario"].dump(), &scenario, options).ok()) {
+    AERROR << "Failed to parse json string to Scenario";
+    return false;
+  }
+
+  // send lane_follow_command when change scenario
+  auto lane_follow_command = std::make_shared<LaneFollowCommand>();
+  auto waypoint = lane_follow_command->mutable_way_point();
+  auto *pose = waypoint->Add();
+  pose->set_x(scenario.start().x());
+  pose->set_y(scenario.start().y());
+  if (scenario.start().has_heading()) {
+    pose->set_heading(scenario.start().heading());
+  }
+
+  auto end_pose = lane_follow_command->mutable_end_pose();
+  end_pose->set_x(scenario.end().x());
+  end_pose->set_y(scenario.end().y());
+  if (scenario.end().has_heading()) {
+    pose->set_heading(scenario.end().heading());
+  }
+
+  apollo::common::util::FillHeader(FLAGS_dreamview_module_name,
+                                   lane_follow_command.get());
+  AINFO << "Constructed LaneFollowCommand to be sent:\n"
+        << lane_follow_command->DebugString();
+  lane_follow_command_client_->SendRequest(lane_follow_command);
 
   return true;
 }

@@ -1,40 +1,12 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-# load("//tools/install:install.bzl", "install")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     library_dest = "drivers/lib/lidar/velodyne/parser",
-#     targets = [
-#         ":libvelodyne_convert_component.so",
-#     ],
-# )
-
-cc_binary(
+apollo_component(
     name = "libvelodyne_convert_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":velodyne_convert_component_lib"],
-)
-
-cc_library(
-    name = "velodyne_convert_component_lib",
-    srcs = ["velodyne_convert_component.cc"],
-    hdrs = ["velodyne_convert_component.h"],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
-    deps = [
-        "//cyber",
-        "//modules/drivers/lidar/velodyne/parser:convert",
-    ],
-    alwayslink = True
-)
-
-cc_library(
-    name = "convert",
     srcs = [
+        "velodyne_convert_component.cc",
         "calibration.cc",
         "convert.cc",
         "online_calibration.cc",
@@ -46,6 +18,7 @@ cc_library(
         "velodyne_parser.cc",
     ],
     hdrs = [
+        "velodyne_convert_component.h",
         "calibration.h",
         "const_variables.h",
         "convert.h",

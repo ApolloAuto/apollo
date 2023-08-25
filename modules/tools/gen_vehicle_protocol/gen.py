@@ -35,13 +35,16 @@ def gen(conf):
     """
         doc string:
     """
-    dbc_file = conf["dbc_file"]
-    protocol_conf_file = conf["protocol_conf"]
+    current_dir = sys.path[0]
+    # print("current dir is", current_dir)
+    dbc_file = sys.path[0] + '/' + conf["dbc_file"]
+    protocol_conf_file = sys.path[0] + '/' + conf["protocol_conf"]
     car_type = conf["car_type"]
     black_list = conf["black_list"]
     sender_list = conf["sender_list"]
     sender = conf["sender"]
-    output_dir = conf["output_dir"]
+    output_dir = sys.path[0] + '/' + conf["output_dir"]
+    template_dir = current_dir + "/template/"
 
     # extract dbc file meta to an internal config file
     if not extract_dbc_meta(dbc_file, protocol_conf_file, car_type, black_list,
@@ -50,15 +53,15 @@ def gen(conf):
 
     # gen proto
     proto_dir = output_dir + "vehicle/" + car_type.lower() + "/" + "proto/"
-    gen_proto_file(protocol_conf_file, proto_dir)
+    gen_proto_file(protocol_conf_file, proto_dir, template_dir)
 
     # gen protocol
     protocol_dir = output_dir + "vehicle/" + car_type.lower() + "/protocol/"
-    gen_protocols(protocol_conf_file, protocol_dir)
+    gen_protocols(protocol_conf_file, protocol_dir, template_dir)
 
     # gen vehicle controller and protocol_manager
     vehicle_dir = output_dir + "vehicle/" + car_type.lower() + "/"
-    gen_vehicle_controller_and_manager(protocol_conf_file, vehicle_dir)
+    gen_vehicle_controller_and_manager(protocol_conf_file, vehicle_dir, template_dir)
 
 
 if __name__ == "__main__":

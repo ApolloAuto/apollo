@@ -140,7 +140,14 @@ def _install_action(
             file_dest = dest
     file_dest = _rename(file_dest, rename)
 
-    return struct(src = artifact, dst = file_dest)
+    target_name = None
+    if hasattr(ctx.attr, "tags") and len(ctx.attr.tags) >= 2 and "export_library" in ctx.attr.tags:
+        for i in ctx.attr.tags:
+            if i == "__CC_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__" or i == "export_library":
+                continue
+            else:
+                target_name = i
+    return struct(src = artifact, dst = file_dest, target_name = target_name)
 
 #------------------------------------------------------------------------------
 def _install_actions(
@@ -309,10 +316,15 @@ def _install_runtime_actions(ctx, target):
 #------------------------------------------------------------------------------
 # Generate install code for an install action.
 def _install_code(action, ctx):
-    if hasattr(ctx.attr, "type") and  ctx.attr.type != "NONE":
+    if hasattr(ctx.attr, "type") and ctx.attr.type != "NONE":
         if hasattr(ctx.attr, "package_path") and ctx.attr.package_path != "NONE":
-            return "install(%r, %r, %r, %r)" % (
-                action.src.short_path, action.dst, ctx.attr.type, ctx.attr.package_path)
+            if action.target_name != None:
+                return "install(%r, %r, %r, %r, %r, %r)" % (
+                    action.src.short_path, action.dst, ctx.attr.type,
+                    ctx.attr.package_path, "export_library", action.target_name)
+            else: 
+                return "install(%r, %r, %r, %r)" % (
+                    action.src.short_path, action.dst, ctx.attr.type, ctx.attr.package_path)
         else:
             fail("Dont't run the install target which is not auto generated!")
     else:
@@ -473,7 +485,7 @@ _install_rule = rule(
 def install(tags = [], **kwargs):
     # (The documentation for this function is immediately below.)
     _install_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 
@@ -579,7 +591,7 @@ _install_files_rule = rule(
 def install_files(tags = [], **kwargs):
     # (The documentation for this function is immediately below.)
     _install_files_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 
@@ -686,7 +698,7 @@ _install_src_files_rule = rule(
 def install_src_files(tags = [], **kwargs):
     # (The documentation for this function is immediately below.)
     _install_src_files_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 
@@ -775,7 +787,7 @@ _install_plugin_rule = rule(
     attrs = {
         "plugin": attr.label(allow_files = True),
         # TODO(liangjinping): install plugin to fixed path or support path register
-        "plugin_dest": attr.string(default = "lib/plugins/@PACKAGE_PATH@"),
+        "plugin_dest": attr.string(default = "lib/@PACKAGE_PATH@"),
         "plugin_strip_prefix": attr.string_list(),
         "plugin_name": attr.string(),
         "description": attr.label(allow_files = True),
@@ -798,7 +810,7 @@ _install_plugin_rule = rule(
 
 def install_plugin(tags = [], **kwargs):
     _install_plugin_rule(
-        tags = tags + ["install"],
+        tags = tags,
         **kwargs
     )
 

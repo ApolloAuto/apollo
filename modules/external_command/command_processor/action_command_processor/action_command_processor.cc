@@ -20,8 +20,12 @@
 
 #include "modules/external_command/command_processor/action_command_processor/action_command_processor.h"
 
+#include <cxxabi.h>
+
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/external_command/command_processor/command_processor_base/proto/command_processor_config.pb.h"
+
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/message_util.h"
 #include "modules/external_command/command_processor/command_processor_base/util/message_reader.h"
 #include "modules/external_command/command_processor/command_processor_base/util/message_writer.h"
@@ -36,8 +40,15 @@ bool ActionCommandProcessor::Init(const std::shared_ptr<cyber::Node>& node) {
   message_reader_ = MessageReader::Instance();
   const auto& config = GetProcessorConfig();
   // Get special config for ActionCommandProcessor.
-  std::string special_config_path = GetConfigDir() + "special_config.pb.txt";
-  if (!cyber::common::GetProtoFromFile(special_config_path, &special_config_)) {
+  int status = 0;
+  std::string class_name =
+      abi::__cxa_demangle(typeid(*this).name(), nullptr, nullptr, &status);
+  std::string special_config_path =
+      cyber::plugin_manager::PluginManager::Instance()
+          ->GetPluginConfPath<CommandProcessorBase>(
+              class_name, "conf/special_config.pb.txt");
+  if (!cyber::common::LoadConfig<ActionCommandConfig>(special_config_path,
+                                                      &special_config_)) {
     AERROR << "Cannot get special config of ActionCommandProcessor";
     return false;
   }
@@ -337,7 +348,7 @@ void ActionCommandProcessor::CheckScenarioFinished(
     return;
   }
   const auto& scenario = debug.scenario();
-  if (!scenario.has_scenario_type()) {
+  if (!scenario.has_scenario_plugin_type()) {
     return;
   }
   auto* latest_planning_command_status =
@@ -348,7 +359,7 @@ void ActionCommandProcessor::CheckScenarioFinished(
     return;
   }
   status->set_message("");
-  const auto& scenario_type = scenario.scenario_type();
+  const auto& scenario_type = scenario.scenario_plugin_type();
   if (scenario_type == scenario_name &&
       latest_planning_command_status->status() ==
           apollo::external_command::CommandStatusType::FINISHED) {

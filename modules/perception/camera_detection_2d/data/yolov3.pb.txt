@@ -46,3 +46,52 @@ nms_param {
   threshold: 0.5
   sigma: 0.1
 }
+info_3d{
+  info {
+    name: "yolov3"
+    version: "2023-06-27"
+    dataset: "L4"
+    task_type: Detection3D
+    sensor_type: Camera
+    framework: PyTorch
+
+    proto_file {
+      file: "yolo_libtorch_model_3d.pth"
+    }
+    weight_file {
+      file: "yolo_libtorch_model_3d.pth"
+    }
+    inputs {
+      name: "image"
+      shape: 1
+      shape: 3
+      shape: 224
+      shape: 224
+    }
+    outputs {
+      name: "orient"
+      shape: 1
+      shape: 2
+      shape: 2
+      shape: 1
+    }
+    outputs {
+      name: "conf"
+      shape: 1
+      shape: 2
+      shape: 1
+      shape: 1
+    }
+    outputs {
+      name: "dim"
+      shape: 1
+      shape: 3
+      shape: 1
+      shape: 1
+    }
+  }
+  resize {
+    width: 224
+    height: 224
+  }
+}

@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,18 +12,35 @@ filegroup(
         "dag/**",
         "data/**",
         "launch/**",
-    ])
+    ]),
 )
 
-cc_binary(
+apollo_cc_library(
+    name = "apollo_perception_traffic_light_recognition",
+    srcs = [
+        "recognition/classify.cc",
+        "recognition/recognition.cc",
+    ],
+    hdrs = [
+        "interface/base_traffic_light_recognitor.h",
+        "recognition/classify.h",
+        "recognition/recognition.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/common:perception_common_util",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/common/inference:apollo_perception_common_inference",
+        "//modules/perception/common/lib:apollo_perception_common_lib",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "//modules/perception/traffic_light_recognition/proto:trafficlights_recognition_component_cc_proto",
+        "//modules/perception/traffic_light_recognition/recognition/proto:model_param_cc_proto",
+    ],
+)
+
+apollo_component(
     name = "libcomponent_traffic_light_recognition.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":perception_component_traffic_recognition"],
-)
-
-cc_library(
-    name = "perception_component_traffic_recognition",
     srcs = [
         "traffic_light_recognition_component.cc",
     ],
@@ -34,14 +50,13 @@ cc_library(
     copts = PERCEPTION_COPTS,
     deps = [
         "//cyber",
-        "//modules/perception/traffic_light_recognition/interface:base_traffic_light_recognitor",
-        "//modules/perception/traffic_light_recognition/recognition:recognition",
-        "//modules/perception/common/camera/common:trafficlight_frame",
-        "//modules/perception/common/onboard/inner_component_messages:traffic_inner_component_messages",
+        ":apollo_perception_traffic_light_recognition",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/traffic_light_recognition/proto:trafficlights_recognition_component_cc_proto",
     ],
-    alwayslink = True,
 )
 
 apollo_package()
+
 cpplint()

@@ -54,7 +54,13 @@ class DstExistenceFusion : public BaseExistenceFusion {
   explicit DstExistenceFusion(TrackPtr track);
   ~DstExistenceFusion() = default;
 
-  // @brief: add dst application
+  /**
+   * @brief add dst application
+   *
+   * @param options
+   * @return true
+   * @return false
+   */
   static bool Init(const ExistenceFusionInitOptions &options);
 
   // @brief: update track state with measurement
@@ -63,31 +69,99 @@ class DstExistenceFusion : public BaseExistenceFusion {
   void UpdateWithMeasurement(const SensorObjectPtr measurement,
                              double target_timestamp,
                              double match_dist) override;
-
+  /**
+   * @brief update track state without measurement
+   *
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @param target_timestamp
+   * @param min_match_dist
+   */
   void UpdateWithoutMeasurement(const std::string &sensor_id,
                                 double measurement_timestamp,
                                 double target_timestamp,
                                 double min_match_dist) override;
 
   std::string Name() const;
+
+  /**
+   * @brief Get toic score
+   *
+   * @return double
+   */
   double GetToicScore() const { return toic_score_; }
+
+  /**
+   * @brief Get existence probability
+   *
+   * @return double
+   */
   double GetExistenceProbability() const;
 
  private:
+  /**
+   * @brief Update toic with camera measurement
+   *
+   * @param camera_obj
+   * @param match_dist
+   */
   void UpdateToicWithCameraMeasurement(const SensorObjectPtr &camera_obj,
                                        double match_dist);
+
+  /**
+   * @brief Update toic without camera measurement
+   *
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @param match_dist
+   */
   void UpdateToicWithoutCameraMeasurement(const std::string &sensor_id,
                                           double measurement_timestamp,
                                           double match_dist);
 
+  /**
+   * @brief compute distance decay
+   *
+   * @param obj
+   * @param sensor_id
+   * @param timestamp
+   * @return double
+   */
   double ComputeDistDecay(base::ObjectConstPtr obj,
                           const std::string &sensor_id, double timestamp);
+
+  /**
+   * @brief Compute feature influence
+   *
+   * @param measurement
+   * @return double
+   */
   double ComputeFeatureInfluence(const SensorObjectPtr measurement);
+
+  /**
+   * @brief Get exist reliability
+   *
+   * @param measurement
+   * @return double
+   */
   double GetExistReliability(const SensorObjectPtr measurement);
+
+  /**
+   * @brief Get unexist reliability
+   *
+   * @param sensor_id
+   * @return double
+   */
   double GetUnexistReliability(const std::string &sensor_id);
+
+  /**
+   * @brief Get toic probability
+   *
+   * @return double
+   */
   double GetToicProbability() const;
 
-  // Update state
+  /// @brief update existence state
   void UpdateExistenceState();
 
  private:

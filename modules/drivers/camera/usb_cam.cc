@@ -37,8 +37,10 @@
 #include <cmath>
 #include <string>
 
+#ifndef __aarch64__
 #include "adv_trigger.h"
 #include "modules/drivers/camera/util.h"
+#endif
 
 #include "modules/drivers/camera/usb_cam.h"
 
@@ -431,6 +433,7 @@ bool UsbCam::init_device(void) {
   return true;
 }
 
+#ifndef __aarch64__
 bool UsbCam::set_adv_trigger() {
   AINFO << "Trigger enable, dev:" << config_->camera_dev()
         << ", fps:" << config_->trigger_fps()
@@ -445,6 +448,7 @@ bool UsbCam::set_adv_trigger() {
   }
   return true;
 }
+#endif
 
 int UsbCam::xioctl(int fd, int request, void* arg) {
   int r = 0;
@@ -970,8 +974,14 @@ bool UsbCam::process_image(void* src, int len, CameraImagePtr dest) {
     if (config_->output_type() == YUYV) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {
+#ifndef __aarch64__
       yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
                    dest->width * dest->height);
+#else
+      convert_yuv_to_rgb_buffer((unsigned char*)src,
+                                (unsigned char*)dest->image, dest->width,
+                                dest->height);
+#endif
     } else {
       AERROR << "unsupported output format:" << config_->output_type();
       return false;
@@ -1083,6 +1093,61 @@ bool UsbCam::wait_for_device() {
 #endif
   return true;
 }
+
+#ifdef __aarch64__
+int UsbCam::convert_yuv_to_rgb_pixel(int y, int u, int v) {
+  unsigned int pixel32 = 0;
+  unsigned char* pixel = (unsigned char*)&pixel32;
+  int r, g, b;
+  r = (int)((double)y + (1.370705 * ((double)v - 128.0)));
+  g = (int)((double)y - (0.698001 * ((double)v - 128.0)) -
+            (0.337633 * ((double)u - 128.0)));
+  b = (int)((double)y + (1.732446 * ((double)u - 128.0)));
+  if (r > 255) r = 255;
+  if (g > 255) g = 255;
+  if (b > 255) b = 255;
+  if (r < 0) r = 0;
+  if (g < 0) g = 0;
+  if (b < 0) b = 0;
+  pixel[0] = (unsigned char)r;
+  pixel[1] = (unsigned char)g;
+  pixel[2] = (unsigned char)b;
+  return pixel32;
+}
+
+int UsbCam::convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
+                                      unsigned int width, unsigned int height) {
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
+
+  for (in = 0; in < width * height * 2; in += 4) {
+    pixel_16 =
+        yuv[in + 3] << 24 | yuv[in + 2] << 16 | yuv[in + 1] << 8 | yuv[in + 0];
+    y0 = (pixel_16 & 0x000000ff);
+    u = (pixel_16 & 0x0000ff00) >> 8;
+    y1 = (pixel_16 & 0x00ff0000) >> 16;
+    v = (pixel_16 & 0xff000000) >> 24;
+    pixel32 = convert_yuv_to_rgb_pixel(y0, u, v);
+    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
+    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
+    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
+    rgb[out++] = pixel_24[0];
+    rgb[out++] = pixel_24[1];
+    rgb[out++] = pixel_24[2];
+    pixel32 = convert_yuv_to_rgb_pixel(y1, u, v);
+    pixel_24[0] = (unsigned char)(pixel32 & 0x000000ff);
+    pixel_24[1] = (unsigned char)((pixel32 & 0x0000ff00) >> 8);
+    pixel_24[2] = (unsigned char)((pixel32 & 0x00ff0000) >> 16);
+    rgb[out++] = pixel_24[0];
+    rgb[out++] = pixel_24[1];
+    rgb[out++] = pixel_24[2];
+  }
+  return 0;
+}
+#endif
 
 void UsbCam::reconnect() {
   stop_capturing();

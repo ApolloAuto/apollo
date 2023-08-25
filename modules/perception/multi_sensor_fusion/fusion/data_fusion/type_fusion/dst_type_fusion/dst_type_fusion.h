@@ -114,6 +114,14 @@ class DstTypeFusion : public BaseTypeFusion {
   void UpdateWithMeasurement(const SensorObjectPtr measurement,
                              double target_timestamp) override;
 
+  /**
+   * @brief update track state without measurement
+   *
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @param target_timestamp
+   * @param min_match_dist
+   */
   void UpdateWithoutMeasurement(const std::string &sensor_id,
                                 double measurement_timestamp,
                                 double target_timestamp,
@@ -122,14 +130,53 @@ class DstTypeFusion : public BaseTypeFusion {
   std::string Name() const;
 
  private:
+  /**
+   * @brief
+   *
+   * @param object_type
+   * @param hypothesis_type
+   * @return true
+   * @return false
+   */
   bool TypToHyp(size_t object_type, uint64_t *hypothesis_type) const;
+
+  /**
+   * @brief
+   *
+   * @param hypothesis_type
+   * @param object_type
+   * @return true
+   * @return false
+   */
   bool HypToTyp(uint64_t hypothesis_type, size_t *object_type) const;
+
+  /**
+   * @brief Convert TypeProbs to distances
+   *
+   * @param type_probs
+   * @return Dst
+   */
   Dst TypeProbsToDst(const std::vector<float> &type_probs);
+
+  /**
+   * @brief Get reliability
+   *
+   * @param sensor_id
+   * @return double
+   */
   double GetReliability(const std::string &sensor_id) const;
+
+  /**
+   * @brief Get reliability for unknown
+   *
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @return double
+   */
   double GetReliabilityForUnKnown(const std::string &sensor_id,
                                   double measurement_timestamp) const;
 
-  // Update state
+  /// @brief Update type state
   void UpdateTypeState();
 
  private:

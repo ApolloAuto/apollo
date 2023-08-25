@@ -1,49 +1,28 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-# filegroup(
-#     name = "cyber_class_loader_hdrs",
-#     srcs = glob([
-#         "*.h",
-#     ]),
-# )
-
-cc_library(
-    name = "class_loader",
-    srcs = ["class_loader.cc"],
-    hdrs = ["class_loader.h"],
-    alwayslink = True,
+apollo_cc_library(
+    name = "cyber_class_loader",
+    srcs = [
+        "class_loader.cc",
+        "class_loader_manager.cc"
+    ],
+    hdrs = [
+        "class_loader.h",
+        "class_loader_register_macro.h",
+        "class_loader_manager.h"
+    ],
     deps = [
-        ":class_loader_register_macro",
         "//cyber/class_loader/shared_library",
-        "//cyber/class_loader/utility:class_factory",
         "//cyber/class_loader/utility:class_loader_utility",
-        "//cyber/common:log",
+        "//cyber/common:cyber_common",
     ],
 )
 
-cc_library(
-    name = "class_loader_register_macro",
-    hdrs = ["class_loader_register_macro.h"],
-    deps = [
-        "//cyber/class_loader/utility:class_loader_utility",
-    ],
-)
-
-cc_library(
-    name = "class_loader_manager",
-    srcs = ["class_loader_manager.cc"],
-    hdrs = ["class_loader_manager.h"],
-    alwayslink = True,
-    deps = [
-        ":class_loader",
-    ],
-)
-
-cc_test(
+apollo_cc_test(
     name = "class_loader_test",
     size = "small",
     srcs = ["class_loader_test.cc"],

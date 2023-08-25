@@ -6,9 +6,6 @@ module_config {
     config {
       name: "LaneComponent"
       config_file_path: "/apollo/modules/perception/lane_detection/conf/lane_detection_config.pb.txt"
-      readers {
-        channel: "/apollo/perception/lane_status"
-      }
     }
   }
 }

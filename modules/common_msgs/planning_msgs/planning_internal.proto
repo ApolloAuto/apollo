@@ -132,9 +132,15 @@ message DpPolyGraphDebug {
 }
 
 message ScenarioDebug {
-  optional string scenario_type = 1;
-  optional string stage_type = 2;
+  // "scenario_type" is deprecated because scenario is designed as plugin and 
+  // "scenario_plugin_type" will be used instead.
+  optional int32 scenario_type = 1 [deprecated=true];
+  // "stage_type" is deprecated because scenario is designed as plugin and 
+  // "stage_plugin_type" will be used instead.
+  optional int32 stage_type = 2 [deprecated=true];
   optional string msg = 3;
+  optional string scenario_plugin_type = 4;
+  optional string stage_plugin_type = 5;
 }
 
 message Trajectories {

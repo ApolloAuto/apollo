@@ -23,6 +23,7 @@
 
 #include "modules/perception/common/base/point_cloud.h"
 #include "modules/perception/common/lidar/common/lidar_log.h"
+#include "modules/perception/common/lidar/common/lidar_point_label.h"
 
 namespace apollo {
 namespace perception {
@@ -70,27 +71,30 @@ inline bool LoadPCLPCD(const std::string& file_path,
   return true;
 }
 
-// static bool WritePcd(const std::string& file_path,
-//                      const base::PointFCloud& cloud) {
-//   pcl::PointCloud<PCLPointXYZL> pcl_cloud;
-//   for (size_t i = 0; i < cloud.size(); ++i) {
-//     PCLPointXYZL point;
-//     point.x = cloud[i].x;
-//     point.y = cloud[i].y;
-//     point.z = cloud[i].z;
-//     point.label = cloud.points_label().at(i);
-//     pcl_cloud.push_back(point);
-//   }
-//   try {
-//     pcl::PCDWriter writer;
-//     writer.writeBinaryCompressed(file_path, pcl_cloud);
-//   } catch (const pcl::IOException& ex) {
-//     AERROR << ex.detailedMessage();
-//     return false;
-//   }
-//   return true;
-// }
-//
+inline bool WritePcdByLabel(const std::string& file_path,
+                            const base::PointFCloud& cloud,
+                            const LidarPointLabel& label) {
+  pcl::PointCloud<PCLPointXYZIT> pcl_cloud;
+  for (size_t i = 0; i < cloud.size(); ++i) {
+    if (cloud.points_label().at(i) != static_cast<uint8_t>(label))
+      continue;
+    PCLPointXYZIT point;
+    point.x = cloud[i].x;
+    point.y = cloud[i].y;
+    point.z = cloud[i].z;
+    point.intensity = cloud[i].intensity;
+    point.timestamp = cloud.points_timestamp().at(i);
+    pcl_cloud.push_back(point);
+  }
+  try {
+    pcl::PCDWriter writer;
+    writer.writeBinaryCompressed(file_path, pcl_cloud);
+  } catch (const pcl::IOException& ex) {
+    AERROR << ex.detailedMessage();
+    return false;
+  }
+  return true;
+}
 
 template <typename PointT>
 inline void TransformToPCLXYZI(
@@ -141,5 +145,6 @@ POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZIT,
                                       intensity)(double, timestamp, timestamp))
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(apollo::perception::lidar::PCLPointXYZL,
-                                  (float, x, x)(float, y, y)(float, z, z)(
-                                      std::uint32_t, label, label))
+                                  (float, x, x)(float, y, y)(float, z,
+                                                             z)(std::uint32_t,
+                                                                label, label))

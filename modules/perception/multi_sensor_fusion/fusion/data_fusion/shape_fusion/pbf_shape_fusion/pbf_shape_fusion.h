@@ -31,23 +31,63 @@ class PbfShapeFusion : public BaseShapeFusion {
   explicit PbfShapeFusion(TrackPtr track) : BaseShapeFusion(track) {}
   virtual ~PbfShapeFusion() = default;
 
+  /**
+   * @brief
+   *
+   * @return true
+   * @return false
+   */
   bool Init() override;
 
+  /**
+   * @brief Update with measurement
+   *
+   * @param measurement
+   * @param target_timestamp
+   */
   void UpdateWithMeasurement(const SensorObjectPtr measurement,
                              double target_timestamp) override;
 
+  /**
+   * @brief Update without measurement
+   *
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @param target_timestamp
+   */
   void UpdateWithoutMeasurement(const std::string& sensor_id,
                                 double measurement_timestamp,
                                 double target_timestamp) override;
 
   std::string Name() const override;
 
+  /**
+   * @brief Get the Track object
+   *
+   * @return TrackPtr
+   */
   inline TrackPtr GetTrack() { return track_ref_; }
 
  private:
-  // Update state
+  /**
+   * @brief Update state
+   *
+   * @param measurement
+   */
   void UpdateState(const SensorObjectConstPtr& measurement);
+
+  /**
+   * @brief Update shape
+   *
+   * @param measurement
+   */
   void UpdateShape(const SensorObjectConstPtr& measurement);
+
+  /**
+   * @brief Update center
+   *
+   * @param measurement
+   */
   void UpdateCenter(const SensorObjectConstPtr& measurement);
 
   static bool s_use_camera_3d_;

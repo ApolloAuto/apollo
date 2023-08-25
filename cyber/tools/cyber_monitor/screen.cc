@@ -18,11 +18,13 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <mutex>
 #include <thread>
+#include <utility>
 
 #include "cyber/tools/cyber_monitor/cyber_topology_message.h"
 #include "cyber/tools/cyber_monitor/general_channel_message.h"

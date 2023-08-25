@@ -24,6 +24,7 @@
 #include <string>
 
 #include <cxxabi.h>
+
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/common/config_util.h"
 #include "modules/planning/planning_base/common/dependency_injector.h"
@@ -62,7 +63,7 @@ class TrafficRule {
 template <typename T>
 bool TrafficRule::LoadConfig(T* config) {
   CHECK_NOTNULL(config);
-  if (!apollo::cyber::common::GetProtoFromFile(config_path_, config)) {
+  if (!apollo::cyber::common::LoadConfig<T>(config_path_, config)) {
     AERROR << "Failed to load default config file" << config_path_;
     return false;
   }

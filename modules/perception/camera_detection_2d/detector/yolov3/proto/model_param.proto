@@ -16,6 +16,7 @@ message ModelParam {
   optional bool with_box3d = 7;
   optional float border_ratio = 8;
   optional NMSParam nms_param = 9;
+  optional Model3DParam info_3d = 10;
 }
 
 message NMSParam {
@@ -24,4 +25,10 @@ message NMSParam {
   optional float sigma = 3 [default = 0.4];
   optional float inter_cls_conf_thresh = 4 [default = 0.1];
   optional float inter_cls_nms_thresh = 5 [default = 1.0];
+}
+
+// add 3d proto
+message Model3DParam {
+  optional common.ModelInfo info = 1;
+  optional common.Resize resize = 2;
 }

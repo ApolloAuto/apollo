@@ -1,37 +1,32 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "postprocess",
-    srcs = ["postprocess.cc"],
-    hdrs = ["postprocess.h"],
-    deps = [
-        "//cyber",
-        "//modules/perception/common/base",
-        "//modules/perception/camera_detection_3d/detector/caddn/proto:model_param_cc_proto",
-    ]
-)
-
-cc_library(
+apollo_cc_library(
     name = "caddn_obstacle_detector",
-    srcs = ["caddn_obstacle_detector.cc"],
-    hdrs = ["caddn_obstacle_detector.h"],
+    srcs = [
+        "caddn_obstacle_detector.cc", 
+        "postprocess.cc",
+    ],
+    hdrs = [
+        "caddn_obstacle_detector.h", 
+        "postprocess.h",
+    ],
     deps = [
-        ":postprocess",
         "//cyber",
-        "//modules/perception/common:util",
-        "//modules/perception/common/onboard/inner_component_messages:camera_detection_component_messages",
-        "//modules/perception/camera_detection_3d/interface:base_obstacle_detector",
-        "//modules/perception/common/base",
-        "//modules/perception/common/camera/common:util",
+        "//modules/perception/common:perception_common_util",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/interface:base_obstacle_detector",
+        "//modules/perception/common/inference:apollo_perception_common_inference",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/camera_detection_3d/detector/caddn/proto:model_param_cc_proto",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "@eigen",
         "@opencv//:imgproc",
-    ]
+    ],
 )
 
 apollo_package()
+
 cpplint()

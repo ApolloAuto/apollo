@@ -21,6 +21,8 @@
 
 #include <memory>
 #include <regex>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include <tinyxml2.h>
@@ -57,44 +59,33 @@ bool PluginManager::LoadPlugin(
     const std::string& plugin_description_file_path) {
   AINFO << "loading plugin from description[" << plugin_description_file_path
         << "]";
-  // load plugin without name, use library path as name
 
-  std::string library_path = "";
-  if (!ProcessPluginDescriptionFile(plugin_description_file_path,
-                                    &library_path)) {
-    // invalid description file
-    AWARN << "plugin load failed, description[" << plugin_description_file_path
-          << "] invalid";
+  auto description =
+      std::make_shared<apollo::cyber::plugin_manager::PluginDescription>();
+  if (!description->ParseFromDescriptionFile(plugin_description_file_path)) {
     return false;
   }
-  std::string plugin_name =
-      std::regex_replace(library_path, std::regex("/"), std::string("__"));
-  if (plugin_description_map_.find(plugin_name) !=
+
+  if (plugin_description_map_.find(description->name_) !=
       plugin_description_map_.end()) {
-    // already loaded
-    AWARN << "plugin name[" << plugin_name << "] already loaded";
+    AWARN << "plugin [" << description->name_ << "] already loaded";
     return true;
   }
-  // try to detect the real path
-  std::string actual_library_path = "";
-  if (!apollo::cyber::common::GetFilePathWithEnv(
-          library_path, "APOLLO_PLUGIN_LIB_PATH", &actual_library_path)) {
+
+  if (!LoadLibrary(description->actual_library_path_)) {
     AWARN << "plugin description[" << plugin_description_file_path << "] name["
-          << plugin_name << "] load failed, library[" << library_path
-          << "] not found";
+          << description->name_ << "] load failed, library["
+          << description->actual_library_path_ << "] invalid";
     return false;
   }
-  if (!class_loader_manager_.LoadLibrary(actual_library_path)) {
-    AWARN << "plugin description[" << plugin_description_file_path << "] name["
-          << plugin_name << "] load failed, library[" << actual_library_path
-          << "] invalid";
-    return false;
+
+  plugin_loaded_map_[description->name_] = true;
+  plugin_description_map_[description->name_] = description;
+  for (auto& class_name_pair : description->class_name_base_class_name_map_) {
+    plugin_class_plugin_name_map_[class_name_pair] = description->name_;
   }
-  plugin_description_map_[plugin_name] =
-      std::make_shared<PluginDescription>(PluginDescription(
-          plugin_name, "", plugin_description_file_path, actual_library_path));
   AINFO << "plugin description[" << plugin_description_file_path << "] name["
-        << plugin_name << "] load success";
+        << description->name_ << "] load success";
   return true;
 }
 
@@ -127,52 +118,29 @@ bool PluginManager::FindPluginIndexAndLoad(
       AWARN << "plugin [" << plugin_name << "] already loaded";
       continue;
     }
-    std::string plugin_description_file_path = "";
-    if (!apollo::cyber::common::GetContent(plugin_index,
-                                           &plugin_description_file_path)) {
-      AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
-            << "] load failed, can not read index file";
-      continue;
-    }
-    std::string actual_description_file_path = "";
-    if (!apollo::cyber::common::GetFilePathWithEnv(
-            plugin_description_file_path, "APOLLO_PLUGIN_DESCRIPTION_PATH",
-            &actual_description_file_path)) {
-      AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
-            << "] load failed, description[" << plugin_description_file_path
-            << "] not found";
-      continue;
-    }
-    std::string library_path = "";
-    if (!ProcessPluginDescriptionFile(actual_description_file_path,
-                                      &library_path)) {
+
+    auto description = std::make_shared<PluginDescription>(plugin_name);
+    if (!description->ParseFromIndexFile(plugin_index)) {
       success = false;
-      // invalid description file
-      AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
-            << "] load failed, description[" << actual_description_file_path
-            << "] invalid";
+      // invalid index file
       continue;
     }
-    // try to detect the real path
-    std::string actual_library_path = "";
-    if (!apollo::cyber::common::GetFilePathWithEnv(
-            library_path, "APOLLO_PLUGIN_LIB_PATH", &actual_library_path)) {
-      success = false;
-      AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
-            << "] load failed, library[" << library_path << "] not found";
-      continue;
+
+    // if (!class_loader_manager_.LoadLibrary(actual_library_path)) {
+    //   success = false;
+    //   AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
+    //         << "] load failed, library[" << actual_library_path << "]
+    //         invalid";
+    //   continue;
+    // }
+    // lazy load
+    plugin_loaded_map_[description->name_] = false;
+    plugin_description_map_[description->name_] = description;
+    for (auto& class_name_pair : description->class_name_base_class_name_map_) {
+      plugin_class_plugin_name_map_[class_name_pair] = description->name_;
     }
-    if (!class_loader_manager_.LoadLibrary(actual_library_path)) {
-      success = false;
-      AWARN << "plugin index[" << plugin_index << "] name[" << plugin_name
-            << "] load failed, library[" << actual_library_path << "] invalid";
-      continue;
-    }
-    plugin_description_map_[plugin_name] = std::make_shared<PluginDescription>(
-        PluginDescription(plugin_name, plugin_index,
-                          actual_description_file_path, actual_library_path));
-    AINFO << "plugin index[" << plugin_index << "] name[" << plugin_name
-          << "] load success";
+    AINFO << "plugin index[" << plugin_index << "] name[" << description->name_
+          << "] lazy load success";
   }
   return success;
 }
@@ -221,6 +189,14 @@ bool PluginManager::LoadInstalledPlugins() {
     }
     begin = index + 1;
   } while (index != std::string::npos);
+  return true;
+}
+
+bool PluginManager::LoadLibrary(const std::string& library_path) {
+  if (!class_loader_manager_.LoadLibrary(library_path)) {
+    AWARN << "plugin library[" << library_path << "] load failed";
+    return false;
+  }
   return true;
 }
 

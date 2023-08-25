@@ -1156,7 +1156,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   {
     boost::shared_lock<boost::shared_mutex> reader_lock(route_paths_mutex_);
     if (world_.has_routing_time() &&
-        world_.routing_time() == routing_response.header().timestamp_sec()) {
+        world_.routing_time() == planning_command.header().timestamp_sec()) {
       // This routing response has been processed.
       return;
     }
@@ -1193,7 +1193,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(route_paths_mutex_);
     std::swap(route_paths, route_paths_);
-    world_.set_routing_time(routing_response.header().timestamp_sec());
+    world_.set_routing_time(planning_command.header().timestamp_sec());
   }
 }
 

@@ -286,6 +286,13 @@ Chassis Neolix_eduController::chassis() {
         chassis_detail.vcu_eps_report_57().drive_enable_resp() == 1);
   }
 
+  if (CheckChassisError()) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Chassis has some fault, please check the chassis_detail.");
+  }
+
   return chassis_;
 }
 
@@ -485,6 +492,20 @@ void Neolix_eduController::ResetProtocol() {
 }
 
 bool Neolix_eduController::CheckChassisError() {
+  Neolix_edu chassis_detail;
+  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis detail failed.";
+  }
+  if (!chassis_.has_check_response()) {
+    AERROR_EVERY(100) << "ChassisDetail has no neolix vehicle info.";
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ChassisDetail has no neolix vehicle info.");
+    return false;
+  } else {
+    chassis_.clear_engage_advice();
+  }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
    */
   return false;
@@ -518,7 +539,7 @@ void Neolix_eduController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by steer manual intervention";
+        AERROR << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -532,12 +553,14 @@ void Neolix_eduController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by speed manual intervention";
+        AERROR << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
       vertical_ctrl_fail = 0;
     }
+
+    // 3. chassis fault check
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;

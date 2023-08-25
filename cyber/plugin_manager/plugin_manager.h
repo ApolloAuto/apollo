@@ -18,8 +18,12 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
+
+#include <cxxabi.h>
 
 #include "cyber/class_loader/class_loader_manager.h"
+#include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
@@ -90,10 +94,46 @@ class PluginManager {
   template <typename Base>
   std::string GetPluginClassHomePath(const std::string& class_name);
 
+  /**
+   * @brief get plugin configuration file location
+   * @param class_name derived class name
+   * @param conf_name configuration file name
+   * @return location of plugin configuration file
+   */
+  template <typename Base>
+  std::string GetPluginConfPath(const std::string& class_name,
+                                const std::string& conf_name);
+
+  /**
+   * @brief load library of plugin
+   * @param library_path library path
+   * @return result of loading library, true for success
+   */
+  bool LoadLibrary(const std::string& library_path);
+
+  /**
+   * @brief check if library of plugin is loaded
+   * @param class_name derived class name of plugin
+   * @return result of checking, true for loaded
+   */
+  template <typename Base>
+  bool IsLibraryLoaded(const std::string& class_name);
+
+  /**
+   * @brief check if library of plugin is loaded, and load it if not
+   * @param class_name derived class name of plugin
+   * @return result of checking, true for loaded
+   */
+  template <typename Base>
+  bool CheckAndLoadPluginLibrary(const std::string& class_name);
+
  private:
   apollo::cyber::class_loader::ClassLoaderManager class_loader_manager_;
   std::map<std::string, std::shared_ptr<PluginDescription>>
       plugin_description_map_;
+  std::map<std::string, bool> plugin_loaded_map_;
+  std::map<std::pair<std::string, std::string>, std::string>
+      plugin_class_plugin_name_map_;
 
   static PluginManager* instance_;
 };
@@ -102,26 +142,109 @@ template <typename Base>
 std::shared_ptr<Base> PluginManager::CreateInstance(
     const std::string& derived_class) {
   AINFO << "creating plugin instance of " << derived_class;
+  if (!CheckAndLoadPluginLibrary<Base>(derived_class)) {
+    AERROR << "plugin of class " << derived_class << " have not been loaded";
+    return nullptr;
+  }
   return class_loader_manager_.CreateClassObj<Base>(derived_class);
 }
 
 template <typename Base>
 std::string PluginManager::GetPluginClassHomePath(
     const std::string& class_name) {
+  if (!CheckAndLoadPluginLibrary<Base>(class_name)) {
+    AERROR << "plugin of class " << class_name << " have not been loaded";
+    return "";
+  }
   std::string library_path =
       class_loader_manager_.GetClassValidLibrary<Base>(class_name);
   if (library_path == "") {
     AWARN << "plugin of class " << class_name << " not found";
-    return ".";
+    return "";
   }
   for (auto it = plugin_description_map_.begin();
        it != plugin_description_map_.end(); ++it) {
-    if (it->second->library_path_ == library_path) {
-      return apollo::cyber::common::GetDirName(it->second->description_path_);
+    if (it->second->actual_library_path_ == library_path) {
+      // TODO(liangjinping): remove hard code of relative prefix
+      std::string relative_prefix = "share/";
+      std::string relative_plugin_home_path =
+          apollo::cyber::common::GetDirName(it->second->description_path_);
+      if (relative_plugin_home_path.rfind(relative_prefix, 0) == 0) {
+        relative_plugin_home_path =
+            relative_plugin_home_path.substr(relative_prefix.size());
+      }
+      return relative_plugin_home_path;
     }
   }
   // not found
-  return ".";
+  return "";
+}
+
+template <typename Base>
+std::string PluginManager::GetPluginConfPath(const std::string& class_name,
+                                             const std::string& conf_name) {
+  std::string plugin_home_path = GetPluginClassHomePath<Base>(class_name);
+  if (apollo::cyber::common::PathIsAbsolute(plugin_home_path)) {
+    // can not detect the plugin relative path
+    AWARN << "plugin of class " << class_name << " load from absolute path, "
+          << "conf path will be relative to it's description file";
+  }
+
+  std::string relative_conf_path = plugin_home_path + "/" + conf_name;
+  std::string actual_conf_path;
+  if (apollo::cyber::common::GetFilePathWithEnv(
+          relative_conf_path, "APOLLO_CONF_PATH", &actual_conf_path)) {
+    return actual_conf_path;
+  }
+  return plugin_home_path + "/" + conf_name;
+}
+
+template <typename Base>
+bool PluginManager::IsLibraryLoaded(const std::string& class_name) {
+  int status = 0;
+  std::string base_class_name =
+      abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
+  if (plugin_class_plugin_name_map_.find({class_name, base_class_name}) ==
+      plugin_class_plugin_name_map_.end()) {
+    // not found
+    return false;
+  }
+  std::string plugin_name =
+      plugin_class_plugin_name_map_[{class_name, base_class_name}];
+  if (plugin_loaded_map_.find(plugin_name) == plugin_loaded_map_.end()) {
+    // not found
+    return false;
+  }
+
+  return plugin_loaded_map_[plugin_name];
+}
+
+template <typename Base>
+bool PluginManager::CheckAndLoadPluginLibrary(const std::string& class_name) {
+  if (IsLibraryLoaded<Base>(class_name)) {
+    return true;
+  }
+  int status = 0;
+  std::string base_class_name =
+      abi::__cxa_demangle(typeid(Base).name(), 0, 0, &status);
+  if (plugin_class_plugin_name_map_.find({class_name, base_class_name}) ==
+      plugin_class_plugin_name_map_.end()) {
+    // not found
+    AWARN << "plugin of class " << class_name << " not found, "
+          << "please check if it's registered";
+    return false;
+  }
+  std::string plugin_name =
+      plugin_class_plugin_name_map_[{class_name, base_class_name}];
+  if (plugin_description_map_.find(plugin_name) ==
+      plugin_description_map_.end()) {
+    // not found
+    AWARN << "plugin description of class " << class_name << " not found, "
+          << "please check if it's loaded";
+    return false;
+  }
+  auto plugin_description = plugin_description_map_[plugin_name];
+  return LoadLibrary(plugin_description->actual_library_path_);
 }
 
 #define CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(name, base) \

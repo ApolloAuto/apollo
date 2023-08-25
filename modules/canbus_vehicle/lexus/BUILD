@@ -1,122 +1,59 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "lexus_vehicle_factory",
-    srcs = ["lexus_vehicle_factory.cc"],
-    hdrs = ["lexus_vehicle_factory.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_lexus",
+    srcs = [
+        "lexus_controller.cc",
+        "lexus_message_manager.cc",
+        "lexus_vehicle_factory.cc",
+    ] + glob(["protocol/*.cc"]),
+    hdrs = [
+        "lexus_controller.h",
+        "lexus_message_manager.h",
+        "lexus_vehicle_factory.h",
+    ] + glob(["protocol/*.h"]),
     deps = [
-        ":lexus_controller",
-        ":lexus_message_manager",
-        "//modules/canbus/common:canbus_gflags",
+        "//modules/canbus:apollo_canbus",
+        "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
-    ],
-)
-
-cc_binary(
-    name = "liblexus_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":lexus_vehicle_factory"],
-)
-
-cc_library(
-    name = "lexus_message_manager",
-    srcs = ["lexus_message_manager.cc"],
-    hdrs = ["lexus_message_manager.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
-        "//modules/canbus_vehicle/lexus/protocol:canbus_lexus_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_library(
-    name = "lexus_controller",
-    srcs = ["lexus_controller.cc"],
-    hdrs = ["lexus_controller.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        ":lexus_message_manager",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus_vehicle/lexus/protocol:canbus_lexus_protocol",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
     ],
 )
 
-cc_test(
+apollo_component(
+    name = "liblexus_vehicle_factory_lib.so",
+    deps = [":apollo_canbus_vehicle_lexus"],
+)
+
+apollo_cc_test(
     name = "lexus_controller_test",
     size = "small",
     srcs = ["lexus_controller_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        "//modules/canbus_vehicle/lexus:lexus_controller",
+        ":apollo_canbus_vehicle_lexus",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "lexus_vehicle_factory_test",
     size = "small",
     srcs = ["lexus_vehicle_factory_test.cc"],
     data = ["//modules/canbus:test_data"],
     linkstatic = True,
     deps = [
-        ":lexus_vehicle_factory",
+        ":apollo_canbus_vehicle_lexus",
         "@com_google_googletest//:gtest_main",
     ],
 )
-
-# install(
-#     name = "install",
-#     library_dest = "canbus-vehicle-lexus/lib",
-#     data_dest = "canbus-vehicle-lexus",
-#     data = [
-#         ":runtime_data",
-#         ":cyberfile.xml",
-#         ":canbus-vehicle-lexus.BUILD",
-#     ],
-#     targets = [
-#         ":liblexus_vehicle_factory_lib.so",
-#     ],
-#     deps = [
-#         ":pb_lexus",
-#         ":pb_hdrs",
-#     ],
-# )
-
-# install(
-#     name = "pb_hdrs",
-#     data_dest = "canbus-vehicle-lexus/include",
-#     data = [
-#         "//modules/canbus_vehicle/lexus/proto:lexus_cc_proto",
-#     ],
-# )
-
-# install_files(
-#     name = "pb_lexus",
-#     dest = "canbus-vehicle-lexus",
-#     files = [
-#         "//modules/canbus_vehicle/lexus/proto:lexus_py_pb2",
-#     ],
-# )
 
 filegroup(
     name = "runtime_data",
@@ -125,27 +62,6 @@ filegroup(
     ]),
 )
 
-# install_src_files(
-#     name = "install_src",
-#     deps = [
-#         ":install_lexus_src",
-#         ":install_lexus_hdrs"
-#     ],
-# )
-
-# install_src_files(
-#     name = "install_lexus_src",
-#     src_dir = ["."],
-#     dest = "canbus-vehicle-lexus/src",
-#     filter = "*",
-# )
-
-# install_src_files(
-#     name = "install_lexus_hdrs",
-#     src_dir = ["."],
-#     dest = "canbus-vehicle-lexus/include",
-#     filter = "*.h",
-# )
-
 apollo_package()
+
 cpplint()

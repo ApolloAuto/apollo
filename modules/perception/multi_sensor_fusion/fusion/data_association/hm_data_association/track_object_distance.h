@@ -47,9 +47,21 @@ class TrackObjectDistance {
   TrackObjectDistance() = default;
   ~TrackObjectDistance() = default;
 
+  /**
+   * @brief Set the distance thresh
+   *
+   * @param distance_thresh
+   */
   void set_distance_thresh(const float distance_thresh) {
     distance_thresh_ = distance_thresh;
   }
+
+  /**
+   * @brief
+   *
+   * @param sensor_id
+   * @param timestamp
+   */
   void ResetProjectionCache(std::string sensor_id, double timestamp) {
     projection_cache_.Reset(sensor_id, timestamp);
   }

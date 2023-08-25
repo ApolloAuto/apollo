@@ -30,23 +30,54 @@ class Scene {
   Scene();
   ~Scene();
 
+  /**
+   * @brief Get the foreground track objects
+   *
+   * @return std::vector<TrackPtr>&
+   */
   inline std::vector<TrackPtr>& GetForegroundTracks() {
     return foreground_tracks_;
   }
 
+  /**
+   * @brief Get the foreground track objects
+   *
+   * @return const std::vector<TrackPtr>&
+   */
   inline const std::vector<TrackPtr>& GetForegroundTracks() const {
     return foreground_tracks_;
   }
 
+  /**
+   * @brief Get the background track objects
+   *
+   * @return std::vector<TrackPtr>&
+   */
   inline std::vector<TrackPtr>& GetBackgroundTracks() {
     return background_tracks_;
   }
 
+  /**
+   * @brief Get the background track objects
+   *
+   * @return const std::vector<TrackPtr>&
+   */
   inline const std::vector<TrackPtr>& GetBackgroundTracks() const {
     return background_tracks_;
   }
 
+  /**
+   * @brief Add a foreground track object
+   *
+   * @param track foreground track object
+   */
   void AddForegroundTrack(TrackPtr track);
+
+  /**
+   * @brief Add a background track object
+   *
+   * @param track background track object
+   */
   void AddBackgroundTrack(TrackPtr track);
 
  protected:

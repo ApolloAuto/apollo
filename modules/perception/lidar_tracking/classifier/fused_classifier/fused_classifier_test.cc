@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <numeric>
+#include <vector>
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/base/object.h"

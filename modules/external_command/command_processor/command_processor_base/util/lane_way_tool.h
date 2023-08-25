@@ -63,6 +63,8 @@ class LaneWayTool {
    */
   bool GetVehicleLaneWayPoint(
       apollo::routing::LaneWaypoint *lane_way_point) const;
+  bool GetVehicleLaneWayPoints(
+      std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const;
   /**
    * @brief Get the parking space center point projected to lane way point
    * @param parking_id parking space id
@@ -72,6 +74,8 @@ class LaneWayTool {
   bool GetParkingLaneWayPoint(
       const std::string &parking_id,
       std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const;
+
+  bool IsParkandgoScenario() const;
 
  private:
   const hdmap::HDMap *hdmap_;

@@ -241,18 +241,35 @@ bool PathBoundsDeciderUtil::GetBoundaryFromStaticObstacles(
           //   - Update the left/right bound accordingly.
           //   - If boundaries blocked, then decide whether can side-pass.
           //   - If yes, then borrow neighbor lane to side-pass.
-          if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
-            // Obstacle is to the right of center-line, should pass from
-            // left.
-            obs_id_to_direction[curr_obstacle_id] = true;
-            right_bounds.insert(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_max));
+
+          if (curr_obstacle_s - init_sl_state.first[0] <
+                  FLAGS_obstacle_pass_check_distance) {
+            if (curr_obstacle_l_min + curr_obstacle_l_max <
+                    init_sl_state.second[0] * 2 &&
+                    curr_obstacle_l_max + GetBufferBetweenADCCenterAndEdge() <
+                        (*path_boundaries)[i].l_upper.l) {
+              obs_id_to_direction[curr_obstacle_id] = false;
+              left_bounds.insert(
+                  std::make_pair(curr_obstacle_id, curr_obstacle_l_min));
+            } else {
+              obs_id_to_direction[curr_obstacle_id] = true;
+              right_bounds.insert(
+                  std::make_pair(curr_obstacle_id, curr_obstacle_l_max));
+            }
           } else {
-            // Obstacle is to the left of center-line, should pass from
-            // right.
-            obs_id_to_direction[curr_obstacle_id] = false;
-            left_bounds.insert(
-                std::make_pair(curr_obstacle_id, curr_obstacle_l_min));
+            if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
+              // Obstacle is to the right of center-line, should pass from
+              // left.
+              obs_id_to_direction[curr_obstacle_id] = true;
+              right_bounds.insert(
+                  std::make_pair(curr_obstacle_id, curr_obstacle_l_max));
+            } else {
+              // Obstacle is to the left of center-line, should pass from
+              // right.
+              obs_id_to_direction[curr_obstacle_id] = false;
+              left_bounds.insert(
+                  std::make_pair(curr_obstacle_id, curr_obstacle_l_min));
+            }
           }
           obs_id_to_start_s[curr_obstacle_id] = curr_obstacle_s;
         } else {

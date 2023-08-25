@@ -123,86 +123,20 @@ Chassis %(car_type_cap)sController::chassis() {
   chassis_.set_error_code(chassis_error_code());
   // 3
   chassis_.set_engine_started(true);
-  // 4 chassis spd
-  if (chassis_detail.has_%(speed_protocol_name)s() &&
-      chassis_detail.%(speed_protocol_name)s().has_%(speed_reoport_name)s()) {
-    chassis_.set_speed_mps(
-        static_cast<float>(chassis_detail.%(speed_protocol_name)s().%(speed_reoport_name)s()));
-  } else {
-    chassis_.set_speed_mps(0);
+  %(protocol_chassis_get_list)s
+  if (CheckChassisError()) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Chassis has some fault, please check the chassis_detail.");
   }
-  // 5 throttle
-  if (chassis_detail.has_%(throttle_protocol_name)s() &&
-      chassis_detail.%(throttle_protocol_name)s().has_%(throttle_report_name)s()) {
-    chassis_.set_throttle_percentage(static_cast<float>(
-        chassis_detail.%(throttle_protocol_name)s().%(throttle_report_name)s()));
-  } else {
-    chassis_.set_throttle_percentage(0);
-  }
-  // 6 brake
-  if (chassis_detail.has_%(brake_protocol_name)s() &&
-      chassis_detail.%(brake_protocol_name)s().has_%(brake_report_name)s()) {
-    chassis_.set_brake_percentage(static_cast<float>(
-        chassis_detail.%(brake_protocol_name)s().%(brake_report_name)s()));
-  } else {
-    chassis_.set_brake_percentage(0);
-  }
-  // 7 gear
-  if (chassis_detail.has_%(gear_protocol_name)s() &&
-      chassis_detail.%(gear_protocol_name)s().has_%(gear_report_name)s()) {
-    Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
-    if (chassis_detail.%(gear_protocol_name)s().%(gear_report_name)s() ==
-        %(gear_report_protocol_name_cap)s::%(gear_report_neutral_enum)s) {
-      gear_pos = Chassis::GEAR_NEUTRAL;
-    }
-    if (chassis_detail.%(gear_protocol_name)s().gear_sts() ==
-        %(gear_report_protocol_name_cap)s::%(gear_report_reverse_enum)s) {
-      gear_pos = Chassis::GEAR_REVERSE;
-    }
-    if (chassis_detail.%(gear_protocol_name)s().gear_sts() ==
-        %(gear_report_protocol_name_cap)s::%(gear_report_drive_enum)s) {
-      gear_pos = Chassis::GEAR_DRIVE;
-    }
-    if (chassis_detail.%(gear_protocol_name)s().gear_sts() ==
-        %(gear_report_protocol_name_cap)s::%(gear_report_park_enum)s) {
-      gear_pos = Chassis::GEAR_PARKING;
-    }
-
-    chassis_.set_gear_location(gear_pos);
-  } else {
-    chassis_.set_gear_location(Chassis::GEAR_NONE);
-  }
-  // 8 steer
-  if (chassis_detail.has_%(steer_protocol_name)s() &&
-      chassis_detail.%(steer_protocol_name)s().has_%(steer_report_name)s()) {
-    chassis_.set_steering_percentage(static_cast<float>(
-        chassis_detail.%(steer_protocol_name)s().%(steer_report_name)s() * 100.0 /
-        vehicle_params_.max_steer_angle()));
-  } else {
-    chassis_.set_steering_percentage(0);
-  }
-  // 9 checkresponse signal
-  if (chassis_detail.has_%(brake_protocol_name)s() &&
-      chassis_detail.%(brake_protocol_name)s().has_%(brake_report_enable_name)s()) {
-    chassis_.mutable_check_response()->set_is_esp_online(
-        chassis_detail.%(brake_protocol_name)s().%(brake_report_enable_name)s() == 1);
-  }
-  if (chassis_detail.has_%(steer_protocol_name)s() &&
-      chassis_detail.%(steer_protocol_name)s().has_%(steer_report_enable_name)s()) {
-    chassis_.mutable_check_response()->set_is_eps_online(
-        chassis_detail.%(steer_protocol_name)s().%(steer_report_enable_name)s() == 1);
-  }
-  if (chassis_detail.has_%(throttle_protocol_name)s() &&
-      chassis_detail.%(throttle_protocol_name)s().has_%(throttle_report_enable_name)s()) {
-    chassis_.mutable_check_response()->set_is_vcu_online(
-        chassis_detail.%(throttle_protocol_name)s().%(throttle_report_enable_name)s() == 1);
-  }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   // 10 battery soc
   // 11 vin
   // 12 bumper event
   */
+
   return chassis_;
 }
 
@@ -217,12 +151,7 @@ ErrorCode %(car_type_cap)sController::EnableAutoMode() {
     return ErrorCode::OK;
   }
   // set enable
-  %(brake_command_protocol_name)s_->set_%(brake_command_enable_name)s(
-      %(brake_command_protocol_name_cap)s::%(brake_command_enable_enable_enum)s);
-  %(throttle_command_protocol_name)s_->set_%(throttle_command_enable_name)s(
-      %(throttle_command_protocol_name_cap)s::%(throttle_command_enable_enable_enum)s);
-  %(steer_command_protocol_name)s_->set_%(steer_command_enable_name)s(
-      %(steer_command_protocol_name_cap)s::%(steer_command_enable_enable_enum)s);
+  %(protocol_auto_enable_add_list)s
 
   can_sender_->Update();
   const int32_t flag =
@@ -258,12 +187,7 @@ ErrorCode %(car_type_cap)sController::EnableSteeringOnlyMode() {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   // TODO(ALL): CHECK YOUR VEHICLE WHETHER SUPPORT THIS MODE OR NOT
   // set enable
-  %(brake_command_protocol_name)s_->set_%(brake_command_enable_name)s(
-      %(brake_command_protocol_name_cap)s::%(brake_command_enable_disable_enum)s);
-  %(throttle_command_protocol_name)s_->set_%(throttle_command_enable_name)s(
-      %(throttle_command_protocol_name_cap)s::%(throttle_command_enable_disable_enum)s);
-  %(steer_command_protocol_name)s_->set_%(steer_command_enable_name)s(
-      %(steer_command_protocol_name_cap)s::%(steer_command_enable_enable_enum)s);
+  %(protocol_steer_enable_add_list)s
 
   can_sender_->Update();
   if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
@@ -289,12 +213,7 @@ ErrorCode %(car_type_cap)sController::EnableSpeedOnlyMode() {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   // TODO(ALL): CHECK YOUR VEHICLE WHETHER SUPPORT THIS MODE OR NOT
   // set enable
-  %(brake_command_protocol_name)s_->set_%(brake_command_enable_name)s(
-      %(brake_command_protocol_name_cap)s::%(brake_command_enable_enable_enum)s);
-  %(throttle_command_protocol_name)s_->set_%(throttle_command_enable_name)s(
-      %(throttle_command_protocol_name_cap)s::%(throttle_command_enable_enable_enum)s);
-  %(steer_command_protocol_name)s_->set_%(steer_command_enable_name)s(
-      %(steer_command_protocol_name_cap)s::%(steer_command_enable_disable_enum)s);
+  %(protocol_speed_enable_add_list)s
 
   can_sender_->Update();
   if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
@@ -317,33 +236,7 @@ void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
     AINFO << "This drive mode no need to set gear.";
     return;
   }
-  switch (gear_position) {
-    case Chassis::GEAR_NEUTRAL: {
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_neutral_enum)s);
-      break;
-    }
-    case Chassis::GEAR_REVERSE: {
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_reverse_enum)s);
-      break;
-    }
-    case Chassis::GEAR_DRIVE: {
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_drive_enum)s);
-      break;
-    }
-    case Chassis::GEAR_PARKING: {
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_park_enum)s);
-      break;
-    }
-    case Chassis::GEAR_INVALID: {
-      // AERROR << "Gear command is invalid!";
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_neutral_enum)s);
-      break;
-    }
-    default: {
-      %(gear_command_protocol_name)s_->set_%(gear_command_name)s(%(gear_command_protocol_name_cap)s::%(gear_command_neutral_enum)s);
-      break;
-    }
-  }
+  %(protocol_gear_command_list)s
 }
 
 // brake with pedal
@@ -356,7 +249,7 @@ void %(car_type_cap)sController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set brake pedal.";
     return;
   }
-  %(brake_command_protocol_name)s_->set_%(brake_command_name)s(pedal);
+  %(protocol_brake_command_list)s
 }
 
 // drive with pedal
@@ -367,7 +260,7 @@ void %(car_type_cap)sController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set throttle pedal.";
     return;
   }
-  %(throttle_command_protocol_name)s_->set_%(throttle_command_name)s(pedal);
+  %(protocol_throttle_command_list)s
 }
 
 // confirm the car is driven by acceleration command instead of
@@ -394,13 +287,7 @@ void %(car_type_cap)sController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  %(steer_command_protocol_name)s_->set_%(steer_command_name)s(real_angle);
-  // reverse sign
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
-  */
+  %(protocol_steer_command_list)s
 }
 
 // %(car_type_lower)s default, steering with new angle speed
@@ -412,9 +299,7 @@ void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-  %(steer_command_protocol_name)s_->set_%(steer_command_name)s(real_angle);
+  %(protocol_steer_command_list)s
 }
 
 void %(car_type_cap)sController::SetEpbBreak(const ControlCommand& command) {
@@ -457,7 +342,7 @@ void %(car_type_cap)sController::SetTurningSignal(const VehicleSignal& vehicle_s
   */
 }
 
-ErrorCode ChController::HandleCustomOperation(
+ErrorCode %(car_type_cap)sController::HandleCustomOperation(
     const external_command::ChassisCommand& command) {
   return ErrorCode::OK;
 }
@@ -498,7 +383,7 @@ void %(car_type_cap)sController::GetVin() {
   */
 }
 
-void ChController::ResetVin() {
+void %(car_type_cap)sController::ResetVin() {
   // Reset vin from vehicle if exist
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   vehicle_mode_command_116_->set_vin_req_cmd(
@@ -513,10 +398,19 @@ void %(car_type_cap)sController::ResetProtocol() {
 }
 
 bool %(car_type_cap)sController::CheckChassisError() {
+  %(car_type_cap)s chassis_detail;
+  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+    AERROR_EVERY(100) << "Get chassis detail failed.";
+  }
   if (!chassis_.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no %(car_type_lower)s vehicle info."
-                      << chassis_.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has no %(car_type_lower)s vehicle info.";
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ChassisDetail has no %(car_type_lower)s vehicle info.");
     return false;
+  } else {
+    chassis_.clear_engage_advice();
   }
 
   /* ADD YOUR OWN CAR CHASSIS OPERATION
@@ -575,6 +469,8 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
     } else {
       vertical_ctrl_fail = 0;
     }
+
+    // 3. chassis fault check
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;

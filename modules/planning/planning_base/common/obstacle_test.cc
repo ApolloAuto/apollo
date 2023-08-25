@@ -594,5 +594,34 @@ TEST(ObstacleMergeTest, add_decision_test) {
     EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
   }
 }
+
+TEST_F(ObstacleTest, GetObstacleTrajectoryPolygon) {
+  Obstacle* obstacle = indexed_obstacles_.Find("88_0");
+  EXPECT_TRUE(false) << obstacle->Id();
+  EXPECT_TRUE(false) << obstacle->Perception().position().x()
+                      << "  " << obstacle->Perception().position().y()
+                      << "  " << obstacle->Perception().theta()
+                      << "  " << sin(obstacle->Perception().theta());
+  for (int i = 0; i < obstacle->Trajectory().trajectory_point_size(); i++) {
+    const auto& point = obstacle->Trajectory().trajectory_point(i);
+    EXPECT_TRUE(false) << point.path_point().x()
+                       << "  " << point.path_point().y()
+                       << "  " << point.path_point().theta()
+                       << "  " << sin(point.path_point().theta());
+    common::math::Polygon2d polygon =
+                              obstacle->GetObstacleTrajectoryPolygon(point);
+    const auto& corner_points = polygon.points();
+    for (size_t j = 0; j < corner_points.size(); j++) {
+      double x = corner_points[j].x();
+      double y = corner_points[j].y();
+      EXPECT_TRUE(false) << x << "  " << y;
+      // ASSERT_EQ(5, x);
+      // EXPECT_NE(1, y)
+      // << x
+      // << y;
+    }
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo

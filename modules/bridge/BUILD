@@ -1,6 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_component")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -16,141 +14,113 @@ filegroup(
     ]),
 )
 
-# install(
-#     name = "install",
-#     library_dest = "bridge/lib",
-#     data_dest = "bridge",
-#     data = [
-#       ":runtime_data",
-#       "cyberfile.xml",
-#       "bridge.BUILD"
-#     ],
-#     targets = [
-#       ":libudp_bridge_sender_component.so",
-#       ":libudp_bridge_receiver_component.so",
-#       ":libudp_bridge_multi_receiver_component.so",
-#     ],
-#     deps = [
-#         "//modules/bridge/test:install",
-#         "//modules/bridge/proto:py_pb_bridge",
-#         "//modules/bridge/common:install", 
-#     ],
-# )
-# install(
-#     name = "pb_hdrs",
-#     data_dest = "bridge/include",
-#     data = [
-#         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
-#     ],
-# )
+apollo_cc_library(
+    name = "apollo_bridge_common",
+    srcs = [
+        "common/bridge_buffer.cc", 
+        "common/bridge_gflags.cc",
+        "common/bridge_header.cc",
+        "common/util.cc"
+    ],
+    hdrs = [
+        "common/bridge_buffer.h", 
+        "common/bridge_gflags.h",
+        "common/bridge_header.h",
+        "common/bridge_header_item.h",
+        "common/bridge_proto_diser_buf_factory.h",
+        "common/bridge_proto_diserialized_buf.h",
+        "common/bridge_proto_serialized_buf.h",
+        "common/macro.h",
+        "common/udp_listener.h",
+        "common/util.h",
+    ],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+        "//modules/common/adapters:adapter_gflags",
+    ]
+)
 
-cc_library(
-    name = "udp_bridge",
+apollo_cc_test(
+    name = "bridge_buffer_test",
+    size = "small",
+    srcs = ["common/bridge_buffer_test.cc"],
+    deps = [
+        ":apollo_bridge_common",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "bridge_proto_buf_test",
+    size = "small",
+    srcs = ["common/bridge_proto_buf_test.cc"],
+    deps = [
+        "//modules/bridge:apollo_udp_bridge",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_library(
+    name = "apollo_udp_bridge",
     copts = BRIDGE_COPTS,
     deps = [
         "//cyber",
-        "//modules/bridge/common:bridge_gflags",
-        "//modules/bridge/common:bridge_header",
-        "//modules/bridge/common:bridge_proto_diser_buf_factory",
-        "//modules/bridge/common:bridge_proto_diserialized_buf",
-        "//modules/bridge/common:bridge_proto_serialized_buf",
-        "//modules/bridge/common:macro",
-        "//modules/bridge/common:util",
+        ":apollo_bridge_common",
         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common/monitor_log",
-        "//modules/common/util",
+        "//modules/common/util:common_util",
     ],
 )
 
-cc_library(
-    name = "udp_bridge_sender",
-    srcs = ["udp_bridge_sender_component.cc"],
-    hdrs = ["udp_bridge_sender_component.h"],
-    copts = BRIDGE_COPTS,
-    alwayslink = True,
-    deps = [
-        ":udp_bridge",
-    ],
-)
-
-cc_library(
-    name = "udp_bridge_receiver",
-    srcs = ["udp_bridge_receiver_component.cc"],
-    hdrs = ["udp_bridge_receiver_component.h"],
-    copts = BRIDGE_COPTS,
-    alwayslink = True,
-    deps = [
-        ":udp_bridge",
-        "//modules/bridge/common:udp_listener",
-    ],
-)
-
-cc_library(
-    name = "udp_bridge_multi_receiver",
-    srcs = ["udp_bridge_multi_receiver_component.cc"],
-    hdrs = ["udp_bridge_multi_receiver_component.h"],
-    copts = BRIDGE_COPTS,
-    alwayslink = True,
-    deps = [
-        ":udp_bridge",
-        "//modules/bridge/common:udp_listener",
-    ],
-)
-
-cc_binary(
+apollo_component(
     name = "libudp_bridge_sender_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":udp_bridge_sender"],
+    srcs = [
+        "udp_bridge_sender_component.cc",
+    ],
+    hdrs = [
+        "udp_bridge_sender_component.h",
+    ],
+    deps = [":apollo_udp_bridge"],
 )
 
-cc_binary(
+apollo_component(
     name = "libudp_bridge_receiver_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":udp_bridge_receiver"],
+    srcs = [
+        "udp_bridge_receiver_component.cc",
+    ],
+    hdrs = [
+        "udp_bridge_receiver_component.h",
+    ],
+    deps = [":apollo_udp_bridge"],
 )
 
-cc_binary(
+apollo_component(
     name = "libudp_bridge_multi_receiver_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":udp_bridge_multi_receiver"],
+    srcs = [
+        "udp_bridge_multi_receiver_component.cc"
+    ],
+    hdrs = [
+        "udp_bridge_multi_receiver_component.h"
+    ],
+    deps = [":apollo_udp_bridge"],
 )
 
-cc_test(
+apollo_cc_test(
     name = "udp_bridge_component_test",
     size = "small",
     srcs = ["udp_bridge_component_test.cc"],
     deps = [
-        ":udp_bridge_sender",
+        ":apollo_udp_bridge",
         "@com_google_googletest//:gtest_main",
+        # internal component library if you really need these component depends
+        ":udp_bridge_multi_receiver_component_lib",
+        ":udp_bridge_receiver_component_lib",
+        ":udp_bridge_sender_component_lib", 
     ],
     linkstatic = True,
 )
-# install_src_files(
-#     name = "install_src",
-#     deps = [
-#         ":install_bridge_src",
-#         ":install_bridge_hdrs"
-#     ],
-# )
-
-# install_src_files(
-#     name = "install_bridge_src",
-#     src_dir = ["."],
-#     dest = "bridge/src",
-#     filter = "*",
-# )
-
-# install_src_files(
-#     name = "install_bridge_hdrs",
-#     src_dir = ["."],
-#     dest = "bridge/include",
-#     filter = "*.h",
-# )
 
 apollo_package()
 cpplint()

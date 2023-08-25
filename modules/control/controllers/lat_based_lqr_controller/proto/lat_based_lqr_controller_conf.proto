@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/control/controllers/control_task_base/proto/gain_scheduler_conf.proto";
-import "modules/control/controllers/control_task_base/proto/leadlag_conf.proto";
-import "modules/control/controllers/control_task_base/proto/mrac_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/leadlag_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/mrac_conf.proto";
 
 message LatBaseLqrControllerConf{
   optional double ts = 1;  // sample time (dt) 0.01 now, configurable

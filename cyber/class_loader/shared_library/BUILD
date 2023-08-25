@@ -1,32 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-# filegroup(
-#     name = "cyber_class_loader_shared_library_hdrs",
-#     srcs = glob([
-#         "*.h",
-#     ]),
-# )
-cc_library(
+apollo_cc_library(
     name = "shared_library",
     srcs = ["shared_library.cc"],
-    hdrs = ["shared_library.h"],
+    hdrs = ["shared_library.h", "exceptions.h"],
     linkopts = ["-ldl"],
-    deps = [
-        ":exceptions",
-    ],
-)
-
-cc_library(
-    name = "exceptions",
-    hdrs = ["exceptions.h"],
 )
 
 cc_binary(
-    name = "libsample.so",
+    name = "libcyber_sample.so",
     testonly = True,
     linkshared = True,
     linkstatic = False,
@@ -50,7 +36,7 @@ cc_test(
     size = "small",
     srcs = ["shared_library_test.cc"],
     data = [
-        ":libsample.so",
+        ":libcyber_sample.so",
     ],
     deps = [
         ":shared_library",

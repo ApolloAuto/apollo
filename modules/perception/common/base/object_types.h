@@ -76,7 +76,7 @@ enum class ObjectSubType {
   SMALLMOT = 12,
   BIGMOT = 13,
   NONMOT = 14,
-  MAX_OBJECT_TYPE = 12,
+  MAX_OBJECT_TYPE = 15,
 };
 
 // @brief motion state

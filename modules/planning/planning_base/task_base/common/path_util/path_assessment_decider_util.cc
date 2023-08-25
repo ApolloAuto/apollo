@@ -140,11 +140,11 @@ bool PathAssessmentDeciderUtil::IsCollidingWithStaticObstacles(
       // Filter the path points by s range.
       if (obstacle_sl.start_s() > path_point_end_s ||
           obstacle_sl.end_s() < path_point_start_s) {
-        break;
+        continue;
       }
       if (obstacle_sl.start_l() > path_point_end_l ||
           obstacle_sl.end_l() < path_point_start_l) {
-        break;
+        continue;
       }
       const auto& path_point = path_data.discretized_path()[i];
       const auto& vehicle_box =

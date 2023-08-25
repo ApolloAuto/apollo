@@ -20,7 +20,7 @@
 
 #include "modules/perception/camera_detection_3d/detector/caddn/proto/model_param.pb.h"
 
-#include "modules/perception/camera_detection_3d/interface/base_obstacle_detector.h"
+#include "modules/perception/common/interface/base_obstacle_detector.h"
 #include "modules/perception/common/base/blob.h"
 #include "modules/perception/common/base/image_8u.h"
 #include "modules/perception/common/base/object_types.h"

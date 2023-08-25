@@ -50,8 +50,7 @@ bool Task::Init(const std::string& config_dir, const std::string& name,
   // Generate the default task config path from PluginManager.
   default_config_path_ =
       apollo::cyber::plugin_manager::PluginManager::Instance()
-          ->GetPluginClassHomePath<Task>(class_name) +
-      "/conf/" + "default_conf.pb.txt";
+          ->GetPluginConfPath<Task>(class_name, "conf/default_conf.pb.txt");
   return true;
 }
 

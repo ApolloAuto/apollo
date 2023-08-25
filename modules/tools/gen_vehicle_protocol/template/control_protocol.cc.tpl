@@ -34,6 +34,11 @@ uint32_t %(classname)s::GetPeriod() const {
   return PERIOD;
 }
 
+void %(classname)s::Parse(const std::uint8_t* bytes, int32_t length,
+                         %(car_type_capitalize)s* chassis) const {
+%(set_parse_var_to_protocol_list)s
+}
+
 void %(classname)s::UpdateData(uint8_t* data) {
 %(set_private_var_list)s
 }
@@ -43,6 +48,7 @@ void %(classname)s::Reset() {
 %(set_private_var_init_list)s
 }
 %(set_func_impl_list)s
+%(set_parse_func_impl_list)s
 }  // namespace %(car_type_lower)s
 }  // namespace canbus
 }  // namespace apollo

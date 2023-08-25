@@ -23,7 +23,6 @@
 #include <string>
 
 #include "cyber/time/clock.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
 #include "modules/control/control_component/common/control_gflags.h"

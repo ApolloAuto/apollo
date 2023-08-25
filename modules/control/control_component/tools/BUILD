@@ -1,27 +1,15 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
-# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     runtime_dest = "control/bin",
-#     targets = [
-#         ":control_tester",
-#         ":pad_terminal",
-#         ],
-#     visibility = ["//visibility:public"],
-# )
-
-cc_binary(
+apollo_cc_binary(
     name = "control_tester",
     srcs = ["control_tester.cc"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
+        "//modules/common/util:common_util",
         "//modules/control/control_component/common:control_gflags",
         "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
         "//modules/common_msgs/dreamview_msgs:chart_cc_proto",
@@ -56,14 +44,14 @@ cc_binary(
     linkstatic = True,
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "pad_terminal",
     srcs = ["pad_terminal.cc"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:util_tool",
-        "//modules/control/controllers/control_task_base/common",
+        "//modules/control/control_component/controller_task_base/common:controllers_control_task_base_common",
         "//modules/control/control_component/common:control_gflags",
         "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
         "//modules/common_msgs/chassis_msgs:chassis_proto",

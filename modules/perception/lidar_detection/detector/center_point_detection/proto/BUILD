@@ -5,7 +5,7 @@ load("//tools/proto:proto.bzl", "proto_library")
 package(default_visibility = ["//visibility:public"])
 
 proto_library(
-    name = "model_param_proto",
+    name = "center_point_model_param_proto",
     srcs = ["model_param.proto"],
     deps = [
         "//modules/perception/common/proto:model_info_proto",

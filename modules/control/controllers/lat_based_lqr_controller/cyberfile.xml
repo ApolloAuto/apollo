@@ -11,7 +11,6 @@
     <author>Apollo</author>
     <depend>bazel-extend-tools</depend>
     <depend type="binary" repo_name="control">control</depend>
-    <depend type="binary" repo_name="control-controllers-control-task-base">control-controllers-control-task-base</depend>
     <depend type="binary" repo_name="common" lib_names="common">common</depend>
     <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
     <depend repo_name="eigen">3rd-eigen3</depend>

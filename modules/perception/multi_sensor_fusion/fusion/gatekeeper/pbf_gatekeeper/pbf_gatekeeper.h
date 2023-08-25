@@ -47,15 +47,54 @@ class PbfGatekeeper : public BaseGatekeeper {
   PbfGatekeeper();
   ~PbfGatekeeper();
 
+  /**
+   * @brief Initialize
+   *
+   * @param options
+   * @return true
+   * @return false
+   */
   bool Init(const GatekeeperInitOptions &options) override;
 
+  /**
+   * @brief whether able to publish
+   *
+   * @param track
+   * @return true
+   * @return false
+   */
   bool AbleToPublish(const TrackPtr& track) override;
 
   std::string Name() const override { return "PbfGatekeeper"; }
 
  private:
+  /**
+   * @brief whether lidar able to publish
+   *
+   * @param track
+   * @return true
+   * @return false
+   */
   bool LidarAbleToPublish(const TrackPtr& track);
+
+  /**
+   * @brief whether radar able to publish
+   *
+   * @param track
+   * @param is_night
+   * @return true
+   * @return false
+   */
   bool RadarAbleToPublish(const TrackPtr& track, bool is_night);
+
+  /**
+   * @brief whether camera able to publish
+   *
+   * @param track
+   * @param is_night
+   * @return true
+   * @return false
+   */
   bool CameraAbleToPublish(const TrackPtr& track, bool is_night);
 
   PbfGatekeeperParams params_;

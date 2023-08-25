@@ -1,26 +1,22 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
-# filegroup(
-#     name = "cyber_blocker_hdrs",
-#     srcs = glob([
-#         "*.h",
-#     ]),
-# )
-
-cc_library(
-    name = "blocker_manager",
-    srcs = ["blocker_manager.cc"],
-    hdrs = ["blocker_manager.h"],
-    deps = [
-        ":blocker",
+apollo_cc_library(
+    name = "cyber_blocker",
+    srcs = [
+        "blocker_manager.cc",
+    ],
+    hdrs = [
+        "blocker_manager.h",
+        "blocker.h",
+        "intra_reader.h",
+        "intra_writer.h",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "blocker_manager_test",
     size = "small",
     srcs = ["blocker_manager_test.cc"],
@@ -31,12 +27,7 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "blocker",
-    hdrs = ["blocker.h"],
-)
-
-cc_test(
+apollo_cc_test(
     name = "blocker_test",
     size = "small",
     srcs = ["blocker_test.cc"],
@@ -44,22 +35,6 @@ cc_test(
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "intra_reader",
-    hdrs = ["intra_reader.h"],
-    deps = [
-        ":blocker_manager",
-    ],
-)
-
-cc_library(
-    name = "intra_writer",
-    hdrs = ["intra_writer.h"],
-    deps = [
-        ":blocker_manager",
     ],
 )
 

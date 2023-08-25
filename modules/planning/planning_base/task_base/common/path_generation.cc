@@ -22,6 +22,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
@@ -42,7 +43,10 @@ void PathGeneration::RecordDebugInfo(
     const PathBound& path_boundaries, const std::string& debug_name,
     ReferenceLineInfo* const reference_line_info) {
   // Sanity checks.
-  ACHECK(!path_boundaries.empty());
+  if (path_boundaries.empty()) {
+    AINFO << "path boundary is empty!";
+    return;
+  }
   CHECK_NOTNULL(reference_line_info);
 
   // Take the left and right path boundaries, and transform them into two

@@ -100,6 +100,13 @@ def cuda_header_library(
         **kwargs
     )
 
-def cuda_library(copts = [], **kwargs):
+def cuda_library(mandatory = True, copts = [], **kwargs):
     """Wrapper over cc_library which adds default CUDA options."""
-    cc_library(copts = cuda_default_copts() + copts, **kwargs)
+    if mandatory:
+        cc_library(copts = cuda_default_copts() + copts, linkstatic = True, **kwargs)
+
+        cc_binary(name = "lib{}.so".format(kwargs["name"]), deps = [":{}".format(kwargs["name"])],
+            linkshared = True, linkstatic = True, visibility = ["//visibility:public"],
+            tags = ["export_library", kwargs["name"]])
+    else:
+        cc_library(copts = cuda_default_copts() + copts, **kwargs)

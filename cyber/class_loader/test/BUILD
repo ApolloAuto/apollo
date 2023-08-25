@@ -16,7 +16,7 @@ cc_library(
     srcs = ["plugin1.cc"],
     deps = [
         ":base",
-        "//cyber/class_loader:class_loader_manager",
+        "//cyber/class_loader:cyber_class_loader",
     ],
 )
 
@@ -26,7 +26,7 @@ cc_library(
     srcs = ["plugin2.cc"],
     deps = [
         ":base",
-        "//cyber/class_loader:class_loader_manager",
+        "//cyber/class_loader:cyber_class_loader",
     ],
 )
 

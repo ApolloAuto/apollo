@@ -1,46 +1,21 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-# load("//tools/install:install.bzl", "install")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
 
 package(
     default_visibility = ["//visibility:public"],
 )
 
-# install(
-#     name = "install",
-#     library_dest = "common/lib",
-#     targets = [
-#         ":libstatus.so",
-#     ],
-#     visibility = ["//visibility:public"],
-# )
-
-cc_library(
+apollo_cc_library(
     name = "status",
     hdrs = ["status.h"],
-    srcs = ["libstatus.so"],
     deps = [
-        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common/util:util_tool",
+        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "@com_google_protobuf//:protobuf",
     ],
-    alwayslink = True,
 )
 
-cc_binary(
-    name = "libstatus.so",
-    srcs = ["status.h"],
-    deps = [
-        "//modules/common_msgs/basic_msgs:error_code_cc_proto",
-        "//modules/common/util:util_tool",
-        "@com_google_protobuf//:protobuf",
-    ],
-    linkshared = True,
-    linkstatic = True,
-)
-
-cc_test(
+apollo_cc_test(
     name = "status_test",
     size = "small",
     srcs = ["status_test.cc"],
@@ -51,4 +26,5 @@ cc_test(
 )
 
 apollo_package()
+
 cpplint()

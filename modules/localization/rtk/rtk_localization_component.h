@@ -19,16 +19,23 @@
 #include <memory>
 #include <string>
 
+#include "Eigen/Eigen"
+// Eigen 3.3.7: #define ALIVE (0)
+// fastrtps: enum ChangeKind_t { ALIVE, ... };
+#if defined(ALIVE)
+#undef ALIVE
+#endif
+
+#include "modules/common_msgs/localization_msgs/gps.pb.h"
+#include "modules/common_msgs/localization_msgs/imu.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/sensor_msgs/ins.pb.h"
+#include "modules/localization/proto/rtk_config.pb.h"
+
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-
-#include "modules/common_msgs/sensor_msgs/ins.pb.h"
-#include "modules/common_msgs/localization_msgs/gps.pb.h"
-#include "modules/common_msgs/localization_msgs/imu.pb.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/localization/proto/rtk_config.pb.h"
 #include "modules/localization/rtk/rtk_localization.h"
 #include "modules/transform/transform_broadcaster.h"
 
@@ -48,6 +55,7 @@ class RTKLocalizationComponent final
  private:
   bool InitConfig();
   bool InitIO();
+  bool GetImuToLocalizationTF();
 
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
   void PublishPoseBroadcastTopic(const LocalizationEstimate &localization);
@@ -72,7 +80,9 @@ class RTKLocalizationComponent final
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";
+  std::string imu_frame_id_ = "";
   std::unique_ptr<apollo::transform::TransformBroadcaster> tf2_broadcaster_;
+  std::unique_ptr<Eigen::Affine3d> imu_localization_trans_;
 
   std::unique_ptr<RTKLocalization> localization_;
 };

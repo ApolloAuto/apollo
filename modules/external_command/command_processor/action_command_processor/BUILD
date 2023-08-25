@@ -1,29 +1,13 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo.bzl", "cyber_plugin_description")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
 
-cyber_plugin_description(
-    name = "plugin_action_command_processor_description",
-    description = ":plugins.xml",
-    plugin = ":libaction_command_processor.so",
-)
-
-cc_binary(
+apollo_plugin(
     name = "libaction_command_processor.so",
-    linkshared = True,
-    linkstatic = True,
-    copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
-    deps = [":action_command_processor_lib"],
-)
-
-cc_library(
-    name = "action_command_processor_lib",
     srcs = ["action_command_processor.cc"],
     hdrs = ["action_command_processor.h"],
-    copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
+    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/external_command/command_processor/command_processor_base:command_processor_base_lib",
@@ -38,7 +22,6 @@ cc_library(
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common/util:message_util",
     ],
-    alwayslink = True,
 )
 
 filegroup(

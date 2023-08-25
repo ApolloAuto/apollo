@@ -36,14 +36,44 @@ class PbfTracker : public BaseTracker {
   PbfTracker() = default;
   virtual ~PbfTracker() = default;
 
+  /**
+   * @brief Init params
+   *
+   * @param options
+   * @return true
+   * @return false
+   */
   static bool InitParams(const TrackerInitOptions &options);
 
+  /**
+   * @brief Init
+   *
+   * @param track
+   * @param measurement
+   * @return true
+   * @return false
+   */
   bool Init(TrackPtr track, SensorObjectPtr measurement) override;
 
+  /**
+   * @brief Update with measurement
+   *
+   * @param options
+   * @param measurement
+   * @param target_timestamp
+   */
   void UpdateWithMeasurement(const TrackerOptions& options,
                              const SensorObjectPtr measurement,
                              double target_timestamp) override;
 
+  /**
+   * @brief Update without measurement
+   *
+   * @param options
+   * @param sensor_id
+   * @param measurement_timestamp
+   * @param target_timestamp
+   */
   void UpdateWithoutMeasurement(const TrackerOptions& options,
                                 const std::string& sensor_id,
                                 double measurement_timestamp,
@@ -52,6 +82,12 @@ class PbfTracker : public BaseTracker {
   std::string Name() const override { return "PbfTracker"; }
 
  protected:
+  /**
+   * @brief Init fusion methods
+   *
+   * @return true
+   * @return false
+   */
   bool InitMethods();
 
  protected:

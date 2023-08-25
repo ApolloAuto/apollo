@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -9,36 +8,39 @@ filegroup(
     srcs = glob([
         "dag/**",
         "launch/**",
-    ])
+    ]),
 )
 
-cc_binary(
+apollo_cc_library(
+    name = "apollo_perception_msg_adapter",
+    srcs = [
+        "common/msg_adapter_gflags.cc",
+    ],
+    hdrs = [
+        "common/msg_adapter_gflags.h",
+        "convert/common.h",
+        "convert/convert.h",
+        "msg_converter.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "@com_github_gflags_gflags//:gflags",
+    ],
+)
+
+apollo_component(
     name = "libmsg_adapter_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":msg_adapter_component_lib"],
-)
-
-cc_library(
-    name = "msg_adapter_component_lib",
     srcs = ["msg_adapter_component.cc"],
     hdrs = ["msg_adapter_component.h"],
     deps = [
-        ":msg_converter",
         "//cyber",
-        "//modules/perception/msg_adapter/common:msg_adapter_gflags",
-        "//modules/perception/msg_adapter/convert",
+        ":apollo_perception_msg_adapter"
     ],
-    alwayslink = True,
-)
-
-cc_library(
-    name = "msg_converter",
-    hdrs = ["msg_converter.h"],
-    deps = [
-        "//cyber",
-    ]
 )
 
 apollo_package()
+
 cpplint()

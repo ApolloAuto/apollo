@@ -1,8 +1,7 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
-cc_library(
+apollo_cc_library(
     name = "msgexporterlib",
     srcs = ["msg_exporter.cc"],
     hdrs = ["msg_exporter.h"],
@@ -10,8 +9,8 @@ cc_library(
         "//cyber",
         "//modules/common_msgs/sensor_msgs:pointcloud_cc_proto",
         "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
-        "//modules/perception/common/lidar/common:pcl_util",
-        "//modules/perception/common/onboard/transform_wrapper",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "//modules/perception/common/lidar:apollo_perception_common_lidar",
         "@com_google_absl//:absl",
         "@opencv//:imgproc",
         "@opencv//:imgcodecs",
@@ -19,7 +18,7 @@ cc_library(
     ],
 )
 
-cc_binary(
+apollo_cc_binary(
     name = "msg_exporter",
     srcs = ["msg_exporter_main.cc"],
     deps = [

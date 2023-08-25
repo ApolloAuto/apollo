@@ -1,45 +1,22 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
-# load("//tools/install:install.bzl", "install")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     runtime_dest = "drivers/bin",
-#     targets = [
-#       ":video2jpg",
-#     ],
-# )
-
-cc_binary(
+apollo_cc_binary(
     name = "video2jpg",
-    srcs = ["video2jpg.cc"],
+    srcs = [
+        "video2jpg.cc",
+        "frame_processor.cc",
+        "frame_processor.h",
+        "h265_decoder.cc",
+        "h265_decoder.h",
+    ],
     deps = [
-        ":frame_processor",
         "@com_github_gflags_gflags//:gflags",
-        "@ffmpeg//:avutil",
-    ],
-)
-
-cc_library(
-    name = "frame_processor",
-    srcs = ["frame_processor.cc"],
-    hdrs = ["frame_processor.h"],
-    deps = [
-        ":h265_decoder",
-        "//modules/common/util",
+        "//modules/common/util:common_util",
         "@com_google_absl//:absl",
-    ],
-)
-
-cc_library(
-    name = "h265_decoder",
-    srcs = ["h265_decoder.cc"],
-    hdrs = ["h265_decoder.h"],
-    deps = [
-        "//cyber",
+        "@ffmpeg//:avutil",
         "@ffmpeg//:avcodec",
     ],
 )

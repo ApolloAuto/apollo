@@ -140,6 +140,10 @@ class OpenSpaceRoiDecider : public Decider {
                           std::vector<std::vector<common::math::Vec2d>>
                               *const roi_parking_boundary);
 
+  bool GetParkingBoundary(const hdmap::Path &nearby_path, Frame *const frame,
+                          std::vector<std::vector<common::math::Vec2d>>
+                              *const roi_parking_boundary);
+
   bool GetPullOverBoundary(Frame *const frame,
                            const std::array<common::math::Vec2d, 4> &vertices,
                            const hdmap::Path &nearby_path,
@@ -228,6 +232,7 @@ class OpenSpaceRoiDecider : public Decider {
 
   common::VehicleState vehicle_state_;
   OpenSpaceRoiDeciderConfig config_;
+  bool isofflane_ = false;
 };
 
 CYBER_PLUGIN_MANAGER_REGISTER_PLUGIN(apollo::planning::OpenSpaceRoiDecider,

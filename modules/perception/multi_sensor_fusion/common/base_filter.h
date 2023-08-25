@@ -26,11 +26,18 @@ namespace fusion {
 // @brief base filter inference
 class BaseFilter {
  public:
-  // @brief constructor
+  /**
+   * @brief Construct a new Base Filter object
+   *
+   * @param name
+   */
   explicit BaseFilter(const std::string name)
       : init_(false), name_(name), states_num_(0) {}
 
-  // @brief destructor
+  /**
+   * @brief Destroy the Base Filter object
+   *
+   */
   virtual ~BaseFilter() {}
 
   // @brief filter initialized

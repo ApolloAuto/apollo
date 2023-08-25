@@ -1,9 +1,8 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
+
 # load("//tools/install:install.bzl", "install", "install_files")
-# load("//tools/install:install.bzl", "install", "install_files", "install_plugin", "install_src_files")
-load("//tools:apollo.bzl", "cyber_plugin_description")
-load("//tools:apollo_package.bzl", "apollo_package")
+
+load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,7 +10,7 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "conf/**",
-    ])
+    ]),
 )
 # install(
 #     name = "install",
@@ -55,37 +54,18 @@ filegroup(
 #     filter = "*.h",
 # )
 
-cyber_plugin_description(
-    name = "plugin_rule_based_stop_decider_description",
-    description = ":plugins.xml",
-    plugin = ":librule_based_stop_decider.so",
-)
-
-cc_binary(
+apollo_plugin(
     name = "librule_based_stop_decider.so",
-    linkshared = True,
-    linkstatic = True,
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [":rule_based_stop_decider_lib"],
-)
-
-cc_library(
-    name = "rule_based_stop_decider_lib",
     srcs = ["rule_based_stop_decider.cc"],
     hdrs = ["rule_based_stop_decider.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//modules/common/status",
-        "//modules/planning/planning_base/common:frame",
-        "//modules/planning/planning_base/common:planning_gflags",
-        "//modules/planning/planning_base/common/util:common_lib",
-        "//modules/planning/planning_base/task_base:task",
-        "//modules/planning/planning_base/task_base/common/lane_change_util:lane_change_util",
-        "//modules/planning/planning_base/task_base/common:decider_base",
+        "//modules/planning/planning_base:apollo_planning_planning_base",
         "//modules/planning/tasks/rule_based_stop_decider/proto:rule_based_stop_decider_cc_proto",
     ],
-    alwayslink = True,
 )
 
 apollo_package()
+
 cpplint()

@@ -28,12 +28,16 @@ namespace perception {
 namespace fusion {
 
 struct FusionFrame {
+  /// @brief Raw sensor input information
   base::FramePtr frame;
 
+  /// @brief Converted sensor input information
   std::vector<SensorFramePtr> sensor_frames;
 
+  /// @brief Obstacle information after fusion
   std::vector<base::ObjectPtr> fused_objects;
 
+  /// @brief A container holds obstacles and their tracking information
   ScenePtr scene_ptr;
 };
 

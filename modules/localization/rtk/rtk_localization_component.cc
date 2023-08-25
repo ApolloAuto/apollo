@@ -15,7 +15,12 @@
  *****************************************************************************/
 
 #include "modules/localization/rtk/rtk_localization_component.h"
+
+#include "modules/common_msgs/transform_msgs/transform.pb.h"
+
 #include "cyber/time/clock.h"
+#include "cyber/time/duration.h"
+#include "modules/transform/buffer.h"
 
 namespace apollo {
 namespace localization {
@@ -32,6 +37,12 @@ bool RTKLocalizationComponent::Init() {
 
   if (!InitIO()) {
     AERROR << "Init Interval falseed.";
+    return false;
+  }
+
+  // get imu to localizaiton transform
+  if (!GetImuToLocalizationTF()) {
+    AERROR << "Get IMU to Localization tranform failed.";
     return false;
   }
 
@@ -53,6 +64,7 @@ bool RTKLocalizationComponent::InitConfig() {
   gps_status_topic_ = rtk_config.gps_status_topic();
   broadcast_tf_frame_id_ = rtk_config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = rtk_config.broadcast_tf_child_frame_id();
+  imu_frame_id_ = rtk_config.imu_frame_id();
 
   localization_->InitConfig(rtk_config);
 
@@ -80,6 +92,33 @@ bool RTKLocalizationComponent::InitIO() {
   return true;
 }
 
+bool RTKLocalizationComponent::GetImuToLocalizationTF() {
+  transform::Buffer* tf2_buffer = transform::Buffer::Instance();
+  transform::TransformStamped tf;
+  cyber::Duration duration(1.0);
+  for (uint8_t i = 0; i < 10; ++i) {
+    try {
+      tf = tf2_buffer->lookupTransform(broadcast_tf_child_frame_id_,
+                                       imu_frame_id_, cyber::Time(0));
+    } catch (std::exception& ex) {
+      AERROR << ex.what();
+      duration.Sleep();
+      continue;
+    }
+    AINFO << "read imu to localization transform: " << tf.DebugString();
+    imu_localization_trans_.reset(new Eigen::Affine3d);
+    *imu_localization_trans_ =
+        Eigen::Translation3d(tf.transform().translation().x(),
+                             tf.transform().translation().y(),
+                             tf.transform().translation().z()) *
+        Eigen::Quaterniond(
+            tf.transform().rotation().qw(), tf.transform().rotation().qx(),
+            tf.transform().rotation().qy(), tf.transform().rotation().qz());
+    return true;
+  }
+  return false;
+}
+
 bool RTKLocalizationComponent::Proc(
     const std::shared_ptr<localization::Gps>& gps_msg) {
   localization_->GpsCallback(gps_msg);
@@ -89,6 +128,14 @@ bool RTKLocalizationComponent::Proc(
     localization_->GetLocalization(&localization);
     LocalizationStatus localization_status;
     localization_->GetLocalizationStatus(&localization_status);
+
+    // set localization pose
+    auto position = localization.mutable_pose()->mutable_position();
+    Eigen::Vector3d pose(position->x(), position->y(), position->z());
+    auto p = *imu_localization_trans_ * pose;
+    position->set_x(p[0]);
+    position->set_y(p[1]);
+    position->set_z(p[2]);
 
     // publish localization messages
     PublishPoseBroadcastTopic(localization);

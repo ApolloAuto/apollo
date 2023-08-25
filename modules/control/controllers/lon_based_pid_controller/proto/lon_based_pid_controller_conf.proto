@@ -1,8 +1,8 @@
 syntax = "proto2";
 
-import "modules/control/controllers/control_task_base/proto/gain_scheduler_conf.proto";
-import "modules/control/controllers/control_task_base/proto/leadlag_conf.proto";
-import "modules/control/controllers/control_task_base/proto/pid_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/leadlag_conf.proto";
+import "modules/control/control_component/controller_task_base/proto/pid_conf.proto";
 
 package apollo.control;
 

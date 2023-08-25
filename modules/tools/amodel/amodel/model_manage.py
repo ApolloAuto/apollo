@@ -31,7 +31,7 @@ from amodel.model_meta import ModelMeta
 # APOLLO_ROOT_DIR
 WORKSPACE_PATH = os.getenv('APOLLO_ROOT_DIR', '/apollo')
 # Model install paths
-MODEL_INSTALL_PATH = "modules/perception/data/model"
+MODEL_INSTALL_PATH = "modules/perception/data/models"
 # MODEL_META_FILE_NAME
 MODEL_META_FILE_NAME = "apollo_deploy"
 

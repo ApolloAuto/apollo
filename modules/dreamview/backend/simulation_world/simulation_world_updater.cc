@@ -173,11 +173,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           }
           sim_control_manager_->ReSetPoinstion(point["x"], point["y"],
                                                point["heading"]);
+
           // Send a ActionCommand to clear the trajectory of planning.
-          auto action_command = std::make_shared<ActionCommand>();
-          action_command->set_command_id(++command_id_);
-          action_command->set_command(ActionCommandType::CLEAR_PLANNING);
-          sim_world_service_.PublishActionCommand(action_command);
+          if (isProcessRunning("planning.dag")) {
+            auto action_command = std::make_shared<ActionCommand>();
+            action_command->set_command_id(++command_id_);
+            action_command->set_command(ActionCommandType::CLEAR_PLANNING);
+            sim_world_service_.PublishActionCommand(action_command);
+          }
         }
       });
 
@@ -727,6 +730,26 @@ bool SimulationWorldUpdater::LoadPOI() {
   }
 
   AWARN << "Failed to load default list of POI from " << EndWayPointFile();
+  return false;
+}
+
+bool SimulationWorldUpdater::isProcessRunning(const std::string &process_name) {
+  std::stringstream commandStream;
+  commandStream << "pgrep -f " << process_name;
+  std::string command = commandStream.str();
+
+  FILE *fp = popen(command.c_str(), "r");
+  if (fp) {
+    char result[128];
+    if (fgets(result, sizeof(result), fp) != nullptr) {
+      AINFO << process_name << " is running";
+      pclose(fp);
+      return true;
+    } else {
+      AINFO << process_name << " is not running";
+    }
+    pclose(fp);
+  }
   return false;
 }
 

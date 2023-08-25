@@ -13,6 +13,9 @@ open_space_trajectory_optimizer_config {
         traj_steer_change_penalty: 1.0
         grid_a_star_xy_resolution: 0.25
         node_radius: 0.2
+        traj_expected_shortest_length: 0.5
+        traj_short_length_penalty: 5.0
+        desired_explored_num: 10000
     }
     dual_variable_warm_start_config {
         weight_d: 1.0

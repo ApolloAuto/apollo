@@ -27,12 +27,14 @@ from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 # Refer to the _cyber_record_wrapper.so with relative path so that it can be
 # always addressed as a part of the runfiles.
-APOLLO_DISTRIBUTION_HOME = os.environ.get('APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
-wrapper_lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '../internal'))
+APOLLO_DISTRIBUTION_HOME = os.environ.get(
+    'APOLLO_DISTRIBUTION_HOME', '/opt/apollo/neo')
+wrapper_lib_path = os.path.abspath(
+    os.path.join(os.path.abspath(os.path.dirname(__file__)), '../internal'))
+
 if not os.path.exists(wrapper_lib_path):
     wrapper_lib_path = wrapper_lib_path.replace(
-        os.path.join(APOLLO_DISTRIBUTION_HOME, "python"), "")
+        os.path.join(APOLLO_DISTRIBUTION_HOME, "python/"), "")
     wrapper_lib_path = os.path.join(
         APOLLO_DISTRIBUTION_HOME, "lib", wrapper_lib_path)
 

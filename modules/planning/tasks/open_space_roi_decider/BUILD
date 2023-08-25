@@ -1,17 +1,15 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-# load("//tools/install:install.bzl", "install", "install_files", "install_plugin", "install_src_files")
-load("//tools:apollo.bzl", "cyber_plugin_description")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 filegroup(
     name = "runtime_files",
     srcs = glob([
         "conf/**",
-    ])
+    ]),
 )
 # install(
 #     name = "install",
@@ -55,45 +53,28 @@ filegroup(
 #     filter = "*.h",
 # )
 
-cyber_plugin_description(
-    name = "plugin_open_space_roi_decider_description",
-    description = ":plugins.xml",
-    plugin = ":libopen_space_roi_decider.so",
-)
-
-cc_binary(
-    name = "libopen_space_roi_decider.so",
-    linkshared = True,
-    linkstatic = True,
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [":open_space_roi_decider_lib"],
-)
-
-cc_library(
-    name = "open_space_roi_decider_lib",
-    srcs = ["open_space_roi_decider.cc"],
-    hdrs = ["open_space_roi_decider.h"],
-    copts = PLANNING_COPTS,
-    deps = [
-        "//modules/planning/planning_base/common:planning_context",
-        "//modules/planning/planning_base/common:planning_gflags",
-        "//modules/planning/planning_base/task_base/common:decider_base",
-         "//modules/planning/planning_base/open_space/utils:open_space_roi_utils",
-        "//modules/planning/tasks/open_space_roi_decider/proto:open_space_roi_decider_cc_proto"
-    ],
-    alwayslink = True,
-)
-
-cc_test(
+apollo_cc_test(
     name = "open_space_roi_decider_test",
     size = "small",
     srcs = ["open_space_roi_decider_test.cc"],
+    tags = ["exclude"],
     deps = [
         ":open_space_roi_decider_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    tags = ["exclude"]
+)
+
+apollo_plugin(
+    name = "libopen_space_roi_decider.so",
+    srcs = ["open_space_roi_decider.cc"],
+    hdrs = ["open_space_roi_decider.h"],
+    description = ":plugins.xml",
+    deps = [
+        "//modules/planning/planning_base:apollo_planning_planning_base",
+        "//modules/planning/tasks/open_space_roi_decider/proto:open_space_roi_decider_cc_proto",
+    ],
 )
 
 apollo_package()
+
 cpplint()

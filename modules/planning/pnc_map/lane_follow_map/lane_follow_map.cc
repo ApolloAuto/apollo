@@ -28,11 +28,11 @@
 #include "modules/common_msgs/map_msgs/map_id.pb.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/planning_base/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -208,7 +208,8 @@ bool LaneFollowMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     AERROR << "Cannot find waypoint: " << adc_waypoint_.DebugString();
     return false;
   }
-
+  ADEBUG << "adc_waypoint_" << adc_waypoint_.DebugString() << "route_index"
+         << route_index;
   // Track how many routing request waypoints the adc have passed.
   UpdateNextRoutingWaypointIndex(route_index);
   adc_route_index_ = route_index;
@@ -551,8 +552,8 @@ bool LaneFollowMap::GetNearestPointFromRouting(
         M_PI_2) {
       continue;
     }
-    if (valid_way_points[i].l < distance) {
-      distance = valid_way_points[i].l;
+    if (std::fabs(valid_way_points[i].l) < distance) {
+      distance = std::fabs(valid_way_points[i].l);
       closest_index = i;
     }
   }

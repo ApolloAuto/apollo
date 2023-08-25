@@ -16,16 +16,17 @@
 
 #include "modules/control/controllers/lat_based_lqr_controller/lat_controller.h"
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "cyber/time/clock.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/control_component/common/control_gflags.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace control {

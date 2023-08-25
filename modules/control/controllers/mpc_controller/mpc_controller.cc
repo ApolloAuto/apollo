@@ -24,6 +24,7 @@
 
 #include "Eigen/LU"
 #include "absl/strings/str_cat.h"
+
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -112,19 +113,15 @@ bool MPCController::LoadControlConf() {
 
   mpc_eps_ = control_conf_.eps();
   mpc_max_iteration_ = control_conf_.max_iteration();
-  throttle_lowerbound_ =
-      std::max(vehicle_param_.throttle_deadzone(),
-               control_conf_.throttle_minimum_action());
-  brake_lowerbound_ =
-      std::max(vehicle_param_.brake_deadzone(),
-               control_conf_.brake_minimum_action());
+  throttle_lowerbound_ = std::max(vehicle_param_.throttle_deadzone(),
+                                  control_conf_.throttle_minimum_action());
+  brake_lowerbound_ = std::max(vehicle_param_.brake_deadzone(),
+                               control_conf_.brake_minimum_action());
 
   minimum_speed_protection_ = FLAGS_minimum_speed_protection;
-  max_acceleration_when_stopped_ =
-      FLAGS_max_acceleration_when_stopped;
+  max_acceleration_when_stopped_ = FLAGS_max_acceleration_when_stopped;
   max_abs_speed_when_stopped_ = vehicle_param_.max_abs_speed_when_stopped();
-  standstill_acceleration_ =
-      control_conf_.standstill_acceleration();
+  standstill_acceleration_ = control_conf_.standstill_acceleration();
 
   enable_mpc_feedforward_compensation_ =
       control_conf_.enable_mpc_feedforward_compensation();
@@ -155,13 +152,12 @@ void MPCController::InitializeFilters() {
   // Low pass filter
   std::vector<double> den(3, 0.0);
   std::vector<double> num(3, 0.0);
-  common::LpfCoefficients(
-      ts_, control_conf_.cutoff_freq(), &den, &num);
+  common::LpfCoefficients(ts_, control_conf_.cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
-  lateral_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
-      control_conf_.mean_filter_window_size()));
-  heading_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
-      control_conf_.mean_filter_window_size()));
+  lateral_error_filter_ = common::MeanFilter(
+      static_cast<std::uint_fast8_t>(control_conf_.mean_filter_window_size()));
+  heading_error_filter_ = common::MeanFilter(
+      static_cast<std::uint_fast8_t>(control_conf_.mean_filter_window_size()));
 }
 
 Status MPCController::Init(std::shared_ptr<DependencyInjector> injector) {
@@ -264,8 +260,7 @@ void MPCController::Stop() { CloseLogFile(); }
 std::string MPCController::Name() const { return name_; }
 
 void MPCController::LoadMPCGainScheduler() {
-  const auto &lat_err_gain_scheduler =
-      control_conf_.lat_err_gain_scheduler();
+  const auto &lat_err_gain_scheduler = control_conf_.lat_err_gain_scheduler();
   const auto &heading_err_gain_scheduler =
       control_conf_.heading_err_gain_scheduler();
   const auto &feedforwardterm_gain_scheduler =

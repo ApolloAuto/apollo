@@ -27,6 +27,7 @@
 #include <boost/thread/shared_mutex.hpp>
 
 #include "nlohmann/json.hpp"
+#include "google/protobuf/util/json_util.h"
 
 #include "modules/common_msgs/audio_msgs/audio_event.pb.h"
 #include "modules/common_msgs/basic_msgs/drive_event.pb.h"
@@ -36,6 +37,8 @@
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/external_command_msgs/action_command.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+#include "modules/common_msgs/external_command_msgs/lane_follow_command.pb.h"
+#include "modules/common_msgs/simulation_msgs/scenario.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_mode.pb.h"
 
@@ -178,6 +181,10 @@ class HMIWorker {
       apollo::cyber::Client<apollo::external_command::ActionCommand,
                             apollo::external_command::CommandStatus>>
       action_command_client_;
+  std::shared_ptr<
+      apollo::cyber::Client<apollo::external_command::LaneFollowCommand,
+                            apollo::external_command::CommandStatus>>
+      lane_follow_command_client_;
   std::shared_ptr<cyber::Writer<apollo::audio::AudioEvent>> audio_event_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;

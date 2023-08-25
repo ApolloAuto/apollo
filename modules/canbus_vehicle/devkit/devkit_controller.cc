@@ -436,6 +436,13 @@ Chassis DevkitController::chassis() {
         chassis_detail.throttle_report_500().throttle_en_state() == 1);
   }
 
+  if (CheckChassisError()) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Chassis has some fault, please check the chassis_detail.");
+  }
+
   return chassis_;
 }
 
@@ -718,9 +725,14 @@ bool DevkitController::CheckChassisError() {
   Devkit chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
   if (!chassis_detail.has_check_response()) {
-    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info."
-                      << chassis_detail.DebugString();
+    AERROR_EVERY(100) << "ChassisDetail has no devkit vehicle info.";
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "ChassisDetail has no devkit vehicle info.");
     return false;
+  } else {
+    chassis_.clear_engage_advice();
   }
 
   // steer fault
@@ -803,7 +815,7 @@ void DevkitController::SecurityDogThreadFunc() {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by steer manual intervention";
+        AERROR << "Driving_mode is into emergency by steer manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
@@ -817,12 +829,14 @@ void DevkitController::SecurityDogThreadFunc() {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
-        AINFO << "Driving_mode is into emergency by speed manual intervention";
+        AERROR << "Driving_mode is into emergency by speed manual intervention";
         set_chassis_error_code(Chassis::MANUAL_INTERVENTION);
       }
     } else {
       vertical_ctrl_fail = 0;
     }
+
+    // 3. chassis fault check
     if (CheckChassisError()) {
       set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;

@@ -1,122 +1,88 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
-# load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 CANBUS_COPTS = ["-DMODULE_NAME=\\\"canbus\\\""]
 
-cc_library(
-    name = "transit_vehicle_factory",
-    srcs = ["transit_vehicle_factory.cc"],
-    hdrs = ["transit_vehicle_factory.h"],
-    copts = CANBUS_COPTS,
-    alwayslink = True,
-    deps = [
-        ":transit_controller",
-        ":transit_message_manager",
-        "//modules/canbus/common:canbus_gflags",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/status",
-        "//modules/canbus/vehicle:abstract_vehicle_factory",
-        "//modules/drivers/canbus:sensor_canbus_lib",
+apollo_cc_library(
+    name = "apollo_canbus_vehicle_transit",
+    srcs = [
+        "protocol/adc_auxiliarycontrol_110.cc",
+        "protocol/adc_motioncontrol1_10.cc",
+        "protocol/adc_motioncontrollimits1_12.cc",
+        "protocol/llc_auxiliaryfeedback_120.cc",
+        "protocol/llc_diag_brakecontrol_721.cc",
+        "protocol/llc_diag_fault_620.cc",
+        "protocol/llc_diag_steeringcontrol_722.cc",
+        "protocol/llc_motioncommandfeedback1_22.cc",
+        "protocol/llc_motionfeedback1_20.cc",
+        "protocol/llc_motionfeedback2_21.cc",
+        "protocol/llc_vehiclelimits_24.cc",
+        "protocol/llc_vehiclestatus_25.cc",
+        "transit_controller.cc",
+        "transit_message_manager.cc",
+        "transit_vehicle_factory.cc",
     ],
-)
-
-cc_binary(
-    name = "libtransit_vehicle_factory_lib.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":transit_vehicle_factory"],
-)
-
-cc_library(
-    name = "transit_message_manager",
-    srcs = ["transit_message_manager.cc"],
-    hdrs = ["transit_message_manager.h"],
-    copts = CANBUS_COPTS,
+    hdrs = [
+        "protocol/adc_auxiliarycontrol_110.h",
+        "protocol/adc_motioncontrol1_10.h",
+        "protocol/adc_motioncontrollimits1_12.h",
+        "protocol/llc_auxiliaryfeedback_120.h",
+        "protocol/llc_diag_brakecontrol_721.h",
+        "protocol/llc_diag_fault_620.h",
+        "protocol/llc_diag_steeringcontrol_722.h",
+        "protocol/llc_motioncommandfeedback1_22.h",
+        "protocol/llc_motionfeedback1_20.h",
+        "protocol/llc_motionfeedback2_21.h",
+        "protocol/llc_vehiclelimits_24.h",
+        "protocol/llc_vehiclestatus_25.h",
+        "transit_controller.h",
+        "transit_message_manager.h",
+        "transit_vehicle_factory.h",
+    ],
     deps = [
+        "//modules/canbus:apollo_canbus",
         "//modules/canbus_vehicle/transit/proto:transit_cc_proto",
-        "//modules/canbus_vehicle/transit/protocol:canbus_transit_protocol",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",
-    ],
-)
-
-cc_library(
-    name = "transit_controller",
-    srcs = ["transit_controller.cc"],
-    hdrs = ["transit_controller.h"],
-    copts = CANBUS_COPTS,
-    deps = [
-        ":transit_message_manager",
-        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/kv_db",
+        "//modules/common/status",
         "//modules/common_msgs/basic_msgs:vehicle_signal_cc_proto",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/drivers/canbus:apollo_drivers_canbus",
+        "@com_google_googletest//:gtest",
     ],
 )
 
-cc_test(
+
+apollo_component(
+    name = "libtransit_vehicle_factory_lib.so",
+    deps = [":apollo_canbus_vehicle_transit"],
+)
+
+apollo_cc_test(
     name = "transit_vehicle_factory_test",
     size = "small",
     srcs = ["transit_vehicle_factory_test.cc"],
     data = ["//modules/canbus:test_data"],
     linkstatic = True,
     deps = [
-        ":transit_vehicle_factory",
+        ":apollo_canbus_vehicle_transit",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "transit_controller_test",
     size = "small",
     srcs = ["transit_controller_test.cc"],
     data = ["//modules/canbus:test_data"],
     deps = [
-        ":transit_controller",
-        "//modules/common/util",
+        ":apollo_canbus_vehicle_transit",
+        "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
     ],
 )
-
-# install(
-#     name = "install",
-#     library_dest = "canbus-vehicle-transit/lib",
-#     data_dest = "canbus-vehicle-transit",
-#     data = [
-#         ":runtime_data",
-#         ":cyberfile.xml",
-#         ":canbus-vehicle-transit.BUILD",
-#     ],
-#     targets = [
-#         ":libtransit_vehicle_factory_lib.so",
-#     ],
-#     deps = [
-#         ":pb_transit",
-#         ":pb_hdrs",
-#     ],
-# )
-
-# install(
-#     name = "pb_hdrs",
-#     data_dest = "canbus-vehicle-transit/include",
-#     data = [
-#         "//modules/canbus_vehicle/transit/proto:transit_cc_proto",
-#     ],
-# )
-
-# install_files(
-#     name = "pb_transit",
-#     dest = "canbus-vehicle-transit",
-#     files = [
-#         "//modules/canbus_vehicle/transit/proto:transit_py_pb2",
-#     ],
-# )
 
 filegroup(
     name = "runtime_data",
@@ -125,27 +91,134 @@ filegroup(
     ]),
 )
 
-# install_src_files(
-#     name = "install_src",
-#     deps = [
-#         ":install_transit_src",
-#         ":install_transit_hdrs"
-#     ],
-# )
+apollo_cc_test(
+    name = "Auxiliarycontrol_110_test",
+    size = "small",
+    srcs = ["protocol/adc_auxiliarycontrol_110_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
 
-# install_src_files(
-#     name = "install_transit_src",
-#     src_dir = ["."],
-#     dest = "canbus-vehicle-transit/src",
-#     filter = "*",
-# )
+apollo_cc_test(
+    name = "adc_motioncontrol1_10_test",
+    size = "small",
+    srcs = ["protocol/adc_motioncontrol1_10_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
 
-# install_src_files(
-#     name = "install_transit_hdrs",
-#     src_dir = ["."],
-#     dest = "canbus-vehicle-transit/include",
-#     filter = "*.h",
-# )
+apollo_cc_test(
+    name = "Motioncontrollimits1_12",
+    size = "small",
+    srcs = ["protocol/adc_motioncontrollimits1_12_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "llc_auxiliaryfeedback_120_test",
+    size = "small",
+    srcs = ["protocol/llc_auxiliaryfeedback_120_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "llc_diag_brakecontrol_721_test",
+    size = "small",
+    srcs = ["protocol/llc_diag_brakecontrol_721_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "Diag_fault_620_test",
+    size = "small",
+    srcs = ["protocol/llc_diag_fault_620_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "llc_diag_steeringcontrol_722_test",
+    size = "small",
+    srcs = ["protocol/llc_diag_steeringcontrol_722_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "Motioncommandfeedback1_22_test",
+    size = "small",
+    srcs = ["protocol/llc_motioncommandfeedback1_22_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "Motionfeedback1_20_test",
+    size = "small",
+    srcs = ["protocol/llc_motionfeedback1_20_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "llc_motionfeedback2_21_test",
+    size = "small",
+    srcs = ["protocol/llc_motionfeedback2_21_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
+
+apollo_cc_test(
+    name = "Vehiclelimits_24_test",
+    size = "small",
+    srcs = ["protocol/llc_vehiclelimits_24_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+apollo_cc_test(
+    name = "llc_vehiclestatus_25_test",
+    size = "small",
+    srcs = ["protocol/llc_vehiclestatus_25_test.cc"],
+    deps = [
+        ":apollo_canbus_vehicle_transit",
+        "@com_google_googletest//:gtest_main",
+    ],
+    linkstatic = True,
+)
 
 apollo_package()
+
 cpplint()

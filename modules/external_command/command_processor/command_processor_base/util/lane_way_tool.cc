@@ -102,6 +102,44 @@ bool LaneWayTool::GetVehicleLaneWayPoint(
   return ConvertToLaneWayPoint(pose, lane_way_point);
 }
 
+bool LaneWayTool::GetVehicleLaneWayPoints(
+    std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const {
+  CHECK_NOTNULL(lane_way_points);
+  // Get the current localization pose
+  auto *localization =
+      message_reader_->GetMessage<apollo::localization::LocalizationEstimate>(
+          FLAGS_localization_topic);
+  if (nullptr == localization) {
+    AERROR << "Cannot get vehicle location!";
+    return false;
+  }
+  apollo::common::PointENU center_enu;
+  center_enu.set_x(localization->pose().position().x());
+  center_enu.set_y(localization->pose().position().y());
+  common::math::Vec2d center_point(center_enu.x(), center_enu.y());
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  static constexpr double kNearbyLaneDistance = 10.0;
+  if (hdmap_->GetLanes(center_enu, kNearbyLaneDistance, &lanes) < 0) {
+    AERROR << "get lanes failed" << center_enu.DebugString();
+    return false;
+  }
+  for (const auto lane : lanes) {
+    double s, l;
+    if (!lane->GetProjection(center_point, &s, &l)) {
+      AERROR << "get projection failed";
+      return false;
+    }
+    lane_way_points->emplace_back();
+    auto &lane_way_point = lane_way_points->back();
+    lane_way_point.mutable_pose()->set_x(center_point.x());
+    lane_way_point.mutable_pose()->set_y(center_point.y());
+    lane_way_point.set_id(lane->id().id());
+    lane_way_point.set_s(s);
+    AINFO << "GET" << lane_way_point.DebugString();
+  }
+  return true;
+}
+
 bool apollo::external_command::LaneWayTool::GetParkingLaneWayPoint(
     const std::string &parking_id,
     std::vector<apollo::routing::LaneWaypoint> *lane_way_points) const {
@@ -138,6 +176,30 @@ bool apollo::external_command::LaneWayTool::GetParkingLaneWayPoint(
     AINFO << "GET" << lane_way_point.DebugString();
   }
   return true;
+}
+
+bool apollo::external_command::LaneWayTool::IsParkandgoScenario() const {
+  auto *localization =
+      message_reader_->GetMessage<apollo::localization::LocalizationEstimate>(
+          FLAGS_localization_topic);
+  if (nullptr == localization) {
+    AERROR << "Cannot get vehicle location!";
+    return false;
+  }
+  common::PointENU adc;
+  adc.set_x(localization->pose().position().x());
+  adc.set_y(localization->pose().position().y());
+  external_command::Pose pose;
+  double heading = localization->pose().heading();
+  hdmap::LaneInfoConstPtr lane;
+  double s = 0.0;
+  double l = 0.0;
+  if (hdmap_->GetNearestLaneWithHeading(adc, 2.0, heading, M_PI / 3.0, &lane,
+                                        &s, &l) != 0 ||
+      lane->lane().type() != hdmap::Lane::CITY_DRIVING) {
+    return true;
+  }
+  return false;
 }
 
 }  // namespace external_command

@@ -132,6 +132,12 @@ class SimulationWorldUpdater {
   bool ConstructLaneWayPoint(const nlohmann::json &point,
                              apollo::routing::LaneWaypoint *laneWayPoint,
                              std::string description);
+  /**
+   * @brief Check if a process exists
+   * @param process_name The name of the process to check
+   * @return True if the process exists
+   */
+  bool isProcessRunning(const std::string &process_name);
 
   bool ValidateCoordinate(const nlohmann::json &json);
 

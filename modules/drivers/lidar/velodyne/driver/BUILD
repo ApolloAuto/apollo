@@ -1,41 +1,17 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-# load("//tools/install:install.bzl", "install")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 
 package(default_visibility = ["//visibility:public"])
 
-
-# install(
-#     name = "install",
-#     library_dest = "drivers/lib/lidar/velodyne/driver",
-#     targets = [
-#         ":libvelodyne_driver_component.so",
-#     ],
-# )
-
-cc_binary(
+apollo_component(
     name = "libvelodyne_driver_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":velodyne_driver_component_lib"],
+    hdrs = ["velodyne_driver_component.h",],
+    srcs = ["velodyne_driver_component.cc",],
+    deps = [":velodyne_driver_lib"],
 )
 
-cc_library(
-    name = "velodyne_driver_component_lib",
-    srcs = ["velodyne_driver_component.cc"],
-    hdrs = ["velodyne_driver_component.h"],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
-    deps = [
-        "//cyber",
-        "//modules/common/util:util_tool",
-        "//modules/drivers/lidar/velodyne/driver",
-    ],
-    alwayslink = True
-)
-
-cc_library(
-    name = "driver",
+apollo_cc_library(
+    name = "velodyne_driver_lib",
     srcs = [
         "driver.cc",
         "driver64.cc",
@@ -51,7 +27,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
-        "//modules/drivers/lidar/common/driver_factory:driver_base",
+        "//modules/drivers/lidar/common/driver_factory:apollo_lidar_driver_base",
         "//modules/drivers/lidar/proto:config_cc_proto",
         "//modules/drivers/lidar/proto:velodyne_config_cc_proto",
     ],

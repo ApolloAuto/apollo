@@ -1,7 +1,4 @@
   start_bare_intersection_scenario_distance: 25.0
   enable_explicit_stop: false
-  min_pass_s_distance: 3.0
   approach_cruise_speed: 6.7056  # 15 mph
   stop_distance: 0.5
-  stop_timeout_sec: 8.0
-  creep_timeout_sec: 10.0

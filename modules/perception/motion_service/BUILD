@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_component")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,35 +9,40 @@ filegroup(
         "conf/**",
         "dag/**",
         "launch/**",
-    ])
+    ]),
 )
 
-cc_binary(
+apollo_component(
     name = "libmotion_service_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":motion_service_component_lib"],
-)
-
-cc_library(
-    name = "motion_service_component_lib",
-    srcs = ["motion_service_component.cc"],
-    hdrs = ["motion_service_component.h"],
+    srcs = ["motion_service_component.cc",],
+    hdrs = ["motion_service_component.h",],
     deps = [
         "//cyber",
+        ":apollo_perception_motion_service",
+        "//modules/common/math",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/common_msgs/localization_msgs:localization_status_cc_proto",
         "//modules/common_msgs/localization_msgs:pose_cc_proto",
         "//modules/common_msgs/sensor_msgs:sensor_image_cc_proto",
-        "//modules/common/math",
-        "//modules/perception/common/camera/common",
-        "//modules/perception/common/lib/interface:base_init_options",
-        "//modules/perception/common/lib/registerer",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/proto:motion_service_cc_proto",
-        "//modules/perception/motion_service/motion:plane_motion",
         "//modules/perception/motion_service/proto:motion_service_component_cc_proto",
     ],
 )
 
+apollo_cc_library(
+    name = "apollo_perception_motion_service",
+    srcs = ["motion/plane_motion.cc"],
+    hdrs = ["motion/plane_motion.h"],
+    copts = [
+        "-Wno-deprecated",
+    ],
+    deps = [
+        "//modules/perception/common/base:apollo_perception_common_base",
+    ]
+)
+
 apollo_package()
+
 cpplint()

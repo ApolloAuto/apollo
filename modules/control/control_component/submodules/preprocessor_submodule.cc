@@ -219,8 +219,7 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
   {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto trajectory_point : local_view->trajectory().trajectory_point()) {
-      if (std::abs(trajectory_point.v()) <
-              FLAGS_minimum_speed_resolution &&
+      if (std::abs(trajectory_point.v()) < FLAGS_minimum_speed_resolution &&
           std::abs(trajectory_point.a()) <
               FLAGS_max_acceleration_when_stopped) {
         trajectory_point.set_v(0.0);
@@ -235,8 +234,7 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
 }
 
 Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
-  if (!FLAGS_enable_input_timestamp_check ||
-      FLAGS_is_control_test_mode) {
+  if (!FLAGS_enable_input_timestamp_check || FLAGS_is_control_test_mode) {
     ADEBUG << "Skip input timestamp check by gflags.";
     return Status::OK();
   }
@@ -245,8 +243,8 @@ Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
   double localization_diff =
       current_timestamp - local_view.localization().header().timestamp_sec();
 
-  if (localization_diff > (FLAGS_max_localization_miss_num *
-                           FLAGS_localization_period)) {
+  if (localization_diff >
+      (FLAGS_max_localization_miss_num * FLAGS_localization_period)) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
            << localization_diff << "s";
     monitor_logger_buffer_.ERROR("Localization msg lost");
@@ -256,8 +254,7 @@ Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
   double chassis_diff =
       current_timestamp - local_view.chassis().header().timestamp_sec();
 
-  if (chassis_diff > (FLAGS_max_chassis_miss_num *
-                      FLAGS_chassis_period)) {
+  if (chassis_diff > (FLAGS_max_chassis_miss_num * FLAGS_chassis_period)) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
            << "s";
     monitor_logger_buffer_.ERROR("Chassis msg lost");
@@ -267,8 +264,8 @@ Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
   double trajectory_diff =
       current_timestamp - local_view.trajectory().header().timestamp_sec();
 
-  if (trajectory_diff > (FLAGS_max_planning_miss_num *
-                         FLAGS_trajectory_period)) {
+  if (trajectory_diff >
+      (FLAGS_max_planning_miss_num * FLAGS_trajectory_period)) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
            << trajectory_diff << "s";
     monitor_logger_buffer_.ERROR("Trajectory msg lost");

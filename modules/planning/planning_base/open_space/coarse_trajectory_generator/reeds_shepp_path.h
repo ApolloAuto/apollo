@@ -142,6 +142,8 @@ class ReedShepp {
   double traj_gear_switch_penalty_;
   double traj_steer_penalty_;
   double traj_steer_change_penalty_;
+  double traj_short_length_penalty_;
+  double traj_expected_shortest_length_;
 };
 }  // namespace planning
 }  // namespace apollo

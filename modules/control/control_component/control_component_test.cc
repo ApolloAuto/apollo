@@ -18,11 +18,11 @@
 
 #include <thread>
 
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "gtest/gtest.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/control_component/common/control_gflags.h"
 

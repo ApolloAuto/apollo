@@ -26,6 +26,14 @@ class InformationFilter : public BaseFilter {
   InformationFilter();
   ~InformationFilter() = default;
 
+  /**
+   * @brief
+   *
+   * @param global_states
+   * @param global_uncertainty
+   * @return true
+   * @return false
+   */
   bool Init(const Eigen::VectorXd &global_states,
             const Eigen::MatrixXd &global_uncertainty);
 

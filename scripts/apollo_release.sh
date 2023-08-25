@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 set -e
 
-# INSTALL_TARGETS=(//modules/external_command/external_command_demo:install //modules/external_command/process_component:install //modules/external_command/old_routing_adapter:install //modules/common_msgs:install  //modules/v2x:install //cyber:install //modules/data:install //modules/audio:install //modules/bridge:install //modules/calibration:install //modules/canbus:install //modules/canbus_vehicle/ch:install //modules/canbus_vehicle/devkit:install //modules/canbus_vehicle/ge3:install //modules/canbus_vehicle/gem:install //modules/canbus_vehicle/lexus:install //modules/canbus_vehicle/lincoln:install //modules/canbus_vehicle/neolix_edu:install //modules/canbus_vehicle/transit:install //modules/canbus_vehicle/wey:install //modules/canbus_vehicle/zhongyun:install //modules/common:install //modules/contrib/cyber_bridge:install //modules/control/control_component:install //modules/planning/planning_base:install //modules/dreamview:install //modules/drivers/camera:install //modules/drivers/canbus:install //modules/drivers/gnss:install //modules/drivers/lidar:install //modules/drivers/microphone:install //modules/drivers/radar:install //modules/drivers/smartereye:install //modules/drivers/tools/image_decompress:install //modules/drivers/video:install //modules/guardian:install //modules/localization:install //modules/map:install //modules/monitor:install //modules/prediction:install //modules/routing:install //modules/storytelling:install //modules/task_manager:install //modules/third_party_perception:install //modules/tools:install //modules/transform:install //third_party/rtklib:install //modules/control/control_component:install)
-# SUBDIR_TARGETS=(modules/planning/pnc_map modules/control/controllers modules/external_command/command_processor modules/planning/traffic_rules modules/perception modules/planning/tasks modules/planning/scenarios modules/control/controllers)
-SUBDIR_TARGETS=(modules/perception)
-INSTALL_TARGETS=()
+INSTALL_TARGETS=(//modules/external_command/external_command_demo:install //modules/external_command/process_component:install //modules/external_command/old_routing_adapter:install //modules/common_msgs:install  //modules/v2x:install //cyber:install //modules/data:install //modules/audio:install //modules/bridge:install //modules/calibration:install //modules/canbus:install //modules/canbus_vehicle/ch:install //modules/canbus_vehicle/devkit:install //modules/canbus_vehicle/ge3:install //modules/canbus_vehicle/gem:install //modules/canbus_vehicle/lexus:install //modules/canbus_vehicle/lincoln:install //modules/canbus_vehicle/neolix_edu:install //modules/canbus_vehicle/transit:install //modules/canbus_vehicle/wey:install //modules/canbus_vehicle/zhongyun:install //modules/common:install //modules/contrib/cyber_bridge:install //modules/control/control_component:install //modules/planning/planning_base:install //modules/dreamview:install //modules/drivers/camera:install //modules/drivers/canbus:install //modules/drivers/gnss:install //modules/drivers/lidar:install //modules/drivers/microphone:install //modules/drivers/radar:install //modules/drivers/smartereye:install //modules/drivers/tools/image_decompress:install //modules/drivers/video:install //modules/guardian:install //modules/localization:install //modules/map:install //modules/monitor:install //modules/prediction:install //modules/routing:install //modules/storytelling:install //modules/task_manager:install //modules/third_party_perception:install //modules/tools:install //modules/transform:install //third_party/rtklib:install //modules/control/control_component:install)
+SUBDIR_TARGETS=(modules/planning/pnc_map modules/control/controllers modules/external_command/command_processor modules/planning/traffic_rules modules/perception modules/planning/tasks modules/planning/scenarios modules/control/controllers)
+CPU_INSTALL_TARGETS=(//modules/planning/planning_base:install)
+CPU_SUBDIR_TARGETS=()
 
 TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 source "${TOP_DIR}/scripts/apollo.bashrc"
@@ -15,7 +15,7 @@ export PREFIX_DIR="${PREFIX_DIR:=${APOLLO_DISTRIBUTION_HOME}}"
 LIST_ONLY=0
 RESOLVE_DEPS=0
 PRE_CLEAN=0
-BAZEL_OPTS=" -c opt --copt=-mavx2 --host_copt=-mavx2 --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5 --cxxopt=-fPIC"
+BAZEL_OPTS=" -c opt --copt=-march=native --host_copt=-march=native --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.5 --cxxopt=-fPIC"
 SHORTHAND_TARGETS=
 CMDLINE_OPTIONS=
 INSTALL_OPTIONS=
@@ -103,7 +103,6 @@ function determine_cpu_or_gpu_build() {
   if [ "${USE_GPU}" -eq 1 ]; then
     CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
     # INSTALL_OPTIONS=" --gpu ${INSTALL_OPTIONS}"
-
     ok "Running GPU build."
   else
     CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
@@ -258,6 +257,26 @@ function run_install() {
         done
     done
 
+    for d in ${CPU_SUBDIR_TARGETS[*]}; do
+        sub_dirs=`ls ${d}`
+        for dir in ${sub_dirs[*]}; do
+            if [[ ${dir} == BUILD ]]; then
+                continue
+            elif [[ ${dir} == README.md ]]; then
+                continue
+            elif [[ ${dir} == production ]]; then
+                continue
+            elif [[ ${dir} == camera_overlap_filter ]]; then
+                continue
+            elif [[ ${dir} == hdmap_based_proposal ]]; then
+                continue
+            elif [[ ${dir} == launch ]]; then
+                continue
+            fi
+            CPU_INSTALL_TARGETS[${#CPU_INSTALL_TARGETS[*]}]="//${d}/${dir}:install"
+        done
+    done
+
     if [[ "${LEGACY_RELEASE}" -gt 0 ]]; then
         bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install \
             -- ${install_opts} ${INSTALL_OPTIONS} ${PREFIX_DIR}
@@ -271,23 +290,26 @@ function run_install() {
         for target in ${INSTALL_TARGETS[*]}; do
             bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
                 -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-	    done
+	      done
+
+        CMDLINE_OPTIONS="--config=cpu "
+
+        for target in ${CPU_INSTALL_TARGETS[*]}; do
+            bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target}_src \
+                -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+        done
+
+        for target in ${CPU_INSTALL_TARGETS[*]}; do
+            bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
+                -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
+	      done
+
+        bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install \
+            -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
 
         # install files copy from source code.
-        # for target in ${install_src_target[*]}; do
-        #     bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} ${target} \
-        #         -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-        # done
-
-        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:install \
-        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-
-        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install \
-        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}"
-
-        # # install files copy from source code.
-        # bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install_src \
-        #     -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}" 
+        bazel run ${BAZEL_OPTS} ${CMDLINE_OPTIONS} //:deprecated_install_src \
+            -- ${install_opts} ${INSTALL_OPTIONS} "${PREFIX_DIR}" 
     
     fi
 

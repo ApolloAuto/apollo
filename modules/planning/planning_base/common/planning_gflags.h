@@ -208,3 +208,12 @@ DECLARE_double(obstacle_lat_buffer);
 DECLARE_double(obstacle_lon_start_buffer);
 DECLARE_double(obstacle_lon_end_buffer);
 DECLARE_double(obstacle_lon_ignore_buffer);
+// parameters for trajectory stitching and reinit planning starting point.
+DECLARE_double(replan_lateral_distance_threshold);
+DECLARE_double(replan_longitudinal_distance_threshold);
+
+DECLARE_double(replan_time_threshold);
+
+DECLARE_double(trajectory_check_collision_time_step);
+
+DECLARE_double(obstacle_pass_check_distance);

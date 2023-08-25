@@ -45,39 +45,117 @@ class ProbabilisticFusion : public BaseFusionSystem {
   ProbabilisticFusion() = default;
   ~ProbabilisticFusion() = default;
 
+  /**
+   * @brief Initialization
+   *
+   * @param options
+   * @return true
+   * @return false
+   */
   bool Init(const FusionInitOptions& options) override;
 
+  /**
+   * @brief Probabilistic fusion of sensor data, the input is the detection
+   * results of different sensors, and the output is the result after fusion
+   *
+   * @param sensor_frame sensor data
+   * @param fused_objects objects after fusion
+   * @return true
+   * @return false
+   */
   bool Fuse(const base::FrameConstPtr& sensor_frame,
             std::vector<base::ObjectPtr>* fused_objects) override;
 
   std::string Name() const override { return "ProbabilisticFusion"; }
 
  private:
+  /**
+   * @brief Determine whether to send message, if it's the message from
+   * the main sensor, it will be publish
+   *
+   * @param sensor_frame
+   * @return true
+   * @return false
+   */
   bool IsPublishSensor(const base::FrameConstPtr& sensor_frame) const;
 
+  /**
+   * @brief Fusion SensorFrame
+   *
+   * @param frame
+   */
   void FuseFrame(const SensorFramePtr& frame);
 
+  /**
+   * @brief Collect the fused objects
+   *
+   * @param timestamp
+   * @param fused_objects
+   */
   void CollectFusedObjects(double timestamp,
                            std::vector<base::ObjectPtr>* fused_objects);
 
+  /**
+   * @brief Fuse foreground track
+   *
+   * @param frame
+   */
   void FuseForegroundTrack(const SensorFramePtr& frame);
+
+  /**
+   * @brief Fuse background track
+   *
+   * @param frame
+   */
   void FusebackgroundTrack(const SensorFramePtr& frame);
 
+  /// @brief delete lost tracker
   void RemoveLostTrack();
 
+  /**
+   * @brief Update assigned tracks
+   *
+   * @param frame
+   * @param assignments
+   */
   void UpdateAssignedTracks(
       const SensorFramePtr& frame,
       const std::vector<TrackMeasurmentPair>& assignments);
 
+  /**
+   * @brief Update unassigned tracks
+   *
+   * @param frame
+   * @param unassigned_track_inds
+   */
   void UpdateUnassignedTracks(const SensorFramePtr& frame,
                               const std::vector<size_t>& unassigned_track_inds);
 
+  /**
+   * @brief Create new tracks
+   *
+   * @param frame
+   * @param unassigned_obj_inds
+   */
   void CreateNewTracks(const SensorFramePtr& frame,
                        const std::vector<size_t>& unassigned_obj_inds);
 
+  /**
+   * @brief Collect objects by track
+   *
+   * @param timestamp
+   * @param track
+   * @param fused_objects
+   */
   void CollectObjectsByTrack(double timestamp, const TrackPtr& track,
                              std::vector<base::ObjectPtr>* fused_objects);
 
+  /**
+   * @brief Collect sensor measurement from object
+   *
+   * @param object
+   * @param measurement
+   */
   void CollectSensorMeasurementFromObject(
       const SensorObjectConstPtr& object,
       base::SensorObjectMeasurement* measurement);

@@ -82,14 +82,11 @@ std::shared_ptr<apollo::cyber::Writer<T>> MessageWriter::RegisterMessage(
     writer_map_[channel_name] = writer;
     return writer;
   }
-  auto existing_writer_ptr = dynamic_cast<apollo::cyber::Writer<T>*>(
-      existing_writer_iter->second.get());
-  if (nullptr == existing_writer_ptr) {
+  if (nullptr == existing_writer_iter->second) {
     return nullptr;
   }
-  auto existing_writer =
-      std::shared_ptr<apollo::cyber::Writer<T>>(existing_writer_ptr);
-  return existing_writer;
+  return std::dynamic_pointer_cast<apollo::cyber::Writer<T>>(
+      existing_writer_iter->second);
 }
 
 template <typename T>
@@ -103,14 +100,11 @@ std::shared_ptr<apollo::cyber::Writer<T>> MessageWriter::RegisterMessage(
     writer_map_[channel_name] = writer;
     return writer;
   }
-  auto existing_writer_ptr = dynamic_cast<apollo::cyber::Writer<T>*>(
-      existing_writer_iter->second.get());
-  if (nullptr == existing_writer_ptr) {
+  if (nullptr == existing_writer_iter->second) {
     return nullptr;
   }
-  auto existing_writer =
-      std::shared_ptr<apollo::cyber::Writer<T>>(existing_writer_ptr);
-  return existing_writer;
+  return std::dynamic_pointer_cast<apollo::cyber::Writer<T>>(
+      existing_writer_iter->second);
 }
 
 template <typename T>

@@ -17,11 +17,12 @@
 #include "modules/prediction/evaluator/model_manager/model/semantic_lstm_vehicle_torch_cpu/semantic_lstm_vehicle_torch_model.h"
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
+
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 #include "cyber/common/file.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/evaluator/warm_up/warm_up.h"
 
 namespace apollo {
@@ -37,10 +38,11 @@ bool SemanticLstmVehicleCpuTorch::Init() {
 
   std::string class_name =
       abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
+
   std::string default_config_path =
       apollo::cyber::plugin_manager::PluginManager::Instance()
-          ->GetPluginClassHomePath<ModelBase>(class_name) +
-      "/conf/" + "default_conf.pb.txt";
+          ->GetPluginConfPath<ModelBase>(class_name,
+                                         "conf/default_conf.pb.txt");
 
   if (!cyber::common::GetProtoFromFile(default_config_path, &model_config)) {
     AERROR << "Unable to load model conf file: " << default_config_path;
@@ -54,6 +56,9 @@ bool SemanticLstmVehicleCpuTorch::Init() {
 
 bool SemanticLstmVehicleCpuTorch::LoadModel() {
   auto device = torch::Device(torch::kCPU);
+  if (torch::cuda::is_available()) {
+    device = torch::Device(torch::kCUDA);
+  }
 
   model_instance_ = torch::jit::load(model_path_, device);
 
@@ -68,7 +73,7 @@ bool SemanticLstmVehicleCpuTorch::LoadModel() {
 
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device)), std::move(obstacle_pos.to(device)),
-      std::move(obstacle_pos_step.to(device))}));
+       std::move(obstacle_pos_step.to(device))}));
 
   // warm up to avoid very slow first inference later
   WarmUp(torch_inputs, &model_instance_, &torch_default_output_tensor);
@@ -76,10 +81,8 @@ bool SemanticLstmVehicleCpuTorch::LoadModel() {
 }
 
 bool SemanticLstmVehicleCpuTorch::Inference(
-                           const std::vector<void*>& input_buffer,
-                           unsigned int input_size,
-                           std::vector<void*>* output_buffer,
-                           unsigned int output_size) {
+    const std::vector<void*>& input_buffer, unsigned int input_size,
+    std::vector<void*>* output_buffer, unsigned int output_size) {
   ACHECK(input_size == input_buffer.size() && input_size == 3);
   ACHECK(output_size == output_buffer->size() && output_size == 1);
 
@@ -88,24 +91,25 @@ bool SemanticLstmVehicleCpuTorch::Inference(
   }
 
   auto device = torch::Device(torch::kCPU);
-  torch::Tensor img_tensor = torch::from_blob(
-    input_buffer[0], {1, 3, 224, 224});
-  torch::Tensor obstacle_pos = torch::from_blob(
-    input_buffer[1], {1, 20, 2});
-  torch::Tensor obstacle_pos_step = torch::from_blob(
-    input_buffer[2], {1, 20, 2});
+  if (torch::cuda::is_available()) {
+    device = torch::Device(torch::kCUDA);
+  }
+  torch::Tensor img_tensor =
+      torch::from_blob(input_buffer[0], {1, 3, 224, 224});
+  torch::Tensor obstacle_pos = torch::from_blob(input_buffer[1], {1, 20, 2});
+  torch::Tensor obstacle_pos_step =
+      torch::from_blob(input_buffer[2], {1, 20, 2});
 
   std::vector<torch::jit::IValue> torch_inputs;
 
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device)), std::move(obstacle_pos.to(device)),
-      std::move(obstacle_pos_step.to(device))}));
+       std::move(obstacle_pos_step.to(device))}));
 
-  torch::Tensor torch_output_tensor = model_instance_.forward(torch_inputs)
-                                      .toTensor()
-                                      .to(torch::kCPU);
+  torch::Tensor torch_output_tensor =
+      model_instance_.forward(torch_inputs).toTensor().to(torch::kCPU);
   memcpy((*output_buffer)[0], torch_output_tensor.data_ptr<float>(),
-          1*30*2*sizeof(float));
+         1 * 30 * 2 * sizeof(float));
   return true;
 }
 

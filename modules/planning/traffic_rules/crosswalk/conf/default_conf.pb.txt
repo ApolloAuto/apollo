@@ -4,5 +4,4 @@ min_pass_s_distance: 1.0
 expand_s_distance: 2.0
 stop_strict_l_distance: 4.0
 stop_loose_l_distance: 5.0
-start_watch_timer_distance:10
 stop_timeout: 10.0

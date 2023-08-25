@@ -229,7 +229,7 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
     } else {
       cf.id = (recv_frames_[i].can_id & CAN_SFF_MASK);
     }
-    ADEBUG << "receive can id is " << cf.id;
+    ADEBUG << "Socket can receive can id is " << recv_frames_[i].can_id;
     cf.len = recv_frames_[i].can_dlc;
     std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
     frames->push_back(cf);

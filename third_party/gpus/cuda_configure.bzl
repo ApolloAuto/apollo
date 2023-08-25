@@ -1230,9 +1230,10 @@ def _create_remote_cuda_repository(repository_ctx, remote_config_repo):
 
 def _cuda_autoconf_impl(repository_ctx):
     """Implementation of the cuda_autoconf repository rule."""
-    if not enable_cuda(repository_ctx):
-        _create_dummy_repository(repository_ctx)
-    elif get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
+    # always retrun valid cuda lib for cpu compile
+    # if not enable_cuda(repository_ctx):
+    #     _create_dummy_repository(repository_ctx)
+    if get_host_environ(repository_ctx, _TF_CUDA_CONFIG_REPO) != None:
         has_cuda_version = get_host_environ(repository_ctx, _TF_CUDA_VERSION) != None
         has_cudnn_version = get_host_environ(repository_ctx, _TF_CUDNN_VERSION) != None
         if not has_cuda_version or not has_cudnn_version:

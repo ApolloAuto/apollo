@@ -1,9 +1,9 @@
---- cc/defs.bzl  
+--- cc/defs.bzl
 +++ cc/defs.bzl
-@@ -26,6 +26,143 @@ def _add_tags(attrs):
+@@ -26,6 +26,155 @@
          attrs["tags"] = [_MIGRATION_TAG]
      return attrs
- 
+
 +def _select2dict(select_str):
 +    result = dict()
 +    cxt_str = select_str[:-2].replace("select({","")
@@ -19,7 +19,7 @@
 +        for v_v in v_cxt.split(","):
 +          v_list.append(v_v.strip()[1:-1])
 +        result[k_str.strip()[1:-1]] = v_list
-+    
++
 +    return result
 +
 +def _list_str2list(list_str):
@@ -28,6 +28,18 @@
 +    for l_str in cxt.strip().split(","):
 +      result.append(l_str.strip()[1:-1])
 +    return result
++
++def _replace_value(origin_target, origin_replace_val):
++  if ":" not in origin_target:
++    origin_target = "{}:{}".format(origin_target, origin_target.split("/")[-1])
++
++  origin_target_split = origin_target.split(":")
++  target_name = origin_target_split[-1] if "proto" not in origin_target_split[-1] else origin_target_split[-1].replace("_cc_", "_")
++  prefix = origin_target_split[0].replace("//", "")
++  replaced_target_name = "{}_C{}".format(prefix.replace("/", "_S"), target_name)
++
++  replaced_repo = origin_replace_val.split("//:")[0]
++  return "{}//:{}".format(replaced_repo, replaced_target_name)
 +
 +def _replace_deps(deps_list, srcs_dict):
 +
@@ -40,7 +52,7 @@
 +            else:
 +                lib_name = deps_list[i].replace("//", "").replace("@", "")
 +                deps_list[i] = deps_list[i] + "//:" + lib_name
-+  
++
 +    need_remove = {}
 +    current_deps = {}
 +
@@ -57,9 +69,9 @@
 +
 +    for i in range(len(deps_list)):
 +        if deps_list[i] in need_remove:
-+            deps_list[i] = need_remove[deps_list[i]]
++            deps_list[i] = _replace_value(deps_list[i], need_remove[deps_list[i]])
 +        current_deps[deps_list[i]] = deps_list[i]
-+    
++
 +    new_deps = [] + deps_list
 +
 +    deps_map = {}
@@ -77,7 +89,7 @@
 +    return ws_deps
 +
 +def _process_apollo_deps(attrs):
-+    # only do this action for targets in current WORKSPACE 
++    # only do this action for targets in current WORKSPACE
 +    if native.repository_name() != "@":
 +        return attrs
 +    if "deps" not in attrs or attrs["deps"] == None:
@@ -120,7 +132,7 @@
 +            current_deps_dict[dep] = dep
 +
 +          ret_deps_list.append(ret_deps)
-+      
++
 +      ret_deps_list.append(_get_workspace_deps(current_deps_dict, workspace_deps))
 +
 +      n_deps = []
@@ -129,7 +141,7 @@
 +
 +      # print(n_deps)
 +      attrs["deps"] = n_deps
-+      
++
 +      return attrs
 +    elif type(deps) == "list":
 +      replaced_deps = _replace_deps(deps, srcs_dict)
@@ -143,31 +155,31 @@
 +
  def cc_binary(**attrs):
      """Bazel cc_binary rule.
- 
-@@ -36,7 +173,7 @@ def cc_binary(**attrs):
+
+@@ -36,7 +185,7 @@
      """
- 
+
      # buildifier: disable=native-cc
 -    native.cc_binary(**_add_tags(attrs))
 +    native.cc_binary(**_add_tags(_process_apollo_deps(attrs)))
- 
+
  def cc_test(**attrs):
      """Bazel cc_test rule.
-@@ -48,7 +185,7 @@ def cc_test(**attrs):
+@@ -48,7 +197,7 @@
      """
- 
+
      # buildifier: disable=native-cc
 -    native.cc_test(**_add_tags(attrs))
 +    native.cc_test(**_add_tags(_process_apollo_deps(attrs)))
- 
+
  def cc_library(**attrs):
      """Bazel cc_library rule.
-@@ -60,7 +197,7 @@ def cc_library(**attrs):
+@@ -60,7 +209,7 @@
      """
- 
+
      # buildifier: disable=native-cc
 -    native.cc_library(**_add_tags(attrs))
 +    native.cc_library(**_add_tags(_process_apollo_deps(attrs)))
- 
+
  def cc_import(**attrs):
      """Bazel cc_import rule.

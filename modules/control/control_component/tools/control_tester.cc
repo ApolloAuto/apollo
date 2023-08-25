@@ -16,19 +16,19 @@
 
 #include "gflags/gflags.h"
 
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/localization_msgs/localization.pb.h"
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
-
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/control_component/common/control_gflags.h"
-#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
-#include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 DEFINE_string(
     chassis_test_file,

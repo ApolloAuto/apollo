@@ -2255,3 +2255,270 @@ prediction_obstacle {
     timestamp: 0
   }
 }
+prediction_obstacle {
+  perception_obstacle {
+    id: 88
+    position {
+      x: -15
+      y: 0
+      z: 0
+    }
+    theta: 0
+    velocity {
+      x: 0.118324922874
+      y: -0.0117234822719
+      z: 0
+    }
+    length: 2
+    width: 2
+    height: 1
+    polygon_point {
+      x: -16
+      y: 1
+      z: 0
+    }
+    polygon_point {
+      x: -14
+      y: 1
+      z: 0
+    }
+    polygon_point {
+      x: -14
+      y: -1
+      z: 0
+    }
+    polygon_point {
+      x: -16
+      y: -1
+      z: 0
+    }
+    tracking_time: 0
+    type: UNKNOWN
+    timestamp: 0
+  }
+  timestamp: 1171064942.14
+  predicted_period: 5000
+  trajectory {
+    probability: 0.918794968878
+    trajectory_point {
+      path_point {
+        x: -15
+        y: 0
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 0.0
+    }
+    trajectory_point {
+      path_point {
+        x: -14
+        y: 1
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 0.2
+    }
+    trajectory_point {
+      path_point {
+        x: -13
+        y: 2
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 0.4
+    }
+    trajectory_point {
+      path_point {
+        x: -12
+        y: 3
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 0.6
+    }
+    trajectory_point {
+      path_point {
+        x: -11
+        y: 4
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 0.8
+    }
+    trajectory_point {
+      path_point {
+        x: -10
+        y: 5
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 1.0
+    }
+    trajectory_point {
+      path_point {
+        x: -9
+        y: 6
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 1.2
+    }
+    trajectory_point {
+      path_point {
+        x: -8
+        y: 7
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 1.4
+    }
+    trajectory_point {
+      path_point {
+        x: -7
+        y: 8
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 1.6
+    }
+    trajectory_point {
+      path_point {
+        x: -6
+        y: 9
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 1.8
+    }
+    trajectory_point {
+      path_point {
+        x: -5
+        y: 10
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 2.0
+    }
+    trajectory_point {
+      path_point {
+        x: -4
+        y: 11
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 2.2
+    }
+    trajectory_point {
+      path_point {
+        x: -3
+        y: 12
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 2.4
+    }
+    trajectory_point {
+      path_point {
+        x: -2
+        y: 13
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 2.6
+    }
+    trajectory_point {
+      path_point {
+        x: -1
+        y: 14
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 2.8
+    }
+    trajectory_point {
+      path_point {
+        x: 0
+        y: 15
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 3.0
+    }
+    trajectory_point {
+      path_point {
+        x: 1
+        y: 16
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 3.2
+    }
+    trajectory_point {
+      path_point {
+        x: 2
+        y: 17
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 3.4
+    }
+    trajectory_point {
+      path_point {
+        x: 3
+        y: 18
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 3.6
+    }
+    trajectory_point {
+      path_point {
+        x: 4
+        y: 19
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 3.8
+    }
+    trajectory_point {
+      path_point {
+        x: 5
+        y: 20
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 4.0
+    }
+    trajectory_point {
+      path_point {
+        x: 6
+        y: 21
+        z: 0
+        theta: 0
+      }
+      v: 2.0
+      relative_time: 4.2
+    }
+  }
+}

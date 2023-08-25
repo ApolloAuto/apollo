@@ -178,6 +178,8 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
+  AINFO << "current_node->GetTrajCost() is " << current_node->GetTrajCost()
+        << " reeds_shepp_to_end->cost is " << reeds_shepp_to_end->cost;
   end_node->SetTrajCost(current_node->GetTrajCost() + reeds_shepp_to_end->cost);
   return end_node;
 }
@@ -766,6 +768,8 @@ bool HybridAStar::Plan(
   // Hybrid A* begins
   size_t explored_node_num = 0;
   size_t available_result_num = 0;
+  auto best_explored_num = explored_node_num;
+  auto best_available_result_num = available_result_num;
   double astar_start_time = Clock::NowInSeconds();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
@@ -773,10 +777,14 @@ bool HybridAStar::Plan(
   double validity_check_time = 0.0;
   size_t max_explored_num =
       planner_open_space_config_.warm_start_config().max_explored_num();
+  size_t desired_explored_num = std::min(
+      planner_open_space_config_.warm_start_config().desired_explored_num(),
+      planner_open_space_config_.warm_start_config().max_explored_num());
   static constexpr int kMaxNodeNum = 200000;
   std::vector<std::shared_ptr<Node3d>> candidate_final_nodes;
   while (!open_pq_.empty() && open_pq_.size() < kMaxNodeNum &&
-         (available_result_num == 0 || explored_node_num < max_explored_num)) {
+         available_result_num < desired_explored_num &&
+         explored_node_num < max_explored_num) {
     std::shared_ptr<Node3d> current_node = open_pq_.top().first;
     open_pq_.pop();
     const double rs_start_time = Clock::NowInSeconds();
@@ -785,6 +793,8 @@ bool HybridAStar::Plan(
       if (final_node_ == nullptr ||
           final_node_->GetTrajCost() > final_node->GetTrajCost()) {
         final_node_ = final_node;
+        best_explored_num = explored_node_num + 1;
+        best_available_result_num = available_result_num + 1;
       }
       available_result_num++;
     }
@@ -825,8 +835,12 @@ bool HybridAStar::Plan(
     }
     open_set_.insert(temp_set.begin(), temp_set.end());
   }
+  AINFO << "min cost is : " << final_node_->GetTrajCost();
+  AINFO << "max_explored_num is " << max_explored_num;
   AINFO << "explored node num is " << explored_node_num
         << "available_result_num " << available_result_num;
+  AINFO << "best_explored_num is " << best_explored_num
+        << "best_available_result_num is " << best_available_result_num;
   AINFO << "cal node time is " << heuristic_time << "validity_check_time "
         << validity_check_time << "node_generator_time " << node_generator_time;
   AINFO << "reed shepp time is " << rs_time;

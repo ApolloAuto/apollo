@@ -1,16 +1,16 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+apollo_cc_library(
     name = "client_wrapper",
     hdrs = ["client_wrapper.h"],
     deps = [
-        "//cyber/service:client",
+        "//cyber",
     ],
 )
 
 cpplint()
+
 apollo_package()

@@ -24,11 +24,12 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
+#include "modules/control/controllers/demo_control_task/proto/demo_control_task_conf.pb.h"
 
 #include "cyber/plugin_manager/plugin_manager.h"
-#include "modules/control/controllers/demo_control_task/proto/demo_control_task_conf.pb.h"
-#include "modules/control/controllers/control_task_base/control_task.h"
+#include "modules/control/control_component/controller_task_base/control_task.h"
 
 /**
  * @namespace apollo::control
@@ -40,7 +41,8 @@ namespace control {
 /**
  * @class DemoControlTask
  *
- * @brief DemoControlTask: Set the acceleration to 2 when the vehicle acceleration is less than 3.
+ * @brief DemoControlTask: Set the acceleration to 2 when the vehicle
+ * acceleration is less than 3.
  */
 class DemoControlTask : public ControlTask {
  public:

@@ -218,9 +218,10 @@ bool PlanningComponent::Proc(
   if (nullptr != local_view_.planning_command) {
     command_status.set_command_id(local_view_.planning_command->command_id());
   }
-  if (adc_trajectory_pb.estop().is_estop()) {
+  if (adc_trajectory_pb.header().status().error_code() !=
+      common::ErrorCode::OK) {
     command_status.set_status(external_command::CommandStatusType::ERROR);
-    command_status.set_message(adc_trajectory_pb.estop().reason());
+    command_status.set_message(adc_trajectory_pb.header().status().msg());
   } else if (planning_base_->IsPlanningFinished()) {
     command_status.set_status(external_command::CommandStatusType::FINISHED);
   } else {

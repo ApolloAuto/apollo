@@ -20,6 +20,7 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/camera_detection_2d/detector/yolov3/postprocess.h"
+#include "modules/perception/common/inference/inference_factory.h"
 #include "modules/perception/common/util.h"
 
 namespace apollo {
@@ -53,6 +54,170 @@ void Yolov3ObstacleDetector::LoadParam(const yolov3::ModelParam &model_param) {
   nms_.set_threshold(nms_param.threshold());
 }
 
+void AddShape3D(
+    std::map<std::string, std::vector<int>> *shape_map,
+    const google::protobuf::RepeatedPtrField<common::ModelBlob> &model_blobs) {
+  for (const auto &blob : model_blobs) {
+    std::vector<int> shape(blob.shape().begin(), blob.shape().end());
+    shape_map->insert(std::make_pair(blob.name(), shape));
+  }
+}
+
+std::vector<std::string> GetBlobNames3D(
+    const google::protobuf::RepeatedPtrField<common::ModelBlob> &model_blobs) {
+  std::vector<std::string> blob_names;
+  for (const auto &blob : model_blobs) {
+    blob_names.push_back(blob.name());
+  }
+  return blob_names;
+}
+
+bool Yolov3ObstacleDetector::Init3DNetwork(const common::ModelInfo &model_info,
+                                           const std::string &model_path) {
+  // Network files
+  std::string proto_file =
+      GetModelFile(model_path, model_info.proto_file().file());
+  std::string weight_file =
+      GetModelFile(model_path, model_info.weight_file().file());
+
+  // Network input and output names
+  std::vector<std::string> input_names = GetBlobNames3D(model_info.inputs());
+  std::vector<std::string> output_names = GetBlobNames3D(model_info.outputs());
+
+  // Network type
+  const auto &framework = model_info.framework();
+
+  net_3D_.reset(inference::CreateInferenceByName(framework, proto_file,
+                                                 weight_file, output_names,
+                                                 input_names, model_path));
+
+  ACHECK(net_3D_ != nullptr);
+  net_3D_->set_gpu_id(gpu_id_);
+
+  std::map<std::string, std::vector<int>> shape_map;
+  AddShape3D(&shape_map, model_info.inputs());
+  AddShape3D(&shape_map, model_info.outputs());
+
+  if (!net_3D_->Init(shape_map)) {
+    AERROR << model_info.name() << "init failed!";
+    return false;
+  }
+  return true;
+}
+
+void Yolov3ObstacleDetector::Yolo3DInference(const base::Image8U *image,
+                                             base::ObjectPtr obj) {
+  ACHECK(image != nullptr);
+
+  cv::Mat img = cv::Mat(image->rows(), image->cols(), CV_8UC3);
+
+  cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+
+  memcpy(img.data, image->cpu_data(),
+         image->rows() * image->cols() * image->channels() * sizeof(uint8_t));
+
+  // get left top and right bottom point
+  float left_x = clamp(obj->camera_supplement.box.xmin, 0.f,
+                       static_cast<float>(image->cols()));
+  float left_y = clamp(obj->camera_supplement.box.ymin, 0.f,
+                       static_cast<float>(image->rows()));
+  float right_x = clamp(obj->camera_supplement.box.xmax, 0.f,
+                        static_cast<float>(image->cols()));
+  float right_y = clamp(obj->camera_supplement.box.ymax, 0.f,
+                        static_cast<float>(image->rows()));
+
+  float width = right_x - left_x;
+  float height = right_y - left_y;
+
+  cv::Rect object_roi(left_x, left_y, width, height);
+  cv::Mat cropped_obj = img(object_roi);
+  // cv::Mat show = cropped_obj;
+
+  // generate new pure black bg as same size as ratio
+  float ratio = std::max(width, height);
+  int dim_diff = std::abs(height - width);
+  int pad1 = std::floor(static_cast<double>(dim_diff) / 2.0);
+  cv::Mat out(ratio, ratio, CV_8UC3, {0, 0, 0});  // helps to clear noisy
+
+  // if h < w : add img to middle of bg
+  // else : add img to left of bg
+  if (width > height) {
+    cropped_obj.copyTo(
+        out(cv::Rect(0, pad1, cropped_obj.cols, cropped_obj.rows)));
+  } else {
+    cropped_obj.copyTo(
+        out(cv::Rect(pad1, 0, cropped_obj.cols, cropped_obj.rows)));
+  }
+
+  cv::resize(out, out, cv::Size(224, 224), cv::INTER_CUBIC);
+
+  out.convertTo(cropped_obj, CV_32F, 1.0 / 255, 0);
+
+  std::vector<float> mean_values{0.485, 0.456, 0.406};
+  std::vector<float> std_values{0.229, 0.224, 0.225};
+
+  // normallize channel value from 0～255 to 0~1 and change it to float type
+  std::vector<cv::Mat> rgbChannels(3);
+  cv::split(cropped_obj, rgbChannels);
+  for (int i = 0; i < 3; ++i) {
+    rgbChannels[i].convertTo(rgbChannels[i], CV_32FC1, 1 / std_values[i],
+                             (0.0 - mean_values[i]) / std_values[i]);
+  }
+  cv::Mat dst;
+  cv::merge(rgbChannels, dst);
+  cropped_obj = dst;
+
+  auto model_inputs = model_param_.info_3d().info().inputs();
+
+  auto input_blob_3d = net_3D_->get_blob(model_inputs[0].name());
+  ACHECK(input_blob_3d != nullptr);
+
+  int model_input_rows = cropped_obj.rows;
+  int model_input_cols = cropped_obj.cols;
+  int model_input_chs = cropped_obj.channels();
+  float *input_data = input_blob_3d->mutable_cpu_data();
+
+  input_blob_3d->Reshape(
+      {1, model_input_chs, model_input_rows, model_input_cols});
+  for (int i = 0; i < model_input_chs; ++i) {
+    // put img model_input_chs i data to input_blob
+    cv::extractChannel(
+        cropped_obj,
+        cv::Mat(model_input_rows, model_input_cols, CV_32FC1,
+                input_data + i * model_input_rows * model_input_cols),
+        i);
+  }
+
+  net_3D_->Infer();
+
+  auto model_outputs = model_param_.info_3d().info().outputs();
+  auto blob_orient = net_3D_->get_blob(model_outputs[0].name());
+  auto blob_conf = net_3D_->get_blob(model_outputs[1].name());
+  auto blob_dim = net_3D_->get_blob(model_outputs[2].name());
+
+  ACHECK(blob_orient != nullptr);
+  ACHECK(blob_conf != nullptr);
+  ACHECK(blob_dim != nullptr);
+
+  const float *orient_data = blob_orient->cpu_data();
+  const float *conf_data = blob_conf->cpu_data();
+
+  float alpha = 0.f;
+  if (conf_data[0] - conf_data[1] >= 0.f) {
+    float cos_result = orient_data[0];
+    float sin_result = orient_data[1];
+    alpha = std::atan2(sin_result, cos_result) + 1.57 - 3.14159;
+  } else {
+    float cos_result = orient_data[2];
+    float sin_result = orient_data[3];
+    alpha = std::atan2(sin_result, cos_result) + 4.71 - 3.14159;
+  }
+  obj->camera_supplement.alpha = alpha;
+  // cv::imwrite("pics/yolov3_image_" + std::to_string(alpha) + ".png", show);
+
+  return;
+}
+
 bool Yolov3ObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   options_ = options;
 
@@ -77,6 +242,15 @@ bool Yolov3ObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
     return false;
   }
   AERROR << "[INFO] yolov3 2D model init success";
+
+  const auto &model_info_3d = model_param_.info_3d().info();
+  std::string model_path_3d = GetModelPath(model_info_3d.name());
+  if (!Init3DNetwork(model_info_3d, model_path_3d)) {
+    AERROR << "Init network failed!";
+    return false;
+  }
+  AERROR << "[INFO] yolov3 3D model init success";
+
   return true;
 }
 
@@ -172,6 +346,8 @@ bool Yolov3ObstacleDetector::Detect(onboard::CameraFrame *frame) {
                                         static_cast<float>(image.cols()));
   for (auto &obj : frame->detected_objects) {
     obj->camera_supplement.area_id = 1;
+
+    Yolo3DInference(&image, obj);
 
     // clear cut off ratios
     auto &box = obj->camera_supplement.box;

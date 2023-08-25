@@ -19,21 +19,20 @@
 #include <memory>
 #include <string>
 
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/timer_component.h"
-#include "cyber/time/time.h"
-
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-
-#include "modules/common/util/util.h"
-#include "modules/control/controllers/control_task_base/common/dependency_injector.h"
-#include "modules/control/controllers/control_task_base/control_task_agent.h"
 #include "modules/control/control_component/proto/preprocessor.pb.h"
+
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/time/time.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/util/util.h"
+#include "modules/control/control_component/controller_task_base/common/dependency_injector.h"
+#include "modules/control/control_component/controller_task_base/control_task_agent.h"
 #include "modules/control/control_component/submodules/preprocessor_submodule.h"
 
 /**

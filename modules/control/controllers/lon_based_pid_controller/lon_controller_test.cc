@@ -16,18 +16,20 @@
 
 #include "modules/control/controllers/lon_based_pid_controller/lon_controller.h"
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "gmock/gmock.h"
-#include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
+#include "google/protobuf/text_format.h"
+
+#include "modules/common_msgs/planning_msgs/planning.pb.h"
+#include "modules/control/controllers/lon_based_pid_controller/proto/lon_based_pid_controller_conf.pb.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "cyber/time/time.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/control_component/common/control_gflags.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/control/controllers/lon_based_pid_controller/proto/lon_based_pid_controller_conf.pb.h"
-#include "modules/common_msgs/planning_msgs/planning.pb.h"
 
 namespace apollo {
 namespace control {
@@ -46,11 +48,12 @@ class LonControllerTest : public ::testing::Test, LonController {
   virtual void SetUp() {
     FLAGS_v = 3;
     std::string controllers_dir = "/apollo/modules/control/controllers/";
-    std::string control_conf_file = controllers_dir +
+    std::string control_conf_file =
+        controllers_dir +
         "lon_based_pid_controller/conf/controller_conf.pb.txt";
 
-    ACHECK(cyber::common::GetProtoFromFile
-    (control_conf_file, &longitudinal_conf_));
+    ACHECK(cyber::common::GetProtoFromFile(control_conf_file,
+                                           &longitudinal_conf_));
 
     timestamp_ = Time::Now().ToSecond();
 
@@ -65,9 +68,7 @@ class LonControllerTest : public ::testing::Test, LonController {
                                              debug);
   }
 
-  common::Status Init() {
-    return LonController::Init(injector_);
-  }
+  common::Status Init() { return LonController::Init(injector_); }
 
  protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {

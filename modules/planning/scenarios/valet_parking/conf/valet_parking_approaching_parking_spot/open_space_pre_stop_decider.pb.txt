@@ -1,2 +1,1 @@
 stop_type: PARKING
-stop_distance_to_target:1.0

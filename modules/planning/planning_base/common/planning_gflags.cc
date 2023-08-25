@@ -31,10 +31,9 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
             "enable force_pull_over_open_space_parking_test");
 
-DEFINE_string(
-    traffic_rule_config_filename,
-    "/apollo/modules/planning/planning_base/conf/traffic_rule_config.pb.txt",
-    "Traffic rule config filename");
+DEFINE_string(traffic_rule_config_filename,
+              "modules/planning/planning_base/conf/traffic_rule_config.pb.txt",
+              "Traffic rule config filename");
 
 DEFINE_string(smoother_config_filename,
               "/apollo/modules/planning/planning_base/conf/"
@@ -394,3 +393,14 @@ DEFINE_double(path_bounds_decider_resolution, 0.5,
 DEFINE_double(num_extra_tail_bound_point, 20, "The extra tail point number.");
 DEFINE_bool(enable_pull_over_at_destination, false,
             "Whether to pull over at destination");
+DEFINE_double(replan_lateral_distance_threshold, 0.5,
+              "The lateral distance threshold of replan");
+DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
+              "The longitudinal distance threshold of replan");
+DEFINE_double(replan_time_threshold, 7.0, "The time threshold of replan");
+DEFINE_double(trajectory_check_collision_time_step, 1.0,
+            "checks collision time step for trajectory");
+
+DEFINE_double(obstacle_pass_check_distance, 3.0,
+            "at the distance, the obstacle goes around left or right"
+            "consider ego and obstacle position");

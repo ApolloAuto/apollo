@@ -36,10 +36,8 @@ bool TrafficDecider::Init(const std::shared_ptr<DependencyInjector> &injector) {
   // Load the pipeline config.
   AINFO << "Load config path:" << FLAGS_traffic_rule_config_filename;
   // Load the pipeline of scenario.
-  // -----临时方案，后续采用工程提供的相对路径接口---
-  // if (!apollo::cyber::common::LoadConfig(pipeline_config_path,
-  if (!apollo::cyber::common::GetProtoFromFile(
-          FLAGS_traffic_rule_config_filename, &rule_pipeline_)) {
+  if (!apollo::cyber::common::LoadConfig(FLAGS_traffic_rule_config_filename,
+                                         &rule_pipeline_)) {
     AERROR << "Load pipeline of Traffic decider"
            << " failed!";
     return false;

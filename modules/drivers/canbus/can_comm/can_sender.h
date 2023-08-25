@@ -299,6 +299,7 @@ int32_t SenderMessage<SensorType>::curr_period() const {
 template <typename SensorType>
 void CanSender<SensorType>::PowerSendThreadFunc() {
   CHECK_NOTNULL(can_client_);
+  CHECK_NOTNULL(pt_manager_);
   sched_param sch;
   sch.sched_priority = 99;
   pthread_setschedparam(pthread_self(), SCHED_FIFO, &sch);
@@ -371,6 +372,10 @@ common::ErrorCode CanSender<SensorType>::Init(
   can_client_ = can_client;
   pt_manager_ = pt_manager;
   enable_log_ = enable_log;
+  if (pt_manager_ == nullptr) {
+    AERROR << "Invalid protocol manager.";
+    return ::apollo::common::ErrorCode::CANBUS_ERROR;
+  }
   return common::ErrorCode::OK;
 }
 

@@ -28,7 +28,6 @@
 
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
 #include "modules/third_party_perception/common/third_party_perception_util.h"
-#include "modules/third_party_perception/tools/conversion_base.h"
 #include "modules/third_party_perception/tools/conversion_smartereye.h"
 
 /**
@@ -53,6 +52,14 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
   PerceptionObstacles obstacles;
   // retrieve position and velocity of the main vehicle from the localization
   // position
+  std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type>
+    lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+                           {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+                           {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
+                           {3, apollo::hdmap::LaneBoundaryType::CURB},
+                           {4, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
+                           {5, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
+                           {6, apollo::hdmap::LaneBoundaryType::UNKNOWN}};
 
   obstacles.mutable_header()->CopyFrom(smartereye_obstacles.header());
 
@@ -63,9 +70,9 @@ apollo::perception::PerceptionObstacles SmartereyeToPerceptionObstacles(
       smartereye_lanemark.lane_road_data().roadway().right_lane().style();
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_lane_type(
-      conversion_base::lane_conversion_map[sma_left_lane_type]);
+      lane_conversion_map[sma_left_lane_type]);
   obstacles.mutable_lane_marker()->mutable_right_lane_marker()->set_lane_type(
-      conversion_base::lane_conversion_map[sma_right_lane_type]);
+      lane_conversion_map[sma_right_lane_type]);
 
   obstacles.mutable_lane_marker()->mutable_left_lane_marker()->set_quality(
       smartereye_lanemark.lane_road_data().roadway()

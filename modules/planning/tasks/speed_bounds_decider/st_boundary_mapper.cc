@@ -212,6 +212,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
 
   // Draw the given obstacle on the ST-graph.
   const auto& trajectory = obstacle.Trajectory();
+  const double obstacle_length = obstacle.Perception().length();
+  const double obstacle_width = obstacle.Perception().width();
   if (trajectory.trajectory_point().empty()) {
     bool box_check_collision = false;
 
@@ -278,82 +280,141 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     } else {
       discretized_path = DiscretizedPath(path_points);
     }
+
     // 2. Go through every point of the predicted obstacle trajectory.
-    for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
+    double trajectory_time_interval =
+              obstacle.Trajectory().trajectory_point()[1].relative_time();
+    int trajectory_step = std::min(
+                            FLAGS_trajectory_check_collision_time_step,
+                            vehicle_param_.width() / obstacle.speed())
+                          / trajectory_time_interval;
+    bool trajectory_point_collision_status = false;
+    int previous_index = 0;
+
+    for (int i = 0; i < trajectory.trajectory_point_size();
+          i = std::min(i + trajectory_step,
+                        trajectory.trajectory_point_size() - 1)) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
-      const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
+      Polygon2d obstacle_shape =
+                  obstacle.GetObstacleTrajectoryPolygon(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
       static constexpr double kNegtiveTimeThreshold = -1.0;
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }
-
-      const double step_length = vehicle_param_.front_edge_to_center();
-      auto path_len = std::min(speed_bounds_config_.max_trajectory_len(),
-                               discretized_path.Length());
-      // Go through every point of the ADC's path.
-      for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
-        const auto curr_adc_path_point =
-            discretized_path.Evaluate(path_s + discretized_path.front().s());
-        if (CheckOverlap(curr_adc_path_point, obs_box, l_buffer)) {
-          // Found overlap, start searching with higher resolution
-          const double backward_distance = -step_length;
-          const double forward_distance = vehicle_param_.length() +
-                                          vehicle_param_.width() +
-                                          obs_box.length() + obs_box.width();
-          const double default_min_step = 0.1;  // in meters
-          const double fine_tuning_step_length = std::fmin(
-              default_min_step, discretized_path.Length() / default_num_point);
-
-          bool find_low = false;
-          bool find_high = false;
-          double low_s = std::fmax(0.0, path_s + backward_distance);
-          double high_s =
-              std::fmin(discretized_path.Length(), path_s + forward_distance);
-
-          // Keep shrinking by the resolution bidirectionally until finally
-          // locating the tight upper and lower bounds.
-          while (low_s < high_s) {
-            if (find_low && find_high) {
-              break;
-            }
-            if (!find_low) {
-              const auto& point_low = discretized_path.Evaluate(
-                  low_s + discretized_path.front().s());
-              if (!CheckOverlap(point_low, obs_box, l_buffer)) {
-                low_s += fine_tuning_step_length;
-              } else {
-                find_low = true;
-              }
-            }
-            if (!find_high) {
-              const auto& point_high = discretized_path.Evaluate(
-                  high_s + discretized_path.front().s());
-              if (!CheckOverlap(point_high, obs_box, l_buffer)) {
-                high_s -= fine_tuning_step_length;
-              } else {
-                find_high = true;
-              }
-            }
-          }
-          if (find_high && find_low) {
-            lower_points->emplace_back(
-                low_s - speed_bounds_config_.point_extension(),
-                trajectory_point_time);
-            upper_points->emplace_back(
-                high_s + speed_bounds_config_.point_extension(),
-                trajectory_point_time);
-          }
-          break;
+      bool collision = CheckOverlapWithTrajectoryPoint(
+                                      discretized_path, obstacle_shape,
+                                      upper_points, lower_points,
+                                      l_buffer, default_num_point,
+                                      obstacle_length, obstacle_width,
+                                      trajectory_point_time);
+      if ((trajectory_point_collision_status ^ collision) && i != 0) {
+        // Start retracing track points forward
+        int index = i - 1;
+        while ((trajectory_point_collision_status ^ collision)
+                  && index > previous_index) {
+          const auto& point = trajectory.trajectory_point(index);
+          trajectory_point_time = point.relative_time();
+          obstacle_shape = obstacle.GetObstacleTrajectoryPolygon(point);
+          collision = CheckOverlapWithTrajectoryPoint(
+                                      discretized_path, obstacle_shape,
+                                      upper_points, lower_points,
+                                      l_buffer, default_num_point,
+                                      obstacle_length, obstacle_width,
+                                      trajectory_point_time);
+          index--;
         }
+        trajectory_point_collision_status = !trajectory_point_collision_status;
       }
+      if (i == trajectory.trajectory_point_size() - 1) break;
+      previous_index = i;
     }
   }
 
   // Sanity checks and return.
+  std::sort(lower_points->begin(), lower_points->end(),
+            [](const STPoint& a, const STPoint& b) {
+              return a.t() < b.t();
+            });
+  std::sort(upper_points->begin(), upper_points->end(),
+            [](const STPoint& a, const STPoint& b) {
+              return a.t() < b.t();
+            });
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 1 && upper_points->size() > 1);
+}
+
+bool STBoundaryMapper::CheckOverlapWithTrajectoryPoint(
+    const DiscretizedPath& discretized_path,
+    const Polygon2d& obstacle_shape,
+    std::vector<STPoint>* upper_points,
+    std::vector<STPoint>* lower_points,
+    const double l_buffer,
+    int default_num_point,
+    const double obstacle_length,
+    const double obstacle_width,
+    const double trajectory_point_time) const {
+  const double step_length = vehicle_param_.front_edge_to_center();
+  auto path_len = std::min(speed_bounds_config_.max_trajectory_len(),
+                               discretized_path.Length());
+  // Go through every point of the ADC's path.
+  for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
+    const auto curr_adc_path_point =
+        discretized_path.Evaluate(path_s + discretized_path.front().s());
+    if (CheckOverlap(curr_adc_path_point, obstacle_shape, l_buffer)) {
+      // Found overlap, start searching with higher resolution
+      const double backward_distance = -step_length;
+      const double forward_distance = vehicle_param_.length() +
+                                      vehicle_param_.width() +
+                                      obstacle_length + obstacle_width;
+      const double default_min_step = 0.1;  // in meters
+      const double fine_tuning_step_length = std::fmin(
+          default_min_step, discretized_path.Length() / default_num_point);
+
+      bool find_low = false;
+      bool find_high = false;
+      double low_s = std::fmax(0.0, path_s + backward_distance);
+      double high_s =
+          std::fmin(discretized_path.Length(), path_s + forward_distance);
+
+      // Keep shrinking by the resolution bidirectionally until finally
+      // locating the tight upper and lower bounds.
+      while (low_s < high_s) {
+        if (find_low && find_high) {
+          break;
+        }
+        if (!find_low) {
+          const auto& point_low = discretized_path.Evaluate(
+              low_s + discretized_path.front().s());
+          if (!CheckOverlap(point_low, obstacle_shape, l_buffer)) {
+            low_s += fine_tuning_step_length;
+          } else {
+            find_low = true;
+          }
+        }
+        if (!find_high) {
+          const auto& point_high = discretized_path.Evaluate(
+              high_s + discretized_path.front().s());
+          if (!CheckOverlap(point_high, obstacle_shape, l_buffer)) {
+            high_s -= fine_tuning_step_length;
+          } else {
+            find_high = true;
+          }
+        }
+      }
+      if (find_high && find_low) {
+        lower_points->emplace_back(
+            low_s - speed_bounds_config_.point_extension(),
+            trajectory_point_time);
+        upper_points->emplace_back(
+            high_s + speed_bounds_config_.point_extension(),
+            trajectory_point_time);
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
 void STBoundaryMapper::ComputeSTBoundaryWithDecision(

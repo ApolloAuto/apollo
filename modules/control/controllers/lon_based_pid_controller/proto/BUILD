@@ -7,9 +7,9 @@ proto_library(
     name = "lon_based_pid_controller_conf_proto",
     srcs = ["lon_based_pid_controller_conf.proto"],
     deps = [
-        "//modules/control/controllers/control_task_base/proto:gain_scheduler_conf_proto",
-        "//modules/control/controllers/control_task_base/proto:leadlag_conf_proto",
-        "//modules/control/controllers/control_task_base/proto:pid_conf_proto",
+        "//modules/control/control_component/controller_task_base/proto:gain_scheduler_conf_proto",
+        "//modules/control/control_component/controller_task_base/proto:leadlag_conf_proto",
+        "//modules/control/control_component/controller_task_base/proto:pid_conf_proto",
     ],
 )
 

@@ -154,11 +154,12 @@ void OpenSpacePreStopDecider::SetParkingSpotStopFence(
   double stop_line_s = 0.0;
   double stop_distance_to_target = config_.stop_distance_to_target();
   double static_linear_velocity_epsilon = 1.0e-2;
+  static constexpr double kStopBuffer = 0.2;
   CHECK_GE(stop_distance_to_target, 1.0e-8);
   double target_vehicle_offset = target_s - adc_front_edge_s;
   if (target_vehicle_offset > stop_distance_to_target) {
     stop_line_s = target_s - stop_distance_to_target;
-  } else if (std::abs(target_vehicle_offset) < stop_distance_to_target) {
+  } else if (target_vehicle_offset < stop_distance_to_target - kStopBuffer) {
     stop_line_s = target_s + stop_distance_to_target;
   } else if (target_vehicle_offset < -stop_distance_to_target) {
     if (!frame->open_space_info().pre_stop_rightaway_flag()) {

@@ -37,7 +37,7 @@ function _determine_drivers_disabled() {
     warning "ESD CAN library supplied by ESD Electronics doesn't exist."
     warning "If you need ESD CAN, please refer to:"
     warning "  third_party/can_card_library/esd_can/README.md"
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/drivers/canbus/can_client/esd/..."
+    DISABLED_TARGETS="${DISABLED_TARGETS}"
   fi
 }
 

@@ -36,6 +36,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using apollo::cyber::Time;
+using apollo::planning::ADCTrajectory;
 using apollo::planning::StopReasonCode;
 
 constexpr double GRA_ACC = 9.8;
@@ -322,7 +323,7 @@ Status LonController::ComputeControlCommand(
        FLAGS_max_acceleration_when_stopped) &&
       std::fabs(debug->preview_speed_reference()) <=
           vehicle_param_.max_abs_speed_when_stopped() &&
-      (chassis->gear_location() == canbus::Chassis::GEAR_DRIVE)) {
+      trajectory_message_->trajectory_type() != ADCTrajectory::OPEN_SPACE) {
     if (debug->is_stop_reason_by_destination() ||
         debug->is_stop_reason_by_prdestrian()) {
       debug->set_is_full_stop(true);
@@ -338,7 +339,7 @@ Status LonController::ComputeControlCommand(
   if (std::abs(debug->path_remain()) < FLAGS_max_path_remain_when_stopped) {
     if (debug->is_stop_reason_by_destination() ||
         debug->is_stop_reason_by_prdestrian() ||
-        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)) {
+        trajectory_message_->trajectory_type() == ADCTrajectory::OPEN_SPACE) {
       debug->set_is_full_stop(true);
       ADEBUG << "Current path remain distance: " << debug->path_remain()
              << " is within max_path_remain threshold: "

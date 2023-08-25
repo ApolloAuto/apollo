@@ -85,7 +85,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
 
   piecewise_jerk_problem.set_weight_ddx(config_.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config_.jerk_weight());
-
+  piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
@@ -137,7 +137,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_x_bounds(std::move(s_bounds));
 
   // Update SpeedBoundary and ref_s
-  std::vector<double> x_ref;
+  std::vector<double> x_ref(num_of_knots, total_length);
   std::vector<double> dx_ref(num_of_knots,
                              reference_line_info_->GetCruiseSpeed());
   std::vector<double> dx_ref_weight(num_of_knots, config_.ref_v_weight());
@@ -150,7 +150,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     SpeedPoint sp;
     reference_speed_data.EvaluateByTime(curr_t, &sp);
     const double path_s = sp.s();
-    x_ref.emplace_back(path_s);
+    // x_ref.emplace_back(path_s);
     // get curvature
     PathPoint path_point = path_data.GetPathPointWithPathS(path_s);
     penalty_dx.push_back(std::fabs(path_point.kappa()) *
@@ -158,20 +158,14 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
-    v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
-    static constexpr double kRefSpeedBuffer = 0.1;
-    static constexpr double kRefSpeedPenaltyRatio = 10000;
-    if (dx_ref[i] > v_upper_bound) {
-      double v_ref = v_upper_bound - kRefSpeedBuffer;
-      v_ref = std::fmax(v_lower_bound, v_ref);
-      dx_ref[i] = v_ref;
-      dx_ref_weight[i] = config_.ref_v_weight() * kRefSpeedPenaltyRatio;
-    }
-
+    v_upper_bound =
+        std::fmin(speed_limit.GetSpeedLimitByS(path_s), v_upper_bound);
+    dx_ref[i] = std::fmin(v_upper_bound, dx_ref[i]);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
-    print_debug.AddPoint("st_reference_line", curr_t, path_s);
+    print_debug.AddPoint("st_reference_line", curr_t, x_ref[i]);
+    print_debug.AddPoint("st_penalty_dx", curr_t, penalty_dx.back());
     print_debug.AddPoint("vt_reference_line", curr_t, dx_ref[i]);
-    // print_debug.AddPoint("st_weighting", curr_t, dx_ref_weight[i]);
+    print_debug.AddPoint("vt_weighting", curr_t, dx_ref_weight[i]);
     print_debug.AddPoint("vt_boundary_lower", curr_t, v_lower_bound);
     print_debug.AddPoint("sv_boundary_lower", path_s, v_lower_bound);
     print_debug.AddPoint("sk_curve", path_s, path_point.kappa());

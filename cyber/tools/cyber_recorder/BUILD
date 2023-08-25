@@ -1,84 +1,39 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-# load("//tools/install:install.bzl", "install")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_binary")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-# install(
-#     name = "install",
-#     runtime_dest = "cyber/bin",
-#     targets = [
-#       ":cyber_recorder",
-#     ],
-# )
-
-cc_binary(
+apollo_cc_binary(
     name = "cyber_recorder",
-    srcs = ["main.cc"],
+    srcs = [
+        "main.cc", "info.cc", "info.h", "recoverer.cc", 
+        "recoverer.h", "spliter.cc", "spliter.h", 
+        "player/play_task.cc", "player/play_task_buffer.cc", 
+        "player/play_task_consumer.cc", "player/play_task_producer.cc", 
+        "player/player.cc", "player/play_param.h", "player/play_task.h", 
+        "player/play_task_buffer.h", "player/play_task_consumer.h", 
+        "player/play_task_producer.h", "player/player.h",
+    ],
     linkopts = ["-pthread"],
     deps = [
-        ":info",
         ":recorder",
-        ":recoverer",
-        ":spliter",
-        "//cyber:init",
-        "//cyber/common:file",
-        "//cyber/common:time_conversion",
-        "//cyber/tools/cyber_recorder/player",
-    ],
-)
-
-cc_library(
-    name = "info",
-    srcs = ["info.cc"],
-    hdrs = ["info.h"],
-    deps = [
-        "//cyber/common:time_conversion",
+        "//cyber",
         "//cyber/proto:record_cc_proto",
-        "//cyber/record:record_file_reader",
-        "//cyber/record:record_message",
     ],
 )
 
-cc_library(
+apollo_cc_library(
     name = "recorder",
     srcs = ["recorder.cc"],
     hdrs = ["recorder.h"],
     deps = [
         "//cyber",
-        "//cyber/common:log",
+        "//cyber/common:cyber_common",
         "//cyber/proto:record_cc_proto",
         "@fastrtps",
     ],
 )
 
-cc_library(
-    name = "recoverer",
-    srcs = ["recoverer.cc"],
-    hdrs = ["recoverer.h"],
-    deps = [
-        "//cyber/base:for_each",
-        "//cyber/common:log",
-        "//cyber/proto:record_cc_proto",
-        "//cyber/record:header_builder",
-        "//cyber/record:record_file_reader",
-        "//cyber/record:record_writer",
-    ],
-)
-
-cc_library(
-    name = "spliter",
-    srcs = ["spliter.cc"],
-    hdrs = ["spliter.h"],
-    deps = [
-        "//cyber/common:log",
-        "//cyber/proto:record_cc_proto",
-        "//cyber/record:header_builder",
-        "//cyber/record:record_file_reader",
-        "//cyber/record:record_writer",
-    ],
-)
-
 apollo_package()
+
 cpplint()

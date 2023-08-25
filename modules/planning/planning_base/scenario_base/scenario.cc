@@ -56,14 +56,20 @@ bool Scenario::Init(std::shared_ptr<DependencyInjector> injector,
   // Get the name of this class.
   std::string class_name =
       abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
-  // Generate the default task config path from PluginManager.
+
   config_dir_ = apollo::cyber::plugin_manager::PluginManager::Instance()
-                    ->GetPluginClassHomePath<Scenario>(class_name) +
-                "/conf";
-  config_path_ = config_dir_ + "/scenario_conf.pb.txt";
+                    ->GetPluginClassHomePath<Scenario>(class_name);
+  config_dir_ += "/conf";
+  AINFO << "config_dir : " << config_dir_;
+  // Generate the default task config path from PluginManager.
+  config_path_ = apollo::cyber::plugin_manager::PluginManager::Instance()
+                     ->GetPluginConfPath<Scenario>(class_name,
+                                                   "conf/scenario_conf.pb.txt");
 
   // Load the pipeline config.
-  std::string pipeline_config_path = config_dir_ + "/pipeline.pb.txt";
+  std::string pipeline_config_path =
+      apollo::cyber::plugin_manager::PluginManager::Instance()
+          ->GetPluginConfPath<Scenario>(class_name, "conf/pipeline.pb.txt");
   AINFO << "Load config path:" << pipeline_config_path;
   // Load the pipeline of scenario.
   if (!apollo::cyber::common::GetProtoFromFile(pipeline_config_path,

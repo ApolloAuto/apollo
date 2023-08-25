@@ -41,6 +41,7 @@
   <depend expose="False">3rd-bazel-skylib</depend>
   <depend expose="False">3rd-rules-proto</depend>
   <depend expose="False">3rd-py</depend>
+  <depend>3rd-mkl</depend>
 
   <depend expose="False">3rd-gpus</depend>
 

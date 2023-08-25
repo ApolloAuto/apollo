@@ -14,16 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
+#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/time/time.h"
-
-#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
-#include "modules/common_msgs/control_msgs/pad_msg.pb.h"
-
 #include "cyber/time/clock.h"
+#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/control/control_component/common/control_gflags.h"
@@ -85,8 +84,7 @@ class PadTerminal {
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";
       } else {
-        int64_t diff =
-            Clock::Now().ToNanosecond() / 1e3 - count_start;
+        int64_t diff = Clock::Now().ToNanosecond() / 1e3 - count_start;
         if (diff > EMERGENCY_MODE_HOLD_TIME) {
           count_start = Clock::Now().ToNanosecond() / 1e3;
           waiting_reset = true;

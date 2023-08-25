@@ -18,6 +18,7 @@ import json
 import shutil
 import stat
 import sys
+import subprocess
 
 import xml.etree.ElementTree as ET
 
@@ -60,19 +61,28 @@ list_only = False
 dylib_match = re.compile(r"(.*\.so)(\.\d+)*$")
 
 meta = []
+export_library_dict = {}
 packages = {}
 plugins = {}
 plugins_meta = {}
 meta_prefix = "share/packages"
-
-BUILD_TMP = '''
-load("@rules_cc//cc:defs.bzl", "cc_library")
+EMPTY_BUILD_TMP = '''
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_import")
 cc_library(
     name = "{}",
     hdrs = glob(["include/{}/**/*.h"]) + glob(["include/{}/**/*.hpp"]),
-    srcs = [{}],
+    srcs = [],
     strip_include_prefix = "include",
     visibility = ["//visibility:public"],
+)
+'''
+BUILD_TMP = '''
+cc_library(
+    name = "{}",
+    srcs = ["{}"],
+    linkopts = [{}],
+    visibility = ["//visibility:public"],
+    alwayslink = True,
 )
 '''
 
@@ -89,6 +99,8 @@ def generate_pack_file(meta_path):
     arch = check_output(["uname", "-m"]).decode("utf-8").replace("\n", "")
     if arch == "x86_64":
         arch = "amd64"
+    elif arch == "aarch64":
+        arch = "arm64"
     description = package_name
     cyberfile_deps = root.iterfind("depend")
     deps = []
@@ -121,7 +133,7 @@ def generate_pack_file(meta_path):
     if package_name in plugins_meta:
         for plugin_info in plugins_meta[package_name]:
             plugin_lib_path = os.path.join(prefix, 
-                "lib/plugins", plugin_info["plugin_src_path"])
+                "lib", plugin_info["plugin_src_path"])
             cyber_plugin_index_file = os.path.join(
                 prefix, "share/cyber_plugin_index", 
                 plugins[os.path.join(
@@ -291,7 +303,8 @@ def copy_or_link(src, dst):
         shutil.copy2(src, dst)
 
 
-def install(src, dst, action_type=None, package_path=None):
+def install(src, dst, action_type=None, 
+    package_path=None, shared_library_export=None, target_name=None):
     global subdirs
     global meta
 
@@ -300,6 +313,8 @@ def install(src, dst, action_type=None, package_path=None):
     # deprecated package install path
     if action_type is not None and package_path is not None:
         global packages
+        global export_library_dict
+
         package_in_cache = False
         deprecated_flag = False
 
@@ -323,6 +338,12 @@ def install(src, dst, action_type=None, package_path=None):
                 print("\033[31m[ERROR]\033[0m orphan install file: {} -> {}".format(
                     src, dst), file=sys.stderr)
                 exit(-1)
+        
+        if shared_library_export is not None and target_name is not None:
+            if package_path not in export_library_dict:
+                export_library_dict[package_path] = [{"target": target_name, "dst": dst}]
+            else:
+                export_library_dict[package_path].append({"target": target_name, "dst": dst})
     else:
         dst = rename_package_name(dst)
 
@@ -391,17 +412,17 @@ def install(src, dst, action_type=None, package_path=None):
 
     dst_full = os.path.join(prefix, dst)
     # Install file, if not up to date.
-    if needs_install(src, dst):
-        print("-- Installing: {}".format(dst_full))
-        if os.path.exists(dst_full):
-            os.remove(dst_full)
-        copy_or_link(src, dst_full)
-    else:
-        # TODO(eric.cousineau): Unclear how RPath-patched file can be deemed
-        # "up-to-date" by comparison?
-        print("-- Up-to-date: {}".format(dst_full))
-        # No need to check patching.
-        return
+    # if needs_install(src, dst):
+    print("-- Installing: {}".format(dst_full))
+    if os.path.exists(dst_full):
+        os.remove(dst_full)
+    copy_or_link(src, dst_full)
+    # else:
+    #     # TODO(eric.cousineau): Unclear how RPath-patched file can be deemed
+    #     # "up-to-date" by comparison?
+    #     print("-- Up-to-date: {}".format(dst_full))
+    #     # No need to check patching.
+    #     return
     basename = os.path.basename(dst)
     if re.match(dylib_match, basename):  # It is a library.
         #TODO(lanyongshun): interim method
@@ -437,6 +458,7 @@ def install(src, dst, action_type=None, package_path=None):
 def create_package_meta(prefix):
     global meta
     global packages
+    global export_library_dict
 
     if list_only:
         return
@@ -467,14 +489,37 @@ def create_package_meta(prefix):
                 if info[1].split("/")[-1].startswith("lib"):
                     so_files.append(info[1])
 
-        build_content = BUILD_TMP.format(
-            pkg_name, package_path, package_path, 
-            ",".join(['"{}"'.format(i) for i in so_files]))
-        
+        package_build_content = []
+        if package_path in export_library_dict:
+            package_library_list = export_library_dict[package_path]
+            for lib_info in package_library_list:
+                target_name = lib_info["target"]
+                dst = lib_info["dst"]
+                path_list = dst.split("/")
+                target_name_prefix = "/".join(
+                    path_list[1: len(path_list)-1]).replace("/", "_S")
+
+                ldd_query = "ldd {}".format(os.path.join(prefix, dst)) + " | awk '{print $1}'"
+                ld_so = subprocess.check_output(
+                    ldd_query, shell=True).decode("utf-8").split("\n")
+                link_opts = []
+                for so_lib in ld_so:
+                    if so_lib.startswith("lib") and so_lib.endswith(".so"):
+                        link_opts.append('"-l{}"'.format(so_lib[3: len(so_lib)-3]))
+                link_opts_str = ",".join(link_opts)
+
+                package_build_content.append(
+                    BUILD_TMP.format("{}_C{}".format(target_name_prefix, target_name), dst, link_opts_str)
+                )
+
+        build_content = EMPTY_BUILD_TMP.format(
+            pkg_name, package_path, package_path)
+
         with open(
             os.path.join(
                 package_index_path, "{}.BUILD".format(pkg_name)), "w+") as f:
-            f.write(build_content)
+            f.write(
+                "\n".join([build_content] + package_build_content))
 
         generate_pack_file(package_index_path)
 
@@ -650,9 +695,14 @@ def resolve_install_rpath(path, rpath, prefix):
 
   decoded_path = m.group(2).replace('_C', ':').replace(
       '_U', '_').replace('_S', '/').replace('_D', '.')
-
-  # skip external libs
+  # external libs
   if decoded_path.startswith('_@'):
+    subpath = decoded_path.split('__')[1]
+    ext_rpath = re.compile(r'^_lib/').sub(m.group(1) + '/', subpath)
+    if os.path.exists(ext_rpath.replace('$ORIGIN', os.path.dirname(path))):
+      # apollo packages
+      return ext_rpath
+    # external packages
     return None
 
   return decoded_path.split(':')[0].replace('_//', m.group(1) + '/')

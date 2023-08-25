@@ -18,12 +18,13 @@
  * @file command_processor_base.cc
  */
 
-#include <cxxabi.h>
-
 #include "modules/external_command/command_processor/command_processor_base/command_processor_base.h"
+
+#include <cxxabi.h>
 
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/external_command/command_processor/command_processor_base/proto/command_processor_config.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 
@@ -41,11 +42,11 @@ bool CommandProcessorBase::Init(const std::shared_ptr<cyber::Node>& node) {
   int status;
   std::string class_name =
       abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
-  config_dir_ = apollo::cyber::plugin_manager::PluginManager::Instance()
-                    ->GetPluginClassHomePath<CommandProcessorBase>(class_name) +
-                "/conf/";
   // Generate the default task config path from PluginManager.
-  std::string config_path = config_dir_ + "config.pb.txt";
+  std::string config_path =
+      apollo::cyber::plugin_manager::PluginManager::Instance()
+          ->GetPluginConfPath<CommandProcessorBase>(class_name,
+                                                    "conf/config.pb.txt");
   if (!cyber::common::GetProtoFromFile(config_path, processor_config_.get())) {
     AERROR << "Cannot get config of " << class_name;
     return false;

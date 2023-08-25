@@ -21,7 +21,7 @@
 #if defined(__x86_64__)
 #include <smmintrin.h>
 #elif defined(__aarch64__) && defined(__ARM_NEON)
-#include "third_party/intrinsics_translation/sse2neon/sse2neon.h"
+#include "sse2neon.h" // NOLINT
 #else
 #error "Processor architecture not supported!"
 #endif

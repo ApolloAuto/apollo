@@ -52,6 +52,12 @@ class KalmanMotionFusion : public BaseMotionFusion {
 
   std::string Name() const override { return "KalmamnMotionFusion"; }
 
+  /**
+   * @brief Get states
+   *
+   * @param anchor_point
+   * @param velocity
+   */
   void GetStates(Eigen::Vector3d* anchor_point, Eigen::Vector3d* velocity);
 
  private:
@@ -61,7 +67,7 @@ class KalmanMotionFusion : public BaseMotionFusion {
   void MotionFusionWithMeasurement(const SensorObjectConstPtr& measurement,
                                    double time_diff);
 
-  // Update state
+  /// @brief Update state
   void UpdateMotionState();
 
   // @brief We use the history sensor information

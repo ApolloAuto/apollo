@@ -41,10 +41,7 @@ DEFINE_string(calibration_table_file,
               "/apollo/modules/control/conf/calibration_table.pb.txt",
               "calibration table file");
 
-DEFINE_double(control_test_duration,
-              -1.0,
-              "control test duration");
-
+DEFINE_double(control_test_duration, -1.0, "control test duration");
 
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 
@@ -93,14 +90,11 @@ DEFINE_bool(use_control_submodules, false,
 DEFINE_bool(enable_input_timestamp_check, false,
             "enable input timestamp check");
 
-DEFINE_int32(max_localization_miss_num, 20,
-             "max localization miss num");
+DEFINE_int32(max_localization_miss_num, 20, "max localization miss num");
 
-DEFINE_int32(max_chassis_miss_num, 20,
-             "max chassis miss num");
+DEFINE_int32(max_chassis_miss_num, 20, "max chassis miss num");
 
-DEFINE_int32(max_planning_miss_num, 20,
-             "max planning miss num");
+DEFINE_int32(max_planning_miss_num, 20, "max planning miss num");
 
 DEFINE_double(max_acceleration_when_stopped, 0.01,
               "max acceleration when stopped.");
@@ -108,32 +102,22 @@ DEFINE_double(max_acceleration_when_stopped, 0.01,
 DEFINE_double(max_path_remain_when_stopped, 0.3,
               "max path remain when stopped.");
 
-DEFINE_bool(enable_persistent_estop, true,
-            "enable persistent estop");
+DEFINE_bool(enable_persistent_estop, true, "enable persistent estop");
 
-DEFINE_double(control_period, 0.01,
-              "control period");
+DEFINE_double(control_period, 0.01, "control period");
 
-DEFINE_double(soft_estop_brake, 50.0,
-              "soft estop brake.");
+DEFINE_double(soft_estop_brake, 50.0, "soft estop brake.");
 
-DEFINE_double(trajectory_period, 0.1,
-              "trajectory period.");
+DEFINE_double(trajectory_period, 0.1, "trajectory period.");
 
-DEFINE_double(chassis_period, 0.01,
-              "chassis period.");
+DEFINE_double(chassis_period, 0.01, "chassis period.");
 
-DEFINE_double(localization_period, 0.01,
-              "localization period.");
+DEFINE_double(localization_period, 0.01, "localization period.");
 
-DEFINE_double(minimum_speed_resolution, 0.2,
-              "minimum speed resolution.");
+DEFINE_double(minimum_speed_resolution, 0.2, "minimum speed resolution.");
 
-DEFINE_double(minimum_speed_protection, 0.1,
-              "minimum speed protection.");
+DEFINE_double(minimum_speed_protection, 0.1, "minimum speed protection.");
 
-DEFINE_int32(action, 1,
-             "START = 1; RESET = 2; VIN_REQ = 3");
+DEFINE_int32(action, 1, "START = 1; RESET = 2; VIN_REQ = 3");
 
-DEFINE_bool(enable_epb_brake, false,
-            "enable brake for anti-slip in slope");
+DEFINE_bool(enable_epb_brake, false, "enable brake for anti-slip in slope");

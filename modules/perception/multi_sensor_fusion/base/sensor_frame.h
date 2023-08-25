@@ -46,16 +46,43 @@ class SensorFrame {
  public:
   SensorFrame();
 
+  /**
+   * @brief Construct a new Sensor Frame object
+   *
+   * @param base_frame_ptr
+   */
   explicit SensorFrame(const base::FrameConstPtr& base_frame_ptr);
 
+  /**
+   * @brief Initialize sensor frame
+   *
+   * @param base_frame_ptr
+   */
   void Initialize(const base::FrameConstPtr& base_frame_ptr);
 
+  /**
+   * @brief Initialize sensor frame
+   *
+   * @param base_frame_ptr
+   * @param sensor
+   */
   void Initialize(const base::FrameConstPtr& base_frame_ptr,
                   const SensorPtr& sensor);
 
-  // Getter
+  /**
+   * @brief Get the timestamp of the sensor frame
+   *
+   * @return double
+   */
   inline double GetTimestamp() const { return header_->timestamp; }
 
+  /**
+   * @brief Get the pose of the sensor frame
+   *
+   * @param pose
+   * @return true
+   * @return false
+   */
   inline bool GetPose(Eigen::Affine3d* pose) const {
     if (pose == nullptr) {
       AERROR << "pose is not available";
@@ -65,26 +92,61 @@ class SensorFrame {
     return true;
   }
 
+  /**
+   * @brief Get the Foreground Objects object
+   *
+   * @return std::vector<SensorObjectPtr>&
+   */
   inline std::vector<SensorObjectPtr>& GetForegroundObjects() {
     return foreground_objects_;
   }
 
+  /**
+   * @brief Get the Foreground Objects object
+   *
+   * @return const std::vector<SensorObjectPtr>&
+   */
   inline const std::vector<SensorObjectPtr>& GetForegroundObjects() const {
     return foreground_objects_;
   }
 
+  /**
+   * @brief Get the Background Objects object
+   *
+   * @return std::vector<SensorObjectPtr>&
+   */
   inline std::vector<SensorObjectPtr>& GetBackgroundObjects() {
     return background_objects_;
   }
 
+  /**
+   * @brief Get the Background Objects object
+   *
+   * @return const std::vector<SensorObjectPtr>&
+   */
   inline const std::vector<SensorObjectPtr>& GetBackgroundObjects() const {
     return background_objects_;
   }
 
+  /**
+   * @brief Get the sensor id
+   *
+   * @return std::string
+   */
   std::string GetSensorId() const;
 
+  /**
+   * @brief Get the sensor type
+   *
+   * @return base::SensorType
+   */
   base::SensorType GetSensorType() const;
 
+  /**
+   * @brief Get sensor frame header
+   *
+   * @return SensorFrameHeaderConstPtr
+   */
   SensorFrameHeaderConstPtr GetHeader() const { return header_; }
 
  private:

@@ -40,6 +40,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
+using apollo::transform::Buffer;
+
 class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
  public:
   /**

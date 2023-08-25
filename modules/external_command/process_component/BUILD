@@ -1,11 +1,10 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 
 package(default_visibility=["//visibility:public"])
 
-cc_library(
-    name="external_command_process_component_lib",
+apollo_component(
+    name="libexternal_command_process_component.so",
     srcs=["external_command_process_component.cc"],
     hdrs=["external_command_process_component.h"],
     copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
@@ -16,14 +15,6 @@ cc_library(
         "//modules/external_command/command_processor/command_processor_base:command_processor_base_lib",
         "//modules/external_command/command_processor/command_processor_base/proto:command_processor_config_cc_proto",
     ],
-    alwayslink=True
-)
-
-cc_binary(
-    name="libexternal_command_process_component.so",
-    linkshared=True,
-    linkstatic=True,
-    deps=[":external_command_process_component_lib"],
 )
 
 filegroup(

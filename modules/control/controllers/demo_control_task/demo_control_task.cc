@@ -35,8 +35,7 @@ DemoControlTask::DemoControlTask() : name_("demo control task") {
 DemoControlTask::~DemoControlTask() {}
 
 Status DemoControlTask::Init(std::shared_ptr<DependencyInjector> injector) {
-  if (!ControlTask::LoadConfig<DemoControlTaskConf>(
-        &demo_control_task_conf_)) {
+  if (!ControlTask::LoadConfig<DemoControlTaskConf>(&demo_control_task_conf_)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "failed to load lat control_conf");
@@ -49,9 +48,7 @@ Status DemoControlTask::Init(std::shared_ptr<DependencyInjector> injector) {
 
 void DemoControlTask::Stop() {}
 
-Status DemoControlTask::Reset() {
-  return Status::OK();
-}
+Status DemoControlTask::Reset() { return Status::OK(); }
 
 std::string DemoControlTask::Name() const { return name_; }
 
@@ -63,12 +60,11 @@ Status DemoControlTask::ComputeControlCommand(
   auto debug = cmd->mutable_debug()->mutable_simple_lon_debug();
 
   double controller_calculate_acceleration = cmd->acceleration();
-  double command_acceleration = abs(controller_calculate_acceleration) <
-                                    low_bound_acceleration_ ?
-                                    controller_calculate_acceleration /
-                                    abs(controller_calculate_acceleration) *
-                                    low_bound_acceleration_ :
-                                    controller_calculate_acceleration;
+  double command_acceleration =
+      abs(controller_calculate_acceleration) < low_bound_acceleration_
+          ? controller_calculate_acceleration /
+                abs(controller_calculate_acceleration) * low_bound_acceleration_
+          : controller_calculate_acceleration;
 
   cmd->set_acceleration(command_acceleration);
   debug->set_acceleration_cmd(command_acceleration);

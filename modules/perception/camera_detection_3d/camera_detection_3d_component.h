@@ -22,7 +22,7 @@
 #include "modules/perception/camera_detection_3d/proto/camera_detection_3d.pb.h"
 
 #include "cyber/cyber.h"
-#include "modules/perception/camera_detection_3d/interface/base_obstacle_detector.h"
+#include "modules/perception/common/interface/base_obstacle_detector.h"
 #include "modules/perception/common/onboard/inner_component_messages/camera_detection_component_messages.h"
 #include "modules/perception/common/onboard/transform_wrapper/transform_wrapper.h"
 

@@ -22,7 +22,7 @@
 
 #include <memory>
 #include <string>
-
+#include <vector>
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
@@ -85,8 +85,9 @@ class MotionCommandProcessorBase : public CommandProcessorBase {
    * @return Return true if there is error occurs.
    */
   bool SetStartPose(
+      std::vector<apollo::routing::LaneWaypoint>* lane_way_points) const;
+  bool SetStartPose(
       std::shared_ptr<apollo::routing::RoutingRequest>& routing_request) const;
-
   /**
    * @brief Process the incoming lane follow command. Search the routing to end
    * point and send to planning module.
@@ -247,6 +248,18 @@ void MotionCommandProcessorBase<T>::OnCommand(
   planning_command_writer_->Write(planning_command);
   AINFO << "publish: " << planning_command->DebugString();
   status->set_status(CommandStatusType::RUNNING);
+}
+
+template <typename T>
+bool MotionCommandProcessorBase<T>::SetStartPose(
+    std::vector<apollo::routing::LaneWaypoint>* lane_way_points) const {
+  CHECK_NOTNULL(lane_way_points);
+  // Get the current vehicle pose as start pose.
+  if (!lane_way_tool_->GetVehicleLaneWayPoints(lane_way_points)) {
+    AERROR << "Get lane near start pose failed!";
+    return false;
+  }
+  return true;
 }
 
 template <typename T>

@@ -23,6 +23,7 @@
 
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
@@ -114,7 +115,7 @@ class Teleop {
     printf("                     1 START ACTION\n");
     printf("                     2 VIN_REQ ACTION\n");
     printf("\n-----------------------------------------------------------\n");
-    printf("Set Gear:           [%c]+Num\n", KEYCODE_SETG1);
+    printf("Set Gear:           [%c]+Num\n", KEYCODE_SETG2);
     printf("                     0 GEAR_NEUTRAL\n");
     printf("                     1 GEAR_DRIVE\n");
     printf("                     2 GEAR_REVERSE\n");
@@ -123,14 +124,14 @@ class Teleop {
     printf("                     5 GEAR_INVALID\n");
     printf("                     6 GEAR_NONE\n");
     printf("\n-----------------------------------------------------------\n");
-    printf("Throttle/Speed up:  [%c]     |  \n", KEYCODE_UP1);
-    printf("Brake/Speed down:   [%c]     |  \n", KEYCODE_DN1);
+    printf("Throttle/Speed up:  [%c]     |  \n", KEYCODE_UP2);
+    printf("Brake/Speed down:   [%c]     |  \n", KEYCODE_DN2);
     printf("Steer LEFT:         [%c]     |  Steer RIGHT:        [%c]\n",
-           KEYCODE_LF1, KEYCODE_RT1);
+           KEYCODE_LF2, KEYCODE_RT2);
     printf("Parking Brake:      [%c]     |  Emergency Stop      [%c]\n",
-           KEYCODE_PKBK1, KEYCODE_ESTOP1);
+           KEYCODE_PKBK2, KEYCODE_ESTOP2);
     printf("Left/Right Lamp:    [%c]     |  Low beam            [%c]\n",
-           KEYCODE_SETQ1, KEYCODE_SETL1);
+           KEYCODE_SETQ2, KEYCODE_SETL2);
     printf("\n-----------------------------------------------------------\n");
     printf("Exit: Ctrl + C, then press enter to normal terminal\n");
     printf("===========================================================\n");
@@ -262,18 +263,18 @@ class Teleop {
           control_command_.set_brake(50.0);
           AINFO << "Estop Brake : " << control_command_.brake();
           break;
-        case KEYCODE_SETT1:  // set throttle 0-50
-        case KEYCODE_SETT2:
-          // read keyboard again
-          if (read(kfd_, &c, 1) < 0) {
-            exit(-1);
-          }
-          level = c - KEYCODE_ZERO;
-          control_command_.set_throttle(level * 5.0);
-          control_command_.set_brake(0.0);
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
-          break;
+        // case KEYCODE_SETT1:  // set throttle 0-50
+        // case KEYCODE_SETT2:
+        //   // read keyboard again
+        //   if (read(kfd_, &c, 1) < 0) {
+        //     exit(-1);
+        //   }
+        //   level = c - KEYCODE_ZERO;
+        //   control_command_.set_throttle(level * 5.0);
+        //   control_command_.set_brake(0.0);
+        //   AINFO << "Throttle = " << control_command_.throttle()
+        //         << ", Brake = " << control_command_.brake();
+        //   break;
         case KEYCODE_SETG1:  // set gear
         case KEYCODE_SETG2:
           // read keyboard again
@@ -285,18 +286,18 @@ class Teleop {
           control_command_.set_gear_location(gear);
           AINFO << "Gear set to : " << level;
           break;
-        case KEYCODE_SETB1:  // set brake 0-50
-        case KEYCODE_SETB2:
-          // read keyboard again
-          if (read(kfd_, &c, 1) < 0) {
-            exit(-1);
-          }
-          level = c - KEYCODE_ZERO;
-          control_command_.set_throttle(0.0);
-          control_command_.set_brake(level * 5.0);
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
-          break;
+        // case KEYCODE_SETB1:  // set brake 0-50
+        // case KEYCODE_SETB2:
+        //   // read keyboard again
+        //   if (read(kfd_, &c, 1) < 0) {
+        //     exit(-1);
+        //   }
+        //   level = c - KEYCODE_ZERO;
+        //   control_command_.set_throttle(0.0);
+        //   control_command_.set_brake(level * 5.0);
+        //   AINFO << "Throttle = " << control_command_.throttle()
+        //         << ", Brake = " << control_command_.brake();
+        //   break;
         case KEYCODE_SETQ1:  // set turn signal
         case KEYCODE_SETQ2:
           static int cnt = 0;

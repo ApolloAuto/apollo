@@ -26,17 +26,19 @@
 #include <string>
 
 #include "Eigen/Core"
-#include "cyber/plugin_manager/plugin_manager.h"
+
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/control/controllers/mpc_controller/proto/mpc_controller.pb.h"
+
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/filters/mean_filter.h"
 #include "modules/common/math/mpc_osqp.h"
-#include "modules/control/controllers/control_task_base/common/interpolation_1d.h"
-#include "modules/control/controllers/control_task_base/common/interpolation_2d.h"
-#include "modules/control/controllers/control_task_base/common/trajectory_analyzer.h"
-#include "modules/control/controllers/control_task_base/control_task.h"
+#include "modules/control/control_component/controller_task_base/common/interpolation_1d.h"
+#include "modules/control/control_component/controller_task_base/common/interpolation_2d.h"
+#include "modules/control/control_component/controller_task_base/common/trajectory_analyzer.h"
+#include "modules/control/control_component/controller_task_base/control_task.h"
 
 /**
  * @namespace apollo::control

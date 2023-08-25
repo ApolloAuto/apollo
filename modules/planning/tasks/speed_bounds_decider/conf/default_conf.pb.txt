@@ -1,6 +1,6 @@
 total_time: 7.0
 boundary_buffer: 0.25
-max_centric_acceleration_limit: 1.0
+max_centric_acceleration_limit: 0.8
 point_extension: 0.0
 lowest_speed: 0.1
 static_obs_nudge_speed_ratio: 0.6

@@ -32,6 +32,9 @@ class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
 
   uint32_t GetPeriod() const override;
 
+  void Parse(const std::uint8_t* bytes, int32_t length,
+                     %(car_type_cap)s* chassis) const override;
+
   void UpdateData(uint8_t* data) override;
 
   void Reset() override;
@@ -39,6 +42,7 @@ class %(classname)s : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
 %(declare_private_func_list)s
+%(declare_private_parse_func_list)s
 
  private:
 %(declare_private_var_list)s

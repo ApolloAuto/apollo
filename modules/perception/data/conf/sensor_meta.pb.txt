@@ -21,12 +21,6 @@ sensor_meta {
 }
 
 sensor_meta {
-    name: "radar_rear"
-    type: LONG_RANGE_RADAR
-    orientation: REAR
-}
-
-sensor_meta {
     name: "front_6mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
@@ -36,16 +30,4 @@ sensor_meta {
     name: "front_12mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
-}
-
-sensor_meta {
-    name: "camera_front"
-    type: MONOCULAR_CAMERA
-    orientation: FRONT
-}
-
-sensor_meta {
-    name: "camera_rear"
-    type: MONOCULAR_CAMERA
-    orientation: REAR
 }

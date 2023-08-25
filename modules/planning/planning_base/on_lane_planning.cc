@@ -286,10 +286,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     AINFO << "new_command:" << last_command_.DebugString();
     injector_->history()->Clear();
     injector_->planning_context()->mutable_planning_status()->Clear();
-    if (reference_line_provider_->UpdatePlanningCommand(
-            *(local_view_.planning_command))) {
-      planner_->Reset(frame_.get());
-    }
+    reference_line_provider_->UpdatePlanningCommand(
+        *(local_view_.planning_command));
+    planner_->Reset(frame_.get());
   }
   // Get end lane way point.
   reference_line_provider_->GetEndLaneWayPoint(local_view_.end_lane_way_point);
@@ -522,7 +521,7 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(ptr_trajectory_pb);
     ptr_trajectory_pb->set_gear(publishable_trajectory_gear);
-
+    ptr_trajectory_pb->set_trajectory_type(ADCTrajectory::OPEN_SPACE);
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
 

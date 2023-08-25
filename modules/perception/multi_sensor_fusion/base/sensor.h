@@ -36,12 +36,22 @@ class Sensor {
   explicit Sensor(const base::SensorInfo& sensor_info)
       : sensor_info_(sensor_info) {}
 
-  // query frames whose time stamp is in range
-  // (_latest_fused_time_stamp, time_stamp]
+  /**
+   * @brief query frames whose time stamp is in range
+   * (_latest_fused_time_stamp, time_stamp]
+   *
+   * @param timestamp
+   * @param frames
+   */
   void QueryLatestFrames(double timestamp, std::vector<SensorFramePtr>* frames);
 
-  // query latest frame whose time stamp is in range
-  // (_latest_fused_time_stamp, time_stamp]
+  /**
+   * @brief query latest frame whose time stamp is in range
+   * (_latest_fused_time_stamp, time_stamp]
+   *
+   * @param timestamp
+   * @return SensorFramePtr
+   */
   SensorFramePtr QueryLatestFrame(double timestamp);
 
   bool GetPose(double timestamp, Eigen::Affine3d* pose) const;

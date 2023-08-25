@@ -12,10 +12,10 @@ from matplotlib import ticker
 seq_num = 1
 # bdkjy_reverse_map
 polygon_free_space = [(437578.6, 4432555.6),
-                      (437575.3, 4432551.8),
-                      (437572.6, 4432550.3),
-                      (437578.6, 4432545.7),
-                      (437582.30, 4432551.8)
+                      (437577.24, 4432552.8),
+                      (437574.3, 4432550.0),
+                      (437579.8, 4432544.7),
+                      (437584.10, 4432551.24)
                       ]
 # bdkjy_reverse_map_parking_out
 polygon_parking_out = [(437547.8, 4432544.35),
@@ -50,7 +50,7 @@ def add_header(planning_command):
 
 
 def set_polygon(fsc, polygon):
-    roi = fsc.parking_roi.add()
+    roi = fsc.drivable_roi
     for pt in polygon:
         pt_pb = roi.point.add()
         pt_pb.x = pt[0]
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     plt.plot(x, y, '*-')
     plt.gca().xaxis.set_major_formatter(ticker.FormatStrFormatter('%.6f'))
     plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.6f'))
-    # plt.show()
+    plt.show()
     cyber.init()
     node = cyber.Node("planning_command")
     writer = node.create_writer(

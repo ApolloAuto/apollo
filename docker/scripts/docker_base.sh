@@ -62,7 +62,7 @@ function determine_gpu_use_host() {
 
     local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
     if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
-        if [[ -x "$(which nvidia-container-toolkit)" ]]; then
+        if [[ -x "$(which nvidia-container-toolkit)" || -x "$(which nvidia-container-runtime)" ]]; then
             local docker_version
             docker_version="$(docker version --format '{{.Server.Version}}')"
             if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
@@ -108,7 +108,7 @@ function postrun_cross_platfrom_download() {
     local flag="$2"
     if [[ "$flag" -eq 1 ]]; then
         download_tegra_lib "${container}"
-    fi 
+    fi
 }
 
 function download_tegra_lib() {
@@ -116,7 +116,7 @@ function download_tegra_lib() {
     local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
     info "download external library for cross-compilation..."
     docker exec -u root "${container}" \
-        bash -c "cd ~ && wget -nv ${tegra_lib_url} && tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null" 
+        bash -c "cd ~ && wget -nv ${tegra_lib_url} && tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null"
 }
 
 function stop_all_apollo_containers() {

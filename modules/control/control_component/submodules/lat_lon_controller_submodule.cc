@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/control/control_component/submodules/lat_lon_controller_submodule.h"
-#include "cyber/plugin_manager/plugin_manager.h"
 
+#include "cyber/plugin_manager/plugin_manager.h"
 #include "cyber/time/clock.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/latency_recorder/latency_recorder.h"
@@ -46,7 +46,7 @@ bool LatLonControllerSubmodule::Init() {
   injector_ = std::make_shared<DependencyInjector>();
 
   lateral_controller_ = PluginManager::Instance()->CreateInstance<ControlTask>(
-        "apollo::control::LatController");
+      "apollo::control::LatController");
   if (!lateral_controller_->Init(injector_).ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init LAT controller failed! Stopping...");
@@ -55,7 +55,7 @@ bool LatLonControllerSubmodule::Init() {
 
   longitudinal_controller_ =
       PluginManager::Instance()->CreateInstance<ControlTask>(
-        "apollo::control::LonController");
+          "apollo::control::LonController");
   if (!longitudinal_controller_->Init(injector_).ok()) {
     monitor_logger_buffer_.ERROR(
         "Control init LON controller failed! Stopping...");

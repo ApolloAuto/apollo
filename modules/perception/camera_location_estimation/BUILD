@@ -1,5 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/platform:build_defs.bzl", "if_profiler")
 
@@ -12,18 +11,38 @@ filegroup(
     srcs = glob([
         "conf/**",
         "dag/**",
-    ])
+    ]),
 )
 
-cc_binary(
+apollo_cc_library(
+    name = "apollo_perception_camera_location_estimation",
+    srcs = [
+        "transformer/multicue/multicue_transformer.cc",
+        "transformer/multicue/obj_mapper.cc",
+        "transformer/singlestage/singlestage_transformer.cc",
+    ],
+    hdrs = [
+        "interface/base_transformer.h",
+        "transformer/multicue/multicue_transformer.h",
+        "transformer/multicue/obj_mapper.h",
+        "transformer/singlestage/singlestage_transformer.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/camera_location_estimation/proto:camera_location_estimation_cc_proto",
+        "//modules/perception/camera_location_estimation/transformer/multicue/proto:multicue_cc_proto",
+        "//modules/perception/camera_location_estimation/transformer/singlestage/proto:singlestage_cc_proto",
+        "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/common/lib:apollo_perception_common_lib",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "@eigen",
+    ],
+)
+
+
+apollo_component(
     name = "libcamera_location_estimation_component_camera.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":camera_location_estimation_component"],
-)
-
-cc_library(
-    name = "camera_location_estimation_component",
     srcs = [
         "camera_location_estimation_component.cc",
     ],
@@ -31,17 +50,14 @@ cc_library(
         "camera_location_estimation_component.h",
     ],
     copts = PERCEPTION_COPTS + if_profiler(),
-    alwayslink = True,
     deps = [
         "//cyber",
-        "//modules/perception/camera_location_estimation/interface:base_transformer",
-        "//modules/perception/camera_location_estimation/proto:camera_location_estimation_cc_proto",
-        "//modules/perception/camera_location_estimation/transformer/multicue:multicue_transformer",
-        "//modules/perception/camera_location_estimation/transformer/singlestage:singlestage_transformer",
-        "//modules/perception/common/camera/common:util",
-        "//modules/perception/common/onboard/inner_component_messages:camera_detection_component_messages",
-    ]
+        "apollo_perception_camera_location_estimation",
+        "//modules/perception/common/camera:apollo_perception_common_camera",
+        "//modules/perception/common/onboard:apollo_perception_common_onboard",
+    ],
 )
 
 apollo_package()
+
 cpplint()

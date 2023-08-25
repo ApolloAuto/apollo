@@ -501,7 +501,7 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
   if (count % 10 == 0) {
     AINFO << "Update Planning";
   }
-  auto scenario_type = msg->debug().planning_data().scenario().scenario_type();
+  auto scenario_type = msg->debug().planning_data().scenario().scenario_plugin_type();
 
   bool pulled_over = scenario_type == "PULL_OVER";
   bool autonomy_resumed = scenario_type == "PARK_AND_GO";

@@ -1,15 +1,13 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "external_command_demo",
+apollo_component(
+    name = "libexternal_command_demo_component.so",
     hdrs = ["external_command_demo.h"],
     srcs = ["external_command_demo.cc"],
     copts = ["-DMODULE_NAME=\\\"external_command_demo\\\""],
-    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/util:message_util",
@@ -27,19 +25,11 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "libexternal_command_demo_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":external_command_demo"],
-)
-
-cc_library(
-    name = "external_command_wrapper_demo",
+apollo_component(
+    name = "libexternal_command_wrapper_demo_component.so",
     hdrs = ["external_command_wrapper_demo.h"],
     srcs = ["external_command_wrapper_demo.cc"],
     copts = ["-DMODULE_NAME=\\\"external_command_demo\\\""],
-    alwayslink = True,
     deps = [
         "//cyber",
         "//modules/common/util:message_util",
@@ -56,13 +46,6 @@ cc_library(
         "//modules/external_command/external_command_demo/proto:sweeper_custom_command_cc_proto",
         "//modules/external_command/external_command_demo/proto:demo_config_cc_proto",
     ],
-)
-
-cc_binary(
-    name = "libexternal_command_wrapper_demo_component.so",
-    linkshared = True,
-    linkstatic = True,
-    deps = [":external_command_wrapper_demo"],
 )
 
 filegroup(
