@@ -82,3 +82,9 @@ tools/FlameGraph
 .DS_Store
 
 #WORKSPACE
+
+.bash_history
+.gitconfig
+.landscape/
+.ssh/
+.vscode-server/
