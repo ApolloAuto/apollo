@@ -53,7 +53,7 @@ MAP_VOLUMES_CONF=
 # Install python tools
 source docker/setup_host/host_env.sh
 DEFAULT_PYTHON_TOOLS=(
-  amodel
+  amodel~=0.1.0
 )
 
 # Model
@@ -353,7 +353,8 @@ function install_python_tools() {
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
     info "Install python tool ${tool} ..."
-    pip3 install --user "${tool}"
+    # Use /usr/bin/pip3 because native python is used in the container.
+    /usr/bin/pip3 install --user "${tool}"
     if [ $? -ne 0 ]; then
         error "Failed to install ${tool}"
         exit 1
@@ -408,11 +409,17 @@ function main() {
 
     mount_map_volumes
 
-    info "Installing python tools ..."
-    install_python_tools
+    if ! [ -x "$(command -v pip3)" ]; then
+      warning "Skip install perception models!!! " \
+          "Need pip3 to install Apollo model management tool!" \
+          "Try \"sudo apt install python3-pip\" "
+    else
+      info "Installing python tools ..."
+      install_python_tools
 
-    info "Installing perception models ..."
-    install_perception_models
+      info "Installing perception models ..."
+      install_perception_models
+    fi
 
     info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
