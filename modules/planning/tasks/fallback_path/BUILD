@@ -15,6 +15,7 @@ apollo_plugin(
     srcs = ["fallback_path.cc"],
     hdrs = ["fallback_path.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",

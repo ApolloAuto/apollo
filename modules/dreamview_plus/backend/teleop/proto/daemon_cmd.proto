@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package modules.teleop.daemon;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message DaemonCmd {
+  optional apollo.common.Header header = 1;
+  optional string service = 2 [default = ""];
+  optional string cmd = 3 [default = "start"];
+}

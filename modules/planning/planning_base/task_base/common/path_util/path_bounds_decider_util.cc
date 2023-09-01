@@ -43,12 +43,18 @@ bool PathBoundsDeciderUtil::InitPathBoundary(
   path_bound->clear();
   const auto& reference_line = reference_line_info.reference_line();
   path_bound->set_delta_s(FLAGS_path_bounds_decider_resolution);
+
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double ego_front_to_center =
+      vehicle_config.vehicle_param().front_edge_to_center();
+
   for (double curr_s = init_sl_state.first[0];
        curr_s < std::fmin(init_sl_state.first[0] +
                               std::fmax(kPathBoundsDeciderHorizon,
                                         reference_line_info.GetCruiseSpeed() *
                                             FLAGS_trajectory_time_length),
-                          reference_line.Length());
+                          reference_line.Length() - ego_front_to_center);
        curr_s += FLAGS_path_bounds_decider_resolution) {
     path_bound->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                              std::numeric_limits<double>::max());

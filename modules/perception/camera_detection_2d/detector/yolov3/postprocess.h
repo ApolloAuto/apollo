@@ -81,12 +81,12 @@ void FillBase(const std::vector<float> &detect, const int width,
 /**
  * @brief Add 3d bbox values for objects
  *
- * @param with_box3d use 3d result
+ * @param model_param The parameters of model
  * @param detect  output of network
  * @param obj pointer to the object
  */
-void FillBbox3d(bool with_box3d, const std::vector<float> &detect,
-                base::ObjectPtr obj);
+void FillBbox3d(const yolov3::ModelParam &model_param,
+                const std::vector<float> &detect, base::ObjectPtr obj);
 /**
  * @brief NMS for objects
  *

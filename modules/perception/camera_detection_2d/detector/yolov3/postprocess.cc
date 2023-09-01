@@ -157,13 +157,39 @@ void FillBase(const std::vector<float> &detect, const int width,
   obj->camera_supplement.box.ymax = y1 + box_h;
 }
 
-void FillBbox3d(bool with_box3d, const std::vector<float> &detect,
-                base::ObjectPtr obj) {
-  if (with_box3d) {
+void FillBbox3d(const yolov3::ModelParam &model_param,
+                const std::vector<float> &detect, base::ObjectPtr obj) {
+  auto obj_l = 0.0;
+  auto obj_w = 0.0;
+  auto obj_h = 0.0;
+
+  if (model_param.with_box3d()) {
+    if (base::ObjectType::VEHICLE == base::kSubType2TypeMap.at(obj->sub_type)) {
+      obj_l = model_param.car_template().l();
+      obj_w = model_param.car_template().w();
+      obj_h = model_param.car_template().h();
+    } else if (base::ObjectType::PEDESTRIAN ==
+               base::kSubType2TypeMap.at(obj->sub_type)) {
+      obj_l = model_param.ped_template().l();
+      obj_w = model_param.ped_template().w();
+      obj_h = model_param.ped_template().h();
+    } else if (base::ObjectType::BICYCLE ==
+               base::kSubType2TypeMap.at(obj->sub_type)) {
+      obj_l = model_param.cyclist_template().l();
+      obj_w = model_param.cyclist_template().w();
+      obj_h = model_param.cyclist_template().h();
+    } else if (base::ObjectType::UNKNOWN_UNMOVABLE ==
+               base::kSubType2TypeMap.at(obj->sub_type)) {
+      obj_l = model_param.trafficcone_template().l();
+      obj_w = model_param.trafficcone_template().w();
+      obj_h = model_param.trafficcone_template().h();
+    }
+
     // length, width, height
-    obj->size[0] = detect[7];
-    obj->size[1] = detect[6];
-    obj->size[2] = detect[5];
+    obj->size[0] = obj_l;
+    obj->size[1] = obj_w;
+    obj->size[2] = obj_h;
+    // alpha
     obj->camera_supplement.alpha = detect[8];
   }
 }
@@ -306,8 +332,8 @@ void GetYolov3ObjectsCpu(const std::shared_ptr<base::Blob<float>> &objects_blob,
     obj->confidence = detect[kScoreIndex];
 
     FillBase(detect, width, height, image_width, image_height, obj);
-    // use 3d regress result to get 3d bbox
-    FillBbox3d(model_param.with_box3d(), detect, obj);
+
+    FillBbox3d(model_param, detect, obj);
 
     objects->push_back(obj);
   }

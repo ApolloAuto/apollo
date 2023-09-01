@@ -35,6 +35,9 @@ proto_library(
 proto_library(
     name = "hmi_mode_proto",
     srcs = ["hmi_mode.proto"],
+    deps = [
+        "//modules/common_msgs/dreamview_msgs:hmi_status_proto"
+    ],
 )
 
 proto_library(

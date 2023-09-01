@@ -201,19 +201,36 @@ void Yolov3ObstacleDetector::Yolo3DInference(const base::Image8U *image,
 
   const float *orient_data = blob_orient->cpu_data();
   const float *conf_data = blob_conf->cpu_data();
+  const float *dim_data = blob_dim->cpu_data();
 
+  const int bin_number = model_param_.info_3d().bin_num();
+  int max_index = 0;
+  int max_conf = conf_data[max_index];
+  for (int i = 1; i < bin_number; ++i) {
+    if (conf_data[i] > max_conf) {
+      max_conf = conf_data[i];
+      max_index = i;
+    }
+  }
+
+  int orient_index = 2 * max_index;
   float alpha = 0.f;
-  if (conf_data[0] - conf_data[1] >= 0.f) {
-    float cos_result = orient_data[0];
-    float sin_result = orient_data[1];
-    alpha = std::atan2(sin_result, cos_result) + 1.57 - 3.14159;
-  } else {
-    float cos_result = orient_data[2];
-    float sin_result = orient_data[3];
-    alpha = std::atan2(sin_result, cos_result) + 4.71 - 3.14159;
+  float cos_result = orient_data[orient_index];
+  float sin_result = orient_data[orient_index + 1];
+  float angle_offset = std::atan2(sin_result, cos_result);
+
+  float wedge = 2 * PI / bin_number;
+  alpha = angle_offset + max_index * wedge;
+  alpha = alpha + wedge / 2 - PI;
+  if (alpha > PI) {
+    alpha -= 2 * PI;
   }
   obj->camera_supplement.alpha = alpha;
-  // cv::imwrite("pics/yolov3_image_" + std::to_string(alpha) + ".png", show);
+
+  // add dim to object here
+  obj->size[0] += dim_data[2];
+  obj->size[1] += dim_data[1];
+  obj->size[2] += dim_data[0];
 
   return;
 }

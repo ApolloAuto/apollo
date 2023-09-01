@@ -67,6 +67,7 @@ apollo_plugin(
         "st_guide_line.h",
         "st_obstacles_processor.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/configs:vehicle_config_helper",

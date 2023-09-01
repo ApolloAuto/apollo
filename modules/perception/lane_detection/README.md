@@ -1,7 +1,12 @@
-# Introduction
-The lane detection module detects lane lines through the camera sensor. Lane lines can be used as an aid to other modules.
+# perception-lane-detection
 
-# Directory Structure
+## Introduction
+
+The lane detection module detects lane lines through the camera sensor. Lane lines can be used as an aid to other
+modules.
+
+## Directory Structure
+
 ```
 lane_detection
 ├── BUILD       // bazel build file
@@ -20,21 +25,30 @@ lane_detection
 └── proto      // proto file
 ```
 
-# Input and Output
-## Input
-| Channel              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `/apollo/sensor/camera/front_6mm/image`             | `drivers::Image`        | camera drive message |
-| `/apollo/sensor/camera/front_12mm/image`             | `drivers::Image`        | camera drive message |
-| `/apollo/perception/motion_service`             | `MotionServiceMsgType`        | motion service message |
+## Modules
 
-## Output
-| Channel              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `/perception/lanes`           | `PerceptionLanes`          | lane line |
+### LaneDetectionComponent
 
-# How to run
+apollo::perception::onboard::LaneDetectionComponent
+
+#### Input
+
+| Channel                                  | Type                                                                        | Description            |
+| ---------------------------------------- | --------------------------------------------------------------------------- | ---------------------- |
+| `/apollo/sensor/camera/front_6mm/image`  | `apollo::drivers::Image`                                                    | camera drive message   |
+| `/apollo/sensor/camera/front_12mm/image` | `apollo::drivers::Image`                                                    | camera drive message   |
+| `/apollo/perception/motion_service`      | `apollo::perception::onboard::LaneDetectionComponent::MotionServiceMsgType` | motion service message |
+
+#### Output
+
+| Channel             | Type                                  | Description |
+| ------------------- | ------------------------------------- | ----------- |
+| `/perception/lanes` | `apollo::perception::PerceptionLanes` | lane line   |
+
+#### How to run
+
 You can start the lane detection module with the following command.
+
 ```
 cyber_launch start modules/perception/launch/perception_lane.launch
 ```

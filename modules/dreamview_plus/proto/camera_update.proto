@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
+
+
+message CameraUpdate {
+  // The transformation matrix of localization in world coordinate system
+  // are stored in the double array in column-major order
+  repeated double localization = 1;
+
+  // The transformation matrix of localization to camera are stored in the
+  // double array in column-major order
+  repeated double localization2camera_tf = 2;
+
+  // Camera image data
+  optional bytes image = 3;
+
+  // Camera image aspect ratio = width / height
+  optional double image_aspect_ratio = 4;
+  repeated apollo.perception.BBox2D bbox2d = 5;
+  repeated int32 obstacles_id = 6;
+  enum SubType{
+    ST_UNKNOWN = 0;
+    ST_UNKNOWN_MOVABLE = 1;
+    ST_UNKNOWN_UNMOVABLE = 2;
+    ST_CAR = 3;
+    ST_VAN = 4;
+    ST_TRUCK = 5;
+    ST_BUS = 6;
+    ST_CYCLIST = 7;
+    ST_MOTORCYCLIST = 8;
+    ST_TRICYCLIST = 9;
+    ST_PEDESTRIAN = 10;
+    ST_TRAFFICCONE = 11;
+  }
+  repeated SubType obstacles_sub_type = 7;
+  optional double k_image_scale = 8;
+}

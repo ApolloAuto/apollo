@@ -1,0 +1,37 @@
+.dreamview-tabs {
+    font-family: PingFangSC-Medium;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #A6B5CC;
+    font-weight: 400;
+
+    & >.dreamview-tabs-nav {
+        .dreamview-tabs-nav-list {
+            background: #0F1014;
+            border-radius: 6px;
+        }
+    }
+
+    .dreamview-tabs-tab {
+        margin: 0 20px !important;
+        padding: 9px 0;
+
+        &.dreamview-tabs-tab-active {
+            .dreamview-tabs-tab-btn {
+                color: #3288FA;
+            }
+        }
+
+        .dreamview-tabs-tab-btn {
+            color: #A6B5CC;
+        }
+    }
+
+    
+}
+
+.dreamview-tabs-top {
+    &>.dreamview-tabs-nav::before {
+        border: none;
+    }
+}

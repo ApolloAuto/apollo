@@ -69,6 +69,7 @@ apollo_plugin(
     srcs = ["open_space_trajectory_partition.cc"],
     hdrs = ["open_space_trajectory_partition.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",

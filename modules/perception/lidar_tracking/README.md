@@ -1,10 +1,12 @@
-# Module Name
-lidar_tracking
+# perception-lidar-tracking
 
-# Introduction
-The tracking module is to track the trajectory of obstacles, update their motion status and geometric shape, and assign tracking id.
+## Introduction
 
-# Directory Structure
+The tracking module is to track the trajectory of obstacles, update their motion status and geometric shape, and assign
+tracking id.
+
+## Directory Structure
+
 ```
 ├── lidar_tracking         // tracking module
     ├── classifier         // classfier
@@ -22,31 +24,44 @@ The tracking module is to track the trajectory of obstacles, update their motion
     └── BUILD              // compile file
 ```
 
-# Module Input and Output
-## Input
-| Name              | Type                            | Description       |
-| ----------------- | ------------------------------- | ----------------- |
-| `frame`           | `onboard::LidarFrameMessage`    | lidar frame message |
+## Modules
 
-## Output
-| Name              | Type                            | Description     |
-| ----------------- | ------------------------------- | --------------- |
-| `frame`           | `onboard::SensorFrameMessage`   | sensor frame message |
+### LidarTrackingComponent
+
+apollo::perception::lidar::LidarTrackingComponent
+
+#### Input
+
+| Name    | Type                                             | Description         |
+| ------- | ------------------------------------------------ | ------------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+
+#### Output
+
+| Name    | Type                                              | Description          |
+| ------- | ------------------------------------------------- | -------------------- |
+| `frame` | `apollo::perception::onboard::SensorFrameMessage` | sensor frame message |
 
 SensorFrameMessage is used in multi sensor fusion.
 
-# How to Launch
+#### How to Launch
 
-1. Add vehicle parameter configuration file to modules/perception/data/params, corresponding frame_id and sensor_name, launch transform
+1. Add vehicle parameter configuration file to `modules/perception/data/params`, corresponding frame_id and sensor_name,
+   launch transform
+
 ```bash
 cyber_launch start modules/transform/launch/static_transform.launch
 ```
 
-2. Modify modules/perception/launch/perception_lidar.launch
-- select the dag file to start, use `lidar_tracking.dag` here
-- modify msg_adapter. It is used to wrap messages sent by other steps as /apollo/perception/obstacles, this can be used for individual debugging. Modify relevant channel configurations in modules/perception/data/flag/perception_common.flag
+2. Modify `modules/perception/launch/perception_lidar.launch`
 
-3. Modify parameter of modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt
+- select the dag file to start, use `modules/perception/lidar_tracking/dag/lidar_tracking.dag` here
+- modify msg_adapter. It is used to wrap messages sent by other steps as `/apollo/perception/obstacles`, this can be
+  used for individual debugging. Modify relevant channel configurations in
+  `modules/perception/data/flag/perception_common.flag`
+
+3. Modify parameter of `modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt`
+
 - main_sensor_name: main sensor name, same as pointcloud_preprocess component sensor_name
 - output_channel_name: output channel name
 - multi_target_tracker: multi target tracking function
@@ -61,6 +76,7 @@ cyber_launch start modules/transform/launch/static_transform.launch
   - config_file: configuration file name
 
 4. Launch tracking component
+
 ```bash
 cyber_launch start modules/perception/lidar_tracking/launch/lidar_tracking.launch
 ```

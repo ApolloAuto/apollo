@@ -112,6 +112,7 @@ class Yolov3ObstacleDetector : public BaseObstacleDetector {
 
   int gpu_id_ = 0;
   cudaStream_t stream_ = nullptr;
+  const double PI = 3.1415926;
 
   // yolo input image size
   int width_ = 0;

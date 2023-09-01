@@ -1,4 +1,4 @@
-camera_name: "camera_rear"
+camera_name: "front_12mm"
 timestamp_offset: 0.0
 plugin_param {
   name: "MultiCueTransformer"

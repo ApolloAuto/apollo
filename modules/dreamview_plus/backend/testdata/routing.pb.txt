@@ -1,0 +1,33 @@
+header {
+  module_name: "routing"
+  timestamp_sec: 1234.5
+  sequence_num: 1
+}
+routing_request {
+   waypoint {
+        id: "l1"
+        s: 0.0
+        pose {
+            x: 586392.840030
+            y: 4140673.012320
+        }
+    }
+    waypoint {
+        id: "l1"
+        s: 153.0
+        pose {
+            x: 586367.706490
+            y: 4140785.357946
+        }
+    }
+}
+road {
+   passage {
+       can_exit: true
+       segment {
+           id: "l1"
+           start_s: 0.0
+           end_s: 153.0
+       }
+   }
+}

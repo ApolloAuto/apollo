@@ -65,7 +65,10 @@ apollo_plugin(
         "open_space_trajectory_optimizer.h",
         "open_space_trajectory_provider.h",
     ],
-    copts = ["-fopenmp"],
+    copts = [
+        "-fopenmp",
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     description = ":plugins.xml",
     deps = [
         "//cyber",

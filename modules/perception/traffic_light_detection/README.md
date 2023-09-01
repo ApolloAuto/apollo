@@ -1,10 +1,15 @@
-# Module Name
-traffic_light_detection
+# perception-traffic-light-detection
 
-# Introduction
-After the previous projection in the preprocessing stage, a projection frame is obtained on the picture, but the obtained projection frame is not completely reliable, so a larger region of interest (Region of Interest ROI) to be calculated by the projected signal light position is used. to determine the exact bounding box of the semaphore. Signal light detection (detect) is a conventional convolutional neural network detection task, which receives images with ROI information as input data and sequentially outputs bounding boxes.
+## Introduction
 
-# Directory Structure
+After the previous projection in the preprocessing stage, a projection frame is obtained on the picture, but the
+obtained projection frame is not completely reliable, so a larger region of interest (Region of Interest ROI) to be
+calculated by the projected signal light position is used. to determine the exact bounding box of the semaphore. Signal
+light detection (detect) is a conventional convolutional neural network detection task, which receives images with ROI
+information as input data and sequentially outputs bounding boxes.
+
+## Directory Structure
+
 ```
 ├── traffic_light_detection // trafficlight detection module
     ├── conf            // module configuration files
@@ -21,19 +26,26 @@ After the previous projection in the preprocessing stage, a projection frame is 
     └── BUILD
 ```
 
-# Module Input and Output
-## Input
-| Name              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `frame`           | `onboard::TrafficDetectMessage` | trafficlight message |
+## Modules
 
+### TrafficLightDetectComponent
 
-## Output
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `frame`           | `onboard::TrafficDetectMessage` | trafficlight message |
+apollo::perception::onboard::TrafficLightDetectComponent
 
-# How to Launch
+#### Input
+
+| Name    | Type                                                | Description          |
+| ------- | --------------------------------------------------- | -------------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+
+#### Output
+
+| Name    | Type                                                | Description          |
+| ------- | --------------------------------------------------- | -------------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+
+#### How to Launch
+
 ```bash
 cyber_launch start modules/perception/traffic_light_detection/launch/traffic_light_detection.launch
 ```

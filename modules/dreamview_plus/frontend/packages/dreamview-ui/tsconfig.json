@@ -1,0 +1,14 @@
+{
+  "extends": "../tslint-config-dreamview/index.json",
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+, "src/icons/index.ts"  ],
+  "exclude": [
+    "node_modules",
+    "**/node_modules"
+  ],
+  "compilerOptions": {
+    "typeRoots": ["./src/@types/assets", "./node_modules/@types"]
+  },
+}

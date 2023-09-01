@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package modules.teleop.modem;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message ModemInfo {
+  optional apollo.common.Header header = 1;
+  optional string provider = 2;
+  optional string ip = 3;
+  optional int32 ip_count = 4;
+  optional string gateway = 5;
+  optional string port = 6;
+  optional string dev = 7;
+  optional uint64 tx = 8;
+  optional uint64 rx = 9;
+  optional string ping = 10;
+  optional string smoni = 11;
+  optional string technology = 12;
+  optional string connection = 13;
+  optional int32 signal = 14;
+  optional int32 quality = 15;
+  optional int32 bandwidth_ul = 16;
+  optional int32 bandwidth_dl = 17;
+  optional bool ca_aggregation = 18;
+  optional int32 rank = 19;
+}

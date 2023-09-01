@@ -23,6 +23,7 @@ apollo_plugin(
         "yield_sign_scenario.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

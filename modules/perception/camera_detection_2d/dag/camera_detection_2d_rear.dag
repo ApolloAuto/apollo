@@ -7,7 +7,7 @@ module_config {
         name : "CameraDetection2dComponentRear"
         config_file_path : "/apollo/modules/perception/camera_detection_2d/conf/camera_detection_2d_rear_config.pb.txt"
         readers {
-          channel: "/apollo/sensor/camera/rear/image"
+          channel: "/apollo/sensor/camera/front_12mm/image"
         }
       }
     }

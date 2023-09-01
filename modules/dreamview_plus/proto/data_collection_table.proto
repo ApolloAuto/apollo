@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+enum ComparisonOperator {
+  EQUAL = 0;
+  NOT_EQUAL = 1;
+  GREATER_THAN = 2;
+  GREATER_THAN_OR_EQUAL = 3;
+  LESS_THAN = 4;
+  LESS_THAN_OR_EQUAL = 5;
+}
+
+message Criterion {
+  optional string field = 1;
+  optional ComparisonOperator comparison_operator = 2;
+
+  // target value: can be either a hard-coded value or a vehicle config
+  optional float value = 3;
+  optional string vehicle_config = 4;
+}
+
+message Range {
+  optional string name = 1;
+  repeated Criterion criterion = 2;
+}
+
+message Feature {
+  optional string name = 1;
+  repeated Range range = 2;
+}
+
+message Scenario {
+  repeated Feature feature = 1;
+}
+
+message DataCollectionTable {
+  map<string, Scenario> scenario = 1;
+
+  // For each category, this is the amount of consecutive
+  // frames needed to start incrementing the count
+  required uint32 frame_threshold = 2;
+
+  // Total number of frames that each category wants to collect
+  required uint32 total_frames = 3;
+}

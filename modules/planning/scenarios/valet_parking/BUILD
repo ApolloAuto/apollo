@@ -23,6 +23,7 @@ apollo_plugin(
         "valet_parking_scenario.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",

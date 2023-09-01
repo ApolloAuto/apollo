@@ -17,6 +17,7 @@ apollo_plugin(
     srcs = ["backside_vehicle.cc"],
     hdrs = ["backside_vehicle.h"],
     description = ":plugins.xml",
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:util_tool",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",

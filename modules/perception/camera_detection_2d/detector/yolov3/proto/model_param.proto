@@ -13,10 +13,15 @@ message ModelParam {
   optional float confidence_threshold = 4;
   optional int32 output_object_num = 5;
   optional int32 output_object_size = 6;
-  optional bool with_box3d = 7;
+  optional bool with_box3d = 7 [default = true];
   optional float border_ratio = 8;
   optional NMSParam nms_param = 9;
   optional Model3DParam info_3d = 10;
+
+  optional ObjTemplate car_template = 11;
+  optional ObjTemplate ped_template = 12;
+  optional ObjTemplate cyclist_template = 13;
+  optional ObjTemplate trafficcone_template = 14;
 }
 
 message NMSParam {
@@ -31,4 +36,11 @@ message NMSParam {
 message Model3DParam {
   optional common.ModelInfo info = 1;
   optional common.Resize resize = 2;
+  optional int32 bin_num = 15 [default = 2];
+}
+
+message ObjTemplate {
+  optional float l = 1;
+  optional float w = 2;
+  optional float h = 3;
 }

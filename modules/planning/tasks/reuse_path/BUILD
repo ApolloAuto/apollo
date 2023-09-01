@@ -55,6 +55,7 @@ apollo_plugin(
     name = "libreuse_path.so",
     srcs = ["reuse_path.cc"],
     hdrs = ["reuse_path.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",

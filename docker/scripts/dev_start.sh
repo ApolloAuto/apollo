@@ -37,6 +37,9 @@ USER_VERSION_OPT=
 FAST_MODE="no"
 
 GEOLOC=
+TIMEZONE_CN=(
+  "Time zone: Asia/Shanghai (CST, +0800)"
+)
 
 USE_LOCAL_IMAGE=0
 CUSTOM_DIST=
@@ -51,7 +54,7 @@ OTHER_VOLUMES_CONF=
 # Install python tools
 source docker/setup_host/host_env.sh
 DEFAULT_PYTHON_TOOLS=(
-  amodel
+  amodel~=0.1.0
 )
 
 # Model
@@ -64,10 +67,10 @@ DEFAULT_INSTALL_MODEL=(
   "${MODEL_REPOSITORY}/darkSCNN_caffe.zip"
   "${MODEL_REPOSITORY}/cnnseg128_caffe.zip"
   "${MODEL_REPOSITORY}/3d-r4-half_caffe.zip"
-  "${MODEL_REPOSITORY}/smoke_torch.zip"
 )
 CROSS_PLATFORM_FLAG=0
 
+# Map
 DEFAULT_MAPS=(
     sunnyvale_big_loop
     sunnyvale_loop
@@ -136,9 +139,9 @@ function parse_arguments() {
                 fi
                 if [[ ! "$TARGET_ARCH" ==  "$custom_arch" ]]; then
                     CROSS_PLATFORM_FLAG=1
-                fi 
+                fi
                 TARGET_ARCH="$custom_arch"
-                check_target_arch 
+                check_target_arch
                 cross_platform_setup
                 ;;
 
@@ -267,6 +270,18 @@ function check_target_arch() {
     exit 1
 }
 
+function check_timezone_cn() {
+    # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    time_zone=$(timedatectl | grep "Time zone" | xargs)
+
+    for tz in "${TIMEZONE_CN[@]}"; do
+        if [[ "${time_zone}" == "${tz}" ]]; then
+            GEOLOC="cn"
+            return 0
+        fi
+    done
+}
+
 function setup_devices_and_mount_local_volumes() {
     local __retval="$1"
 
@@ -287,6 +302,10 @@ function setup_devices_and_mount_local_volumes() {
     local apollo_tools="${APOLLO_ROOT_DIR}/../apollo-tools"
     if [ -d "${apollo_tools}" ]; then
         volumes="${volumes} -v ${apollo_tools}:/tools"
+    fi
+    # Mount PYTHON_INSTALL_PATH to apollo docker
+    if [ -d "${PYTHON_INSTALL_PATH}" ]; then
+        volumes="${volumes} -v ${PYTHON_INSTALL_PATH}:${PYTHON_INSTALL_PATH}"
     fi
 
     local os_release="$(lsb_release -rs)"
@@ -405,7 +424,8 @@ function install_python_tools() {
 
   for tool in ${DEFAULT_PYTHON_TOOLS[@]}; do
     info "Install python tool ${tool} ..."
-    pip3 install --user "${tool}"
+    # Use /usr/bin/pip3 because native python is used in the container.
+    /usr/bin/pip3 install --user "${tool}"
     if [ $? -ne 0 ]; then
         error "Failed to install ${tool}"
         exit 1
@@ -435,6 +455,8 @@ function main() {
     fi
 
     determine_dev_image "${USER_VERSION_OPT}"
+
+    [[ -z "${GEOLOC}" ]] && check_timezone_cn
     geo_specific_config "${GEOLOC}"
 
     if [[ "${USE_LOCAL_IMAGE}" -gt 0 ]]; then
@@ -459,11 +481,17 @@ function main() {
     mount_map_volumes
     mount_other_volumes
 
-    info "Installing python tools ..."
-    install_python_tools
+    if ! [ -x "$(command -v pip3)" ]; then
+      warning "Skip install perception models!!! " \
+          "Need pip3 to install Apollo model management tool!" \
+          "Try \"sudo apt install python3-pip\" "
+    else
+      info "Installing python tools ..."
+      install_python_tools
 
-    info "Installing perception models ..."
-    install_perception_models
+      info "Installing perception models ..."
+      install_perception_models
+    fi
 
     info "Starting Docker container \"${DEV_CONTAINER}\" ..."
 
@@ -488,6 +516,8 @@ function main() {
         -e DOCKER_GRP="${group}" \
         -e DOCKER_GRP_ID="${gid}" \
         -e DOCKER_IMG="${DEV_IMAGE}" \
+        -e PYTHON_INSTALL_PATH="${PYTHON_INSTALL_PATH}" \
+        -e PYTHON_VERSION="${PYTHON_VERSION}" \
         -e USE_GPU_HOST="${USE_GPU_HOST}" \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,graphics,utility \
@@ -512,7 +542,7 @@ function main() {
     set +x
 
     postrun_start_user "${DEV_CONTAINER}"
-    postrun_cross_platfrom_download "${DEV_CONTAINER}" "${CROSS_PLATFORM_FLAG}" 
+    postrun_cross_platfrom_download "${DEV_CONTAINER}" "${CROSS_PLATFORM_FLAG}"
 
     ok "Congratulations! You have successfully finished setting up Apollo Dev Environment."
     ok "To login into the newly created ${DEV_CONTAINER} container, please run the following command:"

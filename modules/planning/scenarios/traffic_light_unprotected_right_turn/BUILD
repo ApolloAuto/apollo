@@ -26,6 +26,7 @@ apollo_plugin(
         "traffic_light_unprotected_right_turn_scenario.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:common_util",

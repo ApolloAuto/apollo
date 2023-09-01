@@ -58,6 +58,7 @@ apollo_plugin(
     srcs = ["open_space_pre_stop_decider.cc"],
     hdrs = ["open_space_pre_stop_decider.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/tasks/open_space_pre_stop_decider/proto:open_space_pre_stop_decider_cc_proto",
         "//modules/planning/planning_base:apollo_planning_planning_base",

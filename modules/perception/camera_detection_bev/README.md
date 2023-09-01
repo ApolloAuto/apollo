@@ -1,11 +1,12 @@
+# perception-camera-detection-bev
 
-# Module Name
-camera_detection_bev
+## Introduction
 
-# Introduction
-The BEV object detection module is a multi camera `transformer` model trained using `Nuscenes` datasets under the `paddlepaddle` framework, which can complete the inference of multiple camera data to obtain obstacle targets.
+The BEV object detection module is a multi camera `transformer` model trained using `Nuscenes` datasets under the
+`paddlepaddle` framework, which can complete the inference of multiple camera data to obtain obstacle targets.
 
-# Directory Structure
+## Directory Structure
+
 ```
 ├── camera_detection_bev // camera bev detector module
     ├── detector         // main part for detector
@@ -20,17 +21,24 @@ The BEV object detection module is a multi camera `transformer` model trained us
     └── BUILD
 ```
 
-# Module Input and Output
-## Input
-| Name              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `msg`             | `apollo::drivers::Image`        | camera sensor image |
+## Modules
 
-## Output
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `frame`           | `onboard::CameraFrame`          | camera frame message |
+### CameraDetectionBevComponent
 
+apollo::perception::camera::CameraDetectionBevComponent
 
-# Reference
+#### Input
+
+| Name  | Type                     | Description         |
+| ----- | ------------------------ | ------------------- |
+| `msg` | `apollo::drivers::Image` | camera sensor image |
+
+#### Output
+
+| Name    | Type                                       | Description          |
+| ------- | ------------------------------------------ | -------------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |
+
+## Reference
+
 1. [PETR: Position Embedding Transformation for Multi-View 3D Object Detection](https://arxiv.org/abs/2203.05625)

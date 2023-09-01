@@ -1,7 +1,11 @@
-# Introduction
+# perception-motion-service
+
+## Introduction
+
 The motion service module provides current motion estimation.
 
-# Directory Structure
+## Directory Structure
+
 ```
 motion_service
 ├── BUILD      // bazel build file
@@ -16,19 +20,29 @@ motion_service
 └── proto      // proto file
 ```
 
-## Input
-| Channel              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `/apollo/sensor/camera/front_6mm/image`             | `ImageMsgType`        | camera drive message |
-| `/apollo/localization/pose`             | `LocalizationMsgType`        | localization message |
+## Modules
 
-## Output
-| Channel              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `/apollo/perception/motion_service`           | `MotionService`          | motion service message |
+### MotionServiceComponent
 
-# How to run
+apollo::perception::camera::MotionServiceComponent
+
+#### Input
+
+| Channel                                 | Type                                              | Description          |
+| --------------------------------------- | ------------------------------------------------- | -------------------- |
+| `/apollo/sensor/camera/front_6mm/image` | `apollo::perception::camera::ImageMsgType`        | camera drive message |
+| `/apollo/localization/pose`             | `apollo::perception::camera::LocalizationMsgType` | localization message |
+
+#### Output
+
+| Channel                             | Type                                | Description            |
+| ----------------------------------- | ----------------------------------- | ---------------------- |
+| `/apollo/perception/motion_service` | `apollo::perception::MotionService` | motion service message |
+
+#### How to run
+
 You can start the lane detection module with the following command.
-```
+
+```bash
 cyber_launch start modules/perception/motion_service/launch/motion_service.launch
 ```

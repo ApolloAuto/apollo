@@ -1,4 +1,4 @@
-import { observable, action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 export default class StudioConnector {
 
@@ -107,10 +107,11 @@ export default class StudioConnector {
    * }
    */
   @action updateRemoteScenarioSetList(scenarioSetObjects) {
-    if (!scenarioSetObjects.error_msg) {
-      this.remoteScenarioSetList = Object.keys(scenarioSetObjects)
+    const { code, data } = scenarioSetObjects;
+    if (code === 0) {
+      this.remoteScenarioSetList = Object.keys(data)
         .map((scenarioSetId) => {
-          const scenarioSet = scenarioSetObjects[scenarioSetId];
+          const scenarioSet = data[scenarioSetId];
           return {
             id: scenarioSetId, name: scenarioSet.name, status: scenarioSet.status, type: 1,
           };
@@ -126,10 +127,11 @@ export default class StudioConnector {
    * }
    */
   @action updateRemoteDynamicsModelList(dynamicModelObjects) {
-    if (!dynamicModelObjects.error_msg) {
-      this.remoteDynamicModelList = Object.keys(dynamicModelObjects)
+    const { code, data } = dynamicModelObjects;
+    if (code === 0) {
+      this.remoteDynamicModelList = Object.keys(data)
         .map((name) => {
-          const dynamicModel = dynamicModelObjects[name];
+          const dynamicModel = data[name];
           return {
             id: name, name: dynamicModel.name, status: dynamicModel.status, type: 2,
           };
@@ -145,10 +147,11 @@ export default class StudioConnector {
    * }
    */
   @action updateRemoteRecordsList(recordObjects) {
-    if (!recordObjects.error_msg) {
-      this.remoteRecordList = Object.keys(recordObjects)
+    const { code, data } = recordObjects;
+    if (code === 0) {
+      this.remoteRecordList = Object.keys(data)
         .map((name) => {
-          const record = recordObjects[name];
+          const record = data[name];
           return {
             id: name, name: record.name, status: record.status, type: 3,
           };
@@ -281,12 +284,13 @@ export default class StudioConnector {
    * @param status "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail"
    * @param errorMsg string
    */
-  @action updateRemoteDynamicsModelStatus(name, status, errorMsg) {
-    if (name) {
+  @action updateRemoteDynamicsModelStatus(dynamicsModelStatusObject) {
+    const {code, data, message} = dynamicsModelStatusObject;
+    if (code === 0) {
       this.remoteDynamicModelList = this.remoteDynamicModelList.map((item) => {
-        if (item.id === name) {
-          item.status = status;
-          item.errorMsg = errorMsg;
+        if (item.id === data.dynamic_model_name) {
+          item.status = data.status;
+          item.errorMsg = data.message;
         }
         return item;
       });
@@ -299,12 +303,14 @@ export default class StudioConnector {
    * @param status "notDownloaded" | "toBeUpdated" | "updating" | "downloaded" | "fail"
    * @param errorMsg string
    */
-  @action updateRemoteRecordStatus(name, status, errorMsg) {
-    if (name) {
+  @action updateRemoteRecordStatus(recordStatusObject) {
+    const {code, data, message} = recordStatusObject;
+    console.log('updateRemoteRecordStatus', recordStatusObject);
+    if (code === 0) {
       this.remoteRecordList = this.remoteRecordList.map((item) => {
-        if (item.id === name) {
-          item.status = status;
-          item.errorMsg = errorMsg;
+        if (item.id === data.record_id) {
+          item.status = data.status;
+          item.errorMsg = message;
         }
         return item;
       });
@@ -319,10 +325,10 @@ export default class StudioConnector {
    * @param vehicleUpdateStatus 0 | 1 | 2| 3 // 0: 未更新 1: 更新中 2: 更新成功 3: 更新失败
    */
   @action updateVehicleInfo(vehicleInfoListObj, vehicleUpdateStatus) {
+    const { code, data, message } = vehicleInfoListObj;
     // 更新成功同步车辆信息
     if (vehicleUpdateStatus === 2) {
-      const vehicleInfoList = Object.values(vehicleInfoListObj);
-      this.vehicleInfoList = vehicleInfoList;
+      this.vehicleInfoList = Object.values(data);
     }
     this.vehicleUpdateStatus = vehicleUpdateStatus;
   }

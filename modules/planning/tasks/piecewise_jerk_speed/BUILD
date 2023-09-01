@@ -58,6 +58,7 @@ apollo_plugin(
     srcs = ["piecewise_jerk_speed_optimizer.cc"],
     hdrs = ["piecewise_jerk_speed_optimizer.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",

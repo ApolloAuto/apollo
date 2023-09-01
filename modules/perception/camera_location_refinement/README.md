@@ -1,10 +1,12 @@
-# Module Name
-camera_location_refinement
+# perception-camera-location-refinement
 
-# Introduction
-Post process the obstacles detected in the previous stage. It mainly calculates the relative position and height of the tuning target and the camera by fitting the ground plane in the camera plane
+## Introduction
 
-# Directory Structure
+Post process the obstacles detected in the previous stage. It mainly calculates the relative position and height of the
+tuning target and the camera by fitting the ground plane in the camera plane
+
+## Directory Structure
+
 ```
 ├── camera_location_refinement  // object location refinement module
     ├── conf                    // module configuration files
@@ -19,13 +21,21 @@ Post process the obstacles detected in the previous stage. It mainly calculates 
     ├── README.md
     └── BUILD
 ```
-# Module Input and Output
-## Input
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `frame`           | `onboard::CameraFrame`          | camera frame message |
 
-## Output
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `frame`           | `onboard::CameraFrame`          | camera frame message |
+## Modules
+
+### CameraLocationRefinementComponent
+
+apollo::perception::camera::CameraLocationRefinementComponent
+
+#### Input
+
+| Name    | Type                                       | Description          |
+| ------- | ------------------------------------------ | -------------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |
+
+#### Output
+
+| Name    | Type                                       | Description          |
+| ------- | ------------------------------------------ | -------------------- |
+| `frame` | `apollo::perception::onboard::CameraFrame` | camera frame message |

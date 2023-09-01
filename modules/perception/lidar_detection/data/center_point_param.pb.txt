@@ -1,7 +1,7 @@
 # center point params
 
 info {
-  name: "center_point"
+  name: "center_point_paddle"
   version: ""
   dataset: "apollo"
   task_type: Detection3D

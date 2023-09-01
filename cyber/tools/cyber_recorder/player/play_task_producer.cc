@@ -23,7 +23,6 @@
 #include "cyber/common/time_conversion.h"
 #include "cyber/cyber.h"
 #include "cyber/message/protobuf_factory.h"
-#include "cyber/record/record_viewer.h"
 
 namespace apollo {
 namespace cyber {
@@ -32,18 +31,23 @@ namespace record {
 const uint32_t PlayTaskProducer::kMinTaskBufferSize = 500;
 const uint32_t PlayTaskProducer::kPreloadTimeSec = 3;
 const uint64_t PlayTaskProducer::kSleepIntervalNanoSec = 1000000;
+const char record_info_channel[] = "/apollo/cyber/record_info";
 
 PlayTaskProducer::PlayTaskProducer(const TaskBufferPtr& task_buffer,
-                                   const PlayParam& play_param)
+                                   const PlayParam& play_param,
+                                   const NodePtr& node,
+                                   const bool preload_fill_buffer_mode)
     : play_param_(play_param),
       task_buffer_(task_buffer),
       produce_th_(nullptr),
       is_initialized_(false),
       is_stopped_(true),
-      node_(nullptr),
+      node_(node),
+      record_viewer_ptr_(nullptr),
       earliest_begin_time_(std::numeric_limits<uint64_t>::max()),
       latest_end_time_(0),
-      total_msg_num_(0) {}
+      total_msg_num_(0),
+      preload_fill_buffer_mode_(preload_fill_buffer_mode) {}
 
 PlayTaskProducer::~PlayTaskProducer() { Stop(); }
 
@@ -51,6 +55,14 @@ bool PlayTaskProducer::Init() {
   if (is_initialized_.exchange(true)) {
     AERROR << "producer has been initialized.";
     return false;
+  }
+  if (preload_fill_buffer_mode_ && node_ == nullptr) {
+    AERROR << "node from same process should pass node param for construct";
+    return false;
+  }
+  if (!preload_fill_buffer_mode_ && node_ != nullptr) {
+    AERROR << "invalid param: nullptr node";
+    node_ = nullptr;
   }
 
   if (!ReadRecordInfo() || !UpdatePlayParam() || !CreateWriters()) {
@@ -72,7 +84,12 @@ void PlayTaskProducer::Start() {
     return;
   }
 
-  produce_th_.reset(new std::thread(&PlayTaskProducer::ThreadFunc, this));
+  if (preload_fill_buffer_mode_) {
+    produce_th_.reset(
+        new std::thread(&PlayTaskProducer::ThreadFuncUnderPreloadMode, this));
+  } else {
+    produce_th_.reset(new std::thread(&PlayTaskProducer::ThreadFunc, this));
+  }
 }
 
 void PlayTaskProducer::Stop() {
@@ -165,10 +182,13 @@ bool PlayTaskProducer::ReadRecordInfo() {
 bool PlayTaskProducer::UpdatePlayParam() {
   if (play_param_.begin_time_ns < earliest_begin_time_) {
     play_param_.begin_time_ns = earliest_begin_time_;
+    play_param_.base_begin_time_ns = earliest_begin_time_;
   }
   if (play_param_.start_time_s > 0) {
-    play_param_.begin_time_ns += static_cast<uint64_t>(
-        static_cast<double>(play_param_.start_time_s) * 1e9);
+    play_param_.begin_time_ns =
+        play_param_.base_begin_time_ns +
+        static_cast<uint64_t>(static_cast<double>(play_param_.start_time_s) *
+                              1e9);
   }
   if (play_param_.end_time_ns > latest_end_time_) {
     play_param_.end_time_ns = latest_end_time_;
@@ -187,12 +207,52 @@ bool PlayTaskProducer::UpdatePlayParam() {
   return true;
 }
 
-bool PlayTaskProducer::CreateWriters() {
-  std::string node_name = "cyber_recorder_play_" + std::to_string(getpid());
-  node_ = apollo::cyber::CreateNode(node_name);
-  if (node_ == nullptr) {
-    AERROR << "create node failed.";
+void PlayTaskProducer::WriteRecordProgress(const double& curr_time_s,
+                                           const double& total_time_s) {
+  RecordInfo record_info;
+  record_info.set_total_time_s(total_time_s);
+  record_info.set_curr_time_s(curr_time_s);
+  record_info.set_progress(curr_time_s / total_time_s);
+  record_info.set_record_name(*(play_param_.files_to_play.cbegin()));
+  std::string content;
+  record_info.SerializeToString(&content);
+  auto raw_msg = std::make_shared<message::RawMessage>(content);
+  writers_[record_info_channel]->Write(raw_msg);
+}
+
+void PlayTaskProducer::Reset(const double& progress_s) {
+  play_param_.begin_time_ns = play_param_.base_begin_time_ns + progress_s * 1e9;
+  play_param_.start_time_s = progress_s;
+  record_viewer_ptr_ = nullptr;
+  record_viewer_ptr_ = std::make_shared<RecordViewer>(
+      record_readers_, play_param_.begin_time_ns, play_param_.end_time_ns,
+      play_param_.channels_to_play);
+  record_viewer_ptr_->set_curr_itr(record_viewer_ptr_->begin());
+}
+
+bool PlayTaskProducer::CreatePlayTaskWriter(const std::string& channel_name,
+                                            const std::string& msg_type) {
+  proto::RoleAttributes attr;
+  attr.set_channel_name(channel_name);
+  attr.set_message_type(msg_type);
+  auto writer = node_->CreateWriter<message::RawMessage>(attr);
+  if (writer == nullptr) {
+    AERROR << "create writer failed. channel name: " << channel_name
+           << ", message type: " << msg_type;
     return false;
+  }
+  writers_[channel_name] = writer;
+  return true;
+}
+
+bool PlayTaskProducer::CreateWriters() {
+  if (node_ == nullptr && !preload_fill_buffer_mode_) {
+    std::string node_name = "cyber_recorder_play_" + std::to_string(getpid());
+    node_ = apollo::cyber::CreateNode(node_name);
+    if (node_ == nullptr) {
+      AERROR << "create node failed.";
+      return false;
+    }
   }
 
   for (auto& item : msg_types_) {
@@ -205,20 +265,101 @@ bool PlayTaskProducer::CreateWriters() {
           play_param_.black_channels.end()) {
         continue;
       }
-      proto::RoleAttributes attr;
-      attr.set_channel_name(channel_name);
-      attr.set_message_type(msg_type);
-      auto writer = node_->CreateWriter<message::RawMessage>(attr);
-      if (writer == nullptr) {
-        AERROR << "create writer failed. channel name: " << channel_name
-               << ", message type: " << msg_type;
+      if (!CreatePlayTaskWriter(channel_name, msg_type)) {
         return false;
       }
-      writers_[channel_name] = writer;
     }
   }
+  return CreatePlayTaskWriter(record_info_channel,
+                              "apollo.cyber.proto.RecordInfo");
+}
 
-  return true;
+void PlayTaskProducer::FillPlayTaskBuffer() {
+  task_buffer_->Clear();
+  // use fixed preload buffer size
+  uint32_t preload_size = kMinTaskBufferSize * 2;
+
+  if (!record_viewer_ptr_) {
+    record_viewer_ptr_ = std::make_shared<RecordViewer>(
+        record_readers_, play_param_.begin_time_ns, play_param_.end_time_ns,
+        play_param_.channels_to_play);
+    record_viewer_ptr_->set_curr_itr(record_viewer_ptr_->begin());
+  }
+
+  auto itr = record_viewer_ptr_->curr_itr();
+
+  for (; itr != record_viewer_ptr_->end(); ++itr) {
+    if (task_buffer_->Size() > preload_size) {
+      record_viewer_ptr_->set_curr_itr(itr);
+      break;
+    }
+
+    auto search = writers_.find(itr->channel_name);
+    if (search == writers_.end()) {
+      continue;
+    }
+
+    auto raw_msg = std::make_shared<message::RawMessage>(itr->content);
+    auto task = std::make_shared<PlayTask>(raw_msg, search->second, itr->time,
+                                           itr->time);
+    task_buffer_->Push(task);
+  }
+}
+
+void PlayTaskProducer::ThreadFuncUnderPreloadMode() {
+  const uint64_t loop_time_ns =
+      play_param_.end_time_ns - play_param_.begin_time_ns;
+  uint64_t avg_interval_time_ns = kSleepIntervalNanoSec;
+  if (total_msg_num_ > 0) {
+    avg_interval_time_ns = loop_time_ns / total_msg_num_;
+  }
+
+  uint32_t preload_size = kMinTaskBufferSize * 2;
+
+  if (preload_fill_buffer_mode_ && !record_viewer_ptr_) {
+    AERROR << "Preload should not nullptr";
+    return;
+  }
+  if (!preload_fill_buffer_mode_ && record_viewer_ptr_) {
+    AERROR << "No preload should nullptr";
+    return;
+  }
+  if (!record_viewer_ptr_) {
+    record_viewer_ptr_ = std::make_shared<RecordViewer>(
+        record_readers_, play_param_.begin_time_ns, play_param_.end_time_ns,
+        play_param_.channels_to_play);
+    record_viewer_ptr_->set_curr_itr(record_viewer_ptr_->begin());
+  }
+
+  while (!is_stopped_.load()) {
+    auto itr = record_viewer_ptr_->curr_itr();
+    auto itr_end = record_viewer_ptr_->end();
+
+    while (itr != itr_end && !is_stopped_.load()) {
+      while (!is_stopped_.load() && task_buffer_->Size() > preload_size) {
+        std::this_thread::sleep_for(
+            std::chrono::nanoseconds(avg_interval_time_ns));
+      }
+      for (; itr != itr_end && !is_stopped_.load(); ++itr) {
+        if (task_buffer_->Size() > preload_size) {
+          break;
+        }
+
+        auto search = writers_.find(itr->channel_name);
+        if (search == writers_.end()) {
+          continue;
+        }
+
+        auto raw_msg = std::make_shared<message::RawMessage>(itr->content);
+        auto task = std::make_shared<PlayTask>(raw_msg, search->second,
+                                               itr->time, itr->time);
+        task_buffer_->Push(task);
+      }
+    }
+    // not support loop
+    is_stopped_.store(true);
+    break;
+  }
 }
 
 void PlayTaskProducer::ThreadFunc() {
@@ -237,15 +378,16 @@ void PlayTaskProducer::ThreadFunc() {
     preload_size = kMinTaskBufferSize;
   }
 
-  auto record_viewer = std::make_shared<RecordViewer>(
+  record_viewer_ptr_ = std::make_shared<RecordViewer>(
       record_readers_, play_param_.begin_time_ns, play_param_.end_time_ns,
       play_param_.channels_to_play);
+  record_viewer_ptr_->set_curr_itr(record_viewer_ptr_->begin());
 
   uint32_t loop_num = 0;
   while (!is_stopped_.load()) {
     uint64_t plus_time_ns = loop_num * loop_time_ns;
-    auto itr = record_viewer->begin();
-    auto itr_end = record_viewer->end();
+    auto itr = record_viewer_ptr_->curr_itr();
+    auto itr_end = record_viewer_ptr_->end();
 
     while (itr != itr_end && !is_stopped_.load()) {
       while (!is_stopped_.load() && task_buffer_->Size() > preload_size) {

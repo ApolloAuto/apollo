@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,13 +7,18 @@ PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 apollo_plugin(
     name = "libroi_service_filter.so",
+    description = ":plugins.xml",
+    deps = [":lib_roi_service_filter"],
+)
+
+apollo_cc_library(
+    name = "lib_roi_service_filter",
     srcs = [
         "roi_service_filter.cc",
     ],
     hdrs = [
         "roi_service_filter.h",
     ],
-    description = ":plugins.xml",
     deps = [
         "//modules/perception/pointcloud_map_based_roi:apollo_perception_pointcloud_map_based_roi",
         "//cyber",

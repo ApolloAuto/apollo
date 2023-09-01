@@ -28,6 +28,7 @@ apollo_plugin(
     srcs = ["open_space_fallback_decider.cc"],
     hdrs = ["open_space_fallback_decider.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/planning_base:apollo_planning_planning_base",
         "//modules/planning/tasks/open_space_fallback_decider/proto:open_space_fallback_decider_cc_proto",

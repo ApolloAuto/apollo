@@ -11,6 +11,14 @@
   <url type="repository">https://github.com/ApolloAuto/apollo</url>
   <url type="bugtracker">https://github.com/ApolloAuto/apollo/issues</url>
 
+  <depend>libglew2.0</depend>
+  <depend>libdouble-conversion1</depend>
+  <depend>libxml2</depend>
+  <depend>libjsoncpp1</depend>
+  <depend>libhdf5-100</depend>
+  <depend>libgl1-mesa-dev</depend>
+  <depend>libxt-dev</depend>
+
   <type>third-wrapper</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/vtk</src_path>
   

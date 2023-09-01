@@ -6,13 +6,7 @@ package(default_visibility = ["//visibility:public"])
 apollo_cc_binary(
     name = "cyber_recorder",
     srcs = [
-        "main.cc", "info.cc", "info.h", "recoverer.cc", 
-        "recoverer.h", "spliter.cc", "spliter.h", 
-        "player/play_task.cc", "player/play_task_buffer.cc", 
-        "player/play_task_consumer.cc", "player/play_task_producer.cc", 
-        "player/player.cc", "player/play_param.h", "player/play_task.h", 
-        "player/play_task_buffer.h", "player/play_task_consumer.h", 
-        "player/play_task_producer.h", "player/player.h",
+        "main.cc",
     ],
     linkopts = ["-pthread"],
     deps = [
@@ -24,8 +18,18 @@ apollo_cc_binary(
 
 apollo_cc_library(
     name = "recorder",
-    srcs = ["recorder.cc"],
-    hdrs = ["recorder.h"],
+    srcs = [
+        "recorder.cc", "info.cc",  "recoverer.cc", 
+        "spliter.cc", "player/play_task.cc", "player/play_task_buffer.cc", 
+        "player/play_task_consumer.cc", "player/play_task_producer.cc", 
+        "player/player.cc",
+    ],
+    hdrs = [
+        "recorder.h", "info.h", "recoverer.h", "spliter.h", 
+        "player/play_param.h", "player/play_task.h", 
+        "player/play_task_buffer.h", "player/play_task_consumer.h", 
+        "player/play_task_producer.h", "player/player.h",
+    ],
     deps = [
         "//cyber",
         "//cyber/common:cyber_common",

@@ -24,6 +24,7 @@ apollo_plugin(
         "traffic_light_protected_scenario.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:common_util",

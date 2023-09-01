@@ -1,0 +1,86 @@
+.dreamview-select {
+    &.dreamview-select-single {
+        .dreamview-select-selector {
+            color: #A6B5CC;
+            font-family: PingFangSC-Regular;
+            height: 40px !important;
+            background-color: #282D38;
+            border: none;
+
+            .dreamview-select-selection-item:hover { 
+                color: #fff !important;
+            }
+    
+            .dreamview-select-selection-item {
+                overflow: hidden; 
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                line-height: 38px;
+            }
+
+            .dreamview-select-selection-placeholder {
+                color: #A6B5CC;
+                font-family: PingFangSC-Regular;
+            }
+
+            &:hover {
+                background-color: rgba(115,193,250,0.16) !important;
+            }
+        }
+    }
+    
+    &.dreamview-select-open {
+        color: #A6B5CC !important;
+        font-family: PingFangSC-Regular;
+
+        .dreamview-select-selection-item { 
+            color: #A6B5CC !important;
+        }
+
+        .dreamview-select-arrow {
+            transform: rotate(180deg);
+        }
+    }
+
+    .dreamview-select-arrow {
+        color: #A6B5CC;
+        font-size: 16px;
+
+        &::before, &::after {
+            background-color: transparent;
+        }
+    }
+}
+
+.dreamview-select-dropdown {
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    background: #282D38;
+    border-radius: 6px;
+    padding: 4px 0 8px 0;
+
+    .dreamview-select-item {
+        color: #A6B5CC;
+        border-radius: 0;
+
+        &.dreamview-select-item-option-selected {
+            color: #3288FA;
+            background-color: rgba(115,193,250,0.08);
+        }
+
+        &.dreamview-select-item-option-active {
+            background-color: rgba(115,193,250,0.08);
+        }
+    }
+}
+
+.rc-virtual-list-scrollbar-thumb {
+    background-color: #3D434E !important;
+    width: 4px !important;
+}
+
+.ant-empty-normal {
+    .ant-empty-description {
+        color: #5D6573;
+    }
+}

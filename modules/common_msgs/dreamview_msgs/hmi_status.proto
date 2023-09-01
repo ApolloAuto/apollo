@@ -6,6 +6,7 @@ import "modules/common_msgs/basic_msgs/header.proto";
 import "modules/common_msgs/monitor_msgs/system_status.proto";
 import "modules/common_msgs/basic_msgs/geometry.proto";
 
+
 message ScenarioInfo {
   optional string scenario_id = 1;
   optional string scenario_name = 2;
@@ -17,6 +18,33 @@ message ScenarioSet {
   // id is key
   optional string scenario_set_name = 1;
   repeated ScenarioInfo scenarios = 2;
+}
+
+enum PlayRecordStatus{
+  // action:play continue
+  RUNNING = 0;
+  // action: pause
+  PAUSED = 1;
+  // action: default kill
+  CLOSED = 2;
+}
+
+message RecordStatus{
+  optional string current_record_id = 1 [default = ""];
+  optional PlayRecordStatus play_record_status = 2 [default = CLOSED];
+  optional double curr_time_s = 4 [default = 0];
+}
+
+enum HMIModeOperation {
+  // 播包
+  Record = 0;
+  // 仿真调试
+  SIM_DEBUG = 1;
+  SIM_CONTROL = 2;
+  // 实车自动驾驶
+  REAL_CAR_AUTO_DRIVING=3;
+  // 循迹
+  TRACE=4;
 }
 
 message HMIStatus {
@@ -49,9 +77,19 @@ message HMIStatus {
   optional string current_scenario_id = 17 [default = ""];
   repeated string dynamic_models = 18;
   optional string current_dynamic_model = 19;
+  // for dreamview(1.0 version)
   optional string current_record_id = 20 [default = ""];
-  map<string, int32> records = 21;
+  // for dv1.0: map value no used,is also equals to 1
+  // for dv2.0: map value equals to record total time(s)
+  map<string, double> records = 21;
   optional sint32 current_vehicle_type = 22;
   optional string current_camera_sensor_channel = 23;
   optional string current_point_cloud_channel = 24;
+
+  // dv2.0: add operation concept
+  // operations is related to hmiMode
+  repeated HMIModeOperation operations = 25;
+  optional HMIModeOperation current_operation = 26;
+  optional string current_layout = 27;
+  optional RecordStatus current_record_status = 28;
 }

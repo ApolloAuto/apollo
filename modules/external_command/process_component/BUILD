@@ -10,6 +10,7 @@ apollo_component(
     copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
     deps=[
         "//cyber",
+        "//modules/common/configs:config_gflags",
         "//modules/external_command/process_component/proto:process_component_config_cc_proto",
         "//modules/common_msgs/external_command_msgs:command_status_cc_proto",
         "//modules/external_command/command_processor/command_processor_base:command_processor_base_lib",

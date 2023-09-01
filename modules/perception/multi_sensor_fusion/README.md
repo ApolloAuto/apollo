@@ -1,9 +1,14 @@
-# Introduction
-The multi-sensor fusion module fuses the output results of Lidar, Camera, and Radar multiple sensors to make the detection results more reliable.
+# perception-multi-sensor-fusion
+
+## Introduction
+
+The multi-sensor fusion module fuses the output results of Lidar, Camera, and Radar multiple sensors to make the
+detection results more reliable.
 
 It uses post-processing technology, the algorithm used is probabilistic fusion.
 
-# Directory Structure
+## Directory Structure
+
 ```
 multi_sensor_fusion
 ├── BUILD      // bazel build file
@@ -21,21 +26,32 @@ multi_sensor_fusion
 └── proto       // proto file
 ```
 
-# Input and Output
-## Input
-| Channel              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `/perception/inner/PrefusedObjects`             | `onboard::SensorFrameMessage`        | frame contains object detection |
+## Input and Output
 
-## Output
-| Channel              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `/apollo/perception/obstacles`           | `PerceptionObstacles`          | detection results after fusion |
+### MultiSensorFusionComponent
 
-# How to run
-The multi-sensor fusion module does not support running alone, it needs to run together with lidar, camera and radar detection modules.
+apollo::perception::fusion::MultiSensorFusionComponent
 
-You can use the following command to start the whole perception function, including lidar, camera, and radar target detection, and output their results after fusion.
+#### Input
+
+| Channel                             | Type                                              | Description                     |
+| ----------------------------------- | ------------------------------------------------- | ------------------------------- |
+| `/perception/inner/PrefusedObjects` | `apollo::perception::onboard::SensorFrameMessage` | frame contains object detection |
+
+#### Output
+
+| Channel                        | Type                                      | Description                    |
+| ------------------------------ | ----------------------------------------- | ------------------------------ |
+| `/apollo/perception/obstacles` | `apollo::perception::PerceptionObstacles` | detection results after fusion |
+
+#### How to run
+
+The multi-sensor fusion module does not support running alone, it needs to run together with lidar, camera and radar
+detection modules.
+
+You can use the following command to start the whole perception function, including lidar, camera, and radar target
+detection, and output their results after fusion.
+
 ```
 cyber_launch start modules/perception/launch/perception_all.launch
 ```

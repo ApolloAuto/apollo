@@ -1,0 +1,10 @@
+{
+    "extends": "@dreamview/tslint-config-dreamview",
+    "include": ["./**/*", "../**/*.stories.*"],
+    "compilerOptions": {
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "lib": ["dom", "dom.iterable", "es2020", "webworker"],
+        "useUnknownInCatchVariables": false
+    },
+}

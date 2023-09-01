@@ -1,11 +1,11 @@
-# Component Name
-lidar_detection_filter
+# perception-lidar-detection-filter
 
 ## Introduction
 
 Filter foreground and background objects based on obejcts attributes, lane lines, ROI, etc.
 
 ## Structure
+
 ```
 ├── lidar_detection_filter
     ├── conf                // component config file
@@ -25,40 +25,54 @@ Filter foreground and background objects based on obejcts attributes, lane lines
     └── BUILD
 ```
 
-## Input and Output
+## Modules
 
-### Input
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -----------------    |
-| `frame`           | `LidarFrameMessage`             | LidarFrame‘s segmented_objects  |
+### LidarDetectionFilterComponent
 
-### Output
-| Name              | Type                            | Description     |
-| ----------------- | ------------------------------- | --------------- |
-| `frame`           | `LidarFrameMessage`             | put the preserved objects into LidarFrame‘s segmented_objects |
+apollo::perception::lidar::LidarDetectionFilterComponent
 
-## How to use
-1. Add vehicle params configs to modules/perception/data/params，keep frame_id and sensor_name consistent, start the tf
+#### Input
+
+| Name    | Type                                             | Description                    |
+| ------- | ------------------------------------------------ | ------------------------------ |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | LidarFrame‘s segmented_objects |
+
+#### Output
+
+| Name    | Type                                             | Description                                                   |
+| ------- | ------------------------------------------------ | ------------------------------------------------------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | put the preserved objects into LidarFrame‘s segmented_objects |
+
+#### How to use
+
+1. Add vehicle params configs to `modules/perception/data/params`，keep frame_id and sensor_name consistent, start the
+   tf
+
 ```bash
 cyber_launch start modules/transform/launch/static_transform.launch
 ```
 
-2. Select the lidar model，download the model files and put them into modules/perception/data/models using amodel tool.
+2. Select the lidar model，download the model files and put them into `modules/perception/data/models` using `amodel`
+   tool.
+
 ```bash
 amodel install https://xxx.zip
 ```
 
-3. Modify the modules/perception/lidar_detection/dag/lidar_detection_filter.dag
+3. Modify the `modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag`
+
 - config_file_path: path of config path
 - reader channel: the name of input channel
 
-4. Modify modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt
+4. Modify `modules/perception/lidar_detection_filter/conf/lidar_detection_filter_config.pb.txt`
+
 - output_channel_name: the name of output channel
 - use_object_filter_bank: whether use object filter
 - config_path: the path of config
 - config_file: the name of config
 
 5. start the lidar component
+
 ```bash
 cyber_launch start modules/perception/launch/perception_lidar.launch
 ```

@@ -1,10 +1,12 @@
-# Module Name
-pointcloud_preprocess
+# perception-pointcloud-preprocess
 
-# Introduction
-The point cloud preprocessing module preprocesses the point cloud data output by the driver. Deleting nan value points, points that are too far away, points scanned onto the self vehicle, and point that are too high.
+## Introduction
 
-# Directory Structure
+The point cloud preprocessing module preprocesses the point cloud data output by the driver. Deleting nan value points,
+points that are too far away, points scanned onto the self vehicle, and point that are too high.
+
+## Directory Structure
+
 ```
 ├── pointcloud_preprocess  // point cloud preprocess component
     ├── conf               // configuration folder
@@ -21,31 +23,45 @@ The point cloud preprocessing module preprocesses the point cloud data output by
     └── BUILD              // compile file
 ```
 
-# Module Input and Output
-## Input
-| Name              | Type                            | Description       |
-| ----------------- | ------------------------------- | ----------------- |
-| `msg`             | `apollo::drivers::PointCloud`   | point cloud message |
+## Modules
 
-Point cloud data from driver: If there is one lidar, output point cloud after motion compensation. If there are multiple lidars, concatenate the point clouds into one frame after motion compensation.
+### PointCloudPreprocessComponent
 
-## Output
-| Name              | Type                            | Description     |
-| ----------------- | ------------------------------- | --------------- |
-| `frame`           | `onboard::LidarFrameMessage`    | lidar frame message |
+apollo::perception::lidar::PointCloudPreprocessComponent
 
-# How to Launch
+#### Input
 
-1. Add vehicle parameter configuration file to modules/perception/data/params, corresponding frame_id and sensor_name, launch transform
+| Name  | Type                          | Description         |
+| ----- | ----------------------------- | ------------------- |
+| `msg` | `apollo::drivers::PointCloud` | point cloud message |
+
+Point cloud data from driver: If there is one lidar, output point cloud after motion compensation. If there are multiple
+lidars, concatenate the point clouds into one frame after motion compensation.
+
+#### Output
+
+| Name    | Type                                             | Description         |
+| ------- | ------------------------------------------------ | ------------------- |
+| `frame` | `apollo::perception::onboard::LidarFrameMessage` | lidar frame message |
+
+#### How to Launch
+
+1. Add vehicle parameter configuration file to `modules/perception/data/params`, corresponding frame_id and sensor_name,
+   launch transform
+
 ```bash
 cyber_launch start modules/transform/launch/static_transform.launch
 ```
 
-2. Modify modules/perception/launch/perception_lidar.launch
-- select the dag file to start, use `pointcloud_preprocess.dag` here
-- modify msg_adapter. It is used to wrap messages sent by other steps as /apollo/perception/obstacles, this can be used for individual debugging. Modify relevant channel configurations in modules/perception/data/flag/perception_common.flag
+2. `Modify modules/perception/launch/perception_lidar.launch`
 
-3. Modify parameters of modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt
+- select the dag file to start, use `modules/perception/pointcloud_preprocess/dag/pointcloud_preprocess.dag` here
+- modify msg_adapter. It is used to wrap messages sent by other steps as `/apollo/perception/obstacles`, this can be
+  used for individual debugging. Modify relevant channel configurations in
+  `modules/perception/data/flag/perception_common.flag`
+
+3. Modify parameters of `modules/perception/pointcloud_preprocess/conf/pointcloud_preprocess_config.pb.txt`
+
 - sensor_name: sensor name
 - lidar_query_tf_offset: tf time offset
 - lidar2novatel_tf2_child_frame_id: point cloud sensor name
@@ -56,6 +72,7 @@ cyber_launch start modules/transform/launch/static_transform.launch
   - config_file: configuration file name
 
 4. Launch point cloud preprocess component
+
 ```bash
 cyber_launch start modules/perception/pointcloud_preprocess/launch/pointcloud_preprocess.launch
 ```

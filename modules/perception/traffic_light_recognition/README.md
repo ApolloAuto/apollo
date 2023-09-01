@@ -1,10 +1,16 @@
-# Module Name
-traffic_light_recognition
+# perception-traffic-light-recognition
 
-# Introduction
-The purpose of the traffic light recognition module is to recognize the color of the traffic light. This task is completed using a conventional convolutional neural network. The input of the recognition module is an image with ROI information and a set of bounding box information as input data, and the output is a four-dimensional vector. , respectively represent the probability that each bounding box is black, red, yellow and green, if and only if the probability is large enough, the class with the highest probability will be identified as the state of the signal light. Otherwise the semaphore state is set to Unknown, indicating that the state is undetermined.
+## Introduction
 
-# Directory Structure
+The purpose of the traffic light recognition module is to recognize the color of the traffic light. This task is
+completed using a conventional convolutional neural network. The input of the recognition module is an image with ROI
+information and a set of bounding box information as input data, and the output is a four-dimensional vector. ,
+respectively represent the probability that each bounding box is black, red, yellow and green, if and only if the
+probability is large enough, the class with the highest probability will be identified as the state of the signal light.
+Otherwise the semaphore state is set to Unknown, indicating that the state is undetermined.
+
+## Directory Structure
+
 ```
 ├── traffic_light_recognition // trafficlight recognition module
     ├── conf            // module configuration files
@@ -21,19 +27,26 @@ The purpose of the traffic light recognition module is to recognize the color of
     └── BUILD
 ```
 
-# Module Input and Output
-## Input
-| Name              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `frame`           | `onboard::TrafficDetectMessage` | trafficlight message |
+## Modules
 
+### TrafficLightRecognComponent
 
-## Output
-| Name              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `frame`           | `onboard::TrafficDetectMessage` | trafficlight message |
+apollo::perception::onboard::TrafficLightRecognComponent
 
-# How to Launch
+#### Input
+
+| Name    | Type                                                | Description          |
+| ------- | --------------------------------------------------- | -------------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+
+#### Output
+
+| Name    | Type                                                | Description          |
+| ------- | --------------------------------------------------- | -------------------- |
+| `frame` | `apollo::perception::onboard::TrafficDetectMessage` | trafficlight message |
+
+#### How to Launch
+
 ```bash
 cyber_launch start modules/perception/traffic_light_recognition/launch/traffic_light_recognition.launch
 ```

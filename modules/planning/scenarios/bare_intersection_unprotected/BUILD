@@ -24,6 +24,7 @@ apollo_plugin(
         "stage_intersection_cruise.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:common_util",

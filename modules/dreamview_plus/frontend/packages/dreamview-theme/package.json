@@ -1,0 +1,47 @@
+{
+  "name": "@dreamview/dreamview-theme",
+  "version": "1.0.2-alpha.0",
+  "description": "themes of dreamview",
+  "author": "adu-sim",
+  "homepage": "",
+  "main": "main.ts",
+  "license": "Apache-2.0",
+  "directories": {
+    "test": "__tests__"
+  },
+  "files": [
+    "main.ts"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "test": "node ./__tests__/frontend.test.js",
+    "generate:types": "node -r esm ./scripts/generateType.js",
+    "pub": "npm publish"
+  },
+  "dependencies": {
+    "@ant-design/colors": "^7.0.0",
+    "@dreamview/log": "^1.0.0",
+    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@types/react-dom": "^18.2.4",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@dreamview/eslint-config-dreamview": "^1.0.0",
+    "@dreamview/tslint-config-dreamview": "^1.0.0",
+    "@types/react-dom": "^18.2.4",
+    "circular-dependency-plugin": "^5.2.2",
+    "esbuild-loader": "^3.0.1",
+    "eslint": "^8.41.0",
+    "esm": "^3.2.25",
+    "jest": "^29.5.0",
+    "mini-css-extract-plugin": "^2.7.5",
+    "postcss-loader": "^7.3.0",
+    "prettier": "^2.8.8",
+    "stylelint": "^15.6.2",
+    "ts-jest": "^29.1.0"
+  }
+}

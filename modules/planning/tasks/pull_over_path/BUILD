@@ -55,6 +55,7 @@ apollo_plugin(
     name = "libpull_over_path.so",
     srcs = ["pull_over_path.cc"],
     hdrs = ["pull_over_path.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",

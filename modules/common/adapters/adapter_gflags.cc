@@ -269,3 +269,5 @@ DEFINE_string(task_topic, "/apollo/task_manager", "task manager topic name");
 DEFINE_string(lidar_model_version, "",
               "It determins which lidar model(16 ,64 or 128) to load, "
               "if not to set, the model will be loaded by the sensor name.");
+DEFINE_string(record_info_topic, "/apollo/cyber/record_info",
+              "record info topic");

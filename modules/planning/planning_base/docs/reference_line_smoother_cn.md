@@ -1,4 +1,4 @@
-# 参考线平滑设定
+# 参考线平滑算法
 
 _**Tip**: 为了更好的展示本文档中的等式，我们建议使用者使用带有[插件](https://chrome.google.com/webstore/detail/tex-all-the-things/cbimabofgmfdkicghcadidpemeenbffn)的Chrome浏览器，或者将Latex等式拷贝到[在线编辑公式网站](http://www.hostmath.com/)进行浏览。_
 
@@ -27,11 +27,11 @@ $$
 
 ```
 $$
-cost = 
-\sum_{i=1}^{n} 
+cost =
+\sum_{i=1}^{n}
 \Big(
-\int\limits_{0}^{t_i} (f_i''')^2(t) dt 
-+ \int\limits_{0}^{t_i} (g_i''')^2(t) dt 
+\int\limits_{0}^{t_i} (f_i''')^2(t) dt
++ \int\limits_{0}^{t_i} (g_i''')^2(t) dt
 \Big)
 $$
 ```
@@ -42,7 +42,7 @@ QP公式：
 
 ```
 $$
-\frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x 
+\frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x
 \\
 s.t. LB \leq x \leq UB
 \\
@@ -52,7 +52,7 @@ Ax \leq b
 $$
 ```
 
-## 2 约束条件  
+## 2 约束条件
 
 ### 2.1 平滑节点约束
 

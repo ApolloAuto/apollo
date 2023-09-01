@@ -200,6 +200,7 @@ export default class DataProfile extends React.Component {
       remoteRecordListFiltered,
     } = store.studioConnector;
 
+
     const remoteResourceLength = remoteScenarioSetList.length
       + remoteDynamicModelList.length
       + remoteRecordList.length;

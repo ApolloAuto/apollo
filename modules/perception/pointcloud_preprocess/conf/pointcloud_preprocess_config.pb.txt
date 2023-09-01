@@ -1,6 +1,6 @@
 sensor_name: "velodyne128"
 lidar_query_tf_offset: 0
-lidar2novatel_tf2_child_frame_id: "lidar16"
+lidar2novatel_tf2_child_frame_id: "velodyne64"
 output_channel_name: "/perception/lidar/pointcloud_preprocess"
 plugin_param {
   name: "PointCloudPreprocessor"

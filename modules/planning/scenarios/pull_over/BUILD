@@ -28,6 +28,7 @@ apollo_plugin(
         "util.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

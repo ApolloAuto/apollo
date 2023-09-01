@@ -73,6 +73,15 @@ int Destination::MakeDecisions(Frame* frame,
   const auto& reference_line = reference_line_info->reference_line();
   reference_line.XYToSL(routing_end->pose(), &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
+
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double ego_front_to_center =
+      vehicle_config.vehicle_param().front_edge_to_center();
+  if (dest_sl.s() + ego_front_to_center > reference_line.Length()) {
+    AWARN << "dest_sl.s() + ego_front_to_center > reference_line->length()"
+            <<"may cause ego is stoped by PATH_END fence not by destination";
+  }
   const auto& dest =
       injector_->planning_context()->mutable_planning_status()->destination();
   if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {

@@ -12,6 +12,7 @@ filegroup(
     srcs = glob([
         "conf/**",
         "dag/**",
+        "data/**",
     ]),
 )
 

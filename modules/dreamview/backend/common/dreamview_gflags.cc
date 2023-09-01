@@ -139,7 +139,7 @@ DEFINE_string(sim_obstacle_stop_command, "pkill -9 -f \"sim_obstacle\" ",
               "Sim obstacle stop command");
 
 DEFINE_string(sim_obstacle_path,
-              "/.apollo/dreamview/plugins/sim_obstacle/sim_obstacle",
+              "/opt/apollo/neo/bin/sim_obstacle",
               "sim obstacle binary placement.");
 
 DEFINE_string(gflag_command_arg,

@@ -28,6 +28,7 @@ apollo_plugin(
         "context.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",

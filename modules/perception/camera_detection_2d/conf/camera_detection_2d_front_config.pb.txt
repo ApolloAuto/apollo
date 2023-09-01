@@ -1,4 +1,4 @@
-camera_name: "camera_front"
+camera_name: "front_6mm"
 timestamp_offset: 0.0
 plugin_param {
   name: "YoloObstacleDetector"
@@ -7,7 +7,7 @@ plugin_param {
 }
 enable_undistortion: false
 channel {
-  input_camera_channel_name: "/apollo/sensor/camera/front/image"
+  input_camera_channel_name: "/apollo/sensor/camera/front_6mm/image"
   output_obstacles_channel_name: "/perception/inner/Detection"
 }
 gpu_id: 0

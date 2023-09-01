@@ -1,0 +1,39 @@
+{
+    "name": "@dreamview/dreamview-mock",
+    "version": "1.0.0",
+    "description": "Server interface for mock dreamview.",
+    "author": "wangkang12 <wangkang12@baidu.com>",
+    "homepage": "",
+    "license": "MIT",
+    "main": "src/index.ts",
+    "directories": {
+        "lib": "src"
+    },
+    "files": [
+        "src"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "ssh://wangkang12@icode.baidu.com:8235/baidu/apollo-bj/apollo"
+    },
+    "scripts": {
+        "build": "tsc src/index.ts --outDir ./dist",
+        "start": "nodemon",
+        "dreamview-mock": "nodemon",
+        "dreamview-record": "node ./scripts/recorder.mjs",
+        "dreamview-replay": "node ./scripts/replay.js",
+        "prepublishOnly": "npm run build"
+    },
+    "dependencies": {
+        "@dreamview/dreamview": "^1.0.0",
+        "ws": "^8.13.0",
+        "flatted": "^3.2.7",
+        "mock-socket": "^9.2.1",
+        "nodemon": "^2.0.22",
+        "rxjs": "^7.8.1",
+        "ts-node": "^10.9.1"
+    },
+    "devDependencies": {
+        "commander": "^11.0.0"
+    }
+}

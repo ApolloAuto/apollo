@@ -63,6 +63,7 @@ apollo_plugin(
         "piecewise_jerk_speed_nonlinear_ipopt_interface.h",
         "piecewise_jerk_speed_nonlinear_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/util:common_util",

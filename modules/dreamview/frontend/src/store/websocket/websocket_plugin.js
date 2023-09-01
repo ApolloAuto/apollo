@@ -9,6 +9,52 @@ export default class PluginWebSocketEndpoint {
     this.worker = new Worker();
   }
 
+  /**
+   * responseResolvers is a map of request id to a resolver function.
+   * @type {{
+   *   [requestId: string]: (response: any) => void
+   * }}
+   */
+  _responseResolvers = {};
+
+  generateRequest(req) {
+    return {
+      ...req,
+      data: {
+        ...req.data,
+        source: 'dreamview',
+        target: 'studio_connector',
+        sourceType: 'module',
+        targetType: 'plugins',
+      },
+      type: 'PluginRequest',
+    };
+  }
+
+  sendMessage(req) {
+    const request = this.generateRequest(req);
+    return new Promise((resolve, reject) => {
+      this.websocket.send(JSON.stringify(request));
+      this._responseResolvers[request.data.requestId] = resolve;
+    });
+  }
+
+  request(req) {
+    return this.sendMessage(req).then(
+      res => {
+        if (res.data.info.code !== 0) {
+          console.warn(res.data.info.message);
+        }
+
+        if (res.data.info.code === 0) {
+          return Promise.resolve(res.data.info.data);
+        }
+
+        return Promise.reject(res.data.info.message);
+      }
+    );
+  }
+
   checkWsConnection() {
     if (this.websocket.readyState === this.websocket.OPEN) {
       return this;
@@ -47,8 +93,8 @@ export default class PluginWebSocketEndpoint {
 
         switch (message.data.name) {
           case 'StudioConnectorCertStatus':
-            const status = JSON.parse(message.data.info ?? '{}').status;
-            if (status === 'OK') {
+            const status = JSON.parse(message.data.info ?? '{}').code;
+            if (status === 0) {
               this.getScenarioSetList();
               this.getDynamicsModelList();
               this.getRecordList();
@@ -90,15 +136,12 @@ export default class PluginWebSocketEndpoint {
             break;
           case 'DownloadDynamicModelSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
-              JSON.parse(message.data.info ?? '{}')?.status,
+              JSON.parse(message.data.info ?? '{}'),
             );
             break;
           case 'DownloadDynamicModelFail':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
-              'fail',
-              JSON.parse(message.data.info ?? '{}')?.error_msg,
+              JSON.parse(message.data.info ?? '{}'),
             );
             break;
           case 'GetRecordsListSuccess':
@@ -113,15 +156,12 @@ export default class PluginWebSocketEndpoint {
           // 下载record成功
           case 'UpdateRecordToStatus':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info ?? '{}')?.record_id,
-              JSON.parse(message.data.info ?? '{}')?.status,
+              JSON.parse(message.data.info ?? '{}')
             );
             break;
           case 'DownloadRecordFail':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info ?? '{}')?.record_id,
-              'fail',
-              JSON.parse(message.data.info ?? '{}')?.error_msg,
+              JSON.parse(message.data.info ?? '{}')
             );
           case 'GetVehicleInfoSuccess':
             STORE.studioConnector.updateVehicleInfo(
@@ -135,11 +175,6 @@ export default class PluginWebSocketEndpoint {
               3,
             );
             break;
-          case 'RefreshVehicleConfigSuccess':
-            STORE.studioConnector.refreshVehicleConfig(
-              JSON.parse(message.data.info ?? '{}'),
-              2,
-            );
         }
       }
     });
@@ -391,10 +426,10 @@ export default class PluginWebSocketEndpoint {
           const message = event.data;
           switch (message.data.name) {
             case 'GetV2xInfoSuccess':
-              resolve(JSON.parse(message.data.info ?? '{}'));
+              resolve(JSON.parse(message.data.info.data ?? '{}')?.data);
               break;
             case 'GetV2xInfoFail':
-              reject(JSON.parse(message.data.info ?? '{}'));
+              reject(JSON.parse(message.data.info.data ?? '{}')?.data);
               break;
           }
         }

@@ -1,9 +1,15 @@
-# Introduction
-The radar detection module detects and tracks obstacles through the radar sensor, then sends them to the multi-sensor fusion module.
+# perception-radar-detection
 
-The radar detection module receives the radar drive message, which is already include the objects detected and tracked. Even so, the radar module has re-tracked the objects.
+## Introduction
 
-# Directory Structure
+The radar detection module detects and tracks obstacles through the radar sensor, then sends them to the multi-sensor
+fusion module.
+
+The radar detection module receives the radar drive message, which is already include the objects detected and tracked.
+Even so, the radar module has re-tracked the objects.
+
+## Directory Structure
+
 ```
 radar_detection
 ├── BUILD     // bazel build file
@@ -22,21 +28,31 @@ radar_detection
 └── radar_detection_component.h
 ```
 
-# Input and Output
-## Input
-| Channel              | Type                            | Description         |
-| ----------------- | ------------------------------- | -----------------   |
-| `/apollo/sensor/radar/front`             | `ContiRadar`        | radar drive message |
+## Modules
 
-## Output
-| Channel              | Type                            | Description          |
-| ----------------- | ------------------------------- | -------------------- |
-| `/perception/inner/PrefusedObjects`           | `onboard::SensorFrameMessage`          | frame contains object detection |
+### RadarDetectionComponent
 
-# How to run
-In most cases, the radar detection module needs to work with the multi-sensor fusion module. If you want to debug the radar module separately and view the detected obstacle information, you can combine the `msg_adapter` module.
+apollo::perception::radar::RadarDetectionComponent
+
+#### Input
+
+| Channel                      | Type                          | Description         |
+| ---------------------------- | ----------------------------- | ------------------- |
+| `/apollo/sensor/radar/front` | `apollo::drivers::ContiRadar` | radar drive message |
+
+#### Output
+
+| Channel                             | Type                                              | Description                     |
+| ----------------------------------- | ------------------------------------------------- | ------------------------------- |
+| `/perception/inner/PrefusedObjects` | `apollo::perception::onboard::SensorFrameMessage` | frame contains object detection |
+
+#### How to run
+
+In most cases, the radar detection module needs to work with the multi-sensor fusion module. If you want to debug the
+radar module separately and view the detected obstacle information, you can combine the `msg_adapter` module.
 
 Run the command as follows.
+
 ```
 cyber_launch start modules/perception/launch/perception_radar.launch
 ```

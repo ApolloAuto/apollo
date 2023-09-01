@@ -1,5 +1,4 @@
-Audio {#apollo-packages-audio}
-============
+# audio
 
 ## 简介
 
@@ -29,33 +28,37 @@ modules/audio/
 
 ### AudioComponent 组件
 
+apollo::audio::AudioComponent
+
 #### 输入
 
-| Channel 名        | 类型                            | 描述          |
-| ----------------- | ------------------------------- | -----------------    |
-| `/apollo/sensor/microphone` | [apollo::drivers::microphone::config::AudioData](#AudioData) | 麦克风数据，可通过 `modules/audio/dag/audio.dag` 启动文件修改channel名 |
-| `/apollo/localization/pose` | [apollo::localization::LocalizationEstimate](#LocalizationEstimate) | 定位信息，可通过 `modules/audio/conf/audio_conf.pb.txt` 配置文件修改 channel 名 |
+| Channel 名                  | 类型                                             | 描述                                                                            |
+| --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `/apollo/sensor/microphone` | `apollo::drivers::microphone::config::AudioData` | 麦克风数据，可通过 `modules/audio/dag/audio.dag` 启动文件修改channel名          |
+| `/apollo/localization/pose` | `apollo::localization::LocalizationEstimate`     | 定位信息，可通过 `modules/audio/conf/audio_conf.pb.txt` 配置文件修改 channel 名 |
 
 #### 输出
 
-| Channel 名      | 类型                            | 描述          |
-| ----------------- | ------------------------------- | -----------------    |
-| `/apollo/audio_detection` | [apollo::audio::AudioDetection](#AudioDetection) | 检测结果，包括警报器的状态和位置 |
+| Channel 名                | 类型                            | 描述                             |
+| ------------------------- | ------------------------------- | -------------------------------- |
+| `/apollo/audio_detection` | `apollo::audio::AudioDetection` | 检测结果，包括警报器的状态和位置 |
 
 #### 配置
 
-| 文件路径 | 类型/结构 | 说明 |
-| -------- | --------- | ---- |
-| `modules/audio/conf/audio_conf.pb.txt` | [apollo::audio::AudioConf](#AudioConf) | [AudioComponent](#AudioComponent) 的配置文件 |
-| `modules/audio/conf/respeaker_extrinsics.yaml` | `yaml` | 麦克风的外参配置文件 |
-| `modules/audio/conf/audio.conf` | `command line flags` | 命令行参数配置 |
+| 文件路径                                       | 类型/结构                  | 说明                                       |
+| ---------------------------------------------- | -------------------------- | ------------------------------------------ |
+| `modules/audio/conf/audio_conf.pb.txt`         | `apollo::audio::AudioConf` | `apollo::audio::AudioComponent` 的配置文件 |
+| `modules/audio/conf/respeaker_extrinsics.yaml` | `yaml`                     | 麦克风的外参配置文件                       |
+| `modules/audio/conf/audio.conf`                | `gflags`                   | 命令行参数配置                             |
 
 #### Flags
 
-| flag | 类型 | 默认值 | 描述 |
-| ---- | ---- | ------ | ---- |
-| `--cache_signal_time` | `int32` | `3` | 缓存的信号时长 |
+| flag                            | 类型     | 默认值                                                      | 描述           |
+| ------------------------------- | -------- | ----------------------------------------------------------- | -------------- |
+| `--cache_signal_time`           | `int32`  | `3`                                                         | 缓存的信号时长 |
 | `--touch_siren_detection_model` | `string` | `/apollo/modules/audio/data/torch_siren_detection_model.pt` | 检测模型的路径 |
+
+- flag 定义和默认值参考 `modules/audio/common/audio_gflags.cc`
 
 #### 使用方式
 

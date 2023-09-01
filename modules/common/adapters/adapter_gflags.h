@@ -125,6 +125,7 @@ DECLARE_string(heading_topic);
 DECLARE_string(rtcm_data_topic);
 DECLARE_string(audio_event_topic);
 DECLARE_string(task_topic);
+DECLARE_string(record_info_topic);
 
 // Guardian topic
 DECLARE_string(guardian_topic);

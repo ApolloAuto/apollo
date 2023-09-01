@@ -43,6 +43,7 @@ class PlayTaskBuffer {
   void Push(const TaskPtr& task);
   TaskPtr Front();
   void PopFront();
+  void Clear();
 
  private:
   TaskMap tasks_;

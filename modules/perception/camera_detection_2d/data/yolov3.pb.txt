@@ -47,6 +47,7 @@ nms_param {
   sigma: 0.1
 }
 info_3d{
+  bin_num: 2
   info {
     name: "yolov3"
     version: "2023-06-27"
@@ -94,4 +95,26 @@ info_3d{
     width: 224
     height: 224
   }
+}
+with_box3d: true
+
+car_template {
+  h: 1.46446
+  w: 1.65112
+  l: 4.54444
+}
+ped_template {
+  h: 1.6574
+  w: 0.5205
+  l: 0.4904
+}
+cyclist_template {
+  h: 1.6182
+  w: 0.4825
+  l: 1.4886
+}
+trafficcone_template {
+  h: 0.70
+  w: 0.41
+  l: 0.41
 }

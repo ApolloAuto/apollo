@@ -17,6 +17,7 @@ apollo_plugin(
     srcs = ["reference_line_end.cc"],
     hdrs = ["reference_line_end.h"],
     description = ":plugins.xml",
+    copts = PLANNING_COPTS,
     deps = [
         "//modules/common/util:util_tool",
         "//modules/common_msgs/perception_msgs:perception_obstacle_cc_proto",

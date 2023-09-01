@@ -1,4 +1,4 @@
-camera_name: "camera_front"
+camera_name: "front_6mm"
 timestamp_offset: 0.0
 postprocessor_param {
   plugin_param {
@@ -17,4 +17,4 @@ channel {
   input_camera_channel_name: "/perception/inner/location_estimation"
   output_obstacles_channel_name: "/perception/inner/location_refinement"
 }
-lane_calibration_working_sensor_name: "camera_front"
+lane_calibration_working_sensor_name: "front_6mm"

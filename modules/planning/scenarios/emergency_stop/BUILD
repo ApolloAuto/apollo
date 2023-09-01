@@ -23,6 +23,7 @@ apollo_plugin(
         "stage_standby.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",

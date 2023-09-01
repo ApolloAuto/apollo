@@ -16,6 +16,7 @@ cc_library(
     #]),
     copts = [
         "-DUSE_WEBSOCKET",
+        "-DNO_SSL",
     ],
     includes = [
         "include",

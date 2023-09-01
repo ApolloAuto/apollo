@@ -862,13 +862,19 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     cur_scenario_id = scenario_id;
   }
 
-  // Todo: Check sim obstacle status before closing it
-  const std::string absolute_path =
-      cyber::common::GetEnv("HOME") + FLAGS_sim_obstacle_path;
-  if (!cyber::common::PathExists(absolute_path)) {
-    AERROR << "Failed to find sim obstacle";
-    return false;
+  std::string absolute_path = FLAGS_sim_obstacle_path;
+
+  // found sim_obstacle binary
+  const std::string command = "which sim_obstacle";
+  std::string result = GetCommandRes(command);
+  if (result != "") {
+    absolute_path = result;
+  } else if (!cyber::common::PathExists(absolute_path)) {
+    AWARN << "Not found sim obstacle";
+    startObstacle = false;
   }
+  AINFO << "sim_obstacle binary path : " << absolute_path;
+
   StopModuleByCommand(FLAGS_sim_obstacle_stop_command);
   std::string scenario_set_id;
   {
@@ -879,6 +885,7 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
   GetScenarioSetPath(scenario_set_id, &scenario_set_path);
   const std::string scenario_path =
       scenario_set_path + "/scenarios/" + cur_scenario_id + ".json";
+  AINFO << "scenario path : " << scenario_path;
   if (!cyber::common::PathExists(scenario_path)) {
     AERROR << "Failed to find scenario!";
     return false;
@@ -938,6 +945,7 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     const std::string start_command = "nohup " + absolute_path + " " +
                                       scenario_path + FLAGS_gflag_command_arg +
                                       " &";
+    AINFO << "start sim_obstacle command : " << start_command;
     int ret = std::system(start_command.data());
     if (ret != 0) {
       AERROR << "Failed to start sim obstacle";
@@ -945,47 +953,27 @@ bool HMIWorker::ResetSimObstacle(const std::string &scenario_id) {
     }
   }
 
-  // wait simcontrol restart
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
-
-  apollo::simulation::Scenario scenario;
-  std::ifstream ifs(scenario_path);
-  CHECK(ifs.is_open()) << "Failed to open file: " << scenario_path;
-  Json json;
-  ifs >> json;
-  ifs.close();
-  google::protobuf::util::JsonParseOptions options;
-  options.ignore_unknown_fields = true;
-  google::protobuf::util::Status dump_status;
-  if (!JsonStringToMessage(json["scenario"].dump(), &scenario, options).ok()) {
-    AERROR << "Failed to parse json string to Scenario";
-    return false;
-  }
-
-  // send lane_follow_command when change scenario
-  auto lane_follow_command = std::make_shared<LaneFollowCommand>();
-  auto waypoint = lane_follow_command->mutable_way_point();
-  auto *pose = waypoint->Add();
-  pose->set_x(scenario.start().x());
-  pose->set_y(scenario.start().y());
-  if (scenario.start().has_heading()) {
-    pose->set_heading(scenario.start().heading());
-  }
-
-  auto end_pose = lane_follow_command->mutable_end_pose();
-  end_pose->set_x(scenario.end().x());
-  end_pose->set_y(scenario.end().y());
-  if (scenario.end().has_heading()) {
-    pose->set_heading(scenario.end().heading());
-  }
-
-  apollo::common::util::FillHeader(FLAGS_dreamview_module_name,
-                                   lane_follow_command.get());
-  AINFO << "Constructed LaneFollowCommand to be sent:\n"
-        << lane_follow_command->DebugString();
-  lane_follow_command_client_->SendRequest(lane_follow_command);
-
   return true;
+}
+
+std::string HMIWorker::GetCommandRes(const std::string &cmd) {
+  if (cmd.size() > 128) {
+    AERROR << "command size exceeds 128";
+    return "";
+  }
+  const char *cmdPtr = cmd.c_str();
+  char buffer[128];
+  std::string result = "";
+
+  FILE *pipe = popen(cmdPtr, "r");
+  while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+    result += buffer;
+  }
+  if (result.back() == '\n') {
+    result.pop_back();
+  }
+  pclose(pipe);
+  return result;
 }
 
 void HMIWorker::ChangeScenario(const std::string &scenario_id) {

@@ -31,13 +31,13 @@ import xml.etree.ElementTree as ET
 
 
 g_binary_name = 'mainboard'
-g_pwd = os.getcwd()
 g_script_name = os.path.basename(sys.argv[0]).split(".")[0]
 g_process_pid = os.getpid()
 g_process_name = g_script_name + "_" + str(g_process_pid)
 g_default_respawn_limit = 3
 
-cyber_path = os.getenv('CYBER_PATH')
+launch_path = os.getenv('APOLLO_LAUNCH_PATH') or '/apollo'
+force_stop_timeout_secs = 3
 
 """
 colorful logging
@@ -132,9 +132,22 @@ class ProcessWrapper(object):
         self.respawn_limit = respawn_limit
         self.respawn_cnt = 0
 
-    def wait(self):
+    def wait(self, timeout_secs=None):
+        """
+        Waiting for process terminal by call Popen.wait function
+        """
         if self.started:
-            self.popen.wait()
+            if timeout_secs:
+                self.popen.wait(timeout_secs)
+            else:
+                self.popen.wait()
+
+    def kill(self):
+        """
+        Force kill process
+        """
+        if self.started:
+            self.popen.kill()
 
     def start(self):
         """
@@ -302,9 +315,13 @@ class ProcessMonitor(object):
         for p in self.procs:
             if p.is_alive():
                 logger.warning('Waiting for [%s][%s] exit.', p.name, p.pid)
+                try:
+                    p.wait(force_stop_timeout_secs)
+                except subprocess.TimeoutExpired as e:
+                    logger.warning("Begin force kill process [%s][%s].", p.name, p.pid)
+                    p.kill()
                 p.wait()
-                logger.info(
-                    'Process [%s] has been stopped. dag_file: %s', p.name, p.dag_list)
+                logger.info('Process [%s] has been stopped. dag_file: %s', p.name, p.dag_list)
         # Reset members
         self.procs = []
         self.dead_cnt = 0
@@ -345,22 +362,15 @@ def start(launch_file=''):
     """
     pmon = ProcessMonitor()
     # Find launch file
-    if launch_file[0] == '/':
-        launch_file = launch_file
-    elif launch_file == os.path.basename(launch_file):
-        launch_file = os.path.join(cyber_path, 'launch', launch_file)
-    else:
-        if os.path.exists(os.path.join(g_pwd, launch_file)):
-            launch_file = os.path.join(g_pwd, launch_file)
+    if not os.path.isfile(launch_file):
+        filename = os.path.join(launch_path, launch_file)
+        if os.path.isfile(filename):
+            launch_file = filename
         else:
             logger.error('Cannot find launch file: %s ', launch_file)
             sys.exit(1)
     logger.info('Launch file [%s]', launch_file)
     logger.info('=' * 120)
-
-    if not os.path.isfile(launch_file):
-        logger.error('Launch xml file %s does not exist', launch_file)
-        sys.exit(1)
 
     try:
         tree = ET.parse(launch_file)
@@ -461,9 +471,6 @@ def main():
     """
     Main function
     """
-    if cyber_path is None:
-        logger.error('Error: environment variable CYBER_PATH not found, set environment first.')
-        sys.exit(1)
     parser = argparse.ArgumentParser(description='cyber launcher')
     subparsers = parser.add_subparsers(help='sub-command help')
 

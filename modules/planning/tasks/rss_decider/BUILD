@@ -67,6 +67,7 @@ apollo_plugin(
     name = "librss_decider.so",
     srcs = ["rss_decider.cc"],
     hdrs = ["rss_decider.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     description = ":plugins.xml",
     deps = [
         "//modules/common/status",

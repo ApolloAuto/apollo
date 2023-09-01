@@ -118,6 +118,8 @@ class HMIWorker {
   void InitReadersAndWriters();
   void InitStatus();
   void StatusUpdateThreadLoop();
+  // get command result
+  std::string GetCommandRes(const std::string& cmd);
 
   // Start / reset current mode.
   void SetupMode() const;

@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-joyride/es/index.js b/node_modules/react-joyride/es/index.js
+index 7a13f95..d68c850 100644
+--- a/node_modules/react-joyride/es/index.js
++++ b/node_modules/react-joyride/es/index.js
+@@ -1745,7 +1745,7 @@ var JoyrideTooltipContainer = /*#__PURE__*/function (_React$Component) {
+           output.primary = /*#__PURE__*/React.createElement("span", null, output.primary, " (", index + 1, "/", size, ")");
+         }
+       }
+-      if (showSkipButton && !isLastStep) {
++      if (showSkipButton) {
+         output.skip = /*#__PURE__*/React.createElement("button", _extends({
+           style: styles.buttonSkip,
+           type: "button",

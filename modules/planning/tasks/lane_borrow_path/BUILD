@@ -15,6 +15,7 @@ apollo_plugin(
     srcs = ["lane_borrow_path.cc"],
     hdrs = ["lane_borrow_path.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",

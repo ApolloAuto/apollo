@@ -176,6 +176,15 @@ class RecordViewer {
    */
   Iterator end();
 
+  /**
+   * @brief Get current iterator.
+   *
+   * @return The current iterator.
+   */
+  Iterator curr_itr();
+
+  void set_curr_itr(const Iterator& curr_itr);
+
  private:
   friend class Iterator;
 
@@ -199,6 +208,8 @@ class RecordViewer {
 
   const uint64_t kStepTimeNanoSec = 1000000000UL;  // 1 second
   const std::size_t kBufferMinSize = 128;
+
+  Iterator itr_;
 };
 
 }  // namespace record

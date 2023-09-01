@@ -8,7 +8,7 @@ filegroup(
     srcs = glob([
         "flag/**",
         "params/**",
-        "perception/**",
+        "conf/**",
     ])
 )
 

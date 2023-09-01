@@ -47,6 +47,14 @@ nlohmann::json JsonUtil::ProtoToTypedJson(
   return json_obj;
 }
 
+nlohmann::json JsonUtil::ProtoToJson(const google::protobuf::Message &proto) {
+  static const auto kJsonOption = JsonOption();
+  std::string json_string;
+  const auto status = MessageToJsonString(proto, &json_string, kJsonOption);
+  Json json_obj = Json::parse(json_string);
+  return json_obj;
+}
+
 bool JsonUtil::GetString(const Json &json, const std::string &key,
                          std::string *value) {
   const auto iter = json.find(key);
@@ -60,6 +68,27 @@ bool JsonUtil::GetString(const Json &json, const std::string &key,
   }
   *value = *iter;
   return true;
+}
+
+bool JsonUtil::GetStringByPath(const Json &json, const std::string &path,
+                               std::string *value) {
+  std::vector<std::string> paths = absl::StrSplit(path, '.');
+  std::string key = paths.back();
+  paths.pop_back();
+  Json upper_layer_json = json;
+  for (auto &field : paths) {
+    if (field.empty()) {
+      AERROR << "Invalid path: " << path;
+      return false;
+    }
+    const auto iter = upper_layer_json.find(field);
+    if (iter == upper_layer_json.end()) {
+      AERROR << "The json has no such key: " << field;
+      return false;
+    }
+    upper_layer_json = *iter;
+  }
+  return GetString(upper_layer_json, key, value);
 }
 
 bool JsonUtil::GetStringVector(const Json &json, const std::string &key,

@@ -22,6 +22,7 @@ apollo_plugin(
         "lane_follow_stage.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common_msgs/basic_msgs:pnc_point_cc_proto",

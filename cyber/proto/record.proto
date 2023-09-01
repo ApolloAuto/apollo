@@ -99,3 +99,10 @@ message ChunkBody {
 message Index {
   repeated SingleIndex indexes = 1;
 }
+
+message RecordInfo {
+  optional string record_name = 1 [default = ""];
+  optional double total_time_s = 2;
+  optional double curr_time_s = 3 [default = 0];
+  optional double progress = 4 [default = 0];
+}

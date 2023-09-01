@@ -79,6 +79,7 @@ apollo_plugin(
         "st_graph_point.h",
     ],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/common/configs:vehicle_config_helper",

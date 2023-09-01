@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declarationDir": ".",
+        "declaration": true
+    },
+    "importHelpers": true,
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**.d.ts"
+    ],
+    "moduleResolution": "node",
+}

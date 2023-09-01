@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>复选/选中</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="16" height="16"></rect>
+    </defs>
+    <g id="复选/选中" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ic_check">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="矩形" fill="#D8D8D8" opacity="0" xlink:href="#path-1"></use>
+            <g id="ic_-勾选" mask="url(#mask-2)">
+                <g transform="translate(0.500000, 0.500000)">
+                    <rect id="矩形" fill="#3288FA" x="0" y="0" width="15" height="15" rx="2"></rect>
+                    <path d="M6.30894118,9.2873942 L11.1418779,4.44584757 L11.1418779,4.44584757 C11.3381852,4.25138414 11.6564622,4.25138414 11.8527695,4.44584757 C12.0490768,4.64031099 12.0490768,4.9555985 11.8527695,5.15006193 L6.58683076,10.4179294 C6.39415948,10.6106712 6.08262358,10.613617 5.88634208,10.4245529 L3.14723047,7.78616105 L3.14723047,7.78616105 C2.95092318,7.59169762 2.95092318,7.27641012 3.14723047,7.08194669 C3.34353776,6.88748327 3.66181477,6.88748327 3.85812206,7.08194669 L6.16910066,9.28906354 C6.20841772,9.32661359 6.2705317,9.32587211 6.30894118,9.2873942 Z" id="Combined-Shape-Copy-4" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
