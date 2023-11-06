@@ -17,7 +17,7 @@ const params = {
     outputPath,
     contextPath: appSrcPath,
     entrypoint: enterPoint,
-    prodSourceMap: 'source-map',
+    prodSourceMap: false,
     version: packageJson.version,
 };
 

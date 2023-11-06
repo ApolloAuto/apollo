@@ -19,7 +19,7 @@
   <depend>libpcap0.8</depend>
   <depend>libqhull7</depend>
   <depend>libflann-dev</depend>
-  <depend>3rd-vtk</depend>
+  <depend expose="False">3rd-vtk</depend>
 
   <type>third-wrapper</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/pcl</src_path>

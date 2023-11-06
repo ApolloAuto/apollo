@@ -87,12 +87,29 @@ class JsonUtil {
                               std::vector<std::string> *value);
 
   /**
+   * @brief Get the json from the given json and path.
+   * @param path eg:"a.b.c" json[a][b][c]
+   * @return Whether the field exists and is a json.
+   */
+  static bool GetJsonByPath(const nlohmann::json &json,
+                            const std::vector<std::string> &paths,
+                            nlohmann::json *value);
+
+  /**
    * @brief Get a string value from the given json and path.
    * @param path eg:"a.b.c" json[a][b][c]
    * @return Whether the field exists and is a valid string.
    */
   static bool GetStringByPath(const nlohmann::json &json,
                               const std::string &path, std::string *value);
+
+  /**
+   * @brief Get a bool value from the given json and path.
+   * @param path eg:"a.b.c" json[a][b][c]
+   * @return Whether the field exists and is a valid string.
+   */
+  static bool GetBooleanByPath(const nlohmann::json &json,
+                               const std::string &path, bool *value);
 
   /**
    * @brief Get a number value from the given json and path.

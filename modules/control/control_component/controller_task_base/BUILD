@@ -9,6 +9,7 @@ apollo_cc_library(
     name = "control_task_agent",
     srcs = ["control_task_agent.cc"],
     hdrs = ["control_task_agent.h"],
+    copts = CONTROL_COPTS,
     deps = [
         "control_task",
         "//cyber",
@@ -26,10 +27,11 @@ apollo_cc_library(
     name = "control_task",
     srcs = [],
     hdrs = ["control_task.h"],
+    copts = CONTROL_COPTS,
     deps = [
         "//cyber",
         "//modules/control/control_component/controller_task_base/common:controllers_control_task_base_common",
-        "//modules/control/control_component/controller_task_base/proto:calibration_table_cc_proto",
+        "//modules/control/control_component/proto:calibration_table_cc_proto",
     ],
 )
 

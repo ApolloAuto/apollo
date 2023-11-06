@@ -1,31 +1,23 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import i18next from '@dreamview/dreamview-lang';
 import { PageLayoutStoreProvider } from '@dreamview/dreamview-core/src/store/PageLayoutStore';
-import { hmiUtils, usePickHmiStore, CURRENT_MODE, changeMode } from '@dreamview/dreamview-core/src/store/HmiStore';
+import { usePickHmiStore, CURRENT_MODE, changeMode } from '@dreamview/dreamview-core/src/store/HmiStore';
 import { usePanelLayoutStore, updateByMode } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
 import { flushSync } from 'react-dom';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import Menu from '../Menu';
 import PanelLayout from '../PanelLayout';
-import PlayerControlBar from '../PlayerControlBar';
 import MenuDrawer from '../MenuDrawer';
 import usePageLayoutStyles from './style';
 import PerceptionGuide from '../Guide/PerceptionGuide';
 import WelcomeGuide from '../WelcomeGuide';
 import DefaultGuide from '../Guide/DefaultGuide';
 import useLocalStorage from '../../util/useLocalStorage';
-
-function ChangeLang() {
-    return (
-        <>
-            <div onClick={() => i18next.changeLanguage('zh')}>1、中文</div>
-            <div onClick={() => i18next.changeLanguage('en')}>2、英文</div>
-        </>
-    );
-}
+import PNCGuide from '../Guide/PNCGuide';
+import useComponentDisplay from '../../hooks/useComponentDisplay';
+import BottomBar from '../BottomBar';
 
 function PageLayout() {
-    const [hmi, dispatch] = usePickHmiStore();
+    const [, dispatch] = usePickHmiStore();
 
     const { mainApi, isMainConnected } = useWebSocketServices();
 
@@ -37,7 +29,7 @@ function PageLayout() {
 
     const [enterGuideState, setEnterGuideState] = useState({ currentMode: '' });
 
-    const isPlayerControlBarShow = useMemo(() => hmiUtils.isPlayerControlShow(hmi), [hmi]);
+    const [{ isBottomBarShow }] = useComponentDisplay();
 
     const [perceptionGuideLastStep, setPerceptionGuideLastState] = useState({});
 
@@ -68,6 +60,9 @@ function PageLayout() {
             if (useGuideMode === CURRENT_MODE.PERCEPTION) {
                 setEnterGuideState({ currentMode: CURRENT_MODE.PERCEPTION });
             }
+            if (useGuideMode === CURRENT_MODE.PNC) {
+                setEnterGuideState({ currentMode: CURRENT_MODE.PNC });
+            }
         },
         [isMainConnected],
     );
@@ -84,6 +79,7 @@ function PageLayout() {
             {enterGuideState.currentMode === CURRENT_MODE.PERCEPTION && (
                 <PerceptionGuide controlPerceptionGuideLastStep={controlPerceptionGuideLastStep} />
             )}
+            {enterGuideState.currentMode === CURRENT_MODE.PNC && <PNCGuide />}
             {localFirstUseGuideMode && (
                 <>
                     <div className={c['dv-layout-menu']}>
@@ -99,10 +95,10 @@ function PageLayout() {
                         </div>
                         <div
                             className={cx(c['dv-layout-playercontrol'], {
-                                [c['dv-layout-playercontrol-active']]: isPlayerControlBarShow,
+                                [c['dv-layout-playercontrol-active']]: isBottomBarShow,
                             })}
                         >
-                            <PlayerControlBar />
+                            <BottomBar />
                         </div>
                     </div>
                 </>
@@ -111,10 +107,12 @@ function PageLayout() {
     );
 }
 
+const PageLayoutMemo = React.memo(PageLayout);
+
 function PageLayoutWrapper() {
     return (
         <PageLayoutStoreProvider>
-            <PageLayout />
+            <PageLayoutMemo />
         </PageLayoutStoreProvider>
     );
 }

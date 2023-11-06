@@ -8,7 +8,7 @@ export const planningParams = {
             width: 0.1,
             color: 16764501,
             opacity: 1,
-            zOffset: 1.4,
+            zOffset: 0.3,
         },
         trajectory: {
             width: 0.8,
@@ -17,10 +17,10 @@ export const planningParams = {
             zOffset: 0.2,
         },
         planning_reference_line: {
-            width: 0.6,
+            width: 0.8,
             color: 14177878,
             opacity: 0.7,
-            zOffset: 1.1,
+            zOffset: 0.1,
         },
         DpPolyPathOptimizer: {
             width: 0.4,

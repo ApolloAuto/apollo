@@ -60,25 +60,23 @@ bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
     if (other_obstacle->IsVirtual()) {
       continue;
     }
-    if (other_obstacle->PerceptionSLBoundary().start_l() >
-            obstacle.PerceptionSLBoundary().end_l() ||
-        other_obstacle->PerceptionSLBoundary().end_l() <
-            obstacle.PerceptionSLBoundary().start_l()) {
+    if (other_obstacle->Perception().type() !=
+        apollo::perception::PerceptionObstacle::VEHICLE) {
+      continue;
+    }
+    const auto& other_boundary = other_obstacle->PerceptionSLBoundary();
+    const auto& this_boundary = obstacle.PerceptionSLBoundary();
+    if (other_boundary.start_l() > this_boundary.end_l() ||
+        other_boundary.end_l() < this_boundary.start_l()) {
       // not blocking the backside vehicle
       continue;
     }
-    double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                     obstacle.PerceptionSLBoundary().end_s();
+    double delta_s = other_boundary.start_s() - this_boundary.end_s();
     if (delta_s < 0.0 || delta_s > kObstaclesDistanceThreshold) {
       continue;
     }
-
-    // TODO(All): Fix the segmentation bug for large vehicles, otherwise
-    // the follow line will be problematic.
-    ADEBUG << " - It is blocked by others, and will move later.";
     return false;
   }
-
   ADEBUG << "IT IS NON-MOVABLE!";
   return true;
 }

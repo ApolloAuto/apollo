@@ -108,3 +108,9 @@ DECLARE_string(valet_parking_command_topic);
 
 DECLARE_string(action_command_topic);
 DECLARE_string(data_handler_config_path);
+
+DECLARE_string(data_recorder_command_keyword);
+
+DECLARE_string(data_record_default_name);
+
+DECLARE_double(threshold_for_destination_check);

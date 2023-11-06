@@ -8,6 +8,14 @@ export default function useStyle() {
             height: '100%',
             position: 'relative',
         },
+        'viz-context': {
+            width: '100%',
+            height: '100%',
+        },
+        'routing-editing-context': {
+            width: '100%',
+            height: '100%',
+        },
         'web-gl': {
             width: '100%',
             height: '100%',
@@ -105,7 +113,7 @@ export default function useStyle() {
         },
         'viz-btn-container': {
             position: 'absolute',
-            bottom: '24px',
+            bottom: '44px',
             right: theme.tokens.padding.speace2,
             display: 'flex',
             flexDirection: 'column',
@@ -133,7 +141,7 @@ export default function useStyle() {
             fontSize: '14px',
             fontWeight: '400',
         },
-        'view-menu-btn-container': {
+        'view-menu-scale-btn-container': {
             marginTop: '12px',
             width: '32px',
             height: '56px',
@@ -145,6 +153,15 @@ export default function useStyle() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
+        },
+        'view-menu-btn-item-only': {
+            cursor: 'pointer',
+            width: '32px',
+            height: '32px',
+            background: '#343C4D',
+            borderRadius: '6px',
+            marginTop: '10px',
+            ...theme.util.flexCenterCenter,
         },
         'view-menu-btn-item': {
             cursor: 'pointer',
@@ -188,6 +205,16 @@ export default function useStyle() {
             color: '#808B9D',
             fontWeight: 400,
             fontFamily: 'PingFangSC-Regular',
+        },
+        'view-btn-container': {
+            position: 'absolute',
+            bottom: '44px',
+            right: '24px',
+        },
+        'view-ope-container': {
+            position: 'absolute',
+            top: '25px',
+            right: '24px',
         },
     }));
     return hoc();

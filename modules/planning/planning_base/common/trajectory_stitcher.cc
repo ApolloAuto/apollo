@@ -117,10 +117,10 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
    (or) 3. the position deviation from actual and target is too high
 */
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
-    const VehicleState& vehicle_state, const double current_timestamp,
-    const double planning_cycle_time, const size_t preserved_points_num,
-    const bool replan_by_offset, const PublishableTrajectory* prev_trajectory,
-    std::string* replan_reason) {
+    const canbus::Chassis& vehicle_chassis, const VehicleState& vehicle_state,
+    const double current_timestamp, const double planning_cycle_time,
+    const size_t preserved_points_num, const bool replan_by_offset,
+    const PublishableTrajectory* prev_trajectory, std::string* replan_reason) {
   if (!FLAGS_enable_trajectory_stitcher) {
     *replan_reason = "stitch is disabled by gflag.";
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
@@ -183,6 +183,20 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
           static_cast<uint32_t>(position_matched_index)));
 
   if (replan_by_offset) {
+    if (vehicle_chassis.has_parking_brake()) {
+      static bool parking_brake = true;
+      if (parking_brake && !vehicle_chassis.parking_brake()) {
+        parking_brake = vehicle_chassis.parking_brake();
+        const std::string msg =
+            "parking brake off, ego move, replan to avoid large station error";
+        AERROR << msg;
+        *replan_reason = msg;
+        return ComputeReinitStitchingTrajectory(planning_cycle_time,
+                                                vehicle_state);
+      }
+      parking_brake = vehicle_chassis.parking_brake();
+    }
+
     auto lon_diff = time_matched_point.path_point().s() - frenet_sd.first;
     auto lat_diff = frenet_sd.second;
     double time_diff = time_matched_point.relative_time() -

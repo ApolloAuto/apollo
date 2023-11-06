@@ -20,7 +20,7 @@
   数据格式定义继承 `apollo::drivers::canbus::ProtocolData` ，并实现报文协议解析。每一类车型代码通过包管理的方式进行组
   织，具体车型实现可移动到 `modules/canbus_vehicle` 进行查看。
 
-- `CanClient` 客户端是CAN卡硬件驱动的实例，它是被不同的使用CAN总线协议的传感器共享的。如果现有的CAN卡驱动不满足使用，可以通过继承 `apollo::drivers::canbus::CanClient` 类在 `modules/drivers/canbus/can_client` 的文件夹中实现新的CAN卡驱动。 `CanClient` 客户端实现可以移动到 `modules/drivers/canbus/can_client/` 进行查看。
+- `CanClient` 客户端是CAN卡硬件驱动的实例，它是被不同的使用CAN总线协议的传感器共享的。如果现有的CAN卡驱动不满足使用，可以通过继承 `apollo::drivers::canbus::CanClient` 类在 `modules/drivers/canbus/can_client` 的文件夹中实现新的CAN卡驱动。 `CanClient` 客户端可以移动到 `modules/drivers/canbus/can_client/` 进行查看。
 
 ## 文件组织结构及说明
 
@@ -79,6 +79,34 @@ apollo::canbus::CanbusComponent
 | `modules/canbus/common/canbus_gflags.h`  | `h`  | Canbus组件flags声明文件     |
 
 #### 使用方式
+
+##### 修改`modules/canbus/conf/canbus.conf`配置文件
+
+- 打开chassis_detail，启动canbus后会输出`/apollo/chassis_detail`消息，建议调试底盘数据时打开
+```
+--enable_chassis_detail_pub
+```
+- 关闭chassis_detail，非底盘调试时可以不打开
+```
+--noenable_chassis_detail_pub
+```
+- 关闭guardian控制指令，默认不打开，不打开则接收`/apollo/control`数据。注意：如果打开，则接收`/apollo/guardian`数据，且需要启动guardian模块
+```
+--noreceive_guardian
+```
+
+##### 修改`modules/canbus/conf/canbus_conf.pb.txt`配置文件
+
+配置can_card_parameter，使用哪个can卡，配置哪个，下图示例是使用HERMES_CAN设备，PCI类型，端口号0，最大端口数8。
+```
+can_card_parameter {
+  brand: HERMES_CAN
+  type: PCI_CARD
+  channel_id: CHANNEL_ID_ZERO
+  num_ports: 8
+  interface: NATIVE
+}
+```
 
 ##### 使用 mainboard 启动
 

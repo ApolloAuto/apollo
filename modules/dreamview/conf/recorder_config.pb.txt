@@ -1,0 +1,17 @@
+process {
+    command_keywords: "cyber_recorder record"
+}
+resource {
+    disk_spaces {
+    # For logs.
+    path: "/apollo/data"
+    insufficient_space_warning: 8
+    insufficient_space_error: 2
+    }
+    disk_spaces {
+    # For records.
+    path: "/apollo/data/bag"
+    insufficient_space_warning: 128
+    insufficient_space_error: 32
+    }
+}

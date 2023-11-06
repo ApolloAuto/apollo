@@ -55,14 +55,17 @@ struct CameraChannelUpdater {
       localization_queue_;
   std::mutex obstacle_mutex_;
   std::mutex image_mutex_;
+  std::mutex localization_mutex_;
   std::vector<apollo::perception::BBox2D> bbox2ds;
   std::vector<int32_t> obstacle_id;
   std::vector<int32_t> obstacle_sub_type;
+  bool enabled_;
   explicit CameraChannelUpdater(std::string channel_name)
       : curr_channel_name_(channel_name),
         perception_camera_reader_(nullptr),
         perception_obstacle_reader_(nullptr),
-        current_image_timestamp_(0.0) {}
+        current_image_timestamp_(0.0),
+        enabled_(false) {}
 };
 
 class PerceptionCameraUpdater : public UpdaterWithChannelsBase {
@@ -77,12 +80,12 @@ class PerceptionCameraUpdater : public UpdaterWithChannelsBase {
   explicit PerceptionCameraUpdater(WebSocketHandler *websocket);
   void Stop();
   void StartStream(const double &time_interval_ms,
-                   const std::string& channel_name = "") override;
+                   const std::string &channel_name = "",
+                   nlohmann::json *subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name = "") override;
   void OnTimer(const std::string& channel_name = "") override;
   void PublishMessage(const std::string& channel_name = "") override;
 
-  bool IsEnabled() const { return enabled_; }
 
   void GetUpdate(std::string *camera_update, const std::string& channel_name);
 
@@ -120,11 +123,9 @@ class PerceptionCameraUpdater : public UpdaterWithChannelsBase {
 
   WebSocketHandler *websocket_;
 
-  bool enabled_ = false;
   bool perception_obstacle_enable_ = false;
 
   std::unique_ptr<cyber::Node> node_;
-  std::mutex localization_mutex_;
   std::map<std::string, CameraChannelUpdater *> channel_updaters_;
   std::mutex channel_updater_map_mutex_;
 };

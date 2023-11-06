@@ -56,7 +56,7 @@ TEST(ProfilerTest, nested_block) {
 }
 
 TEST(ProfilerTest, function) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   for (int i = 0; i < 1000; ++i) {
   }
 }

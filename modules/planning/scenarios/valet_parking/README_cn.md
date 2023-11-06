@@ -51,7 +51,7 @@ apollo::planning::ValetParkingScenario
   
 #### 阶段
 
-| 阶段名                                   | 类型                                            | 描述                       |
+| 阶段名                                   | 类型                                            | <div style="width: 300pt">描述</div>                      |
 | ---------------------------------------- | ----------------------------------------------- | -------------------------- |
 | `VALET_PARKING_APPROACHING_PARKING_SPOT` | `apollo::planning::StageApproachingParkingSpot` | 引导车辆沿主路行驶到泊车位 |
 | `VALET_PARKING_PARKING`                  | `apollo::planning::StageParking`                | 泊入车位                   |
@@ -59,8 +59,8 @@ apollo::planning::ValetParkingScenario
 
 #### 配置
 
-| 文件路径                                                             | 说明             |
-| -------------------------------------------------------------------- | ---------------- |
-| `modules/planning/scenarios/valet_parking/conf/scenario_conf.pb.txt` | 场景的配置文件   |
-| `modules/planning/scenarios/valet_parking/conf/pipeline.pb.txt`      | 场景的流水线文件 |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| `modules/planning/scenarios/valet_parking/conf/scenario_conf.pb.txt` |`apollo::planning::ScenarioValetParkingConfig` |场景的配置文件   |
+| `modules/planning/scenarios/valet_parking/conf/pipeline.pb.txt`      |`apollo::planning::ScenarioPipeline` |场景的流水线文件 |
 

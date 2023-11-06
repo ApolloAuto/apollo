@@ -27,6 +27,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
 
 Task::Task()
     : frame_(nullptr),

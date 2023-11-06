@@ -33,6 +33,27 @@ export function crashReporterMiddleware<S, A>(store: Store<S, A>, next: (action:
     }
 }
 
+const SOME_MAX_SIZE = 100;
+
+interface AnyObject {
+    [key: string]: any;
+}
+
+function countKeysAtLevel(obj: AnyObject, currentLevel: number, targetLevel: number): number {
+    if (currentLevel === targetLevel) {
+        return Object.keys(obj).length;
+    }
+
+    let count = 0;
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+            count += countKeysAtLevel(obj[key], currentLevel + 1, targetLevel);
+        }
+    });
+
+    return count;
+}
+
 export function reduxDevToolsMiddleware<S, A>(store: Store<S, A>, next: (action: A) => void, action: A): void {
     next(action);
 
@@ -40,9 +61,18 @@ export function reduxDevToolsMiddleware<S, A>(store: Store<S, A>, next: (action:
         return;
     }
 
-    // eslint-disable-next-line no-underscore-dangle
-    if (window.__REDUX_DEVTOOLS_EXTENSION__) {
+    try {
         // eslint-disable-next-line no-underscore-dangle
-        window.__REDUX_DEVTOOLS_EXTENSION__.send(action, store.getState());
+        if (window.__REDUX_DEVTOOLS_EXTENSION__) {
+            const state = store.getState();
+            const size = countKeysAtLevel(state, 1, 4);
+
+            if (size <= SOME_MAX_SIZE) {
+                // eslint-disable-next-line no-underscore-dangle
+                window.__REDUX_DEVTOOLS_EXTENSION__.send(action, state);
+            }
+        }
+    } catch (error) {
+        console.error('Failed to send data to Redux DevTools:', error);
     }
 }

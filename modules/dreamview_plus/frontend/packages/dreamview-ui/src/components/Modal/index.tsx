@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Modal as InternalModal, ModalProps } from 'antd';
-import './index.less';
+import { Modal as InternalModal, ModalProps, ModalFuncProps } from 'antd';
+import IcModalConfirmWarning from '@dreamview/dreamview-core/src/assets/svg/routeEditing/modal_confirm_warning';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
 import { IconIcClose } from '../../icons';
+import './index.less';
 
 export function Modal(props: ModalProps) {
     const { prefixCls: customizePrefixCls, children, ...rest } = props;
@@ -44,3 +44,12 @@ Modal.defaultProps = {
 };
 
 Modal.displayName = 'Modal';
+
+Modal.confirm = (props: ModalFuncProps) => {
+    InternalModal.confirm({
+        icon: <IcModalConfirmWarning />,
+        autoFocusButton: null,
+        ...props,
+        className: 'dreamview-modal-confirm',
+    });
+};

@@ -214,11 +214,12 @@ void SimPerfectControl::Reset() {
 }
 
 void SimPerfectControl::Stop() {
-  std::lock_guard<std::mutex> lock(mutex_);
-
   if (enabled_) {
-    sim_control_timer_->Stop();
-    sim_prediction_timer_->Stop();
+    {
+      std::lock_guard<std::mutex> lock(timer_mutex_);
+      sim_control_timer_->Stop();
+      sim_prediction_timer_->Stop();
+    }
     enabled_ = false;
   }
 }
@@ -237,7 +238,9 @@ void SimPerfectControl::ClearPlanning() {
 void SimPerfectControl::OnReceiveNavigationInfo(
     const std::shared_ptr<NavigationInfo> &navigation_info) {
   std::lock_guard<std::mutex> lock(mutex_);
-
+  if (!enabled_) {
+    return;
+  }
   if (navigation_info->navigation_path_size() > 0) {
     const auto &path = navigation_info->navigation_path(0).path();
     if (path.path_point_size() > 0) {
@@ -306,8 +309,11 @@ void SimPerfectControl::Start() {
         next_point_.has_a() ? next_point_.a() : 0.0;
     Init(true, start_point_attr);
     InternalReset();
-    sim_control_timer_->Start();
-    sim_prediction_timer_->Start();
+    {
+      std::lock_guard<std::mutex> lock(timer_mutex_);
+      sim_control_timer_->Start();
+      sim_prediction_timer_->Start();
+    }
     enabled_ = true;
   }
 }

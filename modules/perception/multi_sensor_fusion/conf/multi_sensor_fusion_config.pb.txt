@@ -3,7 +3,6 @@ fusion_param {
   config_path: "perception/multi_sensor_fusion/data"
   config_file: "probabilistic_fusion.pb.txt"
 }
-fusion_main_sensor: "velodyne128"
 object_in_roi_check: true
 radius_for_roi_object_check: 120
 output_obstacles_channel_name: "/apollo/perception/obstacles"

@@ -23,10 +23,10 @@ import {
 import { Popover } from '@dreamview/dreamview-ui/src/components/Popover';
 import { useTranslation } from 'react-i18next';
 import useStyle from './style';
-import useFullScreen from '../../../../hooks/useFullScreen';
 import './index.less';
 import { usePanelInfoStore } from '../../../../store/PanelInfoStore';
 import { addSelectedPanelId, deleteSelectedPanelId } from '../../../../store/PanelInfoStore/actions';
+import { usePanelTileContext } from '../../../../store/PanelInnerStore/PanelTileStore';
 
 type SubscribeInfo = {
     name?: string;
@@ -45,7 +45,7 @@ export interface RenderToolbarProps {
     customToolBar?: React.JSX.Element;
 }
 
-export default function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
+function RenderToolbar(props: PropsWithChildren<RenderToolbarProps>) {
     const { t } = useTranslation('panels');
     const { classes, cx } = useStyle();
     const { path, panel, panelId, inFullScreen, helpContent, updateChannel, name } = props;
@@ -53,7 +53,7 @@ export default function RenderToolbar(props: PropsWithChildren<RenderToolbarProp
         mosaicWindowActions: { connectDragSource: mosaicConnectDragSource },
     } = useContext(MosaicWindowContext);
     const { mosaicActions } = useContext(MosaicContext);
-    const [enterFullScreen, exitFullScreen] = useFullScreen(panelId);
+    const { onClosePanel, enterFullScreen, exitFullScreen } = usePanelTileContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
     const isSelected = useMemo(() => panelInfoState?.selectedPanelIds?.has(panelId) ?? false, [panelInfoState]);
@@ -98,8 +98,8 @@ export default function RenderToolbar(props: PropsWithChildren<RenderToolbarProp
     }, [split]);
 
     const onRemove = useCallback(() => {
-        mosaicActions.remove(path);
-    }, [mosaicActions, path]);
+        onClosePanel();
+    }, [onClosePanel]);
 
     const operate = (
         <div className={classes['mosaic-custom-toolbar-operate-popover']}>
@@ -195,3 +195,5 @@ export default function RenderToolbar(props: PropsWithChildren<RenderToolbarProp
         </div>
     );
 }
+
+export default React.memo(RenderToolbar);

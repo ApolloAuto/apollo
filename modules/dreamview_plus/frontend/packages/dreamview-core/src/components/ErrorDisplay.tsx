@@ -5,6 +5,8 @@ interface ErrorDisplay {
     errorInfo: ErrorInfo;
 }
 
-export default function ErrorDisplay(props: ErrorDisplay) {
+function ErrorDisplay(props: ErrorDisplay) {
     return <div>{props.error.message}</div>;
 }
+
+export default React.memo(ErrorDisplay);

@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-APOLLO_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+TOP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+APOLLO_ROOT_DIR="${TOP_DIR}"
 APOLLO_IN_DOCKER=false
-
 # If inside docker container
 if [ -f /.dockerenv ]; then
   APOLLO_IN_DOCKER=true
   APOLLO_ROOT_DIR="/apollo"
 fi
+
+export PYTHONPATH=/opt/apollo/neo/python:$PYTHONPATH
 
 export APOLLO_CONFIG_HOME="${APOLLO_CONFIG_HOME:=$HOME/.apollo}"
 
@@ -33,7 +35,7 @@ export APOLLO_CACHE_DIR="${APOLLO_ROOT_DIR}/.cache"
 export APOLLO_SYSROOT_DIR="/opt/apollo/sysroot"
 
 export APOLLO_DAG_PATH="${APOLLO_ROOT_DIR}"
-export APOLLO_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin"
+export APOLLO_LIB_PATH=/opt/apollo/neo/lib
 export APOLLO_CONF_PATH="${APOLLO_ROOT_DIR}"
 export APOLLO_FLAG_PATH="${APOLLO_ROOT_DIR}"
 export APOLLO_LAUNCH_PATH="${APOLLO_ROOT_DIR}"
@@ -41,13 +43,14 @@ export APOLLO_MODEL_PATH="${APOLLO_ROOT_DIR}/modules/perception/data/models"
 
 export APOLLO_DISTRIBUTION_HOME="${APOLLO_DISTRIBUTION_HOME:=/opt/apollo/neo}"
 export APOLLO_PLUGIN_INDEX_PATH="${APOLLO_DISTRIBUTION_HOME}/share/cyber_plugin_index"
-export APOLLO_PLUGIN_SEARCH_IN_BAZEL_OUTPUT=1
-export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ROOT_DIR}"
-export APOLLO_PLUGIN_LIB_PATH="${APOLLO_ROOT_DIR}/bazel-bin:${APOLLO_DISTRIBUTION_HOME}/lib"
+export APOLLO_PLUGIN_SEARCH_IN_BAZEL_OUTPUT=0
+export APOLLO_PLUGIN_DESCRIPTION_PATH="${APOLLO_ENV_WORKROOT:-/apollo_workspace}:${APOLLO_DISTRIBUTION_HOME}"
+export APOLLO_PLUGIN_LIB_PATH="${APOLLO_LIB_PATH}"
+export APOLLO_DISTRIBUTION_VERSION='9.0'
 
 export TAB="    " # 4 spaces
 
-source ${APOLLO_ROOT_DIR}/scripts/common.bashrc
+source ${TOP_DIR}/scripts/common.bashrc
 
 : ${VERBOSE:=yes}
 
@@ -309,8 +312,6 @@ function setup_gpu_support() {
 }
 
 if ${APOLLO_IN_DOCKER}; then
+  pathprepend /opt/apollo/neo/bin
   setup_gpu_support
-
-  # add dreamview path
-  pathprepend ${APOLLO_ROOT_DIR}/bazel-bin/modules/dreamview
 fi

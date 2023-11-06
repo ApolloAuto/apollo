@@ -36,6 +36,7 @@
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/external_command_msgs/action_command.pb.h"
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+#include "modules/common_msgs/monitor_msgs/system_status.pb.h"
 #include "modules/dreamview_plus/proto/hmi_config.pb.h"
 #include "modules/dreamview_plus/proto/hmi_mode.pb.h"
 
@@ -102,6 +103,7 @@ class HMIWorker {
   void UpdateComponentStatus();
   // bool UpdateRecordToStatus(const std::string& record_id,
   //                     const std::string& record_status);
+  bool UpdateMapToStatus(const std::string& map_name);
   bool LoadRecords();
   bool RePlayRecord();
   /**
@@ -122,9 +124,27 @@ class HMIWorker {
                           std::string* scenario_set_path);
   void UpdateCameraSensorChannelToStatus(const std::string& channel_name);
   void UpdatePointCloudChannelToStatus(const std::string& channel_name);
+
+  /**
+   * @brief Get the end point of the current scene
+   * @param x is the x-coordinate of the end point
+   * @param y is the y-coordinate of the end point
+   */
+  void GetCurrentScenarioEndPoint(double& x, double& y);
+
+  bool StartSimObstacle();
+  bool StopSimObstacle();
+
+  // Start / Stop Data Recorder
+  bool StartDataRecorder();
+  bool StopDataRecorder();
+  bool SaveDataRecorder(const std::string& new_name);
+  bool DeleteDataRecorder();
+
   // Load HMIConfig and HMIMode.
   static HMIConfig LoadConfig();
   static HMIMode LoadMode(const std::string& mode_config_path);
+  void ChangeMapVal(const std::string& map_name);
 
  private:
   void InitReadersAndWriters();
@@ -132,26 +152,26 @@ class HMIWorker {
   void StatusUpdateThreadLoop();
 
   // Start / reset current mode.
-  void SetupMode() const;
-  void ResetMode() const;
-  bool ResetSimObstacle(const std::string& scenario_id);
+  void SetupMode();
+  void ResetMode();
 
   // Change current mode, launch, map, vehicle and driving mode.
   void ChangeMode(const std::string& mode_name);
-  bool ChangeMap(const std::string& map_name,
-                 bool restart_dynamic_model = true);
+  bool ChangeMap(const std::string& map_name);
+  bool SelectAndReloadMap(const std::string& map_name);
   void ChangeVehicle(const std::string& vehicle_name);
-  void ChangeScenarioSet(const std::string& scenario_set_id);
   void ChangeRecord(const std::string& record_id);
   void ChangeOperation(const std::string& operation_str);
   void ChangeDynamicModel(const std::string& dynamic_model_name);
-  void ChangeScenario(const std::string& scenario_id);
+  void ChangeScenario(const std::string& scenario_info);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
+  void ClearRecordInfo();
+  void ClearScenarioInfo();
 
   bool LoadScenarios();
 
   bool LoadDynamicModels();
-
+  void DeleteMap(const std::string& map_name);
   void DeleteScenarioSet(const std::string& scenario_set_id);
   void DeleteRecord(const std::string& record_id);
   void DeleteDynamicModel(const std::string& dynamic_model_name);
@@ -163,15 +183,52 @@ class HMIWorker {
   void GetRecordPath(std::string* record_path);
 
   // Start / stop a module.
-  void StartModule(const std::string& module) const;
-  void StopModule(const std::string& module) const;
+  void StartModule(const std::string& module);
+  void StopModule(const std::string& module);
   bool StopModuleByCommand(const std::string& stop_command) const;
+  void LockModule(const std::string& module, const bool& lock_flag);
   // Stop play current record process but current record not changed
   void StopRecordPlay(const std::string& record_id = "");
 
   void ResetComponentStatusTimer();
 
   bool ReadRecordInfo(const std::string& file, double* total_time_s) const;
+  // Periodically check whether the monitor is turned on.
+  void OnTimer(const double &overtime_time);
+
+  /**
+   * @brief transfer the mode's cyber modules to modules.
+   * @param mode: the mode to be transfered.
+   */
+  static void TranslateCyberModules(HMIMode* mode);
+
+  /**
+   * @brief load the mode which is self defined by vehicles.
+   * @param mode_config_path: the mode config path
+   * @param current_vehicle_path: current selected vehicle conf absolute path.
+   * @param self_defined_mode: the pointer to store vehicle defined mode config.
+   * @return If vehicle has self-defined mode conf and load it successfully.
+   */
+  bool LoadVehicleDefinedMode(const std::string& mode_config_path,
+                              const std::string& current_vehicle_path,
+                              HMIMode* self_defined_mode);
+
+  /**
+   * @brief merge the mode's modules and monitored components
+   * to current_mode_.
+   * @param mode The mode to be merged.
+   */
+  void MergeToCurrentMode(HMIMode* mode);
+  /**
+   * @brief update the current_mode_'s modules and monitored components
+   * to  hmi status.
+   */
+  void UpdateModeModulesAndMonitoredComponents();
+
+  /**
+   * @brief Increase the expected number of modules to open
+   */
+  void AddExpectedModules(const HMIAction& action);
 
   HMIConfig config_;
 
@@ -183,6 +240,10 @@ class HMIWorker {
   bool status_changed_ = false;
   size_t last_status_fingerprint_{};
   bool stop_ = false;
+  // Used to detect the cycle time of monitor running.
+  uint32_t time_interval_ms_;
+  // The timeout period for monitor not returning a message.
+  double overtime_time_;
   mutable boost::shared_mutex status_mutex_;
   mutable size_t record_count_ = 0;
   std::future<void> thread_future_;
@@ -193,6 +254,8 @@ class HMIWorker {
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
+  std::shared_ptr<cyber::Reader<apollo::monitor::SystemStatus>>
+      monitor_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
   std::shared_ptr<
       apollo::cyber::Client<apollo::external_command::ActionCommand,
@@ -202,6 +265,7 @@ class HMIWorker {
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
   DvCallback callback_api_;
+  std::unique_ptr<cyber::Timer> monitor_timer_;
 };
 
 }  // namespace dreamview

@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import fs from 'fs';
 import * as path from 'path';
-import { from, Subject, interval, Subscription, of } from 'rxjs';
+import { from, Subject, interval, Subscription, of, Observable } from 'rxjs';
 import { concatMap, take, repeat } from 'rxjs/operators';
 import http from 'http';
 import {
@@ -42,6 +42,8 @@ class MockSocketServer {
     private wss: WebSocket.Server;
 
     private mocks: Record<string, { subject: Subject<any>, socket: WebSocket.Server } & Mock> = {};
+
+    private dataIntervals: {[dataName: string]: Observable<number>} = {};
 
     constructor(port: number) {
         this.server = http.createServer();
@@ -212,9 +214,13 @@ class MockSocketServer {
             .sort();
 
         const fileCache: Record<string, Buffer> = {};
-        console.log(dataFrequencyMs);
+
+        if (!this.dataIntervals[dataName]) {
+            this.dataIntervals[dataName] = interval(dataFrequencyMs)
+        }
+
         // Create an interval observable that emits every 1/frequency seconds
-        const interval$ = interval(dataFrequencyMs);
+        const interval$ = this.dataIntervals[dataName];
 
         return interval$
             .pipe(

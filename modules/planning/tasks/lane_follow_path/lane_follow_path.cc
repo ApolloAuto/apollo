@@ -57,9 +57,11 @@ apollo::common::Status LaneFollowPath::Process(
 
   GetStartPointSLState();
   if (!DecidePathBounds(&candidate_path_boundaries)) {
+    AERROR << "Decide path bound failed";
     return Status::OK();
   }
   if (!OptimizePath(candidate_path_boundaries, &candidate_path_data)) {
+    AERROR << "Optmize path failed";
     return Status::OK();
   }
   if (!AssessPath(&candidate_path_data,
@@ -136,7 +138,8 @@ bool LaneFollowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
   }
   if (init_sl_state_.second[0] > path_bound[0].l_upper.l ||
       init_sl_state_.second[0] < path_bound[0].l_lower.l) {
-    ADEBUG << "not in self lane maybe lane borrow";
+    AINFO << "not in self lane maybe lane borrow" << init_sl_state_.second[0]
+          << path_bound[0].l_lower.l << "," << path_bound[0].l_upper.l;
     return false;
   }
   // std::vector<std::pair<double, double>> regular_path_bound_pair;

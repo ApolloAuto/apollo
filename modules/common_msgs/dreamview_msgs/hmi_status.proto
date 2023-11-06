@@ -12,6 +12,7 @@ message ScenarioInfo {
   optional string scenario_name = 2;
   optional string map_name = 3;
   optional apollo.common.Point2D start_point = 4;
+  optional apollo.common.Point2D end_point = 5;
 }
 
 message ScenarioSet {
@@ -36,15 +37,20 @@ message RecordStatus{
 }
 
 enum HMIModeOperation {
-  // 播包
-  Record = 0;
+  // None
+  None = 0;
   // 仿真调试
   SIM_DEBUG = 1;
-  SIM_CONTROL = 2;
+  // 自由仿真
+  Sim_Control = 2;
   // 实车自动驾驶
   REAL_CAR_AUTO_DRIVING=3;
   // 循迹
   TRACE=4;
+  // 场景仿真
+  Scenario_Sim = 5;
+  // 播包
+  Record = 6;
 }
 
 message HMIStatus {
@@ -92,4 +98,13 @@ message HMIStatus {
   optional HMIModeOperation current_operation = 26;
   optional string current_layout = 27;
   optional RecordStatus current_record_status = 28;
+  // Mark data recorder status, including disk space and process status.
+  optional apollo.monitor.Component data_recorder_component = 29;
+  // Mark the expected number of modules to be opened
+  optional uint32 expected_modules = 30 [default = 0];
+  
+  // {module_name: Used to identify whether the user clicks on the module}
+  map<string, bool> modules_lock = 31;
+  // Used to identify whether the backend triggers automatic shutdown.
+  optional bool backend_shutdown = 32 [default = false];
 }

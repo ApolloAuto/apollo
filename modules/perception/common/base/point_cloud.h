@@ -295,6 +295,7 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.assign(size, std::numeric_limits<float>::max());
     points_beam_id_.assign(size, -1);
     points_label_.assign(size, 0);
+    points_semantic_label_.assign(size, 0);
   }
   // @brief destructor
   virtual ~AttributePointCloud() = default;
@@ -311,6 +312,9 @@ class AttributePointCloud : public PointCloud<PointT> {
                            rhs.points_beam_id_.end());
     points_label_.insert(points_label_.end(), rhs.points_label_.begin(),
                          rhs.points_label_.end());
+    points_semantic_label_.insert(points_semantic_label_.end(),
+                                  rhs.points_semantic_label_.begin(),
+                                  rhs.points_semantic_label_.end());
     width_ = width_ * height_ + rhs.width_ * rhs.height_;
     height_ = 1;
     return *this;
@@ -322,6 +326,7 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.reserve(size);
     points_beam_id_.reserve(size);
     points_label_.reserve(size);
+    points_semantic_label_.reserve(size);
   }
   // @brief overrided resize function wrapper of vector
   inline void resize(const size_t size) override {
@@ -330,6 +335,7 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.resize(size, std::numeric_limits<float>::max());
     points_beam_id_.resize(size, -1);
     points_label_.resize(size, 0);
+    points_semantic_label_.resize(size, 0);
     if (size != width_ * height_) {
       width_ = size;
       height_ = 1;
@@ -342,17 +348,20 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.push_back(std::numeric_limits<float>::max());
     points_beam_id_.push_back(-1);
     points_label_.push_back(0);
+    points_semantic_label_.push_back(0);
     width_ = points_.size();
     height_ = 1;
   }
   inline void push_back(const PointT& point, double timestamp,
                         float height = std::numeric_limits<float>::max(),
-                        int32_t beam_id = -1, uint8_t label = 0) {
+                        int32_t beam_id = -1, uint8_t label = 0,
+                        uint8_t semantic_label = 0) {
     points_.push_back(point);
     points_timestamp_.push_back(timestamp);
     points_height_.push_back(height);
     points_beam_id_.push_back(beam_id);
     points_label_.push_back(label);
+    points_semantic_label_.push_back(semantic_label);
     width_ = points_.size();
     height_ = 1;
   }
@@ -363,6 +372,7 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.clear();
     points_beam_id_.clear();
     points_label_.clear();
+    points_semantic_label_.clear();
     width_ = height_ = 0;
   }
   // @brief overrided swap point given source and target id
@@ -374,6 +384,8 @@ class AttributePointCloud : public PointCloud<PointT> {
       std::swap(points_height_[source_id], points_height_[target_id]);
       std::swap(points_beam_id_[source_id], points_beam_id_[target_id]);
       std::swap(points_label_[source_id], points_label_[target_id]);
+      std::swap(points_semantic_label_[source_id],
+                points_semantic_label_[target_id]);
       width_ = points_.size();
       height_ = 1;
       return true;
@@ -389,6 +401,7 @@ class AttributePointCloud : public PointCloud<PointT> {
       points_height_[id] = rhs.points_height_[rhs_id];
       points_beam_id_[id] = rhs.points_beam_id_[rhs_id];
       points_label_[id] = rhs.points_label_[rhs_id];
+      points_semantic_label_[id] = rhs.points_semantic_label_[rhs_id];
       return true;
     }
     return false;
@@ -408,12 +421,14 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.resize(indices.size());
     points_beam_id_.resize(indices.size());
     points_label_.resize(indices.size());
+    points_semantic_label_.resize(indices.size());
     for (size_t i = 0; i < indices.size(); ++i) {
       points_[i] = rhs.points_[indices[i]];
       points_timestamp_[i] = rhs.points_timestamp_[indices[i]];
       points_height_[i] = rhs.points_height_[indices[i]];
       points_beam_id_[i] = rhs.points_beam_id_[indices[i]];
       points_label_[i] = rhs.points_label_[indices[i]];
+      points_semantic_label_[i] = rhs.points_semantic_label_[indices[i]];
     }
   }
 
@@ -428,13 +443,15 @@ class AttributePointCloud : public PointCloud<PointT> {
     points_height_.swap(rhs->points_height_);
     points_beam_id_.swap(rhs->points_beam_id_);
     points_label_.swap(rhs->points_label_);
+    points_semantic_label_.swap(rhs->points_semantic_label_);
   }
   // @brief overrided check data member consistency
   bool CheckConsistency() const override {
     return ((points_.size() == points_timestamp_.size()) &&
             (points_.size() == points_height_.size()) &&
             (points_.size() == points_beam_id_.size()) &&
-            (points_.size() == points_label_.size()));
+            (points_.size() == points_label_.size()) &&
+            (points_.size() == points_semantic_label_.size()));
   }
 
   size_t TransferToIndex(const size_t col, const size_t row) const {
@@ -467,11 +484,26 @@ class AttributePointCloud : public PointCloud<PointT> {
   uint8_t& points_label(size_t i) { return points_label_[i]; }
   const uint8_t& points_label(size_t i) const { return points_label_[i]; }
 
+  const std::vector<uint8_t>& points_semantic_label() const {
+    return points_semantic_label_;
+  }
+  std::vector<uint8_t>* mutable_points_semantic_label() {
+    return &points_semantic_label_;
+  }
+
+  uint8_t& points_semantic_label(size_t i) {
+    return points_semantic_label_[i];
+  }
+  const uint8_t& points_semantic_label(size_t i) const {
+    return points_semantic_label_[i];
+  }
+
  protected:
   std::vector<double> points_timestamp_;
   std::vector<float> points_height_;
   std::vector<int32_t> points_beam_id_;
   std::vector<uint8_t> points_label_;
+  std::vector<uint8_t> points_semantic_label_;
 };
 
 // typedef of point cloud indices

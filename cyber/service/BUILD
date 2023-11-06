@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package")
 

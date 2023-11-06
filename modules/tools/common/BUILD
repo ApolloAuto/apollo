@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_library")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,12 +10,12 @@ package(default_visibility = ["//visibility:public"])
 #     ]),
 # )
 
-py_library(
+apollo_py_library(
     name = "logger",
     srcs = ["logger.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "message_manager",
     srcs = ["message_manager.py"],
     deps = [
@@ -36,12 +36,12 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "proto_utils",
     srcs = ["proto_utils.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "file_utils",
     srcs = ["file_utils.py"],
 )

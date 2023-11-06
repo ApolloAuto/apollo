@@ -7,11 +7,11 @@ mass_fr: 100
 mass_rl: 100
 mass_rr: 100
 eps: 0.01
-matrix_q: 2.0
+matrix_q: 6.0
 matrix_q: 1.0
 matrix_q: 3.0
 matrix_q: 0.0
-reverse_matrix_q: 2.0
+reverse_matrix_q: 5.0
 reverse_matrix_q: 1.0
 reverse_matrix_q: 2.0
 reverse_matrix_q: 0.0
@@ -34,9 +34,11 @@ trajectory_transform_to_com_reverse: true
 trajectory_transform_to_com_drive: true
 enable_feedback_augment_on_high_speed: false
 enable_maximum_steer_rate_limit: false
-lock_steer_speed: 0.081
+lock_steer_speed: -0.081
 query_time_nearest_point_only: false
 enable_navigation_mode_error_filter: false
+reverse_feedforward_ratio: 1.4
+reverse_use_dynamic_model: false
 lat_err_gain_scheduler {
   scheduler {
     speed: 2.0

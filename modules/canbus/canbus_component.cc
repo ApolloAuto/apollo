@@ -63,14 +63,10 @@ bool CanbusComponent::Init() {
            << FLAGS_load_vehicle_class_name;
     return false;
   }
-
-  vehicle_object_ = vehicle_object;
-  if (vehicle_object_ == nullptr) {
-    AERROR << "Failed to create vehicle factory pointer.";
-  }
   AINFO << "Successfully create vehicle factory: "
         << FLAGS_load_vehicle_class_name;
 
+  vehicle_object_ = vehicle_object;
   if (!vehicle_object_->Init(&canbus_conf_)) {
     AERROR << "Fail to init vehicle factory.";
     return false;

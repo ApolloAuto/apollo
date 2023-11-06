@@ -22,7 +22,7 @@
 #include "gtest/gtest.h"
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
-#include "modules/control/control_component/controller_task_base/proto/mrac_conf.pb.h"
+#include "modules/control/control_component/proto/mrac_conf.pb.h"
 
 #include "cyber/common/file.h"
 

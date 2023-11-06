@@ -100,8 +100,16 @@ class MapService {
 
   double GetLaneHeading(const std::string &id_str, double s);
 
+  std::string GetParkingSpaceId(const double x, const double y) const;
+
  private:
+
   void UpdateOffsets();
+
+  bool GetNearestLaneWithDistance(const double x, const double y,
+                                  apollo::hdmap::LaneInfoConstPtr *nearest_lane,
+                                  double *nearest_s, double *nearest_l) const;
+
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;

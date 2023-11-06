@@ -3,15 +3,13 @@
         "target": "es6",
         "module": "commonjs",
         "declarationDir": ".",
-        "declaration": true
+        "declaration": true,
+        "importHelpers": true,
+        "jsx": "react-jsx",
+        "esModuleInterop": true,
+        "lib": ["dom", "esnext"]
     },
-    "importHelpers": true,
-    "include": [
-        "src/**/*.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        "**.d.ts"
-    ],
-    "moduleResolution": "node",
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "**.d.ts"],
+    "moduleResolution": "node"
 }

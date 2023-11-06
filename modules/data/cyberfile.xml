@@ -15,6 +15,7 @@
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/data</src_path>
 
   <depend type="binary" repo_name="cyber">cyber</depend>
+  <depend type="binary" repo_name="canbus">canbus</depend>
   <depend type="binary" repo_name="common" lib_names="common">common</depend>
   <depend type="binary" repo_name="monitor">monitor</depend>
   <depend type="binary" repo_name="dreamview" lib_names="dreamview">dreamview</depend>

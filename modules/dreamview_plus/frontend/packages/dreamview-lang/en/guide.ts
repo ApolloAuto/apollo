@@ -29,7 +29,7 @@ export const guide = {
     perceptionPerceivedEffectsDesc:
         'During data records playback, you can check point cloud and camera images. You can also adjust the current layout and panel.',
 
-    defaultSelectMode: 'Mode settings',
+    defaultSelectMode: 'Mode Settings',
     defaultSelectModeDesc: 'You are currently in the default mode. This mode provides the basic visualization panel.',
     defaultSelectModule: 'Select Module',
     defaultSelectModuleDesc: 'This mode includes all modules buttons, which you can turn on and off as needed.',
@@ -43,6 +43,30 @@ export const guide = {
     defaultSelectVariableResDesc: 'You can try selecting a data record for data playback.',
     defaultSelectFixedRes: 'Select Resources',
     defaultSelectFixedResDesc: 'If you are using data records for data playback, please select the map as needed.',
+
+    PNCSelectOperations: 'Mode Settings',
+    PNCSelectOperationsDesc:
+        'You are currently in PnC mode. If you want to perform scenario simulation, turn on the Scenario button to start the simulation environment; if you do not need to perform simulation, skip this step.',
+    PNCSelectModules: 'Select Module',
+    PNCSelectModulesDesc:
+        'We have sorted out the commonly used modules involved in PnC, and you can turn them on and off according to the modules you need to run.',
+    PNCResourceManager: 'Resource Manager',
+    PNCResourceManagerDesc:
+        'The Resources manager is a car cloud integrated configuration center provided by Apollo, providing download functions for materials such as vehicles, models, records, and simulation scenarios. You can click on the required records, vehicle, model, simulation scenario, and other elements to download.',
+    PNCSelectScenario: 'Select Scenario',
+    PNCSelectScenarioDesc: 'select a scene for simulation, or select a data package for data playback.',
+    PNCSelectMap: 'Select Map',
+    PNCSelectMapDesc:
+        'If you are doing simulation/broadcasting, please continue to select the map corresponding to this scene after selecting the simulation scene/data package.',
+    PNCSelectADS: 'Select Vehicle',
+    PNCSelectADSDesc:
+        'If you are doing simulation, please continue to select the vehicle information corresponding to this scene after selecting Module Delay Console the simulation scene. (If you use the data package for data playback, you only need to select the map',
+    PNCSetRoute: 'Set Route',
+    PNCSetRouteDesc:
+        'If you want to perform simulation, after selecting the scene, vehicle, and map, click Routing to set the routing, and you can set the starting point and ending point information you need. If you are using data packets for data playback, please ignore this step.',
+    PNCSimulationRecord: 'Start the simulation/record',
+    PNCSimulationRecordDesc:
+        'After performing the above operations, please click the Run/Play button to perform simulation/data playback.',
 
     viewLoginStepOne:
         'Open https://apollo.baidu.com/workspace in the browser to access the Apollo Studio cloud workspace.',

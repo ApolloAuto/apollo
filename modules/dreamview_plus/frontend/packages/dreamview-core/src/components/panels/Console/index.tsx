@@ -54,6 +54,7 @@ function MonitorItem(props: IMonitorItem) {
     );
 }
 
+const MonitorItemMemo = React.memo(MonitorItem);
 function InternalConsole() {
     const panelContext = usePanelContext();
     const { data: subcribedData, initSubscription } = panelContext;
@@ -97,18 +98,20 @@ function InternalConsole() {
         <CustomScroll className={classes['panel-console-root']}>
             <div className={classes['panel-console-inner']}>
                 {list.map((item, index) => (
-                    <MonitorItem key={`${index + 1}`} text={item.text} level={item.level} time={item.time as any} />
+                    <MonitorItemMemo key={index + 1} text={item.text} level={item.level} time={item.time as any} />
                 ))}
             </div>
         </CustomScroll>
     );
 }
 
-export default function Console(props: any) {
+function Console(props: any) {
     const C = useMemo(
         () =>
-            Panel(InternalConsole, props.panelId, [{ name: StreamDataNames.SIM_WORLD, needChannel: false }], {
-                test: true,
+            Panel({
+                PanelComponent: InternalConsole,
+                panelId: props.panelId,
+                subscribeInfo: [{ name: StreamDataNames.SIM_WORLD, needChannel: false }],
             }),
         [],
     );
@@ -117,3 +120,5 @@ export default function Console(props: any) {
 }
 
 InternalConsole.displayName = 'InternalConsole';
+
+export default React.memo(Console);

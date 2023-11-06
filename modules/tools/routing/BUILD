@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -14,7 +14,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 # )
 
-py_binary(
+apollo_py_binary(
     name = "debug_passage_region",
     srcs = ["debug_passage_region.py"],
     deps = [
@@ -25,7 +25,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "debug_route",
     srcs = ["debug_route.py"],
     deps = [
@@ -36,7 +36,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "debug_topo",
     srcs = ["debug_topo.py"],
     deps = [
@@ -46,7 +46,7 @@ py_library(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "road_show",
     srcs = ["road_show.py"],
     deps = [
@@ -55,7 +55,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "util",
     srcs = ["util.py"],
     deps = [

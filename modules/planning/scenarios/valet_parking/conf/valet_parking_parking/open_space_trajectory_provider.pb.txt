@@ -3,19 +3,21 @@ open_space_trajectory_optimizer_config {
     warm_start_config {
         xy_grid_resolution: 0.3
         phi_grid_resolution: 0.1
+        traj_kappa_contraint_ratio: 0.8
         next_node_num: 16
         step_size: 0.1
         traj_forward_penalty: 1.0
         traj_back_penalty: 1.0
         traj_gear_switch_penalty: 3.0
         max_explored_num:10000
+        traj_short_length_penalty:20
+        traj_expected_shortest_length:2.0
         traj_steer_penalty: 3.0
         traj_steer_change_penalty: 1.0
         grid_a_star_xy_resolution: 0.25
         node_radius: 0.2
-        traj_expected_shortest_length: 0.5
-        traj_short_length_penalty: 5.0
-        desired_explored_num: 10000
+        astar_max_search_time: 20
+        desired_result_num: 1000
     }
     dual_variable_warm_start_config {
         weight_d: 1.0

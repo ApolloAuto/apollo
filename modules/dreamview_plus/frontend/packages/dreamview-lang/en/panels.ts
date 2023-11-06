@@ -48,10 +48,18 @@ export const panels = {
     pointCloudAbilityDescTwo: 'View Switching: Provide default, near, overhead, map 4 kinds of views to switch',
     pointCloudAbilityDescThree: 'Zoom in and out',
 
+    // panel pncMonitor
+    pncMonitorTitle: 'Pnc Monitor',
+    pncMonitorDescription: 'Panel to show  charts related to Planning, Control, and Latency data.',
+
     // panel dashBoard
     dashBoardTitle: 'Vehicle Dashboard',
     dashBoardDescription:
         'Panel to show the current state of the vehicle, including vehicle speed, acceleration and deceleration pedal opening, steering wheel angle, gear position and other information.',
+
+    // panel components
+    componentsTitle: 'Components',
+    componentsDescription: 'Panel to display the status of common components',
 
     // operate
     pressTips: 'Long press and drag the mouse to move the panel',

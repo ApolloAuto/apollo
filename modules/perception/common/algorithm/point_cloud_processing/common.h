@@ -24,6 +24,7 @@
 #include "Eigen/Core"
 
 #include "modules/perception/common/base/point_cloud.h"
+#include "modules/perception/common/base/radar_point_cloud.h"
 
 namespace apollo {
 namespace perception {
@@ -132,6 +133,24 @@ void GetMinMaxIn3D(const base::AttributePointCloud<PointT> &cloud,
 template <typename T>
 Eigen::Matrix<T, 3, 1> CalculateCentroid(
     const base::AttributePointCloud<base::Point<T>> &cloud) {
+  size_t point_num = cloud.size();
+  Eigen::Matrix<T, 3, 1> centroid(0.0, 0.0, 0.0);
+  for (const auto &pt : cloud.points()) {
+    centroid[0] += pt.x;
+    centroid[1] += pt.y;
+    centroid[2] += pt.z;
+  }
+  if (point_num > 0) {
+    centroid[0] /= static_cast<T>(point_num);
+    centroid[1] /= static_cast<T>(point_num);
+    centroid[2] /= static_cast<T>(point_num);
+  }
+  return centroid;
+}
+
+template <typename T>
+Eigen::Matrix<T, 3, 1> CalculateRadarCentroid(
+    const base::AttributeRadarPointCloud<base::RadarPoint<T>> &cloud) {
   size_t point_num = cloud.size();
   Eigen::Matrix<T, 3, 1> centroid(0.0, 0.0, 0.0);
   for (const auto &pt : cloud.points()) {

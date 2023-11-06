@@ -6,7 +6,7 @@ interface IButton {
     onClick?: () => void;
 }
 
-export default function Button(props: PropsWithChildren<IButton>) {
+function Button(props: PropsWithChildren<IButton>) {
     const { width, onClick = () => true } = props;
     const { classes } = useStyle()({ width });
     return (
@@ -15,3 +15,5 @@ export default function Button(props: PropsWithChildren<IButton>) {
         </button>
     );
 }
+
+export default React.memo(Button);

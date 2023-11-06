@@ -87,4 +87,4 @@ function RotationInfo(props: RotationInfoProps) {
     );
 }
 
-export default RotationInfo;
+export default React.memo(RotationInfo);

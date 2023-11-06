@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>oculii_radar</name>
+        <dag_conf>/apollo/modules/drivers/radar/oculii_radar/dag/oculii_radar.dag</dag_conf>
+        <process_name>oculii_radar</process_name>
+    </module>
+</cyber>

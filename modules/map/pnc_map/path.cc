@@ -47,7 +47,13 @@ const double kSampleDistance = 0.25;
 bool FindLaneSegment(const MapPathPoint& p1, const MapPathPoint& p2,
                      LaneSegment* const lane_segment) {
   for (const auto& wp1 : p1.lane_waypoints()) {
+    if (nullptr == wp1.lane) {
+      continue;
+    }
     for (const auto& wp2 : p2.lane_waypoints()) {
+      if (nullptr == wp2.lane) {
+        continue;
+      }
       if (wp1.lane->id().id() == wp2.lane->id().id() && wp1.s < wp2.s) {
         *lane_segment = LaneSegment(wp1.lane, wp1.s, wp2.s);
         return true;

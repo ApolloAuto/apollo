@@ -27,9 +27,14 @@ from adataset.nuscenes.pcd_converter import convert_pcd as nuscenes_convert_pcd
 from adataset.kitti.dataset_converter import convert_dataset as kitti_convert_dataset
 from adataset.kitti.calibration_converter import convert_calibration as kitti_convert_calibration
 from adataset.kitti.pcd_converter import convert_pcd as kitti_convert_pcd
+from adataset.apolloscape.dataset_converter import convert_dataset as apolloscape_convert_dataset
+from adataset.apolloscape.calibration_converter import convert_calibration as apolloscape_convert_calibration
+from adataset.apolloscape.pcd_converter import convert_pcd as apolloscape_convert_pcd
 
 
 def process_record(args):
+  """Process record
+  """
   # default output
   if args.output is None:
     if args.dataset == 'n':
@@ -43,12 +48,16 @@ def process_record(args):
       nuscenes_convert_dataset(args.input, args.output)
     elif args.dataset == 'k':
       kitti_convert_dataset(args.input, args.output)
+    elif args.dataset == 'a':
+      apolloscape_convert_dataset(args.input, args.output)
     else:
       logging.error("Unsupported dataset type! '{}'".format(args.dataset))
   else:
     logging.error("Pls check the input directory! '{}'".format(args.input))
 
 def process_calibration(args):
+  """Process calibration
+  """
   # default output
   if args.output is None:
     args.output = '.'
@@ -59,12 +68,16 @@ def process_calibration(args):
       nuscenes_convert_calibration(args.input, args.output)
     elif args.dataset == 'k':
       kitti_convert_calibration(args.input, args.output)
+    elif args.dataset == 'a':
+      apolloscape_convert_calibration(args.input, args.output)
     else:
       logging.error("Unsupported dataset type! '{}'".format(args.dataset))
   else:
     logging.error("Pls check the input directory! '{}'".format(args.input))
 
 def process_pointcloud(args):
+  """Process pointcloud
+  """
   # default output
   if args.output is None:
     args.output = 'result.pcd'
@@ -75,6 +88,8 @@ def process_pointcloud(args):
       nuscenes_convert_pcd(args.input, args.output)
     elif args.dataset == 'k':
       kitti_convert_pcd(args.input, args.output)
+    elif args.dataset == 'a':
+      apolloscape_convert_pcd(args.input, args.output)
     else:
       logging.error("Unsupported dataset type! '{}'".format(args.dataset))
   else:
@@ -82,13 +97,15 @@ def process_pointcloud(args):
 
 
 def main(args=sys.argv):
+  """main
+  """
   parser = argparse.ArgumentParser(
     description="Convert datasets (nuScenes, KITTI) to Apollo record files.",
     prog="main.py")
 
   parser.add_argument(
     "-d", "--dataset", action="store", type=str, required=True,
-    choices=['n', 'k', 'w'],
+    choices=['n', 'k', 'a', 'w'],
     help="Dataset type. n:nuScenes, k:KITTI, w:Waymo")
   parser.add_argument(
     "-i", "--input", action="store", type=str, required=True,

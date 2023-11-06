@@ -1,8 +1,7 @@
 syntax = "proto2";
 
-import "modules/control/control_component/controller_task_base/proto/gain_scheduler_conf.proto";
-import "modules/control/control_component/controller_task_base/proto/leadlag_conf.proto";
-import "modules/control/control_component/controller_task_base/proto/pid_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/pid_conf.proto";
 
 package apollo.control;
 
@@ -44,4 +43,17 @@ message LonBasedPidControllerConf{
   optional bool use_steering_check = 26 [default = false];
   optional double pedestrian_stop_time = 27 [default = 10.0];
   optional double standstill_narmal_acceleration = 28 [default = 0.0];
+  optional double full_stop_long_time = 29 [default = 0.0];
+
+  // pid parameter in pit
+  optional PidConf pit_station_pid_conf = 30;
+  optional PidConf pit_speed_pid_conf = 31;
+  optional double pit_replan_check_time = 32 [default = 14.0];
+  optional int32 pit_replan_check_count = 33 [default = 3];
+
+  optional int32 epb_change_count = 34 [default = 2];
+
+  optional double stop_gain_acceleration = 35;
+
+  optional bool use_vehicle_epb = 36 [default = false];
 }

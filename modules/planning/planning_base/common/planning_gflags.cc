@@ -151,7 +151,8 @@ DEFINE_string(destination_obstacle_id, "DEST",
 DEFINE_double(destination_check_distance, 5.0,
               "if the distance between destination and ADC is less than this,"
               " it is considered to reach destination");
-
+DEFINE_double(passed_destination_threshold, 0.05,
+              "check adc whether has passed destination");
 DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
@@ -399,8 +400,33 @@ DEFINE_double(replan_longitudinal_distance_threshold, 2.5,
               "The longitudinal distance threshold of replan");
 DEFINE_double(replan_time_threshold, 7.0, "The time threshold of replan");
 DEFINE_double(trajectory_check_collision_time_step, 1.0,
-            "checks collision time step for trajectory");
+              "checks collision time step for trajectory");
 
 DEFINE_double(obstacle_pass_check_distance, 3.0,
-            "at the distance, the obstacle goes around left or right"
-            "consider ego and obstacle position");
+              "at the distance, the obstacle goes around left or right"
+              "consider ego and obstacle position");
+
+DEFINE_bool(speed_optimize_fail_relax_velocity_constraint, true,
+            "When the speed optimization fails,"
+            "relax the speed upper bound constraint and try to optimize again");
+
+DEFINE_bool(check_collision_freespace_obstacle_vertices, false,
+            "Detect vehicle collisions with map projection obstacles");
+
+DEFINE_double(
+    near_stop_speed, 0.5,
+    "Set deceleration as near_stop_deceleration when vehicle speed is smaller "
+    "than this value before stopping so that control can keep up.");
+
+DEFINE_double(
+    near_stop_deceleration, -1.0,
+    "Set deceleration as near_stop_deceleration when vehicle deceleration is "
+    "smaller than this value before stopping so that control can keep up.");
+
+DEFINE_double(
+    referfece_line_max_forward_heading_diff, 3.1415926536 / 2,
+    "max angle difference between the forward reference line and ego heading");
+
+DEFINE_double(
+    referfece_line_max_backward_heading_diff, 3.1415926536 / 6,
+    "max angle difference between the backward reference line and ego heading");

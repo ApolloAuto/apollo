@@ -40,18 +40,23 @@ class HMI : public UpdaterBase {
       WebSocketHandler *hmi_websocket);
   void Start(DvCallback callback_api);
   void StartStream(const double &time_interval_ms,
-                   const std::string& channel_name = "") override;
-  void PublishMessage(const std::string& channel_name = "") override;
+                   const std::string &channel_name = "",
+                   nlohmann::json *subscribe_param = nullptr) override;
+  void PublishMessage(const std::string &channel_name = "") override;
   void Stop();
-  void StopStream(const std::string& channel_name = "") override;
-  void OnTimer(const std::string& channel_name = "") override;
+  void StopStream(const std::string &channel_name = "") override;
+  void OnTimer(const std::string &channel_name = "") override;
   bool UpdateScenarioSetToStatus(const std::string &scenario_set_id,
                                  const std::string &scenario_set_name);
   bool UpdateDynamicModelToStatus(const std::string &dynamic_model_name);
+  bool UpdateMapToStatus(const std::string &map_name);
   bool UpdateRecordToStatus();
   bool UpdateVehicleToStatus();
   bool UpdateCameraChannelToStatus(const std::string &channel_name);
   bool UpdatePointChannelToStatus(const std::string &channel_name);
+  void GetCurrentScenarioEndPoint(double &x, double &y);
+  bool StartSimObstacle();
+  bool StopSimObstacle();
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.

@@ -26,6 +26,7 @@ apollo_component(
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "//modules/perception/lidar_output/proto:lidar_output_component_config_cc_proto",
         "//modules/common_msgs/perception_msgs:perception_benchmark_cc_proto",
+        "@boost",
     ],
 )
 

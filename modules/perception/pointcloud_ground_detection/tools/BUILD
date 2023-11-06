@@ -12,6 +12,7 @@ apollo_cc_binary(
         "//modules/perception/common/lidar:apollo_perception_common_lidar",
         "//modules/perception/pointcloud_ground_detection:apollo_perception_pointcloud_ground_detection",
         "@eigen",
+        "@local_config_pcl//:pcl",
     ],
 )
 

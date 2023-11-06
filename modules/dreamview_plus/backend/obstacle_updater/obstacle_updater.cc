@@ -61,21 +61,26 @@ ObstacleChannelUpdater* ObstacleUpdater::GetObstacleChannelUpdater(
   return obstacle_channel_updater_map_[channel_name];
 }
 void ObstacleUpdater::StartStream(const double& time_interval_ms,
-                                  const std::string& channel_name) {
+                                  const std::string& channel_name,
+                                  nlohmann::json* subscribe_param) {
   if (channel_name.empty()) {
     AERROR << "Failed to subscribe channel for channel is empty";
   }
-  ObstacleChannelUpdater* channel_updater =
-      GetObstacleChannelUpdater(channel_name);
-  if (channel_updater == nullptr) {
-    AERROR << "Failed to subscribe channel: " << channel_name
-           << "for channel updater not registered!";
-    return;
+  if (time_interval_ms > 0) {
+    ObstacleChannelUpdater* channel_updater =
+        GetObstacleChannelUpdater(channel_name);
+    if (channel_updater == nullptr) {
+      AERROR << "Failed to subscribe channel: " << channel_name
+             << "for channel updater not registered!";
+      return;
+    }
+    channel_updater->timer_.reset(new cyber::Timer(
+        time_interval_ms,
+        [channel_name, this]() { this->OnTimer(channel_name); }, false));
+    channel_updater->timer_->Start();
+  } else {
+    this->OnTimer(channel_name);
   }
-  channel_updater->timer_.reset(new cyber::Timer(
-      time_interval_ms, [channel_name, this]() { this->OnTimer(channel_name); },
-      false));
-  channel_updater->timer_->Start();
 }
 
 void ObstacleUpdater::StopStream(const std::string& channel_name) {
@@ -83,15 +88,24 @@ void ObstacleUpdater::StopStream(const std::string& channel_name) {
     AERROR << "Failed to unsubscribe channel for channel is empty";
     return;
   }
-  ObstacleChannelUpdater* channel_updater =
-      GetObstacleChannelUpdater(channel_name);
-  channel_updater->timer_->Stop();
-  channel_updater->obj_map_.clear();
-  channel_updater->obstacle_objects_.Clear();
-  channel_updater->obstacles_.clear();
+  if (enabled_) {
+    ObstacleChannelUpdater* channel_updater =
+        GetObstacleChannelUpdater(channel_name);
+    if (channel_updater->timer_) {
+      channel_updater->timer_->Stop();
+    }
+    channel_updater->obj_map_.clear();
+    channel_updater->obstacle_objects_.Clear();
+    channel_updater->obstacles_.clear();
+  }
 }
 
-void ObstacleUpdater::Stop() { obstacle_channel_updater_map_.clear(); }
+void ObstacleUpdater::Stop() { 
+  if (enabled_) {
+    obstacle_channel_updater_map_.clear();
+  }
+  enabled_ = false;
+}
 
 void ObstacleUpdater::OnTimer(const std::string& channel_name) {
   PublishMessage(channel_name);
@@ -113,72 +127,73 @@ void ObstacleUpdater::PublishMessage(const std::string& channel_name) {
 }
 
 void ObstacleUpdater::GetChannelMsg(std::vector<std::string>* channels) {
-  auto channelManager =
-      apollo::cyber::service_discovery::TopologyManager::Instance()
-          ->channel_manager();
-  std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
-  channelManager->GetWriters(&role_attr_vec);
-  for (auto& role_attr : role_attr_vec) {
-    std::string messageType;
-    messageType = role_attr.message_type();
-    int index = messageType.rfind("perception.PerceptionObstacles");
-    if (index != -1) {
-      channels->push_back(role_attr.channel_name());
-    }
-  }
+  enabled_ = true;
+  GetChannelMsgWithFilter(channels,"perception.PerceptionObstacles","");
 }
 
 void ObstacleUpdater::OnObstacles(
     const std::shared_ptr<PerceptionObstacles>& obstacles,
     const std::string& channel) {
-  ObstacleChannelUpdater* channel_updater = GetObstacleChannelUpdater(channel);
-  channel_updater->obstacles_.clear();
-  for (auto& obstacle : obstacles->perception_obstacle()) {
-    channel_updater->obstacles_.push_back(obstacle);
+  if (!enabled_) {
+    return;
+  }
+  {
+    std::lock_guard<std::mutex> lck(updater_publish_mutex_);
+    ObstacleChannelUpdater* channel_updater = GetObstacleChannelUpdater(channel);
+    channel_updater->obstacles_.clear();
+    for (auto& obstacle : obstacles->perception_obstacle()) {
+      channel_updater->obstacles_.push_back(obstacle);
+    }
   }
 }
 
 void ObstacleUpdater::OnLocalization(
     const std::shared_ptr<LocalizationEstimate>& localization) {
+  if (!enabled_) {
+    return;
+  }
   adc_pose_ = localization->pose();
 }
 void ObstacleUpdater::GetObjects(std::string* to_send,
                                  std::string channel_name) {
-  ObstacleChannelUpdater* channel_updater =
-      GetObstacleChannelUpdater(channel_name);
-
-  if (channel_updater->obstacles_.empty()) {
-    return;
-  }
-  channel_updater->obj_map_.clear();
-  for (const auto& obstacle : channel_updater->obstacles_) {
-    const std::string id = std::to_string(obstacle.id());
-    if (!apollo::common::util::ContainsKey(channel_updater->obj_map_, id)) {
-      Object& obj = channel_updater->obj_map_[id];
-      SetObstacleInfo(obstacle, &obj);
-      SetObstaclePolygon(obstacle, &obj);
-      SetObstacleType(obstacle.type(), obstacle.sub_type(), &obj);
-      SetObstacleSensorMeasurements(obstacle, &obj, channel_updater);
-      SetObstacleSource(obstacle, &obj);
-    } else {
-      // The object is already in the map.
-      // Only the coordinates of the polygon and its own coordinates are
-      // updated.
-      Object& obj = channel_updater->obj_map_[id];
-      SetObstacleInfo(obstacle, &obj);
-      SetObstaclePolygon(obstacle, &obj);
-      SetObstacleSensorMeasurements(obstacle, &obj, channel_updater);
+  {
+    std::lock_guard<std::mutex> lck(updater_publish_mutex_);
+    ObstacleChannelUpdater* channel_updater =
+        GetObstacleChannelUpdater(channel_name);
+      
+    if (channel_updater->obstacles_.empty()) {
+      return;
     }
+    channel_updater->obj_map_.clear();
+    for (const auto& obstacle : channel_updater->obstacles_) {
+      const std::string id = std::to_string(obstacle.id());
+      if (!apollo::common::util::ContainsKey(channel_updater->obj_map_, id)) {
+        Object& obj = channel_updater->obj_map_[id];
+        SetObstacleInfo(obstacle, &obj);
+        SetObstaclePolygon(obstacle, &obj);
+        SetObstacleType(obstacle.type(), obstacle.sub_type(), &obj);
+        SetObstacleSensorMeasurements(obstacle, &obj, channel_updater);
+        SetObstacleSource(obstacle, &obj);
+      } else {
+        // The object is already in the map.
+        // Only the coordinates of the polygon and its own coordinates are
+        // updated.
+        Object& obj = channel_updater->obj_map_[id];
+        SetObstacleInfo(obstacle, &obj);
+        SetObstaclePolygon(obstacle, &obj);
+        SetObstacleSensorMeasurements(obstacle, &obj, channel_updater);
+      }
+    }
+    Object auto_driving_car;
+    SetADCPosition(&auto_driving_car);
+    channel_updater->obstacle_objects_.Clear();
+    for (const auto& kv : channel_updater->obj_map_) {
+      *channel_updater->obstacle_objects_.add_obstacle() = kv.second;
+    }
+    channel_updater->obstacle_objects_.mutable_auto_driving_car()->CopyFrom(
+        auto_driving_car);
+    channel_updater->obstacle_objects_.SerializeToString(to_send);
   }
-  Object auto_driving_car;
-  SetADCPosition(&auto_driving_car);
-  channel_updater->obstacle_objects_.Clear();
-  for (const auto& kv : channel_updater->obj_map_) {
-    *channel_updater->obstacle_objects_.add_obstacle() = kv.second;
-  }
-  channel_updater->obstacle_objects_.mutable_auto_driving_car()->CopyFrom(
-      auto_driving_car);
-  channel_updater->obstacle_objects_.SerializeToString(to_send);
 }
 void ObstacleUpdater::SetObstacleInfo(const PerceptionObstacle& obstacle,
                                       Object* obj) {

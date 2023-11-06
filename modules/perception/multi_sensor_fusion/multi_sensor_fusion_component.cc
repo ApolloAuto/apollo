@@ -15,8 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/multi_sensor_fusion/multi_sensor_fusion_component.h"
 
+#include "cyber/profiler/profiler.h"
 #include "cyber/time/clock.h"
-#include "modules/common/util/perf_util.h"
+#include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
 #include "modules/perception/common/base/object_pool_types.h"
 #include "modules/perception/common/onboard/common_flags/common_flags.h"
 #include "modules/perception/common/onboard/msg_serializer/msg_serializer.h"
@@ -36,7 +37,6 @@ bool MultiSensorFusionComponent::Init() {
   AINFO << "Fusion Component Configs: " << comp_config.DebugString();
 
   // to load component configs
-  fusion_main_sensor_ = comp_config.fusion_main_sensor();
   object_in_roi_check_ = comp_config.object_in_roi_check();
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
@@ -48,11 +48,14 @@ bool MultiSensorFusionComponent::Init() {
       comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
       comp_config.output_viz_fused_content_channel_name());
+
+  algorithm::SensorManager::Instance()->Init();
   return true;
 }
 
 bool MultiSensorFusionComponent::Proc(
     const std::shared_ptr<SensorFrameMessage>& message) {
+  PERF_FUNCTION()
   if (message->process_stage_ == onboard::ProcessStage::SENSOR_FUSION) {
     return true;
   }
@@ -63,16 +66,18 @@ bool MultiSensorFusionComponent::Proc(
   bool status = InternalProc(message, out_message, viz_message);
   if (status) {
     // TODO(conver sensor id)
-    if (message->sensor_id_ != fusion_main_sensor_) {
-      AINFO << "Fusion receive from " << message->sensor_id_ << "not from "
-            << fusion_main_sensor_ << ". Skip send.";
-    } else {
+    bool is_main_sensor =
+        algorithm::SensorManager::Instance()->IsMainSensor(message->sensor_id_);
+    if (is_main_sensor) {
       writer_->Write(out_message);
       AINFO << "Send fusion processing output message.";
       // send msg for visualization
       if (onboard::FLAGS_obs_enable_visualization) {
         inner_writer_->Write(viz_message);
       }
+    } else {
+      AINFO << "Fusion receive from " << message->sensor_id_
+            << ". Skip because it is not the main sensor.";
     }
   }
   return status;
@@ -84,7 +89,6 @@ bool MultiSensorFusionComponent::InitAlgorithmPlugin(
   FusionInitOptions init_options;
   init_options.config_path = fusion_param.config_path();
   init_options.config_file = fusion_param.config_file();
-  init_options.main_sensor = fusion_main_sensor_;
   BaseFusionSystem* fusion =
       BaseFusionSystemRegisterer::GetInstanceByName(fusion_param.name());
   CHECK_NOTNULL(fusion);
@@ -109,7 +113,7 @@ bool MultiSensorFusionComponent::InternalProc(
     s_seq_num_++;
   }
 
-  PERF_BLOCK_START();
+  PERF_BLOCK("fusion_process")
   const double timestamp = in_message->timestamp_;
   const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
@@ -135,12 +139,15 @@ bool MultiSensorFusionComponent::InternalProc(
     AERROR << "Failed to call fusion plugin.";
     return false;
   }
-  PERF_BLOCK_END_WITH_INDICATOR("fusion_process", in_message->sensor_id_);
+  PERF_BLOCK_END
 
-  if (in_message->sensor_id_ != fusion_main_sensor_) {
+  bool is_main_sensor = algorithm::SensorManager::Instance()->IsMainSensor(
+      in_message->sensor_id_);
+  if (!is_main_sensor) {
     return true;
   }
 
+  PERF_BLOCK("fusion_roi_check")
   Eigen::Matrix4d sensor2world_pose =
       in_message->frame_->sensor2world_pose.matrix();
   if (object_in_roi_check_ && onboard::FLAGS_obs_enable_hdmap_input) {
@@ -162,8 +169,9 @@ bool MultiSensorFusionComponent::InternalProc(
   } else {
     valid_objects.assign(fused_objects.begin(), fused_objects.end());
   }
-  PERF_BLOCK_END_WITH_INDICATOR("fusion_roi_check", in_message->sensor_id_);
+  PERF_BLOCK_END
 
+  PERF_BLOCK("fusion_serialize_message")
   // produce visualization msg
   if (onboard::FLAGS_obs_enable_visualization) {
     viz_message->timestamp_ = in_message->timestamp_;
@@ -185,8 +193,7 @@ bool MultiSensorFusionComponent::InternalProc(
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
-  PERF_BLOCK_END_WITH_INDICATOR("fusion_serialize_message",
-                                in_message->sensor_id_);
+  PERF_BLOCK_END
 
   const double cur_time = ::apollo::cyber::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;

@@ -7,7 +7,7 @@ import { usePanelContext } from '../../base/store/PanelStore';
 import { StreamDataNames } from '../../../../services/api/types';
 import useWebSocketServices from '../../../../services/hooks/useWebSocketServices';
 
-export default function LayerMenu(props: any) {
+function LayerMenu(props: any) {
     const { classes, cx } = useStyle();
     const { carviz, pointCloudFusionChannel } = props;
     const { t } = useTranslation('layerMenu');
@@ -198,7 +198,6 @@ export default function LayerMenu(props: any) {
                                                     });
                                                 }
                                                 if (!checked && key === 'pointCloud') {
-                                                    carviz.removePointCloud();
                                                     closeSubcription(StreamDataNames.POINT_CLOUD);
                                                 }
                                             }}
@@ -214,3 +213,5 @@ export default function LayerMenu(props: any) {
         </div>
     );
 }
+
+export default React.memo(LayerMenu);

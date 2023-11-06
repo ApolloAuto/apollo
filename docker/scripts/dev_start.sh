@@ -25,13 +25,15 @@ DEV_CONTAINER_PREFIX='apollo_dev_'
 DEV_CONTAINER="${DEV_CONTAINER_PREFIX}${USER}"
 DEV_INSIDE="in-dev-docker"
 
+CO_DEV_PATH=
+
 SUPPORTED_ARCHS=(x86_64 aarch64)
 TARGET_ARCH="$(uname -m)"
 
-VERSION_X86_64="dev-x86_64-18.04-20230724_1143"
+VERSION_X86_64="dev-x86_64-18.04-20230831_1143"
 TESTING_VERSION_X86_64="dev-x86_64-18.04-testing-20210112_0008"
 
-VERSION_AARCH64="dev-aarch64-20.04-20230719_2137"
+VERSION_AARCH64="dev-aarch64-20.04-20231024_1054"
 USER_VERSION_OPT=
 
 FAST_MODE="no"
@@ -95,6 +97,7 @@ OPTIONS:
     -t, --tag <TAG>               Specify docker image with tag <TAG> to start
     -d, --dist                    Specify Apollo distribution(stable/testing)
     -c, --cross-platform <arch>   Run a cross-platform image
+    --co-dev <path>               Run collaborative env between source image and package manager image 
     --shm-size <bytes>            Size of /dev/shm, passed directly to "docker run"
     -y                            Agree to Apollo License Agreement non-interactively
     stop                          Stop all running Apollo containers
@@ -143,6 +146,12 @@ function parse_arguments() {
                 TARGET_ARCH="$custom_arch"
                 check_target_arch
                 cross_platform_setup
+                ;;
+
+            --co-dev)
+                mount_workspace_path="$1"
+                shift
+                CO_DEV_PATH="$mount_workspace_path" 
                 ;;
 
             -d | --dist)
@@ -291,6 +300,8 @@ function setup_devices_and_mount_local_volumes() {
     setup_device
 
     local volumes="-v $APOLLO_ROOT_DIR:/apollo"
+
+    [ ! -z "${CO_DEV_PATH}" ] && volumes="-v ${PWD}/${CO_DEV_PATH}:/apollo_workspace ${volumes}"
 
     [ -d "${APOLLO_CONFIG_HOME}" ] || mkdir -p "${APOLLO_CONFIG_HOME}"
     volumes="-v ${APOLLO_CONFIG_HOME}:${APOLLO_CONFIG_HOME} ${volumes}"

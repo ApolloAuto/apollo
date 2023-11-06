@@ -52,13 +52,18 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
 }
 
 void HMI::StartStream(const double& time_interval_ms,
-                      const std::string& channel_name) {
+                      const std::string& channel_name,
+                      nlohmann::json* subscribe_param) {
   AINFO << "Start HMIStatus updater timer with data sending frequency: "
         << time_interval_ms;
   time_interval_ms_ = time_interval_ms;
-  timer_.reset(new cyber::Timer(
-      time_interval_ms, [this]() { this->OnTimer(); }, false));
-  timer_->Start();
+  if (time_interval_ms_ > 0) {
+    timer_.reset(new cyber::Timer(
+        time_interval_ms, [this]() { this->OnTimer(); }, false));
+    timer_->Start();
+  } else {
+    this->OnTimer();
+  }
 }
 
 void HMI::Start(DvCallback callback_api) { hmi_worker_->Start(callback_api); }
@@ -67,7 +72,9 @@ void HMI::Stop() { hmi_worker_->Stop(); }
 
 void HMI::StopStream(const std::string& channel_name) {
   AINFO << "HMIStatus updater timer has been stopped";
-  timer_->Stop();
+  if (timer_) {
+    timer_->Stop();
+  }
 }
 
 void HMI::RegisterMessageHandlers() {
@@ -100,6 +107,20 @@ void HMI::RegisterMessageHandlers() {
       [this](const Json& json, WebSocketHandler::Connection* conn) {
         // Run HMIWorker::Trigger(action) if json is {action: "<action>"}
         // Run HMIWorker::Trigger(action, value) if "value" field is provided.
+
+        // response is used for interfaces that require a reply
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start hmi action: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+
         std::string action;
         if (!JsonUtil::GetStringByPath(json, "data.info.action", &action)) {
           AERROR << "Truncated HMIAction request.";
@@ -110,22 +131,31 @@ void HMI::RegisterMessageHandlers() {
           AERROR << "Invalid HMIAction string: " << action;
           return;
         }
+        bool is_ok = false;
         std::string value;
         if (JsonUtil::GetStringByPath(json, "data.info.value", &value)) {
-          hmi_worker_->Trigger(hmi_action, value);
+          is_ok = hmi_worker_->Trigger(hmi_action, value);
         } else {
-          hmi_worker_->Trigger(hmi_action);
+          is_ok = hmi_worker_->Trigger(hmi_action);
         }
 
         // Extra works for current Dreamview.
-        if (hmi_action == HMIAction::CHANGE_MAP) {
-          // Reload simulation map after changing map.
-          ACHECK(map_service_->ReloadMap(true))
-              << "Failed to load new simulation map: " << value;
-        } else if (hmi_action == HMIAction::CHANGE_VEHICLE) {
+        if (hmi_action == HMIAction::CHANGE_VEHICLE) {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+        } else if (hmi_action == HMIAction::CHANGE_MAP) {
+          response["data"]["info"]["data"]["isOk"] = is_ok;
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] =
+              is_ok ? "Success" : "Failed to change map";
+          websocket_->SendData(conn, response.dump());
+        } else if (hmi_action == HMIAction::CHANGE_OPERATION ||
+                  hmi_action == HMIAction::CHANGE_MODE) {
+          response["data"]["info"]["data"]["isOk"] = true;
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+          websocket_->SendData(conn, response.dump());
         }
       });
 
@@ -349,6 +379,118 @@ void HMI::RegisterMessageHandlers() {
         }
         websocket_->SendData(conn, response.dump());
       });
+
+  websocket_->RegisterMessageHandler(
+      "StartDataRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start data recorder: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool ret = hmi_worker_->StartDataRecorder();
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to start data recorder:Failed to start the "
+              "cyber_recorder process";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "StopDataRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start data recorder: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool ret = hmi_worker_->StopDataRecorder();
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to stop data recorder: failed to stop the cyber_recorder "
+              "process";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "SaveDataRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id, new_name;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to save record: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        } else if (!JsonUtil::GetStringByPath(json, "data.info.newName",
+                                              &new_name)) {
+          AERROR << "Failed to save record: newName not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss newName";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool ret = hmi_worker_->SaveDataRecorder(new_name);
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] =
+              "Failed to save record: a file with the same name exists";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
+      "DeleteDataRecorder",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        Json response;
+        response["action"] = "response";
+        std::string request_id;
+        if (!JsonUtil::GetStringByPath(json, "data.requestId", &request_id)) {
+          AERROR << "Failed to start data recorder: requestId not found.";
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Miss requestId";
+          websocket_->SendData(conn, response.dump());
+          return;
+        }
+        response["data"]["requestId"] = request_id;
+        bool ret = hmi_worker_->DeleteDataRecorder();
+        if (ret) {
+          response["data"]["info"]["code"] = 0;
+          response["data"]["info"]["message"] = "Success";
+        } else {
+          response["data"]["info"]["code"] = -1;
+          response["data"]["info"]["message"] = "Failed to delete the record";
+        }
+        websocket_->SendData(conn, response.dump());
+      });
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
@@ -393,6 +535,10 @@ bool HMI::UpdateDynamicModelToStatus(const std::string& dynamic_model_name) {
   return hmi_worker_->UpdateDynamicModelToStatus(dynamic_model_name);
 }
 
+bool HMI::UpdateMapToStatus(const std::string& map_name) {
+  return hmi_worker_->UpdateMapToStatus(map_name);
+}
+
 bool HMI::UpdateRecordToStatus() { return hmi_worker_->LoadRecords(); }
 
 bool HMI::UpdateVehicleToStatus() { return hmi_worker_->ReloadVehicles(); }
@@ -406,5 +552,14 @@ bool HMI::UpdatePointChannelToStatus(const std::string& channel_name) {
   hmi_worker_->UpdatePointCloudChannelToStatus(channel_name);
   return true;
 }
+
+void HMI::GetCurrentScenarioEndPoint(double& x, double& y) {
+  hmi_worker_->GetCurrentScenarioEndPoint(x, y);
+}
+
+bool HMI::StartSimObstacle() { return hmi_worker_->StartSimObstacle(); }
+
+bool HMI::StopSimObstacle() { return hmi_worker_->StopSimObstacle(); }
+
 }  // namespace dreamview
 }  // namespace apollo

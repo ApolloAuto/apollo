@@ -5,7 +5,7 @@ type SubItemProps = {
     border?: boolean;
 } & PropsWithChildren;
 
-export function SubItem(props: SubItemProps) {
+export function SubItemOrigin(props: SubItemProps) {
     return (
         <div
             style={{
@@ -17,3 +17,5 @@ export function SubItem(props: SubItemProps) {
         </div>
     );
 }
+
+export const SubItem = React.memo(SubItemOrigin);

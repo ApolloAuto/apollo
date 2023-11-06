@@ -45,6 +45,7 @@ void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
 }
 
 bool MonitorManager::StartFrame(const double current_time) {
+  status_.set_detect_immediately(false);
   // Get latest HMIStatus.
   static auto hmi_status_reader =
       CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
@@ -53,6 +54,8 @@ bool MonitorManager::StartFrame(const double current_time) {
   if (hmi_status == nullptr) {
     AERROR << "No HMIStatus was received.";
     return false;
+  } else if (hmi_status->expected_modules() > 0) {
+    status_.set_detect_immediately(true);
   }
 
   if (current_mode_ != hmi_status->current_mode()) {
@@ -71,11 +74,14 @@ bool MonitorManager::StartFrame(const double current_time) {
     for (const auto& iter : mode_config_.other_components()) {
       status_.mutable_other_components()->insert({iter.first, {}});
     }
+    status_.clear_data_recorder_component();
   } else {
     // Mode not changed, clear component summary from the last frame.
     for (auto& iter : *status_.mutable_components()) {
       iter.second.clear_summary();
     }
+    // clear data recorder component summary from the last frame.
+    status_.mutable_data_recorder_component()->clear_summary();
   }
 
   in_autonomous_driving_ = CheckAutonomousDriving(current_time);

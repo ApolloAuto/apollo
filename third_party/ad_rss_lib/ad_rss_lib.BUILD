@@ -87,7 +87,11 @@ cc_binary(
 cc_library(
     name = "ad_rss",
     srcs = ["libad_rss.so"],
-    hdrs = glob(["include/**/*.hpp"]),
+    hdrs = glob([
+        "include/**/*.hpp",
+        "src/**/*.h*",
+        "tests/test_support/**/*.h*",
+    ]),
     copts = [
         "-fPIC",
         "-std=c++11",

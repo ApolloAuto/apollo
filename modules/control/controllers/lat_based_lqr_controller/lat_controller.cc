@@ -189,7 +189,6 @@ Status LatController::Init(std::shared_ptr<DependencyInjector> injector) {
     return Status(ErrorCode::CONTROL_INIT_ERROR,
                   "failed to load lat control_conf");
   }
-
   injector_ = injector;
   if (!LoadControlConf()) {
     AERROR << "failed to load control conf";
@@ -316,7 +315,7 @@ Status LatController::ComputeControlCommand(
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
   auto vehicle_state = injector_->vehicle_state();
-
+  auto previous_lon_debug = injector_->Get_previous_lon_debug_info();
   auto target_tracking_trajectory = *planning_published_trajectory;
 
   if (FLAGS_use_navigation_mode &&
@@ -591,11 +590,15 @@ Status LatController::ComputeControlCommand(
 
   // Check if the steer is locked and hence the previous steer angle should be
   // executed
-  if (std::abs(vehicle_state->linear_velocity()) <
-          lat_based_lqr_controller_conf_.lock_steer_speed() &&
+  if ((std::abs(vehicle_state->linear_velocity()) <
+           lat_based_lqr_controller_conf_.lock_steer_speed() ||
+       previous_lon_debug->path_remain() <= 0) &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    ADEBUG << "Into lock steer, path_remain is "
+          << previous_lon_debug->path_remain() << "linear_velocity is "
+          << vehicle_state->linear_velocity();
     steer_angle = pre_steer_angle_;
   }
 
@@ -708,7 +711,8 @@ void LatController::UpdateMatrix() {
   double v;
   // At reverse driving, replace the lateral translational motion dynamics with
   // the corresponding kinematic models
-  if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE) {
+  if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE &&
+      !lat_based_lqr_controller_conf_.reverse_use_dynamic_model()) {
     v = std::min(injector_->vehicle_state()->linear_velocity(),
                  -minimum_speed_protection_);
     matrix_a_(0, 2) = matrix_a_coeff_(0, 2) * v;
@@ -747,10 +751,12 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
   // from rad to %
   const double v = injector_->vehicle_state()->linear_velocity();
   double steer_angle_feedforwardterm;
-  if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE) {
-    steer_angle_feedforwardterm = wheelbase_ * ref_curvature * 180 / M_PI *
-                                  steer_ratio_ /
-                                  steer_single_direction_max_degree_ * 100;
+  if (injector_->vehicle_state()->gear() == canbus::Chassis::GEAR_REVERSE &&
+      !lat_based_lqr_controller_conf_.reverse_use_dynamic_model()) {
+    steer_angle_feedforwardterm =
+        lat_based_lqr_controller_conf_.reverse_feedforward_ratio() *
+        wheelbase_ * ref_curvature * 180 / M_PI * steer_ratio_ /
+        steer_single_direction_max_degree_ * 100;
   } else {
     steer_angle_feedforwardterm =
         (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -

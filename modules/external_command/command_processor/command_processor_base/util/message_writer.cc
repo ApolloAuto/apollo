@@ -20,11 +20,25 @@
 
 #include "modules/external_command/command_processor/command_processor_base/util/message_writer.h"
 
+#include "cyber/timer/timer.h"
+
 namespace apollo {
 namespace external_command {
 
 MessageWriter::MessageWriter()
-    : node_(apollo::cyber::CreateNode("message_writer")) {}
+    : node_(apollo::cyber::CreateNode("message_writer")) {
+  // Send history in 1 Hz.
+  const uint32_t period = 1000;
+  timer_.reset(new apollo::cyber::Timer(
+      period,  //
+      [this]() {
+        for (auto history_writer : this->history_writers_) {
+          history_writer->WriteLastMessage();
+        }
+      },
+      false));
+  timer_->Start();
+}
 
 }  // namespace external_command
 }  // namespace apollo

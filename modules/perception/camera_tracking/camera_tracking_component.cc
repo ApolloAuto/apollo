@@ -67,7 +67,7 @@ bool CameraTrackingComponent::Init() {
 
 bool CameraTrackingComponent::Proc(
     const std::shared_ptr<onboard::CameraFrame>& message) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   AINFO << std::setprecision(16)
         << "Enter Tracking component, message timestamp: " << message->timestamp
         << " current timestamp: " << Clock::NowInSeconds();

@@ -1,0 +1,22 @@
+syntax = "proto2";
+package apollo.drivers;
+
+import "modules/common_msgs/basic_msgs/header.proto";
+
+message RadarPointXYZVR {
+  optional float x = 1 [default = nan];
+  optional float y = 2 [default = nan];
+  optional float z = 3 [default = nan];
+  optional float velocity = 4 [default = 0];
+  optional float rcs = 5 [default = 0];
+}
+
+message RadarPointCloud {
+  optional apollo.common.Header header = 1;
+  optional string frame_id = 2;
+  optional bool is_dense = 3;
+  repeated RadarPointXYZVR point = 4;
+  optional double measurement_time = 5;
+  optional uint32 width = 6;
+  optional uint32 height = 7;
+}

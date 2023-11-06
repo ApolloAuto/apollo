@@ -25,9 +25,11 @@
 #include <string>
 #include <vector>
 
+#include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
 #include "modules/control/controllers/lon_based_pid_controller/proto/lon_based_pid_controller_conf.pb.h"
 
+#include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
@@ -36,6 +38,7 @@
 #include "modules/control/control_component/controller_task_base/common/pid_controller.h"
 #include "modules/control/control_component/controller_task_base/common/trajectory_analyzer.h"
 #include "modules/control/control_component/controller_task_base/control_task.h"
+#include "modules/control/controllers/lon_based_pid_controller/util/check_pit.h"
 
 /**
  * @namespace apollo::control
@@ -120,6 +123,11 @@ class LonController : public ControlTask {
 
   bool IsPedestrianStopLongTerm(SimpleLongitudinalDebug *debug);
 
+  bool IsFullStopLongTerm(SimpleLongitudinalDebug *debug);
+
+  void SetParkingBrake(const LonBasedPidControllerConf *conf,
+                       control::ControlCommand *control_command);
+
   void CloseLogFile();
 
   const localization::LocalizationEstimate *localization_ = nullptr;
@@ -155,6 +163,18 @@ class LonController : public ControlTask {
   bool is_stop_by_pedestrian_previous_ = false;
   double start_time_ = 0.0;
   double wait_time_diff_ = 0.0;
+
+  bool is_full_stop_previous_ = false;
+  double is_full_stop_start_time_ = 0.0;
+  double is_full_stop_wait_time_diff_ = 0.0;
+
+  bool epb_on_change_switch_ = true;
+  bool epb_off_change_switch_ = true;
+  int epb_change_count_ = 0;
+  int smode_num_ = 0;
+
+  double standstill_narmal_acceleration_ = 0.0;
+  double stop_gain_acceleration_ = 0.0;
 };
 
 // 1.2 当前类声明为插件

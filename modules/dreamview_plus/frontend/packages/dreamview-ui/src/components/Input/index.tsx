@@ -2,6 +2,7 @@ import React from 'react';
 import { Input as InternalInput, InputProps } from 'antd';
 import { TextAreaProps } from 'antd/es/input';
 import { getPrefixCls } from '../../tools/prefixCls/prefixCls';
+import './index.less';
 
 const { TextArea: InternalTextArea } = InternalInput;
 

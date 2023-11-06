@@ -52,8 +52,8 @@ apollo::planning::StopSignUnprotectedScenario
   
 #### 阶段
 
-| 阶段名                                      | 类型                                                           | 描述                                   |
-| ------------------------------------------- | -------------------------------------------------------------- | -------------------------------------- |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
 | `STOP_SIGN_UNPROTECTED_PRE_STOP`            | `apollo::planning::StopSignUnprotectedStagePreStop`            | 停止标记前停车阶段                     |
 | `STOP_SIGN_UNPROTECTED_STOP`                | `apollo::planning::StopSignUnprotectedStageStop`               | 停车观望阶段，等待周围车辆远离继续行驶 |
 | `STOP_SIGN_UNPROTECTED_CREEP`               | `apollo::planning::StopSignUnprotectedStageCreep`              | 跛行阶段                               |
@@ -62,8 +62,15 @@ apollo::planning::StopSignUnprotectedScenario
 
 #### 配置
 
-| 文件路径                                                                     | 说明             |
-| ---------------------------------------------------------------------------- | ---------------- |
-| `modules/planning/scenarios/stop_sign_unprotected/conf/scenario_conf.pb.txt` | 场景的配置文件   |
-| `modules/planning/scenarios/stop_sign_unprotected/conf/pipeline.pb.txt`      | 场景的流水线文件 |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| --------------------------------------------------------------------- | ---------------- | ---------------- |
+| `modules/planning/scenarios/stop_sign_unprotected/conf/scenario_conf.pb.txt` | `apollo::planning::ScenarioStopSignUnprotectedConfig` |场景的配置文件   |
+| `modules/planning/scenarios/stop_sign_unprotected/conf/pipeline.pb.txt`      | `apollo::planning::ScenarioPipeline` |场景的流水线文件 |
+| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+
+#### Flags
+
+| 文件路径                                            |  <div style="width: 300pt">说明</div> |
+| --------------------------------------------------- |  ------------------------------------ |
+| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
 

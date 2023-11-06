@@ -27,6 +27,10 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::VehicleState;
+using apollo::common::math::Box2d;
+using apollo::common::math::Polygon2d;
+
 
 bool BacksideVehicle::Init(
     const std::string& name,
@@ -39,14 +43,21 @@ bool BacksideVehicle::Init(
 }
 
 void BacksideVehicle::MakeLaneKeepingObstacleDecision(
-    const SLBoundary& adc_sl_boundary, PathDecision* path_decision) {
+    const SLBoundary& adc_sl_boundary, PathDecision* path_decision,
+    const VehicleState& vehicle_state) {
   ObjectDecisionType ignore;
   ignore.mutable_ignore();
   const double adc_length_s =
       adc_sl_boundary.end_s() - adc_sl_boundary.start_s();
   for (const auto* obstacle : path_decision->obstacles().Items()) {
-    if (obstacle->PerceptionSLBoundary().end_s() >= adc_sl_boundary.end_s() ||
-        obstacle->IsCautionLevelObstacle()) {
+    if (obstacle->PerceptionSLBoundary().end_s() >= adc_sl_boundary.end_s()) {
+      // don't ignore such vehicles.
+      continue;
+    }
+
+    if (obstacle->IsCautionLevelObstacle() &&
+          obstacle->PerceptionSLBoundary().start_s() >=
+              adc_sl_boundary.start_s()) {
       // don't ignore such vehicles.
       continue;
     }
@@ -79,6 +90,17 @@ void BacksideVehicle::MakeLaneKeepingObstacleDecision(
                                         obstacle->Id(), ignore);
       continue;
     }
+
+    if (PredictionLineOverlapEgo(*obstacle, vehicle_state)) {
+      ADEBUG << "Prediction Line Overlap Ego Obstacle " << obstacle->Id();
+      path_decision->AddLongitudinalDecision("backside_vehicle/"
+                                              "prediction line overlap ego",
+                                              obstacle->Id(), ignore);
+      path_decision->AddLateralDecision("backside_vehicle/"
+                                        "prediction line overlap ego",
+                                        obstacle->Id(), ignore);
+      continue;
+    }
   }
 }
 
@@ -86,11 +108,33 @@ Status BacksideVehicle::ApplyRule(
     Frame* const, ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
+  const VehicleState& vehicle_state = reference_line_info->vehicle_state();
   // The lane keeping reference line.
   if (reference_line_info->Lanes().IsOnSegment()) {
-    MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
+    MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision,
+                                    vehicle_state);
   }
   return Status::OK();
+}
+
+bool BacksideVehicle::PredictionLineOverlapEgo(
+    const Obstacle& obstacle, const VehicleState& vehicle_state) {
+  const auto& trajectory = obstacle.Trajectory().trajectory_point();
+
+  if (trajectory.empty()) return false;
+
+  const auto vehicle_param =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  Box2d adc_box({vehicle_state.x(), vehicle_state.y()}, vehicle_state.heading(),
+                vehicle_param.length(), vehicle_param.width());
+  Polygon2d adc_polygon(adc_box);
+  for (auto& point : trajectory) {
+    Polygon2d obs_polygon = obstacle.GetObstacleTrajectoryPolygon(point);
+    if (adc_polygon.HasOverlap(obs_polygon)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace planning

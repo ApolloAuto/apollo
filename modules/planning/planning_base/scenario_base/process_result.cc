@@ -87,6 +87,13 @@ const ScenarioResult& ScenarioResult::SetStageResult(
   return *this;
 }
 
+const ScenarioResult& ScenarioResult::SetStageResult(
+    const StageStatusType& stage_status, const std::string& message) {
+  stage_result_ = StageResult();
+  stage_result_.SetStageStatus(stage_status, message);
+  return *this;
+}
+
 const ScenarioResult& ScenarioResult::SetScenarioStatus(
     const ScenarioStatusType& scenario_status) {
   scenario_status_ = scenario_status;

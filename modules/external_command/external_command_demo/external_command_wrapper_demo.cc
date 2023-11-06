@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <poll.h>
-#include <cctype>
-
 #include "modules/external_command/external_command_demo/external_command_wrapper_demo.h"
 
+#include <poll.h>
+
+#include <cctype>
+
 #include "modules/external_command/external_command_demo/proto/sweeper_custom_command.pb.h"
+
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 
@@ -71,8 +73,9 @@ bool ExternalCommandWrapperDemo::Proc() {
     case 0:
       return true;
     default:
-      std::string input_command_string = "";
-      std::cin >> input_command_string;
+      char data[50];
+      std::cin.getline(data, 50);
+      std::string input_command_string = data;
       if (input_command_string == "pull_over") {
         // Pull over.
         SendActionCommand(
@@ -102,12 +105,18 @@ bool ExternalCommandWrapperDemo::Proc() {
         SendVehicleSignalCommand();
       } else if (input_command_string == "custom_chassis") {
         SendCustomChassisCommand();
-      } else if (input_command_string == "set_speed_low") {
-        double speed = 1.0;
-        SendSpeedCommand(speed);
-      } else if (input_command_string == "set_speed_high") {
-        double speed = 30.0;
-        SendSpeedCommand(speed);
+      } else if (input_command_string.find("set_speed") != std::string::npos) {
+        auto index = input_command_string.find("set_speed");
+        std::string speed_value_string = input_command_string.substr(
+            index + std::string("set_speed").length(),
+            input_command_string.length());
+        if (!speed_value_string.empty()) {
+          double speed_value = std::atof(speed_value_string.c_str());
+          SendSpeedCommand(speed_value);
+        } else {
+          AWARN << "Input format is invalid, please input format like: "
+                   "set_speed 1.5";
+        }
       } else if (input_command_string == "increase_speed") {
         double speed_factor = 1.2;
         SendSpeedFactorCommand(speed_factor);
@@ -183,7 +192,7 @@ bool ExternalCommandWrapperDemo::Proc() {
 
         SendFreespaceCommand(way_points, end_pose);
       } else {
-        std::cout << "Invalid input!" << std::endl;
+        std::cout << "Invalid input!" << input_command_string << std::endl;
       }
   }
   return true;

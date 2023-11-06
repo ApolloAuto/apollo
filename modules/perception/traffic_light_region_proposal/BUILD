@@ -1,5 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,6 +26,7 @@ apollo_cc_library(
         "preprocessor/multi_camera_projection.h",
         "preprocessor/tl_preprocessor.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         "//modules/common/math",
@@ -60,7 +62,7 @@ apollo_component(
     hdrs = [
         "traffic_light_region_proposal_component.h",
     ],
-    copts = PERCEPTION_COPTS,
+    copts = PERCEPTION_COPTS + if_profiler(),
     linkopts = ["-lpthread"],
     deps = [
         "//cyber",

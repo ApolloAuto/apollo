@@ -126,4 +126,5 @@ message HMIMode {
   repeated HMIModeOperation operations = 5;
   optional HMIModeOperation default_operation = 6;
   optional string layout = 7;
+  optional MonitoredComponent data_recorder_component = 8;
 }

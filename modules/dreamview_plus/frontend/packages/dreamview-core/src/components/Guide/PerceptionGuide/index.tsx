@@ -125,9 +125,9 @@ const steps = (isLogin: boolean, currentStep: number, translation: TFunction) =>
             offset: 5,
         },
         {
-            title: translation('perceptionProfileManager'),
+            title: translation('perceptionResourceManager'),
             target: '.perception-guide-profile-manager-start',
-            content: translation('perceptionProfileManagerDesc'),
+            content: translation('perceptionResourceManagerDesc'),
             placement: 'right' as const,
             disableBeacon: true,
             hideCloseButton: true,

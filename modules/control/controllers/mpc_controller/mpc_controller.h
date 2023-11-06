@@ -37,6 +37,8 @@
 #include "modules/common/math/mpc_osqp.h"
 #include "modules/control/control_component/controller_task_base/common/interpolation_1d.h"
 #include "modules/control/control_component/controller_task_base/common/interpolation_2d.h"
+#include "modules/control/control_component/controller_task_base/common/leadlag_controller.h"
+#include "modules/control/control_component/controller_task_base/common/pid_controller.h"
 #include "modules/control/control_component/controller_task_base/common/trajectory_analyzer.h"
 #include "modules/control/control_component/controller_task_base/control_task.h"
 
@@ -117,6 +119,14 @@ class MPCController : public ControlTask {
 
   void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory,
                                  SimpleMPCDebug *debug);
+
+  void ComputeLongitudinalErrors(const TrajectoryAnalyzer *trajectory_analyzer,
+                                 const double preview_time, const double ts,
+                                 SimpleMPCDebug *debug);
+
+  void GetPathRemain(
+      const planning::ADCTrajectory *planning_published_trajectory,
+      SimpleMPCDebug *debug);
 
   bool LoadControlConf();
 
@@ -236,6 +246,8 @@ class MPCController : public ControlTask {
 
   common::DigitalFilter digital_filter_;
 
+  common::DigitalFilter digital_filter_pitch_angle_;
+
   std::unique_ptr<Interpolation1D> lat_err_interpolation_;
 
   std::unique_ptr<Interpolation1D> heading_err_interpolation_;
@@ -273,6 +285,10 @@ class MPCController : public ControlTask {
   // MeanFilter lateral_error_filter;
   common::MeanFilter heading_error_filter_;
 
+  // Lead/Lag controller
+  bool enable_leadlag_ = false;
+  LeadlagController leadlag_controller_;
+
   double minimum_speed_protection_ = 0.1;
 
   // Enable the feedback-gain-related compensation components in the feedfoward
@@ -283,6 +299,40 @@ class MPCController : public ControlTask {
   // enough to the solver's output with constraint
   double unconstrained_control_diff_limit_ = 5.0;
 
+  // Look-ahead controller
+  bool enable_look_ahead_back_control_ = false;
+
+  double low_speed_bound_ = 0.0;
+
+  double low_speed_window_ = 0.0;
+
+  // number of control cycles look ahead (preview controller)
+  int preview_window_ = 0;
+
+  // longitudial length for look-ahead lateral error estimation during forward
+  // driving and look-back lateral error estimation during backward driving
+  // (look-ahead controller)
+  double lookahead_station_low_speed_ = 0.0;
+  double lookback_station_low_speed_ = 0.0;
+  double lookahead_station_high_speed_ = 0.0;
+  double lookback_station_high_speed_ = 0.0;
+
+  double lateral_error_feedback = 0.0;
+  double heading_error_feedback = 0.0;
+
+  bool use_lqr_curvature_feedforward_ = false;
+
+  double preview_time_ = 0.0;
+
+  bool use_preview_ = false;
+
+  double previous_acceleration_vrf_ = 0.0;
+
+  // PID controller
+  PIDController acceleration_lookup_pid_controller_;
+  bool use_lookup_acc_pid_ = false;
+
+  bool use_pitch_angle_filter_ = false;
   std::shared_ptr<DependencyInjector> injector_;
 };
 

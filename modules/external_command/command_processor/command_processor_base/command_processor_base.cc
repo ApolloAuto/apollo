@@ -63,9 +63,5 @@ const std::shared_ptr<cyber::Node>& CommandProcessorBase::Node() const {
   return node_;
 }
 
-const std::string& CommandProcessorBase::GetConfigDir() const {
-  return config_dir_;
-}
-
 }  // namespace external_command
 }  // namespace apollo

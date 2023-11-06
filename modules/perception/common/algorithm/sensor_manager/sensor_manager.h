@@ -62,6 +62,8 @@ class SensorManager {
   bool IsUltrasonic(const std::string& name) const;
   bool IsUltrasonic(const apollo::perception::base::SensorType& type) const;
 
+  bool IsMainSensor(const std::string& name) const;
+
   // sensor frame id function
   std::string GetFrameId(const std::string& name) const;
 

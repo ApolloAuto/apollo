@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
-import { from, forkJoin, catchError, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { updateStatus, usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
-import Logger from '@dreamview/log';
 import { ChangeCertStatusAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
-import { ENUM_MENU_KEY, ENUM_CERT_STATUS } from '@dreamview/dreamview-core/src/store/MenuStore';
+import { ENUM_CERT_STATUS } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { Emptyable, noop } from './util/similarFunctions';
 import useWebSocketServices from './services/hooks/useWebSocketServices';
 import { StreamDataNames } from './services/api/types';
@@ -56,7 +54,7 @@ function useInitUserMixInfo() {
 }
 
 function useInitHmiStatus() {
-    const { isMainConnected, metadata, streamApi, mainApi, pluginApi } = useWebSocketServices();
+    const { isMainConnected, metadata, streamApi } = useWebSocketServices();
     const [, dispatch] = usePickHmiStore();
 
     useEffect(() => {
@@ -81,10 +79,10 @@ function useInitRecord() {
     useEffect(() => {
         if (isMainConnected) {
             mainApi.loadRecords();
+            mainApi.loadScenarios();
         }
     }, [isMainConnected]);
 }
-
 
 export default function InitAppData() {
     useInitHmiStatus();

@@ -9,6 +9,5 @@ cc_library(
     includes = ["."],
     linkopts = [
         "-L/usr/lib/aarch64-linux-gnu/tegra",
-        "-lnvjpeg",
     ],
 )

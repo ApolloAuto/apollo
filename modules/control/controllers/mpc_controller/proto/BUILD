@@ -7,7 +7,9 @@ proto_library(
     name = "mpc_controller_proto",
     srcs = ["mpc_controller.proto"],
     deps = [
-        "//modules/control/control_component/controller_task_base/proto:gain_scheduler_conf_proto",
+        "//modules/control/control_component/proto:gain_scheduler_conf_proto",
+        "//modules/control/control_component/proto:leadlag_conf_proto",
+        "//modules/control/control_component/proto:pid_conf_proto",
     ],
 )
 

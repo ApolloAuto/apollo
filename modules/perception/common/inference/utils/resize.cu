@@ -14,12 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/common/inference/utils/resize.h"
-
 #include <algorithm>
 
 #include "cyber/common/log.h"
 #include "modules/perception/common/inference/utils/cuda_util.h"
+#include "modules/perception/common/inference/utils/resize.h"
 #include "modules/perception/common/inference/utils/util.h"
 
 namespace apollo {
@@ -245,6 +244,95 @@ bool ResizeGPU(const base::Image8U &src,
       src.gpu_data(), dst->mutable_gpu_data() + dst->offset(start_axis),
       origin_channel, origin_height, origin_width, stepwidth, height, width, fx,
       fy, mean_b, mean_g, mean_r, channel_axis, scale);
+  return true;
+}
+
+__global__ void image_padding_kernel(const unsigned char *src, uint8_t *dst,
+                                     int origin_height, int origin_width,
+                                     int origin_channel, int stepwidth,
+                                     int dst_height, int dst_width,
+                                     int dst_channel, int left_pad,
+                                     int right_pad, int top_pad, int bottom_pad,
+                                     int value) {
+  const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
+  const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
+  // src 1 H W C
+  // dst 1 C H W
+
+  if (dst_x < dst_width && dst_y < dst_height) {
+    if (dst_x < left_pad || dst_x >= (dst_width - right_pad) ||
+        dst_y < top_pad || dst_y >= (dst_height - bottom_pad)) {
+      for (int c = 0; c < dst_channel; c++) {
+        int dst_idx = dst_height * dst_width * c + dst_y * dst_width + dst_x;
+        dst[dst_idx] = value;
+      }
+    } else {
+      int origin_x = dst_x - left_pad;
+      int origin_y = dst_y - top_pad;
+      int origin_idx = (origin_y * stepwidth + origin_x) * origin_channel;
+      for (int c = 0; c < dst_channel; c++) {
+        int dst_idx = dst_height * dst_width * c + dst_y * dst_width + dst_x;
+        dst[dst_idx] = src[origin_idx + c];
+      }
+    }
+  }
+}
+
+__global__ void same_order_padding_kernel(
+    const unsigned char *src, uint8_t *dst, int origin_height, int origin_width,
+    int origin_channel, int stepwidth, int dst_height, int dst_width,
+    int dst_channel, int left_pad, int right_pad, int top_pad, int bottom_pad,
+    int value) {
+  const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
+  const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
+  // src 1 H W C
+  // dst 1 H W C
+
+  if (dst_x < dst_width && dst_y < dst_height) {
+    if (dst_x < left_pad || dst_x >= (dst_width - right_pad) ||
+        dst_y < top_pad || dst_y >= (dst_height - bottom_pad)) {
+      int dst_idx = (dst_y * dst_width + dst_x) * origin_channel;
+      for (int c = 0; c < dst_channel; c++) {
+        dst[dst_idx + c] = value;
+      }
+    } else {
+      int origin_x = dst_x - left_pad;
+      int origin_y = dst_y - top_pad;
+      int origin_idx = (origin_y * stepwidth + origin_x) * origin_channel;
+      int dst_idx =
+          (dst_y * dst_width + dst_x) * origin_channel;  // with same order
+      for (int c = 0; c < dst_channel; c++) {
+        dst[dst_idx + c] = src[origin_idx + c];  // with same order
+      }
+    }
+  }
+}
+bool ImageZeroPadding(const base::Image8U &src, base::Image8U *dst,
+                      int stepwidth, int left_pad, int right_pad, int top_pad,
+                      int bottom_pad, int value, cudaStream_t stream,
+                      bool same_order) {
+  int src_width = src.cols();
+  int src_height = src.rows();
+  int src_channels = src.channels();
+
+  int dst_width = dst->cols();
+  int dst_height = dst->rows();
+  int dst_channels = dst->channels();
+
+  const dim3 block(32, 8);
+  const dim3 grid(divup(dst_width, block.x), divup(dst_height, block.y));
+  if (same_order) {
+    same_order_padding_kernel<<<grid, block, 0, stream>>>(
+        src.gpu_data(), dst->mutable_gpu_data(), src_height, src_width,
+        src_channels, stepwidth, dst_height, dst_width, dst_channels, left_pad,
+        right_pad, top_pad, bottom_pad, value);
+  } else {
+    image_padding_kernel<<<grid, block, 0, stream>>>(
+        src.gpu_data(), dst->mutable_gpu_data(), src_height, src_width,
+        src_channels, stepwidth, dst_height, dst_width, dst_channels, left_pad,
+        right_pad, top_pad, bottom_pad, value);
+  }
+
   return true;
 }
 

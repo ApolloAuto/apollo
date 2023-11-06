@@ -90,6 +90,7 @@ bool MsgSerializer::ConvertObjectToPb(const base::ObjectPtr &object_ptr,
 
   pb_msg->set_id(object_ptr->track_id);
   pb_msg->set_theta(object_ptr->theta);
+  pb_msg->set_confidence(object_ptr->confidence);
 
   apollo::common::Point3D *obj_center = pb_msg->mutable_position();
   obj_center->set_x(object_ptr->center(0));

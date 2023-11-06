@@ -106,7 +106,7 @@ bool CameraLocationRefinementComponent::Init() {
 
 bool CameraLocationRefinementComponent::Proc(
     const std::shared_ptr<onboard::CameraFrame>& msg) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   PostprocessorOptions obstacle_postprocessor_options;
   obstacle_postprocessor_options.do_refinement_with_calibration_service =
       calibration_service_ != nullptr;

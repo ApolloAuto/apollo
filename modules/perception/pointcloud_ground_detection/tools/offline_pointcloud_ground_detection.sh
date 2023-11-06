@@ -16,14 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-pcd_path="./data/pcd/"
-output_path="./data/output/"
+pcd_path="/apollo/data/pcd/"
+output_path="/apollo/data/output/"
 
 mkdir -p $output_path && rm -rf $output_path/*
 
-./bazel-bin/modules/perception/pointcloud_ground_detection/tools/offline_pointcloud_ground_detection \
+/apollo/bazel-bin/modules/perception/pointcloud_ground_detection/tools/offline_pointcloud_ground_detection \
         --pcd_path=$pcd_path \
         --output_path=$output_path \
         --ground_detector_name=SpatioTemporalGroundDetector \
         --config_file=spatio_temporal_ground_detector.pb.txt \
-        2>&1 | tee segment.log
+        2>&1 | tee /apollo/data/log/offline_pointcloud_ground_detection.log

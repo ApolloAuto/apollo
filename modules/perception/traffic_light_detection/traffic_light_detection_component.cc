@@ -17,6 +17,7 @@
 
 #include "modules/perception/traffic_light_detection/proto/traffic_light_detection_component.pb.h"
 
+#include "cyber/profiler/profiler.h"
 #include "cyber/time/clock.h"
 #include "modules/perception/common/camera/common/trafficlight_frame.h"
 #include "modules/perception/traffic_light_detection/interface/base_traffic_light_detector.h"
@@ -42,6 +43,7 @@ bool TrafficLightDetectComponent::Init() {
 
 bool TrafficLightDetectComponent::Proc(
     const std::shared_ptr<TrafficDetectMessage>& message) {
+  PERF_FUNCTION()
   auto time_imags = std::to_string(message->timestamp_);
   AINFO << "Enter detection component, message timestamp: " << time_imags;
 
@@ -107,7 +109,10 @@ bool TrafficLightDetectComponent::InternalProc(
   traffic_light_frame.traffic_lights =
       in_message->traffic_light_frame_->traffic_lights;
 
+  PERF_BLOCK("traffic_light_detector")
   bool status = detector_->Detect(&traffic_light_frame);
+  PERF_BLOCK_END
+
   if (!status) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;

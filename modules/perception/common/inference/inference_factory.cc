@@ -18,6 +18,7 @@
 
 #include "modules/perception/common/inference/libtorch/torch_net.h"
 #include "modules/perception/common/inference/onnx/libtorch_obstacle_detector.h"
+#include "modules/perception/common/inference/onnx/onnx_single_batch_infer.h"
 #include "modules/perception/common/inference/paddlepaddle/paddle_net.h"
 #include "modules/perception/common/inference/tensorrt/rt_net.h"
 
@@ -40,6 +41,8 @@ Inference *CreateInferenceByName(const std::string &frame_work,
     return new TorchNet(proto_file, outputs, inputs);
   } else if (frame_work == "Obstacle") {
     return new ObstacleDetector(proto_file, weight_file, outputs, inputs);
+  } else if (frame_work == "Onnx") {
+    return new SingleBatchInference(proto_file, outputs, inputs);
   } else if (frame_work == "PaddleNet") {
     return new PaddleNet(proto_file, weight_file, outputs, inputs);
   }
@@ -63,6 +66,8 @@ Inference *CreateInferenceByName(const common::Framework &frame_work,
       return new PaddleNet(proto_file, weight_file, outputs, inputs);
     case common::Obstacle:
       return new ObstacleDetector(proto_file, weight_file, outputs, inputs);
+    case common::Onnx:
+      return new SingleBatchInference(proto_file, outputs, inputs);
     default:
       break;
   }

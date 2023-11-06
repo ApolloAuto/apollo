@@ -89,7 +89,8 @@ class PointCloudUpdater : public UpdaterWithChannelsBase {
    */
   void Stop();
   void StartStream(const double &time_interval_ms,
-                   const std::string& channel_name = "") override;
+                   const std::string &channel_name = "",
+                   nlohmann::json *subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name = "") override;
   void OnTimer(const std::string& channel_name = "") override;
   void PublishMessage(const std::string& channel_name = "") override;

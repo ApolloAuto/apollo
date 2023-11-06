@@ -4,6 +4,7 @@ export default function useStyle() {
     const hoc = useMakeStyle((theme, props) => ({
         'dv-layout-menudrawer-item': {
             position: 'relative',
+            height: '100%',
         },
         hidden: {
             position: 'absolute',

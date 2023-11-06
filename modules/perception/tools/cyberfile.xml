@@ -17,7 +17,7 @@
   <depend repo_name="com_google_absl" lib_names="absl">3rd-absl</depend>
   <depend type="binary" repo_name="common" lib_names="common">common</depend>
   <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
-  <depend type="binary" repo_name="perception-camera-detection-2d" lib_names="perception-camera-detection-2d">perception-camera-detection-2d</depend>
+  <depend type="binary" repo_name="perception-camera-detection-multi-stage" lib_names="perception-camera-detection-multi-stage">perception-camera-detection-multi-stage</depend>
   <depend type="binary" repo_name="common-msgs" lib_names="common-msgs">common-msgs</depend>
   <depend repo_name="opencv" lib_names="core,highgui,imgproc,imgcodecs">3rd-opencv</depend>
   <depend repo_name="eigen">3rd-eigen3</depend>

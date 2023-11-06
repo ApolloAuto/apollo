@@ -64,7 +64,7 @@ StageResult TrafficLightUnprotectedLeftTurnStageApproach::Process(
     return FinishScenario();
   }
 
-  const auto& reference_line_info = frame->reference_line_info().front();
+  const auto& reference_line_info = frame->reference_line_info().back();
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 

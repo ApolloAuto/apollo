@@ -8,7 +8,7 @@ apollo_cc_binary(
     srcs = ["offline_camera_detection.cc"],
     deps = [
         "//cyber",
-        "//modules/perception/camera_detection_2d:apollo_perception_camera_detection_2d",
+        "//modules/perception/camera_detection_multi_stage:apollo_perception_camera_detection_multi_stage",
         "//modules/perception/common/algorithm:apollo_perception_common_algorithm",
         "//modules/perception/common/camera:apollo_perception_common_camera",
         "//modules/perception/common/interface:base_obstacle_detector",

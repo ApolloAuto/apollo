@@ -50,6 +50,9 @@ std::map<string, int> data_type_dict = {{
                                         },
                                         {
                                             "vehicles", 4,
+                                        },
+                                        {
+                                            "maps", 5,
                                         }};
 }  // namespace
 namespace apollo {     // namespace apollo
@@ -331,8 +334,9 @@ void PluginManager::RegisterDvSupportApis() {
   RegisterDvSupportApi("UpdateDynamicModelList", &PluginManager::UpdateData);
   RegisterDvSupportApi("UpdateRecordToStatus", &PluginManager::UpdateData);
   RegisterDvSupportApi("ResetVehicleConfigSuccess", &PluginManager::UpdateData);
-  RegisterDvSupportApi(
-    "RefreshVehicleConfigSuccess", &PluginManager::UpdateData);
+  RegisterDvSupportApi("RefreshVehicleConfigSuccess",
+                       &PluginManager::UpdateData);
+  RegisterDvSupportApi("UpdateMapToStatus", &PluginManager::UpdateData);
 }
 
 bool PluginManager::ReceiveMsgFromPlugin(const DvPluginMsg& msg) {
@@ -394,6 +398,11 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
     }
     case 4: {
       update_data_res = callback_api_("UpdateVehicleToStatus", info);
+      break;
+    }
+    case 5: {
+      update_data_res = callback_api_("UpdateMapToStatus", info);
+      break;
     }
     default:
       break;

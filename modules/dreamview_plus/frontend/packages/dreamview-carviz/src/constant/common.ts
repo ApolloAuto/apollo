@@ -68,13 +68,41 @@ export const obstacleColorMapping = {
 };
 
 export const pointCloudHeightColorMapping = {
-    0.5: 0xff0000,
-    1.0: 0xff7f00,
-    1.5: 0xffff00,
-    2.0: 0x00ff00,
-    2.5: 0x0000ff,
-    3.0: 0x4b0082,
-    10.0: 0x9400d3,
+    0.5: {
+        r: 255,
+        g: 0,
+        b: 0,
+    },
+    1.0: {
+        r: 255,
+        g: 127,
+        b: 0,
+    },
+    1.5: {
+        r: 255,
+        g: 255,
+        b: 0,
+    },
+    2.0: {
+        r: 0,
+        g: 255,
+        b: 0,
+    },
+    2.5: {
+        r: 0,
+        g: 0,
+        b: 255,
+    },
+    3.0: {
+        r: 75,
+        g: 0,
+        b: 130,
+    },
+    10.0: {
+        r: 148,
+        g: 0,
+        b: 211,
+    },
 };
 
 export const decisionMarkerColorMapping = {

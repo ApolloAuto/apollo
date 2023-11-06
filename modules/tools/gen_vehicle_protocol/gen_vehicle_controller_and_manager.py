@@ -552,7 +552,7 @@ def gen_vehicle_controller_and_manager(config_file, output_dir, protocol_templat
         gen_vehicle_factory_cpp(content, output_dir, protocol_template_dir)
         gen_build_file(content, output_dir, protocol_template_dir)
         gen_cyberfile(content, output_dir, protocol_template_dir)
-        gen_canbus_vehicle_build_file(content, output_dir, protocol_template_dir)
+        # gen_canbus_vehicle_build_file(content, output_dir, protocol_template_dir)
 
 
 if __name__ == "__main__":

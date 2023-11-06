@@ -65,6 +65,14 @@ class OpenSpaceFallbackDecider : public Decider {
   bool QuardraticFormulaLowerSolution(const double a, const double b,
                                       const double c, double* sol);
 
+  bool IsCollisionFreeEgoBox();
+
+  void PathPointNormalizing(double rotate_angle,
+                            const common::math::Vec2d& translate_origin,
+                            double* x,
+                            double* y,
+                            double* phi);
+
  private:
   OpenSpaceFallBackDeciderConfig config_;
 };

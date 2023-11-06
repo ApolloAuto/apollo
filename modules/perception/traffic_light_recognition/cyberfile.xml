@@ -21,6 +21,9 @@
 
   <depend type="binary" repo_name="cyber">cyber</depend>
   <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
+  <depend repo_name="perception-model-horizontal-caffe" type="binary">perception-model-horizontal-caffe</depend>
+  <depend repo_name="perception-model-quadrate-caffe" type="binary">perception-model-quadrate-caffe</depend>
+  <depend repo_name="perception-model-vertical-caffe" type="binary">perception-model-vertical-caffe</depend>
 
   <depend>libtinyxml2-dev</depend>
   <depend>libleveldb-dev</depend>

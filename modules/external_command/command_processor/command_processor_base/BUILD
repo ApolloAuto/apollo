@@ -22,6 +22,7 @@ apollo_cc_library(
 apollo_cc_library(
     name = "motion_command_processor_base_lib",
     hdrs = ["motion_command_processor_base.h"],
+    copts = ["-DMODULE_NAME=\\\"external_command\\\""],
     deps = [
         ":command_processor_base_lib",
         "//cyber",

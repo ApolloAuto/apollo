@@ -71,4 +71,4 @@ function Signal(props: SignalProps) {
     return <div className={classes['dashboard-signal']}>{child}</div>;
 }
 
-export default Signal;
+export default React.memo(Signal);

@@ -386,7 +386,7 @@ void PlayTaskProducer::ThreadFunc() {
   uint32_t loop_num = 0;
   while (!is_stopped_.load()) {
     uint64_t plus_time_ns = loop_num * loop_time_ns;
-    auto itr = record_viewer_ptr_->curr_itr();
+    auto itr = record_viewer_ptr_->begin();
     auto itr_end = record_viewer_ptr_->end();
 
     while (itr != itr_end && !is_stopped_.load()) {

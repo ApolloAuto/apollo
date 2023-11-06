@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -20,7 +20,7 @@ package(default_visibility = ["//visibility:public"])
 #     ]
 # )
 
-py_binary(
+apollo_py_binary(
     name = "data_collector",
     srcs = ["data_collector.py"],
     deps = [
@@ -33,7 +33,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_data",
     srcs = ["plot_data.py"],
     deps = [
@@ -41,17 +41,17 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_grid",
     srcs = ["plot_grid.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_results",
     srcs = ["plot_results.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "preprocess",
     srcs = ["preprocess.py"],
     deps = [
@@ -61,12 +61,12 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "process",
     srcs = ["process.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "process_data",
     srcs = ["process_data.py"],
     deps = [
@@ -74,7 +74,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "result2pb",
     srcs = ["result2pb.py"],
     deps = [
@@ -84,7 +84,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "sanity_check",
     srcs = ["sanity_check.py"],
     deps = [

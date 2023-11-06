@@ -12,6 +12,15 @@ proto_library(
 )
 
 proto_library(
+    name = "oculii_radar_proto",
+    srcs = ["oculii_radar.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+        "//modules/common_msgs/basic_msgs:error_code_proto",
+    ],
+)
+
+proto_library(
     name = "sensor_image_proto",
     srcs = ["sensor_image.proto"],
     deps = [
@@ -62,6 +71,14 @@ proto_library(
 proto_library(
     name = "pointcloud_proto",
     srcs = ["pointcloud.proto"],
+    deps = [
+        "//modules/common_msgs/basic_msgs:header_proto",
+    ],
+)
+
+proto_library(
+    name = "radarpointcloud_proto",
+    srcs = ["radarpointcloud.proto"],
     deps = [
         "//modules/common_msgs/basic_msgs:header_proto",
     ],

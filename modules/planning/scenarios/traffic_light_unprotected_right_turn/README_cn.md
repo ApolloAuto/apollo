@@ -50,7 +50,7 @@ apollo::planning::TrafficLightUnprotectedRightTurnScenario
   
 #### 阶段
 
-| 阶段名                                                     | 类型                                                                        | 描述                     |
+| 阶段名                                                     | 类型                                                                        | <div style="width: 300pt">描述</div>                    |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------ |
 | `TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP`                | `apollo::planning::TrafficLightUnprotectedRightTurnStageStop`               | 在红绿灯停止线前停车阶段 |
 | `TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP`               | `apollo::planning::TrafficLightUnprotectedRightTurnStageCreep`              | 绿灯后跛行观察路口来车   |
@@ -59,8 +59,8 @@ apollo::planning::TrafficLightUnprotectedRightTurnScenario
 
 #### 配置
 
-| 文件路径                                                                                    | 说明             |
-| ------------------------------------------------------------------------------------------- | ---------------- |
-| `modules/planning/scenarios/traffic_light_unprotected_right_turn/conf/scenario_conf.pb.txt` | 场景的配置文件   |
-| `modules/planning/scenarios/traffic_light_unprotected_right_turn/conf/pipeline.pb.txt`      | 场景的流水线文件 |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| `modules/planning/scenarios/traffic_light_unprotected_right_turn/conf/scenario_conf.pb.txt` |`apollo::planning::ScenarioTrafficLightUnprotectedRightTurnConfig`| 场景的配置文件   |
+| `modules/planning/scenarios/traffic_light_unprotected_right_turn/conf/pipeline.pb.txt`      | `apollo::planning::ScenarioPipeline`|场景的流水线文件 |
 

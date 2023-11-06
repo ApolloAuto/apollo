@@ -1,10 +1,10 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "path_extract",
     srcs = ["path_extract.py"],
     deps = [
@@ -13,17 +13,17 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "path_plot",
     srcs = ["path_plot.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "path_process",
     srcs = ["path_process.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_gps_path",
     srcs = ["plot_gps_path.py"],
 )

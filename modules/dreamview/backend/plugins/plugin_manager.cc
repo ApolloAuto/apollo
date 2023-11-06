@@ -358,18 +358,19 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
     return false;
   }
   const string info_str = msg.info();
-  Json info;
+  Json info({});
   info = Json::parse(info_str);
-  if (!info.contains("data_type")) {
+  if (!info["data"].contains("data_type")) {
     AERROR << "Failed to get data type!";
     return false;
   }
-  const string data_type = info["data_type"];
+  const string data_type = info["data"]["data_type"];
   if (data_type_dict.find(data_type) == data_type_dict.end()) {
     AERROR << "Dv don't support this kind of data type!";
     return false;
   }
   const int data_type_index = data_type_dict[data_type];
+  info = info["data"];
   bool update_data_res = false;
   switch (data_type_index) {
     case 0: {
@@ -388,6 +389,7 @@ bool PluginManager::UpdateData(const DvPluginMsg& msg, const string& json_str) {
     }
     case 4: {
       update_data_res = callback_api_("UpdateVehicleToStatus", info);
+      break;
     }
     default:
       break;

@@ -33,6 +33,20 @@ enum class ObjectType {
   MAX_OBJECT_TYPE = 6,
 };
 
+// @brief semantic object type
+enum class ObjectSemanticType {
+  UNKNOWN = 0,
+  IGNORE = 1,
+  GROUND = 2,
+  OBJECT = 3,
+  CURB = 4,
+  VEGETATION = 5,
+  FENCE = 6,
+  NOISE = 7,
+  WALL = 8,
+  MAX_OBJECT_SEMANTIC_LABEL = 9,
+};
+
 // @brief internal object type used by lidar perception
 enum class InternalObjectType {
   INT_BACKGROUND = 0,
@@ -132,6 +146,35 @@ const std::map<std::string, ObjectType> kObjectName2TypeMap = {
     {"BICYCLE", ObjectType::BICYCLE},
     {"VEHICLE", ObjectType::VEHICLE},
     {"MAX_OBJECT_TYPE", ObjectType::MAX_OBJECT_TYPE}};
+
+/**
+ * ObjectSemanticType mapping
+ */
+const std::map<ObjectSemanticType, std::string> kObjectSemanticType2NameMap = {
+    {ObjectSemanticType::UNKNOWN, "UNKNOWN"},
+    {ObjectSemanticType::IGNORE, "IGNORE"},
+    {ObjectSemanticType::GROUND, "GROUND"},
+    {ObjectSemanticType::OBJECT, "OBJECT"},
+    {ObjectSemanticType::CURB, "CURB"},
+    {ObjectSemanticType::VEGETATION, "VEGETATION"},
+    {ObjectSemanticType::FENCE, "FENCE"},
+    {ObjectSemanticType::NOISE, "NOISE"},
+    {ObjectSemanticType::WALL, "WALL"},
+    {ObjectSemanticType::MAX_OBJECT_SEMANTIC_LABEL,
+        "MAX_OBJECT_SEMANTIC_LABEL"}};
+
+const std::map<std::string, ObjectSemanticType> kName2ObjectSemanticTypeMap = {
+    {"UNKNOWN", ObjectSemanticType::UNKNOWN},
+    {"IGNORE", ObjectSemanticType::IGNORE},
+    {"GROUND", ObjectSemanticType::GROUND},
+    {"OBJECT", ObjectSemanticType::OBJECT},
+    {"CURB", ObjectSemanticType::CURB},
+    {"VEGETATION", ObjectSemanticType::VEGETATION},
+    {"FENCE", ObjectSemanticType::FENCE},
+    {"NOISE", ObjectSemanticType::NOISE},
+    {"WALL", ObjectSemanticType::WALL},
+    {"MAX_OBJECT_SEMANTIC_LABEL",
+        ObjectSemanticType::MAX_OBJECT_SEMANTIC_LABEL}};
 
 /**
  * VisualObjectType mapping

@@ -66,6 +66,7 @@ void Object::Reset() {
 
   lidar_supplement.Reset();
   radar_supplement.Reset();
+  radar4d_supplement.Reset();
   camera_supplement.Reset();
   fusion_supplement.Reset();
 //  feature.reset();

@@ -54,13 +54,13 @@ bool PointCloudMapROIComponent::Init() {
   }
 
   // init roi filter
+  auto& plugin = comp_config.plugin_param();
   roi_filter_ = apollo::cyber::plugin_manager::PluginManager::Instance()
                     ->CreateInstance<BaseROIFilter>(
-                        ConfigUtil::GetFullClassName(comp_config.roi_filter()));
+                        ConfigUtil::GetFullClassName(plugin.name()));
 
   CHECK_NOTNULL(roi_filter_);
   ROIFilterInitOptions roi_filter_init_options;
-  auto& plugin = comp_config.plugin_param();
   roi_filter_init_options.config_path = plugin.config_path();
   roi_filter_init_options.config_file = plugin.config_file();
   ACHECK(roi_filter_->Init(roi_filter_init_options))
@@ -71,7 +71,7 @@ bool PointCloudMapROIComponent::Init() {
 
 bool PointCloudMapROIComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   // internal proc
   bool status = InternalProc(message);
   if (status) {

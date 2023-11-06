@@ -69,11 +69,27 @@ DEFINE_string(object_template_file, "object_template.pb.txt",
 
 DEFINE_int32(hdmap_sample_step, 5, "hdmap sample step");
 
+// lidar_center_point
+DEFINE_bool(use_trt, false, "True if preprocess in CPU mode.");
+DEFINE_int32(trt_precision, 1,
+             "Precision type of tensorrt, 0: kFloat32, 1: kInt8, 2: kHalf");
+DEFINE_int32(
+    trt_use_static, 1,
+    "Whether to load the tensorrt graph optimization from a disk path");
+DEFINE_bool(use_calibration, true, "Whether to use calibration table");
+DEFINE_bool(collect_shape_info, false,
+            "Whether to collect dynamic shape before using tensorrt");
+DEFINE_bool(use_dynamicshape, true,
+            "Whether to use dynamic shape when using tensorrt");
+DEFINE_string(dynamic_shape_file,
+              "/apollo/modules/perception/data/models/"
+              "center_point_paddle/collect_shape_info_3lidar_20.pbtxt",
+              "Path of a dynamic shape file for tensorrt");
+
 // scene manager
 DEFINE_string(scene_manager_file, "scene_manager.conf",
-             "scene manager config file");
-DEFINE_string(roi_service_file, "roi_service.conf",
-              "roi service config file");
+              "scene manager config file");
+DEFINE_string(roi_service_file, "roi_service.conf", "roi service config file");
 DEFINE_string(ground_service_file, "ground_service.conf",
               "ground service config file");
 

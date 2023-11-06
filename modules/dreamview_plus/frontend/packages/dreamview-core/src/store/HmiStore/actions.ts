@@ -1,4 +1,6 @@
 import Logger from '@dreamview/log';
+import { message } from '@dreamview/dreamview-ui';
+import { TFunction } from 'i18next';
 import { ACTIONS, ChangeModeAction, ChangeOperateAction, ChangeRecorderAction } from './actionTypes';
 import * as TYPES from './actionTypes';
 import { MainApi } from '../../services/api';
@@ -39,6 +41,7 @@ export const changeOperate = (
     return async (dispatch, state) => {
         logger.debug('changeOperate', { state, payload });
         await mainApi.changeOperation(payload);
+        await mainApi.resetSimWorld();
         dispatch({
             type: ACTIONS.CHANGE_OPERATE,
             payload,
@@ -61,23 +64,48 @@ export const changeRecorder = (
     };
 };
 
-export const changeScenarios = (payload: TYPES.ChangeScenariosPayload): TYPES.ChangeScenariosAction => ({
-    type: ACTIONS.CHANGE_SCENARIOS,
-    payload,
-});
+export const changeScenarios = (
+    mainApi: MainApi,
+    payload: TYPES.ChangeScenariosPayload,
+): AsyncAction<TYPES.IInitState, TYPES.ChangeScenariosAction> => {
+    noop();
+    return async (dispatch, state) => {
+        logger.debug('changeScenarios', { state, payload });
+        await mainApi.changeScenarios(payload.scenarioId, payload.scenariosSetId);
+        dispatch({
+            type: ACTIONS.CHANGE_SCENARIOS,
+            payload,
+        });
+    };
+};
 
 export const changeMap = (
     mainApi: MainApi,
-    payload: TYPES.ChangeMapPayload,
+    mapId: string,
+    translation: TFunction,
 ): AsyncAction<TYPES.IInitState, TYPES.ChangeMapAction> => {
     noop();
     return async (dispatch, state) => {
-        logger.debug('changeMap', { state, payload });
-        await mainApi.changeMap(payload);
-        dispatch({
-            type: ACTIONS.CHANGE_MAP,
-            payload,
-        });
+        logger.debug('changeMap', { state, mapId });
+        try {
+            message({ type: 'loading', content: translation('mapLoading'), key: 'MODE_SETTING_MAP_CHANGE_LOADING' });
+            dispatch({
+                type: ACTIONS.CHANGE_MAP,
+                payload: { mapSetId: mapId, mapDisableState: true },
+            });
+            await mainApi.changeMap(mapId);
+            message.destory('MODE_SETTING_MAP_CHANGE_LOADING');
+            dispatch({
+                type: ACTIONS.CHANGE_MAP,
+                payload: { mapSetId: mapId, mapDisableState: false },
+            });
+        } catch (error) {
+            message.destory('MODE_SETTING_MAP_CHANGE_LOADING');
+            dispatch({
+                type: ACTIONS.CHANGE_MAP,
+                payload: { mapSetId: mapId, mapDisableState: false },
+            });
+        }
     };
 };
 
@@ -97,7 +125,7 @@ export const changeVehicle = (
 };
 
 export type CombineAction =
-    | TYPES.ChangeScenariosAction
+    | AsyncAction<TYPES.IInitState, TYPES.ChangeScenariosAction>
     | AsyncAction<TYPES.IInitState, TYPES.ChangeVehicleAction>
     | AsyncAction<TYPES.IInitState, TYPES.ChangeMapAction>
     | AsyncAction<TYPES.IInitState, ChangeRecorderAction>

@@ -66,11 +66,13 @@ bool ConvertSensorFrameMessage2Obstacles(
   header->set_radar_timestamp(0);
 
   obstacles->set_error_code(apollo::common::ErrorCode::OK);
-  for (const auto &obj : msg->frame_->objects) {
-    PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
-    if (!ConvertObjectToPb(obj, obstacle)) {
-      AERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
-      return false;
+  if (msg != nullptr && msg->frame_ != nullptr) {
+    for (const auto &obj : msg->frame_->objects) {
+      PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+      if (!ConvertObjectToPb(obj, obstacle)) {
+        AERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
+        return false;
+      }
     }
   }
   return true;

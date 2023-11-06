@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package apollo.drivers.oculii_radar;
+
+message OculiiRadarConf {
+    optional uint32 frame_rate = 1 [default = 10];
+    optional string ip = 2;
+    optional uint32 port = 3;
+    optional string frame_id = 4;
+    optional string channel_name = 5;
+}

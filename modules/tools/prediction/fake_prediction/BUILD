@@ -1,13 +1,11 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-apollo_cc_binary(
+apollo_cc_library(
     name = "libfake_prediction_component.so",
     srcs = ["fake_prediction.cc"],
-    linkshared = True,
-    linkstatic = False,
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

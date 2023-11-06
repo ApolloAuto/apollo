@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useStyle from '../useStyle';
 import { layerMenuParams } from './params';
 
-export default function LayerMenu(props: { setShowBoundingBox: any }) {
+function LayerMenu(props: { setShowBoundingBox: any }) {
     const setShowBoundingBox = props.setShowBoundingBox;
 
     const { classes, cx } = useStyle();
@@ -78,3 +78,5 @@ export default function LayerMenu(props: { setShowBoundingBox: any }) {
         </div>
     );
 }
+
+export default React.memo(LayerMenu);

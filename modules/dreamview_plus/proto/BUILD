@@ -51,6 +51,7 @@ proto_library(
         "//modules/common_msgs/planning_msgs:planning_internal_proto",
         "//modules/common_msgs/prediction_msgs:feature_proto",
         "//modules/common_msgs/routing_msgs:routing_geometry_proto",
+        "//modules/common_msgs/config_msgs:vehicle_config_proto",
     ],
 )
 

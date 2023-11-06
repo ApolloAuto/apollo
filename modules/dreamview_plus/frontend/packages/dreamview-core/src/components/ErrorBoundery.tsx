@@ -11,7 +11,7 @@ interface Props {
     errComponent?: any;
 }
 
-export default class ErrorBoundary extends React.Component<PropsWithChildren<Props>, State> {
+class ErrorBoundary extends React.Component<PropsWithChildren<Props>, State> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -35,3 +35,5 @@ export default class ErrorBoundary extends React.Component<PropsWithChildren<Pro
         return this.props.children;
     }
 }
+
+export default React.memo(ErrorBoundary);

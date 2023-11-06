@@ -59,11 +59,14 @@ struct SensorInfo {
   SensorType type = SensorType::UNKNOWN_SENSOR_TYPE;
   SensorOrientation orientation = SensorOrientation::FRONT;
   std::string frame_id = "UNKNOWN_FRAME_ID";
+  bool is_main_sensor = false;
+
   void Reset() {
     name = "UNKNONW_SENSOR";
     type = SensorType::UNKNOWN_SENSOR_TYPE;
     orientation = SensorOrientation::FRONT;
     frame_id = "UNKNOWN_FRAME_ID";
+    is_main_sensor = false;
   }
 };
 

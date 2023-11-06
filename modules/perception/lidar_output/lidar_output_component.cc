@@ -26,6 +26,15 @@ namespace perception {
 namespace lidar {
 
 using apollo::cyber::common::SetProtoToASCIIFile;
+using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::EnsureDirectory;
+
+LidarOutputComponent::~LidarOutputComponent() {
+  if (save_benchmark_frame_) {
+    is_terminate_.store(true);
+    benchmark_thread_->join();
+  }
+}
 
 bool LidarOutputComponent::Init() {
   LidarOutputComponentConfig comp_config;
@@ -39,6 +48,14 @@ bool LidarOutputComponent::Init() {
   // writer
   output_channel_name_ = comp_config.output_channel_name();
   writer_ = node_->CreateWriter<PerceptionObstacles>(output_channel_name_);
+  // for saving benchmark frame
+  save_benchmark_frame_ = comp_config.save_benchmark_frame();
+  benchmark_frame_output_dir_ = comp_config.benchmark_frame_output_dir();
+  is_terminate_.store(false);
+  if (save_benchmark_frame_) {
+    benchmark_thread_.reset(
+        new std::thread(&LidarOutputComponent::BenchmarkThreadFunc, this));
+  }
 
   return true;
 }
@@ -57,6 +74,11 @@ bool LidarOutputComponent::Proc(
     valid_objects.assign(lidar_objects.begin(), lidar_objects.end());
   }
 
+  if (save_benchmark_frame_) {
+    std::lock_guard<std::mutex> lock(benchmark_mutex_);
+    message_buffer_.push(in_message);
+  }
+
   if (!onboard::MsgSerializer::SerializeMsg(
           timestamp,
           lidar_timestamp,
@@ -67,13 +89,6 @@ bool LidarOutputComponent::Proc(
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }
-
-  // save proto message to file
-  SaveBenchmarkFrame(in_message);
-  // // save proto message to file
-  // std::string pb_name = "/apollo/data/benchmark/bp/" +
-  //                       std::to_string(timestamp) + ".pb";
-  // SetProtoToASCIIFile(*out_message, pb_name);
 
   writer_->Write(out_message);
   AINFO << "Send lidar tracking output message.";
@@ -100,7 +115,7 @@ bool LidarOutputComponent::SaveBenchmarkFrame(
 
   Eigen::Affine3d sensor2world_pose = Eigen::Affine3d::Identity();
   if (in_message == nullptr || in_message->frame_ == nullptr) {
-    AERROR << "SaveBenchmarkFrame, Can't get sensor2world_pose.";
+    AERROR << "SaveBenchmarkFrame error, Can't get sensor2world_pose.";
   }
   sensor2world_pose = in_message->frame_->sensor2world_pose;
   for (int i = 0; i < 4; ++i) {
@@ -120,11 +135,41 @@ bool LidarOutputComponent::SaveBenchmarkFrame(
     AERROR << "Failed to get PerceptionBenchmarkFrame object.";
     return false;
   }
-  std::string pb_name = "/apollo/data/benchmark/dkit/pb/" +
-                        std::to_string(timestamp) + ".pb";
-  // SetProtoToASCIIFile(*out_message, pb_name);
+
+  if (!EnsureDirectory(benchmark_frame_output_dir_)) {
+    AINFO << "Create dir " << benchmark_frame_output_dir_ << " error.";
+    return false;
+  }
+
+  std::string pb_name = GetAbsolutePath(
+      benchmark_frame_output_dir_, std::to_string(timestamp) + ".pb");
+  SetProtoToASCIIFile(*out_message, pb_name);
 
   return true;
+}
+
+void LidarOutputComponent::BenchmarkThreadFunc() {
+  std::shared_ptr<SensorFrameMessage> message = nullptr;
+  while (true) {
+    {
+      std::lock_guard<std::mutex> lock(benchmark_mutex_);
+      if (!message_buffer_.empty()) {
+        message = message_buffer_.front();
+        message_buffer_.pop();
+      } else {
+        message = nullptr;
+      }
+    }
+
+    if (is_terminate_.load()) {
+      break;
+    }
+    if (message != nullptr) {
+      SaveBenchmarkFrame(message);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+  AINFO << "Save benchmark frames finished.";
 }
 
 }  // namespace lidar

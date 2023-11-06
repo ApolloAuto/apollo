@@ -23,10 +23,12 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/planning_msgs/planning_command.pb.h"
 #include "modules/common_msgs/routing_msgs/routing.pb.h"
 #include "modules/external_command/command_processor/command_processor_base/proto/command_processor_config.pb.h"
+
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -80,12 +82,17 @@ class MotionCommandProcessorBase : public CommandProcessorBase {
                        std::shared_ptr<apollo::routing::RoutingRequest>&
                            routing_request) const = 0;
   /**
-   * @brief Set the start pose of RoutingRequest with current vehicle pose.
-   * @param routing_request RoutingRequest to be updated.
+   * @brief Set the start pose of lane_way_points with current vehicle pose.
+   * @param lane_way_points start pose to be updated.
    * @return Return true if there is error occurs.
    */
   bool SetStartPose(
       std::vector<apollo::routing::LaneWaypoint>* lane_way_points) const;
+  /**
+   * @brief Set the start pose of RoutingRequest with current vehicle pose.
+   * @param routing_request RoutingRequest to be updated.
+   * @return Return true if there is error occurs.
+   */
   bool SetStartPose(
       std::shared_ptr<apollo::routing::RoutingRequest>& routing_request) const;
   /**
@@ -108,16 +115,17 @@ class MotionCommandProcessorBase : public CommandProcessorBase {
           planning_command) const = 0;
 
   std::shared_ptr<cyber::Service<T, CommandStatus>> command_service_;
-  std::shared_ptr<cyber::Writer<apollo::planning::PlanningCommand>>
-      planning_command_writer_;
-  std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
-      routing_response_writer_;
+  std::shared_ptr<WriterHandle> planning_command_writer_;
+  std::shared_ptr<WriterHandle> routing_response_writer_;
 
   std::shared_ptr<apollo::routing::Routing> routing_;
   std::shared_ptr<apollo::external_command::LaneWayTool> lane_way_tool_;
   T last_received_command_;
   MessageReader* message_reader_;
   std::string planning_command_status_name_;
+
+ private:
+  std::mutex mutex_;
 };
 
 template <typename T>
@@ -162,7 +170,8 @@ bool MotionCommandProcessorBase<T>::Init(
       apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
   auto message_writer = MessageWriter::Instance();
   planning_command_writer_ =
-      message_writer->RegisterMessage<apollo::planning::PlanningCommand>(attr);
+      message_writer->RegisterMessage<apollo::planning::PlanningCommand>(
+          attr, config.planning_command_history_name());
   routing_response_writer_ =
       message_writer->RegisterMessage<apollo::routing::RoutingResponse>(
           FLAGS_routing_response_topic);
@@ -211,21 +220,22 @@ void MotionCommandProcessorBase<T>::OnCommand(
     return;
   }
   // Search routing.
-  std::shared_ptr<apollo::planning::PlanningCommand> planning_command =
-      std::make_shared<apollo::planning::PlanningCommand>();
   std::string module_name = "UNKNOWN";
   if (command->has_header()) {
     module_name = command->header().module_name();
   }
+  std::lock_guard<std::mutex> guard(this->mutex_);
+  auto planning_command = std::make_shared<apollo::planning::PlanningCommand>();
   common::util::FillHeader(module_name, planning_command.get());
   if (nullptr != routing_request) {
-    AINFO << routing_request->DebugString();
+    AINFO << "Process routing: " << routing_request->DebugString();
     auto routing_response =
         std::make_shared<apollo::routing::RoutingResponse>();
     if (!routing_->Process(routing_request, routing_response.get())) {
       status->set_status(CommandStatusType::ERROR);
       status->set_message("Cannot get routing of command: " +
                           command->DebugString());
+      AERROR << "Routing process failed! ";
       return;
     }
     planning_command->mutable_lane_follow_command()->CopyFrom(

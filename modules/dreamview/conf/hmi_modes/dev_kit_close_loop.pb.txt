@@ -68,12 +68,6 @@ cyber_modules {
   }
 }
 cyber_modules {
-  key: "Routing"
-  value: {
-    dag_files: "/apollo/modules/routing/dag/routing.dag"
-  }
-}
-cyber_modules {
   key: "Transform"
   value: {
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"

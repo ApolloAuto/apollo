@@ -1,4 +1,4 @@
-import {
+export {
     camera,
     renderer,
     scene,
@@ -15,21 +15,5 @@ import {
     obstacles,
     pointCloud,
 } from './render';
-
-export {
-    camera,
-    renderer,
-    scene,
-    view,
-    addObjectToScene,
-    init,
-    removeObjetByName,
-    render,
-    controls,
-    map,
-    adc,
-    checkpoints,
-    pullover,
-    obstacles,
-    pointCloud,
-};
+export { Carviz } from './src/Carviz.class';
+export { RoutingEditor } from './src/RoutingEditor.class';

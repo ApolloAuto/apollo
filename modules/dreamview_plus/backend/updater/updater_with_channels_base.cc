@@ -56,7 +56,8 @@ void UpdaterWithChannelsBase::GetChannelMsgWithFilter(
       index_channel = role_attr.channel_name().rfind(filter_channel);
     }
     if (index != -1 && index_channel != -1) {
-      if (std::find(other_record_node_name.begin(),
+      if (current_record.empty() ||
+          std::find(other_record_node_name.begin(),
                     other_record_node_name.end(),
                     node_name) == other_record_node_name.end()) {
         tmp_channels.push_back(role_attr.channel_name());

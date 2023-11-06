@@ -21,8 +21,8 @@
 #include "modules/perception/multi_sensor_fusion/proto/probabilistic_fusion_config.pb.h"
 
 #include "cyber/common/file.h"
-#include "modules/common/util/perf_util.h"
 #include "modules/common/util/string_util.h"
+#include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
 #include "modules/perception/common/base/object_pool_types.h"
 #include "modules/perception/common/util.h"
 #include "modules/perception/multi_sensor_fusion/base/track_pool_types.h"
@@ -39,8 +39,6 @@ namespace fusion {
 using cyber::common::GetAbsolutePath;
 
 bool ProbabilisticFusion::Init(const FusionInitOptions& options) {
-  main_sensor_ = options.main_sensor;
-
   std::string config_file =
       GetConfigFile(options.config_path, options.config_file);
   ProbabilisticFusionConfig params;
@@ -154,7 +152,9 @@ bool ProbabilisticFusion::Fuse(const base::FrameConstPtr& sensor_frame,
 bool ProbabilisticFusion::IsPublishSensor(
     const base::FrameConstPtr& sensor_frame) const {
   std::string sensor_id = sensor_frame->sensor_info.name;
-  return main_sensor_ == sensor_id;
+  bool is_main_sensor =
+      algorithm::SensorManager::Instance()->IsMainSensor(sensor_id);
+  return is_main_sensor;
 }
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {

@@ -23,7 +23,6 @@
   <depend type="binary" repo_name="cyber">cyber</depend>
   <depend type="binary" repo_name="common" lib_names="common">common</depend>
   <depend type="binary" repo_name="perception-common" lib_names="perception-common">perception-common</depend>
-  <depend type="binary" repo_name="prediction" lib_names="prediction">prediction</depend>
   <depend repo_name="eigen">3rd-eigen3</depend>
 
   <depend>libtinyxml2-dev</depend>

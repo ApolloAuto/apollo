@@ -24,7 +24,7 @@ interface IPanelHelp {
     description: string;
 }
 
-export default function PanelHelp(props: IPanelHelp) {
+function PanelHelp(props: IPanelHelp) {
     const { t } = useTranslation('panels');
     const { classes } = useStyle();
     return (
@@ -34,3 +34,5 @@ export default function PanelHelp(props: IPanelHelp) {
         </div>
     );
 }
+
+export default React.memo(PanelHelp);

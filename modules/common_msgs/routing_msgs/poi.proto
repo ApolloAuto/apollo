@@ -24,6 +24,7 @@ message Landmark {
   repeated LaneWaypoint waypoint = 2;
   optional string parking_space_id = 3 [deprecated = true];
   optional apollo.routing.ParkingInfo parking_info = 4;
+  optional int32 cycle_number = 5;
 }
 
 message POI {

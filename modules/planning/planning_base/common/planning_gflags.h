@@ -84,6 +84,7 @@ DECLARE_bool(enable_skip_path_tasks);
 DECLARE_double(static_obstacle_speed_threshold);
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
+DECLARE_double(passed_destination_threshold);
 
 DECLARE_double(virtual_stop_wall_length);
 DECLARE_double(virtual_stop_wall_height);
@@ -217,3 +218,14 @@ DECLARE_double(replan_time_threshold);
 DECLARE_double(trajectory_check_collision_time_step);
 
 DECLARE_double(obstacle_pass_check_distance);
+
+DECLARE_bool(speed_optimize_fail_relax_velocity_constraint);
+
+DECLARE_bool(check_collision_freespace_obstacle_vertices);
+
+DECLARE_double(near_stop_speed);
+
+DECLARE_double(near_stop_deceleration);
+
+DECLARE_double(referfece_line_max_forward_heading_diff);
+DECLARE_double(referfece_line_max_backward_heading_diff);

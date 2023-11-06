@@ -13,6 +13,7 @@
 
   <type>module</type>
   <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-gpus</depend>
   <depend expose="False">3rd-bazel-skylib</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/camera_library</src_path>
   

@@ -25,6 +25,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "nlohmann/json.hpp"
@@ -32,6 +33,7 @@
 #include "modules/dreamview_plus/proto/data_handler.pb.h"
 
 #include "cyber/common/log.h"
+#include "cyber/service_discovery/topology_manager.h"
 #include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
 #include "modules/dreamview_plus/backend/updater/updater_manager.h"
 /**
@@ -73,6 +75,8 @@ class SocketManager {
   DataHandlerConf data_handler_base_conf_;
   DataHandlerConf data_handler_conf_;
   bool enabled_;
+  std::shared_ptr<apollo::cyber::service_discovery::ChannelManager>
+      channel_manager;
   WebSocketHandler *websocket_ = nullptr;
   UpdaterManager *updater_manager_ = nullptr;
   void RegisterMessageHandlers();
@@ -90,6 +94,8 @@ class SocketManager {
                               std::vector<std::string> *channels);
   Json GetDataHandlerInfo();
   Json ClearDataHandlerChannelMsgs();
+  void RefreshDataUpdaterChannels(
+      const apollo::cyber::proto::ChangeMsg &change_msg);
 };
 
 }  // namespace dreamview

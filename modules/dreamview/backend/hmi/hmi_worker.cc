@@ -41,6 +41,10 @@
 DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
               "HMI modes config path.");
 
+DEFINE_string(recorder_config_path,
+              "/apollo/modules/dreamview/conf/recorder_config.pb.txt",
+              "Recorder config path.");
+
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
@@ -183,20 +187,35 @@ HMIConfig HMIWorker::LoadConfig() {
   return config;
 }
 
-HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
-  HMIMode mode;
-  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
-      << "Unable to parse HMIMode from file " << mode_config_path;
-  // Translate cyber_modules to regular modules.
-  for (const auto &iter : mode.cyber_modules()) {
+bool HMIWorker::LoadVehicleDefinedMode(const std::string &mode_config_path,
+                                       const std::string &current_vehicle_path,
+                                       HMIMode *self_defined_mode) {
+  const std::string mode_file_name =
+      cyber::common::GetFileName(mode_config_path);
+  const std::string vehicle_mode_config_path =
+      current_vehicle_path + "/dreamview_conf/hmi_modes/" +
+      mode_file_name;
+  if (!cyber::common::PathExists(vehicle_mode_config_path)) {
+    return false;
+  }
+  ACHECK(cyber::common::GetProtoFromFile(vehicle_mode_config_path,
+                                         self_defined_mode))
+      << "Unable to parse vehicle self defined HMIMode from file "
+      << vehicle_mode_config_path;
+  TranslateCyberModules(self_defined_mode);
+  return true;
+}
+
+void HMIWorker::TranslateCyberModules(HMIMode* mode){
+    // Translate cyber_modules to regular modules.
+  for (const auto &iter : mode->cyber_modules()) {
     const std::string &module_name = iter.first;
     const CyberModule &cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
     ACHECK(!cyber_module.dag_files().empty())
-        << "None dag file is provided for " << module_name << " module in "
-        << mode_config_path;
+        << "None dag file is provided for " << module_name;
 
-    Module &module = LookupOrInsert(mode.mutable_modules(), module_name, {});
+    Module &module = LookupOrInsert(mode->mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
 
     // Construct start_command:
@@ -218,7 +237,22 @@ HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
   }
-  mode.clear_cyber_modules();
+  mode->clear_cyber_modules();
+}
+
+
+HMIMode HMIWorker::LoadMode(const std::string &mode_config_path) {
+  HMIMode mode;
+  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
+      << "Unable to parse HMIMode from file " << mode_config_path;
+  
+  TranslateCyberModules(&mode);
+  // For global recording.
+  ACHECK(cyber::common::GetProtoFromFile(
+      FLAGS_recorder_config_path, mode.mutable_data_recorder_component()))
+      << "Unable to parse Recorder config from file "
+      << FLAGS_recorder_config_path;
+
   AINFO << "Loaded HMI mode: " << mode.DebugString();
   return mode;
 }
@@ -604,16 +638,31 @@ bool HMIWorker::ChangeMap(const std::string &map_name,
   return true;
 }
 
+void HMIWorker::UpdateModeModulesAndMonitoredComponents() {
+  status_.clear_modules();
+  for (const auto &iter : current_mode_.modules()) {
+    status_.mutable_modules()->insert({iter.first, false});
+  }
+
+  // Update monitored components of current mode.
+  status_.clear_monitored_components();
+  for (const auto &iter : current_mode_.monitored_components()) {
+    status_.mutable_monitored_components()->insert({iter.first, {}});
+  }
+}
+
 void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
   const std::string *vehicle_dir = FindOrNull(config_.vehicles(), vehicle_name);
   if (vehicle_dir == nullptr) {
     AERROR << "Unknown vehicle " << vehicle_name;
     return;
   }
+  std::string current_mode;
 
   {
     // Update current_vehicle status.
     WLock wlock(status_mutex_);
+    current_mode = status_.current_mode();
     if (status_.current_vehicle() == vehicle_name) {
       return;
     }
@@ -633,6 +682,21 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
     status_changed_ = true;
   }
   ResetMode();
+  // before reset mode
+  HMIMode vehicle_defined_mode;
+  const std::string mode_config_path = config_.modes().at(current_mode);
+  if (LoadVehicleDefinedMode(mode_config_path,
+                             *vehicle_dir, &vehicle_defined_mode)) {
+    MergeToCurrentMode(&vehicle_defined_mode);
+  } else {
+    // modules may have been modified the last time selected a vehicle
+    // need to be recovery by load mode
+    current_mode_ = LoadMode(mode_config_path);
+  }
+  {
+    WLock wlock(status_mutex_);
+    UpdateModeModulesAndMonitoredComponents();
+  }
   ACHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
   // Restart Fuel Monitor
   auto *monitors = FuelMonitorManager::Instance()->GetCurrentMonitors();
@@ -643,6 +707,14 @@ void HMIWorker::ChangeVehicle(const std::string &vehicle_name) {
       }
     }
   }
+}
+
+void HMIWorker::MergeToCurrentMode(HMIMode* mode){
+    current_mode_.clear_modules();
+    current_mode_.clear_cyber_modules();
+    current_mode_.clear_monitored_components();
+    current_mode_.mutable_modules()->swap(*(mode->mutable_modules()));
+    current_mode_.mutable_monitored_components()->swap(*(mode->mutable_monitored_components()));
 }
 
 void HMIWorker::ChangeMode(const std::string &mode_name) {
@@ -664,17 +736,15 @@ void HMIWorker::ChangeMode(const std::string &mode_name) {
     WLock wlock(status_mutex_);
     status_.set_current_mode(mode_name);
     current_mode_ = LoadMode(config_.modes().at(mode_name));
-
-    status_.clear_modules();
-    for (const auto &iter : current_mode_.modules()) {
-      status_.mutable_modules()->insert({iter.first, false});
+    // for vehicle self-defined module
+    HMIMode vehicle_defined_mode;
+    const std::string *vehicle_dir = FindOrNull(config_.vehicles(), status_.current_vehicle());
+    if (vehicle_dir != nullptr &&
+        LoadVehicleDefinedMode(config_.modes().at(mode_name), *vehicle_dir,
+                               &vehicle_defined_mode)) {
+      MergeToCurrentMode(&vehicle_defined_mode);
     }
-
-    // Update monitored components of current mode.
-    status_.clear_monitored_components();
-    for (const auto &iter : current_mode_.monitored_components()) {
-      status_.mutable_monitored_components()->insert({iter.first, {}});
-    }
+    UpdateModeModulesAndMonitoredComponents();
 
     status_.clear_other_components();
     for (const auto &iter : current_mode_.other_components()) {

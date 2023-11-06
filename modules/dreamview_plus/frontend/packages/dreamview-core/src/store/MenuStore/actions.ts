@@ -16,4 +16,20 @@ export const CloseMenuAction = (): TYPES.UpdateMenuAction => ({
     payload: TYPES.ENUM_MENU_KEY.HIDDEN,
 });
 
-export type CombineAction = TYPES.UpdateMenuAction | TYPES.ChangeCertStatusAction;
+export const ChangeEnviormentResourcesAction = (
+    payload: TYPES.ChangeEnviormentResourcesPayload,
+): TYPES.ChangeEnviormentResourcesAction => ({
+    type: ACTIONS.UPDATE_ENVIORMENT_MANAGER,
+    payload,
+});
+
+export const ChangeAdsResourcesAction = (payload: TYPES.ChangeAdsResourcesPayload): TYPES.ChangeAdsResourcesAction => ({
+    type: ACTIONS.UPDATE_ADS_MANAGER,
+    payload,
+});
+
+export type CombineAction =
+    | TYPES.UpdateMenuAction
+    | TYPES.ChangeCertStatusAction
+    | TYPES.ChangeEnviormentResourcesAction
+    | TYPES.ChangeAdsResourcesAction;

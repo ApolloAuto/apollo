@@ -50,3 +50,64 @@
         background-color: rgba(0, 0, 0, 0.5);
     }
 }
+
+.dreamview-modal-confirm{
+    .ant-modal-content{
+        width: 400px;
+        background: #282B36;
+        border-radius: 10px;
+        padding: 30px 0px 30px 0px;
+        display: flex;
+        justify-content: center;
+        .ant-modal-body{
+            max-width: 352px;
+            display: flex;
+            justify-content: center;
+            .ant-modal-confirm-body{
+                display: flex;
+                flex-wrap: nowrap;
+                position: relative;
+                & > svg{
+                    position: absolute;
+                    top: 4px;
+                }
+            }
+            .ant-modal-confirm-content{
+                max-width: 324px;
+                margin-left: 28px;
+                font-family: PingFang-SC-Medium;
+                font-size: 16px;
+                color: #A6B5CC;
+                font-weight: 500;
+            }
+            .ant-modal-confirm-btns{
+                margin-top: 24px;
+                display: flex;
+                justify-content: center;
+
+                & > button{
+                    width: 72px;
+                    height: 40px;
+                }
+
+                & > button:nth-child(1){
+                    color: #FFFFFF;
+                    background: #282B36;
+                    border: 1px solid rgba(124,136,153,1);
+                }
+                & > button:nth-child(1):hover{ 
+                    color: #3288FA;
+                    border: 1px solid #3288FA;
+                }
+                & > button:nth-child(1):active{
+                    color: #1252C0;
+                    border: 1px solid #1252C0;
+                }
+
+                & > button:nth-child(2){
+                    padding: 4px 12px 4px 12px !important;
+                }
+            }
+        }
+    }
+}

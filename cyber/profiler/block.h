@@ -42,6 +42,9 @@ class Block {
 
   const time_point& begin_time() const { return begin_time_; }
   const time_point& end_time() const { return end_time_; }
+
+  std::uint64_t begin_time_since_epoch() const;
+  std::uint64_t end_time_since_epoch() const;
   std::uint64_t duration() const;
 
   bool finished() const { return end_time_ > begin_time_; }

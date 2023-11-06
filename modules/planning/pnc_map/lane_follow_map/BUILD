@@ -3,14 +3,12 @@ load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
 
-MAP_COPTS = ["-DMODULE_NAME=\\\"map\\\""]
-PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
-
 apollo_plugin(
     name = "liblane_follow_map.so",
     srcs = ["lane_follow_map.cc",],
     hdrs = ["lane_follow_map.h",],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
         "//modules/map:apollo_map",

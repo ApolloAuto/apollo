@@ -24,9 +24,9 @@ apollo_cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
-        "//modules/control/control_component/controller_task_base/proto:leadlag_conf_cc_proto",
-        "//modules/control/control_component/controller_task_base/proto:mrac_conf_cc_proto",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:leadlag_conf_cc_proto",
+        "//modules/control/control_component/proto:mrac_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
         "@com_google_absl//:absl",
         "@eigen",
     ],
@@ -37,6 +37,7 @@ apollo_cc_library(
     hdrs = ["dependency_injector.h"],
     deps = [
         "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/common_msgs/external_command_msgs:command_status_proto",
     ],
 )
 
@@ -75,7 +76,7 @@ apollo_cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:leadlag_conf_cc_proto",
+        "//modules/control/control_component/proto:leadlag_conf_cc_proto",
     ],
 )
 
@@ -89,7 +90,7 @@ apollo_cc_library(
         "//modules/common/math",
         "//modules/common/status",
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
-        "//modules/control/control_component/controller_task_base/proto:mrac_conf_cc_proto",
+        "//modules/control/control_component/proto:mrac_conf_cc_proto",
         "@com_google_absl//:absl",
         "@eigen",
     ],
@@ -102,7 +103,7 @@ apollo_cc_library(
     copts = CONTROL_COPTS,
     deps = [
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
     ],
 )
 
@@ -115,7 +116,7 @@ apollo_cc_library(
         ":pid_controller",
         "//cyber",
         "//modules/common/math",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
     ],
 )
 
@@ -128,7 +129,7 @@ apollo_cc_library(
         ":pid_controller",
         "//cyber",
         "//modules/common/math",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
     ],
 )
 
@@ -179,7 +180,7 @@ apollo_cc_test(
     deps = [
         ":interpolation_2d",
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:calibration_table_cc_proto",
+        "//modules/control/control_component/proto:calibration_table_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -192,7 +193,7 @@ apollo_cc_test(
     deps = [
         ":leadlag_controller",
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:leadlag_conf_cc_proto",
+        "//modules/control/control_component/proto:leadlag_conf_cc_proto",
         "//modules/control/controllers/lon_based_pid_controller/proto:lon_based_pid_controller_conf_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
@@ -207,7 +208,7 @@ apollo_cc_test(
         ":mrac_controller",
         "//cyber",
         "//modules/common_msgs/config_msgs:vehicle_config_cc_proto",
-        "//modules/control/control_component/controller_task_base/proto:mrac_conf_cc_proto",
+        "//modules/control/control_component/proto:mrac_conf_cc_proto",
         "//modules/control/controllers/lat_based_lqr_controller/proto:lat_based_lqr_controller_conf_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
@@ -221,13 +222,13 @@ apollo_cc_test(
     deps = [
         ":pid_controller",
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
         "//modules/control/controllers/lon_based_pid_controller/proto:lon_based_pid_controller_conf_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "pid_BC_controller_test",
     size = "small",
     srcs = ["pid_BC_controller_test.cc"],
@@ -235,7 +236,7 @@ cc_test(
     deps = [
         ":pid_BC_controller",
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
         "//modules/control/controllers/lon_based_pid_controller/proto:lon_based_pid_controller_conf_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],
@@ -249,7 +250,7 @@ apollo_cc_test(
     deps = [
         ":pid_IC_controller",
         "//cyber",
-        "//modules/control/control_component/controller_task_base/proto:pid_conf_cc_proto",
+        "//modules/control/control_component/proto:pid_conf_cc_proto",
         "//modules/control/controllers/lon_based_pid_controller/proto:lon_based_pid_controller_conf_cc_proto",
         "@com_google_googletest//:gtest_main",
     ],

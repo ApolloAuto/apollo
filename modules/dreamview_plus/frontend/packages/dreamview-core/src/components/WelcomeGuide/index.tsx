@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Tabs, Button, Checkbox } from '@dreamview/dreamview-ui';
+import { Tabs, Button } from '@dreamview/dreamview-ui';
 import welcomeGuideTabsImageDefault from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_default.png';
 import welcomeGuideTabsImagePerception from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_perception.png';
 import welcomeGuideDecorateEle from '@dreamview/dreamview-core/src/assets/welcome_guide_decorate_ele.png';
+import welcomeGuideTabsImagePNC from '@dreamview/dreamview-core/src/assets/welcome_guide_tabs_image_pnc.png';
 import useStyle from './useStyle';
 import { useUserInfoStore } from '../../store/UserInfoStore';
 import { CURRENT_MODE } from '../../store/HmiStore';
 import showViewLoginModal from './showViewLoginModal';
+import BackgroundEffect from './BackgroundEffect';
 
 type WelcomeGuideTabsContentProps = {
     contentImageUrl: string;
@@ -41,10 +43,7 @@ function WelcomeGuideTabsContent(props: WelcomeGuideTabsContentProps) {
                     </div>
                 </div>
                 <div className={classes['enter-this-mode']}>
-                    <Button
-                        className={classes['enter-this-mode-btn']}
-                        onClick={() => clickEnterThisMode()}
-                    >
+                    <Button className={classes['enter-this-mode-btn']} onClick={() => clickEnterThisMode()}>
                         Enter this mode
                     </Button>
                 </div>
@@ -58,7 +57,7 @@ type WelcomeGuideProps = {
     setLocalFirstUseGuideMode: (useGuideMode: CURRENT_MODE) => void;
 };
 
-export default function WelcomeGuide(props: WelcomeGuideProps) {
+function WelcomeGuide(props: WelcomeGuideProps) {
     const { clickEnterThisModeToGuide, setLocalFirstUseGuideMode } = props;
 
     const { classes, theme } = useStyle();
@@ -101,10 +100,21 @@ export default function WelcomeGuide(props: WelcomeGuideProps) {
                 />
             ),
         },
+        {
+            key: CURRENT_MODE.PNC,
+            label: 'PNC Mode',
+            children: (
+                <WelcomeGuideTabsContent
+                    contentImageUrl={welcomeGuideTabsImagePNC}
+                    clickEnterThisMode={clickEnterThisMode}
+                />
+            ),
+        },
     ];
 
     return (
         <div className={classes['welcome-guide-container']}>
+            <BackgroundEffect />
             <div className={classes['welcome-guide-content']}>
                 <div className={classes['welcome-guide-head']}>
                     <div className={classes['welcome-guide-head-text']}>
@@ -146,3 +156,5 @@ export default function WelcomeGuide(props: WelcomeGuideProps) {
         </div>
     );
 }
+
+export default React.memo(WelcomeGuide);

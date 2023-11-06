@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -9,7 +9,7 @@ filegroup(
     srcs = glob(["example_data/*"]) + ["run.sh"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_trajectory",
     srcs = ["plot_trajectory.py"],
     data = [
@@ -23,7 +23,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "mkz_polygon",
     srcs = ["mkz_polygon.py"],
 )

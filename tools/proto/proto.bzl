@@ -1,9 +1,28 @@
 load("//tools:python_rules.bzl", "py_proto_library")
+load("@rules_python//python:defs.bzl", "py_library", "py_binary")
 load("@rules_proto//proto:defs.bzl", external_proto_library = "proto_library", "ProtoInfo")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 
-package_path = "@@REPLACE@@"
+package_path = "@@PACKAGE"
+
+def apollo_py_library(**kwargs):
+    if "deps" not in kwargs:
+        py_library(**dict(kwargs))
+    else:
+        replaced_deps = []
+        for i in kwargs["deps"]:
+            replaced_deps.append(_get_real_dep_label(i))
+        py_library(**dict(kwargs, deps = replaced_deps))
+
+def apollo_py_binary(**kwargs):
+    if "deps" not in kwargs:
+        py_binary(**dict(kwargs))
+    else:
+        replaced_deps = []
+        for i in kwargs["deps"]:
+            replaced_deps.append(_get_real_dep_label(i))
+        py_binary(**dict(kwargs, deps = replaced_deps))
 
 def _depset_to_list(x):
     """Helper function to convert depset to list."""
@@ -20,7 +39,7 @@ def _apollo_proto_impl(ctx):
             ret_info.append(DefaultInfo(runfiles = files))
             ret_info.append(t[InstrumentedFilesInfo])
             # ret_info.append(t[PyCcLinkParamsProvider])
-            ret_info.append(t[OutputGroupInfo]) 
+            ret_info.append(t[OutputGroupInfo])
             ret_info.append(t[PyInfo])
         else:
             ret_info.append(t[ProtoInfo])
@@ -67,7 +86,7 @@ def _get_real_dep_label(dep):
             if len(replace_prefix) == 0 or replace_prefix[0] == "/" or replace_prefix[0] == ":":
                 return dep
             else:
-                return "{}{}".format("@apollo_src", dep) 
+                return "{}{}".format("@apollo_src", dep)
         else:
             return "{}{}".format("@apollo_src", dep)
     return dep
@@ -161,7 +180,7 @@ def proto_library(tags = [], **kwargs):
         srcs = [":%s" % (cc_proto_rule_name,)]
     )
 
-    # py proto target 
+    # py proto target
     py_proto_library(
         name = py_proto_rule_name,
         deps = [":%s" % proto_rule_name] + [_to_py_target(d) for d in external_cc_deps],
@@ -192,7 +211,7 @@ def proto_library(tags = [], **kwargs):
         tags = ["export_library", rule_name],
         # srcs = [":%s_clean" % (cc_proto_rule_name,)],
         # srcs = [":%s" % cc_lib_rule_name],
-        deps = ["@com_google_protobuf//:protobuf"] + external_cc_deps + [cc_lib_rule_name], 
+        deps = ["@com_google_protobuf//:protobuf"] + external_cc_deps + [cc_lib_rule_name],
     )
 
 
@@ -218,7 +237,7 @@ def proto_library(tags = [], **kwargs):
     # cc_binary(
     #     name = cc_bin_rule_name,
     #     srcs = [":%s" % cc_lib_rule_name],
-    #     # deps = [":%s" % cc_lib_rule_name] + depend_libraries, 
+    #     # deps = [":%s" % cc_lib_rule_name] + depend_libraries,
     #     linkshared = True,
     #     linkstatic = True,
     #     # deps = [":%s" % cc_lib_rule_name],

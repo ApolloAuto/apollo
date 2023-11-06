@@ -1,0 +1,6 @@
+main_sensor: "radar_front"
+use_histogram_for_match: false
+histogram_bin_size: 10
+output_predict_objects: false
+reserved_invisible_time: 2
+use_frame_timestamp: true

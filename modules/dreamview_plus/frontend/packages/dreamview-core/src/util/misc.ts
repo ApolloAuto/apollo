@@ -6,7 +6,7 @@
  * fill0(1, 3) => 001
  * fill0(21, 3) => 021
  */
-export function fill0(val: number | string, length = 2): string {
+export function fill0(val: number | string, length = 2, addInFront = true): string {
     const number = Number(val);
     const max = 10 ** (length - 1);
     if (number > max) {
@@ -16,7 +16,10 @@ export function fill0(val: number | string, length = 2): string {
     if (typeof number !== 'number') {
         throw new Error('fill0 recived an invidate value');
     }
-    return `${prefFix}${number}`;
+    if (addInFront) {
+        return `${prefFix}${number}`;
+    }
+    return `${number}${prefFix}`;
 }
 /**
  *

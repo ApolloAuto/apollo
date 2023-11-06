@@ -17,6 +17,7 @@ proto_library(
     name = "chassis_proto",
     srcs = ["chassis.proto"],
     deps = [
+        "@com_google_protobuf//:any_proto",
         "//modules/common_msgs/basic_msgs:drive_state_proto",
         "//modules/common_msgs/basic_msgs:geometry_proto",
         "//modules/common_msgs/basic_msgs:header_proto",

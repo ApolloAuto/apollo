@@ -908,6 +908,10 @@
                 "startPoint": {
                   "type": "apollo.common.Point2D",
                   "id": 4
+                },
+                "endPoint": {
+                  "type": "apollo.common.Point2D",
+                  "id": 5
                 }
               }
             },
@@ -960,9 +964,10 @@
               "values": {
                 "Record": 0,
                 "SIM_DEBUG": 1,
-                "SIM_CONTROL": 2,
+                "Sim_Control": 2,
                 "REAL_CAR_AUTO_DRIVING": 3,
-                "TRACE": 4
+                "TRACE": 4,
+                "Scenario_Sim": 5
               }
             },
             "HMIStatus": {
@@ -1096,6 +1101,10 @@
                 "currentRecordStatus": {
                   "type": "RecordStatus",
                   "id": 28
+                },
+                "dataRecorderComponent": {
+                  "type": "apollo.monitor.Component",
+                  "id": 29
                 }
               }
             }
@@ -2551,6 +2560,10 @@
                 "checkResponse": {
                   "type": "CheckResponse",
                   "id": 40
+                },
+                "customStatus": {
+                  "type": "google.protobuf.Any",
+                  "id": 41
                 }
               },
               "nested": {
@@ -5669,6 +5682,66 @@
                 "jerkError": {
                   "type": "double",
                   "id": 49
+                },
+                "lateralErrorFeedback": {
+                  "type": "double",
+                  "id": 50
+                },
+                "headingErrorFeedback": {
+                  "type": "double",
+                  "id": 51
+                },
+                "steerAngleFeedbackAugment": {
+                  "type": "double",
+                  "id": 52
+                },
+                "currentMatchedPoint": {
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 53
+                },
+                "currentReferencePoint": {
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 54
+                },
+                "previewReferencePoint": {
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 55
+                },
+                "previewStationError": {
+                  "type": "double",
+                  "id": 56
+                },
+                "previewSpeedReference": {
+                  "type": "double",
+                  "id": 57
+                },
+                "previewSpeedError": {
+                  "type": "double",
+                  "id": 58
+                },
+                "previewAccelerationReference": {
+                  "type": "double",
+                  "id": 59
+                },
+                "vehiclePitch": {
+                  "type": "double",
+                  "id": 60
+                },
+                "slopeOffsetCompensation": {
+                  "type": "double",
+                  "id": 61
+                },
+                "pathRemain": {
+                  "type": "double",
+                  "id": 62
+                },
+                "accelerationLookupOffset": {
+                  "type": "double",
+                  "id": 63
+                },
+                "accelerationVrf": {
+                  "type": "double",
+                  "id": 64
                 }
               }
             },
@@ -8870,6 +8943,184 @@
                 }
               }
             },
+            "OculiiRawPointcloud": {
+              "fields": {
+                "range": {
+                  "type": "float",
+                  "id": 1
+                },
+                "doppler": {
+                  "type": "float",
+                  "id": 2
+                },
+                "azimuth": {
+                  "type": "float",
+                  "id": 3
+                },
+                "elevation": {
+                  "type": "float",
+                  "id": 4
+                },
+                "power": {
+                  "type": "float",
+                  "id": 5
+                }
+              }
+            },
+            "OculiiPointXYZIV": {
+              "fields": {
+                "x": {
+                  "type": "float",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "y": {
+                  "type": "float",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "z": {
+                  "type": "float",
+                  "id": 3,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "intensity": {
+                  "type": "float",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "velocity": {
+                  "type": "float",
+                  "id": 5,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "OculiiTrackTarget": {
+              "fields": {
+                "id": {
+                  "type": "int64",
+                  "id": 1
+                },
+                "xPos": {
+                  "type": "float",
+                  "id": 2
+                },
+                "yPos": {
+                  "type": "float",
+                  "id": 3
+                },
+                "zPos": {
+                  "type": "float",
+                  "id": 4
+                },
+                "xDot": {
+                  "type": "float",
+                  "id": 5
+                },
+                "yDot": {
+                  "type": "float",
+                  "id": 6
+                },
+                "zDot": {
+                  "type": "float",
+                  "id": 7
+                },
+                "confidence": {
+                  "type": "int32",
+                  "id": 8
+                },
+                "trackClass": {
+                  "type": "ObstacleClass",
+                  "id": 9
+                }
+              },
+              "nested": {
+                "ObstacleClass": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "PEDESTRIAN": 1,
+                    "BICYCLE": 2,
+                    "VEHICLE": 3,
+                    "TRUCK": 4,
+                    "BACKGROUND": 5
+                  }
+                }
+              }
+            },
+            "OculiiPointCloud": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "frameId": {
+                  "type": "string",
+                  "id": 2
+                },
+                "isDense": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "point": {
+                  "rule": "repeated",
+                  "type": "OculiiPointXYZIV",
+                  "id": 4
+                },
+                "measurementTime": {
+                  "type": "double",
+                  "id": 5
+                },
+                "width": {
+                  "type": "int32",
+                  "id": 6
+                },
+                "height": {
+                  "type": "int32",
+                  "id": 7
+                },
+                "packetId": {
+                  "type": "int64",
+                  "id": 8
+                },
+                "egoSpeed": {
+                  "type": "float",
+                  "id": 9
+                },
+                "egoAngle": {
+                  "type": "float",
+                  "id": 10
+                },
+                "detectionSize": {
+                  "type": "int32",
+                  "id": 11
+                },
+                "trackSize": {
+                  "type": "int32",
+                  "id": 12
+                },
+                "rawPointclouds": {
+                  "rule": "repeated",
+                  "type": "OculiiRawPointcloud",
+                  "id": 13
+                },
+                "tracks": {
+                  "rule": "repeated",
+                  "type": "OculiiTrackTarget",
+                  "id": 14
+                }
+              }
+            },
             "PointXYZIT": {
               "fields": {
                 "x": {
@@ -9262,6 +9513,78 @@
                   "options": {
                     "default": "OK"
                   }
+                }
+              }
+            },
+            "RadarPointXYZVR": {
+              "fields": {
+                "x": {
+                  "type": "float",
+                  "id": 1,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "y": {
+                  "type": "float",
+                  "id": 2,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "z": {
+                  "type": "float",
+                  "id": 3,
+                  "options": {
+                    "default": null
+                  }
+                },
+                "velocity": {
+                  "type": "float",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "rcs": {
+                  "type": "float",
+                  "id": 5,
+                  "options": {
+                    "default": 0
+                  }
+                }
+              }
+            },
+            "RadarPointCloud": {
+              "fields": {
+                "header": {
+                  "type": "apollo.common.Header",
+                  "id": 1
+                },
+                "frameId": {
+                  "type": "string",
+                  "id": 2
+                },
+                "isDense": {
+                  "type": "bool",
+                  "id": 3
+                },
+                "point": {
+                  "rule": "repeated",
+                  "type": "RadarPointXYZVR",
+                  "id": 4
+                },
+                "measurementTime": {
+                  "type": "double",
+                  "id": 5
+                },
+                "width": {
+                  "type": "uint32",
+                  "id": 6
+                },
+                "height": {
+                  "type": "uint32",
+                  "id": 7
                 }
               }
             },
@@ -11713,6 +12036,10 @@
                   "keyType": "string",
                   "type": "ComponentStatus",
                   "id": 10
+                },
+                "dataRecorderComponent": {
+                  "type": "Component",
+                  "id": 11
                 }
               },
               "reserved": [
@@ -12221,10 +12548,7 @@
                 },
                 "confidence": {
                   "type": "double",
-                  "id": 13,
-                  "options": {
-                    "deprecated": true
-                  }
+                  "id": 13
                 },
                 "confidenceType": {
                   "type": "ConfidenceType",
@@ -15396,6 +15720,10 @@
                 "parkingInfo": {
                   "type": "apollo.routing.ParkingInfo",
                   "id": 4
+                },
+                "cycleNumber": {
+                  "type": "int32",
+                  "id": 5
                 }
               }
             },

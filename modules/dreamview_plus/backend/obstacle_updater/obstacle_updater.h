@@ -60,7 +60,8 @@ class ObstacleUpdater : public UpdaterWithChannelsBase {
  public:
   explicit ObstacleUpdater(WebSocketHandler* websocket);
   void StartStream(const double& time_interval_ms,
-                   const std::string& channel_name = "") override;
+                   const std::string& channel_name = "",
+                   nlohmann::json* subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name) override;
   void OnTimer(const std::string& channel_name = "") override;
   void PublishMessage(const std::string& channel_name = "") override;
@@ -69,10 +70,12 @@ class ObstacleUpdater : public UpdaterWithChannelsBase {
   void Init();
 
  private:
+  bool enabled_ = false;
   WebSocketHandler* websocket_;
   std::unique_ptr<cyber::Node> node_;
   std::map<std::string, ObstacleChannelUpdater*> obstacle_channel_updater_map_;
   std::mutex channel_updater_map_mutex_;
+  std::mutex updater_publish_mutex_;
   std::shared_ptr<cyber::Reader<LocalizationEstimate>> localization_reader_;
   Pose adc_pose_;
   ObstacleChannelUpdater* GetObstacleChannelUpdater(

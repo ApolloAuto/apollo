@@ -29,6 +29,7 @@
 #include "modules/common_msgs/external_command_msgs/valet_parking_command.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/external_command/external_command_demo/proto/demo_config.pb.h"
+
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 #include "modules/common/service_wrapper/client_wrapper.h"
@@ -75,6 +76,7 @@ class ExternalCommandWrapperDemo final : public apollo::cyber::TimerComponent {
   void SendFreespaceCommand(
       const std::vector<apollo::external_command::Point>& way_points,
       const apollo::external_command::Pose& end);
+
   static void ReadPathFromPathRecord(
       const std::string& record_file,
       google::protobuf::RepeatedPtrField<apollo::external_command::Point>*

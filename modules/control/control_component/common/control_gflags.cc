@@ -37,9 +37,10 @@ DEFINE_string(
     "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
     "longitudinal controller conf data file");
 
-DEFINE_string(calibration_table_file,
-              "/apollo/modules/control/conf/calibration_table.pb.txt",
-              "calibration table file");
+DEFINE_string(
+    calibration_table_file,
+    "/apollo/modules/control/control_component/conf/calibration_table.pb.txt",
+    "calibration table file");
 
 DEFINE_double(control_test_duration, -1.0, "control test duration");
 
@@ -70,6 +71,8 @@ DEFINE_bool(set_steer_limit, false, "Set steer limit");
 DEFINE_int32(chassis_pending_queue_size, 10, "Max chassis pending queue size");
 DEFINE_int32(planning_pending_queue_size, 10,
              "Max planning pending queue size");
+DEFINE_int32(planning_status_msg_pending_queue_size, 10,
+             "Max planning status message pending queue size");
 DEFINE_int32(localization_pending_queue_size, 10,
              "Max localization pending queue size");
 DEFINE_int32(pad_msg_pending_queue_size, 10,
@@ -120,4 +123,4 @@ DEFINE_double(minimum_speed_protection, 0.1, "minimum speed protection.");
 
 DEFINE_int32(action, 1, "START = 1; RESET = 2; VIN_REQ = 3");
 
-DEFINE_bool(enable_epb_brake, false, "enable brake for anti-slip in slope");
+DEFINE_bool(use_vehicle_epb, false, "enable epb brake for vehicle.");

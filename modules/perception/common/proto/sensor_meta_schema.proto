@@ -15,7 +15,6 @@ message SensorMeta {
     MONOCULAR_CAMERA = 8;
     STEREO_CAMERA = 9;
     ULTRASONIC = 10;
-    
   }
 
   enum SensorOrientation {
@@ -33,6 +32,7 @@ message SensorMeta {
   optional string name = 1;
   optional SensorType type = 2;
   optional SensorOrientation orientation = 3;
+  optional bool is_main_sensor = 4;
 }
 
 message MultiSensorMeta {

@@ -33,6 +33,11 @@
   ],
   "line": [
     {
+      "label": ".*_obs_sl_boundary",
+      "marker": "*-",
+      "subplot": "sl"
+    },
+    {
       "label": "trajxy",
       "marker": "*-",
       "subplot": "xy"

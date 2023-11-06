@@ -22,7 +22,8 @@ namespace dreamview {
 
 bool UpdaterManager::Start(const std::string& path_name,
                            const double& time_interval_ms,
-                           const std::string& channel_name) {
+                           const std::string& channel_name,
+                           nlohmann::json* subscribe_param) {
   auto iter = updater_map_.find(path_name);
   if (iter == updater_map_.end()) {
     AERROR << "Related data updater for " << path_name
@@ -30,7 +31,7 @@ bool UpdaterManager::Start(const std::string& path_name,
     return false;
   }
   UpdaterBase* updater = iter->second;
-  updater->StartStream(time_interval_ms, channel_name);
+  updater->StartStream(time_interval_ms, channel_name, subscribe_param);
   return true;
 }
 

@@ -82,6 +82,13 @@ void ProcessMonitor::RunOnce(const double current_time) {
     const auto& config = iter.second;
     UpdateStatus(running_processes, config, &other_components->at(name));
   }
+  // Check data recorder component.
+  const auto& data_recorder_process_config =
+      mode.data_recorder_component().process();
+  UpdateStatus(running_processes, data_recorder_process_config,
+               manager->GetStatus()
+                   ->mutable_data_recorder_component()
+                   ->mutable_process_status());
 }
 
 void ProcessMonitor::UpdateStatus(

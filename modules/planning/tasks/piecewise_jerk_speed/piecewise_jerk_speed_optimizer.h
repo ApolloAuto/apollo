@@ -22,7 +22,8 @@
 
 #include <memory>
 #include <string>
-
+#include <utility>
+#include <vector>
 #include "modules/planning/tasks/piecewise_jerk_speed/proto/piecewise_jerk_speed.pb.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/planning/planning_base/task_base/common/speed_optimizer.h"
@@ -41,7 +42,9 @@ class PiecewiseJerkSpeedOptimizer : public SpeedOptimizer {
   common::Status Process(const PathData& path_data,
                          const common::TrajectoryPoint& init_point,
                          SpeedData* const speed_data) override;
-
+  void AdjustInitStatus(
+      const std::vector<std::pair<double, double>> s_dot_bound, double delta_t,
+      std::array<double, 3>& init_s);
   PiecewiseJerkSpeedOptimizerConfig config_;
 };
 

@@ -245,6 +245,13 @@ void ResourceMonitor::RunOnce(const double current_time) {
                    components->at(name).mutable_resource_status());
     }
   }
+  // check data recorder disk space
+  auto data_recorder_resource_status = manager->GetStatus()
+                                           ->mutable_data_recorder_component()
+                                           ->mutable_resource_status();
+  data_recorder_resource_status->clear_status();
+  CheckDiskSpace(mode.data_recorder_component().resource(),
+                 data_recorder_resource_status);
 }
 
 void ResourceMonitor::UpdateStatus(

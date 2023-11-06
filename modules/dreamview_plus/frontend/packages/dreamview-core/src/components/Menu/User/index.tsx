@@ -87,7 +87,9 @@ function User(props: UserProps) {
                     text: t('document'),
                     onClick: () => {
                         //
-                        window.open('https://apollo.baidu.com/community/Apollo-Homepage-Document/Apollo_Doc_CN_9_0/dreamview');
+                        window.open(
+                            'https://apollo.baidu.com/community/Apollo-Homepage-Document/Apollo_alpha_doc/dreamview',
+                        );
                     },
                 },
                 {

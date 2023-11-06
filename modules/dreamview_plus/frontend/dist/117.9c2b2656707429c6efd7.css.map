@@ -1,1 +1,0 @@
-{"version":3,"file":"117.9c2b2656707429c6efd7.css","mappings":"AAAA;EACE,YAAY;AACd","sources":["webpack:///../../../dreamview-core/src/components/panels/base/PanelRoot/index.less"],"sourcesContent":[".dreamview-panel-root {\n  height: 100%;\n}\n"],"names":[],"sourceRoot":""}

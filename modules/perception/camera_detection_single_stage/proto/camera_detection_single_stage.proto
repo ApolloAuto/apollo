@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.perception.camera;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message CameraDetectionSingleStage {
+  optional string camera_name = 1 [default = "front_6mm"];
+  optional double timestamp_offset = 2 [default = 0.0];
+  optional perception.PluginParam plugin_param = 3;
+  optional bool enable_undistortion = 4 [default = false];
+  optional int32 gpu_id = 5;
+  optional DetectionChannel channel = 6;
+}
+
+message DetectionChannel {
+  optional string input_camera_channel_name = 1;
+  optional string output_obstacles_channel_name = 2;
+}
+
+message Debug {
+  optional string output_viz_message_channel_name = 1;
+}

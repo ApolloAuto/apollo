@@ -158,6 +158,35 @@ class HMIWorker {
 
   void ResetComponentStatusTimer();
 
+  /**
+   * @brief transfer the mode's cyber modules to modules.
+   * @param mode: the mode to be transfered.
+   */
+  static void TranslateCyberModules(HMIMode* mode);
+
+  /**
+   * @brief load the mode which is self defined by vehicles.
+   * @param mode_config_path: the mode config path
+   * @param current_vehicle_path: current selected vehicle conf absolute path.
+   * @param self_defined_mode: the pointer to store vehicle defined mode config.
+   * @return If vehicle has self-defined mode conf and load it successfully.
+   */
+  bool LoadVehicleDefinedMode(const std::string& mode_config_path,
+                              const std::string& current_vehicle_path,
+                              HMIMode* self_defined_mode);
+
+  /**
+   * @brief merge the mode's modules and monitored components
+   * to current_mode_.
+   * @param mode The mode to be merged.
+   */
+  void MergeToCurrentMode(HMIMode* mode);
+  /**
+   * @brief update the current_mode_'s modules and monitored components
+   * to  hmi status.
+   */
+  void UpdateModeModulesAndMonitoredComponents();
+
   HMIConfig config_;
 
   // HMI status maintenance.

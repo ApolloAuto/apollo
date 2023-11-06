@@ -1,0 +1,2 @@
+claping_acceleration_threshold: 10
+claping_speed_threshold: 1

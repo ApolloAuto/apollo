@@ -257,8 +257,12 @@ bool CenterPointDetection::Detect(const LidarDetectorOptions &options,
               model_param_.postprocess().score_threshold(), &out_detections,
               &out_labels, &out_scores);
 
-  GetObjects(frame->lidar2world_pose, out_detections, out_labels,
+  GetObjects(frame->lidar2world_pose, out_detections, out_labels, out_scores,
              &frame->segmented_objects);
+
+  if (model_param_.filter_by_points()) {
+    FilterObjectsbyPoints(&frame->segmented_objects);
+  }
 
   FilterForegroundPoints(&frame->segmented_objects);
 
@@ -473,6 +477,7 @@ void CenterPointDetection::GetObjects(
     const Eigen::Affine3d &pose,
     const std::vector<float> &detections,
     const std::vector<int64_t> &labels,
+    const std::vector<float> &scores,
     std::vector<std::shared_ptr<Object>> *objects) {
   int num_objects = detections.size() /
     model_param_.postprocess().num_output_box_feature();
@@ -514,6 +519,7 @@ void CenterPointDetection::GetObjects(
     object->direction[1] = sinf(yaw);
     object->direction[2] = 0;
     object->lidar_supplement.is_orientation_ready = true;
+    object->confidence = scores.at(i);
 
     // compute vertexes of bounding box and transform to world coordinate
     object->lidar_supplement.on_use = true;
@@ -613,6 +619,20 @@ void CenterPointDetection::FilterScore(
       scores_filtered->push_back(score_ptr[i]);
     }
   }
+}
+
+void CenterPointDetection::FilterObjectsbyPoints(
+  std::vector<std::shared_ptr<Object>> *objects) {
+    size_t valid_num = 0;
+    for (uint32_t i = 0; i < objects->size(); i++) {
+        auto &object = objects->at(i);
+        uint32_t num_points_thresholds = model_param_.min_points_threshold();
+        if (object->lidar_supplement.cloud.size() >= num_points_thresholds) {
+            objects->at(valid_num) = object;
+            valid_num++;
+        }
+    }
+    objects->resize(valid_num);
 }
 
 void CenterPointDetection::FilterForegroundPoints(

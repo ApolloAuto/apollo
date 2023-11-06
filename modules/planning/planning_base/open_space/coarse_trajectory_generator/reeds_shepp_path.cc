@@ -1062,11 +1062,11 @@ bool ReedShepp::GenerateLocalConfigurations(
   double radius = shortest_path->radius;
   double step_scaled =
       planner_open_space_config_.warm_start_config().step_size() * max_kappa_;
-  AERROR << "shortest_path->total_length" << shortest_path->total_length;
+  ADEBUG << "shortest_path->total_length" << shortest_path->total_length;
   size_t point_num = static_cast<size_t>(
       std::floor(shortest_path->total_length / step_scaled * radius +
                  static_cast<double>(shortest_path->segs_lengths.size()) + 4));
-  AERROR << "point_num" << point_num;
+  ADEBUG << "point_num" << point_num;
   std::vector<double> px(point_num, 0.0);
   std::vector<double> py(point_num, 0.0);
   std::vector<double> pphi(point_num, 0.0);

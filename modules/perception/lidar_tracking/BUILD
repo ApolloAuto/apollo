@@ -39,7 +39,6 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_distance.cc",
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.cc",
         "tracker/multi_lidar_fusion/mlf_tracker.cc",
-        "tracker/semantic_map/evaluator_manager.cc",
     ],
     hdrs = [
         "classifier/fused_classifier/ccrf_type_fusion.h",
@@ -66,7 +65,6 @@ apollo_cc_library(
         "tracker/multi_lidar_fusion/mlf_track_object_distance.h",
         "tracker/multi_lidar_fusion/mlf_track_object_matcher.h",
         "tracker/multi_lidar_fusion/mlf_tracker.h",
-        "tracker/semantic_map/evaluator_manager.h",
     ],
     deps = [
         "//cyber",
@@ -84,7 +82,6 @@ apollo_cc_library(
         "//modules/perception/lidar_tracking/classifier/fused_classifier/proto:fused_classifier_config_cc_proto",
         "//modules/perception/lidar_tracking/proto:lidar_tracking_component_config_cc_proto",
         "//modules/perception/lidar_tracking/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_cc_proto",
-        "//modules/prediction:apollo_prediction",
         "@com_google_googletest//:gtest_main",
         "@eigen",
     ],

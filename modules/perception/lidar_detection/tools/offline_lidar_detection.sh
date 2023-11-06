@@ -16,15 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-pcd_path="./data/pcd/"
-output_path="./data/output/"
+pcd_path="/apollo/data/pcd/"
+output_path="/apollo/data/output/"
 
 mkdir -p $output_path && rm -rf $output_path/*
 
-./bazel-bin/modules/perception/lidar_detection/tools/offline_lidar_detection \
+/apollo/bazel-bin/modules/perception/lidar_detection/tools/offline_lidar_detection \
         --pcd_path=$pcd_path \
         --output_path=$output_path \
         --detector_name=CNNSegmentation \
         --config_file=cnnseg16_param.pb.txt \
-        --log_dir=./logs \
-        2>&1 | tee segment.log
+        2>&1 | tee /apollo/data/log/offline_lidar_detection.log

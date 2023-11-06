@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -30,7 +30,7 @@ filegroup(
     ]),
 )
 
-py_library(
+apollo_py_library(
     name = "configuration_yaml_generator",
     srcs = ["configuration_yaml_generator.py"],
     deps = [
@@ -39,12 +39,12 @@ py_library(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "data_file_object",
     srcs = ["data_file_object.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_data",
     srcs = ["extract_data.py"],
     data = [":runtime_files"],
@@ -62,7 +62,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_static_data",
     srcs = ["extract_static_data.py"],
     data = [":runtime_files"],
@@ -75,7 +75,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "ins_stat_publisher",
     srcs = ["ins_stat_publisher.py"],
     deps = [
@@ -85,7 +85,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "odom_publisher",
     srcs = ["odom_publisher.py"],
     deps = [
@@ -96,7 +96,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "sensor_msg_extractor",
     srcs = ["sensor_msg_extractor.py"],
     deps = [
@@ -109,7 +109,7 @@ py_library(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "sanity_check",
     srcs = ["sanity_check.py"],
     deps = [

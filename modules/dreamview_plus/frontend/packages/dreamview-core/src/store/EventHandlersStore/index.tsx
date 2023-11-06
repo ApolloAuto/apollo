@@ -1,5 +1,8 @@
-import React, { createContext, useCallback, useContext, useMemo, useRef } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { fromEvent, filter, Observable, Subject, OperatorFunction, ReplaySubject } from 'rxjs';
+import EventEmitter from 'eventemitter3';
+
+export * from './eventType';
 
 export type FunctionalKey = 'ctrlKey' | 'metaKey' | 'shiftKey';
 
@@ -39,6 +42,8 @@ type EventHandlers = Record<
             ...operations: OperatorFunction<any, any>[]
         ) => Observable<Event>;
     };
+} & {
+    EE: EventEmitter;
 };
 
 export const EventHandlersContext = createContext<EventHandlers | undefined>(undefined);
@@ -79,6 +84,7 @@ type ProviderProps = {
  * </Button>
  */
 export function EventHandlersProvider({ children }: ProviderProps): React.ReactElement {
+    const [EE] = useState(() => new EventEmitter());
     const customizeEventMapRef = useRef<Map<string, CustomizeEvent>>(new Map());
     const publishEventQueueMap = useRef<Map<string, unknown[]>>(new Map());
     const triggerCleanCache = (subject: Subject<unknown>, publishEventQueue: unknown[]) => {
@@ -246,6 +252,7 @@ export function EventHandlersProvider({ children }: ProviderProps): React.ReactE
 
     const store = useMemo(
         () => ({
+            EE,
             keydown: {
                 observableEvent: keyDownEvent,
                 setFilterKey: usePressedKey,
@@ -281,6 +288,7 @@ export function EventHandlersProvider({ children }: ProviderProps): React.ReactE
             },
         }),
         [
+            EE,
             clickEvent,
             keyDownEvent,
             keyUpEvent,
@@ -298,4 +306,8 @@ export function EventHandlersProvider({ children }: ProviderProps): React.ReactE
 
 export function useEventHandlersContext() {
     return useContext(EventHandlersContext);
+}
+
+export function useEventEmitter() {
+    return useContext(EventHandlersContext).EE;
 }

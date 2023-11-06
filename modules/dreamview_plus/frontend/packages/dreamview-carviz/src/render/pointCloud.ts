@@ -1,6 +1,9 @@
 import * as THREE from 'three';
+import Logger from '@dreamview/log';
 import { pointCloudHeightColorMapping } from '../constant/common';
 import { disposeMesh } from '../utils/common';
+
+const logger = Logger.getInstance(`PointCloud-${Date.now()}`);
 
 const MAX_POINTS = 200000;
 
@@ -13,70 +16,79 @@ export default class PointCloud {
 
     private adc;
 
+    private positionBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
+
+    private colorBuffer = new THREE.BufferAttribute(new Float32Array(MAX_POINTS * 3), 3);
+
+    private material = new THREE.PointsMaterial({
+        size: 0.25,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+    });
+
+    private geometry = new THREE.BufferGeometry();
+
     constructor(scene, adc, option) {
         this.scene = scene;
         this.adc = adc;
         this.option = option;
         this.pointCloudMesh = null;
+        this.geometry.setAttribute('position', this.positionBuffer);
+        this.geometry.setAttribute('color', this.colorBuffer);
     }
 
     update(pointCloud) {
         this.dispose();
-        if (!this.option.layerOption.Perception.pointCloud) {
-            return;
-        }
-        if (!pointCloud.num || pointCloud.num.length % 3 !== 0) {
-            console.warn('pointCloud length should be multiples of 3');
+        if (!this.option.layerOption.Perception.pointCloud || !pointCloud.num || pointCloud.num.length % 3 !== 0) {
+            logger.warn('pointCloud length should be multiples of 3');
             return;
         }
         const adcMesh = this.adc?.adc || {};
-        const { x = 0, y = 0 } = adcMesh.position;
+        const x = adcMesh?.position?.x || 0;
+        const y = adcMesh?.position?.y || 0;
         const heading = adcMesh?.rotation?.y || 0;
 
         const pointCloudSize = pointCloud.num.length / 3;
-        const total = pointCloudSize < MAX_POINTS ? pointCloudSize : MAX_POINTS;
-        let colorKey = 0.5;
-        const positions = [];
-        const colors = [];
-        const geometry = new THREE.BufferGeometry();
-        for (let i = 0; i < total; i += 1) {
-            const x = pointCloud.num[i * 3];
-            const y = pointCloud.num[i * 3 + 1];
-            const z = pointCloud.num[i * 3 + 2];
-            positions.push(x, y, z);
+        const total = Math.min(pointCloudSize, MAX_POINTS);
+        this.geometry.setDrawRange(0, total);
 
-            if (z < 0.5) {
-                colorKey = 0.5;
-            } else if (z < 1.0) {
-                colorKey = 1.0;
-            } else if (z < 1.5) {
-                colorKey = 1.5;
-            } else if (z < 2.0) {
-                colorKey = 2.0;
-            } else if (z < 2.5) {
-                colorKey = 2.5;
-            } else if (z < 3.0) {
-                colorKey = 3.0;
-            } else {
-                colorKey = 10.0;
-            }
-            const color = new THREE.Color(pointCloudHeightColorMapping[colorKey]);
-            colors.push(color.r, color.g, color.b);
+        for (let i = 0; i < total; i += 1) {
+            const index = i * 3;
+            const z = pointCloud.num[index + 2];
+
+            const colorKey =
+                // eslint-disable-next-line no-nested-ternary
+                z < 0.5 ? 0.5 : z < 1.0 ? 1.0 : z < 1.5 ? 1.5 : z < 2.0 ? 2.0 : z < 2.5 ? 2.5 : z < 3.0 ? 3.0 : 10.0;
+
+            const color = pointCloudHeightColorMapping[colorKey];
+
+            this.positionBuffer.setXYZ(i, pointCloud.num[index], pointCloud.num[index + 1], z);
+            this.colorBuffer.setXYZ(i, color.r, color.g, color.b);
         }
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        const material = new THREE.PointsMaterial({
-            size: 0.25,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.7,
-        });
-        const pointCloudMesh = new THREE.Points(geometry, material);
-        pointCloudMesh.position.x = x;
-        pointCloudMesh.position.y = y;
+
+        this.positionBuffer.needsUpdate = true;
+        this.colorBuffer.needsUpdate = true;
+        const pointCloudMesh = new THREE.Points(this.geometry, this.material);
+        pointCloudMesh.position.set(x, y, 0);
         pointCloudMesh.rotateZ(heading);
         this.pointCloudMesh = pointCloudMesh;
         this.scene.add(pointCloudMesh);
+    }
+
+    updateOffsetPosition() {
+        if (!this.pointCloudMesh) {
+            logger.warn('PointCloud mesh is not initialized');
+            return;
+        }
+
+        const adcMesh = this.adc?.adc || {};
+        const x = adcMesh?.position?.x || 0;
+        const y = adcMesh?.position?.y || 0;
+        const heading = adcMesh?.rotation?.y || 0;
+
+        this.pointCloudMesh.position.set(x, y, 0);
+        this.pointCloudMesh.rotation.set(0, 0, heading);
     }
 
     dispose() {

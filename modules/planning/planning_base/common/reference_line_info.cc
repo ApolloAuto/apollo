@@ -739,9 +739,8 @@ void ReferenceLineInfo::ExportVehicleSignal(
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
-  static constexpr double kDestinationDeltaS = 0.05;
   const double distance_destination = SDistanceToDestination();
-  return distance_destination <= kDestinationDeltaS;
+  return distance_destination <= FLAGS_passed_destination_threshold;
 }
 
 double ReferenceLineInfo::SDistanceToDestination() const {

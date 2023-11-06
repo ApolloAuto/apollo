@@ -1,7 +1,7 @@
 import React from 'react';
 import { SubContent, SubHeader, SubItem } from '../../base/PanelHelpContent';
 
-export function DashBoardHelp() {
+export function DashBoardHelpOrigin() {
     return (
         <>
             <SubHeader>面板介绍</SubHeader>
@@ -11,3 +11,5 @@ export function DashBoardHelp() {
         </>
     );
 }
+
+export const DashBoardHelp = React.memo(DashBoardHelpOrigin);

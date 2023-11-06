@@ -8,7 +8,7 @@ import SignalAndGear from './SignalAndGear';
 import SpeedAndRotation from './SpeedAndRotation';
 import { usePanelContext } from '../base/store/PanelStore';
 import ChannelSelectFactory from '../base/ChannelSelect/ChannelSelectFactory';
-import { DemoChannelSelect } from '../base/ChannelSelect/demo';
+import DemoChannelSelect from '../base/ChannelSelect/demo';
 
 type ISimulationWorld = apollo.dreamview.ISimulationWorld;
 type DisengageType = apollo.dreamview.Object.DisengageType;
@@ -39,7 +39,7 @@ type DashBoardState = {
 
 function InnerDashBoard() {
     const panelContext = usePanelContext();
-    const { logger, panelId, initSubscription } = panelContext;
+    const { logger, panelId, initSubscription, registerFullScreenHooks } = panelContext;
     const [rawState, setRawState] = useState<DashBoardState>({});
     const dashBoardState = useMemo(
         () => ({
@@ -64,7 +64,10 @@ function InnerDashBoard() {
     return (
         <div className={classes['panel-dash-board']}>
             <DriveMode mode={toDrivingMode(dashBoardState?.autoDrivingCar?.disengageType)} />
-            <SignalAndGear color={dashBoardState?.trafficSignal?.currentSignal} />
+            <SignalAndGear
+                color={dashBoardState?.trafficSignal?.currentSignal}
+                gearPosition={dashBoardState?.autoDrivingCar?.gearLocation}
+            />
             <SpeedAndRotation
                 speedInfo={{
                     speed: dashBoardState?.autoDrivingCar?.speed,
@@ -83,11 +86,18 @@ function InnerDashBoard() {
 
 InnerDashBoard.displayName = 'DashBoard';
 
-export function DashBoard(props: any) {
+export function DashBoardOrigin(props: any) {
     const C = useMemo(
-        () => Panel(InnerDashBoard, props.panelId, [{ name: StreamDataNames.SIM_WORLD, needChannel: false }]),
+        () =>
+            Panel({
+                PanelComponent: InnerDashBoard,
+                panelId: props.panelId,
+                subscribeInfo: [{ name: StreamDataNames.SIM_WORLD, needChannel: false }],
+            }),
         [],
     );
 
     return <C {...props} />;
 }
+
+export const DashBoard = React.memo(DashBoardOrigin);

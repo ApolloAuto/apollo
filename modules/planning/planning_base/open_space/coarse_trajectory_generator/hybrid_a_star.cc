@@ -802,6 +802,15 @@ bool HybridAStar::Plan(
     const double rs_end_time = Clock::NowInSeconds();
     rs_time += rs_end_time - rs_start_time;
     close_set_.insert(current_node->GetIndex());
+
+    if (Clock::NowInSeconds() - astar_start_time >
+          planner_open_space_config_.
+            warm_start_config().
+              astar_max_search_time() &&
+          available_result_num > 0) {
+      break;
+    }
+
     size_t begin_index = 0;
     size_t end_index = next_node_num_;
     std::unordered_set<std::string> temp_set;
@@ -835,6 +844,9 @@ bool HybridAStar::Plan(
     }
     open_set_.insert(temp_set.begin(), temp_set.end());
   }
+  AINFO << "open_pq_.empty()" << (open_pq_.empty()? "true" : "false");
+  AINFO << "open_pq_.size()" << open_pq_.size();
+  AINFO << "desired_explored_num" << desired_explored_num;
   AINFO << "min cost is : " << final_node_->GetTrajCost();
   AINFO << "max_explored_num is " << max_explored_num;
   AINFO << "explored node num is " << explored_node_num

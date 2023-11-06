@@ -25,13 +25,19 @@ using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
 using Json = nlohmann::json;
 
+SimControlManager::SimControlManager() {}
+
 std::string SimControlManager::Name() const {
   return FLAGS_sim_control_module_name;
 }
 
 Json SimControlManager::LoadDynamicModels() {
   auto *model_factory = DynamicModelFactory::Instance();
-  return model_factory->RegisterDynamicModels();
+  Json result = model_factory->RegisterDynamicModels();
+  // todo(@lijin):dv2.0 default select sim perfect control
+  // phase 3 will add change dynamicmodel function
+  ChangeDynamicModel(FLAGS_sim_perfect_control);
+  return result;
 }
 
 void SimControlManager::Reset() {
@@ -87,15 +93,19 @@ bool SimControlManager::DeleteDynamicModel(
 }
 
 void SimControlManager::Start() {
-  // enabled_仅承担开关作用
+  // enabled_ only performs switching function
   if (!enabled_) {
     enabled_ = true;
+    if (!model_ptr_) {
+      LoadDynamicModels();
+    }
   }
 }
 
 void SimControlManager::ReSetPoinstion(double x, double y, double heading) {
   if (!IsEnabled() || !model_ptr_) {
     AERROR << "Sim control is invalid,Failed to ReSetPoinstion!";
+    return;
   }
   model_ptr_->ReSetPoinstion(x, y, heading);
   return;
@@ -105,6 +115,7 @@ void SimControlManager::Restart(double x, double y) {
   // reset start point for dynamic model.
   if (!IsEnabled() || !model_ptr_) {
     AERROR << "Sim control is invalid,Failed to restart!";
+    return;
   }
   model_ptr_->Stop();
   model_ptr_->Start(x, y);

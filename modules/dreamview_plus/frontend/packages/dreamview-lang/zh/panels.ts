@@ -49,10 +49,18 @@ export const panels = {
     pointCloudAbilityDescTwo: '视图切换：提供默认、近景、俯视、地图四种视图切换',
     pointCloudAbilityDescThree: '缩放：进行放大和缩小',
 
+    // panel pncMonitor
+    pncMonitorTitle: 'Pnc 监控',
+    pncMonitorDescription: '用于展示与Planning、Control、Latency数据相关的图表',
+
     // panel dashBoard
     dashBoardTitle: '车辆仪表盘',
     dashBoardDesc: '显示车辆状态面板',
     dashBoardDescription: '展示车辆当前状态，包括车速、加减速踏板开度、方向盘转角、档位等信息',
+
+    // panel components
+    componentsTitle: '监控组件',
+    componentsDescription: '用于展示常用组件状态的面板',
 
     // operate
     pressTips: '长按并拖拽鼠标移动面板',

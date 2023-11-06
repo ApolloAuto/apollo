@@ -9,6 +9,7 @@ import "modules/common_msgs/perception_msgs/perception_obstacle.proto";
 import "modules/common_msgs/planning_msgs/planning_internal.proto";
 import "modules/common_msgs/prediction_msgs/feature.proto";
 import "modules/common_msgs/routing_msgs/geometry.proto";
+import "modules/common_msgs/config_msgs/vehicle_config.proto";
 
 // Next-id: 4
 message PolygonPoint {
@@ -296,4 +297,7 @@ message SimulationWorld {
   map<string, SensorMeasurements> sensor_measurements = 29;
 
   optional bool is_siren_on = 30 [default = false];
+
+  // vehicle param
+  optional apollo.common.VehicleParam vehicle_param = 31;
 }

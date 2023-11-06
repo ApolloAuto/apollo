@@ -1,0 +1,118 @@
+info {
+  name: "yolox3d"
+  version: "2023-10-18"
+  dataset: "L4"
+  task_type: Detection3D
+  sensor_type: Camera
+  framework: Onnx
+
+  proto_file {
+    file: "yolox3d_onnx_model_2d.onnx"
+  }
+  weight_file {
+    file: "yolox3d_onnx_model_2d.onnx"
+  }
+  inputs {
+    name: "data"
+    shape: 1
+    shape: 3
+    shape: 640
+    shape: 640
+  }
+  outputs {
+    name: "feature"
+    shape: 1
+    shape: 64
+    shape: 160
+    shape: 160
+  }
+  outputs {
+    name: "predict"
+    shape: 1
+    shape: 13
+    shape: 8400
+  }
+}
+output_object_size: 13
+output_object_num: 8400
+confidence_threshold: 0.3
+resize {
+  width: 640
+  height: 640
+}
+nms_param {
+  type: "NormalNMS"
+  threshold: 0.1
+}
+info_3d{
+  info {
+    name: "yolox3d"
+    version: "2023-06-27"
+    dataset: "L4"
+    task_type: Detection3D
+    sensor_type: Camera
+    framework: Onnx
+
+    proto_file {
+      file: "yolo_onnx_model_3d.onnx"
+    }
+    weight_file {
+      file: "yolo_onnx_model_3d.onnx"
+    }
+    inputs {
+      name: "image"
+      shape: 1
+      shape: 3
+      shape: 224
+      shape: 224
+    }
+    outputs {
+      name: "orient"
+      shape: 1
+      shape: 1
+      shape: 2
+      shape: 2
+    }
+    outputs {
+      name: "conf"
+      shape: 1
+      shape: 1
+      shape: 2
+      shape: 1
+    }
+    outputs {
+      name: "dim"
+      shape: 1
+      shape: 1
+      shape: 3
+      shape: 1
+    }
+  }
+  resize {
+    width: 224
+    height: 224
+  }
+}
+
+with_box3d: true
+
+car_template {
+  h: 1.56446
+  w: 1.75112
+  l: 4.24444
+}
+ped_template {
+  h: 1.6874
+  w: 0.5205
+  l: 0.4904
+}
+cyclist_template {
+  h: 1.5082
+  w: 0.4825
+  l: 1.6186
+}
+trafficcone_template {
+  h: 0.50
+  w: 0.25
+  l: 0.21
+}

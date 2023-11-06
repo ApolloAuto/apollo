@@ -26,8 +26,6 @@
 #include "modules/perception/lidar_tracking/interface/base_multi_target_tracker.h"
 #include "modules/perception/lidar_tracking/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
 #include "modules/perception/lidar_tracking/tracker/multi_lidar_fusion/mlf_tracker.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace perception {
@@ -142,20 +140,15 @@ class MlfEngine : public BaseMultiTargetTracker {
   // offset maintained for numeric issues
   Eigen::Vector3d global_to_local_offset_;
   Eigen::Affine3d sensor_to_local_pose_;
-  // main sensor info
-  std::set<std::string> main_sensors_;
+
   // params
   bool use_histogram_for_match_ = true;
   size_t histogram_bin_size_ = 10;
   bool output_predict_objects_ = false;
   double reserved_invisible_time_ = 0.3;
   bool use_frame_timestamp_ = false;
-  // semantic map
-  apollo::prediction::ObstaclesContainer obstacle_container_;
-  apollo::prediction::PoseContainer pose_container_;
-  apollo::perception::onboard::MsgSerializer serializer_;
+  bool set_static_outside_hdmap_ = false;
   bool use_semantic_map_ = false;
-  //  apollo::perception::EvaluatorManager evaluator_;
 };
 
 }  // namespace lidar

@@ -7,7 +7,7 @@ apollo_component(
     name="libexternal_command_process_component.so",
     srcs=["external_command_process_component.cc"],
     hdrs=["external_command_process_component.h"],
-    copts = ["-DMODULE_NAME=\\\"external_command_process\\\""],
+    copts = ["-DMODULE_NAME=\\\"external_command\\\""],
     deps=[
         "//cyber",
         "//modules/common/configs:config_gflags",

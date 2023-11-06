@@ -1,5 +1,5 @@
 ## Convert dataset
-`adataset` is used to convert datasets (nuScenes, KITTI) to Apollo record file. This way we can guarantee **the consistency of training data and test data**, including sensor intrinsics and extrinsics parameter files, thus speeding up model validation.
+`adataset` is used to convert datasets (nuScenes, KITTI, ApolloScape) to Apollo record file. This way we can guarantee **the consistency of training data and test data**, including sensor intrinsics and extrinsics parameter files, thus speeding up model validation.
 
 ## Install
 ```
@@ -11,7 +11,7 @@ We first introduce the use of the command, and then introduce how to use the dat
 
 #### Command options
 The options for `adataset` command are as follows:
-* --dataset(-d) Choose the dataset, support list `n, k, w`, means "n:nuScenes, k:KITTI, w:Waymo"
+* --dataset(-d) Choose the dataset, support list `n, k, a, w`, means "n:nuScenes, k:KITTI, a:ApolloScape, w:Waymo"
 * --input(-i) Set the dataset input directory.
 * --output(-o) Set the output directory, default is the current directory.
 * --type(-t) Choose conversion type, support list `rcd, cal, pcd`, means "rcd:record, cal:calibration, pcd:pointcloud", default is `rcd`.
@@ -21,7 +21,7 @@ You can use below command to convert dataset to Apollo record file. For example 
 ```shell
 adataset -d=n -i=dataset_path
 ```
-The name of the nuScenes record file is `scene_token.record`, and KITTI is `result.record`.
+The name of the nuScenes record file is `scene_token.record`, and KITTI is `result.record`, and ApolloScape is `frame_id.record`
 
 #### Convert calibration files
 You can use below command to convert dataset to apollo calibration files. There maybe multi sense in one dataset, and we create calibration files for each scene.
@@ -98,4 +98,48 @@ The KITTI calibration data is as follows:
 Then we can use the following command to generate the Apollo "calibration" files.
 ```
 adataset -d=k -i=path/to/2011_09_26 -t=cal
+```
+
+#### ApolloScape
+We use [ApolloScape](https://apolloscape.auto/) Detection/Tracking dataset to generate record file.The ApolloScape Detection/Tracking data is as follow.
+```
+Training data
+ -detection_train_pcd_1.zip
+ -detection_train_bin_1.zip
+ -detection_train_label.zip
+ -...
+ -tracking_train_pose.zip
+
+Testing data
+ -detection_test_pcd_1.zip
+ -detection_test_bin_1.zip
+ -...
+ -tracking_test_pose.zip
+```
+
+Before generating record file, we should organize data folders as follow(use test data for example).
+```
+├── tracking_test
+    ├── pcd
+        ├── result_9048_2_frame
+            ├── 2.bin
+            ├── 7.bin
+            └── ...
+        └── ...
+    ├── pose
+        ├── result_9048_2_frame
+            ├── 2_pose.txt
+            ├── 7_pose.txt
+            └── ...
+        └── ...
+```
+
+Then we can use the following command to generate the "record/calibration/pcd" file.
+```
+// record
+python main.py -d=a -i=tracking_test/ -o=records/ -t=rcd
+// calibration
+python main.py -d=a -i=tracking_test/ -o=records/ -t=cal
+// pcd
+python main.py -d=a -i=data_path/data.bin -o=data_path/result.pcd -t=pcd
 ```

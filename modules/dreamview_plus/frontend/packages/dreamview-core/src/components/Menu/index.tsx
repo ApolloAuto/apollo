@@ -140,7 +140,7 @@ function Menu(props: MenuProps) {
                 </ActivatableMenuMemo> */}
                 {isCertSuccess && (
                     <ActivatableMenuMemo
-                        popover={<>{tMode('profileManager')}</>}
+                        popover={<>{tMode('resourceManager')}</>}
                         activeMenuKey={activeMenu}
                         menuKey={ENUM_MENU_KEY.PROFILE_MANAGEER}
                         onMenuChange={onMenuChange}

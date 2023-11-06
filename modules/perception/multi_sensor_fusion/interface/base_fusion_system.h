@@ -30,9 +30,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-struct FusionInitOptions : public BaseInitOptions {
-  std::string main_sensor;
-};
+struct FusionInitOptions : public BaseInitOptions {};
 
 class BaseFusionSystem {
  public:
@@ -67,8 +65,6 @@ class BaseFusionSystem {
   virtual std::string Name() const = 0;
 
  protected:
-  std::string main_sensor_;
-
   DISALLOW_COPY_AND_ASSIGN(BaseFusionSystem);
 };
 

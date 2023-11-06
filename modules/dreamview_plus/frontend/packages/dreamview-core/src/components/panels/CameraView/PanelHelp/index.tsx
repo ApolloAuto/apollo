@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SubContent, SubHeader, SubItem } from '../../base/PanelHelpContent';
 
-export function CameraViewHelp() {
+export function CameraViewHelpOrigin() {
     const { t } = useTranslation('panels');
 
     return (
@@ -14,3 +14,5 @@ export function CameraViewHelp() {
         </>
     );
 }
+
+export const CameraViewHelp = React.memo(CameraViewHelpOrigin);

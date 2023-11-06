@@ -286,8 +286,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
               obstacle.Trajectory().trajectory_point()[1].relative_time();
     int trajectory_step = std::min(
                             FLAGS_trajectory_check_collision_time_step,
-                            vehicle_param_.width() / obstacle.speed())
-                          / trajectory_time_interval;
+                            std::max(vehicle_param_.width() / obstacle.speed()
+                          / trajectory_time_interval, 1.0));
     bool trajectory_point_collision_status = false;
     int previous_index = 0;
 

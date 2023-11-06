@@ -1,0 +1,35 @@
+cyber_modules {
+  key: "Planning"
+  value: {
+    dag_files: "/apollo/modules/planning/planning_base/dag/planning.dag"
+    dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
+  }
+}
+cyber_modules {
+  key: "Prediction"
+  value: {
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+  }
+}
+cyber_modules {
+  key: "Control"
+  value: {
+    dag_files: "/apollo/modules/control/control_component/dag/control.dag"
+  }
+}
+cyber_modules {
+  key: "TaskManager"
+  value: {
+    dag_files: "/apollo/modules/task_manager/dag/task_manager.dag"
+  }
+}
+other_components {
+  key: "ScenarioSimulation"
+  value: {
+    command_keywords: "sim_obstacle"
+  }
+}
+operations: Record
+operations: Scenario_Sim
+operations: Sim_Control
+default_operation: Record

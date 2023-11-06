@@ -124,7 +124,7 @@ class Image8U {
   // @brief: returns the total number of pixels.
   int total() const { return rows_ * cols_ * channels_; }
 
-  Image8U operator()(const Rect<int> &roi) {
+  Image8U operator()(const Rect<int> &roi) const {
     int offset = offset_ + blob_->offset({roi.y, roi.x, 0});
     // return Image8U(roi.height, roi.width, type_, blob_, offset);
     return Image8U(roi.height, roi.width, type_, blob_, offset);

@@ -38,10 +38,10 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/dreamview_plus/backend/handlers/websocket_handler.h"
+#include "modules/dreamview_plus/backend/hmi/hmi.h"
 #include "modules/dreamview_plus/backend/map/map_service.h"
 #include "modules/dreamview_plus/backend/plugins/plugin_manager.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
-#include "modules/dreamview_plus/backend/sim_control_manager/sim_control_manager.h"
 #include "modules/dreamview_plus/backend/simulation_world/simulation_world_service.h"
 #include "modules/dreamview_plus/backend/socket_manager/socket_manager.h"
 #include "modules/dreamview_plus/backend/updater/updater_base.h"
@@ -70,20 +70,20 @@ class SimulationWorldUpdater : public UpdaterBase {
    * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         SimControlManager *sim_control_manager,
                          WebSocketHandler *plugin_ws,
                          const MapService *map_service,
                          PluginManager *plugin_manager,
-                         WebSocketHandler *sim_world_ws,
+                         WebSocketHandler *sim_world_ws, HMI *hmi,
                          bool routing_from_file = false);
 
   /**
    * @brief Starts to push simulation_world to frontend.
    */
   void StartStream(const double &time_interval_ms,
-                   const std::string& channel_name = "") override;
-  void StopStream(const std::string& channel_name = "") override;
-  void PublishMessage(const std::string& channel_name = "") override;
+                   const std::string &channel_name = "",
+                   nlohmann::json *subscribe_param = nullptr) override;
+  void StopStream(const std::string &channel_name = "") override;
+  void PublishMessage(const std::string &channel_name = "") override;
   // Time interval, in milliseconds, between pushing SimulationWorld to
   // frontend.
   double time_interval_ms_;
@@ -95,7 +95,7 @@ class SimulationWorldUpdater : public UpdaterBase {
    * @brief The callback function to get updates from SimulationWorldService,
    * and update simulation_world_json_.
    */
-  void OnTimer(const std::string& channel_name = "") override;
+  void OnTimer(const std::string &channel_name = "") override;
 
   /**
    * @brief The function to construct a LaneFollowCommand from the given json,
@@ -115,7 +115,8 @@ class SimulationWorldUpdater : public UpdaterBase {
    */
   bool ConstructValetParkingCommand(
       const nlohmann::json &json,
-      apollo::external_command::ValetParkingCommand *valet_parking_command);
+      apollo::external_command::ValetParkingCommand *valet_parking_command,
+      const std::string &parking_space_id);
 
   /**
    * @brief get json which construct routing request needs
@@ -146,9 +147,10 @@ class SimulationWorldUpdater : public UpdaterBase {
   /**
    * @brief Check if routing point is located on a lane that is CITY_DRIVING
    * @param json that contains point's coordinate x and y
+   * @param result Messages accompanying the check
    * @return True if the lane is CITY_DRIVING
    */
-  nlohmann::json CheckRoutingPoint(const nlohmann::json &json);
+  bool CheckRoutingPoint(const nlohmann::json &json, nlohmann::json &result);
 
   /**
    * @brief Tries to load the points of interest from the file if it has
@@ -181,16 +183,43 @@ class SimulationWorldUpdater : public UpdaterBase {
    */
   bool AddDefaultRouting(const nlohmann::json &json);
 
+  /**
+   * @brief Delete the default route with the specified name
+   * @param routing_name routing name
+   * @return False if failed to delete,
+   * true otherwise.
+   */
+  bool DeleteDefaultRouting(const std::string &routing_name);
+
+  //   /**
+  //    * @brief Modify the number of cycles for the default route
+  //    * @param routing_name routing name
+  //    * @param cycle_number The number of cycles you want to modify
+  //    * @return False if failed to delete,
+  //    * true otherwise.
+  //    */
+  //   bool ModifyCycleNumber(const std::string &routing_name,
+  //                          const int &cycle_number);
+
+  /**
+   * @brief Determine whether the current route can form a circular route
+   * @param json JSON file containing start and end points
+   * @param result Messages accompanying the check
+   * @return true if enabled, false otherwise.
+   */
+  bool CheckCycleRouting(const nlohmann::json &json, nlohmann::json &result);
+
   void RegisterMessageHandlers();
 
+  bool enable_pnc_monitor_;
   SimulationWorldService sim_world_service_;
   const MapService *map_service_ = nullptr;
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
   WebSocketHandler *plugin_ws_ = nullptr;
-  SimControlManager *sim_control_manager_ = nullptr;
   std::unique_ptr<PluginManager> plugin_manager_ = nullptr;
   WebSocketHandler *sim_world_ws_ = nullptr;
+  HMI *hmi_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

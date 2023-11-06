@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -25,7 +25,7 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 # )
 
-py_binary(
+apollo_py_binary(
     name = "audio_event_record",
     srcs = ["audio_event_record.py"],
     deps = [
@@ -36,7 +36,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "body_sensation_evaluation",
     srcs = ["body_sensation_evaluation.py"],
     deps = [
@@ -47,7 +47,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "channel_size_stats",
     srcs = ["channel_size_stats.py"],
     deps = [
@@ -57,7 +57,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "drive_event",
     srcs = ["drive_event.py"],
     deps = [
@@ -68,7 +68,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "ros_dump_gpsbin",
     srcs = ["ros_dump_gpsbin.py"],
     deps = [
@@ -78,7 +78,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "dump_planning",
     srcs = ["dump_planning.py"],
     deps = [
@@ -86,7 +86,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "dump_record",
     srcs = ["dump_record.py"],
     deps = [
@@ -96,7 +96,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "dump_road_test_log",
     srcs = ["dump_road_test_log.py"],
     deps = [
@@ -106,7 +106,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "extract_trajectory",
     srcs = ["extract_trajectory.py"],
     deps = [
@@ -116,7 +116,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "sample_pnc_topics",
     srcs = ["sample_pnc_topics.py"],
     deps = [
@@ -127,7 +127,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "stat_mileage",
     srcs = ["stat_mileage.py"],
     deps = [
@@ -138,7 +138,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "stat_static_info",
     srcs = ["stat_static_info.py"],
     deps = [
@@ -149,7 +149,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "tf_stats",
     srcs = ["tf_stats.py"],
     deps = [
@@ -158,7 +158,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "transcribe",
     srcs = ["transcribe.py"],
     deps = [

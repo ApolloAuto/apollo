@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 
-export default function ChannelSelect(props: SelectProps) {
+function ChannelSelect(props: SelectProps) {
     const { t } = useTranslation('panels');
 
     return (
@@ -24,3 +24,5 @@ export default function ChannelSelect(props: SelectProps) {
         />
     );
 }
+
+export default React.memo(ChannelSelect);

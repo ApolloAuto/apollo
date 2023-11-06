@@ -358,9 +358,9 @@ Planning模块需要获取外部环境信息，车辆自身信息进行轨迹规
 
 #### Flags
 
-| 文件路径                                            | 类型/结构                        | <div style="width: 300pt">说明</div> |
-| --------------------------------------------------- | -------------------------------- | ------------------------------------ |
-| `modules/planning/planning_base/conf/planning.conf` | apollo::planning::PlanningConfig | planning模块的flag配置文件           |
+| 文件路径                                            |  <div style="width: 300pt">说明</div> |
+| --------------------------------------------------- |  ------------------------------------ |
+| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
 
 #### 使用方式
 

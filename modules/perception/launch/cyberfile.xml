@@ -14,5 +14,11 @@
   <type>module</type>
   <src_path url="https://github.com/ApolloAuto/apollo">//modules/perception/launch</src_path>
   <depend>bazel-extend-tools</depend>
+  <depend expose="False">3rd-rules-python</depend>
+  <depend expose="False">3rd-grpc</depend>
+  <depend expose="False">3rd-rules-proto</depend>
+  <depend expose="False">3rd-py</depend>
+  <depend expose="False">3rd-gpus</depend>
+  <depend expose="False">3rd-bazel-skylib</depend>
 
 </package>

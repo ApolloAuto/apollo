@@ -82,8 +82,10 @@ export default function useStyle() {
         },
         'welcome-guide-content-tab-image': {
             flex: 1,
+            borderRadius: '6px',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
+            backgroundPositionY: '-2px',
         },
         'welcome-guide-content-tab-text': {
             width: '354px',

@@ -16,7 +16,9 @@ function useStyle() {
     return hoc();
 }
 
-export default function PageLoading() {
+function PageLoading() {
     const { classes } = useStyle();
     return <div className={classes['dv-app-loading']}>loading</div>;
 }
+
+export default React.memo(PageLoading);

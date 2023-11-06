@@ -37,10 +37,6 @@ namespace planning {
 
 using apollo::cyber::Clock;
 
-namespace {
-constexpr double kSpeedOptimizationFallbackCost = 2e4;
-}  // namespace
-
 Stage::Stage()
     : next_stage_(""), context_(nullptr), injector_(nullptr), name_("") {}
 
@@ -57,7 +53,8 @@ bool Stage::Init(const StagePipeline& config,
       ->mutable_scenario()
       ->set_stage_type(name_);
   std::string path_name = ConfigUtil::TransformToPathName(name_);
-  // Load task plugin
+  std::string task_config_dir = config_dir + "/" + path_name;
+  // Load task plugin.
   for (int i = 0; i < pipeline_config_.task_size(); ++i) {
     auto task = pipeline_config_.task(i);
     auto task_type = task.type();
@@ -68,24 +65,38 @@ bool Stage::Init(const StagePipeline& config,
       AERROR << "Create task " << task.name() << " of " << name_ << " failed!";
       return false;
     }
-    std::string task_config_dir = config_dir + "/" + path_name;
-    task_ptr->Init(task_config_dir, task.name(), injector);
-    task_list_.push_back(task_ptr);
-    tasks_[task.name()] = task_ptr;
+    if (task_ptr->Init(task_config_dir, task.name(), injector)) {
+      task_list_.push_back(task_ptr);
+    } else {
+      AERROR << task.name() << " init failed!";
+      return false;
+    }
+  }
+  // Load trajectory fallback task.
+  // If fallback task is not set, use "FastStopTrajectoryFallback" as default.
+  std::string fallback_task_type = "FastStopTrajectoryFallback";
+  std::string fallback_task_name = "FAST_STOP_TRAJECTORY_FALLBACK";
+  if (pipeline_config_.has_fallback_task()) {
+    fallback_task_type = pipeline_config_.fallback_task().type();
+    fallback_task_name = pipeline_config_.fallback_task().name();
+  }
+  fallback_task_ =
+      apollo::cyber::plugin_manager::PluginManager::Instance()
+          ->CreateInstance<Task>(
+              ConfigUtil::GetFullPlanningClassName(fallback_task_type));
+  if (nullptr == fallback_task_) {
+    AERROR << "Create fallback task " << fallback_task_name << " of " << name_
+           << " failed!";
+    return false;
+  }
+  if (!fallback_task_->Init(task_config_dir, fallback_task_name, injector)) {
+    AERROR << fallback_task_name << " init failed!";
+    return false;
   }
   return true;
 }
 
 const std::string& Stage::Name() const { return name_; }
-
-Task* Stage::FindTask(const std::string& task_type) const {
-  auto iter = tasks_.find(task_type);
-  if (iter == tasks_.end()) {
-    return nullptr;
-  } else {
-    return iter->second.get();
-  }
-}
 
 StageResult Stage::ExecuteTaskOnReferenceLine(
     const common::TrajectoryPoint& planning_start_point, Frame* frame) {
@@ -96,14 +107,21 @@ StageResult Stage::ExecuteTaskOnReferenceLine(
   }
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (!reference_line_info.IsDrivable()) {
-      AERROR << "The generated path is not drivable";
-      return stage_result.SetStageStatus(StageStatusType::ERROR);
+      AERROR << "The generated path is not drivable skip";
+      reference_line_info.SetDrivable(false);
+      continue;
     }
 
+    if (reference_line_info.IsChangeLanePath()) {
+      AERROR << "The generated refline is change lane path, skip";
+      reference_line_info.SetDrivable(false);
+      continue;
+    }
+    common::Status ret = common::Status::OK();
     for (auto task : task_list_) {
       const double start_timestamp = Clock::NowInSeconds();
 
-      const auto ret = task->Execute(frame, &reference_line_info);
+      ret = task->Execute(frame, &reference_line_info);
 
       const double end_timestamp = Clock::NowInSeconds();
       const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
@@ -119,22 +137,18 @@ StageResult Stage::ExecuteTaskOnReferenceLine(
         break;
       }
     }
-
-    if (reference_line_info.speed_data().empty()) {
-      *reference_line_info.mutable_speed_data() =
-          SpeedProfileGenerator::GenerateFallbackSpeed(
-              injector_->ego_info(), FLAGS_speed_fallback_distance);
-      reference_line_info.AddCost(kSpeedOptimizationFallbackCost);
-      reference_line_info.set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-    } else {
-      reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
+    // Generate fallback trajectory in case of task error.
+    if (!ret.ok()) {
+      fallback_task_->Execute(frame, &reference_line_info);
     }
     DiscretizedTrajectory trajectory;
     if (!reference_line_info.CombinePathAndSpeedProfile(
             planning_start_point.relative_time(),
             planning_start_point.path_point().s(), &trajectory)) {
-      AERROR << "Fail to aggregate planning trajectory.";
-      return stage_result.SetStageStatus(StageStatusType::ERROR);
+      AERROR << "Fail to aggregate planning trajectory."
+             << reference_line_info.IsChangeLanePath();
+      reference_line_info.SetDrivable(false);
+      continue;
     }
     reference_line_info.SetTrajectory(trajectory);
     reference_line_info.SetDrivable(true);
@@ -200,7 +214,8 @@ StageResult Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
     }
   }
 
-  if (frame->open_space_info().fallback_flag()) {
+  if (frame->open_space_info().fallback_flag() ||
+      frame->open_space_info().stop_flag()) {
     auto& trajectory = frame->open_space_info().fallback_trajectory().first;
     auto& gear = frame->open_space_info().fallback_trajectory().second;
     PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),

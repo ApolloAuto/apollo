@@ -32,6 +32,12 @@ using apollo::common::util::JsonUtil;
 using Json = nlohmann::json;
 using cyber::common::GetProtoFromFile;
 
+std::vector<std::pair<std::string, std::string>> filter_info = {
+    {"perception.PerceptionObstacles", ""},
+    {"drivers.Image", ""},
+    {"PointCloud", "sensor"},
+};
+
 SocketManager::SocketManager(WebSocketHandler *websocket,
                              UpdaterManager *updater_manager)
     : enabled_(false),
@@ -39,6 +45,14 @@ SocketManager::SocketManager(WebSocketHandler *websocket,
       updater_manager_(updater_manager) {
   RegisterDataHandlers();
   RegisterMessageHandlers();
+  channel_manager =
+      apollo::cyber::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
+  auto topology_callback =
+      [this](const apollo::cyber::proto::ChangeMsg &change_msg) {
+        this->RefreshDataUpdaterChannels(change_msg);
+      };
+  channel_manager->AddChangeListener(topology_callback);
 }
 
 void SocketManager::RegisterDataHandlers() {
@@ -97,13 +111,19 @@ bool SocketManager::GetDataUpdaterChannels(const std::string &updater_path,
 
 bool SocketManager::Subscribe(const Json &json) {
   const std::string url = json["data"]["info"]["websocketName"];
-  double time_interval_ms = json["data"]["info"]["dataFrequencyMs"];
+  double time_interval_ms = 0;
+  JsonUtil::GetNumberByPath(json, "data.info.dataFrequencyMs",
+                            &time_interval_ms);
   std::string channel_name;
   if (!JsonUtil::GetStringByPath(json, "data.info.channelName",
                                  &channel_name)) {
     channel_name = "";
   }
-  return updater_manager_->Start(url, time_interval_ms, channel_name);
+  Json subscribe_param = {};
+  std::vector<std::string> json_path = {"data", "info", "param"};
+  JsonUtil::GetJsonByPath(json, json_path, &subscribe_param);
+  return updater_manager_->Start(url, time_interval_ms, channel_name,
+                                 &subscribe_param);
 }
 
 bool SocketManager::UnSubscribe(const Json &json) {
@@ -187,5 +207,35 @@ void SocketManager::BrocastDataHandlerConf(bool clear_channel_msg) {
   response["action"] = "metadata";
   websocket_->BroadcastData(response.dump());
 }
+
+void SocketManager::RefreshDataUpdaterChannels(
+    const apollo::cyber::proto::ChangeMsg &change_msg) {
+  if (::apollo::cyber::proto::RoleType::ROLE_READER == change_msg.role_type())
+    return;
+  auto role_attr = change_msg.role_attr();
+  std::string messageType = role_attr.message_type();
+  std::string node_name = role_attr.node_name();
+  auto iter = filter_info.begin();
+  for (; iter != filter_info.end(); ++iter) {
+    int index = 0;
+    if (!iter->first.empty()) {
+      index = messageType.rfind(iter->first);
+    }
+    int index_channel = 0;
+    if (!iter->second.empty()) {
+      index_channel = role_attr.channel_name().rfind(iter->second);
+    }
+    if (index != -1 && index_channel != -1) {
+      break;
+    }
+  }
+  if (iter == filter_info.end()) return;
+
+  Json response({});
+  response["data"] = GetDataHandlerInfo();
+  response["action"] = "metadata";
+  websocket_->BroadcastData(response.dump());
+}
+
 }  // namespace dreamview
 }  // namespace apollo

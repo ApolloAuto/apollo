@@ -14,8 +14,8 @@ apollo_plugin(
     name = "liblane_borrow_path.so",
     srcs = ["lane_borrow_path.cc"],
     hdrs = ["lane_borrow_path.h"],
-    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",
@@ -23,7 +23,6 @@ apollo_plugin(
         "//modules/planning/tasks/lane_borrow_path/proto:lane_borrow_path_cc_proto",
     ],
 )
-
 
 apollo_package()
 

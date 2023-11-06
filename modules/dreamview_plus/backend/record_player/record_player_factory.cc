@@ -54,6 +54,14 @@ bool RecordPlayerFactory::RegisterRecordPlayer(
   // use play_param struct default value
   // loop playback is not allowed
   play_param.is_loop_playback = false;
+  std::vector<std::string> opt_black_channels;
+  // When using DV play recorder, need to block some real-time channels
+  // to avoid conflicts with real-time DV information.
+  opt_black_channels.push_back("/apollo/hmi/status");
+  opt_black_channels.push_back("/apollo/monitor/system_status");
+  opt_black_channels.push_back("/apollo/cyber/record_info");
+  play_param.black_channels.insert(opt_black_channels.begin(),
+                                 opt_black_channels.end());
   // play_param.play_rate = 1.0f;
   // play_param.begin_time_ns = 0;
   // play_param.end_time_ns = std::numeric_limits<uint64_t>::max();

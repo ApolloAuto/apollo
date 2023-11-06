@@ -68,7 +68,6 @@ class Dreamview {
   std::unique_ptr<cyber::Timer> exit_timer_;
 
   std::unique_ptr<PointCloudUpdater> point_cloud_updater_;
-  std::unique_ptr<SimControlManager> sim_control_manager_;
   std::unique_ptr<CivetServer> server_;
   std::unique_ptr<WebSocketHandler> websocket_ = nullptr;
   std::unique_ptr<WebSocketHandler> map_ws_ = nullptr;

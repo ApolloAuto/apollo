@@ -48,9 +48,8 @@ bool ControlComponent::Init() {
       cyber::common::GetProtoFromFile(FLAGS_pipeline_file, &control_pipeline_))
       << "Unable to load control pipeline file: " + FLAGS_pipeline_file;
 
-  AINFO << "Conf file: " << FLAGS_pipeline_file << " is loaded.";
-
-  AINFO << "Conf file: " << ConfigFilePath() << " is loaded.";
+  AINFO << "ControlTask pipeline config file: " << FLAGS_pipeline_file
+        << " is loaded.";
 
   // initial controller agent when not using control submodules
   ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
@@ -77,6 +76,16 @@ bool ControlComponent::Init() {
   trajectory_reader_ =
       node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
   ACHECK(trajectory_reader_ != nullptr);
+
+  cyber::ReaderConfig planning_command_status_reader_config;
+  planning_command_status_reader_config.channel_name =
+      FLAGS_planning_command_status;
+  planning_command_status_reader_config.pending_queue_size =
+      FLAGS_planning_status_msg_pending_queue_size;
+  planning_command_status_reader_ =
+      node_->CreateReader<external_command::CommandStatus>(
+          planning_command_status_reader_config, nullptr);
+  ACHECK(planning_command_status_reader_ != nullptr);
 
   cyber::ReaderConfig localization_reader_config;
   localization_reader_config.channel_name = FLAGS_localization_topic;
@@ -139,6 +148,15 @@ void ControlComponent::OnPlanning(
   ADEBUG << "Received chassis data: run trajectory callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_trajectory_.CopyFrom(*trajectory);
+}
+
+void ControlComponent::OnPlanningCommandStatus(
+    const std::shared_ptr<external_command::CommandStatus>
+        &planning_command_status) {
+  ADEBUG << "Received plannning command status data: run planning command "
+            "status callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  planning_command_status_.CopyFrom(*planning_command_status);
 }
 
 void ControlComponent::OnLocalization(
@@ -295,7 +313,6 @@ bool ControlComponent::Proc() {
     AERROR << "Chassis msg is not ready!";
     return false;
   }
-
   OnChassis(chassis_msg);
 
   trajectory_reader_->Observe();
@@ -309,6 +326,16 @@ bool ControlComponent::Proc() {
       OnPlanning(trajectory_msg);
     }
   }
+
+  planning_command_status_reader_->Observe();
+  const auto &planning_status_msg =
+      planning_command_status_reader_->GetLatestObserved();
+  if (planning_status_msg != nullptr) {
+    OnPlanningCommandStatus(planning_status_msg);
+    ADEBUG << "Planning command status msg is \n"
+           << planning_command_status_.ShortDebugString();
+  }
+  injector_->Set_planning_command_status(planning_command_status_);
 
   localization_reader_->Observe();
   const auto &localization_msg = localization_reader_->GetLatestObserved();
@@ -433,6 +460,10 @@ bool ControlComponent::Proc() {
         local_view_.trajectory().header().lidar_timestamp(), start_time,
         end_time);
   }
+
+  // save current control command
+  injector_->Set_pervious_control_command(&control_command);
+
   control_cmd_writer_->Write(control_command);
   return true;
 }

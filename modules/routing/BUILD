@@ -46,6 +46,7 @@ apollo_cc_library(
         "strategy/a_star_strategy.h",
         "strategy/strategy.h",
     ],
+    copts = ROUTING_COPTS,
     deps = [
         "//modules/common_msgs/map_msgs:map_lane_cc_proto",
         "//modules/common/util:util_tool",

@@ -8,6 +8,7 @@ apollo_plugin(
     srcs = ["lane_follow_command_processor.cc"],
     hdrs = ["lane_follow_command_processor.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"external_command\\\""],
     deps = [
         "//cyber",
         "//modules/external_command/command_processor/command_processor_base:motion_command_processor_base_lib",

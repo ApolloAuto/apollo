@@ -51,7 +51,9 @@ bool Frame::DumpToFile(const std::string& routine_name) {
   ALOG_MODULE(kModuleName, INFO) << "Frame : " << routine_name;
   for (const Block& block : storage_) {
     ALOG_MODULE(kModuleName, INFO)
-        << block.depth() << "," << block.name() << "," << block.duration();
+        << block.depth() << "," << block.name() << "," << block.duration()
+        << "," << block.begin_time_since_epoch()
+        << "," << block.end_time_since_epoch();
   }
   return true;
 }

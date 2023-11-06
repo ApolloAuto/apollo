@@ -50,7 +50,6 @@ class MultiSensorFusionComponent : public cyber::Component<SensorFrameMessage> {
   static std::mutex s_mutex_;
   static uint32_t s_seq_num_;
 
-  std::string fusion_main_sensor_;
   bool object_in_roi_check_ = false;
   double radius_for_roi_object_check_ = 0;
 

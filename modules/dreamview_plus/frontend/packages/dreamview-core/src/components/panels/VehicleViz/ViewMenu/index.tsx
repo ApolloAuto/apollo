@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useStyle from '../useStyle';
 
-export default function ViewMenu(props: any) {
+function ViewMenu(props: any) {
     const { carviz, setCurrentView } = props;
     const { classes, cx } = useStyle();
     const [view, setView] = useState('Default');
@@ -51,3 +51,5 @@ export default function ViewMenu(props: any) {
         </div>
     );
 }
+
+export default React.memo(ViewMenu);

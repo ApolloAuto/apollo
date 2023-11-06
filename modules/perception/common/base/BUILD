@@ -23,6 +23,7 @@ apollo_cc_library(
         "distortion_model.h",
         "frame.h",
         "point_cloud.h",
+        "radar_point_cloud.h",
         "frame_supplement.h",
         "object_pool_types.h",
         "image.h",

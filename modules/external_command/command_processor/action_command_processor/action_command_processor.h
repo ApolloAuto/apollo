@@ -29,6 +29,7 @@
 #include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/planning_msgs/pad_msg.pb.h"
 #include "modules/external_command/command_processor/action_command_processor/proto/action_command_config.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/external_command/command_processor/command_processor_base/command_processor_base.h"
@@ -37,6 +38,7 @@ namespace apollo {
 namespace external_command {
 
 class MessageReader;
+class WriterHandle;
 
 class ActionCommandProcessor : public CommandProcessorBase {
  public:
@@ -104,10 +106,8 @@ class ActionCommandProcessor : public CommandProcessorBase {
 
   std::shared_ptr<cyber::Service<ActionCommand, CommandStatus>>
       command_service_;
-  std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
-      planning_action_writer_;
-  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>>
-      control_action_writer_;
+  std::shared_ptr<WriterHandle> planning_action_writer_;
+  std::shared_ptr<WriterHandle> control_action_writer_;
 
   CommandStatus last_mode_switch_status_;
   std::shared_ptr<ActionCommand> last_command_;

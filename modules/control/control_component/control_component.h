@@ -22,6 +22,7 @@
 #include "modules/common_msgs/chassis_msgs/chassis.pb.h"
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
+#include "modules/common_msgs/external_command_msgs/command_status.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
 #include "modules/control/control_component/proto/preprocessor.pb.h"
@@ -66,6 +67,10 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   void OnPlanning(
       const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
 
+  void OnPlanningCommandStatus(
+      const std::shared_ptr<external_command::CommandStatus>
+          &planning_command_status);
+
   void OnLocalization(
       const std::shared_ptr<apollo::localization::LocalizationEstimate>
           &localization);
@@ -86,6 +91,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   localization::LocalizationEstimate latest_localization_;
   canbus::Chassis latest_chassis_;
   planning::ADCTrajectory latest_trajectory_;
+  external_command::CommandStatus planning_command_status_;
   PadMessage pad_msg_;
   common::Header latest_replan_trajectory_header_;
 
@@ -110,6 +116,8 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
       localization_reader_;
   std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
       trajectory_reader_;
+  std::shared_ptr<cyber::Reader<apollo::external_command::CommandStatus>>
+      planning_command_status_reader_;
 
   std::shared_ptr<cyber::Writer<ControlCommand>> control_cmd_writer_;
   // when using control submodules

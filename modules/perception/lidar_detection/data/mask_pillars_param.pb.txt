@@ -1,7 +1,7 @@
 # mask pillars params
 
 info {
-  name: "mask_pillars"
+  name: "mask_pillars_torch"
   version: ""
   dataset: "waymo"
   task_type: Detection3D

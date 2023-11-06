@@ -134,6 +134,15 @@ class ScenarioResult {
    */
   const ScenarioResult& SetStageResult(const StageResult& stage_result);
   /**
+   * @brief Set the stage status.
+   * @param stage_status The stage status.
+   * @param message Stage message.
+   *
+   * @param stage_result The stage result.
+   */
+  const ScenarioResult& SetStageResult(const StageStatusType& stage_status,
+                                       const std::string& message);
+  /**
    * @brief Set the scenario status.
    *
    * @param scenario_status The scenario status.

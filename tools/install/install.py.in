@@ -116,7 +116,7 @@ def generate_pack_file(meta_path):
             c = f.split(":")[-1]
             if c.startswith("bin"):
                 bin_files.append(c)
-    
+
     config_path = os.path.join(prefix, "share", src_path)
     binaries = ["{}/{}".format(prefix, f) for f in bin_files]
     include_path = os.path.join(prefix, "include", src_path)
@@ -127,21 +127,21 @@ def generate_pack_file(meta_path):
 
     process_file_path = [
         config_path, include_path,
-        library_path, python_path, source_path, 
-        meta_package_path] + binaries 
+        library_path, python_path, source_path,
+        meta_package_path] + binaries
 
     if package_name in plugins_meta:
         for plugin_info in plugins_meta[package_name]:
-            plugin_lib_path = os.path.join(prefix, 
+            plugin_lib_path = os.path.join(prefix,
                 "lib", plugin_info["plugin_src_path"])
             cyber_plugin_index_file = os.path.join(
-                prefix, "share/cyber_plugin_index", 
+                prefix, "share/cyber_plugin_index",
                 plugins[os.path.join(
-                    "share", plugin_info["plugin_src_path"], 
+                    "share", plugin_info["plugin_src_path"],
                     plugin_info["description_file_name"])])
             process_file_path.append(plugin_lib_path)
             process_file_path.append(cyber_plugin_index_file)
-        
+
     preinst_extend_ops = []
     postinst_extend_ops = []
     for r, _, files in os.walk(config_path):
@@ -150,7 +150,7 @@ def generate_pack_file(meta_path):
             conf_dst = os.path.join("/apollo", os.path.join(r, f).replace(
                             os.path.join(prefix, "share") + "/", ""))
             conf_base = os.path.abspath(os.path.dirname(conf_dst))
-            
+
             shell_script = "if [ ! -e '{dst}' ]; then " \
                            "mkdir -p '{base}' && ln -snf '{src}' '{dst}'; " \
                            "fi".format(src=conf_src, dst=conf_dst, base=conf_base)
@@ -163,7 +163,7 @@ def generate_pack_file(meta_path):
     for i in process_file_path:
         if os.path.exists(i):
             data.append({"src": i, "des": i})
-    
+
     content = {
         "name": package_name,
         "ver": version,
@@ -178,7 +178,7 @@ def generate_pack_file(meta_path):
         "type": "neo"
     }
 
-    with open(os.path.join(meta_path, "pack.json"), "w+") as f:            
+    with open(os.path.join(meta_path, "pack.json"), "w+") as f:
         f.write(json.dumps(content, indent=4))
 
 
@@ -294,6 +294,8 @@ def copy_or_link(src, dst):
     Copy the input file to the destination if it is not a relative link. If the
     file is a relative link, create a similar link in the destination folder.
     """
+    if not Path(src).exists():
+        return
     relative_link = is_relative_link(src)
     if relative_link:
         if Path(dst).exists() or Path(dst).is_symlink():
@@ -303,7 +305,7 @@ def copy_or_link(src, dst):
         shutil.copy2(src, dst)
 
 
-def install(src, dst, action_type=None, 
+def install(src, dst, action_type=None,
     package_path=None, shared_library_export=None, target_name=None):
     global subdirs
     global meta
@@ -338,7 +340,7 @@ def install(src, dst, action_type=None,
                 print("\033[31m[ERROR]\033[0m orphan install file: {} -> {}".format(
                     src, dst), file=sys.stderr)
                 exit(-1)
-        
+
         if shared_library_export is not None and target_name is not None:
             if package_path not in export_library_dict:
                 export_library_dict[package_path] = [{"target": target_name, "dst": dst}]
@@ -358,15 +360,15 @@ def install(src, dst, action_type=None,
 
         package_name = root.find("name").text
         dst = "{}/{}/cyberfile.xml".format(meta_prefix, package_name)
-    
+
     elif not deprecated_flag and dst.startswith("plugin_meta"):
         global plugins_meta
         path_list = src.replace("/plugins.xml", "").split("/")
-        cyberfile_src_path = None 
+        cyberfile_src_path = None
         for i in range(1, len(path_list)+1):
             temp_path = "/".join(path_list[: i])
             if os.path.exists(os.path.join(temp_path, "cyberfile.xml")):
-                cyberfile_src_path = os.path.join(temp_path, "cyberfile.xml") 
+                cyberfile_src_path = os.path.join(temp_path, "cyberfile.xml")
                 break
         if cyberfile_src_path is None:
             print("\033[31m[ERROR]\033[0m missing package info of {}".format(src), file=sys.stderr)
@@ -377,22 +379,22 @@ def install(src, dst, action_type=None,
         package_name = root.find("name").text
         plugin_src_path = dst.split("@")[1]
         description_file_name = dst.split("@")[-1]
-        
+
         if package_name not in plugins_meta:
             plugins_meta[package_name] = [{
                 "plugin_src_path": plugin_src_path,
-                "description_file_name": description_file_name 
-            }] 
+                "description_file_name": description_file_name
+            }]
         else:
             plugins_meta[package_name].append({
                 "plugin_src_path": plugin_src_path,
-                "description_file_name": description_file_name 
+                "description_file_name": description_file_name
             })
-        
+
         return
         # dst = "{}/{}/{}/{}".format(
         #     meta_prefix, package_name, plugin_meta,
-        #     "".format(plugin_src_path, description_file_name)) 
+        #     "".format(plugin_src_path, description_file_name))
 
     # Do not install files in ${prefx}/lib dir
     # if not install_lib and dst.startswith("lib/"):
@@ -449,7 +451,7 @@ def install(src, dst, action_type=None,
                 #     # remove it from lib/
                 #     os.remove(pre_full_dst)
                 if dst_full not in libraries_to_fix_rpath[basename]:
-                    libraries_to_fix_rpath[basename].append(dst_full) 
+                    libraries_to_fix_rpath[basename].append(dst_full)
             else:
                 libraries_to_fix_rpath[basename] = [dst_full]
     elif may_be_binary(dst_full):  # May be an executable.
@@ -499,13 +501,62 @@ def create_package_meta(prefix):
                 target_name_prefix = "/".join(
                     path_list[1: len(path_list)-1]).replace("/", "_S")
 
-                ldd_query = "ldd {}".format(os.path.join(prefix, dst)) + " | awk '{print $1}'"
-                ld_so = subprocess.check_output(
+                ldd_query = "ldd {}".format(os.path.join(prefix, dst))
+                elf_query = "patchelf --print-needed {}".format(os.path.join(prefix, dst))
+
+                ld_result = subprocess.check_output(
                     ldd_query, shell=True).decode("utf-8").split("\n")
+                
+                if "not found" in ld_result:
+                    print("[WARNNING] missing dynamic library in ld, try refreash ld cache")
+                    update_sh = os.path.join(prefix, "update_dylib.sh")
+                    ld_cache = os.path.join(prefix, "ld.cache") 
+                    if os.path.exists(update_sh):
+                        subprocess.check_output(
+                            "rm -f {} && bash {}".format(ld_cache, update_sh), shell=True).decode("utf-8").split("\n")
+                    else:
+                        print("\033[31m[ERROR]\033[0m missing dynamic library when processing {}".format(dst))
+                        exit(-1)    
+
+                shared_obj_dict = {}
+                ld_path = []
+                for i in ld_result:
+                    items = i.split(" ")
+                    library_name = items[0].replace("\t", "")
+                    if library_name.startswith("/"):
+                        system_library_name = library_name.split("/")[-1]
+                        shared_obj_dict[system_library_name] = None
+                    if len(items) < 3:
+                        continue
+                    if library_name in shared_obj_dict:
+                        print("\033[31m[ERROR]\033[0m duplicated apollo_cc_library found: {}".format(
+                            dst), file=sys.stderr)
+                        exit(-1)
+                    shared_obj_dict[library_name] = items[2]
+
+                needed_so = subprocess.check_output(
+                    elf_query, shell=True).decode("utf-8").split("\n")
+                needed_so = list(filter(None, needed_so))
+                for i in needed_so:
+                    if shared_obj_dict[i] is None:
+                        continue
+                    if i.startswith("lib") and i.endswith(".so"):
+                        ld_path.append(shared_obj_dict[i])
+
+                link_paths = []
+                for i in ld_path:
+                    if i.startswith("/opt/apollo/neo/lib") and not i.startswith("/opt/apollo/neo/lib/3rd-"):
+                        i = "/".join(i.split("/")[0: len(i.split("/"))-1])
+                        link_paths.append('"-L{}"'.format(i))
+
                 link_opts = []
-                for so_lib in ld_so:
+                for so_lib in needed_so:
                     if so_lib.startswith("lib") and so_lib.endswith(".so"):
                         link_opts.append('"-l{}"'.format(so_lib[3: len(so_lib)-3]))
+                link_opts.sort()
+                link_paths = list(set(link_paths))
+                link_paths.sort()
+                link_opts = link_paths + link_opts
                 link_opts_str = ",".join(link_opts)
 
                 package_build_content.append(
@@ -515,11 +566,17 @@ def create_package_meta(prefix):
         build_content = EMPTY_BUILD_TMP.format(
             pkg_name, package_path, package_path)
 
-        with open(
-            os.path.join(
-                package_index_path, "{}.BUILD".format(pkg_name)), "w+") as f:
-            f.write(
-                "\n".join([build_content] + package_build_content))
+        import_file = os.path.join(package_index_path,
+                            "{}.BUILD".format(pkg_name))
+        if os.path.exists(import_file):
+            with open(import_file, "r") as f:
+                content = f.read()
+            if not content == "\n".join([build_content] + package_build_content):
+                with open(import_file, "w+") as f:
+                    f.write("\n".join([build_content] + package_build_content))
+        else:
+            with open(import_file, "w+") as f:
+                f.write("\n".join([build_content] + package_build_content))
 
         generate_pack_file(package_index_path)
 
@@ -575,7 +632,7 @@ def install_plugin_description(name, src, dst):
         #TODO(lanyongshun): interim method
         if basename in libraries_to_fix_rpath:
             if dst_full not in libraries_to_fix_rpath[basename]:
-                libraries_to_fix_rpath[basename].append(dst_full) 
+                libraries_to_fix_rpath[basename].append(dst_full)
         else:
             libraries_to_fix_rpath[basename] = [dst_full]
 
@@ -583,23 +640,31 @@ def fix_rpaths_and_strip():
     # Add binary executables to list of files to be fixed up:
     find_binary_executables()
     # Only fix files that are installed now.
-    fix_items = itertools.chain(
-        libraries_to_fix_rpath.items(), binaries_to_fix_rpath)
-    for basename, dst_list in fix_items:
-        for dst_full in dst_list:
-            if os.path.islink(dst_full):
-                # Skip files that are links. However, they need to be in the
-                # dictionary to fixup other library and executable paths.
-                continue
-            # Enable write permissions to allow modification.
-            os.chmod(dst_full, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
-                    | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-            # Strip before running `patchelf`. Trying to strip after patching
-            # the files is likely going to create the following error:
-            # 'Not enough room for program headers, try linking with -N'
-            # if strip:
-            #     check_call([strip_tool, dst_full])
-            linux_fix_rpaths(dst_full)
+    fix_items = [] 
+    for k in libraries_to_fix_rpath:
+        fix_items += libraries_to_fix_rpath[k]
+
+    for i in range(len(binaries_to_fix_rpath)):
+        fix_items += binaries_to_fix_rpath[i][1] 
+
+    for dst_full in fix_items:
+        if os.path.islink(dst_full):
+            # Skip files that are links. However, they need to be in the
+            # dictionary to fixup other library and executable paths.
+            continue
+        # Enable write permissions to allow modification.
+        os.chmod(dst_full, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+                | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        # Strip before running `patchelf`. Trying to strip after patching
+        # the files is likely going to create the following error:
+        # 'Not enough room for program headers, try linking with -N'
+        # if strip:
+        #     check_call([strip_tool, dst_full])
+        py_bin_path = os.path.join(prefix, "bin")
+        # skip py runfiles fix rpath
+        if dst_full.startswith(py_bin_path) and ".runfiles" in dst_full:
+            continue
+        linux_fix_rpaths(dst_full)
 
 
 def linux_fix_rpaths_old(dst_full):
@@ -827,11 +892,11 @@ def main(args):
     # Execute the install actions.
     <<actions>>
 
-    create_package_meta(prefix) 
     # Libraries paths may need to be updated in libraries and executables.
     if fix_rpath:
         fix_rpaths_and_strip()
 
+    create_package_meta(prefix)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

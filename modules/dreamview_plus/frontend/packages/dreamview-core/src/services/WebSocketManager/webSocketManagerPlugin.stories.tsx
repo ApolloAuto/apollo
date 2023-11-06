@@ -192,9 +192,11 @@ function WebSocketManagerStory() {
                 </Button>
                 <Button
                     onClick={() => {
-                        pluginApi?.downloadScenarioSet('639323199c8b315fe0a3be36').subscribe((res) => {
-                            logger.info(res);
-                        });
+                        pluginApi
+                            ?.downloadScenarioSet('639323199c8b315fe0a3be36', '639323199c8b315fe0a3be36')
+                            .subscribe((res) => {
+                                logger.info(res);
+                            });
                     }}
                 >
                     downloadScenarioSet

@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.canbus;
 
+import "google/protobuf/any.proto";
 import "modules/common_msgs/basic_msgs/drive_state.proto";
 import "modules/common_msgs/basic_msgs/geometry.proto";
 import "modules/common_msgs/basic_msgs/header.proto";
@@ -151,6 +152,9 @@ message Chassis {
   optional BumperEvent back_bumper_event = 39;
 
   optional CheckResponse check_response = 40;
+
+  // Custom chassis operation command defined by user for extensibility.
+  optional google.protobuf.Any custom_status = 41;
 }
 
 message ChassisGPS {

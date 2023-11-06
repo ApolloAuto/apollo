@@ -1,8 +1,33 @@
 import Logger from '@dreamview/log';
+import { apollo } from '@dreamview/dreamview';
 import { webSocketManager } from '../WebSocketManager';
 import { ReqDataType, RequestDataType } from '../models/request-message.model';
-import { HMIActions, HMIDataPayload, MainApiTypes } from './types';
+import {
+    HMIActions,
+    HMIDataPayload,
+    MainApiTypes,
+    DefaultRoutings,
+    StartScenario,
+    SaveDefaultRoutingInfo,
+    GetStartPointInfo,
+    SetStartPointInfo,
+    CheckCycleRoutingInfo,
+    IsCheckCycleRouting,
+    CheckRoutingPointInfo,
+    CheckRoutingPointLegal,
+    SendRoutingRequestInfo,
+    SendDefaultCycleRoutingRequestInfo,
+    SendParkingRoutingRequestInfo,
+    GetMapElementIdsInfo,
+    GetMapElementsByIdsInfo,
+    HMIActionsOperationInfo,
+    StartCycle,
+    HDMapSwitchInfo,
+} from './types';
 import { Metadata, SocketNameEnum } from '../WebSocketManager/type';
+
+type IMapElementIds = apollo.dreamview.IMapElementIds;
+type IMap = apollo.hdmap.IMap;
 
 const logger = Logger.getInstance(__filename);
 
@@ -85,6 +110,52 @@ export class MainApi {
         });
     }
 
+    // 开始录制数据包
+    startRecordPackets() {
+        return this.requestWithoutRes<undefined>({
+            data: {
+                name: '',
+                info: undefined,
+            },
+            type: MainApiTypes.StartRecordPackets,
+        });
+    }
+
+    // 停止录制
+    stopRecordPackets() {
+        return this.requestWithoutRes<undefined>({
+            data: {
+                name: '',
+                info: undefined,
+            },
+            type: MainApiTypes.StopRecordPackets,
+        });
+    }
+
+    // 保存录制内容
+    saveRecordPackets(newName: string) {
+        return this.request<{ newName: string }, any>({
+            data: {
+                name: '',
+                info: {
+                    newName,
+                },
+            },
+            type: MainApiTypes.SaveRecordPackets,
+        });
+    }
+
+    // 删除录制内容
+    deleteRecordPackets() {
+        return this.requestWithoutRes<undefined>({
+            data: {
+                name: '',
+                info: undefined,
+            },
+            type: MainApiTypes.DeleteRecordPackets,
+        });
+    }
+
     resetRecordProgress(info: { progress: number }) {
         return this.requestWithoutRes<{ progress: string }>({
             data: {
@@ -122,6 +193,33 @@ export class MainApi {
         });
     }
 
+    // 和changeScenarios合并为一个接口
+    // changeScenariosSet(scenariosSetId: string) {
+    //     return this.requestWithoutRes<HMIDataPayload>({
+    //         data: {
+    //             name: '',
+    //             info: {
+    //                 action: HMIActions.ChangeScenariosSet,
+    //                 value: scenariosSetId,
+    //             },
+    //         },
+    //         type: MainApiTypes.HMIAction,
+    //     });
+    // }
+
+    changeScenarios(scenariosId: string, scenariosSetId: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.ChangeScenarios,
+                    value: `${scenariosSetId},${scenariosId}`,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
     changeSetupMode(mode: string) {
         return this.requestWithoutRes<HMIDataPayload>({
             data: {
@@ -136,7 +234,7 @@ export class MainApi {
     }
 
     changeMap(map: string) {
-        return this.requestWithoutRes<HMIDataPayload>({
+        return this.request<HMIDataPayload, HDMapSwitchInfo>({
             data: {
                 name: '',
                 info: {
@@ -162,7 +260,7 @@ export class MainApi {
     }
 
     changeOperation(operation: string) {
-        return this.requestWithoutRes<HMIDataPayload>({
+        return this.request<HMIDataPayload, HMIActionsOperationInfo>({
             data: {
                 name: '',
                 info: {
@@ -200,6 +298,19 @@ export class MainApi {
         });
     }
 
+    deleteHDMap(record: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.DeleteHDMap,
+                    value: record,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
     deleteVehicleConfig(vehicleName: string) {
         return this.requestWithoutRes<HMIDataPayload>({
             data: {
@@ -207,6 +318,19 @@ export class MainApi {
                 info: {
                     action: HMIActions.DeleteVehicle,
                     value: vehicleName,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    deleteScenarioSet(id: string) {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.DeleteScenarios,
+                    value: id,
                 },
             },
             type: MainApiTypes.HMIAction,
@@ -232,6 +356,18 @@ export class MainApi {
                 name: '',
                 info: {
                     action: HMIActions.LoadRecords,
+                },
+            },
+            type: MainApiTypes.HMIAction,
+        });
+    }
+
+    loadScenarios() {
+        return this.requestWithoutRes<HMIDataPayload>({
+            data: {
+                name: '',
+                info: {
+                    action: HMIActions.LoadScenarios,
                 },
             },
             type: MainApiTypes.HMIAction,
@@ -315,6 +451,210 @@ export class MainApi {
                 info: '',
             },
             type: MainApiTypes.GetDataHandlerConf,
+        });
+    }
+
+    triggerPncMonitor(planning: boolean) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    planning,
+                },
+            },
+            type: MainApiTypes.TriggerPncMonitor,
+        });
+    }
+
+    getDefaultRoutings() {
+        return this.request<'', DefaultRoutings>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.GetDefaultRoutings,
+        });
+    }
+
+    startCycle(info: StartCycle) {
+        return this.request<StartCycle, any>({
+            data: {
+                name: '',
+                info,
+            },
+            type: MainApiTypes.SendDefaultCycleRoutingRequest,
+        });
+    }
+
+    startScenario(info: StartScenario) {
+        return this.request<StartScenario, any>({
+            data: {
+                name: '',
+                info,
+            },
+            type: MainApiTypes.SendScenarioSimulationRequest,
+        });
+    }
+
+    stopScenario() {
+        return this.requestWithoutRes<any>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.StopScenarioSimulation,
+        });
+    }
+
+    deleteDefaultRouting(name: string) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    name,
+                },
+            },
+            type: MainApiTypes.DeleteDefaultRouting,
+        });
+    }
+
+    saveDefaultRouting(info: SaveDefaultRoutingInfo) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.SaveDefaultRouting,
+        });
+    }
+
+    getStartPoint() {
+        return this.request<'', GetStartPointInfo>({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.GetStartPoint,
+        });
+    }
+
+    setStartPoint(info: SetStartPointInfo) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.SetStartPoint,
+        });
+    }
+
+    setResetPoint() {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: '',
+            },
+            type: MainApiTypes.SetStartPoint,
+        });
+    }
+
+    checkCycleRouting(info: CheckCycleRoutingInfo) {
+        return this.request<CheckCycleRoutingInfo, IsCheckCycleRouting>({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.CheckCycleRouting,
+        });
+    }
+
+    checkRoutingPoint(info: CheckRoutingPointInfo) {
+        return this.request<CheckRoutingPointInfo, CheckRoutingPointLegal>({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.CheckRoutingPoint,
+        });
+    }
+
+    sendRoutingRequest(info: SendRoutingRequestInfo) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.SendRoutingRequest,
+        });
+    }
+
+    resetSimControl() {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {},
+            },
+            type: MainApiTypes.ResetSimControl,
+        });
+    }
+
+    sendDefaultCycleRoutingRequest(info: SendDefaultCycleRoutingRequestInfo) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.SendDefaultCycleRoutingRequest,
+        });
+    }
+
+    sendParkingRoutingRequest(info: SendParkingRoutingRequestInfo) {
+        return this.requestWithoutRes({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.SendParkingRoutingRequest,
+        });
+    }
+
+    getMapElementIds(info: GetMapElementIdsInfo) {
+        return this.request<GetMapElementIdsInfo, IMapElementIds>({
+            data: {
+                name: '',
+                info: {
+                    ...info,
+                },
+            },
+            type: MainApiTypes.GetMapElementIds,
+        });
+    }
+
+    getMapElementsByIds(mapElementIds: IMapElementIds) {
+        return this.request<GetMapElementsByIdsInfo, IMap>({
+            data: {
+                name: '',
+                info: {
+                    param: {
+                        mapElementIds,
+                    },
+                },
+            },
+            type: MainApiTypes.GetMapElementsByIds,
         });
     }
 }

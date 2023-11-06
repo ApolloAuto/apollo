@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
 #include <NvInferVersion.h>
+
+#include <vector>
 
 #include "modules/perception/common/inference/tensorrt/plugins/slice_plugin.h"
 
@@ -47,8 +48,9 @@ __global__ void Slice(const int nthreads, const Dtype *in_data,
 int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
                          void **outputs, void *workspace, cudaStream_t stream) {
 #else
-int32_t SLICEPlugin::enqueue(int32_t batchSize, const void *const *inputs,
-                         void *const *outputs, void *workspace, cudaStream_t stream) noexcept {
+int SLICEPlugin::enqueue(int batchSize, const void *const *inputs,
+                         void *const *outputs, void *workspace,
+                         cudaStream_t stream) noexcept {
 #endif
 #endif
   int slice_size = 1;

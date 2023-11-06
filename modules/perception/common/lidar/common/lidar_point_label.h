@@ -27,6 +27,19 @@ enum class LidarPointLabel {
   MAX_LABEL,
 };  // enum class LidarPointLabel
 
+enum class PointSemanticLabel {
+  UNKNOWN = 0,
+  IGNORE = 1,
+  GROUND = 2,
+  OBJECT = 3,
+  CURB = 4,
+  VEGETATION = 5,
+  FENCE = 6,
+  NOISE = 7,
+  WALL = 8,
+  MAX_LABEL,
+};  // enum class PointSemanticLabel
+
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

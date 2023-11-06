@@ -1,21 +1,27 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import Carviz from '@dreamview/dreamview-carviz/src/index';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { Carviz } from '@dreamview/dreamview-carviz/src';
 import { Popover, IconIcCoverageHover } from '@dreamview/dreamview-ui';
-import { useTranslation } from 'react-i18next';
 import shortUUID from 'short-uuid';
 import type { apollo } from '@dreamview/dreamview';
+import { SimpleRouter, KeepAlive, Route } from '@dreamview/dreamview-core/src/util/SimpleRouter';
+import { usePickHmiStore } from '@dreamview/dreamview-core/src/store/HmiStore';
+import { StreamDataNames } from '@dreamview/dreamview-core/src/services/api/types';
 import useStyle from './useStyle';
 import LayerMenu from './LayerMenu';
 import ViewMenu from './ViewMenu';
 import ViewBtn from './ViewBtn';
 import { usePanelContext } from '../base/store/PanelStore';
-import { usePickHmiStore } from '../../../store/HmiStore';
 import { formatLayerParams, getCurrentLayerParams } from './LayerMenu/params';
 import Panel from '../base/Panel';
-import { StreamDataNames } from '../../../services/api/types';
 import { isMac, isWin } from './util';
 import './index.less';
+import { RoutingEditingOpArea } from './RoutingEditing';
+import { Editor } from './RoutingEditing/Editor';
 import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
+import { VizProvider, useVizStore } from './VizStore';
+import { initRouteManager } from './VizStore/actions';
+import { RouteManager } from './RoutingEditing/RouteManager';
+import { RouteOrigin, RoutePoint } from './RoutingEditing/RouteManager/type';
 
 type ISimulationWorld = apollo.dreamview.ISimulationWorld;
 type IMap = apollo.hdmap.IMap;
@@ -25,44 +31,51 @@ function Viz() {
     const panelContext = usePanelContext();
     const [hmi] = usePickHmiStore();
     const [uid] = useState(shortUUID.generate);
-    const { initSubscription, logger, updateChannel } = panelContext;
+    const { initSubscription, updateChannel } = panelContext;
     const { classes } = useStyle();
     const [currentView, setCurrentView] = useState('D');
     const [carviz] = useState(() => new Carviz(uid));
-    const { t } = useTranslation('viewMenu');
+
+    const animationFrameIdRef = useRef<number>();
+
+    const render = () => {
+        carviz.render();
+        animationFrameIdRef.current = requestAnimationFrame(render);
+    };
 
     useEffect(() => {
         initSubscription({
             [StreamDataNames.SIM_WORLD]: {
-                consumer: (simDdata) => {
-                    if (!simDdata) return;
-                    if (Object.keys(simDdata).length !== 0) {
-                        carviz.updateData(simDdata);
-                        carviz.render();
+                consumer: (simData: ISimulationWorld) => {
+                    if (!simData) return;
+                    if (Object.keys(simData).length !== 0) {
+                        carviz.updateData(simData);
+                        carviz?.pointCloud.updateOffsetPosition();
                     }
                 },
             },
             [StreamDataNames.Map]: {
-                consumer: (mapData) => {
+                consumer: (mapData: IMap) => {
                     if (!mapData) return;
-                    const data = {
-                        map: mapData,
-                    };
-                    carviz?.updateData(data);
-                    carviz.render();
+                    carviz?.updateMap(mapData);
                 },
             },
             [StreamDataNames.POINT_CLOUD]: {
-                consumer: (pointData) => {
+                consumer: (pointData: IPointCloud) => {
                     if (!pointData) return;
-                    const data = {
-                        pointCloud: pointData,
-                    };
-                    carviz?.updateData(data);
-                    carviz.render();
+                    carviz?.updatePointCloud(pointData);
                 },
             },
         });
+
+        render();
+
+        return () => {
+            const animationFrameId = animationFrameIdRef.current;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
     }, []);
 
     useEffect(() => {
@@ -127,49 +140,94 @@ function Viz() {
         }
     }, [metadata, pointCloudCurrentVisible, pointCloudFusionChannel]);
 
-    useEffect(() => {
-        carviz?.removeAll();
-    }, [hmi.currentRecordId]);
     return (
         <div className={classes['viz-container']}>
             <div id={uid} className={classes['web-gl']} />
             <div className={classes['viz-btn-container']}>
-                <Popover
-                    placement='leftTop'
-                    content={<LayerMenu carviz={carviz} pointCloudFusionChannel={pointCloudFusionChannel} />}
-                    trigger='click'
-                >
-                    <span className={classes['viz-btn-item']}>
-                        <IconIcCoverageHover />
-                    </span>
-                </Popover>
-
-                <Popover
-                    overlayClassName={classes['layer-menu-popover']}
-                    placement='leftBottom'
-                    content={<ViewMenu carviz={carviz} setCurrentView={setCurrentView} />}
-                    trigger='click'
-                    style={{ padding: '0 !importent' }}
-                >
-                    <span className={classes['viz-btn-item']}>{currentView}</span>
-                </Popover>
-                <ViewBtn carviz={carviz} />
+                <ViewBtn carviz={carviz}>
+                    <Popover
+                        placement='leftTop'
+                        content={<LayerMenu carviz={carviz} pointCloudFusionChannel={pointCloudFusionChannel} />}
+                        trigger='click'
+                    >
+                        <span className={classes['viz-btn-item']}>
+                            <IconIcCoverageHover />
+                        </span>
+                    </Popover>
+                    <Popover
+                        overlayClassName={classes['layer-menu-popover']}
+                        placement='leftBottom'
+                        content={<ViewMenu carviz={carviz} setCurrentView={setCurrentView} />}
+                        trigger='click'
+                        style={{ padding: '0 !importent' }}
+                    >
+                        <span className={classes['viz-btn-item']}>{currentView}</span>
+                    </Popover>
+                </ViewBtn>
             </div>
+            <RoutingEditingOpArea />
         </div>
     );
 }
 
-export default function VehicleViz(props: any) {
+function IndexInit() {
+    const [, dispatch] = useVizStore();
+
+    const routeManager = {
+        routeOrigin: RouteOrigin.EDITING_ROUTE,
+        routePoint: {
+            routeInitialPoint: null as RoutePoint,
+            routeWayPoint: [] as RoutePoint[],
+        },
+    };
+
+    const routeManagerMix = {
+        currentRouteLoop: {
+            currentRouteLoopState: false,
+        },
+    };
+
+    useEffect(() => {
+        dispatch(initRouteManager({ routeManager: new RouteManager(routeManager, routeManagerMix) }));
+    }, []);
+
+    return (
+        <SimpleRouter initialPath='/'>
+            <KeepAlive path='/' style={{ minWidth: '244px', height: '100%', position: 'relative' }}>
+                <Viz />
+            </KeepAlive>
+            <Route path='/routing' style={{ width: '100%', height: '100%' }}>
+                <Editor />
+            </Route>
+        </SimpleRouter>
+    );
+}
+
+function Index() {
+    return (
+        <VizProvider>
+            <IndexInit />
+        </VizProvider>
+    );
+}
+
+function VehicleViz(props: any) {
     const Component = useMemo(
         () =>
-            Panel(Viz, props.panelId, [
-                { name: StreamDataNames.SIM_WORLD, needChannel: false },
-                { name: StreamDataNames.Map, needChannel: false },
-            ]),
+            Panel({
+                PanelComponent: Index,
+                panelId: props.panelId,
+                subscribeInfo: [
+                    { name: StreamDataNames.SIM_WORLD, needChannel: false },
+                    { name: StreamDataNames.Map, needChannel: false },
+                ],
+            }),
         [],
     );
 
     return <Component {...props} />;
 }
 
-Viz.displayName = 'VehicleViz';
+Index.displayName = 'VehicleViz';
+
+export default React.memo(VehicleViz);

@@ -52,10 +52,14 @@ class UpdaterManager {
   /**
    * @brief Start a updater implemetnent.
    * @param path_name The path name of the data updater.
-   * @param time_interval_ms  Data update frequency.
+   * @param time_interval_ms  Data update frequency,
+   * If field time_interval_ms equals to 0, it is considered
+   * a single subscribe and will not start timer
+   * @param subscribe_param bring extra params for some updater.
    */
   bool Start(const std::string &path_name, const double &time_interval_ms,
-             const std::string &channel_name = "");
+             const std::string &channel_name = "",
+             nlohmann::json *subscribe_param = nullptr);
 
   /**
    * @brief Stop updater publish data.

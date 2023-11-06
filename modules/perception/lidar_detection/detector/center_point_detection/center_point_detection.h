@@ -108,6 +108,7 @@ class CenterPointDetection : public BaseLidarDetector {
   void GetObjects(const Eigen::Affine3d &pose,
                   const std::vector<float> &detections,
                   const std::vector<int64_t> &labels,
+                  const std::vector<float> &scores,
                   std::vector<std::shared_ptr<base::Object>> *objects);
 
   void FilterScore(
@@ -119,6 +120,9 @@ class CenterPointDetection : public BaseLidarDetector {
       std::vector<float> *scores_filtered);
 
   base::ObjectSubType GetObjectSubType(int label);
+
+  void FilterObjectsbyPoints(
+    std::vector<std::shared_ptr<base::Object>> *objects);
 
   void FilterForegroundPoints(
     std::vector<std::shared_ptr<base::Object>> *objects);

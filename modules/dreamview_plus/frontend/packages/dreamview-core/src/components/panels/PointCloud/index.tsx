@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import Carviz from '@dreamview/dreamview-carviz/src/index';
+import { Carviz } from '@dreamview/dreamview-carviz/src/index';
 import { IconIcCoverageHover, Popover } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import shortUUID from 'short-uuid';
@@ -65,7 +65,7 @@ function Cloud() {
             object: [],
             autoDrivingCar: {},
         });
-        carviz?.render();
+        // carviz?.render();
         if (subscriptionRef.current && subscriptionRef.current.subscription) {
             subscriptionRef.current.subscription.unsubscribe();
             subscriptionRef.current = null;
@@ -81,7 +81,7 @@ function Cloud() {
                 autoDrivingCar: val.autoDrivingCar,
             };
             carviz?.updateData(socketData);
-            carviz?.render();
+            // carviz?.render();
         });
 
         subscriptionRef.current = {
@@ -128,12 +128,26 @@ function Cloud() {
 
     useEffect(() => {
         if (!data) return;
-        const socketData = {
-            pointCloud: data,
-        };
-        carviz?.updateData(socketData);
-        carviz.render();
+        carviz?.updatePointCloud(data);
+        // carviz.render();
     }, [data]);
+
+    const animationFrameIdRef = useRef<number>(0);
+    const render = () => {
+        carviz?.render();
+        animationFrameIdRef.current = requestAnimationFrame(render);
+    };
+
+    useEffect(() => {
+        render();
+
+        return () => {
+            const animationFrameId = animationFrameIdRef.current;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         carviz?.removeAll();
@@ -173,9 +187,14 @@ function Cloud() {
     );
 }
 
-export default function PointCloud(props: any) {
+function PointCloud(props: any) {
     const Component = useMemo(
-        () => Panel(Cloud, props.panelId, [{ name: StreamDataNames.POINT_CLOUD, needChannel: true }]),
+        () =>
+            Panel({
+                PanelComponent: Cloud,
+                panelId: props.panelId,
+                subscribeInfo: [{ name: StreamDataNames.POINT_CLOUD, needChannel: true }],
+            }),
         [],
     );
 
@@ -183,3 +202,5 @@ export default function PointCloud(props: any) {
 }
 
 Cloud.displayName = 'PointCloud';
+
+export default React.memo(PointCloud);

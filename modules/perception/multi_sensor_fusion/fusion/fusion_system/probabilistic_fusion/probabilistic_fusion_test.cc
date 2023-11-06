@@ -37,7 +37,6 @@ TEST(ProbabliticFusionTest, test_init) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
@@ -105,7 +104,6 @@ TEST(ProbabliticFusionTest, test_update) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");
@@ -255,7 +253,6 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
-  init_options.main_sensor = "velodyne64";
   ProbabilisticFusion pf;
   EXPECT_TRUE(pf.Init(init_options));
   EXPECT_EQ(pf.Name(), "ProbabilisticFusion");

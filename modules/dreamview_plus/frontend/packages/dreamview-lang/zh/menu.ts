@@ -14,6 +14,7 @@ export const personal = {
 
     confirm: '确认',
     close: '关闭',
+    generalConfirm: '发送匿名使用数据以帮助我们改进Dreamview',
     dreamviewVersion: 'Dreamview版本',
     dockerVersion: 'Docker版本',
     copyright: '版本和许可',

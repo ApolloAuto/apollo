@@ -106,6 +106,9 @@ class SpeedDecider : public Task {
    **/
   bool IsFollowTooClose(const Obstacle& obstacle) const;
 
+  double EstimateProperOvertakingGap(const double target_obs_speed,
+                                     const double adc_speed) const;
+
  private:
   SLBoundary adc_sl_boundary_;
   common::TrajectoryPoint init_point_;

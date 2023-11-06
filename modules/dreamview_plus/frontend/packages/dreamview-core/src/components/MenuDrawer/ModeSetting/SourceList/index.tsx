@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { IconIcProfileAngerNormal, IconIcSucceed, IconIcPullDownExpansion } from '@dreamview/dreamview-ui';
 import SourceEmptyImg from '@dreamview/dreamview-core/src/assets/ic_default_page_no_data.png';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useMenuStore, ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store
 import { UpdateMenuAction } from '@dreamview/dreamview-core/src/store/MenuStore/actions';
 import useStyle from './useStyle';
 import CustomPopover from '../../../CustomPopover';
+import { usePickHmiStore } from '../../../../store/HmiStore';
 
 interface ISourceList1<T> {
     items: {
@@ -15,15 +16,20 @@ interface ISourceList1<T> {
     }[];
     onChange: (v: T) => void;
     activeId: string;
+    type?: string;
 }
 
 export function SourceList1<T>(props: ISourceList1<T>) {
-    const { items, onChange, activeId } = props;
+    const { items, onChange, activeId, type } = props;
     const { t } = useTranslation('modeSettings');
     const { classes, cx } = useStyle()();
     const [, dispatch] = useMenuStore();
+    const [hmi] = usePickHmiStore();
 
     const onClick = (item: T) => {
+        if (type === 'HDMap' && hmi.envResourcesHDMapDisable) {
+            return;
+        }
         onChange(item);
     };
 
@@ -39,6 +45,7 @@ export function SourceList1<T>(props: ISourceList1<T>) {
                         <div
                             className={cx(classes['source-list-container-item'], {
                                 [classes.active]: activeId === item.id,
+                                'source-list-container-item-disbale': type === 'HDMap' && hmi.envResourcesHDMapDisable,
                             })}
                             key={item.id}
                             onClick={onClick.bind(null, item.content)}
@@ -76,7 +83,7 @@ export function SourceList1<T>(props: ISourceList1<T>) {
 }
 
 interface ISourceList2Item<T> {
-    onChange: (v: T) => void;
+    onChange: (v: ISourceList2Item<T>['item'], i: T) => void;
     activeId: string;
     item: {
         label: string;
@@ -86,12 +93,19 @@ interface ISourceList2Item<T> {
 }
 
 function SourceList2Item<T>(props: ISourceList2Item<T>) {
-    const { item, onChange, activeId } = props;
+    const { item, onChange: propsOnChange, activeId } = props;
     const { classes, cx } = useStyle()({ height: (item.child?.length || 0) * 40 });
     const [expand, setExpand] = useState<boolean>(false);
     const onClick = () => {
         setExpand((prev) => !prev);
     };
+
+    const onChange = useCallback(
+        (subItem: T) => {
+            propsOnChange(item, subItem);
+        },
+        [propsOnChange],
+    );
 
     return (
         <>
@@ -120,18 +134,37 @@ function SourceList2Item<T>(props: ISourceList2Item<T>) {
 interface ISourceList2<T> {
     activeId: string;
     items: ISourceList2Item<T>['item'][];
-    onChange: (v: T) => void;
+    onChange: (v: ISourceList2Item<T>['item'], i: T) => void;
 }
 
 export function SourceList2<T>(props: ISourceList2<T>) {
     const { items, onChange, activeId } = props;
     const { classes } = useStyle()();
+    const [, dispatch] = useMenuStore();
+
+    const { t } = useTranslation('modeSettings');
+
+    const onChangeIntoResource = () => {
+        dispatch(UpdateMenuAction(ENUM_MENU_KEY.PROFILE_MANAGEER));
+    };
 
     return (
         <div className={classes['source-list-container']}>
-            {items.map((item) => (
-                <SourceList2Item<T> activeId={activeId} onChange={onChange} item={item} key={item.id} />
-            ))}
+            {items.length ? (
+                items.map((item) => (
+                    <SourceList2Item<T> activeId={activeId} onChange={onChange} item={item} key={item.id} />
+                ))
+            ) : (
+                <div className={classes.empty}>
+                    <img alt='resource_empty' src={SourceEmptyImg} />
+                    <div>{t('noData')}</div>
+                    <div className={classes['empty-msg']}>
+                        {t('noDataMsg1')}
+                        <span onClick={onChangeIntoResource}>{t('noDataMsg2')}</span>
+                        {t('noDataMsg3')}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

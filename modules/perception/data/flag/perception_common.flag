@@ -152,7 +152,7 @@
 
 ###########################################################################
 # Flags from msg_adapter
---cameraframe_to_obstacles_in=/perception/inner/location_refinement
+# --cameraframe_to_obstacles_in=/perception/inner/location_refinement
 # --lidarframe_to_obstacles_in=/perception/lidar/detection
 --sensorframe_message_to_obstacles_in=/perception/inner/PrefusedObjects
 

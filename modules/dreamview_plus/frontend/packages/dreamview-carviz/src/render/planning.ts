@@ -79,6 +79,10 @@ export default class Planning {
         }
 
         const allPaths = union(Object.keys(this.paths), Object.keys(newPaths));
+        // console.log('planning', allPaths);
+        // const allPaths = ['trajectory'];
+        // const allPaths = ['Planning PathData'];
+        // const allPaths = ['planning_reference_line'];
         allPaths.forEach((name) => {
             const oldPath = this.paths[name];
             if (name === 'trajectory' && !this.option.layerOption.Planning.planningTrajectory) {
@@ -95,7 +99,7 @@ export default class Planning {
 
             let property = planningParams.pathProperties[name];
             if (!property) {
-                console.warn(`No path properties found for [${name}]. Use default properties instead.`);
+                // console.warn(`No path properties found for [${name}]. Use default properties instead.`);
                 property = planningParams.pathProperties.default;
             }
 

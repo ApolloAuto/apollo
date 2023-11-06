@@ -14,8 +14,8 @@ apollo_plugin(
     name = "liblane_follow_path.so",
     srcs = ["lane_follow_path.cc"],
     hdrs = ["lane_follow_path.h"],
-    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/map:apollo_map",

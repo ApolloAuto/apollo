@@ -1,10 +1,10 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "chassis_speed",
     srcs = ["chassis_speed.py"],
     deps = [
@@ -12,7 +12,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_acc",
     srcs = ["imu_acc.py"],
     deps = [
@@ -20,7 +20,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_angular_velocity",
     srcs = ["imu_angular_velocity.py"],
     deps = [
@@ -28,7 +28,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_av_curvature",
     srcs = ["imu_av_curvature.py"],
     deps = [
@@ -38,7 +38,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_speed",
     srcs = ["imu_speed.py"],
     deps = [
@@ -46,7 +46,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_speed_acc",
     srcs = ["imu_speed_acc.py"],
     deps = [
@@ -55,7 +55,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "imu_speed_jerk",
     srcs = ["imu_speed_jerk.py"],
     deps = [
@@ -64,12 +64,12 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "planning_speed",
     srcs = ["planning_speed.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_acc_jerk",
     srcs = ["plot_acc_jerk.py"],
     deps = [
@@ -79,7 +79,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_chassis_acc",
     srcs = ["plot_chassis_acc.py"],
     deps = [
@@ -89,7 +89,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_planning_acc",
     srcs = ["plot_planning_acc.py"],
     deps = [
@@ -99,7 +99,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_planning_speed",
     srcs = ["plot_planning_speed.py"],
     deps = [
@@ -109,7 +109,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_speed_jerk",
     srcs = ["plot_speed_jerk.py"],
     deps = [
@@ -119,7 +119,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "plot_speed_steering",
     srcs = ["plot_speed_steering.py"],
     deps = [
@@ -129,7 +129,7 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "record_reader",
     srcs = ["record_reader.py"],
     deps = [
@@ -140,7 +140,7 @@ py_library(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "speed_dsteering_data",
     srcs = ["speed_dsteering_data.py"],
     deps = [

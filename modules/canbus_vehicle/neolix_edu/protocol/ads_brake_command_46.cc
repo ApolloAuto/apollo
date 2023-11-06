@@ -35,6 +35,12 @@ uint32_t Adsbrakecommand46::GetPeriod() const {
   return PERIOD;
 }
 
+void Adsbrakecommand46::Parse(const std::uint8_t* bytes, int32_t length,
+                             Neolix_edu* chassis) const {
+  chassis->mutable_ads_brake_command_46()->set_drive_enable(
+      drive_enable(bytes, length));
+}
+
 void Adsbrakecommand46::UpdateData(uint8_t* data) {
   set_p_drive_enable(data, drive_enable_);
   set_p_auto_brake_command(data, auto_brake_command_);
@@ -72,6 +78,15 @@ void Adsbrakecommand46::set_p_drive_enable(uint8_t* data, bool drive_enable) {
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
+}
+
+bool Adsbrakecommand46::drive_enable(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 0);
+  int32_t x = t0.get_byte(0, 1);
+
+  bool ret = x;
+  return ret;
 }
 
 Adsbrakecommand46* Adsbrakecommand46::set_auto_brake_command(

@@ -1,8 +1,14 @@
 syntax = "proto2";
 
-import "modules/control/control_component/controller_task_base/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/pid_conf.proto";
 
 package apollo.control;
+
+message FilterConf {
+  optional int32 cutoff_freq = 1;
+}
 
 message MPCControllerConf{
   optional double ts = 1;      // sample time (dt) 0.01 sec, configurable
@@ -37,4 +43,28 @@ message MPCControllerConf{
   optional apollo.control.GainScheduler feedforwardterm_gain_scheduler = 21;
   optional bool enable_mpc_feedforward_compensation = 23 [default = false];
   optional double unconstrained_control_diff_limit = 24;
+  optional bool use_lqr_curvature_feedforward = 25;
+  optional bool use_preview = 26;
+  optional PidConf acc_lookup_pid_conf = 27;
+  optional bool use_lookup_acc_pid = 28;
+  optional bool use_pitch_angle_filter = 29;
+  optional bool enable_look_ahead_back_control = 30 [default = false];
+  optional double switch_speed = 31;
+  optional LeadlagConf reverse_leadlag_conf = 32;
+  // low/high speed switch transition-window
+  optional double switch_speed_window = 33 [default = 0.0];
+  optional int32 preview_window = 34;
+  optional double lookahead_station = 35 [default = 0.0];
+  optional double lookback_station = 36 [default = 0.0];
+  optional double lookahead_station_high_speed = 37 [default = 0.0];
+  optional double lookback_station_high_speed = 38 [default = 0.0];
+  optional bool enable_reverse_leadlag_compensation = 39 [default = false];
+  optional FilterConf pitch_angle_filter_conf = 40;
+  optional bool enable_feedback_augment_on_high_speed = 41 [default = false];
+  optional bool trajectory_transform_to_com_reverse = 42 [default = false];
+  optional bool trajectory_transform_to_com_drive = 43 [default = false];
+  optional bool enable_slope_offset = 44 [default = false];
+  optional bool use_preview_reference_check = 45 [default = false];
+  optional bool use_kinematic_model = 46;
+  optional bool enable_navigation_mode_error_filter = 47 [default = false];
 }

@@ -44,6 +44,15 @@ DECLARE_string(torch_detector_model);
 // lidar sensor name
 DECLARE_string(lidar_sensor_name);
 
+// lidar_center_point
+DECLARE_bool(use_trt);
+DECLARE_int32(trt_precision);
+DECLARE_int32(trt_use_static);
+DECLARE_bool(use_calibration);
+DECLARE_bool(use_dynamicshape);
+DECLARE_bool(collect_shape_info);
+DECLARE_string(dynamic_shape_file);
+
 DECLARE_string(object_template_file);
 
 DECLARE_int32(hdmap_sample_step);

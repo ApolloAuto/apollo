@@ -9,4 +9,6 @@ message CommandProcessorConfig {
   repeated string output_command_name = 2;
   // The name of command status.
   repeated string input_command_status_name = 3;
+  // Topic name of PlanningCommand history.
+  optional string planning_command_history_name = 4 [default = "/apollo/planning_command_history"];
 }

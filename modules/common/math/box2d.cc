@@ -21,8 +21,8 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
-#include "cyber/common/log.h"
 
+#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
 
@@ -191,7 +191,54 @@ bool Box2d::HasOverlap(const LineSegment2d &line_segment) const {
       std::fmin(line_segment.start().y(), line_segment.end().y()) > max_y()) {
     return false;
   }
-  return DistanceTo(line_segment) <= kMathEpsilon;
+  // Construct coordinate system with origin point as left_bottom corner of
+  // Box2d, y axis along direction of heading.
+  Vec2d x_axis(sin_heading_, -cos_heading_);
+  Vec2d y_axis(cos_heading_, sin_heading_);
+  // corners_[2] is the left bottom point of the box.
+  Vec2d start_v = line_segment.start() - corners_[2];
+  // "start_point" is the start point of "line_segment" mapped in the new
+  // coordinate system.
+  Vec2d start_point(start_v.InnerProd(x_axis), start_v.InnerProd(y_axis));
+  // Check if "start_point" is inside the box.
+  if (is_inside_rectangle(start_point)) {
+    return true;
+  }
+  // Check if "end_point" is inside the box.
+  Vec2d end_v = line_segment.end() - corners_[2];
+  Vec2d end_point(end_v.InnerProd(x_axis), end_v.InnerProd(y_axis));
+  if (is_inside_rectangle(end_point)) {
+    return true;
+  }
+  // Exclude the case when the 2 points of "line_segment" are at the same side
+  // of rectangle.
+  if ((start_point.x() < 0.0) && (end_point.x() < 0.0)) {
+    return false;
+  }
+  if ((start_point.y() < 0.0) && (end_point.y() < 0.0)) {
+    return false;
+  }
+  if ((start_point.x() > width_) && (end_point.x() > width_)) {
+    return false;
+  }
+  if ((start_point.y() > length_) && (end_point.y() > length_)) {
+    return false;
+  }
+  // Check if "line_segment" intersects with box.
+  Vec2d line_direction = line_segment.end() - line_segment.start();
+  Vec2d normal_vec(line_direction.y(), -line_direction.x());
+  Vec2d p1 = center_ - line_segment.start();
+  Vec2d diagonal_vec = center_ - corners_[0];
+  // if project_p1 < projection of diagonal, "line_segment" intersects with box.
+  double project_p1 = fabs(p1.InnerProd(normal_vec));
+  if (fabs(diagonal_vec.InnerProd(normal_vec)) >= project_p1) {
+    return true;
+  }
+  diagonal_vec = center_ - corners_[1];
+  if (fabs(diagonal_vec.InnerProd(normal_vec)) >= project_p1) {
+    return true;
+  }
+  return false;
 }
 
 double Box2d::DistanceTo(const LineSegment2d &line_segment) const {

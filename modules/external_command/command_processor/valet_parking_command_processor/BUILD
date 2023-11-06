@@ -8,6 +8,7 @@ apollo_plugin(
     srcs = ["valet_parking_command_processor.cc"],
     hdrs = ["valet_parking_command_processor.h"],
     description = ":plugins.xml",
+    copts = ["-DMODULE_NAME=\\\"external_command\\\""],
     deps = [
         "//cyber",
         "//modules/external_command/command_processor/command_processor_base:motion_command_processor_base_lib",

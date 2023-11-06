@@ -1,8 +1,8 @@
 export const modeSettings = {
     language: '语言',
     modeSettings: '模式设置',
+    resourceManager: '资源管理',
     use: '使用',
-    profileManager: '资源管理',
     currentResource: '当前资源',
     empty: '当前没有资源在使用中',
     mode: '模式',
@@ -12,6 +12,9 @@ export const modeSettings = {
     resetAll: '重置所有模块',
     records: '数据包',
     map: '地图',
+    scenario: '场景',
+    enviormentResources: '环境资源',
+    adsResources: '自动驾驶系统资源',
     variableResources: '环境资源',
     fixedResources: '自动驾驶系统资源',
     HDMap: '高精地图',
@@ -20,4 +23,6 @@ export const modeSettings = {
     noDataMsg1: '请前往',
     noDataMsg2: '资源管理中心',
     noDataMsg3: '去下载',
+    mapLoading: '地图加载中...',
+    moduleStartupFailed: '模块开启失败，请检查',
 };

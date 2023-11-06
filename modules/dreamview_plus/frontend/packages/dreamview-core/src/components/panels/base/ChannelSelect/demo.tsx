@@ -6,7 +6,7 @@ import useWebSocketServices from '../../../../services/hooks/useWebSocketService
 import { RenderToolbarProps } from '../../type/RenderToolBar';
 import useRegisterNotifyInitialChanel from '../../../../hooks/useRegisterNotifyInitialChanel';
 
-export function DemoChannelSelect(props: RenderToolbarProps) {
+function DemoChannelSelect(props: RenderToolbarProps) {
     const { panelId, updateChannel } = props;
     const { metadata, isMainConnected } = useWebSocketServices();
     const [curVal, setCurVal] = useState(undefined);
@@ -47,3 +47,5 @@ export function DemoChannelSelect(props: RenderToolbarProps) {
 
     return <ChannelSelect value={curVal} options={channels} onChange={onChange} />;
 }
+
+export default React.memo(DemoChannelSelect);

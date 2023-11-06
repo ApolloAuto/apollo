@@ -1,10 +1,10 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "control_info",
     srcs = ["control_info.py"],
     deps = [

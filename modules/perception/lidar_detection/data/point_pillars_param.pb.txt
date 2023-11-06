@@ -1,7 +1,7 @@
 # point pillars params
 
 info {
-  name: "point_pillars"
+  name: "point_pillars_torch"
   version: ""
   dataset: "waymo"
   task_type: Detection3D

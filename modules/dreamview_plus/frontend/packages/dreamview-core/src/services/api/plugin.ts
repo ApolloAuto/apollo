@@ -16,6 +16,7 @@ import {
     V2xInfoRecord,
     VehicleInfo,
     VehicleInfoRecord,
+    HDMapSet,
 } from './types';
 
 const logger = Logger.getInstance(__filename);
@@ -160,7 +161,6 @@ export class PluginApi {
         });
     }
 
-    // ProfileManager 获取车辆配置列表
     getVehicleInfo() {
         return this.request<'', VehicleInfoRecord>({
             data: {
@@ -200,7 +200,6 @@ export class PluginApi {
         });
     }
 
-    // profilemanager 获取v2x列表
     getV2xInfo() {
         return this.request<'', V2xInfoRecord>({
             data: {
@@ -274,6 +273,38 @@ export class PluginApi {
                 info: scenarioSetId,
                 name: PluginApiNames.DownloadScenarioSet,
                 requestId,
+            },
+        });
+    }
+
+    // 下载record
+    downloadHDMap(data: string, requestId: string) {
+        return this.requestStream<string, Partial<HDMapSet>>({
+            data: {
+                info: data,
+                name: PluginApiNames.DownloadHDMap,
+                requestId,
+            },
+        });
+    }
+
+    // 更新record下载进度
+    refreshDownloadHDMap(data: string, requestId: string) {
+        return this.requestStream<string, Partial<HDMapSet>>({
+            data: {
+                info: data,
+                name: PluginApiNames.DownloadHDMap,
+                requestId,
+            },
+        });
+    }
+
+    // 获取HDMap列表
+    getHDMapList() {
+        return this.request<'', Files>({
+            data: {
+                info: '',
+                name: PluginApiNames.GetMapList,
             },
         });
     }

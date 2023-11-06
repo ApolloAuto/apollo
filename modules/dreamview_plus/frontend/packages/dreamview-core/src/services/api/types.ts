@@ -1,7 +1,13 @@
+import { apollo } from '@dreamview/dreamview';
+
 /**
  * 主要API类型枚举
  */
 export enum MainApiTypes {
+    StartRecordPackets = 'StartDataRecorder',
+    StopRecordPackets = 'StopDataRecorder',
+    SaveRecordPackets = 'SaveDataRecorder',
+    DeleteRecordPackets = 'DeleteDataRecorder',
     ResetRecordProgress = 'ResetRecordProgress',
     StartPlayRecorder = 'StartPlayRecorder',
     PlayRecorderAction = 'PlayRecorderAction',
@@ -9,6 +15,22 @@ export enum MainApiTypes {
     Dump = 'Dump',
     Reset = 'Reset',
     GetDataHandlerConf = 'GetDataHandlerConf',
+    TriggerPncMonitor = 'TriggerPncMonitor',
+    GetDefaultRoutings = 'GetDefaultRoutings',
+    SendScenarioSimulationRequest = 'SendScenarioSimulationRequest',
+    StopScenarioSimulation = 'StopScenarioSimulation',
+    DeleteDefaultRouting = 'DeleteDefaultRouting',
+    SaveDefaultRouting = 'SaveDefaultRouting',
+    GetStartPoint = 'GetStartPoint',
+    SetStartPoint = 'SetStartPoint',
+    CheckCycleRouting = 'CheckCycleRouting',
+    CheckRoutingPoint = 'CheckRoutingPoint',
+    SendRoutingRequest = 'SendRoutingRequest',
+    ResetSimControl = 'Reset',
+    SendDefaultCycleRoutingRequest = 'SendDefaultCycleRoutingRequest',
+    SendParkingRoutingRequest = 'SendParkingRoutingRequest',
+    GetMapElementIds = 'GetMapElementIds',
+    GetMapElementsByIds = 'GetMapElementsByIds',
 }
 
 /**
@@ -45,11 +67,13 @@ export enum PluginApiNames {
     GetV2xInfo = 'GetV2xInfo',
     RefreshV2xConf = 'RefreshV2xConf',
     UploadV2xConf = 'UploadV2xConf',
-    ResetV2xConfig = 'ResetV2xConfig',
+    ResetV2xConfig = 'ResetV2xConf',
     GetDynamicModelList = 'GetDynamicModelList',
     DownloadDynamicModel = 'DownloadDynamicModel',
     GetScenarioSetList = 'GetScenarioSetList',
     DownloadScenarioSet = 'DownloadScenarioSet',
+    DownloadHDMap = 'DownloadMap',
+    GetMapList = 'GetMapList',
 }
 
 /**
@@ -57,14 +81,19 @@ export enum PluginApiNames {
  */
 export enum HMIActions {
     StopRecord = 'STOP_RECORD',
+    ChangeScenariosSet = 'CHANGE_SCENARIO_SET',
+    ChangeScenarios = 'CHANGE_SCENARIO',
     ChangeMode = 'CHANGE_MODE',
     ChangeMap = 'CHANGE_MAP',
     ChangeVehicle = 'CHANGE_VEHICLE',
     LoadRecords = 'LOAD_RECORDS',
+    LoadScenarios = 'LOAD_SCENARIOS',
     ChangeRecord = 'CHANGE_RECORD',
     DeleteRecord = 'DELETE_RECORD',
+    DeleteHDMap = 'DELETE_MAP',
     DeleteVehicle = 'DELETE_VEHICLE_CONF',
     DeleteV2X = 'DELETE_V2X_CONF',
+    DeleteScenarios = 'DELETE_SCENARIO_SET',
     ChangeOperation = 'CHANGE_OPERATION',
     StartModule = 'START_MODULE',
     StopModule = 'STOP_MODULE',
@@ -154,3 +183,127 @@ export type ScenarioSet = {
 };
 
 export type ScenarioSetRecord = Record<string, ScenarioSet>;
+
+export type HDMapSet = {
+    percentage: number;
+    resource_id: string;
+    resource_type: string;
+
+    data_type: string;
+    status: ENUM_DOWNLOAD_STATUS;
+};
+
+export type DefaultPoint = {
+    x: number;
+    y: number;
+    z?: number;
+    heading?: number;
+};
+
+export type DefaultRouting = {
+    name: string;
+    cycleNumber?: number;
+    point: DefaultPoint[];
+};
+
+export type DefaultRoutings = {
+    defaultRoutings: DefaultRouting[];
+};
+export type StartScenario = {
+    fromScenario: boolean;
+    end?: {
+        x: number;
+        y: number;
+        z?: number;
+        heading?: number;
+    };
+    waypoint?: any;
+};
+
+export type StartCycle = {
+    end: {
+        x: number;
+        y: number;
+        z?: number;
+        heading?: number;
+    };
+    waypoint: any;
+    cycleNumber: number;
+};
+
+export type SaveDefaultRoutingInfo = {
+    name: string;
+    point: DefaultPoint[];
+    routingType: string;
+    cycleNumber?: number;
+};
+
+export enum RoutingType {
+    DEFAULT_ROUTING = 'defaultRouting',
+}
+
+export type GetStartPointInfo = DefaultPoint;
+
+export type SetStartPointInfo = {
+    point: DefaultPoint;
+};
+
+export type CheckCycleRoutingInfo = {
+    start: DefaultPoint;
+    end: DefaultPoint;
+};
+
+export type IsCheckCycleRouting = {
+    isCycle: boolean;
+};
+
+export type CheckRoutingPointInfo = {
+    point: {
+        id: number;
+        x: number;
+        y: number;
+        z?: number;
+        heading?: number;
+    };
+};
+
+export type CheckRoutingPointLegal = {
+    isLegal: number;
+};
+
+export type SendRoutingRequestInfo = {
+    end: DefaultPoint;
+    waypoint: DefaultPoint[];
+};
+
+export type SendDefaultCycleRoutingRequestInfo = {
+    end: DefaultPoint;
+    waypoint: DefaultPoint[];
+    cycleNumber: number;
+};
+
+export type SendParkingRoutingRequestInfo = {};
+
+export type GetMapElementIdsInfo = {
+    point?: {
+        x: number;
+        y: number;
+    };
+    radius?: number;
+};
+
+type IMapElementIds = apollo.dreamview.IMapElementIds;
+
+export type GetMapElementsByIdsInfo = {
+    param: {
+        mapElementIds: IMapElementIds;
+    };
+};
+
+export type HMIActionsOperationInfo = {
+    isOk: boolean;
+};
+
+export type HDMapSwitchInfo = {
+    isOk: boolean;
+};

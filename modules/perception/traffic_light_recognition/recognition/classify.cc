@@ -17,6 +17,7 @@
 
 
 #include "cyber/common/file.h"
+#include "cyber/profiler/profiler.h"
 #include "modules/perception/common/camera/common/util.h"
 #include "modules/perception/common/inference/inference_factory.h"
 #include "modules/perception/common/inference/model_util.h"
@@ -134,7 +135,11 @@ void ClassifyBySimple::Perform(const camera::TrafficLightFrame* frame,
 
     AINFO << "resize gpu finish.";
     cudaDeviceSynchronize();
+
+    PERF_BLOCK("traffic_light_recognition_inference")
     rt_net_->Infer();
+    PERF_BLOCK_END
+
     cudaDeviceSynchronize();
     AINFO << "infer finish.";
 

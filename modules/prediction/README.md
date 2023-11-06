@@ -2,28 +2,13 @@
 
 ## Introduction
 The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
-Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
+Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles. The prediction module is composed of four sub-modules:  **Container**, **Scenario**, **Evaluator** and **Predictor**. 
 
-In **Apollo 5.5**, the Prediction module introduces a new model - **Caution Obstacle**. Together with aggressively emphasizing on caution when proceeding to a junction, this model will now scan all obstacles that have entered the junction as long as computing resources permit. The Semantic LSTM Evaluator and the Extrapolation Predictor have also been introduced in Apolo 5.5 to support the Caution Obstacle model.
 
 ```
 Note:
 The Prediction module only predicts the behavior of obstacles and not the EGO car. The Planning module plans the trajectory of the EGO car.
-
 ```
-
-## Input
-  * Obstacles information from the perception module
-  * Localization information from the localization module
-  * Planning trajectory of the previous computing cycle from the planning module
-
-## Output
-  * Obstacles annotated with predicted trajectories and their priorities. Obstacle priority is now calculated as individual scenarios are prioritized differently. The priorities include: ignore, caution and normal (default)
-
-## Functionalities
-
-Based on the figure below, the prediction module comprises 4 main functionalities: Container, Scenario, Evaluator and Predictor.  Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we introduced the Scenario functionality as we have moved towards a more scenario-based approach for Apollo's autonomous driving capabilities.
-![](images/prediction.png)
 
 ### Container
 
@@ -34,10 +19,11 @@ inputs are **_perception obstacles_**, **_vehicle localization_** and **_vehicle
 
 The Scenario sub-module analyzes scenarios that includes the ego vehicle.
 Currently, we have two defined scenarios:
-- **Cruise** : this scenario includes Lane keeping and following
-- **Junction** : this scenario involves junctions. Junctions can either have traffic lights and/or STOP signs
 
-### Obstacles
+- **Cruise** : this scenario includes Lane keeping and following
+- **Junction** : this scenario involves junctions. Junctions can either have traffic lights and/or STOP signs. 
+
+we also have three defined types of obstacle priority:
 
 - **Ignore**: these obstacles will not affect the ego car's trajectory and can be safely ignored (E.g. the obstacle is too far away)
 - **Caution**: these obstacles have a high possibility of interacting with the ego car
@@ -68,9 +54,9 @@ The list of available evaluators include:
 
 * **Semantic LSTM evaluator**: this evaluator is used in the new Caution Obstacle model to generate short term trajectory points which are calculated using CNN and LSTM. Both vehicles and pedestrians are using this same model, but with different parameters
 
-* **Vectornet LSTM evaluator**: this evaluator is used in place of Semantic LSTM evaluator to generate short term trajectory points for "Caution" tagged obstacles. More detail is in [vectornet lstm evaluator readme](https://github.com/ApolloAuto/apollo/docs/technical_documents/vectornet_lstm_evaluator.md).
+* **Vectornet LSTM evaluator**: this evaluator is used in place of Semantic LSTM evaluator to generate short term trajectory points for "Caution" tagged obstacles. 
 
-* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario. Please refer [jointly prediction planning evaluator](https://github.com/ApolloAuto/apollo/blob/r6.0.0/docs/technical_documents/jointly_prediction_planning_evaluator.md).
+* **Jointly prediction planning evaluator**: this evaluator is used in the new Interactive Obstacle(vehicle-type) model to generate short term trajectory points which are calculated using Vectornet and LSTM. By considering ADC's trajectory info, the obstacle trajectory prediction can be more accurate under interaction scenario.
 
 ### Predictor
 
@@ -86,16 +72,107 @@ Predictor generates predicted trajectories for obstacles. Currently, the support
 * **Interaction predictor**: compute the likelihood to create posterior prediction results after all evaluators have run. This predictor was created for caution level obstacles
 * **Extrapolation predictor**: extends the Semantic LSTM evaluator's results to create an 8 sec trajectory.
 
-## Prediction Architecture
+## Structure
 
-The prediction module estimates the future motion trajectories for all perceived obstacles. The output prediction message wraps the perception information. Prediction both subscribes to and is triggered by perception obstacle messages, as shown below:
+```
+├── prediction
+    ├── common                  // common code        
+    ├── conf                    // configuration folder   
+    ├── container               // container sub-module
+    │   ├── adc_trajectory   
+    │   ├── obstacles 
+    │   ├── pose   
+    │   └── storytelling              
+    ├── dag                     // module startup file     
+    ├── data                    // module configuration parameters
+    ├── evaluator               // evaluator sub-module
+    │   ├── cyclist   
+    │   ├── model_manager 
+    │   ├── pedestrian
+    │   ├── vehicle     
+    │   └── warm_up            
+    ├── images                  // demo images
+    ├── launch                  // launch file
+    ├── network                 // network code
+    ├── pipeline                // VectorNet code
+    ├── predictor               // predictor sub-module
+    │   ├── empty   
+    │   ├── extrapolation 
+    │   ├── free_move
+    │   ├── interaction   
+    │   ├── junction 
+    │   ├── lane_sequence  
+    │   ├── move_sequence   
+    │   ├── sequence    
+    │   └── single_lane            
+    ├── proto                   // configuration proto file
+    ├── scenario                // scenario sub-module
+    │   ├── analyzer   
+    │   ├── feature_extractor 
+    │   ├── interaction_filter
+    │   ├── prioritization   
+    │   ├── right_of_way   
+    │   └── scenario_features            
+    ├── submodules              // manage evaluator and predictor submodules
+    ├── testdata                // test data
+    ├── BUILD                   // compile file
+    ├── cyberfile.xml           // package management file
+    ├── prediction_component.cc //component entrance
+    ├── prediction_component.h   
+    └── prediction_component_test.cc
+    
+```
 
-![](images/architecture.png)
+## Modules
 
-The prediction module also takes messages from both localization and planning as input. The structure is shown below:
+### PredictionComponent
 
-![](images/architecture2.png)
+#### Input
 
-## Related Paper
+| Name    | Type                                             | Description         |
+| ------- | ------------------------------------------------ | ------------------- |
+| `frame` | `apollo::perception::PerceptionObstacles` | Obstacle message |
+
+
+#### Output
+
+| Name    | Type                                             | Description                    |
+| ------- | ------------------------------------------------ | ------------------------------ |
+| `frame` | `apollo::prediction::PredictionObstacles` | Obstacle prediction message |
+
+#### How to use
+
+1. Modify the `modules/prediction/dag/prediction.dag`
+
+- config\_file_path: path of config file
+- flag\_file_path: path of flag file
+- reader channel: the name of input channel
+
+2. Modify the `modules/prediction/conf/prediction_conf.pb.txt`
+
+- topic\_conf: the name of different topic
+  - xxx\_topic_name： the name of xxx topic
+- evaluator\_model_conf: the conf of different evaluator model
+  - evaluator\_type: SEMANTIC\_LSTM_EVALUATOR
+  - obstacle_type:  PEDESTRIAN, VEHICLE
+  - backend: GPU, CPU 
+  - priority: priority of model
+  - type: SemanticLstmPedestrianGpuTorch, SemanticLstmVehicleGpuTorch ...
+
+- obstacle\_conf: the conf of different obstacle
+  - obstacle\_type: VEHICLE, PEDESTRIAN, BICYCLE, UNKNOWN
+  - obstacle\_status: ON\_LANE, OFF\_LANE, IN\_JUNCTION, MOVING
+  - interactive\_tag: INTERACTION
+  - priority\_type: CAUTION, NORMAL,IGNORE
+  - evaluator\_type: VECTORNET\_EVALUATOR, CRUISE\_MLP_EVALUATOR ...
+  - predictor\_type: EXTRAPOLATION\_PREDICTOR, MOVE_SEQUENCE\_PREDICTOR ...
+
+3. start the prediction component
+
+```bash
+cyber_launch start modules/prediction/launch/prediction.launch
+```
+
+## Reference
 
 1. [Xu K, Xiao X, Miao J, Luo Q. "Data Driven Prediction Architecture for Autonomous Driving and its Application on Apollo Platform." *arXiv preprint arXiv:2006.06715.* ](https://arxiv.org/pdf/2006.06715.pdf)

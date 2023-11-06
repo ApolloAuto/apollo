@@ -46,7 +46,7 @@ apollo::planning::TrafficLightProtectedScenario
   
 #### 阶段
 
-| 阶段名                                        | 类型                                                             | 描述                     |
+| 阶段名                                        | 类型                                                             | <div style="width: 300pt">描述</div> |
 | --------------------------------------------- | ---------------------------------------------------------------- | ------------------------ |
 | `TRAFFIC_LIGHT_PROTECTED_APPROACH`            | `apollo::planning::TrafficLightProtectedStageApproach`           | 在红绿灯停止线前停车阶段 |
 | `TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP`   | `apollo::planning::TrafficLightUnprotectedLeftTurnStageCreep`    | 绿灯后跛行观察路口来车   |
@@ -55,8 +55,9 @@ apollo::planning::TrafficLightProtectedScenario
 
 #### 配置
 
-| 文件路径                                                                       | 说明             |
-| ------------------------------------------------------------------------------ | ---------------- |
-| `modules/planning/scenarios/traffic_light_protected/conf/scenario_conf.pb.txt` | 场景的配置文件   |
-| `modules/planning/scenarios/traffic_light_protected/conf/pipeline.pb.txt`      | 场景的流水线文件 |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| `modules/planning/scenarios/traffic_light_protected/conf/scenario_conf.pb.txt` | `apollo::planning::ScenarioTrafficLightProtectedConfig`|场景的配置文件   |
+| `modules/planning/scenarios/traffic_light_protected/conf/pipeline.pb.txt`      |`apollo::planning::ScenarioPipeline` | 场景的流水线文件 |
+| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
 

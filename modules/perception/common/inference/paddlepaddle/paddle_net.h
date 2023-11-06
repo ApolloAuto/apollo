@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "paddle/include/paddle_inference_api.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/inference/inference.h"
 
 

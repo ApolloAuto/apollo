@@ -92,4 +92,4 @@ function SpeedInfo(props: SpeedInfoProps) {
     );
 }
 
-export default SpeedInfo;
+export default React.memo(SpeedInfo);

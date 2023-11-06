@@ -29,11 +29,12 @@
 #include "modules/common_msgs/control_msgs/control_cmd.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/control/control_component/controller_task_base/proto/calibration_table.pb.h"
+#include "modules/control/control_component/proto/calibration_table.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/status/status.h"
+#include "modules/control/control_component/common/control_gflags.h"
 #include "modules/control/control_component/controller_task_base/common/dependency_injector.h"
 
 /**
@@ -103,17 +104,15 @@ class ControlTask {
   bool LoadConfig(T *config);
 
   bool LoadCalibrationTable(calibration_table *calibration_table_conf) {
-    std::string control_base_dir =
-        "/apollo/modules/control/control_component/controller_task_base/";
-    std::string calibration_table_path =
-        control_base_dir + "conf/calibration_table.pb.txt";
+    std::string calibration_table_path = FLAGS_calibration_table_file;
 
     if (!apollo::cyber::common::GetProtoFromFile(calibration_table_path,
                                                  calibration_table_conf)) {
       AERROR << "Load calibration table failed!";
       return false;
     }
-
+    AINFO << "Load the calibraiton table file successfully, file path: "
+          << calibration_table_path;
     return true;
   }
 };
@@ -133,6 +132,8 @@ bool ControlTask::LoadConfig(T *config) {
     AERROR << "Load config of " << class_name << " failed!";
     return false;
   }
+  AINFO << "Load the [" << class_name
+        << "] config file successfully, file path: " << config_path_;
   return true;
 }
 

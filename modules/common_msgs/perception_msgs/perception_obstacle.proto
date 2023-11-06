@@ -95,7 +95,7 @@ message PerceptionObstacle {
   // Format: [x0, y0, z0, x1, y1, z1...]
   repeated double point_cloud = 12 [packed = true];
 
-  optional double confidence = 13 [deprecated = true];
+  optional double confidence = 13;
   enum ConfidenceType {
     CONFIDENCE_UNKNOWN = 0;
     CONFIDENCE_CNN = 1;

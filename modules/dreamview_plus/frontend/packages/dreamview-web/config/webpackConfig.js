@@ -73,7 +73,7 @@ const mainConfig = (params) => (env, argv) => {
             filename: isProd ? '[name].[contenthash].js' : '[name].js',
             chunkFilename: isProd ? '[name].[contenthash].js' : '[name].js',
         },
-        devtool: isProd ? params.prodSourceMap : 'eval-cheap-module-source-map',
+        devtool: isProd ? params.prodSourceMap : 'source-map',
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.less', '.css', '.json'],
         },

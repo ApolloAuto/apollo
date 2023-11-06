@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/control/control_component/controller_task_base/proto/gain_scheduler_conf.proto";
-import "modules/control/control_component/controller_task_base/proto/leadlag_conf.proto";
-import "modules/control/control_component/controller_task_base/proto/mrac_conf.proto";
+import "modules/control/control_component/proto/gain_scheduler_conf.proto";
+import "modules/control/control_component/proto/leadlag_conf.proto";
+import "modules/control/control_component/proto/mrac_conf.proto";
 
 message LatBaseLqrControllerConf{
   optional double ts = 1;  // sample time (dt) 0.01 now, configurable
@@ -50,4 +50,7 @@ message LatBaseLqrControllerConf{
 
   optional double switch_speed = 36;  // low/high speed controller switch speed
   optional double switch_speed_window = 37 [default = 0.0];
+  optional double reverse_feedforward_ratio = 38 [default = 1.0];
+
+  optional bool reverse_use_dynamic_model = 39 [default = false];
 }

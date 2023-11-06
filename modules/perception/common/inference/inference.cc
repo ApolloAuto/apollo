@@ -26,6 +26,15 @@ void Inference::set_max_batch_size(const int &batch_size) {
 
 void Inference::set_gpu_id(const int &gpu_id) { gpu_id_ = gpu_id; }
 
+void Inference::set_model_info(
+    const std::string &proto_file,
+    const std::vector<std::string> &net_input_names,
+    const std::vector<std::string> &net_output_names) {
+  proto_file_ = proto_file;
+  net_input_names_ = net_input_names;
+  net_output_names_ = net_output_names;
+  }
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

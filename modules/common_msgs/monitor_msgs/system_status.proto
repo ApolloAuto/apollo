@@ -55,6 +55,11 @@ message SystemStatus {
   // In some modes, other processes besides modules and monitored components may
   // need to be monitored
   map<string, ComponentStatus> other_components = 10;
+  
+  // In all modes, the monitor needs to detect recording progress and resource space.
+  optional Component data_recorder_component = 11;
+
+  optional bool detect_immediately = 12 [default = false];
 
   reserved 2, 3;
 }

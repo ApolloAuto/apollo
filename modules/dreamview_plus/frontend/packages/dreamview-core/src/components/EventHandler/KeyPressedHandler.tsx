@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useEventHandlersContext } from '../../store/EventHandlersStore';
 
-export function KeyPressed(props) {
+function KeyPressed(props) {
     const [isBlack, setIsBlack] = useState(false);
     const eventHandlers = useEventHandlersContext();
     const { setMultiPressedKey } = eventHandlers.keydown;
@@ -29,3 +29,5 @@ export function KeyPressed(props) {
         </div>
     );
 }
+
+export default React.memo(KeyPressed);

@@ -9,52 +9,6 @@ export default class PluginWebSocketEndpoint {
     this.worker = new Worker();
   }
 
-  /**
-   * responseResolvers is a map of request id to a resolver function.
-   * @type {{
-   *   [requestId: string]: (response: any) => void
-   * }}
-   */
-  _responseResolvers = {};
-
-  generateRequest(req) {
-    return {
-      ...req,
-      data: {
-        ...req.data,
-        source: 'dreamview',
-        target: 'studio_connector',
-        sourceType: 'module',
-        targetType: 'plugins',
-      },
-      type: 'PluginRequest',
-    };
-  }
-
-  sendMessage(req) {
-    const request = this.generateRequest(req);
-    return new Promise((resolve, reject) => {
-      this.websocket.send(JSON.stringify(request));
-      this._responseResolvers[request.data.requestId] = resolve;
-    });
-  }
-
-  request(req) {
-    return this.sendMessage(req).then(
-      res => {
-        if (res.data.info.code !== 0) {
-          console.warn(res.data.info.message);
-        }
-
-        if (res.data.info.code === 0) {
-          return Promise.resolve(res.data.info.data);
-        }
-
-        return Promise.reject(res.data.info.message);
-      }
-    );
-  }
-
   checkWsConnection() {
     if (this.websocket.readyState === this.websocket.OPEN) {
       return this;
@@ -93,8 +47,8 @@ export default class PluginWebSocketEndpoint {
 
         switch (message.data.name) {
           case 'StudioConnectorCertStatus':
-            const status = JSON.parse(message.data.info ?? '{}').code;
-            if (status === 0) {
+            const status = JSON.parse(message.data.info ?? '{}').status;
+            if (status === 'OK') {
               this.getScenarioSetList();
               this.getDynamicsModelList();
               this.getRecordList();
@@ -112,15 +66,17 @@ export default class PluginWebSocketEndpoint {
               JSON.parse(message.data.info ?? '{}')
             );
             break;
-          case 'DownloadScenarioSetSuccess':
+          case 'DownloadScenarioSet':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info ?? '{}')?.scenario_set_id,
+              JSON.parse(message.data.info ?? '{}')?.data.resource_id,
+              'downloaded',
               JSON.parse(message.data.info ?? '{}')?.status,
             );
+            this.getScenarioSetList();
             break;
           case 'DownloadScenarioSetFail':
             STORE.studioConnector.updateRemoteScenarioSetStatus(
-              JSON.parse(message.data.info ?? '{}')?.scenario_set_id,
+              JSON.parse(message.data.info ?? '{}')?.data.resource_id,
               'fail',
               JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
@@ -136,12 +92,15 @@ export default class PluginWebSocketEndpoint {
             break;
           case 'DownloadDynamicModelSuccess':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info ?? '{}'),
+              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
+              JSON.parse(message.data.info ?? '{}')?.status,
             );
             break;
           case 'DownloadDynamicModelFail':
             STORE.studioConnector.updateRemoteDynamicsModelStatus(
-              JSON.parse(message.data.info ?? '{}'),
+              JSON.parse(message.data.info ?? '{}')?.dynamic_model_name,
+              'fail',
+              JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
             break;
           case 'GetRecordsListSuccess':
@@ -156,12 +115,15 @@ export default class PluginWebSocketEndpoint {
           // 下载record成功
           case 'UpdateRecordToStatus':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info ?? '{}')
+              JSON.parse(message.data.info ?? '{}')?.record_id,
+              JSON.parse(message.data.info ?? '{}')?.status,
             );
             break;
           case 'DownloadRecordFail':
             STORE.studioConnector.updateRemoteRecordStatus(
-              JSON.parse(message.data.info ?? '{}')
+              JSON.parse(message.data.info ?? '{}')?.record_id,
+              'fail',
+              JSON.parse(message.data.info ?? '{}')?.error_msg,
             );
           case 'GetVehicleInfoSuccess':
             STORE.studioConnector.updateVehicleInfo(
@@ -175,6 +137,11 @@ export default class PluginWebSocketEndpoint {
               3,
             );
             break;
+          case 'RefreshVehicleConfigSuccess':
+            STORE.studioConnector.refreshVehicleConfig(
+              JSON.parse(message.data.info ?? '{}'),
+              2,
+            );
         }
       }
     });
@@ -426,10 +393,10 @@ export default class PluginWebSocketEndpoint {
           const message = event.data;
           switch (message.data.name) {
             case 'GetV2xInfoSuccess':
-              resolve(JSON.parse(message.data.info.data ?? '{}')?.data);
+              resolve(JSON.parse(message.data.info ?? '{}'));
               break;
             case 'GetV2xInfoFail':
-              reject(JSON.parse(message.data.info.data ?? '{}')?.data);
+              reject(JSON.parse(message.data.info ?? '{}'));
               break;
           }
         }

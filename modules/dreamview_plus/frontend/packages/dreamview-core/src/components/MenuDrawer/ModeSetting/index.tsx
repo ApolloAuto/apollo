@@ -1,7 +1,5 @@
-/* eslint-disable react/jsx-no-bind */
-/* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
-import { Select, Switch, Tabs, IconIcSucceed } from '@dreamview/dreamview-ui';
+import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Select, SwitchLoading, Tabs, IconIcSucceed, IconIcLoading, message } from '@dreamview/dreamview-ui';
 import {
     usePickHmiStore,
     hmiUtils,
@@ -15,15 +13,25 @@ import {
     changeVehicle,
     IInitState,
     HMIModeOperation,
+    CURRENT_MODE,
 } from '@dreamview/dreamview-core/src/store/HmiStore';
 import SourceEmptyImg from '@dreamview/dreamview-core/src/assets/ic_default_page_no_data.png';
 import throttle from 'lodash/throttle';
 import Logger from '@dreamview/log';
 import { useTranslation } from 'react-i18next';
-import i18next from '@dreamview/dreamview-lang';
+import useComponentDisplay from '@dreamview/dreamview-core/src/hooks/useComponentDisplay';
 import useWebSocketServices from '@dreamview/dreamview-core/src/services/hooks/useWebSocketServices';
 import { useMainApi } from '@dreamview/dreamview-core/src/store/WebSocketManagerStore';
 import { usePanelLayoutStore, updateByMode } from '@dreamview/dreamview-core/src/store/PanelLayoutStore';
+import {
+    ChangeAdsResourcesAction,
+    ChangeEnviormentResourcesAction,
+} from '@dreamview/dreamview-core/src/store/MenuStore/actions';
+import {
+    ENUM_ADS_MANAGER_TAB_KEY,
+    ENUM_ENVIORMENT_MANAGER_TAB_KEY,
+    useMenuStore,
+} from '@dreamview/dreamview-core/src/store/MenuStore';
 import MenuDrawerTitle from '../Common/MenuDrawerTitle';
 import ModeSettingTitle from './Title';
 import useStyle, { useCurrentResourceStyle, useGuideContainerStyle } from './useStyle';
@@ -33,35 +41,6 @@ import { SourceList1, SourceList2 } from './SourceList';
 import CustomScroll from '../../CustomScroll';
 
 const logger = Logger.getInstance('ModeSetting');
-
-function Language() {
-    const { t } = useTranslation('modeSettings');
-    const options = [
-        {
-            label: '中文',
-            value: 'zh',
-        },
-        {
-            label: 'English',
-            value: 'en',
-        },
-    ];
-    const onChange = (val: string) => {
-        if (val === 'zh') {
-            i18next.changeLanguage('zh');
-        } else {
-            i18next.changeLanguage('en');
-        }
-    };
-
-    return (
-        <div>
-            <ModeSettingTitle title={t('language')} />
-            <Select onChange={onChange} options={options} placeholder='请选择' defaultValue={i18next.language} />
-            <Divider />
-        </div>
-    );
-}
 
 function Mode() {
     const { isMainConnected, mainApi } = useWebSocketServices();
@@ -84,7 +63,13 @@ function Mode() {
         },
         [isMainConnected],
     );
-    const options = useMemo(() => hmi.modes?.map((item) => ({ label: item, value: item })) || [], [hmi.modes]);
+    const nameMap: Record<string, string> = {
+        [CURRENT_MODE.PNC]: 'PnC',
+    };
+    const options = useMemo(
+        () => hmi.modes?.map((item) => ({ label: nameMap[item] || item, value: item })) || [],
+        [hmi.modes],
+    );
 
     return (
         <>
@@ -105,7 +90,7 @@ function Operations() {
     const { t } = useTranslation('modeSettings');
 
     const options = useMemo(
-        () => hmi.operations?.map((item) => ({ label: item, value: item })) || [],
+        () => hmi.operations?.map((item) => ({ label: item, value: `${item}` })) || [],
         [hmi.operations],
     );
 
@@ -129,23 +114,70 @@ const OperationsMemo = React.memo(Operations);
 
 function CustomSwitch(props: { moduleName: string }) {
     const { moduleName } = props;
+
+    const { t } = useTranslation('modeSettings');
     const mainApi = useMainApi();
     const [hmi] = usePickHmiStore();
+
+    const moduleStatus = hmi.moduleStatus.get(moduleName);
+    const isModuleLocked = hmi.modulesLock.get(moduleName);
+
+    const prevModuleStatus = useRef(moduleStatus);
+    const prevIsModuleLocked = useRef(isModuleLocked);
+
+    useEffect(() => {
+        logger.debug('hmiStatus', hmi);
+        // 状态机： isModuleLocked 从1 变为 0， moduleStatus 从 0 变为 0 ,提示用户monitor没开启
+        if (prevIsModuleLocked.current && !isModuleLocked) {
+            if (!prevModuleStatus.current && !moduleStatus) {
+                message({
+                    type: 'warning',
+                    content: `${moduleName} ${t('moduleStartupFailed')}`,
+                });
+            }
+        }
+
+        // 状态机：sModuleLocked 从 0 变为 0, moduleStatus 从 1 变为 0 自动关闭，模块挂了
+        if (!prevIsModuleLocked.current && !isModuleLocked) {
+            if (prevModuleStatus.current && !moduleStatus) {
+                if (!hmi.backendShutdown) {
+                    message({
+                        type: 'warning',
+                        content: `${moduleName} ${t('moduleStartupFailed')}`,
+                    });
+                }
+            }
+        }
+
+        prevModuleStatus.current = moduleStatus;
+        prevIsModuleLocked.current = isModuleLocked;
+    }, [moduleStatus, isModuleLocked, moduleName, hmi.backendShutdown]);
+
     const onChange = useCallback(
         throttle(() => {
-            const checked = !!hmi.moduleStatus.get(moduleName);
-            if (checked) {
+            if (moduleStatus) {
                 mainApi?.stopModule(moduleName);
             } else {
                 mainApi?.startModule(moduleName);
             }
         }, THROTTLE_TIME),
-        [mainApi, moduleName, hmi.moduleStatus.get(moduleName)],
+        [mainApi, moduleName, moduleStatus],
     );
 
+    const getLoadingIcon = useCallback(() => {
+        if (isModuleLocked) {
+            return <IconIcLoading spin className='switch-inner-loading-icon' />;
+        }
+        return null;
+    }, [mainApi, moduleName, isModuleLocked]);
+
+    const loadingChild = useMemo(getLoadingIcon, [getLoadingIcon]);
+
     return (
-        <Switch
+        <SwitchLoading
             onChange={onChange}
+            checkedChildren={loadingChild}
+            unCheckedChildren={loadingChild}
             checked={!!hmi.moduleStatus.get(moduleName)}
             disabled={
                 hmiUtils.isCalibrationMode(hmi) && moduleName === hmiUtils.preConditionModule(hmi)
@@ -163,24 +195,29 @@ function Modules() {
 
     const { isMainConnected, mainApi } = useWebSocketServices();
     const [hmi] = usePickHmiStore();
+
     const { t } = useTranslation('modeSettings');
 
     const modules = Array.from(hmi.moduleStatus.keys());
 
+    const isLocked = useMemo(() => modules.some((key) => hmi.modulesLock.get(key)), [hmi.modulesLock, modules]);
+
     // fixme 1期需求补充开关逻辑
-    const onSetupAll = () => {
+    const onSetupAll = useCallback(() => {
+        if (isLocked) return;
         // modeSetting -> modules模块
         // setup all
         if (!isMainConnected) return;
         mainApi?.setupAllModule();
-    };
+    }, [isLocked, isMainConnected, mainApi]);
 
-    const onResetAll = () => {
+    const onResetAll = useCallback(() => {
+        if (isLocked) return;
         // modeSetting -> modules模块
         // reset all
         if (!isMainConnected) return;
         mainApi?.resetAllModule();
-    };
+    }, [isLocked, isMainConnected, mainApi]);
 
     const expendChild = (
         <>
@@ -248,13 +285,24 @@ const RecordersMemo = React.memo(Recorders);
 
 function Scenarios() {
     const [hmi, dispatch] = usePickHmiStore();
-    const onChange = (scenario: any) => {
-        dispatch(changeScenarios(scenario));
-    };
+    const { isMainConnected, mainApi } = useWebSocketServices();
+    const onChange = useCallback(
+        (scenariosSet: any, scenarios: any) => {
+            if (isMainConnected) {
+                dispatch(
+                    changeScenarios(mainApi, {
+                        scenariosSetId: scenariosSet.id,
+                        scenarioId: scenarios.scenarioId,
+                    }),
+                );
+            }
+        },
+        [isMainConnected],
+    );
 
     const items = useMemo(
         () =>
-            Object.keys(hmi.scenarioSet)
+            Object.keys(hmi.scenarioSet || {})
                 .sort()
                 .map((key) => ({
                     label: hmi.scenarioSet[key].scenarioSetName,
@@ -269,19 +317,20 @@ function Scenarios() {
     );
 
     // hmi.currentMap换成scenarios
-    return <SourceList2<IScenarioInfo> activeId={hmi.currentMap} onChange={onChange} items={items} />;
+    return <SourceList2<IScenarioInfo> activeId={hmi.currentScenarioId} onChange={onChange} items={items} />;
 }
 
 const ScenariosMemo = React.memo(Scenarios);
 
 function Map() {
+    const { t: translation } = useTranslation('modeSettings');
     const [hmi, dispatch] = usePickHmiStore();
 
     const { isMainConnected, mainApi } = useWebSocketServices();
     const onChange = useCallback(
         (mapId: any) => {
             if (isMainConnected) {
-                dispatch(changeMap(mainApi, mapId));
+                dispatch(changeMap(mainApi, mapId, translation));
             }
         },
         [isMainConnected],
@@ -289,7 +338,7 @@ function Map() {
 
     const items = useMemo(() => hmi.maps.map((item) => ({ id: item, label: item, content: item })), [hmi.maps]);
 
-    return <SourceList1<string> activeId={hmi.currentMap} onChange={onChange} items={items} />;
+    return <SourceList1<string> activeId={hmi.currentMap} onChange={onChange} items={items} type='HDMap' />;
 }
 
 const MapMemo = React.memo(Map);
@@ -320,73 +369,113 @@ function V2X() {
 
 const V2XMemo = React.memo(V2X);
 
-function VariableResources() {
+function EnviormentResources() {
     const { classes } = useStyle()();
     const { t } = useTranslation('modeSettings');
+    const [{ activeEnviormentResourceTab }, dispatch] = useMenuStore();
 
     const [hmi] = usePickHmiStore();
 
-    const variableResourcesItems = useMemo(
+    const EnviormentResourcesItems = useMemo(
         () =>
             ({
                 [HMIModeOperation.PLAY_RECORDER]: [
                     {
-                        key: 'Recorders',
+                        key: ENUM_ENVIORMENT_MANAGER_TAB_KEY.RECORD,
                         label: t('records'),
                         children: <RecordersMemo />,
                     },
                     {
-                        key: 'Map',
+                        key: ENUM_ENVIORMENT_MANAGER_TAB_KEY.MAP,
                         label: t('HDMap'),
                         children: <MapMemo />,
                     },
-                    // {
-                    //     key: 'Scenarios',
-                    //     label: 'Scenarios',
-                    //     children: <Scenarios />,
-                    // },
                 ],
-            }[hmi.currentOperation] || []),
+                [HMIModeOperation.SIM_CONTROL]: [
+                    {
+                        key: ENUM_ENVIORMENT_MANAGER_TAB_KEY.MAP,
+                        label: t('HDMap'),
+                        children: <MapMemo />,
+                    },
+                ],
+                [HMIModeOperation.SCENARIO]: [
+                    {
+                        key: ENUM_ENVIORMENT_MANAGER_TAB_KEY.SCENARIO,
+                        label: t('scenario'),
+                        children: <ScenariosMemo />,
+                    },
+                ],
+            }[hmi.currentOperation]),
         [t, hmi.currentOperation],
+    );
+
+    const onChange = useCallback((key: string) => {
+        dispatch(ChangeEnviormentResourcesAction(key as ENUM_ENVIORMENT_MANAGER_TAB_KEY));
+    }, []);
+
+    useEffect(() => {
+        const hasItemHidden =
+            EnviormentResourcesItems &&
+            !EnviormentResourcesItems.some((item) => item.key === activeEnviormentResourceTab);
+        if (hasItemHidden) {
+            dispatch(ChangeEnviormentResourcesAction(EnviormentResourcesItems[0].key));
+        }
+    }, [activeEnviormentResourceTab, EnviormentResourcesItems]);
+
+    if (!EnviormentResourcesItems) {
+        return null;
+    }
+
+    const expendChild = (
+        <Tabs
+            activeKey={activeEnviormentResourceTab}
+            rootClassName={classes.resource}
+            items={EnviormentResourcesItems}
+            onChange={onChange}
+        />
     );
 
     return (
         <>
-            <ModeSettingTitle
-                expendChild={<Tabs rootClassName={classes.resource} items={variableResourcesItems} />}
-                title={t('variableResources')}
-            />
+            <ModeSettingTitle expendChild={expendChild} title={t('enviormentResources')} />
             <Divider />
         </>
     );
 }
 
-const VariableResourcesMemo = React.memo(VariableResources);
+const EnviormentResourcesMemo = React.memo(EnviormentResources);
 
-function FixedResource() {
+function AdsResource() {
     const { classes } = useStyle()();
+    const [{ activeAdsResourceTab }, dispatch] = useMenuStore();
     const { t } = useTranslation('modeSettings');
-    const fixedResourceItems = useMemo(
+    const adsResourceItems = useMemo(
         () => [
             {
-                key: 'Vehicle',
+                key: ENUM_ADS_MANAGER_TAB_KEY.VEHICLE,
                 label: t('vehicle'),
                 children: <VehicleMemo />,
             },
-            // {
-            //     key: 'V2X',
-            //     label: 'V2X',
-            //     children: <V2X />,
-            // },
         ],
         [t],
     );
-    const expendChild = <Tabs rootClassName={classes.resource} items={fixedResourceItems} />;
+    const onChange = useCallback((key: string) => {
+        dispatch(ChangeAdsResourcesAction(key as ENUM_ADS_MANAGER_TAB_KEY));
+    }, []);
 
-    return <ModeSettingTitle expendChild={expendChild} title={t('fixedResources')} />;
+    const expendChild = (
+        <Tabs
+            onChange={onChange}
+            activeKey={activeAdsResourceTab}
+            rootClassName={classes.resource}
+            items={adsResourceItems}
+        />
+    );
+
+    return <ModeSettingTitle expendChild={expendChild} title={t('adsResources')} />;
 }
 
-const FixedResourceMemo = React.memo(FixedResource);
+const AdsResourceMemo = React.memo(AdsResource);
 
 function CurrentResource() {
     const [hmi] = usePickHmiStore();
@@ -397,7 +486,7 @@ function CurrentResource() {
 
     const values = useMemo(
         () =>
-            ['currentRecordId', 'currentMap', 'currentVehicle']
+            ['currentRecordId', 'currentScenarioName', 'currentMap', 'currentVehicle']
                 .map((key: string) => hmi[key as keyof IInitState])
                 .filter(Boolean),
         [hmi],
@@ -438,20 +527,19 @@ function GudieContainer(props: PropsWithChildren<{ id: string }>) {
 }
 
 function ModeSetting() {
-    const [hmi] = usePickHmiStore();
-    const isPlayerControlShow = hmiUtils.isPlayerControlShow(hmi);
+    const [, { bottomBarHeightString }] = useComponentDisplay();
     const height = useMemo(
         () => ({
-            height: `calc(100vh - 78px - ${isPlayerControlShow ? 63 : 0}px)`,
+            height: `calc(100vh - 78px - ${bottomBarHeightString})`,
         }),
-        [isPlayerControlShow],
+        [bottomBarHeightString],
     );
     const { classes } = useStyle()(height);
     const { t } = useTranslation('modeSettings');
     return (
         <div className={classes['mode-setting']}>
             <MenuDrawerTitle title={t('modeSettings')} />
-            <CustomScroll className={classes['mode-setting-container']} id='mode-setting-container-scroll'>
+            <CustomScroll className={classes['mode-setting-container']}>
                 {/* <Language /> */}
                 <GudieContainer id='guide-modesettings-mode'>
                     <ModeMemo />
@@ -464,10 +552,10 @@ function ModeSetting() {
                 </GudieContainer>
                 <CurrentResourceMemo />
                 <GudieContainer id='guide-modesettings-variable'>
-                    <VariableResourcesMemo />
+                    <EnviormentResourcesMemo />
                 </GudieContainer>
                 <GudieContainer id='guide-modesettings-fixed'>
-                    <FixedResourceMemo />
+                    <AdsResourceMemo />
                 </GudieContainer>
             </CustomScroll>
         </div>

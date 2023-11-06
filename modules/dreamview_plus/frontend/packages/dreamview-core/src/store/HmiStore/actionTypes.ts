@@ -20,6 +20,11 @@ export const enum ACTIONS {
     CHANGE_VEHICLE = 'CHANGE_VEHICLE',
 }
 
+export enum SIM_CONTROL_STATUS {
+    OK = 'OK',
+    UNKNOWN = 'UNKNOWN',
+}
+
 export interface IPoint2D {
     x?: number;
     y?: number;
@@ -65,6 +70,16 @@ export enum VEHICLE_TYPE {
     'DKIT_CHALLENGE',
 }
 
+export enum ENUM_DATARECORD_PRECESS_STATUS {
+    FATAL = 'FATAL',
+    OK = 'OK',
+}
+export enum ENUM_DATARECORD_RESOURCE_STATUS {
+    OK = 'UNKNOWN',
+    ERROR = 'ERROR',
+    WARN = 'WARN',
+}
+
 export enum COMPONENT_STATUS {
     FATAL = 'FATAL',
     OK = 'OK',
@@ -79,6 +94,7 @@ export enum CURRENT_MODE {
     NONE = 'none',
     DEFAULT = 'Default',
     PERCEPTION = 'Perception',
+    PNC = 'Pnc',
 }
 
 export enum PREPROCESS_STATUS {
@@ -90,7 +106,10 @@ export enum PREPROCESS_STATUS {
 export enum HMIModeOperation {
     PLAY_RECORDER = 'Record',
     SIM_DEBUG = 'SIM_DEBUG',
-    SIM_CONTROL = 'SIM_CONTROL',
+    // SIM_CONTROL = 'SIM_CONTROL',
+    // SCENARIO = 'SCENARIO',
+    SIM_CONTROL = 'Sim_Control',
+    SCENARIO = 'Scenario_Sim',
     REAL_CAR_AUTO_DRIVING = 'REAL_CAR_AUTO_DRIVING',
     TRACE = 'TRACE',
 }
@@ -112,12 +131,28 @@ export interface SIM_WORLD_STATUS {
     maps: string[];
     modes: string[];
     modules: Record<string, boolean>;
+    modulesLock: Record<string, boolean>;
     monitoredComponents: Record<string, COMPONENTS>;
-    otherComponents: Record<string, COMPONENTS>;
     passengerMsg: string;
     records: Record<any, any>;
     scenarioSet: Record<string, IScenarioSet>;
     vehicles: string[];
+    backendShutdown: boolean;
+    dataRecorderComponent: {
+        processStatus: {
+            status: ENUM_DATARECORD_PRECESS_STATUS;
+        };
+        resourceStatus: {
+            status: ENUM_DATARECORD_RESOURCE_STATUS;
+        };
+    };
+    otherComponents: Record<
+        string,
+        {
+            message: string;
+            status: SIM_CONTROL_STATUS;
+        }
+    >;
 }
 
 export type IInitState = {
@@ -127,10 +162,18 @@ export type IInitState = {
     vehicles: string[];
     currentVehicle: string;
     dockerImage: string;
+    otherComponents: Record<
+        string,
+        {
+            message: string;
+            status: SIM_CONTROL_STATUS;
+        }
+    >;
 
     maps: string[];
     currentMap: string;
     moduleStatus: Map<string, boolean>;
+    modulesLock: Map<string, boolean>;
     componentStatus: Map<string, COMPONENTS>;
 
     isVehicleCalibrationMode: boolean;
@@ -138,10 +181,24 @@ export type IInitState = {
     records: Record<string, RECORDER_DOWNLOAD_STATUS>;
     currentRecordId: string;
     currentScenarioSetId: string;
+    currentScenarioId: string;
+    currentScenarioName: string;
     scenarioSet: SIM_WORLD_STATUS['scenarioSet'];
     currentRecordStatus: apollo.dreamview.IRecordStatus;
     operations: apollo.dreamview.HMIModeOperation[];
     currentOperation: string;
+
+    dataRecorderComponent: {
+        processStatus: {
+            status: ENUM_DATARECORD_PRECESS_STATUS;
+        };
+        resourceStatus: {
+            status: ENUM_DATARECORD_RESOURCE_STATUS;
+        };
+    };
+
+    envResourcesHDMapDisable: boolean;
+    backendShutdown: boolean;
 };
 
 export type UpdateStatusAction = PayloadAction<ACTIONS.UPDATE_STATUS, SIM_WORLD_STATUS>;
@@ -164,11 +221,17 @@ export type ChangeRecorderPayload = string;
 
 export type ChangeRecorderAction = PayloadAction<ACTIONS.CHANGE_RECORDER, ChangeRecorderPayload>;
 
-export type ChangeScenariosPayload = string;
+export interface ChangeScenariosPayload {
+    scenariosSetId: string;
+    scenarioId: string;
+}
 
 export type ChangeScenariosAction = PayloadAction<ACTIONS.CHANGE_SCENARIOS, ChangeScenariosPayload>;
 
-export type ChangeMapPayload = string;
+export type ChangeMapPayload = {
+    mapSetId: string;
+    mapDisableState: boolean;
+};
 
 export type ChangeMapAction = PayloadAction<ACTIONS.CHANGE_MAP, ChangeMapPayload>;
 

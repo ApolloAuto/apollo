@@ -1,8 +1,8 @@
 export const modeSettings = {
     language: 'Language',
     modeSettings: 'Mode Settings',
+    resourceManager: 'Resource Manager',
     use: 'use',
-    profileManager: 'Resource Manager',
     empty: 'No resource currently in use',
     currentResource: 'Current Resources',
     mode: 'Mode',
@@ -12,6 +12,9 @@ export const modeSettings = {
     resetAll: 'Reset All',
     records: 'Records',
     map: 'Map',
+    scenario: 'scenario',
+    enviormentResources: 'Enviroment Resources',
+    adsResources: 'ADS Resources',
     variableResources: 'Enviroment Resources',
     fixedResources: 'ADS Resources',
     HDMap: 'HDMap',
@@ -20,4 +23,6 @@ export const modeSettings = {
     noDataMsg1: 'Please go to ',
     noDataMsg2: 'Resource Manger',
     noDataMsg3: ' to download',
+    mapLoading: 'Map loading...',
+    moduleStartupFailed: 'module startup failed, please check',
 };

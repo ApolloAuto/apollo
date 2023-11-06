@@ -1,6 +1,7 @@
 import loglevel, { LogLevelNumbers } from 'loglevel';
 import { filter, map, of, reduce } from 'rxjs';
 import { visualizeFlatted } from './utils/visualizeFlatted';
+import { Global, isDarkMode } from './utils/constant';
 
 export enum LogLevel {
     DEBUG = 1,
@@ -35,7 +36,22 @@ export default class Logger {
     private constructor(name: string) {
         this.logger = loglevel.getLogger(name);
         this.loggerName = name ?? 'default';
-        this.setLevel('debug'); // 设置默认级别为debug
+        // 默认不显示日志
+        this.setLevel('silent');
+    }
+
+    /**
+     * 获取所有Logger实例的静态方法
+     */
+    public static getAllInstances(): Map<string, Logger> {
+        return this.instances || new Map();
+    }
+
+    /**
+     * 获取所有Logger实例的名称
+     */
+    public static getAllLoggerNames(): string[] {
+        return Array.from(this.instances.keys());
     }
 
     // 获取Logger实例的静态方法
@@ -206,4 +222,62 @@ export default class Logger {
         }
         return `${timestamp} [${level}] ${message}`;
     }
+}
+
+// 只有在window对象上不存在setLogLevel方法时才注册
+if (Global.setLogLevel === undefined) {
+    const darkMode = isDarkMode();
+    const titleStyle = darkMode
+        ? 'font-size: 14px; font-weight: bold; color: #ffa500; background-color: #333;'
+        : 'font-size: 14px; font-weight: bold; color: #ffa500; background-color: #eee;';
+    const infoStyle = darkMode ? 'color: #ddd;' : 'color: #555;';
+    // setLogLevel使用方法： setLogLevel(name, level)
+    // name: Logger实例的名称，如果不指定，则更改所有Logger实例的日志级别
+    // level: 日志级别，可选值为：trace, debug, info, warn, error, silent
+    // setLogLevel(): 将所有Logger的日志级别设置为默认的debug。
+    // setLogLevel('default'): 将名为'default'的Logger的日志级别设置为debug。
+    // setLogLevel('default', 'info'): 将名为'default'的Logger的日志级别设置为info。
+
+    const displayInitializationHints = () => {
+        // 输出setLogLevel的使用方法
+        console.log('%csetLogLevel 使用方法:', titleStyle);
+        console.log('%c- setLogLevel() %c将所有 Logger 的日志级别设置为默认的 debug。', infoStyle, 'color: blue');
+        console.log(
+            "%c- setLogLevel('default') %c将名为 'default' 的 Logger 的日志级别设置为 debug。",
+            infoStyle,
+            'color: blue',
+        );
+        console.log(
+            "%c- setLogLevel('default', 'info') %c将名为 'default' 的 Logger 的日志级别设置为 info。",
+            infoStyle,
+            'color: blue',
+        );
+
+        // 输出showLogNames的使用方法
+        console.log('%cshowLogNames 使用方法:', titleStyle);
+        console.log('%c- showLogNames() %c显示所有已注册的 Logger 实例名称。', infoStyle, 'color: blue');
+    };
+
+    if (typeof window !== 'undefined') {
+        displayInitializationHints();
+    }
+
+    Global.setLogLevel = (name?: string, level: loglevel.LogLevelDesc = 'debug') => {
+        if (name) {
+            Logger.getInstance(name).setLevel(level);
+            console.log(`已将${name}的日志级别设置为${level}`);
+        } else {
+            // 如果没有指定name，则更改所有Logger的日志级别
+            Logger.getAllInstances().forEach((logger, loggerName) => {
+                logger.setLevel(level);
+                console.log(`已将${loggerName}的日志级别设置为${level}`);
+            });
+        }
+    };
+
+    Global.showLogNames = () => {
+        const loggerNames = Logger.getAllLoggerNames();
+        console.log('%c已注册的 Logger 实例名称：', titleStyle);
+        loggerNames.forEach((name) => console.log(`%c- ${name}`, infoStyle));
+    };
 }

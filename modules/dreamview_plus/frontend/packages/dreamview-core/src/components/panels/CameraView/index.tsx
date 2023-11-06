@@ -141,12 +141,19 @@ function InternalCameraView() {
     );
 }
 
-export default function CameraView(props: any) {
+function CameraView(props: any) {
     const Component = useMemo(
-        () => Panel(InternalCameraView, props.panelId, [{ name: StreamDataNames.CAMERA, needChannel: true }]),
+        () =>
+            Panel({
+                PanelComponent: InternalCameraView,
+                panelId: props.panelId,
+                subscribeInfo: [{ name: StreamDataNames.CAMERA, needChannel: true }],
+            }),
         [],
     );
     return <Component {...props} />;
 }
 
 InternalCameraView.displayName = 'InternalCameraView';
+
+export default React.memo(CameraView);

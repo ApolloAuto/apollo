@@ -12,5 +12,6 @@ cc_library(
     linkopts = [
         "-lncurses",
     ],
+    hdrs = glob(["**/*"]),
     linkstatic = False,
 )

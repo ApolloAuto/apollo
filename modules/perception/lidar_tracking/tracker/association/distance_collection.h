@@ -123,16 +123,6 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
                       const TrackedObjectConstPtr& cur_obj,
                       const double time_diff, double match_threshold);
 
-/**
- * @brief Lidar only: compute semantic map based distance
- *
- * @param track_dat track data contained predicted trajectory feature
- * @param cur_obj new detected object for computing distance
- * @return float distance
- */
-// float SemanticMapDistance(const MlfTrackData& track_dat,
-//                           const TrackedObjectConstPtr& cur_obj);
-
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo

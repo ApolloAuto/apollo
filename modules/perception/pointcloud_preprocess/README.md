@@ -64,7 +64,6 @@ cyber_launch start modules/transform/launch/static_transform.launch
 
 - sensor_name: sensor name
 - lidar_query_tf_offset: tf time offset
-- lidar2novatel_tf2_child_frame_id: point cloud sensor name
 - output_channel_name: output channel name
 - plugin_param: plugin parameters
   - name: method name

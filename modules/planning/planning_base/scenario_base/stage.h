@@ -67,8 +67,6 @@ class Stage {
     return static_cast<T*>(context_);
   }
 
-  Task* FindTask(const std::string& task_type) const;
-
   const std::string& NextStage() const { return next_stage_; }
 
  protected:
@@ -85,8 +83,8 @@ class Stage {
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
                        const std::string& name, const double time_diff_ms);
 
-  std::map<std::string, std::shared_ptr<Task>> tasks_;
   std::vector<std::shared_ptr<Task>> task_list_;
+  std::shared_ptr<Task> fallback_task_;
   std::string next_stage_;
   void* context_;
   std::shared_ptr<DependencyInjector> injector_;

@@ -1,7 +1,10 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
+
+PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 
 filegroup(
     name = "multi_sensor_fusion_files",
@@ -109,6 +112,7 @@ apollo_component(
     name = "libmulti_sensor_fusion.so",
     srcs = ["multi_sensor_fusion_component.cc"],
     hdrs = ["multi_sensor_fusion_component.h"],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         ":apollo_perception_multi_sensor_fusion",

@@ -9,6 +9,7 @@ cc_library(
     includes = [
         "include",
     ],
+    hdrs = glob(["include/**/*"]),
     linkopts = [
         "-latlas",
     ],
@@ -24,6 +25,7 @@ cc_library(
     linkopts = [
         "-lblas",
     ],
+    hdrs = glob(["include/**/*"]),
     linkstatic = False,
     strip_include_prefix = "include",
 )
@@ -36,6 +38,7 @@ cc_library(
     linkopts = [
         "-lcblas",
     ],
+    hdrs = glob(["include/**/*"]),
     linkstatic = False,
     strip_include_prefix = "include",
 )
@@ -48,6 +51,7 @@ cc_library(
     linkopts = [
         "-llapack",
     ],
+    hdrs = glob(["include/**/*"]),
     linkstatic = False,
     strip_include_prefix = "include",
 )

@@ -1,0 +1,5 @@
+frame_rate: 10
+ip: "192.168.2.11"
+port: 9911
+frame_id: "oculii_radar"
+channel_name: "/apollo/sensor/oculii/PointCloud2"

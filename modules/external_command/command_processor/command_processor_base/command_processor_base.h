@@ -60,12 +60,9 @@ class CommandProcessorBase {
 
   const std::shared_ptr<cyber::Node>& Node() const;
 
-  const std::string& GetConfigDir() const;
-
  private:
   std::shared_ptr<CommandProcessorConfig> processor_config_;
   std::shared_ptr<cyber::Node> node_;
-  std::string config_dir_;
 };
 
 }  // namespace external_command

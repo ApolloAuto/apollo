@@ -21,6 +21,7 @@
  */
 #pragma once
 #include <string>
+#include "nlohmann/json.hpp"
 
 namespace apollo {
 
@@ -44,9 +45,12 @@ class UpdaterBase {
   /**
    * @brief Start data flow.
    * @param time_interval_ms Data stream sending frequency.
+   * 0 means single subscribe
+   * @param subscribe_param: subscribe some updater may need extra params
    */
-  virtual void StartStream(const double &time_interval_ms,
-                           const std::string& channel_name = "") = 0;
+  virtual void StartStream(const double& time_interval_ms,
+                           const std::string& channel_name = "",
+                           nlohmann::json* subscribe_param = nullptr) = 0;
 
   /**
    * @brief Stop data flow.

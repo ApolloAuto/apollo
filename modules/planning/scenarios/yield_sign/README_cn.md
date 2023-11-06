@@ -53,8 +53,15 @@ apollo::planning::YieldSignScenario
 
 #### 配置
 
-| 文件路径                                                          | 说明             |
-| ----------------------------------------------------------------- | ---------------- |
-| `modules/planning/scenarios/yield_sign/conf/scenario_conf.pb.txt` | 场景的配置文件   |
-| `modules/planning/scenarios/yield_sign/conf/pipeline.pb.txt`      | 场景的流水线文件 |
+| 文件路径                                                                     | 类型/结构                                       | <div style="width: 300pt">说明</div> |
+| ---------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
+| `modules/planning/scenarios/yield_sign/conf/scenario_conf.pb.txt` |`apollo::planning::ScenarioYieldSignConfig` |场景的配置文件   |
+| `modules/planning/scenarios/yield_sign/conf/pipeline.pb.txt`      | `apollo::planning::ScenarioPipeline`|场景的流水线文件 |
+| `modules/planning/planning_base/conf/planning_config.pb.txt`                 | `apollo::planning::PlanningConfig`              | planning组件的配置文件               |
+
+#### Flags
+
+| 文件路径                                            |  <div style="width: 300pt">说明</div> |
+| --------------------------------------------------- |  ------------------------------------ |
+| `modules/planning/planning_base/conf/planning.conf` |  planning模块的flag配置文件           |
 

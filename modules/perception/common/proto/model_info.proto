@@ -24,10 +24,11 @@ enum Framework {
   TensorFlow = 4;
   Obstacle = 5;
   Caffe = 6;
+  Onnx = 7;
 }
 
 message ModelInfo {
-  reserved 7 to 19, 26 to 39;
+  reserved 8 to 19, 26 to 39;
 
   optional string name = 1;
   optional string version = 2;
@@ -35,6 +36,7 @@ message ModelInfo {
   optional TaskType task_type = 4;
   optional SensorType sensor_type = 5;
   optional Framework framework = 6;
+  optional string infer_plugin = 7;
   // files
   optional ModelFile proto_file = 20;
   optional ModelFile weight_file = 21;

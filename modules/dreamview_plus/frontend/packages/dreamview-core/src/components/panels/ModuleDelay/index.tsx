@@ -59,7 +59,7 @@ function InternalModuleDelay() {
         <CustomScroll className={classes['panel-module-delay-root']}>
             <ul className={classes['panel-module-delay-scroll']}>
                 {delayList.map((item, index) => (
-                    <li className={classes['panel-module-delay-item']} key={`${index + 1}`}>
+                    <li className={classes['panel-module-delay-item']} key={index + 1}>
                         <span className={classes.name}>{item.name}</span>
                         <span className={cx(classes.time, { [classes.error]: item.frotWarning })}>
                             {item.fronDelay}
@@ -71,9 +71,14 @@ function InternalModuleDelay() {
     );
 }
 
-export default function ModuleDelay(props: any) {
+function ModuleDelay(props: any) {
     const Component = useMemo(
-        () => Panel(InternalModuleDelay, props.panelId, [{ name: StreamDataNames.SIM_WORLD, needChannel: false }]),
+        () =>
+            Panel({
+                PanelComponent: InternalModuleDelay,
+                panelId: props.panelId,
+                subscribeInfo: [{ name: StreamDataNames.SIM_WORLD, needChannel: false }],
+            }),
         [],
     );
 
@@ -81,3 +86,5 @@ export default function ModuleDelay(props: any) {
 }
 
 InternalModuleDelay.displayName = 'InternalModuleDelay';
+
+export default React.memo(ModuleDelay);

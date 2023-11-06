@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <NvInfer.h>
 #include <NvInferVersion.h>
 
 #ifdef NV_TENSORRT_MAJOR
@@ -60,10 +61,14 @@ const std::map<std::string, nvinfer1::ActivationType> active_map{
     {"Sigmoid", nvinfer1::ActivationType::kSIGMOID},
     {"TanH", nvinfer1::ActivationType::kTANH},
     {"ReLU", nvinfer1::ActivationType::kRELU}};
-const std::vector<std::string> _gpu_checklist{
-    "GeForce GTX 1080",    "GeForce GTX 1080 Ti", "Tesla P4",
-    "Tesla P40",           "GeForce GTX 1070",    "GeForce GTX 1060",
-    "Tesla V100-SXM2-16GB"};
+const std::vector<std::string> _gpu_checklist{"GeForce GTX 1080",
+                                              "GeForce GTX 1080 Ti",
+                                              "Tesla P4",
+                                              "Tesla P40",
+                                              "GeForce GTX 1070",
+                                              "GeForce GTX 1060",
+                                              "Tesla V100-SXM2-16GB",
+                                              "Orin"};
 
 class RTNet : public Inference {
  public:

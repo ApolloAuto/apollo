@@ -85,7 +85,7 @@ apollo_cc_library(
         "inference_factory.cc",
         "libtorch/torch_net.cc",
         "onnx/libtorch_obstacle_detector.cc",
-        "onnx/onnx_obstacle_detector.cc",
+        "onnx/onnx_single_batch_infer.cc",
         "paddlepaddle/paddle_net.cc",
     ],
     hdrs = [
@@ -93,7 +93,7 @@ apollo_cc_library(
         "inference_factory.h",
         "libtorch/torch_net.h",
         "onnx/libtorch_obstacle_detector.h",
-        "onnx/onnx_obstacle_detector.h",
+        "onnx/onnx_single_batch_infer.h",
         "paddlepaddle/paddle_net.h",
     ],
     deps = [

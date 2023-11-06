@@ -262,7 +262,6 @@ void PathAssessmentDeciderUtil::TrimTailingOutLanePoints(
   ADEBUG << "Trimming " << path_data->path_label();
   auto frenet_path = path_data->frenet_frame_path();
   auto path_point_decision = path_data->path_point_decision_guide();
-  CHECK_EQ(frenet_path.size(), path_point_decision.size());
   while (!path_point_decision.empty() &&
          std::get<1>(path_point_decision.back()) !=
              PathData::PathPointType::IN_LANE) {

@@ -94,12 +94,14 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
                                                  &path_bound, init_sl_state_)) {
       const std::string msg = "Failed to initialize path boundaries.";
       AERROR << msg;
+      boundary->pop_back();
       continue;
     }
     // 2. Decide a rough boundary based on lane info and ADC's position
     if (!GetBoundaryFromNeighborLane(decided_side_pass_direction_[i],
                                      &path_bound, &borrow_lane_type)) {
       AERROR << "Failed to decide a rough boundary based on lane and adc.";
+      boundary->pop_back();
       continue;
     }
     // path_bound.DebugString("after_neighbor_lane");
@@ -112,6 +114,7 @@ bool LaneBorrowPath::DecidePathBounds(std::vector<PathBoundary>* boundary) {
           "Failed to decide fine tune the boundaries after "
           "taking into consideration all static obstacles.";
       AERROR << msg;
+      boundary->pop_back();
       continue;
     }
     // path_bound.DebugString("after_obs");
@@ -267,28 +270,32 @@ bool LaneBorrowPath::GetBoundaryFromNeighborLane(
         if (reference_line_info_->GetNeighborLaneInfo(
                 ReferenceLineInfo::LaneType::LeftForward, curr_s,
                 &neighbor_lane_id, &curr_neighbor_lane_width)) {
-          ADEBUG << "Borrow left forward neighbor lane.";
+          AINFO << "Borrow left forward neighbor lane."
+                << neighbor_lane_id.id();
         } else if (reference_line_info_->GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::LeftReverse, curr_s,
                        &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
-          ADEBUG << "Borrow left reverse neighbor lane.";
+          AINFO << "Borrow left reverse neighbor lane."
+                << neighbor_lane_id.id();
         } else {
-          ADEBUG << "There is no left neighbor lane.";
+          AERROR << "There is no left neighbor lane.";
         }
       } else if (pass_direction == SidePassDirection::RIGHT_BORROW) {
         // Borrowing right neighbor lane.
         if (reference_line_info_->GetNeighborLaneInfo(
                 ReferenceLineInfo::LaneType::RightForward, curr_s,
                 &neighbor_lane_id, &curr_neighbor_lane_width)) {
-          ADEBUG << "Borrow right forward neighbor lane.";
+          AINFO << "Borrow right forward neighbor lane."
+                << neighbor_lane_id.id();
         } else if (reference_line_info_->GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::RightReverse, curr_s,
                        &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
-          ADEBUG << "Borrow right reverse neighbor lane.";
+          AINFO << "Borrow right reverse neighbor lane."
+                << neighbor_lane_id.id();
         } else {
-          ADEBUG << "There is no right neighbor lane.";
+          AINFO << "There is no right neighbor lane.";
         }
       }
     }
@@ -353,8 +360,8 @@ bool LaneBorrowPath::IsNecessaryToBorrowLane() {
     }
   } else {
     // If originally not borrowing neighbor lane:
-    ADEBUG << "Blocking obstacle ID["
-           << mutable_path_decider_status->front_static_obstacle_id() << "]";
+    AINFO << "Blocking obstacle ID["
+          << mutable_path_decider_status->front_static_obstacle_id() << "]";
     // ADC requirements check for lane-borrowing:
     if (!HasSingleReferenceLine(*frame_)) {
       return false;
@@ -552,7 +559,15 @@ void LaneBorrowPath::CheckLaneBorrow(
       *right_neighbor_lane_borrowable = false;
       return;
     }
-
+    auto ptr_lane_info = reference_line_info.LocateLaneInfo(check_s);
+    if (ptr_lane_info->lane().left_neighbor_forward_lane_id().empty() &&
+        ptr_lane_info->lane().left_neighbor_reverse_lane_id().empty()) {
+      *left_neighbor_lane_borrowable = false;
+    }
+    if (ptr_lane_info->lane().right_neighbor_forward_lane_id().empty() &&
+        ptr_lane_info->lane().right_neighbor_reverse_lane_id().empty()) {
+      *right_neighbor_lane_borrowable = false;
+    }
     const auto waypoint = ref_point.lane_waypoints().front();
     hdmap::LaneBoundaryType::Type lane_boundary_type =
         hdmap::LaneBoundaryType::UNKNOWN;
@@ -661,8 +676,11 @@ void LaneBorrowPath::SetPathInfo(PathData* const path_data) {
       }
 
     } else {
-      AERROR << "reference line not ready when setting path point guide";
-      return;
+      AERROR
+          << "reference line not ready when setting path point guide, middle_s"
+          << middle_s << ",index" << i << "path point"
+          << discrete_path[i].DebugString();
+      break;
     }
   }
   path_data->SetPathPointDecisionGuide(std::move(path_decision));

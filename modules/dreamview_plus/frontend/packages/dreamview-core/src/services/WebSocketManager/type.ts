@@ -2,12 +2,14 @@
  * 定义与 WebSocketManager 元数据、连接状态、socket 名称、消息操作和有效负载字段相关的类型和接口。
  */
 
+import { StreamDataNames } from '../api/types';
+
 /**
  * 元数据项，包含数据名称、proto 文件路径、proto 描述、请求名称和 WebSocket 信息。
  */
 export type MetadataItem = {
     /** 数据名称 */
-    dataName: string;
+    dataName: StreamDataNames;
     /** 数据频道 */
     channels: string[];
     /** 是否存在不同的频道 */
@@ -127,6 +129,8 @@ export interface SubscribePayload {
     dataFrequencyMs?: number;
     /** channel名称 */
     channelName?: string;
+    /** 入参 */
+    param?: any;
 }
 
 export type RequestStreamMessage = RequestMessage<SubscribePayload>;
@@ -170,7 +174,14 @@ export interface StreamMessage {
 }
 
 // 二次反序列化数据类型
-export type StreamMessageData<T> = Omit<StreamMessage, 'data'> & { data: T };
+export type StreamMessageData<T> = Omit<StreamMessage, 'data'> & {
+    data: T;
+    // 用于性能评估
+    performance?: {
+        startTimestamp?: number;
+        endTimestamp?: number;
+    };
+};
 
 /**
  * 响应流消息类型，包含操作和数据。
@@ -181,3 +192,56 @@ export interface ResponseStreamMessage<T> {
     /** 数据 */
     data: PayloadField<ResponseDataField<T>>;
 }
+
+/** ***child socket***** */
+
+export type WorkerMessageType =
+    // 初始化WebSocket (INIT_SOCKET):
+    | 'INIT_SOCKET'
+    // 销毁WebSocket (DESTROY_SOCKET):
+    | 'DESTROY_SOCKET'
+    // 中断WebSocket (INTERRUPT_SOCKET):
+    | 'INTERRUPT_SOCKET'
+    // 重新连接WebSocket (RECONNECT_SOCKET):
+    | 'RECONNECT_SOCKET'
+    // WebSocket消息 (SOCKET_MESSAGE):
+    | 'SOCKET_MESSAGE'
+    // WebSocket错误 (SOCKET_ERROR):
+    | 'SOCKET_ERROR'
+    // WebSocket打开 (SOCKET_OPEN):
+    | 'SOCKET_OPEN'
+    // WebSocket已关闭 (SOCKET_CLOSED):
+    | 'SOCKET_CLOSED';
+
+type INIT_SOCKET_Payload = { name: StreamDataNames; url: string };
+type DESTROY_SOCKET_Payload = undefined;
+type INTERRUPT_SOCKET_Payload = undefined;
+type RECONNECT_SOCKET_Payload = { name: StreamDataNames; url: string };
+type SOCKET_MESSAGE_Payload = unknown;
+type SOCKET_ERROR_Payload = undefined;
+type SOCKET_OPEN_Payload = undefined;
+type SOCKET_CLOSED_Payload = undefined;
+
+export type WorkerMessagePayloads = {
+    INIT_SOCKET: INIT_SOCKET_Payload;
+    DESTROY_SOCKET: DESTROY_SOCKET_Payload;
+    INTERRUPT_SOCKET: INTERRUPT_SOCKET_Payload;
+    RECONNECT_SOCKET: RECONNECT_SOCKET_Payload;
+    SOCKET_MESSAGE: SOCKET_MESSAGE_Payload;
+    SOCKET_ERROR: SOCKET_ERROR_Payload;
+    SOCKET_OPEN: SOCKET_OPEN_Payload;
+    SOCKET_CLOSED: SOCKET_CLOSED_Payload;
+};
+export interface WorkerMessage<T extends WorkerMessageType> {
+    type: T;
+    payload?: WorkerMessagePayloads[T];
+}
+
+export function isMessageType<T extends WorkerMessageType>(
+    message: WorkerMessage<WorkerMessageType>,
+    type: T,
+): message is WorkerMessage<T> {
+    return message.type === type;
+}
+
+export type SocketState = 'OPEN' | 'CLOSED' | 'ERROR' | 'PENDING';

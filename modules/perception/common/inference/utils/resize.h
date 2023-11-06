@@ -39,6 +39,10 @@ bool ResizeGPU(const base::Image8U &src,
                int stepwidth, int start_axis, float mean_b, float mean_g,
                float mean_r, bool channel_axis, float scale);
 
+bool ImageZeroPadding(const base::Image8U &src, base::Image8U *dst,
+                      int stepwidth, int left_pad, int right_pad, int top_pad,
+                      int bottom_pad, int value, cudaStream_t stream,
+                      bool same_order);
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo

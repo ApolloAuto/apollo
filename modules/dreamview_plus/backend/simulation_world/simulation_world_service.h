@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -171,6 +172,8 @@ class SimulationWorldService {
   nlohmann::json GetRoutePathAsJson() const;
 
   void DumpMessages();
+
+  void UpdateVehicleParam();
 
  private:
   void InitReaders();

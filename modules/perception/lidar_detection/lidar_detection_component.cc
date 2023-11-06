@@ -68,7 +68,7 @@ bool LidarDetectionComponent::Init() {
 
 bool LidarDetectionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   // internal proc
   bool status = InternalProc(message);
   if (status) {

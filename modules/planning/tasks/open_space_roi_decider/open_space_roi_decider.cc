@@ -1470,7 +1470,7 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
 
 bool OpenSpaceRoiDecider::FilterOutObstacle(const Frame &frame,
                                             const Obstacle &obstacle) {
-  if (obstacle.IsVirtual()) {
+  if (obstacle.IsVirtual() || !obstacle.IsStatic()) {
     return true;
   }
 

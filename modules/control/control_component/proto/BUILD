@@ -40,4 +40,29 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "calibration_table_proto",
+    srcs = ["calibration_table.proto"],
+)
+
+proto_library(
+    name = "mrac_conf_proto",
+    srcs = ["mrac_conf.proto"],
+)
+
+proto_library(
+    name = "leadlag_conf_proto",
+    srcs = ["leadlag_conf.proto"],
+)
+
+proto_library(
+    name = "gain_scheduler_conf_proto",
+    srcs = ["gain_scheduler_conf.proto"],
+)
+
+proto_library(
+    name = "pid_conf_proto",
+    srcs = ["pid_conf.proto"],
+)
+
 apollo_package()

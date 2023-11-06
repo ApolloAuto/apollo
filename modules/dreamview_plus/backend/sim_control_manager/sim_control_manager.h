@@ -21,6 +21,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
+#include "cyber/common/macros.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/dreamview_plus/backend/sim_control_manager/common/sim_control_gflags.h"
 #include "modules/dreamview_plus/backend/sim_control_manager/core/dynamic_model_factory.h"
@@ -38,7 +39,6 @@ namespace dreamview {
  */
 class SimControlManager {
  public:
-  SimControlManager() {}
   bool IsEnabled() const { return enabled_; }
   nlohmann::json LoadDynamicModels();
   bool AddDynamicModel(const std::string &dynamic_model_name);
@@ -78,6 +78,8 @@ class SimControlManager {
   SimControlBase *model_ptr_;
   std::string current_dynamic_model_ = "";
   bool enabled_ = false;
+
+  DECLARE_SINGLETON(SimControlManager)
 };
 
 }  // namespace dreamview

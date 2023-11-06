@@ -16,4 +16,6 @@ export enum PanelType {
     CameraView = 'cameraView',
     PointCloud = 'pointCloud',
     DashBoard = 'dashBoard',
+    PncMonitor = 'pncMonitor',
+    Components = 'components',
 }

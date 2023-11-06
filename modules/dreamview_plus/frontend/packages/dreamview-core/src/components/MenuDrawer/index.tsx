@@ -1,46 +1,36 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useMenuStore } from '@dreamview/dreamview-core/src/store/MenuStore';
 import { ENUM_MENU_KEY } from '@dreamview/dreamview-core/src/store/MenuStore/actionTypes';
 import AddPanel from './AddPanel';
 import ModeSetting from './ModeSetting';
-import ProfileManager from './ProfileManager';
+import ResourceManager from './ResourceManager';
 import useStyle from './useStyle';
-
-interface IMenuDrawer {}
+import useComponentDisplay from '../../hooks/useComponentDisplay';
 
 const DrawerCatalog: any = {
     [ENUM_MENU_KEY.ADD_PANEL]: AddPanel,
     [ENUM_MENU_KEY.MODE_SETTING]: ModeSetting,
-    [ENUM_MENU_KEY.PROFILE_MANAGEER]: ProfileManager,
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+    [ENUM_MENU_KEY.PROFILE_MANAGEER]: ResourceManager,
     [ENUM_MENU_KEY.HIDDEN]: () => <></>,
 };
 
 const DrawerCatalogKeys = Object.keys(DrawerCatalog);
 
-function MenuDrawer(props: IMenuDrawer) {
+function MenuDrawer() {
     const [{ activeMenu }] = useMenuStore();
+    const [, { menuDrawerWidthString }] = useComponentDisplay();
 
     const style = useMemo(() => {
-        const width = (() => {
-            if (activeMenu === ENUM_MENU_KEY.HIDDEN) {
-                return '0px';
-            }
-            if (activeMenu === ENUM_MENU_KEY.PROFILE_MANAGEER) {
-                return 'calc(100vw - 64px)';
-            }
-            return '370px';
-        })();
         const backgroundColor = activeMenu === ENUM_MENU_KEY.PROFILE_MANAGEER ? '#16181E' : '';
         return {
-            width,
+            width: menuDrawerWidthString,
             backgroundColor,
         };
-    }, [activeMenu]);
+    }, [activeMenu, menuDrawerWidthString]);
 
     const { classes, cx } = useStyle()(style);
 
-    const memo = React.useRef<Record<string, boolean>>({});
+    const memo = useRef<Record<string, boolean>>({});
 
     memo.current[activeMenu] = true;
 
@@ -53,7 +43,7 @@ function MenuDrawer(props: IMenuDrawer) {
             })}
         >
             {DrawerCatalogKeys.map((item: string) => {
-                const Component = React.memo(DrawerCatalog[item]);
+                const Component = DrawerCatalog[item];
                 if (memo.current[item]) {
                     return (
                         <div

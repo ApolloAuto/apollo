@@ -19,7 +19,7 @@ cc_library(
 )
 
 cc_library(
-    name = "third_party_Scamera_library_Csmartereye",
+    name = "third_party_Scamera_library_Ssmartereye_Csmartereye",
     srcs = glob(["lib/*.so*"]),
     hdrs = glob(["include/*.h"]),
     include_prefix = "third_party/camera_library/smartereye",

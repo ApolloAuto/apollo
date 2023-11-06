@@ -494,6 +494,7 @@ bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
                                         const double pitch_radian,
                                         const double yaw_radian,
                                         const double roll_radian) {
+  // Todo(zero): Need change to GetCommonConfigFile
   std::string yaml_file =
       FLAGS_obs_sensor_intrinsic_path + "/" + camera_name + "_extrinsics.yaml";
 

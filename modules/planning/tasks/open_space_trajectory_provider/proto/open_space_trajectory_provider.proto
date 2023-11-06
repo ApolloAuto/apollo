@@ -16,6 +16,7 @@ message OpenSpaceTrajectoryProviderConfig {
   optional double open_space_trajectory_stitching_preserved_length = 4 [default = inf];
   // (unit: meter/sec^2) for open space stand still at destination
   optional double open_space_standstill_acceleration = 5 [default = 0.0];
+  optional double open_space_straight_trajectory_length = 6 [default = 0.0];
 }
 
 message OpenSpaceTrajectoryOptimizerConfig {

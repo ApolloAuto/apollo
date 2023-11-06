@@ -9,7 +9,7 @@ export * from './actions';
 
 export { hmiUtils } from './reducerHandler';
 
-export const THROTTLE_TIME = 2000;
+export const THROTTLE_TIME = 3000;
 
 export const {
     StoreProvider: HmiStoreProvider,

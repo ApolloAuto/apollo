@@ -81,7 +81,7 @@ export default function useStyle() {
             },
         },
         'operate-success': {
-            '& .dreamview-popover-inner,& .dreamview-popover-arrow::before, & .dreamview-popover-arrow::after': {
+            '& .dreamview-popover-inner, & .dreamview-popover-arrow::after': {
                 background: 'rgba(31,204,77,0.25)',
             },
             '& .dreamview-popover-arrow::before': {
@@ -95,10 +95,7 @@ export default function useStyle() {
             },
         },
         'operate-failed': {
-            '& .dreamview-popover-inner,& .dreamview-popover-arrow::before, & .dreamview-popover-arrow::after': {
-                background: 'rgba(255,77,88,0.25)',
-            },
-            '& .dreamview-popover-arrow::before': {
+            '& .dreamview-popover-inner, & .dreamview-popover-arrow::after': {
                 background: 'rgba(255,77,88,0.25)',
             },
             '& .dreamview-popover-arrow::after': {

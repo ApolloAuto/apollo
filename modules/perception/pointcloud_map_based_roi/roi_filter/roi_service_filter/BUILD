@@ -1,5 +1,5 @@
+load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_plugin", "apollo_cc_test")
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -8,11 +8,11 @@ PERCEPTION_COPTS = ['-DMODULE_NAME=\\"perception\\"']
 apollo_plugin(
     name = "libroi_service_filter.so",
     description = ":plugins.xml",
-    deps = [":lib_roi_service_filter"],
+    deps = [":lib_rsf"],
 )
 
 apollo_cc_library(
-    name = "lib_roi_service_filter",
+    name = "lib_rsf",
     srcs = [
         "roi_service_filter.cc",
     ],

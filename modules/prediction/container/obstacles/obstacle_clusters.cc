@@ -56,6 +56,10 @@ void ObstacleClusters::AddObstacle(const int obstacle_id,
   lane_obstacles_[lane_id].push_back(std::move(lane_obstacle));
 }
 
+void ObstacleClusters::ClearObstacle() {
+  lane_obstacles_.clear();
+}
+
 void ObstacleClusters::SortObstacles() {
   for (auto iter = lane_obstacles_.begin(); iter != lane_obstacles_.end();
        ++iter) {

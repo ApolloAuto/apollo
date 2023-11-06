@@ -4,7 +4,7 @@ import { isNumber } from 'lodash';
 import useCustomSubcribe from '../../hooks/useCustomSubcribe';
 import useRegisterCustomSubcribe from '../../hooks/useRegisterCustomSubcribe';
 
-export function PublishSubscribe(props) {
+function PublishSubscribe(props) {
     const [count, setCount] = useState(0);
 
     // 注册事件名称，并得到该事件发布最新数据的方法
@@ -39,3 +39,5 @@ export function PublishSubscribe(props) {
         </div>
     );
 }
+
+export default React.memo(PublishSubscribe);

@@ -110,6 +110,7 @@ struct Object {
   CarLight car_light;
   // @brief sensor-specific object supplements, optional
   LidarObjectSupplement lidar_supplement;
+  Radar4dObjectSupplement radar4d_supplement;
   RadarObjectSupplement radar_supplement;
   CameraObjectSupplement camera_supplement;
   FusionObjectSupplement fusion_supplement;

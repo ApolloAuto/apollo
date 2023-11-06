@@ -1,6 +1,6 @@
 <cyber>
     <module>
-        <name>dreamview</name>
+        <name>dreamview_plus</name>
         <dag_conf></dag_conf>
         <type>binary</type>
         <process_name>

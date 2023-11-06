@@ -3,7 +3,7 @@ import { CombineAction } from './actions';
 import { ACTIONS, IInitState, CURRENT_MODE } from './actionTypes';
 import { reducerHander } from './reducerHandler';
 
-// 在使用 Immer 时涉及到了 Map 或 Set 数据结构， 需要开启 MapSet 插件。
+// 使用 Immer 时涉及到了 Map 或 Set 数据结构， 需要开启 MapSet 插件。
 enableMapSet();
 
 export const reducer = (state: IInitState, action: CombineAction) =>
@@ -29,6 +29,7 @@ export const reducer = (state: IInitState, action: CombineAction) =>
                 break;
             case ACTIONS.CHANGE_MAP:
                 reducerHander.changeMap(action.payload);
+                draftState.envResourcesHDMapDisable = action.payload.mapDisableState;
                 break;
             case ACTIONS.CHANGE_VEHICLE:
                 reducerHander.changeVehicle(action.payload);
@@ -50,6 +51,7 @@ export const initState: IInitState = {
     maps: [],
     currentMap: '',
     moduleStatus: new Map(),
+    modulesLock: new Map(),
     componentStatus: new Map(),
 
     isVehicleCalibrationMode: false,
@@ -58,9 +60,24 @@ export const initState: IInitState = {
     records: {},
     currentRecordId: '',
     currentScenarioSetId: '',
+    currentScenarioName: '',
+    currentScenarioId: '',
     scenarioSet: {},
+    otherComponents: {},
 
     currentRecordStatus: undefined,
     operations: [],
     currentOperation: undefined,
+
+    dataRecorderComponent: {
+        processStatus: {
+            status: undefined,
+        },
+        resourceStatus: {
+            status: undefined,
+        },
+    },
+
+    envResourcesHDMapDisable: false,
+    backendShutdown: false,
 };

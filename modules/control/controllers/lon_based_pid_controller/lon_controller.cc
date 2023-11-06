@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 #include "cyber/time/clock.h"
 #include "cyber/time/time.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/control/control_component/common/control_gflags.h"
@@ -31,17 +32,20 @@
 namespace apollo {
 namespace control {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
 using apollo::cyber::Time;
+using apollo::external_command::CommandStatusType;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::StopReasonCode;
 
 constexpr double GRA_ACC = 9.8;
 
 LonController::LonController() : name_("PID-basesd Longitudinal Controller") {
+  // node_.reset(new apollo::cyber::Node("lon_controller"));
   if (FLAGS_enable_csv_debug) {
     time_t rawtime;
     char name_buffer[80];
@@ -110,8 +114,20 @@ Status LonController::Init(std::shared_ptr<DependencyInjector> injector) {
   }
 
   injector_ = injector;
-  // const LonControllerConf &lon_controller_conf =
-  //     control_conf_->lon_controller_conf();
+  standstill_narmal_acceleration_ =
+      lon_based_pidcontroller_conf_.standstill_narmal_acceleration();
+  if (standstill_narmal_acceleration_ > 0) {
+    AERROR << "Lon_Param[standstill_narmal_acceleration] need to be negatived.";
+    standstill_narmal_acceleration_ = common::math::check_negative(
+        lon_based_pidcontroller_conf_.standstill_narmal_acceleration());
+  }
+  stop_gain_acceleration_ =
+      lon_based_pidcontroller_conf_.stop_gain_acceleration();
+  if (stop_gain_acceleration_ > 0) {
+    AERROR << "Lon_Param[stop_gain_acceleration] need to be negatived.";
+    stop_gain_acceleration_ = common::math::check_negative(
+        lon_based_pidcontroller_conf_.stop_gain_acceleration());
+  }
   double ts = lon_based_pidcontroller_conf_.ts();
   bool enable_leadlag =
       lon_based_pidcontroller_conf_.enable_reverse_leadlag_compensation();
@@ -167,8 +183,8 @@ Status LonController::ComputeControlCommand(
     control::ControlCommand *cmd) {
   localization_ = localization;
   chassis_ = chassis;
-
   trajectory_message_ = planning_published_trajectory;
+
   if (!control_interpolation_) {
     AERROR << "Fail to initialize calibration table.";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
@@ -213,10 +229,20 @@ Status LonController::ComputeControlCommand(
   }
 
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
-    station_pid_controller_.SetPID(
-        lon_based_pidcontroller_conf_.reverse_station_pid_conf());
-    speed_pid_controller_.SetPID(
-        lon_based_pidcontroller_conf_.reverse_speed_pid_conf());
+    if (CheckPit::CheckInPit(debug, &lon_based_pidcontroller_conf_,
+                             injector_->vehicle_state()->linear_velocity(),
+                             trajectory_message_->is_replan())) {
+      ADEBUG << "in pit";
+      station_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.pit_station_pid_conf());
+      speed_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.pit_speed_pid_conf());
+    } else {
+      station_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.station_pid_conf());
+      speed_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.low_speed_pid_conf());
+    }
     if (enable_leadlag) {
       station_leadlag_controller_.SetLeadlag(
           lon_based_pidcontroller_conf_.reverse_station_leadlag_conf());
@@ -225,10 +251,20 @@ Status LonController::ComputeControlCommand(
     }
   } else if (injector_->vehicle_state()->linear_velocity() <=
              lon_based_pidcontroller_conf_.switch_speed()) {
-    station_pid_controller_.SetPID(
-        lon_based_pidcontroller_conf_.station_pid_conf());
-    speed_pid_controller_.SetPID(
-        lon_based_pidcontroller_conf_.low_speed_pid_conf());
+    if (CheckPit::CheckInPit(debug, &lon_based_pidcontroller_conf_,
+                             injector_->vehicle_state()->linear_velocity(),
+                             trajectory_message_->is_replan())) {
+      ADEBUG << "in pit";
+      station_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.pit_station_pid_conf());
+      speed_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.pit_speed_pid_conf());
+    } else {
+      station_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.station_pid_conf());
+      speed_pid_controller_.SetPID(
+          lon_based_pidcontroller_conf_.low_speed_pid_conf());
+    }
   } else {
     station_pid_controller_.SetPID(
         lon_based_pidcontroller_conf_.station_pid_conf());
@@ -273,6 +309,8 @@ Status LonController::ComputeControlCommand(
     station_pid_controller_.Reset_integral();
   }
 
+  // uphill slope_offset_compensation < 0;
+  // downhill slope_offset_compensation > 0
   double slope_offset_compensation = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(injector_->vehicle_state()->pitch()));
 
@@ -284,7 +322,7 @@ Status LonController::ComputeControlCommand(
 
   double acceleration_cmd =
       acceleration_cmd_closeloop + debug->preview_acceleration_reference() +
-      lon_based_pidcontroller_conf_.enable_slope_offset() *
+      lon_based_pidcontroller_conf_.enable_slope_offset() * (-1) *
           debug->slope_offset_compensation();
 
   // Check the steer command in reverse trajectory if the current steer target
@@ -336,7 +374,7 @@ Status LonController::ComputeControlCommand(
     }
   }
 
-  if (std::abs(debug->path_remain()) < FLAGS_max_path_remain_when_stopped) {
+  if (debug->path_remain() < FLAGS_max_path_remain_when_stopped) {
     if (debug->is_stop_reason_by_destination() ||
         debug->is_stop_reason_by_prdestrian() ||
         trajectory_message_->trajectory_type() == ADCTrajectory::OPEN_SPACE) {
@@ -383,9 +421,11 @@ Status LonController::ComputeControlCommand(
   if (debug->is_full_stop_soft()) {
     acceleration_cmd =
         (acceleration_cmd >= 0)
-            ? std::min(acceleration_cmd, lon_based_pidcontroller_conf_
-                                             .standstill_narmal_acceleration())
-            : lon_based_pidcontroller_conf_.standstill_narmal_acceleration();
+            ? std::min(acceleration_cmd, standstill_narmal_acceleration_)
+        : (debug->path_remain() >= 0) ? acceleration_cmd
+        : (trajectory_message_->trajectory_type() != ADCTrajectory::NORMAL)
+            ? (acceleration_cmd + stop_gain_acceleration_)
+            : (acceleration_cmd + standstill_narmal_acceleration_);
     speed_pid_controller_.Reset_integral();
     station_pid_controller_.Reset_integral();
   }
@@ -446,6 +486,25 @@ Status LonController::ComputeControlCommand(
       brake_cmd = brake_lowerbound;
     } else {
       brake_cmd = std::max(-calibration_value, brake_lowerbound);
+    }
+  }
+
+  if (FLAGS_use_vehicle_epb) {
+    if (acceleration_lookup >= 0) {
+      cmd->set_parking_brake(false);
+      if (chassis->parking_brake()) {
+        throttle_cmd = 0.0;
+        SetParkingBrake(&lon_based_pidcontroller_conf_, cmd);
+      }
+    } else {
+      cmd->set_parking_brake(false);
+      if (debug->is_full_stop() && IsFullStopLongTerm(debug) &&
+          trajectory_message_->trajectory_type() != ADCTrajectory::OPEN_SPACE) {
+        cmd->set_parking_brake(true);
+        if (chassis->parking_brake()) {
+          brake_cmd = 0.0;
+        }
+      }
     }
   }
 
@@ -647,20 +706,16 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
 bool LonController::IsStopByDestination(SimpleLongitudinalDebug *debug) {
   auto stop_reason = trajectory_message_->decision().main_decision().stop();
   ADEBUG << "Current stop reason is \n" << stop_reason.DebugString();
-  if (trajectory_message_->decision().main_decision().has_mission_complete()) {
-    ADEBUG << "Current main decision is mission complete: "
-           << trajectory_message_->decision()
-                  .main_decision()
-                  .mission_complete()
-                  .DebugString();
-  }
+  ADEBUG << "Planning command status msg is \n"
+         << injector_->Get_planning_command_status()->ShortDebugString();
 
   StopReasonCode stop_reason_code = stop_reason.reason_code();
 
-  if (stop_reason_code == StopReasonCode::STOP_REASON_DESTINATION ||
-      stop_reason_code == StopReasonCode::STOP_REASON_SIGNAL ||
+  if (stop_reason_code == StopReasonCode::STOP_REASON_SIGNAL ||
       stop_reason_code == StopReasonCode::STOP_REASON_REFERENCE_END ||
-      trajectory_message_->decision().main_decision().has_mission_complete()) {
+      stop_reason_code == StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP ||
+      injector_->Get_planning_command_status()->status() ==
+          CommandStatusType::FINISHED) {
     ADEBUG << "[IsStopByDestination]Current stop reason is in destination.";
     debug->set_is_stop_reason_by_destination(true);
     return true;
@@ -691,8 +746,7 @@ bool LonController::IsPedestrianStopLongTerm(SimpleLongitudinalDebug *debug) {
       start_time_ = ::apollo::cyber::Clock::NowInSeconds();
       ADEBUG << "Stop reason for pedestrian, start time(s) is " << start_time_;
     } else {
-      ADEBUG
-          << "Last time stop is already pedestrian, skip the init start_time.";
+      ADEBUG << "Last time stop is already pedestrian, skip start_time init.";
     }
     double end_time = ::apollo::cyber::Clock::NowInSeconds();
     ADEBUG << "Stop reason for pedestrian, current time(s) is " << end_time;
@@ -716,6 +770,84 @@ bool LonController::IsPedestrianStopLongTerm(SimpleLongitudinalDebug *debug) {
            << lon_based_pidcontroller_conf_.pedestrian_stop_time();
     debug->set_is_stop_reason_by_prdestrian(false);
     return false;
+  }
+}
+
+bool LonController::IsFullStopLongTerm(SimpleLongitudinalDebug *debug) {
+  if (debug->is_full_stop()) {
+    if (debug->is_full_stop() && !is_full_stop_previous_) {
+      is_full_stop_start_time_ = ::apollo::cyber::Clock::NowInSeconds();
+      ADEBUG << "Full stop long term start time(s) is "
+             << is_full_stop_start_time_;
+    } else {
+      ADEBUG << "Last time stop is already full stop, skip start_time init.";
+    }
+    double is_full_stop_start_end_time = ::apollo::cyber::Clock::NowInSeconds();
+    is_full_stop_wait_time_diff_ =
+        is_full_stop_start_end_time - is_full_stop_start_time_;
+  } else {
+    is_full_stop_start_time_ = 0.0;
+    is_full_stop_wait_time_diff_ = 0.0;
+  }
+  is_full_stop_previous_ = debug->is_full_stop();
+  if (is_full_stop_wait_time_diff_ >
+      lon_based_pidcontroller_conf_.full_stop_long_time()) {
+    ADEBUG << "Current full stop lasting time(s) is "
+           << is_full_stop_wait_time_diff_ << ", larger than threshold: "
+           << lon_based_pidcontroller_conf_.full_stop_long_time();
+    return true;
+  } else {
+    ADEBUG << "Current full stop lasting time(s) is "
+           << is_full_stop_wait_time_diff_ << ", not reach the threshold: "
+           << lon_based_pidcontroller_conf_.full_stop_long_time();
+    return false;
+  }
+}
+
+void LonController::SetParkingBrake(const LonBasedPidControllerConf *conf,
+                                    control::ControlCommand *control_command) {
+  if (control_command->parking_brake()) {
+    // epb on, parking brake: 0 -> 1
+    if (epb_on_change_switch_) {
+      ADEBUG << "Epb on, first set parking brake false.";
+      control_command->set_parking_brake(false);
+      ++epb_change_count_;
+      if (epb_change_count_ >= conf->epb_change_count()) {
+        epb_on_change_switch_ = false;
+        epb_change_count_ = 0;
+        ADEBUG << "Epb on, first stage has been done.";
+      }
+    } else {
+      ADEBUG << "Epb on, second set parking brake true.";
+      control_command->set_parking_brake(true);
+      ++epb_change_count_;
+      if (epb_change_count_ >= conf->epb_change_count()) {
+        epb_on_change_switch_ = true;
+        epb_change_count_ = 0;
+        ADEBUG << "Epb on, second stage has been done.";
+      }
+    }
+  } else {
+    // epb off, parking brake: 1 -> 0
+    if (epb_off_change_switch_) {
+      ADEBUG << "Epb off, first set praking brake true.";
+      control_command->set_parking_brake(true);
+      ++epb_change_count_;
+      if (epb_change_count_ >= conf->epb_change_count()) {
+        epb_off_change_switch_ = false;
+        epb_change_count_ = 0;
+        ADEBUG << "Epb off, first stage has been done.";
+      }
+    } else {
+      ADEBUG << "Epb off, second set parking brake false.";
+      control_command->set_parking_brake(false);
+      ++epb_change_count_;
+      if (epb_change_count_ >= conf->epb_change_count()) {
+        epb_off_change_switch_ = true;
+        epb_change_count_ = 0;
+        ADEBUG << "Epb off, second stage has been done.";
+      }
+    }
   }
 }
 

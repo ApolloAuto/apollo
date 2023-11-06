@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include "modules/common_msgs/control_msgs/control_cmd.pb.h"
+#include "modules/common_msgs/external_command_msgs/command_status.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
@@ -31,8 +34,31 @@ class DependencyInjector {
     return &vehicle_state_;
   }
 
+  void Set_pervious_control_command(ControlCommand* control_command) {
+    ADEBUG << "Get the new control_command: "
+           << control_command->ShortDebugString();
+    lon_debug_ = control_command->mutable_debug()->simple_lon_debug();
+  }
+
+  void Set_planning_command_status(
+      const external_command::CommandStatus& planning_command_status) {
+    planning_command_status_.CopyFrom(planning_command_status);
+    ADEBUG << "Received planning_command_status_ is "
+          << planning_command_status_.DebugString();
+  }
+
+  const SimpleLongitudinalDebug* Get_previous_lon_debug_info() const {
+    return &lon_debug_;
+  }
+
+  const external_command::CommandStatus* Get_planning_command_status() const {
+    return &planning_command_status_;
+  }
+
  private:
   apollo::common::VehicleStateProvider vehicle_state_;
+  SimpleLongitudinalDebug lon_debug_;
+  external_command::CommandStatus planning_command_status_;
 };
 
 }  // namespace control

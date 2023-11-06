@@ -227,10 +227,11 @@ std::string GetFileName(const std::string &path,
                         const bool remove_extension = false);
 
 /**
- * @brief get file path,
- * if path is an absolute path, use the path directly,
- * if path is an relative path and exists, use the relative path directly,
- * else use the first path that exists in the environment variable.
+ * @brief get file path, judgement priority:
+ * 1. absolute path.
+ * 2. relative path starts with '.'.
+ * 3. add environment variable prefix before the path.
+ * 4. a common relative path.
  *
  * @param path input file path string.
  * @param env_var environment var string.

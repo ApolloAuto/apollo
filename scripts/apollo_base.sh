@@ -29,6 +29,27 @@ function set_lib_path() {
   pathprepend /apollo/modules/teleop/common/scripts
 }
 
+function site_restore() {
+  [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE" 
+  echo "" > "${TOP_DIR}/tools/package/rules_cc.patch" 
+  [[ -e "${TOP_DIR}/tools/proto/proto.bzl.tpl" ]] && rm -f "${TOP_DIR}/tools/proto/proto.bzl" && cp "${TOP_DIR}/tools/proto/proto.bzl.tpl" "${TOP_DIR}/tools/proto/proto.bzl" 
+}
+
+function env_prepare() {
+  set +e
+  mkdir -p /opt/apollo/neo/src
+  dpkg -l apollo-neo-buildtool >/dev/null 2>&1
+  [[ $? -ne 0 ]] && set -e && sudo apt-get install -y ca-certificates curl gnupg && sudo install -m 0755 -d /etc/apt/keyrings && \
+      curl -fsSL https://apollo-pkg-beta.cdn.bcebos.com/neo/beta/key/deb.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/apolloauto.gpg && \
+      sudo chmod a+r /etc/apt/keyrings/apolloauto.gpg && echo \
+      "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/apolloauto.gpg] https://apollo-pkg-beta.cdn.bcebos.com/apollo/core" \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") "main" | sudo tee /etc/apt/sources.list.d/apolloauto.list && \
+      sudo apt-get update && sudo apt-get install -y apollo-neo-buildtool apollo-neo-env-manager-dev && \
+      sudo touch /.installed && sudo sed -i 's/#include "flann\/general\.h"/#include <\/usr\/include\/flann\/general\.h>/g' /usr/include/flann/util/params.h
+  source /opt/apollo/neo/setup.sh
+  return 0
+}
+
 function create_data_dir() {
   local DATA_DIR="${APOLLO_ROOT_DIR}/data"
   mkdir -p "${DATA_DIR}/log"

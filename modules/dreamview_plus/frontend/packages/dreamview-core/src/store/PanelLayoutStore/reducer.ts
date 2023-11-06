@@ -49,6 +49,26 @@ const modeLayoutRelation: Record<string, MosaicNode<string>> = {
         },
         splitPercentage: 66,
     },
+    [CURRENT_MODE.PNC]: {
+        first: {
+            first: genereatePanelId('vehicleViz'),
+            second: {
+                first: genereatePanelId('console'),
+                second: genereatePanelId('moduleDelay'),
+                direction: 'row',
+            },
+            direction: 'column',
+            splitPercentage: 66,
+        },
+        second: {
+            first: genereatePanelId('dashBoard'),
+            second: genereatePanelId('pncMonitor'),
+            direction: 'column',
+            splitPercentage: 42,
+        },
+        direction: 'row',
+        splitPercentage: 66,
+    },
 };
 
 export const initState: IInitState = {

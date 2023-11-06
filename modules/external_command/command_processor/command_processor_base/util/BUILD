@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-EXTERNAL_COMMAND_COPTS = ['-DMODULE_NAME=\\"external_command_process\\"']
+EXTERNAL_COMMAND_COPTS = ['-DMODULE_NAME=\\"external_command\\"']
 
 apollo_cc_library(
     name = "lane_way_tool",

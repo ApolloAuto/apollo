@@ -1,11 +1,10 @@
-import React, { useCallback,useState } from 'react';
-import { Modal, Select } from '@dreamview/dreamview-ui';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Modal, Select, Checkbox } from '@dreamview/dreamview-ui';
 import { useTranslation } from 'react-i18next';
 import i18next from '@dreamview/dreamview-lang';
 import Logo from '@dreamview/dreamview-core/src/assets/welcome_guide_logov2.png';
 import showModal, { ModalComponentProps } from '../../../../util/modal';
 import useStyle from './useStyle';
-
 
 enum KEY {
     GENERAL = 'general',
@@ -40,7 +39,7 @@ function Tabs(props: { tabs: KEY[]; activeKey: string; setActiveKey: (key: KEY) 
     );
 }
 
-const tabs = [KEY.GENERAL, KEY.PRIVACY, KEY.ABOUT];
+const tabs = [KEY.GENERAL, KEY.ABOUT];
 
 function General() {
     const { classes, cx } = useStyle();

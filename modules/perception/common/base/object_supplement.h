@@ -26,6 +26,7 @@
 #include "modules/perception/common/base/box.h"
 #include "modules/perception/common/base/object_types.h"
 #include "modules/perception/common/base/point_cloud.h"
+#include "modules/perception/common/base/radar_point_cloud.h"
 
 namespace apollo {
 namespace perception {
@@ -58,6 +59,10 @@ struct LidarObjectSupplement {
   base::AttributePointCloud<PointD> cloud_world;
   // @brief background indicator
   bool is_background = false;
+  // @brief either object is clustered or from detection model
+  bool is_clustered = false;
+  // @brief object semantic type
+  ObjectSemanticType semantic_type = ObjectSemanticType::UNKNOWN;
   // @brief false positive indicator
   bool is_fp = false;
   // @brief false positive probability
@@ -78,6 +83,54 @@ struct LidarObjectSupplement {
 typedef std::shared_ptr<LidarObjectSupplement> LidarObjectSupplementPtr;
 typedef std::shared_ptr<const LidarObjectSupplement>
     LidarObjectSupplementConstPtr;
+
+struct Radar4dObjectSupplement {
+  void Reset() {
+    is_orientation_ready = false;
+    on_use = false;
+    cloud.clear();
+    cloud_world.clear();
+    is_fp = false;
+    fp_prob = 0.f;
+    is_background = false;
+    is_in_roi = false;
+    num_points_in_roi = 0;
+    height_above_ground = std::numeric_limits<float>::max();
+    raw_probs.clear();
+    raw_classification_methods.clear();
+  }
+  // @brief orientation estimateed indicator
+  bool is_orientation_ready = false;
+  // @brief valid only for on_use = true
+  bool on_use = false;
+  // @brief index of the cloud of the object
+  std::vector<int> point_ids;
+  // @brief cloud of the object in radar coordinates
+  base::AttributeRadarPointCloud<RadarPointF> cloud;
+  // @brief cloud of the object in world coordinates
+  base::AttributeRadarPointCloud<RadarPointD> cloud_world;
+  // @brief background indicator
+  bool is_background = false;
+  // @brief false positive indicator
+  bool is_fp = false;
+  // @brief false positive probability
+  float fp_prob = 0.f;
+  // @brief whether this object is in roi
+  bool is_in_roi = false;
+  // @brief number of cloud points in roi
+  size_t num_points_in_roi = 0;
+  // @brief object height above ground
+  float height_above_ground = std::numeric_limits<float>::max();
+
+  // @brief raw probability of each classification method
+  std::vector<std::vector<float>> raw_probs;
+  std::vector<std::string> raw_classification_methods;
+
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+typedef std::shared_ptr<Radar4dObjectSupplement> Radar4dObjectSupplementPtr;
+typedef std::shared_ptr<const Radar4dObjectSupplement>
+    Radar4dObjectSupplementConstPtr;
 
 struct RadarObjectSupplement {
   void Reset() {

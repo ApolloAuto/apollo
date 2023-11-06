@@ -71,7 +71,8 @@ PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler *websocket)
 }
 
 void PerceptionCameraUpdater::StartStream(const double &time_interval_ms,
-                                           const std::string& channel_name) {
+                                          const std::string &channel_name,
+                                          nlohmann::json *subscribe_param) {
   if (channel_name.empty()) {
     AERROR << "Failed to subscribe channel for channel is empty!";
     return;
@@ -82,11 +83,16 @@ void PerceptionCameraUpdater::StartStream(const double &time_interval_ms,
            << " for channels_ not registered!";
     return;
   }
-  CameraChannelUpdater* updater = GetCameraChannelUpdater(channel_name);
-  updater->timer_.reset(new cyber::Timer(
-      time_interval_ms, [channel_name, this]() { this->OnTimer(channel_name); },
-      false));
-  updater->timer_->Start();
+  if (time_interval_ms > 0) {
+    CameraChannelUpdater *updater = GetCameraChannelUpdater(channel_name);
+    updater->enabled_=true;
+    updater->timer_.reset(new cyber::Timer(
+        time_interval_ms,
+        [channel_name, this]() { this->OnTimer(channel_name); }, false));
+    updater->timer_->Start();
+  } else {
+    this->OnTimer(channel_name);
+  }
 }
 
 CameraChannelUpdater *PerceptionCameraUpdater::GetCameraChannelUpdater(
@@ -108,10 +114,7 @@ CameraChannelUpdater *PerceptionCameraUpdater::GetCameraChannelUpdater(
 }
 
 void PerceptionCameraUpdater::Stop() {
-  if (enabled_) {
-    channel_updaters_.clear();
-  }
-  enabled_ = false;
+  channel_updaters_.clear();
 }
 
 void PerceptionCameraUpdater::StopStream(const std::string &channel_name) {
@@ -119,15 +122,17 @@ void PerceptionCameraUpdater::StopStream(const std::string &channel_name) {
     AERROR << "Failed to unsubscribe channel for channel is empty!";
     return;
   }
-  if (enabled_) {
-    CameraChannelUpdater *updater = GetCameraChannelUpdater(channel_name);
-    updater->timer_->Stop();
+  CameraChannelUpdater *updater = GetCameraChannelUpdater(channel_name);
+  if (updater->enabled_) {
+    if (updater->timer_) {
+      updater->timer_->Stop();
+    }
     updater->localization_queue_.clear();
     updater->image_buffer_.clear();
     updater->current_image_timestamp_ = 0.0;
     updater->camera_update_.Clear();
+    updater->enabled_=false;
   }
-  // enabled_ = false;
 }
 
 void PerceptionCameraUpdater::OnTimer(const std::string& channel_name) {
@@ -281,10 +286,10 @@ void PerceptionCameraUpdater::GetLocalization2CameraTF(
 void PerceptionCameraUpdater::OnImage(
     const std::shared_ptr<apollo::drivers::Image> &image,
     const std::string& channel_name) {
-  if (!enabled_) {
+  CameraChannelUpdater* updater = GetCameraChannelUpdater(channel_name);
+  if (!updater->enabled_) {
     return;
   }
-  CameraChannelUpdater* updater = GetCameraChannelUpdater(channel_name);
   cv::Mat mat(image->height(), image->width(), CV_8UC3,
               const_cast<char *>(image->data().data()), image->step());
   cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
@@ -311,14 +316,12 @@ void PerceptionCameraUpdater::OnImage(
 
 void PerceptionCameraUpdater::OnLocalization(
     const std::shared_ptr<LocalizationEstimate> &localization) {
-  if (!enabled_) {
-    return;
-  }
-
-  std::lock_guard<std::mutex> lock(localization_mutex_);
   for (auto iter = channel_updaters_.begin(); iter != channel_updaters_.end();
        iter++) {
-    iter->second->localization_queue_.push_back(localization);
+    if (iter->second->enabled_) {
+      std::lock_guard<std::mutex> lock(iter->second->localization_mutex_);
+      iter->second->localization_queue_.push_back(localization);
+    }
   }
 }
 
@@ -352,10 +355,10 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update,
     std::vector<double> localization;
     GetImageLocalization(&localization, channel_name);
     CameraChannelUpdater *updater = GetCameraChannelUpdater(channel_name);
-    std::lock(updater->image_mutex_, localization_mutex_,
+    std::lock(updater->image_mutex_, updater->localization_mutex_,
               updater->obstacle_mutex_);
     std::lock_guard<std::mutex> lock1(updater->image_mutex_, std::adopt_lock);
-    std::lock_guard<std::mutex> lock2(localization_mutex_, std::adopt_lock);
+    std::lock_guard<std::mutex> lock2(updater->localization_mutex_, std::adopt_lock);
     std::lock_guard<std::mutex> lock3(updater->obstacle_mutex_,
                                       std::adopt_lock);
     *(updater->camera_update_).mutable_localization() = {localization.begin(),
@@ -379,7 +382,6 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update,
 }
 void PerceptionCameraUpdater::GetChannelMsg(
     std::vector<std::string> *channels) {
-  enabled_ = true;
   GetChannelMsgWithFilter(channels,"drivers.Image","");
 }
 

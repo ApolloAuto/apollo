@@ -50,6 +50,7 @@ bool OpenSpaceTrajectoryProvider::Init(
   if (!Task::LoadConfig<OpenSpaceTrajectoryProviderConfig>(&config_)) {
     return false;
   }
+  straight_trajectory_length_ = config_.open_space_straight_trajectory_length();
   open_space_trajectory_optimizer_.reset(new OpenSpaceTrajectoryOptimizer(
       config_.open_space_trajectory_optimizer_config()));
   return true;
@@ -147,9 +148,18 @@ Status OpenSpaceTrajectoryProvider::Process() {
     }
 
     if (need_replan) {
+      std::vector<double> temp_target =
+          frame_->open_space_info().open_space_end_pose();
+      if (open_space_info.target_parking_spot_id() != "") {
+        double angle = open_space_info.open_space_end_pose()[2];
+        temp_target[0] = straight_trajectory_length_ * cos(angle) +
+                            open_space_info.open_space_end_pose()[0];
+        temp_target[1] = straight_trajectory_length_ * sin(angle) +
+                            open_space_info.open_space_end_pose()[1];
+      }
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.stitching_trajectory = stitching_trajectory;
-      thread_data_.end_pose = open_space_info.open_space_end_pose();
+      thread_data_.end_pose = temp_target;
       thread_data_.rotate_angle = open_space_info.origin_heading();
       thread_data_.translate_origin = open_space_info.origin_point();
       thread_data_.obstacles_edges_num = open_space_info.obstacles_edges_num();
@@ -413,6 +423,47 @@ void OpenSpaceTrajectoryProvider::LoadResult(
     optimizer_trajectory_ptr->at(i).mutable_path_point()->set_s(
         optimizer_trajectory_ptr->at(i).path_point().s() +
         stitching_point_relative_s);
+  }
+
+  if (frame_->open_space_info().target_parking_spot_id() != "") {
+    double distance = straight_trajectory_length_;
+    double v = 0.3;
+    double t = distance / v * 2;
+    double a = v / t;
+    double start_x =
+        optimizer_trajectory_ptr->back().path_point().x();
+    double start_y =
+        optimizer_trajectory_ptr->back().path_point().y();
+    double start_time =
+        optimizer_trajectory_ptr->back().relative_time();
+    std::vector<double> end_pose =
+        frame_->open_space_info().open_space_end_pose();
+    double unit_x =
+        -cos(optimizer_trajectory_ptr->back().path_point().theta());
+    double unit_y =
+        -sin(optimizer_trajectory_ptr->back().path_point().theta());
+    for (size_t i = 1; i <= t / 0.1; i++) {
+      double x = 0, y = 0, v_now = 0, a_now = 0;
+      v_now = v - a * i * 0.1;
+      a_now = -a;
+      double scale = (v + v_now) / 2 * i * 0.1;
+      x = scale * unit_x;
+      y = scale * unit_y;
+      ADEBUG << start_x + x << ", " << start_y + y << ", "
+                << start_time + 0.1 * i << ", "
+                << v_now << ", " << a_now;
+      TrajectoryPoint point;
+      point.mutable_path_point()->set_x(start_x + x);
+      point.mutable_path_point()->set_y(start_y + y);
+      point.mutable_path_point()->set_theta(
+            optimizer_trajectory_ptr->back().path_point().theta());
+      point.mutable_path_point()->set_s(0.0);
+      point.mutable_path_point()->set_kappa(0.0);
+      point.set_relative_time(start_time + 0.1 * i);
+      point.set_v(-v_now);
+      point.set_a(a_now);
+      optimizer_trajectory_ptr->push_back(point);
+    }
   }
   *(trajectory_data) = *(optimizer_trajectory_ptr);
 

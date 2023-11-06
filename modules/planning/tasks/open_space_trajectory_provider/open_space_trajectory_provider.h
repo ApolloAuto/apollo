@@ -84,6 +84,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   void ReuseLastFrameDebug(const Frame* last_frame);
 
  private:
+  double straight_trajectory_length_ = 0.0;
   bool thread_init_flag_ = false;
 
   std::unique_ptr<OpenSpaceTrajectoryOptimizer>

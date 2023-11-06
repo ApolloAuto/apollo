@@ -245,6 +245,10 @@ class OpenSpaceInfo {
 
   void set_fallback_flag(const bool flag) { fallback_flag_ = flag; }
 
+  bool stop_flag() const { return stop_flag_; }
+
+  void set_stop_flag(const bool flag) { stop_flag_ = flag; }
+
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
   const TrajGearPair &fallback_trajectory() const {
@@ -363,6 +367,8 @@ class OpenSpaceInfo {
   TrajGearPair chosen_partitioned_trajectory_;
 
   bool fallback_flag_ = false;
+
+  bool stop_flag_ = false;
 
   TrajGearPair fallback_trajectory_;
 

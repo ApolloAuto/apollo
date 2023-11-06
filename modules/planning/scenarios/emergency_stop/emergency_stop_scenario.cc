@@ -57,6 +57,18 @@ bool EmergencyStopScenario::IsTransferable(const Scenario* const other_scenario,
   return false;
 }
 
+ScenarioResult EmergencyStopScenario::Process(
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  ScenarioResult stage_result;
+  if (frame->reference_line_info().empty()) {
+    stage_result.SetStageResult(StageStatusType::ERROR,
+                                "Reference line is empty!");
+    AERROR << "Reference line is empty in EmergencyStopScenario!";
+    return stage_result;
+  }
+  return Scenario::Process(planning_init_point, frame);
+}
+
 bool EmergencyStopScenario::Exit(Frame* frame) {
   auto* emergency_stop = injector_->planning_context()
                              ->mutable_planning_status()

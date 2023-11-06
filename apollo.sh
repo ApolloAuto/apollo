@@ -124,6 +124,7 @@ function _usage() {
     ${BLUE}build_cpu [module]${NO_COLOR}: build in CPU mode. Equivalent to 'bazel build --config=cpu'
     ${BLUE}build_gpu [module]${NO_COLOR}: run build in GPU mode. Equivalent to 'bazel build --config=gpu'
     ${BLUE}build_opt_gpu [module]${NO_COLOR}: optimized build in GPU mode. Equivalent to 'bazel build --config=opt --config=gpu'
+    ${BLUE}build_legacy [module]${NO_COLOR}: legacy way to build apollo 
     ${BLUE}test [module]${NO_COLOR}: run unittest for cyber (module='cyber') or modules/<module>. If unspecified, test all.
     ${BLUE}coverage [module]${NO_COLOR}: run coverage test for cyber (module='cyber') or modules/<module>. If unspecified, coverage all.
     ${BLUE}lint${NO_COLOR}: run code style check
@@ -158,6 +159,8 @@ function main() {
     apollo_env_setup
 
     local build_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build.sh"
+    local build_legacy_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build_legacy.sh"
+    local pkg_sh="${APOLLO_ROOT_DIR}/scripts/apollo_build_package.sh"
     local test_sh="${APOLLO_ROOT_DIR}/scripts/apollo_test.sh"
     local coverage_sh="${APOLLO_ROOT_DIR}/scripts/apollo_coverage.sh"
     local ci_sh="${APOLLO_ROOT_DIR}/scripts/apollo_ci.sh"
@@ -170,6 +173,12 @@ function main() {
             ;;
         build)
             env ${APOLLO_ENV} bash "${build_sh}" "$@"
+            ;;
+        build_pkg*)
+            info deprecated, please use \'build, build_opt, build_opt_gpu, build_dbg\' command instead
+            ;;
+        build_legacy)
+            env ${APOLLO_ENV} bash "${build_legacy_sh}" --config=opt --config=gpu "$@"  
             ;;
         build_opt)
             env ${APOLLO_ENV} bash "${build_sh}" --config=opt "$@"

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { MeshLine, MeshLineMaterial, MeshLineRaycast } from 'three.meshline';
+import { MeshLine, MeshLineMaterial } from 'three.meshline';
+import { isNaN } from 'lodash';
 import { drawSegmentsFromPoints } from './line';
 
 export const coordinatesSame = (coord1, coord2): boolean =>
@@ -123,8 +124,7 @@ export const drawThickBandFromPoints = (points, thickAttr) => {
         lineWidth,
         opacity,
     });
-    const mesh = new THREE.Mesh(line, material);
-    return mesh;
+    return new THREE.Mesh(line, material);
 };
 
 export const drawShapeFromPoints = (points, color) => {
@@ -144,3 +144,13 @@ export const drawEllipseGeometry = (aRadius, bRadius) => {
     const geometry = new THREE.ShapeGeometry(path);
     return geometry;
 };
+
+export function areVerticesValid(vertices) {
+    for (let i = 0; i < vertices.length; i += 1) {
+        const vert = vertices[i];
+        if (isNaN(vert.x) || isNaN(vert.y) || isNaN(vert.z)) {
+            return false;
+        }
+    }
+    return true;
+}

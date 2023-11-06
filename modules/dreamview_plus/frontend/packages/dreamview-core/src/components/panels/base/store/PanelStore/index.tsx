@@ -9,6 +9,13 @@ export type DataConsumer = (data: unknown) => void;
 export type Unsubscribe = (subscribersCount: number) => void;
 export type PanelMetaData = { panelId?: string } & Record<string, any>;
 export type InitSubscriptionMap = Record<string, { consumer: DataConsumer }>;
+export type HookResType = null | undefined | void | boolean | Promise<unknown>;
+export type FullScreenHookConfig = {
+    beforeEnterFullScreen?: () => HookResType;
+    afterEnterFullScreen?: () => void;
+    beforeExitFullScreen?: () => HookResType;
+    afterExitFullScreen?: () => void;
+};
 export interface IPanelContext {
     panelId: string;
     initSubscription: (value: InitSubscriptionMap) => void;
@@ -26,6 +33,7 @@ export interface IPanelContext {
     closeSubcription: (name: string) => void;
     setKeyUpHandlers: (handlers: KeyHandlers[]) => void;
     setKeyDownHandlers: (handlers: KeyHandlers[]) => void;
+    registerFullScreenHooks: (hookConfig: FullScreenHookConfig) => void;
 }
 
 export const PanelContext = createContext<IPanelContext | undefined>(undefined);

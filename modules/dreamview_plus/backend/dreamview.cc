@@ -27,20 +27,17 @@ std::map<std::string, int> plugin_function_map = {
     {"UpdateScenarioSetToStatus", 0},
     {"UpdateRecordToStatus", 1},
     {"UpdateDynamicModelToStatus", 2},
-    {"UpdateVehicleToStatus", 3}};
+    {"UpdateVehicleToStatus", 3},
+    {"UpdateMapToStatus", 4}};
 std::map<std::string, int> hmi_function_map = {
-    {"SimControlRestart", 0},
     {"MapServiceReloadMap", 1},
-    {"LoadDynamicModels", 2},
-    {"ChangeDynamicModel", 3},
-    {"DeleteDynamicModel", 4},
-    {"AddDynamicModel", 5},
-    {"RestartDynamicModel", 6},
+    // {"RestartDynamicModel", 6},
     {"GetDataHandlerConf", 7},
     {"ClearDataHandlerConfChannelMsgs", 8},
 };
 std::map<std::string, int> socket_manager_function_map = {
-    {"SimControlRestart", 0},   {"MapServiceReloadMap", 1},
+    {"SimControlRestart", 0},
+    {"MapServiceReloadMap", 1},
 };
 }  // namespace
 
@@ -103,17 +100,15 @@ Status Dreamview::Init() {
   obstacle_ws_.reset(new WebSocketHandler("Obstacle"));
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
-  sim_control_manager_.reset(new SimControlManager());
   perception_camera_updater_.reset(
       new PerceptionCameraUpdater(camera_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get(), hmi_ws_.get()));
   plugin_manager_.reset(new PluginManager(plugin_ws_.get()));
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), sim_control_manager_.get(),
-      plugin_ws_.get(), map_service_.get(), plugin_manager_.get(),
-      sim_world_ws_.get(), FLAGS_routing_from_file));
-  point_cloud_updater_.reset(
-      new PointCloudUpdater(point_cloud_ws_.get()));
+      websocket_.get(), map_ws_.get(), plugin_ws_.get(), map_service_.get(),
+      plugin_manager_.get(), sim_world_ws_.get(), hmi_.get(),
+      FLAGS_routing_from_file));
+  point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   map_updater_.reset(new MapUpdater(map_ws_.get(), map_service_.get()));
   obstacle_updater_.reset(new ObstacleUpdater(obstacle_ws_.get()));
   updater_manager_.reset(new UpdaterManager());
@@ -148,10 +143,11 @@ Status Dreamview::Start() {
                                 const nlohmann::json& param_json) -> bool {
     return PluginCallbackHMI(function_name, param_json);
   });
-    // perception_camera_updater_->Start();
-    // ([this](const std::string& param_string) -> bool {
-    //   return PerceptionCameraCallback(param_string);
-    // });
+  // sim_world_updater_->StartStream(100);
+  // perception_camera_updater_->Start();
+  // ([this](const std::string& param_string) -> bool {
+  //   return PerceptionCameraCallback(param_string);
+  // });
 #if WITH_TELEOP == 1
   teleop_->Start();
 #endif
@@ -160,12 +156,13 @@ Status Dreamview::Start() {
 
 void Dreamview::Stop() {
   server_->close();
-  sim_control_manager_->Stop();
+  SimControlManager::Instance()->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
   perception_camera_updater_->Stop();
   obstacle_updater_->Stop();
   plugin_manager_->Stop();
+  // sim_world_updater_->StopStream();
 }
 
 nlohmann::json Dreamview::HMICallbackOtherService(
@@ -177,76 +174,19 @@ nlohmann::json Dreamview::HMICallbackOtherService(
     return callback_res;
   }
   switch (hmi_function_map[function_name]) {
-    case 0: {
-      // 解析结果
-      if (param_json.contains("x") && param_json.contains("y")) {
-        const double x = param_json["x"];
-        const double y = param_json["y"];
-        sim_control_manager_->Restart(x, y);
-        callback_res["result"] = true;
-      }
-    } break;
     case 1: {
-      map_service_->ReloadMap(true);
-      callback_res["result"] = true;
+      callback_res["result"] = map_service_->ReloadMap(true);
       break;
     }
-    case 2: {
-      // loadDynamicModels
-      if (sim_control_manager_->IsEnabled()) {
-        nlohmann::json load_res = sim_control_manager_->LoadDynamicModels();
-        callback_res["loaded_dynamic_models"] =
-            load_res["loaded_dynamic_models"];
-        callback_res["result"] = true;
-      } else {
-        AERROR << "Sim control is not enabled!";
-      }
-      break;
-    }
-    case 3: {
-      // 解析结果
-      if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->ChangeDynamicModel(
-            param_json["dynamic_model_name"]);
-      } else {
-        AERROR << "Sim control is not enabled or missing dynamic model name "
-                  "param!";
-      }
-      break;
-    }
-    case 4: {
-      // 解析结果
-      if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->DeleteDynamicModel(
-            param_json["dynamic_model_name"]);
-      } else {
-        AERROR << "Sim control is not enabled or missing dynamic model name "
-                  "param!";
-      }
-      break;
-    }
-    case 5: {
-      // addDynamicModel
-      if (param_json.contains("dynamic_model_name") &&
-          sim_control_manager_->IsEnabled()) {
-        callback_res["result"] = sim_control_manager_->AddDynamicModel(
-            param_json["dynamic_model_name"]);
-      } else {
-        AERROR << "Sim control is not enabled or missing dynamic model name "
-                  "param!";
-      }
-      break;
-    }
-    case 6: {
-      // restart dynamic model
-      map_service_->ReloadMap(true);
-      sim_control_manager_->Restart();
-      callback_res["result"] = true;
-      break;
-    }
-    // use socket manager to broadcast data handler conf after play record
+      // todo(@lijin):reconstruct map and sim control set point logic
+      //  case 6: {
+      //       // restart dynamic model
+      //       map_service_->ReloadMap(true);
+      //       sim_control_manager_->Restart();
+      //       callback_res["result"] = true;
+      //       break;
+      //     }
+      // use socket manager to broadcast data handler conf after play record
     case 7: {
       socket_manager_->BrocastDataHandlerConf();
       callback_res["result"] = true;
@@ -273,10 +213,12 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
   switch (plugin_function_map[function_name]) {
     case 0: {
       // 解析结果
-      if (param_json.contains("scenario_set_id") &&
-          param_json.contains("scenario_set_name")) {
-        const std::string scenario_set_id = param_json["scenario_set_id"];
-        const std::string scenario_set_name = param_json["scenario_set_name"];
+      if (param_json["data"].contains("scenario_set_id") &&
+          param_json["data"].contains("scenario_set_name")) {
+        const std::string scenario_set_id =
+            param_json["data"]["scenario_set_id"];
+        const std::string scenario_set_name =
+            param_json["data"]["scenario_set_name"];
         if (!scenario_set_id.empty() && !scenario_set_name.empty()) {
           callback_res = hmi_->UpdateScenarioSetToStatus(scenario_set_id,
                                                          scenario_set_name);
@@ -287,8 +229,9 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
       callback_res = hmi_->UpdateRecordToStatus();
     } break;
     case 2: {
-      if (param_json.contains("dynamic_model_name")) {
-        const std::string dynamic_model_name = param_json["dynamic_model_name"];
+      if (param_json["data"].contains("dynamic_model_name")) {
+        const std::string dynamic_model_name =
+            param_json["data"]["dynamic_model_name"];
         if (!dynamic_model_name.empty()) {
           callback_res = hmi_->UpdateDynamicModelToStatus(dynamic_model_name);
         }
@@ -296,7 +239,13 @@ bool Dreamview::PluginCallbackHMI(const std::string& function_name,
     } break;
     case 3: {
       callback_res = hmi_->UpdateVehicleToStatus();
-    }
+    } break;
+    case 4: {
+      if (param_json["data"].contains("resource_id")) {
+        const std::string map_name = param_json["data"]["resource_id"];
+        callback_res = hmi_->UpdateMapToStatus(map_name);
+      }
+    } break;
     default:
       break;
   }

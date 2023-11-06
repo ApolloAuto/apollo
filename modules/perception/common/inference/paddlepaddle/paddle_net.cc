@@ -42,6 +42,30 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>>& shapes) {
     config.EnableUseGpu(MemoryPoolInitSizeMb, gpu_id_);
   }
 
+  if (FLAGS_use_trt) {
+    paddle::AnalysisConfig::Precision precision;
+    if (FLAGS_trt_precision == 0) {
+      precision = paddle_infer::PrecisionType::kFloat32;
+    } else if (FLAGS_trt_precision == 1) {
+      precision = paddle_infer::PrecisionType::kInt8;
+    } else if (FLAGS_trt_precision == 2) {
+      precision = paddle_infer::PrecisionType::kHalf;
+    } else {
+      AERROR << "Tensorrt type can only support 0, 1, 2, but recieved is"
+             << FLAGS_trt_precision << "\n";
+      return false;
+    }
+    config.EnableTensorRtEngine(1 << 30, 1, 3, precision, FLAGS_trt_use_static,
+                                FLAGS_use_calibration);
+
+    if (FLAGS_collect_shape_info) {
+      config.CollectShapeRangeInfo(FLAGS_dynamic_shape_file);
+    }
+
+    if (FLAGS_use_dynamicshape)
+      config.EnableTunedTensorRtDynamicShape(FLAGS_dynamic_shape_file, true);
+  }
+
   config.EnableMemoryOptim();
   config.SwitchIrOptim(true);
   predictor_ = paddle_infer::CreatePredictor(config);

@@ -114,6 +114,14 @@ export default class MultiKeyMap<K extends ObjectType, T = unknown> {
         return this.size;
     }
 
+    public getAllEntries(): [K, T][] {
+        const entries: [K, T][] = [];
+        this.traverse((key, value) => {
+            entries.push([key, value]);
+        });
+        return entries;
+    }
+
     public countIf(predicate: (key: K, value: T) => boolean): number {
         let count = 0;
         this.traverse((key, value) => {
@@ -135,5 +143,10 @@ export default class MultiKeyMap<K extends ObjectType, T = unknown> {
             childNode.values.forEach((value) => callback(newKey, value));
             this.traverse(callback, childNode, newKey);
         });
+    }
+
+    public clear(): void {
+        this.root = new MultiKeyMapNode();
+        this.size = 0;
     }
 }

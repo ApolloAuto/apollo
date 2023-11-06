@@ -15,13 +15,15 @@
  *****************************************************************************/
 #include "modules/perception/multi_sensor_fusion/fusion/dummy/dummy_algorithms.h"
 
+#include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
+
 namespace apollo {
 namespace perception {
 namespace fusion {
 
 // class DummyFusionSystem implementation
 bool DummyFusionSystem::Init(const FusionInitOptions& options) {
-  main_sensor_ = options.main_sensor;
+  algorithm::SensorManager::Instance()->Init();
   return true;
 }
 
@@ -32,7 +34,9 @@ bool DummyFusionSystem::Fuse(const base::FrameConstPtr& sensor_frame,
   }
 
   fused_objects->clear();
-  if (sensor_frame->sensor_info.name != main_sensor_) {
+  bool is_main_sensor = algorithm::SensorManager::Instance()->IsMainSensor(
+      sensor_frame->sensor_info.name);
+  if (!is_main_sensor) {
     return true;
   }
 

@@ -1,5 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/platform:build_defs.bzl", "if_profiler")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,6 +26,7 @@ apollo_cc_library(
         "tracker/semantic_decision.h",
         "traffic_light_tracking_component.h",
     ],
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         "//modules/common_msgs/perception_msgs:traffic_light_detection_cc_proto",
@@ -47,7 +49,7 @@ apollo_component(
     hdrs = [
         "traffic_light_tracking_component.h",
     ],
-    copts = PERCEPTION_COPTS,
+    copts = PERCEPTION_COPTS + if_profiler(),
     deps = [
         "//cyber",
         ":apollo_perception_traffic_light_tracking",

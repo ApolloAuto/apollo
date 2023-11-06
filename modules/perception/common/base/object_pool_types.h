@@ -19,6 +19,7 @@
 #include "modules/perception/common/base/frame.h"
 #include "modules/perception/common/base/object.h"
 #include "modules/perception/common/base/point_cloud.h"
+#include "modules/perception/common/base/radar_point_cloud.h"
 
 namespace apollo {
 namespace perception {
@@ -35,6 +36,13 @@ struct PointCloudInitializer {
   }
 };
 
+template <typename T>
+struct RadarPointCloudInitializer {
+  void operator()(AttributeRadarPointCloud<RadarPoint<T>>* cloud) const {
+    cloud->clear();
+  }
+};
+
 struct FrameInitializer {
   void operator()(Frame* frame) const { frame->Reset(); }
 };
@@ -46,11 +54,21 @@ static const size_t kFramePoolSize = 100;
 using ObjectPool =
     ConcurrentObjectPool<Object, kObjectPoolSize, ObjectInitializer>;
 using PointFCloudPool =
-    ConcurrentObjectPool<AttributePointCloud<PointF>, kPointCloudPoolSize,
-                         PointCloudInitializer<float>>;
+    ConcurrentObjectPool<AttributePointCloud<PointF>,
+    kPointCloudPoolSize,
+    PointCloudInitializer<float>>;
 using PointDCloudPool =
-    ConcurrentObjectPool<AttributePointCloud<PointD>, kPointCloudPoolSize,
-                         PointCloudInitializer<double>>;
+    ConcurrentObjectPool<AttributePointCloud<PointD>,
+    kPointCloudPoolSize,
+    PointCloudInitializer<double>>;
+using RadarPointFCloudPool =
+    ConcurrentObjectPool<AttributeRadarPointCloud<RadarPointF>,
+    kPointCloudPoolSize,
+    RadarPointCloudInitializer<double>>;
+using RadarPointDCloudPool =
+    ConcurrentObjectPool<AttributeRadarPointCloud<RadarPointD>,
+    kPointCloudPoolSize,
+    RadarPointCloudInitializer<double>>;
 using FramePool = ConcurrentObjectPool<Frame, kFramePoolSize, FrameInitializer>;
 
 }  // namespace base

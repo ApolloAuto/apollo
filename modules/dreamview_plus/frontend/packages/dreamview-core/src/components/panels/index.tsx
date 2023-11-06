@@ -9,7 +9,7 @@ import dashBoardIllustratorImg from '@dreamview/dreamview-core/src/assets/dashbo
 import { IPanelMetaInfo, PanelType } from './type/Panel';
 import ChannelSelectFactory from './base/ChannelSelect/ChannelSelectFactory';
 import { StreamDataNames } from '../../services/api/types';
-import { DemoChannelSelect } from './base/ChannelSelect/demo';
+import DemoChannelSelect from './base/ChannelSelect/demo';
 import { DashBoardHelp } from './DashBoard/PanelHelp';
 import { CameraViewHelp } from './CameraView/PanelHelp';
 import { PointCloudHelp } from './PointCloud/PanelHelp';
@@ -85,5 +85,22 @@ export const getAllPanels = (t: TFunction | ((str: string) => string)): IPanelMe
                 default: DashBoard,
             };
         },
+    },
+    {
+        title: t('pncMonitorTitle'),
+        type: PanelType.PncMonitor,
+        thumbnail: dashBoardIllustratorImg,
+        description: t('pncMonitorDescription'),
+        renderToolbar: ChannelSelectFactory({
+            helpContent: <PanelHelp description={t('pncMonitorDescription')} />,
+        }),
+        module: () => import('@dreamview/dreamview-core/src/components/panels/PncMonitor'),
+    },
+    {
+        title: t('componentsTitle'),
+        type: PanelType.Components,
+        // thumbnail: dashBoardIllustratorImg,
+        description: t('componentsDescription'),
+        module: () => import('@dreamview/dreamview-core/src/components/panels/Components'),
     },
 ];

@@ -73,6 +73,7 @@ module.exports = function makeConfig(mode, argv, option) {
             alias: {
                 '@src': path.join(__dirname, '../src'),
                 '@components': path.join(__dirname, '../src/components'),
+                three: path.resolve(__dirname, 'node_modules/three'),
             },
             fallback: {
                 assert: require.resolve('assert'),

@@ -4,27 +4,31 @@ throttle_minimum_action: 0.0
 speed_controller_input_limit: 2.5
 station_error_limit: 2.5
 preview_window: 20.0
-standstill_acceleration: -1.5
+standstill_acceleration: -2.0
 enable_reverse_leadlag_compensation: false
-use_preview_reference_check: true
+use_preview_reference_check: false
 steer_cmd_interval: 20.0
 enable_speed_station_preview: false
 enable_slope_offset: false
 use_acceleration_lookup_limit: false
 use_steering_check: true
 pedestrian_stop_time: 15
-standstill_narmal_acceleration: -0.02
+standstill_narmal_acceleration: -0.5
+full_stop_long_time: 3.0
+epb_change_count: 40
+stop_gain_acceleration: -1.0
+use_vehicle_epb: false
 station_pid_conf {
-  integrator_enable: true
+  integrator_enable: false
   integrator_saturation_level: 0.3
   kp: 0.3 
-  ki: 0.0
+  ki: 0.3
   kd: 0.0
 }
 low_speed_pid_conf {
   integrator_enable: true
   integrator_saturation_level: 0.3
-  kp: 0.4
+  kp: 0.6
   ki: 0.2
   kd: 0.0
 }
@@ -32,17 +36,17 @@ high_speed_pid_conf {
   integrator_enable: true
   integrator_saturation_level: 0.3
   kp: 0.5
-  ki: 0.0005
-  kd: 0.1
+  ki: 0.05
+  kd: 0.0
 }
 switch_speed: 1.0
 switch_speed_window: 0.0
 reverse_station_pid_conf {
   integrator_enable: true
   integrator_saturation_level: 0.5
-  kp: 0.3
-  ki: 0.2
-  kd: 0.0
+  kp: 0.15
+  ki: 0.0
+  kd: 0.1
 }
 reverse_speed_pid_conf {
   integrator_enable: true
@@ -65,4 +69,18 @@ reverse_speed_leadlag_conf {
 }
 pitch_angle_filter_conf {
   cutoff_freq: 5
+}
+pit_station_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 1.5
+  kp: 0.5 
+  ki: 0.3
+  kd: 0.0
+}
+pit_speed_pid_conf {
+  integrator_enable: true
+  integrator_saturation_level: 1.0
+  kp: 1.0
+  ki: 0.2
+  kd: 0.0
 }

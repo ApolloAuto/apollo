@@ -20,6 +20,9 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <queue>
+
+#include <boost/filesystem.hpp>
 
 #include "modules/common_msgs/perception_msgs/perception_benchmark.pb.h"
 #include "modules/perception/lidar_output/proto/lidar_output_component_config.pb.h"
@@ -37,8 +40,8 @@ using onboard::SensorFrameMessage;
 
 class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
  public:
-  LidarOutputComponent() = default;
-  virtual ~LidarOutputComponent() = default;
+  LidarOutputComponent() {}
+  virtual ~LidarOutputComponent();
   /**
    * @brief Init lidar output component
    *
@@ -64,9 +67,22 @@ class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
    */
   bool SaveBenchmarkFrame(const std::shared_ptr<SensorFrameMessage>& message);
 
+  /**
+   * @brief Benchmark thread fucntion
+   *
+   */
+  void BenchmarkThreadFunc();
+
  private:
   std::string output_channel_name_;
   std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>> writer_;
+  // for saving benchmark frame
+  bool save_benchmark_frame_ = false;
+  std::string benchmark_frame_output_dir_;
+  std::mutex benchmark_mutex_;
+  std::atomic<bool> is_terminate_;
+  std::queue<std::shared_ptr<SensorFrameMessage>> message_buffer_;
+  std::unique_ptr<std::thread> benchmark_thread_;
 };
 
 CYBER_REGISTER_COMPONENT(LidarOutputComponent);

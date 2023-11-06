@@ -40,6 +40,7 @@ import datetime
 import os
 import subprocess
 import sys
+import shutil
 
 import psutil
 
@@ -114,6 +115,14 @@ class ArgManager(object):
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
+        self.parser.add_argument('--default_name', default="",
+                                 help='Change the default name of the record')
+        self.parser.add_argument('--rename', default="",
+                                 help='Change the new name of the record')
+        self.parser.add_argument('--dreamview', default=False, action="store_true",
+                                 help='Path for dreamview fixed recording file.')
+        self.parser.add_argument('--delete', default=False, action="store_true",
+                                 help='Delete record.')
         self._args = None
 
     def args(self):
@@ -161,6 +170,7 @@ class Recorder(object):
     def __init__(self, args):
         self.args = args
         self.disk_manager = DiskManager()
+        self.record_path_file = os.path.join(APOLLO_ENV_ROOT, 'data/bag', 'record_path_file')
 
     def start(self):
         """Start recording."""
@@ -177,6 +187,10 @@ class Recorder(object):
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else APOLLO_ENV_ROOT
 
+        # If the start command comes from dreamview, save to the default path.
+        if self.args.dreamview:
+            disk_to_use = APOLLO_ENV_ROOT
+
         # Record small topics to quickly copy and process
         if record_all:
             self.record_task(disk_to_use, False)
@@ -191,6 +205,9 @@ class Recorder(object):
     def record_task(self, disk, record_all):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        # If a default name is set.
+        if self.args.default_name != "":
+            task_id = self.args.default_name
         if not record_all:
             task_id += "_s"
         task_dir = os.path.join(disk, 'data/bag', task_id)
@@ -208,11 +225,59 @@ class Recorder(object):
         cmd = '''
             cd "{task_dir}"
             source {apollo_runtime_path}/scripts/apollo_base.sh
-            source {apollo_runtime_path}/cyber/setup.bash
             nohup cyber_recorder record {topics_str} >{log_file} 2>&1 &
         '''.format(task_dir=task_dir, apollo_runtime_path=APOLLO_RUNTIME_PATH,
                    topics_str=topics_str, log_file=log_file)
         shell_cmd(cmd)
+
+    def rename_files_in_directory(self, task_dir, task_dir_flag=False):
+        """rename files"""
+        # Rename the last directory in the path task_dir
+        path_parts = task_dir.split(os.path.sep)
+        last_dir = path_parts[-1]
+        new_task_dir = task_dir.rsplit(os.path.sep, 1)[0] + os.path.sep + self.args.rename
+        if task_dir_flag:
+            new_task_dir += '_s'
+
+        if os.path.exists(new_task_dir):
+            print(f"The directory '{new_task_dir}' already exist.")
+            exit(-1)
+
+        for filename in os.listdir(task_dir):
+            if "record" in filename:
+                # Extract the part of the filename before ".record".
+                name_parts = filename.split(".record")
+                if len(name_parts) > 1:
+                    prefix = name_parts[0]
+                    extension = ".record" + name_parts[1]
+
+                    # Construct the new filename.
+                    new_filename = f"{self.args.rename}{extension}"
+                    old_path = os.path.join(task_dir, filename)
+                    new_path = os.path.join(task_dir, new_filename)
+                    if os.path.exists(new_path):
+                        print(f"The directory '{new_path}' already exist.")
+                        exit(-1)
+                    os.rename(old_path, new_path)
+                    print(f"Renamed '{filename}' to '{new_filename}'")
+
+        os.rename(task_dir, new_task_dir)
+        print(f"Renamed directory name '{task_dir}' to '{new_task_dir}'")
+
+    def rename(self):
+        """Saving is actually modifying the name of the record just recorded."""
+        task_dir = os.path.join(APOLLO_ENV_ROOT, 'data/bag', self.args.default_name)
+        task_s_dir = task_dir + '_s'
+        self.rename_files_in_directory(task_dir)
+        self.rename_files_in_directory(task_s_dir, True)
+
+        # print('save')
+    def delete(self):
+        """Delete the file just recorded."""
+        task_dir = os.path.join(APOLLO_ENV_ROOT, 'data/bag', self.args.default_name)
+        task_s_dir = task_dir + '_s'
+        shutil.rmtree(task_dir)
+        shutil.rmtree(task_s_dir)
 
     @staticmethod
     def is_running():
@@ -229,8 +294,12 @@ def main():
     recorder = Recorder(args)
     if args.stop:
         recorder.stop()
-    else:
+    elif args.start:
         recorder.start()
+    elif args.delete:
+        recorder.delete()
+    else:
+        recorder.rename() 
 
 
 if __name__ == '__main__':

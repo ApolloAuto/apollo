@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.perception.radar4d;
+
+import "modules/perception/common/proto/plugin_param.proto";
+
+message RadarObstaclePerceptionConfig {
+  optional perception.PluginParam detector_param = 1;
+  optional perception.PluginParam roi_filter_param = 2;
+  optional perception.PluginParam multi_target_tracker_param = 3;
+  optional perception.PluginParam fusion_classifier_param = 4;
+  optional bool enable_roi_filter = 5 [default = false];
+}

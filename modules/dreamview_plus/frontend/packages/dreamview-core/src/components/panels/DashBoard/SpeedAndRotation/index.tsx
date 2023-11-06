@@ -35,4 +35,4 @@ function SpeedAndRotation(props: SpeedAndRotationProps) {
     );
 }
 
-export default SpeedAndRotation;
+export default React.memo(SpeedAndRotation);

@@ -20,4 +20,4 @@ function SignalAndGear(props: SignalAndGearProps) {
     );
 }
 
-export default SignalAndGear;
+export default React.memo(SignalAndGear);

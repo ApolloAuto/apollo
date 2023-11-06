@@ -1,7 +1,7 @@
 # cnnseg params
 
 info {
-  name: "cnnseg64"
+  name: "cnnseg64_caffe"
   version: ""
   dataset: "apollo"
   task_type: Detection3D
@@ -51,7 +51,5 @@ confidence_thresh: 0.1
 confidence_range: 58.0
 height_thresh: 0.5
 min_pts_num: 3
-# ground_detector: "SpatioTemporalGroundDetector"
-# roi_filter: "HdmapROIFilter"
 remove_ground_points: true
 fill_recall_with_segmentor: true

@@ -4,7 +4,7 @@ import { IconIcAmplification, IconIcReduce, IconIcCoverageHover } from '@dreamvi
 import { SubContent, SubHeader } from '../../base/PanelHelpContent';
 import useStyle from '../useStyle';
 
-export function VehicleVizPanelHelp() {
+export function VehicleVizPanelHelpOrigin() {
     const { t } = useTranslation('panels');
     const { classes } = useStyle();
 
@@ -41,3 +41,5 @@ export function VehicleVizPanelHelp() {
         </>
     );
 }
+
+export const VehicleVizPanelHelp = React.memo(VehicleVizPanelHelpOrigin);

@@ -195,6 +195,8 @@ class SimPerfectControl final : public SimControlBase {
 
   // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
+  // Locks related to timer.
+  std::mutex timer_mutex_;
 
   FRIEND_TEST(SimControlTest, Test);
   FRIEND_TEST(SimControlTest, TestDummyPrediction);

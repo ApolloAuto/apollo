@@ -13,6 +13,7 @@ export const personal = {
     language: 'Language',
     confirm: 'confirm',
     close: 'Close',
+    generalConfirm: 'Send anonymous usage data to help us improve Dreamview',
     dreamviewVersion: 'Dreamview version',
     dockerVersion: 'Docker version',
     copyright: 'Copyright and License',

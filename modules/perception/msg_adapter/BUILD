@@ -28,6 +28,12 @@ apollo_cc_library(
         "//modules/perception/common/base:apollo_perception_common_base",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
         "@com_github_gflags_gflags//:gflags",
+        "@local_config_cuda//cuda:cublas",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
+        "@local_config_cuda//cuda:cudnn",
+        "@local_config_cuda//cuda:cudnn_header",
+        "@local_config_tensorrt//:tensorrt",
     ],
 )
 

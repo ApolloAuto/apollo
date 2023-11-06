@@ -17,6 +17,7 @@ apollo_cc_library(
         "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
         "//modules/common_msgs/control_msgs:control_cmd_cc_proto",
         "//modules/common_msgs/control_msgs:control_pad_msg_cc_proto",
+        "//modules/common_msgs/external_command_msgs:command_status_proto",
         "//modules/common_msgs/localization_msgs:localization_cc_proto",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/control/control_component/proto:pipeline_cc_proto",

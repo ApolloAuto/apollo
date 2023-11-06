@@ -2,6 +2,11 @@ import { useMakeStyle } from '@dreamview/dreamview-theme';
 
 export default function useStyle() {
     const hoc = useMakeStyle((theme, prop) => ({
+        'source-list-container': {
+            '& .source-list-container-item-disbale': {
+                cursor: 'not-allowed',
+            },
+        },
         'source-list-container-item': {
             height: '40px',
             lineHeight: '40px',

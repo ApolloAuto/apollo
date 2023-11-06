@@ -45,13 +45,13 @@ namespace profiler {
 #define PERF_BLOCK_END \
   apollo::cyber::profiler::BlockManager::Instance()->EndBlock();
 
-#define PERF_FUNCION(...) PERF_BLOCK(AFUNC, ## __VA_ARGS__)
+#define PERF_FUNCTION(...) PERF_BLOCK(AFUNC, ## __VA_ARGS__)
 
 #else
 
 #define PERF_BLOCK(...)
 #define PERF_BLOCK_END
-#define PERF_FUNCION(...)
+#define PERF_FUNCTION(...)
 
 #endif  // #if ENABLE_PROFILER
 

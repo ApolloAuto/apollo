@@ -15,7 +15,12 @@ function PanelThumbnail(props: { panel: IPanelMetaInfo }) {
     const { title, description, thumbnail } = props.panel;
 
     return (
-        <div className={classes['panel-thumbnail']}>
+        <div
+            className={classes['panel-thumbnail']}
+            onClick={(event) => {
+                event.stopPropagation();
+            }}
+        >
             <div className='panel-thumbnail-image' style={{ backgroundImage: `url(${thumbnail})` }} />
             <div className='panel-thumbnail-title'>{title}</div>
             <div className='panel-thumbnail-description'>{description}</div>

@@ -88,6 +88,12 @@ ScenarioResult Scenario::Process(
   if (current_stage_ == nullptr) {
     current_stage_ = CreateStage(
         *stage_pipeline_map_[scenario_pipeline_config_.stage(0).name()]);
+    if (nullptr == current_stage_) {
+      AERROR << "Create stage " << scenario_pipeline_config_.stage(0).name()
+             << " failed!";
+      scenario_result_.SetStageResult(StageStatusType::ERROR);
+      return scenario_result_;
+    }
     AINFO << "Create stage " << current_stage_->Name();
   }
   if (current_stage_->Name().empty()) {
@@ -155,7 +161,7 @@ std::shared_ptr<Stage> Scenario::CreateStage(
   if (nullptr == stage_ptr ||
       !stage_ptr->Init(stage_pipeline, injector_, config_dir_, GetContext())) {
     AERROR << "Create stage " << stage_pipeline.name() << " of " << name_
-           << "failed!";
+           << " failed!";
     return nullptr;
   }
   return stage_ptr;

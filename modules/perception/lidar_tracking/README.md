@@ -62,10 +62,7 @@ cyber_launch start modules/transform/launch/static_transform.launch
 
 3. Modify parameter of `modules/perception/lidar_tracking/conf/lidar_tracking_config.pb.txt`
 
-- main_sensor_name: main sensor name, same as pointcloud_preprocess component sensor_name
 - output_channel_name: output channel name
-- multi_target_tracker: multi target tracking function
-- fusion_classifier: classification function
 - multi_target_tracker_param: multi traget tracking parameters
   - name: method name
   - config_path: configuration path

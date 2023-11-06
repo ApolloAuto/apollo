@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/control/control_component/controller_task_base/proto/calibration_table.pb.h"
+#include "modules/control/control_component/proto/calibration_table.pb.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"

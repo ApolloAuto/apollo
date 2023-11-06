@@ -3,4 +3,6 @@
 try-import %workspace%/tools/bazel.rc
 try-import %workspace%/.apollo.bazelrc
 
+try-import %workspace%/.custom.bazelrc 
+
 # build --remote_cache="http://localhost:8080/

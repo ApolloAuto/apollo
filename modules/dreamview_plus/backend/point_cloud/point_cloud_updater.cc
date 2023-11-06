@@ -93,7 +93,8 @@ void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
 }
 
 void PointCloudUpdater::StartStream(const double &time_interval_ms,
-                                     const std::string& channel_name) {
+                                    const std::string &channel_name,
+                                    nlohmann::json *subscribe_param) {
   if (channel_name.empty()) {
     AERROR << "Failed to subscribe channel for channel is empty!";
     return;
@@ -104,11 +105,16 @@ void PointCloudUpdater::StartStream(const double &time_interval_ms,
            << channel_name << " is invalid.";
     return;
   }
-  PointCloudChannelUpdater *updater = GetPointCloudChannelUpdater(channel_name);
-  updater->timer_.reset(new cyber::Timer(
-      time_interval_ms, [channel_name, this]() { this->OnTimer(channel_name); },
-      false));
-  updater->timer_->Start();
+  if (time_interval_ms > 0) {
+    PointCloudChannelUpdater *updater =
+        GetPointCloudChannelUpdater(channel_name);
+    updater->timer_.reset(new cyber::Timer(
+        time_interval_ms,
+        [channel_name, this]() { this->OnTimer(channel_name); }, false));
+    updater->timer_->Start();
+  } else {
+    this->OnTimer(channel_name);
+  }
 }
 void PointCloudUpdater::Stop() { enabled_ = false; }
 void PointCloudUpdater::OnTimer(const std::string &channel_name) {
@@ -120,7 +126,9 @@ void PointCloudUpdater::StopStream(const std::string& channel_name) {
     return;
   }
   PointCloudChannelUpdater *updater = GetPointCloudChannelUpdater(channel_name);
-  updater->timer_->Stop();
+  if (updater->timer_) {
+    updater->timer_->Stop();
+  }
   // 回到初始值
   updater->last_point_cloud_time_ = 0.0;
   updater->point_cloud_str_ = "";

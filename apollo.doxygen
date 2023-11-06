@@ -948,12 +948,26 @@ WARN_LOGFILE           =
 #                         tools \
 #                         scripts
 INPUT                   = \
+                          docs/pages_order.dox \
                           docs/MAINPAGE_cn.md \
-                          docs/installation_guide_cn.md \
-                          docs/essential_software_installation_guide_cn.md \
-                          docs/packages_cn.md \
-                          docs/packages_core_cn.md \
-                          docs/quick_start_cn.md \
+INPUT                   += \
+                          docs/installation_instructions/installation_guide_cn.md \
+                          docs/installation_instructions/essential_software_installation_guide_cn.md \
+                          docs/installation_instructions/quick_start_cn.md \
+                          docs/user_guidelines/user_guidelines_cn.md \
+                          docs/user_guidelines/tool_aem_cn.md \
+                          docs/user_guidelines/tool_buildtool_cn.md \
+                          docs/user_guidelines/architecture_overview_cn.md \
+                          docs/user_guidelines/modules \
+                          docs/user_guidelines/tools \
+                          docs/practices/practices_cn.md \
+                          docs/practices/perception \
+                          docs/practices/planning \
+                          docs/data_types/data_types_cn.md \
+                          docs/packages/packages_cn.md \
+                          docs/packages/packages_core_cn.md \
+                          docs/faqs/faqs_cn.md \
+                          docs/faqs/dreamview_plus \
                           cyber/base \
                           cyber/blocker \
                           cyber/class_loader \
@@ -1116,27 +1130,27 @@ INPUT                   = \
                           modules/planning/traffic_rules/stop_sign \
                           modules/planning/traffic_rules/traffic_light \
                           modules/planning/traffic_rules/yield_sign \
-                          modules/perception/camera_detection_2d/conf \
-                          modules/perception/camera_detection_2d/dag \
-                          modules/perception/camera_detection_2d/data \
-                          modules/perception/camera_detection_2d/detector \
-                          modules/perception/camera_detection_2d/proto \
-                          modules/perception/camera_detection_2d/camera_detection_2d_component.h \
-                          modules/perception/camera_detection_2d/camera_detection_2d_component.cc \
-                          modules/perception/camera_detection_2d/README.md \
-                          modules/perception/camera_detection_3d/conf \
-                          modules/perception/camera_detection_3d/dag \
-                          modules/perception/camera_detection_3d/data \
-                          modules/perception/camera_detection_3d/detector \
-                          modules/perception/camera_detection_3d/proto \
-                          modules/perception/camera_detection_3d/camera_detection_3d_component.h \
-                          modules/perception/camera_detection_3d/camera_detection_3d_component.cc \
-                          modules/perception/camera_detection_3d/README.md \
+                          modules/perception/camera_detection_multi_stage/conf \
+                          modules/perception/camera_detection_multi_stage/dag \
+                          modules/perception/camera_detection_multi_stage/data \
+                          modules/perception/camera_detection_multi_stage/detector \
+                          modules/perception/camera_detection_multi_stage/proto \
+                          modules/perception/camera_detection_multi_stage/camera_detection_multi_stage_component.h \
+                          modules/perception/camera_detection_multi_stage/camera_detection_multi_stage_component.cc \
+                          modules/perception/camera_detection_multi_stage/README.md \
+                          modules/perception/camera_detection_single_stage/conf \
+                          modules/perception/camera_detection_single_stage/dag \
+                          modules/perception/camera_detection_single_stage/data \
+                          modules/perception/camera_detection_single_stage/detector \
+                          modules/perception/camera_detection_single_stage/proto \
+                          modules/perception/camera_detection_single_stage/camera_detection_single_stage_component.h \
+                          modules/perception/camera_detection_single_stage/camera_detection_single_stage_component.cc \
+                          modules/perception/camera_detection_single_stage/README.md \
                           modules/perception/common \
                           modules/perception/data \
                           modules/perception/launch/perception_all.launch \
-                          modules/perception/launch/perception_camera_2d.launch \
-                          modules/perception/launch/perception_camera_3d.launch \
+                          modules/perception/launch/perception_camera_multi_stage.launch \
+                          modules/perception/launch/perception_camera_single_stage.launch \
                           modules/perception/launch/perception_lane.launch \
                           modules/perception/launch/perception_lidar.launch \
                           modules/perception/launch/perception_radar.launch \
@@ -1202,13 +1216,9 @@ INPUT_FILE_ENCODING    =
 # comment), *.py, *.pyw, *.f90, *.f95, *.f03, *.f08, *.f18, *.f, *.for, *.vhd,
 # *.vhdl, *.ucf, *.qsf and *.ice.
 
-FILE_PATTERNS          = *.cc \
-                         *.h \
+FILE_PATTERNS          = \
                          *.md \
-                         *.pb.h \
-                         *.pb.cc \
                          *.txt \
-                         *.pb.txt \
                          *.dag \
                          *.launch \
                          *.yaml \
@@ -1216,6 +1226,8 @@ FILE_PATTERNS          = *.cc \
                          *.proto \
                          *.conf \
                          *.flag \
+                         *.cc \
+                         *.h \
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -1247,7 +1259,7 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = *_test.cc \
-#                         */bazel-* \
+                         */bazel-* \
                          */third_party/* \
                          */modules/kernel/* \
                          */modules/ros/* \
@@ -1317,7 +1329,7 @@ IMAGE_PATH             =
 # need to set EXTENSION_MAPPING for the extension otherwise the files are not
 # properly processed by doxygen.
 
-INPUT_FILTER           = "python docs/input_filter.py"
+INPUT_FILTER           = "python3 docs/input_filter.py"
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
 # basis. Doxygen will compare the file name with each pattern and apply the

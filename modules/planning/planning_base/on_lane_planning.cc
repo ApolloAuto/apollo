@@ -284,6 +284,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   if (util::IsDifferentRouting(last_command_, *local_view_.planning_command)) {
     last_command_ = *local_view_.planning_command;
     AINFO << "new_command:" << last_command_.DebugString();
+    reference_line_provider_->Reset();
     injector_->history()->Clear();
     injector_->planning_context()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdatePlanningCommand(
@@ -301,9 +302,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          vehicle_state, start_timestamp, planning_cycle_time,
-          FLAGS_trajectory_stitching_preserved_length, true,
-          last_publishable_trajectory_.get(), &replan_reason);
+          *(local_view_.chassis), vehicle_state, start_timestamp,
+          planning_cycle_time, FLAGS_trajectory_stitching_preserved_length,
+          true, last_publishable_trajectory_.get(), &replan_reason);
 
   injector_->ego_info()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);

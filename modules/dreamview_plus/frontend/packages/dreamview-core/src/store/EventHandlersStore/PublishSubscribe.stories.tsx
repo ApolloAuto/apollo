@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { PublishSubscribe } from '../../components/EventHandler/PublishSubscribe';
+import PublishSubscribe from '../../components/EventHandler/PublishSubscribe';
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction
 const meta: Meta<typeof PublishSubscribe> = {

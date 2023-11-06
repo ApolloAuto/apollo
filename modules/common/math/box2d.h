@@ -272,6 +272,11 @@ class Box2d {
   double min_y() const { return min_y_; }
 
  private:
+  inline bool is_inside_rectangle(const Vec2d &point) const {
+    return (point.x() >= 0.0 && point.x() <= width_ && point.y() >= 0.0 &&
+            point.y() <= length_);
+  }
+
   Vec2d center_;
   double length_ = 0.0;
   double width_ = 0.0;

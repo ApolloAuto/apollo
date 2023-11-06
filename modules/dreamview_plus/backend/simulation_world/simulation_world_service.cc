@@ -93,6 +93,61 @@ using ::google::protobuf::util::MessageToJsonString;
 static constexpr double kAngleThreshold = 0.1;
 
 namespace {
+// Adapt to 1.0 records
+std::map<int, std::string> ScenarioType = {
+    {0, "LANE_FOLLOW"},  // Default scenario
+    {2, "BARE_INTERSECTION_UNPROTECTED"},
+    {3, "STOP_SIGN_PROTECTED"},
+    {4, "TRAFFIC_LIGHT_PROTECTED"},
+    {5, "TRAFFIC_LIGHT_PROTECTED"},
+    {6, "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN"},
+    {7, "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN"},
+    {8, "YIELD_SIGN"},
+    {9, "PULL_OVER"},
+    {10, "VALET_PARKING"},
+    {11, "EMERGENCY_PULL_OVER"},
+    {12, "EMERGENCY_STOP"},
+    {13, "NARROW_STREET_U_TURN"},
+    {14, "PARK_AND_GO"},
+    {15, "LEARNING_MODEL_SAMPLE"},
+    {16, "DEADEND_TURNAROUND"}};
+
+std::map<int, std::string> StageType = {
+    {0, "NO_STAGE"},
+    {1, "LANE_FOLLOW_DEFAULT_STAGE"},
+    {200, "BARE_INTERSECTION_UNPROTECTED_APPROACH"},
+    {201, "BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE"},
+    {300, "STOP_SIGN_UNPROTECTED_PRE_STOP"},
+    {301, "STOP_SIGN_UNPROTECTED_STOP"},
+    {302, "STOP_SIGN_UNPROTECTED_CREEP"},
+    {303, "STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE"},
+    {400, "TRAFFIC_LIGHT_PROTECTED_APPROACH"},
+    {401, "TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE"},
+    {410, "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH"},
+    {411, "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP"},
+    {412, "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE"},
+    {420, "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP"},
+    {421, "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP"},
+    {422, "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE"},
+    {500, "PULL_OVER_APPROACH"},
+    {501, "PULL_OVER_RETRY_APPROACH_PARKING"},
+    {502, "PULL_OVER_RETRY_PARKING"},
+    {600, "EMERGENCY_PULL_OVER_SLOW_DOWN"},
+    {601, "EMERGENCY_PULL_OVER_APPROACH"},
+    {602, "EMERGENCY_PULL_OVER_STANDBY"},
+    {610, "EMERGENCY_STOP_APPROACH"},
+    {611, "EMERGENCY_STOP_STANDBY"},
+    {700, "VALET_PARKING_APPROACHING_PARKING_SPOT"},
+    {701, "VALET_PARKING_PARKING"},
+    {1100, "DEADEND_TURNAROUND_APPROACHING_TURNING_POINT"},
+    {1101, "DEADEND_TURNAROUND_TURNING"},
+    {800, "PARK_AND_GO_CHECK"},
+    {801, "PARK_AND_GO_CRUISE"},
+    {802, "PARK_AND_GO_ADJUST"},
+    {803, "PARK_AND_GO_PRE_CRUISE"},
+    {900, "YIELD_SIGN_APPROACH"},
+    {901, "YIELD_SIGN_CREEP"},
+    {1000, "LEARNING_MODEL_RUN"}};
 
 double CalculateAcceleration(
     const Point3D &acceleration, const Point3D &velocity,
@@ -356,6 +411,8 @@ void SimulationWorldService::Update() {
   node_->Observe();
 
   UpdateMonitorMessages();
+
+  UpdateVehicleParam();
 
   UpdateWithLatestObserved(planning_command_reader_.get(), false);
   UpdateWithLatestObserved(chassis_reader_.get());
@@ -949,6 +1006,14 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   // Update scenario
   if (data.has_scenario()) {
     planning_data->mutable_scenario()->CopyFrom(data.scenario());
+
+    // Adapt to 1.0 records
+    if (!data.scenario().has_scenario_plugin_type()) {
+      planning_data->mutable_scenario()->set_scenario_plugin_type(
+          ScenarioType[planning_data->scenario().scenario_type()]);
+      planning_data->mutable_scenario()->set_stage_plugin_type(
+          StageType[planning_data->scenario().stage_type()]);
+    }
   }
 
   // Update init point
@@ -1392,5 +1457,11 @@ void SimulationWorldService::PublishMonitorMessage(
   monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
   monitor_logger_buffer_.Publish();
 }
+
+void SimulationWorldService::UpdateVehicleParam() {
+  auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  world_.mutable_vehicle_param()->CopyFrom(vehicle_param);
+}
+
 }  // namespace dreamview
 }  // namespace apollo

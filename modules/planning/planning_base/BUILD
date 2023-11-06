@@ -1,11 +1,13 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
 package(default_visibility = ["//visibility:public"])
 
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
+
 PLANNING_FOPENMP = [
     "-DMODULE_NAME=\\\"planning\\\"",
     "-fopenmp",
@@ -35,11 +37,6 @@ apollo_component(
 
 apollo_cc_library(
     name = "apollo_planning_planning_base",
-    copts = [
-        "-fopenmp",
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    linkopts = ["-lgomp"],
     srcs = [
         "common/config_util.cc",
         "common/ego_info.cc",
@@ -185,6 +182,7 @@ apollo_cc_library(
         "task_base/common/speed_optimizer.cc",
         "task_base/common/trajectory_optimizer.cc",
         "task_base/task.cc",
+        "task_base/trajectory_fallback_task.cc",
         "task_base/utils/st_gap_estimator.cc",
         "traffic_rules_base/traffic_decider.cc",
         "traffic_rules_base/traffic_rule.cc",
@@ -351,6 +349,7 @@ apollo_cc_library(
         "task_base/common/speed_optimizer.h",
         "task_base/common/trajectory_optimizer.h",
         "task_base/task.h",
+        "task_base/trajectory_fallback_task.h",
         "task_base/utils/st_gap_estimator.h",
         "traffic_rules_base/traffic_decider.h",
         "traffic_rules_base/traffic_rule.h",
@@ -361,6 +360,11 @@ apollo_cc_library(
         "tuning/speed_model/autotuning_speed_feature_builder.h",
         "tuning/speed_model/autotuning_speed_mlp_model.h",
     ],
+    copts = [
+        "-fopenmp",
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    linkopts = ["-lgomp"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -439,11 +443,11 @@ cuda_library(
     name = "planning_block",
     srcs = ["open_space/trajectory_smoother/planning_block.cu"],
     hdrs = ["open_space/trajectory_smoother/planning_block.h"],
+    mandatory = False,
     deps = [
         "@local_config_cuda//cuda:cuda_headers",
         "@local_config_cuda//cuda:cudart",
     ],
-    mandatory = False,
 )
 
 filegroup(
@@ -487,13 +491,13 @@ apollo_cc_test(
     srcs = ["planner/navi/navi_planner_test.cc"],
     data = ["//modules/planning/planning_base:planning_testdata"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "//cyber",
         "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -502,13 +506,13 @@ apollo_cc_test(
     srcs = ["planner/rtk/rtk_replay_planner_test.cc"],
     data = ["//modules/planning/planning_base:planning_testdata"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "//cyber",
         "//modules/common/util:common_util",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -553,11 +557,11 @@ apollo_cc_test(
     name = "autotuning_speed_mlp_model_test",
     size = "small",
     srcs = ["tuning/speed_model/autotuning_speed_mlp_model_test.cc"],
+    tags = ["exclude"],
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
-    tags = ["exclude"]
 )
 
 apollo_cc_test(
@@ -574,11 +578,11 @@ apollo_cc_test(
     name = "autotuning_mlp_net_model_test",
     size = "small",
     srcs = ["tuning/autotuning_mlp_net_model_test.cc"],
+    tags = ["exclude"],
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
-    tags = ["exclude"]
 )
 
 apollo_cc_test(
@@ -619,11 +623,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["planner/public_road/public_road_planner_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -631,11 +635,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["planner/on_lane_planner_dispatcher_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -643,11 +647,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["planner/navi_planner_dispatcher_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":apollo_planning_planning_base",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -948,13 +952,13 @@ apollo_cc_test(
     size = "medium",
     srcs = ["learning_based/model_inference/model_inference_test.cc"],
     copts = PLANNING_COPTS,
+    linkstatic = True,
+    tags = ["exclude"],
     deps = [
-        ":apollo_planning_planning_base", 
+        ":apollo_planning_planning_base",
         "//modules/common/configs:config_gflags",
         "@com_google_googletest//:gtest",
     ],
-    linkstatic = True,
-    tags = ["exclude"]
 )
 
 apollo_cc_test(
@@ -1102,10 +1106,10 @@ apollo_cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
+        ":apollo_planning_planning_base",
         "//cyber",
         "//modules/common/math",
         "//modules/map:apollo_map",
-        ":apollo_planning_planning_base",
         "//modules/planning/planning_base/proto:planner_open_space_config_cc_proto",
         "@eigen",
     ],
@@ -1133,10 +1137,10 @@ apollo_cc_binary(
     name = "planning_pad_terminal",
     srcs = ["tools/pad_terminal.cc"],
     deps = [
+        ":apollo_planning_planning_base",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:util_tool",
-        ":apollo_planning_planning_base",
         "//modules/common_msgs/planning_msgs:pad_msg_cc_proto",
         "//modules/planning/planning_base/proto:planning_config_cc_proto",
         "@com_github_gflags_gflags//:gflags",
@@ -1149,6 +1153,16 @@ apollo_cc_binary(
     deps = [
         "@com_github_gflags_gflags//:gflags",
         "@libtorch_cpu",
+    ],
+)
+
+apollo_py_binary(
+    name = "planning_task_stats",
+    srcs = ["tools/planning_task_stats.py"],
+    deps = [
+        "//cyber/python/cyber_py3:cyber",
+        "//cyber/python/cyber_py3:record",
+        "//modules/common_msgs/planning_msgs:planning_py_pb2",
     ],
 )
 

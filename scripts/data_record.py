@@ -107,17 +107,20 @@ class Recorder(object):
             print('Another data recorder is running, skip.')
             return
         
+        has_record_task = False
+        if self.args.all:
+            self.record_task('all', record_args_dict['all'])
+            has_record_task = True
         if self.args.middle:
-            mode = 'middle'
-            record_args = record_args_dict['middle']
-        elif self.args.small:
-            mode = 'small'
-            record_args = record_args_dict['small']
-        else:
-            mode = 'all'
-            record_args = record_args_dict['all']
+            self.record_task('middle', record_args_dict['middle'])
+            has_record_task = True
+        if self.args.small:
+            self.record_task('small', record_args_dict['small'])
+            has_record_task = True
 
-        self.record_task(mode, record_args)
+        # default: record all
+        if not has_record_task:
+            self.record_task('all', record_args_dict['all'])
 
     def stop(self):
         """ Stop recording.
@@ -134,7 +137,7 @@ class Recorder(object):
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
         
-        log_file = APOLLO_ENV_ROOT + '/data/log/apollo_record.out'
+        log_file = f'{APOLLO_ENV_ROOT}/data/log/apollo_record_{mode}.out'
         cmd = '''
             cd "{task_dir}"
             nohup cyber_recorder record {record_args} >{log_file} 2>&1 &

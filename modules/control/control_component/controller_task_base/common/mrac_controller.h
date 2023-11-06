@@ -26,7 +26,7 @@
 #include "Eigen/Core"
 
 #include "modules/common_msgs/config_msgs/vehicle_config.pb.h"
-#include "modules/control/control_component/controller_task_base/proto/mrac_conf.pb.h"
+#include "modules/control/control_component/proto/mrac_conf.pb.h"
 
 #include "modules/common/status/status.h"
 

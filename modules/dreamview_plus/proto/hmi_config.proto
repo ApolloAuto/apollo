@@ -30,6 +30,7 @@ enum HMIAction {
   CHANGE_OPERATION = 21; //value = operation_name
   DELETE_VEHICLE_CONF = 22; // Delete the parameters of a vehicle.
   DELETE_V2X_CONF = 23; // Delete the parameters of a v2x.
+  DELETE_MAP = 24; // Delete map that value = map_name
 }
 
 message HMIConfig {

@@ -196,7 +196,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
-  stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
+  stitching_trajectory =
+      TrajectoryStitcher::ComputeStitchingTrajectory(*(local_view_.chassis),
       vehicle_state, start_timestamp, planning_cycle_time,
       FLAGS_trajectory_stitching_preserved_length, true,
       last_publishable_trajectory_.get(), &replan_reason);

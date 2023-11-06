@@ -58,7 +58,8 @@ class MapUpdater : public UpdaterBase {
   MapUpdater(WebSocketHandler *websocket, const MapService *map_service);
   ~MapUpdater() override {}
   void StartStream(const double &time_interval_ms,
-                   const std::string& channel_name = "") override;
+                   const std::string &channel_name = "",
+                   nlohmann::json *subscribe_param = nullptr) override;
   void StopStream(const std::string& channel_name = "") override;
   void OnTimer(const std::string& channel_name = "") override;
   void PublishMessage(const std::string& channel_name = "") override;

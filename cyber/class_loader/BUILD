@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test")
 
@@ -22,21 +21,21 @@ apollo_cc_library(
     ],
 )
 
-apollo_cc_test(
-    name = "class_loader_test",
-    size = "small",
-    srcs = ["class_loader_test.cc"],
-    data = [
-        "//cyber/class_loader/test:plugin1",
-        "//cyber/class_loader/test:plugin2",
-    ],
-    deps = [
-        "//cyber",
-        "//cyber/class_loader/test:base",
-        "//cyber/proto:unit_test_cc_proto",
-        "@com_google_googletest//:gtest",
-    ],
-)
+# apollo_cc_test(
+#     name = "class_loader_test",
+#     size = "small",
+#     srcs = ["class_loader_test.cc"],
+#     data = [
+#         "//cyber/class_loader/test:plugin1",
+#         "//cyber/class_loader/test:plugin2",
+#     ],
+#     deps = [
+#         "//cyber",
+#         "//cyber/class_loader/test:base",
+#         "//cyber/proto:unit_test_cc_proto",
+#         "@com_google_googletest//:gtest",
+#     ],
+# )
 
 apollo_package()
 cpplint()

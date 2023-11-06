@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/control/control_component/controller_task_base/proto/leadlag_conf.pb.h"
+#include "modules/control/control_component/proto/leadlag_conf.pb.h"
 
 #include "cyber/common/file.h"
 

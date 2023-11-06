@@ -1,15 +1,15 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_library(
+apollo_py_library(
     name = "item",
     srcs = ["item.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "realtime_plot",
     srcs = ["realtime_plot.py"],
     deps = [
@@ -24,12 +24,12 @@ py_binary(
     ],
 )
 
-py_library(
+apollo_py_library(
     name = "stitem",
     srcs = ["stitem.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "xyitem",
     srcs = ["xyitem.py"],
 )

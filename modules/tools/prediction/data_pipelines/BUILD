@@ -1,14 +1,14 @@
-load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+load("//tools/proto:proto.bzl", "apollo_py_binary", "apollo_py_library")
 load("//tools:apollo_package.bzl", "apollo_package")
 
 package(default_visibility = ["//visibility:public"])
 
-py_binary(
+apollo_py_binary(
     name = "cruise_h5_preprocessing",
     srcs = ["cruise_h5_preprocessing.py"],
 )
 
-py_library(
+apollo_py_library(
     name = "cruise_models",
     srcs = ["cruise_models.py"],
     deps = [
@@ -17,7 +17,7 @@ py_library(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "cruiseMLP_train",
     srcs = ["cruiseMLP_train.py"],
     deps = [
@@ -27,7 +27,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "junctionMLP_train",
     srcs = ["junctionMLP_train.py"],
     deps = [
@@ -35,12 +35,12 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "merge_h5",
     srcs = ["merge_h5.py"],
 )
 
-py_binary(
+apollo_py_binary(
     name = "mlp_train",
     srcs = ["mlp_train.py"],
     deps = [

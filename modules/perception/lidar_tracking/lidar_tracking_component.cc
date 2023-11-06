@@ -67,7 +67,7 @@ bool LidarTrackingComponent::Init() {
 
 bool LidarTrackingComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   AINFO << std::setprecision(16)
         << "Enter LidarTracking component, message timestamp: "
         << message->timestamp_

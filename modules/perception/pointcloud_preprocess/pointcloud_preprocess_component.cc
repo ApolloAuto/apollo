@@ -41,8 +41,9 @@ bool PointCloudPreprocessComponent::Init() {
 
   output_channel_name_ = comp_config.output_channel_name();
   sensor_name_ = comp_config.sensor_name();
-  lidar2novatel_tf2_child_frame_id_ =
-      comp_config.lidar2novatel_tf2_child_frame_id();
+  // Use sensor_name as lidar to novatel child_frame_id. If not equal
+  // we can use `sensor_info_` to get child_frame_id
+  lidar2novatel_tf2_child_frame_id_ = comp_config.sensor_name();
   lidar_query_tf_offset_ =
       static_cast<float>(comp_config.lidar_query_tf_offset());
 
@@ -67,7 +68,7 @@ bool PointCloudPreprocessComponent::Init() {
 
 bool PointCloudPreprocessComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   AINFO << std::setprecision(16)
         << "Enter pointcloud preprocess component, message timestamp: "
         << message->measurement_time()
@@ -142,6 +143,8 @@ bool PointCloudPreprocessComponent::InternalProc(
     AERROR << "Get sensor2novatel extrinsics error.";
     return false;
   }
+  frame->lidar2novatel_extrinsics =
+      preprocessor_option.sensor2novatel_extrinsics;
 
   PERF_BLOCK("cloud_preprocessor")
   if (!cloud_preprocessor_->Preprocess(

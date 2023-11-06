@@ -409,19 +409,22 @@ bool GetFilePathWithEnv(const std::string &path, const std::string &env_var,
     *file_path = path;
     return PathExists(path);
   }
+
+  bool relative_path_exists = false;
   if (PathExists(path)) {
     // relative path exists
     *file_path = path;
-    return true;
+    relative_path_exists = true;
   }
   if (path.front() == '.') {
     // relative path but not exist.
-    return false;
+    return relative_path_exists;
   }
+
   const char *var = std::getenv(env_var.c_str());
   if (var == nullptr) {
     AWARN << "GetFilePathWithEnv: env " << env_var << " not found.";
-    return false;
+    return relative_path_exists;
   }
   std::string env_path = std::string(var);
 
@@ -445,7 +448,7 @@ bool GetFilePathWithEnv(const std::string &path, const std::string &env_var,
     }
     begin = index + 1;
   } while (index != std::string::npos);
-  return false;
+  return relative_path_exists;
 }
 
 std::string GetCurrentPath() {

@@ -205,6 +205,9 @@ void ReferenceLineProvider::Reset() {
   route_segments_.clear();
   is_reference_line_updated_ = false;
   planning_command_.Clear();
+  while (!reference_line_history_.empty()) {
+    reference_line_history_.pop();
+  }
 }
 
 void ReferenceLineProvider::UpdateReferenceLine(
@@ -330,9 +333,9 @@ bool ReferenceLineProvider::GetReferenceLines(
     }
   }
 
-  ADEBUG << "Reference line is NOT ready.";
+  AINFO << "Reference line is NOT ready.";
   if (reference_line_history_.empty()) {
-    ADEBUG << "Failed to use reference line latest history";
+    AINFO << "Failed to use reference line latest history";
     return false;
   }
 
@@ -775,8 +778,6 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  static constexpr double kMaxHeadingDiff = M_PI * 4.0 / 6.0;
-  static constexpr double kMaxBackwardHeadingDiff = M_PI / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();
@@ -795,7 +796,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   auto last_index = index;
   while (last_index < ref_points.size() &&
          AngleDiff(cur_heading, ref_points[last_index].heading()) <
-             kMaxHeadingDiff) {
+             FLAGS_referfece_line_max_forward_heading_diff) {
     ++last_index;
   }
   --last_index;
@@ -810,7 +811,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   last_index = index;
   while (last_index > 0 &&
          abs(AngleDiff(cur_heading, ref_points[last_index].heading())) <
-             kMaxBackwardHeadingDiff) {
+             FLAGS_referfece_line_max_backward_heading_diff) {
     --last_index;
   }
   if (last_index != 0) {

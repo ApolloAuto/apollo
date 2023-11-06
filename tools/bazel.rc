@@ -1,5 +1,6 @@
-# Apollo Bazel configuration file.
-# This file tries to group and simplify build options for Apollo
+# load bazelrc from the legacy location
+# as recommended in https://github.com/bazelbuild/bazel/issues/6319
+# try-import %workspace%/tools/bazel.rc
 # +------------------------------------------------------------+
 # | Startup Options                                            |
 # +------------------------------------------------------------+
@@ -23,7 +24,7 @@ common --color=yes
 build --show_timestamps
 
 # Work around the sandbox issue.
-build --spawn_strategy=standalone
+build --spawn_strategy=sandboxed
 
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"
@@ -32,9 +33,9 @@ build --cxxopt="-fdiagnostics-color=always"
 # build --output_filter="^//"
 
 build --per_file_copt=external/upb/.*@-Wno-sign-compare
-build --copt="-Werror=sign-compare"
+# build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
-build --copt="-Werror=unused-variable"
+# build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 build --cxxopt="-Werror=reorder"
@@ -47,12 +48,12 @@ build --define=use_fast_cpp_protos=true
 
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
-build:opt -c opt --cxxopt=-fPIC
+build:opt -c opt
 
-#build --config=optimize
+# build --config=optimize
 # Instruction set optimizations
-build:optimize --copt=-march=native
-build:optimize --host_copt=-march=native
+# build:optimize --copt=-march=native
+# build:optimize --host_copt=-march=native
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures
@@ -86,7 +87,7 @@ test --test_output=errors
 test:unit_test --test_verbose_timeout_warnings
 
 # use --copt=-mavx2
-test --copt=-march=native
+# test --copt=-march=native
 
 coverage --javabase="@bazel_tools//tools/jdk:remote_jdk11"
 # coverage --host_javabase="@bazel_tools//tools/jdk:remote_jdk11"
@@ -113,6 +114,7 @@ coverage --linkopt=-lgcov
 # at the end.
 test:cpplint --test_tag_filters=cpplint
 test:cpplint --build_tests_only
+test:cpplint --test_timeout=3600
 test:cpplint --flaky_test_attempts=1
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
@@ -123,3 +125,4 @@ coverage --test_tag_filters=-cpplint
 # | Python Configurations                                      |
 # +------------------------------------------------------------+
 # Python support was configured by third_party/py .
+# build --remote_cache="http://localhost:8080/

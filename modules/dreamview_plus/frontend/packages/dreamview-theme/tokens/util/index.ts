@@ -32,13 +32,13 @@ export default {
     },
     textEllipsis: {
         overflow: 'hidden',
-        'text-overflow': 'ellipsis',
-        'white-space': 'nowrap',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
     },
     textEllipsis2: {
         width: '100%',
         overflow: 'hidden',
-        'text-overflow': 'ellipsis',
+        textOverflow: 'ellipsis',
         display: '-webkit-box',
         '-webkit-line-clamp': '2',
         '-webkit-box-orient': 'vertical',

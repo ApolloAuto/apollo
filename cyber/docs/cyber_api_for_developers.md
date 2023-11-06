@@ -1,4 +1,4 @@
-# Cyber RT API for Developers
+# Apollo Cyber RT API for Developers
 
 This document provides an extensive technical deep dive into how to create, manipulate and use Cyber RT's API.
 
@@ -14,16 +14,16 @@ This document provides an extensive technical deep dive into how to create, mani
 - [Time API](#use-of-time)
 - [Record file: Read and Write](#Record-file-Read-and-Write)
 - [C++ API Directory](##API-Directory)
-    - [Node](#node-api)
-    - [Writer](#writer-api)
-    - [Client](#client-api)
-    - [Parameter](#parameter-api)
-    - [Timer](#timer-api)
-    - [Time](#timer-api)
-    - [Duration](#duration-api)
-    - [Rate](#rate-api)
-    - [RecordReader](#recordreader-api)
-    - [RecordWriter](#recordwriter-api)
+  - [Node](#node-api)
+  - [Writer](#writer-api)
+  - [Client](#client-api)
+  - [Parameter](#parameter-api)
+  - [Timer](#timer-api)
+  - [Time](#timer-api)
+  - [Duration](#duration-api)
+  - [Rate](#rate-api)
+  - [RecordReader](#recordreader-api)
+  - [RecordWriter](#recordwriter-api)
 
 ## Talker-Listener
 
@@ -39,10 +39,11 @@ std::unique_ptr<Node> apollo::cyber::CreateNode(const std::string& node_name, co
 ```
 
 - Parameters:
-    - node_name: name of the node, globally unique identifier
-    - name_space: name of the space where the node is located
 
-    > name_space is empty by default. It is the name of the space concatenated with node_name. The format is `/namespace/node_name`
+  - node_name: name of the node, globally unique identifier
+  - name_space: name of the space where the node is located
+
+  > name_space is empty by default. It is the name of the space concatenated with node_name. The format is `/namespace/node_name`
 
 - Return value - An exclusive smart pointer to Node
 - Error Conditions - when `cyber::Init()` has not called, the system is in an uninitialized state, unable to create a node, return nullptr
@@ -63,8 +64,8 @@ template <typename MessageT>
 ```
 
 - Parameters:
-    - channel_name: the name of the channel to write to
-    - MessageT: The type of message to be written out
+  - channel_name: the name of the channel to write to
+  - MessageT: The type of message to be written out
 - Return value - Shared pointer to the Writer object
 
 ### Create a reader
@@ -89,9 +90,10 @@ auto CreateReader(const proto::RoleAttributes& role_attr,
 ```
 
 - Parameters:
-    - MessageT: The type of message to read
-    - channel_name: the name of the channel to receive from
-    - reader_func: callback function to process the messages
+
+  - MessageT: The type of message to read
+  - channel_name: the name of the channel to receive from
+  - reader_func: callback function to process the messages
 
 - Return value - Shared pointer to the Reader object
 
@@ -273,7 +275,7 @@ cc_binary(
 - Run: ./bazel-bin/cyber/examples/service
 - Examining result: you should see content below in apollo/data/log/service.INFO
 
-``` txt
+```txt
 I1124 16:36:44.568845 14965 service.cc:30] [service] server: i am driver server
 I1124 16:36:44.569031 14949 service.cc:43] [service] client: response: msg_id: 1 timestamp: 0
 I1124 16:36:45.569514 14966 service.cc:30] [service] server: i am driver server
@@ -301,14 +303,14 @@ The Parameter Service is used for shared data between nodes, and provides basic 
 
 All parameters passed through cyber are `apollo::cyber::Parameter` objects, the table below lists the 5 supported parameter types.
 
-Parameter type | C++ data type | protobuf data type
-:------------- | :------------- | :--------------
-apollo::cyber::proto::ParamType::INT    |   int64_t |   int64
-apollo::cyber::proto::ParamType::DOUBLE | double | double
-apollo::cyber::proto::ParamType::BOOL   | bool |bool
-apollo::cyber::proto::ParamType::STRING  | std::string | string
-apollo::cyber::proto::ParamType::PROTOBUF  | std::string | string
-apollo::cyber::proto::ParamType::NOT_SET | - | -
+| Parameter type                            | C++ data type | protobuf data type |
+| :---------------------------------------- | :------------ | :----------------- |
+| apollo::cyber::proto::ParamType::INT      | int64_t       | int64              |
+| apollo::cyber::proto::ParamType::DOUBLE   | double        | double             |
+| apollo::cyber::proto::ParamType::BOOL     | bool          | bool               |
+| apollo::cyber::proto::ParamType::STRING   | std::string   | string             |
+| apollo::cyber::proto::ParamType::PROTOBUF | std::string   | string             |
+| apollo::cyber::proto::ParamType::NOT_SET  | -             | -                  |
 
 Besides the 5 types above, Parameter also supports interface with protobuf object as incoming parameter. Post performing serialization processes the object and converts it to the STRING type for transfer.
 
@@ -616,7 +618,7 @@ module_config {
 
 ### Demo - examples
 
-#### Common_component_example(cyber/examples/common_component_example/*)
+#### Common_component_example(cyber/examples/common_component_example/\*)
 
 Header definition(common_component_example.h)
 
@@ -661,7 +663,7 @@ bool Commontestcomponent::Proc(const std::shared_ptr<Driver>& msg0,
 }
 ```
 
-#### Timer_component_example(cyber/examples/timer_component_example/*)
+#### Timer_component_example(cyber/examples/timer_component_example/\*)
 
 Header definition(timer_component_example.h)
 
@@ -770,8 +772,8 @@ Each loaded component or binary is a module
 - **dag_conf** is the name of the corresponding dag file of the component
 - **process_name** is the name of the mainboard process once started, and the same component of process_name will be loaded and run in the same process.
 - **exception_handler** is the handler method when the exception occurs in the process. The value can be exit or respawn listed below.
-    - exit, which means that the entire process needs to stop running when the current process exits abnormally.
-    - respawn, the current process needs to be restarted after abnormal exit. Start this process. If there is no such thing as it is empty, it means no treatment. Can be controlled by the user according to the specific conditions of the process
+  - exit, which means that the entire process needs to stop running when the current process exits abnormally.
+  - respawn, the current process needs to be restarted after abnormal exit. Start this process. If there is no such thing as it is empty, it means no treatment. Can be controlled by the user according to the specific conditions of the process
 
 ## Timer
 

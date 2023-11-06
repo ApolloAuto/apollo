@@ -6,7 +6,7 @@ export type NoDataPlaceHolderProps = {
     text: string;
 } & HTMLAttributes<HTMLDivElement>;
 
-export default function EmptyPlaceHolder(props: NoDataPlaceHolderProps) {
+function EmptyPlaceHolder(props: NoDataPlaceHolderProps) {
     const { classes } = useStyle();
 
     return (
@@ -23,3 +23,5 @@ export default function EmptyPlaceHolder(props: NoDataPlaceHolderProps) {
         </div>
     );
 }
+
+export default React.memo(EmptyPlaceHolder);

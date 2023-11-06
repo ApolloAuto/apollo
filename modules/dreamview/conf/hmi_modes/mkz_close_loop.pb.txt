@@ -12,7 +12,6 @@ cyber_modules {
     dag_files: "/apollo/modules/external_command/process_component/dag/external_command_process.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
     dag_files: "/apollo/modules/storytelling/dag/storytelling.dag"
-    dag_files: "/apollo/modules/routing/dag/routing.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"
   }

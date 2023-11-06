@@ -107,3 +107,7 @@ DECLARE_string(lane_follow_command_topic);
 DECLARE_string(valet_parking_command_topic);
 
 DECLARE_string(action_command_topic);
+
+DECLARE_string(data_recorder_command_keyword);
+
+DECLARE_string(data_record_default_name);

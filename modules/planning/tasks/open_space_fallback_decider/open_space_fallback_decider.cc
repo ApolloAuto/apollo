@@ -26,6 +26,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::math::Polygon2d;
 
 bool OpenSpaceFallbackDecider::Init(
     const std::string& config_dir, const std::string& name,
@@ -81,7 +82,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
           predicted_bounding_rectangles, &fallback_start_index,
           &first_collision_index)) {
     // change flag
-    frame_->mutable_open_space_info()->set_fallback_flag(true);
+    frame_->mutable_open_space_info()->set_stop_flag(true);
 
     // generate fallback trajectory base on current partition trajectory
     // vehicle speed is decreased to zero inside safety distance
@@ -275,6 +276,37 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
         fallback_trajectory_pair_candidate;
   } else {
+    frame_->mutable_open_space_info()->set_stop_flag(false);
+  }
+
+  if (!IsCollisionFreeEgoBox()) {
+    double relative_time = 0.0;
+    // TODO(Jinyun) Move to conf
+    static constexpr int stop_trajectory_length = 10;
+    static constexpr double relative_stop_time = 0.1;
+    auto fallback_tra_pair =
+        frame_->mutable_open_space_info()->mutable_fallback_trajectory();
+
+    fallback_tra_pair->second = canbus::Chassis::GEAR_DRIVE;
+
+    fallback_tra_pair->first.clear();
+    for (size_t i = 0; i < stop_trajectory_length; i++) {
+      TrajectoryPoint point;
+      point.mutable_path_point()->set_x(frame_->vehicle_state().x());
+      point.mutable_path_point()->set_y(frame_->vehicle_state().y());
+      point.mutable_path_point()->set_theta(frame_->vehicle_state().heading());
+      point.mutable_path_point()->set_s(0.0);
+      point.mutable_path_point()->set_kappa(0.0);
+      point.set_relative_time(relative_time);
+      point.set_v(0.0);
+      point.set_a(-4.0);
+      fallback_tra_pair->first.emplace_back(point);
+      relative_time += relative_stop_time;
+    }
+
+    frame_->mutable_open_space_info()->set_fallback_flag(true);
+
+  } else {
     frame_->mutable_open_space_info()->set_fallback_flag(false);
   }
 
@@ -299,6 +331,45 @@ void OpenSpaceFallbackDecider::BuildPredictedEnvironment(
     predicted_bounding_rectangles.emplace_back(std::move(predicted_env));
     relative_time += FLAGS_trajectory_time_resolution;
   }
+}
+
+bool OpenSpaceFallbackDecider::IsCollisionFreeEgoBox() {
+  // prediction time resolution: FLAGS_trajectory_time_resolution
+  const auto &vehicle_state = frame_->vehicle_state();
+  double x = vehicle_state.x();
+  double y = vehicle_state.y();
+  double heading = vehicle_state.heading();
+
+  const auto& vehicle_config =
+    common::VehicleConfigHelper::Instance()->GetConfig();
+  double ego_length = vehicle_config.vehicle_param().length();
+  double ego_width = vehicle_config.vehicle_param().width();
+  Box2d ego_box({x, y}, heading, ego_length, ego_width);
+  Polygon2d ego_polygon = Polygon2d(ego_box);
+
+  for (const Obstacle* obstacle : frame_->obstacles()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic() ||
+        obstacle->Perception().width() < 0.2 ||
+        obstacle->Perception().length() < 0.2) {
+      continue;
+    }
+    Polygon2d obstacle_polygon = obstacle->PerceptionPolygon();
+    if (ego_polygon.HasOverlap(obstacle_polygon)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void OpenSpaceFallbackDecider::PathPointNormalizing(
+    double rotate_angle, const Vec2d& translate_origin, double* x, double* y,
+    double* phi) {
+  *x -= translate_origin.x();
+  *y -= translate_origin.y();
+  double tmp_x = *x;
+  *x = (*x) * std::cos(-rotate_angle) - (*y) * std::sin(-rotate_angle);
+  *y = tmp_x * std::sin(-rotate_angle) + (*y) * std::cos(-rotate_angle);
+  *phi = common::math::NormalizeAngle(*phi - rotate_angle);
 }
 
 bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(

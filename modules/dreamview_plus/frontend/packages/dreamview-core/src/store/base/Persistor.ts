@@ -1,4 +1,5 @@
-import { pick, omit } from 'lodash';
+import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import { getLocalStorageItem, setLocalStorageItem } from '@dreamview/dreamview-core/src/util/storage';
 
 export type Persistor<S> =

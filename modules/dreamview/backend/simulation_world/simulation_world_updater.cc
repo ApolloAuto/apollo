@@ -638,6 +638,9 @@ bool SimulationWorldUpdater::ConstructLaneFollowCommand(
     for (size_t i = 0; i < iter->size(); ++i) {
       auto &point = (*iter)[i];
       auto *pose = waypoint->Add();
+      if (ContainsKey(point, "heading")) {
+        pose->set_heading(point["heading"]);
+      }
       pose->set_x(point["x"]);
       pose->set_y(point["y"]);
     }

@@ -1,31 +1,32 @@
-/* eslint-disable import/no-webpack-loader-syntax */
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import { from, filter, finalize, Observable, Subject, map, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, filter, finalize, from, map, Observable, Subject, tap } from 'rxjs';
 import Logger from '@dreamview/log';
-// @ts-ignore
-import DeserializerWorker from 'worker-loader!./deserializerWorker';
-import { isEqual } from 'lodash';
+import { isEqual, isNil } from 'lodash';
+import { HandleMessageType } from '@dreamview/dreamview-core/src/services/models/response-message.model';
+import { RequestDataType } from '@dreamview/dreamview-core/src/services/models/request-message.model';
+import CountedSubject from '@dreamview/dreamview-core/src/util/CountedSubject';
+import MultiKeyMap from '@dreamview/dreamview-core/src/util/MultiKeyMap';
+import { Emptyable, Nullable } from '@dreamview/dreamview-core/src/util/similarFunctions';
+import { genereateRequestId } from '@dreamview/dreamview-core/src/util/genereateRequestId';
 import { WebSocketConnection } from './websocket-connect.service';
-import { genereateRequestId } from '../../util/genereateRequestId';
 import { config } from './constant';
-import { ChildWebSocketSubjectConfig } from './deserializerMethods';
 import {
     ConnectionStatusEnum,
-    RequestMessageActionEnum,
-    ResponseMessageActionEnum,
+    isMessageType,
     MetadataItem,
-    SocketNameEnum,
     RequestMessage,
-    ResponseMessage,
+    RequestMessageActionEnum,
     RequestStreamMessage,
+    ResponseMessage,
+    ResponseMessageActionEnum,
+    SocketNameEnum,
     StreamMessageData,
+    SubscribePayload,
 } from './type';
-
-import { HandleMessageType } from '../models/response-message.model';
-import { RequestDataType } from '../models/request-message.model';
-import CountedSubject from '../../util/CountedSubject';
-import MultiKeyMap from '../../util/MultiKeyMap';
-import { Emptyable } from '../../util/similarFunctions';
+import { PluginManager } from './plugins/PluginManager';
+import { WebSocketPlugin } from './plugins/type';
+import MapMessageHandlerPlugin from './plugins/MapMessageHandlerPlugin';
+import ChildWsService from './child-ws.service';
+import { StreamDataNames } from '../api/types';
 
 const logger = Logger.getInstance('WebSocketManager');
 
@@ -36,7 +37,9 @@ export class WebSocketManager {
 
     private readonly pluginConnection: WebSocketConnection;
 
-    private activeSockets: { [key: string]: WebSocketSubject<any> } = {};
+    private activeWorkers: { [key: string]: ChildWsService } = {};
+
+    private pluginManager = new PluginManager();
 
     private metadata: MetadataItem[] = [];
 
@@ -50,11 +53,13 @@ export class WebSocketManager {
     private responseResolvers: {
         [requestId: string]: {
             resolver: (response: any) => void;
+            reject?: (error: any) => void;
             shouldDelete: boolean;
         };
     } = {};
 
     constructor(mainUrl: string = config.mainUrl, pluginUrl: string = config.pluginUrl) {
+        this.registerPlugin([new MapMessageHandlerPlugin()]);
         this.mainConnection = new WebSocketConnection(mainUrl);
         this.pluginConnection = new WebSocketConnection(pluginUrl);
         this.mainConnection.receivedMessages$.subscribe((msg) =>
@@ -65,13 +70,25 @@ export class WebSocketManager {
         );
     }
 
+    public registerPlugin(plugins: WebSocketPlugin[]): void {
+        plugins.forEach((plugin) => this.pluginManager.registerPlugin(plugin));
+    }
+
     handleMessage(msg: HandleMessageType, socketName: SocketNameEnum) {
-        if (!(msg?.data?.info?.code === 0)) {
-            return;
-        }
         logger.debug(`Received message from ${socketName}, message: ${JSON.stringify(msg, null, 0)}`);
 
-        if (msg.data.info.code !== 0) {
+        // 安全校验
+        if (!msg?.action) {
+            logger.error(`Received message from ${socketName}, but action is undefined`);
+            return;
+        }
+
+        if (msg?.data?.info?.code === undefined) {
+            logger.error(`Received message from ${socketName}, but code is undefined`);
+            return;
+        }
+
+        if (msg?.data?.info?.code !== 0) {
             logger.error(
                 `Received error message from ${socketName}, message: ${JSON.stringify(msg.data.info, null, 0)}`,
             );
@@ -83,7 +100,9 @@ export class WebSocketManager {
             this.mainConnection.connectionStatus$.next(ConnectionStatusEnum.METADATA);
         } else if (msg.action === ResponseMessageActionEnum.RESPONSE_MESSAGE_TYPE) {
             if (msg && this.responseResolvers[msg.data.requestId]) {
-                this.responseResolvers[msg.data.requestId].resolver(msg);
+                if (msg.data.info.code === 0) {
+                    this.responseResolvers[msg.data.requestId].resolver(msg);
+                }
                 if (this.responseResolvers[msg.data.requestId].shouldDelete) {
                     delete this.responseResolvers[msg.data.requestId];
                 }
@@ -111,8 +130,8 @@ export class WebSocketManager {
         logger.debug('Disconnected from all sockets');
         this.mainConnection.disconnect();
         this.pluginConnection.disconnect();
-        Object.entries(this.activeSockets).forEach(([name, socket]) => {
-            socket.complete();
+        Object.entries(this.activeWorkers).forEach(([name, childWsService]) => {
+            childWsService.disconnect();
             from(this.dataSubjects.get({ name })).subscribe((subject) => {
                 if (subject) {
                     subject.complete();
@@ -143,75 +162,112 @@ export class WebSocketManager {
         const metadata = this.metadata.find((m) => m.dataName === name);
         if (!metadata) return;
 
-        const childSocket = webSocket(
-            ChildWebSocketSubjectConfig(`${config.baseURL}/${metadata.websocketInfo.websocketName}`),
-        );
-        this.activeSockets[name] = childSocket;
+        if (!this.activeWorkers[name]) {
+            this.activeWorkers[name] = new ChildWsService(
+                name as StreamDataNames,
+                `${config.baseURL}/${metadata.websocketInfo.websocketName}`,
+            ).connect();
+        }
 
-        const worker = new DeserializerWorker();
+        this.activeWorkers[name].socketMessage$.subscribe((message) => {
+            if (isMessageType(message, 'SOCKET_MESSAGE')) {
+                const endTimestamp = performance.now();
+                const startTimestamp = message.payload?.performance?.startTimestamp;
+                if (startTimestamp) {
+                    logger.debug(`Message from ${name} took ${endTimestamp - startTimestamp}ms to transfer`);
+                }
+                this.dataSubjects.getByExactKey({ name })?.next(message.payload);
+            }
+        });
+    }
 
-        worker.onmessage = (event: MessageEvent<StreamMessageData<unknown>>) => {
-            const streamMessageData = event.data;
-            this.dataSubjects.getByExactKey({ name })?.next(streamMessageData);
+    public sendSubscriptionMessage<Param>(
+        action: RequestMessageActionEnum,
+        name: string,
+        channel: Nullable<string>,
+        option?: {
+            param?: Param;
+            dataFrequencyMs?: number;
+        },
+    ): void {
+        if (!this.mainConnection.isConnected()) {
+            logger.error('Main socket is not connected');
+            return;
+        }
+
+        const info: SubscribePayload = {
+            websocketName: name,
+            ...(isNil(channel) ? {} : { channelName: channel }),
+            ...(isNil(option?.param) ? {} : { param: option.param }),
+            dataFrequencyMs: option?.dataFrequencyMs ?? dataFrequencyMs,
         };
 
-        childSocket.subscribe((data: ArrayBuffer) => {
-            worker.postMessage({ data, name }, [data]);
-        });
+        this.mainConnection.sendMessage({
+            action,
+            type: action,
+            data: {
+                name: action,
+                source: 'dreamview',
+                info,
+                sourceType: 'websocktSubscribe',
+                targetType: 'module',
+                requestId: action,
+            },
+        } as RequestStreamMessage);
+    }
+
+    /**
+     * 初始化子socket
+     * @param name websocketName
+     * @private
+     */
+    private initChildSocket(name: string): void {
+        if (this.activeWorkers[name] === undefined) {
+            this.connectChildSocket(name);
+        }
     }
 
     /**
      * 订阅指定name的数据
      * @param name 数据名
+     * @param option 参数
      */
-    public subscribeToData<T>(name: string): CountedSubject<T> {
+    public subscribeToData<T, Param>(
+        name: string,
+        option?: {
+            param?: Param;
+            dataFrequencyMs?: number;
+        },
+    ): CountedSubject<T> {
+        this.initChildSocket(name);
         if (this.dataSubjects.getByExactKey({ name }) === undefined) {
             this.dataSubjects.set({ name }, new CountedSubject(name));
-            this.connectChildSocket(name);
-            this.mainConnection.sendMessage({
-                action: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-                type: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-                data: {
-                    name: 'subscribe',
-                    source: 'dreamview',
-                    info: {
-                        websocketName: name,
-                        dataFrequencyMs,
-                    },
-                    sourceType: 'websocktSubscribe',
-                    targetType: 'module',
-                    requestId: 'dreamview',
-                },
-            } as RequestStreamMessage);
+            this.sendSubscriptionMessage(RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE, name, null, option);
         }
 
         const subject$ = this.dataSubjects.getByExactKey({ name }) as CountedSubject<StreamMessageData<unknown>>;
 
+        const plugins = this.pluginManager.getPluginsForDataName(name);
+
+        const inflowPlugins = this.pluginManager.getPluginsForInflowDataName(name);
+
         return <CountedSubject<T>>subject$.pipe(
-            map((data) => data?.data as T),
+            tap((data) => {
+                inflowPlugins.forEach((plugin) => plugin.handleInflow?.(data?.data, this.dataSubjects, this));
+            }),
+            // @ts-ignore
+            map((data) => plugins.reduce((acc, plugin) => plugin.handleSubscribeData(acc), data?.data as T)),
             finalize(() => {
                 const subscribersCount = subject$.count;
                 const isCompleted = subject$.completed;
                 if (isCompleted) return;
                 if (subscribersCount === 0) {
-                    this.mainConnection.sendMessage({
-                        action: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                        type: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                        data: {
-                            name: 'unsubscribe',
-                            source: 'dreamview',
-                            info: {
-                                websocketName: name,
-                            },
-                            sourceType: 'websocktSubscribe',
-                            targetType: 'module',
-                            requestId: 'unsubscribe',
-                        },
-                    } as RequestStreamMessage);
+                    this.sendSubscriptionMessage(RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE, name, null, option);
 
                     this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
-                    this.activeSockets[name].complete();
-                    delete this.activeSockets[name];
+                    // 不再主动关闭socket，可以复用。
+                    // this.activeSockets[name].complete();
+                    // delete this.activeSockets[name];
                 }
             }),
         );
@@ -221,31 +277,42 @@ export class WebSocketManager {
      * 订阅指定name、channel的数据
      * @param name 数据名
      * @param channel 频道名
+     * @param option 参数
      */
-    public subscribeToDataWithChannel<T>(name: string, channel: string): CountedSubject<T> {
+    public subscribeToDataWithChannel<T, Param>(
+        name: string,
+        channel: string,
+        option?: {
+            param?: Param;
+            dataFrequencyMs?: number;
+        },
+    ): CountedSubject<T> {
+        this.initChildSocket(name);
+
         if (this.dataSubjects.getByExactKey({ name }) === undefined) {
             // 初始化上游数据源
             this.dataSubjects.set({ name }, new CountedSubject(name));
-            this.connectChildSocket(name);
         }
 
         if (this.dataSubjects.getByExactKey({ name, channel }) === undefined) {
-            this.mainConnection.sendMessage({
-                action: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-                type: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
-                data: {
-                    name: 'subscribe',
-                    source: 'dreamview',
-                    info: {
-                        websocketName: name,
-                        channelName: channel,
-                        dataFrequencyMs,
-                    },
-                    sourceType: 'websocktSubscribe',
-                    targetType: 'module',
-                    requestId: 'dreamview',
-                },
-            } as RequestStreamMessage);
+            this.sendSubscriptionMessage(RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE, name, channel, option);
+            // this.mainConnection.sendMessage({
+            //     action: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
+            //     type: RequestMessageActionEnum.SUBSCRIBE_MESSAGE_TYPE,
+            //     data: {
+            //         name: 'subscribe',
+            //         source: 'dreamview',
+            //         info: {
+            //             websocketName: name,
+            //             channelName: channel,
+            //             param: option.param,
+            //             dataFrequencyMs: option.dataFrequencyMs || dataFrequencyMs,
+            //         },
+            //         sourceType: 'websocktSubscribe',
+            //         targetType: 'module',
+            //         requestId: 'dreamview',
+            //     },
+            // } as RequestStreamMessage);
             this.dataSubjects.set({ name, channel }, new CountedSubject(name, channel));
         }
 
@@ -262,21 +329,27 @@ export class WebSocketManager {
                 const isCompleted = downstream.completed;
                 if (isCompleted) return;
                 if (subscribersCount === 0) {
-                    this.mainConnection.sendMessage({
-                        action: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                        type: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
-                        data: {
-                            name: 'unsubscribe',
-                            source: 'dreamview',
-                            info: {
-                                websocketName: name,
-                                channelName: channel,
-                            },
-                            sourceType: 'websocktSubscribe',
-                            targetType: 'module',
-                            requestId: 'unsubscribe',
-                        },
-                    } as RequestStreamMessage);
+                    this.sendSubscriptionMessage(
+                        RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
+                        name,
+                        channel,
+                        option,
+                    );
+                    // this.mainConnection.sendMessage({
+                    //     action: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
+                    //     type: RequestMessageActionEnum.UNSUBSCRIBE_MESSAGE_TYPE,
+                    //     data: {
+                    //         name: 'unsubscribe',
+                    //         source: 'dreamview',
+                    //         info: {
+                    //             websocketName: name,
+                    //             channelName: channel,
+                    //         },
+                    //         sourceType: 'websocktSubscribe',
+                    //         targetType: 'module',
+                    //         requestId: 'unsubscribe',
+                    //     },
+                    // } as RequestStreamMessage);
 
                     this.dataSubjects.deleteByExactKey({ name, channel }, (countedSubject) =>
                         countedSubject.complete(),
@@ -286,8 +359,8 @@ export class WebSocketManager {
                 // 如果没有下游订阅者，就取消上游数据源的订阅
                 if (this.dataSubjects.countIf((subject) => subject.name === name) === 1) {
                     this.dataSubjects.delete({ name }, (countedSubject) => countedSubject.complete());
-                    this.activeSockets[name]?.complete();
-                    delete this.activeSockets[name];
+                    // this.activeSockets[name]?.complete();
+                    // delete this.activeSockets[name];
                 }
             }),
         );
@@ -322,9 +395,10 @@ export class WebSocketManager {
             return Promise.resolve(null);
         }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             this.responseResolvers[requestId] = {
                 resolver: resolve,
+                reject,
                 shouldDelete: true,
             };
             this.sendMessage<Req>(

@@ -24,6 +24,7 @@
 #include <string>
 
 #include "modules/planning/scenarios/emergency_stop/proto/emergency_stop.pb.h"
+
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/planning_base/common/frame.h"
@@ -49,6 +50,10 @@ class EmergencyStopScenario : public Scenario {
 
   bool IsTransferable(const Scenario* const other_scenario,
                       const Frame& frame) override;
+
+  ScenarioResult Process(const common::TrajectoryPoint& planning_init_point,
+                         Frame* frame) override;
+
   bool Exit(Frame* frame);
 
  private:

@@ -86,7 +86,7 @@ apollo_cc_test(
     ],
 )
 
-cc_test(
+apollo_cc_test(
     name = "unbounded_queue_test",
     size = "small",
     srcs = ["unbounded_queue_test.cc"],

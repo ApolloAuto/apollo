@@ -99,6 +99,22 @@ using Point3DF = Point3D<float>;
 using Point3DI = Point3D<int>;
 using Point3DD = Point3D<double>;
 
+template <typename T>
+struct alignas(16) RadarPoint {
+  T x = 0;
+  T y = 0;
+  T z = 0;
+  T velocity = 0;
+  T comp_vel = 0;
+  T rcs = 0;
+  typedef T Type;
+};
+
+using RadarPointF = RadarPoint<float>;
+using RadarPointD = RadarPoint<double>;
+using RadarPointXYZVRF = RadarPoint<float>;
+using RadarPointXYZVRD = RadarPoint<double>;
+
 }  // namespace base
 }  // namespace perception
 }  // namespace apollo

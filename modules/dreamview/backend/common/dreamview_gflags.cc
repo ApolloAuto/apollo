@@ -171,3 +171,9 @@ DEFINE_string(valet_parking_command_topic,
 
 DEFINE_string(action_command_topic, "/apollo/external_command/action",
               "Action command topic name.");
+
+DEFINE_string(data_recorder_command_keyword, "cyber_recorder record",
+              "Data recorder command keyword.");
+
+DEFINE_string(data_record_default_name, "default_record_name",
+              "Data record default name");

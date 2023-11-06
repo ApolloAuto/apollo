@@ -67,6 +67,8 @@ DECLARE_int32(max_chassis_miss_num);
 
 DECLARE_int32(max_planning_miss_num);
 
+DECLARE_int32(planning_status_msg_pending_queue_size);
+
 DECLARE_double(max_acceleration_when_stopped);
 
 DECLARE_double(max_path_remain_when_stopped);
@@ -90,4 +92,4 @@ DECLARE_double(minimum_speed_protection);
 // 0: stop, at first should stop, then receive pad msg to start
 DECLARE_int32(action);
 
-DECLARE_bool(enable_epb_brake);
+DECLARE_bool(use_vehicle_epb);

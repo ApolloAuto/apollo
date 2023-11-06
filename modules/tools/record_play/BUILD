@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("//tools/proto:proto.bzl", "apollo_py_binary")
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -11,7 +11,7 @@ filegroup(
     ]),
 )
 
-py_binary(
+apollo_py_binary(
     name = "rtk_player",
     srcs = ["rtk_player.py"],
     deps = [
@@ -29,7 +29,7 @@ py_binary(
     ],
 )
 
-py_binary(
+apollo_py_binary(
     name = "rtk_recorder",
     srcs = ["rtk_recorder.py"],
     deps = [

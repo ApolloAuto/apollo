@@ -3,11 +3,11 @@ cyber_modules {
   value: {
     dag_files: "/apollo/modules/perception/multi_sensor_fusion/dag/multi_sensor_fusion.dag"
     dag_files: "/apollo/modules/prediction/dag/prediction_navi.dag"
-    dag_files: "/apollo/modules/perception/camera_detection_2d/dag/camera_detection_2d_front.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag"
     dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_front.dag"
     dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_front.dag"
     dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_front.dag"
-    dag_files: "/apollo/modules/perception/camera_detection_2d/dag/camera_detection_2d_rear.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_rear.dag"
     dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation_rear.dag"
     dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement_rear.dag"
     dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking_rear.dag"
@@ -15,7 +15,6 @@ cyber_modules {
     dag_files: "/apollo/modules/perception/pointcloud_map_based_roi/dag/pointcloud_map_based_roi.dag"
     dag_files: "/apollo/modules/perception/pointcloud_ground_detection/dag/pointcloud_ground_detection.dag"
     dag_files: "/apollo/modules/perception/lidar_detection/dag/lidar_detection.dag"
-    dag_files: "/apollo/modules/perception/lidar_segmentation/dag/lidar_segmentation.dag"
     dag_files: "/apollo/modules/perception/lidar_detection_filter/dag/lidar_detection_filter.dag"
     dag_files: "/apollo/modules/perception/lidar_tracking/dag/lidar_tracking.dag"
     dag_files: "/apollo/modules/perception/radar_detection/dag/radar_detection_front.dag"
@@ -50,9 +49,9 @@ cyber_modules {
   }
 }
 cyber_modules {
-  key: "Camera2D"
+  key: "CameraMultiStage"
   value: {
-    dag_files: "/apollo/modules/perception/camera_detection_2d/dag/camera_detection_2d_front.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_multi_stage/dag/camera_detection_multi_stage_front.dag"
     dag_files: "/apollo/modules/perception/camera_location_estimation/dag/camera_location_estimation.dag"
     dag_files: "/apollo/modules/perception/camera_location_refinement/dag/camera_location_refinement.dag"
     dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking.dag"
@@ -60,9 +59,9 @@ cyber_modules {
   }
 }
 cyber_modules {
-  key: "Camera3D"
+  key: "CameraSingleStage"
   value: {
-    dag_files: "/apollo/modules/perception/camera_detection_3d/dag/camera_detection_3d.dag"
+    dag_files: "/apollo/modules/perception/camera_detection_single_stage/dag/camera_detection_single_stage.dag"
     dag_files: "/apollo/modules/perception/camera_tracking/dag/camera_tracking.dag"
     dag_files: "/apollo/modules/perception/msg_adapter/dag/msg_adapter.dag"
   }

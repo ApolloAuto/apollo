@@ -41,7 +41,7 @@ export default class Routing {
                 const pathMesh = drawThickBandFromPoints(points, {
                     color: 0xff0000,
                     opacity: 0.6,
-                    lineWidth: 0.3,
+                    lineWidth: 0.2,
                 });
                 if (pathMesh) {
                     pathMesh.position.z = zOffset.routing;

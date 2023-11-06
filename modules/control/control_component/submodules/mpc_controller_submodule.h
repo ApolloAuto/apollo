@@ -24,7 +24,7 @@
 #include "modules/common_msgs/control_msgs/pad_msg.pb.h"
 #include "modules/common_msgs/localization_msgs/localization.pb.h"
 #include "modules/common_msgs/planning_msgs/planning.pb.h"
-#include "modules/control/control_component/controller_task_base/proto/calibration_table.pb.h"
+#include "modules/control/control_component/proto/calibration_table.pb.h"
 #include "modules/control/control_component/proto/preprocessor.pb.h"
 
 #include "cyber/class_loader/class_loader.h"

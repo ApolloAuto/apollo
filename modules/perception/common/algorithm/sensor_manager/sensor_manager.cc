@@ -61,6 +61,7 @@ bool SensorManager::Init() {
     sensor_info.orientation =
         static_cast<SensorOrientation>(sensor_meta_proto.orientation());
     sensor_info.frame_id = sensor_meta_proto.name();
+    sensor_info.is_main_sensor = sensor_meta_proto.is_main_sensor();
 
     auto pair = sensor_info_map_.insert(
         make_pair(sensor_meta_proto.name(), sensor_info));
@@ -72,6 +73,7 @@ bool SensorManager::Init() {
     if (this->IsCamera(sensor_info.type)) {
       std::shared_ptr<BrownCameraDistortionModel> distort_model(
           new BrownCameraDistortionModel());
+      // Todo(zero): Need change to GetCommonConfigFile
       auto intrinsic_file = IntrinsicPath(sensor_info.frame_id);
       if (!LoadBrownCameraIntrinsic(intrinsic_file, distort_model.get())) {
         AERROR << "Failed to load camera intrinsic:" << intrinsic_file;
@@ -217,6 +219,15 @@ bool SensorManager::IsUltrasonic(const std::string& name) const {
 
 bool SensorManager::IsUltrasonic(const SensorType& type) const {
   return type == SensorType::ULTRASONIC;
+}
+
+bool SensorManager::IsMainSensor(const std::string& name) const {
+  const auto& itr = sensor_info_map_.find(name);
+  if (itr == sensor_info_map_.end()) {
+    return false;
+  }
+
+  return itr->second.is_main_sensor;
 }
 
 std::string SensorManager::GetFrameId(const std::string& name) const {

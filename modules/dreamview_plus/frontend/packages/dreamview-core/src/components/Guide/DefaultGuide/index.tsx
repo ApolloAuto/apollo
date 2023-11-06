@@ -149,9 +149,9 @@ const steps = (isLogin: boolean, currentStep: number, translation: TFunction) =>
             offset: 5,
         },
         {
-            title: translation('defaultProfileManager'),
+            title: translation('defaultResourceManager'),
             target: '.default-guide-profile-manager-start',
-            content: translation('defaultProfileManagerDesc'),
+            content: translation('defaultResourceManagerDesc'),
             placement: 'right' as const,
             disableBeacon: true,
             hideCloseButton: true,
@@ -231,7 +231,7 @@ function DefaultGuide() {
         // }
 
         if (isLogin) {
-            // 登陆状态下 MenuDrawer变更和ProfileManager引导逻辑
+            // 登陆状态下 MenuDrawer变更和Resource引导逻辑
             if (
                 (action === 'next' && index === 2 && lifecycle === 'complete') ||
                 (action === 'prev' && index === 4 && lifecycle === 'complete')

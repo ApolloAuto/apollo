@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
 #include <NvInferVersion.h>
+
+#include <vector>
 
 #include "modules/perception/common/inference/tensorrt/plugins/softmax_plugin.h"
 
@@ -29,7 +30,7 @@ int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
                            void **outputs, void *workspace,
                            cudaStream_t stream) {
 #else
-int32_t SoftmaxPlugin::enqueue(int32_t batch_size, const void *const *inputs,
+int SoftmaxPlugin::enqueue(int batch_size, const void *const *inputs,
                            void *const *outputs, void *workspace,
                            cudaStream_t stream) noexcept {
 #endif

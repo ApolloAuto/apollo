@@ -52,7 +52,7 @@ bool CameraLocationEstimationComponent::Init() {
 
 bool CameraLocationEstimationComponent::Proc(
     const std::shared_ptr<onboard::CameraFrame>& msg) {
-  PERF_FUNCION()
+  PERF_FUNCTION()
   std::shared_ptr<onboard::CameraFrame> out_message(new (std::nothrow)
                                                         onboard::CameraFrame);
   out_message->frame_id = msg->frame_id;

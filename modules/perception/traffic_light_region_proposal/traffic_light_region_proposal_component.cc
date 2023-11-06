@@ -28,6 +28,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/profiler/profiler.h"
 #include "cyber/time/clock.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/string_util.h"
@@ -229,6 +230,7 @@ int TrafficLightsPerceptionComponent::InitCameraFrame() {
 void TrafficLightsPerceptionComponent::OnReceiveImage(
     const std::shared_ptr<apollo::drivers::Image> msg,
     const std::string& camera_name) {
+  PERF_FUNCTION()
   std::lock_guard<std::mutex> lck(mutex_);
   double receive_img_timestamp = Clock::NowInSeconds();
   double image_msg_ts = msg->measurement_time();

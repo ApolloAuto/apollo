@@ -1,5 +1,15 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable react/jsx-no-useless-fragment */
-import React, { PropsWithChildren, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { Spin } from '@dreamview/dreamview-ui';
 import { usePanelCatalogContext } from '@dreamview/dreamview-core/src/store/PanelCatalogStore';
 import { IPanelMetaInfo } from '@dreamview/dreamview-core/src/components/panels/type/Panel';
@@ -9,7 +19,7 @@ import { PanelInnerProvider } from '@dreamview/dreamview-core/src/store/PanelInn
 import { CustomizeEvent, useEventHandlersContext } from '@dreamview/dreamview-core/src/store/EventHandlersStore';
 import useRegisterUpdateChanel from '@dreamview/dreamview-core/src/hooks/useRegisterUpdateChanel';
 import { createLocalStoragePersistor } from '@dreamview/dreamview-core/src/store/base/Persistor';
-import { PanelInnerEventEmitterProvider } from '@dreamview/dreamview-core/src/store/PanelInnerStore/eventEmitter';
+import { PanelTileProvider } from '@dreamview/dreamview-core/src/store/PanelInnerStore/PanelTileStore';
 import errorImg from '@dreamview/dreamview-core/src/assets/ic_fail_to_load.png';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
@@ -20,6 +30,8 @@ import { FullScreen } from '../FullScreen';
 import { SubscribeInfo } from '../../type/RenderToolBar';
 import { usePanelInfoStore } from '../../../../store/PanelInfoStore';
 import './index.less';
+import { hooksManager } from '../../../../util/HooksManager';
+import { FullScreenFnRef } from '../../../../store/PanelInnerStore/type';
 
 export interface RenderTileProps {
     // panelId，panel实例化唯一Id
@@ -109,12 +121,16 @@ function Child(props: PropsWithChildren<ChildProps>) {
     );
 }
 
-export default function RenderTile(props: RenderTileProps) {
+function RenderTile(props: RenderTileProps) {
     const { panelId, path } = props;
     const [inFullScreen, _setFullScreen] = useState<boolean>(false);
     const eventHandlers = useEventHandlersContext();
     const fullScreenEventRef = useRef<CustomizeEvent>();
     const updateChannel = useRegisterUpdateChanel(panelId);
+    const fullScreenFnRef = useRef<FullScreenFnRef>({
+        enterFullScreen: async () => {},
+        exitFullScreen: async () => {},
+    });
 
     const { panelCatalog, panelComponents, panelToolBar } = usePanelCatalogContext();
 
@@ -123,7 +139,7 @@ export default function RenderTile(props: RenderTileProps) {
     const panel = panelCatalog.get(panelId);
 
     // const CustomRenderToolBar = panelToolBar.get(panelId);
-    const CustomRenderToolBar = panel.renderToolbar;
+    const CustomRenderToolBar = panel?.renderToolbar;
 
     const toolBar = useMemo(() => {
         if (CustomRenderToolBar) {
@@ -158,6 +174,57 @@ export default function RenderTile(props: RenderTileProps) {
         });
     }, [eventHandlers, panelId]);
 
+    const enterFullScreen = useCallback(async () => {
+        if (inFullScreen) return;
+
+        const fullScreenHookConfig = hooksManager.getHook(panelId);
+        let hookBeforeResBoolean = false;
+
+        if (fullScreenHookConfig?.beforeEnterFullScreen) {
+            hookBeforeResBoolean = await hooksManager.handleFullScreenBeforeHook(
+                fullScreenHookConfig.beforeEnterFullScreen,
+            );
+        }
+
+        const isExecutable = !fullScreenHookConfig?.beforeEnterFullScreen || hookBeforeResBoolean;
+
+        if (isExecutable) {
+            _setFullScreen(true);
+
+            if (fullScreenHookConfig?.afterEnterFullScreen) {
+                fullScreenHookConfig?.afterEnterFullScreen();
+            }
+        }
+    }, [inFullScreen]);
+
+    const exitFullScreen = useCallback(async () => {
+        if (!inFullScreen) return;
+
+        const fullScreenHookConfig = hooksManager.getHook(panelId);
+        let hookBeforeResBoolean = false;
+
+        if (fullScreenHookConfig?.beforeExitFullScreen) {
+            hookBeforeResBoolean = await hooksManager.handleFullScreenBeforeHook(
+                fullScreenHookConfig.beforeEnterFullScreen,
+            );
+        }
+
+        const isExecutable = !fullScreenHookConfig?.beforeEnterFullScreen || hookBeforeResBoolean;
+
+        if (isExecutable) {
+            _setFullScreen(false);
+
+            if (fullScreenHookConfig?.afterExitFullScreen) {
+                fullScreenHookConfig?.afterExitFullScreen();
+            }
+        }
+    }, [inFullScreen]);
+
+    useEffect(() => {
+        fullScreenFnRef.current.enterFullScreen = enterFullScreen;
+        fullScreenFnRef.current.exitFullScreen = exitFullScreen;
+    }, [enterFullScreen, exitFullScreen]);
+
     const [{ initialState, persistor }] = useState(() => ({
         persistor: createLocalStoragePersistor(`dv-panel-inner-stoer-${panelId}`),
         initialState: {
@@ -184,10 +251,15 @@ export default function RenderTile(props: RenderTileProps) {
 
     return (
         <FullScreen enabled={inFullScreen}>
-            <MosaicWindow path={path} title={panel.title}>
+            <MosaicWindow path={path} title={panel?.title}>
                 <ErrorBoundary>
                     <React.Suspense fallback={<Spin />}>
-                        <PanelInnerEventEmitterProvider>
+                        <PanelTileProvider
+                            path={path}
+                            enterFullScreen={enterFullScreen}
+                            exitFullScreen={exitFullScreen}
+                            fullScreenFnObj={fullScreenFnRef.current}
+                        >
                             <PanelInnerProvider persistor={persistor} initialState={initialState}>
                                 <Child
                                     path={path}
@@ -200,10 +272,12 @@ export default function RenderTile(props: RenderTileProps) {
                                     {toolBar}
                                 </Child>
                             </PanelInnerProvider>
-                        </PanelInnerEventEmitterProvider>
+                        </PanelTileProvider>
                     </React.Suspense>
                 </ErrorBoundary>
             </MosaicWindow>
         </FullScreen>
     );
 }
+
+export default React.memo(RenderTile);

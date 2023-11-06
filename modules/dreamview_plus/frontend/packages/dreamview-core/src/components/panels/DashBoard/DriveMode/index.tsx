@@ -21,4 +21,4 @@ function DriveMode(props: DriveModeProps) {
     return <div className={classes['dashboard-drive-mode']}>{props.mode}</div>;
 }
 
-export default DriveMode;
+export default React.memo(DriveMode);

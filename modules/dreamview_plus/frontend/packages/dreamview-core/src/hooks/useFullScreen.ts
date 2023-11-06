@@ -1,23 +1,37 @@
 import { useCallback, useEffect } from 'react';
 import { useEventHandlersContext } from '../store/EventHandlersStore';
+import { hooksManager } from '../util/HooksManager';
 
 export default function useFullScreen(panelId: string) {
     const eventHandlers = useEventHandlersContext();
     const { customizeSubs } = eventHandlers;
-    const { setFilterKey } = eventHandlers.keydown;
 
     const enterFullScreen = useCallback(() => {
+        const fullScreenHookConfig = hooksManager.getHook(panelId);
+
+        if (fullScreenHookConfig?.beforeEnterFullScreen) {
+            fullScreenHookConfig?.beforeEnterFullScreen();
+        }
+
         customizeSubs.getCustomizeEvent(`full:screen:${panelId}`).publish(true);
+
+        if (fullScreenHookConfig?.afterEnterFullScreen) {
+            fullScreenHookConfig?.afterEnterFullScreen();
+        }
     }, [customizeSubs, panelId]);
     const exitFullScreen = useCallback(() => {
-        customizeSubs.getCustomizeEvent(`full:screen:${panelId}`).publish(false);
-    }, [customizeSubs, panelId]);
+        const fullScreenHookConfig = hooksManager.getHook(panelId);
 
-    useEffect(() => {
-        setFilterKey((_) => {
-            exitFullScreen();
-        }, 'escape');
-    }, [setFilterKey, exitFullScreen]);
+        if (fullScreenHookConfig?.beforeExitFullScreen) {
+            fullScreenHookConfig?.beforeExitFullScreen();
+        }
+
+        customizeSubs.getCustomizeEvent(`full:screen:${panelId}`).publish(false);
+
+        if (fullScreenHookConfig?.afterExitFullScreen) {
+            fullScreenHookConfig?.afterExitFullScreen();
+        }
+    }, [customizeSubs, panelId]);
 
     return [enterFullScreen, exitFullScreen];
 }

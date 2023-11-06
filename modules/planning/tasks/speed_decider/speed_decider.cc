@@ -417,7 +417,7 @@ bool SpeedDecider::CreateFollowDecision(
 bool SpeedDecider::CreateYieldDecision(
     const Obstacle& obstacle, ObjectDecisionType* const yield_decision) const {
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
-  double yield_distance = StGapEstimator::EstimateProperYieldingGap();
+  double yield_distance = config_.yield_distance_buffer();
 
   const auto& obstacle_boundary = obstacle.path_st_boundary();
   const double yield_distance_s =
@@ -456,9 +456,8 @@ bool SpeedDecider::CreateOvertakeDecision(
       common::math::Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
           .InnerProd(Vec2d(velocity.x(), velocity.y()));
 
-  const double overtake_distance_s =
-      StGapEstimator::EstimateProperOvertakingGap(obstacle_speed,
-                                                  init_point_.v());
+  double overtake_distance_s =
+      EstimateProperOvertakingGap(obstacle_speed, init_point_.v());
 
   const auto& boundary = obstacle.path_st_boundary();
   const double reference_line_fence_s =
@@ -579,6 +578,14 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
     pedestrian_stop_time->set_stop_timestamp_sec(stop_time.second);
   }
   return result;
+}
+
+double SpeedDecider::EstimateProperOvertakingGap(const double target_obs_speed,
+                                                 const double adc_speed) const {
+  const double overtake_distance_s = std::fmax(
+      std::fmax(adc_speed, target_obs_speed) * config_.overtake_time_buffer(),
+      config_.overtake_min_distance());
+  return overtake_distance_s;
 }
 
 }  // namespace planning

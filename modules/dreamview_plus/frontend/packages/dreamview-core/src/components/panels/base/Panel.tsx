@@ -13,12 +13,11 @@ import shortUUID from 'short-uuid';
 import { Observable, Subscription, combineLatest, of, withLatestFrom, zip } from 'rxjs';
 import { isEmpty } from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { DataConsumer, InitSubscriptionMap, PanelContext, PanelMetaData } from './store/PanelStore';
+import { FullScreenHookConfig, InitSubscriptionMap, PanelContext, PanelMetaData } from './store/PanelStore';
 import { usePanelCatalogContext } from '../../../store/PanelCatalogStore';
 import { genereatePanelId } from '../../../util/layout';
 import { noop } from '../../../util/similarFunctions';
 import useWebSocketServices from '../../../services/hooks/useWebSocketServices';
-import useFullScreen from '../../../hooks/useFullScreen';
 import { PanelRoot } from './PanelRoot';
 import useUpdateChannel from '../../../hooks/useUpdateChannel';
 import EmptyPlaceHolder from './EmptyPlaceHolder';
@@ -29,13 +28,19 @@ import useGetUpdateChannel from '../../../hooks/useGetUpdateChannel';
 import { usePanelInfoStore } from '../../../store/PanelInfoStore';
 import { addSelectedPanelId, deleteSelectedPanelId } from '../../../store/PanelInfoStore/actions';
 import KeyListener, { KeyHandlers } from './KeyListener';
+import { hooksManager } from '../../../util/HooksManager';
+import { usePanelTileContext } from '../../../store/PanelInnerStore/PanelTileStore';
 
-export default function Panel(
-    PanelComponent: React.ComponentType & { displayName: string },
-    panelId: string,
-    subscribeInfo?: SubscribeInfo[],
-    panelMetaData?: PanelMetaData,
-) {
+export type PanelProps = {
+    PanelComponent: React.ComponentType & { displayName: string };
+    panelId: string;
+    placeHolder?: React.ReactNode;
+    subscribeInfo?: SubscribeInfo[];
+    panelMetaData?: PanelMetaData;
+};
+
+export default function Panel(panelProps: PanelProps) {
+    const { PanelComponent, panelId, placeHolder, subscribeInfo, panelMetaData } = panelProps;
     function PanelWrapper(props: any) {
         const { isMainConnected, streamApi, metadata } = useWebSocketServices();
         const { panelCatalog } = usePanelCatalogContext();
@@ -44,7 +49,7 @@ export default function Panel(
         const [panelInfoState, panelInfoDispatch] = usePanelInfoStore();
         const { t } = useTranslation('panels');
         const [_panelMetaData, setPanelMetaData] = useState(panelMetaData);
-        const [enterFullScreen, exitFullScreen] = useFullScreen(panelId);
+        const { enterFullScreen, exitFullScreen, fullScreenFnObj } = usePanelTileContext();
         const [hasSubscribed, setHasSubscribed] = useState(false);
         const [hasData, setHasData] = useState(false);
         const [combinedData, setCombinedData] = useState<Record<string, any>>({});
@@ -63,8 +68,18 @@ export default function Panel(
 
         const initSubscriptionMapRef = useRef<InitSubscriptionMap>();
         const resizeCallBackRef = useRef<OnResizeCallback>();
-        const [keyDownHandlers, _setKeyDownHandlers] = useState<KeyHandlers[]>();
-        const [keyUpHandlers, _setKeyUpHandlers] = useState<KeyHandlers[]>();
+        const resizeCallBackArrRef = useRef<OnResizeCallback[]>([]);
+        const [keyDownHandlers, _setKeyDownHandlers] = useState<KeyHandlers[]>([
+            {
+                keys: ['escape'],
+                handler: (e) => {
+                    if (fullScreenFnObj && fullScreenFnObj?.exitFullScreen) {
+                        fullScreenFnObj?.exitFullScreen();
+                    }
+                },
+            },
+        ]);
+        const [keyUpHandlers, _setKeyUpHandlers] = useState<KeyHandlers[]>([]);
         const updateChannel = useGetUpdateChannel(panelId);
 
         const panel = useMemo(() => panelCatalog.get(panelId), [panelId, panelCatalog]);
@@ -84,11 +99,19 @@ export default function Panel(
                 if (resizeCallBackRef.current) {
                     resizeCallBackRef.current(width, height);
                 }
+                resizeCallBackArrRef.current.forEach((cb) => {
+                    try {
+                        cb(width, height);
+                    } catch (err) {
+                        console.log(err);
+                    }
+                });
             },
         });
 
         const onPanelResize = useCallback((onResize: OnResizeCallback) => {
             resizeCallBackRef.current = onResize;
+            resizeCallBackArrRef.current.push(onResize);
         }, []);
 
         const splitPanel = useCallback(
@@ -261,24 +284,37 @@ export default function Panel(
         );
 
         const setKeyDownHandlers = useCallback((handlers: KeyHandlers[]) => {
-            _setKeyDownHandlers(handlers);
+            _setKeyDownHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
         }, []);
 
         const setKeyUpHandlers = useCallback((handlers: KeyHandlers[]) => {
-            _setKeyUpHandlers(handlers);
+            _setKeyUpHandlers((prevHandlers) => [...prevHandlers, ...handlers]);
         }, []);
 
-        const NoDataPlaceHolder = useMemo(
-            () => (
+        const registerFullScreenHooks = useCallback((hookConfig: FullScreenHookConfig) => {
+            hooksManager.addHook(panelId, hookConfig);
+        }, []);
+
+        const isPlaceHolderDisplay = useMemo(
+            () => !(!subscribeInfo || (hasSubscribed && hasData)),
+            // 调试使用
+            // () => false,
+            [hasSubscribed, hasData],
+        );
+
+        const NoDataPlaceHolder = useMemo(() => {
+            if (placeHolder) {
+                return placeHolder;
+            }
+            return (
                 <EmptyPlaceHolder
                     style={{
-                        display: hasSubscribed && hasData ? 'none' : 'flex',
+                        display: !isPlaceHolderDisplay ? 'none' : 'flex',
                     }}
                     text={t('noMessages')}
                 />
-            ),
-            [hasSubscribed, hasData],
-        );
+            );
+        }, [isPlaceHolderDisplay]);
 
         useEffect(() => {
             if (!isMainConnected || metadata.length <= 0) return noop;
@@ -288,7 +324,6 @@ export default function Panel(
                 for (let i = 0; i < len; i += 1) {
                     const curSubcibe = subscribeInfo[i];
                     const name = curSubcibe?.name;
-
                     const curItem = metadata.find((item) => item.dataName === name);
                     if (!curItem) {
                         // eslint-disable-next-line no-continue
@@ -331,16 +366,16 @@ export default function Panel(
                     subscription.subscription.unsubscribe();
                 });
             };
-        }, [isMainConnected]);
+        }, [metadata, isMainConnected]);
 
         useNotifyInitialChanel(panelId, addChannel);
         useUpdateChannel(panelId, addChannel);
 
         const style = useMemo(
             () => ({
-                display: hasSubscribed && hasData ? 'block' : 'none',
+                display: !isPlaceHolderDisplay ? 'block' : 'none',
             }),
-            [hasSubscribed, hasData],
+            [isPlaceHolderDisplay],
         );
 
         const contextValue = useMemo(
@@ -361,6 +396,7 @@ export default function Panel(
                 closeSubcription,
                 setKeyDownHandlers,
                 setKeyUpHandlers,
+                registerFullScreenHooks,
             }),
             [
                 logger,
@@ -378,13 +414,14 @@ export default function Panel(
                 closeSubcription,
                 setKeyDownHandlers,
                 setKeyUpHandlers,
+                registerFullScreenHooks,
             ],
         );
 
         return (
             <PanelContext.Provider value={contextValue}>
                 <KeyListener active={isSelected} keyDownHandlers={keyDownHandlers} keyUpHandlers={keyUpHandlers} />
-                <PanelRoot style={style} onClick={onPanleClick} ref={panelRootRef}>
+                <PanelRoot id={panelId} style={style} onClick={onPanleClick} ref={panelRootRef}>
                     <PanelComponent {...props} />
                 </PanelRoot>
                 {NoDataPlaceHolder}

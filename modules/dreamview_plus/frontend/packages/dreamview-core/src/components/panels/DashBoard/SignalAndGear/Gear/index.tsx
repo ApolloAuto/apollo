@@ -13,13 +13,13 @@ type GearProps = {
     gearPosition: apollo.canbus.Chassis.GearPosition;
 };
 
-function gearPositionToEnum(position: apollo.canbus.Chassis.GearPosition) {
+function gearPositionToEnum(position: apollo.canbus.Chassis.GearPosition | string) {
     switch (position) {
-        case apollo.canbus.Chassis.GearPosition.GEAR_PARKING:
+        case 'GEAR_PARKING':
             return GearPositionEnum.P;
-        case apollo.canbus.Chassis.GearPosition.GEAR_REVERSE:
+        case 'GEAR_REVERSE':
             return GearPositionEnum.R;
-        case apollo.canbus.Chassis.GearPosition.GEAR_DRIVE:
+        case 'GEAR_DRIVE':
             return GearPositionEnum.D;
         default:
             return GearPositionEnum.N;
@@ -77,4 +77,4 @@ function Gear(props: GearProps) {
     );
 }
 
-export default Gear;
+export default React.memo(Gear);
