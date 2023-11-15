@@ -170,17 +170,18 @@ void Yolox3DObstacleDetector::Yolo3DInference(const base::Image8U *image,
   // normallize channel value from 0～255 to 0~1 and change it to float type
   cropped_obj.convertTo(cropped_obj, CV_32F, 1.0f / 255.0);
 
-  std::vector<float> mean_values{0.485, 0.456, 0.406};
-  std::vector<float> std_values{0.229, 0.224, 0.225};
+  // BGR
+  std::vector<float> mean_values{0.406, 0.456, 0.485};
+  std::vector<float> std_values{0.225, 0.224, 0.229};
 
-  std::vector<cv::Mat> rgbChannels(3);
-  cv::split(cropped_obj, rgbChannels);
+  std::vector<cv::Mat> bgrChannels(3);
+  cv::split(cropped_obj, bgrChannels);
   for (int i = 0; i < 3; ++i) {
-    rgbChannels[i].convertTo(rgbChannels[i], CV_32FC1, 1 / std_values[i],
+    bgrChannels[i].convertTo(bgrChannels[i], CV_32FC1, 1 / std_values[i],
                              (0.0 - mean_values[i]) / std_values[i]);
   }
   cv::Mat dst;
-  cv::merge(rgbChannels, dst);
+  cv::merge(bgrChannels, dst);
   cropped_obj = dst;
 
   auto model_inputs = model_param_.info_3d().info().inputs();
@@ -308,8 +309,8 @@ bool Yolox3DObstacleDetector::Preprocess(const base::Image8U *image,
   float ratio = std::max(image_width_, image_height_);
   cv::Mat out(ratio, ratio, CV_8UC3, {114, 114, 114});  // 114 sames to yolox3d
 
-  // pad to bottom
-  img_.copyTo(out(cv::Rect(0, 0, img_.cols, img_.rows)));  // sames to yolox3d
+  img_.copyTo(out(cv::Rect(0, 0, img_.cols,
+                           img_.rows)));  // pad to bottom, sames to yolox3d
 
   cv::resize(out, out, cv::Size(width_, height_),
              cv::INTER_LINEAR);  // use INTER_LINEAR, sames to yolox3d
@@ -348,6 +349,7 @@ bool Yolox3DObstacleDetector::Detect(onboard::CameraFrame *frame) {
   auto model_inputs = model_param_.info().inputs();
   auto input_blob_2d = net_->get_blob(model_inputs[0].name());
 
+  // use bgr to infer
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::BGR;
 

@@ -86,6 +86,7 @@ apollo_cc_library(
         "@proj",
         "@tinyxml2",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
 )
 
 filegroup(

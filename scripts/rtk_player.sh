@@ -33,10 +33,10 @@ function start() {
     pkill -SIGKILL -f rtk_player
   fi
 
-  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
+  if [[ ! -z "$(which rtk_player)" ]]; then
+    rtk_player_binary="rtk_player" 
+  elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player ]]; then
     rtk_player_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_player"
-  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player ]]; then
-    rtk_player_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_player
   else
     rtk_player_binary=
   fi

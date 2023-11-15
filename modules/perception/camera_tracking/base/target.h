@@ -20,11 +20,13 @@
 
 #include <boost/circular_buffer.hpp>
 
+#include "modules/perception/camera_tracking/proto/omt.pb.h"
+
+#include "modules/perception/camera_tracking/base/track_object.h"
+#include "modules/perception/camera_tracking/common/camera_tracking_frame.h"
+#include "modules/perception/camera_tracking/common/kalman_filter.h"
 #include "modules/perception/common/base/object.h"
 #include "modules/perception/common/camera/common/object_template_manager.h"
-#include "modules/perception/camera_tracking/common/kalman_filter.h"
-#include "modules/perception/camera_tracking/proto/omt.pb.h"
-#include "modules/perception/camera_tracking/base/track_object.h"
 
 namespace apollo {
 namespace perception {
@@ -36,93 +38,93 @@ struct alignas(16) Target {
   explicit Target(const TargetParam &param);
   /**
    * @brief init Target
-   * 
-   * @param param 
+   *
+   * @param param
    */
   void Init(const TargetParam &param);
   /**
    * @brief add object to tracked_objects
-   * 
-   * @param object 
+   *
+   * @param object
    */
   void Add(TrackObjectPtr object);
 
   /**
-   * @brief remove objects older than frame_id 
-   * 
-   * @param frame_id 
+   * @brief remove objects older than frame_id
+   *
+   * @param frame_id
    */
   void RemoveOld(int frame_id);
 
   /**
    * @brief clear tracked_objects
-  */
+   */
   void Clear();
 
   /**
    * @brief using kalman filter to predict the tracked_objects
-   * 
-   * @param frame 
+   *
+   * @param frame
    */
   void Predict(CameraTrackingFrame *frame);
 
   /**
    * @brief using kalman filter to correct the tracked_objects
    * todo(zero): update world in bev
-   * @param frame 
+   * @param frame
    */
   void Update(CameraTrackingFrame *frame);
 
   /**
    * @brief update 2d
-   * 
-   * @param frame 
+   *
+   * @param frame
    */
   void Update2D(CameraTrackingFrame *frame);
 
   /**
    * @brief update 3d
-   * 
-   * @param frame 
+   *
+   * @param frame
    */
   void Update3D(CameraTrackingFrame *frame);
 
   /**
    * @brief update type
-   * 
-   * @param frame 
+   *
+   * @param frame
    */
   void UpdateType(CameraTrackingFrame *frame);
 
   /**
    * @brief return the size of tracked_objects
-   * 
-   * @return int 
+   *
+   * @return int
    */
   int Size() const;
 
   /**
    * @brief Get the object accoding to index
-   * 
-   * @param index 
-   * @return TrackObjectPtr 
+   *
+   * @param index
+   * @return TrackObjectPtr
    */
   TrackObjectPtr get_object(int index) const;
   TrackObjectPtr operator[](int index) const;
 
   /**
    * @brief return whether the target is tracked
-   * 
-   * @return true 
-   * @return false 
+   *
+   * @return true
+   * @return false
    */
   bool isTracked() const;
 
   /**
    * @brief return whether the target is lost
-   * 
-   * @return true 
-   * @return false 
+   *
+   * @return true
+   * @return false
    */
   bool isLost() const;
 

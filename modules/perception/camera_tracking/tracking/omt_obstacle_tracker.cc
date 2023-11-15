@@ -38,7 +38,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   track_id_ = 0;
   frame_num_ = 0;
   // frame list
-  frame_list_.Init(omt_param_.img_capability());
+  frame_buffer_.set_capacity(omt_param_.img_capability());
   // similar map
   gpu_id_ = options.gpu_id;
   similar_map_.Init(omt_param_.img_capability(), gpu_id_);
@@ -127,22 +127,6 @@ bool OMTObstacleTracker::FeatureExtract(CameraTrackingFrame *frame) {
   bool res = feature_extractor_->Extract(feature_options, frame);
   return res;
 }
-
-// todo(huqilin): need to optimize
-// bool OMTObstacleTracker::CalSimilarity(CameraTrackingFrame *frame) {
-//   frame_list_.Add(frame);
-//   for (int t = 0; t < frame_list_.Size(); t++) {
-//     int frame1 = frame_list_[t]->frame_id;
-//     int frame2 = frame_list_[-1]->frame_id;
-//     similar_->Calc(frame_list_[frame1], frame_list_[frame2],
-//                    similar_map_.get(frame1, frame2).get());
-//   }
-//   for (auto &target : targets_) {
-//     target.RemoveOld(frame_list_.OldestFrameId());
-//     ++target.lost_age;
-//   }
-//   return true;
-// }
 
 bool OMTObstacleTracker::Predict(CameraTrackingFrame *frame) {
   for (auto &target : targets_) {
@@ -429,18 +413,19 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
 bool OMTObstacleTracker::Associate2D(
     std::shared_ptr<CameraTrackingFrame> frame) {
   inference::CudaUtil::set_device_id(gpu_id_);
-  frame_list_.Add(frame);
+  frame_buffer_.push_back(frame);
   // calculate the similarity between the current frame and the previous frames
-  for (int t = 0; t < frame_list_.Size(); t++) {
-    int frame1 = frame_list_[t]->frame_id;
-    int frame2 = frame_list_[-1]->frame_id;
-    // calculate the tracked feature similarity between frame1 and frame2
-    similar_->Calc(frame_list_[frame1], frame_list_[frame2],
-                   similar_map_.get(frame1, frame2).get());
+  std::shared_ptr<CameraTrackingFrame> cur_frame_ptr = frame_buffer_.back();
+  for (auto frame_ptr : frame_buffer_) {
+    int pre_frame_id = frame_ptr->frame_id;
+    int cur_frame_id = cur_frame_ptr->frame_id;
+    similar_->Calc(frame_ptr.get(), cur_frame_ptr.get(),
+                   similar_map_.get(pre_frame_id, cur_frame_id).get());
   }
+
   // remove oldest frame in Target
   for (auto &target : targets_) {
-    target.RemoveOld(frame_list_.OldestFrameId());
+    target.RemoveOld(frame_buffer_.front()->frame_id);
     ++target.lost_age;
   }
   TrackObjectPtrs track_objects;

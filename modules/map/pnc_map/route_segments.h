@@ -98,6 +98,8 @@ class RouteSegments : public std::vector<LaneSegment> {
                      common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
   bool GetProjection(const common::math::Vec2d &point,
                      common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
+  bool GetProjection(const common::math::Vec2d &point, const double heading,
+                     common::SLPoint *sl_point, LaneWaypoint *waypoint) const;
 
   bool GetWaypoint(const double s, LaneWaypoint *waypoint) const;
 

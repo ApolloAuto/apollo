@@ -62,6 +62,9 @@ bool PncMapBase::IsNewPlanningCommand(
 bool PncMapBase::IsNewPlanningCommand(
     const planning::PlanningCommand &prev_command,
     const planning::PlanningCommand &new_command) {
+  if (!new_command.is_motion_command()) {
+    return false;
+  }
   return !common::util::IsProtoEqual(prev_command, new_command);
 }
 

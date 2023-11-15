@@ -19,14 +19,16 @@
 #include <string>
 #include <vector>
 
+#include <boost/circular_buffer.hpp>
+
 #include "modules/perception/camera_tracking/proto/omt.pb.h"
 
 #include "modules/perception/camera_tracking/base/obstacle_reference.h"
 #include "modules/perception/camera_tracking/base/target.h"
+#include "modules/perception/camera_tracking/common/camera_tracking_frame.h"
 #include "modules/perception/camera_tracking/common/similar.h"
 #include "modules/perception/camera_tracking/interface/base_feature_extractor.h"
 #include "modules/perception/camera_tracking/interface/base_obstacle_tracker.h"
-#include "modules/perception/camera_tracking/common/camera_tracking_frame.h"
 #include "modules/perception/common/camera/common/object_template_manager.h"
 
 namespace apollo {
@@ -58,47 +60,47 @@ class OMTObstacleTracker : public BaseObstacleTracker {
 
   /**
    * @brief initialize omt obstacle tracker with options
-   * 
-   * @param options 
-   * @return true 
-   * @return false 
+   *
+   * @param options
+   * @return true
+   * @return false
    */
   bool Init(const ObstacleTrackerInitOptions &options) override;
 
   /**
    * @brief main function for tracking
-   * 
-   * @param camera_frame 
-   * @return true 
-   * @return false 
+   *
+   * @param camera_frame
+   * @return true
+   * @return false
    */
   bool Process(std::shared_ptr<CameraTrackingFrame> camera_frame);
 
   /**
    * @brief extract features from the new frame
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
+   *
+   * @param frame
+   * @return true
+   * @return false
    */
   bool FeatureExtract(CameraTrackingFrame *frame) override;
 
   /**
    * @brief predict candidate obstales in the new frame
    * candidate obstacle 2D boxes should be filled, required
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
+   *
+   * @param frame
+   * @return true
+   * @return false
    */
   bool Predict(CameraTrackingFrame *frame) override;
 
   /**
    * @brief calculate similarity of two objects
-   * 
-   * @param frame 
-   * @return true 
-   * @return false 
+   *
+   * @param frame
+   * @return true
+   * @return false
    */
   // bool CalSimilarity(CameraTrackingFrame *frame) override;
 
@@ -106,9 +108,9 @@ class OMTObstacleTracker : public BaseObstacleTracker {
    * @brief associate obstales by 2D information
    * associated obstacles with tracking id should be filled, required,
    * smoothed 2D&3D information can be filled, optional.
-   * @param frame 
-   * @return true 
-   * @return false 
+   * @param frame
+   * @return true
+   * @return false
    */
   bool Associate2D(std::shared_ptr<CameraTrackingFrame> frame) override;
 
@@ -116,76 +118,76 @@ class OMTObstacleTracker : public BaseObstacleTracker {
    * @brief associate obstales by 3D information
    * associated obstacles with tracking id should be filled, required,
    * smoothed 3D information can be filled, optional.
-   * @param frame 
-   * @return true 
-   * @return false 
+   * @param frame
+   * @return true
+   * @return false
    */
   bool Associate3D(std::shared_ptr<CameraTrackingFrame> frame) override;
 
  private:
   /**
    * @brief calculate the feature similarity between Target and object
-   * 
-   * @param target 
-   * @param object 
-   * @return float 
+   *
+   * @param target
+   * @param object
+   * @return float
    */
   float ScoreAppearance(const Target &target, TrackObjectPtr object);
 
   /**
    * @brief calculate the motion similarity between Target and object
-   * 
-   * @param target 
-   * @param object 
-   * @return float 
+   *
+   * @param target
+   * @param object
+   * @return float
    */
   float ScoreMotion(const Target &target, TrackObjectPtr object);
   /**
    * @brief calculate the shape similarity between Target and object
-   * 
-   * @param target 
-   * @param object 
-   * @return float 
+   *
+   * @param target
+   * @param object
+   * @return float
    */
   float ScoreShape(const Target &target, TrackObjectPtr object);
   /**
    * @brief calculate the overlap similarity (iou) between Target and object
-   * 
-   * @param target 
-   * @param track_obj 
-   * @return float 
+   *
+   * @param target
+   * @param track_obj
+   * @return float
    */
   float ScoreOverlap(const Target &target, TrackObjectPtr track_obj);
   /**
    * @brief clear non Target in targets_
-   * 
+   *
    */
   void ClearTargets();
   /**
    * @brief combine duplicate Targets
-   * 
-   * @return true 
-   * @return false 
+   *
+   * @return true
+   * @return false
    */
   bool CombineDuplicateTargets();
   /**
    * @brief generate hypothesis
-   * 
-   * @param objects 
+   *
+   * @param objects
    */
   void GenerateHypothesis(const TrackObjectPtrs &objects);
   /**
    * @brief create new Target
-   * 
-   * @param objects 
-   * @return int 
+   *
+   * @param objects
+   * @return int
    */
   int CreateNewTarget(const TrackObjectPtrs &objects);
 
  private:
   std::shared_ptr<BaseFeatureExtractor> feature_extractor_;
   OmtParam omt_param_;
-  FrameList frame_list_;
+  boost::circular_buffer<std::shared_ptr<CameraTrackingFrame>> frame_buffer_;
   SimilarMap similar_map_;
   std::shared_ptr<BaseSimilar> similar_ = nullptr;
   // Target is one tracked object in a sequence

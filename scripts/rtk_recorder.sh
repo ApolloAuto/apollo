@@ -34,10 +34,10 @@ function start() {
   fi
 
   NUM_PROCESSES="$(pgrep -f "record_play/rtk_recorder" | grep -cv '^1$')"
-  if [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
+  if [[ ! -z "$(which rtk_recorder)" ]]; then
+    rtk_player_binary="rtk_recorder" 
+  elif [[ -f ${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder ]]; then
     rtk_recorder_binary="${TOP_DIR}/bazel-bin/modules/tools/record_play/rtk_recorder"
-  elif [[ -f /opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder ]]; then
-    rtk_recorder_binary=/opt/apollo/neo/packages/tools-dev/latest/record_play/rtk_recorder
   else
     rtk_recorder_binary=
   fi

@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "modules/perception/camera_tracking/base/frame_list.h"
+#include "modules/perception/common/base/object.h"
 
 namespace apollo {
 namespace perception {

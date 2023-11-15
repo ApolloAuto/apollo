@@ -141,6 +141,11 @@ class ReferenceLine {
               common::SLPoint* const sl_point,
               double warm_start_s = -1.0) const;
 
+  bool XYToSL(const double heading,
+              const common::math::Vec2d& xy_point,
+              common::SLPoint* const sl_point,
+              double warm_start_s = -1.0) const;
+
   template <class XYPoint>
   bool XYToSL(const XYPoint& xy, common::SLPoint* const sl_point) const {
     return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);

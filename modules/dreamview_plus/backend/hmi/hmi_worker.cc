@@ -2123,8 +2123,8 @@ bool HMIWorker::StartSimObstacle() {
   }
   // Start sim obstacle
   const std::string start_command = "nohup " + absolute_path + " " +
-                                    scenario_path + FLAGS_gflag_command_arg +
-                                    " &";
+                                    scenario_path + " " + "false" +
+                                    FLAGS_gflag_command_arg + " &";
   int ret = std::system(start_command.data());
   if (ret != 0) {
     AERROR << "Failed to start sim obstacle";

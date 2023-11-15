@@ -257,11 +257,22 @@ class Path {
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral) const;
 
+  bool GetProjection(const double heading,
+                      const common::math::Vec2d& point,
+                      double* accumulate_s,
+                      double* lateral) const;
+
   bool GetProjectionWithWarmStartS(const common::math::Vec2d& point,
                                    double* accumulate_s, double* lateral) const;
 
   bool GetProjection(const common::math::Vec2d& point, double* accumulate_s,
                      double* lateral, double* distance) const;
+
+  bool GetProjection(const common::math::Vec2d& point,
+                     const double heading,
+                     double* accumulate_s,
+                     double* lateral,
+                     double* distance) const;
 
   bool GetHeadingAlongPath(const common::math::Vec2d& point,
                            double* heading) const;

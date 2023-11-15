@@ -216,7 +216,7 @@ bool HdmapROIFilter::Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
                                     base::PointIndices* roi_indices) {
   if (!bitmap.Check(Eigen::Vector2d(0.0, 0.0))) {
     AWARN << " Car is not in roi!!.";
-    // return false;
+    return false;
   }
   roi_indices->indices.clear();
   roi_indices->indices.reserve(in_cloud->size());

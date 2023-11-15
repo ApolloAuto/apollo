@@ -56,7 +56,7 @@ def process_cmd(cmd, queue):
     output = check_output(cmd, shell=True).decode("utf-8")
     return queue.put(output)
 
-def shell_cmd(cmd, alert_on_failure=True):
+def shell_cmd(cmd, alert_on_failure=False):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print("SHELL > {}".format(cmd))
     proc = Popen(cmd, shell=True, close_fds=True, stdout=PIPE, stderr=PIPE)
@@ -174,7 +174,7 @@ def install_src(src, dst, file_filter, action_type=None):
         dst_full = os.path.join(prefix, deprecated_package_prefix, dst)
         if not os.path.exists(dst_full):
             os.makedirs(dst_full)
-        shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfP --parents @@ {}/ > /dev/null"
+        shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
             .format(src, file_filter, dst_full))
     else:
         global src_install_dirs_dict 
@@ -211,7 +211,7 @@ def install_src_file():
             dst_full = src_install_dirs_dict[file_filter][common_prefix]["dst"]
             if not os.path.exists(dst_full):
                 os.makedirs(dst_full)
-            shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfP --parents @@ {}/ > /dev/null"
+            shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
                 .format(is_relative_link(os.path.join(pwd, common_prefix)), file_filter, dst_full)) 
 
 

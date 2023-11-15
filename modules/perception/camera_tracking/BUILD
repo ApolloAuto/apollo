@@ -72,6 +72,7 @@ apollo_cc_library(
         "//modules/perception/common/inference:apollo_perception_common_inference",
         "//modules/perception/common/lib:apollo_perception_common_lib",
         "//modules/perception/common/onboard:apollo_perception_common_onboard",
+        "@boost",
         "@eigen",
     ],
 )

@@ -4,15 +4,210 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
-    <tab type="pages" visible="yes" title="" intro=""/>
+    <tab type="pages" visible="no" title="" intro=""/>
     <!--
     -->
     <tab type="modules" visible="yes" title="" intro=""/>
-    <!--
-    <tab type="usergroup" visible="yes" title="安装说明" intro="">
-      <tab type="user" visible="yes" title="基础软件包" url="@ref md_docs_2packages__core__cn" intro="" />
+    <!-- 目录结构 -->
+<tab type="user" visible="yes" title="发版说明" intro="" url="@ref md_docs_2RELEASE__cn" />
+<tab type="usergroup" visible="yes" title="安装说明" intro="" url="">
+<tab type="user" visible="yes" title="必备软件安装指南" intro="" url="@ref md_docs_2installation__instructions_2essential__software__installation__guide__cn" />
+<tab type="user" visible="yes" title="快速开始" intro="" url="@ref md_docs_2installation__instructions_2quick__start__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="使用指南" intro="" url="">
+<tab type="user" visible="yes" title="包管理使用教程" intro="" url="@ref md_docs_2user__guidelines_2packages__tutorial__cn" />
+<tab type="usergroup" visible="yes" title="核心模块" intro="" url="">
+<tab type="usergroup" visible="yes" title="感知能力" intro="" url="">
+<tab type="usergroup" visible="yes" title="功能综述" intro="" url="">
+<tab type="user" visible="yes" title="模块概述" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2overview_2overview__cn" />
+<tab type="user" visible="yes" title="功能列表" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2overview_2function__list__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="开发模式" intro="" url="">
+<tab type="user" visible="yes" title="参数开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2development_2development__params__cn" />
+<tab type="user" visible="yes" title="插件开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2development_2development__plugins__cn" />
+<tab type="user" visible="yes" title="新增模型" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2development_2development__models__cn" />
+<tab type="user" visible="yes" title="组件开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2development_2development__components__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="模块解析" intro="" url="">
+<tab type="user" visible="yes" title="框架设计" intro="" url="@ref md_docs_2user__guidelines_2modules_2perception_2analysis_2framework__design__cn" />
+</tab>
+</tab>
+<tab type="usergroup" visible="yes" title="规划能力" intro="" url="">
+<tab type="usergroup" visible="yes" title="功能综述" intro="" url="">
+<tab type="user" visible="yes" title="模块概述" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2overview_2overview__cn" />
+<tab type="user" visible="yes" title="功能列表" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2overview_2function__list__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="开发模式" intro="" url="">
+<tab type="user" visible="yes" title="概述" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2development_2overview__cn" />
+<tab type="user" visible="yes" title="通过发布命令开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2development_2development__commands__cn" />
+<tab type="user" visible="yes" title="通过新增插件开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2development_2development__plugins__cn" />
+<tab type="user" visible="yes" title="通过配置参数开发" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2development_2development__params__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="模块解析" intro="" url="">
+<tab type="user" visible="yes" title="目录结构" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2analysis_2directory__structure__cn" />
+<tab type="user" visible="yes" title="框架设计" intro="" url="@ref md_docs_2user__guidelines_2modules_2planning_2analysis_2framework__design__cn" />
+</tab>
+</tab>
+</tab>
+<tab type="usergroup" visible="yes" title="可视化交互工具 Dreamview+" intro="" url="">
+<tab type="user" visible="yes" title="Dreamview+ 概述" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2dreamview__plus__overview__cn" />
+<tab type="user" visible="yes" title="Add Panel" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2add__panel__cn" />
+<tab type="user" visible="yes" title="Mode Settings" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2mode__settings__cn" />
+<tab type="user" visible="yes" title="Resource Manager" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2resource__manager__cn" />
+<tab type="usergroup" visible="yes" title="PNC可视化调试" intro="" url="">
+<tab type="user" visible="yes" title="场景仿真" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2pnc__visual__debugging_2scenario__simulation__cn" />
+<tab type="user" visible="yes" title="复制全部坐标点信息" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2pnc__visual__debugging_2copy__coordinate__point__information__cn" />
+<tab type="user" visible="yes" title="测距" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2pnc__visual__debugging_2distance__measurement__cn" />
+<tab type="user" visible="yes" title="自由仿真" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2pnc__visual__debugging_2free__simulation__cn" />
+<tab type="user" visible="yes" title="轨迹绘制" intro="" url="@ref md_docs_2user__guidelines_2dreamview__plus_2pnc__visual__debugging_2trajectory__drawing__cn" />
+</tab>
+</tab>
+<tab type="usergroup" visible="yes" title="研发工具" intro="" url="">
+<tab type="user" visible="yes" title="Apollo 研发工具 - aem" intro="" url="@ref md_docs_2user__guidelines_2tools_2tool__aem__cn" />
+<tab type="user" visible="yes" title="Apollo 研发工具 - buildtool" intro="" url="@ref md_docs_2user__guidelines_2tools_2tool__buildtool__cn" />
+</tab>
+</tab>
+<tab type="usergroup" visible="yes" title="应用实践" intro="" url="">
+<tab type="usergroup" visible="yes" title="上机实践教程" intro="" url="">
+<tab type="usergroup" visible="yes" title="Apollo 感知实践（2.0）" intro="" url="">
+<tab type="user" visible="yes" title="基于插件进行开发" intro="" url="@ref md_docs_2practices_2tutorial_2perception__practical__2_80_2development__based__on__plugins__cn" />
+<tab type="user" visible="yes" title="基于组件进行开发" intro="" url="@ref md_docs_2practices_2tutorial_2perception__practical__2_80_2development__based__on__components__cn" />
+<tab type="user" visible="yes" title="如何在感知模式下播包" intro="" url="@ref md_docs_2practices_2tutorial_2perception__practical__2_80_2how__to__play__bag__in__perception__mode__cn" />
+</tab>
+<tab type="usergroup" visible="yes" title="Apollo 规划实践（2.0）" intro="" url="">
+<tab type="user" visible="yes" title="左转待转场景仿真调试" intro="" url="@ref md_docs_2practices_2tutorial_2planning__practical__2_80_2left__turn__waiting__scene__simulation__debugging__cn" />
+<tab type="user" visible="yes" title="红绿灯场景仿真调试" intro="" url="@ref md_docs_2practices_2tutorial_2planning__practical__2_80_2traffic__light__scene__simulation__debugging__cn" />
+<tab type="user" visible="yes" title="限速区域场景仿真调试" intro="" url="@ref md_docs_2practices_2tutorial_2planning__practical__2_80_2speed__limit__area__scene__simulation__debugging__cn" />
+</tab>
+</tab>
+</tab>
+<tab type="usergroup" visible="yes" title="常见问题" intro="" url="">
+<tab type="usergroup" visible="yes" title="Dreamview+" intro="" url="">
+<tab type="user" visible="yes" title="如何把英文界面切换为中文" intro="" url="@ref md_docs_2faqs_2dreamview__plus_2how__to__switch__english__to__chinese__cn" />
+</tab>
+</tab>
+
+
+    <!-- 包 -->
+    <tab type="usergroup" visible="yes" title="包" intro="" url="@ref md_docs_2packages_2packages__cn">
+      <tab type="usergroup" visible="yes" title="Apollo Core" intro="" url="@ref md_docs_2packages_2packages__core__cn" >
+      <!-- 包列表 -->
+<tab type="user" visible="yes" title="cyber" intro="" url="@ref md_cyber_2README__cn" />
+<tab type="user" visible="yes" title="external-command-action" intro="" url="@ref md_modules_2external__command_2command__processor_2action__command__processor_2README__cn" />
+<tab type="user" visible="yes" title="external-command-lane-follow" intro="" url="@ref md_modules_2external__command_2command__processor_2lane__follow__command__processor_2README__cn" />
+<tab type="user" visible="yes" title="external-command-processor-base" intro="" url="@ref md_modules_2external__command_2command__processor_2command__processor__base_2README__cn" />
+<tab type="user" visible="yes" title="external-command-valet-parking" intro="" url="@ref md_modules_2external__command_2command__processor_2valet__parking__command__processor_2README__cn" />
+<tab type="user" visible="yes" title="old-routing-adpter" intro="" url="@ref md_modules_2external__command_2old__routing__adapter_2README__cn" />
+<tab type="user" visible="yes" title="external-command-process" intro="" url="@ref md_modules_2external__command_2process__component_2README__cn" />
+<tab type="user" visible="yes" title="routing" intro="" url="@ref md_modules_2routing_2README__cn" />
+<tab type="user" visible="yes" title="planning" intro="" url="@ref md_modules_2planning_2planning__base_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-pull-over" intro="" url="@ref md_modules_2planning_2scenarios_2pull__over_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-emergency-stop" intro="" url="@ref md_modules_2planning_2scenarios_2emergency__stop_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-traffic-light-unprotected-right-turn" intro="" url="@ref md_modules_2planning_2scenarios_2traffic__light__unprotected__right__turn_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-emergency-pull-over" intro="" url="@ref md_modules_2planning_2scenarios_2emergency__pull__over_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-park-and-go" intro="" url="@ref md_modules_2planning_2scenarios_2park__and__go_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-bare-intersection-unprotected" intro="" url="@ref md_modules_2planning_2scenarios_2bare__intersection__unprotected_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-stop-sign-unprotected" intro="" url="@ref md_modules_2planning_2scenarios_2stop__sign__unprotected_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-lane-follow" intro="" url="@ref md_modules_2planning_2scenarios_2lane__follow_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-yield-sign" intro="" url="@ref md_modules_2planning_2scenarios_2yield__sign_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-traffic-light-unprotected-left-turn" intro="" url="@ref md_modules_2planning_2scenarios_2traffic__light__unprotected__left__turn_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-valet-parking" intro="" url="@ref md_modules_2planning_2scenarios_2valet__parking_2README__cn" />
+<tab type="user" visible="yes" title="planning-scenario-traffic-light-protected" intro="" url="@ref md_modules_2planning_2scenarios_2traffic__light__protected_2README__cn" />
+<tab type="user" visible="yes" title="planning-lane-follow-map" intro="" url="@ref md_modules_2planning_2pnc__map_2lane__follow__map_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-open-space-trajectory-provider" intro="" url="@ref md_modules_2planning_2tasks_2open__space__trajectory__provider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-rule-based-stop-decider" intro="" url="@ref md_modules_2planning_2tasks_2rule__based__stop__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-piecewise-jerk-speed" intro="" url="@ref md_modules_2planning_2tasks_2piecewise__jerk__speed_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-st-bounds-decider" intro="" url="@ref md_modules_2planning_2tasks_2st__bounds__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-lane-change-path" intro="" url="@ref md_modules_2planning_2tasks_2lane__change__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-path-time-heuristic" intro="" url="@ref md_modules_2planning_2tasks_2path__time__heuristic_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-reuse-path" intro="" url="@ref md_modules_2planning_2tasks_2reuse__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-speed-decider" intro="" url="@ref md_modules_2planning_2tasks_2speed__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-open-space-roi-decider" intro="" url="@ref md_modules_2planning_2tasks_2open__space__roi__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-lane-follow-path" intro="" url="@ref md_modules_2planning_2tasks_2lane__follow__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-open-space-trajectory-partition" intro="" url="@ref md_modules_2planning_2tasks_2open__space__trajectory__partition_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-piecewise-jerk-speed-nonlinear" intro="" url="@ref md_modules_2planning_2tasks_2piecewise__jerk__speed__nonlinear_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-lane-borrow-path" intro="" url="@ref md_modules_2planning_2tasks_2lane__borrow__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-fallback-path" intro="" url="@ref md_modules_2planning_2tasks_2fallback__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-path-reference-decider" intro="" url="@ref md_modules_2planning_2tasks_2path__reference__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-pull-over-path" intro="" url="@ref md_modules_2planning_2tasks_2pull__over__path_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-open-space-fallback-decider" intro="" url="@ref md_modules_2planning_2tasks_2open__space__fallback__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-open-space-pre-stop-decider" intro="" url="@ref md_modules_2planning_2tasks_2open__space__pre__stop__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-path-decider" intro="" url="@ref md_modules_2planning_2tasks_2path__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-fast-stop-trajectory-fallback" intro="" url="@ref md_modules_2planning_2tasks_2fast__stop__trajectory__fallback_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-speed-bounds-decider" intro="" url="@ref md_modules_2planning_2tasks_2speed__bounds__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-task-rss-decider" intro="" url="@ref md_modules_2planning_2tasks_2rss__decider_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-destination" intro="" url="@ref md_modules_2planning_2traffic__rules_2destination_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-keepclear" intro="" url="@ref md_modules_2planning_2traffic__rules_2keepclear_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-stop-sign" intro="" url="@ref md_modules_2planning_2traffic__rules_2stop__sign_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-reference-line-end" intro="" url="@ref md_modules_2planning_2traffic__rules_2reference__line__end_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-traffic-light" intro="" url="@ref md_modules_2planning_2traffic__rules_2traffic__light_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-backside-vehicle" intro="" url="@ref md_modules_2planning_2traffic__rules_2backside__vehicle_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-crosswalk" intro="" url="@ref md_modules_2planning_2traffic__rules_2crosswalk_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-yield-sign" intro="" url="@ref md_modules_2planning_2traffic__rules_2yield__sign_2README__cn" />
+<tab type="user" visible="yes" title="planning-traffic-rules-rerouting" intro="" url="@ref md_modules_2planning_2traffic__rules_2rerouting_2README__cn" />
+<tab type="user" visible="yes" title="storytelling" intro="" url="@ref md_modules_2storytelling_2README__cn" />
+<tab type="user" visible="yes" title="control" intro="" url="@ref md_modules_2control_2control__component_2README__cn" />
+<tab type="user" visible="yes" title="control-controller-lat-based-lqr-controller" intro="" url="@ref md_modules_2control_2controllers_2lat__based__lqr__controller_2README__cn" />
+<tab type="user" visible="yes" title="control-controller-demo-control-task" intro="" url="@ref md_modules_2control_2controllers_2demo__control__task_2README__cn" />
+<tab type="user" visible="yes" title="control-controller-mpc-controller" intro="" url="@ref md_modules_2control_2controllers_2mpc__controller_2README__cn" />
+<tab type="user" visible="yes" title="control-controller-lon-based-pid-controller" intro="" url="@ref md_modules_2control_2controllers_2lon__based__pid__controller_2README__cn" />
+<tab type="user" visible="yes" title="canbus" intro="" url="@ref md_modules_2canbus_2README__cn" />
+<tab type="user" visible="yes" title="canbus-vehicle-lincoln" intro="" url="@ref md_modules_2canbus__vehicle_2lincoln_2README__cn" />
+<tab type="user" visible="yes" title="perception-motion-service" intro="" url="@ref md_modules_2perception_2motion__service_2README" />
+<tab type="user" visible="yes" title="perception-pointcloud-preprocess" intro="" url="@ref md_modules_2perception_2pointcloud__preprocess_2README" />
+<tab type="user" visible="yes" title="perception-lidar-detection-filter" intro="" url="@ref md_modules_2perception_2lidar__detection__filter_2README" />
+<tab type="user" visible="yes" title="perception-launch" intro="" url="@ref md_modules_2perception_2launch_2README" />
+<tab type="user" visible="yes" title="perception-radar-detection" intro="" url="@ref md_modules_2perception_2radar__detection_2README" />
+<tab type="user" visible="yes" title="perception-traffic-light-region-proposal" intro="" url="@ref md_modules_2perception_2traffic__light__region__proposal_2README" />
+<tab type="user" visible="yes" title="perception-lidar-output" intro="" url="@ref md_modules_2perception_2lidar__output_2README" />
+<tab type="user" visible="yes" title="perception-lidar-detection" intro="" url="@ref md_modules_2perception_2lidar__detection_2README" />
+<tab type="user" visible="yes" title="perception-camera-detection-single-stage" intro="" url="@ref md_modules_2perception_2camera__detection__single__stage_2README" />
+<tab type="user" visible="yes" title="perception-traffic-light-recognition" intro="" url="@ref md_modules_2perception_2traffic__light__recognition_2README" />
+<tab type="user" visible="yes" title="perception-camera-detection-multi-stage" intro="" url="@ref md_modules_2perception_2camera__detection__multi__stage_2README" />
+<tab type="user" visible="yes" title="perception-pointcloud-map-based-roi" intro="" url="@ref md_modules_2perception_2pointcloud__map__based__roi_2README" />
+<tab type="user" visible="yes" title="perception-common" intro="" url="@ref md_modules_2perception_2common_2README" />
+<tab type="user" visible="yes" title="perception-traffic-light-tracking" intro="" url="@ref md_modules_2perception_2traffic__light__tracking_2README" />
+<tab type="user" visible="yes" title="perception-camera-detection-bev" intro="" url="@ref md_modules_2perception_2camera__detection__bev_2README" />
+<tab type="user" visible="yes" title="perception-camera-location-refinement" intro="" url="@ref md_modules_2perception_2camera__location__refinement_2README" />
+<tab type="user" visible="yes" title="perception-lane-detection" intro="" url="@ref md_modules_2perception_2lane__detection_2README" />
+<tab type="user" visible="yes" title="perception-radar4d-detection" intro="" url="@ref md_modules_2perception_2radar4d__detection_2README" />
+<tab type="user" visible="yes" title="perception-camera-location-estimation" intro="" url="@ref md_modules_2perception_2camera__location__estimation_2README" />
+<tab type="user" visible="yes" title="perception-tools" intro="" url="@ref md_modules_2perception_2tools_2README" />
+<tab type="user" visible="yes" title="perception-pointcloud-ground-detection" intro="" url="@ref md_modules_2perception_2pointcloud__ground__detection_2README" />
+<tab type="user" visible="yes" title="perception-camera-tracking" intro="" url="@ref md_modules_2perception_2camera__tracking_2README" />
+<tab type="user" visible="yes" title="perception-lidar-tracking" intro="" url="@ref md_modules_2perception_2lidar__tracking_2README" />
+<tab type="user" visible="yes" title="perception-multi-sensor-fusion" intro="" url="@ref md_modules_2perception_2multi__sensor__fusion_2README" />
+<tab type="user" visible="yes" title="perception-traffic-light-detection" intro="" url="@ref md_modules_2perception_2traffic__light__detection_2README" />
+<tab type="user" visible="yes" title="perception-msg-adapter" intro="" url="@ref md_modules_2perception_2msg__adapter_2README" />
+<tab type="user" visible="yes" title="third-party-perception" intro="" url="@ref md_modules_2third__party__perception_2README" />
+<tab type="user" visible="yes" title="prediction" intro="" url="@ref md_modules_2prediction_2README__cn" />
+<tab type="user" visible="yes" title="drivers-video" intro="" url="@ref md_modules_2drivers_2video_2README" />
+<tab type="user" visible="yes" title="drivers-lidar" intro="" url="@ref md_modules_2drivers_2lidar_2README" />
+<tab type="user" visible="yes" title="drivers-canbus" intro="" url="@ref md_modules_2drivers_2canbus_2README" />
+<tab type="user" visible="yes" title="drivers-camera" intro="" url="@ref md_modules_2drivers_2camera_2README__cn" />
+<tab type="user" visible="yes" title="drivers-microphone" intro="" url="@ref md_modules_2drivers_2microphone_2README" />
+<tab type="user" visible="yes" title="drivers-smartereye" intro="" url="@ref md_modules_2drivers_2smartereye_2README" />
+<tab type="user" visible="yes" title="drivers-image-decompress" intro="" url="@ref md_modules_2drivers_2tools_2image__decompress_2README" />
+<tab type="user" visible="yes" title="drivers-gnss" intro="" url="@ref md_modules_2drivers_2gnss_2README" />
+<tab type="user" visible="yes" title="localization" intro="" url="@ref md_modules_2localization_2README__cn" />
+<tab type="user" visible="yes" title="dreamview" intro="" url="@ref md_modules_2dreamview_2README" />
+<tab type="user" visible="yes" title="dreamview-plus" intro="" url="@ref md_modules_2dreamview__plus_2README" />
+<tab type="user" visible="yes" title="task-manager" intro="" url="@ref md_modules_2task__manager_2README" />
+<tab type="user" visible="yes" title="monitor" intro="" url="@ref md_modules_2monitor_2README" />
+<tab type="user" visible="yes" title="guardian" intro="" url="@ref md_modules_2guardian_2README" />
+<tab type="user" visible="yes" title="tools" intro="" url="@ref md_modules_2tools_2README" />
+<tab type="user" visible="yes" title="audio" intro="" url="@ref md_modules_2audio_2README__cn" />
+<tab type="user" visible="yes" title="bridge" intro="" url="@ref md_modules_2bridge_2README" />
+<tab type="user" visible="yes" title="common" intro="" url="@ref md_modules_2common_2README__cn" />
+<tab type="user" visible="yes" title="common-msgs" intro="" url="@ref md_modules_2common__msgs_2README" />
+<tab type="user" visible="yes" title="cyber-bridge" intro="" url="@ref md_modules_2contrib_2cyber__bridge_2README" />
+<tab type="user" visible="yes" title="transform" intro="" url="@ref md_modules_2transform_2README" />
+<tab type="user" visible="yes" title="calibration" intro="" url="@ref md_modules_2calibration_2README" />
+<tab type="user" visible="yes" title="apollo-data" intro="" url="@ref md_modules_2data_2README" />
+<tab type="user" visible="yes" title="map" intro="" url="@ref md_modules_2map_2README" />
+
+      </tab>
     </tab>
-    -->
     <tab type="usergroup" visible="yes" title="API 参考" intro="">
       <tab type="namespaces" visible="yes" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>

@@ -82,15 +82,17 @@ aem -h
 Apollo某些模块需要GPU的支持才能够编译、运行（例如感知模块），如果您需要使用此类模块，需要安装Nvidia显卡驱动以及Nvidia
 container toolkit以获取GPU支持。
 
+> 注：如果您之前已经安装过Nvidia显卡驱动，即往终端输入`nvidia-smi`能够正常输出，可以跳过`1.安装显卡驱动`小节
+
 ### 1. 安装显卡驱动
 
-通过以下指令来安装Nvidia显卡驱动：
+10、20、30系列显卡推荐使用470.63.01版本的驱动，您可以通过Nvidia官网来[下载驱动](https://www.nvidia.cn/Download/driverResults.aspx/179605/cn/)
+
+下载之后，找到相应的文件夹打开终端输入安装指令：
 
 ```shell
-sudo apt-get update
-sudo apt-add-repository multiverse
-sudo apt-get update
-sudo apt-get install nvidia-driver-455
+sudo chmod 777 NVIDIA-Linux-x86_64-470.63.01.run
+sudo ./NVIDIA-Linux-x86_64-470.63.01.run
 ```
 
 安装完毕后，您可以通过nvidia-smi指令来检查驱动是否安装成功，如果一切正常，您可以看到类似以下的提示：
@@ -98,7 +100,7 @@ sudo apt-get install nvidia-driver-455
 ```shell
 Tue Jan  3 12:04:21 2023
 +-----------------------------------------------------------------------------+
-| NVIDIA-SMI 460.91.03    Driver Version: 460.91.03    CUDA Version: 11.2     |
+| NVIDIA-SMI 460.91.03    Driver Version: 470.63.01    CUDA Version: 11.4     |
 |-------------------------------+----------------------+----------------------+
 | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
 | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
@@ -141,50 +143,5 @@ sudo apt-get install -y nvidia-docker2
 sudo systemctl restart docker
 ```
 
-## 步骤四：创建和进入 Apollo 环境容器
-
-### 1. 创建工作空间
-
-创建并进入目录
-
-```shell
-mkdir application-pnc
-cd application-pnc
-```
-
-### 2. 启动 apollo 环境容器
-
-```shell
-aem start
-```
-
-如果一切正常，将会见到类似输出的提示：
-
-```text
-[ OK ] apollo_neo_dev_pnc is still running, please run the following command:
-[ OK ]     aem enter
-[ OK ] Enjoy!
-```
-
-### 3. 进入 apollo 环境容器
-
-```shell
-aem enter
-```
-
-脚本执行成功后，将显示以下信息，您将进入 Apollo 的运行容器：
-
-```text
-user_name@in-dev-docker:/apollo_workspace$
-```
-
-> 注：工作空间文件夹将被挂载到容器的 /apollo_workspace 中。
-
-### 4. 初始化工作空间
-
-```shell
-aem init
-```
-
-至此 Apollo 环境管理工具及容器已经安装完成，接下来请跟着 [快速开始](docs/installation_instructions/quick_start_cn.md) 文档根据不同的使用场景按需安
+至此，基础软件与 Apollo 环境管理工具及已经安装完成，接下来请跟着 [快速开始](docs/installation_instructions/quick_start_cn.md) 文档根据不同的使用场景按需安
 装不同的模块。

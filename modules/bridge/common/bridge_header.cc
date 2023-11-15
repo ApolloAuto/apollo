@@ -17,6 +17,7 @@
 #include "modules/bridge/common/bridge_header.h"
 
 #include <cstring>
+#include <limits>
 
 namespace apollo {
 namespace bridge {
@@ -50,17 +51,26 @@ bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
       cursor += sizeof(HType) + 1;
       bsize size = *(reinterpret_cast<const bsize *>(cursor));
       cursor += sizeof(bsize) + size + 2;
+      if (size > (std::numeric_limits<int>::max() - sizeof(HType) -
+                  sizeof(bsize) - 3)) {
+        return false;
+      }
       i -= static_cast<int>(sizeof(HType) + sizeof(bsize) + size + 3);
       continue;
     }
-    size_t value_size = 0;
+
     for (int j = 0; j < Header_Tail; j++) {
       if (type == header_item[j]->GetType()) {
-        cursor = header_item[j]->DiserializeItem(cursor, &value_size);
+        size_t value_size = 0;
+        cursor = header_item[j]->DiserializeItem(cursor, static_cast<size_t>(i),
+                                                 &value_size);
+        i -= static_cast<int>(value_size);
+        if (cursor == nullptr) {
+          return false;
+        }
         break;
       }
     }
-    i -= static_cast<int>(value_size);
   }
   return true;
 }

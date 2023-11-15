@@ -19,7 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/camera_tracking/common/camera_tracking_frame.h"
+#include "Eigen/Core"
+
 #include "modules/perception/common/inference/utils/cuda_util.h"
 #include "modules/perception/common/inference/utils/util.h"
 
@@ -99,105 +100,6 @@ struct alignas(16) SimilarMap {
 
   std::vector<std::vector<std::shared_ptr<base::Blob<float>>>> map_sim;
   int dim;
-};
-
-class FrameList {
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  FrameList() { Init(1); }
-
-  /**
-   * @brief initialize with capability
-   * 
-   * @param cap 
-   * @return true 
-   * @return false 
-   */
-  bool Init(int cap) {
-    if (cap <= 0) {
-      return false;
-    }
-    capability_ = cap;
-    frame_count_ = 0;
-    frames_.resize(capability_);
-    return true;
-  }
-
-  /**
-   * @brief get the oldest frame id
-   * 
-   * @return int 
-   */
-  inline int OldestFrameId() {
-    if (frame_count_ < capability_) {
-      return 0;
-    } else {
-      return get_frame(frame_count_)->frame_id;
-    }
-  }
-
-  /**
-   * @brief get size of frame list
-   * 
-   * @return int 
-   */
-  inline int Size() {
-    if (frame_count_ < capability_) {
-      return frame_count_;
-    } else {
-      return capability_;
-    }
-  }
-
-  /**
-   * @brief add frame to frame list
-   * 
-   * @param frame 
-   */
-  inline void Add(std::shared_ptr<CameraTrackingFrame> frame) {
-    frames_[frame_count_ % capability_] = frame;
-    ++frame_count_;
-  }
-
-  /**
-   * @brief obtain the frame in the frame list according to the index
-   * 
-   * @param index 
-   * @return CameraTrackingFrame* 
-   */
-  inline CameraTrackingFrame *get_frame(int index) const {
-    assert(index <= frame_count_);
-    if (index < 0) {
-      return frames_[(index + frame_count_) % capability_].get();
-    } else {
-      return frames_[index % capability_].get();
-    }
-  }
-
-  /**
-   * @brief obtain the frame in the frame list according to the index
-   * 
-   * @param index 
-   * @return CameraTrackingFrame* 
-   */
-  inline CameraTrackingFrame *operator[](int index) const {
-    return get_frame(index);
-  }
-
-  /**
-   * @brief obtain the object according to the indicator
-   * 
-   * @param indicator 
-   * @return base::ObjectPtr 
-   */
-  inline base::ObjectPtr get_object(PatchIndicator indicator) const {
-    return get_frame(indicator.frame_id)->detected_objects[indicator.patch_id];
-  }
-
- private:
-  int frame_count_ = 0;
-  int capability_ = 0;
-  std::vector<std::shared_ptr<CameraTrackingFrame>> frames_;
 };
 
 }  // namespace camera
