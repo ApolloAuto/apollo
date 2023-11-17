@@ -25,6 +25,7 @@ ARCH="$(uname -m)"
 
 : ${USE_ESD_CAN:=false}
 USE_GPU=-1
+USE_OPT=-1
 
 ENABLE_PROFILER=true
 
@@ -32,53 +33,30 @@ CMDLINE_OPTIONS=
 SHORTHAND_TARGETS=
 DISABLED_TARGETS=
 
-function _determine_drivers_disabled() {
-  if ! ${USE_ESD_CAN}; then
-    warning "ESD CAN library supplied by ESD Electronics doesn't exist."
-    warning "If you need ESD CAN, please refer to:"
-    warning "  third_party/can_card_library/esd_can/README.md"
-    DISABLED_TARGETS="${DISABLED_TARGETS}"
-  fi
-}
+APOLLO_BUILD=0
 
 function _determine_perception_disabled() {
   if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} except //modules/perception/..."
-  fi
-}
-
-function _determine_planning_disabled() {
-  if [ "${USE_GPU}" -eq 0 ]; then
-    DISABLED_TARGETS="${DISABLED_TARGETS} \
-        except //modules/planning/planning_base:planning_block"
+    DISABLED_TARGETS="${DISABLED_TARGETS} modules/perception"
   fi
 }
 
 function determine_disabled_targets() {
   if [ "$#" -eq 0 ]; then
-    _determine_drivers_disabled
     _determine_perception_disabled
-    _determine_planning_disabled
     echo "${DISABLED_TARGETS}"
     return
   fi
 
   for component in $@; do
     case "${component}" in
-      drivers)
-        _determine_drivers_disabled
-        ;;
-      perception)
+      modules/perception*)
         _determine_perception_disabled
-        ;;
-      planning)
-        _determine_planning_disabled
         ;;
     esac
   done
 
   echo "${DISABLED_TARGETS}"
-  # DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
 }
 
 # components="$(echo -e "${@// /\\n}" | sort -u)"
@@ -87,7 +65,7 @@ function determine_disabled_targets() {
 function determine_build_targets() {
   local targets_all
   if [[ "$#" -eq 0 ]]; then
-    targets_all="//modules/... union //cyber/..."
+    targets_all="$(python3 ${TOP_DIR}/scripts/find_all_package.py)"
     echo "${targets_all}"
     return
   fi
@@ -95,13 +73,9 @@ function determine_build_targets() {
   for component in $@; do
     local build_targets
     if [ "${component}" = "cyber" ]; then
-      if [[ "${HOST_OS}" == "Linux" ]]; then
-        build_targets="//cyber/... union //modules/tools/visualizer/..."
-      else
-        build_targets="//cyber/..."
-      fi
+      build_targets="cyber"
     elif [[ -d "${APOLLO_ROOT_DIR}/modules/${component}" ]]; then
-      build_targets="//modules/${component}/..."
+      build_targets="modules/${component}"
     else
       error "Directory <APOLLO_ROOT_DIR>/modules/${component} not found. Exiting ..."
       exit 1
@@ -109,7 +83,7 @@ function determine_build_targets() {
     if [ -z "${targets_all}" ]; then
       targets_all="${build_targets}"
     else
-      targets_all="${targets_all} union ${build_targets}"
+      targets_all="${targets_all} ${build_targets}"
     fi
   done
   echo "${targets_all}"
@@ -137,8 +111,29 @@ function _chk_n_set_gpu_arg() {
   exit 1
 }
 
+function _chk_n_set_opt_arg() {
+  local arg="$1"
+  local use_opt=-1
+  if [ "${arg}" = "dbg" ]; then
+    use_opt=0
+  elif [ "${arg}" = "opt" ]; then
+    use_opt=1
+  else
+    return 0
+  fi
+
+  if [[ "${USE_OPT}" -lt 0 || "${USE_OPT}" = "${use_opt}" ]]; then
+    USE_OPT="${use_opt}"
+    return 0
+  fi
+
+  error "Mixed use of '--config=opt' and '--config=dbg' may" \
+    "lead to unexpected behavior. Exiting..."
+  exit 1 
+}
+
 function parse_cmdline_arguments() {
-  local known_options=""
+  # local known_options=""
   local remained_args=""
 
   for ((pos = 1; pos <= $#; pos++)); do #do echo "$#" "$i" "${!i}"; done
@@ -148,19 +143,14 @@ function parse_cmdline_arguments() {
     case "${opt}" in
       --config=*)
         optarg="${opt#*=}"
-        known_options="${known_options} ${opt}"
         _chk_n_set_gpu_arg "${optarg}"
+        _chk_n_set_opt_arg "${optarg}"
         ;;
       --config)
         ((++pos))
         optarg="${!pos}"
-        known_options="${known_options} ${opt} ${optarg}"
         _chk_n_set_gpu_arg "${optarg}"
-        ;;
-      -c)
-        ((++pos))
-        optarg="${!pos}"
-        known_options="${known_options} ${opt} ${optarg}"
+        _chk_n_set_opt_arg "${optarg}"
         ;;
       *)
         remained_args="${remained_args} ${opt}"
@@ -168,25 +158,30 @@ function parse_cmdline_arguments() {
     esac
   done
   # Strip leading whitespaces
-  known_options="$(echo "${known_options}" | sed -e 's/^[[:space:]]*//')"
   remained_args="$(echo "${remained_args}" | sed -e 's/^[[:space:]]*//')"
 
   CMDLINE_OPTIONS="${known_options}"
   SHORTHAND_TARGETS="${remained_args}"
 }
 
-function determine_cpu_or_gpu_build() {
+function determine_build_arguments() {
   if [ "${USE_GPU}" -lt 0 ]; then
     if [ "${USE_GPU_TARGET}" -eq 0 ]; then
-      CMDLINE_OPTIONS="--config=cpu ${CMDLINE_OPTIONS}"
+      CMDLINE_OPTIONS="--cpu ${CMDLINE_OPTIONS}"
     else
-      CMDLINE_OPTIONS="--config=gpu ${CMDLINE_OPTIONS}"
+      CMDLINE_OPTIONS="--gpu ${CMDLINE_OPTIONS}"
     fi
     # USE_GPU unset, defaults to USE_GPU_TARGET
     USE_GPU="${USE_GPU_TARGET}"
   elif [ "${USE_GPU}" -gt "${USE_GPU_TARGET}" ]; then
     warning "USE_GPU=${USE_GPU} without GPU can't compile. Exiting ..."
     exit 1
+  else
+    if [ "${USE_GPU}" -eq 1 ]; then
+      CMDLINE_OPTIONS="--gpu ${CMDLINE_OPTIONS}" 
+    else
+      CMDLINE_OPTIONS="--cpu ${CMDLINE_OPTIONS}"
+    fi
   fi
 
   if [ "${USE_GPU}" -eq 1 ]; then
@@ -194,46 +189,75 @@ function determine_cpu_or_gpu_build() {
   else
     ok "Running CPU build on ${ARCH} platform."
   fi
+
+  if [ "${USE_OPT}" -lt 0 ]; then
+    # unset, defaults to use opt to build
+    CMDLINE_OPTIONS="--opt ${CMDLINE_OPTIONS}"
+  else 
+    if [ "${USE_OPT}" -eq 0 ]; then
+      CMDLINE_OPTIONS="--dbg ${CMDLINE_OPTIONS}"
+    else
+      CMDLINE_OPTIONS="--opt ${CMDLINE_OPTIONS}"
+    fi
+  fi
 }
 
-function format_bazel_targets() {
-  local targets="$(echo $@ | xargs)"
-  targets="${targets// union / }"   # replace all matches of "A union B" to "A B"
-  targets="${targets// except / -}" # replaces all matches of "A except B" to "A-B"
-  echo "${targets}"
+function drop_targets() {
+  local drop_result
+  local drop_pattern=${1}
+  local targets=${2}
+  
+  for i in $targets; do
+    if [[ $i == $drop_pattern* ]]; then
+      continue
+    fi
+    drop_result="${drop_result} ${i}"
+  done
+
+  echo ${drop_result}
+  return
 }
 
 function run_bazel_build() {
-  if ${USE_ESD_CAN}; then
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define USE_ESD_CAN=${USE_ESD_CAN}"
-  fi
-
   # Add profiler
   if $ENABLE_PROFILER; then
-    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define ENABLE_PROFILER=${ENABLE_PROFILER}"
+    # CMDLINE_OPTIONS="${CMDLINE_OPTIONS} --define ENABLE_PROFILER=${ENABLE_PROFILER}"
+    CMDLINE_OPTIONS="${CMDLINE_OPTIONS} -a \'--define\' \'ENABLE_PROFILER=${ENABLE_PROFILER}\'"
   fi
 
   CMDLINE_OPTIONS="$(echo ${CMDLINE_OPTIONS} | xargs)"
 
   local build_targets
+  [[ -z ${SHORTHAND_TARGETS} ]] && APOLLO_BUILD=1
   build_targets="$(determine_build_targets ${SHORTHAND_TARGETS})"
 
   local disabled_targets
   disabled_targets="$(determine_disabled_targets ${SHORTHAND_TARGETS})"
   disabled_targets="$(echo ${disabled_targets} | xargs)"
-  
+
+  for i in ${disabled_targets}; do
+    build_targets=$(drop_targets "${i}" "${build_targets}")
+  done
+
   # Note(storypku): Workaround for in case "/usr/bin/bazel: Argument list too long"
   # bazel build ${CMDLINE_OPTIONS} ${job_args} $(bazel query ${build_targets})
-  local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
+  # local formatted_targets="$(format_bazel_targets ${build_targets} ${disabled_targets})"
 
   info "Build Overview: "
   info "${TAB}USE_GPU: ${USE_GPU}  [ 0 for CPU, 1 for GPU ]"
-  info "${TAB}Bazel Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
-  info "${TAB}Build Targets: ${GREEN}${build_targets}${NO_COLOR}"
-  info "${TAB}Disabled:      ${YELLOW}${disabled_targets}${NO_COLOR}"
+  info "${TAB}buildtool Options: ${GREEN}${CMDLINE_OPTIONS}${NO_COLOR}"
+  if [ "${APOLLO_BUILD}" -eq 1 ]; then
+    info "${TAB}Build Targets:     ${GREEN}Apollo${NO_COLOR}"
+  else
+    info "${TAB}Build Targets:     ${GREEN}${build_targets}${NO_COLOR}"  
+  fi
+  info "${TAB}Disabled:          ${YELLOW}${disabled_targets}${NO_COLOR}"
 
-  local job_args="--copt=-march=native --host_copt=-march=native --jobs=$(nproc) --local_ram_resources=HOST_RAM*0.7"
-  bazel build ${CMDLINE_OPTIONS} ${job_args} -- ${formatted_targets}
+  local job_args="-j=$(nproc) -m=0.7"
+
+  buildtool build ${CMDLINE_OPTIONS} ${job_args} -p ${build_targets}
+
+  [[ $? -ne 0 ]] && error "Build failed!" && exit -1
 }
 
 function main() {
@@ -241,13 +265,14 @@ function main() {
     error "The build operation must be run from within docker container"
     exit 1
   fi
-  site_restore
+
+  env_prepare
   parse_cmdline_arguments "$@"
-  determine_cpu_or_gpu_build
+  determine_build_arguments
 
   run_bazel_build
 
-  if [ -z "${SHORTHAND_TARGETS}" ]; then
+  if [ "${APOLLO_BUILD}" -eq 1 ]; then
     SHORTHAND_TARGETS="apollo"
   fi
 
