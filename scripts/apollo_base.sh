@@ -33,7 +33,10 @@ function site_restore() {
   [[ -e "${TOP_DIR}/WORKSPACE.source" ]] && rm -f "${TOP_DIR}/WORKSPACE" && cp "${TOP_DIR}/WORKSPACE.source" "${TOP_DIR}/WORKSPACE" 
   echo "" > "${TOP_DIR}/tools/package/rules_cc.patch" 
   [[ -e "${TOP_DIR}/tools/proto/proto.bzl.tpl" ]] && rm -f "${TOP_DIR}/tools/proto/proto.bzl" && cp "${TOP_DIR}/tools/proto/proto.bzl.tpl" "${TOP_DIR}/tools/proto/proto.bzl" 
-  [[ ! -z $(which buildtool) ]] && sudo apt remove -y apollo-neo-buildtool 
+  if which buildtool > /dev/null 2>&1; then
+    sudo apt remove -y apollo-neo-buildtool
+  fi
+  return 0
 }
 
 function env_prepare() {
