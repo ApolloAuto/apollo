@@ -55,7 +55,7 @@ function LocalDynamicModelItem(props) {
     monitor.insert('INFO', 'Deleted  successfully!', Date.now());
     setDeleteConfirmModalVisible(false);
     // 刷新列表
-    WS.loadLocalRecords();
+    // WS.loadLocalRecords();
     PLUGIN_WS.getRecordList();
   };
 

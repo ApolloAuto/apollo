@@ -95,7 +95,6 @@ export function RemoteResourceItemBtn(props) {
     }
 
     if (type === 2) {
-      console.log('handleClick', status, id, type);
       PLUGIN_WS.downloadDynamicsModel(id);
     }
 

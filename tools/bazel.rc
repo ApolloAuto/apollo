@@ -24,7 +24,7 @@ common --color=yes
 build --show_timestamps
 
 # Work around the sandbox issue.
-build --spawn_strategy=sandboxed
+build --spawn_strategy=standalone
 
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"
