@@ -5,7 +5,7 @@
     This module contains system level software such as code to check hardware status
     and monitor system health.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

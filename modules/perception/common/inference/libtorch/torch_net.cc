@@ -16,9 +16,8 @@
 
 #include "modules/perception/common/inference/libtorch/torch_net.h"
 
-#include <c10/cuda/CUDACachingAllocator.h>
-
 #include "cyber/common/log.h"
+#include "modules/perception/common/inference/inference.h"
 
 namespace apollo {
 namespace perception {
@@ -29,9 +28,7 @@ using apollo::perception::base::Blob;
 TorchNet::TorchNet(const std::string &model_file,
                    const std::vector<std::string> &outputs,
                    const std::vector<std::string> &inputs)
-    : model_file_(model_file),
-      output_names_(outputs),
-      input_names_(inputs) {}
+    : model_file_(model_file), output_names_(outputs), input_names_(inputs) {}
 
 bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   if (gpu_id_ >= 0) {
@@ -47,7 +44,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   net_.eval();
 
   // add blobs
-  for (const auto& name : input_names_) {
+  for (const auto &name : input_names_) {
     auto iter = shapes.find(name);
     if (iter != shapes.end()) {
       auto blob = std::make_shared<Blob<float>>(iter->second);
@@ -55,7 +52,7 @@ bool TorchNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     }
   }
 
-  for (const auto& name : output_names_) {
+  for (const auto &name : output_names_) {
     auto iter = shapes.find(name);
     if (iter != shapes.end()) {
       auto blob = std::make_shared<Blob<float>>(iter->second);
@@ -73,9 +70,7 @@ std::shared_ptr<Blob<float>> TorchNet::get_blob(const std::string &name) {
   return iter->second;
 }
 
-bool TorchNet::reshape() {
-  return true;
-}
+bool TorchNet::reshape() { return true; }
 
 bool TorchNet::shape(const std::string &name, std::vector<int> *res) {
   auto blob = get_blob(name);
@@ -91,14 +86,12 @@ void TorchNet::Infer() {
   torch::Device device(device_type_, device_id_);
   // Get input data from blob to torch_blob.
   std::vector<torch::jit::IValue> torch_inputs;
-  for (const auto& name : input_names_) {
+  for (const auto &name : input_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
       std::vector<int64_t> shape(blob->shape().begin(), blob->shape().end());
       torch::Tensor torch_blob = torch::from_blob(
-                                    blob->data()->mutable_cpu_data(),
-                                    shape,
-                                    torch::kFloat32);
+          blob->data()->mutable_cpu_data(), shape, torch::kFloat32);
       torch_blob = torch_blob.to(device);
       torch_inputs.push_back(torch_blob);
     }
@@ -109,7 +102,7 @@ void TorchNet::Infer() {
   // which will overwrite the `inference` results.
   // `out_blob->gpu_data()` will set HEAD to SYNCED,
   // then no copy happends after `enqueue`.
-  for (const auto& name : output_names_) {
+  for (const auto &name : output_names_) {
     auto blob = get_blob(name);
     if (blob != nullptr) {
       blob->gpu_data();
@@ -130,9 +123,8 @@ void TorchNet::Infer() {
       blob->set_gpu_data(output[i].data_ptr<float>());
     }
   }
-  c10::cuda::CUDACachingAllocator::emptyCache();
+  emptyCache();
 }
-
 
 }  // namespace inference
 }  // namespace perception

@@ -22,11 +22,14 @@
 #include <random>
 #include <utility>
 
+#if GPU_PLATFORM == NVIDIA
 #include <cuda_runtime_api.h>
+#elif GPU_PLATFORM == AMD
+#include <hip/hip_runtime.h>
+#include <hip/hip_runtime_api.h>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/perception/common/util.h"
 #include "modules/perception/common/base/object_pool_types.h"
 #include "modules/perception/common/base/point_cloud_util.h"
 #include "modules/perception/common/inference/inference_factory.h"
@@ -34,6 +37,7 @@
 #include "modules/perception/common/lidar/common/cloud_mask.h"
 #include "modules/perception/common/lidar/common/lidar_timer.h"
 #include "modules/perception/common/lidar/common/pcl_util.h"
+#include "modules/perception/common/util.h"
 #include "modules/perception/lidar_detection/detector/center_point_detection/params.h"
 
 namespace apollo {

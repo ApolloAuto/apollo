@@ -1,6 +1,7 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -61,37 +62,42 @@ apollo_cc_test(
         ":apollo_perception_common_inference",
         "//modules/perception/common/inference/tensorrt:apollo_perception_inference_rt_common",
         "@com_google_googletest//:gtest_main",
-        "@local_config_tensorrt//:tensorrt",
     ],
 )
 
-cuda_library(
+gpu_library(
     name = "perception_inference_operators_cuda",
-    srcs = ["operators/roipooling_layer.cu", "operators/roipooling_layer.cc",],
-    hdrs = ["operators/roipooling_layer.h",],
+    srcs = [
+        "operators/roipooling_layer.cc",
+        "operators/roipooling_layer.cu",
+    ],
+    hdrs = ["operators/roipooling_layer.h"],
     deps = [
         "//modules/perception/common/base:apollo_perception_common_base",
         "//modules/perception/common/inference:layer_lib",
         "@eigen",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
     alwayslink = True,
 )
 
 apollo_cc_library(
     name = "apollo_perception_common_inference",
     srcs = [
-        "model_util.cc",
         "inference_factory.cc",
         "libtorch/torch_net.cc",
+        "model_util.cc",
         "onnx/libtorch_obstacle_detector.cc",
         "onnx/onnx_single_batch_infer.cc",
         "paddlepaddle/paddle_net.cc",
     ],
     hdrs = [
-        "model_util.h",
         "inference_factory.h",
         "libtorch/torch_net.h",
+        "model_util.h",
         "onnx/libtorch_obstacle_detector.h",
         "onnx/onnx_single_batch_infer.h",
         "paddlepaddle/paddle_net.h",
@@ -101,27 +107,34 @@ apollo_cc_library(
         ":layer_lib",
         ":perception_inference_operators_cuda",
         "//cyber",
-        "//modules/perception/common/base:apollo_perception_common_base",
         "//modules/perception/common:perception_gflags",
+        "//modules/perception/common/base:apollo_perception_common_base",
         "//modules/perception/common/inference/tensorrt:apollo_perception_inference_rt_net",
         "//modules/perception/common/inference/utils:apollo_perception_common_utils",
         "//modules/perception/common/proto:model_info_cc_proto",
         "//modules/perception/common/proto:rt_cc_proto",
+        "@boost",
         "@com_google_absl//:absl",
         "@com_google_protobuf//:protobuf",
-        "@libtorch_gpu",
+        "@opencv//:imgcodecs",
+    ] + select({
+        "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
+        "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"],
+    }) + if_cuda([
+        "@libtorch_gpu_cuda",
+        "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
         "@local_config_cuda//cuda:cudnn_header",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv//:imgcodecs",
-        "@boost",
-    ] + select({
-        "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
-        "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"]
-  }),
+    ]) + if_rocm([
+        "@libtorch_gpu_rocm",
+        "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:hipblas",
+        "@local_config_rocm//rocm:hip_headers",
+        "@local_config_rocm//rocm:migraphx",
+    ]),
 )
 
 filegroup(
@@ -133,14 +146,14 @@ filegroup(
     name = "libtorch_test_files",
     srcs = glob([
         "libtorch/test_data/**",
-    ])
+    ]),
 )
 
 filegroup(
     name = "onnx_test_files",
     srcs = glob([
         "onnx/testdata/**",
-    ])
+    ]),
 )
 
 apollo_package()

@@ -44,7 +44,6 @@ apollo_cc_test(
     deps = [
         ":emergency_stop_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    ],
     linkstatic = True,
 )
 
@@ -56,7 +55,6 @@ apollo_cc_test(
     deps = [
         ":emergency_stop_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    ],
     linkstatic = True,
 )
 
@@ -68,7 +66,6 @@ apollo_cc_test(
     deps = [
         ":emergency_stop_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    ],
     linkstatic = True,
 )
 

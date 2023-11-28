@@ -166,7 +166,7 @@ __global__ void keep_topN_boxes_kernel(
 
     if (keep_score) {
       out_scores[index] = scores[batch_id * num_box + in_box_id];
-      for (int i = 0; i < num_prob; i++) {
+      for (int i = 0; i < num_prob; ++i) {
         out_all_probs[index * num_prob + i] =
             all_probs[batch_id * num_box * num_prob + in_box_id * num_prob + i];
       }

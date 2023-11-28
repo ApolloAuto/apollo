@@ -2,12 +2,12 @@
   <name>third-party-perception</name>
   <version>local</version>
   <description>
-    In Apollo 2.5, the third_party_perception module incorporates third-party sensors like Mobileye and Conti/Delphi Radar 
+    In Apollo 2.5, the third_party_perception module incorporates third-party sensors like Mobileye and Conti/Delphi Radar
     output with simple fusion and creates a similar perception output produced as obstacle/lane detection information as defined in
     [Perception Obstacles Interface](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/proto/perception_obstacle.proto).
     This module was only intend to serve for the Prediction/Planning/Control algorithm in real vehicle before perception modules fully ready before 2.5. We recommend using 'modules/perception' instead for your own test purpose after Apollo 2.5 officially released.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

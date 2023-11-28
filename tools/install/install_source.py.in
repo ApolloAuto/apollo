@@ -52,7 +52,7 @@ def is_relative_link(filepath):
 
 def process_cmd(cmd, queue):
     """Execute shell command in concurrency"""
-    pwd = check_output("echo $PWD", shell=True).decode("utf-8") 
+    pwd = check_output("echo $PWD", shell=True).decode("utf-8")
     output = check_output(cmd, shell=True).decode("utf-8")
     return queue.put(output)
 
@@ -116,9 +116,9 @@ def replace_config(pkg_module_dict, prefix, config_file):
     for pkg_name, module_name in pkg_module_dict.items():
         shell_cmd(
             "sed -i 's/\/apollo\/bazel-bin\/{}\//{}{}\/latest\/lib\//g' {}".format(
-                module_name, 
-                prefix.replace("/", "\/") if prefix.endswith("/") else prefix.replace("/", "\/") + "\/", 
-                pkg_name, 
+                module_name,
+                prefix.replace("/", "\/") if prefix.endswith("/") else prefix.replace("/", "\/") + "\/",
+                pkg_name,
                 config_file
             )
         )
@@ -154,7 +154,7 @@ def fix_configs_in_pkg():
         for c_d in conf_dirs:
             full_c_d = os.path.join(prefix, d, c_d)
             replace_config_dir(full_c_d, prefix, pkg_module_dict)
-            
+
 
 
 def install_src(src, dst, file_filter, action_type=None):
@@ -177,7 +177,7 @@ def install_src(src, dst, file_filter, action_type=None):
         shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
             .format(src, file_filter, dst_full))
     else:
-        global src_install_dirs_dict 
+        global src_install_dirs_dict
         dst_full = os.path.join(prefix, dst)
         if file_filter not in src_install_dirs_dict:
             src_install_dirs_dict[file_filter] = {}
@@ -191,7 +191,7 @@ def install_src_file():
         if not os.path.exists(common_prefix) or common_prefix not in src_install_dirs_dict[file_filter]:
             print("\033[31m[ERROR]\033[0m can not calculate common prefix: {}".format(common_prefix), file=sys.stderr)
             exit(-1)
-        
+
         pwd = src_install_dirs_dict[file_filter][common_prefix]["pwd"]
         src_hash_cmd = "find {} -name \"*\" -type f -print0 | sort -z | xargs -0 cat | sha1sum".format(
             is_relative_link(os.path.join(pwd, common_prefix)))
@@ -199,11 +199,11 @@ def install_src_file():
         src_process.start()
 
         des_hash_cmd = "find {} -name \"*\" -type f -print0 2>&1 | sort -z | xargs -0 cat 2>&1 | sha1sum".format(
-            src_install_dirs_dict[file_filter][common_prefix]["dst"]) 
-        
+            src_install_dirs_dict[file_filter][common_prefix]["dst"])
+
         des_process = Process(target=process_cmd, args=(des_hash_cmd, queue, ))
         des_process.start()
-        
+
         src_process.join()
         des_process.join()
 
@@ -212,7 +212,7 @@ def install_src_file():
             if not os.path.exists(dst_full):
                 os.makedirs(dst_full)
             shell_cmd("cd {} && find . -name '{}'|xargs -i -I@@ cp -rvfPL --parents @@ {}/ > /dev/null"
-                .format(is_relative_link(os.path.join(pwd, common_prefix)), file_filter, dst_full)) 
+                .format(is_relative_link(os.path.join(pwd, common_prefix)), file_filter, dst_full))
 
 
 def main(args):

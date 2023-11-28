@@ -72,7 +72,7 @@ namespace base {
 inline void PerceptionMallocHost(void** ptr, size_t size, bool use_cuda) {
 #if USE_GPU == 1
   if (use_cuda) {
-    BASE_CUDA_CHECK(cudaMallocHost(ptr, size));
+    BASE_GPU_CHECK(cudaMallocHost(ptr, size));
     return;
   }
 #endif
@@ -83,7 +83,7 @@ inline void PerceptionMallocHost(void** ptr, size_t size, bool use_cuda) {
 inline void PerceptionFreeHost(void* ptr, bool use_cuda) {
 #if USE_GPU == 1
   if (use_cuda) {
-    BASE_CUDA_CHECK(cudaFreeHost(ptr));
+    BASE_GPU_CHECK(cudaFreeHost(ptr));
     return;
   }
 #endif

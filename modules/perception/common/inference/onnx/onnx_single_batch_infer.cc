@@ -30,6 +30,7 @@
 #include "cyber/common/log.h"
 #include "modules/perception/common/inference/onnx/onnx_single_batch_infer.h"
 
+#if GPU_PLATFORM == NVIDIA
 // Logger for TensorRT info/warning/errors
 class OnnxLogger : public nvinfer1::ILogger {
   void log(Severity severity, const char* msg) noexcept override {
@@ -50,6 +51,14 @@ class OnnxLogger : public nvinfer1::ILogger {
     }
   }
 } onnx_gLogger;
+#elif GPU_PLATFORM == AMD
+class OnnxLogger : {
+} onnx_gLogger;
+namespace nvinfer1 {
+class ICudaEngine {};
+class IExecutionContext {};
+}  // namespace nvinfer1
+#endif
 
 namespace apollo {
 namespace perception {
@@ -116,6 +125,7 @@ bool SingleBatchInference::Init(
   }
 
   // create execution context from the engine
+#if GPU_PLATFORM == NVIDIA
   context_ = engine_->createExecutionContext();
   if (context_ == nullptr) {
     AERROR << "Fail to create Exceution Context";
@@ -142,10 +152,14 @@ bool SingleBatchInference::Init(
   init_blob(&input_names_);
   init_blob(&output_names_);
 
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::Init() is not implemented yet");
+#endif
   return true;
 }
 
 bool SingleBatchInference::OnnxToTRTModel(const std::string& model_file) {
+#if GPU_PLATFORM == NVIDIA
   int verbosity = static_cast<int>(nvinfer1::ILogger::Severity::kVERBOSE);
   kBatchSize = 1;
 
@@ -210,6 +224,9 @@ bool SingleBatchInference::OnnxToTRTModel(const std::string& model_file) {
     runtime->destroy();
   }
   return true;
+#elif GPU_PLATFORM == AMD
+  assert(0 && "OnnxObstacleDetector::OnnxToTRTModel() is not implemented yet");
+#endif
 }
 
 void SingleBatchInference::init_blob(std::vector<std::string>* names) {

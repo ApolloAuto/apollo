@@ -5,7 +5,7 @@
     Based on the planning trajectory and the car's current status, the Control module uses different control
     algorithms to generate a comfortable driving experience.The Control module can work both in normal and navigation modes.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

@@ -5,26 +5,26 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 
 cc_library(
-    name = "libtorch_gpu",
+    name = "libtorch_gpu_rocm",
     hdrs = glob(["**/*"]),
-    includes = ["."],
+    includes = [
+        ".",
+    ],
     linkopts = [
         "-L/usr/local/libtorch_gpu/lib",
         "-lc10",
-        "-lc10_cuda",
+        "-lc10_hip",
         "-ltorch",
         "-ltorch_cpu",
-        "-ltorch_cuda",
-        "-lnvonnxparser",
+        "-ltorch_hip",
     ],
     linkstatic = False,
     deps = [
-        "@local_config_cuda//cuda:cudart",
+        ":libtorch_gpu_headers",
         "@local_config_python//:python_headers",
         "@local_config_python//:python_lib",
-        ":libtorch_gpu_headers"
+        "@local_config_rocm//rocm:hip",
     ],
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -32,11 +32,11 @@ cc_library(
     hdrs = glob(["torch/csrc/api/include/**/*"]),
     includes = ["torch/csrc/api/include"],
     linkstatic = False,
-    deps = [
-        "@local_config_cuda//cuda:cudart",
-        "@local_config_python//:python_headers",
-        "@local_config_python//:python_lib",
-    ],
     strip_include_prefix = "torch/csrc/api/include",
     visibility = ["//visibility:public"],
+    deps = [
+        "@local_config_python//:python_headers",
+        "@local_config_python//:python_lib",
+        "@local_config_rocm//:rocm::hip",
+    ],
 )

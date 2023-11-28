@@ -16,10 +16,6 @@
 
 #pragma once
 
-#include <NvInferPlugin.h>
-#include <NvInferRuntimeCommon.h>
-#include <NvInferVersion.h>
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -28,15 +24,23 @@
 #include <utility>
 #include <vector>
 
+#if GPU_PLATFORM == NVIDIA
+#include <NvInferPlugin.h>
+#include <NvInferRuntimeCommon.h>
+#include <NvInferVersion.h>
+
 #include "NvInfer.h"
 #include "NvInferVersion.h"
 #include "NvOnnxParser.h"
+#endif
 
 #include "modules/perception/common/inference/inference.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
+
+using BlobPtr = std::shared_ptr<apollo::perception::base::Blob<float>>;
 
 class SingleBatchInference : public Inference {
  public:

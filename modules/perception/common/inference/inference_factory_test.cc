@@ -18,7 +18,11 @@
 
 #include "gtest/gtest.h"
 
+#if GPU_PLATFORM == NVIDIA
 #include "modules/perception/common/inference/tensorrt/rt_net.h"
+#elif GPU_PLATFORM == AMD
+#include "modules/perception/common/inference/migraphx/mi_net.h"
+#endif
 
 namespace apollo {
 namespace perception {

@@ -19,10 +19,46 @@
 #include <cassert>
 
 #if USE_GPU == 1
-
-#include <cublas_v2.h>
-#include <cuda_runtime.h>
-
+  #if GPU_PLATFORM == NVIDIA
+    #include <cublas_v2.h>
+    #include <cuda_runtime.h>
+    #include <cuda_runtime_api.h>
+  #elif GPU_PLATFORM == AMD
+    #include <hipblas.h>
+    #include <hip/hip_runtime.h>
+    #include <hip/hip_runtime_api.h>
+    #define cublasCreate hipblasCreate
+    #define cublasDestroy hipblasDestroy
+    #define cublasHandle_t hipblasHandle_t
+    #define cudaDeviceProp hipDeviceProp_t
+    #define cudaDeviceSynchronize hipDeviceSynchronize
+    #define cudaError_t hipError_t
+    #define cudaFree hipFree
+    #define cudaFreeHost hipHostFree
+    #define cudaGetDevice hipGetDevice
+    #define cudaGetDeviceCount hipGetDeviceCount
+    #define cudaGetDeviceProperties hipGetDeviceProperties
+    #define cudaGetErrorString hipGetErrorString
+    #define cudaMalloc hipMalloc
+    #define cudaMallocHost hipMallocHost
+    #define cudaMemcpy hipMemcpy
+    #define cudaMemcpyAsync hipMemcpyAsync
+    #define cudaMemcpyDefault hipMemcpyDefault
+    #define cudaMemcpyDeviceToDevice hipMemcpyDeviceToDevice
+    #define cudaMemcpyDeviceToHost hipMemcpyDeviceToHost
+    #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
+    #define cudaMemcpyKind hipMemcpyKind
+    #define cudaMemset hipMemset
+    #define cudaMemsetAsync hipMemsetAsync
+    #define cudaPointerAttributes hipPointerAttribute_t
+    #define cudaPointerGetAttributes hipPointerGetAttributes
+    #define cudaSetDevice hipSetDevice
+    #define cudaStream_t hipStream_t
+    #define cudaStreamCreate hipStreamCreate
+    #define cudaStreamDestroy hipStreamDestroy
+    #define cudaStreamSynchronize hipStreamSynchronize
+    #define cudaSuccess hipSuccess
+  #endif
 #endif
 
 namespace apollo {
@@ -35,7 +71,7 @@ namespace base {
 
 #if USE_GPU == 1
 
-#define BASE_CUDA_CHECK(condition) \
+#define BASE_GPU_CHECK(condition) \
   { apollo::perception::base::GPUAssert((condition), __FILE__, __LINE__); }
 
 inline void GPUAssert(cudaError_t code, const char *file, int line,

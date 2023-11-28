@@ -8,8 +8,8 @@ proto_library(
     name = "canbus_conf_proto",
     srcs = ["canbus_conf.proto"],
     deps = [
-        "//modules/common_msgs/drivers_msgs:can_card_parameter_proto",
         ":vehicle_parameter_proto",
+        "//modules/common_msgs/drivers_msgs:can_card_parameter_proto",
     ],
 )
 
@@ -23,4 +23,3 @@ proto_library(
 )
 
 apollo_package()
-

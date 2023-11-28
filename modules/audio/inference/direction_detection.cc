@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/audio/inference/direction_detection.h"
+
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"
@@ -28,9 +29,9 @@
 namespace apollo {
 namespace audio {
 
+using apollo::common::math::NormalizeAngle;
 using torch::indexing::None;
 using torch::indexing::Slice;
-using apollo::common::math::NormalizeAngle;
 
 DirectionDetection::DirectionDetection() {}
 
@@ -149,7 +150,7 @@ double DirectionDetection::GccPhat(const torch::Tensor& sig,
 
   auto prefsig_complex = at::fft_rfft(prefsig, c10::nullopt, -1, c10::nullopt);
   prefsig = at::stack(
-    {torch::real(prefsig_complex), torch::imag(prefsig_complex)}, -1);
+      {torch::real(prefsig_complex), torch::imag(prefsig_complex)}, -1);
 #endif
 
   ConjugateTensor(&prefsig);
@@ -158,10 +159,10 @@ double DirectionDetection::GccPhat(const torch::Tensor& sig,
   torch::Tensor cc =
       at::irfft(r / ComplexAbsolute(r), 1, false, true, {interp * n});
 #else
-    auto irfft_input_transpose = at::transpose(r / ComplexAbsolute(r), 0, 1);
-    auto irfft_complex = torch::complex(
-      irfft_input_transpose[0], irfft_input_transpose[1]);
-    torch::Tensor cc =
+  auto irfft_input_transpose = at::transpose(r / ComplexAbsolute(r), 0, 1);
+  auto irfft_complex =
+      torch::complex(irfft_input_transpose[0], irfft_input_transpose[1]);
+  torch::Tensor cc =
       torch::real(torch::fft::irfft(irfft_complex, n, -1, c10::nullopt));
 #endif
   int max_shift = static_cast<int>(interp * n / 2);

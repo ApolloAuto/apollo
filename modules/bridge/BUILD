@@ -1,4 +1,4 @@
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_library", "apollo_cc_test", "apollo_component")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -17,13 +17,13 @@ filegroup(
 apollo_cc_library(
     name = "apollo_bridge_common",
     srcs = [
-        "common/bridge_buffer.cc", 
+        "common/bridge_buffer.cc",
         "common/bridge_gflags.cc",
         "common/bridge_header.cc",
-        "common/util.cc"
+        "common/util.cc",
     ],
     hdrs = [
-        "common/bridge_buffer.h", 
+        "common/bridge_buffer.h",
         "common/bridge_gflags.h",
         "common/bridge_header.h",
         "common/bridge_header_item.h",
@@ -35,9 +35,9 @@ apollo_cc_library(
         "common/util.h",
     ],
     deps = [
-        "@com_github_gflags_gflags//:gflags",
         "//modules/common/adapters:adapter_gflags",
-    ]
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 apollo_cc_test(
@@ -64,13 +64,13 @@ apollo_cc_library(
     name = "apollo_udp_bridge",
     copts = BRIDGE_COPTS,
     deps = [
-        "//cyber",
         ":apollo_bridge_common",
+        "//cyber",
         "//modules/bridge/proto:udp_bridge_remote_info_cc_proto",
-        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
-        "//modules/common_msgs/planning_msgs:planning_cc_proto",
         "//modules/common/monitor_log",
         "//modules/common/util:common_util",
+        "//modules/common_msgs/chassis_msgs:chassis_cc_proto",
+        "//modules/common_msgs/planning_msgs:planning_cc_proto",
     ],
 )
 
@@ -99,10 +99,10 @@ apollo_component(
 apollo_component(
     name = "libudp_bridge_multi_receiver_component.so",
     srcs = [
-        "udp_bridge_multi_receiver_component.cc"
+        "udp_bridge_multi_receiver_component.cc",
     ],
     hdrs = [
-        "udp_bridge_multi_receiver_component.h"
+        "udp_bridge_multi_receiver_component.h",
     ],
     deps = [":apollo_udp_bridge"],
 )
@@ -111,16 +111,17 @@ apollo_cc_test(
     name = "udp_bridge_component_test",
     size = "small",
     srcs = ["udp_bridge_component_test.cc"],
+    linkstatic = True,
     deps = [
         ":apollo_udp_bridge",
         "@com_google_googletest//:gtest_main",
         # internal component library if you really need these component depends
         ":udp_bridge_multi_receiver_component_lib",
         ":udp_bridge_receiver_component_lib",
-        ":udp_bridge_sender_component_lib", 
+        ":udp_bridge_sender_component_lib",
     ],
-    linkstatic = True,
 )
 
 apollo_package()
+
 cpplint()

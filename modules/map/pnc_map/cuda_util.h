@@ -16,7 +16,25 @@
 
 #include <vector>
 
-#include <cublas_v2.h>
+#if GPU_PLATFORM == NVIDIA
+  #include <cuda_runtime_api.h>
+  #include <cublas_v2.h>
+#elif GPU_PLATFORM == AMD
+  #include <hip/hip_runtime.h>
+  #include <hip/hip_runtime_api.h>
+  #include <hipblas.h>
+  #define cudaError_t hipError_t
+  #define cudaFree hipFree
+  #define cudaMalloc hipMalloc
+  #define cudaMemcpy hipMemcpy
+  #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
+  #define cudaSuccess hipSuccess
+  #define CUBLAS_STATUS_SUCCESS HIPBLAS_STATUS_SUCCESS
+  #define cublasCreate hipblasCreate
+  #define cublasHandle_t hipblasHandle_t
+  #define cublasIdamin hipblasIdamin
+  #define cublasStatus_t hipblasStatus_t
+#endif
 
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"

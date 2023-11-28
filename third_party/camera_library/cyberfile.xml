@@ -4,7 +4,7 @@
   <description>
     Apollo packaged camera library.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>
@@ -16,5 +16,5 @@
   <depend expose="False">3rd-gpus</depend>
   <depend expose="False">3rd-bazel-skylib</depend>
   <src_path url="https://github.com/ApolloAuto/apollo">//third_party/camera_library</src_path>
-  
+
 </package>

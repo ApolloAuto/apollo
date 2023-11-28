@@ -1,0 +1,1 @@
+config = %{rocm_config}

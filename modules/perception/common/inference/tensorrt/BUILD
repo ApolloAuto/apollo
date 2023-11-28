@@ -1,121 +1,122 @@
-load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_package")
 load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
+load("//third_party/gpus:common.bzl", "gpu_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cuda_library(
+gpu_library(
     name = "apollo_perception_common_inference_tensorrt_plugins",
-    alwayslink = True,
     srcs = [
-        "plugins/kernels.cu",
-        "plugins/nms_cuda.cu",
+        "plugins/argmax_plugin.cu",
         "plugins/dfmb_psroi_align_plugin.cu",
+        "plugins/kernels.cu",
+        "plugins/leakyReLU_plugin.cu",
+        "plugins/nms_cuda.cu",
         "plugins/rcnn_proposal_plugin.cu",
         "plugins/rpn_proposal_ssd_plugin.cu",
         "plugins/slice_plugin.cu",
-        "plugins/argmax_plugin.cu",
         "plugins/softmax_plugin.cu",
-        "plugins/leakyReLU_plugin.cu"
     ],
     hdrs = [
-        "plugins/kernels.h",
+        "plugins/argmax_plugin.h",
         "plugins/dfmb_psroi_align_plugin.h",
+        "plugins/kernels.h",
+        "plugins/leakyReLU_plugin.h",
         "plugins/rcnn_proposal_plugin.h",
         "plugins/rpn_proposal_ssd_plugin.h",
         "plugins/slice_plugin.h",
-        "plugins/argmax_plugin.h",
         "plugins/softmax_plugin.h",
-        "plugins/leakyReLU_plugin.h",
     ],
     deps = [
+        ":apollo_perception_inference_rt_common",
+        "//cyber",
+        "//modules/perception/common/base:apollo_perception_common_base",
         "@eigen",
         "@local_config_cuda//cuda:cublas",
         "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn",
         "@local_config_tensorrt//:tensorrt",
-        "//cyber",
-        "//modules/perception/common/base:apollo_perception_common_base",
-        ":apollo_perception_inference_rt_common",
     ],
+    alwayslink = True,
 )
 
 apollo_cc_test(
     name = "slice_plugin_test",
     size = "small",
     srcs = ["plugins/slice_plugin_test.cc"],
+    linkstatic = True,
     deps = [
         ":apollo_perception_common_inference_tensorrt_plugins",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
     name = "argmax_plugin_test",
     size = "small",
     srcs = ["plugins/argmax_plugin_test.cc"],
+    linkstatic = True,
     deps = [
         ":apollo_perception_common_inference_tensorrt_plugins",
         "@com_google_googletest//:gtest_main",
         "@local_config_cuda//cuda:cublas",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_library(
     name = "apollo_perception_inference_rt_common",
+    srcs = [
+        "batch_stream.cc",
+        "entropy_calibrator.cc",
+        "rt_common.cc",
+        "rt_utils.cc",
+    ],
     hdrs = [
-        "rt_legacy.h",
-        "rt_common.h",
-        "rt_utils.h",
         "batch_stream.h",
         "entropy_calibrator.h",
-    ],
-    srcs = [
-        "rt_common.cc",
-        "batch_stream.cc",
-        "rt_utils.cc",
-        "entropy_calibrator.cc",
+        "rt_common.h",
+        "rt_legacy.h",
+        "rt_utils.h",
     ],
     deps = [
         "//cyber",
         "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/inference:inference_lib",
+        "//modules/perception/common/proto:rt_cc_proto",
+        "@com_google_absl//:absl",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn_header",
         "@local_config_tensorrt//:tensorrt",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "//modules/perception/common/inference:inference_lib",
-        "@com_google_protobuf//:protobuf",
-        "@local_config_cuda//cuda:cudart",
         "@opencv//:imgcodecs",
-        "@com_google_absl//:absl",
-        "@local_config_cuda//cuda:cuda_headers",
-    ]
+    ],
 )
 
 apollo_cc_library(
     name = "apollo_perception_inference_rt_net",
-    hdrs = [
-        "rt_net.h",
-    ],
     srcs = [
         "rt_net.cc",
     ],
+    hdrs = [
+        "rt_net.h",
+    ],
     deps = [
-        "//cyber",
-        ":apollo_perception_inference_rt_common",
         ":apollo_perception_common_inference_tensorrt_plugins",
+        ":apollo_perception_inference_rt_common",
+        "//cyber",
         "//modules/perception/common/base:apollo_perception_common_base",
+        "//modules/perception/common/inference:inference_lib",
+        "//modules/perception/common/proto:rt_cc_proto",
+        "@com_google_absl//:absl",
+        "@com_google_protobuf//:protobuf",
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cudnn_header",
         "@local_config_tensorrt//:tensorrt",
-        "//modules/perception/common/proto:rt_cc_proto",
-        "//modules/perception/common/inference:inference_lib",
-        "@com_google_protobuf//:protobuf",
-        "@local_config_cuda//cuda:cudart",
         "@opencv//:imgcodecs",
-        "@com_google_absl//:absl",
-        "@local_config_cuda//cuda:cuda_headers",
-    ]
+    ],
 )
 
 apollo_cc_test(
@@ -187,4 +188,5 @@ apollo_cc_test(
 )
 
 apollo_package()
+
 cpplint()
