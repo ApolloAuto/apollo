@@ -1,6 +1,5 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
@@ -27,6 +26,7 @@ apollo_cc_library(
     hdrs = ["inference.h"],
     deps = [
         "//modules/perception/common/base:apollo_perception_common_base",
+        "//third_party:libtorch",
         "@boost",
     ],
 )
@@ -132,7 +132,7 @@ apollo_cc_library(
         "@libtorch_gpu_rocm",
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:hipblas",
-        "@local_config_rocm//rocm:hip_headers",
+        "@local_config_rocm//rocm:rocm_headers",
         "@local_config_rocm//rocm:migraphx",
     ]),
 )

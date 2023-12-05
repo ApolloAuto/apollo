@@ -1,7 +1,6 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools/proto:proto.bzl", "apollo_py_binary")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools/platform:build_defs.bzl", "if_gpu")
 
@@ -450,7 +449,7 @@ gpu_library(
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
-        "@local_config_rocm//rocm:hip_headers",
+        "@local_config_rocm//rocm:rocm_headers",
     ]),
 )
 

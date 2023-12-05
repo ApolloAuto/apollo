@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/camera/common/image_data_operations.h"
+#include "modules/perception/common/camera/common/image_data_operations.h"
 
 #include "cyber/common/log.h"
 
 #if GPU_PLATFORM == NVIDIA
-  #include <nppi.h>
-  #include "modules/perception/camera/common/image_data_operations_npp.h"
+#include <nppi.h>
+
+#include "modules/perception/common/camera/common/image_data_operations_npp.h"
 #elif GPU_PLATFORM == AMD
-  #include <rppi.h>
-  #include "modules/perception/camera/common/image_data_operations_rpp.h"
-  #define nppImageToBlob rppImageToBlob
-  #define nppImageToGray rppImageToGray
-  #define nppImageRemap rppImageRemap
-  #define nppSwapImageChannels rppSwapImageChannels
-  #define nppDupImageChannels rppDupImageChannels
+#include <rppi.h>
+
+#include "modules/perception/common/camera/common/image_data_operations_rpp.h"
+#define nppImageToBlob rppImageToBlob
+#define nppImageToGray rppImageToGray
+#define nppImageRemap rppImageRemap
+#define nppSwapImageChannels rppSwapImageChannels
+#define nppDupImageChannels rppDupImageChannels
 #endif
 
 namespace apollo {
@@ -38,22 +40,19 @@ bool imageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob) {
   return nppImageToBlob(image, blob);
 }
 
-bool imageToGray(const base::Image8UPtr &src,
-                 const base::Image8UPtr &dst,
+bool imageToGray(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                  const int src_width, const int src_height,
                  const float coeffs[3]) {
   return nppImageToGray(src, dst, src_width, src_height, coeffs);
 }
 
-bool swapImageChannels(const base::Image8UPtr &src,
-                       const base::Image8UPtr &dst,
+bool swapImageChannels(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                        const int src_width, const int src_height,
                        const int order[3]) {
   return nppSwapImageChannels(src, dst, src_width, src_height, order);
 }
 
-bool dupImageChannels(const base::Image8UPtr &src,
-                      const base::Image8UPtr &dst,
+bool dupImageChannels(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                       const int src_width, const int src_height) {
   return nppDupImageChannels(src, dst, src_width, src_height);
 }

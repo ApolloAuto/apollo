@@ -1,4 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
+load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
@@ -6,9 +7,9 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-cc_library(
+apollo_cc_library(
     name = "perception_inference_migraphx_plugins",
-    hdrs = ["perception_inference_migraphx_plugins.h"],
+    hdrs = if_rocm(["perception_inference_migraphx_plugins.h"]),
     linkstatic = True,
     deps = [
         ":dfmb_psroi_align_plugin",
@@ -29,11 +30,12 @@ cc_library(
 
 gpu_library(
     name = "kernels_cuda",
-    srcs = [
+    mandatory = False,
+    srcs = if_rocm([
         "kernels.cu",
         "nms_cuda.cu",
-    ],
-    hdrs = ["kernels.h"],
+    ]),
+    hdrs = if_rocm(["kernels.h"]),
     deps = [
         "//modules/perception/common/base:apollo_perception_common_base",
     ] + if_cuda([
@@ -45,19 +47,20 @@ gpu_library(
     alwayslink = True,
 )
 
-cc_library(
+apollo_cc_library(
     name = "plugin",
     hdrs = ["plugin.h"],
 )
 
 gpu_library(
     name = "dfmb_psroi_align_plugin",
-    srcs = ["dfmb_psroi_align_plugin.cu"],
-    hdrs = ["dfmb_psroi_align_plugin.h"],
+    mandatory = False,
+    srcs = if_rocm(["dfmb_psroi_align_plugin.cu"]),
+    hdrs = if_rocm(["dfmb_psroi_align_plugin.h"]),
     deps = [
         ":kernels_cuda",
         ":plugin",
-        "//cyber/common:log",
+        "//cyber",
         "//modules/perception/common/inference/migraphx:mi_common",
     ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
@@ -69,8 +72,9 @@ gpu_library(
 
 gpu_library(
     name = "rcnn_proposal_plugin",
-    srcs = ["rcnn_proposal_plugin.cu"],
-    hdrs = ["rcnn_proposal_plugin.h"],
+    mandatory = False,
+    srcs = if_rocm(["rcnn_proposal_plugin.cu"]),
+    hdrs = if_rocm(["rcnn_proposal_plugin.h"]),
     deps = [
         ":kernels_cuda",
         ":plugin",
@@ -85,13 +89,14 @@ gpu_library(
 
 gpu_library(
     name = "rpn_proposal_ssd_plugin",
-    srcs = ["rpn_proposal_ssd_plugin.cu"],
-    hdrs = ["rpn_proposal_ssd_plugin.h"],
-    deps = [
+    mandatory = False,
+    srcs = if_rocm(["rpn_proposal_ssd_plugin.cu"]),
+    hdrs = if_rocm(["rpn_proposal_ssd_plugin.h"]),
+    deps = if_rocm([
         ":kernels_cuda",
         ":plugin",
         "//modules/perception/common/inference/migraphx:mi_common",
-    ] + if_cuda([
+    ]) + if_cuda([
         "@local_config_cuda//cuda:cudart",
     ]) + if_rocm([
         "@local_config_rocm//rocm:hip",
@@ -99,4 +104,5 @@ gpu_library(
     ]),
 )
 
+apollo_package()
 cpplint()

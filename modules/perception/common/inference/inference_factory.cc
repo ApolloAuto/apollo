@@ -22,11 +22,11 @@
 #include "modules/perception/common/inference/paddlepaddle/paddle_net.h"
 #include "modules/perception/common/inference/tensorrt/rt_net.h"
 #if GPU_PLATFORM == NVIDIA
-#include "modules/perception/inference/tensorrt/rt_net.h"
+#include "modules/perception/common/inference/tensorrt/rt_net.h"
 #define RTNET RTNet(proto_file, weight_file, outputs, inputs)
 #define RTNET8 RTNet(proto_file, weight_file, outputs, inputs, model_root)
 #elif GPU_PLATFORM == AMD
-#include "modules/perception/inference/migraphx/mi_net.h"
+#include "modules/perception/common/inference/migraphx/mi_net.h"
 #define RTNET MINet(proto_file, weight_file, outputs, inputs)
 // TODO(B1tway) Add quantization int8 support for RTNetInt8.
 // RTNetInt8 on MIGraphX currently works with fp32.

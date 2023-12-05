@@ -15,17 +15,17 @@ load(
     "files_exist",
     "get_bash_bin",
     "get_cpu_value",
-    "get_host_environ",
     "get_crosstool_verbose",
+    "get_host_environ",
     "get_python_bin",
+    "make_copy_dir_rule",
+    "make_copy_files_rule",
     "raw_exec",
     "realpath",
     "to_list_of_strings",
-    "which",
-    "make_copy_dir_rule",
-    "make_copy_files_rule",
-    "tpl_gpus_path",
     "tpl_gpus",
+    "tpl_gpus_path",
+    "which",
 )
 
 _GCC_HOST_COMPILER_PATH = "GCC_HOST_COMPILER_PATH"
@@ -330,6 +330,7 @@ def find_rocm_config(repository_ctx, script_path):
     exec_result = _exec_find_rocm_config(repository_ctx, script_path)
     if exec_result.return_code:
         auto_configure_fail("Failed to run find_rocm_config.py: %s" % err_out(exec_result))
+
     # Parse the dict from stdout.
     return dict([tuple(x.split(": ")) for x in exec_result.stdout.splitlines()])
 
@@ -362,7 +363,7 @@ def _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script):
         miopen_version_number = miopen_version_number,
         migraphx_version_number = migraphx_version_number,
         hipruntime_version_number = hipruntime_version_number,
-        config = config
+        config = config,
     )
 
 _DUMMY_CROSSTOOL_BZL_FILE = """
@@ -488,28 +489,32 @@ def _create_local_rocm_repository(repository_ctx):
     bash_bin = get_bash_bin(repository_ctx)
     rocm_config = _get_rocm_config(repository_ctx, bash_bin, find_rocm_config_script)
 
-    rocm_lib_srcs = [rocm_config.config["hipruntime_library_dir"] + "/" + lib_name("amdhip64"),
-                     rocm_config.config["miopen_library_dir"] + "/" + lib_name("MIOpen"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_c"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_tf"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_device"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_gpu"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_ref"),
-                     rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_onnx"),
-                     rocm_config.config["hipblas_library_dir"] + "/" + lib_name("hipblas"),
-                     rocm_config.config["rocblas_library_dir"] + "/" + lib_name("rocblas")]
-    rocm_lib_outs = ["rocm/lib/" + lib_name("amdhip64"),
-                     "rocm/lib/" + lib_name("MIOpen"),
-                     "rocm/lib/" + lib_name("migraphx"),
-                     "rocm/lib/" + lib_name("migraphx_c"),
-                     "rocm/lib/" + lib_name("migraphx_tf"),
-                     "rocm/lib/" + lib_name("migraphx_device"),
-                     "rocm/lib/" + lib_name("migraphx_gpu"),
-                     "rocm/lib/" + lib_name("migraphx_ref"),
-                     "rocm/lib/" + lib_name("migraphx_onnx"),
-                     "rocm/lib/" + lib_name("hipblas"),
-                     "rocm/lib/" + lib_name("rocblas")]
+    rocm_lib_srcs = [
+        rocm_config.config["hipruntime_library_dir"] + "/" + lib_name("amdhip64"),
+        rocm_config.config["miopen_library_dir"] + "/" + lib_name("MIOpen"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_c"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_tf"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_device"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_gpu"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_ref"),
+        rocm_config.config["migraphx_library_dir"] + "/" + lib_name("migraphx_onnx"),
+        rocm_config.config["hipblas_library_dir"] + "/" + lib_name("hipblas"),
+        rocm_config.config["rocblas_library_dir"] + "/" + lib_name("rocblas"),
+    ]
+    rocm_lib_outs = [
+        "rocm/lib/" + lib_name("amdhip64"),
+        "rocm/lib/" + lib_name("MIOpen"),
+        "rocm/lib/" + lib_name("migraphx"),
+        "rocm/lib/" + lib_name("migraphx_c"),
+        "rocm/lib/" + lib_name("migraphx_tf"),
+        "rocm/lib/" + lib_name("migraphx_device"),
+        "rocm/lib/" + lib_name("migraphx_gpu"),
+        "rocm/lib/" + lib_name("migraphx_ref"),
+        "rocm/lib/" + lib_name("migraphx_onnx"),
+        "rocm/lib/" + lib_name("hipblas"),
+        "rocm/lib/" + lib_name("rocblas"),
+    ]
     clang_offload_bundler_path = rocm_config.rocm_toolkit_path + "/llvm/bin/clang-offload-bundler"
 
     # Copy header and library files to execroot.
@@ -524,13 +529,13 @@ def _create_local_rocm_repository(repository_ctx):
         make_copy_dir_rule(
             repository_ctx,
             name = "miopen-include",
-            src_dir =  rocm_config.rocm_toolkit_path + "/miopen/include",
+            src_dir = rocm_config.rocm_toolkit_path + "/miopen/include",
             out_dir = "rocm/include/miopen",
         ),
         make_copy_dir_rule(
             repository_ctx,
             name = "migraphx-include",
-            src_dir =  rocm_config.rocm_toolkit_path + "/migraphx/include",
+            src_dir = rocm_config.rocm_toolkit_path + "/migraphx/include",
             out_dir = "rocm/include/migraphx",
         ),
         make_copy_dir_rule(
@@ -554,7 +559,7 @@ def _create_local_rocm_repository(repository_ctx):
             outs = [
                 "rocm/bin/" + "clang-offload-bundler",
             ],
-        )
+        ),
     ]
 
     repository_dict = {
@@ -570,7 +575,7 @@ def _create_local_rocm_repository(repository_ctx):
         "%{migraphx_ref_lib}": lib_name("migraphx_ref"),
         "%{migraphx_onnx_lib}": lib_name("migraphx_onnx"),
         "%{copy_rules}": "\n".join(copy_rules),
-        "%{rocm_headers}": ('":rocm-include"')
+        "%{rocm_headers}": ('":rocm-include"'),
     }
 
     # Set up BUILD file for rocm/
@@ -659,19 +664,19 @@ def _create_local_rocm_repository(repository_ctx):
     # Set up rocm_config.h, which is used by
     # tensorflow/stream_executor/dso_loader.cc.
     repository_ctx.template(
-       "rocm/rocm/rocm_config.h",
-       tpl_paths["rocm:rocm_config.h"],
-       {
-           "%{rocm_amdgpu_targets}": ",".join(
-               ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
-           ),
-           "%{rocm_toolkit_path}": rocm_config.rocm_toolkit_path,
-           "%{rocm_version_number}": rocm_config.rocm_version_number,
-           "%{miopen_version_number}": rocm_config.miopen_version_number,
-           "%{migraphx_version_number}": rocm_config.migraphx_version_number,
-           "%{hipruntime_version_number}": rocm_config.hipruntime_version_number,
-           "%{hipblas_version_number}": rocm_config.config["hipblas_version_number"],
-       },
+        "rocm/rocm/rocm_config.h",
+        tpl_paths["rocm:rocm_config.h"],
+        {
+            "%{rocm_amdgpu_targets}": ",".join(
+                ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
+            ),
+            "%{rocm_toolkit_path}": rocm_config.rocm_toolkit_path,
+            "%{rocm_version_number}": rocm_config.rocm_version_number,
+            "%{miopen_version_number}": rocm_config.miopen_version_number,
+            "%{migraphx_version_number}": rocm_config.migraphx_version_number,
+            "%{hipruntime_version_number}": rocm_config.hipruntime_version_number,
+            "%{hipblas_version_number}": rocm_config.config["hipblas_version_number"],
+        },
     )
 
     # Set up rocm_config.py, which is used by gen_build_info to provide
@@ -681,14 +686,14 @@ def _create_local_rocm_repository(repository_ctx):
         tpl_paths["rocm:rocm_config.py"],
         {
             "%{rocm_config}": str(
-            {
-                "rocm_version": rocm_config.rocm_version_number,
-                "hip_version": rocm_config.hipruntime_version_number,
-                "rocm_amdgpu_targets": ",".join(
-                    ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
-                ),
-                "cpu_compiler": str(cc),
-            }
+                {
+                    "rocm_version": rocm_config.rocm_version_number,
+                    "hip_version": rocm_config.hipruntime_version_number,
+                    "rocm_amdgpu_targets": ",".join(
+                        ["\"%s\"" % c for c in rocm_config.amdgpu_targets],
+                    ),
+                    "cpu_compiler": str(cc),
+                },
             ),
         },
     )
@@ -698,6 +703,7 @@ def _create_remote_rocm_repository(repository_ctx, remote_config_repo):
 
 def _rocm_autoconf_impl(repository_ctx):
     """Implementation of the rocm_autoconf repository rule."""
+
     if not _enable_rocm(repository_ctx):
         _create_dummy_repository(repository_ctx)
     elif get_host_environ(repository_ctx, _TF_ROCM_CONFIG_REPO) != None:

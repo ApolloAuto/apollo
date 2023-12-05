@@ -21,12 +21,12 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/perception/common/util.h"
 #include "modules/perception/common/base/object_pool_types.h"
 #include "modules/perception/common/inference/inference_factory.h"
 #include "modules/perception/common/inference/model_util.h"
 #include "modules/perception/common/lidar/common/lidar_point_label.h"
 #include "modules/perception/common/lidar/common/lidar_timer.h"
+#include "modules/perception/common/util.h"
 #include "modules/perception/lidar_detection/detector/cnn_segmentation/util.h"
 
 namespace apollo {
@@ -52,7 +52,7 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   min_height_ = feature_param.min_height();
   max_height_ = feature_param.max_height();
 
-  const auto &model_info = model_param_.info();
+  const auto& model_info = model_param_.info();
   std::string model_path = GetModelPath(model_info.name());
   std::string proto_file =
       GetModelFile(model_path, model_info.proto_file().file());
@@ -66,13 +66,14 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
       inference::GetBlobNames(model_info.outputs());
 
   inference_.reset(inference::CreateInferenceByName(
-    model_param_.info().framework(), proto_file, weight_file,
-    output_names, input_names));
+      model_param_.info().framework(), proto_file, weight_file, output_names,
+      input_names));
   CHECK_NOTNULL(inference_.get());
 
-  gpu_id_ = model_param_.preprocess().has_gpu_id() ?
-    model_param_.preprocess().gpu_id() : -1;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
+  gpu_id_ = model_param_.preprocess().has_gpu_id()
+                ? model_param_.preprocess().gpu_id()
+                : -1;
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
   inference_->set_gpu_id(gpu_id_);  // inference sets CPU mode when -1
 
   std::map<std::string, std::vector<int>> input_shapes;
@@ -91,8 +92,7 @@ bool CNNSegmentation::Init(const LidarDetectorInitOptions& options) {
   CHECK_NOTNULL(instance_pt_blob_.get());
   category_pt_blob_ = inference_->get_blob(output_names.at(1));
   CHECK_NOTNULL(category_pt_blob_.get());
-  confidence_pt_blob_ =
-      inference_->get_blob(output_names.at(2));
+  confidence_pt_blob_ = inference_->get_blob(output_names.at(2));
   CHECK_NOTNULL(confidence_pt_blob_.get());
   height_pt_blob_ = inference_->get_blob(output_names.at(3));
   CHECK_NOTNULL(height_pt_blob_.get());

@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/base/blob.h"
-#include "modules/perception/base/image.h"
+#include "modules/perception/common/base/blob.h"
+#include "modules/perception/common/base/image.h"
 
 namespace apollo {
 namespace perception {
@@ -24,24 +24,20 @@ namespace camera {
 
 bool imageToBlob(const base::Image8U &image, base::Blob<uint8_t> *blob);
 
-bool imageToGray(const base::Image8UPtr &src,
-                 const base::Image8UPtr &dst,
+bool imageToGray(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                  const int src_width, const int src_height,
                  const float coeffs[3]);
 
-bool swapImageChannels(const base::Image8UPtr &src,
-                       const base::Image8UPtr &dst,
+bool swapImageChannels(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                        const int src_width, const int src_height,
                        const int order[3]);
 
-bool dupImageChannels(const base::Image8UPtr &src,
-                      const base::Image8UPtr &dst,
+bool dupImageChannels(const base::Image8UPtr &src, const base::Image8UPtr &dst,
                       const int src_width, const int src_height);
 
 bool imageRemap(const base::Image8U &src_img, base::Image8U *dst_img,
                 const int src_width, const int src_height,
-                const base::Blob<float> &map_x,
-                const base::Blob<float> &map_y);
+                const base::Blob<float> &map_x, const base::Blob<float> &map_y);
 
 }  // namespace camera
 }  // namespace perception

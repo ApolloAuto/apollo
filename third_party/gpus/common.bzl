@@ -75,3 +75,6 @@ def gpu_library(mandatory = True, copts = [], **kwargs):
         )
     else:
         cc_library(copts = gpu_default_copts() + copts, **kwargs)
+
+def cuda_library(**kwargs):
+    gpu_library(**kwargs)

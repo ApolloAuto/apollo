@@ -17,12 +17,11 @@
 
 #include <vector>
 
-#include "modules/perception/camera/common/image_data_operations.h"
-
 #include "Eigen/Dense"
 
 #include "cyber/common/log.h"
 #include "modules/perception/common/algorithm/sensor_manager/sensor_manager.h"
+#include "modules/perception/common/camera/common/image_data_operations.h"
 
 namespace apollo {
 namespace perception {

@@ -16,7 +16,7 @@
 #include "modules/perception/common/camera/common/data_provider.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/camera/common/image_data_operations.h"
+#include "modules/perception/common/camera/common/image_data_operations.h"
 
 namespace apollo {
 namespace perception {

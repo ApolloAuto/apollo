@@ -19,15 +19,15 @@
 #include <NvInferVersion.h>
 
 #ifdef NV_TENSORRT_MAJOR
-    #if NV_TENSORRT_MAJOR == 8
-    #include "modules/perception/common/inference/tensorrt/rt_legacy.h"
-    #endif
+#if NV_TENSORRT_MAJOR == 8
+#include "modules/perception/common/inference/tensorrt/rt_legacy.h"
+#endif
 #endif
 
 #include <algorithm>
 #include <fstream>
 
-#include "modules/perception/base/common.h"
+#include "modules/perception/common/base/common.h"
 
 namespace nvinfer1 {
 Int8EntropyCalibrator::Int8EntropyCalibrator(
@@ -59,7 +59,7 @@ bool Int8EntropyCalibrator::getBatch(void *bindings[], const char *names[],
 }
 
 const void *Int8EntropyCalibrator::readCalibrationCache(
-  size_t &length) noexcept {
+    size_t &length) noexcept {
   calibration_cache_.clear();
   std::ifstream input(
       apollo::perception::inference::locateFile(network_, "CalibrationTable"),

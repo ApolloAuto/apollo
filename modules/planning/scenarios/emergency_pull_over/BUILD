@@ -1,14 +1,15 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
+
 PLANNING_COPTS = ["-DMODULE_NAME=\\\"planning\\\""]
 
 filegroup(
     name = "runtime_files",
     srcs = glob([
         "conf/**",
-    ])
+    ]),
 )
 
 apollo_plugin(
@@ -25,8 +26,8 @@ apollo_plugin(
         "stage_slow_down.h",
         "stage_standby.h",
     ],
-    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
@@ -43,10 +44,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["emergency_pull_over_scenario_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":emergency_pull_over_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    linkstatic = True,
+    ],
 )
 
 apollo_cc_test(
@@ -54,10 +56,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["stage_slow_down_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":emergency_pull_over_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    linkstatic = True,
+    ],
 )
 
 apollo_cc_test(
@@ -65,10 +68,11 @@ apollo_cc_test(
     size = "small",
     srcs = ["stage_approach_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":emergency_pull_over_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    linkstatic = True,
+    ],
 )
 
 apollo_cc_test(
@@ -76,11 +80,13 @@ apollo_cc_test(
     size = "small",
     srcs = ["stage_standby_test.cc"],
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":emergency_pull_over_scenario_lib",
         "@com_google_googletest//:gtest_main",
-    linkstatic = True,
+    ],
 )
 
 apollo_package()
+
 cpplint()

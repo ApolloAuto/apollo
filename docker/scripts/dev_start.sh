@@ -45,6 +45,7 @@ FAST_MODE="no"
 GEOLOC=
 TIMEZONE_CN=(
   "Time zone: Asia/Shanghai (CST, +0800)"
+  "+0800"
 )
 
 USE_LOCAL_IMAGE=0
@@ -291,7 +292,8 @@ function check_target_arch() {
 
 function check_timezone_cn() {
   # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time_zone=$(timedatectl | grep "Time zone" | xargs)
+  # time_zone=$(timedatectl | grep "Time zone" | xargs)
+  time_zone=$(date +"%z")
 
   for tz in "${TIMEZONE_CN[@]}"; do
     if [[ "${time_zone}" == "${tz}" ]]; then
@@ -510,7 +512,7 @@ function main() {
       "Try \"sudo apt install python3-pip\" "
   else
     info "Installing python tools ..."
-    install_python_tools
+    # install_python_tools
 
     info "Installing perception models ..."
     install_perception_models

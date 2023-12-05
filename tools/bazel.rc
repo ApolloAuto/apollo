@@ -25,6 +25,8 @@ build --show_timestamps
 
 # Work around the sandbox issue.
 build --spawn_strategy=sandboxed
+build --experimental_reuse_sandbox_directories
+build --experimental_sandbox_async_tree_delete_idle_threads=auto
 
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"

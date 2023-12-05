@@ -4,7 +4,7 @@ load("@rules_proto//proto:defs.bzl", external_proto_library = "proto_library", "
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
 
-package_path = "@@PACKAGE"
+package_path = "@@REPLACE@@"
 
 def apollo_py_library(**kwargs):
     if "deps" not in kwargs:

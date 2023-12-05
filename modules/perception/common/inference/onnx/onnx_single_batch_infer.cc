@@ -113,8 +113,8 @@ bool SingleBatchInference::LoadCache(const std::string& path) {
 
 bool SingleBatchInference::Init(
     const std::map<std::string, std::vector<int>>& shapes) {
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
 
   // create a TensorRT model from the onnx model and load it into an engine
   OnnxToTRTModel(model_file_);
@@ -241,8 +241,8 @@ void SingleBatchInference::init_blob(std::vector<std::string>* names) {
 }
 
 void SingleBatchInference::Infer() {
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamSynchronize(stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamSynchronize(stream_));
 
   for (auto name : input_names_) {
     auto blob = get_blob(name);

@@ -1,4 +1,3 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package")
 load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
