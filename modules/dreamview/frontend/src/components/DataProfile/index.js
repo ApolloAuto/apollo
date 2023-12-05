@@ -292,9 +292,6 @@ export default class DataProfile extends React.Component {
                     className={currentKey === tab.key ? 'active' : ''}
                     onClick={() => {
                       this.setState({ currentKey: tab.key });
-                      if (tab.key === 'recordProfiles') {
-                        WS.checkWsConnection().loadLocalRecords();
-                      }
                     }}
                   >{tab.title}</span>
                 );
