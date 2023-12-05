@@ -6,10 +6,10 @@ cc_library(
     name = "libtorch",
     deps = select({
         "//tools/platform:use_nvidia_gpu": [
-            "@libtorch_gpu_cuda",
+            "@libtorch_gpu",
         ],
         "//tools/platform:use_amd_gpu": [
-            "@libtorch_gpu_rocm",
+            "@libtorch_gpu",
         ],
         "//conditions:default": [
             "@libtorch_cpu",

@@ -206,7 +206,7 @@ apollo_cc_library(
         "@opencv//:highgui",
         "@opencv//:imgcodecs",
     ] + if_gpu(
-        ["@libtorch_gpu_cuda"],
+        ["@libtorch_gpu"],
         ["@libtorch_cpu"],
     ),
 )

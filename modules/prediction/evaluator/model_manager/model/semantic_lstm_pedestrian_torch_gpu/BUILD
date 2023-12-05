@@ -24,7 +24,7 @@ apollo_plugin(
         "//modules/prediction/proto:prediction_conf_cc_proto",
     ] + if_gpu(
         [
-            "@libtorch_gpu_cuda",
+            "@libtorch_gpu",
         ],
         ["@libtorch_cpu"],
     ),

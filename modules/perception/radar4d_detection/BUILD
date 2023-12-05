@@ -208,11 +208,8 @@ apollo_cc_library(
         "@local_config_cuda//cuda:cudart",
         "@local_config_pcl//:pcl",
         "@local_config_tensorrt//:tensorrt",
-    ] + if_cuda([
-        "@libtorch_gpu_cuda",
-    ]) + if_rocm([
-        "@libtorch_gpu_rocm",
-    ]),
+        "@libtorch_gpu",
+    ],
 )
 
 apollo_component(

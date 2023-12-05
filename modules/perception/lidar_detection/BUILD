@@ -189,6 +189,7 @@ apollo_cc_library(
         "@com_google_googletest//:gtest",
         "@eigen",
         "@local_config_pcl//:pcl",
+        "@libtorch_gpu",
     ] + select({
         "@platforms//cpu:x86_64": ["@centerpoint_infer_op-x86_64//:centerpoint_infer_op"],
         "@platforms//cpu:aarch64": ["@centerpoint_infer_op-aarch64//:centerpoint_infer_op"],
@@ -196,11 +197,9 @@ apollo_cc_library(
         "@platforms//cpu:x86_64": ["@paddleinference-x86_64//:paddleinference_lib"],
         "@platforms//cpu:aarch64": ["@paddleinference-aarch64//:paddleinference_lib"],
     }) + if_cuda([
-        "@libtorch_gpu_cuda",
         "@local_config_cuda//cuda:cudart",
         "@local_config_tensorrt//:tensorrt",
     ]) + if_rocm([
-        "@libtorch_gpu_rocm",
         "@local_config_rocm//rocm:hip",
         "@local_config_rocm//rocm:migraphx",
     ]),

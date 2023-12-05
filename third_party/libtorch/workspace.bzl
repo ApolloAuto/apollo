@@ -14,12 +14,15 @@ def repo_cpu():
 
 def repo_gpu():
     native.new_local_repository(
-        name = "libtorch_gpu_rocm",
-        build_file = clean_dep("//third_party/libtorch:libtorch_gpu_rocm.BUILD"),
+        name = "libtorch_gpu",
+        build_file = select({
+            "@local_config_rocm//rocm:using_hipcc": clean_dep("//third_party/libtorch:libtorch_gpu_rocm.BUILD"),
+            "//conditions:default": clean_dep("//third_party/libtorch:libtorch_gpu_cuda.BUILD"),
+        })
         path = "/usr/local/libtorch_gpu/include",
     )
-    native.new_local_repository(
-        name = "libtorch_gpu_cuda",
-        build_file = clean_dep("//third_party/libtorch:libtorch_gpu_cuda.BUILD"),
-        path = "/usr/local/libtorch_gpu/include",
-    )
+    # native.new_local_repository(
+    #     name = "libtorch_gpu_cuda",
+    #     build_file = 
+    #     path = "/usr/local/libtorch_gpu/include",
+    # )

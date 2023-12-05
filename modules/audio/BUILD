@@ -33,11 +33,7 @@ apollo_cc_library(
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@eigen",
         "@fftw3",
-    ] + if_cuda([
-        "@libtorch_gpu_cuda",
-    ]) + if_rocm([
-        "@libtorch_gpu_rocm",
-    ]),
+    ] + ["@libtorch_gpu"],
 )
 
 apollo_component(
