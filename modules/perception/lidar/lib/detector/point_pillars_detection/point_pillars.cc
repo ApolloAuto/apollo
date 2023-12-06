@@ -470,6 +470,7 @@ void PointPillars::InitTRT() {
   OnnxToTRTModel(rpn_onnx_file_, &rpn_engine_);
   if (pfe_engine_ == nullptr || rpn_engine_ == nullptr) {
     AERROR << "Failed to load ONNX file.";
+    return;
   }
 
   // create execution context from the engine

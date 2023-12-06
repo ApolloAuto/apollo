@@ -250,6 +250,10 @@ bool CameraBevDetectionComponent::Proc(
   std::shared_ptr<apollo::perception::PerceptionObstacles> out_message(
       new (std::nothrow) apollo::perception::PerceptionObstacles);
   apollo::common::ErrorCode error_code = apollo::common::OK;
+  if (cambackmsg == nullptr) {
+    AERROR << "camera_back msg is not ready!";
+    return false;
+  }
   const double msg_timestamp =
       cambackmsg->measurement_time() + timestamp_offset_;
 
@@ -313,10 +317,6 @@ bool CameraBevDetectionComponent::Proc(
   pipeline::DataFrame data_frame_cambr;
   data_frame_cambr.camera_frame = &cambr_frame;
 
-  if (cambackmsg == nullptr) {
-    AERROR << "camera_back msg is not ready!";
-    return false;
-  }
   camera::CameraFrame &camb_frame = camera_frames_[5];
   const std::string &camb_name = camera_names_[5];
   FillCamMessage(cambackmsg, camb_name, &camb_frame);

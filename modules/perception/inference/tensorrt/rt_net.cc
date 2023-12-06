@@ -129,37 +129,37 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
     convLayer->setDilation(nvinfer1::DimsHW{dilationH, dilationW});
 
     convLayer->setNbGroups(G);
-  }
 
-  if ((*weight_map)[layer_param.name().c_str()].size() > 0) {
-    convLayer->setKernelWeights((*weight_map)[layer_param.name().c_str()][0]);
+    if ((*weight_map)[layer_param.name().c_str()].size() > 0) {
+      convLayer->setKernelWeights((*weight_map)[layer_param.name().c_str()][0]);
 
-    if ((*weight_map)[layer_param.name().c_str()].size() > 1) {
-      convLayer->setBiasWeights((*weight_map)[layer_param.name().c_str()][1]);
+      if ((*weight_map)[layer_param.name().c_str()].size() > 1) {
+        convLayer->setBiasWeights((*weight_map)[layer_param.name().c_str()][1]);
+      }
     }
-  }
-  std::vector<nvinfer1::Weights> lw;
-  lw.resize(2);
-  lw[0] = convLayer->getKernelWeights();
-  lw[1] = convLayer->getBiasWeights();
-  (*weight_map)[layer_param.name().c_str()] = lw;
+    std::vector<nvinfer1::Weights> lw;
+    lw.resize(2);
+    lw[0] = convLayer->getKernelWeights();
+    lw[1] = convLayer->getBiasWeights();
+    (*weight_map)[layer_param.name().c_str()] = lw;
 
-  convLayer->setName(layer_param.name().c_str());
-  ConstructMap(layer_param, convLayer, tensor_map, tensor_modify_map);
+    convLayer->setName(layer_param.name().c_str());
+    ConstructMap(layer_param, convLayer, tensor_map, tensor_modify_map);
 
 #if LOAD_DEBUG
-  auto tmp_out_dims = convLayer->getOutput(0)->getDimensions();
-  std::string dim_string = "input: ";
-  for (int i = 0; i < 3; ++i) {
-    absl::StrAppend(&dim_string, " ",
-                    convLayer->getInput(0)->getDimensions().d[i]);
-  }
-  absl::StrAppend(&dim_string, " | output: ");
-  for (int i = 0; i < 3; ++i) {
-    absl::StrAppend(&dim_string, " ", tmp_out_dims.d[i]);
-  }
-  AINFO << layer_param.name() << dim_string;
+    auto tmp_out_dims = convLayer->getOutput(0)->getDimensions();
+    std::string dim_string = "input: ";
+    for (int i = 0; i < 3; ++i) {
+      absl::StrAppend(&dim_string, " ",
+                      convLayer->getInput(0)->getDimensions().d[i]);
+    }
+    absl::StrAppend(&dim_string, " | output: ");
+    for (int i = 0; i < 3; ++i) {
+      absl::StrAppend(&dim_string, " ", tmp_out_dims.d[i]);
+    }
+    AINFO << layer_param.name() << dim_string;
 #endif
+  }
 }
 
 void RTNet::addDeconvLayer(const LayerParameter &layer_param,

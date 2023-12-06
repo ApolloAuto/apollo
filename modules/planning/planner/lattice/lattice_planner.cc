@@ -299,6 +299,7 @@ Status LatticePlanner::PlanOnReferenceLine(
         std::dynamic_pointer_cast<LatticeTrajectory1d>(trajectory_pair.first);
     if (!lattice_traj_ptr) {
       ADEBUG << "Dynamically casting trajectory1d ptr. failed.";
+      return Status(ErrorCode::PLANNING_ERROR, "Failed to cast trajectory");
     }
 
     if (lattice_traj_ptr->has_target_position()) {

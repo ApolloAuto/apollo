@@ -460,6 +460,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
               MonitorMessageItem::INFO, "Successfully add a routing.");
           if (!default_routing_) {
             AERROR << "Failed to add a routing" << std::endl;
+            return;
           }
           Json response = JsonUtil::ProtoToTypedJson("AddDefaultRoutingPath",
                                                      *default_routing_);

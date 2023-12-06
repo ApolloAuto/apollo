@@ -58,6 +58,7 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
                  const std::string& dump_dir = "/tmp") {
   if (!msg) {
     AWARN << "Message to be dumped is nullptr!";
+    return false;
   }
 
   auto type_name = T::descriptor()->full_name();

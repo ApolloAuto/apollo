@@ -1208,12 +1208,12 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
 bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
                                          std::array<Vec2d, 4> *vertices,
                                          Path *nearby_path) {
-  const auto &routing_request = frame->local_view().routing->routing_request();
-  auto plot_type = routing_request.parking_info().parking_space_type();
   if (frame == nullptr) {
     AERROR << "Invalid frame, fail to GetParkingSpotFromMap from frame. ";
     return false;
   }
+  const auto &routing_request = frame->local_view().routing->routing_request();
+  auto plot_type = routing_request.parking_info().parking_space_type();
 
   LaneInfoConstPtr nearest_lane;
   // Check if last frame lane is available
