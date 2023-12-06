@@ -26,7 +26,7 @@ apollo_cc_library(
     hdrs = ["inference.h"],
     deps = [
         "//modules/perception/common/base:apollo_perception_common_base",
-        "//third_party:libtorch",
+        "@libtorch_gpu",
         "@boost",
     ],
 )

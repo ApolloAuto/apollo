@@ -18,7 +18,7 @@ def repo_gpu():
         build_file = select({
             "@local_config_rocm//rocm:using_hipcc": clean_dep("//third_party/libtorch:libtorch_gpu_rocm.BUILD"),
             "//conditions:default": clean_dep("//third_party/libtorch:libtorch_gpu_cuda.BUILD"),
-        })
+        }),
         path = "/usr/local/libtorch_gpu/include",
     )
     # native.new_local_repository(

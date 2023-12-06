@@ -20,7 +20,6 @@
 #include "modules/perception/common/inference/onnx/libtorch_obstacle_detector.h"
 #include "modules/perception/common/inference/onnx/onnx_single_batch_infer.h"
 #include "modules/perception/common/inference/paddlepaddle/paddle_net.h"
-#include "modules/perception/common/inference/tensorrt/rt_net.h"
 #if GPU_PLATFORM == NVIDIA
 #include "modules/perception/common/inference/tensorrt/rt_net.h"
 #define RTNET RTNet(proto_file, weight_file, outputs, inputs)
