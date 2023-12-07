@@ -224,7 +224,7 @@ Ads338e* Ads338e::set_rfoglampon(Ads3_38e::RfoglamponType rfoglampon) {
   return this;
 }
 
-// config detail: {'description': 'Open the rear fog ligh', 'enum': {0:
+// config detail: {'description': 'Open the rear fog light', 'enum': {0:
 // 'RFOGLAMPON_TURN_OFF', 1: 'RFOGLAMPON_TURN_ON'}, 'precision': 1.0, 'len': 1,
 // 'name': 'RFogLampON', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',

@@ -178,7 +178,7 @@ class Status310 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'Driver Steering Interference Detected
   // Validity', 'enum': {0: 'EPS_INTERFERDETDVALID_INVALID',
   // 1: 'EPS_INTERFERDETDVALID_VALID'}, 'precision': 1.0, 'len': 1, 'name':
-  // 'EPS_InterferDetdValid', 'is_signed_var': False, 'offset': 0.0,
+  // 'EPS_InterfereDetdValid', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 38, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Status_310::Eps_interferdetdvalidType eps_interferdetdvalid(

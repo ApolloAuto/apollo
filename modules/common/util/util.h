@@ -86,7 +86,7 @@ void uniform_slice(const T start, const T end, uint32_t num,
 }
 
 /**
- * calculate the distance beteween Point u and Point v, which are all have
+ * calculate the distance between Point u and Point v, which are all have
  * member function x() and y() in XY dimension.
  * @param u one point that has member function x() and y().
  * @param b one point that has member function x() and y().

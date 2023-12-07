@@ -46,7 +46,7 @@ message ParkingInfo {
 message DeadEndInfo {
   // dead end in/out routing
   optional DeadEndRoutingType dead_end_routing_type = 1;
-  // traget point from the out routing's start point
+  // target point from the out routing's start point
   optional apollo.common.PointENU target_point = 2;
 }
 

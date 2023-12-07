@@ -33,7 +33,7 @@ namespace control {
 /**
  * @class PIDController
  * @brief A proportional-integral-derivative controller for speed and steering
- using defualt integral hold
+ using default integral hold
  */
 class PIDController {
  public:

@@ -74,7 +74,7 @@ enum GnssPositionType {
   SINGLE = 16;           // Single point position
   PSRDIFF = 17;          // Pseudorange differential solution
   WAAS = 18;             // Solution calculated using corrections from an SBAS
-  PROPOGATED = 19;  // Propagated by a Kalman filter without new observations
+  PROPAGATED = 19;  // Propagated by a Kalman filter without new observations
   OMNISTAR = 20;    // OmniSTAR VBS position
   L1_FLOAT = 32;    // Floating L1 albiguity solution
   IONOFREE_FLOAT = 33;  // Floating ionospheric free ambiguity solution
