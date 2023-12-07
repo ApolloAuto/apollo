@@ -923,6 +923,11 @@ bool ReedShepp::SetRSP(const int size, const double* lengths, const char* types,
 bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
     const std::shared_ptr<Node3d> end_node, ReedSheppPath* shortest_path) {
+  for (size_t i = 0; i < shortest_path->segs_lengths.size(); ++i) {
+    if (shortest_path->segs_lengths.at(i) == 0) {
+      shortest_path->segs_lengths.at(i) = 0.0001;
+    }
+  }
   double step_scaled =
       planner_open_space_config_.warm_start_config().step_size() * max_kappa_;
 
