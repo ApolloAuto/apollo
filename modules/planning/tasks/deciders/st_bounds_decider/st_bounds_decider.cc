@@ -411,6 +411,7 @@ void STBoundsDecider::RecordSTGraphDebug(
     return;
   }
 
+  st_graph_debug->set_name(Name());
   // Plot ST-obstacle boundaries.
   for (const auto& boundary : st_graph_data) {
     auto boundary_debug = st_graph_debug->add_boundary();

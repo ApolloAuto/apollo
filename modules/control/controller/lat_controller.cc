@@ -99,7 +99,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
 
   ts_ = control_conf->lat_controller_conf().ts();
   if (ts_ <= 0.0) {
-    AERROR << "[MPCController] Invalid control update interval.";
+    AERROR << "[LatController] Invalid control update interval.";
     return false;
   }
   cf_ = control_conf->lat_controller_conf().cf();
