@@ -18,16 +18,17 @@
 #include <NvInferVersion.h>
 
 #ifdef NV_TENSORRT_MAJOR
-    #if NV_TENSORRT_MAJOR == 8
-    #include "modules/perception/common/inference/tensorrt/rt_legacy.h"
-    #endif
+#if NV_TENSORRT_MAJOR == 8
+#include "modules/perception/common/inference/tensorrt/rt_legacy.h"
+#endif
 #endif
 
 #include <string>
 #include <vector>
 
-#include "modules/perception/common/inference/inference.h"
 #include "modules/perception/common/proto/model_info.pb.h"
+
+#include "modules/perception/common/inference/inference.h"
 
 namespace apollo {
 namespace perception {

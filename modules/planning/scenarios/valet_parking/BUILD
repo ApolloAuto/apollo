@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,7 +7,7 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "conf/**",
-    ])
+    ]),
 )
 
 apollo_plugin(
@@ -22,8 +22,8 @@ apollo_plugin(
         "stage_parking.h",
         "valet_parking_scenario.h",
     ],
-    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/common_msgs/planning_msgs:planning_cc_proto",
@@ -36,40 +36,38 @@ apollo_cc_test(
     name = "valet_parking_scenario_test",
     size = "small",
     srcs = ["valet_parking_scenario_test.cc"],
-    
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":valet_parking_scenario_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
     name = "stage_approaching_parking_spot_test",
     size = "small",
     srcs = ["stage_approaching_parking_spot_test.cc"],
-    
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":valet_parking_scenario_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
     name = "stage_parking_test",
     size = "small",
     srcs = ["stage_parking_test.cc"],
-    
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":valet_parking_scenario_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_package()
+
 cpplint()

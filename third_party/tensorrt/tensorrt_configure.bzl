@@ -10,10 +10,10 @@ load(
     "//third_party/gpus:cuda_configure.bzl",
     "find_cuda_config",
     "lib_name",
-    "make_copy_files_rule",
 )
 load(
     "//tools/platform:common.bzl",
+    "make_copy_files_rule",
     "config_repo_label",
     "get_cpu_value",
     "get_host_environ",

@@ -2,10 +2,10 @@
   <name>dreamview</name>
   <version>local</version>
   <description>
-    Dreamview or Apollo's HMI module provides a web application that helps developers visualize the output of 
+    Dreamview or Apollo's HMI module provides a web application that helps developers visualize the output of
     other relevant autonomous driving modules, e.g. the vehicle's planning trajectory, car localization, chassis status etc.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

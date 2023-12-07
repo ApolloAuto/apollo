@@ -16,7 +16,24 @@
 
 #pragma once
 
-#include <cuda_runtime.h>
+#if GPU_PLATFORM == NVIDIA
+  #include <cuda_runtime.h>
+#elif GPU_PLATFORM == AMD
+  #include <hip/hip_runtime.h>
+  #define cudaDeviceProp hipDeviceProp_t
+  #define cudaDeviceReset hipDeviceReset
+  #define cudaDeviceSynchronize hipDeviceSynchronize
+  #define cudaError_t hipError_t
+  #define cudaFree hipFree
+  #define cudaGetDeviceProperties hipGetDeviceProperties
+  #define cudaGetErrorString hipGetErrorString
+  #define cudaMalloc hipMalloc
+  #define cudaMemcpy hipMemcpy
+  #define cudaMemcpyDeviceToHost hipMemcpyDeviceToHost
+  #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
+  #define cudaSetDevice hipSetDevice
+  #define cudaSuccess hipSuccess
+#endif
 
 namespace apollo {
 namespace planning {

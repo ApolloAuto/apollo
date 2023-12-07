@@ -1,5 +1,5 @@
 load("//tools/platform:build_defs.bzl", "copts_if_teleop")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_cc_binary")
+load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_package")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])

@@ -1,6 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 
 package(
     default_visibility = ["//visibility:public"],
@@ -54,6 +53,7 @@ apollo_cc_library(
         "relative_map/navigation_lane.h",
         "relative_map/relative_map.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -86,7 +86,6 @@ apollo_cc_library(
         "@proj",
         "@tinyxml2",
     ],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
 )
 
 filegroup(
@@ -231,8 +230,8 @@ filegroup(
 
 apollo_component(
     name = "librelative_map_component.so",
-    srcs = ["relative_map/relative_map_component.cc",],
-    hdrs = ["relative_map/relative_map_component.h",],
+    srcs = ["relative_map/relative_map_component.cc"],
+    hdrs = ["relative_map/relative_map_component.h"],
     deps = [":apollo_map"],
 )
 

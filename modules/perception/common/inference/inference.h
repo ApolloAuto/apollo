@@ -24,6 +24,14 @@
 #include "cyber/plugin_manager/plugin_manager.h"
 #include "modules/perception/common/base/blob.h"
 
+#if GPU_PLATFORM == NVIDIA
+  #include <c10/cuda/CUDACachingAllocator.h>
+  using c10::cuda::CUDACachingAllocator::emptyCache;
+#elif GPU_PLATFORM == AMD
+  #include <c10/hip/HIPCachingAllocator.h>
+  using c10::hip::HIPCachingAllocator::emptyCache;
+#endif
+
 namespace apollo {
 namespace perception {
 namespace inference {

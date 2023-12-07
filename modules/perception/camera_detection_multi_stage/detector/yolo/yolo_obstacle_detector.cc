@@ -151,8 +151,8 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   options_ = options;
 
   gpu_id_ = options.gpu_id;
-  BASE_CUDA_CHECK(cudaSetDevice(gpu_id_));
-  BASE_CUDA_CHECK(cudaStreamCreate(&stream_));
+  BASE_GPU_CHECK(cudaSetDevice(gpu_id_));
+  BASE_GPU_CHECK(cudaStreamCreate(&stream_));
 
   std::string config_file =
       GetConfigFile(options.config_path, options.config_file);

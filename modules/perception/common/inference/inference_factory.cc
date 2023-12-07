@@ -20,7 +20,17 @@
 #include "modules/perception/common/inference/onnx/libtorch_obstacle_detector.h"
 #include "modules/perception/common/inference/onnx/onnx_single_batch_infer.h"
 #include "modules/perception/common/inference/paddlepaddle/paddle_net.h"
+#if GPU_PLATFORM == NVIDIA
 #include "modules/perception/common/inference/tensorrt/rt_net.h"
+#define RTNET RTNet(proto_file, weight_file, outputs, inputs)
+#define RTNET8 RTNet(proto_file, weight_file, outputs, inputs, model_root)
+#elif GPU_PLATFORM == AMD
+#include "modules/perception/common/inference/migraphx/mi_net.h"
+#define RTNET MINet(proto_file, weight_file, outputs, inputs)
+// TODO(B1tway) Add quantization int8 support for RTNetInt8.
+// RTNetInt8 on MIGraphX currently works with fp32.
+#define RTNET8 RTNET
+#endif
 
 namespace apollo {
 namespace perception {
@@ -33,9 +43,9 @@ Inference *CreateInferenceByName(const std::string &frame_work,
                                  const std::vector<std::string> &inputs,
                                  const std::string &model_root) {
   if (frame_work == "RTNet") {
-    return new RTNet(proto_file, weight_file, outputs, inputs);
+    return new RTNET;
   } else if (frame_work == "RTNetInt8") {
-    return new RTNet(proto_file, weight_file, outputs, inputs, model_root);
+    return new RTNET8;
   } else if (frame_work == "TorchNet") {
     // PyTorch just have model file, we use proto_file as model file
     return new TorchNet(proto_file, outputs, inputs);
@@ -57,9 +67,10 @@ Inference *CreateInferenceByName(const common::Framework &frame_work,
                                  const std::string &model_root) {
   switch (frame_work) {
     case common::TensorRT:
-      if (model_root.empty())
-        return new RTNet(proto_file, weight_file, outputs, inputs);
-      return new RTNet(proto_file, weight_file, outputs, inputs, model_root);
+      if (model_root.empty()) {
+        return new RTNET;
+      }
+      return new RTNET8;
     case common::PyTorch:
       return new TorchNet(proto_file, outputs, inputs);
     case common::PaddlePaddle:

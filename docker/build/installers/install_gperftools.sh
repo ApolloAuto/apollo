@@ -37,7 +37,7 @@ download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 tar xzf ${PKG_NAME}
 
 pushd "gperftools-gperftools-${VERSION}" >/dev/null
-    ./autogen.sh
+    ./autogen.sh || sleep 1 && ./autogen.sh
     ./configure --prefix=/usr
     # shared lib only options: --enable-static=no --with-pic=yes
     make -j$(nproc)

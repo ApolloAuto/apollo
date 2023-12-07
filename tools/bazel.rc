@@ -24,7 +24,9 @@ common --color=yes
 build --show_timestamps
 
 # Work around the sandbox issue.
-build --spawn_strategy=standalone
+build --spawn_strategy=sandboxed
+build --experimental_reuse_sandbox_directories
+build --experimental_sandbox_async_tree_delete_idle_threads=auto
 
 # Enable colorful output of GCC
 build --cxxopt="-fdiagnostics-color=always"
@@ -46,6 +48,10 @@ build --define=LIBDIR=$(PREFIX)/lib
 build --define=INCLUDEDIR=$(PREFIX)/include
 build --define=use_fast_cpp_protos=true
 
+# GPU_PLATFORM predefined types
+build --define NVIDIA=0
+build --define AMD=1
+
 # dbg config, as a shorthand for '--config=optimize -c dbg'
 build:dbg -c dbg
 build:opt -c opt
@@ -57,8 +63,20 @@ build:opt -c opt
 
 # Now "cpu" configuration was dummy
 build:cpu --verbose_failures
-build:gpu --define USE_GPU=true
-build:gpu --cxxopt="-DUSE_GPU=1"
+# alias gpu to nvidia
+build:gpu --config=nvidia
+
+# GPU platform
+build:amd --define GPU_PLATFORM=AMD
+build:amd --cxxopt="-DGPU_PLATFORM=AMD"
+build:amd --define USE_GPU=true
+build:amd --cxxopt="-DUSE_GPU=1"
+build:amd --cxxopt="-DAMD=1"
+build:nvidia --define GPU_PLATFORM=NVIDIA
+build:nvidia --cxxopt="-DGPU_PLATFORM=NVIDIA"
+build:nvidia --define USE_GPU=true
+build:nvidia --cxxopt="-DUSE_GPU=1"
+build:nvidia --cxxopt="-DNVIDIA=1"
 
 # Build with profiling
 build:prof --linkopt=-lprofiler

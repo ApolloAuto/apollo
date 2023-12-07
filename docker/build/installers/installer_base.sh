@@ -194,3 +194,32 @@ function download_if_not_cached {
         error "Unknown schema for package \"$pkg_name\", url=\"$url\""
     fi
 }
+
+USE_AMD_GPU=0
+USE_NVIDIA_GPU=0
+
+function determine_gpu_use_host() {
+    if [[ "${TARGET_ARCH}" == "aarch64" ]]; then
+        if lsmod | grep -q "^nvgpu"; then
+            USE_NVIDIA_GPU=1
+        fi
+    elif [[ "${TARGET_ARCH}" == "x86_64" ]]; then
+        if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+            warning "No nvidia-smi found."
+        elif [[ -z "$(nvidia-smi)" ]]; then
+            warning "No NVIDIA GPU device found."
+        else
+            USE_NVIDIA_GPU=1
+        fi
+        if [[ ! -x "$(command -v rocm-smi)" ]]; then
+            warning "No rocm-smi found."
+        elif [[ -z "$(rocm-smi)" ]]; then
+            warning "No AMD GPU device found."
+        else
+            USE_AMD_GPU=1
+        fi
+    else
+        error "Unsupported CPU architecture: ${HOST_ARCH}"
+        exit 1
+    fi
+}

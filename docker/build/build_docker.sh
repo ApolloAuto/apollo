@@ -9,6 +9,11 @@ SUPPORTED_ARCHS=(
     aarch64
 )
 
+SUPPORTED_GPUS=(
+    amd
+    nvidia
+)
+
 SUPPORTED_STAGES=(
     base
     cyber
@@ -27,6 +32,7 @@ TARGET_GEOLOC="us"
 
 TARGET_DIST="stable"
 TARGET_ARCH=
+TARGET_GPU=
 TARGET_STAGE=
 
 DOCKERFILE=
@@ -62,6 +68,17 @@ function cpu_arch_support_check() {
     exit 1
 }
 
+function gpu_support_check() {
+    local gpu="$1"
+    for entry in "${SUPPORTED_GPUS[@]}"; do
+        if [[ "${entry}" == "${gpu}" ]]; then
+            return
+        fi
+    done
+    echo "Unsupported GPU: ${gpu}. Exiting..."
+    exit 1
+}
+
 function build_stage_check() {
     local stage="$1"
     for entry in "${SUPPORTED_STAGES[@]}"; do
@@ -76,12 +93,16 @@ function build_stage_check() {
 function determine_target_arch_and_stage() {
     local dockerfile="$(basename "$1")"
     IFS='.' read -ra __arr <<< "${dockerfile}"
-    if [[ ${#__arr[@]} -ne 3 ]]; then
-        echo "Expected dockerfile with name [prefix_]<target>.<arch>.dockerfile"
+    if [[ ${#__arr[@]} -ne 4 ]]; then
+        echo "Expected dockerfile with name [prefix_]<target>.<arch>.<gpu>.dockerfile"
         echo "Got ${dockerfile}. Exiting..."
         exit 1
     fi
     IFS=' '
+
+    local gpu="${__arr[2]}"
+    gpu_support_check "${gpu}"
+    TARGET_GPU="${gpu}"
 
     local arch="${__arr[1]}"
     cpu_arch_support_check "${arch}"
@@ -167,31 +188,52 @@ function determine_images_in_out_x86_64() {
 
     local cudnn_ver="${CUDNN_VERSION%%.*}"
     local trt_ver="${TENSORRT_VERSION%%.*}"
+    local arch
+    if [[ "${TARGET_GPU}" == "amd" ]]; then
+        arch="x86_64-amd"
+    elif [[ "${TARGET_GPU}" == "nvidia" ]]; then
+        arch="x86_64-nvidia"
+    fi
 
-    local base_image="${APOLLO_REPO}:cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}-x86_64"
+    local base_nvidia_image="${APOLLO_REPO}:cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}-${arch}"
+    local base_amd_image="rocm/dev-ubuntu-18.04:5.1.1-complete"
     if [[ "${stage}" == "base" ]]; then
-        IMAGE_IN="nvidia/cuda:${CUDA_LITE}-devel-ubuntu${UBUNTU_LTS}"
-        IMAGE_OUT="${base_image}"
-    elif [[ "${stage}" == "cyber" ]]; then
-        IMAGE_IN="${base_image}"
-        if [[ "${dist}" == "stable" ]]; then
-            IMAGE_OUT="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-${timestamp}"
+        if [[ "${TARGET_GPU}" == "nvidia" ]]; then
+            IMAGE_IN="nvidia/cuda:${CUDA_LITE}-devel-ubuntu${UBUNTU_LTS}"
+            IMAGE_OUT="${base_nvidia_image}"
         else
-            IMAGE_OUT="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-${timestamp}"
+            echo "The base Docker for AMD GPU is not ready. Exiting..."
+            exit 1
+        fi
+    elif [[ "${stage}" == "cyber" ]]; then
+        if [[ "${TARGET_GPU}" == "nvidia" ]]; then
+            IMAGE_IN="${base_nvidia_image}"
+        elif [[ "${TARGET_GPU}" == "amd" ]]; then
+            IMAGE_IN="${base_amd_image}"
+        fi
+
+        if [[ "${dist}" == "stable" ]]; then
+            IMAGE_OUT="${APOLLO_REPO}:cyber-${arch}-${UBUNTU_LTS}-${timestamp}"
+        else
+            IMAGE_OUT="${APOLLO_REPO}:cyber-${arch}-${UBUNTU_LTS}-testing-${timestamp}"
         fi
     elif [[ "${stage}" == "dev" ]]; then
         if [[ "${dist}" == "stable" ]]; then
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-${PREV_IMAGE_TIMESTAMP}"
-            IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${timestamp}"
+            IMAGE_IN="${APOLLO_REPO}:cyber-${arch}-${UBUNTU_LTS}-${PREV_IMAGE_TIMESTAMP}"
+            IMAGE_OUT="${APOLLO_REPO}:dev-${arch}-${UBUNTU_LTS}-${timestamp}"
         else
-            IMAGE_IN="${APOLLO_REPO}:cyber-x86_64-${UBUNTU_LTS}-testing-${PREV_IMAGE_TIMESTAMP}"
-            IMAGE_OUT="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-testing-${timestamp}"
+            IMAGE_IN="${APOLLO_REPO}:cyber-${arch}-${UBUNTU_LTS}-testing-${PREV_IMAGE_TIMESTAMP}"
+            IMAGE_OUT="${APOLLO_REPO}:dev-${arch}-${UBUNTU_LTS}-testing-${timestamp}"
         fi
     elif [[ "${stage}" == "runtime" ]]; then
         if [[ "${dist}" == "stable" ]]; then
+            if [[ "${TARGET_GPU}" == "amd" ]]; then
+                echo "AMD is not supported for runtime Docker. Exiting..."
+                exit 1
+            fi
             IMAGE_IN="nvidia/cuda:${CUDA_LITE}-runtime-ubuntu${UBUNTU_LTS}"
-            DEV_IMAGE_IN="${APOLLO_REPO}:dev-x86_64-${UBUNTU_LTS}-${PREV_IMAGE_TIMESTAMP}"
-            IMAGE_OUT="${APOLLO_REPO}:runtime-x86_64-${UBUNTU_LTS}-${timestamp}"
+            DEV_IMAGE_IN="${APOLLO_REPO}:dev-${arch}-${UBUNTU_LTS}-${PREV_IMAGE_TIMESTAMP}"
+            IMAGE_OUT="${APOLLO_REPO}:runtime-${arch}-${UBUNTU_LTS}-${timestamp}"
         else
             echo "Runtime Docker for Apollo Testing not ready. Exiting..."
             exit 1
@@ -210,7 +252,12 @@ function determine_images_in_out_aarch64() {
     local trt_ver="${TENSORRT_VERSION%%.*}"
 
     local BASE_FMT="l4t-cuda${CUDA_LITE}-cudnn${cudnn_ver}-trt${trt_ver}-devel-${UBUNTU_LTS}"
-    local CYBER_FMT="cyber-aarch64-${UBUNTU_LTS}"
+    local CYBER_FMT="cyber-aarch64-nvidia-${UBUNTU_LTS}"
+
+    if [[ "${TARGET_GPU}" == "amd" ]]; then
+        echo "ARM64 architecture is not supported for AMD GPU target. Exiting..."
+        exit 1
+    fi
 
     if [[ "${stage}" == "base" ]]; then
         # Ref: https://developer.nvidia.com/embedded/linux-tegra
@@ -221,7 +268,7 @@ function determine_images_in_out_aarch64() {
         IMAGE_OUT="${APOLLO_REPO}:${CYBER_FMT}-${timestamp}"
     elif [[ "${stage}" == "dev" ]]; then
         IMAGE_IN="${APOLLO_REPO}:${CYBER_FMT}-${PREV_IMAGE_TIMESTAMP}"
-        IMAGE_OUT="${APOLLO_REPO}:dev-aarch64-${UBUNTU_LTS}-${timestamp}"
+        IMAGE_OUT="${APOLLO_REPO}:dev-aarch64-nvidia-${UBUNTU_LTS}-${timestamp}"
     elif [[ "${stage}" == "runtime" ]]; then
         echo "Runtime Docker for AArch64 not ready yet. Exiting..."
         exit 1
@@ -423,4 +470,3 @@ function main() {
 }
 
 main "$@"
-

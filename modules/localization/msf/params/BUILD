@@ -20,4 +20,5 @@ filegroup(
         "*.yaml",
     ]),
 )
+
 apollo_package()

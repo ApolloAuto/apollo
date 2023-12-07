@@ -3,10 +3,10 @@
   <version>local</version>
   <description>
     The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
-    Prediction receives obstacle data along with basic perception information including positions, headings, velocities, 
+    Prediction receives obstacle data along with basic perception information including positions, headings, velocities,
     accelerations, and then generates predicted trajectories with probabilities for those obstacles.
   </description>
-  
+
   <maintainer email="apollo-support@baidu.com">Apollo</maintainer>
   <license>Apache License 2.0</license>
   <url type="website">https://www.apollo.auto/</url>

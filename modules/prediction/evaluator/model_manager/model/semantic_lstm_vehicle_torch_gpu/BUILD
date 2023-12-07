@@ -9,7 +9,7 @@ filegroup(
     srcs = glob([
         "conf/**",
         "data/**",
-    ])
+    ]),
 )
 
 apollo_plugin(
@@ -19,10 +19,14 @@ apollo_plugin(
     description = ":plugins.xml",
     deps = [
         "//cyber",
-        "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction:apollo_prediction",
-    ] + if_gpu(["@libtorch_gpu",], ["@libtorch_cpu",]),
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+    ] + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 apollo_package()
+
 cpplint()

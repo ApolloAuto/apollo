@@ -8,14 +8,14 @@ PREDICTION_COPTS = ["-DMODULE_NAME=\\\"prediction\\\""]
 
 apollo_component(
     name = "libprediction_component.so",
-    srcs = ["prediction_component.cc",],
-    hdrs = ["prediction_component.h",],
+    srcs = ["prediction_component.cc"],
+    hdrs = ["prediction_component.h"],
     copts = PREDICTION_COPTS,
     deps = [
+        ":apollo_prediction",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:util_tool",
-        ":apollo_prediction",
     ],
 )
 
@@ -40,21 +40,19 @@ apollo_cc_library(
         "//modules/prediction/proto:network_layers_cc_proto",
         "//modules/prediction/proto:network_model_cc_proto",
         "@eigen",
-    ]
+    ],
 )
 
 apollo_cc_library(
     name = "apollo_prediction",
-    copts = ["-fopenmp"] + PREDICTION_COPTS,
-    linkopts = ["-lgomp"],
     srcs = [
-        "common/prediction_system_gflags.cc",
         "common/environment_features.cc",
         "common/feature_output.cc",
         "common/junction_analyzer.cc",
-        "common/prediction_gflags.cc",
         "common/message_process.cc",
+        "common/prediction_gflags.cc",
         "common/prediction_map.cc",
+        "common/prediction_system_gflags.cc",
         "common/prediction_thread_pool.cc",
         "common/prediction_util.cc",
         "common/road_graph.cc",
@@ -172,14 +170,16 @@ apollo_cc_library(
         "submodules/predictor_submodule.h",
         "submodules/submodule_output.h",
     ] + if_aarch64(["common/affine_transform.h"]),
+    copts = ["-fopenmp"] + PREDICTION_COPTS,
+    linkopts = ["-lgomp"],
     deps = [
         ":apollo_prediction_network",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/filters",
         "//modules/common/math",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:common_util",
         "//modules/common/util:util_tool",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
@@ -205,7 +205,10 @@ apollo_cc_library(
         "@npp",
         "@opencv//:highgui",
         "@opencv//:imgcodecs",
-    ] + if_gpu(["@libtorch_gpu",], ["@libtorch_cpu",]),
+    ] + if_gpu(
+        ["@libtorch_gpu"],
+        ["@libtorch_cpu"],
+    ),
 )
 
 apollo_cc_binary(
@@ -319,11 +322,11 @@ apollo_cc_test(
     linkopts = [
         "-lgomp",
     ],
+    linkstatic = True,
     deps = [
         ":apollo_prediction",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -389,10 +392,10 @@ apollo_cc_test(
     linkopts = [
         "-lgomp",
     ],
+    linkstatic = True,
     deps = [
         ":apollo_prediction",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -474,8 +477,8 @@ apollo_cc_test(
         "//modules/prediction:prediction_data",
     ],
     deps = [
-        "//cyber",
         ":apollo_prediction",
+        "//cyber",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -551,11 +554,11 @@ apollo_cc_test(
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
     ],
+    linkstatic = True,
     deps = [
         ":apollo_prediction",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -712,7 +715,6 @@ apollo_cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-
 
 apollo_cc_test(
     name = "road_graph_test",

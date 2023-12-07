@@ -1,4 +1,5 @@
 load("//tools:apollo_package.bzl", "apollo_cc_binary", "apollo_cc_library", "apollo_cc_test", "apollo_component", "apollo_package")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -6,59 +7,54 @@ package(default_visibility = ["//visibility:public"])
 apollo_cc_library(
     name = "apollo_perception_common_base",
     srcs = [
+        "blob.cc",
+        "camera.cc",
         "distortion_model.cc",
+        "object.cc",
+        "object_pool_types.cc",
         "omnidirectional_model.cc",
         "point_cloud_util.cc",
         "polynomial.cc",
         "syncedmem.cc",
-        "object_pool_types.cc",
-        "blob.cc",
-        "object.cc",
-        "camera.cc",
     ],
     hdrs = [
+        "blob.h",
         "box.h",
-        "comparison_traits.h",
+        "camera.h",
         "common.h",
+        "comparison_traits.h",
+        "concurrent_object_pool.h",
         "distortion_model.h",
         "frame.h",
-        "point_cloud.h",
-        "radar_point_cloud.h",
         "frame_supplement.h",
-        "object_pool_types.h",
+        "hdmap_struct.h",
         "image.h",
         "image_8u.h",
         "impending_collision_edge.h",
-        "nms.h",
-        "omnidirectional_model.h",
-        "point.h",
-        "point_cloud_util.h",
-        "polynomial.h",
-        "syncedmem.h",
-        "traffic_light.h",
-        "test/test_helper.h",
-        "concurrent_object_pool.h",
-        "light_object_pool.h",
-        "object_pool.h",
-        "hdmap_struct.h",
         "landmark_struct.h",
         "lane_struct.h",
-        "sensor_meta.h",
-        "blob.h",
+        "light_object_pool.h",
+        "nms.h",
         "object.h",
+        "object_pool.h",
+        "object_pool_types.h",
         "object_supplement.h",
         "object_types.h",
+        "omnidirectional_model.h",
+        "point.h",
+        "point_cloud.h",
+        "point_cloud_util.h",
+        "polynomial.h",
+        "radar_point_cloud.h",
+        "sensor_meta.h",
+        "syncedmem.h",
+        "test/test_helper.h",
+        "traffic_light.h",
         "vehicle_struct.h",
-        "camera.h",
     ],
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
-        "@com_google_googletest//:gtest_main",
-        "@eigen",
-        "@local_config_cuda//cuda:cuda_headers",
-        "@local_config_cuda//cuda:cudart",
-        "@opencv//:imgproc",
         "//modules/common_msgs/basic_msgs:error_code_cc_proto",
         "//modules/common_msgs/basic_msgs:geometry_cc_proto",
         "//modules/common_msgs/basic_msgs:header_cc_proto",
@@ -71,7 +67,16 @@ apollo_cc_library(
         "//modules/common_msgs/prediction_msgs:lane_graph_cc_proto",
         "//modules/common_msgs/prediction_msgs:prediction_point_cc_proto",
         "@boost",
-    ],
+        "@com_google_googletest//:gtest_main",
+        "@eigen",
+        "@opencv//:imgproc",
+    ] + if_cuda([
+        "@local_config_cuda//cuda:cuda_headers",
+        "@local_config_cuda//cuda:cudart",
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 apollo_cc_test(
@@ -81,8 +86,11 @@ apollo_cc_test(
     deps = [
         ":apollo_perception_common_base",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 apollo_cc_test(
@@ -114,8 +122,11 @@ apollo_cc_test(
     deps = [
         ":apollo_perception_common_base",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cuda_headers",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:rocm_headers",
+    ]),
 )
 
 apollo_cc_test(
@@ -207,8 +218,11 @@ apollo_cc_test(
     deps = [
         ":apollo_perception_common_base",
         "@com_google_googletest//:gtest_main",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+    ]),
 )
 
 apollo_package()

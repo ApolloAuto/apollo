@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+
 # load("//tools/install:install.bzl", "install", "install_files", "install_src_files")
 load("//tools:apollo_package.bzl", "apollo_package")
 
@@ -48,7 +49,7 @@ filegroup(
 #         "//modules/localization/ndt/map_creation:install",
 #         "//modules/localization/common:install",
 #         ":testdata",
-#         "//modules/localization/proto:py_pb_localization" 
+#         "//modules/localization/proto:py_pb_localization"
 #     ],
 # )
 
@@ -60,7 +61,7 @@ filegroup(
 #         "//modules/localization/proto:localization_config_cc_proto",
 #         "//modules/localization/proto:measure_cc_proto",
 #         "//modules/localization/proto:rtk_config_cc_proto",
-#         "//modules/localization/proto:sins_pva_cc_proto", 
+#         "//modules/localization/proto:sins_pva_cc_proto",
 #     ],
 # )
 
@@ -104,4 +105,5 @@ filegroup(
 # )
 
 apollo_package()
+
 cpplint()

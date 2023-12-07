@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package", "apollo_plugin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,7 +7,7 @@ filegroup(
     name = "runtime_files",
     srcs = glob([
         "conf/**",
-    ])
+    ]),
 )
 
 apollo_plugin(
@@ -29,8 +29,8 @@ apollo_plugin(
         "stage_pre_cruise.h",
         "util.h",
     ],
-    description = ":plugins.xml",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    description = ":plugins.xml",
     deps = [
         "//cyber",
         "//modules/common/util:util_tool",
@@ -46,13 +46,12 @@ apollo_cc_test(
     name = "park_and_go_scenario_test",
     size = "small",
     srcs = ["park_and_go_scenario_test.cc"],
-    
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":park_and_go_scenario_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_cc_test(
@@ -64,14 +63,14 @@ apollo_cc_test(
         "stage_cruise_test.cc",
         "stage_pre_cruise_test.cc",
     ],
-    
     linkopts = ["-lgomp"],
+    linkstatic = True,
     deps = [
         ":park_and_go_scenario_lib",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = True,
 )
 
 apollo_package()
+
 cpplint()

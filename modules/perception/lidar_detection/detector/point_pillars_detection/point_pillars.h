@@ -50,8 +50,10 @@
 #include <vector>
 
 // headers in TensorRT
-#include "NvInfer.h"
-#include "NvOnnxParser.h"
+#if GPU_PLATFORM == NVIDIA
+  #include "NvInfer.h"
+  #include "NvOnnxParser.h"
+#endif
 #include "torch/script.h"
 #include "torch/torch.h"
 
@@ -71,6 +73,7 @@ namespace perception {
 namespace lidar {
 
 // Logger for TensorRT info/warning/errors
+#if GPU_PLATFORM == NVIDIA
 class Logger : public nvinfer1::ILogger {
  public:
   explicit Logger(Severity severity = Severity::kWARNING)
@@ -102,6 +105,13 @@ class Logger : public nvinfer1::ILogger {
 
   Severity reportable_severity;
 };
+#elif GPU_PLATFORM == AMD
+  class Logger {};
+namespace nvinfer1 {
+  class ICudaEngine {};
+  class IExecutionContext {};
+}
+#endif
 
 class PointPillars {
  private:

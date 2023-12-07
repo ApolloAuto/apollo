@@ -25,153 +25,170 @@ export HOST_OS="$(uname -s)"
 
 GEO_REGISTRY=
 function geo_specific_config() {
-    local geo="$1"
-    if [[ -z "${geo}" ]]; then
-        info "Use default GeoLocation settings"
-        return
-    fi
-    info "Setup geolocation specific configurations for ${geo}"
-    if [[ "${geo}" == "cn" ]]; then
-        info "GeoLocation settings for Mainland China"
-        GEO_REGISTRY="registry.baidubce.com"
-    else
-        info "GeoLocation settings for ${geo} is not ready, fallback to default"
-    fi
+  local geo="$1"
+  if [[ -z "${geo}" ]]; then
+    info "Use default GeoLocation settings"
+    return
+  fi
+  info "Setup geolocation specific configurations for ${geo}"
+  if [[ "${geo}" == "cn" ]]; then
+    info "GeoLocation settings for Mainland China"
+    GEO_REGISTRY="registry.baidubce.com"
+  else
+    info "GeoLocation settings for ${geo} is not ready, fallback to default"
+  fi
 }
 
 DOCKER_RUN_CMD="docker run"
 USE_GPU_HOST=0
+USE_AMD_GPU=0
+USE_NVIDIA_GPU=0
 
 function determine_gpu_use_host() {
-    if [[ "${HOST_ARCH}" == "aarch64" ]]; then
-        if lsmod | grep -q "^nvgpu"; then
-            USE_GPU_HOST=1
-        fi
-    elif [[ "${HOST_ARCH}" == "x86_64" ]]; then
-        if [[ ! -x "$(command -v nvidia-smi)" ]]; then
-            warning "No nvidia-smi found. CPU will be used"
-        elif [[ -z "$(nvidia-smi)" ]]; then
-            warning "No GPU device found. CPU will be used."
-        else
-            USE_GPU_HOST=1
-        fi
+  if [[ "${HOST_ARCH}" == "aarch64" ]]; then
+    if lsmod | grep -q "^nvgpu"; then
+      USE_GPU_HOST=1
+    fi
+  elif [[ "${HOST_ARCH}" == "x86_64" ]]; then
+    if [[ ! -x "$(command -v nvidia-smi)" ]]; then
+      warning "No nvidia-smi found."
+    elif [[ -z "$(nvidia-smi)" ]]; then
+      warning "No NVIDIA GPU device found."
     else
-        error "Unsupported CPU architecture: ${HOST_ARCH}"
-        exit 1
+      USE_NVIDIA_GPU=1
     fi
+    if [[ ! -x "$(command -v rocm-smi)" ]]; then
+      warning "No rocm-smi found."
+    elif [[ -z "$(rocm-smi)" ]]; then
+      warning "No AMD GPU device found."
+    else
+      USE_AMD_GPU=1
+    fi
+    if (($USE_NVIDIA_GPU == 1)) || (($USE_AMD_GPU == 1)); then
+      USE_GPU_HOST=1
+    else
+      USE_GPU_HOST=0
+      warning "No any GPU device found. CPU will be used instead."
+    fi
+  else
+    error "Unsupported CPU architecture: ${HOST_ARCH}"
+    exit 1
+  fi
 
-    local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
-    if [[ "${USE_GPU_HOST}" -eq 1 ]]; then
-        if [[ -x "$(which nvidia-container-toolkit)" || -x "$(which nvidia-container-runtime)" ]]; then
-            local docker_version
-            docker_version="$(docker version --format '{{.Server.Version}}')"
-            if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
-                if [[ "${HOST_ARCH}" == "aarch64" ]]; then
-                    DOCKER_RUN_CMD="docker run --runtime nvidia"
-                else
-                    DOCKER_RUN_CMD="docker run --gpus all"
-                fi
-            else
-                warning "Please upgrade to docker-ce 19.03+ to access GPU from container."
-                USE_GPU_HOST=0
-            fi
-        elif [[ -x "$(which nvidia-docker)" ]]; then
-            DOCKER_RUN_CMD="nvidia-docker run"
+  local nv_docker_doc="https://github.com/NVIDIA/nvidia-docker/blob/master/README.md"
+  if (($USE_NVIDIA_GPU == 1)); then
+    if [[ -x "$(which nvidia-container-toolkit)" || -x "$(which nvidia-container-runtime)" ]]; then
+      local docker_version
+      docker_version="$(docker version --format '{{.Server.Version}}')"
+      if dpkg --compare-versions "${docker_version}" "ge" "19.03"; then
+        if [[ "${HOST_ARCH}" == "aarch64" ]]; then
+          DOCKER_RUN_CMD="docker run --runtime nvidia"
         else
-            USE_GPU_HOST=0
-            warning "Cannot access GPU from within container. Please install latest Docker" \
-                "and NVIDIA Container Toolkit as described by: "
-            warning "  ${nv_docker_doc}"
+          DOCKER_RUN_CMD="docker run --gpus all"
         fi
+      else
+        warning "Please upgrade to docker-ce 19.03+ to access GPU from container."
+        USE_GPU_HOST=0
+      fi
+    elif [[ -x "$(which nvidia-docker)" ]]; then
+      DOCKER_RUN_CMD="nvidia-docker run"
+    else
+      USE_GPU_HOST=0
+      warning "Cannot access GPU from within container. Please install latest Docker" \
+        "and NVIDIA Container Toolkit as described by: "
+      warning "  ${nv_docker_doc}"
     fi
+  elif (($USE_AMD_GPU == 1)); then
+    DOCKER_RUN_CMD="docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
+  fi
 }
 
 function remove_container_if_exists() {
-    local container="$1"
-    if docker ps -a --format '{{.Names}}' | grep -q "${container}"; then
-        info "Removing existing Apollo container: ${container}"
-        docker stop "${container}" >/dev/null
-        docker rm -v -f "${container}" 2>/dev/null
-    fi
+  local container="$1"
+  if docker ps -a --format '{{.Names}}' | grep -q "${container}"; then
+    info "Removing existing Apollo container: ${container}"
+    docker stop "${container}" > /dev/null
+    docker rm -v -f "${container}" 2> /dev/null
+  fi
 }
 
 function postrun_start_user() {
-    local container="$1"
-    if [ "${CUSTOM_USER-$USER}" != "root" ]; then
-        docker exec -u root "${container}" \
-            bash -c '/apollo/scripts/docker_start_user.sh'
-    fi
+  local container="$1"
+  if [ "${CUSTOM_USER-$USER}" != "root" ]; then
+    docker exec -u root "${container}" \
+      bash -c '/apollo/scripts/docker_start_user.sh'
+  fi
 }
 
 function postrun_cross_platfrom_download() {
-    local container="$1"
-    local flag="$2"
-    if [[ "$flag" -eq 1 ]]; then
-        download_tegra_lib "${container}"
-    fi
+  local container="$1"
+  local flag="$2"
+  if [[ "$flag" -eq 1 ]]; then
+    download_tegra_lib "${container}"
+  fi
 }
 
 function download_tegra_lib() {
-    local container="$1"
-    local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
-    info "download external library for cross-compilation..."
-    docker exec -u root "${container}" \
-        bash -c "cd ~ && wget -nv ${tegra_lib_url} && tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null"
+  local container="$1"
+  local tegra_lib_url="https://apollo-pkg-beta.cdn.bcebos.com/archive/tegra.tar.gz"
+  info "download external library for cross-compilation..."
+  docker exec -u root "${container}" \
+    bash -c "cd ~ && wget -nv ${tegra_lib_url} && tar -xzvf ~/tegra.tar.gz -C /usr/lib/aarch64-linux-gnu/ > /dev/null"
 }
 
 function stop_all_apollo_containers() {
-    local force="$1"
-    local running_containers
-    # add a special field `...` as a separator
-    running_containers=($(docker inspect \
-      $(docker ps -q) \
-      --format '{{or .Config.Labels.owner "-"}}...{{.Name}}'))
-    for container in ${running_containers[*]}; do
-        owner="${container%%...*}"
-        name="${container##*...}"
-        # only stop containers created by current user
-        if [[ ("${owner}" == "${USER}") && ("${name}" =~ apollo_.*) ]]; then
-            info "Now stop container ${name} ..."
-            if docker stop "${name}" >/dev/null; then
-                if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
-                    docker rm -f "${name}" 2>/dev/null
-                fi
-                info "Done."
-            else
-                warning "Failed."
-            fi
+  local force="$1"
+  local running_containers
+  # add a special field `...` as a separator
+  running_containers=($(docker inspect \
+    $(docker ps -q) \
+    --format '{{or .Config.Labels.owner "-"}}...{{.Name}}'))
+  for container in ${running_containers[*]}; do
+    owner="${container%%...*}"
+    name="${container##*...}"
+    # only stop containers created by current user
+    if [[ ("${owner}" == "${USER}") && ("${name}" =~ apollo_.*) ]]; then
+      info "Now stop container ${name} ..."
+      if docker stop "${name}" > /dev/null; then
+        if [[ "${force}" == "-f" || "${force}" == "--force" ]]; then
+          docker rm -f "${name}" 2> /dev/null
         fi
-    done
+        info "Done."
+      else
+        warning "Failed."
+      fi
+    fi
+  done
 }
 
 # Check whether user has agreed license agreement
 function check_agreement() {
-    local agreement_record="${HOME}/.apollo_agreement.txt"
-    if [[ -e "${agreement_record}" ]]; then
-        return 0
-    fi
-    local agreement_file
-    agreement_file="${APOLLO_ROOT_DIR}/scripts/AGREEMENT.txt"
-    if [[ ! -f "${agreement_file}" ]]; then
-        error "AGREEMENT ${agreement_file} does not exist."
-        exit 1
-    fi
+  local agreement_record="${HOME}/.apollo_agreement.txt"
+  if [[ -e "${agreement_record}" ]]; then
+    return 0
+  fi
+  local agreement_file
+  agreement_file="${APOLLO_ROOT_DIR}/scripts/AGREEMENT.txt"
+  if [[ ! -f "${agreement_file}" ]]; then
+    error "AGREEMENT ${agreement_file} does not exist."
+    exit 1
+  fi
 
-    cat "${agreement_file}"
-    local tip="Type 'y' or 'Y' to agree to the license agreement above, \
+  cat "${agreement_file}"
+  local tip="Type 'y' or 'Y' to agree to the license agreement above, \
 or type any other key to exit:"
 
-    echo -n "${tip}"
-    local answer="$(read_one_char_from_stdin)"
-    echo
+  echo -n "${tip}"
+  local answer="$(read_one_char_from_stdin)"
+  echo
 
-    if [[ "${answer}" != "y" ]]; then
-        exit 1
-    fi
+  if [[ "${answer}" != "y" ]]; then
+    exit 1
+  fi
 
-    cp -f "${agreement_file}" "${agreement_record}"
-    echo "${tip}" >> "${agreement_record}"
-    echo "${user_agreed}" >> "${agreement_record}"
+  cp -f "${agreement_file}" "${agreement_record}"
+  echo "${tip}" >> "${agreement_record}"
+  echo "${user_agreed}" >> "${agreement_record}"
 }
 
 export -f geo_specific_config

@@ -1,4 +1,5 @@
 load("//tools/proto:proto.bzl", "apollo_py_binary")
+
 # load("//tools/install:install.bzl", "install")
 load("//tools:apollo_package.bzl", "apollo_package")
 

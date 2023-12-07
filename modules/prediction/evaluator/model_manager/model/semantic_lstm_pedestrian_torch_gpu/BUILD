@@ -1,6 +1,7 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:apollo_package.bzl", "apollo_package", "apollo_plugin")
 load("//tools/platform:build_defs.bzl", "if_aarch64", "if_gpu")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -9,7 +10,7 @@ filegroup(
     srcs = glob([
         "conf/**",
         "data/**",
-    ])
+    ]),
 )
 
 apollo_plugin(
@@ -19,10 +20,16 @@ apollo_plugin(
     description = ":plugins.xml",
     deps = [
         "//cyber",
-        "//modules/prediction/proto:prediction_conf_cc_proto",
         "//modules/prediction:apollo_prediction",
-    ] + if_gpu(["@libtorch_gpu",], ["@libtorch_cpu",]),
+        "//modules/prediction/proto:prediction_conf_cc_proto",
+    ] + if_gpu(
+        [
+            "@libtorch_gpu",
+        ],
+        ["@libtorch_cpu"],
+    ),
 )
 
 apollo_package()
+
 cpplint()

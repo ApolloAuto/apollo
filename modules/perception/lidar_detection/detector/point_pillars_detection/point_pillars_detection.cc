@@ -19,8 +19,6 @@
 #include <numeric>
 #include <random>
 
-#include <cuda_runtime_api.h>
-
 #include "cyber/common/log.h"
 #include "cyber/common/file.h"
 #include "modules/perception/common/util.h"

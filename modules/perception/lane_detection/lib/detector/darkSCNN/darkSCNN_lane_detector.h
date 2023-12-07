@@ -26,9 +26,13 @@
 #include "modules/perception/common/base/camera.h"
 #include "modules/perception/common/camera/common/camera_frame.h"
 #include "modules/perception/common/camera/common/data_provider.h"
-#include "modules/perception/common/inference/tensorrt/rt_net.h"
 #include "modules/perception/common/lib/registerer/registerer.h"
 #include "modules/perception/lane_detection/interface/base_lane_detector.h"
+#if GPU_PLATFORM == NVIDIA
+#include "modules/perception/common/inference/tensorrt/rt_net.h"
+#elif GPU_PLATFORM == AMD
+#include "modules/perception/comomn/inference/migraphx/mi_net.h"
+#endif
 
 namespace apollo {
 namespace perception {

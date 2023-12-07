@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_package", "apollo_cc_test")
+load("//tools:apollo_package.bzl", "apollo_cc_library", "apollo_cc_test", "apollo_package")
 
 apollo_cc_library(
     name = "monitor_log",

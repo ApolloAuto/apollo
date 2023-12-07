@@ -1,36 +1,41 @@
-load("@local_config_cuda//cuda:build_defs.bzl", "cuda_library")
 load("//tools:apollo_package.bzl", "apollo_cc_test", "apollo_package")
+load("//third_party/gpus:common.bzl", "gpu_library", "if_cuda", "if_rocm")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cuda_library(
+gpu_library(
     name = "apollo_perception_common_utils",
     srcs = [
-        "cuda_util.cu",
-        "util.cu",
-        "util.cc",
-        "resize.cu",
-        "gemm.cu",
         "binary_data.cc",
+        "cuda_util.cu",
+        "gemm.cu",
+        "resize.cu",
+        "util.cc",
+        "util.cu",
     ],
     hdrs = [
-        "cuda_util.h",
-        "util.h",
-        "resize.h",
-        "gemm.h",
         "binary_data.h",
+        "cuda_util.h",
+        "gemm.h",
+        "resize.h",
+        "util.h",
     ],
     deps = [
         "//cyber",
         "//modules/perception/common/base:apollo_perception_common_base",
-        "@eigen",
         "@boost",
+        "@eigen",
+        "@opencv//:imgcodecs",
+    ] + if_cuda([
         "@local_config_cuda//cuda:cudart",
         "@local_config_cuda//cuda:cublas",
         "@local_config_tensorrt//:tensorrt",
-        "@opencv//:imgcodecs",
-    ],
+    ]) + if_rocm([
+        "@local_config_rocm//rocm:hip",
+        "@local_config_rocm//rocm:migraphx",
+        "@local_config_rocm//rocm:hipblas",
+    ]),
     alwayslink = True,
 )
 
@@ -63,4 +68,5 @@ apollo_cc_test(
 )
 
 apollo_package()
+
 cpplint()
