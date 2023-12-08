@@ -783,6 +783,10 @@ bool HybridAStar::Plan(
     const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
+    if (current_node->IsVisited()) {
+      continue;
+    }
+    current_node->SetVisited();
     // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
@@ -807,14 +811,21 @@ bool HybridAStar::Plan(
       if (!ValidityCheck(next_node)) {
         continue;
       }
+      const double start_time = Clock::NowInSeconds();
+      CalculateNodeCost(current_node, next_node);
+      const double end_time = Clock::NowInSeconds();
+      heuristic_time += end_time - start_time;
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         explored_node_num++;
-        const double start_time = Clock::NowInSeconds();
-        CalculateNodeCost(current_node, next_node);
-        const double end_time = Clock::NowInSeconds();
-        heuristic_time += end_time - start_time;
         open_set_.emplace(next_node->GetIndex(), next_node);
         open_pq_.emplace(next_node->GetIndex(), next_node->GetCost());
+      } else {
+        std::shared_ptr<Node3d>& update_node = open_set_[next_node->GetIndex()];
+        if (next_node->GetTrajCost() < update_node->GetTrajCost()) {
+          open_set_.erase(next_node->GetIndex());
+          open_set_.emplace(next_node->GetIndex(), next_node);
+          open_pq_.emplace(next_node->GetIndex(), next_node->GetCost());
+        }
       }
     }
   }
