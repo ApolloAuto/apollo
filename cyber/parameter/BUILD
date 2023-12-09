@@ -18,7 +18,7 @@ cc_library(
         "//cyber/message:protobuf_factory",
         "//cyber/proto:parameter_cc_proto",
     ],
-    alwayslink = True,
+    # alwayslink = True,
 )
 
 cc_test(
