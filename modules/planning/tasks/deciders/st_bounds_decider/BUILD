@@ -14,6 +14,7 @@ cc_library(
         ":st_guide_line",
         ":st_obstacles_processor",
         "//modules/common/status",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:st_graph_data",
